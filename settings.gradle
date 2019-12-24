@@ -2,5 +2,4 @@
 // Gradle Settings
 //////////////////////////////////////////////////
 
-// TODO: Set project proper name.
-rootProject.name = "Example"
+rootProject.name = "Capable-Cables"

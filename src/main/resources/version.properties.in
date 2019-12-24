@@ -2,5 +2,4 @@
 # Version Properties
 ##################################################
 # suppress inspection "UnusedProperty" for whole file
-# TODO: (Optional) Remove version properties.
 ${modid}.version=${version}
