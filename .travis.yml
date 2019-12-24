@@ -14,14 +14,14 @@ env:
   matrix:
     - BUILD_TYPE=DEBUG
     - BUILD_TYPE=RELEASE
-    - BUILD_TYPE=DEBUG UPDATE=false
-    - BUILD_TYPE=RELEASE UPDATE=false
+    - BUILD_TYPE=DEBUG UPDATE=true
+    - BUILD_TYPE=RELEASE UPDATE=true
 
 matrix:
   fast_finish: true
   allow_failures:
-    - env: BUILD_TYPE=DEBUG
-    - env: BUILD_TYPE=RELEASE
+    - env: BUILD_TYPE=DEBUG UPDATE=true
+    - env: BUILD_TYPE=RELEASE UPDATE=true
 
 before_install:
   - chmod +x ./gradlew

@@ -10,7 +10,7 @@ String rootDir = name == "buildSrc" ? "$rootDir${File.separator}.." : rootDir
 project.ext {
     // Arguments
     buildType = parseArgument "buildType", "BUILD_TYPE", "DEBUG"
-    update = parseArgument("update", "UPDATE", true).toBoolean()
+    update = parseArgument("update", "UPDATE", false).toBoolean()
     strictDigestCheck = parseArgument("strictDigestCheck", "STRICT_DIGEST_CHECK", false).toBoolean()
 
     // Variables

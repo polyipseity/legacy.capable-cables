@@ -2,6 +2,11 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
+      <module name="Capable-Cables.api" target="1.8" />
+      <module name="Capable-Cables.buildSrc.main" target="1.8" />
+      <module name="Capable-Cables.buildSrc.test" target="1.8" />
+      <module name="Capable-Cables.main" target="1.8" />
+      <module name="Capable-Cables.test" target="1.8" />
       <module name="Capable_Cables.api" target="1.8" />
       <module name="Capable_Cables.buildSrc.main" target="1.8" />
       <module name="Capable_Cables.buildSrc.test" target="1.8" />

@@ -21,6 +21,7 @@ buildscript {
 
 plugins {
     id "java"
+    id "scala"
     id "eclipse"
     id "idea"
 }
@@ -44,6 +45,14 @@ repositories {
         name = "Sonatype Snapshots"
         url = "https://oss.sonatype.org/content/repositories/snapshots"
     }
+    maven {
+        name = "Chicken Bones"
+        url = "http://chickenbones.net/maven/"
+    }
+    maven {
+        name = "DVS1"
+        url = "http://dvs1.progwml6.com/files/maven"
+    }
 }
 
 loadExt "$rootDir${File.separator}buildSrc${File.separator}ext.properties"
@@ -52,7 +61,7 @@ ext {
     minecraftVersions = (minecraftVersion as String).split("\\.")
     minecraftMajor = minecraftVersions.first().toInteger()
     minecraftMinor = minecraftVersions[1].toInteger()
-    minecraftVersionRange = "[${minecraftMinor == 0 ? minecraftMajor - 1 : minecraftMajor}.${minecraftMinor == 0 ? 99 : minecraftMinor - 1},$minecraftVersion]"
+    minecraftVersionRange = "[${minecraftMinor == 0 ? minecraftMajor - 1 : minecraftMajor}.${minecraftMinor == 0 ? Integer.MAX_VALUE : minecraftMinor - 1},$minecraftVersion]"
 
     majorMod = majorMod.toInteger()
     majorApi = majorApi.toInteger()
@@ -125,12 +134,11 @@ dependencies {
 
     /*
     'compile' is superseded by 'implementation'.
+    'provided' is superseded by 'compileOnly'.
     'runtime' is superseded by 'runtimeOnly'.
-    'testCompile' is superseded by 'testImplementation'.
-    'testRuntime' is superseded by 'testRuntimeOnly'.
      */
 }
-stringToStringMap(customDependencies).each { String k, String v -> dependencies.add(k, v) }
+stringToStringMap(customDependencies).each { String k, String v -> dependencies.add(k, new GroovyShell(new Binding(ext.properties)).evaluate("\"\"\"$v\"\"\"")) }
 
 sourceSets {
     main {
@@ -162,7 +170,7 @@ processResources {
 task processResourcesConfig(type: Copy, group: "config", description: "Process resources at configuration time.") {
     // this will ensure that this task is redone when the variables change.
     inputs.property "modId", modId
-    inputs.property "name", project.name
+    inputs.property "name", name_
     inputs.property "description", project.description
     inputs.property "version", version
     inputs.property "minecraftVersion", project.minecraft.version
@@ -235,7 +243,7 @@ artifacts {
     archives tasks.javadocJar
 }
 
-task saveCurrentGoodSettings(group: "build", description: "Saves current good settings to \'$lastGoodSettingsPath\'.", dependsOn: "build") {
+task saveCurrentGoodSettings(group: "build", description: "Saves current good settings to \'$lastGoodSettingsPath\'.") {
     outputs.file lastGoodSettingsPath
 
     doLast {
