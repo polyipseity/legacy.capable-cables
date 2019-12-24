@@ -1,0 +1,281 @@
+//////////////////////////////////////////////////
+// Gradle Build Script
+//////////////////////////////////////////////////
+
+import groovy.json.JsonBuilder
+
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            name = "Minecraft Forge"
+            url = "https://files.minecraftforge.net/maven"
+        }
+    }
+
+    dependencies {
+        classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+    }
+    // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+}
+
+plugins {
+    id "java"
+    id "eclipse"
+    id "idea"
+}
+apply plugin: "net.minecraftforge.gradle.forge"
+
+apply from: "$rootDir${File.separator}gradle${File.separator}utilities.gradle"
+apply from: "$rootDir${File.separator}gradle${File.separator}global.gradle"
+apply from: "$rootDir${File.separator}gradle${File.separator}io${File.separator}properties${File.separator}properties.gradle"
+apply from: "$rootDir${File.separator}gradle${File.separator}io${File.separator}properties${File.separator}ext.properties.gradle"
+
+repositories {
+    /*
+    jcenter()
+    maven {
+        name = "Minecraft Forge"
+        url = "https://files.minecraftforge.net/maven"
+    }
+    */
+    mavenCentral()
+    maven {
+        name = "Sonatype Snapshots"
+        url = "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+}
+
+loadExt "$rootDir${File.separator}buildSrc${File.separator}ext.properties"
+ext {
+    minecraftVersion = (minecraftForgeVersion as String).split("-").first()
+    minecraftVersions = (minecraftVersion as String).split("\\.")
+    minecraftMajor = minecraftVersions.first().toInteger()
+    minecraftMinor = minecraftVersions[1].toInteger()
+    minecraftVersionRange = "[${minecraftMinor == 0 ? minecraftMajor - 1 : minecraftMajor}.${minecraftMinor == 0 ? 99 : minecraftMinor - 1},$minecraftVersion]"
+
+    majorMod = majorMod.toInteger()
+    majorApi = majorApi.toInteger()
+    minor = minor.toInteger()
+    patch = patch.toInteger()
+    this."final" = this."final".toBoolean()
+    pre = pre.toBoolean()
+    releaseCandidate = releaseCandidate.toInteger()
+    if (this."final" && pre) throw new IllegalArgumentException("\'final\' and \'pre\' are both 'true'!")
+    if ((this."final" || pre) && releaseCandidate != 0) throw new IllegalArgumentException("\'${this."final" ? "final" : "pre"}\' is \'true\' while \'releaseCandidate\' is not \'0\' but \'$releaseCandidate\'.")
+
+    authorList = stringToStringList authorList_
+    screenshots = stringToStringList screenshots_
+    requiredMods = stringToStringList requiredMods_
+    dependencies = stringToStringList dependencies_
+    dependants = stringToStringList dependencies_
+}
+
+version = "${minecraftVersion}-${majorMod}.${majorApi}.${minor}.${patch}${project.ext."final" ? "-final" : pre ? "-beta" : releaseCandidate != 0 ? "-rc$releaseCandidate" : ""}"
+group = group_ // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = project.name
+description = description_
+
+// Need this here so eclipse task generates correctly.
+sourceCompatibility = targetCompatibility = 1.8
+
+minecraft {
+    version = minecraftForgeVersion
+    runDir = runDir
+
+    // the mappings can be changed at any time, and must be in the following format.
+    // snapshot_YYYYMMDD   snapshot are built nightly.
+    // stable_#            stables are built at the discretion of the MCP team.
+    // Use non-default mappings at your own risk. they may not always work.
+    // simply re-run your setup task after changing the mappings to update your workspace.
+    mappings = minecraftMappings
+    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+
+    // srgExtra "PK: org/ejml your/new/package/here/ejml" // shading example
+}
+tasks.runClient.outputs.upToDateWhen { false }
+tasks.runServer.outputs.upToDateWhen { false }
+
+configurations {
+    shade
+    compile.extendsFrom shade
+}
+
+dependencies {
+    // you may put jars on which you depend on in ./libs
+    // or you may define them like so..
+    //compile "some.group:artifact:version:classifier"
+    //compile "some.group:artifact:version"
+
+    // real examples
+    //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
+    //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
+
+    // the 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
+    //provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+    // the deobf configurations:  'deobfCompile' and 'deobfProvided' are the same as the normal compile and provided,
+    // except that these dependencies get remapped to your current MCP mappings
+    //deobfCompile 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+    //deobfProvided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+    // for more info...
+    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
+    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+    /*
+    'compile' is superseded by 'implementation'.
+    'runtime' is superseded by 'runtimeOnly'.
+    'testCompile' is superseded by 'testImplementation'.
+    'testRuntime' is superseded by 'testRuntimeOnly'.
+     */
+}
+stringToStringMap(customDependencies).each { String k, String v -> dependencies.add(k, v) }
+
+sourceSets {
+    main {
+        resources {
+            exclude "*.in"
+        }
+    }
+    test
+    api
+}
+
+static Map<String, Object> processReplaceKeys(Map<String, Object> m) { return m.collectEntries { k, v -> ["\${$k}".toString(), v]} as Map<String, Object> }
+sourceMainJava {
+    include "${project.name}.java"
+
+    //noinspection GroovyAssignabilityCheck
+    replace processReplaceKeys(["modid"                 : modId,
+                                "minecraftVersionRange" : minecraftVersionRange,
+                                "certificateFingerprint": certificateFingerprint])
+}
+
+static <E> String processResourcesList(List<E> l) { l.empty ? "[]" : l.toListString().replace("[", "[\"").replace("]", "\"]").replace(", ", "\", \"") }
+processResources {
+    // copy everything else except the processed files
+    from(sourceSets.main.resources.srcDirs) {
+        exclude "*.in"
+    }
+}
+task processResourcesConfig(type: Copy, group: "config", description: "Process resources at configuration time.") {
+    // this will ensure that this task is redone when the variables change.
+    inputs.property "modId", modId
+    inputs.property "name", project.name
+    inputs.property "description", project.description
+    inputs.property "version", version
+    inputs.property "minecraftVersion", project.minecraft.version
+    inputs.property "url", url
+    inputs.property "updateUrl", updateUrl
+    inputs.property "updateJSON", updateJSON
+    inputs.property "authorList", processResourcesList(authorList as List<String>)
+    inputs.property "credits", credits
+    inputs.property "logoFile", logoFile
+    inputs.property "screenshots", processResourcesList(screenshots as List<String>)
+    inputs.property "parent", parent_
+    inputs.property "requiredMods", processResourcesList(requiredMods as List<String>)
+    inputs.property "dependencies", processResourcesList(project.ext.dependencies as List<String>)
+    inputs.property "dependants", processResourcesList(dependants as List<String>)
+    inputs.property "pack_format", pack_format
+
+    into sourceSets.main.resources.sourceDirectories.find { f -> f.list().find { s -> s.matches ~/.*\.in/ } }
+
+    // replace stuff in the to-be-processed files, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include "*.in"
+        rename ~/(.*)\.in/, "\$1"
+
+        // replace variables
+        expand "modid": inputs.properties.modId,
+                "name": inputs.properties.name,
+                "description": inputs.properties.description,
+                "version": inputs.properties.version,
+                "minecraftVersion": inputs.properties.minecraftVersion,
+                "url": inputs.properties.url,
+                "updateUrl": inputs.properties.updateUrl,
+                "updateJSON": inputs.properties.updateJSON,
+                "authorList": inputs.properties.authorList,
+                "credits": inputs.properties.credits,
+                "logoFile": inputs.properties.logoFile,
+                "screenshots": inputs.properties.screenshots,
+                "parent": inputs.properties.parent,
+                "requiredMods": inputs.properties.requiredMods,
+                "dependencies": inputs.properties.dependencies,
+                "dependants": inputs.properties.dependants,
+                "pack_format": inputs.properties.pack_format
+    }
+}
+tasks.processResourcesConfig.actions.each { a -> a.execute(tasks.processResourcesConfig) }
+processTestResources {
+    from sourceSets.test.resources.srcDirs
+}
+processApiResources {
+    from sourceSets.api.resources.srcDirs
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "started", "passed", "skipped", "failed", "standard_out", "standard_error"
+    }
+}
+
+task deobfJar(type: Jar, dependsOn: 'jar') {
+    from "build/source/main"
+    classifier "dev"
+}
+task javadocJar(type: Jar, dependsOn: 'javadoc') {
+    from "build/docs/javadoc"
+    classifier "javadoc"
+}
+artifacts {
+    archives tasks.deobfJar
+    archives tasks.sourceJar
+    archives tasks.javadocJar
+}
+
+task saveCurrentGoodSettings(group: "build", description: "Saves current good settings to \'$lastGoodSettingsPath\'.", dependsOn: "build") {
+    outputs.file lastGoodSettingsPath
+
+    doLast {
+        File file = file lastGoodSettingsPath
+        createNewFile file
+
+        Wrapper wrapper = tasks.wrapper as Wrapper
+        Map<String, Object> json = [
+                gradle: [ distributionUrl: wrapper.distributionUrl.replace(wrapper.distributionType.name().toLowerCase(Locale.ROOT), Wrapper.DistributionType.ALL.name().toLowerCase(Locale.ROOT)) ],
+                dependencies: [],
+                minecraft: [
+                        version: minecraftForgeVersion,
+                        mappings: minecraftMappings
+                ]
+        ]
+        configurations.each { configuration ->
+            if (configuration.canBeResolved) configuration.resolvedConfiguration.firstLevelModuleDependencies.each { dependency -> json.dependencies.add([configuration: configuration.name, group: dependency.moduleGroup, name: dependency.moduleName, version: dependency.moduleVersion]) }
+            else configuration.dependencies.each { dependency -> json.dependencies.add([configuration: configuration.name, group: dependency.group, name: dependency.name, version: dependency.version]) }
+        }
+        String jsonText = new JsonBuilder(json).toPrettyString()
+
+        file.write jsonText
+        logger.info "\'${convertToCanonicalPath lastGoodSettingsPath}\':"
+        logger.info jsonText
+    }
+}
+tasks.build.finalizedBy "saveCurrentGoodSettings"
+task cleanCacheAutomatically(type: Delete, group: "build", description: "Clean old items from cache to reduce space usage.", dependsOn: "saveCurrentGoodSettings") {
+    // Gradle
+    gradle.gradleUserHomeDir.eachDir { directory -> directory.eachDirMatch(~/[0-9]+[.-][0-9.+-]+"/) { subdirectory -> if (subdirectory.name != gradle.gradleVersion) delete subdirectory } }
+
+    // Minecraft
+    String minecraftCachePath = "$gradle.gradleUserHomeDir.absolutePath${File.separator}caches${File.separator}minecraft"
+    // Minecraft Coder Pack
+    File mcpDir = file("$minecraftCachePath${File.separator}de${File.separator}oceanlabs${File.separator}mcp${File.separator}mcp_snapshot")
+    if (mcpDir.exists()) mcpDir.eachDir { directory -> if ("snapshot_$directory.name".toString() != minecraftMappings) delete directory }
+    // Minecraft Forge
+    File minecraftForgeDir = file("$minecraftCachePath${File.separator}net${File.separator}minecraftforge${File.separator}forge")
+    if (minecraftForgeDir.exists()) minecraftForgeDir.eachDir { directory -> if (directory.name != minecraftForgeVersion) delete directory }
+}
+tasks.saveCurrentGoodSettings.finalizedBy "cleanCacheAutomatically"
+
+storeExt()

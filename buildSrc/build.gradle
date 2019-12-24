@@ -1,0 +1,144 @@
+//////////////////////////////////////////////////
+// Gradle Build Script
+//////////////////////////////////////////////////
+
+import groovy.json.JsonSlurper
+import org.codehaus.groovy.runtime.GStringImpl
+import org.gradle.util.VersionNumber
+
+import java.security.DigestException
+import java.security.MessageDigest
+import java.text.SimpleDateFormat
+
+String rootDir = "$projectDir${File.separator}.."
+
+apply from: "$rootDir${File.separator}gradle${File.separator}utilities.gradle"
+apply from: "$rootDir${File.separator}gradle${File.separator}global.gradle"
+apply from: "$rootDir${File.separator}gradle${File.separator}io${File.separator}properties${File.separator}properties.gradle"
+apply from: "$rootDir${File.separator}gradle${File.separator}io${File.separator}properties${File.separator}ext.properties.gradle"
+
+(loadProperties("$rootDir${File.separator}gradle.properties").findAll { key, value -> key.contains "org.gradle.project."}).each { key, value -> project.ext."${key.replace "org.gradle.project.", ""}" = value}
+ext {
+    gradleVersionsUrl = "https://services.gradle.org/versions"
+    gradleLatestReleaseNightlyJsonUrl = "$gradleVersionsUrl/release-nightly" as GStringImpl
+    gradleLatestNightlyJsonUrl = "$gradleVersionsUrl/nightly" as GStringImpl
+    gradleAllJsonUrl = "$gradleVersionsUrl/all" as GStringImpl
+    gradleDependenciesDirectory = "$repositoryDirectory${File.separator}org${File.separator}gradle${File.separator}gradle" as GStringImpl
+    gradleLatestReleaseNightlyJsonPath = "$gradleDependenciesDirectory${File.separator}release-nightly.json" as GStringImpl
+    gradleLatestNightlyJsonPath = "$gradleDependenciesDirectory${File.separator}nightly.json" as GStringImpl
+    gradleAllJsonPath = "$gradleDependenciesDirectory${File.separator}all.json" as GStringImpl
+
+    minecraftForgeMavenMetadataXmlUrl = "https://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml"
+    minecraftForgeDependenciesDirectory = "$repositoryDirectory${File.separator}net${File.separator}minecraftforge${File.separator}forge" as GStringImpl
+    minecraftForgeMavenMetadataXmlPath = "$minecraftForgeDependenciesDirectory${File.separator}maven-metadata.xml" as GStringImpl
+}
+
+boolean checkMavenMetadata(String metadataUrl, File metadataFile, String properAlgorithmName, String algorithmName) {
+    File file = file "$metadataFile.absolutePath.$algorithmName"
+    String url = "$metadataUrl.$algorithmName"
+    try { download url, file } catch (FileNotFoundException ex) {
+        logger.log LogLevel.WARN, "$properAlgorithmName file \'$url\' for \'$metadataUrl\' not found."
+        if (strictDigestCheck) throw ex
+        else ex.printStackTrace()
+        return true
+    }
+    String digest = MessageDigest.getInstance(properAlgorithmName).digest(metadataFile.bytes).encodeHex().toString()
+    String expected = file.text.trim()
+    if (expected.equalsIgnoreCase(digest)) return true
+    else {
+        if (strictDigestCheck) throw new DigestException("\'$metadataUrl\' $properAlgorithmName is '$digest', which is different from $properAlgorithmName '$expected' from '$url'.")
+        else logger.log LogLevel.WARN, "\'$metadataUrl\' $properAlgorithmName is '$digest', which is different from $properAlgorithmName '$expected' from '$url'."
+        return false
+    }
+}
+String getLatestVersionMaven(String metadataUrl, String metadataPath, String filter) {
+    File metadataFile = file metadataPath
+    download metadataUrl, metadataFile
+
+    if (!(checkMavenMetadata(metadataUrl, metadataFile, "MD5", "md5") && checkMavenMetadata(metadataUrl, metadataFile, "SHA-1", "sha1"))) {
+        def json = parseLastGoodSettings false
+        String name = metadataUrl.reverse().find("\\/.+?\\/").replace("/", "").reverse()
+        String ret = (json.dependencies.find { dependency -> dependency.name == name }).version
+        logger.log LogLevel.WARN, "Using version \'$ret\' of \'$name\' instead of the latest."
+        return ret
+    }
+
+    List<String> versions = new XmlSlurper().parse(metadataFile).versioning.versions.children().list().collect { v -> v.text() }
+    List<VersionNumber> filtered = versions.findAll { v -> v.contains(filter) }.collect { v -> VersionNumber.parse(v as String) }.sort()
+    return filtered.empty ? versions.collect { v -> VersionNumber.parse(v as String) }.sort().last() : filtered.last()
+}
+void updateGradleWrapperDistributionUrl(String newDistributionUrl) {
+    Wrapper wrapper = tasks.wrapper as Wrapper
+    Properties properties = new Properties()
+    File propertiesFile = file wrapper.propertiesFile.absolutePath.replace("buildSrc", "")
+    FileInputStream fis = new FileInputStream(propertiesFile)
+    try { properties.load fis } finally { fis.close() }
+    String oldDistributionUrl = properties.distributionUrl
+    newDistributionUrl = newDistributionUrl.replace Wrapper.DistributionType.BIN.name().toLowerCase(Locale.ROOT), Wrapper.DistributionType.ALL.name().toLowerCase(Locale.ROOT)
+    URL newDistribution = new URL(newDistributionUrl)
+    HttpURLConnection huc = newDistribution.openConnection() as HttpURLConnection
+    huc.requestMethod = "HEAD"
+    if (huc.responseCode != HttpURLConnection.HTTP_OK) throw new FileNotFoundException("\'$newDistributionUrl\' returns \'$huc.responseCode\' instead of \'$HttpURLConnection.HTTP_OK\'.")
+    if (new URL(oldDistributionUrl) != newDistribution) {
+        properties.distributionUrl = newDistributionUrl
+        FileOutputStream fos = new FileOutputStream(propertiesFile)
+        try { properties.store fos, null } finally { fos.close() }
+        throw new IllegalStateException("Gradle wrapper distribution URL updated from \'$oldDistributionUrl\' to \'$newDistributionUrl\'. Re-run the build with the same command to apply the changes.")
+    }
+}
+Object parseLastGoodSettings(boolean print) {
+    File jsonFile = file lastGoodSettingsPath
+    if (!jsonFile.exists()) throw new FileNotFoundException("'$lastGoodSettingsPath' not found. Obtain '$lastGoodSettingsPath' from the repository.")
+    String jsonText = jsonFile.text
+    if (print) {
+        logger.info "\'${convertToCanonicalPath lastGoodSettingsPath}\':"
+        logger.info jsonText
+    }
+    return new JsonSlurper().parseText(jsonText)
+}
+
+if (update) {
+    if (gradleDistributionUrl == "latest") {
+        JsonSlurper jsonSlurper = new JsonSlurper()
+
+        File gradleLatestReleaseNightlyJsonFile = file gradleLatestReleaseNightlyJsonPath
+        download gradleLatestReleaseNightlyJsonUrl.toString(), gradleLatestReleaseNightlyJsonFile
+        def json = jsonSlurper.parse gradleLatestReleaseNightlyJsonFile
+
+        if (json.broken) {
+            File gradleLatestNightlyJsonFile = file gradleLatestNightlyJsonPath
+            download gradleLatestNightlyJsonUrl.toString(), gradleLatestNightlyJsonFile
+            json = jsonSlurper.parse gradleLatestNightlyJsonFile
+
+            if (json.broken) {
+                File gradleAllJsonFile = file gradleAllJsonPath
+                download gradleAllJsonUrl.toString(), gradleAllJsonFile
+                json = jsonSlurper.parse gradleAllJsonFile
+
+                Map<String, Object> temp
+                for (Map<String, Object> gradleDistributionJson : json as List<Map<String, Object>>) {
+                    if (!gradleDistributionJson.broken) {
+                        temp = gradleDistributionJson
+                        break
+                    }
+                }
+                if (temp != null) json = temp
+                else throw new FileNotFoundException("Cannot find a working Gradle distribution from \'$gradleAllJsonUrl\'.")
+            }
+        }
+        updateGradleWrapperDistributionUrl project.ext.gradleDistributionUrl = (json.downloadUrl as String).replace("bin", "all")
+    } else updateGradleWrapperDistributionUrl gradleDistributionUrl.toString()
+
+    project.ext.minecraftForgeVersion = getLatestVersionMaven minecraftForgeMavenMetadataXmlUrl.toString(), minecraftForgeMavenMetadataXmlPath.toString(), minecraftForgeVersion
+    if (minecraftMappings == "latest") project.ext.minecraftMappings = "snapshot_${new SimpleDateFormat("yyyyMMdd").format(Calendar.instance.time.previous())}"
+} else {
+    logger.lifecycle "Applying last good settings from \'${convertToCanonicalPath lastGoodSettingsPath}\'..."
+    def json = parseLastGoodSettings true
+
+    updateGradleWrapperDistributionUrl project.ext.gradleDistributionUrl = json.gradle.distributionUrl as String
+    gradle.projectsLoaded { json.dependencies.each { dependency -> dependencies.add dependency.configuration as String, "$dependency.group:$dependency.name:$dependency.version" as String, { force = true } } }
+    project.ext.minecraftForgeVersion = json.minecraft.version
+    project.ext.minecraftMappings = json.minecraft.mappings
+}
+
+storeExt()

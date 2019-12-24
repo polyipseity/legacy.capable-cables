@@ -1,0 +1,19 @@
+import org.codehaus.groovy.runtime.GStringImpl
+
+//////////////////////////////////////////////////
+// Global
+//////////////////////////////////////////////////
+
+if (!project.ext.has("parseArgument")) throw new IllegalStateException("Apply 'utilities.gradle' before applying 'global.gradle'.")
+String rootDir = name == "buildSrc" ? "$rootDir${File.separator}.." : rootDir
+
+project.ext {
+    // Arguments
+    buildType = parseArgument "buildType", "BUILD_TYPE", "DEBUG"
+    update = parseArgument("update", "UPDATE", true).toBoolean()
+    strictDigestCheck = parseArgument("strictDigestCheck", "STRICT_DIGEST_CHECK", false).toBoolean()
+
+    // Variables
+    lastGoodSettingsPath = "$rootDir${File.separator}gradle${File.separator}last-good-settings.json" as GStringImpl
+    repositoryDirectory = "$buildDir${File.separator}repo" as GStringImpl
+}

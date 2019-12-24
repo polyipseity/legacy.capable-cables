@@ -1,0 +1,30 @@
+//////////////////////////////////////////////////
+// Utilities
+//////////////////////////////////////////////////
+
+import java.nio.channels.Channels
+
+// Arguments
+project.ext.parseArgument = { String k, String envK, Object defaultV = null ->
+    project.hasProperty(k) ? project."$k" : System.getenv(envK) != null ? System.getenv(envK) : defaultV
+}
+
+// Lists & Maps
+project.ext.stringToStringList = { String s -> s == "[]" ? [] : s.substring(1, s.length() - 1).split(",", 0).collect { e -> e.trim() } }
+project.ext.stringToStringMap = { String s -> s == "[]" ? [] : s.substring(1, s.length() - 1).split(",", 0).collectEntries { String v -> v.trim().split(":", 2).collect { String v2 -> v2.trim() } } }
+
+// I/O
+project.ext.createNewFile = { File f ->
+    f.parentFile.mkdirs()
+    f.createNewFile()
+}
+project.ext.download = { String url, File dest ->
+    createNewFile dest
+    FileOutputStream fos = new FileOutputStream(dest)
+    long ret = 0
+    try { ret = fos.channel.transferFrom(Channels.newChannel(new URL(url).openStream()), 0, Long.MAX_VALUE) } finally { fos.close() }
+    ret
+}
+project.ext.convertToCanonicalPath = { String p ->
+    project.file(p).canonicalPath
+}
