@@ -1,11 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Minecraft Client" type="Application" factoryName="Application" folderName="Minecraft Client" singleton="false">
-    <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
+  <configuration default="false" name="Minecraft Client (w/o provided)" type="Application" factoryName="Application" folderName="Minecraft Client" singleton="false">
     <option name="MAIN_CLASS_NAME" value="GradleStart" />
     <module name="CapableCables.main" />
     <option name="WORKING_DIRECTORY" value="run" />
-    <RunnerSettings RunnerId="Run" />
-    <ConfigurationWrapper RunnerId="Run" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
