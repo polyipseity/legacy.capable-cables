@@ -99,6 +99,7 @@ Object parseLastGoodSettings(boolean print) {
 
 if (update) {
     if (gradleDistributionUrl == "latest") {
+        //noinspection SpellCheckingInspection
         JsonSlurper jsonSlurper = new JsonSlurper()
 
         File gradleLatestReleaseNightlyJsonFile = file gradleLatestReleaseNightlyJsonPath

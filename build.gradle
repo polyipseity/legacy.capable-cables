@@ -91,6 +91,7 @@ description = description_
 // Need this here so eclipse task generates correctly.
 sourceCompatibility = targetCompatibility = 1.8
 
+//noinspection SpellCheckingInspection
 minecraft {
     version = minecraftForgeVersion
     runDir = runDir
@@ -113,6 +114,7 @@ configurations {
     compile.extendsFrom shade
 }
 
+//noinspection SpellCheckingInspection
 dependencies {
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
@@ -294,5 +296,16 @@ task cleanCacheAutomatically(type: Delete, group: "build", description: "Clean o
     if (minecraftForgeDir.exists()) minecraftForgeDir.eachDir { directory -> if (directory.name != minecraftForgeVersion) delete directory }
 }
 tasks.saveCurrentGoodSettings.finalizedBy "cleanCacheAutomatically"
+
+eclipse {
+    classpath {
+        downloadSources = downloadJavadoc = true
+    }
+}
+idea {
+    module {
+        downloadSources = downloadJavadoc = true
+    }
+}
 
 storeExt()

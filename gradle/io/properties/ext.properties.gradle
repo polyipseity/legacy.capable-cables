@@ -4,5 +4,5 @@
 
 if (!project.ext.has("storeProperties") || !project.ext.has("loadProperties")) throw new IllegalStateException("Apply 'properties.gradle' before applying 'ext.properties.gradle'.")
 
-project.ext.storeExt = { String path = "$projectDir${File.separator}ext.properties" -> storeProperties new Properties(project.ext.properties.collectEntries { k, v -> [k, v.toString()]}), path, "Extra Properties # suppress inspection \"UnusedProperty\" for whole file" }
+project.ext.storeExt = { String path = "$projectDir${File.separator}ext.properties" -> storeProperties new Properties(project.ext.properties.collectEntries { k, v -> [k, v.toString()]}), path, "Extra Properties # suppress inspection \"UnusedProperty\", \"SpellCheckingInspection\" for whole file" }
 project.ext.loadExt = { String path = "$projectDir${File.separator}ext.properties" -> (loadProperties(path).findAll { String k, v -> !project.ext.has(k) }).each { k, v -> project.ext."$k" = v } }
