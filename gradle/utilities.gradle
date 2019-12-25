@@ -4,6 +4,9 @@
 
 import java.nio.channels.Channels
 
+// Strings
+project.ext.evaluateGStringString = { String s -> new GroovyShell(new Binding(project.ext.properties)).evaluate("\"\"\"$s\"\"\"") }
+
 // Arguments
 project.ext.parseArgument = { String k, String envK, Object defaultV = null ->
     project.hasProperty(k) ? project."$k" : System.getenv(envK) != null ? System.getenv(envK) : defaultV
@@ -11,7 +14,16 @@ project.ext.parseArgument = { String k, String envK, Object defaultV = null ->
 
 // Lists & Maps
 project.ext.stringToStringList = { String s -> s == "[]" ? [] : s.substring(1, s.length() - 1).split(",", 0).collect { e -> e.trim() } }
-project.ext.stringToStringMap = { String s -> s == "[]" ? [] : s.substring(1, s.length() - 1).split(",", 0).collectEntries { String v -> v.trim().split(":", 2).collect { String v2 -> v2.trim() } } }
+project.ext.stringToStringMap = { String s ->
+    List<String> temp = s == "[:]" ? [] : s.substring(1, s.length() - 1).split(",", 0).toList()
+    Map<String, List<String>> ret = [:]
+    temp.each { v ->
+        List<String> temp2 = v.trim().split(":", 2).collect { v2 -> v2.trim() }
+        if (ret.containsKey(temp2.first())) ret[temp2.first()].add temp2.last()
+        else ret[temp2.first()] = [temp2.last()]
+    }
+    ret
+}
 
 // I/O
 project.ext.createNewFile = { File f ->

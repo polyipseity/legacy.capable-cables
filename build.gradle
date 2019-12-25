@@ -32,29 +32,6 @@ apply from: "$rootDir${File.separator}gradle${File.separator}global.gradle"
 apply from: "$rootDir${File.separator}gradle${File.separator}io${File.separator}properties${File.separator}properties.gradle"
 apply from: "$rootDir${File.separator}gradle${File.separator}io${File.separator}properties${File.separator}ext.properties.gradle"
 
-repositories {
-    /*
-    jcenter()
-    maven {
-        name = "Minecraft Forge"
-        url = "https://files.minecraftforge.net/maven"
-    }
-    */
-    mavenCentral()
-    maven {
-        name = "Sonatype Snapshots"
-        url = "https://oss.sonatype.org/content/repositories/snapshots"
-    }
-    maven {
-        name = "Chicken Bones"
-        url = "http://chickenbones.net/maven/"
-    }
-    maven {
-        name = "DVS1"
-        url = "http://dvs1.progwml6.com/files/maven"
-    }
-}
-
 loadExt "$rootDir${File.separator}buildSrc${File.separator}ext.properties"
 ext {
     minecraftVersion = (minecraftForgeVersion as String).split("-").first()
@@ -78,7 +55,33 @@ ext {
     requiredMods = stringToStringList requiredMods_
     dependencies = stringToStringList dependencies_
     dependants = stringToStringList dependencies_
+
+    combinedDependencies = ""
+    requiredMods.each { m -> combinedDependencies += "required:$m;"}
+    ext.dependencies.each { m ->
+        if (combinedDependencies.contains(m)) combinedDependencies.replace "required:$m", "required-after:$m"
+        else combinedDependencies += "after:$m;"
+    }
+    dependants.each { m ->
+        if (combinedDependencies.contains(m)) combinedDependencies.replace "required:$m", "required-before:$m"
+        else combinedDependencies += "before:$m;"
+    }
+    combinedDependencies += combinedDependenciesAdditions
 }
+
+repositories {
+    gradlePluginPortal()
+    jcenter()
+    mavenCentral()
+    google()
+}
+stringToStringMap(customRepositories).each { String k, List<String> v -> v.each { v2 ->
+    String[] temp = v2.split(":", 2).collect { s -> evaluateGStringString s.trim() }
+    repositories."$k" {
+        name = temp.first()
+        url = temp.last()
+    }
+}}
 
 version = "${minecraftVersion}-${majorMod}.${majorApi}.${minor}.${patch}${project.ext."final" ? "-final" : pre ? "-beta" : releaseCandidate != 0 ? "-rc$releaseCandidate" : ""}"
 group = group_ // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -138,7 +141,7 @@ dependencies {
     'runtime' is superseded by 'runtimeOnly'.
      */
 }
-stringToStringMap(customDependencies).each { String k, String v -> dependencies.add(k, new GroovyShell(new Binding(ext.properties)).evaluate("\"\"\"$v\"\"\"")) }
+stringToStringMap(customDependencies).each { String k, List<String> v -> v.each { s -> dependencies.add k, evaluateGStringString(s) } }
 
 sourceSets {
     main {
@@ -152,12 +155,18 @@ sourceSets {
 
 static Map<String, Object> processReplaceKeys(Map<String, Object> m) { return m.collectEntries { k, v -> ["\${$k}".toString(), v]} as Map<String, Object> }
 sourceMainJava {
-    include "${project.name}.java"
+    include "Constants.java"
 
     //noinspection GroovyAssignabilityCheck
-    replace processReplaceKeys(["modid"                 : modId,
-                                "minecraftVersionRange" : minecraftVersionRange,
-                                "certificateFingerprint": certificateFingerprint])
+    replace processReplaceKeys([
+            "modid": modId,
+            "name": name_,
+            "version": version,
+            "dependencies": combinedDependencies,
+            "minecraftVersionRange": minecraftVersionRange,
+            "certificateFingerprint": certificateFingerprint,
+            "updateJSON": updateJSON
+    ])
 }
 
 static <E> String processResourcesList(List<E> l) { l.empty ? "[]" : l.toListString().replace("[", "[\"").replace("]", "\"]").replace(", ", "\", \"") }
