@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.common.registrables.items;
 
-import net.minecraft.item.Item;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.common.registrables.items.templates.ItemUnstackable;
 
-public class ItemWrench extends Item {
+public class ItemWrench extends ItemUnstackable {
 }

@@ -1,15 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.common.registrables.blocks;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.common.registrables.blocks.templates.BlockDefault;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.common.registrables.materials.Materials;
 
-public class BlockCable extends Block {
-    public BlockCable(Material blockMaterialIn, MapColor blockMapColorIn) {
-        super(blockMaterialIn, blockMapColorIn);
-    }
-
-    public BlockCable(Material materialIn) {
-        super(materialIn);
-    }
+public class BlockCable extends BlockDefault {
+    public BlockCable() { super(Materials.PETRIFIED_SKY); }
 }

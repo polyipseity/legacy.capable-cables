@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.utilities;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.common.registrables;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.utilities.Constants.MOD_ID;
 

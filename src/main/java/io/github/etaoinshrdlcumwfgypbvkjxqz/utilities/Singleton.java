@@ -15,7 +15,7 @@ public abstract class Singleton {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T getInstance(final Class<T> clazz) {
+    public static <T> T getInstance(Class<T> clazz) {
         try {
             return INSTANCES.containsKey(clazz) ? (T)INSTANCES.get(clazz) : clazz.newInstance();
         } catch (Exception ex) {

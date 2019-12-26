@@ -7,8 +7,10 @@ public enum Constants {
     public static final String
             NAME = "${name}",
             VERSION = "${version}",
-            DEPENDENCIES = "${dependencies}",
-            ACCEPTED_MINECRAFT_VERSIONS = "${minecraftVersionRange}",
+            DEPENDENCIES = "${dependencies}";
+    @SuppressWarnings("SpellCheckingInspection")
+    public static final String ACCEPTED_MINECRAFT_VERSIONS = "${minecraftVersionRange}";
+    public static final String
             CERTIFICATE_FINGERPRINT = "${certificateFingerprint}",
             UPDATE_JSON = "${updateJSON}";
 }
