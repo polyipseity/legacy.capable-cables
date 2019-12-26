@@ -5,7 +5,7 @@
 language: java
 
 git:
-  depth: 50
+  depth: 100
 
 jdk: openjdk8
 

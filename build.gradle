@@ -14,7 +14,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+        classpath "net.minecraftforge.gradle:ForgeGradle:2.+"
     }
     // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 }
@@ -76,7 +76,7 @@ repositories {
     google()
 }
 stringToStringMap(customRepositories).each { String k, List<String> v -> v.each { v2 ->
-    String[] temp = v2.split(":", 2).collect { s -> evaluateGStringString s.trim() }
+    String[] temp = v2.split("(?<!\\\\):", 2).collect { s -> evaluateGStringString s.trim().replace("\\:", ":") }
     repositories."$k" {
         name = temp.first()
         url = temp.last()
@@ -161,13 +161,14 @@ sourceMainJava {
 
     //noinspection GroovyAssignabilityCheck
     replace processReplaceKeys([
-            "modid": modId,
+            "modid": project.name,
             "name": name_,
             "version": version,
             "dependencies": combinedDependencies,
             "minecraftVersionRange": minecraftVersionRange,
             "certificateFingerprint": certificateFingerprint,
-            "updateJSON": updateJSON
+            "updateJSON": updateJSON,
+            "group": project.group
     ])
 }
 
@@ -180,7 +181,7 @@ processResources {
 }
 task processResourcesConfig(type: Copy, group: "config", description: "Process resources at configuration time.") {
     // this will ensure that this task is redone when the variables change.
-    inputs.property "modId", modId
+    inputs.property "modId", project.name
     inputs.property "name", name_
     inputs.property "description", project.description
     inputs.property "version", version
@@ -244,6 +245,13 @@ task deobfJar(type: Jar, dependsOn: 'jar') {
     from "build/source/main"
     classifier "dev"
 }
+/*
+task sourceJar(type: Jar, dependsOn: 'sourceMainJava') {
+    from "build/sources/java"
+    from "build/resources/main/java"
+    classifier "sources"
+}
+*/
 task javadocJar(type: Jar, dependsOn: 'javadoc') {
     from "build/docs/javadoc"
     classifier "javadoc"
@@ -282,16 +290,19 @@ task saveCurrentGoodSettings(group: "build", description: "Saves current good se
     }
 }
 tasks.build.finalizedBy "saveCurrentGoodSettings"
+//noinspection SpellCheckingInspection
 task cleanCacheAutomatically(type: Delete, group: "build", description: "Clean old items from cache to reduce space usage.", dependsOn: "saveCurrentGoodSettings") {
     // Gradle
     gradle.gradleUserHomeDir.eachDir { directory -> directory.eachDirMatch(~/[0-9]+[.-][0-9.+-]+"/) { subdirectory -> if (subdirectory.name != gradle.gradleVersion) delete subdirectory } }
 
     // Minecraft
+    //noinspection SpellCheckingInspection
     String minecraftCachePath = "$gradle.gradleUserHomeDir.absolutePath${File.separator}caches${File.separator}minecraft"
     // Minecraft Coder Pack
     File mcpDir = file("$minecraftCachePath${File.separator}de${File.separator}oceanlabs${File.separator}mcp${File.separator}mcp_snapshot")
     if (mcpDir.exists()) mcpDir.eachDir { directory -> if ("snapshot_$directory.name".toString() != minecraftMappings) delete directory }
     // Minecraft Forge
+    //noinspection SpellCheckingInspection
     File minecraftForgeDir = file("$minecraftCachePath${File.separator}net${File.separator}minecraftforge${File.separator}forge")
     if (minecraftForgeDir.exists()) minecraftForgeDir.eachDir { directory -> if (directory.name != minecraftForgeVersion) delete directory }
 }

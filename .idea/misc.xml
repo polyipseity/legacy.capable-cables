@@ -9,6 +9,9 @@
       <item index="4" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.eventhandler.SubscribeEvent" />
       <item index="5" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.network.NetworkCheckHandler" />
     </list>
+    <writeAnnotations>
+      <writeAnnotation name="net.minecraftforge.fml.common.SidedProxy" />
+    </writeAnnotations>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">

@@ -13,12 +13,12 @@ project.ext.parseArgument = { String k, String envK, Object defaultV = null ->
 }
 
 // Lists & Maps
-project.ext.stringToStringList = { String s -> s == "[]" ? [] : s.substring(1, s.length() - 1).split(",", 0).collect { e -> e.trim() } }
+project.ext.stringToStringList = { String s -> s == "[]" ? [] : s.substring(1, s.length() - 1).split("(?<!\\\\),", 0).collect { e -> e.trim().replace("\\,", ",") } }
 project.ext.stringToStringMap = { String s ->
-    List<String> temp = s == "[:]" ? [] : s.substring(1, s.length() - 1).split(",", 0).toList()
+    List<String> temp = s == "[:]" ? [] : s.substring(1, s.length() - 1).split("(?<!\\\\),", 0).collect { e -> e.trim().replace("\\,", ",") }
     Map<String, List<String>> ret = [:]
     temp.each { v ->
-        List<String> temp2 = v.trim().split(":", 2).collect { v2 -> v2.trim() }
+        List<String> temp2 = v.trim().split("(?<!\\\\):", 2).collect { e -> e.trim().replace("\\:", ":") }
         if (ret.containsKey(temp2.first())) ret[temp2.first()].add temp2.last()
         else ret[temp2.first()] = [temp2.last()]
     }

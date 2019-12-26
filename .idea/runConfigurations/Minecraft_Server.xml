@@ -2,7 +2,7 @@
   <configuration default="false" name="Minecraft Server" type="Application" factoryName="Application" folderName="Minecraft Server">
     <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
     <option name="MAIN_CLASS_NAME" value="GradleStartServer" />
-    <module name="CapableCables.main" />
+    <module name="capablecables.main" />
     <option name="WORKING_DIRECTORY" value="run" />
     <RunnerSettings RunnerId="Run" />
     <ConfigurationWrapper RunnerId="Run" />
