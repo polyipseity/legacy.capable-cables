@@ -4,7 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 
-import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.RegistryHelper.getNamespacedUnlocalizedNameForRegistry;
+import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.utilities.RegistryHelper.getNamespacedUnlocalizedNameForRegistry;
 
 public class BlockDefault extends Block {
     public BlockDefault(Material materialIn) { super(materialIn); }

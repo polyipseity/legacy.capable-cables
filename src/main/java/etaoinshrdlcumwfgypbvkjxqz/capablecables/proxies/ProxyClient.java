@@ -5,5 +5,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SuppressWarnings("unused")
 @SideOnly(Side.CLIENT)
-public final class ClientProxy extends Proxy {
+public final class ProxyClient extends Proxy {
+    public static final String CLASS_SIMPLE_NAME = "ProxyClient";
 }

@@ -6,5 +6,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 // Is this class of any use?
 @SuppressWarnings("unused")
 @SideOnly(Side.SERVER)
-public final class ServerProxy extends Proxy {
+public final class ProxyServer extends Proxy {
+    public static final String CLASS_SIMPLE_NAME = "ProxyServer";
 }

@@ -1,4 +1,4 @@
-package etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables;
+package etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.utilities;
 
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Constants.MOD_ID;
 

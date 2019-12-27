@@ -2,7 +2,7 @@ package etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.items.templ
 
 import net.minecraft.item.Item;
 
-import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.RegistryHelper.getNamespacedUnlocalizedNameForRegistry;
+import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.utilities.RegistryHelper.getNamespacedUnlocalizedNameForRegistry;
 
 public class ItemDefault extends Item {
     @Override

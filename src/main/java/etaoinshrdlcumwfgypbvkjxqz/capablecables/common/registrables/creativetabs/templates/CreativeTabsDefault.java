@@ -2,7 +2,7 @@ package etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.creativetab
 
 import net.minecraft.creativetab.CreativeTabs;
 
-import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.RegistryHelper.getNamespacedUnlocalizedNameForRegistry;
+import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.utilities.RegistryHelper.getNamespacedUnlocalizedNameForRegistry;
 
 public abstract class CreativeTabsDefault extends CreativeTabs {
     public CreativeTabsDefault(String label) { super(getNamespacedUnlocalizedNameForRegistry(label)); }

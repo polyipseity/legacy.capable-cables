@@ -8,7 +8,7 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import java.lang.reflect.Field;
 
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.CapableCables.LOGGER;
-import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.GrammarHelper.appendPluralSuffix;
+import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.GrammarHelper.appendSuffixIfPlural;
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper.wrapUnhandledThrowable;
 
 @SuppressWarnings("SpellCheckingInspection")
@@ -28,7 +28,7 @@ public abstract class Registrables<T extends IForgeRegistryEntry<T>> extends Sin
         {
             Object v;
             Field[] fs = getClass().getFields();
-            LOGGER.info("Found {} field{} in '{}'", fs.length, appendPluralSuffix(fs.length, "s"), classGS);
+            LOGGER.info("Found {} field{} in '{}'", fs.length, appendSuffixIfPlural(fs.length, "s"), classGS);
             for (Field f : fs) {
                 try {
                     v = f.get(this);

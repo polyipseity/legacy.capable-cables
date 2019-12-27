@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import java.util.Map;
 
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.CapableCables.LOGGER;
+import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper.rejectArguments;
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper.rejectInstantiation;
 
 public abstract class Singleton {
@@ -15,11 +16,11 @@ public abstract class Singleton {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T getInstance(Class<T> clazz) {
+    public static <T extends Singleton> T getInstance(Class<T> clazz) {
         try {
             return INSTANCES.containsKey(clazz) ? (T)INSTANCES.get(clazz) : clazz.newInstance();
         } catch (Exception ex) {
-            throw ThrowableHelper.wrapUnhandledThrowable(new IllegalArgumentException(String.format("Illegal arguments passed: %s", clazz.toGenericString()), ex));
+            throw ThrowableHelper.wrapUnhandledThrowable(rejectArguments(clazz));
         }
     }
 }
