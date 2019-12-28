@@ -2,14 +2,16 @@ package etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.items;
 
 import buildcraft.api.tools.IToolWrench;
 import cofh.api.item.IToolHammer;
+import etaoinshrdlcumwfgypbvkjxqz.capablecables.CapableCables;
 import etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.items.templates.ItemUnstackable;
+import etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.utilities.IEventBusSubscriber;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -20,23 +22,29 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.config.Config;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import javax.annotation.Nullable;
 
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.CapableCables.LOGGER;
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.utilities.RegistrablesHelper.BlockHelper.checkNoEntityCollision;
-import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.utilities.RegistrablesHelper.ItemHelper.getSlotFor;
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.utilities.RegistrablesHelper.NBTHelper.*;
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.utilities.RegistrablesHelper.PositionHelper.getPosition;
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.References.*;
+import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper.requireRunOnceOnly;
 
 @Optional.InterfaceList({
         @Optional.Interface(iface = COFH_CORE_PACKAGE + ".api.item.IToolHammer", modid = COFH_CORE_ID),
         @Optional.Interface(iface = BUILDCRAFT_API_PACKAGE + ".api.tools.IToolWrench", modid = BUILDCRAFT_API_ID)
 })
-public class ItemWrench extends ItemUnstackable implements IToolHammer, IToolWrench {
+public class ItemWrench extends ItemUnstackable implements IEventBusSubscriber, IToolHammer, IToolWrench {
+    public ItemWrench() { super(); }
+
     /**
      * {@inheritDoc}
      */
@@ -51,32 +59,32 @@ public class ItemWrench extends ItemUnstackable implements IToolHammer, IToolWre
     public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         return worldIn.isRemote || use(player.getHeldItem(hand), worldIn, player, new RayTraceResult(new Vec3d(hitX, hitY, hitZ), facing, pos), hand) ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean itemInteractionForEntity(ItemStack stack, EntityPlayer playerIn, EntityLivingBase target, EnumHand hand) {
-        RayTraceResult targetRTR = new RayTraceResult(target);
-        boolean ret = canUse(stack, playerIn.world, playerIn, targetRTR, hand);
-        if (playerIn.world.isRemote) return ret;
-        if (ret) {
-            ItemStack newStack = stack.copy();
-            ret = use(newStack, playerIn.world, playerIn, targetRTR, hand);
-            InventoryPlayer inventory = playerIn.inventory;
-            inventory.setInventorySlotContents(getSlotFor(inventory, stack), newStack);
-            inventory.markDirty();
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void onPlayerInteractsEntity(PlayerInteractEvent.EntityInteract e) {
+        ItemStack stack = e.getItemStack();
+        Item item = stack.getItem();
+        if (item instanceof ItemWrench) {
+            World world = e.getWorld();
+            EntityPlayer player = e.getEntityPlayer();
+            RayTraceResult targetRTR = new RayTraceResult(e.getTarget());
+            EnumHand hand = e.getHand();
+            boolean ret = canUse(stack, world, player, targetRTR, hand);
+            if (ret && !world.isRemote) {
+                ret = use(stack, world, player, targetRTR, hand);
+            }
+            e.setCancellationResult(ret ? EnumActionResult.SUCCESS : EnumActionResult.FAIL);
+            e.setCanceled(true);
         }
-        return ret;
     }
 
     /* Helper methods */
     @SuppressWarnings("unused")
     protected boolean canUse(ItemStack stack, World world, EntityLivingBase user, RayTraceResult target, EnumHand hand) {
+        if (!CONFIGURATION.enablePickup) return false;
         Tag tag = new Tag(stack.getTagCompound());
         switch (target.typeOfHit) {
             case BLOCK:
-                if (user.isSneaking()) {
+                if (user.isSneaking() && CONFIGURATION.enablePickupTile) {
                     if (tag.pickedUpBlock != null) {
                         BlockPos targetPos = target.getBlockPos().add(target.sideHit.getDirectionVec());
                         //noinspection ConstantConditions
@@ -86,7 +94,8 @@ public class ItemWrench extends ItemUnstackable implements IToolHammer, IToolWre
                     return true;
                 }
                 break;
-            case ENTITY: return user.isSneaking() && tag.pickedUpEntity == null && tag.pickedUpBlock == null && target.entityHit instanceof EntityLivingBase;
+            case ENTITY:
+                return user.isSneaking() && CONFIGURATION.enablePickupTile && tag.pickedUpEntity == null && tag.pickedUpBlock == null && target.entityHit instanceof EntityLivingBase;
         }
         return false;
     }
@@ -238,4 +247,24 @@ public class ItemWrench extends ItemUnstackable implements IToolHammer, IToolWre
     @Override
     @Optional.Method(modid = BUILDCRAFT_API_ID)
     public void wrenchUsed(EntityPlayer player, EnumHand hand, ItemStack wrench, RayTraceResult rayTrace) {}
+
+    // Configuration
+    public static final Configuration CONFIGURATION = CapableCables.Configuration.behavior.items.wrench;
+    public static final class Configuration {
+        public static final String LANG_KEY_BASE = CapableCables.Configuration.Behavior.Items.LANG_KEY_BASE + ".wrench";
+        public Configuration() { requireRunOnceOnly(); }
+
+        @Config.Name("Enable picking up")
+        @Config.Comment({
+                "Whether the wrench can pickup things for moving.",
+                "This overrides other options."
+        })
+        public boolean enablePickup = true;
+        @Config.Name("Enable picking up blocks")
+        @Config.Comment("Whether the wrench can pickup blocks for moving.")
+        public boolean enablePickupTile = true;
+        @Config.Name("Enable picking up entity")
+        @Config.Comment("Whether the wrench can pickup entities for moving.")
+        public boolean enablePickupEntity = true;
+    }
 }

@@ -1,12 +1,14 @@
 package etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.utilities;
 
-import javax.annotation.concurrent.Immutable;
+import net.minecraft.util.ResourceLocation;
 
-import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Constants.MOD_ID;
+import javax.annotation.concurrent.Immutable;
 
 @Immutable
 public enum RegistryHelper {
     ;
     @SuppressWarnings("SpellCheckingInspection")
-    public static String getNamespacedUnlocalizedNameForRegistry(String name) { return String.format("%s.%s", MOD_ID, name); }
+    public static String getNamespacedUnlocalizedNameForRegistry(ResourceLocation name) { return String.format("%s.%s", name.getResourceDomain(), name.getResourcePath()); }
+    @SuppressWarnings("SpellCheckingInspection")
+    public static String getNamespacedUnlocalizedNameForRegistry(String modID, String name) { return String.format("%s.%s", modID, name); }
 }

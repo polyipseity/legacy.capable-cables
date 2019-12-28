@@ -38,7 +38,7 @@ public enum CreativeTabsOwn {
         @Override
         @SideOnly(Side.CLIENT)
         public ItemStack getTabIconItem() {
-            return new ItemStack(ItemsOwn.getInstance().WRENCH);
+            return new ItemStack(ItemsOwn.getInstance().wrench);
         }
     };
 }

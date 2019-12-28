@@ -40,8 +40,5 @@ public final class BlocksOwn extends Registrables<Block> {
             // Subclass is probably needed for below properties.
             .setTickRandomly(true); // Overrides are required for properties unlisted here.
 
-    public final Block CABLE = new BlockCable()
-            .setRegistryName(MOD_ID, "cable")
-            .setUnlocalizedName("cable")
-            .setCreativeTab(CreativeTabsOwn.DEFAULT);
+    public final Block cable = new BlockCable().setRegistryAndUnlocalizedName(MOD_ID, "cable").setUnlocalizedName("cable").setCreativeTab(CreativeTabsOwn.DEFAULT);
 }

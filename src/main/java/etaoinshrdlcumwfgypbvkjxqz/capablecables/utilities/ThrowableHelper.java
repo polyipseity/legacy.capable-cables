@@ -1,8 +1,11 @@
 package etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
+import com.google.common.collect.Sets;
+
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import java.util.Arrays;
+import java.util.Set;
 
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.GrammarHelper.appendSuffixIfPlural;
 
@@ -25,6 +28,7 @@ public enum ThrowableHelper {
 
     public static RuntimeException rejectInstantiation() { throw rejectAttempt("illegal instantiation"); }
     public static RuntimeException rejectArguments(Object... args) { throw new IllegalArgumentException(rejectObjectsString(String.format("illegal argument%s", appendSuffixIfPlural(args.length, "s")), args)); }
-    /* private static final Set<String> RAN_ONCE = Sets.newConcurrentHashSet();
-    public static void requireRunOnceOnly() { if (!RAN_ONCE.add(getStackTrace()[2].toString())) throw rejectAttempt("illegal second invocation"); } */
+    public static RuntimeException rejectArguments(Throwable cause, Object... args) { throw new IllegalArgumentException(rejectObjectsString(String.format("illegal argument%s", appendSuffixIfPlural(args.length, "s")), args), cause); }
+    private static final Set<String> RAN_ONCE = Sets.newConcurrentHashSet();
+    public static void requireRunOnceOnly() { if (!RAN_ONCE.add(getStackTrace()[2].toString())) throw rejectAttempt("illegal second invocation"); }
 }

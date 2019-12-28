@@ -1,7 +1,10 @@
 package etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables;
 
+import etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.utilities.IEventBusSubscriber;
 import etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Singleton;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
@@ -17,6 +20,7 @@ import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper
 public abstract class Registrables<T extends IForgeRegistryEntry<T>> extends Singleton {
     private final Class<T> clazz;
     public Registrables(Class<T> clazz) {
+        super();
         this.clazz = clazz;
     }
 
@@ -26,6 +30,8 @@ public abstract class Registrables<T extends IForgeRegistryEntry<T>> extends Sin
         LOGGER.info("Registration of '{}' started", classGS);
         IForgeRegistry<T> reg = e.getRegistry();
         int reged = 0;
+        int evtReged = 0;
+        String evtRegSName = Mod.EventBusSubscriber.class.getSimpleName();
 
         {
             Object v;
@@ -39,14 +45,20 @@ public abstract class Registrables<T extends IForgeRegistryEntry<T>> extends Sin
                 }
                 LOGGER.debug("Field '{}' value is '{}'", f.toGenericString(), v);
                 if (clazz.isAssignableFrom(v.getClass())) {
-                    reg.register(((T) v));
+                    reg.register((T)v);
+                    if (v instanceof IEventBusSubscriber) {
+                        MinecraftForge.EVENT_BUS.register(v);
+                        evtReged++;
+                        LOGGER.debug("Registered '{}' as '{}'", v, evtRegSName);
+                    }
                     reged++;
-                    LOGGER.debug("Registered '{}'", v.toString());
+                    LOGGER.debug("Registered '{}' as '{}'", v, classGS);
                 }
             }
         }
 
         LOGGER.info("Registered {} '{}'", reged, classGS);
+        LOGGER.info("Registered {} '{}'", evtReged, evtRegSName);
         LOGGER.info("Registration of '{}' ended", classGS);
     }
 }

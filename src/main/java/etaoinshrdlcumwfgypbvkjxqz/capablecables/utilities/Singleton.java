@@ -21,8 +21,8 @@ public abstract class Singleton {
     public static <T extends Singleton> T getInstance(Class<T> clazz) {
         try {
             return INSTANCES.containsKey(clazz) ? (T)INSTANCES.get(clazz) : clazz.newInstance();
-        } catch (Exception ex) {
-            throw ThrowableHelper.wrapUnhandledThrowable(rejectArguments(clazz));
+        } catch (IllegalAccessException | InstantiationException ex) {
+            throw rejectArguments(ex, clazz);
         }
     }
 }

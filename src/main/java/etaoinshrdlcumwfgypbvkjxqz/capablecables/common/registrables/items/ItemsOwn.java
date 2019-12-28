@@ -40,5 +40,5 @@ public final class ItemsOwn extends Registrables<Item> {
             .setContainerItem(Items.BUCKET);
     static { TEMPLATE_.setHarvestLevel("template_", 9001); } // Overrides are required for properties unlisted here.
 
-    public final Item WRENCH = new ItemWrench().setRegistryName(MOD_ID, "wrench").setUnlocalizedName("wrench").setCreativeTab(CreativeTabsOwn.DEFAULT);
+    public final Item wrench = new ItemWrench().setRegistryAndUnlocalizedName(MOD_ID, "wrench").setCreativeTab(CreativeTabsOwn.DEFAULT);
 }

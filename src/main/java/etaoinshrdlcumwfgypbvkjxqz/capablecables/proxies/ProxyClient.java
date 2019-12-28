@@ -10,4 +10,5 @@ import javax.annotation.concurrent.Immutable;
 @SideOnly(Side.CLIENT)
 public final class ProxyClient extends Proxy {
     public static final String CLASS_SIMPLE_NAME = "ProxyClient";
+    public ProxyClient() { super(); }
 }

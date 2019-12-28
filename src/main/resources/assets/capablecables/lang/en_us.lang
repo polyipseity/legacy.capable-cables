@@ -1,0 +1,13 @@
+# "English (United States)" language file
+#PARSE_ESCAPES
+# suppress inspection "UnusedProperty", "SpellCheckingInspection" for whole file
+
+# Items
+itemGroup.capablecables.capablecables=Capable Cables
+item.capablecables.wrench.name=Wrench
+
+# Config
+config.capablecables.name=Capable Cables
+config.capablecables.behavior.name=Behavior
+config.capablecables.behavior.items.name=Items
+config.capablecables.behavior.items.wrench.name=Wrench
