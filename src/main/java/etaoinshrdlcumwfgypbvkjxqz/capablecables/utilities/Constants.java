@@ -1,8 +1,5 @@
 package etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
-import javax.annotation.concurrent.Immutable;
-
-@Immutable
 public enum Constants {
     ;
     @SuppressWarnings({"SpellCheckingInspection", "RedundantSuppression"})

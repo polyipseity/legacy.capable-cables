@@ -1,6 +1,6 @@
 package etaoinshrdlcumwfgypbvkjxqz.capablecables;
 
-import etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.items.ItemWrench;
+import etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items.ItemWrench;
 import etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.Proxy;
 import etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.ProxyClient;
 import etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.ProxyServer;

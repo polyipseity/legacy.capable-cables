@@ -2,14 +2,12 @@ package etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
 import com.google.common.collect.Maps;
 
-import javax.annotation.concurrent.Immutable;
 import java.util.Map;
 
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.CapableCables.LOGGER;
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper.rejectArguments;
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper.rejectInstantiation;
 
-@Immutable
 public abstract class Singleton {
     private static final Map<Class<?>, Object> INSTANCES = Maps.newConcurrentMap();
     public Singleton() {
