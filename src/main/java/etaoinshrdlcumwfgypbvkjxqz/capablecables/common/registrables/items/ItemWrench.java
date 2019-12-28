@@ -3,6 +3,8 @@ package etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.items;
 import buildcraft.api.tools.IToolWrench;
 import cofh.api.item.IToolHammer;
 import etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.items.templates.ItemUnstackable;
+import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
@@ -10,6 +12,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -23,6 +26,7 @@ import net.minecraftforge.fml.common.Optional;
 import javax.annotation.Nullable;
 
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.CapableCables.LOGGER;
+import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.utilities.RegistrablesHelper.BlockHelper.checkNoEntityCollision;
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.utilities.RegistrablesHelper.ItemHelper.getSlotFor;
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.utilities.RegistrablesHelper.NBTHelper.*;
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.utilities.RegistrablesHelper.PositionHelper.getPosition;
@@ -33,66 +37,117 @@ import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.References.*;
         @Optional.Interface(iface = BUILDCRAFT_API_PACKAGE + ".api.tools.IToolWrench", modid = BUILDCRAFT_API_ID)
 })
 public class ItemWrench extends ItemUnstackable implements IToolHammer, IToolWrench {
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-        return canUse(player.getHeldItem(hand), player, new RayTraceResult(new Vec3d(hitX, hitY, hitZ), side, pos), hand) ? EnumActionResult.PASS : EnumActionResult.FAIL;
+        return canUse(player.getHeldItem(hand), world, player, new RayTraceResult(new Vec3d(hitX, hitY, hitZ), side, pos), hand) ? EnumActionResult.PASS : EnumActionResult.FAIL;
     }
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if (!worldIn.isRemote) use(player.getHeldItem(hand), player, new RayTraceResult(new Vec3d(hitX, hitY, hitZ), facing, pos), hand);
-        return EnumActionResult.SUCCESS;
+        return worldIn.isRemote || use(player.getHeldItem(hand), worldIn, player, new RayTraceResult(new Vec3d(hitX, hitY, hitZ), facing, pos), hand) ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean itemInteractionForEntity(ItemStack stack, EntityPlayer playerIn, EntityLivingBase target, EnumHand hand) {
         RayTraceResult targetRTR = new RayTraceResult(target);
-        if (canUse(stack, playerIn, targetRTR, hand)) {
+        boolean ret = canUse(stack, playerIn.world, playerIn, targetRTR, hand);
+        if (playerIn.world.isRemote) return ret;
+        if (ret) {
             ItemStack newStack = stack.copy();
-            use(newStack, playerIn, targetRTR, hand);
+            ret = use(newStack, playerIn.world, playerIn, targetRTR, hand);
             InventoryPlayer inventory = playerIn.inventory;
             inventory.setInventorySlotContents(getSlotFor(inventory, stack), newStack);
             inventory.markDirty();
-            return true;
         }
-        return false;
+        return ret;
     }
 
     /* Helper methods */
     @SuppressWarnings("unused")
-    protected boolean canUse(ItemStack stack, EntityLivingBase user, RayTraceResult target, EnumHand hand) {
+    protected boolean canUse(ItemStack stack, World world, EntityLivingBase user, RayTraceResult target, EnumHand hand) {
         Tag tag = new Tag(stack.getTagCompound());
         switch (target.typeOfHit) {
-            case BLOCK: return user.isSneaking() && (tag.pickedUpTile != null || tag.pickedUpEntity != null);
-            case ENTITY: return user.isSneaking() && tag.pickedUpEntity == null && tag.pickedUpTile == null && target.entityHit instanceof EntityLivingBase;
+            case BLOCK:
+                if (user.isSneaking()) {
+                    if (tag.pickedUpBlock != null) {
+                        BlockPos targetPos = target.getBlockPos().add(target.sideHit.getDirectionVec());
+                        //noinspection ConstantConditions
+                        IBlockState state = Block.getStateById(tag.pickedUpBlockState);
+                        return state.getBlock().canPlaceBlockOnSide(world, targetPos, target.sideHit) && checkNoEntityCollision(state, world, targetPos);
+                    }
+                    return true;
+                }
+                break;
+            case ENTITY: return user.isSneaking() && tag.pickedUpEntity == null && tag.pickedUpBlock == null && target.entityHit instanceof EntityLivingBase;
         }
         return false;
     }
 
     @SuppressWarnings("unused")
-    protected void use(ItemStack stack, EntityLivingBase user, RayTraceResult target, EnumHand hand) {
+    protected boolean use(ItemStack stack, World world, EntityLivingBase user, RayTraceResult target, EnumHand hand) {
         Tag tag = new Tag(stack.getTagCompound());
         switch (target.typeOfHit) {
             case BLOCK:
-                if (tag.pickedUpEntity != null) {
-                    EntityLivingBase entity = (EntityLivingBase)EntityList.createEntityFromNBT(tag.pickedUpEntity, user.world);
+                if (tag.pickedUpBlock != null) {
+                    BlockPos pos = target.getBlockPos().add(target.sideHit.getDirectionVec());
+                    //noinspection ConstantConditions
+                    IBlockState state = Block.getStateById(tag.pickedUpBlockState);
+                    Block block = state.getBlock();
+                    if (!world.setBlockState(pos, state)) {
+                        LOGGER.error("Cannot create block state ID {}", tag.pickedUpBlockState);
+                        return false;
+                    } else if (tag.pickedUpBlockTile != null) {
+                        TileEntity tile = state.getBlock().createTileEntity(world, state);
+                        if (tile == null) {
+                            LOGGER.error("Cannot create tile entity of block state ID {}", tag.pickedUpBlockState);
+                            return false;
+                        }
+                        tile.deserializeNBT(tag.pickedUpBlockTile);
+                        world.setTileEntity(pos, tile);
+                        tag.pickedUpBlockTile = null;
+                    }
+                    tag.pickedUpBlockState = null;
+                    stack.setTagCompound(tag.serializeNBT());
+                } else if (tag.pickedUpEntity != null) {
+                    EntityLivingBase entity = (EntityLivingBase)EntityList.createEntityFromNBT(tag.pickedUpEntity, world);
                     if (entity == null) {
                         LOGGER.error("Cannot create entity with tag '{}'", tag.pickedUpEntity);
-                        return;
+                        return false;
                     }
                     Vec3d targetPos = getPosition(target);
                     entity.setPosition(targetPos.x, targetPos.y, targetPos.z);
-                    entity.world.spawnEntity(entity);
+                    world.spawnEntity(entity);
                     tag.pickedUpEntity = null;
+                } else {
+                    BlockPos pos = target.getBlockPos();
+                    IBlockState state = user.world.getBlockState(pos);
+                    TileEntity tile = state.getBlock().hasTileEntity(state) ? world.getTileEntity(pos) : null;
+                    tag.pickedUpBlockState = Block.getStateId(state);
+                    if (tile != null) {
+                        tag.pickedUpBlockTile = tile.serializeNBT();
+                        world.removeTileEntity(pos);
+                    }
+                    stack.setTagCompound(tag.serializeNBT());
+                    world.setBlockToAir(pos);
                 }
                 stack.setTagCompound(tag.serializeNBT());
                 break;
             case ENTITY:
                 EntityLivingBase entity = (EntityLivingBase)target.entityHit;
                 tag.pickedUpEntity = entity.serializeNBT();
-                entity.setDead();
                 stack.setTagCompound(tag.serializeNBT());
+                world.removeEntity(entity);
                 break;
         }
+        return true;
     }
 
     protected static class Tag implements INBTSerializable<NBTTagCompound> {
@@ -100,8 +155,12 @@ public class ItemWrench extends ItemUnstackable implements IToolHammer, IToolWre
 
         @Nullable
         public NBTTagCompound
-                pickedUpTile,
+                pickedUpBlock,
+                pickedUpBlockTile,
                 pickedUpEntity;
+        @Nullable
+        public Integer
+                pickedUpBlockState;
 
         /**
          * {@inheritDoc}
@@ -112,7 +171,12 @@ public class ItemWrench extends ItemUnstackable implements IToolHammer, IToolWre
             NBTTagCompound tag = new NBTTagCompound();
             {
                 NBTTagCompound pickup = new NBTTagCompound();
-                setChildIfNotNull(pickup, "tile", pickedUpTile, NBTTagCompound::setTag);
+                {
+                    NBTTagCompound pickedUpBlock = new NBTTagCompound();
+                    setChildIfNotNull(pickedUpBlock, "state", pickedUpBlockState, NBTTagCompound::setInteger);
+                    setChildIfNotNull(pickedUpBlock, "tile", pickedUpBlockTile, NBTTagCompound::setTag);
+                    if (setTagIfNotEmpty(pickup, "block", pickedUpBlock)) this.pickedUpBlock = pickedUpBlock;
+                }
                 setChildIfNotNull(pickup, "entity", pickedUpEntity, NBTTagCompound::setTag);
                 setTagIfNotEmpty(tag, "pickup", pickup);
             }
@@ -125,7 +189,11 @@ public class ItemWrench extends ItemUnstackable implements IToolHammer, IToolWre
         public void deserializeNBT(@Nullable NBTTagCompound nbt) {
             {
                 NBTTagCompound pickup = readChildIfHasKey(nbt, "pickup", NBTTagCompound.class, NBTTagCompound::getCompoundTag);
-                pickedUpTile = readChildIfHasKey(pickup, "tile", NBTTagCompound.class, NBTTagCompound::getCompoundTag);
+                {
+                    pickedUpBlock = readChildIfHasKey(pickup, "block", NBTTagCompound.class, NBTTagCompound::getCompoundTag);
+                    pickedUpBlockState = readChildIfHasKey(pickedUpBlock, "state", int.class, NBTTagCompound::getInteger);
+                    pickedUpBlockTile = readChildIfHasKey(pickedUpBlock, "tile", NBTTagCompound.class, NBTTagCompound::getCompoundTag);
+                }
                 pickedUpEntity = readChildIfHasKey(pickup, "entity", NBTTagCompound.class, NBTTagCompound::getCompoundTag);
             }
         }

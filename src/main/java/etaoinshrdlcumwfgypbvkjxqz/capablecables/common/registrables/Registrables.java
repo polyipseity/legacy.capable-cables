@@ -5,6 +5,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
+import javax.annotation.concurrent.Immutable;
 import java.lang.reflect.Field;
 
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.CapableCables.LOGGER;
@@ -12,6 +13,7 @@ import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.GrammarHelper.a
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper.wrapUnhandledThrowable;
 
 @SuppressWarnings("SpellCheckingInspection")
+@Immutable
 public abstract class Registrables<T extends IForgeRegistryEntry<T>> extends Singleton {
     private final Class<T> clazz;
     public Registrables(Class<T> clazz) {

@@ -11,6 +11,9 @@ public class BlockDefault extends Block {
     @SuppressWarnings("unused")
     public BlockDefault(Material blockMaterialIn, MapColor blockMapColorIn) { super(blockMaterialIn, blockMapColorIn); }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Block setUnlocalizedName(String name) { return super.setUnlocalizedName(getNamespacedUnlocalizedNameForRegistry(name)); }
 }

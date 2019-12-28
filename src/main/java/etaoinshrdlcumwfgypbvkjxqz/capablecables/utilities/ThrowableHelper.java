@@ -1,10 +1,12 @@
 package etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import java.util.Arrays;
 
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.GrammarHelper.appendSuffixIfPlural;
 
+@Immutable
 public enum ThrowableHelper {
     ;
     public static StackTraceElement[] getStackTrace() { return new Throwable().getStackTrace(); }

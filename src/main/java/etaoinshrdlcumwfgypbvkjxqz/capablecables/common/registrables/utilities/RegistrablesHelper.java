@@ -1,6 +1,7 @@
 package etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.utilities;
 
 import com.google.common.collect.ImmutableMap;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -8,18 +9,33 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.text.WordUtils;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import java.util.*;
 import java.util.function.BiFunction;
 
+import static java.util.Objects.requireNonNull;
+
 @SuppressWarnings("SpellCheckingInspection")
+@Immutable
 public enum RegistrablesHelper {
     ;
+    public enum BlockHelper {
+        ;
+        public static boolean checkNoEntityCollision(IBlockState state, World world, BlockPos pos) {
+            AxisAlignedBB collision = state.getCollisionBoundingBox(world, pos);
+            return collision == null || world.checkNoEntityCollision(collision.offset(pos));
+        }
+    }
+
     public enum ItemHelper {
         ;
         public static boolean areItemStacksCompletelyEqual(ItemStack a, ItemStack b) { return ItemStack.areItemsEqual(a, b) && ItemStack.areItemStackTagsEqual(a, b); }
@@ -49,19 +65,28 @@ public enum RegistrablesHelper {
 
     public enum NBTHelper {
         ;
+        public static final Map<String, Integer> RAW_NBT_TYPE_LOOKUP;
         public static final Map<String, Integer> NBT_TYPE_LOOKUP;
         static {
             List<String> nbtTypes = Arrays.asList(NBTBase.NBT_TYPES);
+
+            Map<String, Integer> rawNbtTypeLookup = new HashMap<>(NBTBase.NBT_TYPES.length);
+            nbtTypes.forEach(t -> rawNbtTypeLookup.put(t, rawNbtTypeLookup.size()));
+            RAW_NBT_TYPE_LOOKUP = ImmutableMap.copyOf(rawNbtTypeLookup);
+
             Map<String, Integer> nbtTypeLookup = new HashMap<>(NBTBase.NBT_TYPES.length);
             nbtTypes.forEach(t -> nbtTypeLookup.put("NBTTag" + WordUtils.capitalizeFully(t).replace("[]", "Array"), nbtTypeLookup.size()));
             NBT_TYPE_LOOKUP = ImmutableMap.copyOf(nbtTypeLookup);
         }
-        public static int lookupNBTType(Class<? extends NBTBase> clazz) {
-            return Objects.requireNonNull(NBT_TYPE_LOOKUP.get(clazz.getSimpleName()));
+        @SuppressWarnings("ConstantConditions")
+        public static int lookupNBTType(Class<?> clazz) {
+            return lookupNBTType(clazz, false);
         }
         @Nullable
-        public static Integer lookupNBTType(Class<? extends NBTBase> clazz, boolean nullable) {
-            return nullable ? NBT_TYPE_LOOKUP.get(clazz.getSimpleName()) : lookupNBTType(clazz);
+        public static Integer lookupNBTType(Class<?> clazz, boolean nullable) {
+            Integer ret = NBT_TYPE_LOOKUP.get(clazz.getSimpleName());
+            if (ret == null) ret = RAW_NBT_TYPE_LOOKUP.get(clazz.getSimpleName().toUpperCase(Locale.ROOT));
+            return nullable ? ret : requireNonNull(ret);
         }
 
         @SuppressWarnings("UnusedReturnValue")
@@ -78,7 +103,7 @@ public enum RegistrablesHelper {
         }
 
         @Nullable
-        public static <C extends NBTBase> C readChildIfHasKey(@Nullable NBTTagCompound p, String key, Class<C> type, BiFunction<NBTTagCompound, String, C> f) {
+        public static <C> C readChildIfHasKey(@Nullable NBTTagCompound p, String key, Class<C> type, BiFunction<NBTTagCompound, String, C> f) {
             if (p != null && p.hasKey(key, lookupNBTType(type))) return f.apply(p, key);
             return null;
         }

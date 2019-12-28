@@ -19,6 +19,9 @@ public enum CreativeTabsOwn {
     // Using a function here to avoid registering the tab.
     @SuppressWarnings("unused")
     private static final Function<CreativeTabsOwn, CreativeTabs> TEMPLATE_ = t -> new CreativeTabsDefault("template_") {
+        /**
+         * {@inheritDoc}
+         */
         @Override
         @SideOnly(Side.CLIENT) // IMPORTANT!
         public ItemStack getTabIconItem() { return new ItemStack(Items.AIR); }
@@ -29,6 +32,9 @@ public enum CreativeTabsOwn {
             .setBackgroundImageName("template_");
 
     public static final CreativeTabs DEFAULT = new CreativeTabsDefault(MOD_ID) {
+        /**
+         * {@inheritDoc}
+         */
         @Override
         @SideOnly(Side.CLIENT)
         public ItemStack getTabIconItem() {

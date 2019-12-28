@@ -5,6 +5,9 @@ import etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrables.items.ItemsO
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
+import javax.annotation.concurrent.Immutable;
+
+@Immutable
 public abstract class Proxy {
     public static final String SUBPACKAGE = "proxies";
 

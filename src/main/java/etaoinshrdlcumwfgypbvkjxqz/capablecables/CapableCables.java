@@ -11,7 +11,6 @@ import org.apache.logging.log4j.Logger;
 
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Constants.*;
 
-@Mod.EventBusSubscriber
 @Mod(modid = MOD_ID,
         name = NAME,
         version = VERSION,
