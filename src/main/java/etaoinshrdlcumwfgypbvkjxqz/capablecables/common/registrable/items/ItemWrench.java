@@ -38,6 +38,7 @@ import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.utilit
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.References.*;
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper.requireRunOnceOnly;
 
+@SuppressWarnings("ALL")
 @Optional.InterfaceList({
         @Optional.Interface(iface = COFH_CORE_PACKAGE + ".api.item.IToolHammer", modid = COFH_CORE_ID),
         @Optional.Interface(iface = BUILDCRAFT_API_PACKAGE + ".api.tools.IToolWrench", modid = BUILDCRAFT_API_ID)
@@ -250,6 +251,7 @@ public class ItemWrench extends ItemUnstackable implements IEventBusSubscriber, 
 
     // Configuration
     public static final Configuration CONFIGURATION = CapableCables.Configuration.behavior.items.wrench;
+    @SuppressWarnings("CanBeFinal")
     public static final class Configuration {
         public static final String LANG_KEY_BASE = CapableCables.Configuration.Behavior.Items.LANG_KEY_BASE + ".wrench";
         public Configuration() { requireRunOnceOnly(); }

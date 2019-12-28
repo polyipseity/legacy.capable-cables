@@ -12,7 +12,8 @@ public class Rectangle4<T> extends PolygonN<T> {
     @SafeVarargs
     public Rectangle4(T... e) {
         super(e);
-        if (e.length != 4) rejectArguments((Object)e);
+        if (e.length != 4) //noinspection ConfusingArgumentToVarargsMethod
+            throw rejectArguments(e);
     }
 
     public T a() { return get(0); }

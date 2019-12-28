@@ -60,6 +60,7 @@ public class GuiTabs extends Gui implements IDrawable, IGuiThemed<IGuiThemed.The
                 this.content = content;
                 this.access = access;
             }
+            @SuppressWarnings("EmptyMethod")
             protected void merge() {}
 
             /**
