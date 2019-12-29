@@ -1,6 +1,6 @@
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-package etaoinshrdlcumwfgypbvkjxqz.capablecables.client.gui.components;
+package etaoinshrdlcumwfgypbvkjxqz.capablecables.client.gui.templates;
 
 import mcp.MethodsReturnNonnullByDefault;
 

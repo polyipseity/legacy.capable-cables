@@ -18,7 +18,7 @@ public abstract class Singleton {
     @SuppressWarnings("unchecked")
     public static <T extends Singleton> T getInstance(Class<T> clazz) {
         try {
-            return INSTANCES.containsKey(clazz) ? (T)INSTANCES.get(clazz) : clazz.newInstance();
+            return INSTANCES.containsKey(clazz) ? (T) INSTANCES.get(clazz) : clazz.newInstance();
         } catch (IllegalAccessException | InstantiationException ex) {
             throw rejectArguments(ex, clazz);
         }

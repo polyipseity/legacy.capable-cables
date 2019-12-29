@@ -12,7 +12,7 @@ import java.lang.reflect.Field;
 
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.CapableCables.LOGGER;
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.GrammarHelper.appendSuffixIfPlural;
-import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper.wrapUnhandledThrowable;
+import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper.unexpectedThrowable;
 
 public abstract class Registrable<T extends IForgeRegistryEntry<T>> extends Singleton {
     private final Class<T> clazz;
@@ -35,14 +35,11 @@ public abstract class Registrable<T extends IForgeRegistryEntry<T>> extends Sing
             Field[] fs = getClass().getFields();
             LOGGER.info("Found {} field{} in '{}'", fs.length, appendSuffixIfPlural(fs.length, "s"), classGS);
             for (Field f : fs) {
-                try {
-                    v = f.get(this);
-                } catch (IllegalAccessException ex) {
-                    throw wrapUnhandledThrowable(ex, String.format("Unexpected illegal access to '%s'", f.toGenericString()));
-                }
+                LOGGER.trace("Processing field '{}'", f.toGenericString());
+                try { v = f.get(this); } catch (IllegalAccessException ex) { throw unexpectedThrowable(ex); }
                 LOGGER.debug("Field '{}' value is '{}'", f.toGenericString(), v);
                 if (clazz.isAssignableFrom(v.getClass())) {
-                    reg.register((T)v);
+                    reg.register((T) v);
                     if (v instanceof IEventBusSubscriber) {
                         MinecraftForge.EVENT_BUS.register(v);
                         evtRegEd++;

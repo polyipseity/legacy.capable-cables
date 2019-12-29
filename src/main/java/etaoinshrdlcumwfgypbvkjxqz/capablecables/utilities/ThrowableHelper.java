@@ -3,6 +3,7 @@ package etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 import com.google.common.collect.Sets;
 
 import javax.annotation.Nullable;
+import java.rmi.UnexpectedException;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -41,4 +42,6 @@ public enum ThrowableHelper {
 
     public static IllegalArgumentException rejectArguments(Object... args) { throw new IllegalArgumentException(rejectObjectsString(String.format("illegal argument%s", appendSuffixIfPlural(args.length, "s")), args)); }
     public static IllegalArgumentException rejectArguments(Throwable cause, Object... args) { throw new IllegalArgumentException(rejectObjectsString(String.format("illegal argument%s", appendSuffixIfPlural(args.length, "s")), args), cause); }
+
+    public static RuntimeException unexpectedThrowable(Throwable cause) { throw wrapUnhandledThrowable(new UnexpectedException(String.format("Unexpected throwable '%s'", cause.getClass().toGenericString()))); }
 }

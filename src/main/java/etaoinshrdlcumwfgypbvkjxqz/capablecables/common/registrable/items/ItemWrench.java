@@ -3,10 +3,12 @@ package etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items;
 import buildcraft.api.tools.IToolWrench;
 import cofh.api.item.IToolHammer;
 import etaoinshrdlcumwfgypbvkjxqz.capablecables.CapableCables;
+import etaoinshrdlcumwfgypbvkjxqz.capablecables.client.gui.GuiWrench;
 import etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items.templates.ItemUnstackable;
 import etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.utilities.IEventBusSubscriber;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
@@ -15,6 +17,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -32,9 +35,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import javax.annotation.Nullable;
 
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.CapableCables.LOGGER;
-import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.utilities.RegistrableHelper.BlockHelper.checkNoEntityCollision;
-import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.utilities.RegistrableHelper.NBTHelper.*;
-import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.utilities.RegistrableHelper.PositionHelper.getPosition;
+import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.utilities.RegistrableHelper.Blocks.checkNoEntityCollision;
+import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.utilities.RegistrableHelper.Blocks.getPosition;
+import static etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.utilities.RegistrableHelper.NBT.*;
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.References.*;
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper.requireRunOnceOnly;
 
@@ -45,6 +48,16 @@ import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper
 })
 public class ItemWrench extends ItemUnstackable implements IEventBusSubscriber, IToolHammer, IToolWrench {
     public ItemWrench() { super(); }
+
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
+        ItemStack stack = playerIn.getHeldItem(handIn);
+        if (playerIn.isSneaking()) {
+            if (worldIn.isRemote) Minecraft.getMinecraft().addScheduledTask(() -> Minecraft.getMinecraft().displayGuiScreen(new GuiWrench(stack)));
+            return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+        }
+        return new ActionResult<>(EnumActionResult.FAIL, stack);
+    }
 
     /**
      * {@inheritDoc}
@@ -127,7 +140,7 @@ public class ItemWrench extends ItemUnstackable implements IEventBusSubscriber, 
                     tag.pickedUpBlockState = null;
                     stack.setTagCompound(tag.serializeNBT());
                 } else if (tag.pickedUpEntity != null) {
-                    EntityLivingBase entity = (EntityLivingBase)EntityList.createEntityFromNBT(tag.pickedUpEntity, world);
+                    EntityLivingBase entity = (EntityLivingBase) EntityList.createEntityFromNBT(tag.pickedUpEntity, world);
                     if (entity == null) {
                         LOGGER.error("Cannot create entity with tag '{}'", tag.pickedUpEntity);
                         return false;
@@ -151,7 +164,7 @@ public class ItemWrench extends ItemUnstackable implements IEventBusSubscriber, 
                 stack.setTagCompound(tag.serializeNBT());
                 break;
             case ENTITY:
-                EntityLivingBase entity = (EntityLivingBase)target.entityHit;
+                EntityLivingBase entity = (EntityLivingBase) target.entityHit;
                 tag.pickedUpEntity = entity.serializeNBT();
                 stack.setTagCompound(tag.serializeNBT());
                 world.removeEntity(entity);

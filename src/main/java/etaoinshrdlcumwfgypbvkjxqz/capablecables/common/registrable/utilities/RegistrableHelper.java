@@ -20,20 +20,17 @@ import static java.util.Objects.requireNonNull;
 
 public enum RegistrableHelper {
     ;
-    public enum BlockHelper {
+    public enum Blocks {
         ;
+        public static Vec3d getPosition(RayTraceResult rtr) { return new Vec3d(rtr.getBlockPos()).add(rtr.hitVec); }
+
         public static boolean checkNoEntityCollision(IBlockState state, World world, BlockPos pos) {
             AxisAlignedBB collision = state.getCollisionBoundingBox(world, pos);
             return collision == null || world.checkNoEntityCollision(collision.offset(pos));
         }
     }
 
-    public enum PositionHelper {
-        ;
-        public static Vec3d getPosition(RayTraceResult rtr) { return new Vec3d(rtr.getBlockPos()).add(rtr.hitVec); }
-    }
-
-    public enum NBTHelper {
+    public enum NBT {
         ;
         public static final Map<String, Integer> RAW_NBT_TYPE_LOOKUP;
         public static final Map<String, Integer> NBT_TYPE_LOOKUP;

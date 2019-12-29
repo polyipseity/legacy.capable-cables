@@ -4,7 +4,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public interface IGuiThemed<T extends Enum<T>> {
+public interface IThemed<T extends Enum<T>> {
     void setTheme(T theme);
     T getTheme();
 
