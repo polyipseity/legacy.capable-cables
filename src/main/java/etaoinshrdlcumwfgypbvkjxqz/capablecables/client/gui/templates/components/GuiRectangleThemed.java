@@ -1,5 +1,6 @@
 package etaoinshrdlcumwfgypbvkjxqz.capablecables.client.gui.templates.components;
 
+import etaoinshrdlcumwfgypbvkjxqz.capablecables.client.gui.utilities.Color;
 import etaoinshrdlcumwfgypbvkjxqz.capablecables.client.gui.utilities.IThemed;
 import etaoinshrdlcumwfgypbvkjxqz.capablecables.client.gui.utilities.polygons.Rectangle;
 import net.minecraft.client.Minecraft;
@@ -12,38 +13,28 @@ import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper.unexpectedThrowable;
 
 @SideOnly(Side.CLIENT)
-public abstract class GuiRectangleThemed<N extends Number> extends GuiRectangle<N> implements IThemed<IThemed.Theme> {
-    public GuiRectangleThemed(Rectangle<N> rect, int color, Theme theme) {
+public class GuiRectangleThemed<N extends Number> extends GuiRectangle<N> implements IThemed<IThemed.Theme> {
+    public GuiRectangleThemed(Rectangle<N> rect, Color color, Theme theme) {
         super(rect, color);
         this.theme = theme;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    public abstract void draw(Minecraft minecraft);
+    public void draw(Minecraft minecraft) { theme.getHandler().drawRect(specs().getOffset(), specs().getSize(), color); }
 
     protected Theme theme;
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void setTheme(Theme theme) { this.theme = theme; }
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Theme getTheme() { return theme; }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public GuiRectangleThemed<N> clone() { try { return (GuiRectangleThemed<N>) super.clone(); } catch (ClassCastException ex) { throw unexpectedThrowable(ex); } }
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -52,57 +43,37 @@ public abstract class GuiRectangleThemed<N extends Number> extends GuiRectangle<
         GuiRectangleThemed<?> that = (GuiRectangleThemed<?>) o;
         return theme == that.theme;
     }
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public int hashCode() { return Objects.hash(super.hashCode(), theme); }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    public GuiRectangleThemed<N> toImmutable() {
-        GuiRectangleThemed<N> t = this;
-        return new Immutable<N>(this) {
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void draw(Minecraft minecraft) { t.draw(minecraft); }
-        };
-    }
+    public GuiRectangleThemed<N> toImmutable() { return new Immutable<>(this); }
     @javax.annotation.concurrent.Immutable
-    public static abstract class Immutable<N extends Number> extends GuiRectangleThemed<N> {
-        public Immutable(Rectangle<N> rect, int color, Theme theme) { super(rect.toImmutable(), color, theme); }
+    public static class Immutable<N extends Number> extends GuiRectangleThemed<N> {
+        public Immutable(Rectangle<N> rect, Color color, Theme theme) { super(rect.toImmutable(), color.toImmutable(), theme); }
         public Immutable(GuiRectangleThemed<N> c) { this(c.rect, c.color, c.theme); }
 
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public void setRect(Rectangle<N> rect) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
-        public void setColor(int color) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+        public void setColor(Color color) { throw rejectUnsupportedOperation(); }
+         /** {@inheritDoc} */
         @Override
         public void setTheme(Theme theme) { throw rejectUnsupportedOperation(); }
 
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public GuiRectangleThemed.Immutable<N> clone() { try { return (GuiRectangleThemed.Immutable<N>) super.clone(); } catch (ClassCastException ex) { throw unexpectedThrowable(ex); } }
 
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public GuiRectangleThemed.Immutable<N> toImmutable() { return this; }
+         /** {@inheritDoc} */
+        @Override
+        public boolean isImmutable() { return true; }
     }
 }

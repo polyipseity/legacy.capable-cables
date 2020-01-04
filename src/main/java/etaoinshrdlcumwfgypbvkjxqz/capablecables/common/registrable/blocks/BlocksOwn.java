@@ -17,9 +17,7 @@ public final class BlocksOwn extends Registrable<Block> {
     public BlocksOwn() { super(Block.class); }
     public static BlocksOwn getInstance() { return getInstance(BlocksOwn.class); }
 
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     @SubscribeEvent
     public void register(RegistryEvent.Register<Block> e) { super.register(e); }

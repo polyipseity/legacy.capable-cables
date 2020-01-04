@@ -21,7 +21,10 @@ public class GuiWrench extends GuiScreen implements IThemed<IThemed.Theme> {
         this.stack = stack;
         /* tabs = new GuiTabsThemed.Immutable<>(open, this.theme,
                 new GuiTabs.ITab.Impl.Immutable<>(
-                        new GuiRectangleThemedDrawable.Immutable<>())); */
+                        new GuiRectangleThemedDrawable.Immutable<>(),
+                        new GuiRectangleThemed.Immutable<>()
+                )
+        ); */
     }
     public GuiWrench(ItemStack stack) { this(0, Theme.NONE, stack); }
 
@@ -31,14 +34,10 @@ public class GuiWrench extends GuiScreen implements IThemed<IThemed.Theme> {
     public ItemStack getStack() { return stack; }
 
     protected Theme theme;
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void setTheme(Theme theme) { this.theme = theme; }
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Theme getTheme() { return theme; }
 }

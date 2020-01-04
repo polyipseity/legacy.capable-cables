@@ -36,9 +36,7 @@ public class Frame<N extends Number> implements IImmutablizable<Frame<N>> {
     public void setLeft(N l) { tl.setX(l); }
     public N left() { return tl.getX(); }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override
     public Frame<N> clone() {
@@ -48,9 +46,7 @@ public class Frame<N extends Number> implements IImmutablizable<Frame<N>> {
         r.br = br.clone();
         return r;
     }
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -59,15 +55,11 @@ public class Frame<N extends Number> implements IImmutablizable<Frame<N>> {
         return tl.equals(frame.tl) &&
                 br.equals(frame.br);
     }
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public int hashCode() { return Objects.hash(tl, br); }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Frame<N> toImmutable() { return new Immutable<>(this); }
     @javax.annotation.concurrent.Immutable
@@ -76,47 +68,34 @@ public class Frame<N extends Number> implements IImmutablizable<Frame<N>> {
         public Immutable(N top, N right, N bottom, N left) { this(new XY<>(left, top), new XY<>(right, bottom)); }
         public Immutable(Frame<N> c) { this(c.tl, c.br); }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void setTopLeft(XY<N> tl) { throw ThrowableHelper.rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void setBottomRight(XY<N> br) { throw ThrowableHelper.rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void setTop(N t) { throw ThrowableHelper.rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void setRight(N r) { throw ThrowableHelper.rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void setBottom(N b) { throw ThrowableHelper.rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void setLeft(N l) { throw ThrowableHelper.rejectUnsupportedOperation(); }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public Immutable<N> clone() { try { return (Immutable<N>) super.clone(); } catch (ClassCastException ex) { throw unexpectedThrowable(ex); } }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public Immutable<N> toImmutable() { return this; }
+        /** {@inheritDoc} */
+        @Override
+        public boolean isImmutable() { return true; }
     }
 }

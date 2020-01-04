@@ -25,57 +25,42 @@ public class Polygon4<N extends Number> extends PolygonN<N> {
     public XY<N> d() { return get(3); }
     public void setD(XY<N> d) { set(0, d); }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Polygon4<N> clone() { try { return (Polygon4<N>) super.clone(); } catch (ClassCastException ex) { throw unexpectedThrowable(ex); } }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Polygon4<N> toImmutable() { return new Immutable<>(this); }
     public static class Immutable<N extends Number> extends Polygon4<N> {
         public Immutable(XY<N> a, XY<N> b, XY<N> c, XY<N> d) { super(ImmutableList.of(a.toImmutable(), b.toImmutable(), c.toImmutable(), d.toImmutable())); }
         public Immutable(Polygon4<N> c) { this(c.a(), c.b(), c.c(), c.d()); }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void setList(List<XY<N>> list) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void setA(XY<N> a) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void setB(XY<N> b) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void setC(XY<N> c) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void setD(XY<N> d) { throw rejectUnsupportedOperation(); }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public Polygon4.Immutable<N> clone() { try { return (Polygon4.Immutable<N>) super.clone(); } catch (ClassCastException ex) { throw unexpectedThrowable(ex); } }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public Polygon4.Immutable<N> toImmutable() { return this; }
+        /** {@inheritDoc} */
+        @Override
+        public boolean isImmutable() { return true; }
     }
 }

@@ -24,25 +24,17 @@ public class GuiTabsThemed<N extends Number> extends GuiTabs<N> implements IThem
     }
 
     protected Theme theme;
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void setTheme(Theme theme) { this.theme = theme; }
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Theme getTheme() { return theme; }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public GuiTabsThemed<N> clone() { try { return (GuiTabsThemed<N>) super.clone(); } catch (ClassCastException ex) { throw unexpectedThrowable(ex); } }
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -51,9 +43,7 @@ public class GuiTabsThemed<N extends Number> extends GuiTabs<N> implements IThem
         GuiTabsThemed<?> that = (GuiTabsThemed<?>) o;
         return theme == that.theme;
     }
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public int hashCode() { return Objects.hash(super.hashCode(), theme); }
 
@@ -66,24 +56,21 @@ public class GuiTabsThemed<N extends Number> extends GuiTabs<N> implements IThem
         public Immutable(int open, Theme theme, ITab<N>... tabs) { super(open, theme, ImmutableList.copyOf(tabs)); }
         public Immutable(GuiTabsThemed<N> c) { this(c.open, c.theme, c.tabs); }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void setOpen(int open) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void setTheme(Theme theme) { throw rejectUnsupportedOperation(); }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public GuiTabsThemed.Immutable<N> clone() { try { return (GuiTabsThemed.Immutable<N>) super.clone(); } catch (ClassCastException ex) { throw unexpectedThrowable(ex); } }
 
         @Override
         public GuiTabsThemed.Immutable<N> toImmutable() { return this; }
+        /** {@inheritDoc} */
+        @Override
+        public boolean isImmutable() { return true; }
     }
 }

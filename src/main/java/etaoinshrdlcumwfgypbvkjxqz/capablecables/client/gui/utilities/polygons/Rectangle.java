@@ -42,30 +42,20 @@ public class Rectangle<N extends Number> extends Polygon4<N> {
     public XY<N> min() { return a().min(c()); }
     public XY<N> max() { return a().max(c()); }
 
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public void setA(XY<N> a) { throw rejectUnsupportedOperation(); }
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public void setB(XY<N> b) { throw rejectUnsupportedOperation(); }
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public void setC(XY<N> c) { throw rejectUnsupportedOperation(); }
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public void setD(XY<N> d) { throw rejectUnsupportedOperation(); }
 
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public Rectangle<N> clone() {
         Rectangle<N> r;
@@ -74,9 +64,7 @@ public class Rectangle<N extends Number> extends Polygon4<N> {
         r.size = size.clone();
         return r;
     }
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -86,15 +74,11 @@ public class Rectangle<N extends Number> extends Polygon4<N> {
         return offset.equals(rectangle.offset) &&
                 size.equals(rectangle.size);
     }
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public int hashCode() { return Objects.hash(super.hashCode(), offset, size); }
 
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public Rectangle<N> toImmutable() { return new Immutable<>(this); }
     public static class Immutable<N extends Number> extends Rectangle<N> {
@@ -104,57 +88,40 @@ public class Rectangle<N extends Number> extends Polygon4<N> {
         }
         public Immutable(Rectangle<N> c) { this(c.offset, c.size); }
 
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public void setList(List<XY<N>> list) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public void setA(XY<N> a) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public void setB(XY<N> b) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public void setC(XY<N> c) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public void setD(XY<N> d) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public void setSize(XY<N> size) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public void setOffset(XY<N> offset) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public void setOffsetAndSize(XY<N> offset, XY<N> size) { throw rejectUnsupportedOperation(); }
 
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public Rectangle.Immutable<N> clone() { try { return (Rectangle.Immutable<N>) super.clone(); } catch (ClassCastException ex) { throw unexpectedThrowable(ex); } }
 
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public Rectangle.Immutable<N> toImmutable() { return this; }
+         /** {@inheritDoc} */
+        @Override
+        public boolean isImmutable() { return true; }
     }
 }

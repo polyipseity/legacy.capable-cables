@@ -20,35 +20,23 @@ public class PolygonN<N extends Number> extends AbstractList<XY<N>> implements I
     public void setList(List<XY<N>> list) { this.list = list; }
     public List<XY<N>> getList() { return list; }
 
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public XY<N> get(int index) { return list.get(index); }
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public int size() { return list.size(); }
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public XY<N> set(int index, XY<N> element) { return list.set(index, element); }
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public void add(int index, XY<N> element) { list.add(index, element); }
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public boolean remove(Object o) { return list.remove(o); }
 
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override
     public PolygonN<N> clone() {
@@ -57,9 +45,7 @@ public class PolygonN<N extends Number> extends AbstractList<XY<N>> implements I
         r.list = list instanceof ImmutableList ? ImmutableList.copyOf(list) : new ArrayList<>(list);
         return r;
     }
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -68,15 +54,11 @@ public class PolygonN<N extends Number> extends AbstractList<XY<N>> implements I
         PolygonN<?> polygonN = (PolygonN<?>) o;
         return list.equals(polygonN.list);
     }
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public int hashCode() { return Objects.hash(super.hashCode(), list); }
 
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public PolygonN<N> toImmutable() { return new Immutable<>(this); }
     public static class Immutable<N extends Number> extends PolygonN<N> {
@@ -84,22 +66,19 @@ public class PolygonN<N extends Number> extends AbstractList<XY<N>> implements I
         public Immutable(XY<N>... e) { super(ImmutableList.copyOf(e)); }
         public Immutable(List<XY<N>> l) { super(ImmutableList.copyOf(l)); }
 
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public void setList(List<XY<N>> list) { throw rejectUnsupportedOperation(); }
 
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public Immutable<N> clone() { try { return (Immutable<N>) super.clone(); } catch (ClassCastException ex) { throw unexpectedThrowable(ex); } }
 
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public Immutable<N> toImmutable() { return this; }
+         /** {@inheritDoc} */
+        @Override
+        public boolean isImmutable() { return true; }
     }
 }

@@ -16,14 +16,10 @@ public class BlockDefault extends Block implements IForgeRegistryEntryExtension<
     }
 
     /* IForgeRegistryEntryExtension */
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public Block setUnlocalizedName(ResourceLocation name) { return setUnlocalizedName(getNamespacedUnlocalizedNameForRegistry(name)); }
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public Block setRegistryAndUnlocalizedName(ResourceLocation name) { return setUnlocalizedName(name).setRegistryName(name); }
 }

@@ -1,5 +1,3 @@
-import org.codehaus.groovy.runtime.GStringImpl
-
 //////////////////////////////////////////////////
 // Global
 //////////////////////////////////////////////////
@@ -14,6 +12,6 @@ project.ext {
     strictDigestCheck = parseArgument("strictDigestCheck", "STRICT_DIGEST_CHECK", false).toBoolean()
 
     // Variables
-    lastGoodSettingsPath = "$rootDir${File.separator}gradle${File.separator}last-good-settings.json" as GStringImpl
-    repositoryDirectory = "$buildDir${File.separator}repo" as GStringImpl
+    lastGoodSettingsPath = "$rootDir${File.separator}gradle${File.separator}last-good-settings.json".toString()
+    repositoryDirectory = "$buildDir${File.separator}repo".toString()
 }

@@ -71,5 +71,10 @@
       <option name="name" value="BuildCraft" />
       <option name="url" value="http://mod-buildcraft.com/maven/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="cil" />
+      <option name="name" value="cil" />
+      <option name="url" value="http://maven.cil.li/" />
+    </remote-repository>
   </component>
 </project>

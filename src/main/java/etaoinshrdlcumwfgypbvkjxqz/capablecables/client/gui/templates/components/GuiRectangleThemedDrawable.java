@@ -1,120 +1,102 @@
 package etaoinshrdlcumwfgypbvkjxqz.capablecables.client.gui.templates.components;
 
+import etaoinshrdlcumwfgypbvkjxqz.capablecables.client.gui.utilities.Color;
 import etaoinshrdlcumwfgypbvkjxqz.capablecables.client.gui.utilities.IDrawable;
 import etaoinshrdlcumwfgypbvkjxqz.capablecables.client.gui.utilities.polygons.Rectangle;
-import etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.IImmutablizable;
+import etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Remarks;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Objects;
 
-import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper.rejectUnsupportedOperation;
-import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper.unexpectedThrowable;
+import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper.*;
 
 @SideOnly(Side.CLIENT)
-public abstract class GuiRectangleThemedDrawable<N extends Number, D extends IDrawable<N, ? extends GuiRectangleThemedDrawable<N, D, MD>>, MD extends IImmutablizable<D>> extends GuiRectangleThemed<N> {
-    protected MD drawable;
-    public GuiRectangleThemedDrawable(Rectangle<N> rect, int color, Theme theme, MD drawable) {
+public class GuiRectangleThemedDrawable<N extends Number, D extends IDrawable<N, D>> extends GuiRectangleThemed<N> {
+    @Remarks("Mutable")
+    protected IDrawable<N, D> drawable;
+    public GuiRectangleThemedDrawable(Rectangle<N> rect, Color color, Theme theme, IDrawable<N, D> drawable) {
         super(rect, color, theme);
-        this.drawable = drawable;
+        setDrawable(drawable);
+    }
+    public GuiRectangleThemedDrawable(Rectangle<N> rect, Theme theme, IDrawable<N, D> drawable) { this(rect, Color.TRANSPARENT, theme, drawable); }
+
+    /** {@inheritDoc} */
+    @Override
+    public void draw(Minecraft minecraft) {
+        theme.getHandler().drawRect(rect.getOffset(), rect.getSize(), color);
+        drawable.specs().setOffsetAndSize(rect.getOffset(), rect.getSize());
+        drawable.draw(minecraft);
     }
 
-    public void setDrawable(MD drawable) { this.drawable = drawable; }
-    public MD getDrawable() { return drawable; }
+    public void setDrawable(IDrawable<N, D> drawable) {
+        if (drawable.isImmutable()) throw rejectArguments(drawable);
+        this.drawable = drawable;
+    }
+    public IDrawable<N, D> getDrawable() { return drawable; }
 
     protected Theme theme;
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void setTheme(Theme theme) { this.theme = theme; }
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public Theme getTheme() { return theme; }
 
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
+    /** {@inheritDoc} */
     @Override
-    public GuiRectangleThemedDrawable<N, D, MD> clone() {
-        GuiRectangleThemedDrawable<N, D, MD> r;
-        try { r = (GuiRectangleThemedDrawable<N, D, MD>) super.clone(); } catch (ClassCastException ex) { throw unexpectedThrowable(ex); }
-        r.drawable = (MD) ((D) drawable).clone();
+    public GuiRectangleThemedDrawable<N, D> clone() {
+        GuiRectangleThemedDrawable<N, D> r;
+        try { r = (GuiRectangleThemedDrawable<N, D>) super.clone(); } catch (ClassCastException ex) { throw unexpectedThrowable(ex); }
+        r.drawable = drawable.clone();
         return r;
     }
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof GuiRectangleThemedDrawable)) return false;
         if (!super.equals(o)) return false;
-        GuiRectangleThemedDrawable<?, ?, ?> that = (GuiRectangleThemedDrawable<?, ?, ?>) o;
+        GuiRectangleThemedDrawable<?, ?> that = (GuiRectangleThemedDrawable<?, ?>) o;
         return drawable.equals(that.drawable) &&
                 theme == that.theme;
     }
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public int hashCode() { return Objects.hash(super.hashCode(), drawable, theme); }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
-    public GuiRectangleThemedDrawable<N, D, MD> toImmutable() {
-        GuiRectangleThemedDrawable<N, D, MD> t = this;
-        return new Immutable<N, D, MD>(this) {
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void draw(Minecraft minecraft) { t.draw(minecraft); }
-        };
-    }
+    public GuiRectangleThemedDrawable<N, D> toImmutable() { return new Immutable<>(this); }
     @javax.annotation.concurrent.Immutable
-    public static abstract class Immutable<N extends Number, D extends IDrawable<N, ? extends GuiRectangleThemedDrawable<N, D, MD>>, MD extends IImmutablizable<D>> extends GuiRectangleThemedDrawable<N, D, MD> {
-        @SuppressWarnings("unchecked")
-        public Immutable(Rectangle<N> rect, int color, Theme theme, MD drawable) { super(rect.toImmutable(), color, theme, (MD) drawable.toImmutable()); }
-        public Immutable(GuiRectangleThemedDrawable<N, D, MD> c) { super(c.rect, c.color, c.theme, c.drawable); }
+    public static class Immutable<N extends Number, D extends IDrawable<N, D>> extends GuiRectangleThemedDrawable<N, D> {
+        public Immutable(Rectangle<N> rect, Color color, Theme theme, IDrawable<N, D> drawable) { super(rect.toImmutable(), color.toImmutable(), theme, drawable); }
+        public Immutable(Rectangle<N> rect, Theme theme, IDrawable<N, D> drawable) { this(rect, Color.TRANSPARENT_I, theme, drawable); }
+        public Immutable(GuiRectangleThemedDrawable<N, D> c) { this(c.rect, c.color, c.theme, c.drawable); }
 
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public void setRect(Rectangle<N> rect) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
-        public void setColor(int color) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+        public void setColor(Color color) { throw rejectUnsupportedOperation(); }
+         /** {@inheritDoc} */
         @Override
         public void setTheme(Theme theme) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
-        public void setDrawable(MD drawable) { throw rejectUnsupportedOperation(); }
+        public void setDrawable(IDrawable<N, D> drawable) { throw rejectUnsupportedOperation(); }
 
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
-        public GuiRectangleThemedDrawable.Immutable<N, D, MD> clone() { try { return (GuiRectangleThemedDrawable.Immutable<N, D, MD>) super.clone(); } catch (ClassCastException ex) { throw unexpectedThrowable(ex); } }
+        public GuiRectangleThemedDrawable.Immutable<N, D> clone() { try { return (GuiRectangleThemedDrawable.Immutable<N, D>) super.clone(); } catch (ClassCastException ex) { throw unexpectedThrowable(ex); } }
 
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
-        public GuiRectangleThemedDrawable.Immutable<N, D, MD> toImmutable() { return this; }
+        public GuiRectangleThemedDrawable.Immutable<N, D> toImmutable() { return this; }
+         /** {@inheritDoc} */
+        @Override
+        public boolean isImmutable() { return true; }
     }
 }

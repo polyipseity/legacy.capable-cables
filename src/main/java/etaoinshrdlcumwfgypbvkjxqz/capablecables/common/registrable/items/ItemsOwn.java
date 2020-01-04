@@ -16,9 +16,7 @@ public final class ItemsOwn extends Registrable<Item> {
     public ItemsOwn() { super(Item.class); }
     public static ItemsOwn getInstance() { return getInstance(ItemsOwn.class); }
 
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     @SubscribeEvent
     public void register(RegistryEvent.Register<Item> e) { super.register(e); }

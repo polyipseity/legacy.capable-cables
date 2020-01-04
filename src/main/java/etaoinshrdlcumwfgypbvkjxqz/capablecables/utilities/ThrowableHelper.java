@@ -11,6 +11,8 @@ import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.GrammarHelper.a
 
 public enum ThrowableHelper {
     ;
+    public static <T extends Throwable> T throw_(T t) throws T { throw t; }
+
     public static StackTraceElement[] getStackTrace() { return new Throwable().getStackTrace(); }
     public static RuntimeException wrapUnhandledThrowable(Throwable t) { throw wrapUnhandledThrowable(t, null); }
     public static RuntimeException wrapUnhandledThrowable(Throwable t, @Nullable String msg) { throw new RuntimeException(msg, t); }

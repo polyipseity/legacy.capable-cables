@@ -10,14 +10,10 @@ public class ItemDefault extends Item implements IForgeRegistryEntryExtension<It
     public ItemDefault() { super(); }
 
     /* IForgeRegistryEntryExtension */
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public Item setUnlocalizedName(ResourceLocation name) { return setUnlocalizedName(getNamespacedUnlocalizedNameForRegistry(name)); }
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public Item setRegistryAndUnlocalizedName(ResourceLocation name) { return setUnlocalizedName(name).setRegistryName(name); }
 }

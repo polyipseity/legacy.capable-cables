@@ -47,15 +47,11 @@ public class XY<N extends Number> implements IImmutablizable<XY<N>> {
     @SafeVarargs
     public static <N extends Number> N[] extractY(XY<N>... o) { return (N[]) Arrays.stream(o).map(t -> t.y).toArray(); }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     @Override
     public XY<N> clone() { try { return (XY<N>) super.clone(); } catch (CloneNotSupportedException | ClassCastException ex) { throw unexpectedThrowable(ex); } }
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -64,42 +60,33 @@ public class XY<N extends Number> implements IImmutablizable<XY<N>> {
         return x.equals(xy.x) &&
                 y.equals(xy.y);
     }
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public int hashCode() { return Objects.hash(x, y); }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public XY<N> toImmutable() { return new Immutable<>(this); }
     @javax.annotation.concurrent.Immutable
     public static class Immutable<N extends Number> extends XY<N> {
         public Immutable(N x, N y) { super(x, y); }
         public Immutable(XY<N> c) { this(c.x, c.y); }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void setX(N x) { throw rejectUnsupportedOperation(); }
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void setY(N y) { throw rejectUnsupportedOperation(); }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public Immutable<N> clone() { try { return (Immutable<N>) super.clone(); } catch (ClassCastException ex) { throw unexpectedThrowable(ex); } }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public Immutable<N> toImmutable() { return this; }
+        /** {@inheritDoc} */
+        @Override
+        public boolean isImmutable() { return true; }
     }
 }

@@ -1,5 +1,6 @@
 package etaoinshrdlcumwfgypbvkjxqz.capablecables.client.gui.templates.components;
 
+import etaoinshrdlcumwfgypbvkjxqz.capablecables.client.gui.utilities.Color;
 import etaoinshrdlcumwfgypbvkjxqz.capablecables.client.gui.utilities.polygons.Frame;
 import etaoinshrdlcumwfgypbvkjxqz.capablecables.client.gui.utilities.polygons.Rectangle;
 import etaoinshrdlcumwfgypbvkjxqz.capablecables.client.gui.utilities.polygons.XY;
@@ -10,6 +11,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Objects;
 
+import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper.rejectUnsupportedOperation;
 import static etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ThrowableHelper.unexpectedThrowable;
 
 @SideOnly(Side.CLIENT)
@@ -19,7 +21,7 @@ public class GuiResource<N extends Number, T extends Number> extends GuiRectangl
     protected Rectangle<T> texture;
 
     public GuiResource(Rectangle<N> rect, Frame<N> padding, ResourceLocation resource, Rectangle<T> texture) {
-        super(rect, 0);
+        super(rect, Color.TRANSPARENT_I);
         this.padding = padding;
         this.resource = resource;
         this.texture = texture;
@@ -32,9 +34,11 @@ public class GuiResource<N extends Number, T extends Number> extends GuiRectangl
     public void setTexture(Rectangle<T> texture) { this.texture = texture; }
     public Rectangle<T> getTexture() { return texture; }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
+    @Override
+    public void setColor(Color color) { throw rejectUnsupportedOperation(); }
+
+    /** {@inheritDoc} */
     @Override
     public void draw(Minecraft minecraft) {
         minecraft.getTextureManager().bindTexture(resource);
@@ -46,9 +50,7 @@ public class GuiResource<N extends Number, T extends Number> extends GuiRectangl
         drawModalRectWithCustomSizedTexture(rectOffset.getX().intValue(), rectOffset.getY().intValue(), textureOffset.getX().floatValue(), textureOffset.getY().floatValue(), rectSize.getX().intValue(), rectSize.getY().intValue(), textureSize.getX().floatValue(), textureSize.getY().floatValue());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public GuiResource<N, T> clone() {
         GuiResource<N, T> r;
@@ -58,9 +60,7 @@ public class GuiResource<N extends Number, T extends Number> extends GuiRectangl
         r.texture = texture.clone();
         return r;
     }
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -71,15 +71,11 @@ public class GuiResource<N extends Number, T extends Number> extends GuiRectangl
                 resource.equals(that.resource) &&
                 texture.equals(that.texture);
     }
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public int hashCode() { return Objects.hash(super.hashCode(), padding, resource, texture); }
 
-    /**
-     * {@inheritDoc}
-     */
+      /** {@inheritDoc} */
     @Override
     public GuiResource<N, T> toImmutable() { return new Immutable<>(this); }
     @javax.annotation.concurrent.Immutable
@@ -87,16 +83,15 @@ public class GuiResource<N extends Number, T extends Number> extends GuiRectangl
         public Immutable(Rectangle<N> rect, Frame<N> padding, ResourceLocation resource, Rectangle<T> texture) { super(rect.toImmutable(), padding.toImmutable(), resource, texture.toImmutable()); }
         public Immutable(GuiResource<N, T> c) { super(c.rect, c.padding, c.resource, c.texture); }
 
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public GuiResource.Immutable<N, T> clone() { try { return (GuiResource.Immutable<N, T>) super.clone(); } catch (ClassCastException ex) { throw unexpectedThrowable(ex); } }
 
-        /**
-         * {@inheritDoc}
-         */
+         /** {@inheritDoc} */
         @Override
         public GuiResource.Immutable<N, T> toImmutable() { return this; }
+         /** {@inheritDoc} */
+        @Override
+        public boolean isImmutable() { return true; }
     }
 }
