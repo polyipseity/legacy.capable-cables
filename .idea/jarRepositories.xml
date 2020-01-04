@@ -47,11 +47,6 @@
       <option name="url" value="http://chickenbones.net/maven/" />
     </remote-repository>
     <remote-repository>
-      <option name="id" value="maven" />
-      <option name="name" value="maven" />
-      <option name="url" value="http://dvs1.progwml6.com/files/maven" />
-    </remote-repository>
-    <remote-repository>
       <option name="id" value="Gradle Central Plugin Repository" />
       <option name="name" value="Gradle Central Plugin Repository" />
       <option name="url" value="https://plugins.gradle.org/m2" />
@@ -69,12 +64,17 @@
     <remote-repository>
       <option name="id" value="BuildCraft" />
       <option name="name" value="BuildCraft" />
-      <option name="url" value="http://mod-buildcraft.com/maven/" />
+      <option name="url" value="https://mod-buildcraft.com/maven/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="DVS1" />
+      <option name="name" value="DVS1" />
+      <option name="url" value="https://dvs1.progwml6.com/files/maven" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="cil" />
       <option name="name" value="cil" />
-      <option name="url" value="http://maven.cil.li/" />
+      <option name="url" value="https://maven.cil.li/" />
     </remote-repository>
   </component>
 </project>
