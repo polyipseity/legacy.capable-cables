@@ -2,8 +2,8 @@ package etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items.templa
 
 @SuppressWarnings("SpellCheckingInspection")
 public class ItemUnstackable extends ItemDefault {
-    public ItemUnstackable() {
-        super();
-        setMaxStackSize(1);
-    }
+	public ItemUnstackable() {
+		super();
+		setMaxStackSize(1);
+	}
 }

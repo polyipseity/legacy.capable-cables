@@ -4,5 +4,5 @@ import etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.blocks.templa
 import etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.materials.Materials;
 
 public class BlockCable extends BlockDefault {
-    public BlockCable() { super(Materials.PETRIFIED_SKY); }
+	public BlockCable() { super(Materials.PETRIFIED_SKY); }
 }

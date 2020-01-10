@@ -4,10 +4,22 @@
     },
     "dependencies": [
         {
+            "configuration": "apiCompile",
+            "group": "org.reflections",
+            "name": "reflections",
+            "version": "0.9.12"
+        },
+        {
             "configuration": "apiCompileClasspath",
             "group": "org.apiguardian",
             "name": "apiguardian-api",
-            "version": "1.2.0-SNAPSHOT"
+            "version": "1.1.0"
+        },
+        {
+            "configuration": "apiCompileClasspath",
+            "group": "org.reflections",
+            "name": "reflections",
+            "version": "0.9.12"
         },
         {
             "configuration": "apiImplementation",
@@ -16,10 +28,100 @@
             "version": "+"
         },
         {
+            "configuration": "apiRuntime",
+            "group": "org.reflections",
+            "name": "reflections",
+            "version": "0.9.12"
+        },
+        {
             "configuration": "apiRuntimeClasspath",
             "group": "org.apiguardian",
             "name": "apiguardian-api",
-            "version": "1.2.0-SNAPSHOT"
+            "version": "1.1.0"
+        },
+        {
+            "configuration": "apiRuntimeClasspath",
+            "group": "org.reflections",
+            "name": "reflections",
+            "version": "0.9.12"
+        },
+        {
+            "configuration": "compile",
+            "group": "org.reflections",
+            "name": "reflections",
+            "version": "0.9.12"
+        },
+        {
+            "configuration": "compileClasspath",
+            "group": "codechicken",
+            "name": "ChickenASM",
+            "version": "1.12-1.0.2.9"
+        },
+        {
+            "configuration": "compileClasspath",
+            "group": "codechicken",
+            "name": "ForgeMultipart",
+            "version": "1.12.2-2.6.2.83"
+        },
+        {
+            "configuration": "compileClasspath",
+            "group": "cofh",
+            "name": "CoFHCore",
+            "version": "1.12.2-4.6.3.27"
+        },
+        {
+            "configuration": "compileClasspath",
+            "group": "cofh",
+            "name": "RedstoneFlux",
+            "version": "1.12-2.1.0.7"
+        },
+        {
+            "configuration": "compileClasspath",
+            "group": "com.mod-buildcraft",
+            "name": "buildcraft-api",
+            "version": "7.99.24.4"
+        },
+        {
+            "configuration": "compileClasspath",
+            "group": "org.reflections",
+            "name": "reflections",
+            "version": "0.9.12"
+        },
+        {
+            "configuration": "compileOnly",
+            "group": "codechicken",
+            "name": "ChickenASM",
+            "version": "1.12-1.0.2.9"
+        },
+        {
+            "configuration": "compileOnly",
+            "group": "codechicken",
+            "name": "ForgeMultipart",
+            "version": "1.12.2-2.6.2.83"
+        },
+        {
+            "configuration": "compileOnly",
+            "group": "cofh",
+            "name": "CoFHCore",
+            "version": "1.12.2-4.6.3.27"
+        },
+        {
+            "configuration": "compileOnly",
+            "group": "cofh",
+            "name": "RedstoneFlux",
+            "version": "1.12-2.1.0.7"
+        },
+        {
+            "configuration": "compileOnly",
+            "group": "com.mod-buildcraft",
+            "name": "buildcraft-api",
+            "version": "7.99.24.4"
+        },
+        {
+            "configuration": "default",
+            "group": "org.reflections",
+            "name": "reflections",
+            "version": "0.9.12"
         },
         {
             "configuration": "forgeGradleMc",
@@ -409,7 +511,7 @@
             "configuration": "forgeGradleMcpMappings",
             "group": "de.oceanlabs.mcp",
             "name": "mcp_snapshot",
-            "version": "20190205-1.13.1"
+            "version": "20171003-1.12"
         },
         {
             "configuration": "forgeGradleUserDevPackage",
@@ -418,16 +520,82 @@
             "version": "1.12.2-14.23.5.2810"
         },
         {
+            "configuration": "incrementalScalaAnalysisForapi",
+            "group": "org.apiguardian",
+            "name": "apiguardian-api",
+            "version": "1.1.0"
+        },
+        {
+            "configuration": "incrementalScalaAnalysisForapi",
+            "group": "org.reflections",
+            "name": "reflections",
+            "version": "0.9.12"
+        },
+        {
+            "configuration": "incrementalScalaAnalysisFormain",
+            "group": "org.reflections",
+            "name": "reflections",
+            "version": "0.9.12"
+        },
+        {
+            "configuration": "incrementalScalaAnalysisFortest",
+            "group": "org.reflections",
+            "name": "reflections",
+            "version": "0.9.12"
+        },
+        {
+            "configuration": "incrementalScalaAnalysisFortest",
+            "group": "org.junit.jupiter",
+            "name": "junit-jupiter-api",
+            "version": "5.6.0-RC1"
+        },
+        {
+            "configuration": "incrementalScalaAnalysisFortest",
+            "group": "org.junit.jupiter",
+            "name": "junit-jupiter-params",
+            "version": "5.6.0-RC1"
+        },
+        {
+            "configuration": "runtime",
+            "group": "org.reflections",
+            "name": "reflections",
+            "version": "0.9.12"
+        },
+        {
+            "configuration": "runtimeClasspath",
+            "group": "org.reflections",
+            "name": "reflections",
+            "version": "0.9.12"
+        },
+        {
+            "configuration": "shade",
+            "group": "org.reflections",
+            "name": "reflections",
+            "version": "0.9.12"
+        },
+        {
+            "configuration": "testCompile",
+            "group": "org.reflections",
+            "name": "reflections",
+            "version": "0.9.12"
+        },
+        {
+            "configuration": "testCompileClasspath",
+            "group": "org.reflections",
+            "name": "reflections",
+            "version": "0.9.12"
+        },
+        {
             "configuration": "testCompileClasspath",
             "group": "org.junit.jupiter",
             "name": "junit-jupiter-api",
-            "version": "5.6.0-SNAPSHOT"
+            "version": "5.6.0-RC1"
         },
         {
             "configuration": "testCompileClasspath",
             "group": "org.junit.jupiter",
             "name": "junit-jupiter-params",
-            "version": "5.6.0-SNAPSHOT"
+            "version": "5.6.0-RC1"
         },
         {
             "configuration": "testImplementation",
@@ -442,28 +610,46 @@
             "version": "+"
         },
         {
+            "configuration": "testRuntime",
+            "group": "org.reflections",
+            "name": "reflections",
+            "version": "0.9.12"
+        },
+        {
+            "configuration": "testRuntimeClasspath",
+            "group": "org.reflections",
+            "name": "reflections",
+            "version": "0.9.12"
+        },
+        {
             "configuration": "testRuntimeClasspath",
             "group": "org.junit.jupiter",
             "name": "junit-jupiter-api",
-            "version": "5.6.0-SNAPSHOT"
+            "version": "5.6.0-RC1"
         },
         {
             "configuration": "testRuntimeClasspath",
             "group": "org.junit.jupiter",
             "name": "junit-jupiter-params",
-            "version": "5.6.0-SNAPSHOT"
+            "version": "5.6.0-RC1"
         },
         {
             "configuration": "testRuntimeClasspath",
             "group": "org.junit.jupiter",
             "name": "junit-jupiter-engine",
-            "version": "5.6.0-SNAPSHOT"
+            "version": "5.6.0-RC1"
         },
         {
             "configuration": "testRuntimeOnly",
             "group": "org.junit.jupiter",
             "name": "junit-jupiter-engine",
             "version": "+"
+        },
+        {
+            "configuration": "zinc",
+            "group": "com.typesafe.zinc",
+            "name": "zinc",
+            "version": "0.3.15"
         }
     ],
     "minecraft": {

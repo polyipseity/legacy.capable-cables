@@ -5,9 +5,9 @@ import org.junit.platform.commons.annotation.Testable;
 
 @Testable
 public class ResourcesTest {
-    @Test
-    @BeforeEach
-    void testResourcesProperlyCopied() {
-        Assertions.assertNotNull(getClass().getResource("/test.txt"), "Resources not properly copied");
-    }
+	@Test
+	@BeforeEach
+	void testResourcesProperlyCopied() {
+		Assertions.assertNotNull(getClass().getResource("/test.txt"), "Resources NOT properly copied");
+	}
 }

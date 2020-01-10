@@ -54,7 +54,7 @@ ext {
     screenshots = stringToStringList screenshots_
     requiredMods = stringToStringList requiredMods_
     dependencies = stringToStringList dependencies_
-    dependants = stringToStringList dependencies_
+    dependants = stringToStringList dependants_
 
     combinedDependencies = ""
     requiredMods.each { m -> combinedDependencies += "required:$m;"}
@@ -103,11 +103,20 @@ minecraft {
     // simply re-run your setup task after changing the mappings to update your workspace.
     mappings = minecraftMappings
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-
-    // srgExtra "PK: org/ejml your/new/package/here/ejml" // shading example
 }
 tasks.runClient.outputs.upToDateWhen { false }
 tasks.runServer.outputs.upToDateWhen { false }
+
+reobf {
+    jar {
+        // extraLines "PK: org/ejml your/new/package/here/ejml" // shading example
+    }
+}
+stringToStringMap(customDependencies).each { String k, List<String> v -> v.each { s ->
+    if (k != "shade") return
+    String p = evaluateGStringString(s).split(":", 2).first().replace ".", "/"
+    reobf.jar.extraLines "PK: $p ${group.replace ".", "/"}/shaded/$p"
+}}
 
 configurations {
     shade
@@ -161,7 +170,7 @@ sourceMainJava {
 
     //noinspection GroovyAssignabilityCheck
     replace processReplaceKeys([
-            "modid": project.name,
+            "modId": project.name,
             "name": name_,
             "version": version,
             "dependencies": combinedDependencies,
@@ -179,6 +188,19 @@ processResources {
         exclude "*.in"
     }
 }
+task copyProcessedResources(type: Copy, description: "Copy processed resources.") {
+    from "$buildDir/resources/main"
+    into "$buildDir/classes/java/main"
+
+    doFirst {
+        delete fileTree(dir: "$buildDir/classes/java/main", exclude: ["*.class"])
+    }
+}
+tasks.processResources.finalizedBy tasks.copyProcessedResources
+task deleteCopiedProcessedResources(type: Delete, description: "Delete copied processed resources.") {
+    delete fileTree(dir: "$buildDir/classes/java/main", exclude: ["*.class"])
+}
+tasks.jar.dependsOn tasks.deleteCopiedProcessedResources
 task processResourcesConfig(type: Copy, group: "config", description: "Process resources at configuration time.") {
     // this will ensure that this task is redone when the variables change.
     inputs.property "modId", project.name
@@ -207,7 +229,7 @@ task processResourcesConfig(type: Copy, group: "config", description: "Process r
         rename ~/(.*)\.in/, "\$1"
 
         // replace variables
-        expand "modid": inputs.properties.modId,
+        expand "modId": inputs.properties.modId,
                 "name": inputs.properties.name,
                 "description": inputs.properties.description,
                 "version": inputs.properties.version,
@@ -241,6 +263,9 @@ test {
     }
 }
 
+jar {
+    configurations.shade.each { d -> from (project.zipTree(d)) { exclude 'META-INF', 'META-INF/**' }}
+}
 task deobfJar(type: Jar, dependsOn: 'jar') {
     from "build/source/main"
     classifier "dev"
