@@ -196,6 +196,3 @@ gradle-app.setting
 
 # Custom files
 ext.properties
-src/main/resources/mcmod.info
-src/main/resources/pack.mcmeta
-src/main/resources/version.properties

@@ -1,42 +1,56 @@
 //////////////////////////////////////////////////
-// Utilities
+// TITLE Utilities
 //////////////////////////////////////////////////
 
 import java.nio.channels.Channels
 
-// Strings
-project.ext.evaluateGStringString = { String s -> new GroovyShell(new Binding(project.ext.properties)).evaluate("\"\"\"$s\"\"\"") }
 
-// Arguments
+/* SECTION methods */
+
+// COMMENT strings
+
+project.ext.evaluateGStringStringWithBinding = { String s, Binding b -> new GroovyShell(b).evaluate("\"\"\"$s\"\"\"") }
+
+project.ext.evaluateGStringString = { String s -> evaluateGStringStringWithBinding(s, new Binding(project.ext.properties)) }
+
+
+// COMMENT arguments
+
 project.ext.parseArgument = { String k, String envK, Object defaultV = null ->
     project.hasProperty(k) ? project."$k" : System.getenv(envK) != null ? System.getenv(envK) : defaultV
 }
 
-// Lists & Maps
-project.ext.stringToStringList = { String s -> s == "[]" ? [] : s.substring(1, s.length() - 1).split("(?<!\\\\),", 0).collect { e -> e.trim().replace("\\,", ",") } }
+
+// COMMENT lists & maps
+
+project.ext.stringToStringList = { String s -> s == '[]' ? [] : s.substring(1, s.length() - 1).split('(?<!\\\\),', 0).collect { it.trim().replace '\\,', ',' } }
+
 project.ext.stringToStringMap = { String s ->
-    List<String> temp = s == "[:]" ? [] : s.substring(1, s.length() - 1).split("(?<!\\\\),", 0).collect { e -> e.trim().replace("\\,", ",") }
-    Map<String, List<String>> ret = [:]
-    temp.each { v ->
-        List<String> temp2 = v.trim().split("(?<!\\\\):", 2).collect { e -> e.trim().replace("\\:", ":") }
-        if (ret.containsKey(temp2.first())) ret[temp2.first()].add temp2.last()
-        else ret[temp2.first()] = [temp2.last()]
+    Map<String, List<String>> r = [:]
+    (s == '[:]' ? [] : stringToStringList(s)).each {
+        List<String> e = it.trim().split('(?<!\\\\):', 2).collect { it.trim().replace('\\:', ':') }
+        if (r.containsKey(e.first())) r[e.first()].add e.last()
+        else r[e.first()] = [e.last()]
     }
-    ret
+    r
 }
 
-// I/O
+
+// COMMENT I/O
+
 project.ext.createNewFile = { File f ->
     f.parentFile.mkdirs()
     f.createNewFile()
 }
+
 project.ext.download = { String url, File dest ->
     createNewFile dest
     FileOutputStream fos = new FileOutputStream(dest)
-    long ret = 0
-    try { ret = fos.channel.transferFrom(Channels.newChannel(new URL(url).openStream()), 0, Long.MAX_VALUE) } finally { fos.close() }
-    ret
+    long r = 0
+    try { r = fos.channel.transferFrom(Channels.newChannel(new URL(url).openStream()), 0, Long.MAX_VALUE) } finally { fos.close() }
+    r
 }
+
 project.ext.convertToCanonicalPath = { String p ->
     project.file(p).canonicalPath
 }

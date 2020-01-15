@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Minecraft Client (Gradle)" type="GradleRunConfiguration" factoryName="Gradle" singleton="false">
+  <configuration default="false" name="Minecraft Client (Gradle)" type="GradleRunConfiguration" factoryName="Gradle" folderName="Minecraft" singleton="true">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />

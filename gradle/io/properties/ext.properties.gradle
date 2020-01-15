@@ -1,8 +1,17 @@
 //////////////////////////////////////////////////
-// Extra Properties Properties (ext.properties)
+// TITLE Extra Properties Properties (ext.properties)
 //////////////////////////////////////////////////
 
-if (!project.ext.has("storeProperties") || !project.ext.has("loadProperties")) throw new IllegalStateException("Apply 'properties.gradle' before applying 'ext.properties.gradle'.")
+import static java.io.File.separator
 
-project.ext.storeExt = { String path = "$projectDir${File.separator}ext.properties" -> storeProperties new Properties(project.ext.properties.collectEntries { k, v -> [k, v.toString()]}), path, "Extra Properties # suppress inspection \"UnusedProperty\", \"SpellCheckingInspection\" for whole file" }
-project.ext.loadExt = { String path = "$projectDir${File.separator}ext.properties" -> (loadProperties(path).findAll { String k, v -> !project.ext.has(k) }).each { k, v -> project.ext."$k" = v } }
+
+/* SECTION check */
+
+if (!project.ext.has('storeProperties') || !project.ext.has('loadProperties')) throw new IllegalStateException('Apply "properties.gradle" before applying "ext.properties.gradle".')
+
+
+/* SECTION methods */
+
+project.ext.storeExt = { String path = "$projectDir${separator}ext.properties" -> storeProperties new Properties(project.ext.properties.collectEntries { [it.key, it.value.toString()] }), path, 'Extra Properties # suppress inspection "UnusedProperty", "SpellCheckingInspection" for whole file' }
+
+project.ext.loadExt = { String path = "$projectDir${separator}ext.properties" -> loadProperties(path).each { if (!project.ext.has(it.key as String)) project.ext."$it.key" = it.value } }

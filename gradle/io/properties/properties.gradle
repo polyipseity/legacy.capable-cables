@@ -1,8 +1,13 @@
 //////////////////////////////////////////////////
-// Properties (.properties)
+// TITLE Properties (.properties)
 //////////////////////////////////////////////////
 
-if (!project.ext.has("createNewFile")) throw new IllegalStateException("Apply 'utilities.gradle' before applying 'properties.gradle'.")
+/* SECTION check */
+
+if (!project.ext.has('createNewFile')) throw new IllegalStateException('Apply "utilities.gradle" before applying "properties.gradle".')
+
+
+/* SECTION methods */
 
 project.ext.storeProperties = { Properties prop, String path, String comment = null ->
     File f = file path
@@ -10,6 +15,7 @@ project.ext.storeProperties = { Properties prop, String path, String comment = n
     FileOutputStream fos = new FileOutputStream(f)
     try { prop.store fos, comment } finally { fos.close() }
 }
+
 project.ext.loadProperties = { String path ->
     Properties prop = new Properties()
     FileInputStream fis = new FileInputStream(path)

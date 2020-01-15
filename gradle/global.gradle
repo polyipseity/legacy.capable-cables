@@ -1,17 +1,28 @@
 //////////////////////////////////////////////////
-// Global
+// TITLE Global
 //////////////////////////////////////////////////
 
-if (!project.ext.has("parseArgument")) throw new IllegalStateException("Apply 'utilities.gradle' before applying 'global.gradle'.")
-String rootDir = name == "buildSrc" ? "$rootDir${File.separator}.." : rootDir
+import static java.io.File.separator
+
+
+/* SECTION check */
+
+if (!project.ext.has('parseArgument')) throw new IllegalStateException('Apply "utilities.gradle" before applying "global.gradle".')
+String rootDir = name == 'buildSrc' ? "$rootDir${separator}.." : rootDir
+
+
+/* SECTION extension variables */
 
 project.ext {
-    // Arguments
-    buildType = parseArgument "buildType", "BUILD_TYPE", "DEBUG"
-    update = parseArgument("update", "UPDATE", false).toBoolean()
-    strictDigestCheck = parseArgument("strictDigestCheck", "STRICT_DIGEST_CHECK", false).toBoolean()
+    // COMMENT arguments
 
-    // Variables
-    lastGoodSettingsPath = "$rootDir${File.separator}gradle${File.separator}last-good-settings.json".toString()
-    repositoryDirectory = "$buildDir${File.separator}repo".toString()
+    buildType = parseArgument 'buildType', 'BUILD_TYPE', 'DEBUG'
+    update = parseArgument('update', 'UPDATE', false).toBoolean()
+    strictDigestCheck = parseArgument('strictDigestCheck', 'STRICT_DIGEST_CHECK', false).toBoolean()
+
+
+    // COMMENT variables
+
+    lastGoodSettingsPath = "$rootDir${separator}gradle${separator}last-good-settings.json".toString()
+    repositoryDirectory = "$buildDir${separator}repo".toString()
 }
