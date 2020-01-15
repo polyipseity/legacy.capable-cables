@@ -16,45 +16,44 @@ import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Miscellaneou
 import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 
 @SideOnly(Side.CLIENT)
-public class GuiTabsThemed<N extends Number, T extends IThemed.ITheme<T>, D extends GuiTabsThemed<N, T, D>> extends GuiTabs<N, D> implements IDrawableThemed<N, T, D> {
+public class GuiTabsThemed<N extends Number, TH extends IThemed.ITheme<TH>, T extends GuiTabsThemed<N, TH, T>> extends GuiTabs<N, T> implements IDrawableThemed<N, TH, T> {
 	/* SECTION variables */
 
-	protected T theme;
+	protected TH theme;
 
 
 	/* SECTION constructors */
 
-	public GuiTabsThemed(List<ITab<N, ?>> tabs, T theme, int open) {
+	public GuiTabsThemed(List<ITab<N, ?>> tabs, TH theme, int open) {
 		super(tabs, open);
 		setTheme(this, theme);
 	}
 
 	@SuppressWarnings("varargs")
 	@SafeVarargs
-	public GuiTabsThemed(T theme, int open, ITab<N, ?>... tabs) {
+	public GuiTabsThemed(TH theme, int open, ITab<N, ?>... tabs) {
 		this(Arrays.asList(tabs), theme, open);
 	}
 
-	public GuiTabsThemed(GuiTabsThemed<N, T, ?> c) { this(c.getTabs(), c.getTheme(), c.getOpen()); }
+	public GuiTabsThemed(GuiTabsThemed<N, TH, ?> c) { this(c.getTabs(), c.getTheme(), c.getOpen()); }
 
 
 	/* SECTION getters & setters */
 
 	/** {@inheritDoc} */
 	@Override
-	public void setTheme(T theme) { setTheme(this, theme); }
+	public void setTheme(TH theme) { setTheme(this, theme); }
 
 	/** {@inheritDoc} */
 	@Override
-	public T getTheme() { return theme; }
+	public TH getTheme() { return theme; }
 
 
 	/* SECTION methods */
 
 	/** {@inheritDoc} */
-	@SuppressWarnings("unchecked")
 	@Override
-	public D toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+	public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
 
 
 	/** {@inheritDoc} */
@@ -85,20 +84,20 @@ public class GuiTabsThemed<N extends Number, T extends IThemed.ITheme<T>, D exte
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, T extends ITheme<T>, D extends Immutable<N, T, D>> extends GuiTabsThemed<N, T, D> {
+	public static class Immutable<N extends Number, TH extends ITheme<TH>, T extends Immutable<N, TH, T>> extends GuiTabsThemed<N, TH, T> {
 		/* SECTION constructors */
 
-		public Immutable(List<ITab<N, ?>> tabs, T theme, int open) {
+		public Immutable(List<ITab<N, ?>> tabs, TH theme, int open) {
 			super(ImmutableList.copyOf(tabs), theme, open);
 		}
 
 		@SuppressWarnings("varargs")
 		@SafeVarargs
-		public Immutable(T theme, int open, ITab<N, ?>... tabs) {
+		public Immutable(TH theme, int open, ITab<N, ?>... tabs) {
 			this(Arrays.asList(tabs), theme, open);
 		}
 
-		public Immutable(GuiTabsThemed<N, T, ?> c) { this(c.getTabs(), c.getTheme(), c.getOpen()); }
+		public Immutable(GuiTabsThemed<N, TH, ?> c) { this(c.getTabs(), c.getTheme(), c.getOpen()); }
 
 
 		/* SECTION getters & setters */
@@ -113,14 +112,14 @@ public class GuiTabsThemed<N extends Number, T extends IThemed.ITheme<T>, D exte
 
 		/** {@inheritDoc} */
 		@Override
-		public void setTheme(T theme) { throw rejectUnsupportedOperation(); }
+		public void setTheme(TH theme) { throw rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */
 
 		/** {@inheritDoc} */
 		@Override
-		public D toImmutable() { return castUnchecked(this); }
+		public T toImmutable() { return castUnchecked(this); }
 
 		/** {@inheritDoc} */
 		@Override

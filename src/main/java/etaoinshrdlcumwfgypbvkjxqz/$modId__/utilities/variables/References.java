@@ -51,6 +51,7 @@ public enum References {
 		return requireNonNull(r);
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	@Nullable
 	public static <T> T markUnused() { return null; }
 

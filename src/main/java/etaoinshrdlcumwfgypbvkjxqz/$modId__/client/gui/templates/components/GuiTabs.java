@@ -24,7 +24,7 @@ import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Miscellaneou
 import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Throwables.*;
 
 @SideOnly(Side.CLIENT)
-public class GuiTabs<N extends Number, D extends GuiTabs<N, D>> extends Gui implements IDrawable<N, D> {
+public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui implements IDrawable<N, T> {
 	/* SECTION variables */
 
 	protected List<ITab<N, ?>> tabs;
@@ -82,9 +82,8 @@ public class GuiTabs<N extends Number, D extends GuiTabs<N, D>> extends Gui impl
 
 
 	/** {@inheritDoc} */
-	@SuppressWarnings("unchecked")
 	@Override
-	public D toImmutable() { return castUnchecked(new Immutable<>(this)); }
+	public T toImmutable() { return castUnchecked(new Immutable<>(this)); }
 
 
 	/** {@inheritDoc} */
@@ -107,8 +106,8 @@ public class GuiTabs<N extends Number, D extends GuiTabs<N, D>> extends Gui impl
 
 	/** {@inheritDoc} */
 	@Override
-	public D clone() {
-		D r;
+	public T clone() {
+		T r;
 		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException | ClassCastException e) { throw unexpectedThrowable(e); }
 		List<ITab<N, ?>> t = getTabs();
 		ITab<N, ?>[] tabsC = castUnchecked(t.stream().map(ICloneable::copy).toArray(ITab<?, ?>[]::new));
@@ -133,7 +132,7 @@ public class GuiTabs<N extends Number, D extends GuiTabs<N, D>> extends Gui impl
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, D extends Immutable<N, D>> extends GuiTabs<N, D> {
+	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends GuiTabs<N, T> {
 		/* SECTION constructors */
 
 		public Immutable(List<ITab<N, ?>> tabs, int open) { super(ImmutableList.copyOf(tabs), open); }
@@ -160,7 +159,7 @@ public class GuiTabs<N extends Number, D extends GuiTabs<N, D>> extends Gui impl
 
 		/** {@inheritDoc} */
 		@Override
-		public D toImmutable() { return castUnchecked(this); }
+		public T toImmutable() { return castUnchecked(this); }
 
 		/** {@inheritDoc} */
 		@Override
@@ -168,7 +167,7 @@ public class GuiTabs<N extends Number, D extends GuiTabs<N, D>> extends Gui impl
 	}
 
 
-	public interface ITab<N extends Number, D extends ITab<N, D>> extends IDrawable<N, D> {
+	public interface ITab<N extends Number, T extends ITab<N, T>> extends IDrawable<N, T> {
 		/* SECTION methods */
 
 		boolean isOpen();
@@ -190,12 +189,12 @@ public class GuiTabs<N extends Number, D extends GuiTabs<N, D>> extends Gui impl
 
 		/** {@inheritDoc} */
 		@Override
-		D clone();
+		T clone();
 
 
 		/* SECTION static classes */
 
-		class Impl<N extends Number, D extends Impl<N, D>> implements ITab<N, D> {
+		class Impl<N extends Number, T extends Impl<N, T>> implements ITab<N, T> {
 			/* SECTION variables */
 
 			protected IDrawable<N, ?> access;
@@ -220,11 +219,11 @@ public class GuiTabs<N extends Number, D extends GuiTabs<N, D>> extends Gui impl
 
 			public IDrawable<N, ?> getAccess() { return access; }
 
-			public void setAccess(IDrawable<N, D> access) { this.access = access; }
+			public void setAccess(IDrawable<N, T> access) { this.access = access; }
 
 			public IDrawable<N, ?> getContent() { return content; }
 
-			public void setContent(IDrawable<N, D> content) { this.content = content; }
+			public void setContent(IDrawable<N, T> content) { this.content = content; }
 
 
 			/** {@inheritDoc} */
@@ -269,9 +268,8 @@ public class GuiTabs<N extends Number, D extends GuiTabs<N, D>> extends Gui impl
 
 
 			/** {@inheritDoc} */
-			@SuppressWarnings("unchecked")
 			@Override
-			public D toImmutable() { return castUnchecked(new Immutable<>(this)); }
+			public T toImmutable() { return castUnchecked(new Immutable<>(this)); }
 
 
 			/** {@inheritDoc} */
@@ -294,8 +292,8 @@ public class GuiTabs<N extends Number, D extends GuiTabs<N, D>> extends Gui impl
 
 			/** {@inheritDoc} */
 			@Override
-			public D clone() {
-				D r;
+			public T clone() {
+				T r;
 				try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException | ClassCastException e) { throw unexpectedThrowable(e); }
 				r.access = access.clone();
 				r.content = content.clone();
@@ -306,7 +304,7 @@ public class GuiTabs<N extends Number, D extends GuiTabs<N, D>> extends Gui impl
 			/* SECTION static classes */
 
 			@javax.annotation.concurrent.Immutable
-			public static class Immutable<N extends Number, D extends Immutable<N, D>> extends Impl<N, D> {
+			public static class Immutable<N extends Number, T extends Immutable<N, T>> extends Impl<N, T> {
 				/* SECTION constructors */
 
 				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content, boolean open) { super(access.toImmutable(), content.toImmutable(), open); }
@@ -320,11 +318,11 @@ public class GuiTabs<N extends Number, D extends GuiTabs<N, D>> extends Gui impl
 
 				/** {@inheritDoc} */
 				@Override
-				public void setContent(IDrawable<N, D> content) { throw rejectUnsupportedOperation(); }
+				public void setContent(IDrawable<N, T> content) { throw rejectUnsupportedOperation(); }
 
 				/** {@inheritDoc} */
 				@Override
-				public void setAccess(IDrawable<N, D> access) { throw rejectUnsupportedOperation(); }
+				public void setAccess(IDrawable<N, T> access) { throw rejectUnsupportedOperation(); }
 
 				/** {@inheritDoc} */
 				@Override
@@ -335,7 +333,7 @@ public class GuiTabs<N extends Number, D extends GuiTabs<N, D>> extends Gui impl
 
 				/** {@inheritDoc} */
 				@Override
-				public D toImmutable() { return castUnchecked(this); }
+				public T toImmutable() { return castUnchecked(this); }
 
 				/** {@inheritDoc} */
 				@Override
@@ -345,7 +343,7 @@ public class GuiTabs<N extends Number, D extends GuiTabs<N, D>> extends Gui impl
 	}
 
 
-	public interface ITabThemed<N extends Number, T extends IThemed.ITheme<T>, D extends ITabThemed<N, T, D>> extends ITab<N, D>, IDrawableThemed<N, T, D> {
+	public interface ITabThemed<N extends Number, TH extends IThemed.ITheme<TH>, T extends ITabThemed<N, TH, T>> extends ITab<N, T>, IDrawableThemed<N, TH, T> {
 		/* SECTION methods */
 
 		/** {@inheritDoc} */
@@ -362,46 +360,45 @@ public class GuiTabs<N extends Number, D extends GuiTabs<N, D>> extends Gui impl
 
 		/** {@inheritDoc} */
 		@Override
-		D clone();
+		T clone();
 
 
 		/* SECTION static classes */
 
-		class Impl<N extends Number, T extends ITheme<T>, D extends Impl<N, T, D>> extends ITab.Impl<N, D> implements ITabThemed<N, T, D> {
+		class Impl<N extends Number, TH extends ITheme<TH>, T extends Impl<N, TH, T>> extends ITab.Impl<N, T> implements ITabThemed<N, TH, T> {
 			/* SECTION variables */
 
-			protected T theme;
+			protected TH theme;
 
 
 			/* SECTION constructors */
 
-			public Impl(IDrawable<N, ?> access, IDrawable<N, ?> content, T theme, boolean open) {
+			public Impl(IDrawable<N, ?> access, IDrawable<N, ?> content, TH theme, boolean open) {
 				super(access, content, open);
 				setTheme(this, theme);
 			}
 
-			public Impl(IDrawable<N, ?> access, IDrawable<N, ?> content, T theme) { this(access, content, theme, false); }
+			public Impl(IDrawable<N, ?> access, IDrawable<N, ?> content, TH theme) { this(access, content, theme, false); }
 
-			public Impl(ITabThemed.Impl<N, T, ?> c) { this(c.getAccess(), c.getContent(), c.getTheme(), c.isOpen()); }
+			public Impl(ITabThemed.Impl<N, TH, ?> c) { this(c.getAccess(), c.getContent(), c.getTheme(), c.isOpen()); }
 
 
 			/* SECTION getters & setters */
 
 			/** {@inheritDoc} */
 			@Override
-			public T getTheme() { return theme; }
+			public TH getTheme() { return theme; }
 
 			/** {@inheritDoc} */
 			@Override
-			public void setTheme(T theme) { setTheme(this, theme); }
+			public void setTheme(TH theme) { setTheme(this, theme); }
 
 
 			/* SECTION methods */
 
 			/** {@inheritDoc} */
-			@SuppressWarnings("unchecked")
 			@Override
-			public D toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+			public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
 
 
 			/** {@inheritDoc} */
@@ -434,14 +431,14 @@ public class GuiTabs<N extends Number, D extends GuiTabs<N, D>> extends Gui impl
 			/* SECTION static classes */
 
 			@javax.annotation.concurrent.Immutable
-			public static class Immutable<N extends Number, T extends ITheme<T>, D extends Immutable<N, T, D>> extends ITabThemed.Impl<N, T, D> {
+			public static class Immutable<N extends Number, TH extends ITheme<TH>, T extends Immutable<N, TH, T>> extends ITabThemed.Impl<N, TH, T> {
 				/* SECTION constructors */
 
-				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content, T theme, boolean open) { super(access.toImmutable(), content.toImmutable(), theme, open); }
+				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content, TH theme, boolean open) { super(access.toImmutable(), content.toImmutable(), theme, open); }
 
-				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content, T theme) { this(access.toImmutable(), content.toImmutable(), theme, false); }
+				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content, TH theme) { this(access.toImmutable(), content.toImmutable(), theme, false); }
 
-				public Immutable(ITabThemed.Impl<N, T, ?> c) { this(c.getAccess(), c.getContent(), c.getTheme()); }
+				public Immutable(ITabThemed.Impl<N, TH, ?> c) { this(c.getAccess(), c.getContent(), c.getTheme()); }
 
 
 				/* SECTION getters & setters */
@@ -452,22 +449,22 @@ public class GuiTabs<N extends Number, D extends GuiTabs<N, D>> extends Gui impl
 
 				/** {@inheritDoc} */
 				@Override
-				public void setContent(IDrawable<N, D> content) { throw rejectUnsupportedOperation(); }
+				public void setContent(IDrawable<N, T> content) { throw rejectUnsupportedOperation(); }
 
 				/** {@inheritDoc} */
 				@Override
-				public void setAccess(IDrawable<N, D> access) { throw rejectUnsupportedOperation(); }
+				public void setAccess(IDrawable<N, T> access) { throw rejectUnsupportedOperation(); }
 
 				/** {@inheritDoc} */
 				@Override
-				public void setTheme(T theme) { throw rejectUnsupportedOperation(); }
+				public void setTheme(TH theme) { throw rejectUnsupportedOperation(); }
 
 
 				/* SECTION methods */
 
 				/** {@inheritDoc} */
 				@Override
-				public D toImmutable() { return castUnchecked(this); }
+				public T toImmutable() { return castUnchecked(this); }
 
 				/** {@inheritDoc} */
 				@Override

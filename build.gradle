@@ -303,6 +303,7 @@ jar {
 }
 
 reobf {
+    //noinspection SpellCheckingInspection
     jar {
         // COMMENT extraLines 'PK: org/ejml your/new/package/here/ejml' // COMMENT shading example
     }

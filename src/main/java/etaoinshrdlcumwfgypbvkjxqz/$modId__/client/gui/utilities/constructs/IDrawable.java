@@ -10,7 +10,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.variables.References.Client.GAME;
 
 @SideOnly(Side.CLIENT)
-public interface IDrawable<N extends Number, D extends IDrawable<N, D>> extends IStructure<D>, ISpecified<Rectangle<N, ?>> {
+public interface IDrawable<N extends Number, T extends IDrawable<N, T>> extends IStructure<T>, ISpecified<Rectangle<N, ?>> {
 	/* SECTION methods */
 
 	void draw(Minecraft game);
@@ -32,5 +32,5 @@ public interface IDrawable<N extends Number, D extends IDrawable<N, D>> extends 
 
 	/** {@inheritDoc} */
 	@Override
-	D clone();
+	T clone();
 }

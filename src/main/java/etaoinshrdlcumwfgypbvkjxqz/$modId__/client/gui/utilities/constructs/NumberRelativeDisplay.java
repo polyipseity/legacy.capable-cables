@@ -17,16 +17,16 @@ import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Throwables.r
 import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.variables.References.Client.getResolution;
 
 @SideOnly(Side.CLIENT)
-public abstract class NumberRelativeDisplay<N extends NumberRelativeDisplay<N>> extends NumberRelative<N> {
+public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> extends NumberRelative<T> {
 	/* SECTION variables */
 
-	protected final Consumer<? extends N> updater;
+	protected final Consumer<? extends T> updater;
 	protected final AtomicBoolean update;
 
 
 	/* SECTION constructors */
 
-	public NumberRelativeDisplay(Number value, Consumer<? extends N> updater, @Nullable Number offset, AtomicBoolean update) {
+	public NumberRelativeDisplay(Number value, Consumer<? extends T> updater, @Nullable Number offset, AtomicBoolean update) {
 		super(value, null, offset);
 		this.updater = updater;
 		this.update = update;
@@ -34,14 +34,14 @@ public abstract class NumberRelativeDisplay<N extends NumberRelativeDisplay<N>> 
 		updater.accept(castUnchecked(this));
 	}
 
-	public NumberRelativeDisplay(Number value, Consumer<? extends N> updater, @Nullable Number offset) { this(value, updater, offset, new AtomicBoolean(true)); }
+	public NumberRelativeDisplay(Number value, Consumer<? extends T> updater, @Nullable Number offset) { this(value, updater, offset, new AtomicBoolean(true)); }
 
-	public NumberRelativeDisplay(NumberRelativeDisplay<? extends N> c) { this(c.getValue(), c.getUpdater(), c.getOffset(), c.getUpdate()); }
+	public NumberRelativeDisplay(NumberRelativeDisplay<? extends T> c) { this(c.getValue(), c.getUpdater(), c.getOffset(), c.getUpdate()); }
 
 
 	/* SECTION getters & setters */
 
-	public Consumer<? extends N> getUpdater() { return updater; }
+	public Consumer<? extends T> getUpdater() { return updater; }
 
 	public AtomicBoolean getUpdate() { return update; }
 
@@ -81,7 +81,7 @@ public abstract class NumberRelativeDisplay<N extends NumberRelativeDisplay<N>> 
 
 	/* SECTION static classes */
 
-	public static class X<N extends X<N>> extends NumberRelativeDisplay<N> {
+	public static class X<T extends X<T>> extends NumberRelativeDisplay<T> {
 		/* SECTION constructors */
 
 		public X(Number value, @Nullable Number offset, AtomicBoolean update) { super(value, t -> t.parent = getResolution().getScaledWidth_double(), offset, update); }
@@ -99,13 +99,13 @@ public abstract class NumberRelativeDisplay<N extends NumberRelativeDisplay<N>> 
 
 		/** {@inheritDoc} */
 		@Override
-		public N toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+		public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
 
 
 		/* SECTION static classes */
 
 		@javax.annotation.concurrent.Immutable
-		public static class Immutable<N extends Immutable<N>> extends X<N> {
+		public static class Immutable<T extends Immutable<T>> extends X<T> {
 			/* SECTION constructors */
 
 			public Immutable(Number value, @Nullable Number offset, AtomicBoolean update) { super(value, offset, update); }
@@ -132,7 +132,7 @@ public abstract class NumberRelativeDisplay<N extends NumberRelativeDisplay<N>> 
 
 			/** {@inheritDoc} */
 			@Override
-			public N toImmutable() { return castUnchecked(this); }
+			public T toImmutable() { return castUnchecked(this); }
 
 			/** {@inheritDoc} */
 			@Override
@@ -141,7 +141,7 @@ public abstract class NumberRelativeDisplay<N extends NumberRelativeDisplay<N>> 
 	}
 
 
-	public static class Y<N extends Y<N>> extends NumberRelativeDisplay<N> {
+	public static class Y<T extends Y<T>> extends NumberRelativeDisplay<T> {
 		/* SECTION constructors */
 
 		public Y(Number value, @Nullable Number offset, AtomicBoolean update) { super(value, t -> t.parent = getResolution().getScaledHeight_double(), offset, update); }
@@ -157,13 +157,13 @@ public abstract class NumberRelativeDisplay<N extends NumberRelativeDisplay<N>> 
 
 		/** {@inheritDoc} */
 		@Override
-		public N toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+		public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
 
 
 		/* SECTION static classes */
 
 		@javax.annotation.concurrent.Immutable
-		public static class Immutable<N extends Immutable<N>> extends Y<N> {
+		public static class Immutable<T extends Immutable<T>> extends Y<T> {
 			/* SECTION constructors */
 
 			public Immutable(Number value, @Nullable Number offset, AtomicBoolean update) { super(value, offset, update); }
@@ -190,7 +190,7 @@ public abstract class NumberRelativeDisplay<N extends NumberRelativeDisplay<N>> 
 
 			/** {@inheritDoc} */
 			@Override
-			public N toImmutable() { return castUnchecked(this); }
+			public T toImmutable() { return castUnchecked(this); }
 
 			/** {@inheritDoc} */
 			@Override

@@ -23,7 +23,7 @@ import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Throwables.u
 import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.variables.Constants.GROUP;
 
 @SideOnly(Side.CLIENT)
-public class PolygonN<N extends Number, M extends PolygonN<N, M>> extends AbstractList<XY<N, ?>> implements ICloneable<M>, IImmutablizable<M> {
+public class PolygonN<N extends Number, T extends PolygonN<N, T>> extends AbstractList<XY<N, ?>> implements ICloneable<T>, IImmutablizable<T> {
 	/* SECTION variables */
 
 	protected List<XY<N, ?>> list;
@@ -50,9 +50,8 @@ public class PolygonN<N extends Number, M extends PolygonN<N, M>> extends Abstra
 	/* SECTION methods */
 
 	/** {@inheritDoc} */
-	@SuppressWarnings("unchecked")
 	@Override
-	public M toImmutable() { return castUnchecked(new Immutable<>(this)); }
+	public T toImmutable() { return castUnchecked(new Immutable<>(this)); }
 
 	/** {@inheritDoc} */
 	@Override
@@ -101,8 +100,8 @@ public class PolygonN<N extends Number, M extends PolygonN<N, M>> extends Abstra
 	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public M clone() {
-		M r;
+	public T clone() {
+		T r;
 		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException | ClassCastException e) { throw unexpectedThrowable(e); }
 		r.list = list instanceof ImmutableList ? ImmutableList.copyOf(list) : new ArrayList<>(list);
 		return r;
@@ -112,7 +111,7 @@ public class PolygonN<N extends Number, M extends PolygonN<N, M>> extends Abstra
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, M extends Immutable<N, M>> extends PolygonN<N, M> {
+	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends PolygonN<N, T> {
 		/* SECTION constructors */
 
 		public Immutable(List<XY<N, ?>> l) { super(ImmutableList.copyOf(l)); }
@@ -135,7 +134,7 @@ public class PolygonN<N extends Number, M extends PolygonN<N, M>> extends Abstra
 
 		/** {@inheritDoc} */
 		@Override
-		public M toImmutable() { return castUnchecked(this); }
+		public T toImmutable() { return castUnchecked(this); }
 
 		/** {@inheritDoc} */
 		@Override

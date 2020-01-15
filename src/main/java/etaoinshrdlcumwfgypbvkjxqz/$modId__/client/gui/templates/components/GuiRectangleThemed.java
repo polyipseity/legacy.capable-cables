@@ -16,31 +16,31 @@ import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Miscellaneou
 import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 
 @SideOnly(Side.CLIENT)
-public class GuiRectangleThemed<N extends Number, T extends IThemed.ITheme<T>, D extends GuiRectangleThemed<N, T, D>> extends GuiRectangle<N, D> implements IDrawableThemed<N, T, D> {
+public class GuiRectangleThemed<N extends Number, TH extends IThemed.ITheme<TH>, T extends GuiRectangleThemed<N, TH, T>> extends GuiRectangle<N, T> implements IDrawableThemed<N, TH, T> {
 	/* SECTION variables */
 
-	protected T theme;
+	protected TH theme;
 
 
 	/* SECTION constructors */
 
-	public GuiRectangleThemed(Rectangle<N, ?> rect, Color color, T theme) {
+	public GuiRectangleThemed(Rectangle<N, ?> rect, Color color, TH theme) {
 		super(rect, color);
 		this.theme = theme;
 	}
 
-	public GuiRectangleThemed(GuiRectangleThemed<N, T, ?> c) { this(c.getRect(), c.getColor(), c.getTheme()); }
+	public GuiRectangleThemed(GuiRectangleThemed<N, TH, ?> c) { this(c.getRect(), c.getColor(), c.getTheme()); }
 
 
 	/* SECTION getters & setters */
 
 	/** {@inheritDoc} */
 	@Override
-	public void setTheme(T theme) { this.theme = theme; }
+	public void setTheme(TH theme) { this.theme = theme; }
 
 	/** {@inheritDoc} */
 	@Override
-	public T getTheme() { return theme; }
+	public TH getTheme() { return theme; }
 
 
 	/* SECTION methods */
@@ -51,9 +51,8 @@ public class GuiRectangleThemed<N extends Number, T extends IThemed.ITheme<T>, D
 
 
 	/** {@inheritDoc} */
-	@SuppressWarnings("unchecked")
 	@Override
-	public D toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+	public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
 
 
 	/** {@inheritDoc} */
@@ -74,12 +73,12 @@ public class GuiRectangleThemed<N extends Number, T extends IThemed.ITheme<T>, D
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, T extends ITheme<T>, D extends Immutable<N, T, D>> extends GuiRectangleThemed<N, T, D> {
+	public static class Immutable<N extends Number, TH extends ITheme<TH>, T extends Immutable<N, TH, T>> extends GuiRectangleThemed<N, TH, T> {
 		/* SECTION constructors */
 
-		public Immutable(Rectangle<N, ?> rect, Color color, T theme) { super(rect.toImmutable(), color, theme); }
+		public Immutable(Rectangle<N, ?> rect, Color color, TH theme) { super(rect.toImmutable(), color, theme); }
 
-		public Immutable(GuiRectangleThemed<N, T, ?> c) { this(c.getRect(), c.getColor(), c.getTheme()); }
+		public Immutable(GuiRectangleThemed<N, TH, ?> c) { this(c.getRect(), c.getColor(), c.getTheme()); }
 
 
 		/* SECTION getters & setters */
@@ -94,14 +93,14 @@ public class GuiRectangleThemed<N extends Number, T extends IThemed.ITheme<T>, D
 
 		/** {@inheritDoc} */
 		@Override
-		public void setTheme(T theme) { throw rejectUnsupportedOperation(); }
+		public void setTheme(TH theme) { throw rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */
 
 		/** {@inheritDoc} */
 		@Override
-		public D toImmutable() { return castUnchecked(this); }
+		public T toImmutable() { return castUnchecked(this); }
 
 		/** {@inheritDoc} */
 		@Override

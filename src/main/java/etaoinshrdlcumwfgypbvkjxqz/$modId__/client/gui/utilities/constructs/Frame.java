@@ -16,7 +16,7 @@ import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Throwables.u
 import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.variables.Constants.GROUP;
 
 @SideOnly(Side.CLIENT)
-public class Frame<N extends Number, M extends Frame<N, M>> implements IStructure<M> {
+public class Frame<N extends Number, T extends Frame<N, T>> implements IStructure<T> {
 	/* SECTION variables */
 
 	protected XY<N, ?> tl;
@@ -65,9 +65,8 @@ public class Frame<N extends Number, M extends Frame<N, M>> implements IStructur
 	/* SECTION methods */
 
 	/** {@inheritDoc} */
-	@SuppressWarnings("unchecked")
 	@Override
-	public M toImmutable() { return castUnchecked(new Immutable<>(this)); }
+	public T toImmutable() { return castUnchecked(new Immutable<>(this)); }
 
 	/** {@inheritDoc} */
 	@Override
@@ -97,8 +96,8 @@ public class Frame<N extends Number, M extends Frame<N, M>> implements IStructur
 	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public M clone() {
-		M r;
+	public T clone() {
+		T r;
 		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException | ClassCastException e) { throw unexpectedThrowable(e); }
 		r.tl = tl.clone();
 		r.br = br.clone();
@@ -109,7 +108,7 @@ public class Frame<N extends Number, M extends Frame<N, M>> implements IStructur
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, M extends Immutable<N, M>> extends Frame<N, M> {
+	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends Frame<N, T> {
 		/* SECTION constructors */
 
 		public Immutable(XY<N, ?> tl, XY<N, ?> br) { super(tl.toImmutable(), br.toImmutable()); }
@@ -152,7 +151,7 @@ public class Frame<N extends Number, M extends Frame<N, M>> implements IStructur
 		 * {@inheritDoc}
 		 */
 		@Override
-		public M toImmutable() { return castUnchecked(this); }
+		public T toImmutable() { return castUnchecked(this); }
 
 		/**
 		 * {@inheritDoc}

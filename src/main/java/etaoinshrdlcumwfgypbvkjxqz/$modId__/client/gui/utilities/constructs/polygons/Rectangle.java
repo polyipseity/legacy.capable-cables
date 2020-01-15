@@ -14,7 +14,7 @@ import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Miscellaneou
 import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 
 @SideOnly(Side.CLIENT)
-public class Rectangle<N extends Number, M extends Rectangle<N, M>> extends Polygon4<N, M> {
+public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Polygon4<N, T> {
 	/* SECTION variables */
 
 	protected XY<N, ?> offset;
@@ -91,7 +91,7 @@ public class Rectangle<N extends Number, M extends Rectangle<N, M>> extends Poly
 
 	/** {@inheritDoc} */
 	@Override
-	public M toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+	public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
 
 
 	/** {@inheritDoc} */
@@ -112,8 +112,8 @@ public class Rectangle<N extends Number, M extends Rectangle<N, M>> extends Poly
 
 	/** {@inheritDoc} */
 	@Override
-	public M clone() {
-		M r = super.clone();
+	public T clone() {
+		T r = super.clone();
 		r.offset = offset.clone();
 		r.size = size.clone();
 		return r;
@@ -123,7 +123,7 @@ public class Rectangle<N extends Number, M extends Rectangle<N, M>> extends Poly
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, M extends Immutable<N, M>> extends Rectangle<N, M> {
+	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends Rectangle<N, T> {
 		/* SECTION constructors */
 
 		public Immutable(XY<N, ?> offset, XY<N, ?> size) {
@@ -159,7 +159,7 @@ public class Rectangle<N extends Number, M extends Rectangle<N, M>> extends Poly
 
 		/** {@inheritDoc} */
 		@Override
-		public M toImmutable() { return castUnchecked(this); }
+		public T toImmutable() { return castUnchecked(this); }
 
 		/** {@inheritDoc} */
 		@Override

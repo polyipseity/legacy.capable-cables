@@ -28,7 +28,7 @@ public final class ItemsOwn extends Registrable<Item> {
 
 	/* SECTION static variables */
 
-	public static ItemsOwn INSTANCE = getInstance(ItemsOwn.class);
+	public static final ItemsOwn INSTANCE = getInstance(ItemsOwn.class);
 
 
 	/* REFERENCE item template */

@@ -17,7 +17,7 @@ import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Throwables.r
 import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 
 @SideOnly(Side.CLIENT)
-public class GuiRectangleDrawable<N extends Number, D extends GuiRectangleDrawable<N, D>> extends GuiRectangle<N, D> {
+public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawable<N, T>> extends GuiRectangle<N, T> {
 	/* SECTION variables */
 
 	protected IDrawable<N, ?> drawable;
@@ -56,7 +56,7 @@ public class GuiRectangleDrawable<N extends Number, D extends GuiRectangleDrawab
 
 	/** {@inheritDoc} */
 	@Override
-	public D toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+	public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
 
 	/** {@inheritDoc} */
 	@Override
@@ -74,8 +74,8 @@ public class GuiRectangleDrawable<N extends Number, D extends GuiRectangleDrawab
 
 	/** {@inheritDoc} */
 	@Override
-	public D clone() {
-		D r = super.clone();
+	public T clone() {
+		T r = super.clone();
 		r.drawable = drawable.clone();
 		return r;
 	}
@@ -92,10 +92,10 @@ public class GuiRectangleDrawable<N extends Number, D extends GuiRectangleDrawab
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, D extends Immutable<N, D>> extends GuiRectangleDrawable<N, D> {
+	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends GuiRectangleDrawable<N, T> {
 		/* SECTION variables */
 
-		/* REMARKS internal */ protected final GuiRectangle<N, D> guiRect = new GuiRectangle<>(this);
+		/* REMARKS internal */ protected final GuiRectangle<N, T> guiRect = new GuiRectangle<>(this);
 
 
 		/* SECTION constructors */
@@ -138,7 +138,7 @@ public class GuiRectangleDrawable<N extends Number, D extends GuiRectangleDrawab
 
 		/** {@inheritDoc} */
 		@Override
-		public D toImmutable() { return castUnchecked(this); }
+		public T toImmutable() { return castUnchecked(this); }
 
 		/** {@inheritDoc} */
 		@Override

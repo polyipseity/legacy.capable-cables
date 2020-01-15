@@ -15,7 +15,7 @@ import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Miscellaneou
 import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.variables.Constants.GROUP;
 
-public class NumberRelative<N extends NumberRelative<N>> extends NumberDefault<N> {
+public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T> {
 	/* SECTION variables */
 
 	protected Number value;
@@ -61,8 +61,8 @@ public class NumberRelative<N extends NumberRelative<N>> extends NumberDefault<N
 
 	/** {@inheritDoc} */
 	@Override
-	public N sum(Number... o) {
-		N r = clone();
+	public T sum(Number... o) {
+		T r = clone();
 		Number p = getParent();
 		r.setValue(Numbers.sum(getValue(), Arrays.stream(o).map(t -> p == null ? t.doubleValue() : t.doubleValue() / p.doubleValue()).collect(Collectors.toList())));
 		Number to = getOffset();
@@ -72,8 +72,8 @@ public class NumberRelative<N extends NumberRelative<N>> extends NumberDefault<N
 
 	/** {@inheritDoc} */
 	@Override
-	public N minus(Number o) {
-		N r = clone();
+	public T minus(Number o) {
+		T r = clone();
 		Number p = getParent();
 		r.setValue(Numbers.minus(getValue(), p == null ? o.doubleValue() : o.doubleValue() / p.doubleValue()));
 		if (o instanceof NumberRelative<?>) {
@@ -87,7 +87,7 @@ public class NumberRelative<N extends NumberRelative<N>> extends NumberDefault<N
 
 	/** {@inheritDoc} */
 	@Override
-	public int compareTo(N o) {
+	public int compareTo(T o) {
 		boolean greater = doubleValue() > o.doubleValue();
 		boolean lesser = doubleValue() < o.doubleValue();
 		return greater ? 1 : lesser ? -1 : 0;
@@ -95,9 +95,8 @@ public class NumberRelative<N extends NumberRelative<N>> extends NumberDefault<N
 
 
 	/** {@inheritDoc} */
-	@SuppressWarnings("unchecked")
 	@Override
-	public N toImmutable() { return castUnchecked(new Immutable<>(this)); }
+	public T toImmutable() { return castUnchecked(new Immutable<>(this)); }
 
 	/** {@inheritDoc} */
 	@Override
@@ -148,8 +147,8 @@ public class NumberRelative<N extends NumberRelative<N>> extends NumberDefault<N
 	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public N clone() {
-		N r = super.clone();
+	public T clone() {
+		T r = super.clone();
 		if (value instanceof ICloneable<?>) r.value = castUnchecked(value, (ICloneable<Number>) null).clone();
 		if (parent instanceof ICloneable<?>) r.parent = castUnchecked(parent, (ICloneable<Number>) null).clone();
 		if (offset instanceof ICloneable<?>) r.offset = castUnchecked(offset, (ICloneable<Number>) null).clone();
@@ -160,7 +159,7 @@ public class NumberRelative<N extends NumberRelative<N>> extends NumberDefault<N
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends NumberRelative<N>> extends NumberRelative<N> {
+	public static class Immutable<T extends NumberRelative<T>> extends NumberRelative<T> {
 		/* SECTION constructors */
 
 		public Immutable(Number value, @Nullable Number parent, @Nullable Number offset) { super(value, parent, offset); }
@@ -191,7 +190,7 @@ public class NumberRelative<N extends NumberRelative<N>> extends NumberDefault<N
 
 		/** {@inheritDoc} */
 		@Override
-		public N toImmutable() { return castUnchecked(this); }
+		public T toImmutable() { return castUnchecked(this); }
 
 		/** {@inheritDoc} */
 		@Override

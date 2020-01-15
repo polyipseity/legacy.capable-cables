@@ -1,6 +1,6 @@
 package etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.constructs;
 
-public interface IStructure<S extends IStructure<S>> extends IStrictToString, IStrictEquality, ICloneable<S>, IImmutablizable<S> {
+public interface IStructure<T extends IStructure<T>> extends IStrictToString, IStrictEquality, ICloneable<T>, IImmutablizable<T> {
 	/* SECTION methods */
 
 	/** {@inheritDoc} */
@@ -16,5 +16,5 @@ public interface IStructure<S extends IStructure<S>> extends IStrictToString, IS
 	boolean equals(Object o);
 
 	/** {@inheritDoc} */
-	S clone();
+	T clone();
 }

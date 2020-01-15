@@ -19,24 +19,24 @@ import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Miscellaneou
 import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 
 @SideOnly(Side.CLIENT)
-public class GuiResource<N extends Number, T extends Number, D extends GuiResource<N, T, D>> extends GuiRectangle<N, D> {
+public class GuiResource<N extends Number, TE extends Number, T extends GuiResource<N, TE, T>> extends GuiRectangle<N, T> {
 	/* SECTION variables */
 
 	protected Frame<N, ?> padding;
 	protected ResourceLocation resource;
-	protected Rectangle<T, ?> texture;
+	protected Rectangle<TE, ?> texture;
 
 
 	/* SECTION constructors */
 
-	public GuiResource(Rectangle<N, ?> rect, Frame<N, ?> padding, ResourceLocation resource, Rectangle<T, ?> texture) {
+	public GuiResource(Rectangle<N, ?> rect, Frame<N, ?> padding, ResourceLocation resource, Rectangle<TE, ?> texture) {
 		super(rect, Colors.COLORLESS);
 		this.padding = padding;
 		this.resource = resource;
 		this.texture = texture;
 	}
 
-	public GuiResource(GuiResource<N, T, ?> c) { this(c.getRect(), c.getPadding(), c.getResource(), c.getTexture()); }
+	public GuiResource(GuiResource<N, TE, ?> c) { this(c.getRect(), c.getPadding(), c.getResource(), c.getTexture()); }
 
 
 	/* SECTION getters & setters */
@@ -49,9 +49,9 @@ public class GuiResource<N extends Number, T extends Number, D extends GuiResour
 
 	public void setResource(ResourceLocation resource) { this.resource = resource; }
 
-	public Rectangle<T, ?> getTexture() { return texture; }
+	public Rectangle<TE, ?> getTexture() { return texture; }
 
-	public void setTexture(Rectangle<T, ?> texture) { this.texture = texture; }
+	public void setTexture(Rectangle<TE, ?> texture) { this.texture = texture; }
 
 	/** {@inheritDoc} */
 	@Override
@@ -71,7 +71,7 @@ public class GuiResource<N extends Number, T extends Number, D extends GuiResour
 
 	/** {@inheritDoc} */
 	@Override
-	public D toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+	public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
 
 
 	/** {@inheritDoc} */
@@ -87,8 +87,8 @@ public class GuiResource<N extends Number, T extends Number, D extends GuiResour
 
 	/** {@inheritDoc} */
 	@Override
-	public D clone() {
-		D r = super.clone();
+	public T clone() {
+		T r = super.clone();
 		r.padding = padding.clone();
 		r.texture = texture.clone();
 		return r;
@@ -98,12 +98,12 @@ public class GuiResource<N extends Number, T extends Number, D extends GuiResour
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, T extends Number, D extends Immutable<N, T, D>> extends GuiResource<N, T, D> {
+	public static class Immutable<N extends Number, TE extends Number, T extends Immutable<N, TE, T>> extends GuiResource<N, TE, T> {
 		/* SECTION constructors */
 
-		public Immutable(Rectangle<N, ?> rect, Frame<N, ?> padding, ResourceLocation resource, Rectangle<T, ?> texture) { super(rect.toImmutable(), padding.toImmutable(), resource, texture.toImmutable()); }
+		public Immutable(Rectangle<N, ?> rect, Frame<N, ?> padding, ResourceLocation resource, Rectangle<TE, ?> texture) { super(rect.toImmutable(), padding.toImmutable(), resource, texture.toImmutable()); }
 
-		public Immutable(GuiResource<N, T, ?> c) { super(c.getRect(), c.getPadding(), c.getResource(), c.getTexture()); }
+		public Immutable(GuiResource<N, TE, ?> c) { super(c.getRect(), c.getPadding(), c.getResource(), c.getTexture()); }
 
 
 		/* SECTION getters & setters */
@@ -118,14 +118,14 @@ public class GuiResource<N extends Number, T extends Number, D extends GuiResour
 
 		/** {@inheritDoc} */
 		@Override
-		public void setTexture(Rectangle<T, ?> texture) { throw rejectUnsupportedOperation(); }
+		public void setTexture(Rectangle<TE, ?> texture) { throw rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */
 
 		/** {@inheritDoc} */
 		@Override
-		public D toImmutable() { return castUnchecked(this); }
+		public T toImmutable() { return castUnchecked(this); }
 
 		/** {@inheritDoc} */
 		@Override

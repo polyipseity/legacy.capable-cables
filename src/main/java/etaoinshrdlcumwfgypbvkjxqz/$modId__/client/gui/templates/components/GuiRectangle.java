@@ -21,7 +21,7 @@ import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Throwables.u
 import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.variables.Constants.GROUP;
 
 @SideOnly(Side.CLIENT)
-public class GuiRectangle<N extends Number, D extends GuiRectangle<N, D>> extends Gui implements IDrawable<N, D> {
+public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extends Gui implements IDrawable<N, T> {
 	/* SECTION variables */
 
 	protected Rectangle<N, ?> rect;
@@ -60,9 +60,8 @@ public class GuiRectangle<N extends Number, D extends GuiRectangle<N, D>> extend
 	public Rectangle<N, ?> specification() { return getRect(); }
 
 	/** {@inheritDoc} */
-	@SuppressWarnings("unchecked")
 	@Override
-	public D toImmutable() { return castUnchecked(new Immutable<>(this)); }
+	public T toImmutable() { return castUnchecked(new Immutable<>(this)); }
 
 
 	/** {@inheritDoc} */
@@ -87,8 +86,8 @@ public class GuiRectangle<N extends Number, D extends GuiRectangle<N, D>> extend
 	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public D clone() {
-		D r;
+	public T clone() {
+		T r;
 		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException | ClassCastException e) { throw unexpectedThrowable(e); }
 		r.rect = rect.clone();
 		return r;
@@ -98,7 +97,7 @@ public class GuiRectangle<N extends Number, D extends GuiRectangle<N, D>> extend
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, D extends Immutable<N, D>> extends GuiRectangle<N, D> {
+	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends GuiRectangle<N, T> {
 		/* SECTION constructors */
 
 		public Immutable(Rectangle<N, ?> rect, Color color) { super(rect.toImmutable(), color); }
@@ -121,7 +120,7 @@ public class GuiRectangle<N extends Number, D extends GuiRectangle<N, D>> extend
 
 		/** {@inheritDoc} */
 		@Override
-		public D toImmutable() { return castUnchecked(this); }
+		public T toImmutable() { return castUnchecked(this); }
 
 		/** {@inheritDoc} */
 		@Override

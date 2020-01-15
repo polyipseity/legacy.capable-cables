@@ -18,7 +18,7 @@ import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Throwables.u
 import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.variables.Constants.GROUP;
 
 @SideOnly(Side.CLIENT)
-public class XY<N extends Number, M extends XY<N, M>> implements IStructure<M>, IOperable<XY<N, ?>, XY<N, ?>> {
+public class XY<N extends Number, T extends XY<N, T>> implements IStructure<T>, IOperable<XY<N, ?>, XY<N, ?>> {
 	/* SECTION variables */
 	
 	protected N x;
@@ -76,8 +76,7 @@ public class XY<N extends Number, M extends XY<N, M>> implements IStructure<M>, 
 
 
 	/** {@inheritDoc} */
-	@SuppressWarnings("unchecked")
-	public M toImmutable() { return castUnchecked(new Immutable<>(this)); }
+	public T toImmutable() { return castUnchecked(new Immutable<>(this)); }
 
 	/** {@inheritDoc} */
 	@Override
@@ -106,8 +105,8 @@ public class XY<N extends Number, M extends XY<N, M>> implements IStructure<M>, 
 	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public M clone() {
-		M r;
+	public T clone() {
+		T r;
 		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException | ClassCastException e) { throw unexpectedThrowable(e); }
 		if (x instanceof ICloneable<?>) r.x = castUnchecked(x, (ICloneable<N>) null).clone();
 		if (y instanceof ICloneable<?>) r.y = castUnchecked(y, (ICloneable<N>) null).clone();
@@ -129,7 +128,7 @@ public class XY<N extends Number, M extends XY<N, M>> implements IStructure<M>, 
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, M extends Immutable<N, M>> extends XY<N, M> {
+	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends XY<N, T> {
 		/* SECTION constructors */
 
 		public Immutable(N x, N y) { super(x, y); }
@@ -152,7 +151,7 @@ public class XY<N extends Number, M extends XY<N, M>> implements IStructure<M>, 
 
 		/** {@inheritDoc} */
 		@Override
-		public M toImmutable() { return castUnchecked(this); }
+		public T toImmutable() { return castUnchecked(this); }
 
 		/** {@inheritDoc} */
 		@Override

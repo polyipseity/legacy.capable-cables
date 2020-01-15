@@ -13,7 +13,7 @@ import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Throwables.r
 import static etaoinshrdlcumwfgypbvkjxqz.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 
 @SideOnly(Side.CLIENT)
-public class Polygon4<N extends Number, M extends Polygon4<N, M>> extends PolygonN<N, M> {
+public class Polygon4<N extends Number, T extends Polygon4<N, T>> extends PolygonN<N, T> {
 	/* SECTION constructors */
 
 	public Polygon4(List<XY<N, ?>> l) {
@@ -53,12 +53,12 @@ public class Polygon4<N extends Number, M extends Polygon4<N, M>> extends Polygo
 
 	/** {@inheritDoc} */
 	@Override
-	public M toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+	public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
 
 
 	/* SECTION static classes */
 
-	public static class Immutable<N extends Number, M extends Immutable<N, M>> extends Polygon4<N, M> {
+	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends Polygon4<N, T> {
 		/* SECTION constructors */
 
 		public Immutable(List<XY<N, ?>> l) { super(ImmutableList.copyOf(l)); }
@@ -95,7 +95,7 @@ public class Polygon4<N extends Number, M extends Polygon4<N, M>> extends Polygo
 
 		/** {@inheritDoc} */
 		@Override
-		public M toImmutable() { return castUnchecked(this); }
+		public T toImmutable() { return castUnchecked(this); }
 
 		/** {@inheritDoc} */
 		@Override
