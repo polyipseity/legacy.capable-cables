@@ -1,0 +1,6 @@
+##################################################
+# Version Properties
+##################################################
+# suppress inspection "UnusedProperty" for whole file
+# suppress inspection "SpellCheckingInspection"
+${modId}.version=${version}

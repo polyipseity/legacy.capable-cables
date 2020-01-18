@@ -13,7 +13,7 @@
           <option value="setupCiWorkspace" />
         </list>
       </option>
-      <option name="vmOptions" value="-Xmx=2G" />
+      <option name="vmOptions" value="" />
     </ExternalSystemSettings>
     <GradleScriptDebugEnabled>true</GradleScriptDebugEnabled>
     <method v="2" />

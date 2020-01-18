@@ -4,6 +4,7 @@
     <module name="capablecables.main" />
     <option name="WORKING_DIRECTORY" value="run" />
     <method v="2">
+      <option name="Gradle.BeforeRunTask" enabled="true" tasks="makeStart" externalProjectPath="$PROJECT_DIR$" vmOptions="" scriptParameters="" />
       <option name="Make" enabled="true" />
     </method>
   </configuration>

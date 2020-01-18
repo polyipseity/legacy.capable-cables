@@ -183,19 +183,23 @@ dependencies {
     'runtime' is superseded by 'runtimeOnly'.
      */
 }
-
 stringToStringMap(customDependencies).each { String k, List<String> v -> v.each { dependencies.add k, evaluateGStringString(it) } }
 
 
 sourceSets {
-    main
+    main {
+        java {
+            srcDir 'src/main/java_debug'
+            include { it.path.contains('$') }
+        }
+    }
     test
     api
 }
 
 
 tasks.sourceMainJava.enabled = false
-task processSourceMainJava(type: ProcessResources, description: 'rocess main java.') {
+task processSourceMainJava(type: ProcessResources, description: 'Process main Java.') {
     inputs.property 'expand_modId', project.name
     inputs.property 'expand_name', name_
     inputs.property 'expand_version', version
@@ -207,12 +211,6 @@ task processSourceMainJava(type: ProcessResources, description: 'rocess main jav
 
     into tasks.sourceMainJava.output
 
-    delete { delete temporaryDir }
-    copy {
-        from tasks.sourceMainJava.source as FileCollection
-        into temporaryDir
-    }
-
     from(temporaryDir) {
         Map<String, Object> e = [:]
         inputs.properties.each { if (it.key.startsWith('expand_')) {
@@ -222,16 +220,30 @@ task processSourceMainJava(type: ProcessResources, description: 'rocess main jav
         }}
 
         expand e
-        
+
         Binding eb = new Binding(e)
         eachFile {
-            File f = file "$temporaryDir.absolutePath/$it.sourcePath"
-            f.text = f.text.replaceAll(~/\$(.*)__/) { "\${${it[1]}}" }
+            File f = file "$temporaryDir.absolutePath$separator$it.sourcePath"
+            f.text = f.text.replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }
             it.path = evaluateGStringStringWithBinding it.path, eb
         }
     }
 }
 tasks.sourceMainJava.finalizedBy tasks.processSourceMainJava
+
+task preprocessSourceMainJava(type: Sync, description: 'Prepare sources for processing main Java.') {
+    from tasks.sourceMainJava.source as FileCollection
+    into tasks.processSourceMainJava.temporaryDir
+}
+task postprocessSourceMainJava(type: Sync, description: 'Finalize after processing main Java.') {
+    from(tasks.processSourceMainJava.destinationDir as File) { exclude { it.directory ? it.path.contains('$') : it.path.endsWith('.in') } }
+    into sourceSets.main.allJava.srcDirs.find { it.name == 'java_debug' }
+
+    doFirst { destinationDir.eachFileRecurse { it.writable = true } }
+    doLast { destinationDir.eachFileRecurse { it.setReadOnly() } }
+}
+tasks.processSourceMainJava.dependsOn tasks.preprocessSourceMainJava
+tasks.processSourceMainJava.finalizedBy tasks.postprocessSourceMainJava
 
 
 static <E> String processResourcesList(List<E> l) { l.empty ? '[]' : l.toListString().replace('[', '["').replace(']', '"]').replace(', ', '", "') }
@@ -257,6 +269,7 @@ processResources {
     inputs.property 'expand_dependants', processResourcesList(dependants as List<String>)
     inputs.property 'expand_pack_format', pack_format
 
+    Map<String, Object> e = inputs.properties.findAll { it.key.startsWith 'expand_' }.collectEntries { [it.key.replace('expand_', ''), it.value] } as Map<String, Object>
 
     // COMMENT replace stuff in the to-be-processed files, nothing else
     from(sourceSets.main.resources.srcDirs) {
@@ -264,30 +277,24 @@ processResources {
         rename ~/(.*)\.in/, '$1'
 
         // COMMENT replace variables
-        Map<String, Object> e = inputs.properties.findAll { it.key.startsWith 'expand_' }.collectEntries { [it.key.replace('expand_', ''), it.value] } as Map<String, Object>
-
         expand e
-
-        Binding eb = new Binding(e)
-        eachFile { it.path = evaluateGStringStringWithBinding it.path, eb }
     }
 
     // COMMENT copy everything else except the processed files
     from(sourceSets.main.resources.srcDirs) {
         exclude '**/*.in'
     }
+
+    Binding eb = new Binding(e)
+    eachFile { it.path = evaluateGStringStringWithBinding it.path, eb }
 }
 
-task copyProcessedResources(type: ProcessResources, description: 'Copy processed resources.') {
-    from tasks.processSourceMainJava.destinationDir as File
+task syncProcessedResources(type: Sync, description: 'Sync processed resources.') {
+    from tasks.processResources.destinationDir as File
     into tasks.compileJava.destinationDir
+    preserve { include '**/*.class' }
 }
-tasks.processResources.finalizedBy tasks.copyProcessedResources
-
-task deleteCopiedProcessedResources(type: Delete, description: 'Delete copied processed resources.') {
-    delete fileTree(dir: tasks.copyProcessedResources.destinationDir, excludes: ['**/*.class'])
-}
-tasks.jar.dependsOn tasks.deleteCopiedProcessedResources
+tasks.processResources.finalizedBy tasks.syncProcessedResources
 
 
 test {
@@ -332,6 +339,15 @@ task javadocJar(type: Jar, dependsOn: 'javadoc') {
     from "$buildDir${separator}docs${separator}javadoc"
     classifier 'javadoc'
 }
+
+task beforeJar(description: 'Prepare stuff for jaring.') {
+    mustRunAfter tasks.syncProcessedResources
+    doLast {
+        sourceSets.main.allSource.srcDirs.each { it.mkdir() }
+        delete fileTree(dir: tasks.syncProcessedResources.destinationDir, excludes: ['**/*.class'])
+    }
+}
+tasks.jar.dependsOn tasks.beforeJar
 
 tasks.each { if (it instanceof org.gradle.jvm.tasks.Jar) it.exclude { it.directory ? it.path.contains('$') : it.path.endsWith('.in') } }
 
@@ -378,7 +394,7 @@ tasks.build.finalizedBy tasks.saveCurrentGoodSettings
 
 
 //noinspection SpellCheckingInspection
-task cleanCacheAutomatically(type: Delete, group: "build", description: "Clean old items from cache to reduce space usage.", dependsOn: "saveCurrentGoodSettings") {
+task cleanCacheAutomatically(type: Delete, group: 'build', description: 'Clean old items from cache to reduce space usage.', dependsOn: tasks.saveCurrentGoodSettings) {
     // COMMENT Gradle
 
     gradle.gradleUserHomeDir.eachDir { it.eachDirMatch(~/[0-9]+[.-][0-9.+-]+/) { if (it.name != gradle.gradleVersion) delete it } }
@@ -398,7 +414,7 @@ task cleanCacheAutomatically(type: Delete, group: "build", description: "Clean o
     // COMMENT Minecraft Forge
 
     //noinspection SpellCheckingInspection
-    File minecraftForgeDir = file("$minecraftCachePath${separator}net${separator}minecraftforge${separator}forge")
+    File minecraftForgeDir = file "$minecraftCachePath${separator}net${separator}minecraftforge${separator}forge"
     if (minecraftForgeDir.exists()) minecraftForgeDir.eachDir { if (it.name != minecraftForgeVersion) delete it }
 }
 tasks.saveCurrentGoodSettings.finalizedBy tasks.cleanCacheAutomatically
