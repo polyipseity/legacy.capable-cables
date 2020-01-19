@@ -64,7 +64,7 @@ public enum Primitives {
 					return castUnchecked(e.toArray()[0]);
 				default:
 					List<? extends N> el = new ArrayList<>(e);
-					return sum(el.get(0), el.subList(1, el.size() - 1));
+					return sum(el.get(0), el.subList(1, el.size()));
 			}
 		}
 
@@ -108,7 +108,7 @@ public enum Primitives {
 					return castUnchecked(e.toArray()[0]);
 				default:
 					List<? extends N> el = new ArrayList<>(e);
-					return max(el.get(0), el.subList(1, el.size() - 1));
+					return max(el.get(0), el.subList(1, el.size()));
 			}
 		}
 
@@ -152,7 +152,7 @@ public enum Primitives {
 					return castUnchecked(e.toArray()[0]);
 				default:
 					List<? extends N> el = new ArrayList<>(e);
-					return min(el.get(0), el.subList(1, el.size() - 1));
+					return min(el.get(0), el.subList(1, el.size()));
 			}
 		}
 

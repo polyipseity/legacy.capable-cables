@@ -2,7 +2,7 @@ package $group__.$modId__.client.gui.templates.components;
 
 import $group__.$modId__.client.gui.utilities.constructs.IDrawable;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
-import $group__.$modId__.client.gui.utilities.helpers.GuiHelper;
+import $group__.$modId__.client.gui.utilities.helpers.Guis;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -12,6 +12,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.meta.When;
 import java.awt.*;
 
+import static $group__.$modId__.client.gui.utilities.helpers.Guis.popMatrix;
+import static $group__.$modId__.client.gui.utilities.helpers.Guis.pushMatrix;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
@@ -53,7 +55,11 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 
 	/** {@inheritDoc} */
 	@Override
-	public void draw(Minecraft game) { GuiHelper.drawRect(getRect(), getColor()); }
+	public void draw(Minecraft client) {
+		pushMatrix();
+		Guis.drawRect(getRect(), getColor());
+		popMatrix();
+	}
 
 	/** {@inheritDoc} */
 	@Override

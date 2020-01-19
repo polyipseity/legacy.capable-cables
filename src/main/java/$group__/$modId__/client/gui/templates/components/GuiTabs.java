@@ -83,7 +83,7 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 
 	/** {@inheritDoc} */
 	@Override
-	public void draw(Minecraft game) { getTabs().forEach(t -> t.draw(game)); }
+	public void draw(Minecraft client) { getTabs().forEach(t -> t.draw(client)); }
 
 
 	/** {@inheritDoc} */
@@ -93,6 +93,7 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 
 	/** {@inheritDoc} */
 	@Override
+	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public String toString() {
 		return getToStringString(this, super.toString(),
 				new Object[]{"tabs", getTabs()},
@@ -101,16 +102,19 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 
 	/** {@inheritDoc} */
 	@Override
+	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public int hashCode() { return getHashCode(this, super.hashCode(), getTabs(), getOpen()); }
 
 	/** {@inheritDoc} */
 	@Override
+	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
 			t -> getOpen() == t.getOpen(),
 			t -> getTabs().equals(t.getTabs())); }
 
 	/** {@inheritDoc} */
 	@Override
+	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r;
 		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw unexpectedThrowable(e); }
@@ -265,10 +269,10 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 
 			/** {@inheritDoc} */
 			@Override
-			public void draw(Minecraft game) {
-				getAccess().draw(game);
+			public void draw(Minecraft client) {
+				getAccess().draw(client);
 				if (isOpen()) {
-					getContent().draw(game);
+					getContent().draw(client);
 					merge();
 				}
 			}

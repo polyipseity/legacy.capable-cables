@@ -3,7 +3,6 @@ package $group__.$modId__.utilities.constructs.classes;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import javax.annotation.Nullable;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
@@ -31,8 +30,8 @@ public abstract class Singleton {
 
 	/* SECTION static variables */
 
-	protected static final Map<Class<?>, Singleton> INSTANCES = new ConcurrentHashMap<>();
-	protected static final Map<Class<?>, String> STACKTRACE_STRINGS = new ConcurrentHashMap<>();
+	protected static final ConcurrentHashMap<Class<?>, Singleton> INSTANCES = new ConcurrentHashMap<>();
+	protected static final ConcurrentHashMap<Class<?>, String> STACKTRACE_STRINGS = new ConcurrentHashMap<>();
 
 
 	/* SECTION static methods */

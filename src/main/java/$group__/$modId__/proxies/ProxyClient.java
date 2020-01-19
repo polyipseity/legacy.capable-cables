@@ -1,7 +1,7 @@
 package $group__.$modId__.proxies;
 
 import $group__.$modId__.ModOwn;
-import $group__.$modId__.client.gui.utilities.constructs.NumberRelativeDisplay;
+import etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.variables.References;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -16,7 +16,7 @@ public final class ProxyClient extends Proxy {
 	@Override
 	public void preInitialize(ModOwn mod, FMLPreInitializationEvent e) {
 		super.preInitialize(mod, e);
-		EVENT_BUS.register(NumberRelativeDisplay.class);
+		EVENT_BUS.register(References.Client.class);
 	}
 
 

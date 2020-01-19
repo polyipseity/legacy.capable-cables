@@ -11,6 +11,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.meta.When;
 import java.awt.*;
 
+import static $group__.$modId__.client.gui.utilities.helpers.Guis.popMatrix;
+import static $group__.$modId__.client.gui.utilities.helpers.Guis.pushMatrix;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
@@ -49,11 +51,11 @@ public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawab
 
 	/** {@inheritDoc} */
 	@Override
-	public void draw(Minecraft game) {
-		super.draw(game);
-		IDrawable<N, ?> d = getDrawable();
-		d.spec().setOffsetAndSize(getRect());
-		d.draw(game);
+	public void draw(Minecraft client) {
+		pushMatrix();
+		super.draw(client);
+		getDrawable().draw(client);
+		popMatrix();
 	}
 
 
@@ -96,18 +98,9 @@ public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawab
 
 	@javax.annotation.concurrent.Immutable
 	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends GuiRectangleDrawable<N, T> {
-		/* SECTION variables */
-
-		/* REMARKS internal */ protected final GuiRectangle<N, T> guiRect = new GuiRectangle<>(this);
-
-
 		/* SECTION constructors */
 
-		public Immutable(Rectangle<N, ?> rect, Color color, IDrawable<N, ?> drawable) {
-			super(rect.toImmutable(), color, drawable);
-			drawable.spec().setOffsetAndSize(getRect());
-			this.drawable = drawable.toImmutable();
-		}
+		public Immutable(Rectangle<N, ?> rect, Color color, IDrawable<N, ?> drawable) { super(rect.toImmutable(), color, drawable.toImmutable()); }
 
 		public Immutable(Rectangle<N, ?> rect, IDrawable<N, ?> drawable) { this(rect, Colors.COLORLESS, drawable); }
 
@@ -130,14 +123,6 @@ public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawab
 
 
 		/* SECTION methods */
-
-		/** {@inheritDoc} */
-		@Override
-		public void draw(Minecraft game) {
-			guiRect.draw(game); // CODE super.super.draw(game);
-			getDrawable().draw(game);
-		}
-
 
 		/** {@inheritDoc} */
 		@Override

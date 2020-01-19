@@ -45,8 +45,8 @@ public enum RegistrableHelper {
 
 		/* SECTION static variables */
 
-		public static final Map<String, Integer> RAW_NBT_TYPE_LOOKUP;
-		public static final Map<String, Integer> NBT_TYPE_LOOKUP;
+		public static final ImmutableMap<String, Integer> RAW_NBT_TYPE_LOOKUP;
+		public static final ImmutableMap<String, Integer> NBT_TYPE_LOOKUP;
 
 		static {
 			List<String> nbtTypes = Arrays.asList(NBTBase.NBT_TYPES);

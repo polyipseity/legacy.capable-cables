@@ -17,41 +17,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 
 @SideOnly(Side.CLIENT)
 public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<EnumTheme> {
-	/* SECTION static variables */
-
-	protected static final GuiTabsThemed<?, ?, ?> TABS = new GuiTabsThemed<>(
-			EnumTheme.NONE,
-			0,
-			new GuiTabs.ITabThemed.Impl<>(
-					new GuiRectangleThemedDrawable<>(
-							new Rectangle<>(new XY<>(new X<>(0.3F), new Y<>(0.3F)), new XY<>(16, 16)),
-							EnumTheme.NONE,
-							new GuiResource<>(
-									new Rectangle<>(new XY<>(new X<>(0.3F), new Y<>(0.3F)), new XY<>(16, 16)),
-									new Frame<>(0, 0, 0, 0),
-									References.ResourceLocations.GUI_WRENCH,
-									new Rectangle<>(new XY<>(256 - 16, 0), new XY<>(16, 16))
-							)
-					),
-					new GuiRectangleThemed<>(
-							new Rectangle<>(new XY<>(new X<>(0.3F, 16), new Y<>(0.3F, 16)), new XY<>(new X<>(0.4F, -16), new Y<>(0.4F, -16))),
-							Colors.WHITE,
-							EnumTheme.NONE
-					),
-					EnumTheme.NONE
-			)
-	);
-
-
 	/* SECTION variables */
 
-	protected GuiTabsThemed.Immutable<Number, EnumTheme, ?> tabs;
+	protected GuiTabsThemed<Number, EnumTheme, ?> tabs;
 	protected ItemStack stack;
 	protected EnumTheme theme;
 
@@ -64,10 +37,10 @@ public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<En
 		this.stack = stack;
 		this.theme = theme;
 
-		GuiTabsThemed<Number, EnumTheme, ?> tabs = castUnchecked(TABS.clone());
+		GuiTabsThemed<Number, EnumTheme, ?> tabs = TABS.clone();
 		tabs.setOpen(open);
 		tabs.setTheme(theme);
-		this.tabs = castUnchecked(tabs.toImmutable());
+		this.tabs = tabs;
 	}
 
 	public GuiWrench(Container container, ItemStack stack) { this(container, stack, EnumTheme.NONE, 0); }
@@ -108,4 +81,30 @@ public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<En
 	/** {@inheritDoc} */
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) { tabs.draw(mc); }
+
+
+	/* SECTION static variables */
+
+	protected static final GuiTabsThemed<Number, EnumTheme, ?> TABS = new GuiTabsThemed<>(
+			EnumTheme.NONE,
+			0,
+			new GuiTabs.ITabThemed.Impl<>(
+					new GuiRectangleThemedDrawable<>(
+							new Rectangle<>(new XY<>(new X<>(0.2F), new Y<>(0.2F, -16)), new XY<>(16, 16)),
+							EnumTheme.NONE,
+							new GuiResource<>(
+									new Rectangle<>(new XY<>(new X<>(0.2F), new Y<>(0.2F, -16)), new XY<>(16, 16)),
+									new Frame<>(0, 0, 0, 0),
+									References.Client.Resources.GUI_WRENCH,
+									References.Client.Resources.GUI_WRENCH_INFO
+							)
+					),
+					new GuiRectangleThemed<>(
+							new Rectangle<>(new XY<>(new X<>(0.2F), new Y<>(0.2F)), new XY<>(new X<>(0.6F), new Y<>(0.6F))),
+							Colors.WHITE,
+							EnumTheme.NONE
+					),
+					EnumTheme.NONE
+			)
+	);
 }

@@ -7,14 +7,16 @@ import javax.annotation.meta.When;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IAnnotationProcessor.*;
+import static $group__.$modId__.utilities.helpers.Miscellaneous.Reflections.isClassAbstract;
 import static $group__.$modId__.utilities.helpers.Miscellaneous.Reflections.isFormerMethodOverriddenByLatter;
 import static $group__.$modId__.utilities.helpers.Throwables.throw_;
+import static $group__.$modId__.utilities.helpers.Throwables.wrapUnhandledThrowable;
 import static $group__.$modId__.utilities.variables.References.LOGGER;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -53,26 +55,19 @@ public @interface OverridingStatus {
 			OverridingStatus a = result.annotations[0];
 			When when = a.when();
 			Boolean whenB = when == When.ALWAYS ? Boolean.TRUE : when == When.NEVER ? Boolean.FALSE : null;
-			if (whenB == null && when == When.UNKNOWN) return;
+			if (when == When.UNKNOWN) return;
 
 			Reflections refs;
-			{
-				final Reflections[] r = new Reflections[1]; // COMMENT keep hard reference
-				refs = CACHED_REFLECTIONS.computeIfAbsent(a.group(), g -> {
-					r[0] = new Reflections(g);
-					r[0].expandSuperTypes();
-					return new SoftReference<>(r[0]);
-				}).get();
-				assert refs != null;
-			}
+			try { refs = REFLECTIONS_CACHE.get(a.group()); } catch (ExecutionException e) { throw wrapUnhandledThrowable(e); }
 
 			Class<?> superC = result.clazz;
 			Method superM = result.element;
 			Set<Class<?>> ignore = new HashSet<>();
 			check:
 			for (Class<?> subC : refs.getSubTypesOf(superC)) {
-				if (ignore.contains(subC)) continue;
-				if (getEffectiveAnnotationIfInheritingConsidered(this, subC, superM) != a) {
+				if (isClassAbstract(subC) || ignore.contains(subC)) continue;
+				OverridingStatus[] ar = getEffectiveAnnotationsIfInheritingConsidered(this, subC, superM);
+				if (ar.length != 0 && ar[0] != a) {
 					ignore.addAll(refs.getSubTypesOf(subC));
 					continue;
 				}
@@ -80,18 +75,18 @@ public @interface OverridingStatus {
 				for (Method subM : subC.getDeclaredMethods()) {
 					if (whenB == null) {
 						if (isFormerMethodOverriddenByLatter(superM, subM)) {
-							LOGGER.debug(getMessage(this, "method '" + subM.toGenericString() + "' @ subclass '" + subC.toGenericString() + "' -> @ subclass '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "' (" + a + ")"));
+							LOGGER.debug(getMessage(this, "method '" + subM.toGenericString() + "' -> @ subclass '" + superM.toGenericString() + "' (" + a + ")"));
 						}
 						continue check;
 					} else if (isFormerMethodOverriddenByLatter(superM, subM) == whenB) {
-						if (whenB && isFinal(subM.getModifiers())) LOGGER.warn(getMessage(this, "Impossible: subclass -Y> final method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "' (" + a + ")"));
+						if (whenB && isFinal(subM.getModifiers())) LOGGER.warn(getMessage(this, "Impossible: subclass -Y> final method '" + superM.toGenericString() + "' (" + a + ")"));
 						continue check;
 					}
 				}
 
 				if (whenB == null) {
-					LOGGER.debug(getMessage(this, "subclass '" + subC.toGenericString() + "' -X> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "' (" + a + ")"));
-				} else throw throw_(new AnnotationProcessingException(getMessage(this, "Unfulfilled requirement: subclass '" + subC.toGenericString() + "' -" + (whenB ? "Y" : "X") + "> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "' (" + a + "), instead: subclass '" + subC.toGenericString() + "' -" + (whenB ? "X" : "") + "> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "'")));
+					LOGGER.debug(getMessage(this, "subclass '" + subC.toGenericString() + "' -X> method '" + superM.toGenericString() + "' (" + a + ")"));
+				} else throw throw_(new AnnotationProcessingException(getMessage(this, "Unfulfilled requirement: subclass '" + subC.toGenericString() + "' -" + (whenB ? "Y" : "X") + "> method '" + superM.toGenericString() + "' (" + a + "), instead: subclass '" + subC.toGenericString() + "' -" + (whenB ? "X" : "") + "> method '" + superM.toGenericString() + "'")));
 			}
 		}
 	}

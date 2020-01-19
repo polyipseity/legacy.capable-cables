@@ -13,6 +13,8 @@ import javax.annotation.meta.When;
 import java.awt.*;
 
 import static $group__.$modId__.client.gui.utilities.constructs.IThemed.tryCastThemedTo;
+import static $group__.$modId__.client.gui.utilities.helpers.Guis.popMatrix;
+import static $group__.$modId__.client.gui.utilities.helpers.Guis.pushMatrix;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
@@ -59,11 +61,11 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 
 	/** {@inheritDoc} */
 	@Override
-	public void draw(Minecraft game) {
-		super.draw(game);
-		IDrawable<N, ?> d = getDrawable();
-		d.spec().setOffsetAndSize(getRect());
-		d.draw(game);
+	public void draw(Minecraft client) {
+		pushMatrix();
+		super.draw(client);
+		getDrawable().draw(client);
+		popMatrix();
 	}
 
 
@@ -108,18 +110,9 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 
 	@javax.annotation.concurrent.Immutable
 	public static class Immutable<N extends Number, TH extends ITheme<TH>, T extends Immutable<N, TH, T>> extends GuiRectangleThemedDrawable<N, TH, T> {
-		/* SECTION variables */
-
-		/* REMARKS internal */ protected final GuiRectangleThemed<N, TH, T> guiRectT = new GuiRectangleThemed<>(this);
-
-
 		/* SECTION constructors */
 
-		public Immutable(Rectangle<N, ?> rect, Color color, TH theme, IDrawable<N, ?> drawable) {
-			super(rect.toImmutable(), color, theme, drawable);
-			drawable.spec().setOffsetAndSize(getRect());
-			this.drawable = drawable.toImmutable();
-		}
+		public Immutable(Rectangle<N, ?> rect, Color color, TH theme, IDrawable<N, ?> drawable) { super(rect.toImmutable(), color, theme, drawable.toImmutable()); }
 
 		public Immutable(Rectangle<N, ?> rect, TH theme, IDrawable<N, ?> drawable) { this(rect, Colors.COLORLESS, theme, drawable); }
 
@@ -146,14 +139,6 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 
 
 		/* SECTION methods */
-
-		/** {@inheritDoc} */
-		@Override
-		public void draw(Minecraft game) {
-			guiRectT.draw(game); // CODE super.super.draw(game);
-			getDrawable().draw(game);
-		}
-
 
 		/** {@inheritDoc} */
 		@Override

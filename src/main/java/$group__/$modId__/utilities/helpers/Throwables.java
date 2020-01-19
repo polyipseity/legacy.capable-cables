@@ -4,9 +4,7 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import javax.annotation.Nullable;
-import java.rmi.UnexpectedException;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,7 +19,7 @@ public enum Throwables {
 	/* SECTION static variables */
 
 	private static final Set<String> RAN_ONCE = Sets.newConcurrentHashSet();
-	protected static final Map<String, String> RAN_ONCE_STACKTRACE_STRINGS = new ConcurrentHashMap<>();
+	protected static final ConcurrentHashMap<String, String> RAN_ONCE_STACKTRACE_STRINGS = new ConcurrentHashMap<>();
 
 
 	/* SECTION static methods */
@@ -86,5 +84,5 @@ public enum Throwables {
 	public static IllegalArgumentException rejectIndexOutOfBounds(Number index, Number bound) { throw rejectArguments(new IndexOutOfBoundsException("index: " + index + ", bound: " + bound), index); }
 
 
-	public static RuntimeException unexpectedThrowable(Throwable t) { throw wrapUnhandledThrowable(new UnexpectedException("Unexpected throwable '" + t.getClass() + "': " + t, wrapUnhandledThrowable(t))); }
+	public static InternalError unexpectedThrowable(Throwable t) { throw new InternalError("Unexpected throwable '" + t.getClass() + "': " + t, wrapUnhandledThrowable(t)); }
 }

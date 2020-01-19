@@ -1,7 +1,7 @@
 package $group__.$modId__.client.gui.utilities.constructs;
 
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
-import $group__.$modId__.client.gui.utilities.helpers.GuiHelper;
+import $group__.$modId__.client.gui.utilities.helpers.Guis;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -35,7 +35,7 @@ public interface IThemed<T extends IThemed.ITheme<T>> {
 
 		default T getTheme() { return castUnchecked(this); }
 
-		default void drawRect(Rectangle<?, ?> rect, Color color) { GuiHelper.drawRect(rect, color); }
+		default void drawRect(Rectangle<?, ?> rect, Color color) { Guis.drawRect(rect, color); }
 	}
 
 

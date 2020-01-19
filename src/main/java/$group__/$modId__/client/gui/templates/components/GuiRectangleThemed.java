@@ -11,6 +11,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.meta.When;
 import java.awt.*;
 
+import static $group__.$modId__.client.gui.utilities.helpers.Guis.popMatrix;
+import static $group__.$modId__.client.gui.utilities.helpers.Guis.pushMatrix;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
@@ -50,7 +52,11 @@ public class GuiRectangleThemed<N extends Number, TH extends IThemed.ITheme<TH>,
 
 	/** {@inheritDoc} */
 	@Override
-	public void draw(Minecraft game) { getTheme().drawRect(getRect(), getColor()); }
+	public void draw(Minecraft client) {
+		pushMatrix();
+		getTheme().drawRect(getRect(), getColor());
+		popMatrix();
+	}
 
 
 	/** {@inheritDoc} */

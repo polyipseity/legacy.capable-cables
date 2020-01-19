@@ -2,7 +2,7 @@ package $group__.$modId__.client.gui.templates.components;
 
 import $group__.$modId__.client.gui.utilities.constructs.Frame;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
-import $group__.$modId__.client.gui.utilities.helpers.GuiHelper;
+import $group__.$modId__.client.gui.utilities.helpers.Guis;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 import $group__.$modId__.utilities.helpers.Colors;
 import net.minecraft.client.Minecraft;
@@ -13,8 +13,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.meta.When;
 import java.awt.*;
 
-import static $group__.$modId__.client.gui.utilities.helpers.GuiHelper.bindTexture;
-import static $group__.$modId__.client.gui.utilities.helpers.GuiHelper.resetColor;
+import static $group__.$modId__.client.gui.utilities.helpers.Guis.*;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
@@ -65,10 +64,12 @@ public class GuiResource<N extends Number, TE extends Number, T extends GuiResou
 
 	/** {@inheritDoc} */
 	@Override
-	public void draw(Minecraft game) {
-		resetColor();
-		bindTexture(game, getResource());
-		GuiHelper.drawModalRectWithCustomSizedTexture(getRect(), getTexture());
+	public void draw(Minecraft client) {
+		pushMatrix();
+		reset();
+		bindTexture(getResource());
+		Guis.drawModalRectWithCustomSizedTexture(getRect(), getTexture());
+		popMatrix();
 	}
 
 

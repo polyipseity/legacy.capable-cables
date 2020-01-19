@@ -7,6 +7,7 @@ import $group__.$modId__.utilities.helpers.Primitives.Numbers;
 import javax.annotation.Nullable;
 import javax.annotation.meta.When;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -75,33 +76,32 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 	@Override
 	public T sum(Collection<? extends Number> o) {
 		T r = clone();
+
 		Number p = getParent();
+		r.value = Numbers.sum(getValue(), o.stream().filter(t -> t instanceof NumberRelative<?>).map(t -> (NumberRelative<?>) t).map(t -> (t.doubleValue() - (t.getOffset() == null ? 0 : t.getOffset().doubleValue())) / (p == null ? 1 : p.doubleValue())).collect(Collectors.toList()));
 
-		Collection<? extends NumberRelative<?>> hasOffset = o.stream().filter(t -> t instanceof NumberRelative<?> && ((NumberRelative<?>) t).getOffset() != null).map(t -> (NumberRelative<?>) t).collect(Collectors.toList());
+		List<Number> o1 = o.stream().map(t -> t instanceof NumberRelative<?> ? ((NumberRelative<?>) t).getOffset() == null ? 0 : ((NumberRelative<?>) t).getOffset().doubleValue() : t.doubleValue()).collect(Collectors.toList());
 		Number to = getOffset();
-		r.setOffset(to == null ? Numbers.sumNullable(hasOffset) : Numbers.sum(to, hasOffset));
-
-		Collection<Number> ol = o.stream().filter(t -> !(t instanceof NumberRelative<?>)).map(t -> p == null ? t : t.doubleValue() / p.doubleValue()).collect(Collectors.toList());
-		ol.addAll(hasOffset.stream().map(t -> (t.doubleValue() - t.getOffset().doubleValue()) / (p == null ? 1D : p.doubleValue())).collect(Collectors.toList()));
-		r.setValue(Numbers.sum(getValue(), ol));
+		if (to != null) o1.add(0, to);
+		r.offset = Numbers.sumNullable(o1);
 
 		return r;
 	}
 
 
 	@Override
-	public void assimilate(Number o) {
-		Number p = getParent();
-		Number o1 = o;
-
+	public T newInstanceFrom(Number o) {
+		T r = clone();
 		if (o instanceof NumberRelative<?>) {
-			NumberRelative<?> o2 = (NumberRelative<?>) o;
-			o = o2.getOffset();
-			o1 = o == null ? o1 : o2.doubleValue() - o.doubleValue();
-			setOffset(o);
-		} else setOffset(0);
-
-		setValue(p == null ? o1 : o1.doubleValue() / p.doubleValue());
+			NumberRelative<?> o1 = (NumberRelative<?>) o;
+			r.value = o1.value;
+			r.parent = o1.parent;
+			r.offset = o1.offset;
+		} else {
+			r.value = o;
+			r.parent = offset = null;
+		}
+		return r;
 	}
 
 

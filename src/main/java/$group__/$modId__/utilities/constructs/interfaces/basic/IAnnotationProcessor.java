@@ -1,20 +1,21 @@
 package $group__.$modId__.utilities.constructs.interfaces.basic;
 
-import $group__.$modId__.utilities.constructs.classes.concrete.ReferenceMap;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import org.reflections.Reflections;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.SoftReference;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
+import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
 import static $group__.$modId__.utilities.helpers.Miscellaneous.Reflections.getMethodNameDescriptor;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
 
@@ -28,7 +29,11 @@ public interface IAnnotationProcessor<A extends Annotation> {
 
 	/* SECTION static variables */
 
-	ReferenceMap<String, SoftReference<Reflections>, ?> CACHED_REFLECTIONS = new ReferenceMap<>(new ConcurrentHashMap<>(), new ReferenceQueue<>());
+	LoadingCache<String, Reflections> REFLECTIONS_CACHE = CacheBuilder.newBuilder().softValues().build(CacheLoader.from(t -> {
+		Reflections r = new Reflections(t);
+		r.expandSuperTypes();
+		return r;
+	}));
 
 
 	/* SECTION static methods */
@@ -36,28 +41,29 @@ public interface IAnnotationProcessor<A extends Annotation> {
 	static String getMessage(IAnnotationProcessor<?> processor, @Nullable String msg) { return "Process annotation '" + processor.annotationType() + "'" + (msg == null || msg.isEmpty() ? "" : ": " + msg); }
 
 
-	@Nullable
-	static <T, A extends Annotation> A getEffectiveAnnotationIfInheritingConsidered(IAnnotationProcessor<A> processor, java.lang.Class<T> sub, Method m) {
+	static <T, A extends Annotation> A[] getEffectiveAnnotationsIfInheritingConsidered(IAnnotationProcessor<A> processor, Class<T> sub, Method m) {
 		String mName = m.getName();
 		Class<?>[] mArgs = m.getParameterTypes();
 		Class<A> aClass = processor.annotationType();
-		A subA;
-		try { subA = sub.getMethod(mName, mArgs).getDeclaredAnnotation(aClass); } catch (NoSuchMethodException e) { throw rejectArguments(e, sub, m); }
+		ArrayList<A> subA = new ArrayList<>();
 
 		Class<? super T> supper = sub;
-		while (subA == null && supper != null) {
+		while (subA.isEmpty() && supper != null) {
 			try {
 				m = supper.getDeclaredMethod(mName, mArgs);
-				subA = m.getDeclaredAnnotation(aClass);
+				subA.addAll(Arrays.asList(m.getDeclaredAnnotationsByType(aClass)));
 			} catch (NoSuchMethodException ignored) {}
 			supper = supper.getSuperclass();
 		}
 
-		return subA;
+		return subA.toArray(castUnchecked(Array.newInstance(aClass, subA.size())));
 	}
 
-	@Nonnull
-	static <T, A extends Annotation> A getEffectiveAnnotationIfInheritingConsideredNonnull(IAnnotationProcessor<A> processor, Class<T> sub, Method subM) { return Objects.requireNonNull(getEffectiveAnnotationIfInheritingConsidered(processor, sub, subM)); }
+	static <T, A extends Annotation> A[] getEffectiveAnnotationsIfInheritingConsideredNonEmpty(IAnnotationProcessor<A> processor, Class<T> sub, Method subM) {
+		A[] r = getEffectiveAnnotationsIfInheritingConsidered(processor, sub, subM);
+		if (r.length == 0) r = castUnchecked(Array.newInstance(r.getClass().getComponentType(), 1));
+		return r;
+	}
 
 
 	/* SECTION static classes */

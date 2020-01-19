@@ -19,7 +19,7 @@ public enum GuiHandler implements IGuiHandler {
 
 	/* SECTION variables */
 
-	protected final Map<Integer, IGuiHandler> guiMap = new HashMap<>();
+	protected final HashMap<Integer, IGuiHandler> guiMap = new HashMap<>();
 
 
 	/* SECTION getters & setters */

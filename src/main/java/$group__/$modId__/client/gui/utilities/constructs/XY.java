@@ -37,7 +37,7 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructure<T>, 
 		this.y = y;
 	}
 	
-	public XY(XY<N, ?> c) { this(c.getX(), c.getY()); }
+	public XY(XY<? extends N, ?> c) { this(c.getX(), c.getY()); }
 	
 	
 	/* SECTION getters & setters */

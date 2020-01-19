@@ -7,15 +7,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import static $group__.$modId__.utilities.variables.References.Client.GAME;
+import static $group__.$modId__.utilities.variables.References.Client.CLIENT;
 
 @SideOnly(Side.CLIENT)
 public interface IDrawable<N extends Number, T extends IDrawable<N, T>> extends IStructure<T>, ISpec<Rectangle<N, ?>> {
 	/* SECTION methods */
 
-	void draw(Minecraft game);
+	void draw(Minecraft client);
 
-	default void draw() { draw(GAME); }
+	default void draw() { draw(CLIENT); }
 
 
 	/** {@inheritDoc} */

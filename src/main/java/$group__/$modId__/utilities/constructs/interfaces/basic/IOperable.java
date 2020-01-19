@@ -46,14 +46,14 @@ public interface IOperable<T extends IOperable<T, A>, A> {
 		/* SECTION methods */
 
 		@OverridingStatus(group = GROUP, when = When.MAYBE)
-		default void assimilate(Number o) throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
+		default T newInstanceFrom(Number o) throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 
 		@Override
 		@OverridingStatus(group = GROUP, when = When.MAYBE)
 		default T max(Collection<? extends Number> o) {
 			T r = castUnchecked(clone());
-			for (Number t : o) if (lessThan(r, t)) r.assimilate(t);
+			for (Number t : o) if (lessThan(r, t)) r = r.newInstanceFrom(t);
 			return r;
 		}
 
@@ -61,7 +61,7 @@ public interface IOperable<T extends IOperable<T, A>, A> {
 		@OverridingStatus(group = GROUP, when = When.MAYBE)
 		default T min(Collection<? extends Number> o) {
 			T r = castUnchecked(clone());
-			for (Number t : o) if (greaterThan(r, t)) r.assimilate(t);
+			for (Number t : o) if (greaterThan(r, t)) r.newInstanceFrom(t);
 			return r;
 		}
 
