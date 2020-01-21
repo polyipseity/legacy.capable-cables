@@ -196,4 +196,3 @@ gradle-app.setting
 
 # Custom files
 ext.properties
-*_debug/
