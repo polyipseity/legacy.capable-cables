@@ -11,12 +11,11 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Set;
 
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Reflections.getMethodNameDescriptor;
+import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.forName;
+import static $group__.$modId__.utilities.helpers.Reflections.getMethodNameDescriptor;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
 
 public interface IAnnotationProcessor<A extends Annotation> {
@@ -42,21 +41,16 @@ public interface IAnnotationProcessor<A extends Annotation> {
 
 
 	static <T, A extends Annotation> A[] getEffectiveAnnotationsIfInheritingConsidered(IAnnotationProcessor<A> processor, Class<T> sub, Method m) {
+		Class<A> aClass = processor.annotationType();
+		A[] r = castUnchecked(Array.newInstance(aClass, 0));
+
+		Class<? super T> sc = sub;
 		String mName = m.getName();
 		Class<?>[] mArgs = m.getParameterTypes();
-		Class<A> aClass = processor.annotationType();
-		ArrayList<A> subA = new ArrayList<>();
+		do { try { r = sc.getDeclaredMethod(mName, mArgs).getDeclaredAnnotationsByType(aClass); } catch (NoSuchMethodException ignored) {  /* MARK empty */ }
+		} while (r.length == 0 && (sc = sc.getSuperclass()) != null);
 
-		Class<? super T> supper = sub;
-		while (subA.isEmpty() && supper != null) {
-			try {
-				m = supper.getDeclaredMethod(mName, mArgs);
-				subA.addAll(Arrays.asList(m.getDeclaredAnnotationsByType(aClass)));
-			} catch (NoSuchMethodException ignored) {}
-			supper = supper.getSuperclass();
-		}
-
-		return subA.toArray(castUnchecked(Array.newInstance(aClass, subA.size())));
+		return r;
 	}
 
 	static <T, A extends Annotation> A[] getEffectiveAnnotationsIfInheritingConsideredNonEmpty(IAnnotationProcessor<A> processor, Class<T> sub, Method subM) {
@@ -78,12 +72,7 @@ public interface IAnnotationProcessor<A extends Annotation> {
 		default void process(ASMDataTable asm) {
 			Set<ASMDataTable.ASMData> thisAsm = asm.getAll(annotationType().getName());
 
-			thisAsm.forEach(t -> {
-				Class<?> supper;
-				try { supper = Class.forName(t.getClassName(), false, getClass().getClassLoader()); } catch (ClassNotFoundException e) { throw rejectArguments(e, t.getClassName()); }
-
-				processClass(new Result(asm, thisAsm, t, supper));
-			});
+			thisAsm.forEach(t -> processClass(new Result(asm, thisAsm, t, forName(t.getClassName(), false, getClass().getClassLoader()))));
 		}
 
 

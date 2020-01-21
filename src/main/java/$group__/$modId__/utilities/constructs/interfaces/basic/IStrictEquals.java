@@ -5,7 +5,7 @@ import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingS
 import javax.annotation.meta.When;
 import java.util.function.Function;
 
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
+import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
 public interface IStrictEquals {

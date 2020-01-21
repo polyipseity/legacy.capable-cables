@@ -7,8 +7,7 @@ import $group__.$modId__.client.gui.utilities.constructs.XY;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString;
-import $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable;
-import com.google.common.collect.ImmutableList;
+import $group__.$modId__.utilities.helpers.Throwables;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraftforge.fml.relauncher.Side;
@@ -20,11 +19,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static $group__.$modId__.client.gui.utilities.constructs.IThemed.tryCastThemedTo;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
-import static $group__.$modId__.utilities.helpers.Throwables.*;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneNonnull;
+import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.helpers.Throwables.rejectIndexOutOfBounds;
+import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 import static com.google.common.collect.ImmutableSet.of;
 
@@ -47,7 +49,7 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 	@SafeVarargs
 	public GuiTabs(int open, ITab<N, ?>... tabs) { this(Arrays.asList(tabs), open); }
 
-	public GuiTabs(GuiTabs<N, ?> c) { this(c.getTabs(), c.getOpen()); }
+	public GuiTabs(GuiTabs<N, ?> copy) { this(copy.getTabs(), copy.getOpen()); }
 
 
 	/* SECTION getters & setters */
@@ -117,10 +119,8 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r;
-		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw unexpectedThrowable(e); }
-		List<ITab<N, ?>> t = getTabs();
-		ITab<N, ?>[] tabsC = castUnchecked(t.stream().map(ICloneable::copy).toArray(ITab<?, ?>[]::new));
-		r.tabs = isImmutable() ? ImmutableList.copyOf(tabsC) : Arrays.asList(tabsC);
+		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw Throwables.unexpected(e); }
+		r.tabs = tryCloneNonnull(tabs);
 		return r;
 	}
 
@@ -144,13 +144,13 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends GuiTabs<N, T> {
 		/* SECTION constructors */
 
-		public Immutable(List<ITab<N, ?>> tabs, int open) { super(ImmutableList.copyOf(tabs), open); }
+		public Immutable(List<ITab<N, ?>> tabs, int open) { super(tryToImmutableNonnull(tabs), tryToImmutableNonnull(open)); }
 
 		@SuppressWarnings("varargs")
 		@SafeVarargs
 		public Immutable(int open, ITab<N, ?>... tabs) { this(Arrays.asList(tabs), open); }
 
-		public Immutable(GuiTabs<N, ?> c) { this(c.getTabs(), c.getOpen()); }
+		public Immutable(GuiTabs<N, ?> copy) { this(copy.getTabs(), copy.getOpen()); }
 
 
 		/* SECTION getters & setters */
@@ -223,7 +223,7 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 
 			public Impl(IDrawable<N, ?> access, IDrawable<N, ?> content) { this(access, content, false); }
 
-			public Impl(Impl<N, ?> c) { this(c.getAccess(), c.getContent(), c.isOpen()); }
+			public Impl(Impl<N, ?> copy) { this(copy.getAccess(), copy.getContent(), copy.isOpen()); }
 
 
 			/* SECTION getters & setters */
@@ -249,7 +249,7 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 			/* SECTION methods */
 
 			@SuppressWarnings("EmptyMethod")
-			protected void merge() {}
+			protected void merge() { /* MARK empty */ }
 
 
 			/** {@inheritDoc} */
@@ -309,7 +309,7 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 			@OverridingStatus(group = GROUP, when = When.MAYBE)
 			public T clone() {
 				T r;
-				try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw unexpectedThrowable(e); }
+				try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw Throwables.unexpected(e); }
 				r.access = access.clone();
 				r.content = content.clone();
 				return r;
@@ -322,11 +322,11 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 			public static class Immutable<N extends Number, T extends Immutable<N, T>> extends Impl<N, T> {
 				/* SECTION constructors */
 
-				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content, boolean open) { super(access.toImmutable(), content.toImmutable(), open); }
+				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content, boolean open) { super(access.toImmutable(), content.toImmutable(), tryToImmutableNonnull(open)); }
 
 				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content) { this(access, content, false); }
 
-				public Immutable(Impl<N, ?> c) { this(c.getAccess(), c.getContent(), c.isOpen()); }
+				public Immutable(Impl<N, ?> copy) { this(copy.getAccess(), copy.getContent(), copy.isOpen()); }
 
 
 				/* SECTION getters & setters */
@@ -385,6 +385,7 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 		class Impl<N extends Number, TH extends ITheme<TH>, T extends Impl<N, TH, T>> extends ITab.Impl<N, T> implements ITabThemed<N, TH, T> {
 			/* SECTION variables */
 
+			@SuppressWarnings("NotNullFieldNotInitialized")
 			protected TH theme;
 
 
@@ -397,7 +398,7 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 
 			public Impl(IDrawable<N, ?> access, IDrawable<N, ?> content, TH theme) { this(access, content, theme, false); }
 
-			public Impl(ITabThemed.Impl<N, TH, ?> c) { this(c.getAccess(), c.getContent(), c.getTheme(), c.isOpen()); }
+			public Impl(ITabThemed.Impl<N, TH, ?> copy) { this(copy.getAccess(), copy.getContent(), copy.getTheme(), copy.isOpen()); }
 
 
 			/* SECTION getters & setters */
@@ -432,6 +433,13 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 			public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
 					t -> getTheme().equals(t.getTheme())); }
 
+			@Override
+			public T clone() {
+				T r = super.clone();
+				r.theme = tryCloneNonnull(theme);
+				return r;
+			}
+
 
 			/* SECTION static methods */
 
@@ -451,11 +459,11 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 			public static class Immutable<N extends Number, TH extends ITheme<TH>, T extends Immutable<N, TH, T>> extends ITabThemed.Impl<N, TH, T> {
 				/* SECTION constructors */
 
-				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content, TH theme, boolean open) { super(access.toImmutable(), content.toImmutable(), theme, open); }
+				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content, TH theme, boolean open) { super(access.toImmutable(), content.toImmutable(), tryToImmutableNonnull(theme), tryToImmutableNonnull(open)); }
 
 				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content, TH theme) { this(access.toImmutable(), content.toImmutable(), theme, false); }
 
-				public Immutable(ITabThemed.Impl<N, TH, ?> c) { this(c.getAccess(), c.getContent(), c.getTheme()); }
+				public Immutable(ITabThemed.Impl<N, TH, ?> copy) { this(copy.getAccess(), copy.getContent(), copy.getTheme()); }
 
 
 				/* SECTION getters & setters */

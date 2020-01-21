@@ -16,8 +16,6 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BiFunction;
 
-import static java.util.Objects.requireNonNull;
-
 public enum RegistrableHelper {
 	/* MARK empty */ ;
 
@@ -63,16 +61,16 @@ public enum RegistrableHelper {
 
 		/* SECTION static methods */
 
-		@SuppressWarnings("ConstantConditions")
-		public static int lookupNBTType(Class<?> clazz) {
-			return lookupNBTType(clazz, false);
-		}
-
 		@Nullable
-		public static Integer lookupNBTType(Class<?> clazz, boolean nullable) {
+		public static Integer lookupNBTType(Class<?> clazz) {
 			Integer ret = NBT_TYPE_LOOKUP.get(clazz.getSimpleName());
 			if (ret == null) ret = RAW_NBT_TYPE_LOOKUP.get(clazz.getSimpleName().toUpperCase(Locale.ROOT));
-			return nullable ? ret : requireNonNull(ret);
+			return ret;
+		}
+
+		@SuppressWarnings("ConstantConditions")
+		public static int lookupNBTTypeNonnull(Class<?> clazz) {
+			return lookupNBTType(clazz);
 		}
 
 
@@ -92,7 +90,7 @@ public enum RegistrableHelper {
 
 		@Nullable
 		public static <C> C readChildIfHasKey(@Nullable NBTTagCompound p, String key, Class<C> type, BiFunction<NBTTagCompound, String, C> f) {
-			if (p != null && p.hasKey(key, lookupNBTType(type))) return f.apply(p, key);
+			if (p != null && p.hasKey(key, lookupNBTTypeNonnull(type))) return f.apply(p, key);
 			return null;
 		}
 

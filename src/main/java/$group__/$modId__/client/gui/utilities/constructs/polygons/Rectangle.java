@@ -2,17 +2,17 @@ package $group__.$modId__.client.gui.utilities.constructs.polygons;
 
 import $group__.$modId__.client.gui.utilities.constructs.XY;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
-import com.google.common.collect.ImmutableList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.meta.When;
 import java.util.List;
 
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
+import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 import static com.google.common.collect.ImmutableSet.of;
@@ -34,7 +34,7 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 
 	public Rectangle(N offsetX, N offsetY, N sizeX, N sizeY) { this(new XY<>(offsetX, offsetY), new XY<>(sizeX, sizeY)); }
 
-	public Rectangle(Rectangle<N, ?> c) { this(c.getOffset(), c.getSize()); }
+	public Rectangle(Rectangle<N, ?> copy) { this(copy.getOffset(), copy.getSize()); }
 
 
 	/* SECTION getters & setters */
@@ -132,12 +132,12 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 
 		public Immutable(XY<N, ?> offset, XY<N, ?> size) {
 			super(offset.toImmutable(), size.toImmutable());
-			list = ImmutableList.copyOf(list);
+			list = tryToImmutableNonnull(list);
 		}
 
 		public Immutable(N offsetX, N offsetY, N sizeX, N sizeY) { this(new XY<>(offsetX, offsetY), new XY<>(sizeX, sizeY)); }
 
-		public Immutable(Rectangle<N, ?> c) { this(c.getOffset(), c.getSize()); }
+		public Immutable(Rectangle<N, ?> copy) { this(copy.getOffset(), copy.getSize()); }
 
 
 		/* SECTION getters & setters */

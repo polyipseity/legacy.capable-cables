@@ -29,6 +29,4 @@ public enum Colors {
 	/* SECTION static methods */
 
 	public static Color newColor(String s) { return new Color(Integer.parseInt(s.replace("#", ""), 16), true); }
-
-	public static Color copyColor(Color c) { return new Color(c.getColorSpace(), c.getColorComponents(null), c.getAlpha() / 255F); }
 }

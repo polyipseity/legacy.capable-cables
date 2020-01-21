@@ -2,7 +2,6 @@ package $group__.$modId__.client.gui;
 
 import $group__.$modId__.client.gui.templates.GuiContainerDefault;
 import $group__.$modId__.client.gui.templates.components.*;
-import $group__.$modId__.client.gui.utilities.constructs.Frame;
 import $group__.$modId__.client.gui.utilities.constructs.IThemed;
 import $group__.$modId__.client.gui.utilities.constructs.IThemed.EnumTheme;
 import $group__.$modId__.client.gui.utilities.constructs.NumberRelativeDisplay.X;
@@ -90,17 +89,16 @@ public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<En
 			0,
 			new GuiTabs.ITabThemed.Impl<>(
 					new GuiRectangleThemedDrawable<>(
-							new Rectangle<>(new XY<>(new X<>(0.2F), new Y<>(0.2F, -16)), new XY<>(16, 16)),
+							new Rectangle<>(new XY<>(new X<>(0.1F), new Y<>(0.1F, -16)), new XY<>(16, 16)),
 							EnumTheme.NONE,
 							new GuiResource<>(
-									new Rectangle<>(new XY<>(new X<>(0.2F), new Y<>(0.2F, -16)), new XY<>(16, 16)),
-									new Frame<>(0, 0, 0, 0),
+									new Rectangle<>(new XY<>(new X<>(0.1F), new Y<>(0.1F, -16)), new XY<>(16, 16)),
 									References.Client.Resources.GUI_WRENCH,
 									References.Client.Resources.GUI_WRENCH_INFO
 							)
 					),
 					new GuiRectangleThemed<>(
-							new Rectangle<>(new XY<>(new X<>(0.2F), new Y<>(0.2F)), new XY<>(new X<>(0.6F), new Y<>(0.6F))),
+							new Rectangle<>(new XY<>(new X<>(0.1F), new Y<>(0.1F)), new XY<>(new X<>(0.8F), new Y<>(0.8F))),
 							Colors.WHITE,
 							EnumTheme.NONE
 					),

@@ -1,6 +1,6 @@
 package $group__.$modId__.common.registrable.items;
 
-import $group__.$modId__.common.registrable.Registrable;
+import $group__.$modId__.common.registrable.Registerable;
 import $group__.$modId__.common.registrable.creativetabs.CreativeTabsOwn;
 import $group__.$modId__.common.registrable.items.templates.ItemDefault;
 import net.minecraft.creativetab.CreativeTabs;
@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 
-public final class ItemsOwn extends Registrable<Item> {
+public final class ItemsOwn extends Registerable<Item> {
 	/* SECTION variables */
 
 	@SuppressWarnings("unused")

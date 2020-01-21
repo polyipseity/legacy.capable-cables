@@ -1,6 +1,6 @@
 package $group__.$modId__.utilities.constructs.classes.concrete;
 
-import $group__.$modId__.utilities.constructs.interfaces.IStructure;
+import $group__.$modId__.utilities.constructs.interfaces.IStructureCloneable;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 import $group__.$modId__.utilities.helpers.Throwables;
 import com.google.common.collect.ImmutableMap;
@@ -13,12 +13,12 @@ import java.util.Set;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryClone;
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneNonnull;
+import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
-public class DelegateMap<K, V, T extends DelegateMap<K, V, T>> extends AbstractMap<K, V> implements IStructure<T> {
+public class DelegateMap<K, V, T extends DelegateMap<K, V, T>> extends AbstractMap<K, V> implements IStructureCloneable<T> {
 	/* SECTION variables */
 
 	protected Map<K, V> delegate;
@@ -77,8 +77,8 @@ public class DelegateMap<K, V, T extends DelegateMap<K, V, T>> extends AbstractM
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r;
-		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw Throwables.unexpectedThrowable(e); }
-		r.delegate = tryClone(delegate);
+		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw Throwables.unexpected(e); }
+		r.delegate = tryCloneNonnull(delegate);
 		return r;
 	}
 

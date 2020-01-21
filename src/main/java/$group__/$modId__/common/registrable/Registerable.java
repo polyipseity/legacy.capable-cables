@@ -11,13 +11,14 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.lang.reflect.Field;
 
+import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
 import static $group__.$modId__.utilities.helpers.Grammar.appendSuffixIfPlural;
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Reflections.getGenericSuperclassActualTypeArgument;
-import static $group__.$modId__.utilities.helpers.Throwables.unexpectedThrowable;
+import static $group__.$modId__.utilities.helpers.Reflections.getGenericSuperclassActualTypeArgument;
+import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
 import static $group__.$modId__.utilities.variables.References.LOGGER;
 
-public abstract class Registrable<T extends IForgeRegistryEntry<T>> extends Singleton {
+@SuppressWarnings("SpellCheckingInspection")
+public abstract class Registerable<T extends IForgeRegistryEntry<T>> extends Singleton {
 	/* SECTION variables */
 
 	protected final Class<T> clazz;
@@ -25,7 +26,7 @@ public abstract class Registrable<T extends IForgeRegistryEntry<T>> extends Sing
 
 	/* SECTION constructors */
 
-	protected Registrable() { clazz = getGenericSuperclassActualTypeArgument(getClass(), 0); }
+	protected Registerable() { clazz = getGenericSuperclassActualTypeArgument(getClass(), 0); }
 
 
 	/* SECTION methods */
@@ -45,7 +46,7 @@ public abstract class Registrable<T extends IForgeRegistryEntry<T>> extends Sing
 			LOGGER.info("Found {} field{} in '{}'", fs.length, appendSuffixIfPlural(fs.length, "s"), classGS);
 			for (Field f : fs) {
 				LOGGER.trace("Processing field '{}'", f.toGenericString());
-				try { v = f.get(this); } catch (IllegalAccessException ex) { throw unexpectedThrowable(ex); }
+				try { v = f.get(this); } catch (IllegalAccessException ex) { throw unexpected(ex); }
 				LOGGER.debug("Field '{}' value is '{}'", f.toGenericString(), v);
 				if (clazz.isAssignableFrom(v.getClass())) {
 					reg.register(castUnchecked(v));

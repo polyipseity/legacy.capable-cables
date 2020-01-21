@@ -12,10 +12,13 @@ import javax.annotation.meta.When;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutable;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneNonnull;
+import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 import static $group__.$modId__.utilities.variables.References.Client.getResolution;
@@ -25,8 +28,8 @@ import static $group__.$modId__.utilities.variables.References.Client.registerPr
 public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> extends NumberRelative<T> {
 	/* SECTION variables */
 
-	protected final BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater;
-	protected final AtomicBoolean update;
+	protected BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater;
+	protected AtomicBoolean update;
 
 
 	/* SECTION constructors */
@@ -40,12 +43,16 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 
 	public NumberRelativeDisplay(Number value, Number parent, @Nullable Number offset, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater) { this(value, parent, offset, updater, new AtomicBoolean(true)); }
 
-	public NumberRelativeDisplay(NumberRelativeDisplay<T> c) { this(c.getValue(), c.getParent(), c.getOffset(), c.getUpdater(), c.getUpdate()); }
+	public NumberRelativeDisplay(NumberRelativeDisplay<T> copy) { this(copy.getValue(), copy.getParent(), copy.getOffset(), copy.getUpdater(), copy.getUpdate()); }
 
 
 	/* SECTION getters & setters */
 
+	public void setUpdater(BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater) { registerPreInitGuiListener(this, castUnchecked(this.updater = updater)); }
+
 	public BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> getUpdater() { return updater; }
+
+	public void setUpdate(AtomicBoolean update) { this.update = update; }
 
 	public AtomicBoolean getUpdate() { return update; }
 
@@ -63,17 +70,14 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 
 	/* SECTION methods */
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() { return getToStringString(this, super.toString(),
 			new Object[]{"updater", getUpdater()},
 			new Object[]{"update", getUpdate()}); }
 
-	/** {@inheritDoc} */
 	@Override
 	public int hashCode() { return getHashCode(this, super.hashCode(), getUpdater(), getUpdate()); }
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
 			t -> getUpdater().equals(t.getUpdater()),
@@ -82,9 +86,12 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 	@Override
 	public T clone() {
 		T r = super.clone();
+		r.updater = tryCloneNonnull(updater);
+		r.update = tryCloneNonnull(update);
 		registerPreInitGuiListener(r, r.getUpdater());
 		return r;
 	}
+
 
 	/* SECTION static classes */
 
@@ -117,7 +124,7 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 		public static class Immutable<T extends Immutable<T>> extends X<T> {
 			/* SECTION constructors */
 
-			public Immutable(Number value, Number parent, @Nullable Number offset, AtomicBoolean update) { super(value, parent, offset, update); }
+			public Immutable(Number value, Number parent, @Nullable Number offset, AtomicBoolean update) { super(tryToImmutableNonnull(value), tryToImmutableNonnull(parent), tryToImmutable(offset), tryToImmutableNonnull(update)); }
 
 			public Immutable(Number value, @Nullable Number offset, AtomicBoolean update) { this(value, getResolution().getScaledWidth_double(), offset, update); }
 
@@ -127,28 +134,30 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 
 			public Immutable(Number value) { this(value, new AtomicBoolean(true)); }
 
-			public Immutable(X.Immutable<?> copy) { this(copy.getValue(), copy.getParent(), copy.getOffset(), copy.getUpdate()); }
+			public Immutable(X<?> copy) { this(copy.getValue(), copy.getParent(), copy.getOffset(), copy.getUpdate()); }
 
 
 			/* SECTION getters & setters */
 
-			/** {@inheritDoc} */
 			@Override
-			public void setValue(Number value) { throw rejectUnsupportedOperation();}
+			public void setValue(Number value) { throw rejectUnsupportedOperation(); }
 
-			/** {@inheritDoc} */
 			@Override
-			public void setOffset(@Nullable Number offset) { throw rejectUnsupportedOperation();}
+			public void setOffset(@Nullable Number offset) { throw rejectUnsupportedOperation(); }
+
+			@Override
+			public void setUpdater(BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater) { throw rejectUnsupportedOperation(); }
+
+			@Override
+			public void setUpdate(AtomicBoolean update) { throw rejectUnsupportedOperation(); }
 
 
 			/* SECTION methods */
 
-			/** {@inheritDoc} */
 			@Override
 			@OverridingStatus(group = GROUP, when = When.NEVER)
 			public final T toImmutable() { return castUnchecked(this); }
 
-			/** {@inheritDoc} */
 			@Override
 			@OverridingStatus(group = GROUP, when = When.NEVER)
 			public final boolean isImmutable() { return true; }
@@ -174,7 +183,6 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 
 		/* SECTION methods */
 
-		/** {@inheritDoc} */
 		@Override
 		public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
 
@@ -185,7 +193,7 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 		public static class Immutable<T extends Immutable<T>> extends Y<T> {
 			/* SECTION constructors */
 
-			public Immutable(Number value, Number parent, @Nullable Number offset, AtomicBoolean update) { super(value, parent, offset, update); }
+			public Immutable(Number value, Number parent, @Nullable Number offset, AtomicBoolean update) { super(tryToImmutableNonnull(value), tryToImmutableNonnull(parent), tryToImmutable(offset), tryToImmutableNonnull(update)); }
 
 			public Immutable(Number value, @Nullable Number offset, AtomicBoolean update) { this(value, getResolution().getScaledWidth_double(), offset, update); }
 
@@ -195,28 +203,30 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 
 			public Immutable(Number value) { this(value, new AtomicBoolean(true)); }
 
-			public Immutable(Y.Immutable<?> copy) { this(copy.getValue(), copy.getParent(), copy.getOffset(), copy.getUpdate()); }
+			public Immutable(Y<?> copy) { this(copy.getValue(), copy.getParent(), copy.getOffset(), copy.getUpdate()); }
 
 
 			/* SECTION getters & setters */
 
-			/** {@inheritDoc} */
 			@Override
-			public void setValue(Number value) { throw rejectUnsupportedOperation();}
+			public void setValue(Number value) { throw rejectUnsupportedOperation(); }
 
-			/** {@inheritDoc} */
 			@Override
-			public void setOffset(@Nullable Number offset) { throw rejectUnsupportedOperation();}
+			public void setOffset(@Nullable Number offset) { throw rejectUnsupportedOperation(); }
+
+			@Override
+			public void setUpdater(BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater) { throw rejectUnsupportedOperation(); }
+
+			@Override
+			public void setUpdate(AtomicBoolean update) { throw rejectUnsupportedOperation(); }
 
 
 			/* SECTION methods */
 
-			/** {@inheritDoc} */
 			@Override
 			@OverridingStatus(group = GROUP, when = When.NEVER)
 			public final T toImmutable() { return castUnchecked(this); }
 
-			/** {@inheritDoc} */
 			@Override
 			@OverridingStatus(group = GROUP, when = When.NEVER)
 			public final boolean isImmutable() { return true; }

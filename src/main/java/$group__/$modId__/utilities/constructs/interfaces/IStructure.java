@@ -4,9 +4,8 @@ import $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquality;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IStruct;
-import $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable;
 
-public interface IStructure<T extends IStructure<T>> extends IStruct, IStrictToString, IStrictEquality, ICloneable<T>, IImmutablizable<T> {
+public interface IStructure<T extends IStructure<T>> extends IStruct, IStrictToString, IStrictEquality, IImmutablizable<T> {
 	/* SECTION methods */
 
 	@Override
@@ -17,7 +16,4 @@ public interface IStructure<T extends IStructure<T>> extends IStruct, IStrictToS
 
 	@Override
 	boolean equals(Object o);
-
-	@SuppressWarnings("override")
-	T clone();
 }

@@ -3,19 +3,21 @@ package $group__.$modId__.utilities.constructs.classes.concrete;
 import $group__.$modId__.utilities.constructs.classes.NumberDefault;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 import $group__.$modId__.utilities.helpers.Primitives.Numbers;
+import com.google.common.collect.Streams;
 
 import javax.annotation.Nullable;
 import javax.annotation.meta.When;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryClone;
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneNonnull;
+import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
@@ -71,19 +73,19 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 		return r;
 	}
 
-	/** {@inheritDoc} */
 	@SuppressWarnings("ConstantConditions")
 	@Override
-	public T sum(Collection<? extends Number> o) {
+	public T sum(Iterable<? extends Number> o) {
 		T r = clone();
+		@SuppressWarnings("UnstableApiUsage") Stream<? extends Number> o1 = Streams.stream(o);
 
 		Number p = getParent();
-		r.value = Numbers.sum(getValue(), o.stream().filter(t -> t instanceof NumberRelative<?>).map(t -> (NumberRelative<?>) t).map(t -> (t.doubleValue() - (t.getOffset() == null ? 0 : t.getOffset().doubleValue())) / (p == null ? 1 : p.doubleValue())).collect(Collectors.toList()));
+		r.value = Numbers.sum(getValue(), o1.distinct().filter(t -> t instanceof NumberRelative<?>).map(t -> (NumberRelative<?>) t).map(t -> (t.doubleValue() - (t.getOffset() == null ? 0 : t.getOffset().doubleValue())) / (p == null ? 1 : p.doubleValue())).collect(Collectors.toList()));
 
-		List<Number> o1 = o.stream().map(t -> t instanceof NumberRelative<?> ? ((NumberRelative<?>) t).getOffset() == null ? 0 : ((NumberRelative<?>) t).getOffset().doubleValue() : t.doubleValue()).collect(Collectors.toList());
+		List<Number> o2 = o1.distinct().map(t -> t instanceof NumberRelative<?> ? ((NumberRelative<?>) t).getOffset() == null ? 0 : ((NumberRelative<?>) t).getOffset().doubleValue() : t.doubleValue()).collect(Collectors.toList());
 		Number to = getOffset();
-		if (to != null) o1.add(0, to);
-		r.offset = Numbers.sumNullable(o1);
+		if (to != null) o2.add(0, to);
+		r.offset = Numbers.sumNullable(o2);
 
 		return r;
 	}
@@ -169,7 +171,7 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r = super.clone();
-		r.value = tryClone(value);
+		r.value = tryCloneNonnull(value);
 		r.parent = tryClone(parent);
 		r.offset = tryClone(offset);
 		return r;

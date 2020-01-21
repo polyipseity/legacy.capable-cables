@@ -15,9 +15,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
+import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
 import static java.util.Objects.requireNonNull;
 
 public enum References {
@@ -41,16 +42,12 @@ public enum References {
 
 	public static <T> T markUnused(Class<T> t) {
 		T r = null;
-		if (Number.class.isAssignableFrom(t)) {
-			if (Integer.class.isAssignableFrom(t)) r = castUnchecked(0);
-			else if (Float.class.isAssignableFrom(t)) r = castUnchecked(0F);
-			else if (Double.class.isAssignableFrom(t)) r = castUnchecked(0D);
-			else if (Long.class.isAssignableFrom(t)) r = castUnchecked(0L);
-			else if (Byte.class.isAssignableFrom(t)) r = castUnchecked(0);
-			else if (Short.class.isAssignableFrom(t)) r = castUnchecked(0);
+		for (Map.Entry<Class<?>, Object> entry : Constants.PRIMITIVE_DATA_TYPES.entrySet()) {
+			if (entry.getKey().isAssignableFrom(t)) {
+				r = castUnchecked(entry.getValue());
+				break;
+			}
 		}
-		else if (Boolean.class.isAssignableFrom(t)) r = castUnchecked(false);
-		else if (Character.class.isAssignableFrom(t)) r = castUnchecked(0);
 		return requireNonNull(r);
 	}
 

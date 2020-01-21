@@ -1,6 +1,6 @@
 package $group__.$modId__.common.registrable.blocks;
 
-import $group__.$modId__.common.registrable.Registrable;
+import $group__.$modId__.common.registrable.Registerable;
 import $group__.$modId__.common.registrable.blocks.templates.BlockDefault;
 import $group__.$modId__.common.registrable.creativetabs.CreativeTabsOwn;
 import net.minecraft.block.Block;
@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 
-public final class BlocksOwn extends Registrable<Block> {
+public final class BlocksOwn extends Registerable<Block> {
 	/* SECTION variables */
 
 	@SuppressWarnings("unused")

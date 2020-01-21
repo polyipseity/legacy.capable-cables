@@ -2,7 +2,6 @@ package $group__.$modId__.client.gui.utilities.constructs.polygons;
 
 import $group__.$modId__.client.gui.utilities.constructs.XY;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
-import com.google.common.collect.ImmutableList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -10,7 +9,8 @@ import javax.annotation.meta.When;
 import java.util.Arrays;
 import java.util.List;
 
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
+import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -19,14 +19,14 @@ import static $group__.$modId__.utilities.variables.Constants.GROUP;
 public class Polygon4<N extends Number, T extends Polygon4<N, T>> extends PolygonN<N, T> {
 	/* SECTION constructors */
 
-	public Polygon4(List<XY<N, ?>> l) {
-		super(l);
-		if (l.size() != 4) throw rejectArguments(l);
+	public Polygon4(List<XY<N, ?>> list) {
+		super(list);
+		if (list.size() != 4) throw rejectArguments(list);
 	}
 
 	public Polygon4(XY<N, ?> a, XY<N, ?> b, XY<N, ?> c, XY<N, ?> d) { super(a, b, c, d); }
 
-	public Polygon4(Polygon4<N, ?> c) { this(c.getList()); }
+	public Polygon4(Polygon4<N, ?> copy) { this(copy.getList()); }
 
 
 	/* SECTION getters & setters */
@@ -64,11 +64,11 @@ public class Polygon4<N extends Number, T extends Polygon4<N, T>> extends Polygo
 	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends Polygon4<N, T> {
 		/* SECTION constructors */
 
-		public Immutable(List<XY<N, ?>> l) { super(ImmutableList.copyOf(l)); }
+		public Immutable(List<XY<N, ?>> list) { super(tryToImmutableNonnull(list)); }
 
 		public Immutable(XY<N, ?> a, XY<N, ?> b, XY<N, ?> c, XY<N, ?> d) { this(Arrays.asList(a, b, c, d)); }
 
-		public Immutable(Polygon4<N, ?> c) { this(c.getList()); }
+		public Immutable(Polygon4<N, ?> copy) { this(copy.getList()); }
 
 
 		/* SECTION getters & setters */

@@ -4,22 +4,22 @@ import $group__.$modId__.client.gui.utilities.constructs.XY;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable;
 import $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable;
-import com.google.common.collect.ImmutableList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.meta.When;
 import java.util.AbstractList;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneNonnull;
+import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
-import static $group__.$modId__.utilities.helpers.Throwables.unexpectedThrowable;
+import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
 @SideOnly(Side.CLIENT)
@@ -31,13 +31,13 @@ public class PolygonN<N extends Number, T extends PolygonN<N, T>> extends Abstra
 
 	/* SECTION constructors */
 
-	public PolygonN(List<XY<N, ?>> l) { this.list = l; }
+	public PolygonN(List<XY<N, ?>> list) { this.list = list; }
 
 	@SuppressWarnings("varargs")
 	@SafeVarargs
-	public PolygonN(XY<N, ?>... e) { this(Arrays.asList(e)); }
+	public PolygonN(XY<N, ?>... array) { this(Arrays.asList(array)); }
 
-	public PolygonN(PolygonN<N, ?> c) { this(c.getList()); }
+	public PolygonN(PolygonN<N, ?> copy) { this(copy.getList()); }
 
 
 	/* SECTION getters & setters */
@@ -102,8 +102,8 @@ public class PolygonN<N extends Number, T extends PolygonN<N, T>> extends Abstra
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r;
-		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw unexpectedThrowable(e); }
-		r.list = isImmutable() ? ImmutableList.copyOf(list) : new ArrayList<>(list);
+		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
+		r.list = tryCloneNonnull(list);
 		return r;
 	}
 
@@ -114,13 +114,13 @@ public class PolygonN<N extends Number, T extends PolygonN<N, T>> extends Abstra
 	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends PolygonN<N, T> {
 		/* SECTION constructors */
 
-		public Immutable(List<XY<N, ?>> l) { super(ImmutableList.copyOf(l)); }
+		public Immutable(List<XY<N, ?>> list) { super(tryToImmutableNonnull(list)); }
 
 		@SuppressWarnings("varargs")
 		@SafeVarargs
-		public Immutable(XY<N, ?>... e) { this(Arrays.asList(e)); }
+		public Immutable(XY<N, ?>... array) { this(Arrays.asList(array)); }
 
-		public Immutable(PolygonN<N, ?> c) { this(c.getList()); }
+		public Immutable(PolygonN<N, ?> copy) { this(copy.getList()); }
 
 
 		/* SECTION getters & setters */

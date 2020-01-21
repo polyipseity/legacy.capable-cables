@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="EntryPointsManager">
-    <list size="9">
-      <item index="0" class="java.lang.String" itemvalue="net.minecraftforge.common.config.Config" />
-      <item index="1" class="java.lang.String" itemvalue="net.minecraftforge.common.config.Config.LangKey" />
-      <item index="2" class="java.lang.String" itemvalue="net.minecraftforge.common.config.Config.Name" />
-      <item index="3" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.Mod" />
-      <item index="4" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.Mod.EventHandler" />
-      <item index="5" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.Mod.InstanceFactory" />
-      <item index="6" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.SaveInspectionHandler" />
-      <item index="7" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.eventhandler.SubscribeEvent" />
-      <item index="8" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.network.NetworkCheckHandler" />
+    <list size="12">
+      <item index="0" class="java.lang.String" itemvalue="$group__.$modId__.utilities.constructs.interfaces.annotations.ExternalCloneMethod" />
+      <item index="1" class="java.lang.String" itemvalue="$group__.$modId__.utilities.constructs.interfaces.annotations.ExternalToImmutableMethod" />
+      <item index="2" class="java.lang.String" itemvalue="net.minecraftforge.common.config.Config" />
+      <item index="3" class="java.lang.String" itemvalue="net.minecraftforge.common.config.Config.LangKey" />
+      <item index="4" class="java.lang.String" itemvalue="net.minecraftforge.common.config.Config.Name" />
+      <item index="5" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.Mod" />
+      <item index="6" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.Mod.EventHandler" />
+      <item index="7" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.Mod.InstanceFactory" />
+      <item index="8" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.SaveInspectionHandler" />
+      <item index="9" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.eventhandler.SubscribeEvent" />
+      <item index="10" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.network.NetworkCheckHandler" />
     </list>
     <writeAnnotations>
       <writeAnnotation name="net.minecraftforge.fml.common.SidedProxy" />
@@ -19,7 +21,7 @@
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="javax.annotation.Nullable" />
-    <option name="myDefaultNotNull" value="org.jetbrains.annotations.NotNull" />
+    <option name="myDefaultNotNull" value="javax.annotation.Nonnull" />
     <option name="myNullables">
       <value>
         <list size="11">

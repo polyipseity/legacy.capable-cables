@@ -32,9 +32,9 @@ public enum Throwables {
 	public static StackTraceElement[] getStackTrace() { return newThrowable().getStackTrace(); }
 
 
-	public static RuntimeException wrapUnhandledThrowable(Throwable t) { return wrapUnhandledThrowable(t, null); }
+	public static RuntimeException wrapUnhandledThrowable(Throwable t) throws RuntimeException { return wrapUnhandledThrowable(t, null); }
 
-	public static RuntimeException wrapUnhandledThrowable(Throwable t, @Nullable String msg) { return new RuntimeException(msg, t); }
+	public static RuntimeException wrapUnhandledThrowable(Throwable t, @Nullable String msg) throws RuntimeException { return new RuntimeException(msg, t); }
 
 
 	public static String rejectAttemptString(String msg, @Nullable Object from, @Nullable Object to) { return (from == null ? "A" : "'" + from + "' a") + "ttempted " + msg + (to == null ? "" : " of '" + to + "'"); }
@@ -50,12 +50,12 @@ public enum Throwables {
 	public static String rejectObjectsString(String msg, Object... objects) { return "Reject " + msg + ": " + Arrays.toString(objects); }
 
 
-	public static RuntimeException rejectInstantiation(@Nullable String msg) { throw wrapUnhandledThrowable(new InstantiationException(rejectAttemptString("illegal instantiation" + (msg == null ? "" : ": " + msg)))); }
+	public static RuntimeException rejectInstantiation(@Nullable String msg) throws RuntimeException { throw wrapUnhandledThrowable(new InstantiationException(rejectAttemptString("illegal instantiation" + (msg == null ? "" : ": " + msg)))); }
 
-	public static RuntimeException rejectInstantiation() { throw rejectInstantiation(null); }
+	public static RuntimeException rejectInstantiation() throws RuntimeException { throw rejectInstantiation(null); }
 
 
-	public static void requireRunOnceOnly() {
+	public static void requireRunOnceOnly() throws IllegalStateException {
 		Throwable t = newThrowable();
 		StackTraceElement[] st = t.getStackTrace();
 		if (st.length <= 2) return;
@@ -71,18 +71,31 @@ public enum Throwables {
 	}
 
 
-	public static UnsupportedOperationException rejectUnsupportedOperation() { throw rejectUnsupportedOperation(null); }
+	public static UnsupportedOperationException rejectUnsupportedOperation() throws UnsupportedOperationException { throw rejectUnsupportedOperation(null); }
 
-	public static UnsupportedOperationException rejectUnsupportedOperation(@Nullable Throwable cause) { throw throw_(new UnsupportedOperationException(rejectAttemptString("unsupported operation"), cause)); }
-
-
-	public static IllegalArgumentException rejectArguments(Object... args) { throw throw_(new IllegalArgumentException(rejectObjectsString("illegal argument" + appendSuffixIfPlural(args.length, "s"), args))); }
-
-	public static IllegalArgumentException rejectArguments(Throwable cause, Object... args) { throw throw_(new IllegalArgumentException(rejectObjectsString("illegal argument" + appendSuffixIfPlural(args.length, "s"), args), cause)); }
+	public static UnsupportedOperationException rejectUnsupportedOperation(@Nullable Throwable cause) throws UnsupportedOperationException { throw throw_(new UnsupportedOperationException(rejectAttemptString("unsupported operation"), cause)); }
 
 
-	public static IllegalArgumentException rejectIndexOutOfBounds(Number index, Number bound) { throw rejectArguments(new IndexOutOfBoundsException("index: " + index + ", bound: " + bound), index); }
+	public static IllegalArgumentException rejectArguments(Object... args) throws IllegalArgumentException { throw throw_(new IllegalArgumentException(rejectObjectsString("illegal argument" + appendSuffixIfPlural(args.length, "s"), args))); }
+
+	public static IllegalArgumentException rejectArguments(Throwable cause, Object... args) throws IllegalArgumentException { throw throw_(new IllegalArgumentException(rejectObjectsString("illegal argument" + appendSuffixIfPlural(args.length, "s"), args), cause)); }
 
 
-	public static InternalError unexpectedThrowable(Throwable t) { throw new InternalError("Unexpected throwable '" + t.getClass() + "': " + t, wrapUnhandledThrowable(t)); }
+	public static IllegalArgumentException rejectIndexOutOfBounds(Number index, Number bound) throws IllegalArgumentException { throw rejectArguments(new IndexOutOfBoundsException("index: " + index + ", bound: " + bound), index);
+	}
+
+	public static InternalError unexpected(@Nullable String msg, @Nullable Throwable t) throws InternalError {
+		throw throw_(new InternalError(msg, t));
+	}
+
+	public static InternalError unexpected(Throwable t) throws InternalError { throw unexpected(null, t); }
+
+	public static InternalError unexpected(String msg) throws InternalError { throw unexpected(msg, null); }
+
+	public static InternalError unexpected() throws InternalError { throw unexpected(null, null); }
+
+
+	public static InterruptedException interrupt(@Nullable String msg) throws InterruptedException { throw throw_(new InterruptedException(msg)); }
+
+	public static InterruptedException interrupt() throws InterruptedException { throw interrupt(null); }
 }

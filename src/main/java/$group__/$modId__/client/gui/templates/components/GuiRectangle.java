@@ -14,12 +14,14 @@ import java.awt.*;
 
 import static $group__.$modId__.client.gui.utilities.helpers.Guis.popMatrix;
 import static $group__.$modId__.client.gui.utilities.helpers.Guis.pushMatrix;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneNonnull;
+import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
-import static $group__.$modId__.utilities.helpers.Throwables.unexpectedThrowable;
+import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
 @SideOnly(Side.CLIENT)
@@ -37,7 +39,7 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 		this.color = color;
 	}
 
-	public GuiRectangle(GuiRectangle<N, ?> c) { this(c.getRect(), c.getColor()); }
+	public GuiRectangle(GuiRectangle<N, ?> copy) { this(copy.getRect(), copy.getColor()); }
 
 
 	/* SECTION getters & setters */
@@ -53,7 +55,6 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 
 	/* SECTION methods */
 
-	/** {@inheritDoc} */
 	@Override
 	public void draw(Minecraft client) {
 		pushMatrix();
@@ -61,41 +62,36 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 		popMatrix();
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public Rectangle<N, ?> spec() { return getRect(); }
 
-	/** {@inheritDoc} */
 	@Override
 	public T toImmutable() { return castUnchecked(new Immutable<>(this)); }
 
 
-	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public String toString() { return getToStringString(this, super.toString(),
 			new Object[]{"rect", getRect()},
 			new Object[]{"color", getColor()}); }
 
-	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public int hashCode() { return getHashCode(this, super.hashCode(), getRect(), getColor()); }
 
-	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
 			t -> getRect().equals(t.getRect()),
 			t -> getColor().equals(t.getColor())); }
 
-	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r;
-		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw unexpectedThrowable(e); }
+		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
 		r.rect = rect.clone();
+		r.color = tryCloneNonnull(color);
 		return r;
 	}
 
@@ -106,30 +102,26 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends GuiRectangle<N, T> {
 		/* SECTION constructors */
 
-		public Immutable(Rectangle<N, ?> rect, Color color) { super(rect.toImmutable(), color); }
+		public Immutable(Rectangle<N, ?> rect, Color color) { super(rect.toImmutable(), tryToImmutableNonnull(color)); }
 
-		public Immutable(GuiRectangle<N, ?> c) { this(c.getRect(), c.getColor()); }
+		public Immutable(GuiRectangle<N, ?> copy) { this(copy.getRect(), copy.getColor()); }
 
 
 		/* SECTION getters & setters */
 
-		/** {@inheritDoc} */
 		@Override
 		public void setRect(Rectangle<N, ?> rect) { throw rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setColor(Color color) { throw rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final T toImmutable() { return castUnchecked(this); }
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final boolean isImmutable() { return true; }

@@ -15,10 +15,11 @@ import java.awt.*;
 import static $group__.$modId__.client.gui.utilities.constructs.IThemed.tryCastThemedTo;
 import static $group__.$modId__.client.gui.utilities.helpers.Guis.popMatrix;
 import static $group__.$modId__.client.gui.utilities.helpers.Guis.pushMatrix;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
+import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -27,6 +28,7 @@ import static $group__.$modId__.utilities.variables.Constants.GROUP;
 public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITheme<TH>, T extends GuiRectangleThemedDrawable<N, TH, T>> extends GuiRectangleThemed<N, TH, T> {
 	/* SECTION variables */
 
+	@SuppressWarnings("NotNullFieldNotInitialized")
 	protected IDrawable<N, ?> drawable;
 
 
@@ -39,7 +41,7 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 
 	public GuiRectangleThemedDrawable(Rectangle<N, ?> rect, TH theme, /* REMARKS mutable */ IDrawable<N, ?> drawable) { this(rect, Color.WHITE, theme, drawable); }
 
-	public GuiRectangleThemedDrawable(GuiRectangleThemedDrawable<N, TH, ?> c) { this(c.getRect(), c.getColor(), c.getTheme(), c.getDrawable()); }
+	public GuiRectangleThemedDrawable(GuiRectangleThemedDrawable<N, TH, ?> copy) { this(copy.getRect(), copy.getColor(), copy.getTheme(), copy.getDrawable()); }
 
 
 	/* SECTION getters & setters */
@@ -112,11 +114,11 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 	public static class Immutable<N extends Number, TH extends ITheme<TH>, T extends Immutable<N, TH, T>> extends GuiRectangleThemedDrawable<N, TH, T> {
 		/* SECTION constructors */
 
-		public Immutable(Rectangle<N, ?> rect, Color color, TH theme, IDrawable<N, ?> drawable) { super(rect.toImmutable(), color, theme, drawable.toImmutable()); }
+		public Immutable(Rectangle<N, ?> rect, Color color, TH theme, IDrawable<N, ?> drawable) { super(rect.toImmutable(), tryToImmutableNonnull(color), tryToImmutableNonnull(theme), drawable.toImmutable()); }
 
 		public Immutable(Rectangle<N, ?> rect, TH theme, IDrawable<N, ?> drawable) { this(rect, Colors.COLORLESS, theme, drawable); }
 
-		public Immutable(GuiRectangleThemedDrawable<N, TH, ?> c) { this(c.getRect(), c.getColor(), c.getTheme(), c.getDrawable()); }
+		public Immutable(GuiRectangleThemedDrawable<N, TH, ?> copy) { this(copy.getRect(), copy.getColor(), copy.getTheme(), copy.getDrawable()); }
 
 
 		/* SECTION getters & setters */

@@ -52,7 +52,7 @@ public class ItemWrench extends ItemUnstackable implements IEventBusSubscriber, 
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
 		if (playerIn.isSneaking()) {
 			if (!worldIn.isRemote)
-				playerIn.openGui(MOD, ContainerWrench.ID, worldIn, handIn.ordinal(), markUnused(Integer.class), markUnused(Integer.class));
+				playerIn.openGui(MOD, ContainerWrench.ID, worldIn, handIn.ordinal(), markUnused(int.class), markUnused(int.class));
 			return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
 		}
 		return new ActionResult<>(EnumActionResult.FAIL, playerIn.getHeldItem(handIn));
@@ -101,12 +101,12 @@ public class ItemWrench extends ItemUnstackable implements IEventBusSubscriber, 
 	/** {@inheritDoc} */
 	@Override
 	@Optional.Method(modid = COFH_CORE_ID)
-	public void toolUsed(ItemStack item, EntityLivingBase user, BlockPos pos) {}
+	public void toolUsed(ItemStack item, EntityLivingBase user, BlockPos pos) {  /* MARK empty */ }
 
 	/** {@inheritDoc} */
 	@Override
 	@Optional.Method(modid = COFH_CORE_ID)
-	public void toolUsed(ItemStack item, EntityLivingBase user, Entity entity) {}
+	public void toolUsed(ItemStack item, EntityLivingBase user, Entity entity) {  /* MARK empty */ }
 
 
 	/** {@inheritDoc} */
@@ -117,7 +117,7 @@ public class ItemWrench extends ItemUnstackable implements IEventBusSubscriber, 
 	/** {@inheritDoc} */
 	@Override
 	@Optional.Method(modid = BUILDCRAFT_API_ID)
-	public void wrenchUsed(EntityPlayer player, EnumHand hand, ItemStack wrench, RayTraceResult rayTrace) {}
+	public void wrenchUsed(EntityPlayer player, EnumHand hand, ItemStack wrench, RayTraceResult rayTrace) {  /* MARK empty */ }
 
 
 	/* SECTION static variables */

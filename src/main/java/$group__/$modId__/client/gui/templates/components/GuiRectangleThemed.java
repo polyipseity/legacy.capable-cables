@@ -13,10 +13,12 @@ import java.awt.*;
 
 import static $group__.$modId__.client.gui.utilities.helpers.Guis.popMatrix;
 import static $group__.$modId__.client.gui.utilities.helpers.Guis.pushMatrix;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneNonnull;
+import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
@@ -34,7 +36,7 @@ public class GuiRectangleThemed<N extends Number, TH extends IThemed.ITheme<TH>,
 		this.theme = theme;
 	}
 
-	public GuiRectangleThemed(GuiRectangleThemed<N, TH, ?> c) { this(c.getRect(), c.getColor(), c.getTheme()); }
+	public GuiRectangleThemed(GuiRectangleThemed<N, TH, ?> copy) { this(copy.getRect(), copy.getColor(), copy.getTheme()); }
 
 
 	/* SECTION getters & setters */
@@ -78,6 +80,12 @@ public class GuiRectangleThemed<N extends Number, TH extends IThemed.ITheme<TH>,
 	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
 			t -> getTheme().equals(t.getTheme())); }
 
+	@Override
+	public T clone() {
+		T r = super.clone();
+		r.theme = tryCloneNonnull(theme);
+		return r;
+	}
 
 	/* SECTION static classes */
 
@@ -85,9 +93,9 @@ public class GuiRectangleThemed<N extends Number, TH extends IThemed.ITheme<TH>,
 	public static class Immutable<N extends Number, TH extends ITheme<TH>, T extends Immutable<N, TH, T>> extends GuiRectangleThemed<N, TH, T> {
 		/* SECTION constructors */
 
-		public Immutable(Rectangle<N, ?> rect, Color color, TH theme) { super(rect.toImmutable(), color, theme); }
+		public Immutable(Rectangle<N, ?> rect, Color color, TH theme) { super(rect.toImmutable(), tryToImmutableNonnull(color), tryToImmutableNonnull(theme)); }
 
-		public Immutable(GuiRectangleThemed<N, TH, ?> c) { this(c.getRect(), c.getColor(), c.getTheme()); }
+		public Immutable(GuiRectangleThemed<N, TH, ?> copy) { this(copy.getRect(), copy.getColor(), copy.getTheme()); }
 
 
 		/* SECTION getters & setters */

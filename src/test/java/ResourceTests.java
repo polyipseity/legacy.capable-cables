@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.annotation.Testable;
 
 @Testable
-public class ResourcesTest {
+public class ResourceTests {
+	/* SECTION methods */
+
 	@Test
 	@BeforeEach
 	void testResourcesProperlyCopied() {

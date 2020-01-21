@@ -1,6 +1,6 @@
 package $group__.$modId__.client.gui.utilities.constructs;
 
-import $group__.$modId__.utilities.constructs.interfaces.IStructure;
+import $group__.$modId__.utilities.constructs.interfaces.IStructureCloneable;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 import $group__.$modId__.utilities.helpers.Throwables;
 import net.minecraftforge.fml.relauncher.Side;
@@ -11,12 +11,12 @@ import javax.annotation.meta.When;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.helpers.Miscellaneous.Casts.castUnchecked;
-import static $group__.$modId__.utilities.helpers.Throwables.unexpectedThrowable;
+import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
 @SideOnly(Side.CLIENT)
-public class Frame<N extends Number, T extends Frame<N, T>> implements IStructure<T> {
+public class Frame<N extends Number, T extends Frame<N, T>> implements IStructureCloneable<T> {
 	/* SECTION variables */
 
 	protected XY<N, ?> tl;
@@ -32,7 +32,7 @@ public class Frame<N extends Number, T extends Frame<N, T>> implements IStructur
 
 	public Frame(N top, N right, N bottom, N left) { this(new XY<>(left, top), new XY<>(right, bottom)); }
 
-	public Frame(Frame<N, ?> c) { this(c.getTopLeft(), c.getBottomRight()); }
+	public Frame(Frame<N, ?> copy) { this(copy.getTopLeft(), copy.getBottomRight()); }
 
 
 	/* SECTION getters & setters */
@@ -98,7 +98,7 @@ public class Frame<N extends Number, T extends Frame<N, T>> implements IStructur
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r;
-		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw unexpectedThrowable(e); }
+		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
 		r.tl = tl.clone();
 		r.br = br.clone();
 		return r;
@@ -113,9 +113,9 @@ public class Frame<N extends Number, T extends Frame<N, T>> implements IStructur
 
 		public Immutable(XY<N, ?> tl, XY<N, ?> br) { super(tl.toImmutable(), br.toImmutable()); }
 
-		public Immutable(N top, N right, N bottom, N left) { this(new XY<>(left, top), new XY<>(right, bottom)); }
+		public Immutable(N top, N right, N bottom, N left) { this(new XY.Immutable<>(left, top), new XY.Immutable<>(right, bottom)); }
 
-		public Immutable(Frame<N, ?> c) { this(c.getTopLeft(), c.getBottomRight()); }
+		public Immutable(Frame<N, ?> copy) { this(copy.getTopLeft(), copy.getBottomRight()); }
 
 
 		/* SECTION getters & setters */
