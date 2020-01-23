@@ -93,6 +93,11 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 	}
 
 
+	/* SECTION static variables */
+
+	private static final long serialVersionUID = 1046506854640455032L;
+
+
 	/* SECTION static classes */
 
 	public static class X<T extends X<T>> extends NumberRelativeDisplay<T> {
@@ -116,6 +121,11 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 		/** {@inheritDoc} */
 		@Override
 		public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+
+
+		/* SECTION static variables */
+
+		private static final long serialVersionUID = 4079465691262621348L;
 
 
 		/* SECTION static classes */
@@ -161,6 +171,11 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 			@Override
 			@OverridingStatus(group = GROUP, when = When.NEVER)
 			public final boolean isImmutable() { return true; }
+
+
+			/* SECTION static variables */
+
+			private static final long serialVersionUID = -6713655815326599341L;
 		}
 	}
 
@@ -185,6 +200,11 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 
 		@Override
 		public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+
+
+		/* SECTION static variables */
+
+		private static final long serialVersionUID = 838852564853210693L;
 
 
 		/* SECTION static classes */
@@ -230,6 +250,11 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 			@Override
 			@OverridingStatus(group = GROUP, when = When.NEVER)
 			public final boolean isImmutable() { return true; }
+
+
+			/* SECTION static variables */
+
+			private static final long serialVersionUID = 6434701388754540645L;
 		}
 	}
 }

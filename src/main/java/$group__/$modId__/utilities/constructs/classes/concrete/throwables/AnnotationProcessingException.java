@@ -14,5 +14,5 @@ public class AnnotationProcessingException extends RuntimeException {
 
 	/* SECTION static variables */
 
-	static final long serialVersionUID = 6003555440382442147L;
+	private static final long serialVersionUID = 6003555440382442147L;
 }

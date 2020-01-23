@@ -178,6 +178,11 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 	}
 
 
+	/* SECTION static variables */
+
+	private static final long serialVersionUID = -1684871905587506897L;
+
+
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
@@ -219,5 +224,10 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final boolean isImmutable() { return true; }
+
+
+		/* SECTION static variables */
+
+		private static final long serialVersionUID = -7462190942914160372L;
 	}
 }
