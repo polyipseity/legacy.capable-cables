@@ -63,10 +63,10 @@ public enum Throwables {
 		if (RAN_ONCE.add(cs)) {
 			String sts = ExceptionUtils.getStackTrace(t);
 			RAN_ONCE_STACKTRACE_STRINGS.put(cs, sts);
-			LOGGER.debug("First ONLY invocation, stacktrace: {}", sts);
+			LOGGER.debug("First ONLY invocation, stacktrace:\n{}", sts);
 			return;
 		}
-		LOGGER.error("Illegal second invocation, previous stacktrace: {}", RAN_ONCE_STACKTRACE_STRINGS.get(cs));
+		LOGGER.error("Illegal second invocation, previous stacktrace:\n{}", RAN_ONCE_STACKTRACE_STRINGS.get(cs));
 		throw throw_(new IllegalStateException(rejectAttemptString("illegal second invocation", st)));
 	}
 

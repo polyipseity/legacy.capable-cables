@@ -43,7 +43,7 @@ public @interface ExternalCloneMethod {
 
 	@Nullable
 	MethodAdapter CLONE_METHOD_DEFAULT = getDeclaredMethod((t, u) -> v -> {
-		LOGGER.warn("Default clone method access failed, stacktrace: {}", getStackTrace(t));
+		LOGGER.warn("Default clone method access failed, stacktrace:\n{}", getStackTrace(t));
 		return null;
 	}, Object.class, "clone");
 	@Nullable

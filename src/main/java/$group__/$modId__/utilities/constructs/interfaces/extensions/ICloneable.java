@@ -38,7 +38,7 @@ public interface ICloneable<T> extends Cloneable {
 	Set<Class<?>> BROKEN_CLONE_CLASSES = Collections.newSetFromMap(CacheBuilder.newBuilder().softValues().<Class<?>, Boolean>build().asMap());
 	BiFunction<? super Throwable, ? super MethodAdapter, ? extends BiFunction<? super Object, ? super Object[], ?>> CALLBACK = (t, u) -> (v, w) -> {
 		Class<?> vc = v.getClass();
-		LOGGER.warn("Clone method '{}' failed for object '{}' of class '{}', will not attempt to clone again, stacktrace: {}", u.get().toGenericString(), v, vc.toGenericString(), getStackTrace(t));
+		LOGGER.warn("Clone method '{}' failed for object '{}' of class '{}', will not attempt to clone again, stacktrace:\n{}", u.get().toGenericString(), v, vc.toGenericString(), getStackTrace(t));
 		BROKEN_CLONE_CLASSES.add(vc);
 		return v;
 	};
@@ -56,12 +56,12 @@ public interface ICloneable<T> extends Cloneable {
 
 		MethodAdapter m;
 		try { m = EXTERNAL_CLONE_METHOD_MAP.get(EXTERNAL_CLONE_METHOD_ANNOTATIONS_CACHE.get(oc)); } catch (ExecutionException e) {
-			LOGGER.warn("Unable to clone object '{}' of class '{}' as no clone method is found, will not attempt to clone again, stacktrace: {}", o, oc.toGenericString(), getStackTrace(e));
+			LOGGER.warn("Unable to clone object '{}' of class '{}' as no clone method is found, will not attempt to clone again, stacktrace:\n{}", o, oc.toGenericString(), getStackTrace(e));
 			BROKEN_CLONE_CLASSES.add(oc);
 			return o;
 		}
 
-		m.setAccessible((t, u) -> v -> LOGGER.warn("Unable to set clone method '{}' of object '{}' of class '{}' accessible, stacktrace: {}", u.get().toGenericString(), o, oc.toGenericString(), getStackTrace(t)), true);
+		m.setAccessible((t, u) -> v -> LOGGER.warn("Unable to set clone method '{}' of object '{}' of class '{}' accessible, stacktrace:\n{}", u.get().toGenericString(), o, oc.toGenericString(), getStackTrace(t)), true);
 
 		return castUnchecked(isMemberStatic(m.get()) ? m.invokeNonnull(CALLBACK, null, o) : m.invokeNonnull(CALLBACK, o));
 	}

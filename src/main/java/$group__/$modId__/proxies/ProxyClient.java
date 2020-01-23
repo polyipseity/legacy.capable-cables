@@ -1,7 +1,7 @@
 package $group__.$modId__.proxies;
 
 import $group__.$modId__.ModOwn;
-import etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.variables.References;
+import $group__.$modId__.utilities.variables.References;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

@@ -1,10 +1,7 @@
 package $group__.$modId__.utilities.helpers;
 
-import $group__.$modId__.client.gui.utilities.constructs.IThemed;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.ExternalToImmutableMethod;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.awt.*;
 import java.util.Collection;
@@ -26,7 +23,7 @@ public enum Immutables {
 	public static Object toImmutableImmutable(Object immutable) { return immutable; }
 
 	@ExternalToImmutableMethod(value = {
-
+			Enum.class
 	}, allowExtends = true)
 	public static Object toImmutableImmutableExtends(Object copy) { return copy; }
 
@@ -39,18 +36,4 @@ public enum Immutables {
 
 	@ExternalToImmutableMethod(value = Set.class, allowExtends = true)
 	public static <T> Set<T> toImmutableCollection(Set<? extends T> mutable) { return Collections.unmodifiableSet(mutable); }
-
-
-	/* SECTION static classes */
-
-	@SideOnly(Side.CLIENT)
-	public enum Client {
-		/* MARK empty */ ;
-
-
-		/* SECTION static methods */
-
-		@ExternalToImmutableMethod(IThemed.EnumTheme.class)
-		public static Object toImmutableImmutable(Object immutable) { return immutable; }
-	}
 }

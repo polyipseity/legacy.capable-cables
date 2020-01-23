@@ -17,14 +17,14 @@ public abstract class Singleton {
 		String classGS = clazz.toGenericString();
 
 		if (INSTANCES.put(clazz, this) != null) {
-			LOGGER.error("Singleton instance of '{}' already created, previous stacktrace: {}", classGS, STACKTRACE_STRINGS.get(clazz));
+			LOGGER.error("Singleton instance of '{}' already created, previous stacktrace:\n{}", classGS, STACKTRACE_STRINGS.get(clazz));
 			throw rejectInstantiation();
 		}
 		String sts = ExceptionUtils.getStackTrace(newThrowable());
 		STACKTRACE_STRINGS.put(clazz, sts);
 
 		LOGGER.info("Singleton instance of '{}' created", classGS);
-		LOGGER.debug("Singleton instance of '{}' created, stacktrace: {}", classGS, sts);
+		LOGGER.debug("Singleton instance of '{}' created, stacktrace:\n{}", classGS, sts);
 	}
 
 

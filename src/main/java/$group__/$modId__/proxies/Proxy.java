@@ -5,6 +5,7 @@ import $group__.$modId__.common.gui.GuiHandler;
 import $group__.$modId__.common.registrable.blocks.BlocksOwn;
 import $group__.$modId__.common.registrable.items.ItemsOwn;
 import $group__.$modId__.utilities.constructs.classes.Singleton;
+import $group__.$modId__.utilities.constructs.interfaces.annotations.ExternalCloneMethod;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.ExternalToImmutableMethod;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
@@ -22,8 +23,10 @@ public abstract class Proxy extends Singleton {
 	@OverridingMethodsMustInvokeSuper
 	public void construct(@SuppressWarnings("unused") ModOwn mod, @SuppressWarnings("unused") FMLConstructionEvent e) {
 		ASMDataTable asm = e.getASMHarvestedData();
+
 		ExternalToImmutableMethod.AnnotationProcessor.INSTANCE.process(asm);
-		ExternalToImmutableMethod.AnnotationProcessor.INSTANCE.process(asm);
+		ExternalCloneMethod.AnnotationProcessor.INSTANCE.process(asm);
+
 		OverridingStatus.AnnotationProcessor.INSTANCE.process(asm);
 	}
 

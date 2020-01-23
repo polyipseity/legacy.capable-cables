@@ -49,21 +49,21 @@ public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<En
 
 	public GuiTabsThemed<Number, EnumTheme, ?> getTabs() { return tabs; }
 
+	@SuppressWarnings("unused")
 	public void setTabs(GuiTabsThemed<Number, EnumTheme, ?> tabs) { throw rejectUnsupportedOperation(); }
 
 	public ItemStack getStack() { return stack; }
 
+	@SuppressWarnings("unused")
 	public void setStack(ItemStack stack) { throw rejectUnsupportedOperation(); }
 
 
-	/** {@inheritDoc} */
 	@Override
 	public void setTheme(EnumTheme theme) {
 		tabs.setTheme(theme);
 		this.theme = theme;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public EnumTheme getTheme() { return theme; }
 

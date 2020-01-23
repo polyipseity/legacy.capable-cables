@@ -37,7 +37,7 @@ public interface IAnnotationProcessor<A extends Annotation> {
 
 	/* SECTION static methods */
 
-	static String getMessage(IAnnotationProcessor<?> processor, @Nullable String msg) { return "Process annotation '" + processor.annotationType() + "'" + (msg == null || msg.isEmpty() ? "" : ": " + msg); }
+	static String getMessage(IAnnotationProcessor<?> processor, @Nullable String msg) { return "Processing annotation '" + processor.annotationType() + "'" + (msg == null || msg.isEmpty() ? "" : ": " + msg); }
 
 
 	static <T, A extends Annotation> A[] getEffectiveAnnotationsIfInheritingConsidered(IAnnotationProcessor<A> processor, Class<T> sub, Method m) {

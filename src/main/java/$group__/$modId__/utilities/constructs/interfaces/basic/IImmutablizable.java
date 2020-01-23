@@ -38,7 +38,7 @@ public interface IImmutablizable<T> {
 	Set<Class<?>> BROKEN_TO_IMMUTABLE_CLASSES = Collections.newSetFromMap(CacheBuilder.newBuilder().softValues().<Class<?>, Boolean>build().asMap());
 	BiFunction<? super Throwable, ? super MethodAdapter, ? extends BiFunction<? super Object, ? super Object[], ?>> CALLBACK = (t, u) -> (v, w) -> {
 		Class<?> vc = v.getClass();
-		LOGGER.warn("To immutable method '{}' failed for object '{}' of class '{}', will not attempt to immutable again, stacktrace: {}", u.get().toGenericString(), v, vc.toGenericString(), getStackTrace(t));
+		LOGGER.warn("To immutable method '{}' failed for object '{}' of class '{}', will not attempt to immutable again, stacktrace:\n{}", u.get().toGenericString(), v, vc.toGenericString(), getStackTrace(t));
 		BROKEN_TO_IMMUTABLE_CLASSES.add(vc);
 		return v;
 	};
@@ -56,12 +56,12 @@ public interface IImmutablizable<T> {
 
 		MethodAdapter m;
 		try { m = EXTERNAL_TO_IMMUTABLE_METHOD_MAP.get(EXTERNAL_TO_IMMUTABLE_METHOD_ANNOTATIONS_CACHE.get(oc)); } catch (ExecutionException e) {
-			LOGGER.warn("Unable to immutablize object '{}' of class '{}' as no to immutable method is found, will not attempt to immutable again, stacktrace: {}", o, oc.toGenericString(), getStackTrace(e));
+			LOGGER.warn("Unable to immutablize object '{}' of class '{}' as no to immutable method is found, will not attempt to immutable again, stacktrace:\n{}", o, oc.toGenericString(), getStackTrace(e));
 			BROKEN_TO_IMMUTABLE_CLASSES.add(oc);
 			return o;
 		}
 
-		m.setAccessible((t, u) -> v -> LOGGER.warn("Unable to set to immutable method '{}' of object '{}' of class '{}' accessible, stacktrace: {}", u.get().toGenericString(), o, oc.toGenericString(), getStackTrace(t)), true);
+		m.setAccessible((t, u) -> v -> LOGGER.warn("Unable to set to immutable method '{}' of object '{}' of class '{}' accessible, stacktrace:\n{}", u.get().toGenericString(), o, oc.toGenericString(), getStackTrace(t)), true);
 
 		return castChecked(isMemberStatic(m.get()) ? m.invokeNonnull(CALLBACK, null, o) : m.invokeNonnull(CALLBACK, o));
 	}

@@ -2,7 +2,9 @@
 // TITLE Gradle Build Script
 //////////////////////////////////////////////////
 
+import groovy.io.FileType
 import groovy.json.JsonBuilder
+import net.minecraftforge.gradle.user.TaskSourceCopy
 
 import java.util.regex.Pattern
 
@@ -195,121 +197,128 @@ sourceSets {
     api
 }
 
-static <E> String processResourcesList(List<E> l) { l.empty ? '[]' : l.toListString().replace('[', '["').replace(']', '"]').replace(', ', '", "') }
 
-new ArrayList<>(tasks).each { t ->
-    String name = t.name
-    if (name.endsWith('Java') && name.startsWith('source')) { // COMMENT sourceJava
-        t.enabled = false
-        String sourceSetName = name.replace('source', '').replace('Java', '').uncapitalize()
-        String taskSourceSetName = sourceSetName == 'main' ? '' : sourceSetName.capitalize()
+tasks.withType(TaskSourceCopy) { TaskSourceCopy t ->
+    String sourceSetName = name.replace('source', '').uncapitalize()
+    sourceSetName = sourceSets.find { sourceSetName.startsWith it.name }.name
+    String taskSourceSetName = sourceSetName == 'main' ? '' : sourceSetName.capitalize(),
+            language = name.replace "source${sourceSetName.capitalize()}", ''
 
-        Task process = task("process${name.capitalize()}", type: ProcessResources, description: "Process $sourceSetName Java.") {
-            inputs.property 'expand_modId', project.name
-            inputs.property 'expand_name', name_
-            inputs.property 'expand_version', version
-            inputs.property 'expand_dependencies', combinedDependencies
-            inputs.property 'expand_minecraftVersionRange', minecraftVersionRange
-            inputs.property 'expand_certificateFingerprint', certificateFingerprint
-            inputs.property 'expand_updateJSON', updateJSON
-            inputs.property 'expand_group', project.group
+    enabled = false
 
-            into t.output
+    Sync process = task("process${name.capitalize()}", type: Sync, description: "Process $sourceSetName $language.") {
+        inputs.property 'expand_modId', project.name
+        inputs.property 'expand_name', name_
+        inputs.property 'expand_version', version
+        inputs.property 'expand_dependencies', combinedDependencies
+        inputs.property 'expand_minecraftVersionRange', minecraftVersionRange
+        inputs.property 'expand_certificateFingerprint', certificateFingerprint
+        inputs.property 'expand_updateJSON', updateJSON
+        inputs.property 'expand_group', project.group
 
-            from(temporaryDir) {
-                Map<String, Object> e = [:]
-                inputs.properties.each { if (it.key.startsWith('expand_')) {
-                    String k = it.key.replace('expand_', '')
-                    e.put k, it.value
-                    e.put "${k}__".toString(), it.value
-                }}
+        into t.output
 
-                expand e
+        from(temporaryDir) {
+            Map<String, Object> e = [:]
+            inputs.properties.each { if (it.key.startsWith('expand_')) {
+                String k = it.key.replace('expand_', '')
+                e.put k, it.value
+                e.put "${k}__".toString(), it.value
+            }}
 
-                Binding eb = new Binding(e)
-                eachFile {
-                    File f = file "$temporaryDir.absolutePath$separator$it.sourcePath"
-                    f.text = f.text.replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }
-                    it.path = evaluateGStringStringWithBinding it.path, eb
-                }
-            }
-        }
-        t.finalizedBy process
-
-        Task preProcess = task("preProcess${name.capitalize()}", type: Sync, description: "Prepare sources for processing $sourceSetName Java.") {
-            from t.source as FileCollection
-            into process.temporaryDir
-        }
-        Task postProcess = task("postProcess${name.capitalize()}", type: Jar, description: "Finalize after processing $sourceSetName Java.") {
-            from process.destinationDir as File
-            classifier sourceSetName
-            destinationDir = file "$buildDir/debug"
-
-            createNewFile archivePath
-            dependencies."${"${taskSourceSetName}Compile".uncapitalize()}" files(archivePath)
-        }
-        process.dependsOn preProcess
-        process.finalizedBy postProcess
-    } else if (name.endsWith('Resources') && name.startsWith('process')) { // COMMENT processResources
-        String taskSourceSetName = name.replace('process', '').replace('Resources', '')
-        String sourceSetName = (taskSourceSetName.empty ? 'main' : taskSourceSetName).uncapitalize()
-
-        t.configure {
-            // COMMENT this will ensure that this task is redone when the variables change.
-            inputs.property 'expand_modId', project.name
-            inputs.property 'expand_name', name_
-            inputs.property 'expand_description', project.description
-            inputs.property 'expand_version', version
-            inputs.property 'expand_minecraftVersion', project.minecraft.version
-            inputs.property 'expand_url', url
-            inputs.property 'expand_updateUrl', updateUrl
-            inputs.property 'expand_updateJSON', updateJSON
-            inputs.property 'expand_authorList', processResourcesList(authorList as List<String>)
-            inputs.property 'expand_credits', credits
-            inputs.property 'expand_logoFile', logoFile
-            inputs.property 'expand_screenshots', processResourcesList(screenshots as List<String>)
-            inputs.property 'expand_parent', parent_
-            inputs.property 'expand_requiredMods', processResourcesList(requiredMods as List<String>)
-            inputs.property 'expand_dependencies', processResourcesList(project.ext.dependencies as List<String>)
-            inputs.property 'expand_dependants', processResourcesList(dependants as List<String>)
-            inputs.property 'expand_pack_format', pack_format
-
-            Map<String, Object> e = inputs.properties.findAll { it.key.startsWith 'expand_' }.collectEntries { [it.key.replace('expand_', ''), it.value] } as Map<String, Object>
-
-            // COMMENT replace stuff in the to-be-processed files, nothing else
-            from(sourceSets."$sourceSetName".resources.srcDirs) {
-                include '**/*.in'
-                rename ~/(.*)\.in/, '$1'
-
-                // COMMENT replace variables
-                expand e
-            }
-
-            // COMMENT copy everything else except the processed files
-            from(sourceSets."$sourceSetName".resources.srcDirs) {
-                exclude '**/*.in'
-            }
+            expand e
 
             Binding eb = new Binding(e)
             eachFile { it.path = evaluateGStringStringWithBinding it.path, eb }
         }
+    } as Sync
+    t.finalizedBy process
 
-        Task sync = task("sync${name.capitalize()}", type: Sync, description: "Sync $sourceSetName resources.") {
-            from t.destinationDir as File
-            into tasks."compile${taskSourceSetName}Java".destinationDir
-            preserve { include '**/*.class' }
-        }
-        t.finalizedBy sync
+    Sync preProcess = task("preProcess${name.capitalize()}", type: Sync, description: "Prepare sources for processing $sourceSetName $language.") {
+        from t.source
+        into process.temporaryDir
 
-        Task before = task("before${taskSourceSetName}Jar", description: "Prepare $sourceSetName stuff for jaring.") {
-            mustRunAfter sync
-            doLast {
-                sourceSets."$sourceSetName".allSource.srcDirs.each { it.mkdir() }
-                delete fileTree(dir: sync.destinationDir, excludes: ['**/*.class'])
+        doLast {
+            destinationDir.eachFileRecurse(FileType.FILES) {
+                it.text = it.text.replace('\\', '\\\\').replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }.replaceAll ~/\$(?!\{)/, '\\\\\\$' // COMMENT standard
             }
         }
-        tasks.jar.dependsOn before
+    } as Sync
+    Jar postProcess = task("postProcess${name.capitalize()}", type: Jar, description: "Finalize after processing $sourceSetName $language.") {
+        from process.destinationDir
+        classifier "$sourceSetName$language"
+        destinationDir = file "$buildDir/debug"
+
+        createNewFile archivePath
+        dependencies."${"${taskSourceSetName}Compile".uncapitalize()}" files(archivePath)
+    } as Jar
+    process.dependsOn preProcess
+    process.finalizedBy postProcess
+}
+
+
+static <E> String processResourcesList(List<E> l) { l.empty ? '[]' : l.toListString().replace('[', '["').replace(']', '"]').replace(', ', '", "') }
+
+tasks.withType(ProcessResources) { ProcessResources t ->
+    String taskSourceSetName = name.replace('process', '').replace('Resources', ''),
+            sourceSetName = (taskSourceSetName.empty ? 'main' : taskSourceSetName).uncapitalize()
+
+    t.configure {
+        // COMMENT this will ensure that this task is redone when the variables change.
+        inputs.property 'expand_modId', project.name
+        inputs.property 'expand_name', name_
+        inputs.property 'expand_description', project.description
+        inputs.property 'expand_version', version
+        inputs.property 'expand_minecraftVersion', project.minecraft.version
+        inputs.property 'expand_url', url
+        inputs.property 'expand_updateUrl', updateUrl
+        inputs.property 'expand_updateJSON', updateJSON
+        inputs.property 'expand_authorList', processResourcesList(authorList as List<String>)
+        inputs.property 'expand_credits', credits
+        inputs.property 'expand_logoFile', logoFile
+        inputs.property 'expand_screenshots', processResourcesList(screenshots as List<String>)
+        inputs.property 'expand_parent', parent_
+        inputs.property 'expand_requiredMods', processResourcesList(requiredMods as List<String>)
+        inputs.property 'expand_dependencies', processResourcesList(project.ext.dependencies as List<String>)
+        inputs.property 'expand_dependants', processResourcesList(dependants as List<String>)
+        inputs.property 'expand_pack_format', pack_format
+
+        Map<String, Object> e = inputs.properties.findAll { it.key.startsWith 'expand_' }.collectEntries { [it.key.replace('expand_', ''), it.value] } as Map<String, Object>
+
+        // COMMENT replace stuff in the to-be-processed files, nothing else
+        from(sourceSets."$sourceSetName".resources.srcDirs as Set<File>) {
+            include '**/*.in'
+            rename ~/(.*)\.in/, '$1'
+
+            // COMMENT replace variables
+            expand e
+        }
+
+        // COMMENT copy everything else except the processed files
+        from(sourceSets."$sourceSetName".resources.srcDirs as Set<File>) {
+            exclude '**/*.in'
+        }
+
+        Binding eb = new Binding(e)
+        eachFile { it.path = evaluateGStringStringWithBinding it.path, eb }
     }
+
+    Sync sync = task("sync${name.capitalize()}", type: Sync, description: "Sync $sourceSetName resources.") {
+        from t.destinationDir
+        into tasks."compile${taskSourceSetName}Java".destinationDir
+        preserve { include '**/*.class' }
+    } as Sync
+    t.finalizedBy sync
+
+    tasks.jar.dependsOn task("before${taskSourceSetName}Jar", type: Delete, description: "Prepare $sourceSetName stuff for jaring.") {
+        delete fileTree(dir: sync.destinationDir, excludes: ['**/*.class'])
+        mustRunAfter sync
+    }
+}
+
+tasks.withType(AbstractCompile) {
+    options.verbose = true
+    options.compilerArgs << '-Xlint'
 }
 
 
@@ -338,27 +347,71 @@ stringToStringMap(customDependencies).each { if (it.key == 'shade') it.value.eac
 }}
 
 
-task deobfJar(type: Jar, dependsOn: 'jar') {
+task deobfJar(type: Jar, dependsOn: tasks.jar) {
     from sourceSets.main.java.outputDir
     classifier 'dev'
 }
 
 /* CODE
-task sourceJar(type: Jar, dependsOn: 'sourceMainJava') {
+task sourceJar(type: Jar, dependsOn: tasks.sourceMainJava) {
     from sourceSets.main.allSource
     classifier 'sources'
 }
 */
 
-task javadocJar(type: Jar, dependsOn: 'javadoc') {
+task javadocJar(type: Jar, dependsOn: tasks.javadoc) {
     from tasks.javadoc.destinationDir
     classifier 'javadoc'
 }
 
-tasks.each { if (it instanceof org.gradle.jvm.tasks.Jar) {
-    it.exclude { it.directory ? it.path.contains('$') : it.path.endsWith('.in') }
-    artifacts.archives it
-} }
+tasks.withType(Javadoc) { Javadoc t ->
+    File outputInput = file "$temporaryDir/output"
+
+    finalizedBy task("post${name.capitalize()}", type: Sync, description: "Process $name output for jaring.") {
+        inputs.property 'expand_modId', project.name
+        inputs.property 'expand_name', name_
+        inputs.property 'expand_version', version
+        inputs.property 'expand_dependencies', combinedDependencies
+        inputs.property 'expand_minecraftVersionRange', minecraftVersionRange
+        inputs.property 'expand_certificateFingerprint', certificateFingerprint
+        inputs.property 'expand_updateJSON', updateJSON
+        inputs.property 'expand_group', project.group
+
+        into t.destinationDir
+
+        from(outputInput) {
+            exclude { it.path.contains('$') }
+
+            Map<String, Object> e = [:]
+            inputs.properties.each { if (it.key.startsWith('expand_')) {
+                String k = it.key.replace('expand_', '')
+                e.put k, it.value
+                e.put "${k}__".toString(), it.value
+            }}
+
+            // CODE expand e // COMMENT method code > 65536
+
+            doFirst {
+                t.destinationDir.eachFile(FileType.FILES) {
+                    String text = it.text.replace(':D', '$') // COMMENT specific
+                            /* CODE .replace('\\', '\\\\') */.replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }/* CODE .replaceAll ~/\$(?!\{)/, '\\\\\\$' */ // COMMENT standard
+
+                    // COMMENT temp fix for method code > 65536
+                    // TODO use a better fix
+                    e.each { text = text.replace "\${$it.key}", it.value.toString() }
+                    it.text = text
+                }
+            }
+        }
+    }
+
+    destinationDir outputInput
+}
+
+tasks.withType(org.gradle.jvm.tasks.Jar) {
+    exclude { it.directory ? it.path.contains('$') : it.path.endsWith('.in') }
+    if (!name.startsWith('postProcess')) artifacts.archives it
+}
 
 
 tasks.runClient.outputs.upToDateWhen { false }

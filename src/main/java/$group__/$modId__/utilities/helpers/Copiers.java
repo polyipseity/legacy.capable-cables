@@ -1,12 +1,9 @@
 package $group__.$modId__.utilities.helpers;
 
-import $group__.$modId__.client.gui.utilities.constructs.IThemed;
+import $group__.$modId__.utilities.constructs.interfaces.annotations.ExternalCloneMethod;
 import $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable;
 import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.ConstructorAdapter;
-import etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.constructs.interfaces.annotations.ExternalCloneMethod;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.awt.*;
 import java.util.Collection;
@@ -26,6 +23,7 @@ public enum Copiers {
 	/* SECTION static methods */
 
 	@ExternalCloneMethod(value = {
+			Enum.class,
 			Callable.class,
 			Consumer.class,
 			BiConsumer.class,
@@ -49,19 +47,5 @@ public enum Copiers {
 		ConstructorAdapter<? extends C> co = getDeclaredConstructorNonnull((t, u) -> v -> getDeclaredConstructor(u, a.getAndSet(null)), cl, cl);
 
 		return co.newInstance(a.get() == null ? copy.stream().map(ICloneable::tryClone).toArray() : copy.stream().map(ICloneable::tryClone).collect(Collectors.toList()));
-	}
-
-
-	/* SECTION static classes */
-
-	@SideOnly(Side.CLIENT)
-	public enum Client {
-		/* MARK empty */ ;
-
-
-		/* SECTION static methods */
-
-		@ExternalCloneMethod(IThemed.EnumTheme.class)
-		public static Object copySingleton(Object copy) { return copy; }
 	}
 }
