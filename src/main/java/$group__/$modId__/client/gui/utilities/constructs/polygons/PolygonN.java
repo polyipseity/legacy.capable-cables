@@ -12,12 +12,12 @@ import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.List;
 
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneNonnull;
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -51,7 +51,7 @@ public class PolygonN<N extends Number, T extends PolygonN<N, T>> extends Abstra
 
 	/** {@inheritDoc} */
 	@Override
-	public T toImmutable() { return castUnchecked(new Immutable<>(this)); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }
 
 	/** {@inheritDoc} */
 	@Override
@@ -102,8 +102,8 @@ public class PolygonN<N extends Number, T extends PolygonN<N, T>> extends Abstra
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r;
-		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
-		r.list = tryCloneNonnull(list);
+		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
+		r.list = tryCloneUnboxedNonnull(list);
 		return r;
 	}
 
@@ -114,7 +114,7 @@ public class PolygonN<N extends Number, T extends PolygonN<N, T>> extends Abstra
 	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends PolygonN<N, T> {
 		/* SECTION constructors */
 
-		public Immutable(List<XY<N, ?>> list) { super(tryToImmutableNonnull(list)); }
+		public Immutable(List<XY<N, ?>> list) { super(tryToImmutableUnboxedNonnull(list)); }
 
 		@SuppressWarnings("varargs")
 		@SafeVarargs
@@ -135,7 +135,7 @@ public class PolygonN<N extends Number, T extends PolygonN<N, T>> extends Abstra
 		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
-		public final T toImmutable() { return castUnchecked(this); }
+		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		/** {@inheritDoc} */
 		@Override

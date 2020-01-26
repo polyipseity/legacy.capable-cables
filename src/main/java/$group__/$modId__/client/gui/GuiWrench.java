@@ -10,7 +10,7 @@ import $group__.$modId__.client.gui.utilities.constructs.XY;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
 import $group__.$modId__.common.registrable.items.ItemWrench;
 import $group__.$modId__.utilities.helpers.Colors;
-import $group__.$modId__.utilities.variables.References;
+import $group__.$modId__.utilities.variables.Globals;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
@@ -84,6 +84,7 @@ public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<En
 
 	/* SECTION static variables */
 
+	@SuppressWarnings({"unchecked", "RedundantSuppression"})
 	protected static final GuiTabsThemed<Number, EnumTheme, ?> TABS = new GuiTabsThemed<>(
 			EnumTheme.NONE,
 			0,
@@ -93,8 +94,8 @@ public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<En
 							EnumTheme.NONE,
 							new GuiResource<>(
 									new Rectangle<>(new XY<>(new X<>(0.1F), new Y<>(0.1F, -16)), new XY<>(16, 16)),
-									References.Client.Resources.GUI_WRENCH,
-									References.Client.Resources.GUI_WRENCH_INFO
+									Globals.Client.Resources.GUI_WRENCH,
+									Globals.Client.Resources.GUI_WRENCH_INFO
 							)
 					),
 					new GuiRectangleThemed<>(

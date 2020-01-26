@@ -3,19 +3,19 @@ package $group__.$modId__.utilities.constructs.interfaces.basic;
 import $group__.$modId__.utilities.constructs.interfaces.IStructureCloneable;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.meta.When;
 import java.util.Objects;
+import java.util.Optional;
 
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutable;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxed;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryClone;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneNonnull;
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
+import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -23,7 +23,6 @@ import static $group__.$modId__.utilities.variables.Constants.GROUP;
 public interface IAdapter<V, T extends IAdapter<V, T>> extends IStructureCloneable<T> {
 	/* SECTION getters & setters */
 
-	@Nullable
 	V get();
 
 	void set(V value);
@@ -34,13 +33,12 @@ public interface IAdapter<V, T extends IAdapter<V, T>> extends IStructureCloneab
 	class Impl<V, T extends Impl<V, T>> implements IAdapter<V, T> {
 		/* SECTION variables */
 
-		@Nullable
 		protected V value;
 
 
 		/* SECTION constructors */
 
-		public Impl(@Nullable V value) { this.value = value; }
+		public Impl(V value) { this.value = value; }
 
 		public Impl(IAdapter<? extends V, ?> copy) { this(copy.get()); }
 
@@ -48,15 +46,14 @@ public interface IAdapter<V, T extends IAdapter<V, T>> extends IStructureCloneab
 		/* SECTION methods */
 
 		@Override
-		@Nullable
 		public V get() { return value; }
 
 		@Override
-		public void set(@Nullable V value) { this.value = value; }
+		public void set(V value) { this.value = value; }
 
 
 		@Override
-		public T toImmutable() { return castUnchecked(new Immutable<>(this)); }
+		public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }
 
 		@Override
 		public boolean isImmutable() { return false; }
@@ -80,8 +77,8 @@ public interface IAdapter<V, T extends IAdapter<V, T>> extends IStructureCloneab
 		@OverridingStatus(group = GROUP, when = When.MAYBE)
 		public T clone() {
 			T r;
-			try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
-			r.value = tryClone(value);
+			try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
+			r.value = tryCloneUnboxedNonnull(value);
 			return r;
 		}
 
@@ -92,7 +89,7 @@ public interface IAdapter<V, T extends IAdapter<V, T>> extends IStructureCloneab
 		public static class Immutable<V, T extends Immutable<V, T>> extends Impl<V, T> {
 			/* SECTION constructors */
 
-			public Immutable(@Nullable V value) { super(tryToImmutable(value)); }
+			public Immutable(V value) { super(tryToImmutableUnboxedNonnull(value)); }
 
 			public Immutable(IAdapter<? extends V, ?> copy) { this(copy.get()); }
 
@@ -100,12 +97,12 @@ public interface IAdapter<V, T extends IAdapter<V, T>> extends IStructureCloneab
 			/* SECTION methods */
 
 			@Override
-			public void set(@Nullable V value) { throw rejectUnsupportedOperation(); }
+			public void set(V value) { throw rejectUnsupportedOperation(); }
 
 
 			@Override
 			@OverridingStatus(group = GROUP, when = When.NEVER)
-			public final T toImmutable() { return castUnchecked(this); }
+			public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 			@Override
 			@OverridingStatus(group = GROUP, when = When.NEVER)
@@ -114,90 +111,61 @@ public interface IAdapter<V, T extends IAdapter<V, T>> extends IStructureCloneab
 	}
 
 
-	interface INonnull<V, T extends INonnull<V, T>> extends IAdapter<V, T> {
+	interface IOptional<V, T extends IOptional<V, T>> extends IAdapter<Optional<? extends V>, T> {
 		/* SECTION getters & setters */
 
-		@Nonnull
-		@Override
-		V get();
+		@Nullable
+		default V getUnboxed() { return unboxOptional(get()); }
+
+		default void setUnboxed(@Nullable V value) { set(Optional.ofNullable(value)); }
 
 
 		/* SECTION static classes */
 
-		class Impl<V, T extends Impl<V, T>> implements INonnull<V, T> {
-			/* SECTION variables */
-
-			protected V value;
-
-
+		class Impl<V, T extends Impl<V, T>> extends IAdapter.Impl<Optional<? extends V>, T> implements IOptional<V, T> {
 			/* SECTION constructors */
 
-			public Impl(V value) { this.value = value; }
+			public Impl(@Nullable V value) { super(Optional.ofNullable(value)); }
 
-			public Impl(IAdapter.INonnull<? extends V, ?> copy) { this(copy.get()); }
+			public Impl(IAdapter.IOptional<? extends V, ?> copy) { this(copy.getUnboxed()); }
+
+			public Impl(IAdapter<? extends V, ?> copy) { this(copy.get()); }
 
 
 			/* SECTION methods */
 
-			@Nonnull
 			@Override
-			public V get() { return value; }
-
-			@Override
-			public void set(V value) { this.value = value; }
-
-
-			@Override
-			public T toImmutable() { return castUnchecked(new IAdapter.Impl.Immutable<>(this)); }
+			public T toImmutable() { return castUncheckedUnboxedNonnull(new IAdapter.Impl.Immutable<>(this)); }
 
 			@Override
 			public boolean isImmutable() { return false; }
 
 
-			@Override
-			@OverridingStatus(group = GROUP, when = When.MAYBE)
-			public String toString() { return getToStringString(this, super.toString(),
-					new Object[]{"value", get()}); }
-
-			@Override
-			@OverridingStatus(group = GROUP, when = When.MAYBE)
-			public int hashCode() { return getHashCode(this, super.hashCode(), get()); }
-
-			@Override
-			@OverridingStatus(group = GROUP, when = When.MAYBE)
-			public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
-					t -> Objects.equals(get(), t.get())); }
-
-			@Override
-			@OverridingStatus(group = GROUP, when = When.MAYBE)
-			public T clone() {
-				T r;
-				try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
-				r.value = tryCloneNonnull(value);
-				return r;
-			}
-
-
 			/* SECTION static classes */
 
 			@javax.annotation.concurrent.Immutable
-			public static class Immutable<V, T extends Immutable<V, T>> extends INonnull.Impl<V, T> {
+			public static class Immutable<V, T extends Immutable<V, T>> extends IOptional.Impl<V, T> {
 				/* SECTION constructors */
 
-				public Immutable(V value) { super(tryToImmutableNonnull(value)); }
+				public Immutable(@Nullable V value) { super(tryToImmutableUnboxed(value)); }
 
-				public Immutable(IAdapter.INonnull<? extends V, ?> copy) { this(copy.get()); }
+				public Immutable(IAdapter.IOptional<? extends V, ?> copy) { this(copy.getUnboxed()); }
+
+				public Immutable(IAdapter<? extends V, ?> copy) { this(copy.get()); }
 
 
 				/* SECTION methods */
 
 				@Override
-				public void set(V value) { throw rejectUnsupportedOperation(); }
+				public void set(Optional<? extends V> value) { throw rejectUnsupportedOperation(); }
+
+				@Override
+				public void setUnboxed(@Nullable V value) { throw rejectUnsupportedOperation(); }
 
 
 				@Override
 				@OverridingStatus(group = GROUP, when = When.NEVER)
-				public final T toImmutable() { return castUnchecked(this); }
+				public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 				@Override
 				@OverridingStatus(group = GROUP, when = When.NEVER)

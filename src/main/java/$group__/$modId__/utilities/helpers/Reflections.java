@@ -1,6 +1,10 @@
 package $group__.$modId__.utilities.helpers;
 
 import $group__.$modId__.utilities.constructs.interfaces.basic.IAdapter;
+import $group__.$modId__.utilities.constructs.interfaces.basic.IThrowableCatcher;
+import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.ConstructorAdapter;
+import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.FieldAdapter;
+import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.MethodAdapter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
@@ -10,13 +14,12 @@ import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.Optional;
 
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
-import static $group__.$modId__.utilities.helpers.Masks.maskToNonnull;
-import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
+import static $group__.$modId__.utilities.helpers.Throwables.consumeCaught;
+import static $group__.$modId__.utilities.variables.Globals.clearCaughtThrowableStatic;
+import static $group__.$modId__.utilities.variables.Globals.setCaughtThrowableStatic;
 import static java.util.Objects.requireNonNull;
 
 public enum Reflections {
@@ -33,7 +36,7 @@ public enum Reflections {
 
 
 	public static SetMultimap<Long, Class<?>> getSuperclassesAndInterfaces(Class<?> c) {
-		@SuppressWarnings("UnstableApiUsage") SetMultimap<Long, Class<?>> r = MultimapBuilder.hashKeys().linkedHashSetValues().build();
+		@SuppressWarnings("UnstableApiUsage") SetMultimap<Long, Class<?>> r = MultimapBuilder.hashKeys().hashSetValues().build();
 		Class<?> cs = c.getSuperclass();
 		List<Class<?>> l = cs == null ? Arrays.asList(c.getInterfaces()) : Lists.asList(c.getSuperclass(), c.getInterfaces());
 		long k = 0;
@@ -65,7 +68,7 @@ public enum Reflections {
 
 	public static Type[] getGenericSuperclassActualTypeArguments(Class<?> c) { return ((ParameterizedType) c.getGenericSuperclass()).getActualTypeArguments(); }
 
-	public static <T extends Type> T getGenericSuperclassActualTypeArgument(Class<?> c, int i) { return castUnchecked(getGenericSuperclassActualTypeArguments(c)[i]); }
+	public static Type getGenericSuperclassActualTypeArgument(Class<?> c, int i) throws ClassCastException { return getGenericSuperclassActualTypeArguments(c)[i]; }
 
 
 	/* SECTION static classes */
@@ -76,135 +79,237 @@ public enum Reflections {
 
 		/* SECTION static methods */
 
-		@Nullable
-		public static Class<?> forName(BiFunction<? super Throwable, ? super String, ? extends BiFunction<? super Boolean, ? super ClassLoader, ? extends Class<?>>> callback, String name, boolean initialize, ClassLoader loader) { try { return Class.forName(name, initialize, loader); } catch (Throwable t) { return callback.apply(t, name).apply(initialize, loader); } }
+		public static Optional<Class<?>> forName(String name, boolean initialize, ClassLoader loader) {
+			clearCaughtThrowableStatic();
+			try { return Optional.of(Class.forName(name, initialize, loader));
+			} catch (Throwable t) {
+				setCaughtThrowableStatic(t);
+				return Optional.empty();
+			}
+		}
 
-		public static Class<?> forNameNonnull(BiFunction<? super Throwable, ? super String, ? extends BiFunction<? super Boolean, ? super ClassLoader, ? extends Class<?>>> callback, String name, boolean initialize, ClassLoader loader) { return requireNonNull(forName(callback, name, initialize, loader)); }
+		public static Optional<Class<?>> forName(String name, boolean initialize) { return forName(name, initialize, Unsafe.class.getClassLoader()); }
 
-		public static Class<?> forName(String name, boolean initialize, ClassLoader loader) { return maskToNonnull(forName((t, u) -> (v, w) -> { throw rejectArguments(t, u, v, w); }, name, initialize, loader)); }
-
-		@Nullable
-		public static Class<?> forName(BiFunction<? super Throwable, ? super String, ? extends Function<? super Boolean, ? extends Class<?>>> callback, String name, boolean initialize) { return forName((t, u) -> (v, w) -> callback.apply(t, u).apply(v), name, initialize, Unsafe.class.getClassLoader()); }
-
-		public static Class<?> forNameNonnull(BiFunction<? super Throwable, ? super String, ? extends Function<? super Boolean, ? extends Class<?>>> callback, String name, boolean initialize) { return requireNonNull(forName(callback, name, initialize)); }
-
-		public static Class<?> forName(String name, boolean initialize) { return maskToNonnull(forName((t, u) -> v -> { throw rejectArguments(t, u, v); }, name, initialize)); }
-
-		@Nullable
-		public static Class<?> forName(BiFunction<? super Throwable, ? super String, ? extends Class<?>> callback, String name) { return forName((t, u) -> v -> callback.apply(t, u), name, true); }
-
-		public static Class<?> forNameNonnull(BiFunction<? super Throwable, ? super String, ? extends Class<?>> callback, String name) { return requireNonNull(forName(callback, name)); }
-
-		public static Class<?> forName(String name) { return maskToNonnull(forName((t, u) -> { throw rejectArguments(t, u); }, name)); }
+		public static Optional<Class<?>> forName(String name) { return forName(name, true); }
 
 
-		@Nullable
-		public static <T> T newInstance(BiFunction<? super Throwable, ? super Class<? extends T>, ? extends T> callback, Class<? extends T> clazz) { try { return clazz.newInstance(); } catch (Throwable t) { return callback.apply(t, clazz); } }
-
-		public static <T> T newInstanceNonnull(BiFunction<? super Throwable, ? super Class<? extends T>, ? extends T> callback, Class<? extends T> clazz) { return requireNonNull(newInstance(callback, clazz)); }
-
-		public static <T> T newInstance(Class<? extends T> clazz) { return maskToNonnull(newInstance((t, u) -> { throw rejectArguments(t, u); }, clazz)); }
-
-
-		@Nullable
-		public static Field getField(BiFunction<? super Throwable, ? super Class<?>, ? extends Function<? super String, ? extends Field>> callback, Class<?> clazz, String name) { try { return clazz.getField(name); } catch (Throwable t) { return callback.apply(t, clazz).apply(name); } }
-
-		public static Field getFieldNonnull(BiFunction<? super Throwable, ? super Class<?>, ? extends Function<? super String, ? extends Field>> callback, Class<?> clazz, String name) { return requireNonNull(getField(callback, clazz, name)); }
-
-		public static Field getField(Class<?> clazz, String name) { return maskToNonnull(getField((t, u) -> v -> { throw rejectArguments(t, u, v); }, clazz, name)); }
-
-		@Nullable
-		public static Field getDeclaredField(BiFunction<? super Throwable, ? super Class<?>, ? extends Function<? super String, ? extends Field>> callback, Class<?> clazz, String name) { try { return clazz.getDeclaredField(name); } catch (Throwable t) { return callback.apply(t, clazz).apply(name); } }
-
-		public static Field getDeclaredFieldNonnull(BiFunction<? super Throwable, ? super Class<?>, ? extends Function<? super String, ? extends Field>> callback, Class<?> clazz, String name) { return requireNonNull(getDeclaredField(callback, clazz, name)); }
-
-		public static Field getDeclaredField(Class<?> clazz, String name) { return maskToNonnull(getDeclaredField((t, u) -> v -> { throw rejectArguments(t, u, v); }, clazz, name)); }
+		public static <T> Optional<T> newInstance(Class<? extends T> clazz) {
+			clearCaughtThrowableStatic();
+			try { return Optional.of(clazz.newInstance());
+			} catch (Throwable t) {
+				setCaughtThrowableStatic(t);
+				return Optional.empty();
+			}
+		}
 
 
-		@Nullable
-		public static AccessibleObjectAdapter.MethodAdapter getMethod(BiFunction<? super Throwable, ? super Class<?>, ? extends Function<? super String, ? extends AccessibleObjectAdapter.MethodAdapter>> callback, Class<?> clazz, String name) { try { return new AccessibleObjectAdapter.MethodAdapter(clazz.getMethod(name)); } catch (Throwable t) { return callback.apply(t, clazz).apply(name); } }
+		public static FieldAdapter getField(Class<?> clazz, String name) {
+			clearCaughtThrowableStatic();
+			try { return FieldAdapter.of(clazz.getField(name));
+			} catch (Throwable t) {
+				setCaughtThrowableStatic(t);
+				return FieldAdapter.empty();
+			}
+		}
 
-		public static AccessibleObjectAdapter.MethodAdapter getMethodNonnull(BiFunction<? super Throwable, ? super Class<?>, ? extends Function<? super String, ? extends AccessibleObjectAdapter.MethodAdapter>> callback, Class<?> clazz, String name) { return requireNonNull(getMethod(callback, clazz, name)); }
-
-		public static AccessibleObjectAdapter.MethodAdapter getMethod(Class<?> clazz, String name) { return maskToNonnull(getMethod((t, u) -> v -> { throw rejectArguments(t, u, v); }, clazz, name)); }
-
-		@Nullable
-		public static AccessibleObjectAdapter.MethodAdapter getDeclaredMethod(BiFunction<? super Throwable, ? super Class<?>, ? extends Function<? super String, ? extends AccessibleObjectAdapter.MethodAdapter>> callback, Class<?> clazz, String name) { try { return new AccessibleObjectAdapter.MethodAdapter(clazz.getDeclaredMethod(name)); } catch (Throwable t) { return callback.apply(t, clazz).apply(name); } }
-
-		public static AccessibleObjectAdapter.MethodAdapter getDeclaredMethodNonnull(BiFunction<? super Throwable, ? super Class<?>, ? extends Function<? super String, ? extends AccessibleObjectAdapter.MethodAdapter>> callback, Class<?> clazz, String name) { return requireNonNull(getDeclaredMethod(callback, clazz, name)); }
-
-		public static AccessibleObjectAdapter.MethodAdapter getDeclaredMethod(Class<?> clazz, String name) { return maskToNonnull(getDeclaredMethod((t, u) -> v -> { throw rejectArguments(t, u, v); }, clazz, name)); }
+		public static FieldAdapter getDeclaredField(Class<?> clazz, String name) {
+			clearCaughtThrowableStatic();
+			try { return FieldAdapter.of(clazz.getDeclaredField(name));
+			} catch (Throwable t) {
+				setCaughtThrowableStatic(t);
+				return FieldAdapter.empty();
+			}
+		}
 
 
-		@Nullable
-		public static <T> AccessibleObjectAdapter.ConstructorAdapter<T> getConstructor(BiFunction<? super Throwable, ? super Class<? extends T>, ? extends Function<? super Class<?>[], ? extends AccessibleObjectAdapter.ConstructorAdapter<T>>> callback, Class<? extends T> clazz, Class<?>... parameterTypes) { try { return new AccessibleObjectAdapter.ConstructorAdapter<>(clazz.getConstructor(parameterTypes)); } catch (Throwable t) { return callback.apply(t, clazz).apply(parameterTypes); } }
+		public static MethodAdapter getMethod(Class<?> clazz, String name, Class<?>... args) {
+			clearCaughtThrowableStatic();
+			try { return MethodAdapter.of(clazz.getMethod(name, args));
+			} catch (Throwable t) {
+				setCaughtThrowableStatic(t);
+				return MethodAdapter.empty();
+			}
+		}
 
-		public static <T> AccessibleObjectAdapter.ConstructorAdapter<T> getConstructorNonnull(BiFunction<? super Throwable, ? super Class<? extends T>, ? extends Function<? super Class<?>[], ? extends AccessibleObjectAdapter.ConstructorAdapter<T>>> callback, Class<? extends T> clazz, Class<?>... parameterTypes) { return requireNonNull(getConstructor(callback, clazz, parameterTypes)); }
+		public static MethodAdapter getDeclaredMethod(Class<?> clazz, String name, Class<?>... args) {
+			clearCaughtThrowableStatic();
+			try { return MethodAdapter.of(clazz.getDeclaredMethod(name, args));
+			} catch (Throwable t) {
+				setCaughtThrowableStatic(t);
+				return MethodAdapter.empty();
+			}
+		}
 
-		public static <T> AccessibleObjectAdapter.ConstructorAdapter<T> getConstructor(Class<? extends T> clazz, Class<?>... parameterTypes) { return maskToNonnull(getConstructor((t, u) -> v -> { throw rejectArguments(t, u, v); }, clazz, parameterTypes)); }
 
-		@Nullable
-		public static <T> AccessibleObjectAdapter.ConstructorAdapter<T> getDeclaredConstructor(BiFunction<? super Throwable, ? super Class<? extends T>, ? extends Function<? super Class<?>[], ? extends AccessibleObjectAdapter.ConstructorAdapter<T>>> callback, Class<? extends T> clazz, Class<?>... parameterTypes) { try { return new AccessibleObjectAdapter.ConstructorAdapter<>(clazz.getDeclaredConstructor(parameterTypes)); } catch (Throwable t) { return callback.apply(t, clazz).apply(parameterTypes); } }
+		public static <T> ConstructorAdapter<T> getConstructor(Class<? extends T> clazz, Class<?>... args) {
+			clearCaughtThrowableStatic();
+			try { return ConstructorAdapter.of(clazz.getConstructor(args));
+			} catch (Throwable t) {
+				setCaughtThrowableStatic(t);
+				return ConstructorAdapter.empty();
+			}
+		}
 
-		public static <T> AccessibleObjectAdapter.ConstructorAdapter<T> getDeclaredConstructorNonnull(BiFunction<? super Throwable, ? super Class<? extends T>, ? extends Function<? super Class<?>[], ? extends AccessibleObjectAdapter.ConstructorAdapter<T>>> callback, Class<? extends T> clazz, Class<?>... parameterTypes) { return requireNonNull(getDeclaredConstructor(callback, clazz, parameterTypes)); }
-
-		public static <T> AccessibleObjectAdapter.ConstructorAdapter<T> getDeclaredConstructor(Class<? extends T> clazz, Class<?>... parameterTypes) { return maskToNonnull(getDeclaredConstructor((t, u) -> v -> { throw rejectArguments(t, u, v); }, clazz, parameterTypes)); }
+		public static <T> ConstructorAdapter<T> getDeclaredConstructor(Class<? extends T> clazz, Class<?>... args) {
+			clearCaughtThrowableStatic();
+			try { return ConstructorAdapter.of(clazz.getDeclaredConstructor(args));
+			} catch (Throwable t) {
+				setCaughtThrowableStatic(t);
+				return ConstructorAdapter.empty();
+			}
+		}
 
 
 		/* SECTION static classes */
 
-		public static class AccessibleObjectAdapter<V extends AccessibleObject, T extends AccessibleObjectAdapter<V, T>> extends IAdapter.INonnull.Impl.Immutable<V, T> {
+		public static class AccessibleObjectAdapter<V extends java.lang.reflect.AccessibleObject /* COMMENT error: cannot find symbol if qualification NOT used */, T extends AccessibleObjectAdapter<V, T>> extends IAdapter.IOptional.Impl.Immutable<V, T> implements IThrowableCatcher {
+			/* SECTION variables */
+
+			protected final ThreadLocal<Throwable> caughtThrowable = new ThreadLocal<>();
+
+
 			/* SECTION constructors */
 
-			public AccessibleObjectAdapter(V value) { super(value); }
-
-			public AccessibleObjectAdapter(IAdapter.INonnull<? extends V, ?> copy) { this(copy.get()); }
+			public AccessibleObjectAdapter(@Nullable V value) { super(value); }
 
 
 			/* SECTION methods */
 
-			public void setAccessible(BiFunction<? super Throwable, ? super T, ? extends Consumer<? super Boolean>> callback, boolean flag) { try { get().setAccessible(flag); } catch (Throwable t) { callback.apply(t, castUnchecked(this)).accept(flag); } }
+			@SuppressWarnings({"UnusedReturnValue", "BooleanMethodIsAlwaysInverted"})
+			public boolean setAccessible(boolean flag) {
+				clearCaughtThrowable();
+				try {
+					final boolean[] r = {false};
+					get().ifPresent(t -> {
+						t.setAccessible(flag);
+						r[0] = true;
+					});
+					return r[0];
+				} catch (Throwable t) {
+					consumeCaught(t);
+					caughtThrowable.set(t);
+					return false;
+				}
+			}
 
-			public void setAccessible(boolean flag) { setAccessible((t, u) -> v -> { throw rejectArguments(t, u, v); }, flag); }
+
+			@Override
+			public Optional<Throwable> getCaughtThrowable() { return Optional.ofNullable(caughtThrowable.get()); }
+
+			@Override
+			public void clearCaughtThrowable() { caughtThrowable.set(null); }
 
 
 			/* SECTION static classes */
 
-			public static final class MethodAdapter extends AccessibleObjectAdapter<Method, MethodAdapter> {
+			public static final class FieldAdapter extends AccessibleObjectAdapter<Field, FieldAdapter> {
 				/* SECTION constructors */
 
-				public MethodAdapter(Method value) { super(value); }
+				protected FieldAdapter(@Nullable Field value) { super(value); }
 
-				public MethodAdapter(INonnull<? extends Method, ?> copy) { this(copy.get()); }
+				public FieldAdapter(IAdapter.IOptional<? extends Field, ?> copy) { this(requireNonNull(copy.getUnboxed())); }
+
+				public FieldAdapter(IAdapter<? extends Field, ?> copy) { this(requireNonNull(copy.get())); }
 
 
 				/* SECTION methods */
 
-				@Nullable
-				public <O> Object invoke(BiFunction<? super Throwable, ? super MethodAdapter, ? extends BiFunction<? super O, ? super Object[], ?>> callback, @Nullable O obj, Object... args) { try { return get().invoke(obj, args); } catch (Throwable t) { return callback.apply(t, this).apply(obj, args); } }
+				public Optional<?> get_(@Nullable Object obj) {
+					clearCaughtThrowable();
+					return get().map(t -> {
+						try { return t.get(obj); } catch (Throwable th) {
+							consumeCaught(th);
+							caughtThrowable.set(th);
+							return null;
+						}
+					});
+				}
 
-				public <O> Object invokeNonnull(BiFunction<? super Throwable, ? super MethodAdapter, ? extends BiFunction<? super O, ? super Object[], ?>> callback, @Nullable O obj, Object... args) { return requireNonNull(invoke(callback, obj, args)); }
 
-				@Nullable
-				public Object invoke(@Nullable Object obj, Object... args) { return invoke((t, u) -> (v, w) -> { throw rejectArguments(t, u, v, w); }, obj, args); }
+				/* SECTION static variables */
 
-				public Object invokeNonnull(@Nullable Object obj, Object... args) { return requireNonNull(invoke(obj, args)); }
+				private static final FieldAdapter EMPTY = new FieldAdapter((Field) null);
+
+
+				/* SECTION static methods */
+
+				public static FieldAdapter empty() { return EMPTY; }
+
+				public static FieldAdapter of(@Nullable Field value) { return value == null ? empty() : new FieldAdapter(value); }
+			}
+
+
+			public static final class MethodAdapter extends AccessibleObjectAdapter<Method, MethodAdapter> {
+				/* SECTION constructors */
+
+				protected MethodAdapter(@Nullable Method value) { super(value); }
+
+				public MethodAdapter(IAdapter.IOptional<? extends Method, ?> copy) { this(requireNonNull(copy.getUnboxed())); }
+
+				public MethodAdapter(IAdapter<? extends Method, ?> copy) { this(requireNonNull(copy.get())); }
+
+
+				/* SECTION methods */
+
+				public Optional<?> invoke(@Nullable Object obj, Object... args) {
+					clearCaughtThrowable();
+					return get().map(t -> {
+						try { return t.invoke(obj, args); } catch (Throwable th) {
+							consumeCaught(th);
+							caughtThrowable.set(th);
+							return null;
+						}
+					});
+				}
+
+
+				/* SECTION static variables */
+
+				private static final MethodAdapter EMPTY = new MethodAdapter((Method) null);
+
+
+				/* SECTION static methods */
+
+				public static MethodAdapter empty() { return EMPTY; }
+
+				public static MethodAdapter of(@Nullable Method value) { return value == null ? empty() : new MethodAdapter(value); }
 			}
 
 
 			public static final class ConstructorAdapter<C> extends AccessibleObjectAdapter<Constructor<? extends C>, ConstructorAdapter<C>> {
 				/* SECTION constructors */
 
-				public ConstructorAdapter(Constructor<? extends C> value) { super(value); }
+				protected ConstructorAdapter(@Nullable Constructor<? extends C> value) { super(value); }
 
-				public ConstructorAdapter(INonnull<? extends Constructor<? extends C>, ?> copy) { this(copy.get()); }
+				public ConstructorAdapter(IAdapter.IOptional<? extends Constructor<? extends C>, ?> copy) { this(requireNonNull(copy.getUnboxed())); }
+
+				public ConstructorAdapter(IAdapter<? extends Constructor<? extends C>, ?> copy) { this(requireNonNull(copy.get())); }
 
 
 				/* SECTION methods */
 
-				public C newInstance(BiFunction<? super Throwable, ? super ConstructorAdapter<C>, Function<? super Object[], ? extends C>> callback, Object... args) { try { return get().newInstance(args); } catch (Throwable t) { return callback.apply(t, this).apply(args); } }
+				public Optional<C> newInstance(Object... args) {
+					clearCaughtThrowable();
+					return get().map(t -> {
+						try { return t.newInstance(args); } catch (Throwable th) {
+							consumeCaught(th);
+							caughtThrowable.set(th);
+							return null;
+						}
+					});
+				}
 
-				public C newInstance(Object... args) { return newInstance((t, u) -> v -> { throw rejectArguments(t, u, v); }, args); }
+
+				/* SECTION static variables */
+
+				private static final ConstructorAdapter<?> EMPTY = new ConstructorAdapter<>((Constructor<?>) null);
+
+
+				/* SECTION static methods */
+
+				public static <T> ConstructorAdapter<T> empty() { return castUncheckedUnboxedNonnull(EMPTY); }
+
+				public static <T> ConstructorAdapter<T> of(@Nullable Constructor<? extends T> value) { return value == null ? empty() : new ConstructorAdapter<>(value); }
 			}
 		}
 	}

@@ -2,7 +2,7 @@ package $group__.$modId__.common.registrable.creativetabs.templates;
 
 import net.minecraft.creativetab.CreativeTabs;
 
-import static $group__.$modId__.common.registrable.utilities.helpers.RegistryHelper.getNamespacedUnlocalizedNameForRegistry;
+import static $group__.$modId__.common.registrable.utilities.helpers.Registries.getNamespacedUnlocalizedNameForRegistry;
 import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 
 public abstract class CreativeTabsDefault extends CreativeTabs {

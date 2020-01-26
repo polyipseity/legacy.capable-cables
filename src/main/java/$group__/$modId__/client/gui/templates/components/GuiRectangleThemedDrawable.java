@@ -4,6 +4,7 @@ import $group__.$modId__.client.gui.utilities.constructs.IDrawable;
 import $group__.$modId__.client.gui.utilities.constructs.IThemed;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
+import $group__.$modId__.utilities.helpers.Casts;
 import $group__.$modId__.utilities.helpers.Colors;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
@@ -12,14 +13,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.meta.When;
 import java.awt.*;
 
-import static $group__.$modId__.client.gui.utilities.constructs.IThemed.tryCastThemedTo;
-import static $group__.$modId__.client.gui.utilities.helpers.Guis.popMatrix;
-import static $group__.$modId__.client.gui.utilities.helpers.Guis.pushMatrix;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -50,42 +48,33 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 
 	public void setDrawable(IDrawable<N, ?> drawable) { setDrawable(this, drawable); }
 
-	/** {@inheritDoc} */
 	@Override
 	public void setTheme(TH theme) {
-		IThemed<TH> t;
-		if ((t = tryCastThemedTo(drawable)) != null) t.setTheme(theme);
 		super.setTheme(theme);
+		Casts.<IThemed<TH>>castChecked(drawable, castUncheckedUnboxedNonnull(IThemed.class)).ifPresent(t -> t.setTheme(theme));
 	}
 
 
 	/* SECTION methods */
 
-	/** {@inheritDoc} */
 	@Override
 	public void draw(Minecraft client) {
-		pushMatrix();
 		super.draw(client);
 		getDrawable().draw(client);
-		popMatrix();
 	}
 
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() { return getToStringString(this, super.toString(),
 				new Object[]{"drawable", getDrawable()}); }
 
-	/** {@inheritDoc} */
 	@Override
 	public int hashCode() { return getHashCode(this, super.hashCode(), getDrawable(), getTheme()); }
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
 			t -> getDrawable().equals(t.getDrawable())); }
 
-	/** {@inheritDoc} */
 	@Override
 	public T clone() {
 		T r = super.clone();
@@ -94,9 +83,8 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 	}
 
 
-	/** {@inheritDoc} */
 	@Override
-	public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
 
 	/* SECTION static methods */
@@ -114,7 +102,7 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 	public static class Immutable<N extends Number, TH extends ITheme<TH>, T extends Immutable<N, TH, T>> extends GuiRectangleThemedDrawable<N, TH, T> {
 		/* SECTION constructors */
 
-		public Immutable(Rectangle<N, ?> rect, Color color, TH theme, IDrawable<N, ?> drawable) { super(rect.toImmutable(), tryToImmutableNonnull(color), tryToImmutableNonnull(theme), drawable.toImmutable()); }
+		public Immutable(Rectangle<N, ?> rect, Color color, TH theme, IDrawable<N, ?> drawable) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(color), tryToImmutableUnboxedNonnull(theme), drawable.toImmutable()); }
 
 		public Immutable(Rectangle<N, ?> rect, TH theme, IDrawable<N, ?> drawable) { this(rect, Colors.COLORLESS, theme, drawable); }
 
@@ -145,7 +133,7 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
-		public final T toImmutable() { return castUnchecked(this); }
+		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		/** {@inheritDoc} */
 		@Override

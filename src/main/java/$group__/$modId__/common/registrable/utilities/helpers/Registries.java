@@ -2,7 +2,7 @@ package $group__.$modId__.common.registrable.utilities.helpers;
 
 import net.minecraft.util.ResourceLocation;
 
-public enum RegistryHelper {
+public enum Registries {
 	/* MARK empty */ ;
 
 

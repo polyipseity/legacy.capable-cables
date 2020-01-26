@@ -1,5 +1,7 @@
 package $group__.$modId__.utilities.helpers;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.awt.*;
 
 public enum Colors {
@@ -28,5 +30,5 @@ public enum Colors {
 
 	/* SECTION static methods */
 
-	public static Color newColor(String s) { return new Color(Integer.parseInt(s.replace("#", ""), 16), true); }
+	public static Color newColor(String s) { return new Color(Integer.parseInt(s.replace("#", StringUtils.EMPTY), 16), true); }
 }

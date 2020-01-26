@@ -1,8 +1,8 @@
 package $group__.$modId__.common.registrable.blocks;
 
-import $group__.$modId__.common.registrable.Registerable;
+import $group__.$modId__.common.registrable.Registrable;
 import $group__.$modId__.common.registrable.blocks.templates.BlockDefault;
-import $group__.$modId__.common.registrable.creativetabs.CreativeTabsOwn;
+import $group__.$modId__.common.registrable.creativetabs.CreativeTabsThis;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -12,11 +12,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 
-public final class BlocksOwn extends Registerable<Block> {
+public final class BlocksThis extends Registrable<Block> {
 	/* SECTION variables */
 
 	@SuppressWarnings("unused")
-	public final Block cable = new BlockCable().setRegistryAndUnlocalizedName(MOD_ID, "cable").setUnlocalizedName("cable").setCreativeTab(CreativeTabsOwn.DEFAULT);
+	public final Block cable = new BlockCable().setRegistryAndUnlocalizedName(MOD_ID, "cable").setUnlocalizedName("cable").setCreativeTab(CreativeTabsThis.DEFAULT);
 
 
 	/* SECTION methods */
@@ -29,7 +29,7 @@ public final class BlocksOwn extends Registerable<Block> {
 
 	/* SECTION static variables */
 
-	public static final BlocksOwn INSTANCE = getInstance(BlocksOwn.class);
+	public static final BlocksThis INSTANCE = getInstance(BlocksThis.class);
 
 
 	/* REFERENCE block template */

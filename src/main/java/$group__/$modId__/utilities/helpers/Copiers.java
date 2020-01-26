@@ -3,6 +3,7 @@ package $group__.$modId__.utilities.helpers;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.ExternalCloneMethod;
 import $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable;
 import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.ConstructorAdapter;
+import $group__.$modId__.utilities.variables.Globals;
 import net.minecraft.util.ResourceLocation;
 
 import java.awt.*;
@@ -12,9 +13,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.*;
 import java.util.stream.Collectors;
 
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclaredConstructor;
-import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclaredConstructorNonnull;
 
 public enum Copiers {
 	/* MARK empty */ ;
@@ -42,10 +42,11 @@ public enum Copiers {
 
 	@ExternalCloneMethod(value = Collection.class, allowExtends = true)
 	public static <C extends Collection<E>, E> C copyCollection(C copy) {
-		Class<? extends C> cl = castUnchecked(copy.getClass());
+		Class<? extends C> cl = castUncheckedUnboxedNonnull(copy.getClass());
 		AtomicReference<Class<Object[]>> a = new AtomicReference<>(Object[].class);
-		ConstructorAdapter<? extends C> co = getDeclaredConstructorNonnull((t, u) -> v -> getDeclaredConstructor(u, a.getAndSet(null)), cl, cl);
+		ConstructorAdapter<? extends C> co = getDeclaredConstructor(cl, Collection.class);
+		co = co.get().isPresent() ? co : getDeclaredConstructor(cl, a.getAndSet(null));
 
-		return co.newInstance(a.get() == null ? copy.stream().map(ICloneable::tryClone).toArray() : copy.stream().map(ICloneable::tryClone).collect(Collectors.toList()));
+		return co.newInstance(a.get() == null ? copy.stream().map(ICloneable::tryClone).toArray() : copy.stream().map(ICloneable::tryClone).collect(Collectors.toList())).orElseThrow(Globals::rethrowCaughtThrowableStatic);
 	}
 }

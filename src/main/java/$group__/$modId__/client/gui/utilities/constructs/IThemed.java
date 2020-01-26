@@ -6,11 +6,9 @@ import $group__.$modId__.utilities.constructs.interfaces.IStructure;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import javax.annotation.Nullable;
 import java.awt.*;
 
-import static $group__.$modId__.utilities.helpers.Casts.castChecked;
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 
 @SideOnly(Side.CLIENT)
 public interface IThemed<T extends IThemed.ITheme<T>> {
@@ -25,16 +23,13 @@ public interface IThemed<T extends IThemed.ITheme<T>> {
 
 	static <T extends ITheme<T>> boolean isThemeInstanceOf(Class<T> t, Object o) { return o instanceof IThemed<?> && t.isAssignableFrom(((IThemed<?>) o).getTheme().getClass()); }
 
-	@Nullable
-	static <T extends ITheme<T>> IThemed<T> tryCastThemedTo(Object o) { try { return castChecked(o); } catch (ClassCastException e) { return null; } }
-
 
 	/* SECTION static classes */
 
 	interface ITheme<T extends ITheme<T>> extends IStructure<T> {
 		/* SECTION methods */
 
-		default T getTheme() { return castUnchecked(this); }
+		default T getTheme() { return castUncheckedUnboxedNonnull(this); }
 
 		default void drawRect(Rectangle<?, ?> rect, Color color) { Guis.drawRect(rect, color); }
 

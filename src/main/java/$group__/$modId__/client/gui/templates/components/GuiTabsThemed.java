@@ -3,6 +3,7 @@ package $group__.$modId__.client.gui.templates.components;
 import $group__.$modId__.client.gui.utilities.constructs.IDrawableThemed;
 import $group__.$modId__.client.gui.utilities.constructs.IThemed;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
+import $group__.$modId__.utilities.helpers.Casts;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -10,12 +11,12 @@ import javax.annotation.meta.When;
 import java.util.Arrays;
 import java.util.List;
 
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneNonnull;
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
@@ -36,9 +37,7 @@ public class GuiTabsThemed<N extends Number, TH extends IThemed.ITheme<TH>, T ex
 
 	@SuppressWarnings("varargs")
 	@SafeVarargs
-	public GuiTabsThemed(TH theme, int open, ITab<N, ?>... tabs) {
-		this(Arrays.asList(tabs), theme, open);
-	}
+	public GuiTabsThemed(TH theme, int open, ITab<N, ?>... tabs) { this(Arrays.asList(tabs), theme, open); }
 
 	public GuiTabsThemed(GuiTabsThemed<N, TH, ?> copy) { this(copy.getTabs(), copy.getTheme(), copy.getOpen()); }
 
@@ -58,7 +57,7 @@ public class GuiTabsThemed<N extends Number, TH extends IThemed.ITheme<TH>, T ex
 
 	/** {@inheritDoc} */
 	@Override
-	public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
 
 	/** {@inheritDoc} */
@@ -78,7 +77,7 @@ public class GuiTabsThemed<N extends Number, TH extends IThemed.ITheme<TH>, T ex
 	@Override
 	public T clone() {
 		T r = super.clone();
-		r.theme = tryCloneNonnull(theme);
+		r.theme = tryCloneUnboxedNonnull(theme);
 		return r;
 	}
 
@@ -89,7 +88,7 @@ public class GuiTabsThemed<N extends Number, TH extends IThemed.ITheme<TH>, T ex
 		t.theme = theme;
 
 		T th = t.getTheme();
-		t.getTabs().forEach(tab -> { if (tab instanceof IThemed<?>) castUnchecked(tab, (IThemed<T>) null).setTheme(th); });
+		t.getTabs().forEach(tab -> Casts.<IThemed<T>>castChecked(tab, castUncheckedUnboxedNonnull(IThemed.class)).ifPresent(t1 -> t1.setTheme(th)));
 	}
 
 
@@ -99,7 +98,7 @@ public class GuiTabsThemed<N extends Number, TH extends IThemed.ITheme<TH>, T ex
 	public static class Immutable<N extends Number, TH extends ITheme<TH>, T extends Immutable<N, TH, T>> extends GuiTabsThemed<N, TH, T> {
 		/* SECTION constructors */
 
-		public Immutable(List<ITab<N, ?>> tabs, TH theme, int open) { super(tryToImmutableNonnull(tabs), tryToImmutableNonnull(theme), tryToImmutableNonnull(open)); }
+		public Immutable(List<ITab<N, ?>> tabs, TH theme, int open) { super(tryToImmutableUnboxedNonnull(tabs), tryToImmutableUnboxedNonnull(theme), tryToImmutableUnboxedNonnull(open)); }
 
 		@SuppressWarnings("varargs")
 		@SafeVarargs
@@ -130,7 +129,7 @@ public class GuiTabsThemed<N extends Number, TH extends IThemed.ITheme<TH>, T ex
 		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
-		public final T toImmutable() { return castUnchecked(this); }
+		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		/** {@inheritDoc} */
 		@Override

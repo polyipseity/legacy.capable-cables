@@ -6,7 +6,7 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.ResourceLocation;
 
-import static $group__.$modId__.common.registrable.utilities.helpers.RegistryHelper.getNamespacedUnlocalizedNameForRegistry;
+import static $group__.$modId__.common.registrable.utilities.helpers.Registries.getNamespacedUnlocalizedNameForRegistry;
 
 public class BlockDefault extends Block implements IForgeRegistryEntryExtension<Block> {
 	/* SECTION constructors */

@@ -9,8 +9,8 @@ import javax.annotation.meta.When;
 import java.util.Arrays;
 import java.util.List;
 
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -56,7 +56,7 @@ public class Polygon4<N extends Number, T extends Polygon4<N, T>> extends Polygo
 
 	/** {@inheritDoc} */
 	@Override
-	public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
 
 	/* SECTION static classes */
@@ -64,7 +64,7 @@ public class Polygon4<N extends Number, T extends Polygon4<N, T>> extends Polygo
 	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends Polygon4<N, T> {
 		/* SECTION constructors */
 
-		public Immutable(List<XY<N, ?>> list) { super(tryToImmutableNonnull(list)); }
+		public Immutable(List<XY<N, ?>> list) { super(tryToImmutableUnboxedNonnull(list)); }
 
 		public Immutable(XY<N, ?> a, XY<N, ?> b, XY<N, ?> c, XY<N, ?> d) { this(Arrays.asList(a, b, c, d)); }
 
@@ -99,7 +99,7 @@ public class Polygon4<N extends Number, T extends Polygon4<N, T>> extends Polygo
 		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
-		public final T toImmutable() { return castUnchecked(this); }
+		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		/** {@inheritDoc} */
 		@Override

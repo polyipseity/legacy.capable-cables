@@ -23,7 +23,7 @@ import static $group__.$modId__.utilities.variables.Constants.*;
 		acceptedMinecraftVersions = ACCEPTED_MINECRAFT_VERSIONS,
 		certificateFingerprint = CERTIFICATE_FINGERPRINT,
 		updateJSON = UPDATE_JSON)
-public enum ModOwn {
+public enum ModThis {
 	/* SECTION enums */
 	INSTANCE;
 
@@ -59,7 +59,7 @@ public enum ModOwn {
 
 	@SuppressWarnings("SameReturnValue")
 	@Mod.InstanceFactory
-	public static ModOwn getInstance() { return INSTANCE; }
+	public static ModThis getInstance() { return INSTANCE; }
 
 
 	/* SECTION static classes */

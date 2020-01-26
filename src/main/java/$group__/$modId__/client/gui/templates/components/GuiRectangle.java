@@ -12,14 +12,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.meta.When;
 import java.awt.*;
 
-import static $group__.$modId__.client.gui.utilities.helpers.Guis.popMatrix;
-import static $group__.$modId__.client.gui.utilities.helpers.Guis.pushMatrix;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneNonnull;
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -56,17 +54,13 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 	/* SECTION methods */
 
 	@Override
-	public void draw(Minecraft client) {
-		pushMatrix();
-		Guis.drawRect(getRect(), getColor());
-		popMatrix();
-	}
+	public void draw(Minecraft client) { Guis.drawRect(getRect(), getColor()); }
 
 	@Override
 	public Rectangle<N, ?> spec() { return getRect(); }
 
 	@Override
-	public T toImmutable() { return castUnchecked(new Immutable<>(this)); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }
 
 
 	@Override
@@ -89,9 +83,9 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r;
-		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
+		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
 		r.rect = rect.clone();
-		r.color = tryCloneNonnull(color);
+		r.color = tryCloneUnboxedNonnull(color);
 		return r;
 	}
 
@@ -102,7 +96,7 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends GuiRectangle<N, T> {
 		/* SECTION constructors */
 
-		public Immutable(Rectangle<N, ?> rect, Color color) { super(rect.toImmutable(), tryToImmutableNonnull(color)); }
+		public Immutable(Rectangle<N, ?> rect, Color color) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(color)); }
 
 		public Immutable(GuiRectangle<N, ?> copy) { this(copy.getRect(), copy.getColor()); }
 
@@ -120,7 +114,7 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
-		public final T toImmutable() { return castUnchecked(this); }
+		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)

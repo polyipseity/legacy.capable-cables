@@ -11,7 +11,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.awt.*;
 
-import static $group__.$modId__.utilities.variables.References.Client.CLIENT;
+import static $group__.$modId__.utilities.variables.Globals.Client.CLIENT;
 
 @SuppressWarnings("SpellCheckingInspection")
 @SideOnly(Side.CLIENT)

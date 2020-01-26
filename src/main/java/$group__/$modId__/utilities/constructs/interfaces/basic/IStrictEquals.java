@@ -5,7 +5,7 @@ import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingS
 import javax.annotation.meta.When;
 import java.util.function.Function;
 
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
 public interface IStrictEquals {
@@ -25,7 +25,7 @@ public interface IStrictEquals {
 		if (t == o) return true;
 		if (!(equalsSuper && t.getClass().isAssignableFrom(o.getClass()))) return false;
 
-		O oc = castUnchecked(o);
+		O oc = castUncheckedUnboxedNonnull(o);
 		for (Function<O, Boolean> vp : v) if (!vp.apply(oc)) return false;
 		return true;
 	}

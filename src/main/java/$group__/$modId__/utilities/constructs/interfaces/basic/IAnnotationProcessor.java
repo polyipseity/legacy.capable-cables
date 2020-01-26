@@ -1,9 +1,11 @@
 package $group__.$modId__.utilities.constructs.interfaces.basic;
 
+import $group__.$modId__.utilities.variables.Globals;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
+import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 
 import javax.annotation.Nullable;
@@ -13,8 +15,9 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Set;
 
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.forName;
+import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclaredMethod;
 import static $group__.$modId__.utilities.helpers.Reflections.getMethodNameDescriptor;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
 
@@ -22,6 +25,9 @@ public interface IAnnotationProcessor<A extends Annotation> {
 	/* SECTION methods */
 
 	Class<A> annotationType();
+
+	boolean isProcessed();
+
 
 	void process(ASMDataTable asm);
 
@@ -37,25 +43,17 @@ public interface IAnnotationProcessor<A extends Annotation> {
 
 	/* SECTION static methods */
 
-	static String getMessage(IAnnotationProcessor<?> processor, @Nullable String msg) { return "Processing annotation '" + processor.annotationType() + "'" + (msg == null || msg.isEmpty() ? "" : ": " + msg); }
+	static String getMessage(IAnnotationProcessor<?> processor, @Nullable String msg) { return "Processing annotation '" + processor.annotationType() + "'" + (msg == null || msg.isEmpty() ? StringUtils.EMPTY : ": " + msg); }
 
 
-	static <T, A extends Annotation> A[] getEffectiveAnnotationsIfInheritingConsidered(IAnnotationProcessor<A> processor, Class<T> sub, Method m) {
+	static <A extends Annotation> A[] getEffectiveAnnotationsIfInheritingConsidered(IAnnotationProcessor<A> processor, Class<?> clazz, Method method) {
 		Class<A> aClass = processor.annotationType();
-		A[] r = castUnchecked(Array.newInstance(aClass, 0));
+		String mName = method.getName();
+		Class<?>[] mArgs = method.getParameterTypes();
 
-		Class<? super T> sc = sub;
-		String mName = m.getName();
-		Class<?>[] mArgs = m.getParameterTypes();
-		do { try { r = sc.getDeclaredMethod(mName, mArgs).getDeclaredAnnotationsByType(aClass); } catch (NoSuchMethodException ignored) {  /* MARK empty */ }
-		} while (r.length == 0 && (sc = sc.getSuperclass()) != null);
+		A[] r = castUncheckedUnboxedNonnull(Array.newInstance(aClass, 0));
+		do { r = getDeclaredMethod(clazz, mName, mArgs).get().map(t -> t.getDeclaredAnnotationsByType(aClass)).orElse(r); } while (r.length == 0 && (clazz = clazz.getSuperclass()) != null);
 
-		return r;
-	}
-
-	static <T, A extends Annotation> A[] getEffectiveAnnotationsIfInheritingConsideredNonEmpty(IAnnotationProcessor<A> processor, Class<T> sub, Method subM) {
-		A[] r = getEffectiveAnnotationsIfInheritingConsidered(processor, sub, subM);
-		if (r.length == 0) r = castUnchecked(Array.newInstance(r.getClass().getComponentType(), 1));
 		return r;
 	}
 
@@ -71,8 +69,7 @@ public interface IAnnotationProcessor<A extends Annotation> {
 		@Override
 		default void process(ASMDataTable asm) {
 			Set<ASMDataTable.ASMData> thisAsm = asm.getAll(annotationType().getName());
-
-			thisAsm.forEach(t -> processClass(new Result(asm, thisAsm, t, forName(t.getClassName(), false, getClass().getClassLoader()))));
+			thisAsm.forEach(t -> processClass(new Result(asm, thisAsm, t, forName(t.getClassName(), false, getClass().getClassLoader()).orElseThrow(Globals::rethrowCaughtThrowableStatic))));
 		}
 
 
@@ -145,7 +142,7 @@ public interface IAnnotationProcessor<A extends Annotation> {
 				@Override
 				default Method findElement(IClass.Result result) {
 					String mName = result.currentAsm.getObjectName();
-					Method r = null;
+					@Nullable Method r = null;
 					for (Method m : result.clazz.getDeclaredMethods()) {
 						if (mName.equals(getMethodNameDescriptor(m))) {
 							r = m;

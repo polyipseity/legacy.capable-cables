@@ -1,6 +1,7 @@
 package $group__.$modId__.utilities.constructs.interfaces.basic;
 
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.meta.When;
 import java.util.regex.Pattern;
@@ -29,6 +30,6 @@ public interface IStrictToString {
 			sb.append(var[0]).append("=").append(var[1]);
 			f = true;
 		}
-		return sb.append("}").append(stringSuper.replaceFirst(Pattern.quote(classN), "")).toString();
+		return sb.append("}").append(stringSuper.replaceFirst(Pattern.quote(classN), StringUtils.EMPTY)).toString();
 	}
 }

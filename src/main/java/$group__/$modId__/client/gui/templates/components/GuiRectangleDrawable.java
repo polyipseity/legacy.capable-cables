@@ -11,13 +11,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.meta.When;
 import java.awt.*;
 
-import static $group__.$modId__.client.gui.utilities.helpers.Guis.popMatrix;
-import static $group__.$modId__.client.gui.utilities.helpers.Guis.pushMatrix;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -53,15 +51,13 @@ public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawab
 
 	@Override
 	public void draw(Minecraft client) {
-		pushMatrix();
 		super.draw(client);
 		getDrawable().draw(client);
-		popMatrix();
 	}
 
 
 	@Override
-	public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
 	@Override
 	public String toString() { return getToStringString(this, super.toString(),
@@ -96,7 +92,7 @@ public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawab
 	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends GuiRectangleDrawable<N, T> {
 		/* SECTION constructors */
 
-		public Immutable(Rectangle<N, ?> rect, Color color, IDrawable<N, ?> drawable) { super(rect.toImmutable(), tryToImmutableNonnull(color), drawable.toImmutable()); }
+		public Immutable(Rectangle<N, ?> rect, Color color, IDrawable<N, ?> drawable) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(color), drawable.toImmutable()); }
 
 		public Immutable(Rectangle<N, ?> rect, IDrawable<N, ?> drawable) { this(rect, Colors.COLORLESS, drawable); }
 
@@ -119,7 +115,7 @@ public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawab
 
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
-		public final T toImmutable() { return castUnchecked(this); }
+		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)

@@ -5,7 +5,7 @@ import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingS
 
 import javax.annotation.meta.When;
 
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Comparables.greaterThan;
 import static $group__.$modId__.utilities.helpers.Comparables.lessThan;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
@@ -51,7 +51,7 @@ public interface IOperable<T extends IOperable<T, A>, A> {
 		@Override
 		@OverridingStatus(group = GROUP, when = When.MAYBE)
 		default T max(Iterable<? extends Number> o) {
-			T r = castUnchecked(clone());
+			T r = castUncheckedUnboxedNonnull(clone());
 			for (Number t : o) if (lessThan(r, t)) r = r.newInstanceFrom(t);
 			return r;
 		}
@@ -59,7 +59,7 @@ public interface IOperable<T extends IOperable<T, A>, A> {
 		@Override
 		@OverridingStatus(group = GROUP, when = When.MAYBE)
 		default T min(Iterable<? extends Number> o) {
-			T r = castUnchecked(clone());
+			T r = castUncheckedUnboxedNonnull(clone());
 			for (Number t : o) if (greaterThan(r, t)) r.newInstanceFrom(t);
 			return r;
 		}

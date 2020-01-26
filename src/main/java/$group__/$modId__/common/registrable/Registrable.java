@@ -1,7 +1,9 @@
 package $group__.$modId__.common.registrable;
 
-import $group__.$modId__.common.registrable.utilities.constructs.IEventBusSubscriber;
+import $group__.$modId__.common.registrable.utilities.constructs.IRegistrableEventBusSubscriber;
 import $group__.$modId__.utilities.constructs.classes.Singleton;
+import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.FieldAdapter;
+import $group__.$modId__.utilities.variables.Globals;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -11,14 +13,12 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.lang.reflect.Field;
 
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Grammar.appendSuffixIfPlural;
 import static $group__.$modId__.utilities.helpers.Reflections.getGenericSuperclassActualTypeArgument;
-import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
-import static $group__.$modId__.utilities.variables.References.LOGGER;
+import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 
-@SuppressWarnings("SpellCheckingInspection")
-public abstract class Registerable<T extends IForgeRegistryEntry<T>> extends Singleton {
+public abstract class Registrable<T extends IForgeRegistryEntry<T>> extends Singleton {
 	/* SECTION variables */
 
 	protected final Class<T> clazz;
@@ -26,7 +26,7 @@ public abstract class Registerable<T extends IForgeRegistryEntry<T>> extends Sin
 
 	/* SECTION constructors */
 
-	protected Registerable() { clazz = getGenericSuperclassActualTypeArgument(getClass(), 0); }
+	protected Registrable() { clazz = castUncheckedUnboxedNonnull(getGenericSuperclassActualTypeArgument(getClass(), 0)); }
 
 
 	/* SECTION methods */
@@ -36,8 +36,8 @@ public abstract class Registerable<T extends IForgeRegistryEntry<T>> extends Sin
 		String classGS = clazz.toGenericString();
 		LOGGER.info("Registration of '{}' started", classGS);
 		IForgeRegistry<T> reg = e.getRegistry();
-		int regEd = 0;
-		int evtRegEd = 0;
+		int regEd = 0,
+				evtRegEd = 0;
 		String evtRegGS = Mod.EventBusSubscriber.class.toGenericString();
 
 		{
@@ -46,11 +46,11 @@ public abstract class Registerable<T extends IForgeRegistryEntry<T>> extends Sin
 			LOGGER.info("Found {} field{} in '{}'", fs.length, appendSuffixIfPlural(fs.length, "s"), classGS);
 			for (Field f : fs) {
 				LOGGER.trace("Processing field '{}'", f.toGenericString());
-				try { v = f.get(this); } catch (IllegalAccessException ex) { throw unexpected(ex); }
+				v = FieldAdapter.of(f).get_(this).orElseThrow(Globals::rethrowCaughtThrowableStatic);
 				LOGGER.debug("Field '{}' value is '{}'", f.toGenericString(), v);
 				if (clazz.isAssignableFrom(v.getClass())) {
-					reg.register(castUnchecked(v));
-					if (v instanceof IEventBusSubscriber) {
+					reg.register(castUncheckedUnboxedNonnull(v));
+					if (v instanceof IRegistrableEventBusSubscriber) {
 						MinecraftForge.EVENT_BUS.register(v);
 						evtRegEd++;
 						LOGGER.debug("Registered '{}' as '{}'", v, evtRegGS);

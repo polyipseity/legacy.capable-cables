@@ -4,7 +4,7 @@ import $group__.$modId__.common.registrable.utilities.constructs.IForgeRegistryE
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 
-import static $group__.$modId__.common.registrable.utilities.helpers.RegistryHelper.getNamespacedUnlocalizedNameForRegistry;
+import static $group__.$modId__.common.registrable.utilities.helpers.Registries.getNamespacedUnlocalizedNameForRegistry;
 
 public class ItemDefault extends Item implements IForgeRegistryEntryExtension<Item> {
 	/* SECTION methods */

@@ -5,6 +5,7 @@ import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingS
 import $group__.$modId__.utilities.constructs.interfaces.basic.IOperable;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString;
 import $group__.$modId__.utilities.helpers.Primitives.Numbers;
+import $group__.$modId__.utilities.variables.Globals;
 import com.google.common.collect.Streams;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -14,11 +15,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneNonnull;
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -58,8 +59,8 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructureClone
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T negate() {
 		T r = clone();
-		r.x = Numbers.negate(r.getX());
-		r.y = Numbers.negate(r.getY());
+		r.x = Numbers.negate(r.getX()).orElseThrow(Globals::rethrowCaughtThrowableStatic);
+		r.y = Numbers.negate(r.getY()).orElseThrow(Globals::rethrowCaughtThrowableStatic);
 		return r;
 	}
 
@@ -68,15 +69,15 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructureClone
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T sum(Iterable<? extends XY<N, ?>> o) {
 		T r = clone();
-		r.x = Numbers.sum(r.getX(), extractXs(o));
-		r.y = Numbers.sum(r.getY(), extractYs(o));
+		r.x = Numbers.sum(r.getX(), extractXs(o)).orElseThrow(Globals::rethrowCaughtThrowableStatic);
+		r.y = Numbers.sum(r.getY(), extractYs(o)).orElseThrow(Globals::rethrowCaughtThrowableStatic);
 		return r;
 	}
 
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T sumX(Iterable<? extends XY<N, ?>> o) {
 		T r = clone();
-		r.x = Numbers.sum(r.getX(), extractXs(o));
+		r.x = Numbers.sum(r.getX(), extractXs(o)).orElseThrow(Globals::rethrowCaughtThrowableStatic);
 		return r;
 	}
 
@@ -87,7 +88,7 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructureClone
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T sumY(Iterable<? extends XY<N, ?>> o) {
 		T r = clone();
-		r.y = Numbers.sum(r.getY(), extractYs(o));
+		r.y = Numbers.sum(r.getY(), extractYs(o)).orElseThrow(Globals::rethrowCaughtThrowableStatic);
 		return r;
 	}
 
@@ -100,15 +101,15 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructureClone
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T max(Iterable<? extends XY<N, ?>> o) {
 		T r = clone();
-		r.x = Numbers.max(r.getX(), extractXs(o));
-		r.y = Numbers.max(r.getY(), extractYs(o));
+		r.x = Numbers.max(r.getX(), extractXs(o)).orElseThrow(Globals::rethrowCaughtThrowableStatic);
+		r.y = Numbers.max(r.getY(), extractYs(o)).orElseThrow(Globals::rethrowCaughtThrowableStatic);
 		return r;
 	}
 
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T maxX(Iterable<? extends XY<N, ?>> o) {
 		T r = clone();
-		r.x = Numbers.max(r.getX(), extractXs(o));
+		r.x = Numbers.max(r.getX(), extractXs(o)).orElseThrow(Globals::rethrowCaughtThrowableStatic);
 		return r;
 	}
 
@@ -119,7 +120,7 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructureClone
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T maxY(Iterable<? extends XY<N, ?>> o) {
 		T r = clone();
-		r.y = Numbers.max(r.getY(), extractYs(o));
+		r.y = Numbers.max(r.getY(), extractYs(o)).orElseThrow(Globals::rethrowCaughtThrowableStatic);
 		return r;
 	}
 
@@ -132,15 +133,15 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructureClone
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T min(Iterable<? extends XY<N, ?>> o) {
 		T r = clone();
-		r.x = Numbers.min(r.getX(), extractXs(o));
-		r.y = Numbers.min(r.getY(), extractYs(o));
+		r.x = Numbers.min(r.getX(), extractXs(o)).orElseThrow(Globals::rethrowCaughtThrowableStatic);
+		r.y = Numbers.min(r.getY(), extractYs(o)).orElseThrow(Globals::rethrowCaughtThrowableStatic);
 		return r;
 	}
 
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T minX(Iterable<? extends XY<N, ?>> o) {
 		T r = clone();
-		r.x = Numbers.min(getX(), extractXs(o));
+		r.x = Numbers.min(getX(), extractXs(o)).orElseThrow(Globals::rethrowCaughtThrowableStatic);
 		return r;
 	}
 
@@ -151,7 +152,7 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructureClone
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T minY(Iterable<? extends XY<N, ?>> o) {
 		T r = clone();
-		r.y = Numbers.min(r.getY(), extractYs(o));
+		r.y = Numbers.min(r.getY(), extractYs(o)).orElseThrow(Globals::rethrowCaughtThrowableStatic);
 		return r;
 	}
 
@@ -161,7 +162,7 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructureClone
 
 
 	@Override
-	public T toImmutable() { return castUnchecked(new Immutable<>(this)); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }
 
 	@Override
 	public boolean isImmutable() { return false; }
@@ -187,24 +188,24 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructureClone
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r;
-		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
-		r.x = tryCloneNonnull(x);
-		r.y = tryCloneNonnull(y);
+		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
+		r.x = tryCloneUnboxedNonnull(x);
+		r.y = tryCloneUnboxedNonnull(y);
 		return r;
 	}
 
 	
 	/* SECTION static methods */
 
-	@SuppressWarnings("UnstableApiUsage")
+	@SuppressWarnings({"UnstableApiUsage", "rawtypes", "RedundantSuppression"})
 	public static <N extends Number> List<N> extractXs(Iterable<? extends XY<N, ?>> o) { return Streams.stream(o).map(XY::getX).collect(Collectors.toList()); }
 
 	@SuppressWarnings("varargs")
 	@SafeVarargs
-	public static <N extends Number> List<N> extractXs(XY<N, ?>... o) { return extractYs(Arrays.asList(o)); }
+	public static <N extends Number> List<N> extractXs(XY<N, ?>... o) { return extractXs(Arrays.asList(o)); }
 
 
-	@SuppressWarnings("UnstableApiUsage")
+	@SuppressWarnings({"UnstableApiUsage", "rawtypes", "RedundantSuppression"})
 	public static <N extends Number> List<N> extractYs(Iterable<? extends XY<N, ?>> o) { return Streams.stream(o).map(XY::getY).collect(Collectors.toList()); }
 
 	@SuppressWarnings("varargs")
@@ -218,7 +219,7 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructureClone
 	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends XY<N, T> {
 		/* SECTION constructors */
 
-		public Immutable(N x, N y) { super(tryToImmutableNonnull(x), tryToImmutableNonnull(y)); }
+		public Immutable(N x, N y) { super(tryToImmutableUnboxedNonnull(x), tryToImmutableUnboxedNonnull(y)); }
 
 		public Immutable(XY<N, ?> copy) { this(copy.getX(), copy.getY()); }
 
@@ -239,7 +240,7 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructureClone
 		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
-		public final T toImmutable() { return castUnchecked(this); }
+		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		/** {@inheritDoc} */
 		@Override

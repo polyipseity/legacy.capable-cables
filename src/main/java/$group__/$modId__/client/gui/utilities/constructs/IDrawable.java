@@ -7,7 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import static $group__.$modId__.utilities.variables.References.Client.CLIENT;
+import static $group__.$modId__.utilities.variables.Globals.Client.CLIENT;
 
 @SideOnly(Side.CLIENT)
 public interface IDrawable<N extends Number, T extends IDrawable<N, T>> extends IStructureCloneable<T>, ISpec<Rectangle<N, ?>> {

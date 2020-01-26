@@ -59,7 +59,7 @@ boolean checkMavenMetadata(String metadataUrl, File metadataFile, String properA
     File file = file "$metadataFile.absolutePath.$algorithmName"
     String url = "$metadataUrl.$algorithmName"
     try { download url, file } catch (FileNotFoundException e) {
-        logger.log LogLevel.WARN, "$properAlgorithmName file \'$url\' for \'$metadataUrl\' not found."
+        logger.log LogLevel.WARN, "$properAlgorithmName file \'$url\' for \'$metadataUrl\' NOT found."
         if (strictDigestCheck) throw e
         else e.printStackTrace()
         return true
@@ -113,7 +113,7 @@ void updateGradleWrapperDistributionUrl(String newDistributionUrl) {
 
 Object parseLastGoodSettings(boolean print) {
     File jsonFile = file lastGoodSettingsPath
-    if (!jsonFile.exists()) throw new FileNotFoundException("'$lastGoodSettingsPath' not found. Obtain '$lastGoodSettingsPath' from the repository.")
+    if (!jsonFile.exists()) throw new FileNotFoundException("'$lastGoodSettingsPath' NOT found. Obtain '$lastGoodSettingsPath' from the repository.")
     String jsonText = jsonFile.text
     if (print) {
         logger.info "\'${convertToCanonicalPath lastGoodSettingsPath}\':"

@@ -11,7 +11,7 @@ import javax.annotation.meta.When;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
@@ -66,7 +66,7 @@ public class Frame<N extends Number, T extends Frame<N, T>> implements IStructur
 
 	/** {@inheritDoc} */
 	@Override
-	public T toImmutable() { return castUnchecked(new Immutable<>(this)); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }
 
 	/** {@inheritDoc} */
 	@Override
@@ -98,7 +98,7 @@ public class Frame<N extends Number, T extends Frame<N, T>> implements IStructur
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r;
-		try { r = castUnchecked(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
+		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
 		r.tl = tl.clone();
 		r.br = br.clone();
 		return r;
@@ -152,7 +152,7 @@ public class Frame<N extends Number, T extends Frame<N, T>> implements IStructur
 		 */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
-		public final T toImmutable() { return castUnchecked(this); }
+		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		/**
 		 * {@inheritDoc}

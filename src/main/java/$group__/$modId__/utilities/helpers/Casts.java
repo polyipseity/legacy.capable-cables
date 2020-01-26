@@ -1,7 +1,15 @@
 package $group__.$modId__.utilities.helpers;
 
+import $group__.$modId__.utilities.variables.Globals;
+
 import javax.annotation.Nullable;
-import java.util.function.Function;
+import java.util.Optional;
+
+import static $group__.$modId__.utilities.helpers.Assertions.assertNonnull;
+import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
+import static $group__.$modId__.utilities.helpers.Throwables.cast;
+import static $group__.$modId__.utilities.variables.Globals.clearCaughtThrowableStatic;
+import static $group__.$modId__.utilities.variables.Globals.setCaughtThrowableStatic;
 
 public enum Casts {
 	/* MARK empty */ ;
@@ -10,38 +18,24 @@ public enum Casts {
 	/* SECTION static methods */
 
 	@SuppressWarnings("unchecked")
-	public static <T, R extends T> R castUncheckedExtended(Object o, @SuppressWarnings("unused") @Nullable T t) throws ClassCastException { return (R) o; }
-
-	public static <T, R extends T> R castUncheckedExtended(T o) throws ClassCastException { return castUncheckedExtended(o, null); }
-
-	public static <T> T castUnchecked(Object o, @Nullable T t) { return castUncheckedExtended(o, t); }
-
-	public static <T> T castUnchecked(Object o) { return castUncheckedExtended(o); }
-
-	@SuppressWarnings("ConstantConditions")
-	@Nullable
-	public static <T> T castUncheckedExtendedNullable(@Nullable Object o, @Nullable T t) { return castUncheckedExtended(o, t); }
+	public static <T> Optional<T> castUnchecked(@Nullable Object o) { return Optional.ofNullable((T) o); }
 
 	@Nullable
-	public static <T> T castUncheckedExtendedNullable(@Nullable Object o) { return castUncheckedExtendedNullable(o, null); }
+	public static <T> T castUncheckedUnboxed(@Nullable Object o) { return unboxOptional(castUnchecked(o)); }
 
-	@SuppressWarnings("ConstantConditions")
-	@Nullable
-	public static <T> T castUncheckedNullable(@Nullable Object o, @Nullable T t) { return castUnchecked(o, t); }
-
-	@Nullable
-	public static <T> T castUncheckedNullable(@Nullable Object o) { return castUncheckedNullable(o, null); }
+	public static <T> T castUncheckedUnboxedNonnull(Object o) { return assertNonnull(castUncheckedUnboxed(o)); }
 
 
-	@Nullable
-	public static <O, T extends O> T castChecked(Function<O, T> callback, O o, @Nullable T t) { try { return castUnchecked(o, t); } catch (ClassCastException e) { return callback.apply(o); } }
-
-	@Nullable
-	public static <O, T extends O> T castChecked(O o, @Nullable T t) { return castChecked(t1 -> null, o, t); }
+	public static <T> Optional<T> castChecked(@Nullable Object o, Class<T> type) {
+		clearCaughtThrowableStatic();
+		Optional<T> r = Casts.<T>castUnchecked(o).filter(t -> type.isAssignableFrom(t.getClass()));
+		if (!(r.isPresent() || o == null))
+			try { throw cast(o, type); } catch (ClassCastException e) { setCaughtThrowableStatic(e); }
+		return r;
+	}
 
 	@Nullable
-	public static <O, T extends O> T castChecked(Function<O, T> callback, O o) { return castChecked(callback, o, null); }
+	public static <T> T castCheckedUnboxed(@Nullable Object o, Class<T> type) { return unboxOptional(castChecked(o, type)); }
 
-	@Nullable
-	public static <O, T extends O> T castChecked(O o) { return castChecked(t -> null, o); }
+	public static <T> T castCheckedUnboxedNonnull(Object o, Class<T> type) { return Casts.castChecked(o, type).orElseThrow(Globals::rethrowCaughtThrowableStatic); }
 }

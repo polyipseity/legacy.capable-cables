@@ -11,14 +11,12 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.meta.When;
 import java.awt.*;
 
-import static $group__.$modId__.client.gui.utilities.helpers.Guis.popMatrix;
-import static $group__.$modId__.client.gui.utilities.helpers.Guis.pushMatrix;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneNonnull;
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
@@ -54,16 +52,12 @@ public class GuiRectangleThemed<N extends Number, TH extends IThemed.ITheme<TH>,
 
 	/** {@inheritDoc} */
 	@Override
-	public void draw(Minecraft client) {
-		pushMatrix();
-		getTheme().drawRect(getRect(), getColor());
-		popMatrix();
-	}
+	public void draw(Minecraft client) { getTheme().drawRect(getRect(), getColor()); }
 
 
 	/** {@inheritDoc} */
 	@Override
-	public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
 
 	/** {@inheritDoc} */
@@ -83,7 +77,7 @@ public class GuiRectangleThemed<N extends Number, TH extends IThemed.ITheme<TH>,
 	@Override
 	public T clone() {
 		T r = super.clone();
-		r.theme = tryCloneNonnull(theme);
+		r.theme = tryCloneUnboxedNonnull(theme);
 		return r;
 	}
 
@@ -93,7 +87,7 @@ public class GuiRectangleThemed<N extends Number, TH extends IThemed.ITheme<TH>,
 	public static class Immutable<N extends Number, TH extends ITheme<TH>, T extends Immutable<N, TH, T>> extends GuiRectangleThemed<N, TH, T> {
 		/* SECTION constructors */
 
-		public Immutable(Rectangle<N, ?> rect, Color color, TH theme) { super(rect.toImmutable(), tryToImmutableNonnull(color), tryToImmutableNonnull(theme)); }
+		public Immutable(Rectangle<N, ?> rect, Color color, TH theme) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(color), tryToImmutableUnboxedNonnull(theme)); }
 
 		public Immutable(GuiRectangleThemed<N, TH, ?> copy) { this(copy.getRect(), copy.getColor(), copy.getTheme()); }
 
@@ -118,7 +112,7 @@ public class GuiRectangleThemed<N extends Number, TH extends IThemed.ITheme<TH>,
 		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
-		public final T toImmutable() { return castUnchecked(this); }
+		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		/** {@inheritDoc} */
 		@Override

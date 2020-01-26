@@ -12,12 +12,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.meta.When;
 import java.awt.*;
 
-import static $group__.$modId__.client.gui.utilities.helpers.Guis.*;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
+import static $group__.$modId__.client.gui.utilities.helpers.Guis.bindTexture;
+import static $group__.$modId__.client.gui.utilities.helpers.Guis.reset;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneNonnull;
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
@@ -60,17 +61,15 @@ public class GuiResource<N extends Number, TN extends Number, T extends GuiResou
 	/** {@inheritDoc} */
 	@Override
 	public void draw(Minecraft client) {
-		pushMatrix();
 		reset();
 		bindTexture(getResource());
 		Guis.drawModalRectWithCustomSizedTexture(getRect(), getTexture());
-		popMatrix();
 	}
 
 
 	/** {@inheritDoc} */
 	@Override
-	public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
 
 	/** {@inheritDoc} */
@@ -87,7 +86,7 @@ public class GuiResource<N extends Number, TN extends Number, T extends GuiResou
 	@Override
 	public T clone() {
 		T r = super.clone();
-		r.resource = tryCloneNonnull(resource);
+		r.resource = tryCloneUnboxedNonnull(resource);
 		r.texture = texture.clone();
 		return r;
 	}
@@ -99,7 +98,7 @@ public class GuiResource<N extends Number, TN extends Number, T extends GuiResou
 	public static class Immutable<N extends Number, TE extends Number, T extends Immutable<N, TE, T>> extends GuiResource<N, TE, T> {
 		/* SECTION constructors */
 
-		public Immutable(Rectangle<N, ?> rect, ResourceLocation resource, Rectangle<TE, ?> texture) { super(rect.toImmutable(), tryToImmutableNonnull(resource), texture.toImmutable()); }
+		public Immutable(Rectangle<N, ?> rect, ResourceLocation resource, Rectangle<TE, ?> texture) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(resource), texture.toImmutable()); }
 
 		public Immutable(GuiResource<N, TE, ?> copy) { super(copy.getRect(), copy.getResource(), copy.getTexture()); }
 
@@ -120,7 +119,7 @@ public class GuiResource<N extends Number, TN extends Number, T extends GuiResou
 		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
-		public final T toImmutable() { return castUnchecked(this); }
+		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		/** {@inheritDoc} */
 		@Override

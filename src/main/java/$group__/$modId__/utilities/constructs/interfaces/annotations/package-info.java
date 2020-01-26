@@ -1,6 +1,7 @@
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
+@LocalVariablesAreNonnullByDefault
 package $group__.$modId__.utilities.constructs.interfaces.annotations;
 
 import mcp.MethodsReturnNonnullByDefault;

@@ -1,9 +1,12 @@
 package $group__.$modId__.utilities.constructs.interfaces.annotations;
 
 import $group__.$modId__.utilities.constructs.classes.concrete.throwables.AnnotationProcessingException;
+import net.minecraftforge.fml.common.discovery.ASMDataTable;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.reflections.Reflections;
 
+import javax.annotation.Nullable;
 import javax.annotation.meta.When;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -16,8 +19,8 @@ import java.util.concurrent.ExecutionException;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IAnnotationProcessor.*;
 import static $group__.$modId__.utilities.helpers.Reflections.*;
 import static $group__.$modId__.utilities.helpers.Throwables.throw_;
-import static $group__.$modId__.utilities.helpers.Throwables.wrapUnhandledThrowable;
-import static $group__.$modId__.utilities.variables.References.LOGGER;
+import static $group__.$modId__.utilities.helpers.Throwables.wrapCheckedThrowable;
+import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -42,23 +45,30 @@ public @interface OverridingStatus {
 		INSTANCE;
 
 
+		/* SECTION variables */
+
+		private volatile boolean processed = false;
+
+
 		/* SECTION methods */
 
-		/** {@inheritDoc} */
 		@Override
 		public Class<OverridingStatus> annotationType() { return OverridingStatus.class; }
 
-		/** {@inheritDoc} */
+		@Override
+		public boolean isProcessed() { return processed; }
+
+
 		@Override
 		public void processMethod(Result<OverridingStatus> result) {
 			OverridingStatus a = result.annotations[0];
 			When when = a.when();
-			Boolean whenB = when == When.ALWAYS ? Boolean.TRUE : when == When.NEVER ? Boolean.FALSE : null;
+			@Nullable Boolean whenB = when == When.ALWAYS ? Boolean.TRUE : when == When.NEVER ? Boolean.FALSE : null;
 			if (when == When.UNKNOWN) return;
 
 			Reflections refs;
 			String g = a.group();
-			try { refs = REFLECTIONS_CACHE.get(g); } catch (ExecutionException e) { throw wrapUnhandledThrowable(e); }
+			try { refs = REFLECTIONS_CACHE.get(g); } catch (ExecutionException e) { throw wrapCheckedThrowable(e); }
 
 			Class<?> superC = result.clazz;
 			Method superM = result.element;
@@ -100,9 +110,15 @@ public @interface OverridingStatus {
 						}
 					}
 
-					throw throw_(new AnnotationProcessingException(getMessage(this, "Unfulfilled requirement: subclass '" + subC.toGenericString() + "' -" + (whenB ? "Y" : "X") + "> method '" + superM.toGenericString() + "' (" + a + "), instead: subclass '" + subC.toGenericString() + "' -" + (whenB ? "X" : "") + "> method '" + superM.toGenericString() + "'")));
+					throw throw_(new AnnotationProcessingException(getMessage(this, "Unfulfilled requirement: subclass '" + subC.toGenericString() + "' -" + (whenB ? "Y" : "X") + "> method '" + superM.toGenericString() + "' (" + a + "), instead: subclass '" + subC.toGenericString() + "' -" + (whenB ? "X" : StringUtils.EMPTY) + "> method '" + superM.toGenericString() + "'")));
 				}
 			}
+		}
+
+		@Override
+		public void process(ASMDataTable asm) {
+			IMethod.super.process(asm);
+			processed = true;
 		}
 	}
 }

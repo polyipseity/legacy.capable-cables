@@ -1,7 +1,7 @@
 package $group__.$modId__.common.registrable.creativetabs;
 
 import $group__.$modId__.common.registrable.creativetabs.templates.CreativeTabsDefault;
-import $group__.$modId__.common.registrable.items.ItemsOwn;
+import $group__.$modId__.common.registrable.items.ItemsThis;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.init.Items;
@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 
-public enum CreativeTabsOwn {
+public enum CreativeTabsThis {
 	/* MARK empty */ ;
 
 
@@ -23,7 +23,7 @@ public enum CreativeTabsOwn {
 		/** {@inheritDoc} */
 		@Override
 		@SideOnly(Side.CLIENT)
-		public ItemStack getTabIconItem() { return new ItemStack(ItemsOwn.INSTANCE.wrench); }
+		public ItemStack getTabIconItem() { return new ItemStack(ItemsThis.INSTANCE.wrench); }
 	};
 
 
@@ -31,7 +31,7 @@ public enum CreativeTabsOwn {
 
 	// COMMENT using a function here to avoid registering the tab
 	@SuppressWarnings("unused")
-	private static final Function<CreativeTabsOwn, CreativeTabs> TEMPLATE_ = t -> new CreativeTabsDefault("template_") {
+	private static final Function<CreativeTabsThis, CreativeTabs> TEMPLATE_ = t -> new CreativeTabsDefault("template_") {
 		/** {@inheritDoc} */
 		@Override
 		@SideOnly(Side.CLIENT) // COMMENT IMPORTANT!

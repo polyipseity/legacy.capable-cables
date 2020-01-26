@@ -69,7 +69,7 @@ ext {
     pre = pre.toBoolean()
     releaseCandidate = releaseCandidate.toInteger()
     if (this.'final' && pre) throw new IllegalArgumentException('"final" and "pre" are both "true"!')
-    if ((this.'final' || pre) && releaseCandidate != 0) throw new IllegalArgumentException("'${this.'final' ? 'final' : 'pre'}' is 'true' while 'releaseCandidate' is not '0' but '$releaseCandidate'.")
+    if ((this.'final' || pre) && releaseCandidate != 0) throw new IllegalArgumentException("'${this.'final' ? 'final' : 'pre'}' is 'true' while 'releaseCandidate' is NOT '0' but '$releaseCandidate'.")
 
 
     // COMMENT mod

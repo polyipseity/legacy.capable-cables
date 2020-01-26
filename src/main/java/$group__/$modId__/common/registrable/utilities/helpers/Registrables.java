@@ -16,7 +16,10 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BiFunction;
 
-public enum RegistrableHelper {
+import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
+
+@SuppressWarnings("SpellCheckingInspection")
+public enum Registrables {
 	/* MARK empty */ ;
 
 
@@ -32,12 +35,12 @@ public enum RegistrableHelper {
 
 
 		public static boolean checkNoEntityCollision(IBlockState state, World world, BlockPos pos) {
-			AxisAlignedBB collision = state.getCollisionBoundingBox(world, pos);
+			@Nullable AxisAlignedBB collision = state.getCollisionBoundingBox(world, pos);
 			return collision == null || world.checkNoEntityCollision(collision.offset(pos));
 		}
 	}
 
-	public enum NBT {
+	public enum NBTs {
 		/* MARK empty */ ;
 
 
@@ -61,17 +64,13 @@ public enum RegistrableHelper {
 
 		/* SECTION static methods */
 
-		@Nullable
-		public static Integer lookupNBTType(Class<?> clazz) {
+		public static Optional<Integer> lookupNBTType(Class<?> clazz) {
 			Integer ret = NBT_TYPE_LOOKUP.get(clazz.getSimpleName());
 			if (ret == null) ret = RAW_NBT_TYPE_LOOKUP.get(clazz.getSimpleName().toUpperCase(Locale.ROOT));
-			return ret;
+			return Optional.ofNullable(ret);
 		}
 
-		@SuppressWarnings("ConstantConditions")
-		public static int lookupNBTTypeNonnull(Class<?> clazz) {
-			return lookupNBTType(clazz);
-		}
+		public static int lookupNBTTypeNonnull(Class<?> clazz) { return lookupNBTType(clazz).orElseThrow(() -> rejectArguments(clazz)); }
 
 
 		@SuppressWarnings("UnusedReturnValue")
@@ -88,13 +87,11 @@ public enum RegistrableHelper {
 			return true;
 		}
 
-		@Nullable
-		public static <C> C readChildIfHasKey(@Nullable NBTTagCompound p, String key, Class<C> type, BiFunction<NBTTagCompound, String, C> f) {
-			if (p != null && p.hasKey(key, lookupNBTTypeNonnull(type))) return f.apply(p, key);
-			return null;
+		public static <C> Optional<C> readChildIfHasKey(@Nullable NBTTagCompound p, String key, Class<C> type, BiFunction<NBTTagCompound, String, C> f) {
+			if (p != null && p.hasKey(key, lookupNBTTypeNonnull(type))) return Optional.of(f.apply(p, key));
+			return Optional.empty();
 		}
 
-		@Nullable
-		public static NBTTagCompound returnTagIfNotEmpty(NBTTagCompound p) { return p.getSize() == 0 ? null : p; }
+		public static Optional<NBTTagCompound> returnTagIfNotEmpty(NBTTagCompound p) { return p.getSize() == 0 ? Optional.empty() : Optional.of(p); }
 	}
 }

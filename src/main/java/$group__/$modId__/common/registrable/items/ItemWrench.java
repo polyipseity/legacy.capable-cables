@@ -1,9 +1,9 @@
 package $group__.$modId__.common.registrable.items;
 
-import $group__.$modId__.ModOwn;
+import $group__.$modId__.ModThis;
 import $group__.$modId__.common.inventory.ContainerWrench;
 import $group__.$modId__.common.registrable.items.templates.ItemUnstackable;
-import $group__.$modId__.common.registrable.utilities.constructs.IEventBusSubscriber;
+import $group__.$modId__.common.registrable.utilities.constructs.IRegistrableEventBusSubscriber;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IStruct;
 import buildcraft.api.tools.IToolWrench;
 import cofh.api.item.IToolHammer;
@@ -33,18 +33,21 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import javax.annotation.Nullable;
+import java.util.concurrent.atomic.AtomicReference;
 
-import static $group__.$modId__.common.registrable.utilities.helpers.RegistrableHelper.Blocks.checkNoEntityCollision;
-import static $group__.$modId__.common.registrable.utilities.helpers.RegistrableHelper.Blocks.getPosition;
-import static $group__.$modId__.common.registrable.utilities.helpers.RegistrableHelper.NBT.*;
+import static $group__.$modId__.common.registrable.utilities.helpers.Registrables.Blocks.checkNoEntityCollision;
+import static $group__.$modId__.common.registrable.utilities.helpers.Registrables.Blocks.getPosition;
+import static $group__.$modId__.common.registrable.utilities.helpers.Registrables.NBTs.*;
+import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
 import static $group__.$modId__.utilities.helpers.Throwables.requireRunOnceOnly;
-import static $group__.$modId__.utilities.variables.References.*;
+import static $group__.$modId__.utilities.helpers.Tracking.markUnused;
+import static $group__.$modId__.utilities.variables.Globals.*;
 
 @Optional.InterfaceList({
 		@Optional.Interface(iface = COFH_CORE_PACKAGE + ".api.item.IToolHammer", modid = COFH_CORE_ID),
 		@Optional.Interface(iface = BUILDCRAFT_API_PACKAGE + ".api.tools.IToolWrench", modid = BUILDCRAFT_API_ID)
 })
-public class ItemWrench extends ItemUnstackable implements IEventBusSubscriber, IToolHammer, IToolWrench {
+public class ItemWrench extends ItemUnstackable implements IRegistrableEventBusSubscriber, IToolHammer, IToolWrench {
 	/* SECTION methods */
 
 	/** {@inheritDoc} */
@@ -122,7 +125,7 @@ public class ItemWrench extends ItemUnstackable implements IEventBusSubscriber, 
 
 	/* SECTION static variables */
 
-	public static final Configuration CONFIGURATION = ModOwn.Configuration.behavior.items.wrench;
+	public static final Configuration CONFIGURATION = ModThis.Configuration.behavior.items.wrench;
 
 
 	/* SECTION static methods */
@@ -163,7 +166,7 @@ public class ItemWrench extends ItemUnstackable implements IEventBusSubscriber, 
 						LOGGER.error("Cannot create block state ID {}", tag.pickedUpBlockState);
 						return false;
 					} else if (tag.pickedUpBlockTile != null) {
-						TileEntity tile = state.getBlock().createTileEntity(world, state);
+						@Nullable TileEntity tile = state.getBlock().createTileEntity(world, state);
 						if (tile == null) {
 							LOGGER.error("Cannot create tile entity of block state ID {}", tag.pickedUpBlockState);
 							return false;
@@ -175,7 +178,7 @@ public class ItemWrench extends ItemUnstackable implements IEventBusSubscriber, 
 					tag.pickedUpBlockState = null;
 					stack.setTagCompound(tag.serializeNBT());
 				} else if (tag.pickedUpEntity != null) {
-					EntityLivingBase entity = (EntityLivingBase) EntityList.createEntityFromNBT(tag.pickedUpEntity, world);
+					@Nullable EntityLivingBase entity = (EntityLivingBase) EntityList.createEntityFromNBT(tag.pickedUpEntity, world);
 					if (entity == null) {
 						LOGGER.error("Cannot create entity with tag '{}'", tag.pickedUpEntity);
 						return false;
@@ -187,7 +190,7 @@ public class ItemWrench extends ItemUnstackable implements IEventBusSubscriber, 
 				} else {
 					BlockPos pos = target.getBlockPos();
 					IBlockState state = user.world.getBlockState(pos);
-					TileEntity tile = state.getBlock().hasTileEntity(state) ? world.getTileEntity(pos) : null;
+					@Nullable TileEntity tile = state.getBlock().hasTileEntity(state) ? world.getTileEntity(pos) : null;
 					tag.pickedUpBlockState = Block.getStateId(state);
 					if (tile != null) {
 						tag.pickedUpBlockTile = tile.serializeNBT();
@@ -247,20 +250,21 @@ public class ItemWrench extends ItemUnstackable implements IEventBusSubscriber, 
 				setChildIfNotNull(pickup, "entity", pickedUpEntity, NBTTagCompound::setTag);
 				setTagIfNotEmpty(tag, "pickup", pickup);
 			}
-			return returnTagIfNotEmpty(tag);
+			return unboxOptional(returnTagIfNotEmpty(tag));
 		}
 
 		/** {@inheritDoc} */
 		@Override
-		public void deserializeNBT(@Nullable NBTTagCompound nbt) {
+		public void deserializeNBT(@Nullable NBTTagCompound tag) {
 			{
-				NBTTagCompound pickup = readChildIfHasKey(nbt, "pickup", NBTTagCompound.class, NBTTagCompound::getCompoundTag);
+				AtomicReference<NBTTagCompound> pickup = new AtomicReference<>();
+				readChildIfHasKey(tag, "pickup", NBTTagCompound.class, NBTTagCompound::getCompoundTag).ifPresent(pickup::set);
 				{
-					pickedUpBlock = readChildIfHasKey(pickup, "block", NBTTagCompound.class, NBTTagCompound::getCompoundTag);
-					pickedUpBlockState = readChildIfHasKey(pickedUpBlock, "state", int.class, NBTTagCompound::getInteger);
-					pickedUpBlockTile = readChildIfHasKey(pickedUpBlock, "tile", NBTTagCompound.class, NBTTagCompound::getCompoundTag);
+					readChildIfHasKey(pickup.get(), "block", NBTTagCompound.class, NBTTagCompound::getCompoundTag).ifPresent(t -> pickedUpBlock = t);
+					readChildIfHasKey(pickedUpBlock, "state", int.class, NBTTagCompound::getInteger).ifPresent(t -> pickedUpBlockState = t);
+					readChildIfHasKey(pickedUpBlock, "tile", NBTTagCompound.class, NBTTagCompound::getCompoundTag).ifPresent(t -> pickedUpBlockTile = t);
 				}
-				pickedUpEntity = readChildIfHasKey(pickup, "entity", NBTTagCompound.class, NBTTagCompound::getCompoundTag);
+				readChildIfHasKey(pickup.get(), "entity", NBTTagCompound.class, NBTTagCompound::getCompoundTag).ifPresent(t -> pickedUpEntity = t);
 			}
 		}
 	}
@@ -291,6 +295,6 @@ public class ItemWrench extends ItemUnstackable implements IEventBusSubscriber, 
 
 		/* SECTION static variables */
 
-		public static final String LANG_KEY_BASE = ModOwn.Configuration.Behavior.Items.LANG_KEY_BASE + ".wrench";
+		public static final String LANG_KEY_BASE = ModThis.Configuration.Behavior.Items.LANG_KEY_BASE + ".wrench";
 	}
 }

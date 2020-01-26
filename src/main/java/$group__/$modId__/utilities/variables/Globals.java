@@ -1,8 +1,9 @@
 package $group__.$modId__.utilities.variables;
 
-import $group__.$modId__.ModOwn;
+import $group__.$modId__.ModThis;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
 import $group__.$modId__.common.registrable.utilities.constructs.ResourceLocationDefault;
+import $group__.$modId__.utilities.constructs.interfaces.basic.IThrowableCatcher;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.minecraft.client.Minecraft;
@@ -15,20 +16,36 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
-import static java.util.Objects.requireNonNull;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
+import static $group__.$modId__.utilities.helpers.Throwables.consumeCaught;
 
-public enum References {
-	/* MARK empty */ ;
+public enum Globals implements IThrowableCatcher {
+	/* SECTION enums */
+	INSTANCE;
+
+
+	/* SECTION methods */
+
+	@Override
+	public Optional<Throwable> getCaughtThrowable() { return Optional.ofNullable(CAUGHT_THROWABLE.get()); }
+
+	@Override
+	public void clearCaughtThrowable() { CAUGHT_THROWABLE.set(null); }
+
+
+	public void setCaughtThrowable(Throwable t) {
+		consumeCaught(t);
+		CAUGHT_THROWABLE.set(t);
+	}
 
 
 	/* SECTION static variables */
 
-	public static final ModOwn MOD = ModOwn.INSTANCE;
-	public static final Logger LOGGER = ModOwn.LOGGER;
+	public static final ModThis MOD = ModThis.INSTANCE;
+	public static final Logger LOGGER = ModThis.LOGGER;
 
 	@SuppressWarnings({"SpellCheckingInspection", "RedundantSuppression"})
 	public static final String
@@ -38,22 +55,25 @@ public enum References {
 			BUILDCRAFT_API_PACKAGE = "buildcraft";
 
 
+	public static final ThreadLocal<Throwable> CAUGHT_THROWABLE = new ThreadLocal<>();
+
+
 	/* SECTION static methods */
 
-	public static <T> T markUnused(Class<T> t) {
-		T r = null;
-		for (Map.Entry<Class<?>, Object> entry : Constants.PRIMITIVE_DATA_TYPES.entrySet()) {
-			if (entry.getKey().isAssignableFrom(t)) {
-				r = castUnchecked(entry.getValue());
-				break;
-			}
-		}
-		return requireNonNull(r);
-	}
+	public static Optional<Throwable> getCaughtThrowableStatic() { return INSTANCE.getCaughtThrowable(); }
 
-	@SuppressWarnings("SameReturnValue")
 	@Nullable
-	public static <T> T markUnused() { return null; }
+	public static Throwable getCaughtThrowableUnboxedStatic() { return INSTANCE.getCaughtThrowableUnboxed(); }
+
+	public static Throwable getCaughtThrowableUnboxedNonnullStatic() { return INSTANCE.getCaughtThrowableUnboxedNonnull(); }
+
+	public static void clearCaughtThrowableStatic() { INSTANCE.clearCaughtThrowable(); }
+
+	public static void rethrowCaughtThrowableStatic(boolean nullable) { INSTANCE.rethrowCaughtThrowable(nullable); }
+
+	public static RuntimeException rethrowCaughtThrowableStatic() { throw INSTANCE.rethrowCaughtThrowable(); }
+
+	public static void setCaughtThrowableStatic(Throwable t) { INSTANCE.setCaughtThrowable(t); }
 
 
 	/* SECTION static classes */
@@ -82,7 +102,7 @@ public enum References {
 
 
 		@SubscribeEvent
-		public static void preInitGui(GuiScreenEvent.InitGuiEvent.Pre e) { PRE_INIT_GUI_LISTENER.asMap().forEach((k, v) -> v.accept(e, castUnchecked(k))); }
+		public static void preInitGui(GuiScreenEvent.InitGuiEvent.Pre e) { PRE_INIT_GUI_LISTENER.asMap().forEach((k, v) -> v.accept(e, castUncheckedUnboxedNonnull(k))); }
 
 		@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
 		public static void preInitGuiForResolution(GuiScreenEvent.InitGuiEvent.Pre e) { resolution = new ScaledResolution(CLIENT); }

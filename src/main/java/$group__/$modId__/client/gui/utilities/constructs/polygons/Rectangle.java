@@ -8,11 +8,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.meta.When;
 import java.util.List;
 
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 import static com.google.common.collect.ImmutableSet.of;
@@ -95,7 +95,7 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 
 	/** {@inheritDoc} */
 	@Override
-	public T toImmutable() { return castUnchecked((Object) new Immutable<>(this)); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
 
 	/** {@inheritDoc} */
@@ -132,7 +132,7 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 
 		public Immutable(XY<N, ?> offset, XY<N, ?> size) {
 			super(offset.toImmutable(), size.toImmutable());
-			list = tryToImmutableNonnull(list);
+			list = tryToImmutableUnboxedNonnull(list);
 		}
 
 		public Immutable(N offsetX, N offsetY, N sizeX, N sizeY) { this(new XY<>(offsetX, offsetY), new XY<>(sizeX, sizeY)); }
@@ -164,7 +164,7 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
-		public final T toImmutable() { return castUnchecked(this); }
+		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		/** {@inheritDoc} */
 		@Override

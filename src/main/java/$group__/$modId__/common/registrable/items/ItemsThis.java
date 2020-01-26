@@ -1,7 +1,7 @@
 package $group__.$modId__.common.registrable.items;
 
-import $group__.$modId__.common.registrable.Registerable;
-import $group__.$modId__.common.registrable.creativetabs.CreativeTabsOwn;
+import $group__.$modId__.common.registrable.Registrable;
+import $group__.$modId__.common.registrable.creativetabs.CreativeTabsThis;
 import $group__.$modId__.common.registrable.items.templates.ItemDefault;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
@@ -11,11 +11,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 
-public final class ItemsOwn extends Registerable<Item> {
+public final class ItemsThis extends Registrable<Item> {
 	/* SECTION variables */
 
 	@SuppressWarnings("unused")
-	public final Item wrench = new ItemWrench().setRegistryAndUnlocalizedName(MOD_ID, "wrench").setCreativeTab(CreativeTabsOwn.DEFAULT);
+	public final Item wrench = new ItemWrench().setRegistryAndUnlocalizedName(MOD_ID, "wrench").setCreativeTab(CreativeTabsThis.DEFAULT);
 
 
 	/* SECTION methods */
@@ -28,7 +28,7 @@ public final class ItemsOwn extends Registerable<Item> {
 
 	/* SECTION static variables */
 
-	public static final ItemsOwn INSTANCE = getInstance(ItemsOwn.class);
+	public static final ItemsThis INSTANCE = getInstance(ItemsThis.class);
 
 
 	/* REFERENCE item template */
