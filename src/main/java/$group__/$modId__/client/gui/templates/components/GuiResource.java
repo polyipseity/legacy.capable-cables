@@ -13,7 +13,6 @@ import javax.annotation.meta.When;
 import java.awt.*;
 
 import static $group__.$modId__.client.gui.utilities.helpers.Guis.bindTexture;
-import static $group__.$modId__.client.gui.utilities.helpers.Guis.reset;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
@@ -61,9 +60,8 @@ public class GuiResource<N extends Number, TN extends Number, T extends GuiResou
 	/** {@inheritDoc} */
 	@Override
 	public void draw(Minecraft client) {
-		reset();
 		bindTexture(getResource());
-		Guis.drawModalRectWithCustomSizedTexture(getRect(), getTexture());
+		Guis.drawModalRectWithCustomSizedTexture(this, getRect(), getTexture());
 	}
 
 

@@ -1,6 +1,5 @@
 package $group__.$modId__.client.gui.templates;
 
-import $group__.$modId__.client.gui.utilities.constructs.XY;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
 import $group__.$modId__.utilities.constructs.interfaces.basic.ISpec;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -14,12 +13,13 @@ public abstract class GuiContainerDefault<N extends Number> extends GuiContainer
 
 	/* SECTION methods */
 
+	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 	@Override
 	public void initGui() {
-		XY<N, ?> s = spec().getSize();
-		xSize = s.getX().intValue();
-		ySize = s.getY().intValue();
-
+		spec().map(Rectangle::getSize).ifPresent(t -> {
+			xSize = t.getX().intValue();
+			ySize = t.getY().intValue();
+		});
 		super.initGui();
 	}
 }

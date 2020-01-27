@@ -4,7 +4,6 @@ import $group__.$modId__.client.gui.utilities.constructs.IDrawableThemed;
 import $group__.$modId__.client.gui.utilities.constructs.IThemed;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -49,11 +48,6 @@ public class GuiRectangleThemed<N extends Number, TH extends IThemed.ITheme<TH>,
 
 
 	/* SECTION methods */
-
-	/** {@inheritDoc} */
-	@Override
-	public void draw(Minecraft client) { getTheme().drawRect(getRect(), getColor()); }
-
 
 	/** {@inheritDoc} */
 	@Override

@@ -3,21 +3,20 @@ package $group__.$modId__.client.gui.templates.components;
 import $group__.$modId__.client.gui.utilities.constructs.IDrawable;
 import $group__.$modId__.client.gui.utilities.constructs.IDrawableThemed;
 import $group__.$modId__.client.gui.utilities.constructs.IThemed;
-import $group__.$modId__.client.gui.utilities.constructs.XY;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString;
 import $group__.$modId__.utilities.helpers.Casts;
 import $group__.$modId__.utilities.helpers.Throwables;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.meta.When;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
@@ -31,39 +30,38 @@ import static $group__.$modId__.utilities.variables.Constants.GROUP;
 import static com.google.common.collect.ImmutableSet.of;
 
 @SideOnly(Side.CLIENT)
-public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui implements IDrawable<N, T> {
+public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends GuiTabs<N, E, T>> extends GuiGroup<N, E, T> {
 	/* SECTION variables */
 
-	protected List<ITab<N, ?>> tabs;
 	protected int open;
 
 
 	/* SECTION constructors */
 
-	public GuiTabs(List<ITab<N, ?>> tabs, int open) {
-		this.tabs = tabs;
+	public GuiTabs(List<? extends E> tabs, int open) {
+		super(tabs);
 		setOpen(this, open);
 	}
 
 	@SuppressWarnings("varargs")
 	@SafeVarargs
-	public GuiTabs(int open, ITab<N, ?>... tabs) { this(Arrays.asList(tabs), open); }
+	public GuiTabs(int open, E... tabs) { this(Arrays.asList(tabs), open); }
 
-	public GuiTabs(GuiTabs<N, ?> copy) { this(copy.getTabs(), copy.getOpen()); }
+	public GuiTabs(GuiTabs<N, ? extends E, ?> copy) { this(copy.getTabs(), copy.getOpen()); }
 
 
 	/* SECTION getters & setters */
 
-	public List<ITab<N, ?>> getTabs() { return tabs; }
+	public List<E> getTabs() { return (List<E>) getElements(); }
 
-	public void setTabs(List<ITab<N, ?>> tabs, int open) {
-		this.tabs = tabs;
-		setOpen(open);
+	public void setTabs(List<? extends E> tabs, int open) {
+		setElements(tabs);
+		setOpen(this, open);
 	}
 
 	@SuppressWarnings("varargs")
 	@SafeVarargs
-	public final void setTabs(int open, ITab<N, ?>... tabs) { setTabs(Arrays.asList(tabs), open); }
+	public final void setTabs(int open, E... tabs) { setTabs(Arrays.asList(tabs), open); }
 
 	public int getOpen() { return open; }
 
@@ -72,106 +70,81 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 
 	/* SECTION methods */
 
-	/** {@inheritDoc} */
 	@Override
-	public Rectangle<N, ?> spec() {
-		List<ITab<N, ?>> t = getTabs();
-		Rectangle<N, ?> f = t.get(0).spec();
-		Rectangle<N, ?>[] r = castUncheckedUnboxedNonnull(t.subList(1, t.size()).stream().map(IDrawable::spec).toArray(Rectangle<?, ?>[]::new));
-		XY<N, ?> min = f.min().min(Arrays.stream(r).map(Rectangle::min).collect(Collectors.toList()));
-		return new Rectangle<>(min, f.max().max(Arrays.stream(r).map(Rectangle::max).collect(Collectors.toList())).sum(of(min.negate())));
-	}
+	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
 
-	/** {@inheritDoc} */
-	@Override
-	public void draw(Minecraft client) { getTabs().forEach(t -> t.draw(client)); }
-
-
-	/** {@inheritDoc} */
-	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }
-
-
-	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public String toString() {
 		return getToStringString(this, super.toString(),
-				new Object[]{"tabs", getTabs()},
 				new Object[]{"open", getOpen()});
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public int hashCode() { return getHashCode(this, super.hashCode(), getTabs(), getOpen()); }
+	public int hashCode() { return getHashCode(this, super.hashCode(), getOpen()); }
 
-	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
-			t -> getOpen() == t.getOpen(),
-			t -> getTabs().equals(t.getTabs())); }
+			t -> getOpen() == t.getOpen()); }
 
-	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
-		T r;
-		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) { throw Throwables.unexpected(e); }
-		r.tabs = tryCloneUnboxedNonnull(tabs);
+		T r = super.clone();
+		r.open = tryCloneUnboxedNonnull(open);
 		return r;
 	}
 
 
 	/* SECTION static methods */
 
-	protected static void setOpen(GuiTabs<?, ?> t, int open) {
-		int bound = t.getTabs().size();
+	protected static void setOpen(GuiTabs<?, ?, ?> t, int open) {
+		int bound = t.getElements().size();
 		if (bound <= open) throw rejectIndexOutOfBounds(bound, open);
 		t.open = open;
 		open = t.getOpen();
 
 		int i = 0;
-		for (ITab<?, ?> tab : t.getTabs()) { tab.setOpen(i++ == open); }
+		for (ITab<?, ?> tab : t.getElements()) { tab.setOpen(i++ == open); }
 	}
 
 
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends GuiTabs<N, T> {
+	public static class Immutable<N extends Number, E extends ITab<N, ?>, T extends Immutable<N, E, T>> extends GuiTabs<N, E, T> {
 		/* SECTION constructors */
 
-		public Immutable(List<ITab<N, ?>> tabs, int open) { super(tryToImmutableUnboxedNonnull(tabs), tryToImmutableUnboxedNonnull(open)); }
+		public Immutable(List<? extends E> tabs, int open) { super(tryToImmutableUnboxedNonnull(tabs), tryToImmutableUnboxedNonnull(open)); }
 
 		@SuppressWarnings("varargs")
 		@SafeVarargs
-		public Immutable(int open, ITab<N, ?>... tabs) { this(Arrays.asList(tabs), open); }
+		public Immutable(int open, E... tabs) { this(Arrays.asList(tabs), open); }
 
-		public Immutable(GuiTabs<N, ?> copy) { this(copy.getTabs(), copy.getOpen()); }
+		public Immutable(GuiTabs<N, ? extends E, ?> copy) { this(copy.getTabs(), copy.getOpen()); }
 
 
 		/* SECTION getters & setters */
 
-		/** {@inheritDoc} */
 		@Override
-		public void setTabs(List<ITab<N, ?>> iTabs, int open) { throw rejectUnsupportedOperation(); }
+		public void setElements(Collection<? extends E> elements) { throw rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
+		@Override
+		public void setTabs(List<? extends E> tabs, int open) { throw rejectUnsupportedOperation(); }
+
 		@Override
 		public void setOpen(int open) { throw rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final boolean isImmutable() { return true; }
@@ -186,19 +159,15 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 		void setOpen(boolean open);
 
 
-		/** {@inheritDoc} */
 		@Override
 		String toString();
 
-		/** {@inheritDoc} */
 		@Override
 		int hashCode();
 
-		/** {@inheritDoc} */
 		@Override
 		boolean equals(Object o);
 
-		/** {@inheritDoc} */
 		@Override
 		T clone();
 
@@ -237,11 +206,9 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 			public void setContent(IDrawable<N, T> content) { this.content = content; }
 
 
-			/** {@inheritDoc} */
 			@Override
 			public boolean isOpen() { return open; }
 
-			/** {@inheritDoc} */
 			@Override
 			public void setOpen(boolean open) { this.open = open; }
 
@@ -252,22 +219,17 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 			protected void merge() { /* MARK empty */ }
 
 
-			/** {@inheritDoc} */
 			@Override
-			public Rectangle<N, ?> spec() {
-				Rectangle<N, ?> aSpec = getAccess().spec();
-				Rectangle<N, ?> cSpec = getContent().spec();
-				if (isOpen()) {
-					XY<N, ?> min = aSpec.min().min(of(cSpec.min()));
-					return new Rectangle<>(min, aSpec.max().max(of(cSpec.max())).sum(of(min.negate())));
-				} else {
-					XY<N, ?> min = aSpec.min();
-					return new Rectangle<>(min, aSpec.max().sum(of(min.negate())));
-				}
+			public Optional<Rectangle<N, ?>> spec() {
+				Optional<? extends Rectangle<N, ?>> aSpec = getAccess().spec(),
+						cSpec = getContent().spec();
+				if (isOpen() && cSpec.isPresent())
+					return aSpec.map(t -> t.min().min(of(cSpec.get().min()))).<Optional<Rectangle<N, ?>>>map(min -> Optional.of(new Rectangle<>(min, aSpec.get().max().max(of(cSpec.get().max())).sum(of(min.negate()))))).orElseGet(() -> castUncheckedUnboxedNonnull(cSpec));
+				else
+					return castUncheckedUnboxedNonnull(aSpec);
 			}
 
 
-			/** {@inheritDoc} */
 			@Override
 			public void draw(Minecraft client) {
 				getAccess().draw(client);
@@ -278,12 +240,10 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 			}
 
 
-			/** {@inheritDoc} */
 			@Override
 			public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }
 
 
-			/** {@inheritDoc} */
 			@Override
 			@OverridingStatus(group = GROUP, when = When.MAYBE)
 			public String toString() { return getToStringString(this, super.toString(),
@@ -291,12 +251,10 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 						new Object[]{"content", getContent()},
 						new Object[]{"open", isOpen()}); }
 
-			/** {@inheritDoc} */
 			@Override
 			@OverridingStatus(group = GROUP, when = When.MAYBE)
 			public int hashCode() { return getHashCode(this, super.hashCode(), getContent(), getAccess(), isOpen()); }
 
-			/** {@inheritDoc} */
 			@Override
 			@OverridingStatus(group = GROUP, when = When.MAYBE)
 			public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
@@ -304,7 +262,6 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 					t -> getContent().equals(t.getContent()),
 					t -> isOpen() == t.isOpen()); }
 
-			/** {@inheritDoc} */
 			@Override
 			@OverridingStatus(group = GROUP, when = When.MAYBE)
 			public T clone() {
@@ -331,27 +288,22 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 
 				/* SECTION getters & setters */
 
-				/** {@inheritDoc} */
 				@Override
 				public void setContent(IDrawable<N, T> content) { throw rejectUnsupportedOperation(); }
 
-				/** {@inheritDoc} */
 				@Override
 				public void setAccess(IDrawable<N, T> access) { throw rejectUnsupportedOperation(); }
 
-				/** {@inheritDoc} */
 				@Override
 				public void setOpen(boolean open) { throw rejectUnsupportedOperation(); }
 
 
 				/* SECTION methods */
 
-				/** {@inheritDoc} */
 				@Override
 				@OverridingStatus(group = GROUP, when = When.NEVER)
 				public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
-				/** {@inheritDoc} */
 				@Override
 				@OverridingStatus(group = GROUP, when = When.NEVER)
 				public final boolean isImmutable() { return true; }
@@ -363,19 +315,15 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 	public interface ITabThemed<N extends Number, TH extends IThemed.ITheme<TH>, T extends ITabThemed<N, TH, T>> extends ITab<N, T>, IDrawableThemed<N, TH, T> {
 		/* SECTION methods */
 
-		/** {@inheritDoc} */
 		@Override
 		String toString();
 
-		/** {@inheritDoc} */
 		@Override
 		int hashCode();
 
-		/** {@inheritDoc} */
 		@Override
 		boolean equals(Object o);
 
-		/** {@inheritDoc} */
 		@Override
 		T clone();
 
@@ -403,32 +351,26 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 
 			/* SECTION getters & setters */
 
-			/** {@inheritDoc} */
 			@Override
 			public TH getTheme() { return theme; }
 
-			/** {@inheritDoc} */
 			@Override
 			public void setTheme(TH theme) { setTheme(this, theme); }
 
 
 			/* SECTION methods */
 
-			/** {@inheritDoc} */
 			@Override
 			public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
 
-			/** {@inheritDoc} */
 			@Override
 			public String toString() { return IStrictToString.getToStringString(this, super.toString(),
 						new Object[]{"theme", getTheme()}); }
 
-			/** {@inheritDoc} */
 			@Override
 			public int hashCode() { return getHashCode(this, super.hashCode(), getTheme()); }
 
-			/** {@inheritDoc} */
 			@Override
 			public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
 					t -> getTheme().equals(t.getTheme())); }
@@ -467,31 +409,25 @@ public class GuiTabs<N extends Number, T extends GuiTabs<N, T>> extends Gui impl
 
 				/* SECTION getters & setters */
 
-				/** {@inheritDoc} */
 				@Override
 				public void setOpen(boolean open) { throw rejectUnsupportedOperation(); }
 
-				/** {@inheritDoc} */
 				@Override
 				public void setContent(IDrawable<N, T> content) { throw rejectUnsupportedOperation(); }
 
-				/** {@inheritDoc} */
 				@Override
 				public void setAccess(IDrawable<N, T> access) { throw rejectUnsupportedOperation(); }
 
-				/** {@inheritDoc} */
 				@Override
 				public void setTheme(TH theme) { throw rejectUnsupportedOperation(); }
 
 
 				/* SECTION methods */
 
-				/** {@inheritDoc} */
 				@Override
 				@OverridingStatus(group = GROUP, when = When.NEVER)
 				public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
-				/** {@inheritDoc} */
 				@Override
 				@OverridingStatus(group = GROUP, when = When.NEVER)
 				public final boolean isImmutable() { return true; }

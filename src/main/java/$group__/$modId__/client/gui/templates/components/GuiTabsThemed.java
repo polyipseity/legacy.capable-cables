@@ -21,7 +21,7 @@ import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOp
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
 @SideOnly(Side.CLIENT)
-public class GuiTabsThemed<N extends Number, TH extends IThemed.ITheme<TH>, T extends GuiTabsThemed<N, TH, T>> extends GuiTabs<N, T> implements IDrawableThemed<N, TH, T> {
+public class GuiTabsThemed<N extends Number, E extends GuiTabs.ITab<N, ?>, TH extends IThemed.ITheme<TH>, T extends GuiTabsThemed<N, E, TH, T>> extends GuiTabs<N, E, T> implements IDrawableThemed<N, TH, T> {
 	/* SECTION variables */
 
 	@SuppressWarnings("NotNullFieldNotInitialized")
@@ -30,46 +30,40 @@ public class GuiTabsThemed<N extends Number, TH extends IThemed.ITheme<TH>, T ex
 
 	/* SECTION constructors */
 
-	public GuiTabsThemed(List<ITab<N, ?>> tabs, TH theme, int open) {
+	public GuiTabsThemed(List<? extends E> tabs, TH theme, int open) {
 		super(tabs, open);
 		setTheme(this, theme);
 	}
 
 	@SuppressWarnings("varargs")
 	@SafeVarargs
-	public GuiTabsThemed(TH theme, int open, ITab<N, ?>... tabs) { this(Arrays.asList(tabs), theme, open); }
+	public GuiTabsThemed(TH theme, int open, E... tabs) { this(Arrays.asList(tabs), theme, open); }
 
-	public GuiTabsThemed(GuiTabsThemed<N, TH, ?> copy) { this(copy.getTabs(), copy.getTheme(), copy.getOpen()); }
+	public GuiTabsThemed(GuiTabsThemed<N, ? extends E, TH, ?> copy) { this(copy.getTabs(), copy.getTheme(), copy.getOpen()); }
 
 
 	/* SECTION getters & setters */
 
-	/** {@inheritDoc} */
 	@Override
 	public void setTheme(TH theme) { setTheme(this, theme); }
 
-	/** {@inheritDoc} */
 	@Override
 	public TH getTheme() { return theme; }
 
 
 	/* SECTION methods */
 
-	/** {@inheritDoc} */
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
 
-	/** {@inheritDoc} */
 	@Override
 	public String toString() { return getToStringString(this, super.toString(),
 				new Object[]{"theme", getTheme()}); }
 
-	/** {@inheritDoc} */
 	@Override
 	public int hashCode() { return getHashCode(this, super.hashCode(), getTheme()); }
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
 			t -> getTheme().equals(t.getTheme())); }
@@ -84,7 +78,7 @@ public class GuiTabsThemed<N extends Number, TH extends IThemed.ITheme<TH>, T ex
 
 	/* SECTION static methods */
 
-	protected static <T extends ITheme<T>> void setTheme(GuiTabsThemed<?, T, ?> t, T theme) {
+	protected static <T extends ITheme<T>> void setTheme(GuiTabsThemed<?, ?, T, ?> t, T theme) {
 		t.theme = theme;
 
 		T th = t.getTheme();
@@ -95,43 +89,38 @@ public class GuiTabsThemed<N extends Number, TH extends IThemed.ITheme<TH>, T ex
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, TH extends ITheme<TH>, T extends Immutable<N, TH, T>> extends GuiTabsThemed<N, TH, T> {
+	public static class Immutable<N extends Number, E extends ITab<N, ?>, TH extends ITheme<TH>, T extends Immutable<N, E, TH, T>> extends GuiTabsThemed<N, E, TH, T> {
 		/* SECTION constructors */
 
-		public Immutable(List<ITab<N, ?>> tabs, TH theme, int open) { super(tryToImmutableUnboxedNonnull(tabs), tryToImmutableUnboxedNonnull(theme), tryToImmutableUnboxedNonnull(open)); }
+		public Immutable(List<? extends E> tabs, TH theme, int open) { super(tryToImmutableUnboxedNonnull(tabs), tryToImmutableUnboxedNonnull(theme), tryToImmutableUnboxedNonnull(open)); }
 
 		@SuppressWarnings("varargs")
 		@SafeVarargs
-		public Immutable(TH theme, int open, ITab<N, ?>... tabs) {
+		public Immutable(TH theme, int open, E... tabs) {
 			this(Arrays.asList(tabs), theme, open);
 		}
 
-		public Immutable(GuiTabsThemed<N, TH, ?> copy) { this(copy.getTabs(), copy.getTheme(), copy.getOpen()); }
+		public Immutable(GuiTabsThemed<N, ? extends E, TH, ?> copy) { this(copy.getTabs(), copy.getTheme(), copy.getOpen()); }
 
 
 		/* SECTION getters & setters */
 
-		/** {@inheritDoc} */
 		@Override
-		public void setTabs(List<ITab<N, ?>> iTabs, int open) { throw rejectUnsupportedOperation(); }
+		public void setTabs(List<? extends E> iTabs, int open) { throw rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setOpen(int open) { throw rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setTheme(TH theme) { throw rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final boolean isImmutable() { return true; }

@@ -11,6 +11,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.meta.When;
 import java.awt.*;
+import java.util.Optional;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
@@ -54,10 +55,10 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 	/* SECTION methods */
 
 	@Override
-	public void draw(Minecraft client) { Guis.drawRect(getRect(), getColor()); }
+	public void draw(Minecraft client) { Guis.drawRect(this, getRect(), getColor()); }
 
 	@Override
-	public Rectangle<N, ?> spec() { return getRect(); }
+	public Optional<Rectangle<N, ?>> spec() { return Optional.of(getRect().clone()); }
 
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }

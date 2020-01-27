@@ -16,6 +16,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.Optional;
+
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 
@@ -23,7 +25,7 @@ import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOp
 public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<EnumTheme> {
 	/* SECTION variables */
 
-	protected GuiTabsThemed<Number, EnumTheme, ?> tabs;
+	protected GuiTabsThemed<Number, GuiTabs.ITab<Number, ?>, EnumTheme, ?> tabs;
 	protected ItemStack stack;
 	protected EnumTheme theme;
 
@@ -36,10 +38,9 @@ public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<En
 		this.stack = stack;
 		this.theme = theme;
 
-		GuiTabsThemed<Number, EnumTheme, ?> tabs = TABS.clone();
+		tabs = TABS.clone();
 		tabs.setOpen(open);
 		tabs.setTheme(theme);
-		this.tabs = tabs;
 	}
 
 	public GuiWrench(Container container, ItemStack stack) { this(container, stack, EnumTheme.NONE, 0); }
@@ -47,10 +48,10 @@ public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<En
 
 	/* SECTION getters & setters */
 
-	public GuiTabsThemed<Number, EnumTheme, ?> getTabs() { return tabs; }
+	public GuiTabsThemed<Number, GuiTabs.ITab<Number, ?>, EnumTheme, ?> getTabs() { return tabs; }
 
 	@SuppressWarnings("unused")
-	public void setTabs(GuiTabsThemed<Number, EnumTheme, ?> tabs) { throw rejectUnsupportedOperation(); }
+	public void setTabs(GuiTabsThemed<Number, GuiTabs.ITab<Number, ?>, EnumTheme, ?> tabs) { throw rejectUnsupportedOperation(); }
 
 	public ItemStack getStack() { return stack; }
 
@@ -70,11 +71,8 @@ public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<En
 
 	/* SECTION methods */
 
-	/** {@inheritDoc} */
 	@Override
-	public Rectangle<Number, ?> spec() {
-		return tabs.spec();
-	}
+	public Optional<Rectangle<Number, ?>> spec() { return tabs.spec(); }
 
 
 	/** {@inheritDoc} */
@@ -85,18 +83,18 @@ public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<En
 	/* SECTION static variables */
 
 	@SuppressWarnings({"unchecked", "RedundantSuppression"})
-	protected static final GuiTabsThemed<Number, EnumTheme, ?> TABS = new GuiTabsThemed<>(
+	protected static final GuiTabsThemed<Number, GuiTabs.ITab<Number, ?>, EnumTheme, ?> TABS = new GuiTabsThemed<>(
 			EnumTheme.NONE,
 			0,
 			new GuiTabs.ITabThemed.Impl<>(
 					new GuiRectangleThemedDrawable<>(
 							new Rectangle<>(new XY<>(new X<>(0.1F), new Y<>(0.1F, -16)), new XY<>(16, 16)),
-							EnumTheme.NONE,
 							new GuiResource<>(
 									new Rectangle<>(new XY<>(new X<>(0.1F), new Y<>(0.1F, -16)), new XY<>(16, 16)),
 									Globals.Client.Resources.GUI_WRENCH,
 									Globals.Client.Resources.GUI_WRENCH_INFO
-							)
+							),
+							EnumTheme.NONE
 					),
 					new GuiRectangleThemed<>(
 							new Rectangle<>(new XY<>(new X<>(0.1F), new Y<>(0.1F)), new XY<>(new X<>(0.8F), new Y<>(0.8F))),
