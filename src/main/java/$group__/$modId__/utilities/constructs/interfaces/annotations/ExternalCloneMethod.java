@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IAnnotationProcessor.getMessage;
 import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclaredMethod;
@@ -69,7 +70,8 @@ public @interface ExternalCloneMethod {
 		public Class<ExternalCloneMethod> annotationType() { return ExternalCloneMethod.class; }
 	} : null;
 
-	LoadingCache<Class<?>, ExternalCloneMethod> EXTERNAL_CLONE_METHOD_ANNOTATIONS_CACHE = CacheBuilder.newBuilder().maximumWeight(100).weigher((k, v) -> v == CLONE_METHOD_DEFAULT_ANNOTATION ? 1 : 0).removalListener((RemovalNotification<Class<?>, ExternalCloneMethod> t) -> LOGGER.debug("Default clone method '{}' cached for class '{}' evicted", CLONE_METHOD_DEFAULT.get().orElseThrow(Throwables::unexpected), t.getKey().toGenericString())).build(new CacheLoader<Class<?>, ExternalCloneMethod>() {
+	AtomicLong EVICTION_COUNT = new AtomicLong();
+	LoadingCache<Class<?>, ExternalCloneMethod> EXTERNAL_CLONE_METHOD_ANNOTATIONS_CACHE = CacheBuilder.newBuilder().maximumWeight(10000L).weigher((k, v) -> v == CLONE_METHOD_DEFAULT_ANNOTATION ? 10000 / (int) Math.min(10000L, 100L + EVICTION_COUNT.get()) : 0).removalListener((RemovalNotification<Class<?>, ExternalCloneMethod> t) -> LOGGER.debug("Default clone method '{}' cached for class '{}' evicted, count: {}", CLONE_METHOD_DEFAULT.get().orElseThrow(Throwables::unexpected), t.getKey().toGenericString(), EVICTION_COUNT.incrementAndGet())).build(new CacheLoader<Class<?>, ExternalCloneMethod>() {
 		@Override
 		public ExternalCloneMethod load(Class<?> key) throws InterruptedException {
 			@Nullable ExternalCloneMethod r = null;

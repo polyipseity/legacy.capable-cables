@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.annotation.Testable;
 
-import static $group__.$modId__.utilities.helpers.Throwables.consumeCaught;
-
 @Testable
 public class MethodTests {
 	/* SECTION methods */
@@ -21,7 +19,7 @@ public class MethodTests {
 			Miscellaneous.markUnused(Object.class);
 			Assertions.fail("Should have caught NullPointerException");
 		} catch (NullPointerException e) {
-			consumeCaught(e);
+			TestUtilities.consumeCaught(e);
 		}
 	}
 }

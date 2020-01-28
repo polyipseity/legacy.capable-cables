@@ -6,7 +6,6 @@ import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAd
 import $group__.$modId__.utilities.variables.Globals;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
@@ -33,13 +32,13 @@ public abstract class Registrable<T extends IForgeRegistryEntry<T>> extends Sing
 
 	@OverridingMethodsMustInvokeSuper
 	protected void register(RegistryEvent.Register<T> e) {
-		String classGS = clazz.toGenericString();
+		String classGS = clazz.toGenericString(),
+				evtRegGS = IRegistrableEventBusSubscriber.class.toGenericString();
 		LOGGER.info("Registration of '{}' started", classGS);
 		IForgeRegistry<T> reg = e.getRegistry();
+
 		int regEd = 0,
 				evtRegEd = 0;
-		String evtRegGS = Mod.EventBusSubscriber.class.toGenericString();
-
 		{
 			Object v;
 			Field[] fs = getClass().getFields();
