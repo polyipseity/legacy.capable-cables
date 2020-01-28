@@ -3,8 +3,6 @@ package $group__.$modId__.proxies;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-// COMMENT: Is this class of any use?
-@SuppressWarnings("unused")
 @SideOnly(Side.SERVER)
 public final class ProxyServer extends Proxy {
 	/* SECTION static variables */

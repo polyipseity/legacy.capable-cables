@@ -6,17 +6,15 @@ import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAd
 import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.FieldAdapter;
 import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.MethodAdapter;
 import com.google.common.collect.Lists;
-import com.google.common.collect.MultimapBuilder;
-import com.google.common.collect.SetMultimap;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.*;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
+import static $group__.$modId__.utilities.helpers.Miscellaneous.K;
 import static $group__.$modId__.utilities.helpers.Throwables.consumeCaught;
 import static $group__.$modId__.utilities.variables.Globals.clearCaughtThrowableStatic;
 import static $group__.$modId__.utilities.variables.Globals.setCaughtThrowableStatic;
@@ -35,19 +33,19 @@ public enum Reflections {
 	public static boolean isMemberFinal(Member m) { return Modifier.isFinal(m.getModifiers()); }
 
 
-	public static SetMultimap<Long, Class<?>> getSuperclassesAndInterfaces(Class<?> c) {
-		@SuppressWarnings("UnstableApiUsage") SetMultimap<Long, Class<?>> r = MultimapBuilder.hashKeys().hashSetValues().build();
+	public static LinkedHashSet<LinkedHashSet<Class<?>>> getSuperclassesAndInterfaces(Class<?> c) {
+		LinkedHashSet<LinkedHashSet<Class<?>>> r = new LinkedHashSet<>();
 		Class<?> cs = c.getSuperclass();
-		List<Class<?>> l = cs == null ? Arrays.asList(c.getInterfaces()) : Lists.asList(c.getSuperclass(), c.getInterfaces());
-		long k = 0;
+		LinkedHashSet<Class<?>> l = new LinkedHashSet<>(cs == null ? Arrays.asList(c.getInterfaces()) : Lists.asList(cs, c.getInterfaces())),
+				l1 = new LinkedHashSet<>();
 		while (!l.isEmpty()) {
-			r.putAll(k++, l);
-			List<Class<?>> tmpL = new LinkedList<>();
-			l.forEach(t -> {
+			r.add(l);
+			for (Class<?> t : l) {
 				Class<?> ts = t.getSuperclass();
-				tmpL.addAll(ts == null ? Arrays.asList(t.getInterfaces()) : Lists.asList(t.getSuperclass(), t.getInterfaces()));
-			});
-			l = tmpL;
+				l1.addAll(ts == null ? Arrays.asList(t.getInterfaces()) : Lists.asList(ts, t.getInterfaces()));
+			}
+			l.clear();
+			l = K(l1, l1 = l); // COMMENT swap
 		}
 		return r;
 	}

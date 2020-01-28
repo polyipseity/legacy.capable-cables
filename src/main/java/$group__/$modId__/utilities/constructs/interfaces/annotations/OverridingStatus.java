@@ -1,7 +1,11 @@
 package $group__.$modId__.utilities.constructs.interfaces.annotations;
 
+import $group__.$modId__.utilities.constructs.classes.concrete.AnnotationProcessingEvent;
 import $group__.$modId__.utilities.constructs.classes.concrete.throwables.AnnotationProcessingException;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.reflections.Reflections;
@@ -20,6 +24,7 @@ import static $group__.$modId__.utilities.constructs.interfaces.basic.IAnnotatio
 import static $group__.$modId__.utilities.helpers.Reflections.*;
 import static $group__.$modId__.utilities.helpers.Throwables.throw_;
 import static $group__.$modId__.utilities.helpers.Throwables.wrapCheckedThrowable;
+import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -40,6 +45,7 @@ public @interface OverridingStatus {
 
 	/* SECTION static classes */
 
+	@Mod.EventBusSubscriber(modid = MOD_ID)
 	enum AnnotationProcessor implements IClass.IElement.IMethod<OverridingStatus> {
 		/* SECTION enums */
 		INSTANCE;
@@ -121,5 +127,11 @@ public @interface OverridingStatus {
 			IMethod.super.process(asm);
 			processed = true;
 		}
+
+
+		/* SECTION static methods */
+
+		@SubscribeEvent(priority = EventPriority.HIGH)
+		public static void process(AnnotationProcessingEvent e) { if (MOD_ID.equals(e.getModId())) INSTANCE.process(e.getAsm()); }
 	}
 }

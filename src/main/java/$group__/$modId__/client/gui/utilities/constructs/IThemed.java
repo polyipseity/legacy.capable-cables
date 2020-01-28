@@ -34,10 +34,10 @@ public interface IThemed<T extends IThemed.ITheme<T>> {
 		default T getTheme() { return castUncheckedUnboxedNonnull(this); }
 
 		default void drawRect(Rectangle<?, ?> rect, Color color) {
+			Color pColor = new Color(GL11.glGetInteger(GL11.GL_CURRENT_COLOR), true);
 			XY<?, ?> a = rect.a(), c = rect.c();
-			float cr = GL11.glGetFloat(GL11.GL_RED), cg = GL11.glGetFloat(GL11.GL_GREEN), cb = GL11.glGetFloat(GL11.GL_BLUE), ca = GL11.glGetFloat(GL11.GL_ALPHA);
 			Gui.drawRect(a.getX().intValue(), a.getY().intValue(), c.getX().intValue(), c.getY().intValue(), color.getRGB());
-			GlStateManager.color(cr, cg, cb, ca);
+			GlStateManager.color(pColor.getRed(), pColor.getGreen(), pColor.getBlue(), pColor.getAlpha());
 		}
 
 		default void drawModalRectWithCustomSizedTexture(Rectangle<?, ?> rect, Rectangle<?, ?> tex) {

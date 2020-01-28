@@ -9,6 +9,7 @@ import com.google.common.cache.CacheBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
@@ -21,6 +22,7 @@ import java.util.function.BiConsumer;
 
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.consumeCaught;
+import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 
 public enum Globals implements IThrowableCatcher {
 	/* SECTION enums */
@@ -79,6 +81,7 @@ public enum Globals implements IThrowableCatcher {
 	/* SECTION static classes */
 
 	@SideOnly(Side.CLIENT)
+	@Mod.EventBusSubscriber(value = Side.CLIENT, modid = MOD_ID)
 	public enum Client {
 		/* MARK empty */;
 

@@ -8,10 +8,12 @@ import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 
+@Mod.EventBusSubscriber(modid = MOD_ID)
 public final class BlocksThis extends Registrable<Block> {
 	/* SECTION variables */
 
@@ -19,17 +21,15 @@ public final class BlocksThis extends Registrable<Block> {
 	public final Block cable = new BlockCable().setRegistryAndUnlocalizedName(MOD_ID, "cable").setUnlocalizedName("cable").setCreativeTab(CreativeTabsThis.DEFAULT);
 
 
-	/* SECTION methods */
-
-	/** {@inheritDoc} */
-	@Override
-	@SubscribeEvent
-	public void register(RegistryEvent.Register<Block> e) { super.register(e); }
-
-
 	/* SECTION static variables */
 
 	public static final BlocksThis INSTANCE = getInstance(BlocksThis.class);
+
+
+	/* SECTION static methods */
+
+	@SubscribeEvent
+	public static void registerStatic(RegistryEvent.Register<Block> e) { INSTANCE.register(e); }
 
 
 	/* REFERENCE block template */

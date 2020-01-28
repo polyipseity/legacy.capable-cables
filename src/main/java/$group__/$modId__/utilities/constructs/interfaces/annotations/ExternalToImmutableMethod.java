@@ -1,12 +1,16 @@
 package $group__.$modId__.utilities.constructs.interfaces.annotations;
 
+import $group__.$modId__.utilities.constructs.classes.concrete.AnnotationProcessingEvent;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IAnnotationProcessor;
 import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.MethodAdapter;
 import $group__.$modId__.utilities.helpers.Throwables;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -14,11 +18,14 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IAnnotationProcessor.getMessage;
+import static $group__.$modId__.utilities.helpers.Reflections.getSuperclassesAndInterfaces;
 import static $group__.$modId__.utilities.helpers.Throwables.interrupt;
+import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -44,23 +51,16 @@ public @interface ExternalToImmutableMethod {
 		@Override
 		public ExternalToImmutableMethod load(Class<?> key) throws InterruptedException {
 			@Nullable ExternalToImmutableMethod r = null;
-
-			long n = Long.MAX_VALUE;
 			for (Map.Entry<Class<?>, ExternalToImmutableMethod> e : EXTERNAL_TO_IMMUTABLE_METHOD_ANNOTATIONS_CACHE.asMap().entrySet()) {
 				ExternalToImmutableMethod v = e.getValue();
 				if (v.allowExtends()) {
 					Class<?> k = e.getKey();
 					if (k.isAssignableFrom(key)) {
-						long l = 0;
-						for (Class<?> s = key; s != null; l++) {
-							if (s == k) {
-								if (l < n) {
-									n = l;
-									r = v;
-								}
+						for (LinkedHashSet<Class<?>> ss : getSuperclassesAndInterfaces(key)) {
+							if (ss.contains(k)) {
+								r = v;
 								break;
 							}
-							s = s.getSuperclass();
 						}
 					}
 				}
@@ -79,6 +79,7 @@ public @interface ExternalToImmutableMethod {
 
 	/* SECTION static classes */
 
+	@Mod.EventBusSubscriber(modid = MOD_ID)
 	enum AnnotationProcessor implements IAnnotationProcessor.IClass.IElement.IMethod<ExternalToImmutableMethod> {
 		/* SECTION enums */
 		INSTANCE;
@@ -126,5 +127,11 @@ public @interface ExternalToImmutableMethod {
 			IMethod.super.process(asm);
 			processed = true;
 		}
+
+
+		/* SECTION static methods */
+
+		@SubscribeEvent(priority = EventPriority.HIGHEST)
+		public static void process(AnnotationProcessingEvent e) { if (MOD_ID.equals(e.getModId())) INSTANCE.process(e.getAsm()); }
 	}
 }

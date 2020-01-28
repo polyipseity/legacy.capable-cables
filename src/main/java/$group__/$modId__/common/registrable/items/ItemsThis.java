@@ -7,10 +7,12 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 
+@Mod.EventBusSubscriber(modid = MOD_ID)
 public final class ItemsThis extends Registrable<Item> {
 	/* SECTION variables */
 
@@ -18,17 +20,15 @@ public final class ItemsThis extends Registrable<Item> {
 	public final Item wrench = new ItemWrench().setRegistryAndUnlocalizedName(MOD_ID, "wrench").setCreativeTab(CreativeTabsThis.DEFAULT);
 
 
-	/* SECTION methods */
-
-	/** {@inheritDoc} */
-	@Override
-	@SubscribeEvent
-	public void register(RegistryEvent.Register<Item> e) { super.register(e); }
-
-
 	/* SECTION static variables */
 
 	public static final ItemsThis INSTANCE = getInstance(ItemsThis.class);
+
+
+	/* SECTION static methods */
+
+	@SubscribeEvent
+	public static void registerStatic(RegistryEvent.Register<Item> e) { INSTANCE.register(e); }
 
 
 	/* REFERENCE item template */

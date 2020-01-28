@@ -8,7 +8,7 @@ import java.util.Map;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxed;
 import static java.util.Objects.requireNonNull;
 
-public enum Tracking {
+public enum Miscellaneous {
 	/* MARK empty */;
 
 
@@ -28,4 +28,15 @@ public enum Tracking {
 	@SuppressWarnings("SameReturnValue")
 	@Nullable
 	public static <T> T markUnused() { return null; }
+
+
+	/**
+	 * Function K of SKI combinator calculus.
+	 *
+	 * @param x constant
+	 * @param y any
+	 * @param <T> type of parameter {@code x}
+	 * @return parameter {@code x}
+	 */
+	public static <T> T K(T x, @SuppressWarnings("unused") Object... y) { return x; }
 }
