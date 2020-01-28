@@ -20,7 +20,7 @@ while [ -h "$PRG" ]; do
 	fi
 done
 SAVED="$(pwd)"
-cd "$(dirname \""$PRG"\")/" >/dev/null || exit
+cd "$(dirname "$PRG")/" >/dev/null || exit
 APP_HOME="$(pwd -P)"
 cd "$SAVED" >/dev/null || exit
 
@@ -136,7 +136,7 @@ if $cygwin; then
 		if [ "$CHECK" -ne 0 ] && [ "$CHECK2" -eq 0 ]; then ### Added a condition
 			eval "$(args$i)"="$(cygpath --path --ignore --mixed "$arg")"
 		else
-			eval "$(args$i)=\"$arg\""
+			eval "$(args$i)=$arg"
 		fi
 		i=$((i + 1))
 	done
