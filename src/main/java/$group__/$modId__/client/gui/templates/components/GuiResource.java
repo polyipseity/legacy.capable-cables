@@ -76,9 +76,11 @@ public class GuiResource<N extends Number, TN extends Number, T extends GuiResou
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
-			t -> getResource().equals(t.getResource()),
-			t -> getTexture().equals(t.getTexture())); }
+	public boolean equals(Object o) {
+		return isEquals(this, o, super.equals(o),
+				t -> getResource().equals(t.getResource()),
+				t -> getTexture().equals(t.getTexture()));
+	}
 
 	/** {@inheritDoc} */
 	@Override

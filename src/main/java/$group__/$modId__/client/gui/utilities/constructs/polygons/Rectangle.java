@@ -100,9 +100,11 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 
 	/** {@inheritDoc} */
 	@Override
-	public String toString() { return getToStringString(this, super.toString(),
+	public String toString() {
+		return getToStringString(this, super.toString(),
 				new Object[]{"offset", getOffset()},
-				new Object[]{"size", getSize()}); }
+				new Object[]{"size", getSize()});
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -110,9 +112,11 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
-			t -> getOffset().equals(t.getOffset()),
-			t -> getSize().equals(t.getSize())); }
+	public boolean equals(Object o) {
+		return isEquals(this, o, super.equals(o),
+				t -> getOffset().equals(t.getOffset()),
+				t -> getSize().equals(t.getSize()));
+	}
 
 	/** {@inheritDoc} */
 	@Override

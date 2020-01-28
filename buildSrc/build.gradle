@@ -58,7 +58,9 @@ ext {
 boolean checkMavenMetadata(String metadataUrl, File metadataFile, String properAlgorithmName, String algorithmName) {
     File file = file "$metadataFile.absolutePath.$algorithmName"
     String url = "$metadataUrl.$algorithmName"
-    try { download url, file } catch (FileNotFoundException e) {
+    try {
+        download url, file
+    } catch (FileNotFoundException e) {
         logger.log LogLevel.WARN, "$properAlgorithmName file \'$url\' for \'$metadataUrl\' NOT found."
         if (strictDigestCheck) throw e
         else e.printStackTrace()
@@ -96,7 +98,11 @@ void updateGradleWrapperDistributionUrl(String newDistributionUrl) {
     Properties properties = new Properties()
     File propertiesFile = file wrapper.propertiesFile.absolutePath.replace("buildSrc", "")
     FileInputStream fis = new FileInputStream(propertiesFile)
-    try { properties.load fis } finally { fis.close() }
+    try {
+        properties.load fis
+    } finally {
+        fis.close()
+    }
     String oldDistributionUrl = properties.distributionUrl
     newDistributionUrl = newDistributionUrl.replace Wrapper.DistributionType.BIN.name().toLowerCase(Locale.ROOT), Wrapper.DistributionType.ALL.name().toLowerCase(Locale.ROOT)
     URL newDistribution = new URL(newDistributionUrl)
@@ -106,7 +112,11 @@ void updateGradleWrapperDistributionUrl(String newDistributionUrl) {
     if (new URL(oldDistributionUrl) != newDistribution) {
         properties.distributionUrl = newDistributionUrl
         FileOutputStream fos = new FileOutputStream(propertiesFile)
-        try { properties.store fos, null } finally { fos.close() }
+        try {
+            properties.store fos, null
+        } finally {
+            fos.close()
+        }
         throw new IllegalStateException("Gradle wrapper distribution URL updated from \'$oldDistributionUrl\' to \'$newDistributionUrl\'. Re-run the build with the same command to apply the changes.")
     }
 }

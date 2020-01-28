@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.awt.*;
 
 public enum Colors {
-	/* MARK empty */ ;
+	/* MARK empty */;
 
 
 	/* SECTION static variables */

@@ -7,7 +7,7 @@ import com.google.common.collect.Sets;
 import java.util.HashSet;
 
 public enum Constants {
-	/* MARK empty */ ;
+	/* MARK empty */;
 
 
 	/* SECTION static variables */

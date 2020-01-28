@@ -65,17 +65,21 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 	/* SECTION methods */
 
 	@Override
-	public String toString() { return getToStringString(this, super.toString(),
-			new Object[]{"updater", getUpdater()},
-			new Object[]{"update", getUpdate()}); }
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"updater", getUpdater()},
+				new Object[]{"update", getUpdate()});
+	}
 
 	@Override
 	public int hashCode() { return getHashCode(this, super.hashCode(), getUpdater(), getUpdate()); }
 
 	@Override
-	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
-			t -> getUpdater().equals(t.getUpdater()),
-			t -> getUpdate().equals(t.getUpdate())); }
+	public boolean equals(Object o) {
+		return isEquals(this, o, super.equals(o),
+				t -> getUpdater().equals(t.getUpdater()),
+				t -> getUpdate().equals(t.getUpdate()));
+	}
 
 	@Override
 	public T clone() {
@@ -97,7 +101,11 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 	public static class X<T extends X<T>> extends NumberRelativeDisplay<T> {
 		/* SECTION constructors */
 
-		public X(Number value, Number parent, @Nullable Number offset, AtomicBoolean update) { super(value, parent, offset, (e, t) -> { if (t.getUpdate().get()) t.parent = getResolution().getScaledWidth_double(); }, update); }
+		public X(Number value, Number parent, @Nullable Number offset, AtomicBoolean update) {
+			super(value, parent, offset, (e, t) -> {
+				if (t.getUpdate().get()) t.parent = getResolution().getScaledWidth_double();
+			}, update);
+		}
 
 		public X(Number value, @Nullable Number offset, AtomicBoolean update) { this(value, getResolution().getScaledWidth_double(), offset, update); }
 
@@ -177,7 +185,11 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 	public static class Y<T extends Y<T>> extends NumberRelativeDisplay<T> {
 		/* SECTION constructors */
 
-		public Y(Number value, Number parent, @Nullable Number offset, AtomicBoolean update) { super(value, parent, offset, (e, t) -> { if (t.getUpdate().get()) t.parent = getResolution().getScaledHeight_double(); }, update); }
+		public Y(Number value, Number parent, @Nullable Number offset, AtomicBoolean update) {
+			super(value, parent, offset, (e, t) -> {
+				if (t.getUpdate().get()) t.parent = getResolution().getScaledHeight_double();
+			}, update);
+		}
 
 		public Y(Number value, @Nullable Number offset, AtomicBoolean update) { this(value, getResolution().getScaledHeight_double(), offset, update); }
 

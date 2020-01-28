@@ -61,8 +61,10 @@ public interface IAdapter<V, T extends IAdapter<V, T>> extends IStructureCloneab
 
 		@Override
 		@OverridingStatus(group = GROUP, when = When.MAYBE)
-		public String toString() { return getToStringString(this, super.toString(),
-				new Object[]{"value", get()}); }
+		public String toString() {
+			return getToStringString(this, super.toString(),
+					new Object[]{"value", get()});
+		}
 
 		@Override
 		@OverridingStatus(group = GROUP, when = When.MAYBE)
@@ -70,14 +72,18 @@ public interface IAdapter<V, T extends IAdapter<V, T>> extends IStructureCloneab
 
 		@Override
 		@OverridingStatus(group = GROUP, when = When.MAYBE)
-		public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
-					t -> Objects.equals(get(), t.get())); }
+		public boolean equals(Object o) {
+			return isEquals(this, o, super.equals(o),
+					t -> Objects.equals(get(), t.get()));
+		}
 
 		@Override
 		@OverridingStatus(group = GROUP, when = When.MAYBE)
 		public T clone() {
 			T r;
-			try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
+			try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
+				throw unexpected(e);
+			}
 			r.value = tryCloneUnboxedNonnull(value);
 			return r;
 		}

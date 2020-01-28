@@ -3,7 +3,7 @@ package $group__.$modId__.utilities.helpers;
 import org.apache.commons.lang3.StringUtils;
 
 public enum Grammar {
-	/* MARK empty */ ;
+	/* MARK empty */;
 
 
 	/* SECTION static methods */

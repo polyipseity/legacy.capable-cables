@@ -27,32 +27,32 @@ import static $group__.$modId__.utilities.variables.Constants.GROUP;
 @SideOnly(Side.CLIENT)
 public class XY<N extends Number, T extends XY<N, T>> implements IStructureCloneable<T>, IOperable<T, XY<N, ?>> {
 	/* SECTION variables */
-	
+
 	protected N x;
 	protected N y;
-	
-	
+
+
 	/* SECTION constructors */
 
 	public XY(N x, N y) {
 		this.x = x;
 		this.y = y;
 	}
-	
+
 	public XY(XY<? extends N, ?> copy) { this(copy.getX(), copy.getY()); }
-	
-	
+
+
 	/* SECTION getters & setters */
-	
+
 	public N getX() { return x; }
-	
+
 	public void setX(N x) { this.x = x; }
-	
+
 	public N getY() { return y; }
 
 	public void setY(N y) { this.y = y; }
-	
-	
+
+
 	/* SECTION methods */
 
 	@Override
@@ -170,9 +170,11 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructureClone
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public String toString() { return IStrictToString.getToStringString(this, super.toString(),
-			new Object[]{"x", getX()},
-			new Object[]{"y", getY()}); }
+	public String toString() {
+		return IStrictToString.getToStringString(this, super.toString(),
+				new Object[]{"x", getX()},
+				new Object[]{"y", getY()});
+	}
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
@@ -180,21 +182,25 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructureClone
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
-			t -> getX().equals(t.getX()),
-			t -> getY().equals(t.getY())); }
+	public boolean equals(Object o) {
+		return isEquals(this, o, super.equals(o),
+				t -> getX().equals(t.getX()),
+				t -> getY().equals(t.getY()));
+	}
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r;
-		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
+		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
+			throw unexpected(e);
+		}
 		r.x = tryCloneUnboxedNonnull(x);
 		r.y = tryCloneUnboxedNonnull(y);
 		return r;
 	}
 
-	
+
 	/* SECTION static methods */
 
 	@SuppressWarnings({"UnstableApiUsage", "rawtypes", "RedundantSuppression"})
@@ -212,7 +218,7 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructureClone
 	@SafeVarargs
 	public static <N extends Number> List<N> extractYs(XY<N, ?>... o) { return extractYs(Arrays.asList(o)); }
 
-	
+
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable

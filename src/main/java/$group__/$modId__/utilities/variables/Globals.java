@@ -80,7 +80,7 @@ public enum Globals implements IThrowableCatcher {
 
 	@SideOnly(Side.CLIENT)
 	public enum Client {
-		/* MARK empty */ ;
+		/* MARK empty */;
 
 
 		/* SECTION static variables */
@@ -111,7 +111,7 @@ public enum Globals implements IThrowableCatcher {
 		/* SECTION static classes */
 
 		public enum Resources {
-			/* MARK empty */ ;
+			/* MARK empty */;
 
 
 			/* SECTION static variables */

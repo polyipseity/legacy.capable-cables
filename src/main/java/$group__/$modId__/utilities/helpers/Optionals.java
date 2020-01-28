@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 public enum Optionals {
-	/* MARK empty */ ;
+	/* MARK empty */;
 
 
 	/* SECTION static methods */

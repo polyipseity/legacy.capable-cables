@@ -13,7 +13,7 @@ import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 
 @SuppressWarnings("SpellCheckingInspection")
 public enum Throwables {
-	/* MARK empty */ ;
+	/* MARK empty */;
 
 
 	/* SECTION static variables */
@@ -89,7 +89,8 @@ public enum Throwables {
 	public static IllegalArgumentException rejectArguments(Throwable cause, Object... args) throws IllegalArgumentException { throw throw_(new IllegalArgumentException(rejectObjectsString("illegal argument" + appendSuffixIfPlural(args.length, "s"), args), cause)); }
 
 
-	public static IllegalArgumentException rejectIndexOutOfBounds(Number index, Number bound) throws IllegalArgumentException { throw rejectArguments(new IndexOutOfBoundsException("index: " + index + ", bound: " + bound), index);
+	public static IllegalArgumentException rejectIndexOutOfBounds(Number index, Number bound) throws IllegalArgumentException {
+		throw rejectArguments(new IndexOutOfBoundsException("index: " + index + ", bound: " + bound), index);
 	}
 
 	public static InternalError unexpected(@Nullable String msg, @Nullable Throwable t) throws InternalError {

@@ -3,7 +3,7 @@ package $group__.$modId__.utilities.helpers;
 import javax.annotation.Nullable;
 
 public enum Assertions {
-	/* MARK empty */ ;
+	/* MARK empty */;
 
 
 	/* SECTION static methods */

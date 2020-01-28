@@ -17,7 +17,7 @@ import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonn
 import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclaredConstructor;
 
 public enum Copiers {
-	/* MARK empty */ ;
+	/* MARK empty */;
 
 
 	/* SECTION static methods */

@@ -12,7 +12,7 @@ import static $group__.$modId__.utilities.variables.Globals.clearCaughtThrowable
 import static $group__.$modId__.utilities.variables.Globals.setCaughtThrowableStatic;
 
 public enum Casts {
-	/* MARK empty */ ;
+	/* MARK empty */;
 
 
 	/* SECTION static methods */

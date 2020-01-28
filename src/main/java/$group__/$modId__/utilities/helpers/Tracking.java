@@ -9,7 +9,7 @@ import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxed;
 import static java.util.Objects.requireNonNull;
 
 public enum Tracking {
-	/* MARK empty */ ;
+	/* MARK empty */;
 
 
 	/* SECTION static methods */

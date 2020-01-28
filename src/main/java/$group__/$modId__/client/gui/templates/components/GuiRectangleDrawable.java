@@ -66,15 +66,19 @@ public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawab
 	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
 	@Override
-	public String toString() { return getToStringString(this, super.toString(),
-			new Object[]{"drawable", getDrawable()}); }
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"drawable", getDrawable()});
+	}
 
 	@Override
 	public int hashCode() { return getHashCode(this, super.hashCode(), getDrawable()); }
 
 	@Override
-	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
-			t -> getDrawable().equals(t.getDrawable())); }
+	public boolean equals(Object o) {
+		return isEquals(this, o, super.equals(o),
+				t -> getDrawable().equals(t.getDrawable()));
+	}
 
 	@Override
 	public T clone() {

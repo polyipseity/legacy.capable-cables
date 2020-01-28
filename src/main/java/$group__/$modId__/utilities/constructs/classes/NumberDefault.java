@@ -16,7 +16,11 @@ public abstract class NumberDefault<T extends NumberDefault<T>> extends Number i
 
 	/** {@inheritDoc} */
 	@Override
-	public T clone() { try { return castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); } }
+	public T clone() {
+		try { return castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
+			throw unexpected(e);
+		}
+	}
 
 
 	/* SECTION static variables */

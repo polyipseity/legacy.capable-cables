@@ -23,7 +23,7 @@ import static $group__.$modId__.utilities.variables.Globals.setCaughtThrowableSt
 import static java.util.Objects.requireNonNull;
 
 public enum Reflections {
-	/* MARK empty */ ;
+	/* MARK empty */;
 
 
 	/* SECTION static methods */
@@ -74,14 +74,15 @@ public enum Reflections {
 	/* SECTION static classes */
 
 	public enum Unsafe {
-		/* MARK empty */ ;
+		/* MARK empty */;
 
 
 		/* SECTION static methods */
 
 		public static Optional<Class<?>> forName(String name, boolean initialize, ClassLoader loader) {
 			clearCaughtThrowableStatic();
-			try { return Optional.of(Class.forName(name, initialize, loader));
+			try {
+				return Optional.of(Class.forName(name, initialize, loader));
 			} catch (Throwable t) {
 				setCaughtThrowableStatic(t);
 				return Optional.empty();
@@ -95,7 +96,8 @@ public enum Reflections {
 
 		public static <T> Optional<T> newInstance(Class<? extends T> clazz) {
 			clearCaughtThrowableStatic();
-			try { return Optional.of(clazz.newInstance());
+			try {
+				return Optional.of(clazz.newInstance());
 			} catch (Throwable t) {
 				setCaughtThrowableStatic(t);
 				return Optional.empty();
@@ -105,7 +107,8 @@ public enum Reflections {
 
 		public static FieldAdapter getField(Class<?> clazz, String name) {
 			clearCaughtThrowableStatic();
-			try { return FieldAdapter.of(clazz.getField(name));
+			try {
+				return FieldAdapter.of(clazz.getField(name));
 			} catch (Throwable t) {
 				setCaughtThrowableStatic(t);
 				return FieldAdapter.empty();
@@ -114,7 +117,8 @@ public enum Reflections {
 
 		public static FieldAdapter getDeclaredField(Class<?> clazz, String name) {
 			clearCaughtThrowableStatic();
-			try { return FieldAdapter.of(clazz.getDeclaredField(name));
+			try {
+				return FieldAdapter.of(clazz.getDeclaredField(name));
 			} catch (Throwable t) {
 				setCaughtThrowableStatic(t);
 				return FieldAdapter.empty();
@@ -124,7 +128,8 @@ public enum Reflections {
 
 		public static MethodAdapter getMethod(Class<?> clazz, String name, Class<?>... args) {
 			clearCaughtThrowableStatic();
-			try { return MethodAdapter.of(clazz.getMethod(name, args));
+			try {
+				return MethodAdapter.of(clazz.getMethod(name, args));
 			} catch (Throwable t) {
 				setCaughtThrowableStatic(t);
 				return MethodAdapter.empty();
@@ -133,7 +138,8 @@ public enum Reflections {
 
 		public static MethodAdapter getDeclaredMethod(Class<?> clazz, String name, Class<?>... args) {
 			clearCaughtThrowableStatic();
-			try { return MethodAdapter.of(clazz.getDeclaredMethod(name, args));
+			try {
+				return MethodAdapter.of(clazz.getDeclaredMethod(name, args));
 			} catch (Throwable t) {
 				setCaughtThrowableStatic(t);
 				return MethodAdapter.empty();
@@ -143,7 +149,8 @@ public enum Reflections {
 
 		public static <T> ConstructorAdapter<T> getConstructor(Class<? extends T> clazz, Class<?>... args) {
 			clearCaughtThrowableStatic();
-			try { return ConstructorAdapter.of(clazz.getConstructor(args));
+			try {
+				return ConstructorAdapter.of(clazz.getConstructor(args));
 			} catch (Throwable t) {
 				setCaughtThrowableStatic(t);
 				return ConstructorAdapter.empty();
@@ -152,7 +159,8 @@ public enum Reflections {
 
 		public static <T> ConstructorAdapter<T> getDeclaredConstructor(Class<? extends T> clazz, Class<?>... args) {
 			clearCaughtThrowableStatic();
-			try { return ConstructorAdapter.of(clazz.getDeclaredConstructor(args));
+			try {
+				return ConstructorAdapter.of(clazz.getDeclaredConstructor(args));
 			} catch (Throwable t) {
 				setCaughtThrowableStatic(t);
 				return ConstructorAdapter.empty();

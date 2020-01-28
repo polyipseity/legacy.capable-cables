@@ -2,7 +2,7 @@ package $group__.$modId__.utilities.helpers;
 
 @SuppressWarnings("SpellCheckingInspection")
 public enum Comparables {
-	/* MARK empty */ ;
+	/* MARK empty */;
 
 
 	/* SECTION static methods */

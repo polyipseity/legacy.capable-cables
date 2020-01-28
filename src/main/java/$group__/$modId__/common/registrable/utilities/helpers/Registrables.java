@@ -20,13 +20,13 @@ import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
 
 @SuppressWarnings("SpellCheckingInspection")
 public enum Registrables {
-	/* MARK empty */ ;
+	/* MARK empty */;
 
 
 	/* SECTION static classes */
 
 	public enum Blocks {
-		/* MARK empty */ ;
+		/* MARK empty */;
 
 
 		/* SECTION static methods */
@@ -41,7 +41,7 @@ public enum Registrables {
 	}
 
 	public enum NBTs {
-		/* MARK empty */ ;
+		/* MARK empty */;
 
 
 		/* SECTION static variables */

@@ -87,8 +87,10 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
-			t -> getOpen() == t.getOpen()); }
+	public boolean equals(Object o) {
+		return isEquals(this, o, super.equals(o),
+				t -> getOpen() == t.getOpen());
+	}
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
@@ -246,10 +248,12 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 
 			@Override
 			@OverridingStatus(group = GROUP, when = When.MAYBE)
-			public String toString() { return getToStringString(this, super.toString(),
+			public String toString() {
+				return getToStringString(this, super.toString(),
 						new Object[]{"access", getAccess()},
 						new Object[]{"content", getContent()},
-						new Object[]{"open", isOpen()}); }
+						new Object[]{"open", isOpen()});
+			}
 
 			@Override
 			@OverridingStatus(group = GROUP, when = When.MAYBE)
@@ -257,16 +261,20 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 
 			@Override
 			@OverridingStatus(group = GROUP, when = When.MAYBE)
-			public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
-					t -> getAccess().equals(t.getAccess()),
-					t -> getContent().equals(t.getContent()),
-					t -> isOpen() == t.isOpen()); }
+			public boolean equals(Object o) {
+				return isEquals(this, o, super.equals(o),
+						t -> getAccess().equals(t.getAccess()),
+						t -> getContent().equals(t.getContent()),
+						t -> isOpen() == t.isOpen());
+			}
 
 			@Override
 			@OverridingStatus(group = GROUP, when = When.MAYBE)
 			public T clone() {
 				T r;
-				try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) { throw Throwables.unexpected(e); }
+				try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
+					throw Throwables.unexpected(e);
+				}
 				r.access = access.clone();
 				r.content = content.clone();
 				return r;
@@ -365,15 +373,19 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 
 
 			@Override
-			public String toString() { return IStrictToString.getToStringString(this, super.toString(),
-						new Object[]{"theme", getTheme()}); }
+			public String toString() {
+				return IStrictToString.getToStringString(this, super.toString(),
+						new Object[]{"theme", getTheme()});
+			}
 
 			@Override
 			public int hashCode() { return getHashCode(this, super.hashCode(), getTheme()); }
 
 			@Override
-			public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
-					t -> getTheme().equals(t.getTheme())); }
+			public boolean equals(Object o) {
+				return isEquals(this, o, super.equals(o),
+						t -> getTheme().equals(t.getTheme()));
+			}
 
 			@Override
 			public T clone() {

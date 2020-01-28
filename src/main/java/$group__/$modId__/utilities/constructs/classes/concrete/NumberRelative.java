@@ -144,10 +144,12 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public String toString() { return getToStringString(this, super.toString(),
-			new Object[]{"value", getValue()},
-			new Object[]{"parent", getParent()},
-			new Object[]{"offset", getOffset()}); }
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"value", getValue()},
+				new Object[]{"parent", getParent()},
+				new Object[]{"offset", getOffset()});
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -157,10 +159,12 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
+	public boolean equals(Object o) {
+		return isEquals(this, o, super.equals(o),
 				t -> getValue().equals(t.getValue()),
 				t -> Objects.equals(getParent(), t.getParent()),
-				t -> Objects.equals(getOffset(), t.getOffset())); }
+				t -> Objects.equals(getOffset(), t.getOffset()));
+	}
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)

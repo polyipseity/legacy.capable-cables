@@ -66,9 +66,11 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public String toString() { return getToStringString(this, super.toString(),
-			new Object[]{"rect", getRect()},
-			new Object[]{"color", getColor()}); }
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"rect", getRect()},
+				new Object[]{"color", getColor()});
+	}
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
@@ -76,15 +78,19 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
-			t -> getRect().equals(t.getRect()),
-			t -> getColor().equals(t.getColor())); }
+	public boolean equals(Object o) {
+		return isEquals(this, o, super.equals(o),
+				t -> getRect().equals(t.getRect()),
+				t -> getColor().equals(t.getColor()));
+	}
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r;
-		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
+		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
+			throw unexpected(e);
+		}
 		r.rect = rect.clone();
 		r.color = tryCloneUnboxedNonnull(color);
 		return r;

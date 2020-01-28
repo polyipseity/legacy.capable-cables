@@ -11,7 +11,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.awt.Color;
+import java.awt.*;
 
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.variables.Globals.Client.CLIENT;
@@ -20,7 +20,7 @@ import static net.minecraft.client.renderer.GlStateManager.*;
 @SuppressWarnings("SpellCheckingInspection")
 @SideOnly(Side.CLIENT)
 public enum Guis {
-	/* MARK empty */ ;
+	/* MARK empty */;
 
 
 	/* SECTION static variables */

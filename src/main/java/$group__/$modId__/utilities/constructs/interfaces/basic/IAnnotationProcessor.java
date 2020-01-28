@@ -52,7 +52,8 @@ public interface IAnnotationProcessor<A extends Annotation> {
 		Class<?>[] mArgs = method.getParameterTypes();
 
 		A[] r = castUncheckedUnboxedNonnull(Array.newInstance(aClass, 0));
-		do { r = getDeclaredMethod(clazz, mName, mArgs).get().map(t -> t.getDeclaredAnnotationsByType(aClass)).orElse(r); } while (r.length == 0 && (clazz = clazz.getSuperclass()) != null);
+		do
+		{ r = getDeclaredMethod(clazz, mName, mArgs).get().map(t -> t.getDeclaredAnnotationsByType(aClass)).orElse(r); } while (r.length == 0 && (clazz = clazz.getSuperclass()) != null);
 
 		return r;
 	}
@@ -149,7 +150,8 @@ public interface IAnnotationProcessor<A extends Annotation> {
 							break;
 						}
 					}
-					if (r == null) throw rejectArguments(new NoSuchMethodException(getMessage(this, "No method name '" + mName + "' in class '" + result.clazz.toGenericString() + "'")), result.thisAsm);
+					if (r == null)
+						throw rejectArguments(new NoSuchMethodException(getMessage(this, "No method name '" + mName + "' in class '" + result.clazz.toGenericString() + "'")), result.thisAsm);
 					return r;
 				}
 

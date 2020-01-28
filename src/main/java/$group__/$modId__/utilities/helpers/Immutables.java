@@ -11,7 +11,7 @@ import java.util.Set;
 
 @SuppressWarnings("SpellCheckingInspection")
 public enum Immutables {
-	/* MARK empty */ ;
+	/* MARK empty */;
 
 
 	/* SECTION static methods */

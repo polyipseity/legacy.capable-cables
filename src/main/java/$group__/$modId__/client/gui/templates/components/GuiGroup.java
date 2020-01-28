@@ -17,8 +17,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
@@ -99,14 +97,18 @@ public class GuiGroup<N extends Number, E extends IDrawable<N, ?>, T extends Gui
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
-			t -> getElements().equals(t.getElements())); }
+	public boolean equals(Object o) {
+		return isEquals(this, o, super.equals(o),
+				t -> getElements().equals(t.getElements()));
+	}
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r;
-		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) { throw Throwables.unexpected(e); }
+		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
+			throw Throwables.unexpected(e);
+		}
 		r.elements = tryCloneUnboxedNonnull(elements);
 		return r;
 	}

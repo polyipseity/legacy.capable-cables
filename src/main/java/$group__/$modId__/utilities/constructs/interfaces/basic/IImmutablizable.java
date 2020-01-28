@@ -48,7 +48,8 @@ public interface IImmutablizable<T> {
 
 	static <T> Optional<T> tryToImmutable(@Nullable T o) {
 		if (o == null) return Optional.empty();
-		else if (o instanceof IImmutablizable<?>) return Casts.<IImmutablizable<T>>castUnchecked(o).map(IImmutablizable::toImmutable);
+		else if (o instanceof IImmutablizable<?>)
+			return Casts.<IImmutablizable<T>>castUnchecked(o).map(IImmutablizable::toImmutable);
 
 		Class<?> oc = o.getClass();
 		if (ExternalToImmutableMethod.AnnotationProcessor.INSTANCE.isProcessed()) {

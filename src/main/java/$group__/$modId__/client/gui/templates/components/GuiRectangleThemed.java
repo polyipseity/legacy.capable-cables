@@ -56,8 +56,10 @@ public class GuiRectangleThemed<N extends Number, TH extends IThemed.ITheme<TH>,
 
 	/** {@inheritDoc} */
 	@Override
-	public String toString() { return getToStringString(this, super.toString(),
-				new Object[]{"theme", getTheme()}); }
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"theme", getTheme()});
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -65,8 +67,10 @@ public class GuiRectangleThemed<N extends Number, TH extends IThemed.ITheme<TH>,
 
 	/** {@inheritDoc} */
 	@Override
-	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
-			t -> getTheme().equals(t.getTheme())); }
+	public boolean equals(Object o) {
+		return isEquals(this, o, super.equals(o),
+				t -> getTheme().equals(t.getTheme()));
+	}
 
 	@Override
 	public T clone() {

@@ -58,14 +58,18 @@ public class DelegateMap<K, V, T extends DelegateMap<K, V, T>> extends AbstractM
 	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public String toString() { return getToStringString(this, super.toString(),
-			new Object[]{"delegate", getDelegate()}); }
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"delegate", getDelegate()});
+	}
 
 	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
-			t -> getDelegate().equals(t.getDelegate())); }
+	public boolean equals(Object o) {
+		return isEquals(this, o, super.equals(o),
+				t -> getDelegate().equals(t.getDelegate()));
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -77,7 +81,9 @@ public class DelegateMap<K, V, T extends DelegateMap<K, V, T>> extends AbstractM
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r;
-		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) { throw Throwables.unexpected(e); }
+		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
+			throw Throwables.unexpected(e);
+		}
 		r.delegate = tryCloneUnboxedNonnull(delegate);
 		return r;
 	}

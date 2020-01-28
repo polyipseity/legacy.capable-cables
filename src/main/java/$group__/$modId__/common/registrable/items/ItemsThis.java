@@ -48,5 +48,7 @@ public final class ItemsThis extends Registrable<Item> {
 			.setNoRepair()
 			.setContainerItem(Items.BUCKET);
 
-	static { TEMPLATE_.setHarvestLevel("template_", 9001); } // COMMENT overrides are required for properties unlisted here
+	static {
+		TEMPLATE_.setHarvestLevel("template_", 9001);
+	} // COMMENT overrides are required for properties unlisted here
 }

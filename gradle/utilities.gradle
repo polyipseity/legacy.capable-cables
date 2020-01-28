@@ -47,7 +47,11 @@ project.ext.download = { String url, File dest ->
     createNewFile dest
     FileOutputStream fos = new FileOutputStream(dest)
     long r = 0
-    try { r = fos.channel.transferFrom(Channels.newChannel(new URL(url).openStream()), 0, Long.MAX_VALUE) } finally { fos.close() }
+    try {
+        r = fos.channel.transferFrom(Channels.newChannel(new URL(url).openStream()), 0, Long.MAX_VALUE)
+    } finally {
+        fos.close()
+    }
     r
 }
 

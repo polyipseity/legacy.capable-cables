@@ -14,7 +14,7 @@ import java.util.function.Function;
 import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 
 public enum CreativeTabsThis {
-	/* MARK empty */ ;
+	/* MARK empty */;
 
 
 	/* SECTION static variables */

@@ -4,12 +4,12 @@
 
 import groovy.io.FileType
 import groovy.json.JsonBuilder
+import groovy.json.JsonOutput
 import net.minecraftforge.gradle.user.TaskSourceCopy
 
 import java.util.regex.Pattern
 
 import static java.io.File.separator
-
 
 /* SECTION build script */
 
@@ -103,13 +103,15 @@ repositories {
     google()
 }
 
-stringToStringMap(customRepositories).each { String k, List<String> v -> v.each {
-    String[] e = it.split('(?<!\\\\):', 2).collect { evaluateGStringString it.trim().replace('\\:', ':') }
-    repositories."$k" {
-        name = e.first()
-        url = e.last()
+stringToStringMap(customRepositories).each { String k, List<String> v ->
+    v.each {
+        String[] e = it.split('(?<!\\\\):', 2).collect { evaluateGStringString it.trim().replace('\\:', ':') }
+        repositories."$k" {
+            name = e.first()
+            url = e.last()
+        }
     }
-}}
+}
 
 
 /* SECTION configuration */
@@ -202,7 +204,7 @@ tasks.withType(TaskSourceCopy) { TaskSourceCopy t ->
     String sourceSetName = name.replace('source', '').uncapitalize()
     sourceSetName = sourceSets.find { sourceSetName.startsWith it.name }.name
     String taskSourceSetName = sourceSetName == 'main' ? '' : sourceSetName.capitalize(),
-            language = name.replace "source${sourceSetName.capitalize()}", ''
+           language = name.replace "source${sourceSetName.capitalize()}", ''
 
     enabled = false
 
@@ -220,11 +222,13 @@ tasks.withType(TaskSourceCopy) { TaskSourceCopy t ->
 
         from(temporaryDir) {
             Map<String, Object> e = [:]
-            inputs.properties.each { if (it.key.startsWith('expand_')) {
-                String k = it.key.replace('expand_', '')
-                e.put k, it.value
-                e.put "${k}__".toString(), it.value
-            }}
+            inputs.properties.each {
+                if (it.key.startsWith('expand_')) {
+                    String k = it.key.replace('expand_', '')
+                    e.put k, it.value
+                    e.put "${k}__".toString(), it.value
+                }
+            }
 
             expand e
 
@@ -240,7 +244,8 @@ tasks.withType(TaskSourceCopy) { TaskSourceCopy t ->
 
         doLast {
             destinationDir.eachFileRecurse(FileType.FILES) {
-                it.text = it.text.replace('\\', '\\\\').replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }.replaceAll ~/\$(?!\{)/, '\\\\\\$' // COMMENT standard
+                it.text = it.text.replace('\\', '\\\\').replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }.replaceAll ~/\$(?!\{)/, '\\\\\\$'
+                // COMMENT standard
             }
         }
     } as Sync
@@ -257,11 +262,13 @@ tasks.withType(TaskSourceCopy) { TaskSourceCopy t ->
 }
 
 
-static <E> String processResourcesList(List<E> l) { l.empty ? '[]' : l.toListString().replace('[', '["').replace(']', '"]').replace(', ', '", "') }
+static <E> String processResourcesList(List<E> l) {
+    l.empty ? '[]' : l.toListString().replace('[', '["').replace(']', '"]').replace(', ', '", "')
+}
 
 tasks.withType(ProcessResources) { ProcessResources t ->
     String taskSourceSetName = name.replace('process', '').replace('Resources', ''),
-            sourceSetName = (taskSourceSetName.empty ? 'main' : taskSourceSetName).uncapitalize()
+           sourceSetName = (taskSourceSetName.empty ? 'main' : taskSourceSetName).uncapitalize()
 
     t.configure {
         // COMMENT this will ensure that this task is redone when the variables change.
@@ -331,7 +338,7 @@ test {
 
 
 jar {
-    configurations.shade.each { from (zipTree(it)) { exclude 'META-INF', 'META-INF/**' }}
+    configurations.shade.each { from(zipTree(it)) { exclude 'META-INF', 'META-INF/**' } }
 }
 
 reobf {
@@ -341,10 +348,12 @@ reobf {
     }
 }
 
-stringToStringMap(customDependencies).each { if (it.key == 'shade') it.value.each {
-    String p = evaluateGStringString(it as String).split(":", 2).first().replace '.', '/'
-    reobf.jar.extraLines "PK: $p ${group.replace '.', '/'}/shaded/$p"
-}}
+stringToStringMap(customDependencies).each {
+    if (it.key == 'shade') it.value.each {
+        String p = evaluateGStringString(it as String).split(":", 2).first().replace '.', '/'
+        reobf.jar.extraLines "PK: $p ${group.replace '.', '/'}/shaded/$p"
+    }
+}
 
 
 task deobfJar(type: Jar, dependsOn: tasks.jar) {
@@ -383,18 +392,21 @@ tasks.withType(Javadoc) { Javadoc t ->
             exclude { it.path.contains('$') }
 
             Map<String, Object> e = [:]
-            inputs.properties.each { if (it.key.startsWith('expand_')) {
-                String k = it.key.replace('expand_', '')
-                e.put k, it.value
-                e.put "${k}__".toString(), it.value
-            }}
+            inputs.properties.each {
+                if (it.key.startsWith('expand_')) {
+                    String k = it.key.replace('expand_', '')
+                    e.put k, it.value
+                    e.put "${k}__".toString(), it.value
+                }
+            }
 
             // CODE expand e // COMMENT method code > 65536
 
             doFirst {
                 t.destinationDir.eachFile(FileType.FILES) {
                     String text = it.text.replace(':D', '$') // COMMENT specific
-                            /* CODE .replace('\\', '\\\\') */.replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }/* CODE .replaceAll ~/\$(?!\{)/, '\\\\\\$' */ // COMMENT standard
+                    /* CODE .replace('\\', '\\\\') */.replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }
+/* CODE .replaceAll ~/\$(?!\{)/, '\\\\\\$' */ // COMMENT standard
 
                     // COMMENT temp fix for method code > 65536
                     // TODO use a better fix
@@ -427,10 +439,10 @@ task saveCurrentGoodSettings(group: 'build', description: "Saves current good se
 
         Wrapper wrapper = tasks.wrapper as Wrapper
         Map<String, Object> json = [
-                gradle: [ distributionUrl: wrapper.distributionUrl.replace(wrapper.distributionType.name().toLowerCase(Locale.ROOT), Wrapper.DistributionType.ALL.name().toLowerCase(Locale.ROOT)) ],
+                gradle      : [distributionUrl: wrapper.distributionUrl.replace(wrapper.distributionType.name().toLowerCase(Locale.ROOT), Wrapper.DistributionType.ALL.name().toLowerCase(Locale.ROOT))],
                 dependencies: [],
-                minecraft: [
-                        version: minecraftForgeVersion,
+                minecraft   : [
+                        version : minecraftForgeVersion,
                         mappings: minecraftMappings
                 ]
         ]
@@ -438,11 +450,10 @@ task saveCurrentGoodSettings(group: 'build', description: "Saves current good se
             if (configuration.canBeResolved) configuration.resolvedConfiguration.firstLevelModuleDependencies.each { json.dependencies.add([configuration: configuration.name, group: it.moduleGroup, name: it.moduleName, version: it.moduleVersion]) }
             else configuration.dependencies.each { json.dependencies.add([configuration: configuration.name, group: it.group, name: it.name, version: it.version]) }
         }
-        String jsonText = new JsonBuilder(json).toPrettyString()
+        String jsonText = new JsonBuilder(json).toString()
 
         file.write jsonText
-        logger.info "'${convertToCanonicalPath lastGoodSettingsPath}':"
-        logger.info jsonText
+        logger.info "'${convertToCanonicalPath lastGoodSettingsPath}':\n${JsonOutput.prettyPrint(jsonText)}"
     }
 }
 tasks.build.finalizedBy tasks.saveCurrentGoodSettings

@@ -13,12 +13,20 @@ project.ext.storeProperties = { Properties prop, String path, String comment = n
     File f = file path
     createNewFile f
     FileOutputStream fos = new FileOutputStream(f)
-    try { prop.store fos, comment } finally { fos.close() }
+    try {
+        prop.store fos, comment
+    } finally {
+        fos.close()
+    }
 }
 
 project.ext.loadProperties = { String path ->
     Properties prop = new Properties()
     FileInputStream fis = new FileInputStream(path)
-    try { prop.load fis } finally { fis.close() }
+    try {
+        prop.load fis
+    } finally {
+        fis.close()
+    }
     prop
 }

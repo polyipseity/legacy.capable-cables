@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
-import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
 
 public enum GuiHandler implements IGuiHandler {
 	/* SECTION enums */
@@ -53,7 +52,9 @@ public enum GuiHandler implements IGuiHandler {
 
 	/* SECTION static variables */
 
-	protected static final GuiHandlerFunctional DEFAULT = (side, id, player, world, x, y, z) -> { throw rejectArguments(side, id, player, world, x, y, z); };
+	protected static final GuiHandlerFunctional DEFAULT = (side, id, player, world, x, y, z) -> {
+		throw rejectArguments(side, id, player, world, x, y, z);
+	};
 
 
 	/* SECTION static classes */

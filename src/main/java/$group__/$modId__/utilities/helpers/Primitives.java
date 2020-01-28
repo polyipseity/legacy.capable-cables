@@ -19,13 +19,13 @@ import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclared
 import static java.util.Arrays.asList;
 
 public enum Primitives {
-	/* MARK empty */ ;
+	/* MARK empty */;
 
 
 	/* SECTION static classes */
 
 	public enum Numbers {
-		/* MARK empty */ ;
+		/* MARK empty */;
 
 
 		/* SECTION static methods */
@@ -42,7 +42,8 @@ public enum Primitives {
 
 
 		public static <N> Optional<N> sum(@Nullable N n, Iterable<? extends N> it) {
-			if (n instanceof IOperable<?, ?>) return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class)).flatMap(t -> castChecked(t.sum(it), castUncheckedUnboxedNonnull(t.getClass())));
+			if (n instanceof IOperable<?, ?>)
+				return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class)).flatMap(t -> castChecked(t.sum(it), castUncheckedUnboxedNonnull(t.getClass())));
 			else if (n instanceof Number) {
 				Class<? extends N> clazz = castUncheckedUnboxedNonnull(n.getClass());
 				@Nullable Class<?> pClass = unboxOptional(getDeclaredField(clazz, "TYPE").get_(null).flatMap(t -> castChecked(t, Class.class)));
@@ -52,7 +53,8 @@ public enum Primitives {
 						em = getDeclaredMethod(Number.class, pClass + "Value");
 
 				Iterator<? extends N> itr = it.iterator();
-				while (itr.hasNext() && n != null) n = unboxOptional(m.invoke(null, n, unboxOptional(em.invoke(itr.next()))).flatMap(t -> castChecked(t, clazz)));
+				while (itr.hasNext() && n != null)
+					n = unboxOptional(m.invoke(null, n, unboxOptional(em.invoke(itr.next()))).flatMap(t -> castChecked(t, clazz)));
 				return Optional.ofNullable(n);
 			}
 			return Optional.empty();
@@ -76,7 +78,8 @@ public enum Primitives {
 
 
 		public static <N> Optional<N> max(@Nullable N n, Iterable<? extends N> it) {
-			if (n instanceof IOperable<?, ?>) return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class)).flatMap(t -> castChecked(t.max(it), castUncheckedUnboxedNonnull(t.getClass())));
+			if (n instanceof IOperable<?, ?>)
+				return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class)).flatMap(t -> castChecked(t.max(it), castUncheckedUnboxedNonnull(t.getClass())));
 			else if (n instanceof Comparable<?>) {
 				@Nullable Comparable<N> t = castCheckedUnboxed(n, castUncheckedUnboxedNonnull(Comparable.class));
 				Iterator<? extends N> itr = it.iterator();
@@ -107,7 +110,8 @@ public enum Primitives {
 
 
 		public static <N> Optional<N> min(@Nullable N n, Iterable<? extends N> it) {
-			if (n instanceof IOperable<?, ?>) return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class)).flatMap(t -> castChecked(t.min(it), castUncheckedUnboxedNonnull(t.getClass())));
+			if (n instanceof IOperable<?, ?>)
+				return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class)).flatMap(t -> castChecked(t.min(it), castUncheckedUnboxedNonnull(t.getClass())));
 			else if (n instanceof Comparable<?>) {
 				@Nullable Comparable<N> t = castCheckedUnboxed(n, castUncheckedUnboxedNonnull(Comparable.class));
 				Iterator<? extends N> itr = it.iterator();

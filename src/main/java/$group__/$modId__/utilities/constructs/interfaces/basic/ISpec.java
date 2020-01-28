@@ -5,6 +5,6 @@ import java.util.Optional;
 @FunctionalInterface
 public interface ISpec<T> {
 	/* SECTION methods */
-	
+
 	Optional<? extends T> spec();
 }

@@ -83,8 +83,10 @@ public class PolygonN<N extends Number, T extends PolygonN<N, T>> extends Abstra
 	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public String toString() { return getToStringString(this, super.toString(),
-				new Object[]{"list", getList()}); }
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"list", getList()});
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -94,15 +96,19 @@ public class PolygonN<N extends Number, T extends PolygonN<N, T>> extends Abstra
 	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
-			t -> getList().equals(t.getList())); }
+	public boolean equals(Object o) {
+		return isEquals(this, o, super.equals(o),
+				t -> getList().equals(t.getList()));
+	}
 
 	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r;
-		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
+		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
+			throw unexpected(e);
+		}
 		r.list = tryCloneUnboxedNonnull(list);
 		return r;
 	}

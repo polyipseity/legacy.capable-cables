@@ -15,4 +15,4 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Nonnull
 @TypeQualifierDefault(LOCAL_VARIABLE)
 @Retention(RUNTIME)
-public @interface LocalVariablesAreNonnullByDefault { /* MARK empty */ }
+public @interface LocalVariablesAreNonnullByDefault { /* MARK empty */}

@@ -77,9 +77,11 @@ public class Frame<N extends Number, T extends Frame<N, T>> implements IStructur
 	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public String toString() { return getToStringString(this, super.toString(),
+	public String toString() {
+		return getToStringString(this, super.toString(),
 				new Object[]{"tl", getTopLeft()},
-				new Object[]{"br", getBottomRight()}); }
+				new Object[]{"br", getBottomRight()});
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -89,16 +91,20 @@ public class Frame<N extends Number, T extends Frame<N, T>> implements IStructur
 	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
+	public boolean equals(Object o) {
+		return isEquals(this, o, super.equals(o),
 				t -> getTopLeft().equals(t.getTopLeft()),
-				t -> getBottomRight().equals(t.getBottomRight())); }
+				t -> getBottomRight().equals(t.getBottomRight()));
+	}
 
 	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r;
-		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) { throw unexpected(e); }
+		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
+			throw unexpected(e);
+		}
 		r.tl = tl.clone();
 		r.br = br.clone();
 		return r;

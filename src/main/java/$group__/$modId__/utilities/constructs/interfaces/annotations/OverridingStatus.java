@@ -89,7 +89,8 @@ public @interface OverridingStatus {
 						}
 						continue check;
 					} else if (isFormerMethodOverriddenByLatter(superM, subM) == whenB) {
-						if (whenB && isMemberFinal(subM)) LOGGER.warn(getMessage(this, "Impossible: subclass -Y> final method '" + superM.toGenericString() + "' (" + a + ")"));
+						if (whenB && isMemberFinal(subM))
+							LOGGER.warn(getMessage(this, "Impossible: subclass -Y> final method '" + superM.toGenericString() + "' (" + a + ")"));
 						continue check;
 					}
 				}

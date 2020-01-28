@@ -58,15 +58,19 @@ public class GuiTabsThemed<N extends Number, E extends GuiTabs.ITab<N, ?>, TH ex
 
 
 	@Override
-	public String toString() { return getToStringString(this, super.toString(),
-				new Object[]{"theme", getTheme()}); }
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"theme", getTheme()});
+	}
 
 	@Override
 	public int hashCode() { return getHashCode(this, super.hashCode(), getTheme()); }
 
 	@Override
-	public boolean equals(Object o) { return isEquals(this, o, super.equals(o),
-			t -> getTheme().equals(t.getTheme())); }
+	public boolean equals(Object o) {
+		return isEquals(this, o, super.equals(o),
+				t -> getTheme().equals(t.getTheme()));
+	}
 
 	@Override
 	public T clone() {

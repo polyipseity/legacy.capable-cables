@@ -3,7 +3,7 @@ package $group__.$modId__.common.registrable.utilities.helpers;
 import net.minecraft.util.ResourceLocation;
 
 public enum Registries {
-	/* MARK empty */ ;
+	/* MARK empty */;
 
 
 	/* SECTION static methods */
