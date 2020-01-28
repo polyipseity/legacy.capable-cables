@@ -17,6 +17,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;

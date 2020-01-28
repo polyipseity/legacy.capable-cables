@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
+import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
 
 public enum GuiHandler implements IGuiHandler {
 	/* SECTION enums */
