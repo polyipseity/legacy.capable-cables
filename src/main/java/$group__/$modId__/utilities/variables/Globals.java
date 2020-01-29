@@ -6,6 +6,8 @@ import $group__.$modId__.common.registrable.utilities.constructs.ResourceLocatio
 import $group__.$modId__.utilities.constructs.interfaces.basic.IThrowableCatcher;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraftforge.client.event.GuiScreenEvent;
@@ -15,6 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
+import org.reflections.Reflections;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -49,12 +52,11 @@ public enum Globals implements IThrowableCatcher {
 	public static final ModThis MOD = ModThis.INSTANCE;
 	public static final Logger LOGGER = ModThis.LOGGER;
 
-	@SuppressWarnings({"SpellCheckingInspection", "RedundantSuppression"})
-	public static final String
-			COFH_CORE_ID = "cofhcore",
-			COFH_CORE_PACKAGE = "cofh",
-			BUILDCRAFT_API_ID = "BuildCraftAPI|core",
-			BUILDCRAFT_API_PACKAGE = "buildcraft";
+	public static final LoadingCache<String, Reflections> REFLECTIONS_CACHE = CacheBuilder.newBuilder().softValues().build(CacheLoader.from(t -> {
+		Reflections r = new Reflections(t);
+		r.expandSuperTypes();
+		return r;
+	}));
 
 
 	public static final ThreadLocal<Throwable> CAUGHT_THROWABLE = new ThreadLocal<>();
@@ -71,9 +73,9 @@ public enum Globals implements IThrowableCatcher {
 
 	public static void clearCaughtThrowableStatic() { INSTANCE.clearCaughtThrowable(); }
 
-	public static void rethrowCaughtThrowableStatic(boolean nullable) { INSTANCE.rethrowCaughtThrowable(nullable); }
+	public static void rethrowCaughtThrowableStatic(boolean nullable) throws RuntimeException { INSTANCE.rethrowCaughtThrowable(nullable); }
 
-	public static RuntimeException rethrowCaughtThrowableStatic() { throw INSTANCE.rethrowCaughtThrowable(); }
+	public static RuntimeException rethrowCaughtThrowableStatic() throws RuntimeException { throw INSTANCE.rethrowCaughtThrowable(); }
 
 	public static void setCaughtThrowableStatic(Throwable t) { INSTANCE.setCaughtThrowable(t); }
 

@@ -28,27 +28,26 @@ public final class ItemsThis extends Registrable<Item> {
 	/* SECTION static methods */
 
 	@SubscribeEvent
-	public static void registerStatic(RegistryEvent.Register<Item> e) { INSTANCE.register(e); }
+	public static void registerStatic(RegistryEvent.Register<Item> event) { INSTANCE.register(event); }
 
 
 	/* REFERENCE item template */
 
 	@SuppressWarnings("unused")
-	private static final Item TEMPLATE_ = new ItemDefault()
-			// COMMENT below one is required
-			.setRegistryName(MOD_ID, "template_")
-			// COMMENT all below are optional
-			.setUnlocalizedName("template_")
-			.setCreativeTab(CreativeTabs.MISC)
-			.setMaxStackSize(69)
-			.setFull3D()
-			// COMMENT subclass is probably needed for below properties (including the static initializer)
-			.setHasSubtypes(true)
-			.setMaxDamage(1337)
-			.setNoRepair()
-			.setContainerItem(Items.BUCKET);
-
-	static {
-		TEMPLATE_.setHarvestLevel("template_", 9001);
-	} // COMMENT overrides are required for properties unlisted here
+	private static final Item TEMPLATE_ = new ItemDefault() {{
+		// COMMENT below one is required
+		setRegistryName(MOD_ID, "template_");
+		// COMMENT all below are optional
+		setUnlocalizedName("template_");
+		setCreativeTab(CreativeTabs.MISC);
+		setMaxStackSize(69);
+		setFull3D();
+		// COMMENT subclass is probably needed for below properties
+		setHasSubtypes(true);
+		setMaxDamage(1337);
+		setNoRepair();
+		setContainerItem(Items.BUCKET);
+		setHarvestLevel("template_", 9001);
+		// COMMENT overrides are required for properties unlisted here
+	}};
 }

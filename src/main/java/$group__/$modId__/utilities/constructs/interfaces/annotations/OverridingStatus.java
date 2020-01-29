@@ -26,12 +26,10 @@ import static $group__.$modId__.utilities.helpers.Throwables.throw_;
 import static $group__.$modId__.utilities.helpers.Throwables.wrapCheckedThrowable;
 import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 import static $group__.$modId__.utilities.variables.Globals.LOGGER;
+import static $group__.$modId__.utilities.variables.Globals.REFLECTIONS_CACHE;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-/**
- *
- */
 @Documented
 @Target(METHOD)
 @Retention(RUNTIME)
@@ -132,6 +130,6 @@ public @interface OverridingStatus {
 		/* SECTION static methods */
 
 		@SubscribeEvent(priority = EventPriority.HIGH)
-		public static void process(AnnotationProcessingEvent e) { if (MOD_ID.equals(e.getModId())) INSTANCE.process(e.getAsm()); }
+		public static void process(AnnotationProcessingEvent event) { if (MOD_ID.equals(event.getModId())) INSTANCE.process(event.getAsm()); }
 	}
 }

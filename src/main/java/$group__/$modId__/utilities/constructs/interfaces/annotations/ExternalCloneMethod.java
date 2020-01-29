@@ -8,6 +8,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalNotification;
+import com.google.common.collect.ImmutableMap;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -34,9 +35,6 @@ import static $group__.$modId__.utilities.variables.Globals.getCaughtThrowableUn
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-/**
- *
- */
 @Documented
 @Nonnull
 @Retention(RUNTIME)
@@ -100,7 +98,7 @@ public @interface ExternalCloneMethod {
 			return r;
 		}
 	});
-	WeakHashMap<ExternalCloneMethod, MethodAdapter> EXTERNAL_CLONE_METHOD_MAP = new WeakHashMap<>();
+	WeakHashMap<ExternalCloneMethod, MethodAdapter> EXTERNAL_CLONE_METHOD_MAP = new WeakHashMap<>(CLONE_METHOD_DEFAULT_ANNOTATION == null ? ImmutableMap.of() : ImmutableMap.of(CLONE_METHOD_DEFAULT_ANNOTATION, CLONE_METHOD_DEFAULT));
 
 
 	/* SECTION static classes */
@@ -158,11 +156,6 @@ public @interface ExternalCloneMethod {
 		/* SECTION static methods */
 
 		@SubscribeEvent(priority = EventPriority.HIGHEST)
-		public static void process(AnnotationProcessingEvent e) { if (MOD_ID.equals(e.getModId())) INSTANCE.process(e.getAsm()); }
-
-
-		/* SECTION static initializer */
-
-		static { EXTERNAL_CLONE_METHOD_MAP.put(CLONE_METHOD_DEFAULT_ANNOTATION, CLONE_METHOD_DEFAULT); }
+		public static void process(AnnotationProcessingEvent event) { if (MOD_ID.equals(event.getModId())) INSTANCE.process(event.getAsm()); }
 	}
 }

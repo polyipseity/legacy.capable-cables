@@ -31,6 +31,8 @@ public enum Throwables {
 
 	public static StackTraceElement[] getStackTrace() { return newThrowable().getStackTrace(); }
 
+	public static String getStackTraceString() { return ExceptionUtils.getStackTrace(newThrowable()); }
+
 
 	public static void consumeCaught(Throwable t) { LOGGER.debug("Consumed throwable", t); }
 

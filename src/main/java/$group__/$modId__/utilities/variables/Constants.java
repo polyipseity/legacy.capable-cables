@@ -21,7 +21,13 @@ public enum Constants {
 			ACCEPTED_MINECRAFT_VERSIONS = "${minecraftVersionRange}",
 			CERTIFICATE_FINGERPRINT = "${certificateFingerprint}",
 			UPDATE_JSON = "${updateJSON}",
-			GROUP = "${group}";
+			GROUP = "${group}",
+			PACKAGE = GROUP + "." + MOD_ID;
+
+	@SuppressWarnings({"SpellCheckingInspection", "RedundantSuppression"})
+	public static final String
+			COFH_CORE_ID = "cofhcore", COFH_CORE_PACKAGE = "cofh",
+			BUILDCRAFT_API_ID = "BuildCraftAPI|core", BUILDCRAFT_API_PACKAGE = "buildcraft";
 
 
 	public static final ImmutableMap<Class<?>, Object> PRIMITIVE_DATA_TYPES = ImmutableMap.<Class<?>, Object>builder()

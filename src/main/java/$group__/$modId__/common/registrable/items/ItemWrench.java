@@ -5,6 +5,7 @@ import $group__.$modId__.common.inventory.ContainerWrench;
 import $group__.$modId__.common.registrable.items.templates.ItemUnstackable;
 import $group__.$modId__.common.registrable.utilities.constructs.IRegistrableEventBusSubscriber;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IStruct;
+import $group__.$modId__.utilities.variables.Constants;
 import buildcraft.api.tools.IToolWrench;
 import cofh.api.item.IToolHammer;
 import net.minecraft.block.Block;
@@ -41,11 +42,12 @@ import static $group__.$modId__.common.registrable.utilities.helpers.Registrable
 import static $group__.$modId__.utilities.helpers.Miscellaneous.markUnused;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
 import static $group__.$modId__.utilities.helpers.Throwables.requireRunOnceOnly;
-import static $group__.$modId__.utilities.variables.Globals.*;
+import static $group__.$modId__.utilities.variables.Globals.LOGGER;
+import static $group__.$modId__.utilities.variables.Globals.MOD;
 
 @Optional.InterfaceList({
-		@Optional.Interface(iface = COFH_CORE_PACKAGE + ".api.item.IToolHammer", modid = COFH_CORE_ID),
-		@Optional.Interface(iface = BUILDCRAFT_API_PACKAGE + ".api.tools.IToolWrench", modid = BUILDCRAFT_API_ID)
+		@Optional.Interface(iface = Constants.COFH_CORE_PACKAGE + ".api.item.IToolHammer", modid = Constants.COFH_CORE_ID),
+		@Optional.Interface(iface = Constants.BUILDCRAFT_API_PACKAGE + ".api.tools.IToolWrench", modid = Constants.BUILDCRAFT_API_ID)
 })
 public class ItemWrench extends ItemUnstackable implements IRegistrableEventBusSubscriber, IToolHammer, IToolWrench {
 	/* SECTION methods */
@@ -93,33 +95,33 @@ public class ItemWrench extends ItemUnstackable implements IRegistrableEventBusS
 
 	/** {@inheritDoc} */
 	@Override
-	@Optional.Method(modid = COFH_CORE_ID)
+	@Optional.Method(modid = Constants.COFH_CORE_ID)
 	public boolean isUsable(ItemStack item, EntityLivingBase user, BlockPos pos) { return true; }
 
 	/** {@inheritDoc} */
 	@Override
-	@Optional.Method(modid = COFH_CORE_ID)
+	@Optional.Method(modid = Constants.COFH_CORE_ID)
 	public boolean isUsable(ItemStack item, EntityLivingBase user, Entity entity) { return true; }
 
 	/** {@inheritDoc} */
 	@Override
-	@Optional.Method(modid = COFH_CORE_ID)
+	@Optional.Method(modid = Constants.COFH_CORE_ID)
 	public void toolUsed(ItemStack item, EntityLivingBase user, BlockPos pos) {  /* MARK empty */ }
 
 	/** {@inheritDoc} */
 	@Override
-	@Optional.Method(modid = COFH_CORE_ID)
+	@Optional.Method(modid = Constants.COFH_CORE_ID)
 	public void toolUsed(ItemStack item, EntityLivingBase user, Entity entity) {  /* MARK empty */ }
 
 
 	/** {@inheritDoc} */
 	@Override
-	@Optional.Method(modid = BUILDCRAFT_API_ID)
+	@Optional.Method(modid = Constants.BUILDCRAFT_API_ID)
 	public boolean canWrench(EntityPlayer player, EnumHand hand, ItemStack wrench, RayTraceResult rayTrace) { return true; }
 
 	/** {@inheritDoc} */
 	@Override
-	@Optional.Method(modid = BUILDCRAFT_API_ID)
+	@Optional.Method(modid = Constants.BUILDCRAFT_API_ID)
 	public void wrenchUsed(EntityPlayer player, EnumHand hand, ItemStack wrench, RayTraceResult rayTrace) {  /* MARK empty */ }
 
 

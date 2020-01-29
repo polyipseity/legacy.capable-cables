@@ -31,11 +31,11 @@ public abstract class Registrable<T extends IForgeRegistryEntry<T>> extends Sing
 	/* SECTION methods */
 
 	@OverridingMethodsMustInvokeSuper
-	protected void register(RegistryEvent.Register<T> e) {
+	protected void register(RegistryEvent.Register<T> event) {
 		String classGS = clazz.toGenericString(),
 				evtRegGS = IRegistrableEventBusSubscriber.class.toGenericString();
 		LOGGER.info("Registration of '{}' started", classGS);
-		IForgeRegistry<T> reg = e.getRegistry();
+		IForgeRegistry<T> reg = event.getRegistry();
 
 		int regEd = 0,
 				evtRegEd = 0;

@@ -68,11 +68,16 @@ public interface ICloneable<T> extends Cloneable {
 			if (!m.setAccessible(true))
 				LOGGER.warn("Unable to set clone method '{}' of object '{}' of class '{}' accessible, stacktrace:\n{}", m0.toGenericString(), o, oc.toGenericString(), getStackTrace(m.getCaughtThrowableUnboxedNonnull()));
 
-			return castUnchecked((isMemberStatic(m0) ? m.invoke(null, o) : m.invoke(o)).orElseGet(() -> {
+			Optional<T> r = castUnchecked((isMemberStatic(m0) ? m.invoke(null, o) : m.invoke(o)).orElseGet(() -> {
 				LOGGER.warn("Clone method '{}' failed for object '{}' of class '{}', will NOT attempt to clone again, stacktrace:\n{}", m0.toGenericString(), o, oc.toGenericString(), getStackTrace(m.getCaughtThrowableUnboxedNonnull()));
 				BROKEN_CLONE_CLASSES.add(oc);
 				return castUncheckedUnboxed(o);
 			}));
+
+			if (!m.setAccessible(false))
+				LOGGER.warn("Unable to restore accessibility of clone method '{}' of object '{}' of class '{}', presenting a potential security problem, stacktrace:\n{}", m0.toGenericString(), o, oc.toGenericString(), getStackTrace(m.getCaughtThrowableUnboxedNonnull()));
+
+			return r;
 		} else {
 			LOGGER.debug("Unable to clone object '{}' of class '{}' as clone method annotation is not yet processed, will attempt to clone again, stacktrace:\n{}", o, oc.toGenericString(), getStackTrace(newThrowable()));
 			return Optional.of(o);

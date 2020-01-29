@@ -1,7 +1,6 @@
 package $group__.$modId__.utilities.constructs.classes;
 
 import $group__.$modId__.utilities.variables.Globals;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.HashMap;
 import java.util.Optional;
@@ -10,7 +9,7 @@ import java.util.function.Function;
 import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
 import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.newInstance;
-import static $group__.$modId__.utilities.helpers.Throwables.newThrowable;
+import static $group__.$modId__.utilities.helpers.Throwables.getStackTraceString;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectInstantiation;
 import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 
@@ -20,7 +19,7 @@ public abstract class Singleton {
 	public Singleton() {
 		Class<? extends Singleton> clazz = getClass();
 		String classGS = clazz.toGenericString();
-		String sts = ExceptionUtils.getStackTrace(newThrowable());
+		String sts = getStackTraceString();
 
 		synchronized (INSTANCES) {
 			if (INSTANCES.put(clazz, this) != null) {

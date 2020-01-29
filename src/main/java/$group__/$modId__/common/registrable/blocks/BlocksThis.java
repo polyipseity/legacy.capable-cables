@@ -29,7 +29,7 @@ public final class BlocksThis extends Registrable<Block> {
 	/* SECTION static methods */
 
 	@SubscribeEvent
-	public static void registerStatic(RegistryEvent.Register<Block> e) { INSTANCE.register(e); }
+	public static void registerStatic(RegistryEvent.Register<Block> event) { INSTANCE.register(event); }
 
 
 	/* REFERENCE block template */

@@ -30,9 +30,6 @@ import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-/**
- *
- */
 @Documented
 @Nonnull
 @Retention(RUNTIME)
@@ -132,6 +129,6 @@ public @interface ExternalToImmutableMethod {
 		/* SECTION static methods */
 
 		@SubscribeEvent(priority = EventPriority.HIGHEST)
-		public static void process(AnnotationProcessingEvent e) { if (MOD_ID.equals(e.getModId())) INSTANCE.process(e.getAsm()); }
+		public static void process(AnnotationProcessingEvent event) { if (MOD_ID.equals(event.getModId())) INSTANCE.process(event.getAsm()); }
 	}
 }

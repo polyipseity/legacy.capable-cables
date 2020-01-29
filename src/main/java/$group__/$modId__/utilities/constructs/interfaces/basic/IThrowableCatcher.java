@@ -23,12 +23,12 @@ public interface IThrowableCatcher {
 	void clearCaughtThrowable();
 
 
-	default void rethrowCaughtThrowable(boolean nullable) {
+	default void rethrowCaughtThrowable(boolean nullable) throws RuntimeException {
 		if (nullable) getCaughtThrowable().ifPresent(t -> { throw wrapCheckedThrowable(t); });
 		else throw wrapCheckedThrowable(getCaughtThrowable().orElseThrow(Throwables::unexpected));
 	}
 
-	default RuntimeException rethrowCaughtThrowable() {
+	default RuntimeException rethrowCaughtThrowable() throws RuntimeException {
 		rethrowCaughtThrowable(false);
 		throw unexpected();
 	}

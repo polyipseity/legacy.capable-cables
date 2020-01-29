@@ -1,12 +1,8 @@
 package $group__.$modId__.utilities.constructs.interfaces.basic;
 
 import $group__.$modId__.utilities.variables.Globals;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import org.apache.commons.lang3.StringUtils;
-import org.reflections.Reflections;
 
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
@@ -30,15 +26,6 @@ public interface IAnnotationProcessor<A extends Annotation> {
 
 
 	void process(ASMDataTable asm);
-
-
-	/* SECTION static variables */
-
-	LoadingCache<String, Reflections> REFLECTIONS_CACHE = CacheBuilder.newBuilder().softValues().build(CacheLoader.from(t -> {
-		Reflections r = new Reflections(t);
-		r.expandSuperTypes();
-		return r;
-	}));
 
 
 	/* SECTION static methods */

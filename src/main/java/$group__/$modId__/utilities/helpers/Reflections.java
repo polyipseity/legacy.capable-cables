@@ -26,11 +26,18 @@ public enum Reflections {
 
 	/* SECTION static methods */
 
-	public static boolean isClassAbstract(Class<?> c) { return c.isInterface() || Modifier.isAbstract(c.getModifiers()); }
+	public static boolean isClassAbstract(Class<?> clazz) { return clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()); }
 
-	public static boolean isMemberStatic(Member m) { return Modifier.isStatic(m.getModifiers()); }
+	public static boolean isMemberStatic(Member member) { return Modifier.isStatic(member.getModifiers()); }
 
-	public static boolean isMemberFinal(Member m) { return Modifier.isFinal(m.getModifiers()); }
+	public static boolean isMemberFinal(Member member) { return Modifier.isFinal(member.getModifiers()); }
+
+
+	public static String getPackage(Class<?> clazz) {
+		String r = clazz.getName().replace(clazz.getSimpleName(), "");
+		if (r.endsWith(".")) r = r.substring(0, r.length() - 1);
+		return r;
+	}
 
 
 	public static LinkedHashSet<LinkedHashSet<Class<?>>> getSuperclassesAndInterfaces(Class<?> c) {
@@ -181,21 +188,20 @@ public enum Reflections {
 
 			/* SECTION methods */
 
-			@SuppressWarnings({"UnusedReturnValue", "BooleanMethodIsAlwaysInverted"})
+			@SuppressWarnings({"UnusedReturnValue"})
 			public boolean setAccessible(boolean flag) {
 				clearCaughtThrowable();
-				try {
-					final boolean[] r = {false};
-					get().ifPresent(t -> {
+				final boolean[] r = {false};
+				get().ifPresent(t -> {
+					try {
 						t.setAccessible(flag);
 						r[0] = true;
-					});
-					return r[0];
-				} catch (Throwable t) {
-					consumeCaught(t);
-					caughtThrowable.set(t);
-					return false;
-				}
+					} catch (Throwable th) {
+						consumeCaught(th);
+						caughtThrowable.set(th);
+					}
+				});
+				return r[0];
 			}
 
 
@@ -229,6 +235,36 @@ public enum Reflections {
 							return null;
 						}
 					});
+				}
+
+				public boolean set(@Nullable Object obj, Object value) {
+					clearCaughtThrowable();
+					final boolean[] r = {false};
+					get().ifPresent(t -> {
+						try {
+							t.set(obj, value);
+							r[0] = true;
+						} catch (Throwable th) {
+							consumeCaught(th);
+							caughtThrowable.set(th);
+						}
+					});
+					return r[0];
+				}
+
+				public boolean setInt(@Nullable Object obj, int i) {
+					clearCaughtThrowable();
+					final boolean[] r = {false};
+					get().ifPresent(t -> {
+						try {
+							t.setInt(obj, i);
+							r[0] = true;
+						} catch (Throwable th) {
+							consumeCaught(th);
+							caughtThrowable.set(th);
+						}
+					});
+					return r[0];
 				}
 
 

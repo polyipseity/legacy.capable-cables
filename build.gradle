@@ -56,7 +56,7 @@ ext {
     minecraftVersions = (minecraftVersion as String).split('\\.')
     minecraftMajor = minecraftVersions.first().toInteger()
     minecraftMinor = minecraftVersions[1].toInteger()
-    minecraftVersionRange = "[${minecraftMinor == 0 ? minecraftMajor - 1 : minecraftMajor}.${minecraftMinor == 0 ? Integer.MAX_VALUE : minecraftMinor - 1},$minecraftVersion]"
+    minecraftVersionRange = "[$minecraftMajor.$minecraftMinor,$minecraftVersion]"
 
 
     // COMMENT versioning
