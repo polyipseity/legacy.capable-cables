@@ -79,7 +79,7 @@ public interface ICloneable<T> extends Cloneable {
 
 			return r;
 		} else {
-			LOGGER.debug("Unable to clone object '{}' of class '{}' as clone method annotation is not yet processed, will attempt to clone again, stacktrace:\n{}", o, oc.toGenericString(), getStackTrace(newThrowable()));
+			LOGGER.debug("Unable to clone object '{}' of class '{}' as clone method annotation is NOT yet processed, will attempt to clone again, stacktrace:\n{}", o, oc.toGenericString(), getStackTrace(newThrowable()));
 			return Optional.of(o);
 		}
 	}

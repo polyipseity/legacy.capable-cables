@@ -63,7 +63,7 @@ public enum ModThis {
 
 	@Marker(@Property(key = "Method", value = EVENT_PROCESSOR_VALUE))
 	@EventHandler
-	public void processEvent(FMLEvent event) { EVENT_MAP.getOrDefault(event.getClass(), (m, e) -> LOGGER.info("FMLEvent '{}' received, but processing is not implemented", e)).accept(castUncheckedUnboxedNonnull(this), castUncheckedUnboxedNonnull(event)); }
+	public void processEvent(FMLEvent event) { EVENT_MAP.getOrDefault(event.getClass(), (m, e) -> LOGGER.info("FMLEvent '{}' received, but processing is NOT implemented", e)).accept(castUncheckedUnboxedNonnull(this), castUncheckedUnboxedNonnull(event)); }
 
 
 	/* SECTION static variables */

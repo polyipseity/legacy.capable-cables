@@ -79,7 +79,7 @@ public interface IImmutablizable<T> {
 
 			return r;
 		} else {
-			LOGGER.debug("Unable to immutable object '{}' of class '{}' as to immutable method annotation is not yet processed, will attempt to immutable again, stacktrace:\n{}", o, oc.toGenericString(), getStackTrace(newThrowable()));
+			LOGGER.debug("Unable to immutable object '{}' of class '{}' as to immutable method annotation is NOT yet processed, will attempt to immutable again, stacktrace:\n{}", o, oc.toGenericString(), getStackTrace(newThrowable()));
 			return Optional.of(o);
 		}
 	}

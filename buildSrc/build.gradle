@@ -83,11 +83,13 @@ String getLatestVersionMaven(String metadataUrl, String metadataPath, String fil
     if (!(checkMavenMetadata(metadataUrl, metadataFile, "MD5", "md5") && checkMavenMetadata(metadataUrl, metadataFile, "SHA-1", "sha1"))) {
         def json = parseLastGoodSettings false
         String name = metadataUrl.reverse().find("\\/.+?\\/").replace("/", "").reverse()
+        //noinspection GrUnresolvedAccess
         String ret = (json.dependencies.find { it.name == name }).version
         logger.log LogLevel.WARN, "Using version \'$ret\' of \'$name\' instead of the latest."
         return ret
     }
 
+    //noinspection GrUnresolvedAccess
     List<String> versions = new XmlSlurper().parse(metadataFile).versioning.versions.children().list().collect { it.text() }
     List<VersionNumber> filtered = versions.findAll { it.contains(filter) }.collect { VersionNumber.parse(it as String) }.sort()
     return filtered.empty ? versions.collect { VersionNumber.parse(it as String) }.sort().last() : filtered.last()
@@ -141,17 +143,17 @@ if (update) {
         JsonSlurper jsonSlurper = new JsonSlurper()
 
         File gradleLatestReleaseNightlyJsonFile = file gradleLatestReleaseNightlyJsonPath
-        download gradleLatestReleaseNightlyJsonUrl, gradleLatestReleaseNightlyJsonFile
+        download gradleLatestReleaseNightlyJsonUrl.toString(), gradleLatestReleaseNightlyJsonFile
         def json = jsonSlurper.parse gradleLatestReleaseNightlyJsonFile
 
         if (json.broken) {
             File gradleLatestNightlyJsonFile = file gradleLatestNightlyJsonPath
-            download gradleLatestNightlyJsonUrl, gradleLatestNightlyJsonFile
+            download gradleLatestNightlyJsonUrl.toString(), gradleLatestNightlyJsonFile
             json = jsonSlurper.parse gradleLatestNightlyJsonFile
 
             if (json.broken) {
                 File gradleAllJsonFile = file gradleAllJsonPath
-                download gradleAllJsonUrl, gradleAllJsonFile
+                download gradleAllJsonUrl.toString(), gradleAllJsonFile
                 json = jsonSlurper.parse gradleAllJsonFile
 
                 Map<String, Object> temp
@@ -165,18 +167,29 @@ if (update) {
                 else throw new FileNotFoundException("Cannot find a working Gradle distribution from \'$gradleAllJsonUrl\'.")
             }
         }
+        //noinspection GrUnresolvedAccess
         updateGradleWrapperDistributionUrl project.ext.gradleDistributionUrl = (json.downloadUrl as String).replace("bin", "all")
-    } else updateGradleWrapperDistributionUrl gradleDistributionUrl
+    } else updateGradleWrapperDistributionUrl gradleDistributionUrl.toString()
 
-    project.ext.minecraftForgeVersion = getLatestVersionMaven minecraftForgeMavenMetadataXmlUrl, minecraftForgeMavenMetadataXmlPath, minecraftForgeVersion
-    if (minecraftMappings == "latest") project.ext.minecraftMappings = "snapshot_${new SimpleDateFormat("yyyyMMdd").format(Calendar.instance.time.previous())}"
+    //noinspection GrUnresolvedAccess
+    project.ext.minecraftForgeVersion = getLatestVersionMaven minecraftForgeMavenMetadataXmlUrl.toString(), minecraftForgeMavenMetadataXmlPath.toString(), minecraftForgeVersion
+
+    if (minecraftMappings == "latest") {
+        //noinspection SpellCheckingInspection
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd")
+        //noinspection GrUnresolvedAccess
+        project.ext.minecraftMappings = "snapshot_${sdf.format(Calendar.instance.time.previous())}"
+    }
 } else {
     logger.lifecycle "Applying last good settings from \'${convertToCanonicalPath lastGoodSettingsPath}\'..."
     def json = parseLastGoodSettings true
 
+    //noinspection GrUnresolvedAccess
     updateGradleWrapperDistributionUrl project.ext.gradleDistributionUrl = json.gradle.distributionUrl as String
     gradle.projectsLoaded { json.dependencies.each { dependencies.add it.configuration as String, "$it.group:$it.name:$it.version" as String, { force = true } } }
+    //noinspection GrUnresolvedAccess
     project.ext.minecraftForgeVersion = json.minecraft.version
+    //noinspection GrUnresolvedAccess
     project.ext.minecraftMappings = json.minecraft.mappings
 }
 

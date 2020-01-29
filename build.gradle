@@ -17,12 +17,14 @@ buildscript {
     repositories {
         jcenter()
         maven {
+            //noinspection SpellCheckingInspection
             name = 'Minecraft Forge'
             url = 'https://files.minecraftforge.net/maven'
         }
     }
 
     dependencies {
+        //noinspection SpellCheckingInspection
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.+'
     }
     // COMMENT Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
@@ -37,6 +39,7 @@ plugins {
     id 'eclipse'
     id 'idea'
 }
+//noinspection SpellCheckingInspection
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 apply from: "$rootDir${separator}gradle${separator}utilities.gradle"
@@ -53,13 +56,14 @@ ext {
     // COMMENT game
 
     minecraftVersion = (minecraftForgeVersion as String).split('-').first()
-    minecraftVersions = (minecraftVersion as String).split('\\.')
+    //noinspection SpellCheckingInspection
+    String[] minecraftVersions = (minecraftVersion as String).split('\\.')
     minecraftMajor = minecraftVersions.first().toInteger()
     minecraftMinor = minecraftVersions[1].toInteger()
-    minecraftVersionRange = "[$minecraftMajor.$minecraftMinor,$minecraftVersion]"
+    minecraftVersionRange = "[$minecraftMajor.$minecraftMinor,$minecraftVersion]".toString()
 
 
-    // COMMENT versioning
+    // COMMENT version
 
     majorMod = majorMod.toInteger()
     majorApi = majorApi.toInteger()
@@ -87,6 +91,7 @@ ext {
         else cdSb.append "after:$it;"
     }
     dependants.each {
+        //noinspection GrUnresolvedAccess
         if (cdSb.contains(m as String)) cdSb.replaceFirst Pattern.quote("required:$it"), "required-before:$it"
         else cdSb.append "before:$it;"
     }
@@ -145,7 +150,7 @@ minecraft {
     // COMMENT the mappings can be changed at any time, and must be in the following format.
     // COMMENT snapshot_YYYYMMDD   snapshot are built nightly.
     // COMMENT stable_#            stables are built at the discretion of the MCP team.
-    // COMMENT Use non-default mappings at your own risk. they may not always work.
+    // COMMENT Use non-default mappings at your own risk. they may NOT always work.
     // COMMENT simply re-run your setup task after changing the mappings to update your workspace.
     mappings = minecraftMappings
     // COMMENT makeObfSourceJar = false // COMMENT an Srg named sources jar is made by default. uncomment this to disable.
@@ -172,7 +177,7 @@ dependencies {
     // CODE compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
     // CODE compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
 
-    // COMMENT the 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
+    // COMMENT the 'provided' configuration is for optional dependencies that exist at compile-time but might NOT at runtime.
     // CODE provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
 
     // COMMENT the deobf configurations:  'deobfCompile' and 'deobfProvided' are the same as the normal compile and provided,
@@ -185,10 +190,10 @@ dependencies {
     // COMMENT http://www.gradle.org/docs/current/userguide/dependency_management.html
 
     /* COMMENT
-    'compile' is superseded by 'implementation'.
-    'provided' is superseded by 'compileOnly'.
-    'runtime' is superseded by 'runtimeOnly'.
-     */
+	'compile' is superseded by 'implementation'.
+	'provided' is superseded by 'compileOnly'.
+	'runtime' is superseded by 'runtimeOnly'.
+	 */
 }
 stringToStringMap(customDependencies).each { String k, List<String> v -> v.each { dependencies.add k, evaluateGStringString(it) } }
 
@@ -213,6 +218,7 @@ tasks.withType(TaskSourceCopy) { TaskSourceCopy t ->
         inputs.property 'expand_name', name_
         inputs.property 'expand_version', version
         inputs.property 'expand_dependencies', combinedDependencies
+        //noinspection SpellCheckingInspection
         inputs.property 'expand_minecraftVersionRange', minecraftVersionRange
         inputs.property 'expand_certificateFingerprint', certificateFingerprint
         inputs.property 'expand_updateJSON', updateJSON
@@ -276,6 +282,7 @@ tasks.withType(ProcessResources) { ProcessResources t ->
         inputs.property 'expand_name', name_
         inputs.property 'expand_description', project.description
         inputs.property 'expand_version', version
+        //noinspection SpellCheckingInspection
         inputs.property 'expand_minecraftVersion', project.minecraft.version
         inputs.property 'expand_url', url
         inputs.property 'expand_updateUrl', updateUrl
@@ -324,7 +331,9 @@ tasks.withType(ProcessResources) { ProcessResources t ->
 }
 
 tasks.withType(AbstractCompile) {
+    //noinspection GrUnresolvedAccess
     options.verbose = true
+    //noinspection SpellCheckingInspection, GrUnresolvedAccess
     options.compilerArgs << '-Xlint'
 }
 
@@ -332,6 +341,7 @@ tasks.withType(AbstractCompile) {
 test {
     useJUnitPlatform()
     testLogging {
+        //noinspection GrUnresolvedAccess
         events 'started', 'passed', 'skipped', 'failed', 'standard_out', 'standard_error'
     }
 }
@@ -381,6 +391,7 @@ tasks.withType(Javadoc) { Javadoc t ->
         inputs.property 'expand_name', name_
         inputs.property 'expand_version', version
         inputs.property 'expand_dependencies', combinedDependencies
+        //noinspection SpellCheckingInspection
         inputs.property 'expand_minecraftVersionRange', minecraftVersionRange
         inputs.property 'expand_certificateFingerprint', certificateFingerprint
         inputs.property 'expand_updateJSON', updateJSON
@@ -420,7 +431,7 @@ tasks.withType(Javadoc) { Javadoc t ->
     destinationDir outputInput
 }
 
-tasks.withType(org.gradle.jvm.tasks.Jar) {
+tasks.withType(org.gradle.jvm.tasks.Jar) { org.gradle.jvm.tasks.Jar it ->
     exclude { it.directory ? it.path.contains('$') : it.path.endsWith('.in') }
     if (!name.startsWith('postProcess')) artifacts.archives it
 }
