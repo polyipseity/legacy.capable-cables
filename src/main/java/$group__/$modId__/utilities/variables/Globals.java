@@ -88,9 +88,8 @@ public enum Globals implements IThrowableCatcher {
 		/* SECTION static variables */
 
 		public static final Minecraft CLIENT = Minecraft.getMinecraft();
-		private static ScaledResolution resolution = new ScaledResolution(CLIENT);
-
 		private static final Cache<Object, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ?>> PRE_INIT_GUI_LISTENER = CacheBuilder.newBuilder().weakKeys().build();
+		private static ScaledResolution resolution = new ScaledResolution(CLIENT);
 
 
 		/* SECTION static methods */

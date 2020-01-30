@@ -14,14 +14,14 @@ public abstract class NumberDefault<T extends NumberDefault<T>> extends Number i
 
 	/* SECTION methods */
 
-	@SuppressWarnings("EmptyMethod")
-	@Override
-	public String toString() { return super.toString(); }
-
 	@Override
 	public T clone() {
 		try { return castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
 			throw unexpected(e);
 		}
 	}
+
+	@SuppressWarnings("EmptyMethod")
+	@Override
+	public String toString() { return super.toString(); }
 }

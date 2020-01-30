@@ -55,6 +55,19 @@ public enum Registrables {
 
 		/* SECTION static methods */
 
+		static {
+			Map<String, Integer> rawNbtTypeLookup = new HashMap<>(NBTBase.NBT_TYPES.length);
+			Map<String, Integer> nbtTypeLookup = new HashMap<>(NBTBase.NBT_TYPES.length);
+
+			for (String nbt : NBTBase.NBT_TYPES) {
+				rawNbtTypeLookup.put(nbt, rawNbtTypeLookup.size());
+				nbtTypeLookup.put("NBTTag" + WordUtils.capitalizeFully(nbt).replace("[]", "Array"), nbtTypeLookup.size());
+			}
+
+			RAW_NBT_TYPE_LOOKUP = ImmutableMap.copyOf(rawNbtTypeLookup);
+			NBT_TYPE_LOOKUP = ImmutableMap.copyOf(nbtTypeLookup);
+		}
+
 		@SuppressWarnings("UnusedReturnValue")
 		public static boolean setTagIfNotEmpty(NBTTagCompound p, String k, NBTTagCompound v) {
 			if (v.getSize() == 0) return false;
@@ -82,22 +95,9 @@ public enum Registrables {
 			return Optional.ofNullable(ret);
 		}
 
-		public static Optional<NBTTagCompound> returnTagIfNotEmpty(NBTTagCompound p) { return p.getSize() == 0 ? Optional.empty() : Optional.of(p); }
-
 
 		/* SECTION static initializer */
 
-		static {
-			Map<String, Integer> rawNbtTypeLookup = new HashMap<>(NBTBase.NBT_TYPES.length);
-			Map<String, Integer> nbtTypeLookup = new HashMap<>(NBTBase.NBT_TYPES.length);
-
-			for (String nbt : NBTBase.NBT_TYPES) {
-				rawNbtTypeLookup.put(nbt, rawNbtTypeLookup.size());
-				nbtTypeLookup.put("NBTTag" + WordUtils.capitalizeFully(nbt).replace("[]", "Array"), nbtTypeLookup.size());
-			}
-
-			RAW_NBT_TYPE_LOOKUP = ImmutableMap.copyOf(rawNbtTypeLookup);
-			NBT_TYPE_LOOKUP = ImmutableMap.copyOf(nbtTypeLookup);
-		}
+		public static Optional<NBTTagCompound> returnTagIfNotEmpty(NBTTagCompound p) { return p.getSize() == 0 ? Optional.empty() : Optional.of(p); }
 	}
 }

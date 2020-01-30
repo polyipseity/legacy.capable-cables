@@ -21,7 +21,9 @@ public enum GuiHandler implements IGuiHandler {
 
 	/* SECTION static variables */
 
-	protected static final GuiHandlerFunctional DEFAULT = (side, id, player, world, x, y, z) -> { throw rejectArguments(side, id, player, world, x, y, z); };
+	protected static final GuiHandlerFunctional DEFAULT = (side, id, player, world, x, y, z) -> {
+		throw rejectArguments(side, id, player, world, x, y, z);
+	};
 
 
 	/* SECTION variables */
