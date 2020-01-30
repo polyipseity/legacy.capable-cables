@@ -31,21 +31,15 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 @SuppressWarnings("SpellCheckingInspection")
 @FunctionalInterface
 public interface IImmutablizable<T> {
-	/* SECTION methods */
-
-	@OverridingStatus(group = GROUP, when = When.ALWAYS)
-	T toImmutable();
-
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	default boolean isImmutable() { return getClass().getSimpleName().toLowerCase(Locale.ROOT).contains("immutable"); }
-
-
 	/* SECTION static variables */
 
 	Set<Class<?>> BROKEN_TO_IMMUTABLE_CLASSES = Collections.newSetFromMap(CacheBuilder.newBuilder().softValues().<Class<?>, Boolean>build().asMap());
 
 
-	/* SECTION static methods */
+	/* SECTION static variables */
+
+	@Nullable
+	static <T> T tryToImmutableUnboxed(@Nullable T o) { return unboxOptional(tryToImmutable(o)); }
 
 	@SuppressWarnings("ConstantConditions")
 	static <T> Optional<T> tryToImmutable(@Nullable T o) {
@@ -86,8 +80,14 @@ public interface IImmutablizable<T> {
 		}
 	}
 
-	@Nullable
-	static <T> T tryToImmutableUnboxed(@Nullable T o) { return unboxOptional(tryToImmutable(o)); }
-
 	static <T> T tryToImmutableUnboxedNonnull(T o) { return tryToImmutable(o).orElseThrow(Globals::rethrowCaughtThrowableStatic); }
+
+
+	/* SECTION methods */
+
+	@OverridingStatus(group = GROUP, when = When.ALWAYS)
+	T toImmutable();
+
+	@OverridingStatus(group = GROUP, when = When.MAYBE)
+	default boolean isImmutable() { return getClass().getSimpleName().toLowerCase(Locale.ROOT).contains("immutable"); }
 }

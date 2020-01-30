@@ -40,13 +40,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(METHOD)
 public @interface ExternalCloneMethod {
-	/* SECTION methods */
-
-	Class<?>[] value();
-
-	@SuppressWarnings("SameReturnValue") boolean allowExtends() default false;
-
-
 	/* SECTION static variables */
 
 	MethodAdapter CLONE_METHOD_DEFAULT = MethodAdapter.of(getDeclaredMethod(Object.class, "clone").get().orElseGet(() -> {
@@ -69,7 +62,10 @@ public @interface ExternalCloneMethod {
 	} : null;
 
 	AtomicLong EVICTION_COUNT = new AtomicLong();
+	WeakHashMap<ExternalCloneMethod, MethodAdapter> EXTERNAL_CLONE_METHOD_MAP = new WeakHashMap<>(CLONE_METHOD_DEFAULT_ANNOTATION == null ? ImmutableMap.of() : ImmutableMap.of(CLONE_METHOD_DEFAULT_ANNOTATION, CLONE_METHOD_DEFAULT));
 	LoadingCache<Class<?>, ExternalCloneMethod> EXTERNAL_CLONE_METHOD_ANNOTATIONS_CACHE = CacheBuilder.newBuilder().maximumWeight(10000L).weigher((k, v) -> v == CLONE_METHOD_DEFAULT_ANNOTATION ? 10000 / (int) Math.min(10000L, 100L + EVICTION_COUNT.get()) : 0).removalListener((RemovalNotification<Class<?>, ExternalCloneMethod> t) -> LOGGER.debug("Default clone method '{}' cached for class '{}' evicted, count: {}", CLONE_METHOD_DEFAULT.get().orElseThrow(Throwables::unexpected), t.getKey().toGenericString(), EVICTION_COUNT.incrementAndGet())).build(new CacheLoader<Class<?>, ExternalCloneMethod>() {
+		/* SECTION methods */
+
 		@SuppressWarnings("ConstantConditions")
 		@Override
 		public ExternalCloneMethod load(Class<?> key) throws InterruptedException {
@@ -99,7 +95,13 @@ public @interface ExternalCloneMethod {
 			return r;
 		}
 	});
-	WeakHashMap<ExternalCloneMethod, MethodAdapter> EXTERNAL_CLONE_METHOD_MAP = new WeakHashMap<>(CLONE_METHOD_DEFAULT_ANNOTATION == null ? ImmutableMap.of() : ImmutableMap.of(CLONE_METHOD_DEFAULT_ANNOTATION, CLONE_METHOD_DEFAULT));
+
+
+	/* SECTION methods */
+
+	Class<?>[] value();
+
+	@SuppressWarnings("SameReturnValue") boolean allowExtends() default false;
 
 
 	/* SECTION static classes */
@@ -115,14 +117,27 @@ public @interface ExternalCloneMethod {
 		private volatile boolean processed = false;
 
 
+		/* SECTION static methods */
+
+		@SubscribeEvent(priority = EventPriority.HIGHEST)
+		public static void process(AnnotationProcessingEvent event) {
+			if (MOD_ID.equals(event.getModId())) INSTANCE.process(event.getAsm());
+		}
+
+
 		/* SECTION methods */
+
+		@Override
+		public void process(ASMDataTable asm) {
+			IMethod.super.process(asm);
+			processed = true;
+		}
 
 		@Override
 		public Class<ExternalCloneMethod> annotationType() { return ExternalCloneMethod.class; }
 
 		@Override
 		public boolean isProcessed() { return processed; }
-
 
 		@SuppressWarnings("ConstantConditions")
 		@Override
@@ -147,17 +162,5 @@ public @interface ExternalCloneMethod {
 					LOGGER.warn(getMessage(this, "Replaced previous method '{}' with annotation '{}' with method '{}' with annotation '{}' for class '{}'"), EXTERNAL_CLONE_METHOD_MAP.get(ap).get().orElseThrow(Throwables::unexpected).toGenericString(), ap, m.toGenericString(), a, k.toGenericString());
 			}
 		}
-
-		@Override
-		public void process(ASMDataTable asm) {
-			IMethod.super.process(asm);
-			processed = true;
-		}
-
-
-		/* SECTION static methods */
-
-		@SubscribeEvent(priority = EventPriority.HIGHEST)
-		public static void process(AnnotationProcessingEvent event) { if (MOD_ID.equals(event.getModId())) INSTANCE.process(event.getAsm()); }
 	}
 }

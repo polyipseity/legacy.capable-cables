@@ -19,6 +19,11 @@ public enum GuiHandler implements IGuiHandler {
 	INSTANCE;
 
 
+	/* SECTION static variables */
+
+	protected static final GuiHandlerFunctional DEFAULT = (side, id, player, world, x, y, z) -> { throw rejectArguments(side, id, player, world, x, y, z); };
+
+
 	/* SECTION variables */
 
 	protected final HashMap<Integer, IGuiHandler> guiMap = new HashMap<>();
@@ -31,13 +36,13 @@ public enum GuiHandler implements IGuiHandler {
 
 	/* SECTION methods */
 
+	public int registerGui(GuiHandlerFunctional handler) { return registerGui((IGuiHandler) handler); }
+
 	public int registerGui(IGuiHandler handler) {
 		int r = guiMap.size();
 		guiMap.put(r, handler);
 		return r;
 	}
-
-	public int registerGui(GuiHandlerFunctional handler) { return registerGui((IGuiHandler) handler); }
 
 
 	@Nullable
@@ -49,21 +54,11 @@ public enum GuiHandler implements IGuiHandler {
 	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) { return guiMap.getOrDefault(id, DEFAULT).getClientGuiElement(id, player, world, x, y, z); }
 
 
-	/* SECTION static variables */
-
-	protected static final GuiHandlerFunctional DEFAULT = (side, id, player, world, x, y, z) -> {
-		throw rejectArguments(side, id, player, world, x, y, z);
-	};
-
-
 	/* SECTION static classes */
 
 	@FunctionalInterface
 	public interface GuiHandlerFunctional extends IGuiHandler {
 		/* SECTION methods */
-
-		Optional<Object> getGuiElement(Side side, int id, EntityPlayer player, World world, int x, int y, int z);
-
 
 		@Nullable
 		@Override
@@ -72,5 +67,8 @@ public enum GuiHandler implements IGuiHandler {
 		@Nullable
 		@Override
 		default Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) { return unboxOptional(getGuiElement(Side.CLIENT, id, player, world, x, y, z)); }
+
+
+		Optional<Object> getGuiElement(Side side, int id, EntityPlayer player, World world, int x, int y, int z);
 	}
 }

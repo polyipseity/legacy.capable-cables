@@ -25,25 +25,25 @@ public class Frame<N extends Number, T extends Frame<N, T>> implements IStructur
 
 	/* SECTION constructors */
 
+	public Frame(N top, N right, N bottom, N left) { this(new XY<>(left, top), new XY<>(right, bottom)); }
+
 	public Frame(XY<N, ?> tl, XY<N, ?> br) {
 		this.tl = tl;
 		this.br = br;
 	}
-
-	public Frame(N top, N right, N bottom, N left) { this(new XY<>(left, top), new XY<>(right, bottom)); }
 
 	public Frame(Frame<N, ?> copy) { this(copy.getTopLeft(), copy.getBottomRight()); }
 
 
 	/* SECTION getters & setters */
 
-	public void setTopLeft(XY<N, ?> tl) { this.tl = tl; }
-
 	public XY<N, ?> getTopLeft() { return tl; }
 
-	public void setBottomRight(XY<N, ?> br) { this.br = br; }
+	public void setTopLeft(XY<N, ?> tl) { this.tl = tl; }
 
 	public XY<N, ?> getBottomRight() { return br; }
+
+	public void setBottomRight(XY<N, ?> br) { this.br = br; }
 
 	public void setTop(N t) { getTopLeft().setY(t); }
 
@@ -71,15 +71,6 @@ public class Frame<N extends Number, T extends Frame<N, T>> implements IStructur
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public boolean isImmutable() { return false; }
 
-
-	@Override
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"tl", getTopLeft()},
-				new Object[]{"br", getBottomRight()});
-	}
-
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public int hashCode() {
@@ -106,6 +97,14 @@ public class Frame<N extends Number, T extends Frame<N, T>> implements IStructur
 		return r;
 	}
 
+	@Override
+	@OverridingStatus(group = GROUP, when = When.MAYBE)
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"tl", getTopLeft()},
+				new Object[]{"br", getBottomRight()});
+	}
+
 
 	/* SECTION static classes */
 
@@ -113,9 +112,9 @@ public class Frame<N extends Number, T extends Frame<N, T>> implements IStructur
 	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends Frame<N, T> {
 		/* SECTION constructors */
 
-		public Immutable(XY<N, ?> tl, XY<N, ?> br) { super(tl.toImmutable(), br.toImmutable()); }
-
 		public Immutable(N top, N right, N bottom, N left) { this(new XY.Immutable<>(left, top), new XY.Immutable<>(right, bottom)); }
+
+		public Immutable(XY<N, ?> tl, XY<N, ?> br) { super(tl.toImmutable(), br.toImmutable()); }
 
 		public Immutable(Frame<N, ?> copy) { this(copy.getTopLeft(), copy.getBottomRight()); }
 

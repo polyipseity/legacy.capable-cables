@@ -9,13 +9,6 @@ import static $group__.$modId__.utilities.variables.Constants.GROUP;
 import static com.google.common.collect.Lists.asList;
 
 public interface IStrictHashCode {
-	/* SECTION methods */
-
-	@Override
-	@OverridingStatus(group = GROUP, when = When.ALWAYS)
-	int hashCode();
-
-
 	/* SECTION static methods */
 
 	static int getHashCode(Object t, int hashCodeSuper, Object... v) {
@@ -24,7 +17,13 @@ public interface IStrictHashCode {
 				return hashCodeSuper;
 			else
 				return Objects.hash(v); // COMMENT ignore Object hashCode
-		}
-		else return Objects.hash(asList(hashCodeSuper, v).toArray());
+		} else return Objects.hash(asList(hashCodeSuper, v).toArray());
 	}
+
+
+	/* SECTION methods */
+
+	@Override
+	@OverridingStatus(group = GROUP, when = When.ALWAYS)
+	int hashCode();
 }

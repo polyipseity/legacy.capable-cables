@@ -30,22 +30,15 @@ import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 public interface ICloneable<T> extends Cloneable {
-	/* SECTION methods */
-
-	@OverridingMethodsMustInvokeSuper
-	@OverridingStatus(group = GROUP, when = When.ALWAYS)
-	default T clone() { throw rejectUnsupportedOperation(); }
-
-
-	@OverridingStatus(group = GROUP, when = When.NEVER)
-	default T copy() { return clone(); }
-
-
 	/* SECTION static variables */
+
 	Set<Class<?>> BROKEN_CLONE_CLASSES = Collections.newSetFromMap(CacheBuilder.newBuilder().softValues().<Class<?>, Boolean>build().asMap());
 
 
 	/* SECTION static methods */
+
+	@Nullable
+	static <T> T tryCloneUnboxed(@Nullable T o) { return unboxOptional(tryClone(o)); }
 
 	@SuppressWarnings("ConstantConditions")
 	static <T> Optional<T> tryClone(@Nullable T o) {
@@ -85,8 +78,15 @@ public interface ICloneable<T> extends Cloneable {
 		}
 	}
 
-	@Nullable
-	static <T> T tryCloneUnboxed(@Nullable T o) { return unboxOptional(tryClone(o)); }
-
 	static <T> T tryCloneUnboxedNonnull(T o) { return tryClone(o).orElseThrow(Globals::rethrowCaughtThrowableStatic); }
+
+
+	/* SECTION methods */
+
+	@OverridingStatus(group = GROUP, when = When.NEVER)
+	default T copy() { return clone(); }
+
+	@OverridingMethodsMustInvokeSuper
+	@OverridingStatus(group = GROUP, when = When.ALWAYS)
+	default T clone() { throw rejectUnsupportedOperation(); }
 }

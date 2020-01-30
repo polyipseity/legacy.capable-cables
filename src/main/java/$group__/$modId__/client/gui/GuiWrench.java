@@ -23,62 +23,6 @@ import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOp
 
 @SideOnly(Side.CLIENT)
 public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<EnumTheme> {
-	/* SECTION variables */
-
-	protected GuiTabsThemed<Number, GuiTabs.ITab<Number, ?>, EnumTheme, ?> tabs;
-	protected ItemStack stack;
-	protected EnumTheme theme;
-
-
-	/* SECTION constructors */
-
-	public GuiWrench(Container container, ItemStack stack, EnumTheme theme, int open) {
-		super(container);
-		if (!(stack.getItem() instanceof ItemWrench)) throw rejectArguments(stack);
-		this.stack = stack;
-		this.theme = theme;
-
-		tabs = TABS.clone();
-		tabs.setOpen(open);
-		tabs.setTheme(theme);
-	}
-
-	public GuiWrench(Container container, ItemStack stack) { this(container, stack, EnumTheme.NONE, 0); }
-
-
-	/* SECTION getters & setters */
-
-	public GuiTabsThemed<Number, GuiTabs.ITab<Number, ?>, EnumTheme, ?> getTabs() { return tabs; }
-
-	@SuppressWarnings("unused")
-	public void setTabs(GuiTabsThemed<Number, GuiTabs.ITab<Number, ?>, EnumTheme, ?> tabs) { throw rejectUnsupportedOperation(); }
-
-	public ItemStack getStack() { return stack; }
-
-	@SuppressWarnings("unused")
-	public void setStack(ItemStack stack) { throw rejectUnsupportedOperation(); }
-
-
-	@Override
-	public void setTheme(EnumTheme theme) {
-		tabs.setTheme(theme);
-		this.theme = theme;
-	}
-
-	@Override
-	public EnumTheme getTheme() { return theme; }
-
-
-	/* SECTION methods */
-
-	@Override
-	public Optional<Rectangle<Number, ?>> spec() { return tabs.spec(); }
-
-
-	@Override
-	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) { tabs.draw(mc); }
-
-
 	/* SECTION static variables */
 
 	@SuppressWarnings({"unchecked", "RedundantSuppression"})
@@ -103,4 +47,58 @@ public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<En
 					EnumTheme.NONE
 			)
 	);
+
+
+	/* SECTION variables */
+
+	protected GuiTabsThemed<Number, GuiTabs.ITab<Number, ?>, EnumTheme, ?> tabs;
+	protected ItemStack stack;
+	protected EnumTheme theme;
+
+
+	/* SECTION constructors */
+
+	public GuiWrench(Container container, ItemStack stack) { this(container, stack, EnumTheme.NONE, 0); }
+
+	public GuiWrench(Container container, ItemStack stack, EnumTheme theme, int open) {
+		super(container);
+		if (!(stack.getItem() instanceof ItemWrench)) throw rejectArguments(stack);
+		this.stack = stack;
+		this.theme = theme;
+
+		tabs = TABS.clone();
+		tabs.setOpen(open);
+		tabs.setTheme(theme);
+	}
+
+
+	/* SECTION getters & setters */
+
+	public GuiTabsThemed<Number, GuiTabs.ITab<Number, ?>, EnumTheme, ?> getTabs() { return tabs; }
+
+	@SuppressWarnings("unused")
+	public void setTabs(GuiTabsThemed<Number, GuiTabs.ITab<Number, ?>, EnumTheme, ?> tabs) { throw rejectUnsupportedOperation(); }
+
+	public ItemStack getStack() { return stack; }
+
+	@SuppressWarnings("unused")
+	public void setStack(ItemStack stack) { throw rejectUnsupportedOperation(); }
+
+	@Override
+	public EnumTheme getTheme() { return theme; }
+
+	@Override
+	public void setTheme(EnumTheme theme) {
+		tabs.setTheme(theme);
+		this.theme = theme;
+	}
+
+
+	/* SECTION methods */
+
+	@Override
+	public Optional<Rectangle<Number, ?>> spec() { return tabs.spec(); }
+
+	@Override
+	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) { tabs.draw(mc); }
 }

@@ -15,25 +15,11 @@ import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 
 @Mod.EventBusSubscriber(modid = MOD_ID)
 public final class BlocksThis extends Registrable<Block> {
-	/* SECTION variables */
-
-	@SuppressWarnings("unused")
-	public final Block cable = new BlockCable().setRegistryAndUnlocalizedName(MOD_ID, "cable").setUnlocalizedName("cable").setCreativeTab(CreativeTabsThis.DEFAULT);
-
-
 	/* SECTION static variables */
 
 	public static final BlocksThis INSTANCE = getInstance(BlocksThis.class);
 
-
-	/* SECTION static methods */
-
-	@SubscribeEvent
-	public static void registerStatic(RegistryEvent.Register<Block> event) { INSTANCE.register(event); }
-
-
 	/* REFERENCE block template */
-
 	@SuppressWarnings("unused")
 	private static final Block TEMPLATE_ = new BlockDefault(new Material(MapColor.AIR), MapColor.AIR)
 			// COMMENT below one is required
@@ -48,4 +34,16 @@ public final class BlocksThis extends Registrable<Block> {
 			.setLightOpacity(7)
 			// COMMENT subclass is probably needed for below properties
 			.setTickRandomly(true); // COMMENT overrides are required for properties unlisted here
+
+
+	/* SECTION variables */
+
+	@SuppressWarnings("unused")
+	public final Block cable = new BlockCable().setRegistryAndUnlocalizedName(MOD_ID, "cable").setUnlocalizedName("cable").setCreativeTab(CreativeTabsThis.DEFAULT);
+
+
+	/* SECTION static methods */
+
+	@SubscribeEvent
+	public static void registerStatic(RegistryEvent.Register<Block> event) { INSTANCE.register(event); }
 }

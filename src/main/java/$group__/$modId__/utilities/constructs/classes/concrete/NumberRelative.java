@@ -24,6 +24,11 @@ import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOp
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
 public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T> {
+	/* SECTION static variables */
+
+	private static final long serialVersionUID = -1684871905587506897L;
+
+
 	/* SECTION variables */
 
 	protected Number value;
@@ -35,15 +40,15 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 
 	/* SECTION constructors */
 
+	public NumberRelative(Number value) { this(value, null); }
+
+	public NumberRelative(Number value, @Nullable Number parent) { this(value, parent, null); }
+
 	public NumberRelative(Number value, @Nullable Number parent, @Nullable Number offset) {
 		this.value = value;
 		this.parent = parent;
 		this.offset = offset;
 	}
-
-	public NumberRelative(Number value, @Nullable Number parent) { this(value, parent, null); }
-
-	public NumberRelative(Number value) { this(value, null); }
 
 	@SuppressWarnings("CopyConstructorMissesField")
 	public NumberRelative(NumberRelative<?> copy) { this(copy.getValue(), unboxOptional(copy.getParent()), unboxOptional(copy.getOffset())); }
@@ -66,14 +71,6 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 
 	/* SECTION methods */
 
-	@Override
-	public T negate() {
-		T r = clone();
-		r.value = Numbers.negate(value).orElseThrow(Globals::rethrowCaughtThrowableStatic);
-		r.offset = unboxOptional(Numbers.negate(offset));
-		return r;
-	}
-
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public T sum(Iterable<? extends Number> o) {
@@ -89,6 +86,13 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 		return r;
 	}
 
+	@Override
+	public T negate() {
+		T r = clone();
+		r.value = Numbers.negate(value).orElseThrow(Globals::rethrowCaughtThrowableStatic);
+		r.offset = unboxOptional(Numbers.negate(offset));
+		return r;
+	}
 
 	@Override
 	public T newInstanceFrom(Number o) {
@@ -105,7 +109,6 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 		return r;
 	}
 
-
 	@Override
 	public int compareTo(Number o) {
 		boolean greater = doubleValue() > o.doubleValue();
@@ -113,13 +116,11 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 		return greater ? 1 : lesser ? -1 : 0;
 	}
 
-
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }
 
 	@Override
 	public boolean isImmutable() { return false; }
-
 
 	@Override
 	public int intValue() { return (int) doubleValue(); }
@@ -133,6 +134,15 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 	@Override
 	public double doubleValue() { return getParent().map(Number::doubleValue).orElse(1D) * getValue().doubleValue() + getOffset().map(Number::doubleValue).orElse(0D); }
 
+	@Override
+	@OverridingStatus(group = GROUP, when = When.MAYBE)
+	public T clone() {
+		T r = super.clone();
+		r.value = tryCloneUnboxedNonnull(value);
+		r.parent = tryCloneUnboxed(parent);
+		r.offset = tryCloneUnboxed(offset);
+		return r;
+	}
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
@@ -158,33 +168,23 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 				t -> Objects.equals(getOffset(), t.getOffset())) : isEqual(this, o, super.equals(o));
 	}
 
-	@Override
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public T clone() {
-		T r = super.clone();
-		r.value = tryCloneUnboxedNonnull(value);
-		r.parent = tryCloneUnboxed(parent);
-		r.offset = tryCloneUnboxed(offset);
-		return r;
-	}
-
-
-	/* SECTION static variables */
-
-	private static final long serialVersionUID = -1684871905587506897L;
-
 
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
 	public static class Immutable<T extends NumberRelative<T>> extends NumberRelative<T> {
+		/* SECTION static variables */
+
+		private static final long serialVersionUID = -7462190942914160372L;
+
+
 		/* SECTION constructors */
 
-		public Immutable(Number value, @Nullable Number parent, @Nullable Number offset) { super(value, parent, offset); }
+		public Immutable(Number value) { this(value, null); }
 
 		public Immutable(Number value, @Nullable Number parent) { this(value, parent, null); }
 
-		public Immutable(Number value) { this(value, null); }
+		public Immutable(Number value, @Nullable Number parent, @Nullable Number offset) { super(value, parent, offset); }
 
 		public Immutable(Immutable<?> c) { this(c.getValue(), unboxOptional(c.getParent()), unboxOptional(c.getOffset())); }
 
@@ -210,10 +210,5 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final boolean isImmutable() { return true; }
-
-
-		/* SECTION static variables */
-
-		private static final long serialVersionUID = -7462190942914160372L;
 	}
 }

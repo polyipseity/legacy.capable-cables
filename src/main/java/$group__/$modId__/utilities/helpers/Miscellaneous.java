@@ -36,9 +36,10 @@ public enum Miscellaneous {
 	/**
 	 * Function K of SKI combinator calculus.
 	 *
-	 * @param x constant
-	 * @param y any
+	 * @param x   constant
+	 * @param y   any
 	 * @param <T> type of parameter {@code x}
+	 *
 	 * @return parameter {@code x}
 	 */
 	public static <T> T K(T x, @SuppressWarnings("unused") Object... y) { return x; }

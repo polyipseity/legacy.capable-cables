@@ -8,19 +8,18 @@ import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOp
 
 public interface IListDelegated<L extends List<E>, E, T extends IListDelegated<L, E, T>> extends List<E>, ICollectionDelegated<L, E, T> {
 	/* SECTION methods */
-	
-	L getList();
-	
-	void setList(L list);
 
 	@Override
 	@Deprecated
 	default L getCollection() { return getList(); }
-	
+
 	@Override
 	@Deprecated
 	default void setCollection(L collection) { setList(collection); }
 
+	L getList();
+
+	void setList(L list);
 
 	@SuppressWarnings("EmptyMethod")
 	@Override
@@ -50,7 +49,7 @@ public interface IListDelegated<L extends List<E>, E, T extends IListDelegated<L
 	@Override
 	default boolean remove(Object o) { return ICollectionDelegated.super.remove(o); }
 
-	
+
 	@Override
 	default boolean containsAll(Collection<?> c) { return ICollectionDelegated.super.containsAll(c); }
 
@@ -76,14 +75,14 @@ public interface IListDelegated<L extends List<E>, E, T extends IListDelegated<L
 	@Override
 	default void clear() { ICollectionDelegated.super.clear(); }
 
-	
+
 	@Override
 	boolean equals(Object o);
 
 	@Override
 	int hashCode();
 
-	
+
 	@Override
 	default E get(int index) { return getList().get(index); }
 
@@ -124,14 +123,13 @@ public interface IListDelegated<L extends List<E>, E, T extends IListDelegated<L
 	interface IImmutable<I extends List<E>, E, T extends IImmutable<I, E, T>> extends IListDelegated<I, E, T>, ICollectionDelegated.IImmutable<I, E, T> {
 		/* SECTION methods */
 
-		@Override
-		default void setList(I list) { throw rejectUnsupportedOperation(); }
-
 		@SuppressWarnings("deprecation")
 		@Override
 		@Deprecated
 		default void setCollection(I collection) { ICollectionDelegated.IImmutable.super.setCollection(collection); }
 
+		@Override
+		default void setList(I list) { throw rejectUnsupportedOperation(); }
 
 		@Override
 		default boolean add(E e) { return ICollectionDelegated.IImmutable.super.add(e); }

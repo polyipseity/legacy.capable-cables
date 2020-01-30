@@ -17,6 +17,11 @@ import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 import static com.google.common.collect.Maps.immutableEntry;
 
 public abstract class Singleton {
+	/* SECTION static variables */
+
+	protected static final ConcurrentHashMap<Class<?>, Map.Entry<? extends Singleton, String>> INSTANCES = new ConcurrentHashMap<>();
+
+
 	/* SECTION constructors */
 
 	public Singleton() {
@@ -35,18 +40,13 @@ public abstract class Singleton {
 	}
 
 
-	/* SECTION static variables */
-
-	protected static final ConcurrentHashMap<Class<?>, Map.Entry<? extends Singleton, String>> INSTANCES = new ConcurrentHashMap<>();
-
-
 	/* SECTION static methods */
+
+	public static <T extends Singleton> T getInstance(Class<T> clazz) { return getInstance(clazz, true, t -> unboxOptional(newInstance(t))).orElseThrow(Globals::rethrowCaughtThrowableStatic); }
 
 	public static <T extends Singleton> Optional<T> getInstance(Class<T> clazz, boolean instantiate, Function<? super Class<T>, ? extends T> instantiation) {
 		Optional<T> r = Optional.ofNullable(INSTANCES.get(clazz)).map(Map.Entry::getKey).flatMap(Casts::castUnchecked);
 		if (!r.isPresent() && instantiate) r = Optional.of(instantiation.apply(clazz));
 		return r;
 	}
-
-	public static <T extends Singleton> T getInstance(Class<T> clazz) { return getInstance(clazz, true, t -> unboxOptional(newInstance(t))).orElseThrow(Globals::rethrowCaughtThrowableStatic); }
 }

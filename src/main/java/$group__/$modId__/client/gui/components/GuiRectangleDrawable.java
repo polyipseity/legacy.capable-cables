@@ -31,12 +31,12 @@ public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawab
 
 	/* SECTION constructors */
 
+	public GuiRectangleDrawable(Rectangle<N, ?> rect, IDrawable<N, ?> drawable) { this(rect, Colors.COLORLESS, drawable); }
+
 	public GuiRectangleDrawable(Rectangle<N, ?> rect, Color color, IDrawable<N, ?> drawable) {
 		super(rect, color);
 		this.drawable = drawable;
 	}
-
-	public GuiRectangleDrawable(Rectangle<N, ?> rect, IDrawable<N, ?> drawable) { this(rect, Colors.COLORLESS, drawable); }
 
 	public GuiRectangleDrawable(GuiRectangleDrawable<N, ?> copy) { this(copy.getRect(), copy.getColor(), copy.getDrawable()); }
 
@@ -68,13 +68,6 @@ public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawab
 	@Override
 	public boolean isImmutable() { return false; }
 
-
-	@Override
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"drawable", getDrawable()});
-	}
-
 	@Override
 	public int hashCode() {
 		return isImmutable() ? getHashCode(this, super.hashCode(), getDrawable()) : getHashCode(this, super.hashCode());
@@ -93,6 +86,12 @@ public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawab
 		return r;
 	}
 
+	@Override
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"drawable", getDrawable()});
+	}
+
 
 	/* SECTION static classes */
 
@@ -100,9 +99,9 @@ public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawab
 	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends GuiRectangleDrawable<N, T> {
 		/* SECTION constructors */
 
-		public Immutable(Rectangle<N, ?> rect, Color color, IDrawable<N, ?> drawable) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(color), drawable.toImmutable()); }
-
 		public Immutable(Rectangle<N, ?> rect, IDrawable<N, ?> drawable) { this(rect, Colors.COLORLESS, drawable); }
+
+		public Immutable(Rectangle<N, ?> rect, Color color, IDrawable<N, ?> drawable) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(color), drawable.toImmutable()); }
 
 		public Immutable(GuiRectangleDrawable<N, ?> copy) { this(copy.getRect(), copy.getColor(), copy.getDrawable()); }
 

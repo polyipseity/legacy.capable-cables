@@ -30,11 +30,11 @@ public class PolygonN<N extends Number, T extends PolygonN<N, T>> implements ILi
 
 	/* SECTION constructors */
 
-	public PolygonN(List<XY<N, ?>> vertexes) { this.vertexes = vertexes; }
-
 	@SuppressWarnings("varargs")
 	@SafeVarargs
 	public PolygonN(XY<N, ?>... array) { this(Arrays.asList(array)); }
+
+	public PolygonN(List<XY<N, ?>> vertexes) { this.vertexes = vertexes; }
 
 	public PolygonN(PolygonN<N, ?> copy) { this(copy.getVertexes()); }
 
@@ -63,14 +63,6 @@ public class PolygonN<N extends Number, T extends PolygonN<N, T>> implements ILi
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public boolean isImmutable() { return false; }
 
-
-	@Override
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"list", getVertexes()});
-	}
-
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public int hashCode() {
@@ -95,6 +87,13 @@ public class PolygonN<N extends Number, T extends PolygonN<N, T>> implements ILi
 		return r;
 	}
 
+	@Override
+	@OverridingStatus(group = GROUP, when = When.MAYBE)
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"list", getVertexes()});
+	}
+
 
 	/* SECTION static classes */
 
@@ -102,11 +101,11 @@ public class PolygonN<N extends Number, T extends PolygonN<N, T>> implements ILi
 	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends PolygonN<N, T> implements IListDelegated.IImmutable<List<XY<N, ?>>, XY<N, ?>, T> {
 		/* SECTION constructors */
 
-		public Immutable(List<XY<N, ?>> list) { super(tryToImmutableUnboxedNonnull(list)); }
-
 		@SuppressWarnings("varargs")
 		@SafeVarargs
 		public Immutable(XY<N, ?>... array) { this(ImmutableList.copyOf(array)); }
+
+		public Immutable(List<XY<N, ?>> list) { super(tryToImmutableUnboxedNonnull(list)); }
 
 		public Immutable(PolygonN<N, ?> copy) { this(copy.getVertexes()); }
 

@@ -32,32 +32,15 @@ public enum Globals implements IThrowableCatcher {
 	INSTANCE;
 
 
-	/* SECTION methods */
-
-	@Override
-	public Optional<Throwable> getCaughtThrowable() { return Optional.ofNullable(CAUGHT_THROWABLE.get()); }
-
-	@Override
-	public void clearCaughtThrowable() { CAUGHT_THROWABLE.set(null); }
-
-
-	public void setCaughtThrowable(Throwable t) {
-		consumeCaught(t);
-		CAUGHT_THROWABLE.set(t);
-	}
-
-
 	/* SECTION static variables */
 
 	public static final ModThis MOD = ModThis.INSTANCE;
 	public static final Logger LOGGER = ModThis.LOGGER;
-
 	public static final LoadingCache<String, Reflections> REFLECTIONS_CACHE = CacheBuilder.newBuilder().softValues().build(CacheLoader.from(t -> {
 		Reflections r = new Reflections(t);
 		r.expandSuperTypes();
 		return r;
 	}));
-
 
 	public static final ThreadLocal<Throwable> CAUGHT_THROWABLE = new ThreadLocal<>();
 
@@ -65,6 +48,8 @@ public enum Globals implements IThrowableCatcher {
 	/* SECTION static methods */
 
 	public static Optional<Throwable> getCaughtThrowableStatic() { return INSTANCE.getCaughtThrowable(); }
+
+	public static void setCaughtThrowableStatic(Throwable t) { INSTANCE.setCaughtThrowable(t); }
 
 	@Nullable
 	public static Throwable getCaughtThrowableUnboxedStatic() { return INSTANCE.getCaughtThrowableUnboxed(); }
@@ -77,7 +62,19 @@ public enum Globals implements IThrowableCatcher {
 
 	public static RuntimeException rethrowCaughtThrowableStatic() throws RuntimeException { throw INSTANCE.rethrowCaughtThrowable(); }
 
-	public static void setCaughtThrowableStatic(Throwable t) { INSTANCE.setCaughtThrowable(t); }
+
+	/* SECTION methods */
+
+	@Override
+	public Optional<Throwable> getCaughtThrowable() { return Optional.ofNullable(CAUGHT_THROWABLE.get()); }
+
+	public void setCaughtThrowable(Throwable t) {
+		consumeCaught(t);
+		CAUGHT_THROWABLE.set(t);
+	}
+
+	@Override
+	public void clearCaughtThrowable() { CAUGHT_THROWABLE.set(null); }
 
 
 	/* SECTION static classes */
@@ -91,19 +88,17 @@ public enum Globals implements IThrowableCatcher {
 		/* SECTION static variables */
 
 		public static final Minecraft CLIENT = Minecraft.getMinecraft();
+		private static ScaledResolution resolution = new ScaledResolution(CLIENT);
 
 		private static final Cache<Object, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ?>> PRE_INIT_GUI_LISTENER = CacheBuilder.newBuilder().weakKeys().build();
 
 
-		private static ScaledResolution resolution = new ScaledResolution(CLIENT);
-
-
 		/* SECTION static methods */
 
-		public static <T> void registerPreInitGuiListener(T k, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> v) { PRE_INIT_GUI_LISTENER.put(k, v); }
-
-
 		public static ScaledResolution getResolution() { return resolution; }
+
+
+		public static <T> void registerPreInitGuiListener(T k, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> v) { PRE_INIT_GUI_LISTENER.put(k, v); }
 
 
 		@SubscribeEvent

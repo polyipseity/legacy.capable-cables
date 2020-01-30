@@ -17,14 +17,16 @@ public enum Casts {
 
 	/* SECTION static methods */
 
-	@SuppressWarnings("unchecked")
-	public static <T> Optional<T> castUnchecked(@Nullable Object o) { return Optional.ofNullable((T) o); }
+	public static <T> T castUncheckedUnboxedNonnull(Object o) { return assertNonnull(castUncheckedUnboxed(o)); }
 
 	@Nullable
 	public static <T> T castUncheckedUnboxed(@Nullable Object o) { return unboxOptional(castUnchecked(o)); }
 
-	public static <T> T castUncheckedUnboxedNonnull(Object o) { return assertNonnull(castUncheckedUnboxed(o)); }
+	@SuppressWarnings("unchecked")
+	public static <T> Optional<T> castUnchecked(@Nullable Object o) { return Optional.ofNullable((T) o); }
 
+	@Nullable
+	public static <T> T castCheckedUnboxed(@Nullable Object o, Class<T> type) { return unboxOptional(castChecked(o, type)); }
 
 	public static <T> Optional<T> castChecked(@Nullable Object o, Class<T> type) {
 		clearCaughtThrowableStatic();
@@ -33,9 +35,6 @@ public enum Casts {
 			try { throw cast(o, type); } catch (ClassCastException e) { setCaughtThrowableStatic(e); }
 		return r;
 	}
-
-	@Nullable
-	public static <T> T castCheckedUnboxed(@Nullable Object o, Class<T> type) { return unboxOptional(castChecked(o, type)); }
 
 	public static <T> T castCheckedUnboxedNonnull(Object o, Class<T> type) { return Casts.castChecked(o, type).orElseThrow(Globals::rethrowCaughtThrowableStatic); }
 }

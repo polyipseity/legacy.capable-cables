@@ -31,13 +31,13 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 
 	/* SECTION constructors */
 
+	public GuiRectangleThemedDrawable(Rectangle<N, ?> rect, IDrawable<N, ?> drawable, TH theme) { this(rect, Colors.COLORLESS, drawable, theme); }
+
 	public GuiRectangleThemedDrawable(Rectangle<N, ?> rect, Color color, IDrawable<N, ?> drawable, TH theme) {
 		super(rect, color, drawable);
 		this.theme = theme;
 		setTheme(getTheme());
 	}
-
-	public GuiRectangleThemedDrawable(Rectangle<N, ?> rect, IDrawable<N, ?> drawable, TH theme) { this(rect, Colors.COLORLESS, drawable, theme); }
 
 	public GuiRectangleThemedDrawable(GuiRectangleThemedDrawable<N, TH, ?> copy) { this(copy.getRect(), copy.getColor(), copy.getDrawable(), copy.getTheme()); }
 
@@ -45,10 +45,7 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 	/* SECTION getters & setters */
 
 	@Override
-	public void setDrawable(IDrawable<N, ?> drawable) {
-		super.setDrawable(drawable);
-		setTheme(getTheme());
-	}
+	public TH getTheme() { return theme; }
 
 	@Override
 	public void setTheme(TH theme) {
@@ -57,7 +54,10 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 	}
 
 	@Override
-	public TH getTheme() { return theme; }
+	public void setDrawable(IDrawable<N, ?> drawable) {
+		super.setDrawable(drawable);
+		setTheme(getTheme());
+	}
 
 
 	/* SECTION methods */
@@ -67,13 +67,6 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 
 	@Override
 	public boolean isImmutable() { return false; }
-
-
-	@Override
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"theme", getTheme()});
-	}
 
 	@Override
 	public int hashCode() {
@@ -93,15 +86,21 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 		return r;
 	}
 
+	@Override
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"theme", getTheme()});
+	}
+
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
 	public static class Immutable<N extends Number, TH extends IThemed.ITheme<TH>, T extends Immutable<N, TH, T>> extends GuiRectangleThemedDrawable<N, TH, T> {
 		/* SECTION constructors */
 
-		public Immutable(Rectangle<N, ?> rect, Color color, IDrawable<N, ?> drawable, TH theme) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(color), tryToImmutableUnboxedNonnull(drawable), tryToImmutableUnboxedNonnull(theme)); }
-
 		public Immutable(GuiRectangleThemedDrawable<N, TH, ?> copy) { this(copy.getRect(), copy.getColor(), copy.getDrawable(), copy.getTheme()); }
+
+		public Immutable(Rectangle<N, ?> rect, Color color, IDrawable<N, ?> drawable, TH theme) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(color), tryToImmutableUnboxedNonnull(drawable), tryToImmutableUnboxedNonnull(theme)); }
 
 
 		/* SECTION getters & setters */
@@ -113,10 +112,10 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 		public void setColor(Color color) { throw rejectUnsupportedOperation(); }
 
 		@Override
-		public void setDrawable(IDrawable<N, ?> drawable) { throw rejectUnsupportedOperation(); }
+		public void setTheme(TH theme) { throw rejectUnsupportedOperation(); }
 
 		@Override
-		public void setTheme(TH theme) { throw rejectUnsupportedOperation(); }
+		public void setDrawable(IDrawable<N, ?> drawable) { throw rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */

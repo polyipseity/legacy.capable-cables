@@ -28,21 +28,21 @@ public class GuiRectangleThemed<N extends Number, TH extends IThemed.ITheme<TH>,
 
 	/* SECTION constructors */
 
+	public GuiRectangleThemed(GuiRectangleThemed<N, TH, ?> copy) { this(copy.getRect(), copy.getColor(), copy.getTheme()); }
+
 	public GuiRectangleThemed(Rectangle<N, ?> rect, Color color, TH theme) {
 		super(rect, color);
 		this.theme = theme;
 	}
 
-	public GuiRectangleThemed(GuiRectangleThemed<N, TH, ?> copy) { this(copy.getRect(), copy.getColor(), copy.getTheme()); }
-
 
 	/* SECTION getters & setters */
 
 	@Override
-	public void setTheme(TH theme) { this.theme = theme; }
+	public TH getTheme() { return theme; }
 
 	@Override
-	public TH getTheme() { return theme; }
+	public void setTheme(TH theme) { this.theme = theme; }
 
 
 	/* SECTION methods */
@@ -52,13 +52,6 @@ public class GuiRectangleThemed<N extends Number, TH extends IThemed.ITheme<TH>,
 
 	@Override
 	public boolean isImmutable() { return false; }
-
-
-	@Override
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"theme", getTheme()});
-	}
 
 	@Override
 	public int hashCode() {
@@ -78,15 +71,21 @@ public class GuiRectangleThemed<N extends Number, TH extends IThemed.ITheme<TH>,
 		return r;
 	}
 
+	@Override
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"theme", getTheme()});
+	}
+
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
 	public static class Immutable<N extends Number, TH extends ITheme<TH>, T extends Immutable<N, TH, T>> extends GuiRectangleThemed<N, TH, T> {
 		/* SECTION constructors */
 
-		public Immutable(Rectangle<N, ?> rect, Color color, TH theme) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(color), tryToImmutableUnboxedNonnull(theme)); }
-
 		public Immutable(GuiRectangleThemed<N, TH, ?> copy) { this(copy.getRect(), copy.getColor(), copy.getTheme()); }
+
+		public Immutable(Rectangle<N, ?> rect, Color color, TH theme) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(color), tryToImmutableUnboxedNonnull(theme)); }
 
 
 		/* SECTION getters & setters */

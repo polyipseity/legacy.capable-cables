@@ -42,6 +42,7 @@ public class ModContainerNull extends Singleton implements ModContainer {
 
 	@Override
 	public void setEnabledState(boolean enabled) { throw rejectUnsupportedOperation(); }
+
 	@Override
 	public Set<ArtifactVersion> getRequirements() { throw rejectUnsupportedOperation(); }
 
@@ -74,6 +75,7 @@ public class ModContainerNull extends Singleton implements ModContainer {
 
 	@Override
 	public VersionRange acceptableMinecraftVersionRange() { throw rejectUnsupportedOperation(); }
+
 	@Nullable
 	@Override
 	public Certificate getSigningCertificate() { throw rejectUnsupportedOperation(); }
@@ -103,8 +105,8 @@ public class ModContainerNull extends Singleton implements ModContainer {
 	public URL getUpdateUrl() { throw rejectUnsupportedOperation(); }
 
 	@Override
-	public void setClassVersion(int classVersion) { throw rejectUnsupportedOperation(); }
+	public int getClassVersion() { throw rejectUnsupportedOperation(); }
 
 	@Override
-	public int getClassVersion() { throw rejectUnsupportedOperation(); }
+	public void setClassVersion(int classVersion) { throw rejectUnsupportedOperation(); }
 }

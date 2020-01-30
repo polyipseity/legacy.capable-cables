@@ -52,30 +52,8 @@ public enum Registrables {
 		public static final ImmutableMap<String, Integer> RAW_NBT_TYPE_LOOKUP;
 		public static final ImmutableMap<String, Integer> NBT_TYPE_LOOKUP;
 
-		static {
-			Map<String, Integer> rawNbtTypeLookup = new HashMap<>(NBTBase.NBT_TYPES.length);
-			Map<String, Integer> nbtTypeLookup = new HashMap<>(NBTBase.NBT_TYPES.length);
-
-			for (String nbt : NBTBase.NBT_TYPES) {
-				rawNbtTypeLookup.put(nbt, rawNbtTypeLookup.size());
-				nbtTypeLookup.put("NBTTag" + WordUtils.capitalizeFully(nbt).replace("[]", "Array"), nbtTypeLookup.size());
-			}
-
-			RAW_NBT_TYPE_LOOKUP = ImmutableMap.copyOf(rawNbtTypeLookup);
-			NBT_TYPE_LOOKUP = ImmutableMap.copyOf(nbtTypeLookup);
-		}
-
 
 		/* SECTION static methods */
-
-		public static Optional<Integer> lookupNBTType(Class<?> clazz) {
-			@Nullable Integer ret = NBT_TYPE_LOOKUP.get(clazz.getSimpleName());
-			if (ret == null) ret = RAW_NBT_TYPE_LOOKUP.get(clazz.getSimpleName().toUpperCase(Locale.ROOT));
-			return Optional.ofNullable(ret);
-		}
-
-		public static int lookupNBTTypeNonnull(Class<?> clazz) { return lookupNBTType(clazz).orElseThrow(() -> rejectArguments(clazz)); }
-
 
 		@SuppressWarnings("UnusedReturnValue")
 		public static boolean setTagIfNotEmpty(NBTTagCompound p, String k, NBTTagCompound v) {
@@ -96,6 +74,30 @@ public enum Registrables {
 			return Optional.empty();
 		}
 
+		public static int lookupNBTTypeNonnull(Class<?> clazz) { return lookupNBTType(clazz).orElseThrow(() -> rejectArguments(clazz)); }
+
+		public static Optional<Integer> lookupNBTType(Class<?> clazz) {
+			@Nullable Integer ret = NBT_TYPE_LOOKUP.get(clazz.getSimpleName());
+			if (ret == null) ret = RAW_NBT_TYPE_LOOKUP.get(clazz.getSimpleName().toUpperCase(Locale.ROOT));
+			return Optional.ofNullable(ret);
+		}
+
 		public static Optional<NBTTagCompound> returnTagIfNotEmpty(NBTTagCompound p) { return p.getSize() == 0 ? Optional.empty() : Optional.of(p); }
+
+
+		/* SECTION static initializer */
+
+		static {
+			Map<String, Integer> rawNbtTypeLookup = new HashMap<>(NBTBase.NBT_TYPES.length);
+			Map<String, Integer> nbtTypeLookup = new HashMap<>(NBTBase.NBT_TYPES.length);
+
+			for (String nbt : NBTBase.NBT_TYPES) {
+				rawNbtTypeLookup.put(nbt, rawNbtTypeLookup.size());
+				nbtTypeLookup.put("NBTTag" + WordUtils.capitalizeFully(nbt).replace("[]", "Array"), nbtTypeLookup.size());
+			}
+
+			RAW_NBT_TYPE_LOOKUP = ImmutableMap.copyOf(rawNbtTypeLookup);
+			NBT_TYPE_LOOKUP = ImmutableMap.copyOf(nbtTypeLookup);
+		}
 	}
 }

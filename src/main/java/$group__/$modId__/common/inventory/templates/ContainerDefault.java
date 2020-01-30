@@ -9,9 +9,6 @@ public abstract class ContainerDefault extends Container {
 	/* SECTION methods */
 
 	@Override
-	public boolean canInteractWith(EntityPlayer playerIn) { return true; }
-
-	@Override
 	public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
 		Slot s = inventorySlots.get(index);
 		if (s != null && s.getHasStack()) {
@@ -33,4 +30,7 @@ public abstract class ContainerDefault extends Container {
 		}
 		return ItemStack.EMPTY;
 	}
+
+	@Override
+	public boolean canInteractWith(EntityPlayer playerIn) { return true; }
 }

@@ -33,12 +33,12 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 
 	/* SECTION constructors */
 
+	public GuiRectangle(GuiRectangle<N, ?> copy) { this(copy.getRect(), copy.getColor()); }
+
 	public GuiRectangle(Rectangle<N, ?> rect, Color color) {
 		this.rect = rect;
 		this.color = color;
 	}
-
-	public GuiRectangle(GuiRectangle<N, ?> copy) { this(copy.getRect(), copy.getColor()); }
 
 
 	/* SECTION getters & setters */
@@ -66,15 +66,6 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 	@Override
 	public boolean isImmutable() { return false; }
 
-
-	@Override
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"rect", getRect()},
-				new Object[]{"color", getColor()});
-	}
-
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public int hashCode() {
@@ -101,6 +92,14 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 		return r;
 	}
 
+	@Override
+	@OverridingStatus(group = GROUP, when = When.MAYBE)
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"rect", getRect()},
+				new Object[]{"color", getColor()});
+	}
+
 
 	/* SECTION static classes */
 
@@ -108,9 +107,9 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends GuiRectangle<N, T> {
 		/* SECTION constructors */
 
-		public Immutable(Rectangle<N, ?> rect, Color color) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(color)); }
-
 		public Immutable(GuiRectangle<N, ?> copy) { this(copy.getRect(), copy.getColor()); }
+
+		public Immutable(Rectangle<N, ?> rect, Color color) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(color)); }
 
 
 		/* SECTION getters & setters */

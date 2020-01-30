@@ -13,7 +13,7 @@ import static $group__.$modId__.utilities.variables.Globals.Client.CLIENT;
 public interface IDrawable<N extends Number, T extends IDrawable<N, T>> extends IStructureCloneable<T>, ISpec<Rectangle<N, ?>> {
 	/* SECTION methods */
 
-	void draw(Minecraft client);
-
 	default void draw() { draw(CLIENT); }
+
+	void draw(Minecraft client);
 }

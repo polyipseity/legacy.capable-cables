@@ -12,10 +12,6 @@ import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOp
 public interface IIterableDelegated<I extends Iterable<E>, E, T extends IIterableDelegated<I, E, T>> extends Iterable<E>, IAdapter<I, T> {
 	/* SECTION methods */
 
-	I getIterable();
-
-	void setIterable(I iterable);
-
 	@Override
 	@Deprecated
 	default I get() { return getIterable(); }
@@ -24,6 +20,9 @@ public interface IIterableDelegated<I extends Iterable<E>, E, T extends IIterabl
 	@Deprecated
 	default void set(I value) { setIterable(value); }
 
+	I getIterable();
+
+	void setIterable(I iterable);
 
 	@Override
 	default Iterator<E> iterator() { return getIterable().iterator(); }
@@ -41,12 +40,12 @@ public interface IIterableDelegated<I extends Iterable<E>, E, T extends IIterabl
 	interface IImmutable<I extends Iterable<E>, E, T extends IImmutable<I, E, T>> extends IIterableDelegated<I, E, T>, IAdapter.IImmutable<I, T> {
 		/* SECTION methods */
 
-		@Override
-		default void setIterable(I iterable) { throw rejectUnsupportedOperation(); }
-
 		@SuppressWarnings("deprecation")
 		@Override
 		@Deprecated
 		default void set(I value) { IAdapter.IImmutable.super.set(value); }
+
+		@Override
+		default void setIterable(I iterable) { throw rejectUnsupportedOperation(); }
 	}
 }

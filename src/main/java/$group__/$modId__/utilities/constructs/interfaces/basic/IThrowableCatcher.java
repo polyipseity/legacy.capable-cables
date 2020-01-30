@@ -12,24 +12,23 @@ import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
 public interface IThrowableCatcher {
 	/* SECTION methods */
 
-	Optional<Throwable> getCaughtThrowable();
-
 	@Nullable
 	default Throwable getCaughtThrowableUnboxed() { return unboxOptional(getCaughtThrowable()); }
+
+	Optional<Throwable> getCaughtThrowable();
 
 	default Throwable getCaughtThrowableUnboxedNonnull() { return getCaughtThrowable().orElseThrow(Throwables::unexpected); }
 
 
 	void clearCaughtThrowable();
 
+	default RuntimeException rethrowCaughtThrowable() throws RuntimeException {
+		rethrowCaughtThrowable(false);
+		throw unexpected();
+	}
 
 	default void rethrowCaughtThrowable(boolean nullable) throws RuntimeException {
 		if (nullable) getCaughtThrowable().ifPresent(Throwables::throwThrowable);
 		else throw throwThrowable(getCaughtThrowable().orElseThrow(Throwables::unexpected));
-	}
-
-	default RuntimeException rethrowCaughtThrowable() throws RuntimeException {
-		rethrowCaughtThrowable(false);
-		throw unexpected();
 	}
 }

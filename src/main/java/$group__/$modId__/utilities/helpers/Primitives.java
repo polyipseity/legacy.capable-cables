@@ -40,6 +40,21 @@ public enum Primitives {
 			return Optional.empty();
 		}
 
+		@SuppressWarnings("varargs")
+		@SafeVarargs
+		public static <N> Optional<N> sum(N... a) { return sum(asList(a)); }
+
+		public static <N> Optional<N> sum(Iterable<? extends N> it) {
+			List<? extends N> l = Lists.newArrayList(it);
+			switch (l.size()) {
+				case 0:
+					return Optional.empty();
+				case 1:
+					return Optional.ofNullable(l.get(0));
+				default:
+					return sum(l.get(0), l.subList(1, l.size()));
+			}
+		}
 
 		public static <N> Optional<N> sum(@Nullable N n, Iterable<? extends N> it) {
 			if (n instanceof IOperable<?, ?>)
@@ -60,7 +75,11 @@ public enum Primitives {
 			return Optional.empty();
 		}
 
-		public static <N> Optional<N> sum(Iterable<? extends N> it) {
+		@SuppressWarnings("varargs")
+		@SafeVarargs
+		public static <N> Optional<N> max(N... a) { return max(asList(a)); }
+
+		public static <N> Optional<N> max(Iterable<? extends N> it) {
 			List<? extends N> l = Lists.newArrayList(it);
 			switch (l.size()) {
 				case 0:
@@ -68,14 +87,9 @@ public enum Primitives {
 				case 1:
 					return Optional.ofNullable(l.get(0));
 				default:
-					return sum(l.get(0), l.subList(1, l.size()));
+					return max(l.get(0), l.subList(1, l.size()));
 			}
 		}
-
-		@SuppressWarnings("varargs")
-		@SafeVarargs
-		public static <N> Optional<N> sum(N... a) { return sum(asList(a)); }
-
 
 		public static <N> Optional<N> max(@Nullable N n, Iterable<? extends N> it) {
 			if (n instanceof IOperable<?, ?>)
@@ -92,7 +106,11 @@ public enum Primitives {
 			return Optional.empty();
 		}
 
-		public static <N> Optional<N> max(Iterable<? extends N> it) {
+		@SuppressWarnings("varargs")
+		@SafeVarargs
+		public static <N> Optional<N> min(N... a) { return min(asList(a)); }
+
+		public static <N> Optional<N> min(Iterable<? extends N> it) {
 			List<? extends N> l = Lists.newArrayList(it);
 			switch (l.size()) {
 				case 0:
@@ -100,14 +118,9 @@ public enum Primitives {
 				case 1:
 					return Optional.ofNullable(l.get(0));
 				default:
-					return max(l.get(0), l.subList(1, l.size()));
+					return min(l.get(0), l.subList(1, l.size()));
 			}
 		}
-
-		@SuppressWarnings("varargs")
-		@SafeVarargs
-		public static <N> Optional<N> max(N... a) { return max(asList(a)); }
-
 
 		public static <N> Optional<N> min(@Nullable N n, Iterable<? extends N> it) {
 			if (n instanceof IOperable<?, ?>)
@@ -123,21 +136,5 @@ public enum Primitives {
 			}
 			return Optional.empty();
 		}
-
-		public static <N> Optional<N> min(Iterable<? extends N> it) {
-			List<? extends N> l = Lists.newArrayList(it);
-			switch (l.size()) {
-				case 0:
-					return Optional.empty();
-				case 1:
-					return Optional.ofNullable(l.get(0));
-				default:
-					return min(l.get(0), l.subList(1, l.size()));
-			}
-		}
-
-		@SuppressWarnings("varargs")
-		@SafeVarargs
-		public static <N> Optional<N> min(N... a) { return min(asList(a)); }
 	}
 }

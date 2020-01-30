@@ -31,13 +31,13 @@ public class GuiResource<N extends Number, TN extends Number, T extends GuiResou
 
 	/* SECTION constructors */
 
+	public GuiResource(GuiResource<N, TN, ?> copy) { this(copy.getRect(), copy.getResource(), copy.getTexture()); }
+
 	public GuiResource(Rectangle<N, ?> rect, ResourceLocation resource, Rectangle<TN, ?> texture) {
 		super(rect, Colors.COLORLESS);
 		this.resource = resource;
 		this.texture = texture;
 	}
-
-	public GuiResource(GuiResource<N, TN, ?> copy) { this(copy.getRect(), copy.getResource(), copy.getTexture()); }
 
 
 	/* SECTION getters & setters */

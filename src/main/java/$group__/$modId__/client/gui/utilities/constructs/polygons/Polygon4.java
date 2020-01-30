@@ -19,14 +19,14 @@ import static $group__.$modId__.utilities.variables.Constants.GROUP;
 public class Polygon4<N extends Number, T extends Polygon4<N, T>> extends PolygonN<N, T> {
 	/* SECTION constructors */
 
+	public Polygon4(XY<N, ?> a, XY<N, ?> b, XY<N, ?> c, XY<N, ?> d) { super(a, b, c, d); }
+
+	public Polygon4(Polygon4<N, ?> copy) { this(copy.getVertexes()); }
+
 	public Polygon4(List<XY<N, ?>> list) {
 		super(list);
 		if (list.size() != 4) throw rejectArguments(list);
 	}
-
-	public Polygon4(XY<N, ?> a, XY<N, ?> b, XY<N, ?> c, XY<N, ?> d) { super(a, b, c, d); }
-
-	public Polygon4(Polygon4<N, ?> copy) { this(copy.getVertexes()); }
 
 
 	/* SECTION getters & setters */
@@ -66,9 +66,9 @@ public class Polygon4<N extends Number, T extends Polygon4<N, T>> extends Polygo
 	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends Polygon4<N, T> {
 		/* SECTION constructors */
 
-		public Immutable(List<XY<N, ?>> list) { super(tryToImmutableUnboxedNonnull(list)); }
-
 		public Immutable(XY<N, ?> a, XY<N, ?> b, XY<N, ?> c, XY<N, ?> d) { this(ImmutableList.of(a, b, c, d)); }
+
+		public Immutable(List<XY<N, ?>> list) { super(tryToImmutableUnboxedNonnull(list)); }
 
 		public Immutable(Polygon4<N, ?> copy) { this(copy.getVertexes()); }
 

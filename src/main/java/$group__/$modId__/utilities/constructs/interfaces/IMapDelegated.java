@@ -16,10 +16,6 @@ import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOp
 public interface IMapDelegated<M extends Map<K, V>, K, V, T extends IMapDelegated<M, K, V, T>> extends Map<K, V>, IAdapter<M, T> {
 	/* SECTION methods */
 
-	M getMap();
-
-	void setMap(M map);
-
 	@Override
 	@Deprecated
 	default M get() { return getMap(); }
@@ -28,6 +24,9 @@ public interface IMapDelegated<M extends Map<K, V>, K, V, T extends IMapDelegate
 	@Deprecated
 	default void set(M value) { setMap(value); }
 
+	M getMap();
+
+	void setMap(M map);
 
 	@Override
 	default int size() { return getMap().size(); }
@@ -117,14 +116,13 @@ public interface IMapDelegated<M extends Map<K, V>, K, V, T extends IMapDelegate
 	interface IImmutable<M extends Map<K, V>, K, V, T extends IImmutable<M, K, V, T>> extends IMapDelegated<M, K, V, T>, IAdapter.IImmutable<M, T> {
 		/* SECTION methods */
 
-		@Override
-		default void setMap(M iterable) { throw rejectUnsupportedOperation(); }
-
 		@SuppressWarnings("deprecation")
 		@Override
 		@Deprecated
 		default void set(M value) { IAdapter.IImmutable.super.set(value); }
 
+		@Override
+		default void setMap(M iterable) { throw rejectUnsupportedOperation(); }
 
 		@Override
 		default V put(K key, V value) { throw rejectUnsupportedOperation(); }

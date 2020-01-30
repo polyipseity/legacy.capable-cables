@@ -54,23 +54,12 @@ public enum ModThis {
 	INSTANCE;
 
 
-	/* SECTION static variables (forward reference) */
-
-	private static final String
-			EVENT_PROCESSOR_VALUE = "event processor",
-			CONTAINER_VALUE = "container";
-
-
-	/* SECTION methods */
-
-	@Marker(@Property(key = "Method", value = EVENT_PROCESSOR_VALUE))
-	@EventHandler
-	public void processEvent(FMLEvent event) { EVENT_MAP.getOrDefault(event.getClass(), (m, e) -> LOGGER.info("FMLEvent '{}' received, but processing is NOT implemented", e)).accept(castUncheckedUnboxedNonnull(this), castUncheckedUnboxedNonnull(event)); }
-
-
 	/* SECTION static variables */
 
-	public static final String CLASS_SIMPLE_NAME = "ModThis";
+	public static final String
+			CLASS_SIMPLE_NAME = "ModThis",
+			EVENT_PROCESSOR_VALUE = "event processor",
+			CONTAINER_VALUE = "container";
 	public static final Logger LOGGER = LogManager.getLogger(NAME + "|" + MOD_ID);
 	@Marker(@Property(key = "Field", value = CONTAINER_VALUE))
 	public static final ModContainer CONTAINER = Singleton.getInstance(ModContainerNull.class);
@@ -78,8 +67,6 @@ public enum ModThis {
 			clientSide = PACKAGE + "." + Proxy.SUBPACKAGE + "." + ProxyClient.CLASS_SIMPLE_NAME,
 			serverSide = PACKAGE + "." + Proxy.SUBPACKAGE + "." + ProxyServer.CLASS_SIMPLE_NAME)
 	public static final Proxy PROXY = Singleton.getInstance(ProxyNull.class);
-
-
 	private static final ImmutableMap<Class<? extends FMLEvent>, BiConsumer<?, ? extends FMLEvent>> EVENT_MAP = new ImmutableMap.Builder<Class<? extends FMLEvent>, BiConsumer<?, ? extends FMLEvent>>()
 			.put(FMLConstructionEvent.class, (ModThis m, FMLConstructionEvent e) ->
 					processEvent("Construction", m, e, PROXY::construct))
@@ -117,7 +104,6 @@ public enum ModThis {
 	@InstanceFactory
 	public static ModThis getInstance() { return INSTANCE; }
 
-
 	private static <M, E> void processEvent(String name, M mod, E event, BiConsumer<? super M, ? super E> process) {
 		LOGGER.info("{} started", name);
 		Stopwatch stopwatch = Stopwatch.createStarted();
@@ -126,9 +112,63 @@ public enum ModThis {
 	}
 
 
+	/* SECTION methods */
+
+	@Marker(@Property(key = "Method", value = EVENT_PROCESSOR_VALUE))
+	@EventHandler
+	public void processEvent(FMLEvent event) { EVENT_MAP.getOrDefault(event.getClass(), (m, e) -> LOGGER.info("FMLEvent '{}' received, but processing is NOT implemented", e)).accept(castUncheckedUnboxedNonnull(this), castUncheckedUnboxedNonnull(event)); }
+
+
 	/* SECTION static classes */
 
+	@Config(modid = MOD_ID, name = NAME, category = "General")
+	@Config.LangKey(Configuration.LANG_KEY_BASE + ".name")
+	public enum Configuration {
+		;
+		@Config.Ignore
+		public static final String LANG_KEY_BASE = "configurations." + MOD_ID;
+		@Config.LangKey(Behavior.LANG_KEY_BASE + ".name")
+		public static final Behavior behavior = new Behavior();
+		@SuppressWarnings("unused")
+		@Config.Comment({"1st line", "2nd line"})
+		@Config.Name("Template") // COMMENT overridden by @Config.LangKey
+		@Config.LangKey("template.template.template_") // COMMENT overrides @Config.Name
+		@Config.RequiresMcRestart
+		@Config.RequiresWorldRestart
+		@Config.Ignore
+		private static final String TEMPLATE_ = "default";
+		@SuppressWarnings("unused")
+		@Config.RangeInt(min = -1337, max = 1337)
+		@Config.Ignore
+		private static final int INT_TEMPLATE_ = 69;
+		@SuppressWarnings("unused")
+		@Config.RangeDouble(min = -13.37D, max = 13.37D)
+		@Config.Ignore
+		private static final double DOUBLE_TEMPLATE_ = 6.9D;
+
+		public static final class Behavior {
+			public static final String LANG_KEY_BASE = Configuration.LANG_KEY_BASE + ".behavior";
+			@Config.LangKey(Items.LANG_KEY_BASE + ".name")
+			public final Items items = new Items();
+
+			private Behavior() { requireRunOnceOnly(); }
+
+			public static final class Items {
+				public static final String LANG_KEY_BASE = Behavior.LANG_KEY_BASE + ".items";
+				@Config.LangKey(ItemWrench.Configuration.LANG_KEY_BASE + ".name")
+				public final ItemWrench.Configuration wrench = new ItemWrench.Configuration();
+
+				private Items() { requireRunOnceOnly(); }
+			}
+		}
+	}
+
 	public static class CustomLanguageAdapter extends ILanguageAdapter.JavaAdapter {
+		/* SECTION static variables */
+
+		public static final String CLASS_SIMPLE_NAME = "CustomLanguageAdapter";
+
+
 		/* SECTION methods */
 
 		@Override
@@ -149,7 +189,8 @@ public enum ModThis {
 										fModF = getDeclaredField(fc, "modifiers");
 								int fMod = f.getModifiers();
 
-								if (!(fModF.setAccessible(true) && fModF.setInt(f, fMod & ~Modifier.FINAL))) LOGGER.warn("Unable to set modifier field '{}' of container field '{}' to be non-final, will crash with a final proxy field, stacktrace:\n{}", fModF.get(), f, getStackTrace(fModF.getCaughtThrowableUnboxedNonnull()));
+								if (!(fModF.setAccessible(true) && fModF.setInt(f, fMod & ~Modifier.FINAL)))
+									LOGGER.warn("Unable to set modifier field '{}' of container field '{}' to be non-final, will crash with a final proxy field, stacktrace:\n{}", fModF.get(), f, getStackTrace(fModF.getCaughtThrowableUnboxedNonnull()));
 
 								String objectClassGS = objectClass.toGenericString();
 								if (!fa.setAccessible(true))
@@ -158,7 +199,8 @@ public enum ModThis {
 								if (!fa.setAccessible(false))
 									LOGGER.warn("Unable to restore accessibility of container field '{}' of class '{}', presenting a potential security problem, stacktrace:\n{}", f, objectClassGS, getStackTrace(fa.getCaughtThrowableUnboxedNonnull()));
 
-								if (!(fModF.setInt(f, fMod) && fModF.setAccessible(false))) LOGGER.warn("Unable to restore modifier field '{}' of container field '{}', presenting a potential security problem, stacktrace:\n{}", fModF.get(), f, getStackTrace(fModF.getCaughtThrowableUnboxedNonnull()));
+								if (!(fModF.setInt(f, fMod) && fModF.setAccessible(false)))
+									LOGGER.warn("Unable to restore modifier field '{}' of container field '{}', presenting a potential security problem, stacktrace:\n{}", fModF.get(), f, getStackTrace(fModF.getCaughtThrowableUnboxedNonnull()));
 
 								break;
 							}
@@ -208,60 +250,11 @@ public enum ModThis {
 			FieldAdapter tModF = getDeclaredField(target.getClass(), "modifiers");
 			int tMod = target.getModifiers();
 
-			if (!(tModF.setAccessible(true) && tModF.setInt(target, tMod & ~Modifier.FINAL))) LOGGER.warn("Unable to set modifier field '{}' of proxy field '{}' to be non-final, will crash with a final proxy field, stacktrace:\n{}", tModF.get(), target, getStackTrace(tModF.getCaughtThrowableUnboxedNonnull()));
+			if (!(tModF.setAccessible(true) && tModF.setInt(target, tMod & ~Modifier.FINAL)))
+				LOGGER.warn("Unable to set modifier field '{}' of proxy field '{}' to be non-final, will crash with a final proxy field, stacktrace:\n{}", tModF.get(), target, getStackTrace(tModF.getCaughtThrowableUnboxedNonnull()));
 			super.setProxy(target, proxyTarget, proxy);
-			if (!(tModF.setInt(target, tMod) && tModF.setAccessible(false))) LOGGER.warn("Unable to restore modifier field '{}' of proxy field '{}', presenting a potential security problem, stacktrace:\n{}", tModF.get(), target, getStackTrace(tModF.getCaughtThrowableUnboxedNonnull()));
-		}
-
-
-		/* SECTION static variables */
-
-		public static final String CLASS_SIMPLE_NAME = "CustomLanguageAdapter";
-	}
-
-	@Config(modid = MOD_ID, name = NAME, category = "General")
-	@Config.LangKey(Configuration.LANG_KEY_BASE + ".name")
-	public enum Configuration {
-		;
-		@SuppressWarnings("unused")
-		@Config.Comment({"1st line", "2nd line"})
-		@Config.Name("Template") // COMMENT overridden by @Config.LangKey
-		@Config.LangKey("template.template.template_") // COMMENT overrides @Config.Name
-		@Config.RequiresMcRestart
-		@Config.RequiresWorldRestart
-		@Config.Ignore
-		private static final String TEMPLATE_ = "default";
-		@SuppressWarnings("unused")
-		@Config.RangeInt(min = -1337, max = 1337)
-		@Config.Ignore
-		private static final int INT_TEMPLATE_ = 69;
-		@SuppressWarnings("unused")
-		@Config.RangeDouble(min = -13.37D, max = 13.37D)
-		@Config.Ignore
-		private static final double DOUBLE_TEMPLATE_ = 6.9D;
-
-		@Config.Ignore
-		public static final String LANG_KEY_BASE = "configurations." + MOD_ID;
-
-		@Config.LangKey(Behavior.LANG_KEY_BASE + ".name")
-		public static final Behavior behavior = new Behavior();
-
-		public static final class Behavior {
-			public static final String LANG_KEY_BASE = Configuration.LANG_KEY_BASE + ".behavior";
-
-			private Behavior() { requireRunOnceOnly(); }
-
-			@Config.LangKey(Items.LANG_KEY_BASE + ".name")
-			public final Items items = new Items();
-
-			public static final class Items {
-				public static final String LANG_KEY_BASE = Behavior.LANG_KEY_BASE + ".items";
-
-				private Items() { requireRunOnceOnly(); }
-
-				@Config.LangKey(ItemWrench.Configuration.LANG_KEY_BASE + ".name")
-				public final ItemWrench.Configuration wrench = new ItemWrench.Configuration();
-			}
+			if (!(tModF.setInt(target, tMod) && tModF.setAccessible(false)))
+				LOGGER.warn("Unable to restore modifier field '{}' of proxy field '{}', presenting a potential security problem, stacktrace:\n{}", tModF.get(), target, getStackTrace(tModF.getCaughtThrowableUnboxedNonnull()));
 		}
 	}
 }

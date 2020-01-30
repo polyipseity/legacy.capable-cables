@@ -31,25 +31,35 @@ public class GuiTabsThemed<N extends Number, E extends GuiTabs.ITab<N, ?>, TH ex
 
 	/* SECTION constructors */
 
+	@SuppressWarnings("varargs")
+	@SafeVarargs
+	public GuiTabsThemed(TH theme, int open, E... tabs) { this(Arrays.asList(tabs), theme, open); }
+
 	public GuiTabsThemed(List<? extends E> tabs, TH theme, int open) {
 		super(tabs, open);
 		setTheme(this, theme);
 	}
 
-	@SuppressWarnings("varargs")
-	@SafeVarargs
-	public GuiTabsThemed(TH theme, int open, E... tabs) { this(Arrays.asList(tabs), theme, open); }
-
 	public GuiTabsThemed(GuiTabsThemed<N, ? extends E, TH, ?> copy) { this(copy.getTabs(), copy.getTheme(), copy.getOpen()); }
+
+
+	/* SECTION static methods */
+
+	protected static <T extends ITheme<T>> void setTheme(GuiTabsThemed<?, ?, T, ?> t, T theme) {
+		t.theme = theme;
+
+		T th = t.getTheme();
+		t.getTabs().forEach(tab -> Casts.<IThemed<T>>castChecked(tab, castUncheckedUnboxedNonnull(IThemed.class)).ifPresent(t1 -> t1.setTheme(th)));
+	}
 
 
 	/* SECTION getters & setters */
 
 	@Override
-	public void setTheme(TH theme) { setTheme(this, theme); }
+	public TH getTheme() { return theme; }
 
 	@Override
-	public TH getTheme() { return theme; }
+	public void setTheme(TH theme) { setTheme(this, theme); }
 
 
 	/* SECTION methods */
@@ -60,12 +70,6 @@ public class GuiTabsThemed<N extends Number, E extends GuiTabs.ITab<N, ?>, TH ex
 	@Override
 	public boolean isImmutable() { return false; }
 
-
-	@Override
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"theme", getTheme()});
-	}
 
 	@Override
 	public int hashCode() {
@@ -85,14 +89,10 @@ public class GuiTabsThemed<N extends Number, E extends GuiTabs.ITab<N, ?>, TH ex
 		return r;
 	}
 
-
-	/* SECTION static methods */
-
-	protected static <T extends ITheme<T>> void setTheme(GuiTabsThemed<?, ?, T, ?> t, T theme) {
-		t.theme = theme;
-
-		T th = t.getTheme();
-		t.getTabs().forEach(tab -> Casts.<IThemed<T>>castChecked(tab, castUncheckedUnboxedNonnull(IThemed.class)).ifPresent(t1 -> t1.setTheme(th)));
+	@Override
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"theme", getTheme()});
 	}
 
 
@@ -102,11 +102,11 @@ public class GuiTabsThemed<N extends Number, E extends GuiTabs.ITab<N, ?>, TH ex
 	public static class Immutable<N extends Number, E extends ITab<N, ?>, TH extends ITheme<TH>, T extends Immutable<N, E, TH, T>> extends GuiTabsThemed<N, E, TH, T> {
 		/* SECTION constructors */
 
-		public Immutable(List<? extends E> tabs, TH theme, int open) { super(tryToImmutableUnboxedNonnull(tabs), tryToImmutableUnboxedNonnull(theme), tryToImmutableUnboxedNonnull(open)); }
-
 		@SuppressWarnings("varargs")
 		@SafeVarargs
 		public Immutable(TH theme, int open, E... tabs) { this(ImmutableList.copyOf(tabs), theme, open); }
+
+		public Immutable(List<? extends E> tabs, TH theme, int open) { super(tryToImmutableUnboxedNonnull(tabs), tryToImmutableUnboxedNonnull(theme), tryToImmutableUnboxedNonnull(open)); }
 
 		public Immutable(GuiTabsThemed<N, ? extends E, TH, ?> copy) { this(copy.getTabs(), copy.getTheme(), copy.getOpen()); }
 
@@ -114,10 +114,10 @@ public class GuiTabsThemed<N extends Number, E extends GuiTabs.ITab<N, ?>, TH ex
 		/* SECTION getters & setters */
 
 		@Override
-		public void setTabs(List<? extends E> iTabs, int open) { throw rejectUnsupportedOperation(); }
+		public void setOpen(int open) { throw rejectUnsupportedOperation(); }
 
 		@Override
-		public void setOpen(int open) { throw rejectUnsupportedOperation(); }
+		public void setTabs(List<? extends E> iTabs, int open) { throw rejectUnsupportedOperation(); }
 
 		@Override
 		public void setTheme(TH theme) { throw rejectUnsupportedOperation(); }

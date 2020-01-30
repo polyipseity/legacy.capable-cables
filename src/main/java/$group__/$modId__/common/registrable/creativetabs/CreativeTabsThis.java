@@ -25,7 +25,6 @@ public enum CreativeTabsThis {
 		public ItemStack getTabIconItem() { return new ItemStack(ItemsThis.INSTANCE.wrench); }
 	};
 
-
 	/* REFERENCE creative tab template */
 
 	// COMMENT using a function here to avoid registering the tab

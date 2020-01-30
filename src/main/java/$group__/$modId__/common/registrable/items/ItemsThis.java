@@ -14,25 +14,11 @@ import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 
 @Mod.EventBusSubscriber(modid = MOD_ID)
 public final class ItemsThis extends Registrable<Item> {
-	/* SECTION variables */
-
-	@SuppressWarnings("unused")
-	public final Item wrench = new ItemWrench().setRegistryAndUnlocalizedName(MOD_ID, "wrench").setCreativeTab(CreativeTabsThis.DEFAULT);
-
-
 	/* SECTION static variables */
 
 	public static final ItemsThis INSTANCE = getInstance(ItemsThis.class);
 
-
-	/* SECTION static methods */
-
-	@SubscribeEvent
-	public static void registerStatic(RegistryEvent.Register<Item> event) { INSTANCE.register(event); }
-
-
 	/* REFERENCE item template */
-
 	@SuppressWarnings("unused")
 	private static final Item TEMPLATE_ = new ItemDefault() {{
 		// COMMENT below one is required
@@ -50,4 +36,16 @@ public final class ItemsThis extends Registrable<Item> {
 		setHarvestLevel("template_", 9001);
 		// COMMENT overrides are required for properties unlisted here
 	}};
+
+
+	/* SECTION variables */
+
+	@SuppressWarnings("unused")
+	public final Item wrench = new ItemWrench().setRegistryAndUnlocalizedName(MOD_ID, "wrench").setCreativeTab(CreativeTabsThis.DEFAULT);
+
+
+	/* SECTION static methods */
+
+	@SubscribeEvent
+	public static void registerStatic(RegistryEvent.Register<Item> event) { INSTANCE.register(event); }
 }

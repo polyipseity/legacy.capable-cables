@@ -25,13 +25,13 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 
 	/* SECTION constructors */
 
+	public Rectangle(N offsetX, N offsetY, N sizeX, N sizeY) { this(new XY<>(offsetX, offsetY), new XY<>(sizeX, sizeY)); }
+
 	public Rectangle(XY<N, ?> offset, XY<N, ?> size) {
 		super(offset.toImmutable(), offset.sumX(size).toImmutable(), offset.sum(of(size)).toImmutable(), offset.sumY(size).toImmutable());
 		this.offset = offset;
 		this.size = size;
 	}
-
-	public Rectangle(N offsetX, N offsetY, N sizeX, N sizeY) { this(new XY<>(offsetX, offsetY), new XY<>(sizeX, sizeY)); }
 
 	public Rectangle(Rectangle<N, ?> copy) { this(copy.getOffset(), copy.getSize()); }
 
@@ -56,13 +56,12 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 		this.size = size;
 	}
 
+	public final void setOffsetAndSize(Rectangle<N, ?> rect) { setOffsetAndSize(rect.getOffset(), rect.getSize()); }
+
 	public void setOffsetAndSize(XY<N, ?> offset, XY<N, ?> size) {
 		setOffset(offset);
 		setSize(size);
 	}
-
-	public final void setOffsetAndSize(Rectangle<N, ?> rect) { setOffsetAndSize(rect.getOffset(), rect.getSize()); }
-
 
 	@Override
 	public void setA(XY<N, ?> a) { throw rejectUnsupportedOperation(); }
@@ -79,24 +78,15 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 
 	/* SECTION methods */
 
-	public XY<N, ?> max() { return a().max(of(c())); }
-
-	public XY<N, ?> min() { return a().min(of(c())); }
-
-
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
 	@Override
 	public boolean isImmutable() { return false; }
 
+	public XY<N, ?> max() { return a().max(of(c())); }
 
-	@Override
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"offset", getOffset()},
-				new Object[]{"size", getSize()});
-	}
+	public XY<N, ?> min() { return a().min(of(c())); }
 
 	@Override
 	public int hashCode() {
@@ -118,6 +108,13 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 		return r;
 	}
 
+	@Override
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"offset", getOffset()},
+				new Object[]{"size", getSize()});
+	}
+
 
 	/* SECTION static classes */
 
@@ -125,12 +122,12 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends Rectangle<N, T> {
 		/* SECTION constructors */
 
+		public Immutable(N offsetX, N offsetY, N sizeX, N sizeY) { this(new XY<>(offsetX, offsetY), new XY<>(sizeX, sizeY)); }
+
 		public Immutable(XY<N, ?> offset, XY<N, ?> size) {
 			super(offset.toImmutable(), size.toImmutable());
 			vertexes = tryToImmutableUnboxedNonnull(vertexes);
 		}
-
-		public Immutable(N offsetX, N offsetY, N sizeX, N sizeY) { this(new XY<>(offsetX, offsetY), new XY<>(sizeX, sizeY)); }
 
 		public Immutable(Rectangle<N, ?> copy) { this(copy.getOffset(), copy.getSize()); }
 
@@ -138,10 +135,10 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 		/* SECTION getters & setters */
 
 		@Override
-		public void setSize(XY<N, ?> size) { throw rejectUnsupportedOperation(); }
+		public void setOffset(XY<N, ?> offset) { throw rejectUnsupportedOperation(); }
 
 		@Override
-		public void setOffset(XY<N, ?> offset) { throw rejectUnsupportedOperation(); }
+		public void setSize(XY<N, ?> size) { throw rejectUnsupportedOperation(); }
 
 		@Override
 		public void setOffsetAndSize(XY<N, ?> offset, XY<N, ?> size) { throw rejectUnsupportedOperation(); }

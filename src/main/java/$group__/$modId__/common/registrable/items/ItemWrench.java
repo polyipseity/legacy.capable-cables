@@ -50,100 +50,12 @@ import static $group__.$modId__.utilities.variables.Globals.MOD;
 		@Optional.Interface(iface = Constants.BUILDCRAFT_API_PACKAGE + ".api.tools.IToolWrench", modid = Constants.BUILDCRAFT_API_ID)
 })
 public class ItemWrench extends ItemUnstackable implements IRegistrableEventBusSubscriber, IToolHammer, IToolWrench {
-	/* SECTION methods */
-
-	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
-		if (playerIn.isSneaking()) {
-			if (!worldIn.isRemote)
-				playerIn.openGui(MOD, ContainerWrench.ID, worldIn, handIn.ordinal(), markUnused(int.class), markUnused(int.class));
-			return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
-		}
-		return new ActionResult<>(EnumActionResult.FAIL, playerIn.getHeldItem(handIn));
-	}
-
-	@Override
-	public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-		return canUse(player.getHeldItem(hand), world, player, new RayTraceResult(new Vec3d(hitX, hitY, hitZ), side, pos), hand) ? EnumActionResult.PASS : EnumActionResult.FAIL;
-	}
-
-	@Override
-	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		return worldIn.isRemote || use(player.getHeldItem(hand), worldIn, player, new RayTraceResult(new Vec3d(hitX, hitY, hitZ), facing, pos), hand) ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
-	}
-
-
-	@SubscribeEvent(priority = EventPriority.HIGH)
-	public void onPlayerInteractsEntity(PlayerInteractEvent.EntityInteract e) {
-		ItemStack stack = e.getItemStack();
-		Item item = stack.getItem();
-		if (item instanceof ItemWrench) {
-			World world = e.getWorld();
-			EntityPlayer player = e.getEntityPlayer();
-			RayTraceResult targetRTR = new RayTraceResult(e.getTarget());
-			EnumHand hand = e.getHand();
-			boolean ret = canUse(stack, world, player, targetRTR, hand);
-			if (ret && !world.isRemote) ret = use(stack, world, player, targetRTR, hand);
-			e.setCancellationResult(ret ? EnumActionResult.SUCCESS : EnumActionResult.FAIL);
-			e.setCanceled(true);
-		}
-	}
-
-
-	@Override
-	@Optional.Method(modid = Constants.COFH_CORE_ID)
-	public boolean isUsable(ItemStack item, EntityLivingBase user, BlockPos pos) { return true; }
-
-	@Override
-	@Optional.Method(modid = Constants.COFH_CORE_ID)
-	public boolean isUsable(ItemStack item, EntityLivingBase user, Entity entity) { return true; }
-
-	@Override
-	@Optional.Method(modid = Constants.COFH_CORE_ID)
-	public void toolUsed(ItemStack item, EntityLivingBase user, BlockPos pos) {  /* MARK empty */ }
-
-	@Override
-	@Optional.Method(modid = Constants.COFH_CORE_ID)
-	public void toolUsed(ItemStack item, EntityLivingBase user, Entity entity) {  /* MARK empty */ }
-
-
-	@Override
-	@Optional.Method(modid = Constants.BUILDCRAFT_API_ID)
-	public boolean canWrench(EntityPlayer player, EnumHand hand, ItemStack wrench, RayTraceResult rayTrace) { return true; }
-
-	@Override
-	@Optional.Method(modid = Constants.BUILDCRAFT_API_ID)
-	public void wrenchUsed(EntityPlayer player, EnumHand hand, ItemStack wrench, RayTraceResult rayTrace) {  /* MARK empty */ }
-
-
 	/* SECTION static variables */
 
 	public static final Configuration CONFIGURATION = ModThis.Configuration.behavior.items.wrench;
 
 
 	/* SECTION static methods */
-
-	@SuppressWarnings("unused")
-	protected static boolean canUse(ItemStack stack, World world, EntityLivingBase user, RayTraceResult target, EnumHand hand) {
-		if (!CONFIGURATION.enablePickup) return false;
-		Tag tag = new Tag(stack.getTagCompound());
-		switch (target.typeOfHit) {
-			case BLOCK:
-				if (user.isSneaking() && CONFIGURATION.enablePickupTile) {
-					if (tag.pickedUpBlock != null) {
-						BlockPos targetPos = target.getBlockPos().add(target.sideHit.getDirectionVec());
-						//noinspection ConstantConditions
-						IBlockState state = Block.getStateById(tag.pickedUpBlockState);
-						return state.getBlock().canPlaceBlockOnSide(world, targetPos, target.sideHit) && checkNoEntityCollision(state, world, targetPos);
-					}
-					return true;
-				}
-				break;
-			case ENTITY:
-				return user.isSneaking() && CONFIGURATION.enablePickupTile && tag.pickedUpEntity == null && tag.pickedUpBlock == null && target.entityHit instanceof EntityLivingBase;
-		}
-		return false;
-	}
 
 	@SuppressWarnings("unused")
 	protected static boolean use(ItemStack stack, World world, EntityLivingBase user, RayTraceResult target, EnumHand hand) {
@@ -204,6 +116,94 @@ public class ItemWrench extends ItemUnstackable implements IRegistrableEventBusS
 		return true;
 	}
 
+	@SuppressWarnings("unused")
+	protected static boolean canUse(ItemStack stack, World world, EntityLivingBase user, RayTraceResult target, EnumHand hand) {
+		if (!CONFIGURATION.enablePickup) return false;
+		Tag tag = new Tag(stack.getTagCompound());
+		switch (target.typeOfHit) {
+			case BLOCK:
+				if (user.isSneaking() && CONFIGURATION.enablePickupTile) {
+					if (tag.pickedUpBlock != null) {
+						BlockPos targetPos = target.getBlockPos().add(target.sideHit.getDirectionVec());
+						//noinspection ConstantConditions
+						IBlockState state = Block.getStateById(tag.pickedUpBlockState);
+						return state.getBlock().canPlaceBlockOnSide(world, targetPos, target.sideHit) && checkNoEntityCollision(state, world, targetPos);
+					}
+					return true;
+				}
+				break;
+			case ENTITY:
+				return user.isSneaking() && CONFIGURATION.enablePickupTile && tag.pickedUpEntity == null && tag.pickedUpBlock == null && target.entityHit instanceof EntityLivingBase;
+		}
+		return false;
+	}
+
+
+	/* SECTION methods */
+
+	@Override
+	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		return worldIn.isRemote || use(player.getHeldItem(hand), worldIn, player, new RayTraceResult(new Vec3d(hitX, hitY, hitZ), facing, pos), hand) ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
+	}
+
+	@Override
+	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
+		if (playerIn.isSneaking()) {
+			if (!worldIn.isRemote)
+				playerIn.openGui(MOD, ContainerWrench.ID, worldIn, handIn.ordinal(), markUnused(int.class), markUnused(int.class));
+			return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
+		}
+		return new ActionResult<>(EnumActionResult.FAIL, playerIn.getHeldItem(handIn));
+	}
+
+	@Override
+	public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
+		return canUse(player.getHeldItem(hand), world, player, new RayTraceResult(new Vec3d(hitX, hitY, hitZ), side, pos), hand) ? EnumActionResult.PASS : EnumActionResult.FAIL;
+	}
+
+	@SubscribeEvent(priority = EventPriority.HIGH)
+	public void onPlayerInteractsEntity(PlayerInteractEvent.EntityInteract e) {
+		ItemStack stack = e.getItemStack();
+		Item item = stack.getItem();
+		if (item instanceof ItemWrench) {
+			World world = e.getWorld();
+			EntityPlayer player = e.getEntityPlayer();
+			RayTraceResult targetRTR = new RayTraceResult(e.getTarget());
+			EnumHand hand = e.getHand();
+			boolean ret = canUse(stack, world, player, targetRTR, hand);
+			if (ret && !world.isRemote) ret = use(stack, world, player, targetRTR, hand);
+			e.setCancellationResult(ret ? EnumActionResult.SUCCESS : EnumActionResult.FAIL);
+			e.setCanceled(true);
+		}
+	}
+
+	@Override
+	@Optional.Method(modid = Constants.COFH_CORE_ID)
+	public boolean isUsable(ItemStack item, EntityLivingBase user, BlockPos pos) { return true; }
+
+	@Override
+	@Optional.Method(modid = Constants.COFH_CORE_ID)
+	public boolean isUsable(ItemStack item, EntityLivingBase user, Entity entity) { return true; }
+
+	@Override
+	@Optional.Method(modid = Constants.COFH_CORE_ID)
+	public void toolUsed(ItemStack item, EntityLivingBase user, BlockPos pos) {  /* MARK empty */ }
+
+	@Override
+	@Optional.Method(modid = Constants.COFH_CORE_ID)
+	public void toolUsed(ItemStack item, EntityLivingBase user, Entity entity) {  /* MARK empty */ }
+
+
+	/* SECTION static methods */
+
+	@Override
+	@Optional.Method(modid = Constants.BUILDCRAFT_API_ID)
+	public boolean canWrench(EntityPlayer player, EnumHand hand, ItemStack wrench, RayTraceResult rayTrace) { return true; }
+
+	@Override
+	@Optional.Method(modid = Constants.BUILDCRAFT_API_ID)
+	public void wrenchUsed(EntityPlayer player, EnumHand hand, ItemStack wrench, RayTraceResult rayTrace) {  /* MARK empty */ }
+
 
 	/* SECTION static classes */
 
@@ -263,8 +263,7 @@ public class ItemWrench extends ItemUnstackable implements IRegistrableEventBusS
 
 	@SuppressWarnings("CanBeFinal")
 	public static final class Configuration {
-		/* SECTION variables */
-
+		public static final String LANG_KEY_BASE = ModThis.Configuration.Behavior.Items.LANG_KEY_BASE + ".wrench";
 		@Config.Name("Enable picking up")
 		@Config.Comment({
 				"Whether the wrench can pickup things for moving.",
@@ -278,14 +277,6 @@ public class ItemWrench extends ItemUnstackable implements IRegistrableEventBusS
 		@Config.Comment("Whether the wrench can pickup entities for moving.")
 		public boolean enablePickupEntity = true;
 
-
-		/* SECTION constructor */
-
 		public Configuration() { requireRunOnceOnly(); }
-
-
-		/* SECTION static variables */
-
-		public static final String LANG_KEY_BASE = ModThis.Configuration.Behavior.Items.LANG_KEY_BASE + ".wrench";
 	}
 }

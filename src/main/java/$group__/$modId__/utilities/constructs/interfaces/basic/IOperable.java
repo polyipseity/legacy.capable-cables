@@ -13,17 +13,6 @@ import static $group__.$modId__.utilities.variables.Constants.GROUP;
 import static java.util.Arrays.asList;
 
 public interface IOperable<T extends IOperable<T, A>, A> {
-	/* SECTION methods */
-
-	T negate();
-
-	T sum(Iterable<? extends A> o);
-
-	T max(Iterable<? extends A> o);
-
-	T min(Iterable<? extends A> o);
-
-
 	/* SECTION static methods */
 
 	@SuppressWarnings("varargs")
@@ -39,14 +28,21 @@ public interface IOperable<T extends IOperable<T, A>, A> {
 	static <N extends IOperable<N, A>, A> N min(N t, A... o) { return t.min(asList(o)); }
 
 
+	/* SECTION methods */
+
+	T sum(Iterable<? extends A> o);
+
+	T max(Iterable<? extends A> o);
+
+	T min(Iterable<? extends A> o);
+
+	T negate();
+
+
 	/* SECTION static classes */
 
 	interface INumberOperable<T extends INumberOperable<T>> extends IOperable<T, Number>, IStructureCloneable<T>, Comparable<Number> {
 		/* SECTION methods */
-
-		@OverridingStatus(group = GROUP, when = When.MAYBE)
-		default T newInstanceFrom(Number o) throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
-
 
 		@Override
 		@OverridingStatus(group = GROUP, when = When.MAYBE)
@@ -63,5 +59,8 @@ public interface IOperable<T extends IOperable<T, A>, A> {
 			for (Number t : o) if (greaterThan(r, t)) r.newInstanceFrom(t);
 			return r;
 		}
+
+		@OverridingStatus(group = GROUP, when = When.MAYBE)
+		default T newInstanceFrom(Number o) throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 	}
 }

@@ -12,14 +12,14 @@ public interface IConsumer<T> extends Consumer<T>, Function<T, Void> {
 	/* SECTION methods */
 
 	@Override
-	void accept(@Nonnull T t);
-
-	@Override
 	@Nullable
 	default Void apply(@Nonnull T t) {
 		accept(t);
 		return null;
 	}
+
+	@Override
+	void accept(@Nonnull T t);
 
 
 	/* SECTION static classes */
@@ -28,11 +28,11 @@ public interface IConsumer<T> extends Consumer<T>, Function<T, Void> {
 	interface IConsumerNullable<T> extends IConsumer<T> {
 		/* SECTION methods */
 
-		@Override
-		void accept(@Nullable T t);
-
 		@Nullable
 		@Override
 		default Void apply(@Nullable T t) { return IConsumer.super.apply(assumeNonnull(t)); }
+
+		@Override
+		void accept(@Nullable T t);
 	}
 }

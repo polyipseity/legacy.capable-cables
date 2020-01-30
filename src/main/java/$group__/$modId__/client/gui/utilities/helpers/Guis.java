@@ -11,9 +11,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.awt.*;
+import java.awt.Color;
 
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
+import static $group__.$modId__.utilities.helpers.Throwables.requireRunOnceOnly;
 import static $group__.$modId__.utilities.variables.Globals.Client.CLIENT;
 import static net.minecraft.client.renderer.GlStateManager.*;
 
@@ -36,13 +37,11 @@ public enum Guis {
 
 	public static void bindTexture(ResourceLocation tex) { TEXTURE_MANAGER.bindTexture(tex); }
 
+	public static void drawRect(IDrawable<?, ?> that, Rectangle<?, ?> rect, Color color) { getOrDefaultTheme(that).drawRect(rect, color); }
 
 	public static IThemed.ITheme<?> getOrDefaultTheme(IDrawable<?, ?> parent) {
 		return Casts.<IThemed<?>>castChecked(parent, castUncheckedUnboxedNonnull(IThemed.class)).map(t -> (IThemed.ITheme<?>) t.getTheme()).orElse(castUncheckedUnboxedNonnull(IThemed.EnumTheme.NONE));
 	}
-
-
-	public static void drawRect(IDrawable<?, ?> that, Rectangle<?, ?> rect, Color color) { getOrDefaultTheme(that).drawRect(rect, color); }
 
 	public static void drawModalRectWithCustomSizedTexture(IDrawable<?, ?> that, Rectangle<?, ?> rect, Rectangle<?, ?> tex) { getOrDefaultTheme(that).drawModalRectWithCustomSizedTexture(rect, tex); }
 
@@ -60,10 +59,15 @@ public enum Guis {
 	/* SECTION static classes */
 
 	private static final class GuiWithPublicZLevel extends Gui {
+		/* SECTION constructors */
+
+		private GuiWithPublicZLevel() { requireRunOnceOnly(); }
+
+
 		/* SECTION methods */
 
-		public void setZLevel(float zLevel) { this.zLevel = zLevel; }
-
 		public float getZLevel() { return zLevel; }
+
+		public void setZLevel(float zLevel) { this.zLevel = zLevel; }
 	}
 }

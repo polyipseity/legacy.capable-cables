@@ -14,19 +14,39 @@ import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonn
 
 @SideOnly(Side.CLIENT)
 public interface IThemed<T extends IThemed.ITheme<T>> {
-	/* SECTION methods */
-
-	void setTheme(T theme);
-
-	T getTheme();
-
-
 	/* SECTION static methods */
 
 	static <T extends ITheme<T>> boolean isThemeInstanceOf(Class<T> t, Object o) { return o instanceof IThemed<?> && t.isAssignableFrom(((IThemed<?>) o).getTheme().getClass()); }
 
 
+	/* SECTION methods */
+
+	T getTheme();
+
+	void setTheme(T theme);
+
+
 	/* SECTION static classes */
+
+	enum EnumTheme implements ITheme<EnumTheme> {
+		/* SECTION enums */
+		NONE;
+
+
+		/* SECTION methods */
+
+		@SuppressWarnings("EmptyMethod")
+		@Override
+		public String toString() { return super.toString(); }
+
+
+		@Override
+		public EnumTheme toImmutable() { return this; }
+
+		@Override
+		public boolean isImmutable() { return true; }
+	}
+
 
 	interface ITheme<T extends ITheme<T>> extends IStructure<T> {
 		/* SECTION methods */
@@ -51,25 +71,5 @@ public interface IThemed<T extends IThemed.ITheme<T>> {
 					texO = tex.getOffset(), texS = tex.getSize();
 			Gui.drawScaledCustomSizeModalRect(rectO.getX().intValue(), rectO.getY().intValue(), texO.getX().floatValue(), texO.getY().floatValue(), texS.getX().intValue(), texS.getY().intValue(), rectS.getX().intValue(), rectS.getY().intValue(), tile.getX().floatValue(), tile.getY().floatValue());
 		}
-	}
-
-
-	enum EnumTheme implements ITheme<EnumTheme> {
-		/* SECTION enums */
-		NONE;
-
-
-		/* SECTION methods */
-
-		@SuppressWarnings("EmptyMethod")
-		@Override
-		public String toString() { return super.toString(); }
-
-
-		@Override
-		public EnumTheme toImmutable() { return this; }
-
-		@Override
-		public boolean isImmutable() { return true; }
 	}
 }

@@ -35,15 +35,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(METHOD)
 public @interface ExternalToImmutableMethod {
-	/* SECTION methods */
-
-	Class<?>[] value();
-
-	@SuppressWarnings("SameReturnValue") boolean allowExtends() default false;
-
-
 	/* SECTION static variables */
 
+	WeakHashMap<ExternalToImmutableMethod, MethodAdapter> EXTERNAL_TO_IMMUTABLE_METHOD_MAP = new WeakHashMap<>();
 	LoadingCache<Class<?>, ExternalToImmutableMethod> EXTERNAL_TO_IMMUTABLE_METHOD_ANNOTATIONS_CACHE = CacheBuilder.newBuilder().build(new CacheLoader<Class<?>, ExternalToImmutableMethod>() {
 		@SuppressWarnings("ConstantConditions")
 		@Override
@@ -72,7 +66,13 @@ public @interface ExternalToImmutableMethod {
 			return r;
 		}
 	});
-	WeakHashMap<ExternalToImmutableMethod, MethodAdapter> EXTERNAL_TO_IMMUTABLE_METHOD_MAP = new WeakHashMap<>();
+
+
+	/* SECTION methods */
+
+	Class<?>[] value();
+
+	@SuppressWarnings("SameReturnValue") boolean allowExtends() default false;
 
 
 	/* SECTION static classes */
@@ -88,7 +88,21 @@ public @interface ExternalToImmutableMethod {
 		private volatile boolean processed = false;
 
 
+		/* SECTION static methods */
+
+		@SubscribeEvent(priority = EventPriority.HIGHEST)
+		public static void process(AnnotationProcessingEvent event) {
+			if (MOD_ID.equals(event.getModId())) INSTANCE.process(event.getAsm());
+		}
+
+
 		/* SECTION methods */
+
+		@Override
+		public void process(ASMDataTable asm) {
+			IMethod.super.process(asm);
+			processed = true;
+		}
 
 		@Override
 		public Class<ExternalToImmutableMethod> annotationType() { return ExternalToImmutableMethod.class; }
@@ -96,8 +110,7 @@ public @interface ExternalToImmutableMethod {
 		@Override
 		public boolean isProcessed() { return processed; }
 
-
-		@SuppressWarnings({"ControlFlowStatementWithoutBraces", "ConstantConditions"})
+		@SuppressWarnings("ConstantConditions")
 		@Override
 		public void processMethod(Result<ExternalToImmutableMethod> result) {
 			ExternalToImmutableMethod a = result.annotations[0];
@@ -120,17 +133,5 @@ public @interface ExternalToImmutableMethod {
 					LOGGER.warn(getMessage(this, "Replaced previous method '{}' with annotation '{}' with method '{}' with annotation '{}' for class '{}'"), EXTERNAL_TO_IMMUTABLE_METHOD_MAP.get(ap).get().orElseThrow(Throwables::unexpected).toGenericString(), ap, m.toGenericString(), a, k.toGenericString());
 			}
 		}
-
-		@Override
-		public void process(ASMDataTable asm) {
-			IMethod.super.process(asm);
-			processed = true;
-		}
-
-
-		/* SECTION static methods */
-
-		@SubscribeEvent(priority = EventPriority.HIGHEST)
-		public static void process(AnnotationProcessingEvent event) { if (MOD_ID.equals(event.getModId())) INSTANCE.process(event.getAsm()); }
 	}
 }

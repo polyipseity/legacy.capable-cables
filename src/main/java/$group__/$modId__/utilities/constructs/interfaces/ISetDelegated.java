@@ -12,10 +12,6 @@ import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOp
 public interface ISetDelegated<S extends Set<E>, E, T extends ISetDelegated<S, E, T>> extends Set<E>, ICollectionDelegated<S, E, T> {
 	/* SECTION methods */
 
-	S getSet();
-
-	void setSet(S set);
-
 	@Override
 	@Deprecated
 	default S getCollection() { return getSet(); }
@@ -24,6 +20,9 @@ public interface ISetDelegated<S extends Set<E>, E, T extends ISetDelegated<S, E
 	@Deprecated
 	default void setCollection(S collection) { setSet(collection); }
 
+	S getSet();
+
+	void setSet(S set);
 
 	@SuppressWarnings("EmptyMethod")
 	@Override
@@ -88,14 +87,13 @@ public interface ISetDelegated<S extends Set<E>, E, T extends ISetDelegated<S, E
 	interface IImmutable<S extends Set<E>, E, T extends IImmutable<S, E, T>> extends ISetDelegated<S, E, T>, ICollectionDelegated.IImmutable<S, E, T> {
 		/* SECTION methods */
 
-		@Override
-		default void setSet(S set) { throw rejectUnsupportedOperation(); }
-
 		@SuppressWarnings("deprecation")
 		@Override
 		@Deprecated
 		default void setCollection(S collection) { ICollectionDelegated.IImmutable.super.setCollection(collection); }
 
+		@Override
+		default void setSet(S set) { throw rejectUnsupportedOperation(); }
 
 		@Override
 		default boolean add(E e) { return ICollectionDelegated.IImmutable.super.add(e); }
@@ -108,15 +106,15 @@ public interface ISetDelegated<S extends Set<E>, E, T extends ISetDelegated<S, E
 		default boolean addAll(Collection<? extends E> c) { return ICollectionDelegated.IImmutable.super.addAll(c); }
 
 		@Override
-		default boolean removeAll(Collection<?> c) { return ICollectionDelegated.IImmutable.super.removeAll(c); }
-
-		@Override
-		default boolean removeIf(Predicate<? super E> filter) { return ICollectionDelegated.IImmutable.super.removeIf(filter); }
-
-		@Override
 		default boolean retainAll(Collection<?> c) { return ICollectionDelegated.IImmutable.super.retainAll(c); }
 
 		@Override
+		default boolean removeAll(Collection<?> c) { return ICollectionDelegated.IImmutable.super.removeAll(c); }
+
+		@Override
 		default void clear() { ICollectionDelegated.IImmutable.super.clear(); }
+
+		@Override
+		default boolean removeIf(Predicate<? super E> filter) { return ICollectionDelegated.IImmutable.super.removeIf(filter); }
 	}
 }

@@ -8,11 +8,11 @@ public enum Assertions {
 
 	/* SECTION static methods */
 
-	@SuppressWarnings("ConstantConditions")
-	public static <T> T assumeNonnull(@Nullable T o) { return o; }
-
 	public static <T> T assertNonnull(@Nullable T o) {
 		assert o != null;
 		return assumeNonnull(o);
 	}
+
+	@SuppressWarnings("ConstantConditions")
+	public static <T> T assumeNonnull(@Nullable T o) { return o; }
 }

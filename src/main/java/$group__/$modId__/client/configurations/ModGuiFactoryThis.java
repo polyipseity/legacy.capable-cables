@@ -11,6 +11,13 @@ import java.util.Set;
 
 @SideOnly(Side.CLIENT)
 public class ModGuiFactoryThis implements IModGuiFactory {
+	/* SECTION static variables */
+
+	public static final String
+			SUBPACKAGE = "client.configurations",
+			CLASS_SIMPLE_NAME = "ModGuiFactoryThis";
+
+
 	/* SECTION methods */
 
 	@Override
@@ -27,11 +34,4 @@ public class ModGuiFactoryThis implements IModGuiFactory {
 	@Deprecated
 	@Override
 	public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() { return null; }
-
-
-	/* SECTION static variables */
-
-	public static final String
-			SUBPACKAGE = "client.configurations",
-			CLASS_SIMPLE_NAME = "ModGuiFactoryThis";
 }

@@ -12,10 +12,6 @@ import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOp
 public interface ICollectionDelegated<C extends Collection<E>, E, T extends ICollectionDelegated<C, E, T>> extends Collection<E>, IIterableDelegated<C, E, T> {
 	/* SECTION methods */
 
-	C getCollection();
-
-	void setCollection(C collection);
-
 	@Override
 	@Deprecated
 	default C getIterable() { return getCollection(); }
@@ -24,6 +20,9 @@ public interface ICollectionDelegated<C extends Collection<E>, E, T extends ICol
 	@Deprecated
 	default void setIterable(C iterable) { setCollection(iterable); }
 
+	C getCollection();
+
+	void setCollection(C collection);
 
 	@Override
 	default int size() { return getCollection().size(); }
@@ -94,14 +93,13 @@ public interface ICollectionDelegated<C extends Collection<E>, E, T extends ICol
 	interface IImmutable<I extends Collection<E>, E, T extends IImmutable<I, E, T>> extends ICollectionDelegated<I, E, T>, IIterableDelegated.IImmutable<I, E, T> {
 		/* SECTION methods */
 
-		@Override
-		default void setCollection(I collection) { throw rejectUnsupportedOperation(); }
-
 		@SuppressWarnings("deprecation")
 		@Override
 		@Deprecated
 		default void setIterable(I iterable) { IIterableDelegated.IImmutable.super.setIterable(iterable); }
 
+		@Override
+		default void setCollection(I collection) { throw rejectUnsupportedOperation(); }
 
 		@Override
 		default boolean add(E e) { throw rejectUnsupportedOperation(); }

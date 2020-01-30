@@ -10,8 +10,8 @@ public interface IForgeRegistryEntryExtension<V extends IForgeRegistryEntry<V>> 
 	V setUnlocalizedName(ResourceLocation name);
 
 	@SuppressWarnings("SpellCheckingInspection")
-	V setRegistryAndUnlocalizedName(ResourceLocation name);
+	default V setRegistryAndUnlocalizedName(String modId, String name) { return setRegistryAndUnlocalizedName(new ResourceLocation(modId, name)); }
 
 	@SuppressWarnings("SpellCheckingInspection")
-	default V setRegistryAndUnlocalizedName(String modId, String name) { return setRegistryAndUnlocalizedName(new ResourceLocation(modId, name)); }
+	V setRegistryAndUnlocalizedName(ResourceLocation name);
 }

@@ -25,18 +25,18 @@ public class ResourceLocationDefault extends ResourceLocation {
 
 		/* SECTION constructors */
 
+		public Texture(String resourceName, float sizeX, float sizeY) { this(resourceName, new XY.Immutable<>(sizeX, sizeY)); }
+
 		public Texture(String resourceName, XY.Immutable<Float, ?> size) {
 			super(resourceName);
 			this.size = size;
 		}
 
-		public Texture(String resourceName, float sizeX, float sizeY) { this(resourceName, new XY.Immutable<>(sizeX, sizeY)); }
-
 
 		/* SECTION methods */
 
-		public Rectangle.Immutable<Float, ?> generateRect(XY<? extends Float, ?> offset) { return new Rectangle.Immutable<>(new XY<>(offset), size); }
-
 		public Rectangle<Float, ?> generateRect(float offsetX, float offsetY) { return generateRect(new XY<>(offsetX, offsetY)); }
+
+		public Rectangle.Immutable<Float, ?> generateRect(XY<? extends Float, ?> offset) { return new Rectangle.Immutable<>(new XY<>(offset), size); }
 	}
 }

@@ -5,4 +5,4 @@ import $group__.$modId__.utilities.constructs.interfaces.basic.IStruct;
 import $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquality;
 import $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString;
 
-public interface IStructure<T extends IStructure<T>> extends IStruct, IStrictToString, IStrictEquality, IImmutablizable<T> { /* MARK empty */ }
+public interface IStructure<T extends IStructure<T>> extends IStruct, IStrictToString, IStrictEquality, IImmutablizable<T> { /* MARK empty */}

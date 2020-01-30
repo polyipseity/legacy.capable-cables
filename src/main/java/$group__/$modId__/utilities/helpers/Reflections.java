@@ -18,7 +18,6 @@ import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonn
 import static $group__.$modId__.utilities.helpers.Throwables.consumeCaught;
 import static $group__.$modId__.utilities.variables.Globals.clearCaughtThrowableStatic;
 import static $group__.$modId__.utilities.variables.Globals.setCaughtThrowableStatic;
-import static java.util.Objects.requireNonNull;
 
 public enum Reflections {
 	/* MARK empty */;
@@ -53,7 +52,8 @@ public enum Reflections {
 
 	public static <U> LinkedHashSet<Class<? extends U>> getLowerAndIntermediateSuperclasses(Class<? extends U> lower, @Nullable Class<U> upper) {
 		LinkedHashSet<Class<? extends U>> r = new LinkedHashSet<>();
-		for (@Nullable Class<?> i = lower; i != upper && i != null; i = i.getSuperclass()) r.add(castUncheckedUnboxedNonnull(i));
+		for (@Nullable Class<?> i = lower; i != upper && i != null; i = i.getSuperclass())
+			r.add(castUncheckedUnboxedNonnull(i));
 		return r;
 	}
 
@@ -87,10 +87,9 @@ public enum Reflections {
 		return true;
 	}
 
+	public static Type getGenericSuperclassActualTypeArgument(Class<?> c, int i) throws ClassCastException { return getGenericSuperclassActualTypeArguments(c)[i]; }
 
 	public static Type[] getGenericSuperclassActualTypeArguments(Class<?> c) { return ((ParameterizedType) c.getGenericSuperclass()).getActualTypeArguments(); }
-
-	public static Type getGenericSuperclassActualTypeArgument(Class<?> c, int i) throws ClassCastException { return getGenericSuperclassActualTypeArguments(c)[i]; }
 
 
 	/* SECTION static classes */
@@ -101,6 +100,10 @@ public enum Reflections {
 
 		/* SECTION static methods */
 
+		public static Optional<Class<?>> forName(String name) { return forName(name, true); }
+
+		public static Optional<Class<?>> forName(String name, boolean initialize) { return forName(name, initialize, Unsafe.class.getClassLoader()); }
+
 		public static Optional<Class<?>> forName(String name, boolean initialize, ClassLoader loader) {
 			clearCaughtThrowableStatic();
 			try {
@@ -110,11 +113,6 @@ public enum Reflections {
 				return Optional.empty();
 			}
 		}
-
-		public static Optional<Class<?>> forName(String name, boolean initialize) { return forName(name, initialize, Unsafe.class.getClassLoader()); }
-
-		public static Optional<Class<?>> forName(String name) { return forName(name, true); }
-
 
 		public static <T> Optional<T> newInstance(Class<? extends T> clazz) {
 			clearCaughtThrowableStatic();
@@ -232,9 +230,21 @@ public enum Reflections {
 			/* SECTION static classes */
 
 			public static final class FieldAdapter extends AccessibleObjectAdapter<Field, FieldAdapter> {
+				/* SECTION static variables */
+
+				private static final FieldAdapter EMPTY = new FieldAdapter(null);
+
+
 				/* SECTION constructors */
 
 				protected FieldAdapter(@Nullable Field value) { super(value); }
+
+
+				/* SECTION static methods */
+
+				public static FieldAdapter of(@Nullable Field value) { return value == null ? empty() : new FieldAdapter(value); }
+
+				public static FieldAdapter empty() { return EMPTY; }
 
 
 				/* SECTION methods */
@@ -279,25 +289,25 @@ public enum Reflections {
 					});
 					return r[0];
 				}
-
-
-				/* SECTION static variables */
-
-				private static final FieldAdapter EMPTY = new FieldAdapter(null);
-
-
-				/* SECTION static methods */
-
-				public static FieldAdapter empty() { return EMPTY; }
-
-				public static FieldAdapter of(@Nullable Field value) { return value == null ? empty() : new FieldAdapter(value); }
 			}
 
 
 			public static final class MethodAdapter extends AccessibleObjectAdapter<Method, MethodAdapter> {
+				/* SECTION static variables */
+
+				private static final MethodAdapter EMPTY = new MethodAdapter(null);
+
+
 				/* SECTION constructors */
 
 				protected MethodAdapter(@Nullable Method value) { super(value); }
+
+
+				/* SECTION static methods */
+
+				public static MethodAdapter of(@Nullable Method value) { return value == null ? empty() : new MethodAdapter(value); }
+
+				public static MethodAdapter empty() { return EMPTY; }
 
 
 				/* SECTION methods */
@@ -312,29 +322,25 @@ public enum Reflections {
 						}
 					});
 				}
-
-
-				/* SECTION static variables */
-
-				private static final MethodAdapter EMPTY = new MethodAdapter(null);
-
-
-				/* SECTION static methods */
-
-				public static MethodAdapter empty() { return EMPTY; }
-
-				public static MethodAdapter of(@Nullable Method value) { return value == null ? empty() : new MethodAdapter(value); }
 			}
 
 
 			public static final class ConstructorAdapter<C> extends AccessibleObjectAdapter<Constructor<? extends C>, ConstructorAdapter<C>> {
+				/* SECTION static variables */
+
+				private static final ConstructorAdapter<?> EMPTY = new ConstructorAdapter<>((Constructor<?>) null);
+
+
 				/* SECTION constructors */
 
 				protected ConstructorAdapter(@Nullable Constructor<? extends C> value) { super(value); }
 
-				public ConstructorAdapter(IAdapter.IOptional<? extends Constructor<? extends C>, ?> copy) { this(requireNonNull(copy.getUnboxed())); }
 
-				public ConstructorAdapter(IAdapter<? extends Constructor<? extends C>, ?> copy) { this(requireNonNull(copy.get())); }
+				/* SECTION static methods */
+
+				public static <T> ConstructorAdapter<T> of(@Nullable Constructor<? extends T> value) { return value == null ? empty() : new ConstructorAdapter<>(value); }
+
+				public static <T> ConstructorAdapter<T> empty() { return castUncheckedUnboxedNonnull(EMPTY); }
 
 
 				/* SECTION methods */
@@ -349,18 +355,6 @@ public enum Reflections {
 						}
 					});
 				}
-
-
-				/* SECTION static variables */
-
-				private static final ConstructorAdapter<?> EMPTY = new ConstructorAdapter<>((Constructor<?>) null);
-
-
-				/* SECTION static methods */
-
-				public static <T> ConstructorAdapter<T> empty() { return castUncheckedUnboxedNonnull(EMPTY); }
-
-				public static <T> ConstructorAdapter<T> of(@Nullable Constructor<? extends T> value) { return value == null ? empty() : new ConstructorAdapter<>(value); }
 			}
 		}
 	}

@@ -12,13 +12,6 @@ import static $group__.$modId__.utilities.helpers.Reflections.isMemberStatic;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
 public interface IStrictEquals {
-	/* SECTION methods */
-
-	@Override
-	@OverridingStatus(group = GROUP, when = When.ALWAYS)
-	boolean equals(Object o);
-
-
 	/* SECTION static methods */
 
 	@SuppressWarnings("varargs")
@@ -44,4 +37,11 @@ public interface IStrictEquals {
 				return false;
 		return true;
 	}
+
+
+	/* SECTION methods */
+
+	@Override
+	@OverridingStatus(group = GROUP, when = When.ALWAYS)
+	boolean equals(Object o);
 }

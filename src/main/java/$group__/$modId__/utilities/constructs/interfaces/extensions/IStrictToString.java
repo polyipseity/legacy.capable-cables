@@ -12,13 +12,6 @@ import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
 public interface IStrictToString {
-	/* SECTION methods */
-
-	@Override
-	@OverridingStatus(group = GROUP, when = When.ALWAYS)
-	String toString();
-
-
 	/* SECTION static methods */
 
 	static String getToStringString(Object o, String stringSuper, Object[]... vars) {
@@ -37,4 +30,11 @@ public interface IStrictToString {
 		}
 		return sb.append("}").append(stringSuper.replaceFirst(Pattern.quote(classN), StringUtils.EMPTY)).toString();
 	}
+
+
+	/* SECTION methods */
+
+	@Override
+	@OverridingStatus(group = GROUP, when = When.ALWAYS)
+	String toString();
 }

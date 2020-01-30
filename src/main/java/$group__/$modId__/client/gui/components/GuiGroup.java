@@ -36,11 +36,11 @@ public class GuiGroup<N extends Number, E extends IDrawable<N, ?>, T extends Gui
 
 	/* SECTION constructors */
 
-	public GuiGroup(Collection<? extends E> elements) { this.elements = castUncheckedUnboxedNonnull(elements); }
-
 	@SuppressWarnings("varargs")
 	@SafeVarargs
 	public GuiGroup(E... elements) { this(Arrays.asList(elements)); }
+
+	public GuiGroup(Collection<? extends E> elements) { this.elements = castUncheckedUnboxedNonnull(elements); }
 
 	public GuiGroup(GuiGroup<N, ? extends E, ?> copy) { this(copy.getElements()); }
 
@@ -89,14 +89,6 @@ public class GuiGroup<N extends Number, E extends IDrawable<N, ?>, T extends Gui
 	@Override
 	public boolean isImmutable() { return false; }
 
-
-	@Override
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"elements", getElements()});
-	}
-
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public int hashCode() {
@@ -121,6 +113,13 @@ public class GuiGroup<N extends Number, E extends IDrawable<N, ?>, T extends Gui
 		return r;
 	}
 
+	@Override
+	@OverridingStatus(group = GROUP, when = When.MAYBE)
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"elements", getElements()});
+	}
+
 
 	/* SECTION static classes */
 
@@ -128,20 +127,22 @@ public class GuiGroup<N extends Number, E extends IDrawable<N, ?>, T extends Gui
 	public static class Immutable<N extends Number, E extends IDrawable<N, ?>, T extends GuiGroup<N, E, T>> extends GuiGroup<N, E, T> {
 		/* SECTION constructors */
 
-		public Immutable(Collection<? extends E> elements) { super(tryToImmutableUnboxedNonnull(elements)); }
-
 		@SuppressWarnings("varargs")
 		@SafeVarargs
 		public Immutable(E... elements) { this(ImmutableList.copyOf(elements)); }
 
+		public Immutable(Collection<? extends E> elements) { super(tryToImmutableUnboxedNonnull(elements)); }
+
 		public Immutable(GuiGroup<N, ? extends E, ?> copy) { this(copy.getElements()); }
 
 
-		/* SECTION methods */
+		/* SECTION getters & setters */
 
 		@Override
 		public void setElements(Collection<? extends E> elements) { throw rejectUnsupportedOperation(); }
 
+
+		/* SECTION methods */
 
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)

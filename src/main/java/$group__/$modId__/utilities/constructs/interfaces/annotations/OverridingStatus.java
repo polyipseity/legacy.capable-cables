@@ -54,14 +54,27 @@ public @interface OverridingStatus {
 		private volatile boolean processed = false;
 
 
+		/* SECTION static methods */
+
+		@SubscribeEvent(priority = EventPriority.HIGH)
+		public static void process(AnnotationProcessingEvent event) {
+			if (MOD_ID.equals(event.getModId())) INSTANCE.process(event.getAsm());
+		}
+
+
 		/* SECTION methods */
+
+		@Override
+		public void process(ASMDataTable asm) {
+			IMethod.super.process(asm);
+			processed = true;
+		}
 
 		@Override
 		public Class<OverridingStatus> annotationType() { return OverridingStatus.class; }
 
 		@Override
 		public boolean isProcessed() { return processed; }
-
 
 		@Override
 		public void processMethod(Result<OverridingStatus> result) {
@@ -111,17 +124,5 @@ public @interface OverridingStatus {
 				}
 			}
 		}
-
-		@Override
-		public void process(ASMDataTable asm) {
-			IMethod.super.process(asm);
-			processed = true;
-		}
-
-
-		/* SECTION static methods */
-
-		@SubscribeEvent(priority = EventPriority.HIGH)
-		public static void process(AnnotationProcessingEvent event) { if (MOD_ID.equals(event.getModId())) INSTANCE.process(event.getAsm()); }
 	}
 }

@@ -27,6 +27,11 @@ import static $group__.$modId__.utilities.variables.Globals.Client.registerPreIn
 
 @SideOnly(Side.CLIENT)
 public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> extends NumberRelative<T> {
+	/* SECTION static variables */
+
+	private static final long serialVersionUID = 1046506854640455032L;
+
+
 	/* SECTION variables */
 
 	protected BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater;
@@ -35,6 +40,8 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 
 	/* SECTION constructors */
 
+	public NumberRelativeDisplay(Number value, Number parent, @Nullable Number offset, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater) { this(value, parent, offset, updater, new AtomicBoolean(true)); }
+
 	public NumberRelativeDisplay(Number value, Number parent, @Nullable Number offset, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater, AtomicBoolean update) {
 		super(value, parent, offset);
 		this.updater = updater;
@@ -42,27 +49,33 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 		registerPreInitGuiListener(this, castUncheckedUnboxedNonnull(updater));
 	}
 
-	public NumberRelativeDisplay(Number value, Number parent, @Nullable Number offset, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater) { this(value, parent, offset, updater, new AtomicBoolean(true)); }
-
 	public NumberRelativeDisplay(NumberRelativeDisplay<T> copy) { this(copy.getValue(), copy.getParent().orElseThrow(() -> rejectArguments(copy)), unboxOptional(copy.getOffset()), copy.getUpdater(), copy.getUpdate()); }
 
 
 	/* SECTION getters & setters */
 
-	public void setUpdater(BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater) { registerPreInitGuiListener(this, castUncheckedUnboxedNonnull(this.updater = updater)); }
-
 	public BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> getUpdater() { return updater; }
 
-	public void setUpdate(AtomicBoolean update) { this.update = update; }
+	public void setUpdater(BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater) { registerPreInitGuiListener(this, castUncheckedUnboxedNonnull(this.updater = updater)); }
 
 	public AtomicBoolean getUpdate() { return update; }
 
+	public void setUpdate(AtomicBoolean update) { this.update = update; }
 
 	@Override
 	public void setParent(@Nullable Number parent) { throw rejectUnsupportedOperation(); }
 
 
 	/* SECTION methods */
+
+	@Override
+	public T clone() {
+		T r = super.clone();
+		r.updater = tryCloneUnboxedNonnull(updater);
+		r.update = tryCloneUnboxedNonnull(update);
+		registerPreInitGuiListener(r, r.getUpdater());
+		return r;
+	}
 
 	@Override
 	public String toString() {
@@ -83,25 +96,20 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 				t -> getUpdate().equals(t.getUpdate())) : isEqual(this, o, super.equals(o));
 	}
 
-	@Override
-	public T clone() {
-		T r = super.clone();
-		r.updater = tryCloneUnboxedNonnull(updater);
-		r.update = tryCloneUnboxedNonnull(update);
-		registerPreInitGuiListener(r, r.getUpdater());
-		return r;
-	}
-
-
-	/* SECTION static variables */
-
-	private static final long serialVersionUID = 1046506854640455032L;
-
 
 	/* SECTION static classes */
 
 	public static class X<T extends X<T>> extends NumberRelativeDisplay<T> {
+		/* SECTION static variables */
+
+		private static final long serialVersionUID = 4079465691262621348L;
+
+
 		/* SECTION constructors */
+
+		public X(Number value, @Nullable Number offset) { this(value, offset, new AtomicBoolean(true)); }
+
+		public X(Number value, @Nullable Number offset, AtomicBoolean update) { this(value, getResolution().getScaledWidth_double(), offset, update); }
 
 		public X(Number value, Number parent, @Nullable Number offset, AtomicBoolean update) {
 			super(value, parent, offset, (e, t) -> {
@@ -109,13 +117,9 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 			}, update);
 		}
 
-		public X(Number value, @Nullable Number offset, AtomicBoolean update) { this(value, getResolution().getScaledWidth_double(), offset, update); }
+		public X(Number value) { this(value, new AtomicBoolean(true)); }
 
 		public X(Number value, AtomicBoolean update) { this(value, null, update); }
-
-		public X(Number value, @Nullable Number offset) { this(value, offset, new AtomicBoolean(true)); }
-
-		public X(Number value) { this(value, new AtomicBoolean(true)); }
 
 		public X(X<?> copy) { this(copy.getValue(), copy.getParent().orElseThrow(() -> rejectArguments(copy)), unboxOptional(copy.getOffset()), copy.getUpdate()); }
 
@@ -129,26 +133,26 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 		public boolean isImmutable() { return false; }
 
 
-		/* SECTION static variables */
-
-		private static final long serialVersionUID = 4079465691262621348L;
-
-
 		/* SECTION static classes */
 
 		@javax.annotation.concurrent.Immutable
 		public static class Immutable<T extends Immutable<T>> extends X<T> {
+			/* SECTION static variables */
+
+			private static final long serialVersionUID = -6713655815326599341L;
+
+
 			/* SECTION constructors */
-
-			public Immutable(Number value, Number parent, @Nullable Number offset, AtomicBoolean update) { super(tryToImmutableUnboxedNonnull(value), tryToImmutableUnboxedNonnull(parent), tryToImmutableUnboxed(offset), tryToImmutableUnboxedNonnull(update)); }
-
-			public Immutable(Number value, @Nullable Number offset, AtomicBoolean update) { this(value, getResolution().getScaledWidth_double(), offset, update); }
-
-			public Immutable(Number value, AtomicBoolean update) { this(value, null, update); }
 
 			public Immutable(Number value, @Nullable Number offset) { this(value, offset, new AtomicBoolean(true)); }
 
+			public Immutable(Number value, @Nullable Number offset, AtomicBoolean update) { this(value, getResolution().getScaledWidth_double(), offset, update); }
+
+			public Immutable(Number value, Number parent, @Nullable Number offset, AtomicBoolean update) { super(tryToImmutableUnboxedNonnull(value), tryToImmutableUnboxedNonnull(parent), tryToImmutableUnboxed(offset), tryToImmutableUnboxedNonnull(update)); }
+
 			public Immutable(Number value) { this(value, new AtomicBoolean(true)); }
+
+			public Immutable(Number value, AtomicBoolean update) { this(value, null, update); }
 
 			public Immutable(X<?> copy) { this(copy.getValue(), copy.getParent().orElseThrow(() -> rejectArguments(copy)), unboxOptional(copy.getOffset()), copy.getUpdate()); }
 
@@ -177,17 +181,21 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 			@Override
 			@OverridingStatus(group = GROUP, when = When.NEVER)
 			public final boolean isImmutable() { return true; }
-
-
-			/* SECTION static variables */
-
-			private static final long serialVersionUID = -6713655815326599341L;
 		}
 	}
 
 
 	public static class Y<T extends Y<T>> extends NumberRelativeDisplay<T> {
+		/* SECTION static variables */
+
+		private static final long serialVersionUID = 838852564853210693L;
+
+
 		/* SECTION constructors */
+
+		public Y(Number value, @Nullable Number offset) { this(value, offset, new AtomicBoolean(true)); }
+
+		public Y(Number value, @Nullable Number offset, AtomicBoolean update) { this(value, getResolution().getScaledHeight_double(), offset, update); }
 
 		public Y(Number value, Number parent, @Nullable Number offset, AtomicBoolean update) {
 			super(value, parent, offset, (e, t) -> {
@@ -195,13 +203,9 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 			}, update);
 		}
 
-		public Y(Number value, @Nullable Number offset, AtomicBoolean update) { this(value, getResolution().getScaledHeight_double(), offset, update); }
+		public Y(Number value) { this(value, new AtomicBoolean(true)); }
 
 		public Y(Number value, AtomicBoolean update) { this(value, null, update); }
-
-		public Y(Number value, @Nullable Number offset) { this(value, offset, new AtomicBoolean(true)); }
-
-		public Y(Number value) { this(value, new AtomicBoolean(true)); }
 
 		public Y(Y<?> copy) { this(copy.getValue(), copy.getParent().orElseThrow(() -> rejectArguments(copy)), unboxOptional(copy.getOffset()), copy.getUpdate()); }
 
@@ -215,26 +219,26 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 		public boolean isImmutable() { return false; }
 
 
-		/* SECTION static variables */
-
-		private static final long serialVersionUID = 838852564853210693L;
-
-
 		/* SECTION static classes */
 
 		@javax.annotation.concurrent.Immutable
 		public static class Immutable<T extends Immutable<T>> extends Y<T> {
+			/* SECTION static variables */
+
+			private static final long serialVersionUID = 6434701388754540645L;
+
+
 			/* SECTION constructors */
-
-			public Immutable(Number value, Number parent, @Nullable Number offset, AtomicBoolean update) { super(tryToImmutableUnboxedNonnull(value), tryToImmutableUnboxedNonnull(parent), tryToImmutableUnboxed(offset), tryToImmutableUnboxedNonnull(update)); }
-
-			public Immutable(Number value, @Nullable Number offset, AtomicBoolean update) { this(value, getResolution().getScaledWidth_double(), offset, update); }
-
-			public Immutable(Number value, AtomicBoolean update) { this(value, null, update); }
 
 			public Immutable(Number value, @Nullable Number offset) { this(value, offset, new AtomicBoolean(true)); }
 
+			public Immutable(Number value, @Nullable Number offset, AtomicBoolean update) { this(value, getResolution().getScaledWidth_double(), offset, update); }
+
+			public Immutable(Number value, Number parent, @Nullable Number offset, AtomicBoolean update) { super(tryToImmutableUnboxedNonnull(value), tryToImmutableUnboxedNonnull(parent), tryToImmutableUnboxed(offset), tryToImmutableUnboxedNonnull(update)); }
+
 			public Immutable(Number value) { this(value, new AtomicBoolean(true)); }
+
+			public Immutable(Number value, AtomicBoolean update) { this(value, null, update); }
 
 			public Immutable(Y<?> copy) { this(copy.getValue(), copy.getParent().orElseThrow(() -> rejectArguments(copy)), unboxOptional(copy.getOffset()), copy.getUpdate()); }
 
@@ -263,11 +267,6 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 			@Override
 			@OverridingStatus(group = GROUP, when = When.NEVER)
 			public final boolean isImmutable() { return true; }
-
-
-			/* SECTION static variables */
-
-			private static final long serialVersionUID = 6434701388754540645L;
 		}
 	}
 }

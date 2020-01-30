@@ -14,6 +14,11 @@ import static net.minecraftforge.common.MinecraftForge.EVENT_BUS;
 
 @SuppressWarnings("EmptyMethod")
 public abstract class Proxy extends Singleton {
+	/* SECTION static variables */
+
+	public static final String SUBPACKAGE = "proxies";
+
+
 	/* SECTION methods */
 
 	@OverridingMethodsMustInvokeSuper
@@ -35,7 +40,6 @@ public abstract class Proxy extends Singleton {
 	@OverridingMethodsMustInvokeSuper
 	public void completeLoading(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLLoadCompleteEvent event) {}
 
-
 	@OverridingMethodsMustInvokeSuper
 	public void preStartServer(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLServerAboutToStartEvent event) {}
 
@@ -51,22 +55,15 @@ public abstract class Proxy extends Singleton {
 	@OverridingMethodsMustInvokeSuper
 	public void postStopServer(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLServerStoppedEvent event) {}
 
-
 	@OverridingMethodsMustInvokeSuper
 	public void violateFingerprint(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLFingerprintViolationEvent event) {}
 
 	@OverridingMethodsMustInvokeSuper
 	public void processIMCMessages(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLInterModComms.IMCEvent event) {}
 
-
 	@OverridingMethodsMustInvokeSuper
 	public void processIDMapping(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLModIdMappingEvent event) {}
 
 	@OverridingMethodsMustInvokeSuper
 	public void disable(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLModDisabledEvent event) {}
-
-
-	/* SECTION static variables */
-
-	public static final String SUBPACKAGE = "proxies";
 }
