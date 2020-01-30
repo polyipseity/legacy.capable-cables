@@ -1,5 +1,6 @@
 package $group__.$modId__;
 
+import $group__.$modId__.client.configurations.ModGuiFactoryThis;
 import $group__.$modId__.common.registrable.items.ItemWrench;
 import $group__.$modId__.proxies.Proxy;
 import $group__.$modId__.proxies.ProxyClient;
@@ -44,8 +45,9 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 		useMetadata = true,
 		acceptedMinecraftVersions = ACCEPTED_MINECRAFT_VERSIONS,
 		certificateFingerprint = CERTIFICATE_FINGERPRINT,
-		updateJSON = UPDATE_JSON,
-		modLanguageAdapter = PACKAGE + "." + ModThis.CLASS_SIMPLE_NAME + "$" + ModThis.CustomLanguageAdapter.CLASS_SIMPLE_NAME
+		modLanguageAdapter = PACKAGE + "." + ModThis.CLASS_SIMPLE_NAME + "$" + ModThis.CustomLanguageAdapter.CLASS_SIMPLE_NAME,
+		guiFactory = PACKAGE + "." + ModGuiFactoryThis.SUBPACKAGE + "." + ModGuiFactoryThis.CLASS_SIMPLE_NAME,
+		updateJSON = UPDATE_JSON
 )
 public enum ModThis {
 	/* SECTION enums */
@@ -239,7 +241,7 @@ public enum ModThis {
 		private static final double DOUBLE_TEMPLATE_ = 6.9D;
 
 		@Config.Ignore
-		public static final String LANG_KEY_BASE = "config." + MOD_ID;
+		public static final String LANG_KEY_BASE = "configurations." + MOD_ID;
 
 		@Config.LangKey(Behavior.LANG_KEY_BASE + ".name")
 		public static final Behavior behavior = new Behavior();

@@ -1,11 +1,11 @@
-package $group__.$modId__.client.gui.templates.components;
+package $group__.$modId__.client.gui.components;
 
 import $group__.$modId__.client.gui.utilities.constructs.IDrawable;
 import $group__.$modId__.client.gui.utilities.constructs.XY;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
-import $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable;
 import $group__.$modId__.utilities.helpers.Throwables;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraftforge.fml.relauncher.Side;
@@ -16,10 +16,11 @@ import javax.annotation.meta.When;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
@@ -85,6 +86,9 @@ public class GuiGroup<N extends Number, E extends IDrawable<N, ?>, T extends Gui
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }
 
+	@Override
+	public boolean isImmutable() { return false; }
+
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
@@ -95,13 +99,15 @@ public class GuiGroup<N extends Number, E extends IDrawable<N, ?>, T extends Gui
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public int hashCode() { return getHashCode(this, super.hashCode(), getElements()); }
+	public int hashCode() {
+		return isImmutable() ? getHashCode(this, super.hashCode(), getElements()) : getHashCode(this, super.hashCode());
+	}
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public boolean equals(Object o) {
-		return isEquals(this, o, super.equals(o),
-				t -> getElements().equals(t.getElements()));
+		return isImmutable() ? isEqual(this, o, super.equals(o),
+				t -> getElements().equals(t.getElements())) : isEqual(this, o, super.equals(o));
 	}
 
 	@Override
@@ -118,14 +124,15 @@ public class GuiGroup<N extends Number, E extends IDrawable<N, ?>, T extends Gui
 
 	/* SECTION static classes */
 
+	@javax.annotation.concurrent.Immutable
 	public static class Immutable<N extends Number, E extends IDrawable<N, ?>, T extends GuiGroup<N, E, T>> extends GuiGroup<N, E, T> {
 		/* SECTION constructors */
 
-		public Immutable(Collection<? extends E> elements) { super(IImmutablizable.tryToImmutableUnboxedNonnull(elements)); }
+		public Immutable(Collection<? extends E> elements) { super(tryToImmutableUnboxedNonnull(elements)); }
 
 		@SuppressWarnings("varargs")
 		@SafeVarargs
-		public Immutable(E... elements) { this(Arrays.asList(elements)); }
+		public Immutable(E... elements) { this(ImmutableList.copyOf(elements)); }
 
 		public Immutable(GuiGroup<N, ? extends E, ?> copy) { this(copy.getElements()); }
 

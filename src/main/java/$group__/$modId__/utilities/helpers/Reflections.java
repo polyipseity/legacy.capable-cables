@@ -6,6 +6,7 @@ import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAd
 import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.FieldAdapter;
 import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.MethodAdapter;
 import com.google.common.collect.Lists;
+import sun.corba.Bridge;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.*;
@@ -14,7 +15,6 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
-import static $group__.$modId__.utilities.helpers.Miscellaneous.K;
 import static $group__.$modId__.utilities.helpers.Throwables.consumeCaught;
 import static $group__.$modId__.utilities.variables.Globals.clearCaughtThrowableStatic;
 import static $group__.$modId__.utilities.variables.Globals.setCaughtThrowableStatic;
@@ -22,6 +22,11 @@ import static java.util.Objects.requireNonNull;
 
 public enum Reflections {
 	/* MARK empty */;
+
+
+	/* SECTION static variables */
+
+	public static final Bridge BRIDGE = Bridge.get();
 
 
 	/* SECTION static methods */
@@ -40,19 +45,31 @@ public enum Reflections {
 	}
 
 
+	public static <U> LinkedHashSet<Class<? extends U>> getIntermediateSuperclasses(Class<? extends U> lower, @Nullable Class<U> upper) {
+		LinkedHashSet<Class<? extends U>> r = getLowerAndIntermediateSuperclasses(lower, upper);
+		r.remove(lower);
+		return r;
+	}
+
+	public static <U> LinkedHashSet<Class<? extends U>> getLowerAndIntermediateSuperclasses(Class<? extends U> lower, @Nullable Class<U> upper) {
+		LinkedHashSet<Class<? extends U>> r = new LinkedHashSet<>();
+		for (@Nullable Class<?> i = lower; i != upper && i != null; i = i.getSuperclass()) r.add(castUncheckedUnboxedNonnull(i));
+		return r;
+	}
+
+
 	public static LinkedHashSet<LinkedHashSet<Class<?>>> getSuperclassesAndInterfaces(Class<?> c) {
 		LinkedHashSet<LinkedHashSet<Class<?>>> r = new LinkedHashSet<>();
-		Class<?> cs = c.getSuperclass();
-		LinkedHashSet<Class<?>> l = new LinkedHashSet<>(cs == null ? Arrays.asList(c.getInterfaces()) : Lists.asList(cs, c.getInterfaces())),
-				l1 = new LinkedHashSet<>();
+		@Nullable Class<?> cs = c.getSuperclass();
+		LinkedHashSet<Class<?>> l = new LinkedHashSet<>(cs == null ? Arrays.asList(c.getInterfaces()) : Lists.asList(cs, c.getInterfaces()));
 		while (!l.isEmpty()) {
 			r.add(l);
-			for (Class<?> t : l) {
-				Class<?> ts = t.getSuperclass();
+			LinkedHashSet<Class<?>> l1 = new LinkedHashSet<>();
+			l.forEach(t -> {
+				@Nullable Class<?> ts = t.getSuperclass();
 				l1.addAll(ts == null ? Arrays.asList(t.getInterfaces()) : Lists.asList(ts, t.getInterfaces()));
-			}
-			l.clear();
-			l = K(l1, l1 = l); // COMMENT swap
+			});
+			l = l1;
 		}
 		return r;
 	}
@@ -175,7 +192,7 @@ public enum Reflections {
 
 		/* SECTION static classes */
 
-		public static class AccessibleObjectAdapter<V extends java.lang.reflect.AccessibleObject /* COMMENT error: cannot find symbol if qualification NOT used */, T extends AccessibleObjectAdapter<V, T>> extends IAdapter.IOptional.Impl.Immutable<V, T> implements IThrowableCatcher {
+		public static class AccessibleObjectAdapter<V extends java.lang.reflect.AccessibleObject /* COMMENT error: cannot find symbol if qualification NOT used */, T extends AccessibleObjectAdapter<V, T>> extends IAdapter.IOptional.IImmutable.Impl<V, T> implements IThrowableCatcher {
 			/* SECTION variables */
 
 			protected final ThreadLocal<Throwable> caughtThrowable = new ThreadLocal<>();
@@ -218,10 +235,6 @@ public enum Reflections {
 				/* SECTION constructors */
 
 				protected FieldAdapter(@Nullable Field value) { super(value); }
-
-				public FieldAdapter(IAdapter.IOptional<? extends Field, ?> copy) { this(requireNonNull(copy.getUnboxed())); }
-
-				public FieldAdapter(IAdapter<? extends Field, ?> copy) { this(requireNonNull(copy.get())); }
 
 
 				/* SECTION methods */
@@ -270,7 +283,7 @@ public enum Reflections {
 
 				/* SECTION static variables */
 
-				private static final FieldAdapter EMPTY = new FieldAdapter((Field) null);
+				private static final FieldAdapter EMPTY = new FieldAdapter(null);
 
 
 				/* SECTION static methods */
@@ -285,10 +298,6 @@ public enum Reflections {
 				/* SECTION constructors */
 
 				protected MethodAdapter(@Nullable Method value) { super(value); }
-
-				public MethodAdapter(IAdapter.IOptional<? extends Method, ?> copy) { this(requireNonNull(copy.getUnboxed())); }
-
-				public MethodAdapter(IAdapter<? extends Method, ?> copy) { this(requireNonNull(copy.get())); }
 
 
 				/* SECTION methods */
@@ -307,7 +316,7 @@ public enum Reflections {
 
 				/* SECTION static variables */
 
-				private static final MethodAdapter EMPTY = new MethodAdapter((Method) null);
+				private static final MethodAdapter EMPTY = new MethodAdapter(null);
 
 
 				/* SECTION static methods */

@@ -40,12 +40,10 @@ public enum GuiHandler implements IGuiHandler {
 	public int registerGui(GuiHandlerFunctional handler) { return registerGui((IGuiHandler) handler); }
 
 
-	/** {@inheritDoc} */
 	@Nullable
 	@Override
 	public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) { return guiMap.getOrDefault(id, DEFAULT).getServerGuiElement(id, player, world, x, y, z); }
 
-	/** {@inheritDoc} */
 	@Nullable
 	@Override
 	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) { return guiMap.getOrDefault(id, DEFAULT).getClientGuiElement(id, player, world, x, y, z); }
@@ -67,12 +65,10 @@ public enum GuiHandler implements IGuiHandler {
 		Optional<Object> getGuiElement(Side side, int id, EntityPlayer player, World world, int x, int y, int z);
 
 
-		/** {@inheritDoc} */
 		@Nullable
 		@Override
 		default Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) { return unboxOptional(getGuiElement(Side.SERVER, id, player, world, x, y, z)); }
 
-		/** {@inheritDoc} */
 		@Nullable
 		@Override
 		default Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) { return unboxOptional(getGuiElement(Side.CLIENT, id, player, world, x, y, z)); }

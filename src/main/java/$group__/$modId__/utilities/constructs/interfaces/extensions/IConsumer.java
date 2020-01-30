@@ -1,4 +1,4 @@
-package $group__.$modId__.utilities.constructs.interfaces.basic;
+package $group__.$modId__.utilities.constructs.interfaces.extensions;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -24,6 +24,7 @@ public interface IConsumer<T> extends Consumer<T>, Function<T, Void> {
 
 	/* SECTION static classes */
 
+	@FunctionalInterface
 	interface IConsumerNullable<T> extends IConsumer<T> {
 		/* SECTION methods */
 

@@ -13,10 +13,10 @@ import java.util.function.BiConsumer;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxed;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
@@ -72,13 +72,15 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 	}
 
 	@Override
-	public int hashCode() { return getHashCode(this, super.hashCode(), getUpdater(), getUpdate()); }
+	public int hashCode() {
+		return isImmutable() ? getHashCode(this, super.hashCode(), getUpdater(), getUpdate()) : getHashCode(this, super.hashCode());
+	}
 
 	@Override
 	public boolean equals(Object o) {
-		return isEquals(this, o, super.equals(o),
+		return isImmutable() ? isEqual(this, o, super.equals(o),
 				t -> getUpdater().equals(t.getUpdater()),
-				t -> getUpdate().equals(t.getUpdate()));
+				t -> getUpdate().equals(t.getUpdate())) : isEqual(this, o, super.equals(o));
 	}
 
 	@Override
@@ -120,9 +122,11 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 
 		/* SECTION methods */
 
-		/** {@inheritDoc} */
 		@Override
 		public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
+
+		@Override
+		public boolean isImmutable() { return false; }
 
 
 		/* SECTION static variables */
@@ -206,6 +210,9 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 
 		@Override
 		public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
+
+		@Override
+		public boolean isImmutable() { return false; }
 
 
 		/* SECTION static variables */

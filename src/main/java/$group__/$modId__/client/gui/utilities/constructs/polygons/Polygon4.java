@@ -2,11 +2,11 @@ package $group__.$modId__.client.gui.utilities.constructs.polygons;
 
 import $group__.$modId__.client.gui.utilities.constructs.XY;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
+import com.google.common.collect.ImmutableList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.meta.When;
-import java.util.Arrays;
 import java.util.List;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
@@ -26,7 +26,7 @@ public class Polygon4<N extends Number, T extends Polygon4<N, T>> extends Polygo
 
 	public Polygon4(XY<N, ?> a, XY<N, ?> b, XY<N, ?> c, XY<N, ?> d) { super(a, b, c, d); }
 
-	public Polygon4(Polygon4<N, ?> copy) { this(copy.getList()); }
+	public Polygon4(Polygon4<N, ?> copy) { this(copy.getVertexes()); }
 
 
 	/* SECTION getters & setters */
@@ -47,61 +47,53 @@ public class Polygon4<N extends Number, T extends Polygon4<N, T>> extends Polygo
 
 	public void setD(XY<N, ?> d) { set(0, d); }
 
-	/** {@inheritDoc} */
 	@Override
-	public void setList(List<XY<N, ?>> list) { throw rejectUnsupportedOperation(); }
+	public void setVertexes(List<XY<N, ?>> vertexes) { throw rejectUnsupportedOperation(); }
 
 
 	/* SECTION methods */
 
-	/** {@inheritDoc} */
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
+
+	@Override
+	public boolean isImmutable() { return false; }
 
 
 	/* SECTION static classes */
 
+	@javax.annotation.concurrent.Immutable
 	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends Polygon4<N, T> {
 		/* SECTION constructors */
 
 		public Immutable(List<XY<N, ?>> list) { super(tryToImmutableUnboxedNonnull(list)); }
 
-		public Immutable(XY<N, ?> a, XY<N, ?> b, XY<N, ?> c, XY<N, ?> d) { this(Arrays.asList(a, b, c, d)); }
+		public Immutable(XY<N, ?> a, XY<N, ?> b, XY<N, ?> c, XY<N, ?> d) { this(ImmutableList.of(a, b, c, d)); }
 
-		public Immutable(Polygon4<N, ?> copy) { this(copy.getList()); }
+		public Immutable(Polygon4<N, ?> copy) { this(copy.getVertexes()); }
 
 
 		/* SECTION getters & setters */
 
-		/** {@inheritDoc} */
 		@Override
 		public void setA(XY<N, ?> a) { throw rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setB(XY<N, ?> b) { throw rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setC(XY<N, ?> c) { throw rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setD(XY<N, ?> d) { throw rejectUnsupportedOperation(); }
-
-		/** {@inheritDoc} */
-		@Override
-		public void setList(List<XY<N, ?>> list) { throw rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final boolean isImmutable() { return true; }

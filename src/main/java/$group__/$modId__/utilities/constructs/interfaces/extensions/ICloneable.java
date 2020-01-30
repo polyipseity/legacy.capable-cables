@@ -24,6 +24,7 @@ import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxed;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
 import static $group__.$modId__.utilities.helpers.Reflections.isMemberStatic;
 import static $group__.$modId__.utilities.helpers.Throwables.newThrowable;
+import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
@@ -31,10 +32,9 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 public interface ICloneable<T> extends Cloneable {
 	/* SECTION methods */
 
-	/** {@inheritDoc} */
 	@OverridingMethodsMustInvokeSuper
 	@OverridingStatus(group = GROUP, when = When.ALWAYS)
-	T clone();
+	default T clone() { throw rejectUnsupportedOperation(); }
 
 
 	@OverridingStatus(group = GROUP, when = When.NEVER)
@@ -47,6 +47,7 @@ public interface ICloneable<T> extends Cloneable {
 
 	/* SECTION static methods */
 
+	@SuppressWarnings("ConstantConditions")
 	static <T> Optional<T> tryClone(@Nullable T o) {
 		if (o == null) return Optional.empty();
 		else if (o instanceof ICloneable<?>) return Casts.<ICloneable<T>>castUnchecked(o).map(ICloneable::copy);

@@ -6,7 +6,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.reflections.Reflections;
 
@@ -21,9 +20,10 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IAnnotationProcessor.*;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxed;
 import static $group__.$modId__.utilities.helpers.Reflections.*;
+import static $group__.$modId__.utilities.helpers.Throwables.throwThrowable;
 import static $group__.$modId__.utilities.helpers.Throwables.throw_;
-import static $group__.$modId__.utilities.helpers.Throwables.wrapCheckedThrowable;
 import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 import static $group__.$modId__.utilities.variables.Globals.REFLECTIONS_CACHE;
@@ -72,7 +72,7 @@ public @interface OverridingStatus {
 
 			Reflections refs;
 			String g = a.group();
-			try { refs = REFLECTIONS_CACHE.get(g); } catch (ExecutionException e) { throw wrapCheckedThrowable(e); }
+			try { refs = REFLECTIONS_CACHE.get(g); } catch (ExecutionException e) { throw throwThrowable(e); }
 
 			Class<?> superC = result.clazz;
 			Method superM = result.element;
@@ -87,35 +87,27 @@ public @interface OverridingStatus {
 				}
 
 				for (Method subM : subC.getDeclaredMethods()) {
-					if (whenB == null) {
-						if (isFormerMethodOverriddenByLatter(superM, subM)) {
-							LOGGER.debug(getMessage(this, "method '" + subM.toGenericString() + "' -> @ subclass '" + superM.toGenericString() + "' (" + a + ")"));
-						}
-						continue check;
-					} else if (isFormerMethodOverriddenByLatter(superM, subM) == whenB) {
-						if (whenB && isMemberFinal(subM))
-							LOGGER.warn(getMessage(this, "Impossible: subclass -Y> final method '" + superM.toGenericString() + "' (" + a + ")"));
+					if (isFormerMethodOverriddenByLatter(superM, subM)) {
+						if (whenB == null || whenB)
+							LOGGER.debug(getMessage(this, "method '" + subM.toGenericString() + "' -> @ superclass '" + superM.toGenericString() + "' (" + a + ")"));
+						else
+							throw throw_(new AnnotationProcessingException(getMessage(this, "Unfulfilled requirement: subclass '" + subC.toGenericString() + "' -X> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "' (" + a + "),\ninstead: method '" + subM.toGenericString() + "' -> @ superclass '" + superC.toGenericString() + "'")));
 						continue check;
 					}
 				}
 
-				if (whenB == null) {
-					LOGGER.debug(getMessage(this, "subclass '" + subC.toGenericString() + "' -X> method '" + superM.toGenericString() + "' (" + a + ")"));
+				if (whenB == null || !whenB) {
+					LOGGER.debug(getMessage(this, "subclass '" + subC.toGenericString() + "' -X> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "' (" + a + ")"));
 				} else {
-					if (whenB) {
-						Class<?> superC1 = subC;
-						while (superC1 != null && superC1 != superC) {
-							for (Method superM1 : superC1.getDeclaredMethods()) {
-								if (isFormerMethodOverriddenByLatter(superM, superM1) && isMemberFinal(superM1)) {
-									LOGGER.log(superM1.getDeclaringClass().getName().startsWith(g) ? Level.WARN : Level.INFO, getMessage(this, "Impossible: subclass '" + subC.toGenericString() + "' -Y> final method '" + superM1.toGenericString() + "' (" + a + ")"));
-									continue check;
-								}
+					for (Class<?> superC1 : getIntermediateSuperclasses(subC, castUncheckedUnboxed(superC.getSuperclass()))) {
+						for (Method superM1 : superC1.getDeclaredMethods()) {
+							if (isFormerMethodOverriddenByLatter(superM, superM1) && isMemberFinal(superM1)) {
+								LOGGER.log(superM1.getDeclaringClass().getName().startsWith(g) ? Level.WARN : Level.INFO, getMessage(this, "Impossible requirement: subclass '" + subC.toGenericString() + "' -Y> final method '" + superM1.toGenericString() + "' @ superclass '" + superM1.toGenericString() + "' (" + a + ")"));
+								continue check;
 							}
-							superC1 = superC1.getSuperclass();
 						}
 					}
-
-					throw throw_(new AnnotationProcessingException(getMessage(this, "Unfulfilled requirement: subclass '" + subC.toGenericString() + "' -" + (whenB ? "Y" : "X") + "> method '" + superM.toGenericString() + "' (" + a + "), instead: subclass '" + subC.toGenericString() + "' -" + (whenB ? "X" : StringUtils.EMPTY) + "> method '" + superM.toGenericString() + "'")));
+					throw throw_(new AnnotationProcessingException(getMessage(this, "Unfulfilled requirement: subclass '" + subC.toGenericString() + "' -Y> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "' (" + a + "),\ninstead: subclass '" + subC.toGenericString() + "' -X> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "'")));
 				}
 			}
 		}

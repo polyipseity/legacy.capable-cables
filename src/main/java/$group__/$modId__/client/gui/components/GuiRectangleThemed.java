@@ -1,4 +1,4 @@
-package $group__.$modId__.client.gui.templates.components;
+package $group__.$modId__.client.gui.components;
 
 import $group__.$modId__.client.gui.utilities.constructs.IDrawableThemed;
 import $group__.$modId__.client.gui.utilities.constructs.IThemed;
@@ -11,10 +11,10 @@ import javax.annotation.meta.When;
 import java.awt.*;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -38,38 +38,37 @@ public class GuiRectangleThemed<N extends Number, TH extends IThemed.ITheme<TH>,
 
 	/* SECTION getters & setters */
 
-	/** {@inheritDoc} */
 	@Override
 	public void setTheme(TH theme) { this.theme = theme; }
 
-	/** {@inheritDoc} */
 	@Override
 	public TH getTheme() { return theme; }
 
 
 	/* SECTION methods */
 
-	/** {@inheritDoc} */
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
+	@Override
+	public boolean isImmutable() { return false; }
 
-	/** {@inheritDoc} */
+
 	@Override
 	public String toString() {
 		return getToStringString(this, super.toString(),
 				new Object[]{"theme", getTheme()});
 	}
 
-	/** {@inheritDoc} */
 	@Override
-	public int hashCode() { return getHashCode(this, super.hashCode(), getTheme()); }
+	public int hashCode() {
+		return isImmutable() ? getHashCode(this, super.hashCode(), getTheme()) : getHashCode(this, super.hashCode());
+	}
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean equals(Object o) {
-		return isEquals(this, o, super.equals(o),
-				t -> getTheme().equals(t.getTheme()));
+		return isImmutable() ? isEqual(this, o, super.equals(o),
+				t -> getTheme().equals(t.getTheme())) : isEqual(this, o, super.equals(o));
 	}
 
 	@Override
@@ -92,27 +91,22 @@ public class GuiRectangleThemed<N extends Number, TH extends IThemed.ITheme<TH>,
 
 		/* SECTION getters & setters */
 
-		/** {@inheritDoc} */
 		@Override
 		public void setRect(Rectangle<N, ?> rect) { throw rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setColor(Color color) { throw rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setTheme(TH theme) { throw rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final boolean isImmutable() { return true; }

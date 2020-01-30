@@ -6,8 +6,8 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
+import static $group__.$modId__.utilities.helpers.Throwables.throwThrowable;
 import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
-import static $group__.$modId__.utilities.helpers.Throwables.wrapCheckedThrowable;
 
 public interface IThrowableCatcher {
 	/* SECTION methods */
@@ -24,8 +24,8 @@ public interface IThrowableCatcher {
 
 
 	default void rethrowCaughtThrowable(boolean nullable) throws RuntimeException {
-		if (nullable) getCaughtThrowable().ifPresent(t -> { throw wrapCheckedThrowable(t); });
-		else throw wrapCheckedThrowable(getCaughtThrowable().orElseThrow(Throwables::unexpected));
+		if (nullable) getCaughtThrowable().ifPresent(Throwables::throwThrowable);
+		else throw throwThrowable(getCaughtThrowable().orElseThrow(Throwables::unexpected));
 	}
 
 	default RuntimeException rethrowCaughtThrowable() throws RuntimeException {

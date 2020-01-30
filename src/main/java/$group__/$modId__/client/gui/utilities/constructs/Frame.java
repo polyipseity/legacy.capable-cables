@@ -8,9 +8,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.meta.When;
 
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -64,17 +64,14 @@ public class Frame<N extends Number, T extends Frame<N, T>> implements IStructur
 
 	/* SECTION methods */
 
-	/** {@inheritDoc} */
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }
 
-	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public boolean isImmutable() { return false; }
 
 
-	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public String toString() {
@@ -83,21 +80,20 @@ public class Frame<N extends Number, T extends Frame<N, T>> implements IStructur
 				new Object[]{"br", getBottomRight()});
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public int hashCode() { return getHashCode(this, super.hashCode(), getTopLeft(), getBottomRight()); }
+	public int hashCode() {
+		return isImmutable() ? getHashCode(this, super.hashCode(), getTopLeft(), getBottomRight()) : getHashCode(this, super.hashCode());
+	}
 
-	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public boolean equals(Object o) {
-		return isEquals(this, o, super.equals(o),
+		return isImmutable() ? isEqual(this, o, super.equals(o),
 				t -> getTopLeft().equals(t.getTopLeft()),
-				t -> getBottomRight().equals(t.getBottomRight()));
+				t -> getBottomRight().equals(t.getBottomRight())) : isEqual(this, o, super.equals(o));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
@@ -126,43 +122,31 @@ public class Frame<N extends Number, T extends Frame<N, T>> implements IStructur
 
 		/* SECTION getters & setters */
 
-		/** {@inheritDoc} */
 		@Override
 		public void setTopLeft(XY<N, ?> tl) { throw Throwables.rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setBottomRight(XY<N, ?> br) { throw Throwables.rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setTop(N t) { throw Throwables.rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setRight(N r) { throw Throwables.rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setBottom(N b) { throw Throwables.rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setLeft(N l) { throw Throwables.rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final boolean isImmutable() { return true; }

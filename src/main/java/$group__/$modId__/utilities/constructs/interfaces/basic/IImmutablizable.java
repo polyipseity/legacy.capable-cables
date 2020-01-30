@@ -29,6 +29,7 @@ import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 @SuppressWarnings("SpellCheckingInspection")
+@FunctionalInterface
 public interface IImmutablizable<T> {
 	/* SECTION methods */
 
@@ -46,6 +47,7 @@ public interface IImmutablizable<T> {
 
 	/* SECTION static methods */
 
+	@SuppressWarnings("ConstantConditions")
 	static <T> Optional<T> tryToImmutable(@Nullable T o) {
 		if (o == null) return Optional.empty();
 		else if (o instanceof IImmutablizable<?>)

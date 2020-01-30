@@ -1,4 +1,4 @@
-package $group__.$modId__.utilities.constructs.interfaces.basic;
+package $group__.$modId__.utilities.constructs.interfaces.extensions;
 
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 import $group__.$modId__.utilities.variables.Globals;
@@ -14,7 +14,6 @@ import static $group__.$modId__.utilities.variables.Constants.GROUP;
 public interface IStrictToString {
 	/* SECTION methods */
 
-	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.ALWAYS)
 	String toString();

@@ -6,12 +6,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.meta.When;
-import java.util.List;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -65,23 +64,15 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 	public final void setOffsetAndSize(Rectangle<N, ?> rect) { setOffsetAndSize(rect.getOffset(), rect.getSize()); }
 
 
-	/** {@inheritDoc} */
-	@Override
-	public void setList(List<XY<N, ?>> list) { throw rejectUnsupportedOperation(); }
-
-	/** {@inheritDoc} */
 	@Override
 	public void setA(XY<N, ?> a) { throw rejectUnsupportedOperation(); }
 
-	/** {@inheritDoc} */
 	@Override
 	public void setB(XY<N, ?> b) { throw rejectUnsupportedOperation(); }
 
-	/** {@inheritDoc} */
 	@Override
 	public void setC(XY<N, ?> c) { throw rejectUnsupportedOperation(); }
 
-	/** {@inheritDoc} */
 	@Override
 	public void setD(XY<N, ?> d) { throw rejectUnsupportedOperation(); }
 
@@ -93,12 +84,13 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 	public XY<N, ?> min() { return a().min(of(c())); }
 
 
-	/** {@inheritDoc} */
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
+	@Override
+	public boolean isImmutable() { return false; }
 
-	/** {@inheritDoc} */
+
 	@Override
 	public String toString() {
 		return getToStringString(this, super.toString(),
@@ -106,19 +98,18 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 				new Object[]{"size", getSize()});
 	}
 
-	/** {@inheritDoc} */
 	@Override
-	public int hashCode() { return getHashCode(this, super.hashCode(), getOffset(), getSize()); }
-
-	/** {@inheritDoc} */
-	@Override
-	public boolean equals(Object o) {
-		return isEquals(this, o, super.equals(o),
-				t -> getOffset().equals(t.getOffset()),
-				t -> getSize().equals(t.getSize()));
+	public int hashCode() {
+		return isImmutable() ? getHashCode(this, super.hashCode(), getOffset(), getSize()) : getHashCode(this, super.hashCode());
 	}
 
-	/** {@inheritDoc} */
+	@Override
+	public boolean equals(Object o) {
+		return isImmutable() ? isEqual(this, o, super.equals(o),
+				t -> getOffset().equals(t.getOffset()),
+				t -> getSize().equals(t.getSize())) : isEqual(this, o, super.equals(o));
+	}
+
 	@Override
 	public T clone() {
 		T r = super.clone();
@@ -136,7 +127,7 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 
 		public Immutable(XY<N, ?> offset, XY<N, ?> size) {
 			super(offset.toImmutable(), size.toImmutable());
-			list = tryToImmutableUnboxedNonnull(list);
+			vertexes = tryToImmutableUnboxedNonnull(vertexes);
 		}
 
 		public Immutable(N offsetX, N offsetY, N sizeX, N sizeY) { this(new XY<>(offsetX, offsetY), new XY<>(sizeX, sizeY)); }
@@ -146,31 +137,22 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 
 		/* SECTION getters & setters */
 
-		/** {@inheritDoc} */
-		@Override
-		public void setList(List<XY<N, ?>> list) { throw rejectUnsupportedOperation(); }
-
-		/** {@inheritDoc} */
 		@Override
 		public void setSize(XY<N, ?> size) { throw rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setOffset(XY<N, ?> offset) { throw rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setOffsetAndSize(XY<N, ?> offset, XY<N, ?> size) { throw rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final boolean isImmutable() { return true; }

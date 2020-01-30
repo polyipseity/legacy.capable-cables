@@ -1,3 +1,5 @@
+package tests;
+
 import $group__.$modId__.utilities.helpers.Miscellaneous;
 import $group__.$modId__.utilities.variables.Constants;
 import org.junit.jupiter.api.Assertions;

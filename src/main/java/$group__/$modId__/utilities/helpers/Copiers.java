@@ -7,14 +7,18 @@ import $group__.$modId__.utilities.variables.Globals;
 import net.minecraft.util.ResourceLocation;
 
 import java.awt.*;
+import java.lang.reflect.Member;
 import java.util.Collection;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.*;
 import java.util.stream.Collectors;
 
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclaredConstructor;
+import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.newInstance;
 
 public enum Copiers {
 	/* MARK empty */;
@@ -29,9 +33,14 @@ public enum Copiers {
 			BiConsumer.class,
 			Function.class,
 			BiFunction.class,
-			Supplier.class
+			Supplier.class,
+			Member.class
 	}, allowExtends = true)
 	public static Object copySingletonExtends(Object copy) { return copy; }
+
+
+	@ExternalCloneMethod(Object.class)
+	public static <T> T copyEmpty(T copy) { return newInstance(copy.getClass()).<T>flatMap(Casts::castUnchecked).orElseThrow(Globals::rethrowCaughtThrowableStatic); }
 
 
 	@ExternalCloneMethod(Color.class)
@@ -49,4 +58,10 @@ public enum Copiers {
 
 		return co.newInstance(a.get() == null ? copy.stream().map(ICloneable::tryClone).toArray() : copy.stream().map(ICloneable::tryClone).collect(Collectors.toList())).orElseThrow(Globals::rethrowCaughtThrowableStatic);
 	}
+
+	@ExternalCloneMethod(ReentrantLock.class)
+	public static ReentrantLock copyReentrantLock(ReentrantLock copy) { return new ReentrantLock(copy.isFair()); }
+
+	@ExternalCloneMethod(ReentrantReadWriteLock.class)
+	public static ReentrantReadWriteLock copyReentrantReadWriteLock(ReentrantReadWriteLock copy) { return new ReentrantReadWriteLock(copy.isFair()); }
 }

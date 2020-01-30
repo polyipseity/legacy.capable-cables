@@ -1,13 +1,14 @@
-package $group__.$modId__.client.gui.templates.components;
+package $group__.$modId__.client.gui.components;
 
 import $group__.$modId__.client.gui.utilities.constructs.IDrawable;
 import $group__.$modId__.client.gui.utilities.constructs.IDrawableThemed;
 import $group__.$modId__.client.gui.utilities.constructs.IThemed;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
-import $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString;
+import $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString;
 import $group__.$modId__.utilities.helpers.Casts;
 import $group__.$modId__.utilities.helpers.Throwables;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -19,10 +20,10 @@ import java.util.List;
 import java.util.Optional;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectIndexOutOfBounds;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
@@ -73,6 +74,9 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
+	@Override
+	public boolean isImmutable() { return false; }
+
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
@@ -83,13 +87,15 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public int hashCode() { return getHashCode(this, super.hashCode(), getOpen()); }
+	public int hashCode() {
+		return isImmutable() ? getHashCode(this, super.hashCode(), getOpen()) : getHashCode(this, super.hashCode());
+	}
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public boolean equals(Object o) {
-		return isEquals(this, o, super.equals(o),
-				t -> getOpen() == t.getOpen());
+		return isImmutable() ? isEqual(this, o, super.equals(o),
+				t -> getOpen() == t.getOpen()) : isEqual(this, o, super.equals(o));
 	}
 
 	@Override
@@ -124,7 +130,7 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 
 		@SuppressWarnings("varargs")
 		@SafeVarargs
-		public Immutable(int open, E... tabs) { this(Arrays.asList(tabs), open); }
+		public Immutable(int open, E... tabs) { this(ImmutableList.copyOf(tabs), open); }
 
 		public Immutable(GuiTabs<N, ? extends E, ?> copy) { this(copy.getTabs(), copy.getOpen()); }
 
@@ -159,19 +165,6 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 		boolean isOpen();
 
 		void setOpen(boolean open);
-
-
-		@Override
-		String toString();
-
-		@Override
-		int hashCode();
-
-		@Override
-		boolean equals(Object o);
-
-		@Override
-		T clone();
 
 
 		/* SECTION static classes */
@@ -245,6 +238,9 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 			@Override
 			public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }
 
+			@Override
+			public boolean isImmutable() { return false; }
+
 
 			@Override
 			@OverridingStatus(group = GROUP, when = When.MAYBE)
@@ -257,15 +253,17 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 
 			@Override
 			@OverridingStatus(group = GROUP, when = When.MAYBE)
-			public int hashCode() { return getHashCode(this, super.hashCode(), getContent(), getAccess(), isOpen()); }
+			public int hashCode() {
+				return isImmutable() ? getHashCode(this, super.hashCode(), getContent(), getAccess(), isOpen()) : getHashCode(this, super.hashCode());
+			}
 
 			@Override
 			@OverridingStatus(group = GROUP, when = When.MAYBE)
 			public boolean equals(Object o) {
-				return isEquals(this, o, super.equals(o),
+				return isImmutable() ? isEqual(this, o, super.equals(o),
 						t -> getAccess().equals(t.getAccess()),
 						t -> getContent().equals(t.getContent()),
-						t -> isOpen() == t.isOpen());
+						t -> isOpen() == t.isOpen()) : isEqual(this, o, super.equals(o));
 			}
 
 			@Override
@@ -321,21 +319,6 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 
 
 	public interface ITabThemed<N extends Number, TH extends IThemed.ITheme<TH>, T extends ITabThemed<N, TH, T>> extends ITab<N, T>, IDrawableThemed<N, TH, T> {
-		/* SECTION methods */
-
-		@Override
-		String toString();
-
-		@Override
-		int hashCode();
-
-		@Override
-		boolean equals(Object o);
-
-		@Override
-		T clone();
-
-
 		/* SECTION static classes */
 
 		class Impl<N extends Number, TH extends ITheme<TH>, T extends Impl<N, TH, T>> extends ITab.Impl<N, T> implements ITabThemed<N, TH, T> {
@@ -371,6 +354,9 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 			@Override
 			public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
+			@Override
+			public boolean isImmutable() { return false; }
+
 
 			@Override
 			public String toString() {
@@ -379,12 +365,14 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 			}
 
 			@Override
-			public int hashCode() { return getHashCode(this, super.hashCode(), getTheme()); }
+			public int hashCode() {
+				return isImmutable() ? getHashCode(this, super.hashCode(), getTheme()) : getHashCode(this, super.hashCode());
+			}
 
 			@Override
 			public boolean equals(Object o) {
-				return isEquals(this, o, super.equals(o),
-						t -> getTheme().equals(t.getTheme()));
+				return isImmutable() ? isEqual(this, o, super.equals(o),
+						t -> getTheme().equals(t.getTheme())) : isEqual(this, o, super.equals(o));
 			}
 
 			@Override

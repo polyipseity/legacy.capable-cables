@@ -39,24 +39,22 @@ public abstract class Registrable<T extends IForgeRegistryEntry<T>> extends Sing
 
 		int regEd = 0,
 				evtRegEd = 0;
-		{
-			Object v;
-			Field[] fs = getClass().getFields();
-			LOGGER.info("Found {} field{} in '{}'", fs.length, appendSuffixIfPlural(fs.length, "s"), classGS);
-			for (Field f : fs) {
-				LOGGER.trace("Processing field '{}'", f.toGenericString());
-				v = FieldAdapter.of(f).get_(this).orElseThrow(Globals::rethrowCaughtThrowableStatic);
-				LOGGER.debug("Field '{}' value is '{}'", f.toGenericString(), v);
-				if (clazz.isAssignableFrom(v.getClass())) {
-					reg.register(castUncheckedUnboxedNonnull(v));
-					if (v instanceof IRegistrableEventBusSubscriber) {
-						MinecraftForge.EVENT_BUS.register(v);
-						evtRegEd++;
-						LOGGER.debug("Registered '{}' as '{}'", v, evtRegGS);
-					}
-					regEd++;
-					LOGGER.debug("Registered '{}' as '{}'", v, classGS);
+
+		Field[] fs = getClass().getFields();
+		LOGGER.info("Found {} field{} in '{}'", fs.length, appendSuffixIfPlural(fs.length, "s"), classGS);
+		for (Field f : fs) {
+			LOGGER.trace("Processing field '{}'", f.toGenericString());
+			Object v = FieldAdapter.of(f).get_(this).orElseThrow(Globals::rethrowCaughtThrowableStatic);
+			LOGGER.debug("Field '{}' value is '{}'", f.toGenericString(), v);
+			if (clazz.isAssignableFrom(v.getClass())) {
+				reg.register(castUncheckedUnboxedNonnull(v));
+				if (v instanceof IRegistrableEventBusSubscriber) {
+					MinecraftForge.EVENT_BUS.register(v);
+					evtRegEd++;
+					LOGGER.debug("Registered '{}' as '{}'", v, evtRegGS);
 				}
+				regEd++;
+				LOGGER.debug("Registered '{}' as '{}'", v, classGS);
 			}
 		}
 

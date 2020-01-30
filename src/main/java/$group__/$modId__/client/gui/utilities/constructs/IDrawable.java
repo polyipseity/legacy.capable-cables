@@ -16,21 +16,4 @@ public interface IDrawable<N extends Number, T extends IDrawable<N, T>> extends 
 	void draw(Minecraft client);
 
 	default void draw() { draw(CLIENT); }
-
-
-	/** {@inheritDoc} */
-	@Override
-	String toString();
-
-	/** {@inheritDoc} */
-	@Override
-	int hashCode();
-
-	/** {@inheritDoc} */
-	@Override
-	boolean equals(Object o);
-
-	/** {@inheritDoc} */
-	@Override
-	T clone();
 }

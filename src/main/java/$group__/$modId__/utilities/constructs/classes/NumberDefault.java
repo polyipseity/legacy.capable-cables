@@ -9,12 +9,10 @@ import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
 public abstract class NumberDefault<T extends NumberDefault<T>> extends Number implements IStructureCloneable<T>, IOperable.INumberOperable<T> {
 	/* SECTION methods */
 
-	/** {@inheritDoc} */
 	@SuppressWarnings("EmptyMethod")
 	@Override
 	public String toString() { return super.toString(); }
 
-	/** {@inheritDoc} */
 	@Override
 	public T clone() {
 		try { return castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {

@@ -1,4 +1,4 @@
-package $group__.$modId__.client.gui.templates.components;
+package $group__.$modId__.client.gui.components;
 
 import $group__.$modId__.client.gui.utilities.constructs.IDrawable;
 import $group__.$modId__.client.gui.utilities.constructs.IDrawableThemed;
@@ -14,10 +14,10 @@ import javax.annotation.meta.When;
 import java.awt.*;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -65,6 +65,9 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
+	@Override
+	public boolean isImmutable() { return false; }
+
 
 	@Override
 	public String toString() {
@@ -73,12 +76,14 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 	}
 
 	@Override
-	public int hashCode() { return getHashCode(this, super.hashCode(), getTheme()); }
+	public int hashCode() {
+		return isImmutable() ? getHashCode(this, super.hashCode(), getTheme()) : getHashCode(this, super.hashCode());
+	}
 
 	@Override
 	public boolean equals(Object o) {
-		return isEquals(this, o, super.equals(o),
-				t -> getTheme().equals(t.getTheme()));
+		return isImmutable() ? isEqual(this, o, super.equals(o),
+				t -> getTheme().equals(t.getTheme())) : isEqual(this, o, super.equals(o));
 	}
 
 	@Override

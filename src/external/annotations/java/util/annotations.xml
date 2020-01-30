@@ -1,0 +1,8 @@
+<root>
+	<item name='java.util.Map V computeIfPresent(K, java.util.function.BiFunction&lt;? super K,? super V,? extends V&gt;)'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
+	<item name='java.util.Map V get(java.lang.Object)'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
+</root>

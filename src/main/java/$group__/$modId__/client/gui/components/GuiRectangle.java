@@ -1,4 +1,4 @@
-package $group__.$modId__.client.gui.templates.components;
+package $group__.$modId__.client.gui.components;
 
 import $group__.$modId__.client.gui.utilities.constructs.IDrawable;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
@@ -14,10 +14,10 @@ import java.awt.*;
 import java.util.Optional;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
@@ -63,6 +63,9 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }
 
+	@Override
+	public boolean isImmutable() { return false; }
+
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
@@ -74,14 +77,16 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public int hashCode() { return getHashCode(this, super.hashCode(), getRect(), getColor()); }
+	public int hashCode() {
+		return isImmutable() ? getHashCode(this, super.hashCode(), getRect(), getColor()) : getHashCode(this, super.hashCode());
+	}
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public boolean equals(Object o) {
-		return isEquals(this, o, super.equals(o),
+		return isImmutable() ? isEqual(this, o, super.equals(o),
 				t -> getRect().equals(t.getRect()),
-				t -> getColor().equals(t.getColor()));
+				t -> getColor().equals(t.getColor())) : isEqual(this, o, super.equals(o));
 	}
 
 	@Override

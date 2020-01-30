@@ -1,4 +1,4 @@
-package $group__.$modId__.client.gui.templates.components;
+package $group__.$modId__.client.gui.components;
 
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
 import $group__.$modId__.client.gui.utilities.helpers.Guis;
@@ -14,9 +14,9 @@ import java.awt.*;
 
 import static $group__.$modId__.client.gui.utilities.helpers.Guis.bindTexture;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -50,14 +50,12 @@ public class GuiResource<N extends Number, TN extends Number, T extends GuiResou
 
 	public void setTexture(Rectangle<TN, ?> texture) { this.texture = texture; }
 
-	/** {@inheritDoc} */
 	@Override
 	public void setColor(Color color) { throw rejectUnsupportedOperation(); }
 
 
 	/* SECTION methods */
 
-	/** {@inheritDoc} */
 	@Override
 	public void draw(Minecraft client) {
 		bindTexture(getResource());
@@ -65,24 +63,25 @@ public class GuiResource<N extends Number, TN extends Number, T extends GuiResou
 	}
 
 
-	/** {@inheritDoc} */
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
-
-	/** {@inheritDoc} */
 	@Override
-	public int hashCode() { return getHashCode(this, super.hashCode(), getResource(), getTexture()); }
+	public boolean isImmutable() { return false; }
 
-	/** {@inheritDoc} */
+
 	@Override
-	public boolean equals(Object o) {
-		return isEquals(this, o, super.equals(o),
-				t -> getResource().equals(t.getResource()),
-				t -> getTexture().equals(t.getTexture()));
+	public int hashCode() {
+		return isImmutable() ? getHashCode(this, super.hashCode(), getResource(), getTexture()) : getHashCode(this, super.hashCode());
 	}
 
-	/** {@inheritDoc} */
+	@Override
+	public boolean equals(Object o) {
+		return isImmutable() ? isEqual(this, o, super.equals(o),
+				t -> getResource().equals(t.getResource()),
+				t -> getTexture().equals(t.getTexture())) : isEqual(this, o, super.equals(o));
+	}
+
 	@Override
 	public T clone() {
 		T r = super.clone();
@@ -105,23 +104,19 @@ public class GuiResource<N extends Number, TN extends Number, T extends GuiResou
 
 		/* SECTION getters & setters */
 
-		/** {@inheritDoc} */
 		@Override
 		public void setResource(ResourceLocation resource) { throw rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setTexture(Rectangle<TE, ?> texture) { throw rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final boolean isImmutable() { return true; }

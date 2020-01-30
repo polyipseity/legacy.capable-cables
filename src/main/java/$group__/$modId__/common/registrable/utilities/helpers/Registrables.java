@@ -13,7 +13,10 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
@@ -50,14 +53,15 @@ public enum Registrables {
 		public static final ImmutableMap<String, Integer> NBT_TYPE_LOOKUP;
 
 		static {
-			List<String> nbtTypes = Arrays.asList(NBTBase.NBT_TYPES);
-
 			Map<String, Integer> rawNbtTypeLookup = new HashMap<>(NBTBase.NBT_TYPES.length);
-			nbtTypes.forEach(t -> rawNbtTypeLookup.put(t, rawNbtTypeLookup.size()));
-			RAW_NBT_TYPE_LOOKUP = ImmutableMap.copyOf(rawNbtTypeLookup);
-
 			Map<String, Integer> nbtTypeLookup = new HashMap<>(NBTBase.NBT_TYPES.length);
-			nbtTypes.forEach(t -> nbtTypeLookup.put("NBTTag" + WordUtils.capitalizeFully(t).replace("[]", "Array"), nbtTypeLookup.size()));
+
+			for (String nbt : NBTBase.NBT_TYPES) {
+				rawNbtTypeLookup.put(nbt, rawNbtTypeLookup.size());
+				nbtTypeLookup.put("NBTTag" + WordUtils.capitalizeFully(nbt).replace("[]", "Array"), nbtTypeLookup.size());
+			}
+
+			RAW_NBT_TYPE_LOOKUP = ImmutableMap.copyOf(rawNbtTypeLookup);
 			NBT_TYPE_LOOKUP = ImmutableMap.copyOf(nbtTypeLookup);
 		}
 
@@ -65,7 +69,7 @@ public enum Registrables {
 		/* SECTION static methods */
 
 		public static Optional<Integer> lookupNBTType(Class<?> clazz) {
-			Integer ret = NBT_TYPE_LOOKUP.get(clazz.getSimpleName());
+			@Nullable Integer ret = NBT_TYPE_LOOKUP.get(clazz.getSimpleName());
 			if (ret == null) ret = RAW_NBT_TYPE_LOOKUP.get(clazz.getSimpleName().toUpperCase(Locale.ROOT));
 			return Optional.ofNullable(ret);
 		}

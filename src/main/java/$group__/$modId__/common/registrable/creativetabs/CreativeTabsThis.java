@@ -20,7 +20,6 @@ public enum CreativeTabsThis {
 	/* SECTION static variables */
 
 	public static final CreativeTabs DEFAULT = new CreativeTabsDefault(MOD_ID) {
-		/** {@inheritDoc} */
 		@Override
 		@SideOnly(Side.CLIENT)
 		public ItemStack getTabIconItem() { return new ItemStack(ItemsThis.INSTANCE.wrench); }
@@ -32,7 +31,6 @@ public enum CreativeTabsThis {
 	// COMMENT using a function here to avoid registering the tab
 	@SuppressWarnings("unused")
 	private static final Function<CreativeTabsThis, CreativeTabs> TEMPLATE_ = t -> new CreativeTabsDefault("template_") {
-		/** {@inheritDoc} */
 		@Override
 		@SideOnly(Side.CLIENT) // COMMENT IMPORTANT!
 		public ItemStack getTabIconItem() { return new ItemStack(Items.AIR); }

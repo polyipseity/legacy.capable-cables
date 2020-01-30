@@ -51,16 +51,6 @@ public interface IThemed<T extends IThemed.ITheme<T>> {
 					texO = tex.getOffset(), texS = tex.getSize();
 			Gui.drawScaledCustomSizeModalRect(rectO.getX().intValue(), rectO.getY().intValue(), texO.getX().floatValue(), texO.getY().floatValue(), texS.getX().intValue(), texS.getY().intValue(), rectS.getX().intValue(), rectS.getY().intValue(), tile.getX().floatValue(), tile.getY().floatValue());
 		}
-
-
-		@Override
-		String toString();
-
-		@Override
-		int hashCode();
-
-		@Override
-		boolean equals(Object o);
 	}
 
 

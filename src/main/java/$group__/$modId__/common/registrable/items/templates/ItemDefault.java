@@ -9,11 +9,11 @@ import static $group__.$modId__.common.registrable.utilities.helpers.Registries.
 public class ItemDefault extends Item implements IForgeRegistryEntryExtension<Item> {
 	/* SECTION methods */
 
-	/** {@inheritDoc} */
+	@SuppressWarnings("SpellCheckingInspection")
 	@Override
 	public Item setUnlocalizedName(ResourceLocation name) { return setUnlocalizedName(getNamespacedUnlocalizedNameForRegistry(name)); }
 
-	/** {@inheritDoc} */
+	@SuppressWarnings("SpellCheckingInspection")
 	@Override
 	public Item setRegistryAndUnlocalizedName(ResourceLocation name) { return setUnlocalizedName(name).setRegistryName(name); }
 }

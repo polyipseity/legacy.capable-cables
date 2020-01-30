@@ -30,6 +30,9 @@ public enum Miscellaneous {
 	public static <T> T markUnused() { return null; }
 
 
+	public static Object newLockObject() { return new Object(); }
+
+
 	/**
 	 * Function K of SKI combinator calculus.
 	 *

@@ -9,12 +9,14 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.forName;
 import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclaredMethod;
 import static $group__.$modId__.utilities.helpers.Reflections.getMethodNameDescriptor;
+import static $group__.$modId__.utilities.helpers.Reflections.getSuperclassesAndInterfaces;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
 
 public interface IAnnotationProcessor<A extends Annotation> {
@@ -39,8 +41,13 @@ public interface IAnnotationProcessor<A extends Annotation> {
 		Class<?>[] mArgs = method.getParameterTypes();
 
 		A[] r = castUncheckedUnboxedNonnull(Array.newInstance(aClass, 0));
-		do
-		{ r = getDeclaredMethod(clazz, mName, mArgs).get().map(t -> t.getDeclaredAnnotationsByType(aClass)).orElse(r); } while (r.length == 0 && (clazz = clazz.getSuperclass()) != null);
+		sss:
+		for (LinkedHashSet<Class<?>> ss : getSuperclassesAndInterfaces(clazz)) {
+			for (Class<?> s : ss) {
+				r = getDeclaredMethod(s, mName, mArgs).get().map(t -> t.getDeclaredAnnotationsByType(aClass)).orElse(r);
+				if (r.length != 0) break sss;
+			}
+		}
 
 		return r;
 	}
@@ -53,7 +60,6 @@ public interface IAnnotationProcessor<A extends Annotation> {
 
 		void processClass(Result result);
 
-		/** {@inheritDoc} */
 		@Override
 		default void process(ASMDataTable asm) {
 			Set<ASMDataTable.ASMData> thisAsm = asm.getAll(annotationType().getName());
@@ -92,7 +98,6 @@ public interface IAnnotationProcessor<A extends Annotation> {
 
 			void processElement(Result<A, AE> result);
 
-			/** {@inheritDoc} */
 			@Override
 			default void processClass(IClass.Result result) {
 				AE ae = findElement(result);
@@ -126,7 +131,6 @@ public interface IAnnotationProcessor<A extends Annotation> {
 
 				void processMethod(Result<A> result);
 
-				/** {@inheritDoc} */
 				@Override
 				default Method findElement(IClass.Result result) {
 					String mName = result.currentAsm.getObjectName();
@@ -142,7 +146,6 @@ public interface IAnnotationProcessor<A extends Annotation> {
 					return r;
 				}
 
-				/** {@inheritDoc} */
 				@Override
 				default void processElement(IElement.Result<A, Method> result) {
 					processMethod(new Result<>(result));

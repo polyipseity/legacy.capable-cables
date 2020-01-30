@@ -1,4 +1,4 @@
-package $group__.$modId__.client.gui.templates.components;
+package $group__.$modId__.client.gui.components;
 
 import $group__.$modId__.client.gui.utilities.constructs.IDrawable;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
@@ -13,9 +13,9 @@ import java.awt.*;
 
 import static $group__.$modId__.client.gui.utilities.helpers.Guis.translateAndScaleFromTo;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -66,18 +66,24 @@ public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawab
 	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
 	@Override
+	public boolean isImmutable() { return false; }
+
+
+	@Override
 	public String toString() {
 		return getToStringString(this, super.toString(),
 				new Object[]{"drawable", getDrawable()});
 	}
 
 	@Override
-	public int hashCode() { return getHashCode(this, super.hashCode(), getDrawable()); }
+	public int hashCode() {
+		return isImmutable() ? getHashCode(this, super.hashCode(), getDrawable()) : getHashCode(this, super.hashCode());
+	}
 
 	@Override
 	public boolean equals(Object o) {
-		return isEquals(this, o, super.equals(o),
-				t -> getDrawable().equals(t.getDrawable()));
+		return isImmutable() ? isEqual(this, o, super.equals(o),
+				t -> getDrawable().equals(t.getDrawable())) : isEqual(this, o, super.equals(o));
 	}
 
 	@Override

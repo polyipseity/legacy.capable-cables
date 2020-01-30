@@ -70,6 +70,7 @@ public @interface ExternalCloneMethod {
 
 	AtomicLong EVICTION_COUNT = new AtomicLong();
 	LoadingCache<Class<?>, ExternalCloneMethod> EXTERNAL_CLONE_METHOD_ANNOTATIONS_CACHE = CacheBuilder.newBuilder().maximumWeight(10000L).weigher((k, v) -> v == CLONE_METHOD_DEFAULT_ANNOTATION ? 10000 / (int) Math.min(10000L, 100L + EVICTION_COUNT.get()) : 0).removalListener((RemovalNotification<Class<?>, ExternalCloneMethod> t) -> LOGGER.debug("Default clone method '{}' cached for class '{}' evicted, count: {}", CLONE_METHOD_DEFAULT.get().orElseThrow(Throwables::unexpected), t.getKey().toGenericString(), EVICTION_COUNT.incrementAndGet())).build(new CacheLoader<Class<?>, ExternalCloneMethod>() {
+		@SuppressWarnings("ConstantConditions")
 		@Override
 		public ExternalCloneMethod load(Class<?> key) throws InterruptedException {
 			@Nullable ExternalCloneMethod r = null;
@@ -123,6 +124,7 @@ public @interface ExternalCloneMethod {
 		public boolean isProcessed() { return processed; }
 
 
+		@SuppressWarnings("ConstantConditions")
 		@Override
 		public void processMethod(Result<ExternalCloneMethod> result) {
 			ExternalCloneMethod a = result.annotations[0];

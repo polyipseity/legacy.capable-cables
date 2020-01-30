@@ -45,6 +45,7 @@ public @interface ExternalToImmutableMethod {
 	/* SECTION static variables */
 
 	LoadingCache<Class<?>, ExternalToImmutableMethod> EXTERNAL_TO_IMMUTABLE_METHOD_ANNOTATIONS_CACHE = CacheBuilder.newBuilder().build(new CacheLoader<Class<?>, ExternalToImmutableMethod>() {
+		@SuppressWarnings("ConstantConditions")
 		@Override
 		public ExternalToImmutableMethod load(Class<?> key) throws InterruptedException {
 			@Nullable ExternalToImmutableMethod r = null;
@@ -96,6 +97,7 @@ public @interface ExternalToImmutableMethod {
 		public boolean isProcessed() { return processed; }
 
 
+		@SuppressWarnings({"ControlFlowStatementWithoutBraces", "ConstantConditions"})
 		@Override
 		public void processMethod(Result<ExternalToImmutableMethod> result) {
 			ExternalToImmutableMethod a = result.annotations[0];

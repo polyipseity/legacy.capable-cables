@@ -4,6 +4,7 @@ import $group__.$modId__.utilities.constructs.interfaces.annotations.ExternalToI
 import net.minecraft.util.ResourceLocation;
 
 import java.awt.*;
+import java.lang.reflect.Member;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -17,15 +18,17 @@ public enum Immutables {
 	/* SECTION static methods */
 
 	@ExternalToImmutableMethod({
+			String.class,
 			Color.class,
 			ResourceLocation.class
 	})
-	public static Object toImmutableImmutable(Object immutable) { return immutable; }
+	public static Object toImmutableImmutable(Object mutable) { return mutable; }
 
 	@ExternalToImmutableMethod(value = {
-			Enum.class
+			Enum.class,
+			Member.class
 	}, allowExtends = true)
-	public static Object toImmutableImmutableExtends(Object copy) { return copy; }
+	public static Object toImmutableImmutableExtends(Object mutable) { return mutable; }
 
 
 	@ExternalToImmutableMethod(value = Collection.class, allowExtends = true)
@@ -35,5 +38,5 @@ public enum Immutables {
 	public static <T> List<T> toImmutableList(List<? extends T> mutable) { return Collections.unmodifiableList(mutable); }
 
 	@ExternalToImmutableMethod(value = Set.class, allowExtends = true)
-	public static <T> Set<T> toImmutableCollection(Set<? extends T> mutable) { return Collections.unmodifiableSet(mutable); }
+	public static <T> Set<T> toImmutableSet(Set<? extends T> mutable) { return Collections.unmodifiableSet(mutable); }
 }

@@ -13,11 +13,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxed;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
@@ -106,7 +106,6 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 	}
 
 
-	/** {@inheritDoc} */
 	@Override
 	public int compareTo(Number o) {
 		boolean greater = doubleValue() > o.doubleValue();
@@ -115,33 +114,26 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 	}
 
 
-	/** {@inheritDoc} */
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean isImmutable() { return false; }
 
 
-	/** {@inheritDoc} */
 	@Override
 	public int intValue() { return (int) doubleValue(); }
 
-	/** {@inheritDoc} */
 	@Override
 	public long longValue() { return (long) doubleValue(); }
 
-	/** {@inheritDoc} */
 	@Override
 	public float floatValue() { return (float) doubleValue(); }
 
-	/** {@inheritDoc} */
 	@Override
 	public double doubleValue() { return getParent().map(Number::doubleValue).orElse(1D) * getValue().doubleValue() + getOffset().map(Number::doubleValue).orElse(0D); }
 
 
-	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public String toString() {
@@ -151,19 +143,19 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 				new Object[]{"offset", getOffset()});
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public int hashCode() { return getHashCode(this, super.hashCode(), getValue(), getParent(), getOffset()); }
+	public int hashCode() {
+		return isImmutable() ? getHashCode(this, super.hashCode(), getValue(), getParent(), getOffset()) : getHashCode(this, super.hashCode());
+	}
 
-	/** {@inheritDoc} */
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public boolean equals(Object o) {
-		return isEquals(this, o, super.equals(o),
+		return isImmutable() ? isEqual(this, o, super.equals(o),
 				t -> getValue().equals(t.getValue()),
 				t -> Objects.equals(getParent(), t.getParent()),
-				t -> Objects.equals(getOffset(), t.getOffset()));
+				t -> Objects.equals(getOffset(), t.getOffset())) : isEqual(this, o, super.equals(o));
 	}
 
 	@Override
@@ -199,27 +191,22 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 
 		/* SECTION getters & setters */
 
-		/** {@inheritDoc} */
 		@Override
 		public void setValue(Number value) { throw rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setParent(@Nullable Number parent) { throw rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setOffset(@Nullable Number offset) { throw rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final boolean isImmutable() { return true; }

@@ -1,0 +1,12 @@
+<root>
+	<item name='net.minecraftforge.fml.client.IModGuiFactory java.util.Set&lt;net.minecraftforge.fml.client.IModGuiFactory.RuntimeOptionCategoryElement&gt; runtimeGuiCategories()'>
+		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='java.lang.Deprecated'/>
+	</item>
+	<item name='net.minecraftforge.fml.client.IModGuiFactory net.minecraft.client.gui.GuiScreen createConfigGui(net.minecraft.client.gui.GuiScreen)'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
+	<item name='net.minecraftforge.fml.client.IModGuiFactory.RuntimeOptionCategoryElement'>
+		<annotation name='java.lang.Deprecated'/>
+	</item>
+</root>

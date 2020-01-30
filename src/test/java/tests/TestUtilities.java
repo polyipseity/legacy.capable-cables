@@ -1,3 +1,5 @@
+package tests;
+
 import static java.lang.System.out;
 
 public enum TestUtilities {

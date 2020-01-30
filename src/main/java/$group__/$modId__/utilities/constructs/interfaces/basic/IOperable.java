@@ -63,17 +63,5 @@ public interface IOperable<T extends IOperable<T, A>, A> {
 			for (Number t : o) if (greaterThan(r, t)) r.newInstanceFrom(t);
 			return r;
 		}
-
-
-		@Override
-		String toString();
-
-		@Override
-		int hashCode();
-
-		@Override
-		boolean equals(Object o);
-
-		T clone();
 	}
 }

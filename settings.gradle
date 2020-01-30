@@ -5,4 +5,5 @@
 
 /* SECTION variables */
 
+//noinspection SpellCheckingInspection
 rootProject.name = "capablecables"

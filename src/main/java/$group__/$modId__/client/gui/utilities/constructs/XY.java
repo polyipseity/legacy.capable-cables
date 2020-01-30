@@ -3,7 +3,7 @@ package $group__.$modId__.client.gui.utilities.constructs;
 import $group__.$modId__.utilities.constructs.interfaces.IStructureCloneable;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IOperable;
-import $group__.$modId__.utilities.constructs.interfaces.basic.IStrictToString;
+import $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString;
 import $group__.$modId__.utilities.helpers.Primitives.Numbers;
 import $group__.$modId__.utilities.variables.Globals;
 import com.google.common.collect.Streams;
@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictEquals.isEquals;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
+import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
@@ -178,14 +178,16 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructureClone
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public int hashCode() { return getHashCode(this, super.hashCode(), getX(), getY()); }
+	public int hashCode() {
+		return isImmutable() ? getHashCode(this, super.hashCode(), getX(), getY()) : getHashCode(this, super.hashCode());
+	}
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public boolean equals(Object o) {
-		return isEquals(this, o, super.equals(o),
+		return isImmutable() ? isEqual(this, o, super.equals(o),
 				t -> getX().equals(t.getX()),
-				t -> getY().equals(t.getY()));
+				t -> getY().equals(t.getY())) : isEqual(this, o, super.equals(o));
 	}
 
 	@Override
@@ -232,23 +234,19 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructureClone
 
 		/* SECTION getters & setters */
 
-		/** {@inheritDoc} */
 		@Override
 		public void setX(N x) { throw rejectUnsupportedOperation(); }
 
-		/** {@inheritDoc} */
 		@Override
 		public void setY(N y) { throw rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
-		/** {@inheritDoc} */
 		@Override
 		@OverridingStatus(group = GROUP, when = When.NEVER)
 		public final boolean isImmutable() { return true; }

@@ -21,11 +21,11 @@ public class BlockDefault extends Block implements IForgeRegistryEntryExtension<
 
 	/* SECTION methods */
 
-	/** {@inheritDoc} */
+	@SuppressWarnings("SpellCheckingInspection")
 	@Override
 	public Block setUnlocalizedName(ResourceLocation name) { return setUnlocalizedName(getNamespacedUnlocalizedNameForRegistry(name)); }
 
-	/** {@inheritDoc} */
+	@SuppressWarnings("SpellCheckingInspection")
 	@Override
 	public Block setRegistryAndUnlocalizedName(ResourceLocation name) { return setUnlocalizedName(name).setRegistryName(name); }
 }

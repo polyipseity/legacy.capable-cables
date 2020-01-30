@@ -1,32 +1,34 @@
 package $group__.$modId__.utilities.constructs.classes;
 
+import $group__.$modId__.utilities.helpers.Casts;
 import $group__.$modId__.utilities.variables.Globals;
 
-import java.util.HashMap;
+import javax.annotation.Nullable;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
 import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.newInstance;
 import static $group__.$modId__.utilities.helpers.Throwables.getStackTraceString;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectInstantiation;
 import static $group__.$modId__.utilities.variables.Globals.LOGGER;
+import static com.google.common.collect.Maps.immutableEntry;
 
 public abstract class Singleton {
 	/* SECTION constructors */
 
 	public Singleton() {
 		Class<? extends Singleton> clazz = getClass();
-		String classGS = clazz.toGenericString();
-		String sts = getStackTraceString();
+		String classGS = clazz.toGenericString(),
+				sts = getStackTraceString();
 
-		synchronized (INSTANCES) {
-			if (INSTANCES.put(clazz, this) != null) {
-				LOGGER.error("Singleton instance of '{}' already created, previous stacktrace:\n{}", classGS, STACKTRACE_STRINGS.get(clazz));
-				throw rejectInstantiation();
-			}
-			STACKTRACE_STRINGS.put(clazz, sts);
+		Map.Entry<? extends Singleton, String> v = immutableEntry(this, sts);
+		@Nullable Map.Entry<? extends Singleton, String> vo = INSTANCES.put(clazz, v);
+		if (vo != null) {
+			LOGGER.error("Singleton instance of '{}' already created, previous stacktrace:\n{}", classGS, vo.getValue());
+			throw rejectInstantiation();
 		}
 
 		LOGGER.debug("Singleton instance of '{}' created, stacktrace:\n{}", classGS, sts);
@@ -35,18 +37,14 @@ public abstract class Singleton {
 
 	/* SECTION static variables */
 
-	protected static final HashMap<Class<?>, Singleton> INSTANCES = new HashMap<>();
-	protected static final HashMap<Class<?>, String> STACKTRACE_STRINGS = new HashMap<>();
+	protected static final ConcurrentHashMap<Class<?>, Map.Entry<? extends Singleton, String>> INSTANCES = new ConcurrentHashMap<>();
 
 
 	/* SECTION static methods */
 
 	public static <T extends Singleton> Optional<T> getInstance(Class<T> clazz, boolean instantiate, Function<? super Class<T>, ? extends T> instantiation) {
-		Optional<T> r;
-		synchronized (INSTANCES) {
-			r = castUnchecked(INSTANCES.get(clazz));
-			if (!r.isPresent()) r = Optional.ofNullable(instantiate ? instantiation.apply(clazz) : null);
-		}
+		Optional<T> r = Optional.ofNullable(INSTANCES.get(clazz)).map(Map.Entry::getKey).flatMap(Casts::castUnchecked);
+		if (!r.isPresent() && instantiate) r = Optional.of(instantiation.apply(clazz));
 		return r;
 	}
 

@@ -8,11 +8,9 @@ import net.minecraft.item.ItemStack;
 public abstract class ContainerDefault extends Container {
 	/* SECTION methods */
 
-	/** {@inheritDoc} */
 	@Override
 	public boolean canInteractWith(EntityPlayer playerIn) { return true; }
 
-	/** {@inheritDoc} */
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
 		Slot s = inventorySlots.get(index);

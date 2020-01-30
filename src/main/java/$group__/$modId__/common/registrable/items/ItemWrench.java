@@ -52,7 +52,6 @@ import static $group__.$modId__.utilities.variables.Globals.MOD;
 public class ItemWrench extends ItemUnstackable implements IRegistrableEventBusSubscriber, IToolHammer, IToolWrench {
 	/* SECTION methods */
 
-	/** {@inheritDoc} */
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
 		if (playerIn.isSneaking()) {
@@ -63,13 +62,11 @@ public class ItemWrench extends ItemUnstackable implements IRegistrableEventBusS
 		return new ActionResult<>(EnumActionResult.FAIL, playerIn.getHeldItem(handIn));
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
 		return canUse(player.getHeldItem(hand), world, player, new RayTraceResult(new Vec3d(hitX, hitY, hitZ), side, pos), hand) ? EnumActionResult.PASS : EnumActionResult.FAIL;
 	}
 
-	/** {@inheritDoc} */
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		return worldIn.isRemote || use(player.getHeldItem(hand), worldIn, player, new RayTraceResult(new Vec3d(hitX, hitY, hitZ), facing, pos), hand) ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
@@ -93,33 +90,27 @@ public class ItemWrench extends ItemUnstackable implements IRegistrableEventBusS
 	}
 
 
-	/** {@inheritDoc} */
 	@Override
 	@Optional.Method(modid = Constants.COFH_CORE_ID)
 	public boolean isUsable(ItemStack item, EntityLivingBase user, BlockPos pos) { return true; }
 
-	/** {@inheritDoc} */
 	@Override
 	@Optional.Method(modid = Constants.COFH_CORE_ID)
 	public boolean isUsable(ItemStack item, EntityLivingBase user, Entity entity) { return true; }
 
-	/** {@inheritDoc} */
 	@Override
 	@Optional.Method(modid = Constants.COFH_CORE_ID)
 	public void toolUsed(ItemStack item, EntityLivingBase user, BlockPos pos) {  /* MARK empty */ }
 
-	/** {@inheritDoc} */
 	@Override
 	@Optional.Method(modid = Constants.COFH_CORE_ID)
 	public void toolUsed(ItemStack item, EntityLivingBase user, Entity entity) {  /* MARK empty */ }
 
 
-	/** {@inheritDoc} */
 	@Override
 	@Optional.Method(modid = Constants.BUILDCRAFT_API_ID)
 	public boolean canWrench(EntityPlayer player, EnumHand hand, ItemStack wrench, RayTraceResult rayTrace) { return true; }
 
-	/** {@inheritDoc} */
 	@Override
 	@Optional.Method(modid = Constants.BUILDCRAFT_API_ID)
 	public void wrenchUsed(EntityPlayer player, EnumHand hand, ItemStack wrench, RayTraceResult rayTrace) {  /* MARK empty */ }
@@ -236,7 +227,6 @@ public class ItemWrench extends ItemUnstackable implements IRegistrableEventBusS
 
 		/* SECTION methods */
 
-		/** {@inheritDoc} */
 		@Override
 		@Nullable
 		public NBTTagCompound serializeNBT() {
@@ -255,7 +245,6 @@ public class ItemWrench extends ItemUnstackable implements IRegistrableEventBusS
 			return unboxOptional(returnTagIfNotEmpty(tag));
 		}
 
-		/** {@inheritDoc} */
 		@Override
 		public void deserializeNBT(@Nullable NBTTagCompound tag) {
 			{

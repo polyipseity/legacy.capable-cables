@@ -5,10 +5,10 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static $group__.$modId__.utilities.helpers.Grammar.appendSuffixIfPlural;
+import static $group__.$modId__.utilities.helpers.Reflections.BRIDGE;
 import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 
 @SuppressWarnings("SpellCheckingInspection")
@@ -18,13 +18,18 @@ public enum Throwables {
 
 	/* SECTION static variables */
 
-	private static final HashSet<String> RAN_ONCE = new HashSet<>();
-	private static final HashMap<String, String> RAN_ONCE_STACKTRACE_STRINGS = new HashMap<>();
+	private static final ConcurrentHashMap<String, String> RAN_ONCE = new ConcurrentHashMap<>();
 
 
 	/* SECTION static methods */
 
 	public static <T extends Throwable> T throw_(T t) throws T { throw t; }
+
+	public static RuntimeException throwThrowable(Throwable t) {
+		BRIDGE.throwException(t);
+		throw unexpected();
+	}
+
 
 	public static Throwable newThrowable() { return new Throwable("Instantiated throwable"); }
 
@@ -55,7 +60,7 @@ public enum Throwables {
 	public static String rejectObjectsString(String msg, Object... objects) { return "Reject " + msg + ": " + Arrays.toString(objects); }
 
 
-	public static RuntimeException rejectInstantiation(@Nullable String msg) throws RuntimeException { throw wrapCheckedThrowable(new InstantiationException(rejectAttemptString("illegal instantiation" + (msg == null ? StringUtils.EMPTY : ": " + msg)))); }
+	public static RuntimeException rejectInstantiation(@Nullable String msg) throws RuntimeException { throw throwThrowable(new InstantiationException(rejectAttemptString("illegal instantiation" + (msg == null ? StringUtils.EMPTY : ": " + msg)))); }
 
 	public static RuntimeException rejectInstantiation() throws RuntimeException { throw rejectInstantiation(null); }
 
@@ -64,20 +69,15 @@ public enum Throwables {
 		Throwable t = newThrowable();
 		StackTraceElement[] st = t.getStackTrace();
 		if (st.length <= 2) return;
+		String sts = ExceptionUtils.getStackTrace(t);
 
-		String cs = st[2].toString(),
-				sts = ExceptionUtils.getStackTrace(t);
-
-		synchronized (RAN_ONCE) {
-			if (RAN_ONCE.add(cs)) {
-				RAN_ONCE_STACKTRACE_STRINGS.put(cs, sts);
-				LOGGER.debug("First ONLY invocation, stacktrace:\n{}", sts);
-				return;
-			}
+		@Nullable String stsO = RAN_ONCE.put(st[2].toString(), sts);
+		if (stsO != null) {
+			LOGGER.error("Illegal second invocation, previous stacktrace:\n{}", stsO);
+			throw throw_(new IllegalStateException(rejectAttemptString("illegal second invocation", st)));
 		}
 
-		LOGGER.error("Illegal second invocation, previous stacktrace:\n{}", RAN_ONCE_STACKTRACE_STRINGS.get(cs));
-		throw throw_(new IllegalStateException(rejectAttemptString("illegal second invocation", st)));
+		LOGGER.debug("First ONLY invocation, stacktrace:\n{}", sts);
 	}
 
 
