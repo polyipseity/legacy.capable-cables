@@ -9,11 +9,13 @@ import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
 
 import static $group__.$modId__.utilities.helpers.Casts.*;
 import static $group__.$modId__.utilities.helpers.Comparables.greaterThan;
 import static $group__.$modId__.utilities.helpers.Comparables.lessThan;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
+import static $group__.$modId__.utilities.helpers.Patterns.TWO_MINUS_SIGNS_PATTERN;
 import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclaredField;
 import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclaredMethod;
 import static java.util.Arrays.asList;
@@ -27,7 +29,6 @@ public enum Primitives {
 	public enum Numbers {
 		/* MARK empty */;
 
-
 		/* SECTION static methods */
 
 		public static <N> Optional<N> negate(@Nullable N n) {
@@ -36,7 +37,7 @@ public enum Primitives {
 			else if (n instanceof IOperable<?, ?>)
 				return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class)).flatMap(t -> castChecked(t.negate(), castUncheckedUnboxedNonnull(t.getClass())));
 			else if (n instanceof Number)
-				return getDeclaredMethod(n.getClass(), "valueOf", String.class).invoke(null, ("-" + n).replace("--", StringUtils.EMPTY)).flatMap(t -> castChecked(t, castUncheckedUnboxedNonnull(t.getClass())));
+				return getDeclaredMethod(n.getClass(), "valueOf", String.class).invoke(null, TWO_MINUS_SIGNS_PATTERN.matcher(("-" + n)).replaceAll(Matcher.quoteReplacement(StringUtils.EMPTY))).flatMap(t -> castChecked(t, castUncheckedUnboxedNonnull(t.getClass())));
 			return Optional.empty();
 		}
 

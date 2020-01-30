@@ -13,12 +13,14 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.regex.Matcher;
 
+import static $group__.$modId__.utilities.helpers.Patterns.LEFT_N_RIGHT_BRACKETS_PATTERN;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
 
 @SuppressWarnings("SpellCheckingInspection")
@@ -56,13 +58,13 @@ public enum Registrables {
 		/* SECTION static methods */
 
 		static {
-			Map<String, Integer> rawNbtTypeLookup = new HashMap<>(NBTBase.NBT_TYPES.length);
-			Map<String, Integer> nbtTypeLookup = new HashMap<>(NBTBase.NBT_TYPES.length);
+			HashMap<String, Integer> rawNbtTypeLookup = new HashMap<>(NBTBase.NBT_TYPES.length);
+			HashMap<String, Integer> nbtTypeLookup = new HashMap<>(NBTBase.NBT_TYPES.length);
 
-			for (String nbt : NBTBase.NBT_TYPES) {
+			Arrays.stream(NBTBase.NBT_TYPES).forEachOrdered(nbt -> {
 				rawNbtTypeLookup.put(nbt, rawNbtTypeLookup.size());
-				nbtTypeLookup.put("NBTTag" + WordUtils.capitalizeFully(nbt).replace("[]", "Array"), nbtTypeLookup.size());
-			}
+				nbtTypeLookup.put("NBTTag" + LEFT_N_RIGHT_BRACKETS_PATTERN.matcher(WordUtils.capitalizeFully(nbt)).replaceAll(Matcher.quoteReplacement("Array")), nbtTypeLookup.size());
+			});
 
 			RAW_NBT_TYPE_LOOKUP = ImmutableMap.copyOf(rawNbtTypeLookup);
 			NBT_TYPE_LOOKUP = ImmutableMap.copyOf(nbtTypeLookup);

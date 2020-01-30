@@ -9,6 +9,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -90,13 +91,7 @@ public interface IAnnotationProcessor<A extends Annotation> {
 				@Override
 				default Method findElement(IClass.Result result) {
 					String mName = result.currentAsm.getObjectName();
-					@Nullable Method r = null;
-					for (Method m : result.clazz.getDeclaredMethods()) {
-						if (mName.equals(getMethodNameDescriptor(m))) {
-							r = m;
-							break;
-						}
-					}
+					@Nullable Method r = Arrays.stream(result.clazz.getDeclaredMethods()).filter(m -> mName.equals(getMethodNameDescriptor(m))).findFirst().orElse(null);
 					if (r == null)
 						throw rejectArguments(new NoSuchMethodException(getMessage(this, "No method name '" + mName + "' in class '" + result.clazz.toGenericString() + "'")), result.thisAsm);
 					return r;

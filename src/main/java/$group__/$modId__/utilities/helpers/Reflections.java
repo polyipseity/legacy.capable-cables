@@ -13,6 +13,7 @@ import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.consumeCaught;
@@ -52,8 +53,7 @@ public enum Reflections {
 
 	public static <U> LinkedHashSet<Class<? extends U>> getLowerAndIntermediateSuperclasses(Class<? extends U> lower, @Nullable Class<U> upper) {
 		LinkedHashSet<Class<? extends U>> r = new LinkedHashSet<>();
-		for (@Nullable Class<?> i = lower; i != upper && i != null; i = i.getSuperclass())
-			r.add(castUncheckedUnboxedNonnull(i));
+		for (@Nullable Class<?> i = lower; i != upper && i != null; i = i.getSuperclass()) r.add(castUncheckedUnboxedNonnull(i));
 		return r;
 	}
 
@@ -80,11 +80,8 @@ public enum Reflections {
 
 	public static boolean isFormerMethodOverriddenByLatter(Method a, Method b) {
 		if (!(a.getName().equals(b.getName()) && a.getReturnType().isAssignableFrom(b.getReturnType()))) return false;
-		Class<?>[] ap = a.getParameterTypes();
-		Class<?>[] bp = a.getParameterTypes();
-		if (ap.length != bp.length) return false;
-		for (int i = 0; i < ap.length; i++) { if (!bp[i].isAssignableFrom(ap[i])) return false; }
-		return true;
+		Class<?>[] ap = a.getParameterTypes(), bp = b.getParameterTypes();
+		return ap.length == bp.length && IntStream.range(0, ap.length).allMatch(i -> bp[i].isAssignableFrom(ap[i]));
 	}
 
 	public static Type getGenericSuperclassActualTypeArgument(Class<?> c, int i) throws ClassCastException { return getGenericSuperclassActualTypeArguments(c)[i]; }

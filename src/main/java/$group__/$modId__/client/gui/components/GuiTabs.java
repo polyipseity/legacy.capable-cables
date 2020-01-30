@@ -57,10 +57,10 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 		int bound = t.getElements().size();
 		if (bound <= open) throw rejectIndexOutOfBounds(bound, open);
 		t.open = open;
-		open = t.getOpen();
 
-		int i = 0;
-		for (ITab<?, ?> tab : t.getElements()) { tab.setOpen(i++ == open); }
+		int o1 = t.getOpen();
+		final int[] i = {0};
+		t.getElements().forEach(e -> e.setOpen(i[0]++ == o1));
 	}
 
 

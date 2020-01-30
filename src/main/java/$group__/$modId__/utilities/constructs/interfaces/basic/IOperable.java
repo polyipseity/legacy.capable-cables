@@ -4,6 +4,7 @@ import $group__.$modId__.utilities.constructs.interfaces.IStructureCloneable;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 
 import javax.annotation.meta.When;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Comparables.greaterThan;
@@ -47,20 +48,20 @@ public interface IOperable<T extends IOperable<T, A>, A> {
 		@Override
 		@OverridingStatus(group = GROUP, when = When.MAYBE)
 		default T max(Iterable<? extends Number> o) {
-			T r = castUncheckedUnboxedNonnull(clone());
-			for (Number t : o) if (lessThan(r, t)) r = r.newInstanceFrom(t);
-			return r;
+			AtomicReference<T> r = new AtomicReference<>(castUncheckedUnboxedNonnull(this));
+			o.forEach(ot -> r.updateAndGet(rt -> lessThan(rt, ot) ? rt.cloneFrom(ot) : rt));
+			return r.get();
 		}
 
 		@Override
 		@OverridingStatus(group = GROUP, when = When.MAYBE)
 		default T min(Iterable<? extends Number> o) {
-			T r = castUncheckedUnboxedNonnull(clone());
-			for (Number t : o) if (greaterThan(r, t)) r.newInstanceFrom(t);
-			return r;
+			AtomicReference<T> r = new AtomicReference<>(castUncheckedUnboxedNonnull(this));
+			o.forEach(ot -> r.updateAndGet(rt -> greaterThan(rt, ot) ? rt.cloneFrom(ot) : rt));
+			return r.get();
 		}
 
 		@OverridingStatus(group = GROUP, when = When.MAYBE)
-		default T newInstanceFrom(Number o) throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
+		default T cloneFrom(Number o) { throw rejectUnsupportedOperation(); }
 	}
 }

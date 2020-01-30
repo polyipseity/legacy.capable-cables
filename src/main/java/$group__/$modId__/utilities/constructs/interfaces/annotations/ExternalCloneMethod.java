@@ -21,9 +21,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IAnnotationProcessor.getMessage;
 import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclaredMethod;
@@ -70,20 +72,15 @@ public @interface ExternalCloneMethod {
 		@Override
 		public ExternalCloneMethod load(Class<?> key) throws InterruptedException {
 			@Nullable ExternalCloneMethod r = null;
-			for (Map.Entry<Class<?>, ExternalCloneMethod> e : EXTERNAL_CLONE_METHOD_ANNOTATIONS_CACHE.asMap().entrySet()) {
-				ExternalCloneMethod v = e.getValue();
-				if (v.allowExtends()) {
-					Class<?> k = e.getKey();
-					if (k.isAssignableFrom(key)) {
-						for (LinkedHashSet<Class<?>> ss : getSuperclassesAndInterfaces(key)) {
-							if (ss.contains(k)) {
-								r = v;
-								break;
-							}
-						}
+			List<Map.Entry<Class<?>, ExternalCloneMethod>> l = EXTERNAL_CLONE_METHOD_ANNOTATIONS_CACHE.asMap().entrySet().stream().filter(t -> t.getValue().allowExtends() && t.getKey().isAssignableFrom(key)).collect(Collectors.toList());
+
+			sss:
+			for (LinkedHashSet<Class<?>> ss : getSuperclassesAndInterfaces(key))
+				for (Map.Entry<Class<?>, ExternalCloneMethod> e : l)
+					if (ss.contains(e.getKey())) {
+						r = e.getValue();
+						break sss;
 					}
-				}
-			}
 
 			if (r != null)
 				LOGGER.debug("Clone method '{}' with annotation '{}' auto-registered for class '{}'", EXTERNAL_CLONE_METHOD_MAP.get(r).get().orElseThrow(Throwables::unexpected).toGenericString(), r, key.toGenericString());

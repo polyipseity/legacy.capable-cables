@@ -101,7 +101,7 @@ public enum Globals implements IThrowableCatcher {
 
 
 		@SubscribeEvent
-		public static void preInitGui(GuiScreenEvent.InitGuiEvent.Pre e) { PRE_INIT_GUI_LISTENER.asMap().forEach((k, v) -> v.accept(e, castUncheckedUnboxedNonnull(k))); }
+		public static void preInitGui(GuiScreenEvent.InitGuiEvent.Pre e) { PRE_INIT_GUI_LISTENER.asMap().forEach((o, f) -> f.accept(e, castUncheckedUnboxedNonnull(o))); }
 
 		@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
 		public static void preInitGuiForResolution(GuiScreenEvent.InitGuiEvent.Pre e) { resolution = new ScaledResolution(CLIENT); }

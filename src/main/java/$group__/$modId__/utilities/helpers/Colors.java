@@ -3,6 +3,9 @@ package $group__.$modId__.utilities.helpers;
 import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
+import java.util.regex.Matcher;
+
+import static $group__.$modId__.utilities.helpers.Patterns.HASH_PATTERN;
 
 public enum Colors {
 	/* MARK empty */;
@@ -30,5 +33,7 @@ public enum Colors {
 
 	/* SECTION static methods */
 
-	public static Color newColor(String s) { return new Color(Integer.parseInt(s.replace("#", StringUtils.EMPTY), 16), true); }
+	public static Color newColor(String s) {
+		return new Color(Integer.parseInt(HASH_PATTERN.matcher(s).replaceAll(Matcher.quoteReplacement(StringUtils.EMPTY)), 16), true);
+	}
 }

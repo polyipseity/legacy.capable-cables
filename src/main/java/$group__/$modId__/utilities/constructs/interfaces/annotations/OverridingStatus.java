@@ -90,13 +90,12 @@ public @interface OverridingStatus {
 			Class<?> superC = result.clazz;
 			Method superM = result.element;
 			Set<Class<?>> ignore = new HashSet<>();
-			check:
-			for (Class<?> subC : refs.getSubTypesOf(superC)) {
-				if (isClassAbstract(subC) || ignore.contains(subC)) continue;
+			refs.getSubTypesOf(superC).forEach(subC -> {
+				if (isClassAbstract(subC) || ignore.contains(subC)) return;
 				OverridingStatus[] ar = getEffectiveAnnotationsIfInheritingConsidered(this, subC, superM);
 				if (ar.length != 0 && ar[0] != a) {
 					ignore.addAll(refs.getSubTypesOf(subC));
-					continue;
+					return;
 				}
 
 				for (Method subM : subC.getDeclaredMethods()) {
@@ -105,7 +104,7 @@ public @interface OverridingStatus {
 							LOGGER.debug(getMessage(this, "method '" + subM.toGenericString() + "' -> @ superclass '" + superM.toGenericString() + "' (" + a + ")"));
 						else
 							throw throw_(new AnnotationProcessingException(getMessage(this, "Unfulfilled requirement: subclass '" + subC.toGenericString() + "' -X> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "' (" + a + "),\ninstead: method '" + subM.toGenericString() + "' -> @ superclass '" + superC.toGenericString() + "'")));
-						continue check;
+						return;
 					}
 				}
 
@@ -116,13 +115,13 @@ public @interface OverridingStatus {
 						for (Method superM1 : superC1.getDeclaredMethods()) {
 							if (isFormerMethodOverriddenByLatter(superM, superM1) && isMemberFinal(superM1)) {
 								LOGGER.log(superM1.getDeclaringClass().getName().startsWith(g) ? Level.WARN : Level.INFO, getMessage(this, "Impossible requirement: subclass '" + subC.toGenericString() + "' -Y> final method '" + superM1.toGenericString() + "' @ superclass '" + superM1.toGenericString() + "' (" + a + ")"));
-								continue check;
+								return;
 							}
 						}
 					}
 					throw throw_(new AnnotationProcessingException(getMessage(this, "Unfulfilled requirement: subclass '" + subC.toGenericString() + "' -Y> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "' (" + a + "),\ninstead: subclass '" + subC.toGenericString() + "' -X> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "'")));
 				}
-			}
+			});
 		}
 	}
 }

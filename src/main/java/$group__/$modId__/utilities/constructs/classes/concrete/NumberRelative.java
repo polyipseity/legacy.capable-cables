@@ -95,7 +95,7 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 	}
 
 	@Override
-	public T newInstanceFrom(Number o) {
+	public T cloneFrom(Number o) {
 		T r = clone();
 		if (o instanceof NumberRelative<?>) {
 			NumberRelative<?> o1 = (NumberRelative<?>) o;
