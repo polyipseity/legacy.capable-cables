@@ -7,7 +7,6 @@ import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 import $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString;
 import $group__.$modId__.utilities.helpers.Casts;
-import $group__.$modId__.utilities.helpers.Throwables;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
@@ -25,8 +24,7 @@ import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStri
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
-import static $group__.$modId__.utilities.helpers.Throwables.rejectIndexOutOfBounds;
-import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
+import static $group__.$modId__.utilities.helpers.Throwables.*;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 import static com.google.common.collect.ImmutableSet.of;
 
@@ -220,10 +218,10 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 			public T clone() {
 				T r;
 				try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
-					throw Throwables.unexpected(e);
+					throw unexpected(e);
 				}
-				r.access = access.clone();
-				r.content = content.clone();
+				r.access = access.copy();
+				r.content = content.copy();
 				return r;
 			}
 

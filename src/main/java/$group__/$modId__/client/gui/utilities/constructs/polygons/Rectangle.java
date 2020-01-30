@@ -107,8 +107,8 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 	@Override
 	public T clone() {
 		T r = super.clone();
-		r.offset = offset.clone();
-		r.size = size.clone();
+		r.offset = offset.copy();
+		r.size = size.copy();
 		return r;
 	}
 

@@ -4,7 +4,6 @@ import $group__.$modId__.client.gui.utilities.constructs.IDrawable;
 import $group__.$modId__.client.gui.utilities.constructs.XY;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
-import $group__.$modId__.utilities.helpers.Throwables;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -24,6 +23,7 @@ import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStri
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
+import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 import static com.google.common.collect.ImmutableSet.of;
 
@@ -107,7 +107,7 @@ public class GuiGroup<N extends Number, E extends IDrawable<N, ?>, T extends Gui
 	public T clone() {
 		T r;
 		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
-			throw Throwables.unexpected(e);
+			throw unexpected(e);
 		}
 		r.elements = tryCloneUnboxedNonnull(elements);
 		return r;

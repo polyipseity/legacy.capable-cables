@@ -58,7 +58,7 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 	public void draw(Minecraft client) { Guis.drawRect(this, getRect(), getColor()); }
 
 	@Override
-	public Optional<Rectangle<N, ?>> spec() { return Optional.of(getRect().clone()); }
+	public Optional<Rectangle<N, ?>> spec() { return Optional.of(getRect().copy()); }
 
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }
@@ -87,7 +87,7 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
 			throw unexpected(e);
 		}
-		r.rect = rect.clone();
+		r.rect = rect.copy();
 		r.color = tryCloneUnboxedNonnull(color);
 		return r;
 	}

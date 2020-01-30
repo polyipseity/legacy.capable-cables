@@ -92,8 +92,8 @@ public class Frame<N extends Number, T extends Frame<N, T>> implements IStructur
 		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
 			throw unexpected(e);
 		}
-		r.tl = tl.clone();
-		r.br = br.clone();
+		r.tl = tl.copy();
+		r.br = br.copy();
 		return r;
 	}
 

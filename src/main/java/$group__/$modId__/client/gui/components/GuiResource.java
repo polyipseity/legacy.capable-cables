@@ -87,7 +87,7 @@ public class GuiResource<N extends Number, TN extends Number, T extends GuiResou
 	public T clone() {
 		T r = super.clone();
 		r.resource = tryCloneUnboxedNonnull(resource);
-		r.texture = texture.clone();
+		r.texture = texture.copy();
 		return r;
 	}
 

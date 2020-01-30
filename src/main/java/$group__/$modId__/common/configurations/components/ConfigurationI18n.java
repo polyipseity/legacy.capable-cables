@@ -3,7 +3,6 @@ package $group__.$modId__.common.configurations.components;
 import $group__.$modId__.utilities.constructs.interfaces.IMapDelegated;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 import $group__.$modId__.utilities.helpers.Casts;
-import $group__.$modId__.utilities.helpers.Throwables;
 import $group__.$modId__.utilities.variables.Globals;
 
 import javax.annotation.Nullable;
@@ -26,6 +25,7 @@ import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
 import static $group__.$modId__.utilities.helpers.Reflections.BRIDGE;
 import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclaredField;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
+import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
 public class ConfigurationI18n<M extends Map<String, ConfigurationI18n<?, ?>>, T extends ConfigurationI18n<M, T>> implements IMapDelegated<M, String, ConfigurationI18n<?, ?>, T> {
@@ -144,7 +144,7 @@ public class ConfigurationI18n<M extends Map<String, ConfigurationI18n<?, ?>>, T
 	public T clone() {
 		T r;
 		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
-			throw Throwables.unexpected(e);
+			throw unexpected(e);
 		}
 		r.id = tryCloneUnboxedNonnull(id);
 		r.name = tryCloneUnboxedNonnull(name);

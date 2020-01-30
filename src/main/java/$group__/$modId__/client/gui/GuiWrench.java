@@ -65,7 +65,7 @@ public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<En
 		this.stack = stack;
 		this.theme = theme;
 
-		tabs = TABS.clone();
+		tabs = TABS.copy();
 		tabs.setOpen(open);
 		tabs.setTheme(theme);
 	}

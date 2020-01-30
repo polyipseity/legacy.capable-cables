@@ -14,7 +14,7 @@ public enum Miscellaneous {
 	/* SECTION static methods */
 
 	public static <T> T markUnused(Class<T> t) {
-		return Constants.PRIMITIVE_DATA_TYPES.entrySet().stream().filter(e -> e.getKey().isAssignableFrom(t)).findFirst().<T>map(e -> castUncheckedUnboxed(e.getValue())).orElseThrow(() -> rejectArguments(t));
+		return Constants.PRIMITIVE_DATA_TYPE_MAP.entrySet().stream().filter(e -> e.getKey().isAssignableFrom(t)).findFirst().<T>map(e -> castUncheckedUnboxed(e.getValue())).orElseThrow(() -> rejectArguments(t));
 	}
 
 	@SuppressWarnings("SameReturnValue")
@@ -30,9 +30,9 @@ public enum Miscellaneous {
 	 *
 	 * @param x   constant
 	 * @param y   any
-	 * @param <T> type of parameter {@code x}
+	 * @param <T> type of parameter <pre>{@code x}</pre>
 	 *
-	 * @return parameter {@code x}
+	 * @return parameter <pre>{@code x}</pre>
 	 */
 	public static <T> T K(T x, @SuppressWarnings("unused") Object... y) { return x; }
 }

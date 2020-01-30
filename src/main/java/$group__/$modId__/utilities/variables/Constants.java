@@ -2,9 +2,6 @@ package $group__.$modId__.utilities.variables;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
-
-import java.util.HashSet;
 
 public enum Constants {
 	/* MARK empty */;
@@ -30,7 +27,13 @@ public enum Constants {
 			BUILDCRAFT_API_ID = "BuildCraftAPI|core", BUILDCRAFT_API_PACKAGE = "buildcraft";
 
 
-	public static final ImmutableMap<Class<?>, Object> PRIMITIVE_DATA_TYPES = ImmutableMap.<Class<?>, Object>builder()
+	public static final Class<?>[]
+			PRIMITIVE_TYPE_ARRAY = {int.class, float.class, double.class, long.class, byte.class, short.class, boolean.class, char.class, void.class},
+			PRIMITIVE_DATA_TYPE_ARRAY = {int.class, float.class, double.class, long.class, byte.class, short.class, boolean.class, char.class};
+	public static final ImmutableSet<Class<?>>
+			PRIMITIVE_TYPE_SET = ImmutableSet.copyOf(PRIMITIVE_TYPE_ARRAY),
+			PRIMITIVE_DATA_TYPE_SET = ImmutableSet.copyOf(PRIMITIVE_DATA_TYPE_ARRAY);
+	public static final ImmutableMap<Class<?>, Object> PRIMITIVE_DATA_TYPE_MAP = ImmutableMap.<Class<?>, Object>builder()
 			.put(int.class, 0)
 			.put(float.class, 0F)
 			.put(double.class, 0D)
@@ -39,14 +42,4 @@ public enum Constants {
 			.put(short.class, (short) 0)
 			.put(boolean.class, false)
 			.put(char.class, '\u0000').build();
-	public static final ImmutableSet<Class<?>> PRIMITIVE_TYPES;
-
-
-	/* SECTION static initializer */
-
-	static {
-		HashSet<Class<?>> primitiveDataTypeKeys = Sets.newHashSet(PRIMITIVE_DATA_TYPES.keySet());
-		primitiveDataTypeKeys.add(void.class);
-		PRIMITIVE_TYPES = ImmutableSet.copyOf(primitiveDataTypeKeys);
-	}
 }

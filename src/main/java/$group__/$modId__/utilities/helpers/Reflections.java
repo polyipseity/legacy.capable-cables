@@ -6,6 +6,7 @@ import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAd
 import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.FieldAdapter;
 import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.MethodAdapter;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import sun.corba.Bridge;
 
 import javax.annotation.Nullable;
@@ -39,7 +40,7 @@ public enum Reflections {
 
 
 	public static String getPackage(Class<?> clazz) {
-		String r = clazz.getName().replace(clazz.getSimpleName(), "");
+		String r = clazz.getName().replace(clazz.getSimpleName(), StringUtils.EMPTY);
 		if (r.endsWith(".")) r = r.substring(0, r.length() - 1);
 		return r;
 	}

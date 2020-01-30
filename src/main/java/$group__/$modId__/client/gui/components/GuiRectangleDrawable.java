@@ -82,7 +82,7 @@ public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawab
 	@Override
 	public T clone() {
 		T r = super.clone();
-		r.drawable = drawable.clone();
+		r.drawable = drawable.copy();
 		return r;
 	}
 

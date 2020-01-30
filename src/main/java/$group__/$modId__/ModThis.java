@@ -10,7 +10,9 @@ import $group__.$modId__.utilities.constructs.classes.Singleton;
 import $group__.$modId__.utilities.constructs.classes.concrete.ModContainerNull;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.Marker;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.Property;
+import $group__.$modId__.utilities.helpers.Loggers;
 import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.FieldAdapter;
+import $group__.$modId__.utilities.variables.Globals;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ListMultimap;
@@ -185,22 +187,25 @@ public enum ModThis {
 							Property mp = mps[0];
 							Class<? extends Field> fc = f.getClass();
 							if (mp.key().equals(fc.getSimpleName()) && mp.value().equals(CONTAINER_VALUE)) {
-								FieldAdapter fa = FieldAdapter.of(f),
-										fModF = getDeclaredField(fc, "modifiers");
-								int fMod = f.getModifiers();
+								FieldAdapter fa = FieldAdapter.of(f), fModF = getDeclaredField(fc, "modifiers");
+								Field fModF0 = fModF.get().orElseThrow(Globals::rethrowCaughtThrowableStatic);
+								int fMod = f.getModifiers(), fMod1 = fMod & ~Modifier.FINAL;
 
-								if (!(fModF.setAccessible(true) && fModF.setInt(f, fMod & ~Modifier.FINAL)))
-									LOGGER.warn("Unable to set modifier field '{}' of container field '{}' to be non-final, will crash with a final proxy field, stacktrace:\n{}", fModF.get(), f, getStackTrace(fModF.getCaughtThrowableUnboxedNonnull()));
+								if (!fModF.setAccessible(true))
+									LOGGER.warn(Loggers.FORMATTER_WITH_THROWABLE.apply(Loggers.FORMATTER_REFLECTION_UNABLE_TO_SET_ACCESSIBLE.apply(() -> "modifier field", fModF0).apply(f, fc).apply(true), fModF.getCaughtThrowableUnboxedNonnull()));
+								if (!fModF.setInt(f, fMod1))
+									LOGGER.warn(Loggers.FORMATTER_WITH_THROWABLE.apply(Loggers.FORMATTER_REFLECTION_UNABLE_TO_SET_FIELD.apply(fModF0, f).apply(fc, fMod1), fModF.getCaughtThrowableUnboxedNonnull()));
 
-								String objectClassGS = objectClass.toGenericString();
 								if (!fa.setAccessible(true))
-									LOGGER.warn("Unable to set container field '{}' of class '{}' accessible, stacktrace:\n{}", f, objectClassGS, getStackTrace(fa.getCaughtThrowableUnboxedNonnull()));
+									LOGGER.warn(Loggers.FORMATTER_WITH_THROWABLE.apply(Loggers.FORMATTER_REFLECTION_UNABLE_TO_SET_ACCESSIBLE.apply(() -> "container field", f).apply(null, objectClass).apply(true), fa.getCaughtThrowableUnboxedNonnull()));
 								if (!fa.set(null, container)) throw fa.rethrowCaughtThrowable();
 								if (!fa.setAccessible(false))
-									LOGGER.warn("Unable to restore accessibility of container field '{}' of class '{}', presenting a potential security problem, stacktrace:\n{}", f, objectClassGS, getStackTrace(fa.getCaughtThrowableUnboxedNonnull()));
+									LOGGER.warn(Loggers.FORMATTER_WITH_THROWABLE.apply(Loggers.FORMATTER_REFLECTION_UNABLE_TO_SET_ACCESSIBLE.apply(() -> "container field", f).apply(null, objectClass).apply(false), fa.getCaughtThrowableUnboxedNonnull()));
 
-								if (!(fModF.setInt(f, fMod) && fModF.setAccessible(false)))
-									LOGGER.warn("Unable to restore modifier field '{}' of container field '{}', presenting a potential security problem, stacktrace:\n{}", fModF.get(), f, getStackTrace(fModF.getCaughtThrowableUnboxedNonnull()));
+								if (!fModF.setInt(f, fMod))
+									LOGGER.warn(Loggers.FORMATTER_WITH_THROWABLE.apply(Loggers.FORMATTER_REFLECTION_UNABLE_TO_SET_FIELD.apply(fModF0, f).apply(fc, fMod), fModF.getCaughtThrowableUnboxedNonnull()));
+								if (!fModF.setAccessible(false))
+									LOGGER.warn(Loggers.FORMATTER_WITH_THROWABLE.apply(Loggers.FORMATTER_REFLECTION_UNABLE_TO_SET_ACCESSIBLE.apply(() -> "modifier field", fModF0).apply(f, fc).apply(false), fModF.getCaughtThrowableUnboxedNonnull()));
 
 								break;
 							}
@@ -248,6 +253,7 @@ public enum ModThis {
 		@Override
 		public void setProxy(Field target, Class<?> proxyTarget, Object proxy) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
 			FieldAdapter tModF = getDeclaredField(target.getClass(), "modifiers");
+			Field tModF0 = tModF.get().orElseThrow(Globals::rethrowCaughtThrowableStatic);
 			int tMod = target.getModifiers();
 
 			if (!(tModF.setAccessible(true) && tModF.setInt(target, tMod & ~Modifier.FINAL)))
