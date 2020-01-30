@@ -122,48 +122,62 @@ public interface IMapDelegated<M extends Map<K, V>, K, V, T extends IMapDelegate
 		default void set(M value) { IAdapter.IImmutable.super.set(value); }
 
 		@Override
+		@Deprecated
 		default void setMap(M iterable) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default V put(K key, V value) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default V remove(Object key) { throw rejectUnsupportedOperation(); }
 
 
 		@Override
+		@Deprecated
 		default void putAll(Map<? extends K, ? extends V> m) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default void clear() { throw rejectUnsupportedOperation(); }
 
 
 		@Override
+		@Deprecated
 		default void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default V putIfAbsent(K key, V value) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default boolean remove(Object key, Object value) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default boolean replace(K key, V oldValue, V newValue) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default V replace(K key, V value) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) { throw rejectUnsupportedOperation(); }
 
 		@Override
 		@Nullable
+		@Deprecated
 		default V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default V merge(K key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) { throw rejectUnsupportedOperation(); }
 	}
 }

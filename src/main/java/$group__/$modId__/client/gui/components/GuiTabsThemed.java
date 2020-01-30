@@ -114,12 +114,15 @@ public class GuiTabsThemed<N extends Number, E extends GuiTabs.ITab<N, ?>, TH ex
 		/* SECTION getters & setters */
 
 		@Override
+		@Deprecated
 		public void setOpen(int open) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setTabs(List<? extends E> iTabs, int open) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setTheme(TH theme) { throw rejectUnsupportedOperation(); }
 
 

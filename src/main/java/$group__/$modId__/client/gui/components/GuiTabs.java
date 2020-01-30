@@ -253,12 +253,15 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 				/* SECTION getters & setters */
 
 				@Override
+				@Deprecated
 				public void setAccess(IDrawable<N, T> access) { throw rejectUnsupportedOperation(); }
 
 				@Override
+				@Deprecated
 				public void setContent(IDrawable<N, T> content) { throw rejectUnsupportedOperation(); }
 
 				@Override
+				@Deprecated
 				public void setOpen(boolean open) { throw rejectUnsupportedOperation(); }
 
 
@@ -366,15 +369,19 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 				/* SECTION getters & setters */
 
 				@Override
+				@Deprecated
 				public void setAccess(IDrawable<N, T> access) { throw rejectUnsupportedOperation(); }
 
 				@Override
+				@Deprecated
 				public void setContent(IDrawable<N, T> content) { throw rejectUnsupportedOperation(); }
 
 				@Override
+				@Deprecated
 				public void setOpen(boolean open) { throw rejectUnsupportedOperation(); }
 
 				@Override
+				@Deprecated
 				public void setTheme(TH theme) { throw rejectUnsupportedOperation(); }
 
 
@@ -407,12 +414,15 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 		/* SECTION getters & setters */
 
 		@Override
+		@Deprecated
 		public void setElements(Collection<? extends E> elements) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setOpen(int open) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setTabs(List<? extends E> tabs, int open) { throw rejectUnsupportedOperation(); }
 
 

@@ -230,9 +230,11 @@ public class XY<N extends Number, T extends XY<N, T>> implements IStructureClone
 		/* SECTION getters & setters */
 
 		@Override
+		@Deprecated
 		public void setX(N x) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setY(N y) { throw rejectUnsupportedOperation(); }
 
 

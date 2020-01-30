@@ -109,12 +109,15 @@ public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawab
 		/* SECTION getters & setter */
 
 		@Override
+		@Deprecated
 		public void setRect(Rectangle<N, ?> rect) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setColor(Color color) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setDrawable(IDrawable<N, ?> drawable) { throw rejectUnsupportedOperation(); }
 
 

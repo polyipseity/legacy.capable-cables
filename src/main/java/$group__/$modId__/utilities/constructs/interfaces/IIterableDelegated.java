@@ -46,6 +46,7 @@ public interface IIterableDelegated<I extends Iterable<E>, E, T extends IIterabl
 		default void set(I value) { IAdapter.IImmutable.super.set(value); }
 
 		@Override
+		@Deprecated
 		default void setIterable(I iterable) { throw rejectUnsupportedOperation(); }
 	}
 }

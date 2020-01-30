@@ -51,6 +51,7 @@ public class GuiResource<N extends Number, TN extends Number, T extends GuiResou
 	public void setTexture(Rectangle<TN, ?> texture) { this.texture = texture; }
 
 	@Override
+	@Deprecated
 	public void setColor(Color color) { throw rejectUnsupportedOperation(); }
 
 
@@ -105,9 +106,11 @@ public class GuiResource<N extends Number, TN extends Number, T extends GuiResou
 		/* SECTION getters & setters */
 
 		@Override
+		@Deprecated
 		public void setResource(ResourceLocation resource) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setTexture(Rectangle<TE, ?> texture) { throw rejectUnsupportedOperation(); }
 
 

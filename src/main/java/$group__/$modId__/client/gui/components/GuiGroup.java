@@ -139,6 +139,7 @@ public class GuiGroup<N extends Number, E extends IDrawable<N, ?>, T extends Gui
 		/* SECTION getters & setters */
 
 		@Override
+		@Deprecated
 		public void setElements(Collection<? extends E> elements) { throw rejectUnsupportedOperation(); }
 
 

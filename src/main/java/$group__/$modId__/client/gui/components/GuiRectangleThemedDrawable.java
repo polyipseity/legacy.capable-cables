@@ -106,15 +106,19 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 		/* SECTION getters & setters */
 
 		@Override
+		@Deprecated
 		public void setRect(Rectangle<N, ?> rect) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setColor(Color color) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setTheme(TH theme) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setDrawable(IDrawable<N, ?> drawable) { throw rejectUnsupportedOperation(); }
 
 

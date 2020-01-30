@@ -64,15 +64,19 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 	}
 
 	@Override
+	@Deprecated
 	public void setA(XY<N, ?> a) { throw rejectUnsupportedOperation(); }
 
 	@Override
+	@Deprecated
 	public void setB(XY<N, ?> b) { throw rejectUnsupportedOperation(); }
 
 	@Override
+	@Deprecated
 	public void setC(XY<N, ?> c) { throw rejectUnsupportedOperation(); }
 
 	@Override
+	@Deprecated
 	public void setD(XY<N, ?> d) { throw rejectUnsupportedOperation(); }
 
 
@@ -135,12 +139,15 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 		/* SECTION getters & setters */
 
 		@Override
+		@Deprecated
 		public void setOffset(XY<N, ?> offset) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setSize(XY<N, ?> size) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setOffsetAndSize(XY<N, ?> offset, XY<N, ?> size) { throw rejectUnsupportedOperation(); }
 
 

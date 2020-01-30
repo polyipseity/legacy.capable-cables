@@ -93,28 +93,43 @@ public interface ISetDelegated<S extends Set<E>, E, T extends ISetDelegated<S, E
 		default void setCollection(S collection) { ICollectionDelegated.IImmutable.super.setCollection(collection); }
 
 		@Override
+		@Deprecated
 		default void setSet(S set) { throw rejectUnsupportedOperation(); }
 
+		@SuppressWarnings("deprecation")
 		@Override
+		@Deprecated
 		default boolean add(E e) { return ICollectionDelegated.IImmutable.super.add(e); }
 
+		@SuppressWarnings("deprecation")
 		@Override
+		@Deprecated
 		default boolean remove(Object o) { return ICollectionDelegated.IImmutable.super.remove(o); }
 
 
+		@SuppressWarnings("deprecation")
 		@Override
+		@Deprecated
 		default boolean addAll(Collection<? extends E> c) { return ICollectionDelegated.IImmutable.super.addAll(c); }
 
+		@SuppressWarnings("deprecation")
 		@Override
+		@Deprecated
 		default boolean retainAll(Collection<?> c) { return ICollectionDelegated.IImmutable.super.retainAll(c); }
 
+		@SuppressWarnings("deprecation")
 		@Override
+		@Deprecated
 		default boolean removeAll(Collection<?> c) { return ICollectionDelegated.IImmutable.super.removeAll(c); }
 
+		@SuppressWarnings("deprecation")
 		@Override
+		@Deprecated
 		default void clear() { ICollectionDelegated.IImmutable.super.clear(); }
 
+		@SuppressWarnings("deprecation")
 		@Override
+		@Deprecated
 		default boolean removeIf(Predicate<? super E> filter) { return ICollectionDelegated.IImmutable.super.removeIf(filter); }
 	}
 }

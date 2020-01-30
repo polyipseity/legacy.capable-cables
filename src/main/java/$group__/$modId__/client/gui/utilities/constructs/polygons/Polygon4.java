@@ -48,6 +48,7 @@ public class Polygon4<N extends Number, T extends Polygon4<N, T>> extends Polygo
 	public void setD(XY<N, ?> d) { set(0, d); }
 
 	@Override
+	@Deprecated
 	public void setVertexes(List<XY<N, ?>> vertexes) { throw rejectUnsupportedOperation(); }
 
 
@@ -76,15 +77,19 @@ public class Polygon4<N extends Number, T extends Polygon4<N, T>> extends Polygo
 		/* SECTION getters & setters */
 
 		@Override
+		@Deprecated
 		public void setA(XY<N, ?> a) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setB(XY<N, ?> b) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setC(XY<N, ?> c) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setD(XY<N, ?> d) { throw rejectUnsupportedOperation(); }
 
 

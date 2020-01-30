@@ -194,15 +194,19 @@ public class ConfigurationI18n<M extends Map<String, ConfigurationI18n<?, ?>>, T
 		/* SECTION getters & setters */
 
 		@Override
+		@Deprecated
 		public void setName(String name) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setId(String id) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setParent(@Nullable ConfigurationI18n<?, ?> parent) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setChildren(M children) { throw rejectUnsupportedOperation(); }
 
 

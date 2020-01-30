@@ -129,44 +129,63 @@ public interface IListDelegated<L extends List<E>, E, T extends IListDelegated<L
 		default void setCollection(I collection) { ICollectionDelegated.IImmutable.super.setCollection(collection); }
 
 		@Override
+		@Deprecated
 		default void setList(I list) { throw rejectUnsupportedOperation(); }
 
+		@SuppressWarnings("deprecation")
 		@Override
+		@Deprecated
 		default boolean add(E e) { return ICollectionDelegated.IImmutable.super.add(e); }
 
+		@SuppressWarnings("deprecation")
 		@Override
+		@Deprecated
 		default boolean remove(Object o) { return ICollectionDelegated.IImmutable.super.remove(o); }
 
 
+		@SuppressWarnings("deprecation")
 		@Override
+		@Deprecated
 		default boolean addAll(Collection<? extends E> c) { return ICollectionDelegated.IImmutable.super.addAll(c); }
 
 		@Override
+		@Deprecated
 		default boolean addAll(int index, Collection<? extends E> c) { throw rejectUnsupportedOperation(); }
 
+		@SuppressWarnings("deprecation")
 		@Override
+		@Deprecated
 		default boolean removeAll(Collection<?> c) { return ICollectionDelegated.IImmutable.super.removeAll(c); }
 
+		@SuppressWarnings("deprecation")
 		@Override
+		@Deprecated
 		default boolean retainAll(Collection<?> c) { return ICollectionDelegated.IImmutable.super.retainAll(c); }
 
 		@Override
+		@Deprecated
 		default void replaceAll(UnaryOperator<E> operator) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default void sort(Comparator<? super E> c) { throw rejectUnsupportedOperation(); }
 
+		@SuppressWarnings("deprecation")
 		@Override
+		@Deprecated
 		default void clear() { ICollectionDelegated.IImmutable.super.clear(); }
 
 
 		@Override
+		@Deprecated
 		default E set(int index, E element) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default void add(int index, E element) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default E remove(int index) { throw rejectUnsupportedOperation(); }
 	}
 }

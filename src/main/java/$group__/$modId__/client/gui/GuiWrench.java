@@ -19,7 +19,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.Optional;
 
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
-import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 
 @SideOnly(Side.CLIENT)
 public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<EnumTheme> {
@@ -76,13 +75,11 @@ public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<En
 
 	public GuiTabsThemed<Number, GuiTabs.ITab<Number, ?>, EnumTheme, ?> getTabs() { return tabs; }
 
-	@SuppressWarnings("unused")
-	public void setTabs(GuiTabsThemed<Number, GuiTabs.ITab<Number, ?>, EnumTheme, ?> tabs) { throw rejectUnsupportedOperation(); }
+	public void setTabs(GuiTabsThemed<Number, GuiTabs.ITab<Number, ?>, EnumTheme, ?> tabs) { this.tabs = tabs; }
 
 	public ItemStack getStack() { return stack; }
 
-	@SuppressWarnings("unused")
-	public void setStack(ItemStack stack) { throw rejectUnsupportedOperation(); }
+	public void setStack(ItemStack stack) { this.stack = stack; }
 
 	@Override
 	public EnumTheme getTheme() { return theme; }

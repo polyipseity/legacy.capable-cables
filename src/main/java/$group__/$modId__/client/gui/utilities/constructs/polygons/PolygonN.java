@@ -113,6 +113,7 @@ public class PolygonN<N extends Number, T extends PolygonN<N, T>> implements ILi
 		/* SECTION getters & setters */
 
 		@Override
+		@Deprecated
 		public void setVertexes(List<XY<N, ?>> vertexes) { throw rejectUnsupportedOperation(); }
 
 

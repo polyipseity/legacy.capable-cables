@@ -136,21 +136,21 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"value", getValue()},
-				new Object[]{"parent", getParent()},
-				new Object[]{"offset", getOffset()});
-	}
-
-	@Override
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() {
 		T r = super.clone();
 		r.value = tryCloneUnboxedNonnull(value);
 		r.parent = tryCloneUnboxed(parent);
 		r.offset = tryCloneUnboxed(offset);
 		return r;
+	}
+
+	@Override
+	@OverridingStatus(group = GROUP, when = When.MAYBE)
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"value", getValue()},
+				new Object[]{"parent", getParent()},
+				new Object[]{"offset", getOffset()});
 	}
 
 	@Override
@@ -192,12 +192,15 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 		/* SECTION getters & setters */
 
 		@Override
+		@Deprecated
 		public void setValue(Number value) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setParent(@Nullable Number parent) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setOffset(@Nullable Number offset) { throw rejectUnsupportedOperation(); }
 
 

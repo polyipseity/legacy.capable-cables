@@ -63,10 +63,18 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 	public void setUpdate(AtomicBoolean update) { this.update = update; }
 
 	@Override
+	@Deprecated
 	public void setParent(@Nullable Number parent) { throw rejectUnsupportedOperation(); }
 
 
 	/* SECTION methods */
+
+	@Override
+	public String toString() {
+		return getToStringString(this, super.toString(),
+				new Object[]{"updater", getUpdater()},
+				new Object[]{"update", getUpdate()});
+	}
 
 	@Override
 	public T clone() {
@@ -75,13 +83,6 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 		r.update = tryCloneUnboxedNonnull(update);
 		registerPreInitGuiListener(r, r.getUpdater());
 		return r;
-	}
-
-	@Override
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"updater", getUpdater()},
-				new Object[]{"update", getUpdate()});
 	}
 
 	@Override
@@ -160,15 +161,19 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 			/* SECTION getters & setters */
 
 			@Override
+			@Deprecated
 			public void setValue(Number value) { throw rejectUnsupportedOperation(); }
 
 			@Override
+			@Deprecated
 			public void setOffset(@Nullable Number offset) { throw rejectUnsupportedOperation(); }
 
 			@Override
+			@Deprecated
 			public void setUpdater(BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater) { throw rejectUnsupportedOperation(); }
 
 			@Override
+			@Deprecated
 			public void setUpdate(AtomicBoolean update) { throw rejectUnsupportedOperation(); }
 
 
@@ -246,15 +251,19 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 			/* SECTION getters & setters */
 
 			@Override
+			@Deprecated
 			public void setValue(Number value) { throw rejectUnsupportedOperation(); }
 
 			@Override
+			@Deprecated
 			public void setOffset(@Nullable Number offset) { throw rejectUnsupportedOperation(); }
 
 			@Override
+			@Deprecated
 			public void setUpdater(BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater) { throw rejectUnsupportedOperation(); }
 
 			@Override
+			@Deprecated
 			public void setUpdate(AtomicBoolean update) { throw rejectUnsupportedOperation(); }
 
 

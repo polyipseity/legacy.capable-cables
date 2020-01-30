@@ -115,9 +115,11 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 		/* SECTION getters & setters */
 
 		@Override
+		@Deprecated
 		public void setRect(Rectangle<N, ?> rect) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		public void setColor(Color color) { throw rejectUnsupportedOperation(); }
 
 

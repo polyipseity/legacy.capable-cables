@@ -36,6 +36,7 @@ public interface IAdapter<V, T extends IAdapter<V, T>> extends IStructureCloneab
 		/* SECTION methods */
 
 		@Override
+		@Deprecated
 		default void set(V value) { throw rejectUnsupportedOperation(); }
 
 
@@ -69,7 +70,9 @@ public interface IAdapter<V, T extends IAdapter<V, T>> extends IStructureCloneab
 			@OverridingStatus(group = GROUP, when = When.NEVER)
 			public final boolean isImmutable() { return IImmutable.super.isImmutable(); }
 
+			@SuppressWarnings("deprecation")
 			@Override
+			@Deprecated
 			public void set(V value) { IImmutable.super.set(value); }
 		}
 	}
@@ -90,9 +93,11 @@ public interface IAdapter<V, T extends IAdapter<V, T>> extends IStructureCloneab
 			/* SECTION methods */
 
 			@Override
+			@Deprecated
 			default void set(Optional<? extends V> value) { throw rejectUnsupportedOperation(); }
 
 			@Override
+			@Deprecated
 			default void setUnboxed(@Nullable V value) { throw rejectUnsupportedOperation(); }
 
 
@@ -118,10 +123,14 @@ public interface IAdapter<V, T extends IAdapter<V, T>> extends IStructureCloneab
 
 				/* SECTION methods */
 
+				@SuppressWarnings("deprecation")
 				@Override
+				@Deprecated
 				public void set(Optional<? extends V> value) { IOptional.IImmutable.super.set(value); }
 
+				@SuppressWarnings("deprecation")
 				@Override
+				@Deprecated
 				public void setUnboxed(@Nullable V value) { IOptional.IImmutable.super.setUnboxed(value); }
 
 

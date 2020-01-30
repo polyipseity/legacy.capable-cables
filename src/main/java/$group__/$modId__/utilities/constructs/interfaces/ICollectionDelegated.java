@@ -99,28 +99,36 @@ public interface ICollectionDelegated<C extends Collection<E>, E, T extends ICol
 		default void setIterable(I iterable) { IIterableDelegated.IImmutable.super.setIterable(iterable); }
 
 		@Override
+		@Deprecated
 		default void setCollection(I collection) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default boolean add(E e) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default boolean remove(Object o) { throw rejectUnsupportedOperation(); }
 
 
 		@Override
+		@Deprecated
 		default boolean addAll(Collection<? extends E> c) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default boolean removeAll(Collection<?> c) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default boolean removeIf(Predicate<? super E> filter) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default boolean retainAll(Collection<?> c) { throw rejectUnsupportedOperation(); }
 
 		@Override
+		@Deprecated
 		default void clear() { throw rejectUnsupportedOperation(); }
 	}
 }
