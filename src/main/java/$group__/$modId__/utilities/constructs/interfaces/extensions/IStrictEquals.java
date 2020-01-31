@@ -19,12 +19,13 @@ public interface IStrictEquals {
 	static <O> boolean isEqual(O thisObj, Object other, boolean equalsSuper, Function<? super O, ? extends Boolean>... equals) {
 		if (thisObj == other) // COMMENT simple equals
 			return true;
+		if (equals.length == 0) // COMMENT no fields are immutable
+			return false;
 
 		Class<?> tc = thisObj.getClass(), oc = other.getClass();
 		if (!((equalsSuper || tc.getSuperclass() == Object.class) && // COMMENT check equals for super
 				tc.isAssignableFrom(oc)) || // COMMENT instanceof
-				getLowerAndIntermediateSuperclasses(oc, castUncheckedUnboxedNonnull(tc)).stream().flatMap(ic -> Arrays.stream(ic.getDeclaredFields())).anyMatch(f -> !isMemberStatic(f)) || // COMMENT not equals if there are additional instance fields in other
-				equals.length == 0) // COMMENT no fields are immutable
+				getLowerAndIntermediateSuperclasses(oc, castUncheckedUnboxedNonnull(tc)).stream().flatMap(ic -> Arrays.stream(ic.getDeclaredFields())).anyMatch(f -> !isMemberStatic(f))) // COMMENT not equals if there are additional instance fields in other
 			return false;
 
 		O o1 = castUncheckedUnboxedNonnull(other);

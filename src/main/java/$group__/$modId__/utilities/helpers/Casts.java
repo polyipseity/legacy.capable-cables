@@ -31,7 +31,7 @@ public enum Casts {
 	public static <T> Optional<T> castChecked(@Nullable Object o, Class<T> type) {
 		clearCaughtThrowableStatic();
 		Optional<T> r = Casts.<T>castUnchecked(o).filter(t -> type.isAssignableFrom(t.getClass()));
-		if (!(r.isPresent() || o == null))
+		if (!r.isPresent() && o != null)
 			try { throw cast(o, type); } catch (ClassCastException e) { setCaughtThrowableStatic(e); }
 		return r;
 	}

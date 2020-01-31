@@ -22,7 +22,7 @@ import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOp
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
 @SideOnly(Side.CLIENT)
-public class GuiTabsThemed<N extends Number, E extends GuiTabs.ITab<N, ?>, TH extends IThemed.ITheme<TH>, T extends GuiTabsThemed<N, E, TH, T>> extends GuiTabs<N, E, T> implements IDrawableThemed<N, TH, T> {
+public class GuiTabsThemed<N extends Number, L extends List<E>, E extends GuiTabs.ITab<N, ?>, TH extends IThemed.ITheme<TH>, T extends GuiTabsThemed<N, L, E, TH, T>> extends GuiTabs<N, L, E, T> implements IDrawableThemed<N, TH, T> {
 	/* SECTION variables */
 
 	@SuppressWarnings("NotNullFieldNotInitialized")
@@ -33,21 +33,20 @@ public class GuiTabsThemed<N extends Number, E extends GuiTabs.ITab<N, ?>, TH ex
 
 	@SuppressWarnings("varargs")
 	@SafeVarargs
-	public GuiTabsThemed(TH theme, int open, E... tabs) { this(Arrays.asList(tabs), theme, open); }
+	public GuiTabsThemed(TH theme, int open, E... tabs) { this(castUncheckedUnboxedNonnull(Arrays.asList(tabs)), theme, open); }
 
-	public GuiTabsThemed(List<? extends E> tabs, TH theme, int open) {
+	public GuiTabsThemed(L tabs, TH theme, int open) {
 		super(tabs, open);
 		setTheme(this, theme);
 	}
 
-	public GuiTabsThemed(GuiTabsThemed<N, ? extends E, TH, ?> copy) { this(copy.getTabs(), copy.getTheme(), copy.getOpen()); }
+	public GuiTabsThemed(GuiTabsThemed<N, L, E, TH, ?> copy) { this(copy.getTabs(), copy.getTheme(), copy.getOpen()); }
 
 
 	/* SECTION static methods */
 
-	protected static <T extends ITheme<T>> void setTheme(GuiTabsThemed<?, ?, T, ?> t, T theme) {
+	protected static <T extends ITheme<T>> void setTheme(GuiTabsThemed<?, ?, ?, T, ?> t, T theme) {
 		t.theme = theme;
-
 		T th = t.getTheme();
 		t.getTabs().forEach(tab -> Casts.<IThemed<T>>castChecked(tab, castUncheckedUnboxedNonnull(IThemed.class)).ifPresent(t1 -> t1.setTheme(th)));
 	}
@@ -99,16 +98,16 @@ public class GuiTabsThemed<N extends Number, E extends GuiTabs.ITab<N, ?>, TH ex
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, E extends ITab<N, ?>, TH extends ITheme<TH>, T extends Immutable<N, E, TH, T>> extends GuiTabsThemed<N, E, TH, T> {
+	public static class Immutable<N extends Number, L extends List<E>, E extends ITab<N, ?>, TH extends ITheme<TH>, T extends Immutable<N, L, E, TH, T>> extends GuiTabsThemed<N, L, E, TH, T> {
 		/* SECTION constructors */
 
 		@SuppressWarnings("varargs")
 		@SafeVarargs
-		public Immutable(TH theme, int open, E... tabs) { this(ImmutableList.copyOf(tabs), theme, open); }
+		public Immutable(TH theme, int open, E... tabs) { this(castUncheckedUnboxedNonnull(ImmutableList.copyOf(tabs)), theme, open); }
 
-		public Immutable(List<? extends E> tabs, TH theme, int open) { super(tryToImmutableUnboxedNonnull(tabs), tryToImmutableUnboxedNonnull(theme), tryToImmutableUnboxedNonnull(open)); }
+		public Immutable(L tabs, TH theme, int open) { super(tryToImmutableUnboxedNonnull(tabs), tryToImmutableUnboxedNonnull(theme), tryToImmutableUnboxedNonnull(open)); }
 
-		public Immutable(GuiTabsThemed<N, ? extends E, TH, ?> copy) { this(copy.getTabs(), copy.getTheme(), copy.getOpen()); }
+		public Immutable(GuiTabsThemed<N, L, E, TH, ?> copy) { this(copy.getTabs(), copy.getTheme(), copy.getOpen()); }
 
 
 		/* SECTION getters & setters */
@@ -119,7 +118,7 @@ public class GuiTabsThemed<N extends Number, E extends GuiTabs.ITab<N, ?>, TH ex
 
 		@Override
 		@Deprecated
-		public void setTabs(List<? extends E> iTabs, int open) { throw rejectUnsupportedOperation(); }
+		public void setTabs(L tabs, int open) { throw rejectUnsupportedOperation(); }
 
 		@Override
 		@Deprecated

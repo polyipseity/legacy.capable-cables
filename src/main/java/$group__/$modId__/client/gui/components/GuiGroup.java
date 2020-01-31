@@ -3,7 +3,9 @@ package $group__.$modId__.client.gui.components;
 import $group__.$modId__.client.gui.utilities.constructs.IDrawable;
 import $group__.$modId__.client.gui.utilities.constructs.XY;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
+import $group__.$modId__.utilities.constructs.interfaces.ICollectionDelegated;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
+import $group__.$modId__.utilities.helpers.Casts;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -27,40 +29,140 @@ import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 import static com.google.common.collect.ImmutableSet.of;
 
+/**
+ * Contains a group of {@link IDrawable}.
+ * <p>
+ * Used for grouping a bunch of {@code IDrawable} into one {@code IDrawable}.
+ *
+ * @author William So
+ * @param <N> type of {@link Number} used for {@link Rectangle}
+ * @param <C> type of {@link Collection} used for storing {@code E}
+ * @param <E> type of {@link IDrawable} of the children
+ * @param <T> type of this object
+ * @see IDrawable
+ * @since 0.0.1.0
+ */
 @SideOnly(Side.CLIENT)
-public class GuiGroup<N extends Number, E extends IDrawable<N, ?>, T extends GuiGroup<N, E, T>> extends Gui implements IDrawable<N, T> {
+public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDrawable<N, ?>, T extends GuiGroup<N, C, E, T>> extends Gui implements IDrawable<N, T>, ICollectionDelegated<C, E, T> {
 	/* SECTION variables */
 
-	protected Collection<E> elements;
+	/**
+	 * Group of {@link E}.
+	 *
+	 * @since 0.0.1.0
+	 */
+	protected C children;
 
 
 	/* SECTION constructors */
 
+	/**
+	 * Creates a group containing the provided {@code children}.
+	 *
+	 * @param children {@link #children} of this group
+	 * @see #GuiGroup(E...) varargs version
+	 * @since 0.0.1.0
+	 */
+	public GuiGroup(C children) { this.children = children; }
+
+	/**
+	 * See {@link #GuiGroup(Collection)}.
+	 * <p>
+	 * Parameter {@code children} is in varargs form for convenience.
+	 *
+	 * @implNote
+	 * Type parameter {@link C} is considered compatible with
+	 * {@code java.util.Arrays.ArrayList}.
+	 * Will result in {@link ClassCastException} at a undefined time if not so.
+	 *
+	 * @param children {@link #children} of this group
+	 * @see #GuiGroup(Collection) {@link Collection} version
+	 * @since 0.0.1.0
+	 */
 	@SuppressWarnings("varargs")
 	@SafeVarargs
-	public GuiGroup(E... elements) { this(Arrays.asList(elements)); }
+	public GuiGroup(E... children) { this(Casts.<C>castUncheckedUnboxedNonnull(Arrays.asList(children))); }
 
-	public GuiGroup(Collection<? extends E> elements) { this.elements = castUncheckedUnboxedNonnull(elements); }
-
-	public GuiGroup(GuiGroup<N, ? extends E, ?> copy) { this(copy.getElements()); }
+	/**
+	 * Shallow copy constructor.
+	 *
+	 * @param copy to-be-shallow-copied object
+	 * @see #clone() as-deep-as-possible clone method
+	 * @since 0.0.1.0
+	 */
+	public GuiGroup(GuiGroup<N, C, E, ?> copy) { this(copy.getChildren()); }
 
 
 	/* SECTION getters & setters */
 
-	public Collection<E> getElements() { return elements; }
+	/**
+	 * Gets the {@link #children} of this group that will be drawn.
+	 *
+	 * @return the {@code children} of this group
+	 * @since 0.0.1.0
+	 */
+	public C getChildren() { return children; }
 
-	public void setElements(Collection<? extends E> elements) { this.elements = castUncheckedUnboxedNonnull(elements); }
+	/**
+	 * Replaces the children of this group, configuring the new children for drawing if
+	 * needed.
+	 *
+	 * @param children new children of this group
+	 * @throws UnsupportedOperationException if immutable
+	 * @see #setChildren(E...) the varargs version
+	 * @since 0.0.1.0
+	 */
+	public void setChildren(C children) { this.children = children; }
 
+	/**
+	 * See {@link #setChildren(Collection)}.
+	 * <p>
+	 * Parameter {@code children} is in varargs form for convenience.
+	 *
+	 * @implNote
+	 * Type parameter {@link C} is considered compatible with
+	 * {@code java.util.Arrays.ArrayList}.
+	 * Will result in {@code ClassCastException} at a undefined time if not so.
+	 *
+	 * @param children new children of this group
+	 * @throws UnsupportedOperationException if immutable
+	 * @see #setChildren(Collection) the {@code Collection} version
+	 * @since 0.0.1.0
+	 */
 	@SuppressWarnings("varargs")
 	@SafeVarargs
-	public final void setElements(E... elements) { setElements(Arrays.asList(elements)); }
+	public final void setChildren(E... children) { setChildren(Casts.<C>castUncheckedUnboxedNonnull(Arrays.asList(children))); }
+
+	/**
+	 * @since 0.0.1.0
+	 * @deprecated replaced with {@link #getChildren}
+	 */
+	@Override
+	@Deprecated
+	public C getCollection() { return getChildren(); }
+
+	/**
+	 * @since 0.0.1.0
+	 * @deprecated replaced with {@link #setChildren}
+	 */
+	@Override
+	@Deprecated
+	public void setCollection(C collection) { setChildren(collection); }
 
 
 	/* SECTION methods */
 
+	/**
+	 * Returns the GUI size of this group.
+	 * <p>
+	 * Returns {@link Optional#empty} if every children has a spec of
+	 * {@code Optional#empty}.
+	 *
+	 * @return the GUI size of this group, optional
+	 */
 	@Override
 	public Optional<Rectangle<N, ?>> spec() {
-		Collection<E> e = getElements();
+		Collection<E> e = getChildren();
 		if (e.isEmpty()) return Optional.empty();
 
 		List<E> l = new ArrayList<>(e);
@@ -80,7 +182,7 @@ public class GuiGroup<N extends Number, E extends IDrawable<N, ?>, T extends Gui
 
 
 	@Override
-	public void draw(Minecraft client) { getElements().forEach(t -> t.draw(client)); }
+	public void draw(Minecraft client) { getChildren().forEach(t -> t.draw(client)); }
 
 
 	@Override
@@ -89,17 +191,18 @@ public class GuiGroup<N extends Number, E extends IDrawable<N, ?>, T extends Gui
 	@Override
 	public boolean isImmutable() { return false; }
 
+
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public int hashCode() {
-		return isImmutable() ? getHashCode(this, super.hashCode(), getElements()) : getHashCode(this, super.hashCode());
+		return isImmutable() ? getHashCode(this, super.hashCode(), getChildren()) : getHashCode(this, super.hashCode());
 	}
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public boolean equals(Object o) {
 		return isImmutable() ? isEqual(this, o, super.equals(o),
-				t -> getElements().equals(t.getElements())) : isEqual(this, o, super.equals(o));
+				t -> getChildren().equals(t.getChildren())) : isEqual(this, o, super.equals(o));
 	}
 
 	@Override
@@ -109,7 +212,7 @@ public class GuiGroup<N extends Number, E extends IDrawable<N, ?>, T extends Gui
 		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
 			throw unexpected(e);
 		}
-		r.elements = tryCloneUnboxedNonnull(elements);
+		r.children = tryCloneUnboxedNonnull(children);
 		return r;
 	}
 
@@ -117,30 +220,62 @@ public class GuiGroup<N extends Number, E extends IDrawable<N, ?>, T extends Gui
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public String toString() {
 		return getToStringString(this, super.toString(),
-				new Object[]{"elements", getElements()});
+				new Object[]{"children", getChildren()});
 	}
 
 
 	/* SECTION static classes */
 
+	/**
+	 * Immutable version of {@link GuiGroup}.
+	 *
+	 * @author William So
+	 * @param <N> see {@link GuiGroup}
+	 * @param <C> see {@link GuiGroup}
+	 * @param <E> see {@link GuiGroup}
+	 * @param <T> see {@link GuiGroup}
+	 * @see GuiGroup
+	 * @since 0.0.1.0
+	 */
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, E extends IDrawable<N, ?>, T extends GuiGroup<N, E, T>> extends GuiGroup<N, E, T> {
+	public static class Immutable<N extends Number, C extends Collection<E>, E extends IDrawable<N, ?>, T extends GuiGroup<N, C, E, T>> extends GuiGroup<N, C, E, T> {
 		/* SECTION constructors */
 
+		/**
+		 * See {@link #GuiGroup(Collection)}.
+		 *
+		 * @param children see {@link #GuiGroup(Collection)}
+		 * @see #GuiGroup(Collection)
+		 * @since 0.0.1.0
+		 */
+		public Immutable(C children) { super(tryToImmutableUnboxedNonnull(children)); }
+
+		/**
+		 * See {@link #GuiGroup(E...)}.
+		 *
+		 * @param children see {@link #GuiGroup(E...)}
+		 * @see #GuiGroup(E...)
+		 * @since 0.0.1.0
+		 */
 		@SuppressWarnings("varargs")
 		@SafeVarargs
-		public Immutable(E... elements) { this(ImmutableList.copyOf(elements)); }
+		public Immutable(E... children) { this(Casts.<C>castUncheckedUnboxedNonnull(ImmutableList.copyOf(children))); }
 
-		public Immutable(Collection<? extends E> elements) { super(tryToImmutableUnboxedNonnull(elements)); }
-
-		public Immutable(GuiGroup<N, ? extends E, ?> copy) { this(copy.getElements()); }
+		/**
+		 * See {@link #GuiGroup(GuiGroup)}.
+		 *
+		 * @param copy see {@link #GuiGroup(GuiGroup)}
+		 * @see #GuiGroup(GuiGroup)
+		 * @since 0.0.1.0
+		 */
+		public Immutable(GuiGroup<N, C, E, ?> copy) { this(copy.getChildren()); }
 
 
 		/* SECTION getters & setters */
 
 		@Override
 		@Deprecated
-		public void setElements(Collection<? extends E> elements) { throw rejectUnsupportedOperation(); }
+		public void setChildren(C children) { throw rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */

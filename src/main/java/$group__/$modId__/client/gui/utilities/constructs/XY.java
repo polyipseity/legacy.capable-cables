@@ -4,7 +4,7 @@ import $group__.$modId__.utilities.constructs.interfaces.IStructureCloneable;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IOperable;
 import $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString;
-import $group__.$modId__.utilities.helpers.Primitives.Numbers;
+import $group__.$modId__.utilities.helpers.Numbers;
 import $group__.$modId__.utilities.variables.Globals;
 import com.google.common.collect.Streams;
 import net.minecraftforge.fml.relauncher.Side;

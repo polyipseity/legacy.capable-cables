@@ -6,9 +6,10 @@ import $group__.$modId__.utilities.variables.Globals;
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
+import static $group__.$modId__.utilities.helpers.MapsExtension.MULTI_THREAD_MAP_MAKER;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
 import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.newInstance;
 import static $group__.$modId__.utilities.helpers.Throwables.getStackTraceString;
@@ -19,12 +20,12 @@ import static com.google.common.collect.Maps.immutableEntry;
 public abstract class Singleton {
 	/* SECTION static variables */
 
-	protected static final ConcurrentHashMap<Class<?>, Map.Entry<? extends Singleton, String>> INSTANCES = new ConcurrentHashMap<>();
+	protected static final ConcurrentMap<Class<?>, Map.Entry<? extends Singleton, String>> INSTANCES = MULTI_THREAD_MAP_MAKER.makeMap();
 
 
 	/* SECTION constructors */
 
-	public Singleton() {
+	protected Singleton() {
 		Class<? extends Singleton> clazz = getClass();
 		String classGS = clazz.toGenericString(),
 				sts = getStackTraceString();

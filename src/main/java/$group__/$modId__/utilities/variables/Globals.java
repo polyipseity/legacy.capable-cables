@@ -4,7 +4,6 @@ import $group__.$modId__.ModThis;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
 import $group__.$modId__.common.registrable.utilities.constructs.ResourceLocationDefault;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IThrowableCatcher;
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -21,11 +20,14 @@ import org.reflections.Reflections;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
 
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
+import static $group__.$modId__.utilities.helpers.MapsExtension.SINGLE_THREAD_WEAK_KEY_MAP_MAKER;
 import static $group__.$modId__.utilities.helpers.Throwables.consumeCaught;
 import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
+import static $group__.$modId__.utilities.variables.Constants.MULTI_THREAD_THREAD_COUNT;
 
 public enum Globals implements IThrowableCatcher {
 	/* SECTION enums */
@@ -36,7 +38,7 @@ public enum Globals implements IThrowableCatcher {
 
 	public static final ModThis MOD = ModThis.INSTANCE;
 	public static final Logger LOGGER = ModThis.LOGGER;
-	public static final LoadingCache<String, Reflections> REFLECTIONS_CACHE = CacheBuilder.newBuilder().softValues().build(CacheLoader.from(t -> {
+	public static final LoadingCache<String, Reflections> REFLECTIONS_CACHE = CacheBuilder.newBuilder().softValues().concurrencyLevel(MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(t -> {
 		Reflections r = new Reflections(t);
 		r.expandSuperTypes();
 		return r;
@@ -88,7 +90,7 @@ public enum Globals implements IThrowableCatcher {
 		/* SECTION static variables */
 
 		public static final Minecraft CLIENT = Minecraft.getMinecraft();
-		private static final Cache<Object, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ?>> PRE_INIT_GUI_LISTENER = CacheBuilder.newBuilder().weakKeys().build();
+		private static final ConcurrentMap<Object, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ?>> PRE_INIT_GUI_LISTENER_MAP = SINGLE_THREAD_WEAK_KEY_MAP_MAKER.makeMap();
 		private static ScaledResolution resolution = new ScaledResolution(CLIENT);
 
 
@@ -97,11 +99,11 @@ public enum Globals implements IThrowableCatcher {
 		public static ScaledResolution getResolution() { return resolution; }
 
 
-		public static <T> void registerPreInitGuiListener(T k, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> v) { PRE_INIT_GUI_LISTENER.put(k, v); }
+		public static <T> void registerPreInitGuiListener(T k, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> v) { PRE_INIT_GUI_LISTENER_MAP.put(k, v); }
 
 
 		@SubscribeEvent
-		public static void preInitGui(GuiScreenEvent.InitGuiEvent.Pre e) { PRE_INIT_GUI_LISTENER.asMap().forEach((o, f) -> f.accept(e, castUncheckedUnboxedNonnull(o))); }
+		public static void preInitGui(GuiScreenEvent.InitGuiEvent.Pre e) { PRE_INIT_GUI_LISTENER_MAP.forEach((o, f) -> f.accept(e, castUncheckedUnboxedNonnull(o))); }
 
 		@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
 		public static void preInitGuiForResolution(GuiScreenEvent.InitGuiEvent.Pre e) { resolution = new ScaledResolution(CLIENT); }
@@ -115,8 +117,8 @@ public enum Globals implements IThrowableCatcher {
 
 			/* SECTION static variables */
 
-			public static final ResourceLocationDefault.Texture GUI_WRENCH = new ResourceLocationDefault.Texture("textures/gui/containers/wrench.png", 256, 256);
-			public static final Rectangle<Float, ?> GUI_WRENCH_INFO = GUI_WRENCH.generateRect(240F, 0F);
+			public static final ResourceLocationDefault.Texture GUI_WRENCH = new ResourceLocationDefault.Texture("textures/gui/containers/wrench.png", 1024F, 1024F);
+			public static final Rectangle<Float, ?> GUI_WRENCH_INFO = GUI_WRENCH.generateRect(-64F, 0F);
 		}
 	}
 }

@@ -2,7 +2,7 @@ package $group__.$modId__.utilities.constructs.classes.concrete;
 
 import $group__.$modId__.utilities.constructs.classes.NumberDefault;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
-import $group__.$modId__.utilities.helpers.Primitives.Numbers;
+import $group__.$modId__.utilities.helpers.Numbers;
 import $group__.$modId__.utilities.variables.Globals;
 import com.google.common.collect.Streams;
 

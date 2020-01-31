@@ -4,6 +4,7 @@ import $group__.$modId__.client.gui.utilities.constructs.IDrawable;
 import $group__.$modId__.client.gui.utilities.constructs.IDrawableThemed;
 import $group__.$modId__.client.gui.utilities.constructs.IThemed;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
+import $group__.$modId__.utilities.constructs.interfaces.IListDelegated;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 import $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString;
 import $group__.$modId__.utilities.helpers.Casts;
@@ -29,7 +30,7 @@ import static $group__.$modId__.utilities.variables.Constants.GROUP;
 import static com.google.common.collect.ImmutableSet.of;
 
 @SideOnly(Side.CLIENT)
-public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends GuiTabs<N, E, T>> extends GuiGroup<N, E, T> {
+public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab<N, ?>, T extends GuiTabs<N, L, E, T>> extends GuiGroup<N, L, E, T> implements IListDelegated<L, E, T> {
 	/* SECTION variables */
 
 	protected int open;
@@ -39,26 +40,27 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 
 	@SuppressWarnings("varargs")
 	@SafeVarargs
-	public GuiTabs(int open, E... tabs) { this(Arrays.asList(tabs), open); }
+	public GuiTabs(int open, E... tabs) { this(castUncheckedUnboxedNonnull(Arrays.asList(tabs)), open); }
 
-	public GuiTabs(List<? extends E> tabs, int open) {
+	public GuiTabs(L tabs, int open) {
 		super(tabs);
 		setOpen(this, open);
 	}
 
-	public GuiTabs(GuiTabs<N, ? extends E, ?> copy) { this(copy.getTabs(), copy.getOpen()); }
+	public GuiTabs(GuiTabs<N, L, E, ?> copy) { this(copy.getTabs(), copy.getOpen()); }
 
 
 	/* SECTION static methods */
 
-	protected static void setOpen(GuiTabs<?, ?, ?> t, int open) {
-		int bound = t.getElements().size();
+	protected static void setOpen(GuiTabs<?, ?, ?, ?> t, int open) {
+		Collection<? extends ITab<?, ?>> tabs = t.getTabs();
+		int bound = tabs.size();
 		if (bound <= open) throw rejectIndexOutOfBounds(bound, open);
 		t.open = open;
 
 		int o1 = t.getOpen();
 		final int[] i = {0};
-		t.getElements().forEach(e -> e.setOpen(i[0]++ == o1));
+		tabs.forEach(e -> e.setOpen(i[0]++ == o1));
 	}
 
 
@@ -68,16 +70,48 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 
 	public void setOpen(int open) { setOpen(this, open); }
 
-	public List<E> getTabs() { return (List<E>) getElements(); }
+	public L getTabs() { return children; }
+
+	public void setTabs(L tabs, int open) {
+		this.children = tabs;
+		setOpen(this, open);
+	}
 
 	@SuppressWarnings("varargs")
 	@SafeVarargs
-	public final void setTabs(int open, E... tabs) { setTabs(Arrays.asList(tabs), open); }
+	public final void setTabs(int open, E... tabs) { setTabs(castUncheckedUnboxedNonnull(Arrays.asList(tabs)), open); }
 
-	public void setTabs(List<? extends E> tabs, int open) {
-		setElements(tabs);
-		setOpen(this, open);
-	}
+	/**
+	 * @since 0.0.1.0
+	 * @deprecated replaced with {@link #getTabs}
+	 */
+	@Override
+	@Deprecated
+	public L getChildren() { return getTabs(); }
+
+	/**
+	 * @since 0.0.1.0
+	 * @deprecated replaced with {@link #setTabs}
+	 */
+	@Override
+	@Deprecated
+	public void setChildren(L children) { setTabs(children, 0); }
+
+	/**
+	 * @since 0.0.1.0
+	 * @deprecated replaced with {@link #getTabs}
+	 */
+	@Override
+	@Deprecated
+	public L getList() { return getChildren(); }
+
+	/**
+	 * @since 0.0.1.0
+	 * @deprecated replaced with {@link #setTabs}
+	 */
+	@Override
+	@Deprecated
+	public void setList(L list) { setChildren(list); }
 
 
 	/* SECTION methods */
@@ -87,6 +121,7 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 
 	@Override
 	public boolean isImmutable() { return false; }
+
 
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
@@ -397,23 +432,19 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 	}
 
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, E extends ITab<N, ?>, T extends Immutable<N, E, T>> extends GuiTabs<N, E, T> {
+	public static class Immutable<N extends Number, L extends List<E>, E extends ITab<N, ?>, T extends Immutable<N, L, E, T>> extends GuiTabs<N, L, E, T> {
 		/* SECTION constructors */
 
 		@SuppressWarnings("varargs")
 		@SafeVarargs
-		public Immutable(int open, E... tabs) { this(ImmutableList.copyOf(tabs), open); }
+		public Immutable(int open, E... tabs) { this(castUncheckedUnboxedNonnull(ImmutableList.copyOf(tabs)), open); }
 
-		public Immutable(List<? extends E> tabs, int open) { super(tryToImmutableUnboxedNonnull(tabs), tryToImmutableUnboxedNonnull(open)); }
+		public Immutable(L tabs, int open) { super(tryToImmutableUnboxedNonnull(tabs), tryToImmutableUnboxedNonnull(open)); }
 
-		public Immutable(GuiTabs<N, ? extends E, ?> copy) { this(copy.getTabs(), copy.getOpen()); }
+		public Immutable(GuiTabs<N, L, E, ?> copy) { this(copy.getTabs(), copy.getOpen()); }
 
 
 		/* SECTION getters & setters */
-
-		@Override
-		@Deprecated
-		public void setElements(Collection<? extends E> elements) { throw rejectUnsupportedOperation(); }
 
 		@Override
 		@Deprecated
@@ -421,7 +452,7 @@ public class GuiTabs<N extends Number, E extends GuiTabs.ITab<N, ?>, T extends G
 
 		@Override
 		@Deprecated
-		public void setTabs(List<? extends E> tabs, int open) { throw rejectUnsupportedOperation(); }
+		public void setTabs(L tabs, int open) { throw rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */

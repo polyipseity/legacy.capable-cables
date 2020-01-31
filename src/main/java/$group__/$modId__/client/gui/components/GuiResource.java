@@ -22,22 +22,22 @@ import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOp
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
 @SideOnly(Side.CLIENT)
-public class GuiResource<N extends Number, TN extends Number, T extends GuiResource<N, TN, T>> extends GuiRectangle<N, T> {
+public class GuiResource<N extends Number, NT extends Number, T extends GuiResource<N, NT, T>> extends GuiRectangle<N, T> {
 	/* SECTION variables */
 
 	protected ResourceLocation resource;
-	protected Rectangle<TN, ?> texture;
+	protected Rectangle<NT, ?> texture;
 
 
 	/* SECTION constructors */
 
-	public GuiResource(GuiResource<N, TN, ?> copy) { this(copy.getRect(), copy.getResource(), copy.getTexture()); }
-
-	public GuiResource(Rectangle<N, ?> rect, ResourceLocation resource, Rectangle<TN, ?> texture) {
+	public GuiResource(Rectangle<N, ?> rect, ResourceLocation resource, Rectangle<NT, ?> texture) {
 		super(rect, Colors.COLORLESS);
 		this.resource = resource;
 		this.texture = texture;
 	}
+
+	public GuiResource(GuiResource<N, NT, ?> copy) { this(copy.getRect(), copy.getResource(), copy.getTexture()); }
 
 
 	/* SECTION getters & setters */
@@ -46,9 +46,9 @@ public class GuiResource<N extends Number, TN extends Number, T extends GuiResou
 
 	public void setResource(ResourceLocation resource) { this.resource = resource; }
 
-	public Rectangle<TN, ?> getTexture() { return texture; }
+	public Rectangle<NT, ?> getTexture() { return texture; }
 
-	public void setTexture(Rectangle<TN, ?> texture) { this.texture = texture; }
+	public void setTexture(Rectangle<NT, ?> texture) { this.texture = texture; }
 
 	@Override
 	@Deprecated
@@ -95,12 +95,12 @@ public class GuiResource<N extends Number, TN extends Number, T extends GuiResou
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, TE extends Number, T extends Immutable<N, TE, T>> extends GuiResource<N, TE, T> {
+	public static class Immutable<N extends Number, NT extends Number, T extends Immutable<N, NT, T>> extends GuiResource<N, NT, T> {
 		/* SECTION constructors */
 
-		public Immutable(Rectangle<N, ?> rect, ResourceLocation resource, Rectangle<TE, ?> texture) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(resource), texture.toImmutable()); }
+		public Immutable(Rectangle<N, ?> rect, ResourceLocation resource, Rectangle<NT, ?> texture) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(resource), texture.toImmutable()); }
 
-		public Immutable(GuiResource<N, TE, ?> copy) { super(copy.getRect(), copy.getResource(), copy.getTexture()); }
+		public Immutable(GuiResource<N, NT, ?> copy) { this(copy.getRect(), copy.getResource(), copy.getTexture()); }
 
 
 		/* SECTION getters & setters */
@@ -111,7 +111,7 @@ public class GuiResource<N extends Number, TN extends Number, T extends GuiResou
 
 		@Override
 		@Deprecated
-		public void setTexture(Rectangle<TE, ?> texture) { throw rejectUnsupportedOperation(); }
+		public void setTexture(Rectangle<NT, ?> texture) { throw rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */

@@ -188,6 +188,7 @@ public enum Reflections {
 
 		/* SECTION static classes */
 
+		@SuppressWarnings("UnnecessaryFullyQualifiedName")
 		public static class AccessibleObjectAdapter<V extends java.lang.reflect.AccessibleObject /* COMMENT error: cannot find symbol if qualification NOT used */, T extends AccessibleObjectAdapter<V, T>> extends IAdapter.IOptional.IImmutable.Impl<V, T> implements IThrowableCatcher {
 			/* SECTION variables */
 

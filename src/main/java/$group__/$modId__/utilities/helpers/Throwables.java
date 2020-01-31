@@ -5,9 +5,10 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import static $group__.$modId__.utilities.helpers.Grammar.appendSuffixIfPlural;
+import static $group__.$modId__.utilities.helpers.MapsExtension.MULTI_THREAD_MAP_MAKER;
 import static $group__.$modId__.utilities.helpers.Reflections.BRIDGE;
 import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 
@@ -18,7 +19,7 @@ public enum Throwables {
 
 	/* SECTION static variables */
 
-	private static final ConcurrentHashMap<String, String> RAN_ONCE = new ConcurrentHashMap<>();
+	private static final ConcurrentMap<String, String> RAN_ONCE = MULTI_THREAD_MAP_MAKER.makeMap();
 
 
 	/* SECTION static methods */
@@ -99,4 +100,6 @@ public enum Throwables {
 	public static InterruptedException interrupt(@Nullable String msg) throws InterruptedException { throw throw_(new InterruptedException(msg)); }
 
 	public static ClassCastException cast(Object o, Class<?> type) throws ClassCastException { throw throw_(new ClassCastException(o.getClass().getName() + " cannot be cast to " + type.getName())); }
+
+	public static NullPointerException null_(String s) { throw throw_(new NullPointerException(s)); }
 }

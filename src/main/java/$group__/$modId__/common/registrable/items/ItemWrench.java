@@ -55,6 +55,11 @@ public class ItemWrench extends ItemUnstackable implements IRegistrableEventBusS
 	public static final Configuration CONFIGURATION = ModThis.Configuration.behavior.items.wrench;
 
 
+	/* SECTION constructors */
+
+	protected ItemWrench() { requireRunOnceOnly(); }
+
+
 	/* SECTION static methods */
 
 	@SuppressWarnings("unused")

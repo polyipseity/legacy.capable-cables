@@ -6,6 +6,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import static $group__.$modId__.utilities.helpers.Numbers.isNegative;
 import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 
 public class ResourceLocationDefault extends ResourceLocation {
@@ -35,8 +36,10 @@ public class ResourceLocationDefault extends ResourceLocation {
 
 		/* SECTION methods */
 
-		public Rectangle<Float, ?> generateRect(float offsetX, float offsetY) { return generateRect(new XY<>(offsetX, offsetY)); }
-
-		public Rectangle.Immutable<Float, ?> generateRect(XY<? extends Float, ?> offset) { return new Rectangle.Immutable<>(new XY<>(offset), size); }
+		public Rectangle.Immutable<Float, ?> generateRect(float offsetX, float offsetY) {
+			return new Rectangle.Immutable<>(new XY<>(
+					isNegative(offsetX) ? size.getX() + offsetX : offsetX,
+					isNegative(offsetY) ? size.getY() + offsetY : offsetY), size);
+		}
 	}
 }

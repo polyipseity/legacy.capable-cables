@@ -1,6 +1,5 @@
-package tests;
+package $group__.$modId__.utilities.helpers;
 
-import $group__.$modId__.utilities.helpers.Miscellaneous;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.annotation.Testable;
 
@@ -10,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static tests.TestUtilities.consumeCaught;
 
 @Testable
-public class MethodTests {
+public class MiscellaneousTest {
 	/* SECTION methods */
 
 	@Test

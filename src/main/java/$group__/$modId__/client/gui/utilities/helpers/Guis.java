@@ -51,8 +51,9 @@ public enum Guis {
 	public static void translateAndScaleFromTo(Rectangle<?, ?> from, Rectangle<?, ?> to) {
 		XY<?, ?> fromO = from.getOffset(), fromS = from.getSize(),
 				toO = to.getOffset(), toS = to.getSize();
-		translate(toO.getX().doubleValue() - fromO.getX().doubleValue(), toO.getY().doubleValue() - fromO.getY().doubleValue(), 0D);
-		scale(toS.getX().doubleValue() / fromS.getX().doubleValue(), toS.getY().doubleValue() / fromS.getY().doubleValue(), 1D);
+		double scaleX = toS.getX().doubleValue() / fromS.getX().doubleValue(), scaleY = toS.getY().doubleValue() / fromS.getY().doubleValue();
+		scale(scaleX, scaleY, 1D);
+		translate(toO.getX().doubleValue() / scaleX - fromO.getX().doubleValue(), toO.getY().doubleValue() / scaleY - fromO.getY().doubleValue(), 0D);
 	}
 
 

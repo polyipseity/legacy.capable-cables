@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.annotation.Testable;
 
 @Testable
-public class ResourceTests {
+public class ResourceTest {
 	/* SECTION methods */
 
 	@Test

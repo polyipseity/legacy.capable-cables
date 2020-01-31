@@ -16,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.List;
 import java.util.Optional;
 
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
@@ -25,14 +26,14 @@ public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<En
 	/* SECTION static variables */
 
 	@SuppressWarnings({"unchecked", "RedundantSuppression"})
-	protected static final GuiTabsThemed<Number, GuiTabs.ITab<Number, ?>, EnumTheme, ?> TABS = new GuiTabsThemed<>(
+	protected static final GuiTabsThemed<Number, List<GuiTabs.ITab<Number, ?>>, GuiTabs.ITab<Number, ?>, EnumTheme, ?> TABS = new GuiTabsThemed<>(
 			EnumTheme.NONE,
 			0,
 			new GuiTabs.ITabThemed.Impl<>(
 					new GuiRectangleThemedDrawable<>(
-							new Rectangle<>(new XY<>(new X<>(0.1F), new Y<>(0.1F, -16)), new XY<>(16, 16)),
+							new Rectangle<>(new XY<>(new X<>(0.1F), new Y<>(0.1F, -32)), new XY<>(32, 32)),
 							new GuiResource<>(
-									new Rectangle<>(new XY<>(new X<>(0.1F), new Y<>(0.1F, -16)), new XY<>(16, 16)),
+									new Rectangle<>(new XY<>(new X<>(0.1F), new Y<>(0.1F, -32)), new XY<>(64, 64)),
 									Globals.Client.Resources.GUI_WRENCH,
 									Globals.Client.Resources.GUI_WRENCH_INFO
 							),
@@ -50,7 +51,7 @@ public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<En
 
 	/* SECTION variables */
 
-	protected GuiTabsThemed<Number, GuiTabs.ITab<Number, ?>, EnumTheme, ?> tabs;
+	protected GuiTabsThemed<Number, List<GuiTabs.ITab<Number, ?>>, GuiTabs.ITab<Number, ?>, EnumTheme, ?> tabs;
 	protected ItemStack stack;
 	protected EnumTheme theme;
 
@@ -73,9 +74,9 @@ public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<En
 
 	/* SECTION getters & setters */
 
-	public GuiTabsThemed<Number, GuiTabs.ITab<Number, ?>, EnumTheme, ?> getTabs() { return tabs; }
+	public GuiTabsThemed<Number, List<GuiTabs.ITab<Number, ?>>, GuiTabs.ITab<Number, ?>, EnumTheme, ?> getTabs() { return tabs; }
 
-	public void setTabs(GuiTabsThemed<Number, GuiTabs.ITab<Number, ?>, EnumTheme, ?> tabs) { this.tabs = tabs; }
+	public void setTabs(GuiTabsThemed<Number, List<GuiTabs.ITab<Number, ?>>, GuiTabs.ITab<Number, ?>, EnumTheme, ?> tabs) { this.tabs = tabs; }
 
 	public ItemStack getStack() { return stack; }
 

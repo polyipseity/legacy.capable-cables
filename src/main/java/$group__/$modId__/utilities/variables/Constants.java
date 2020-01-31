@@ -2,6 +2,7 @@ package $group__.$modId__.utilities.variables;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import net.minecraftforge.fml.relauncher.Side;
 
 public enum Constants {
 	/* MARK empty */;
@@ -25,6 +26,11 @@ public enum Constants {
 	public static final String
 			COFH_CORE_ID = "cofhcore", COFH_CORE_PACKAGE = "cofh",
 			BUILDCRAFT_API_ID = "BuildCraftAPI|core", BUILDCRAFT_API_PACKAGE = "buildcraft";
+
+
+	public static final int
+			MULTI_THREAD_THREAD_COUNT = Side.values().length,
+			SINGLE_THREAD_THREAD_COUNT = 1;
 
 
 	public static final Class<?>[]
