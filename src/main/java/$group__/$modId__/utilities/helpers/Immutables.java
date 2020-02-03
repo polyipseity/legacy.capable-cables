@@ -8,8 +8,13 @@ import net.minecraft.util.ResourceLocation;
 
 import java.awt.*;
 import java.lang.reflect.Member;
+import java.util.Collection;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.Set;
+
+import static com.google.common.collect.Iterables.unmodifiableIterable;
+import static java.util.Collections.unmodifiableCollection;
 
 @SuppressWarnings("SpellCheckingInspection")
 public enum Immutables {
@@ -51,10 +56,13 @@ public enum Immutables {
 	public static <T> T toImmutablePrimitives(T mutable) { return mutable; }
 
 
-	// COMMENT collections
+	// COMMENT iterables & collections
+
+	@ExternalToImmutableMethod(value = Iterable.class, allowExtends = true)
+	public static <T> Iterable<T> toImmutableIterableExtends(Iterable<? extends T> mutable) { return unmodifiableIterable(mutable); }
 
 	@ExternalToImmutableMethod(value = Collection.class, allowExtends = true)
-	public static <T> Collection<T> toImmutableCollectionExtends(Collection<? extends T> mutable) { return Collections.unmodifiableCollection(mutable); }
+	public static <T> Collection<T> toImmutableCollectionExtends(Collection<? extends T> mutable) { return unmodifiableCollection(mutable); }
 
 	@ExternalToImmutableMethod(value = List.class, allowExtends = true)
 	public static <T> List<T> toImmutableListExtends(List<? extends T> mutable) { return ImmutableList.copyOf(mutable); }

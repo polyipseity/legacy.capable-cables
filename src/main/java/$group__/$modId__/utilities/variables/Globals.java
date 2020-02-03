@@ -58,6 +58,8 @@ public enum Globals implements IThrowableCatcher {
 
 	public static Throwable getCaughtThrowableUnboxedNonnullStatic() { return INSTANCE.getCaughtThrowableUnboxedNonnull(); }
 
+	public static boolean caughtThrowableStatic() { return INSTANCE.caughtThrowable(); }
+
 	public static void clearCaughtThrowableStatic() { INSTANCE.clearCaughtThrowable(); }
 
 	public static void rethrowCaughtThrowableStatic(boolean nullable) throws RuntimeException { INSTANCE.rethrowCaughtThrowable(nullable); }
@@ -99,7 +101,10 @@ public enum Globals implements IThrowableCatcher {
 		public static ScaledResolution getResolution() { return resolution; }
 
 
-		public static <T> void registerPreInitGuiListener(T k, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> v) { PRE_INIT_GUI_LISTENER_MAP.put(k, v); }
+		public static <T> void registerPreInitGuiListener(T k, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> v) {
+			PRE_INIT_GUI_LISTENER_MAP.put(k, v);
+			Thread.currentThread().getUncaughtExceptionHandler();
+		}
 
 
 		@SubscribeEvent
@@ -111,6 +116,7 @@ public enum Globals implements IThrowableCatcher {
 
 		/* SECTION static classes */
 
+		@SuppressWarnings("HardcodedFileSeparator")
 		public enum Resources {
 			/* MARK empty */;
 

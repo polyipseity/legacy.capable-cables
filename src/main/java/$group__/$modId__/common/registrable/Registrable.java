@@ -2,7 +2,7 @@ package $group__.$modId__.common.registrable;
 
 import $group__.$modId__.common.registrable.utilities.constructs.IRegistrableEventBusSubscriber;
 import $group__.$modId__.utilities.constructs.classes.Singleton;
-import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.FieldAdapter;
+import $group__.$modId__.utilities.helpers.Reflections.Classes.AccessibleObjectAdapter.FieldAdapter;
 import $group__.$modId__.utilities.variables.Globals;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -44,7 +44,7 @@ public abstract class Registrable<T extends IForgeRegistryEntry<T>> extends Sing
 		LOGGER.info("Found {} field{} in '{}'", fs.length, appendSuffixIfPlural(fs.length, "s"), classGS);
 		for (Field f : fs) {
 			LOGGER.trace("Processing field '{}'", f.toGenericString());
-			Object v = FieldAdapter.of(f).get_(this).orElseThrow(Globals::rethrowCaughtThrowableStatic);
+			Object v = FieldAdapter.of(f).get(this).orElseThrow(Globals::rethrowCaughtThrowableStatic);
 			LOGGER.debug("Field '{}' value is '{}'", f.toGenericString(), v);
 			if (clazz.isAssignableFrom(v.getClass())) {
 				reg.register(castUncheckedUnboxedNonnull(v));

@@ -17,9 +17,8 @@ public interface ISpec<T> {
 	/**
 	 * Returns the spec of this object.
 	 * <p>
-	 * Overriding methods should return a spec that is {@code new}, but equals spec
-	 * given that the state of this object is not changed, each time the method is
-	 * invoked.
+	 * Overriding methods should {@code return} a spec that cannot change this object's
+	 * state by any means through it.
 	 *
 	 * @apiNote See the overriding methods for its meaning.
 	 *

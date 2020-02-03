@@ -101,25 +101,25 @@ public @interface OverridingStatus {
 				for (Method subM : subC.getDeclaredMethods()) {
 					if (isFormerMethodOverriddenByLatter(superM, subM)) {
 						if (whenB == null || whenB)
-							LOGGER.debug(getMessage(this, "method '" + subM.toGenericString() + "' -> @ superclass '" + superM.toGenericString() + "' (" + a + ")"));
+							LOGGER.debug(getMessage(this, "method '" + subM.toGenericString() + "' -> @ superclass '" + superM.toGenericString() + "' (" + a + ')'));
 						else
-							throw throw_(new AnnotationProcessingException(getMessage(this, "Unfulfilled requirement: subclass '" + subC.toGenericString() + "' -X> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "' (" + a + "),\ninstead: method '" + subM.toGenericString() + "' -> @ superclass '" + superC.toGenericString() + "'")));
+							throw throw_(new AnnotationProcessingException(getMessage(this, "Unfulfilled requirement: subclass '" + subC.toGenericString() + "' -X> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "' (" + a + ")," + System.lineSeparator() + "instead: method '" + subM.toGenericString() + "' -> @ superclass '" + superC.toGenericString() + '\'')));
 						return;
 					}
 				}
 
 				if (whenB == null || !whenB) {
-					LOGGER.debug(getMessage(this, "subclass '" + subC.toGenericString() + "' -X> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "' (" + a + ")"));
+					LOGGER.debug(getMessage(this, "subclass '" + subC.toGenericString() + "' -X> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "' (" + a + ')'));
 				} else {
 					for (Class<?> superC1 : getIntermediateSuperclasses(subC, castUncheckedUnboxed(superC.getSuperclass()))) {
 						for (Method superM1 : superC1.getDeclaredMethods()) {
 							if (isFormerMethodOverriddenByLatter(superM, superM1) && isMemberFinal(superM1)) {
-								LOGGER.log(superM1.getDeclaringClass().getName().startsWith(g) ? Level.WARN : Level.INFO, getMessage(this, "Impossible requirement: subclass '" + subC.toGenericString() + "' -Y> final method '" + superM1.toGenericString() + "' @ superclass '" + superM1.toGenericString() + "' (" + a + ")"));
+								LOGGER.log(superM1.getDeclaringClass().getName().startsWith(g) ? Level.WARN : Level.INFO, getMessage(this, "Impossible requirement: subclass '" + subC.toGenericString() + "' -Y> final method '" + superM1.toGenericString() + "' @ superclass '" + superM1.toGenericString() + "' (" + a + ')'));
 								return;
 							}
 						}
 					}
-					throw throw_(new AnnotationProcessingException(getMessage(this, "Unfulfilled requirement: subclass '" + subC.toGenericString() + "' -Y> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "' (" + a + "),\ninstead: subclass '" + subC.toGenericString() + "' -X> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "'")));
+					throw throw_(new AnnotationProcessingException(getMessage(this, "Unfulfilled requirement: subclass '" + subC.toGenericString() + "' -Y> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "' (" + a + ")," + System.lineSeparator() + "instead: subclass '" + subC.toGenericString() + "' -X> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + '\'')));
 				}
 			});
 		}

@@ -1,11 +1,11 @@
-package $group__.$modId__.common.registrable.creativetabs.templates;
+package $group__.$modId__.common.registrable.creativetabs.base;
 
 import net.minecraft.creativetab.CreativeTabs;
 
 import static $group__.$modId__.common.registrable.utilities.helpers.Registries.getNamespacedUnlocalizedNameForRegistry;
 import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 
-public abstract class CreativeTabsDefault extends CreativeTabs {
+public abstract class CreativeTabsDefault<T extends CreativeTabsDefault<T>> extends CreativeTabs {
 	/* SECTION constructors */
 
 	public CreativeTabsDefault(String label) { super(getNamespacedUnlocalizedNameForRegistry(MOD_ID, label)); }

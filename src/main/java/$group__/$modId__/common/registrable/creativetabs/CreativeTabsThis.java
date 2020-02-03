@@ -1,6 +1,6 @@
 package $group__.$modId__.common.registrable.creativetabs;
 
-import $group__.$modId__.common.registrable.creativetabs.templates.CreativeTabsDefault;
+import $group__.$modId__.common.registrable.creativetabs.base.CreativeTabsDefault;
 import $group__.$modId__.common.registrable.items.ItemsThis;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.EnumEnchantmentType;

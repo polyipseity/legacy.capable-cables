@@ -1,7 +1,5 @@
 package $group__.$modId__.utilities.helpers;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.awt.*;
 import java.util.regex.Matcher;
 
@@ -34,6 +32,6 @@ public enum Colors {
 	/* SECTION static methods */
 
 	public static Color newColor(String s) {
-		return new Color(Integer.parseInt(HASH_PATTERN.matcher(s).replaceAll(Matcher.quoteReplacement(StringUtils.EMPTY)), 16), true);
+		return new Color(Integer.parseInt(HASH_PATTERN.matcher(s).replaceAll(Matcher.quoteReplacement(StringsExtension.EMPTY)), 16), true);
 	}
 }

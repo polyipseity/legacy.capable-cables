@@ -2,7 +2,7 @@
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
 @LocalVariablesAreNonnullByDefault
-package $group__.$modId__.common.registrable.creativetabs.templates;
+package $group__.$modId__.common.registrable.blocks.bases;
 
 import $group__.$modId__.utilities.constructs.interfaces.annotations.FieldsAreNonnullByDefault;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.LocalVariablesAreNonnullByDefault;

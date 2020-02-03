@@ -1,5 +1,7 @@
 package $group__.$modId__.utilities.constructs.interfaces;
 
+import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
+
 import javax.annotation.concurrent.Immutable;
 import java.util.Collection;
 import java.util.Iterator;
@@ -7,7 +9,10 @@ import java.util.Spliterator;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
+import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
 public interface ICollectionDelegated<C extends Collection<E>, E, T extends ICollectionDelegated<C, E, T>> extends Collection<E>, IIterableDelegated<C, E, T> {
 	/* SECTION methods */
@@ -130,5 +135,70 @@ public interface ICollectionDelegated<C extends Collection<E>, E, T extends ICol
 		@Override
 		@Deprecated
 		default void clear() { throw rejectUnsupportedOperation(); }
+
+
+		/* SECTION static classes */
+
+		@Immutable
+		class Impl<C extends Collection<E>, E, T extends Impl<C, E, T>> extends ICollectionDelegated.Impl<C, E, T> implements ICollectionDelegated.IImmutable<C, E, T> {
+			/* SECTION constructors */
+
+			public Impl(C collection) { super(tryToImmutableUnboxedNonnull(collection)); }
+
+			public Impl(ICollectionDelegated<C, E, ?> copy) { this(copy.getCollection()); }
+
+
+			/* SECTION getters & setters */
+
+			@SuppressWarnings("deprecation")
+			@Override
+			@Deprecated
+			public void setCollection(C collection) { ICollectionDelegated.IImmutable.super.setIterable(collection); }
+
+
+			/* SECTION methods */
+
+			@Override
+			@OverridingStatus(group = GROUP)
+			public final T toImmutable() { return ICollectionDelegated.IImmutable.super.toImmutable(); }
+
+			@Override
+			@OverridingStatus(group = GROUP)
+			public final boolean isImmutable() { return ICollectionDelegated.IImmutable.super.isImmutable(); }
+		}
+	}
+
+
+	class Impl<C extends Collection<E>, E, T extends Impl<C, E, T>> extends IIterableDelegated.Impl<C, E, T> implements ICollectionDelegated<C, E, T> {
+		/* SECTION constructors */
+
+		public Impl(C collection) { super(collection); }
+
+		public Impl(ICollectionDelegated<C, E, ?> copy) { this(copy.getCollection()); }
+
+
+		/* SECTION getters & setters */
+
+		@SuppressWarnings("deprecation")
+		@Override
+		@Deprecated
+		public C getIterable() { return getCollection(); }
+
+		@SuppressWarnings("deprecation")
+		@Override
+		@Deprecated
+		public void setIterable(C iterable) { setCollection(iterable); }
+
+		@Override
+		public C getCollection() { return value; }
+
+		@Override
+		public void setCollection(C collection) { value = collection; }
+
+
+		/* SECTION methods */
+
+		@Override
+		public T toImmutable() { return castUncheckedUnboxedNonnull(new ICollectionDelegated.IImmutable.Impl<>(this)); }
 	}
 }

@@ -3,6 +3,7 @@ package $group__.$modId__.client.gui.utilities.constructs;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
 import $group__.$modId__.utilities.constructs.interfaces.IStructureCloneable;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
+import $group__.$modId__.utilities.constructs.interfaces.basic.IDirty;
 import $group__.$modId__.utilities.constructs.interfaces.basic.ISpec;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
@@ -22,7 +23,7 @@ import static $group__.$modId__.utilities.variables.Globals.Client.CLIENT;
  * @since 0.0.1.0
  */
 @SideOnly(Side.CLIENT)
-public interface IDrawable<N extends Number, T extends IDrawable<N, T>> extends IStructureCloneable<T>, ISpec<Rectangle<N, ?>> {
+public interface IDrawable<N extends Number, T extends IDrawable<N, T>> extends IStructureCloneable<T>, ISpec<Rectangle<N, ?>>, IDirty {
 	/* SECTION methods */
 
 	/**

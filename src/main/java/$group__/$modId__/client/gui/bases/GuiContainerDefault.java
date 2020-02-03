@@ -1,4 +1,4 @@
-package $group__.$modId__.client.gui.templates;
+package $group__.$modId__.client.gui.bases;
 
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
 import $group__.$modId__.utilities.constructs.interfaces.basic.ISpec;

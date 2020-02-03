@@ -2,7 +2,7 @@
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
 @LocalVariablesAreNonnullByDefault
-package $group__.$modId__.common.inventory.templates;
+package $group__.$modId__.common.inventory.bases;
 
 import $group__.$modId__.utilities.constructs.interfaces.annotations.FieldsAreNonnullByDefault;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.LocalVariablesAreNonnullByDefault;

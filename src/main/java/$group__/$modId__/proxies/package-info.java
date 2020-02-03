@@ -2,7 +2,7 @@
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
 @LocalVariablesAreNonnullByDefault
-package $group__.$modId__.client.gui.templates;
+package $group__.$modId__.proxies;
 
 import $group__.$modId__.utilities.constructs.interfaces.annotations.FieldsAreNonnullByDefault;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.LocalVariablesAreNonnullByDefault;

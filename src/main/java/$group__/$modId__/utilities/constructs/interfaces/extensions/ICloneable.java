@@ -4,8 +4,7 @@ import $group__.$modId__.utilities.constructs.interfaces.annotations.ExternalClo
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IAnnotationProcessor;
 import $group__.$modId__.utilities.helpers.Casts;
-import $group__.$modId__.utilities.helpers.Loggers;
-import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.MethodAdapter;
+import $group__.$modId__.utilities.helpers.Reflections.Classes.AccessibleObjectAdapter.MethodAdapter;
 import $group__.$modId__.utilities.helpers.Throwables;
 import $group__.$modId__.utilities.variables.Globals;
 import com.google.common.annotations.Beta;
@@ -19,20 +18,19 @@ import javax.annotation.OverridingMethodsMustInvokeSuper;
 import javax.annotation.meta.When;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-import static $group__.$modId__.utilities.helpers.Casts.castUnchecked;
-import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxed;
+import static $group__.$modId__.utilities.helpers.Casts.*;
 import static $group__.$modId__.utilities.helpers.MapsExtension.MULTI_THREAD_WEAK_KEY_MAP_MAKER;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
-import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclaredMethod;
-import static $group__.$modId__.utilities.helpers.Reflections.getSuperclassesAndInterfaces;
-import static $group__.$modId__.utilities.helpers.Reflections.isMemberStatic;
-import static $group__.$modId__.utilities.helpers.Throwables.newThrowable;
-import static $group__.$modId__.utilities.helpers.Throwables.throw_;
+import static $group__.$modId__.utilities.helpers.Reflections.Classes.AccessibleObjectAdapter.setAccessibleWithLogging;
+import static $group__.$modId__.utilities.helpers.Reflections.Classes.Bulk.mapFields;
+import static $group__.$modId__.utilities.helpers.Reflections.*;
+import static $group__.$modId__.utilities.helpers.Throwables.*;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 import static $group__.$modId__.utilities.variables.Constants.MULTI_THREAD_THREAD_COUNT;
 import static $group__.$modId__.utilities.variables.Globals.*;
@@ -41,12 +39,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 public interface ICloneable<T> extends Cloneable {
 	/* SECTION static variables */
 
-	MethodAdapter DEFAULT_METHOD = MethodAdapter.of(getDeclaredMethod(Object.class, "clone").get().orElseGet(() -> {
-		LOGGER.warn("Default clone method access failed", getCaughtThrowableUnboxedStatic());
-		return null;
-	}));
-	@Nullable
-	ExternalCloneMethod DEFAULT_ANNOTATION = DEFAULT_METHOD.get().isPresent() ? new ExternalCloneMethod() {
+	ExternalCloneMethod DEFAULT_ANNOTATION = new ExternalCloneMethod() {
 		/* SECTION methods */
 
 		@Override
@@ -58,16 +51,16 @@ public interface ICloneable<T> extends Cloneable {
 
 		@Override
 		public Class<ExternalCloneMethod> annotationType() { return ExternalCloneMethod.class; }
-	} : null;
+	};
 	AtomicLong EVICTION_COUNT = new AtomicLong();
 
 	ConcurrentMap<ExternalCloneMethod, MethodAdapter> EXTERNAL_METHOD_MAP = MULTI_THREAD_WEAK_KEY_MAP_MAKER.makeMap();
-	LoadingCache<Class<?>, ExternalCloneMethod> EXTERNAL_ANNOTATIONS_CACHE = CacheBuilder.newBuilder().maximumWeight(10000L).weigher((k, v) -> v == DEFAULT_ANNOTATION ? 10000 / (int) Math.min(10000L, 100L + EVICTION_COUNT.get()) : 0).removalListener((RemovalNotification<Class<?>, ExternalCloneMethod> t) -> LOGGER.debug("Default clone method '{}' cached for class '{}' evicted, count: {}", DEFAULT_METHOD.get().orElseThrow(Throwables::unexpected), t.getKey().toGenericString(), EVICTION_COUNT.incrementAndGet())).concurrencyLevel(MULTI_THREAD_THREAD_COUNT).build(new CacheLoader<Class<?>, ExternalCloneMethod>() {
+	LoadingCache<Class<?>, ExternalCloneMethod> EXTERNAL_ANNOTATIONS_CACHE = CacheBuilder.newBuilder().maximumWeight(10000L).weigher((k, v) -> v == DEFAULT_ANNOTATION ? 10000 / (int) Math.min(10000L, 100L + EVICTION_COUNT.get()) : 0).removalListener((RemovalNotification<Class<?>, ExternalCloneMethod> t) -> LOGGER.debug("Default clone method '{}' cached for class '{}' evicted, count: {}", METHOD_OBJECT_CLONE0, t.getKey().toGenericString(), EVICTION_COUNT.incrementAndGet())).concurrencyLevel(MULTI_THREAD_THREAD_COUNT).build(new CacheLoader<Class<?>, ExternalCloneMethod>() {
 		/* SECTION methods */
 
 		@SuppressWarnings("ConstantConditions")
 		@Override
-		public ExternalCloneMethod load(Class<?> key) throws NoSuchMethodException {
+		public ExternalCloneMethod load(Class<?> key) {
 			@Nullable ExternalCloneMethod r = null;
 			List<Map.Entry<Class<?>, ExternalCloneMethod>> l = EXTERNAL_ANNOTATIONS_CACHE.asMap().entrySet().stream().filter(t -> t.getValue().allowExtends() && t.getKey().isAssignableFrom(key)).collect(Collectors.toList());
 
@@ -81,10 +74,10 @@ public interface ICloneable<T> extends Cloneable {
 
 			if (r != null)
 				LOGGER.debug("Clone method '{}' with annotation '{}' auto-registered for class '{}'", EXTERNAL_METHOD_MAP.get(r).get().orElseThrow(Throwables::unexpected).toGenericString(), r, key.toGenericString());
-			else if ((r = DEFAULT_ANNOTATION) == null)
-				throw throw_(new NoSuchMethodException("Default clone method inaccessible for class '" + key.toGenericString() + "'"));
-			else
-				LOGGER.debug("Default clone method '{}' cached for class '{}'", DEFAULT_METHOD.get().orElseThrow(Throwables::unexpected).toGenericString(), key.toGenericString());
+			else {
+				r = DEFAULT_ANNOTATION;
+				LOGGER.debug("Default clone method '{}' cached for class '{}'", METHOD_OBJECT_CLONE0.toGenericString(), key.toGenericString());
+			}
 
 			return r;
 		}
@@ -145,28 +138,22 @@ public interface ICloneable<T> extends Cloneable {
 				m = EXTERNAL_METHOD_MAP.get(EXTERNAL_ANNOTATIONS_CACHE.get(oc));
 			} catch (ExecutionException e) {
 				setCaughtThrowableStatic(e);
-				LOGGER.warn("Unable to clone object '{}' of class '{}' as no clone method is obtained, will NOT attempt to clone again, stacktrace:\n{}", o, oc.toGenericString(), getStackTrace(e));
+				LOGGER.warn("Unable to clone object '{}' of class '{}' as no clone method is obtained, will NOT attempt to clone again, stacktrace:" + System.lineSeparator() + "{}", o, oc.toGenericString(), getStackTrace(e));
 				BROKEN_CLASS_SET.add(oc);
 				return Optional.of(o);
 			}
 
 			Method m0 = m.get().orElseThrow(Throwables::unexpected);
 			boolean m0s = isMemberStatic(m0);
-			if (!m.setAccessible(true))
-				LOGGER.warn(Loggers.FORMATTER_WITH_THROWABLE.apply(Loggers.FORMATTER_REFLECTION_UNABLE_TO_SET_ACCESSIBLE.apply(() -> "clone method", m0).apply(m0s ? null : o, oc).apply(true), m.getCaughtThrowableUnboxedNonnull()));
+			setAccessibleWithLogging(m, "clone method", m0s ? null : o, oc,true);
 
-			Optional<T> r = castUnchecked((m0s ? m.invoke(null, o) : m.invoke(o)).orElseGet(() -> {
-				LOGGER.warn("Clone method '{}' failed for object '{}' of class '{}', will NOT attempt to clone again, stacktrace:\n{}", m0.toGenericString(), o, oc.toGenericString(), getStackTrace(m.getCaughtThrowableUnboxedNonnull()));
+			return castUnchecked((m0s ? m.invoke(null, o) : m.invoke(o)).orElseGet(() -> {
+				LOGGER.warn("Clone method '{}' failed for object '{}' of class '{}', will NOT attempt to clone again, stacktrace:" + System.lineSeparator() + "{}", m0.toGenericString(), o, oc.toGenericString(), getStackTrace(caughtThrowableStatic() ? getCaughtThrowableUnboxedNonnullStatic() : new_(new NullPointerException())));
 				BROKEN_CLASS_SET.add(oc);
 				return castUncheckedUnboxed(o);
 			}));
-
-			if (!m.setAccessible(false))
-				LOGGER.warn(Loggers.FORMATTER_WITH_THROWABLE.apply(Loggers.FORMATTER_REFLECTION_UNABLE_TO_SET_ACCESSIBLE.apply(() -> "clone method", m0).apply(m0s ? null : o, oc).apply(false), m.getCaughtThrowableUnboxedNonnull()));
-
-			return r;
 		} else {
-			LOGGER.debug("Unable to clone object '{}' of class '{}' as clone method annotation is NOT yet processed, will attempt to clone again, stacktrace:\n{}", o, oc.toGenericString(), getStackTrace(newThrowable()));
+			LOGGER.debug("Unable to clone object '{}' of class '{}' as clone method annotation is NOT yet processed, will attempt to clone again, stacktrace:" + System.lineSeparator() + "{}", o, oc.toGenericString(), getStackTrace(newThrowable()));
 			return Optional.of(o);
 		}
 	}
@@ -204,6 +191,16 @@ public interface ICloneable<T> extends Cloneable {
 	 * @since 0.0.1.0
 	 */
 	static <T> T tryCloneUnboxedNonnull(T o) { return tryClone(o).orElseThrow(Globals::rethrowCaughtThrowableStatic); }
+
+
+	static <T> T clone(Callable<?> clone) {
+		T cloned;
+		try { cloned = castUncheckedUnboxedNonnull(clone.call()); } catch (Exception e) {
+			throw unexpected(e);
+		}
+		mapFields(castUncheckedUnboxedNonnull(cloned.getClass()), cloned, cloned, ICloneable::tryCloneUnboxed, true);
+		return cloned;
+	}
 
 
 	/* SECTION methods */

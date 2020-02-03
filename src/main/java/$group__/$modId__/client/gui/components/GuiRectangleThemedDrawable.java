@@ -10,14 +10,9 @@ import $group__.$modId__.utilities.helpers.Colors;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import javax.annotation.meta.When;
 import java.awt.*;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -51,12 +46,14 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 	public void setTheme(TH theme) {
 		this.theme = theme;
 		Casts.<IThemed<TH>>castChecked(drawable, castUncheckedUnboxedNonnull(IThemed.class)).ifPresent(t -> t.setTheme(getTheme()));
+		markDirty();
 	}
 
 	@Override
 	public void setDrawable(IDrawable<N, ?> drawable) {
 		super.setDrawable(drawable);
 		setTheme(getTheme());
+		markDirty();
 	}
 
 
@@ -68,29 +65,6 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 	@Override
 	public boolean isImmutable() { return false; }
 
-	@Override
-	public int hashCode() {
-		return isImmutable() ? getHashCode(this, super.hashCode(), getTheme()) : getHashCode(this, super.hashCode());
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		return isImmutable() ? isEqual(this, o, super.equals(o),
-				t -> getTheme().equals(t.getTheme())) : isEqual(this, o, super.equals(o));
-	}
-
-	@Override
-	public T clone() {
-		T r = super.clone();
-		r.theme = tryCloneUnboxedNonnull(theme);
-		return r;
-	}
-
-	@Override
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"theme", getTheme()});
-	}
 
 	/* SECTION static classes */
 
@@ -100,7 +74,7 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 
 		public Immutable(GuiRectangleThemedDrawable<N, TH, ?> copy) { this(copy.getRect(), copy.getColor(), copy.getDrawable(), copy.getTheme()); }
 
-		public Immutable(Rectangle<N, ?> rect, Color color, IDrawable<N, ?> drawable, TH theme) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(color), tryToImmutableUnboxedNonnull(drawable), tryToImmutableUnboxedNonnull(theme)); }
+		public Immutable(Rectangle<N, ?> rect, Color color, IDrawable<N, ?> drawable, TH theme) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(color), drawable.toImmutable(), tryToImmutableUnboxedNonnull(theme)); }
 
 
 		/* SECTION getters & setters */
@@ -125,11 +99,11 @@ public class GuiRectangleThemedDrawable<N extends Number, TH extends IThemed.ITh
 		/* SECTION methods */
 
 		@Override
-		@OverridingStatus(group = GROUP, when = When.NEVER)
+		@OverridingStatus(group = GROUP)
 		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		@Override
-		@OverridingStatus(group = GROUP, when = When.NEVER)
+		@OverridingStatus(group = GROUP)
 		public final boolean isImmutable() { return true; }
 	}
 }

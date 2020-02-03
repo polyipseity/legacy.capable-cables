@@ -8,14 +8,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import javax.annotation.meta.When;
 import java.awt.*;
 
 import static $group__.$modId__.client.gui.utilities.helpers.Guis.translateAndScaleFromTo;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -45,7 +41,10 @@ public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawab
 
 	public IDrawable<N, ?> getDrawable() { return drawable; }
 
-	public void setDrawable(IDrawable<N, ?> drawable) { this.drawable = drawable; }
+	public void setDrawable(IDrawable<N, ?> drawable) {
+		this.drawable = drawable;
+		markDirty();
+	}
 
 
 	/* SECTION methods */
@@ -64,33 +63,6 @@ public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawab
 
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
-
-	@Override
-	public boolean isImmutable() { return false; }
-
-	@Override
-	public int hashCode() {
-		return isImmutable() ? getHashCode(this, super.hashCode(), getDrawable()) : getHashCode(this, super.hashCode());
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		return isImmutable() ? isEqual(this, o, super.equals(o),
-				t -> getDrawable().equals(t.getDrawable())) : isEqual(this, o, super.equals(o));
-	}
-
-	@Override
-	public T clone() {
-		T r = super.clone();
-		r.drawable = drawable.copy();
-		return r;
-	}
-
-	@Override
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"drawable", getDrawable()});
-	}
 
 
 	/* SECTION static classes */
@@ -124,11 +96,11 @@ public class GuiRectangleDrawable<N extends Number, T extends GuiRectangleDrawab
 		/* SECTION methods */
 
 		@Override
-		@OverridingStatus(group = GROUP, when = When.NEVER)
+		@OverridingStatus(group = GROUP)
 		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		@Override
-		@OverridingStatus(group = GROUP, when = When.NEVER)
+		@OverridingStatus(group = GROUP)
 		public final boolean isImmutable() { return true; }
 	}
 }

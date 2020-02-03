@@ -1,4 +1,4 @@
-package $group__.$modId__.common.registrable.items.templates;
+package $group__.$modId__.common.registrable.items.base;
 
 @SuppressWarnings("SpellCheckingInspection")
 public class ItemUnstackable extends ItemDefault {

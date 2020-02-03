@@ -2,10 +2,11 @@ package $group__.$modId__.common.configurations.components;
 
 import $group__.$modId__.utilities.constructs.interfaces.IMapDelegated;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
+import $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable;
 import $group__.$modId__.utilities.helpers.Casts;
-import $group__.$modId__.utilities.variables.Globals;
 
 import javax.annotation.Nullable;
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import javax.annotation.meta.When;
 import java.lang.ref.WeakReference;
 import java.util.Map;
@@ -15,25 +16,16 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxed;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.MapsExtension.toMapFromValues;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
-import static $group__.$modId__.utilities.helpers.Reflections.BRIDGE;
-import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclaredField;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
-import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
 public class ConfigurationI18n<M extends Map<String, ConfigurationI18n<?, ?>>, T extends ConfigurationI18n<M, T>> implements IMapDelegated<M, String, ConfigurationI18n<?, ?>, T> {
-	/* SECTION static variables */
-
-	private static final long PARENT_LOCK_OFFSET = BRIDGE.objectFieldOffset(getDeclaredField(ConfigurationI18n.class, "parentLock").get().orElseThrow(Globals::rethrowCaughtThrowableStatic));
-
-
 	/* SECTION variables */
 
 	protected final ReentrantReadWriteLock parentLock = new ReentrantReadWriteLock();
@@ -123,48 +115,23 @@ public class ConfigurationI18n<M extends Map<String, ConfigurationI18n<?, ?>>, T
 	public boolean isImmutable() { return false; }
 
 	@Override
+	@OverridingStatus(group = GROUP)
+	public final int hashCode() { return getHashCode(this, super::hashCode); }
+
+	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+	@Override
+	@OverridingStatus(group = GROUP)
+	public final boolean equals(Object o) { return isEqual(this, o, super::equals); }
+
+	@SuppressWarnings("Convert2MethodRef")
+	@Override
+	@OverridingMethodsMustInvokeSuper
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public int hashCode() {
-		return isImmutable() ? getHashCode(this, super.hashCode(), getId(), getName(), getParent(), isParentNull(), getChildren()) : getHashCode(this, super.hashCode());
-	}
+	public T clone() { return ICloneable.clone(() -> super.clone()); }
 
 	@Override
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public boolean equals(Object o) {
-		return isImmutable() ? isEqual(this, o, super.equals(o),
-				t -> getId().equals(t.getId()),
-				t -> getName().equals(t.getName()),
-				t -> getParent().equals(getParent()),
-				t -> isParentNull() == t.isParentNull(),
-				t -> getChildren().equals(t.getChildren())) : isEqual(this, o, super.equals(o));
-	}
-
-	@Override
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public T clone() {
-		T r;
-		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
-			throw unexpected(e);
-		}
-		r.id = tryCloneUnboxedNonnull(id);
-		r.name = tryCloneUnboxedNonnull(name);
-		r.parent = tryCloneUnboxedNonnull(parent);
-		r.parentNull = tryCloneUnboxedNonnull(parentNull);
-		BRIDGE.putObject(this, PARENT_LOCK_OFFSET, tryCloneUnboxedNonnull(parentLock));
-		r.children = tryCloneUnboxedNonnull(children);
-		return r;
-	}
-
-	@Override
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"id", getId()},
-				new Object[]{"name", getName()},
-				new Object[]{"parent", getParent()},
-				new Object[]{"parentNull", isParentNull()},
-				new Object[]{"children", getChildren()});
-	}
+	@OverridingStatus(group = GROUP)
+	public final String toString() { return getToStringString(this, super.toString()); }
 
 	protected boolean isParentNull() {
 		ReentrantReadWriteLock.ReadLock plr = parentLock.readLock();
@@ -213,11 +180,11 @@ public class ConfigurationI18n<M extends Map<String, ConfigurationI18n<?, ?>>, T
 		/* SECTION methods */
 
 		@Override
-		@OverridingStatus(group = GROUP, when = When.NEVER)
+		@OverridingStatus(group = GROUP)
 		public final T toImmutable() { return IMapDelegated.IImmutable.super.toImmutable(); }
 
 		@Override
-		@OverridingStatus(group = GROUP, when = When.NEVER)
+		@OverridingStatus(group = GROUP)
 		public final boolean isImmutable() { return IMapDelegated.IImmutable.super.isImmutable(); }
 	}
 }

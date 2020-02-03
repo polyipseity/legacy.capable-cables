@@ -2,7 +2,6 @@ package $group__.$modId__.utilities.helpers;
 
 import $group__.$modId__.utilities.constructs.interfaces.basic.IOperable;
 import com.google.common.collect.Lists;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
@@ -15,8 +14,8 @@ import static $group__.$modId__.utilities.helpers.Comparables.greaterThan;
 import static $group__.$modId__.utilities.helpers.Comparables.lessThan;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
 import static $group__.$modId__.utilities.helpers.Patterns.TWO_MINUS_SIGNS_PATTERN;
-import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclaredField;
-import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclaredMethod;
+import static $group__.$modId__.utilities.helpers.Reflections.Classes.getDeclaredField;
+import static $group__.$modId__.utilities.helpers.Reflections.Classes.getDeclaredMethod;
 import static java.lang.Double.doubleToLongBits;
 import static java.util.Arrays.asList;
 
@@ -38,7 +37,7 @@ public enum Numbers {
 		else if (n instanceof IOperable<?, ?>)
 			return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class)).flatMap(t -> castChecked(t.negate(), castUncheckedUnboxedNonnull(t.getClass())));
 		else if (n instanceof Number)
-			return getDeclaredMethod(n.getClass(), "valueOf", String.class).invoke(null, TWO_MINUS_SIGNS_PATTERN.matcher(("-" + n)).replaceAll(Matcher.quoteReplacement(StringUtils.EMPTY))).flatMap(t -> castChecked(t, castUncheckedUnboxedNonnull(t.getClass())));
+			return getDeclaredMethod(n.getClass(), "valueOf", String.class).invoke(null, TWO_MINUS_SIGNS_PATTERN.matcher(("-" + n)).replaceAll(Matcher.quoteReplacement(StringsExtension.EMPTY))).flatMap(t -> castChecked(t, castUncheckedUnboxedNonnull(t.getClass())));
 		return Optional.empty();
 	}
 
@@ -63,10 +62,10 @@ public enum Numbers {
 			return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class)).flatMap(t -> castChecked(t.sum(it), castUncheckedUnboxedNonnull(t.getClass())));
 		else if (n instanceof Number) {
 			Class<? extends N> clazz = castUncheckedUnboxedNonnull(n.getClass());
-			@Nullable Class<?> pClass = unboxOptional(getDeclaredField(clazz, "TYPE").get_(null).flatMap(t -> castChecked(t, Class.class)));
+			@Nullable Class<?> pClass = unboxOptional(getDeclaredField(clazz, "TYPE").get(null).flatMap(t -> castChecked(t, Class.class)));
 			if (pClass == null) return Optional.empty();
 
-			Reflections.Unsafe.AccessibleObjectAdapter.MethodAdapter m = getDeclaredMethod(clazz, "sum", pClass, pClass),
+			Reflections.Classes.AccessibleObjectAdapter.MethodAdapter m = getDeclaredMethod(clazz, "sum", pClass, pClass),
 					em = getDeclaredMethod(Number.class, pClass + "Value");
 
 			Iterator<? extends N> itr = it.iterator();

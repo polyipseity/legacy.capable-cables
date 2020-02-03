@@ -10,8 +10,7 @@ import $group__.$modId__.utilities.constructs.classes.Singleton;
 import $group__.$modId__.utilities.constructs.classes.concrete.ModContainerNull;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.Marker;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.Property;
-import $group__.$modId__.utilities.helpers.Loggers;
-import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.FieldAdapter;
+import $group__.$modId__.utilities.helpers.Reflections.Classes.AccessibleObjectAdapter.FieldAdapter;
 import $group__.$modId__.utilities.variables.Globals;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
@@ -28,16 +27,17 @@ import java.lang.reflect.Modifier;
 import java.util.function.BiConsumer;
 
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
-import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclaredField;
+import static $group__.$modId__.utilities.helpers.Reflections.Classes.AccessibleObjectAdapter.FieldAdapter.setModifiers;
+import static $group__.$modId__.utilities.helpers.Reflections.Classes.AccessibleObjectAdapter.setAccessibleWithLogging;
 import static $group__.$modId__.utilities.helpers.Reflections.getPackage;
 import static $group__.$modId__.utilities.helpers.Reflections.isMemberStatic;
 import static $group__.$modId__.utilities.helpers.Throwables.requireRunOnceOnly;
 import static $group__.$modId__.utilities.variables.Constants.*;
 import static $group__.$modId__.utilities.variables.Globals.REFLECTIONS_CACHE;
+import static $group__.$modId__.utilities.variables.Globals.rethrowCaughtThrowableStatic;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static net.minecraftforge.fml.common.Mod.EventHandler;
 import static net.minecraftforge.fml.common.Mod.InstanceFactory;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 @Mod(
 		modid = MOD_ID,
@@ -47,8 +47,8 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 		useMetadata = true,
 		acceptedMinecraftVersions = ACCEPTED_MINECRAFT_VERSIONS,
 		certificateFingerprint = CERTIFICATE_FINGERPRINT,
-		modLanguageAdapter = PACKAGE + "." + ModThis.CLASS_SIMPLE_NAME + "$" + ModThis.CustomLanguageAdapter.CLASS_SIMPLE_NAME,
-		guiFactory = PACKAGE + "." + ModGuiFactoryThis.SUBPACKAGE + "." + ModGuiFactoryThis.CLASS_SIMPLE_NAME,
+		modLanguageAdapter = PACKAGE + '.' + ModThis.CLASS_SIMPLE_NAME + '$' + ModThis.CustomLanguageAdapter.CLASS_SIMPLE_NAME,
+		guiFactory = PACKAGE + '.' + ModGuiFactoryThis.SUBPACKAGE + '.' + ModGuiFactoryThis.CLASS_SIMPLE_NAME,
 		updateJSON = UPDATE_JSON
 )
 public enum ModThis {
@@ -62,12 +62,12 @@ public enum ModThis {
 			CLASS_SIMPLE_NAME = "ModThis",
 			EVENT_PROCESSOR_VALUE = "event processor",
 			CONTAINER_VALUE = "container";
-	public static final Logger LOGGER = LogManager.getLogger(NAME + "|" + MOD_ID);
+	public static final Logger LOGGER = LogManager.getLogger(NAME + '|' + MOD_ID);
 	@Marker(@Property(key = "Field", value = CONTAINER_VALUE))
 	public static final ModContainer CONTAINER = Singleton.getInstance(ModContainerNull.class);
 	@SidedProxy(modId = MOD_ID,
-			clientSide = PACKAGE + "." + Proxy.SUBPACKAGE + "." + ProxyClient.CLASS_SIMPLE_NAME,
-			serverSide = PACKAGE + "." + Proxy.SUBPACKAGE + "." + ProxyServer.CLASS_SIMPLE_NAME)
+			clientSide = PACKAGE + '.' + Proxy.SUBPACKAGE + '.' + ProxyClient.CLASS_SIMPLE_NAME,
+			serverSide = PACKAGE + '.' + Proxy.SUBPACKAGE + '.' + ProxyServer.CLASS_SIMPLE_NAME)
 	public static final Proxy PROXY = Singleton.getInstance(ProxyNull.class);
 	private static final ImmutableMap<Class<? extends FMLEvent>, BiConsumer<?, ? extends FMLEvent>> EVENT_MAP = new ImmutableMap.Builder<Class<? extends FMLEvent>, BiConsumer<?, ? extends FMLEvent>>()
 			.put(FMLConstructionEvent.class, (ModThis m, FMLConstructionEvent e) ->
@@ -110,7 +110,7 @@ public enum ModThis {
 		LOGGER.info("{} started", name);
 		Stopwatch stopwatch = Stopwatch.createStarted();
 		process.accept(mod, event);
-		LOGGER.info("{} ended ({} <- {} ns)", name, stopwatch.stop().toString(), stopwatch.elapsed(NANOSECONDS));
+		LOGGER.info("{} ended ({} <- {} ns)", name, stopwatch.stop(), stopwatch.elapsed(NANOSECONDS));
 	}
 
 
@@ -187,26 +187,10 @@ public enum ModThis {
 							Property mp = mps[0];
 							Class<? extends Field> fc = f.getClass();
 							if (mp.key().equals(fc.getSimpleName()) && mp.value().equals(CONTAINER_VALUE)) {
-								FieldAdapter fa = FieldAdapter.of(f), fModF = getDeclaredField(fc, "modifiers");
-								Field fModF0 = fModF.get().orElseThrow(Globals::rethrowCaughtThrowableStatic);
-								int fMod = f.getModifiers(), fMod1 = fMod & ~Modifier.FINAL;
-
-								if (!fModF.setAccessible(true))
-									LOGGER.warn(Loggers.FORMATTER_WITH_THROWABLE.apply(Loggers.FORMATTER_REFLECTION_UNABLE_TO_SET_ACCESSIBLE.apply(() -> "modifier field", fModF0).apply(f, fc).apply(true), fModF.getCaughtThrowableUnboxedNonnull()));
-								if (!fModF.setInt(f, fMod1))
-									LOGGER.warn(Loggers.FORMATTER_WITH_THROWABLE.apply(Loggers.FORMATTER_REFLECTION_UNABLE_TO_SET_FIELD.apply(fModF0, f).apply(fc, fMod1), fModF.getCaughtThrowableUnboxedNonnull()));
-
-								if (!fa.setAccessible(true))
-									LOGGER.warn(Loggers.FORMATTER_WITH_THROWABLE.apply(Loggers.FORMATTER_REFLECTION_UNABLE_TO_SET_ACCESSIBLE.apply(() -> "container field", f).apply(null, objectClass).apply(true), fa.getCaughtThrowableUnboxedNonnull()));
-								if (!fa.set(null, container)) throw fa.rethrowCaughtThrowable();
-								if (!fa.setAccessible(false))
-									LOGGER.warn(Loggers.FORMATTER_WITH_THROWABLE.apply(Loggers.FORMATTER_REFLECTION_UNABLE_TO_SET_ACCESSIBLE.apply(() -> "container field", f).apply(null, objectClass).apply(false), fa.getCaughtThrowableUnboxedNonnull()));
-
-								if (!fModF.setInt(f, fMod))
-									LOGGER.warn(Loggers.FORMATTER_WITH_THROWABLE.apply(Loggers.FORMATTER_REFLECTION_UNABLE_TO_SET_FIELD.apply(fModF0, f).apply(fc, fMod), fModF.getCaughtThrowableUnboxedNonnull()));
-								if (!fModF.setAccessible(false))
-									LOGGER.warn(Loggers.FORMATTER_WITH_THROWABLE.apply(Loggers.FORMATTER_REFLECTION_UNABLE_TO_SET_ACCESSIBLE.apply(() -> "modifier field", fModF0).apply(f, fc).apply(false), fModF.getCaughtThrowableUnboxedNonnull()));
-
+								FieldAdapter fa = FieldAdapter.of(f);
+								setAccessibleWithLogging(fa, "container field", null, fc, true);
+								setModifiers(fa, f.getModifiers() & ~Modifier.FINAL);
+								if (!fa.set(null, container)) throw rethrowCaughtThrowableStatic();
 								break;
 							}
 						}
@@ -229,11 +213,8 @@ public enum ModThis {
 										FieldAdapter fa = FieldAdapter.of(f);
 										ListMultimap<Class<? extends FMLEvent>, Method> fv;
 
-										if (!fa.setAccessible(true))
-											throw fa.rethrowCaughtThrowable();
-										fv = castUncheckedUnboxedNonnull(fa.get_(container).orElseThrow(fa::rethrowCaughtThrowable));
-										if (!fa.setAccessible(false))
-											LOGGER.warn("Unable to restore accessibility of list multi-map field '{}' of object '{}' of class '{}', presenting a potential security problem, stacktrace:\n{}", f, container, containerC.toGenericString(), getStackTrace(fa.getCaughtThrowableUnboxedNonnull()));
+										if (!fa.setAccessible(true)) throw rethrowCaughtThrowableStatic();
+										fv = castUncheckedUnboxedNonnull(fa.get(container).orElseThrow(Globals::rethrowCaughtThrowableStatic));
 
 										REFLECTIONS_CACHE.get(getPackage(FMLEvent.class)).getSubTypesOf(FMLEvent.class).forEach(t -> fv.put(t, m));
 
@@ -252,15 +233,8 @@ public enum ModThis {
 
 		@Override
 		public void setProxy(Field target, Class<?> proxyTarget, Object proxy) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
-			FieldAdapter tModF = getDeclaredField(target.getClass(), "modifiers");
-			Field tModF0 = tModF.get().orElseThrow(Globals::rethrowCaughtThrowableStatic);
-			int tMod = target.getModifiers();
-
-			if (!(tModF.setAccessible(true) && tModF.setInt(target, tMod & ~Modifier.FINAL)))
-				LOGGER.warn("Unable to set modifier field '{}' of proxy field '{}' to be non-final, will crash with a final proxy field, stacktrace:\n{}", tModF.get(), target, getStackTrace(tModF.getCaughtThrowableUnboxedNonnull()));
+			setModifiers(FieldAdapter.of(target), target.getModifiers() & ~Modifier.FINAL);
 			super.setProxy(target, proxyTarget, proxy);
-			if (!(tModF.setInt(target, tMod) && tModF.setAccessible(false)))
-				LOGGER.warn("Unable to restore modifier field '{}' of proxy field '{}', presenting a potential security problem, stacktrace:\n{}", tModF.get(), target, getStackTrace(tModF.getCaughtThrowableUnboxedNonnull()));
 		}
 	}
 }

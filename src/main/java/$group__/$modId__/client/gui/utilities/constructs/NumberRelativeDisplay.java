@@ -7,16 +7,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
-import javax.annotation.meta.When;
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxed;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
@@ -46,21 +42,35 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 		super(value, parent, offset);
 		this.updater = updater;
 		this.update = update;
-		registerPreInitGuiListener(this, castUncheckedUnboxedNonnull(updater));
+		initializeInstance(this);
 	}
 
 	public NumberRelativeDisplay(NumberRelativeDisplay<T> copy) { this(copy.getValue(), copy.getParent().orElseThrow(() -> rejectArguments(copy)), unboxOptional(copy.getOffset()), copy.getUpdater(), copy.getUpdate()); }
+
+
+	/* SECTION static methods */
+
+	private static <T extends NumberRelativeDisplay<?>> T initializeInstance(T t) {
+		registerPreInitGuiListener(t, castUncheckedUnboxedNonnull(t.getUpdater()));
+		return t;
+	}
 
 
 	/* SECTION getters & setters */
 
 	public BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> getUpdater() { return updater; }
 
-	public void setUpdater(BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater) { registerPreInitGuiListener(this, castUncheckedUnboxedNonnull(this.updater = updater)); }
+	public void setUpdater(BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater) {
+		registerPreInitGuiListener(this, castUncheckedUnboxedNonnull(this.updater = updater));
+		markDirty();
+	}
 
 	public AtomicBoolean getUpdate() { return update; }
 
-	public void setUpdate(AtomicBoolean update) { this.update = update; }
+	public void setUpdate(AtomicBoolean update) {
+		this.update = update;
+		markDirty();
+	}
 
 	@Override
 	@Deprecated
@@ -70,32 +80,8 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 	/* SECTION methods */
 
 	@Override
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"updater", getUpdater()},
-				new Object[]{"update", getUpdate()});
-	}
-
-	@Override
-	public T clone() {
-		T r = super.clone();
-		r.updater = tryCloneUnboxedNonnull(updater);
-		r.update = tryCloneUnboxedNonnull(update);
-		registerPreInitGuiListener(r, r.getUpdater());
-		return r;
-	}
-
-	@Override
-	public int hashCode() {
-		return isImmutable() ? getHashCode(this, super.hashCode(), getUpdater(), getUpdate()) : getHashCode(this, super.hashCode());
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		return isImmutable() ? isEqual(this, o, super.equals(o),
-				t -> getUpdater().equals(t.getUpdater()),
-				t -> getUpdate().equals(t.getUpdate())) : isEqual(this, o, super.equals(o));
-	}
+	@OverridingMethodsMustInvokeSuper
+	public T clone() { return initializeInstance(super.clone()); }
 
 
 	/* SECTION static classes */
@@ -114,7 +100,10 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 
 		public X(Number value, Number parent, @Nullable Number offset, AtomicBoolean update) {
 			super(value, parent, offset, (e, t) -> {
-				if (t.getUpdate().get()) t.parent = getResolution().getScaledWidth_double();
+				if (t.getUpdate().get()) {
+					t.parent = getResolution().getScaledWidth_double();
+					t.markDirty();
+				}
 			}, update);
 		}
 
@@ -180,11 +169,11 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 			/* SECTION methods */
 
 			@Override
-			@OverridingStatus(group = GROUP, when = When.NEVER)
+			@OverridingStatus(group = GROUP)
 			public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 			@Override
-			@OverridingStatus(group = GROUP, when = When.NEVER)
+			@OverridingStatus(group = GROUP)
 			public final boolean isImmutable() { return true; }
 		}
 	}
@@ -204,7 +193,10 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 
 		public Y(Number value, Number parent, @Nullable Number offset, AtomicBoolean update) {
 			super(value, parent, offset, (e, t) -> {
-				if (t.getUpdate().get()) t.parent = getResolution().getScaledHeight_double();
+				if (t.getUpdate().get()) {
+					t.parent = getResolution().getScaledHeight_double();
+					t.markDirty();
+				}
 			}, update);
 		}
 
@@ -270,11 +262,11 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 			/* SECTION methods */
 
 			@Override
-			@OverridingStatus(group = GROUP, when = When.NEVER)
+			@OverridingStatus(group = GROUP)
 			public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 			@Override
-			@OverridingStatus(group = GROUP, when = When.NEVER)
+			@OverridingStatus(group = GROUP)
 			public final boolean isImmutable() { return true; }
 		}
 	}

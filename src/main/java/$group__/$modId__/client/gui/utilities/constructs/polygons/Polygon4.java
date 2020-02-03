@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import javax.annotation.meta.When;
 import java.util.List;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
@@ -30,6 +29,13 @@ public class Polygon4<N extends Number, T extends Polygon4<N, T>> extends Polygo
 
 
 	/* SECTION getters & setters */
+
+	@Override
+	public XY<N, ?> set(int index, XY<N, ?> element) {
+		XY<N, ?> r = super.set(index, element);
+		markDirty();
+		return r;
+	}
 
 	public XY<N, ?> a() { return get(0); }
 
@@ -57,9 +63,6 @@ public class Polygon4<N extends Number, T extends Polygon4<N, T>> extends Polygo
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
-	@Override
-	public boolean isImmutable() { return false; }
-
 
 	/* SECTION static classes */
 
@@ -75,6 +78,10 @@ public class Polygon4<N extends Number, T extends Polygon4<N, T>> extends Polygo
 
 
 		/* SECTION getters & setters */
+
+		@Override
+		@Deprecated
+		public XY<N, ?> set(int index, XY<N, ?> element) { throw rejectUnsupportedOperation(); }
 
 		@Override
 		@Deprecated
@@ -96,11 +103,11 @@ public class Polygon4<N extends Number, T extends Polygon4<N, T>> extends Polygo
 		/* SECTION methods */
 
 		@Override
-		@OverridingStatus(group = GROUP, when = When.NEVER)
+		@OverridingStatus(group = GROUP)
 		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		@Override
-		@OverridingStatus(group = GROUP, when = When.NEVER)
+		@OverridingStatus(group = GROUP)
 		public final boolean isImmutable() { return true; }
 	}
 }

@@ -2,7 +2,7 @@ package $group__.$modId__.utilities.helpers;
 
 import $group__.$modId__.utilities.constructs.interfaces.annotations.ExternalCloneMethod;
 import $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable;
-import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.ConstructorAdapter;
+import $group__.$modId__.utilities.helpers.Reflections.Classes.AccessibleObjectAdapter.ConstructorAdapter;
 import $group__.$modId__.utilities.variables.Globals;
 import net.minecraft.util.ResourceLocation;
 
@@ -20,8 +20,8 @@ import java.util.function.*;
 import java.util.stream.Collectors;
 
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
-import static $group__.$modId__.utilities.helpers.Optionals.unboxOptionalNonnull;
-import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.newInstance;
+import static $group__.$modId__.utilities.helpers.Reflections.Classes.AccessibleObjectAdapter.setAccessibleWithLogging;
+import static $group__.$modId__.utilities.helpers.Reflections.Classes.newInstance;
 import static $group__.$modId__.utilities.helpers.Throwables.consumeCaught;
 import static $group__.$modId__.utilities.variables.Globals.*;
 
@@ -92,12 +92,11 @@ public enum Copiers {
 		for (Map.Entry<ConstructorAdapter<? extends C>, String> co : cos.entrySet()) {
 			ConstructorAdapter<? extends C> coa = co.getKey();
 
-			if (!coa.setAccessible(true))
-				LOGGER.warn(Loggers.FORMATTER_WITH_THROWABLE.apply(Loggers.FORMATTER_REFLECTION_UNABLE_TO_SET_ACCESSIBLE.apply(() -> "copy constructor", unboxOptionalNonnull(coa.get())).apply(null, cl).apply(true), coa.getCaughtThrowableUnboxedNonnull()));
+			setAccessibleWithLogging(coa, "copy constructor", null, cl, true);
 			try {
 				switch (co.getValue()) {
 					case "Copy":
-						r = coa.newInstance(copy).orElseThrow(coa::rethrowCaughtThrowable);
+						r = coa.newInstance(copy).orElseThrow(Globals::rethrowCaughtThrowableStatic);
 						try {
 							r.clear();
 							r.addAll(copy.stream().map(ICloneable::tryCloneUnboxed).collect(Collectors.toList())); // COMMENT keep it ordered by collecting stream to list
@@ -108,14 +107,11 @@ public enum Copiers {
 						}
 						break cos;
 					case "Object[]":
-						r = coa.newInstance((Object) copy.stream().map(ICloneable::tryCloneUnboxed).toArray()).orElseThrow(coa::rethrowCaughtThrowable); // COMMENT cast to Object to call the method with the array as 1 object
+						r = coa.newInstance((Object) copy.stream().map(ICloneable::tryCloneUnboxed).toArray()).orElseThrow(Globals::rethrowCaughtThrowableStatic); // COMMENT cast to Object to call the method with the array as 1 object
 						break cos;
 				}
 			} catch (Throwable t) {
 				setCaughtThrowableStatic(t);
-			} finally {
-				if (!coa.setAccessible(false))
-					LOGGER.warn(Loggers.FORMATTER_WITH_THROWABLE.apply(Loggers.FORMATTER_REFLECTION_UNABLE_TO_SET_ACCESSIBLE.apply(() -> "copy constructor", unboxOptionalNonnull(coa.get())).apply(null, cl).apply(false), coa.getCaughtThrowableUnboxedNonnull()));
 			}
 		}
 

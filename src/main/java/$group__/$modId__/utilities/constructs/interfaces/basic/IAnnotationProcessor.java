@@ -1,8 +1,8 @@
 package $group__.$modId__.utilities.constructs.interfaces.basic;
 
+import $group__.$modId__.utilities.helpers.StringsExtension;
 import $group__.$modId__.utilities.variables.Globals;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
@@ -14,8 +14,8 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
-import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.forName;
-import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.getDeclaredMethod;
+import static $group__.$modId__.utilities.helpers.Reflections.Classes.forName;
+import static $group__.$modId__.utilities.helpers.Reflections.Classes.getDeclaredMethod;
 import static $group__.$modId__.utilities.helpers.Reflections.getMethodNameDescriptor;
 import static $group__.$modId__.utilities.helpers.Reflections.getSuperclassesAndInterfaces;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
@@ -23,7 +23,7 @@ import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
 public interface IAnnotationProcessor<A extends Annotation> {
 	/* SECTION static methods */
 
-	static String getMessage(IAnnotationProcessor<?> processor, @Nullable String msg) { return "Processing annotation '" + processor.annotationType() + "'" + (msg == null || msg.isEmpty() ? StringUtils.EMPTY : ": " + msg); }
+	static String getMessage(IAnnotationProcessor<?> processor, @Nullable String msg) { return "Processing annotation '" + processor.annotationType() + '\'' + (msg == null || msg.isEmpty() ? StringsExtension.EMPTY : ": " + msg); }
 
 	static <A extends Annotation> A[] getEffectiveAnnotationsIfInheritingConsidered(IAnnotationProcessor<A> processor, Class<?> clazz, Method method) {
 		Class<A> aClass = processor.annotationType();
@@ -93,7 +93,7 @@ public interface IAnnotationProcessor<A extends Annotation> {
 					String mName = result.currentAsm.getObjectName();
 					@Nullable Method r = Arrays.stream(result.clazz.getDeclaredMethods()).filter(m -> mName.equals(getMethodNameDescriptor(m))).findFirst().orElse(null);
 					if (r == null)
-						throw rejectArguments(new NoSuchMethodException(getMessage(this, "No method name '" + mName + "' in class '" + result.clazz.toGenericString() + "'")), result.thisAsm);
+						throw rejectArguments(new NoSuchMethodException(getMessage(this, "No method name '" + mName + "' in class '" + result.clazz.toGenericString() + '\'')), result.thisAsm);
 					return r;
 				}
 

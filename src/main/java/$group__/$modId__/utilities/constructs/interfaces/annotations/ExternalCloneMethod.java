@@ -3,7 +3,7 @@ package $group__.$modId__.utilities.constructs.interfaces.annotations;
 import $group__.$modId__.utilities.constructs.classes.concrete.AnnotationProcessingEvent;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IAnnotationProcessor;
 import $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable;
-import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.MethodAdapter;
+import $group__.$modId__.utilities.helpers.Reflections.Classes.AccessibleObjectAdapter.MethodAdapter;
 import $group__.$modId__.utilities.helpers.Throwables;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
@@ -18,6 +18,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IAnnotationProcessor.getMessage;
+import static $group__.$modId__.utilities.helpers.Reflections.METHOD_OBJECT_CLONE;
 import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
 import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 import static java.lang.annotation.ElementType.METHOD;
@@ -61,8 +62,7 @@ public @interface ExternalCloneMethod {
 		@Override
 		public void process(ASMDataTable asm) {
 			IMethod.super.process(asm);
-			if (ICloneable.DEFAULT_ANNOTATION != null)
-				ICloneable.EXTERNAL_METHOD_MAP.put(ICloneable.DEFAULT_ANNOTATION, ICloneable.DEFAULT_METHOD);
+			ICloneable.EXTERNAL_METHOD_MAP.put(ICloneable.DEFAULT_ANNOTATION, METHOD_OBJECT_CLONE);
 			processed = true;
 		}
 

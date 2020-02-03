@@ -1,7 +1,7 @@
 package $group__.$modId__.client.gui;
 
+import $group__.$modId__.client.gui.bases.GuiContainerDefault;
 import $group__.$modId__.client.gui.components.*;
-import $group__.$modId__.client.gui.templates.GuiContainerDefault;
 import $group__.$modId__.client.gui.utilities.constructs.IThemed;
 import $group__.$modId__.client.gui.utilities.constructs.IThemed.EnumTheme;
 import $group__.$modId__.client.gui.utilities.constructs.NumberRelativeDisplay.X;
@@ -95,7 +95,7 @@ public class GuiWrench extends GuiContainerDefault<Number> implements IThemed<En
 	/* SECTION methods */
 
 	@Override
-	public Optional<Rectangle<Number, ?>> spec() { return tabs.spec(); }
+	public Optional<Rectangle.Immutable<Number, ?>> spec() { return tabs.spec(); }
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) { tabs.draw(mc); }

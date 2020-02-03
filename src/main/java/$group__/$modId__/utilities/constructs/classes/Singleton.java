@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 import static $group__.$modId__.utilities.helpers.MapsExtension.MULTI_THREAD_MAP_MAKER;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
-import static $group__.$modId__.utilities.helpers.Reflections.Unsafe.newInstance;
+import static $group__.$modId__.utilities.helpers.Reflections.Classes.newInstance;
 import static $group__.$modId__.utilities.helpers.Throwables.getStackTraceString;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectInstantiation;
 import static $group__.$modId__.utilities.variables.Globals.LOGGER;
@@ -33,11 +33,11 @@ public abstract class Singleton {
 		Map.Entry<? extends Singleton, String> v = immutableEntry(this, sts);
 		@Nullable Map.Entry<? extends Singleton, String> vo = INSTANCES.put(clazz, v);
 		if (vo != null) {
-			LOGGER.error("Singleton instance of '{}' already created, previous stacktrace:\n{}", classGS, vo.getValue());
+			LOGGER.error("Singleton instance of '{}' already created, previous stacktrace:" + System.lineSeparator() + "{}", classGS, vo.getValue());
 			throw rejectInstantiation();
 		}
 
-		LOGGER.debug("Singleton instance of '{}' created, stacktrace:\n{}", classGS, sts);
+		LOGGER.debug("Singleton instance of '{}' created, stacktrace:" + System.lineSeparator() + "{}", classGS, sts);
 	}
 
 

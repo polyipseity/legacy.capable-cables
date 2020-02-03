@@ -3,7 +3,7 @@ package $group__.$modId__.utilities.constructs.interfaces.annotations;
 import $group__.$modId__.utilities.constructs.classes.concrete.AnnotationProcessingEvent;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IAnnotationProcessor;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable;
-import $group__.$modId__.utilities.helpers.Reflections.Unsafe.AccessibleObjectAdapter.MethodAdapter;
+import $group__.$modId__.utilities.helpers.Reflections.Classes.AccessibleObjectAdapter.MethodAdapter;
 import $group__.$modId__.utilities.helpers.Throwables;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;

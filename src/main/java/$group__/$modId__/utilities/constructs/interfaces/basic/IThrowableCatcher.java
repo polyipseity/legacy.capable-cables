@@ -19,6 +19,8 @@ public interface IThrowableCatcher {
 
 	default Throwable getCaughtThrowableUnboxedNonnull() { return getCaughtThrowable().orElseThrow(Throwables::unexpected); }
 
+	default boolean caughtThrowable() { return getCaughtThrowable().isPresent(); }
+
 
 	void clearCaughtThrowable();
 

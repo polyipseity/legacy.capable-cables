@@ -13,5 +13,5 @@ public interface IForgeRegistryEntryExtension<V extends IForgeRegistryEntry<V>> 
 	default V setRegistryAndUnlocalizedName(String modId, String name) { return setRegistryAndUnlocalizedName(new ResourceLocation(modId, name)); }
 
 	@SuppressWarnings("SpellCheckingInspection")
-	V setRegistryAndUnlocalizedName(ResourceLocation name);
+	default V setRegistryAndUnlocalizedName(ResourceLocation name) { return setUnlocalizedName(name).setRegistryName(name); }
 }

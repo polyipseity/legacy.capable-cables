@@ -5,12 +5,7 @@ import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingS
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import javax.annotation.meta.When;
-
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -44,6 +39,7 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 		XY<N, ?> change = offset.sum(of(getOffset().negate()));
 		replaceAll(t -> t.sum(of(change)).toImmutable());
 		this.offset = offset;
+		markDirty();
 	}
 
 	public XY<N, ?> getSize() { return size; }
@@ -54,6 +50,7 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 		set(2, c().sum(of(change)).toImmutable());
 		set(3, d().sumY(change).toImmutable());
 		this.size = size;
+		markDirty();
 	}
 
 	public final void setOffsetAndSize(Rectangle<N, ?> rect) { setOffsetAndSize(rect.getOffset(), rect.getSize()); }
@@ -85,39 +82,10 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
-	@Override
-	public boolean isImmutable() { return false; }
 
 	public XY<N, ?> max() { return a().max(of(c())); }
 
 	public XY<N, ?> min() { return a().min(of(c())); }
-
-	@Override
-	public int hashCode() {
-		return isImmutable() ? getHashCode(this, super.hashCode(), getOffset(), getSize()) : getHashCode(this, super.hashCode());
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		return isImmutable() ? isEqual(this, o, super.equals(o),
-				t -> getOffset().equals(t.getOffset()),
-				t -> getSize().equals(t.getSize())) : isEqual(this, o, super.equals(o));
-	}
-
-	@Override
-	public T clone() {
-		T r = super.clone();
-		r.offset = offset.copy();
-		r.size = size.copy();
-		return r;
-	}
-
-	@Override
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"offset", getOffset()},
-				new Object[]{"size", getSize()});
-	}
 
 
 	/* SECTION static classes */
@@ -154,11 +122,11 @@ public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Poly
 		/* SECTION methods */
 
 		@Override
-		@OverridingStatus(group = GROUP, when = When.NEVER)
+		@OverridingStatus(group = GROUP)
 		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		@Override
-		@OverridingStatus(group = GROUP, when = When.NEVER)
+		@OverridingStatus(group = GROUP)
 		public final boolean isImmutable() { return true; }
 	}
 }

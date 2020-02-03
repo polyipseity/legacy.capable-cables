@@ -1,16 +1,19 @@
 package $group__.$modId__.utilities.helpers;
 
-import org.apache.commons.lang3.StringUtils;
+import $group__.$modId__.utilities.constructs.interfaces.extensions.ICallable;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 
 import static $group__.$modId__.utilities.helpers.Grammar.appendSuffixIfPlural;
 import static $group__.$modId__.utilities.helpers.MapsExtension.MULTI_THREAD_MAP_MAKER;
 import static $group__.$modId__.utilities.helpers.Reflections.BRIDGE;
-import static $group__.$modId__.utilities.variables.Globals.LOGGER;
+import static $group__.$modId__.utilities.variables.Globals.*;
+import static java.lang.System.lineSeparator;
 
 @SuppressWarnings("SpellCheckingInspection")
 public enum Throwables {
@@ -24,6 +27,23 @@ public enum Throwables {
 
 	/* SECTION static methods */
 
+	public static <T> Optional<T> tryCall(ICallable<T> callable) {
+		clearCaughtThrowableStatic();
+		try {
+			return Optional.ofNullable(callable.call());
+		} catch (Throwable t) {
+			setCaughtThrowableStatic(t);
+			return Optional.empty();
+		}
+	}
+
+	public static <T> Optional<T> tryCallWithLogging(ICallable<T> callable, Logger logger) {
+		Optional<T> r = tryCall(callable);
+		if (caughtThrowableStatic()) logger.warn("Failed callable, stacktrace:{}{}", lineSeparator(), ExceptionUtils.getStackTrace(getCaughtThrowableUnboxedNonnullStatic()));
+		return r;
+	}
+
+
 	public static String getStackTraceString() { return ExceptionUtils.getStackTrace(newThrowable()); }
 
 	public static Throwable newThrowable() { return new Throwable("Instantiated throwable"); }
@@ -36,7 +56,7 @@ public enum Throwables {
 
 	public static RuntimeException rejectInstantiation() throws RuntimeException { throw rejectInstantiation(null); }
 
-	public static RuntimeException rejectInstantiation(@Nullable String msg) throws RuntimeException { throw throwThrowable(new InstantiationException(rejectAttemptString("illegal instantiation" + (msg == null ? StringUtils.EMPTY : ": " + msg)))); }
+	public static RuntimeException rejectInstantiation(@Nullable String msg) throws RuntimeException { throw throwThrowable(new InstantiationException(rejectAttemptString("illegal instantiation" + (msg == null ? StringsExtension.EMPTY : ": " + msg)))); }
 
 	public static RuntimeException throwThrowable(Throwable t) {
 		BRIDGE.throwException(t);
@@ -52,13 +72,15 @@ public enum Throwables {
 
 	public static StackTraceElement[] getStackTrace() { return newThrowable().getStackTrace(); }
 
-	public static String rejectAttemptString(String msg, @Nullable Object from, @Nullable Object to) { return (from == null ? "A" : "'" + from + "' a") + "ttempted " + msg + (to == null ? StringUtils.EMPTY : " of '" + to + "'"); }
+	public static String rejectAttemptString(String msg, @Nullable Object from, @Nullable Object to) { return (from == null ? "A" : "'" + from + "' a") + "ttempted " + msg + (to == null ? StringsExtension.EMPTY : " of '" + to + '\''); }
 
 	public static InternalError unexpected(@Nullable String msg, @Nullable Throwable t) throws InternalError {
 		throw throw_(new InternalError(msg, t));
 	}
 
 	public static <T extends Throwable> T throw_(T t) throws T { throw t; }
+
+	public static <T extends Throwable> T new_(T t) { return t; }
 
 	public static void requireRunOnceOnly() throws IllegalStateException {
 		Throwable t = newThrowable();
@@ -68,11 +90,11 @@ public enum Throwables {
 
 		@Nullable String stsO = RAN_ONCE.put(st[2].toString(), sts);
 		if (stsO != null) {
-			LOGGER.error("Illegal second invocation, previous stacktrace:\n{}", stsO);
+			LOGGER.error("Illegal second invocation, previous stacktrace:" + lineSeparator() + "{}", stsO);
 			throw throw_(new IllegalStateException(rejectAttemptString("illegal second invocation", st)));
 		}
 
-		LOGGER.debug("First ONLY invocation, stacktrace:\n{}", sts);
+		LOGGER.debug("First ONLY invocation, stacktrace:" + lineSeparator() + "{}", sts);
 	}
 
 	public static String rejectAttemptString(String msg, StackTraceElement[] st) { return rejectAttemptString(msg, st.length > 3 ? st[3] : null, st.length > 2 ? st[2] : null); }

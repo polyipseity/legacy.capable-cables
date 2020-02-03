@@ -1,8 +1,6 @@
 package $group__.$modId__.common.registrable.blocks;
 
 import $group__.$modId__.common.registrable.Registrable;
-import $group__.$modId__.common.registrable.blocks.templates.BlockDefault;
-import $group__.$modId__.common.registrable.creativetabs.CreativeTabsThis;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -21,7 +19,7 @@ public final class BlocksThis extends Registrable<Block> {
 
 	/* REFERENCE block template */
 	@SuppressWarnings("unused")
-	private static final Block TEMPLATE_ = new BlockDefault(new Material(MapColor.AIR), MapColor.AIR)
+	private static final Block TEMPLATE_ = new Block(new Material(MapColor.AIR), MapColor.AIR)
 			// COMMENT below one is required
 			.setRegistryName(MOD_ID, "template_")
 			// COMMENT all below are optional
@@ -39,7 +37,7 @@ public final class BlocksThis extends Registrable<Block> {
 	/* SECTION variables */
 
 	@SuppressWarnings("unused")
-	public final Block cable = new BlockCable().setRegistryAndUnlocalizedName(MOD_ID, "cable").setUnlocalizedName("cable").setCreativeTab(CreativeTabsThis.DEFAULT);
+	// public final Block cable = new BlockCable().setRegistryAndUnlocalizedName(MOD_ID, "cable").setCreativeTab(CreativeTabsThis.DEFAULT);
 
 
 	/* SECTION static methods */

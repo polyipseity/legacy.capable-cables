@@ -1,4 +1,4 @@
-package $group__.$modId__.common.registrable.items.templates;
+package $group__.$modId__.common.registrable.items.base;
 
 import $group__.$modId__.common.registrable.utilities.constructs.IForgeRegistryEntryExtension;
 import net.minecraft.item.Item;
@@ -12,8 +12,4 @@ public class ItemDefault extends Item implements IForgeRegistryEntryExtension<It
 	@SuppressWarnings("SpellCheckingInspection")
 	@Override
 	public Item setUnlocalizedName(ResourceLocation name) { return setUnlocalizedName(getNamespacedUnlocalizedNameForRegistry(name)); }
-
-	@SuppressWarnings("SpellCheckingInspection")
-	@Override
-	public Item setRegistryAndUnlocalizedName(ResourceLocation name) { return setUnlocalizedName(name).setRegistryName(name); }
 }

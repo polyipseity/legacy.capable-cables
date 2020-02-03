@@ -5,6 +5,8 @@ import $group__.$modId__.client.gui.utilities.constructs.XY;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
 import $group__.$modId__.utilities.constructs.interfaces.ICollectionDelegated;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
+import $group__.$modId__.utilities.constructs.interfaces.basic.IDirty;
+import $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable;
 import $group__.$modId__.utilities.helpers.Casts;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
@@ -13,19 +15,18 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
-import javax.annotation.meta.When;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IDirty.isDirty;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
-import static $group__.$modId__.utilities.helpers.Throwables.unexpected;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 import static com.google.common.collect.ImmutableSet.of;
 
@@ -52,6 +53,22 @@ public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDraw
 	 * @since 0.0.1.0
 	 */
 	protected C children;
+	protected long dirtiness;
+	@SuppressWarnings("unused")
+	protected final IDirty dirtyCustom = new IDirty() {
+		/* SECTION methods */
+
+		@Override
+		public void markDirty() { getChildren().forEach(IDirty::markDirty); }
+
+		@Override
+		public long getDirtiness() { return getChildren().stream().mapToLong(IDirty::getDirtiness).sum(); }
+	};
+
+	@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+	@Nullable
+	protected Optional<Rectangle.Immutable<N, ?>> cachedSpec;
+	protected final AtomicLong cachedSpecDirtiness = new AtomicLong();
 
 
 	/* SECTION constructors */
@@ -90,7 +107,14 @@ public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDraw
 	 * @see #clone() as-deep-as-possible clone method
 	 * @since 0.0.1.0
 	 */
-	public GuiGroup(GuiGroup<N, C, E, ?> copy) { this(copy.getChildren()); }
+	public GuiGroup(GuiGroup<N, C, E, ?> copy) {
+		this(copy.getChildren());
+		dirtiness = copy.dirtiness;
+		synchronized (cachedSpecDirtiness) {
+			cachedSpec = copy.cachedSpec;
+			cachedSpecDirtiness.set(copy.cachedSpecDirtiness.get());
+		}
+	}
 
 
 	/* SECTION getters & setters */
@@ -112,7 +136,10 @@ public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDraw
 	 * @see #setChildren(E...) the varargs version
 	 * @since 0.0.1.0
 	 */
-	public void setChildren(C children) { this.children = children; }
+	public void setChildren(C children) {
+		this.children = children;
+		markDirty();
+	}
 
 	/**
 	 * See {@link #setChildren(Collection)}.
@@ -160,24 +187,29 @@ public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDraw
 	 *
 	 * @return the GUI size of this group, optional
 	 */
+	@SuppressWarnings("OptionalAssignedToNull")
 	@Override
-	public Optional<Rectangle<N, ?>> spec() {
-		Collection<E> e = getChildren();
-		if (e.isEmpty()) return Optional.empty();
+	public Optional<Rectangle.Immutable<N, ?>> spec() {
+		synchronized (cachedSpecDirtiness) {
+			if (isDirty(this, cachedSpecDirtiness) || cachedSpec == null) {
+				Collection<E> e = getChildren();
+				if (e.isEmpty()) return cachedSpec = Optional.empty();
 
-		List<E> l = new ArrayList<>(e);
-		@Nullable Rectangle<N, ?> f = unboxOptional(l.get(0).spec());
-		List<Rectangle<N, ?>> r = l.subList(1, l.size()).stream().map(E::spec).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
-		if (f == null) {
-			if (r.isEmpty()) return Optional.empty();
-			else {
-				f = r.get(0);
-				r = r.subList(1, r.size());
-			}
+				List<E> l = new ArrayList<>(e);
+				@Nullable Rectangle<N, ?> f = unboxOptional(l.get(0).spec());
+				List<Rectangle<N, ?>> r = l.subList(1, l.size()).stream().map(E::spec).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+				if (f == null) {
+					if (r.isEmpty()) return cachedSpec = Optional.empty();
+					else {
+						f = r.get(0);
+						r = r.subList(1, r.size());
+					}
+				}
+
+				XY<N, ?> min = f.min().min(r.stream().map(Rectangle::min).collect(Collectors.toList()));
+				return cachedSpec = Optional.of(new Rectangle.Immutable<>(min, f.max().max(r.stream().map(Rectangle::max).collect(Collectors.toList())).sum(of(min.negate()))));
+			} else return cachedSpec;
 		}
-
-		XY<N, ?> min = f.min().min(r.stream().map(Rectangle::min).collect(Collectors.toList()));
-		return Optional.of(new Rectangle<>(min, f.max().max(r.stream().map(Rectangle::max).collect(Collectors.toList())).sum(of(min.negate()))));
 	}
 
 
@@ -193,35 +225,22 @@ public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDraw
 
 
 	@Override
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public int hashCode() {
-		return isImmutable() ? getHashCode(this, super.hashCode(), getChildren()) : getHashCode(this, super.hashCode());
-	}
+	@OverridingStatus(group = GROUP)
+	public final int hashCode() { return getHashCode(this, super::hashCode); }
+
+	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+	@Override
+	@OverridingStatus(group = GROUP)
+	public final boolean equals(Object o) { return isEqual(this, o, super::equals); }
+
+	@SuppressWarnings("Convert2MethodRef")
+	@Override
+	@OverridingStatus(group = GROUP)
+	public final T clone() { return ICloneable.clone(() -> super.clone()); }
 
 	@Override
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public boolean equals(Object o) {
-		return isImmutable() ? isEqual(this, o, super.equals(o),
-				t -> getChildren().equals(t.getChildren())) : isEqual(this, o, super.equals(o));
-	}
-
-	@Override
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public T clone() {
-		T r;
-		try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
-			throw unexpected(e);
-		}
-		r.children = tryCloneUnboxedNonnull(children);
-		return r;
-	}
-
-	@Override
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"children", getChildren()});
-	}
+	@OverridingStatus(group = GROUP)
+	public final String toString() { return getToStringString(this, super.toString()); }
 
 
 	/* SECTION static classes */
@@ -281,11 +300,11 @@ public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDraw
 		/* SECTION methods */
 
 		@Override
-		@OverridingStatus(group = GROUP, when = When.NEVER)
+		@OverridingStatus(group = GROUP)
 		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		@Override
-		@OverridingStatus(group = GROUP, when = When.NEVER)
+		@OverridingStatus(group = GROUP)
 		public final boolean isImmutable() { return true; }
 	}
 }

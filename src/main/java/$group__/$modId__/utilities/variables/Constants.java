@@ -20,7 +20,7 @@ public enum Constants {
 			CERTIFICATE_FINGERPRINT = "${certificateFingerprint}",
 			UPDATE_JSON = "${updateJSON}",
 			GROUP = "${group}",
-			PACKAGE = GROUP + "." + MOD_ID;
+			PACKAGE = GROUP + '.' + MOD_ID;
 
 	@SuppressWarnings({"SpellCheckingInspection", "RedundantSuppression"})
 	public static final String

@@ -6,26 +6,30 @@ import $group__.$modId__.client.gui.utilities.constructs.IThemed;
 import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
 import $group__.$modId__.utilities.constructs.interfaces.IListDelegated;
 import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
-import $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString;
+import $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable;
 import $group__.$modId__.utilities.helpers.Casts;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import javax.annotation.meta.When;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 
+import static $group__.$modId__.utilities.constructs.interfaces.basic.IDirty.isDirty;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
-import static $group__.$modId__.utilities.helpers.Throwables.*;
+import static $group__.$modId__.utilities.helpers.Throwables.rejectIndexOutOfBounds;
+import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 import static com.google.common.collect.ImmutableSet.of;
 
@@ -68,13 +72,17 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 
 	public int getOpen() { return open; }
 
-	public void setOpen(int open) { setOpen(this, open); }
+	public void setOpen(int open) {
+		setOpen(this, open);
+		markDirty();
+	}
 
 	public L getTabs() { return children; }
 
 	public void setTabs(L tabs, int open) {
 		this.children = tabs;
 		setOpen(this, open);
+		markDirty();
 	}
 
 	@SuppressWarnings("varargs")
@@ -119,38 +127,6 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
 
-	@Override
-	public boolean isImmutable() { return false; }
-
-
-	@Override
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public int hashCode() {
-		return isImmutable() ? getHashCode(this, super.hashCode(), getOpen()) : getHashCode(this, super.hashCode());
-	}
-
-	@Override
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public boolean equals(Object o) {
-		return isImmutable() ? isEqual(this, o, super.equals(o),
-				t -> getOpen() == t.getOpen()) : isEqual(this, o, super.equals(o));
-	}
-
-	@Override
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public T clone() {
-		T r = super.clone();
-		r.open = tryCloneUnboxedNonnull(open);
-		return r;
-	}
-
-	@Override
-	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public String toString() {
-		return getToStringString(this, super.toString(),
-				new Object[]{"open", getOpen()});
-	}
-
 
 	/* SECTION static classes */
 
@@ -170,6 +146,12 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 			protected IDrawable<N, ?> access;
 			protected IDrawable<N, ?> content;
 			protected boolean open;
+			protected long dirtiness;
+
+			@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+			@Nullable
+			protected Optional<Rectangle.Immutable<N, ?>> cachedSpec;
+			protected final AtomicLong cachedSpecDirtiness = new AtomicLong();
 
 
 			/* SECTION constructors */
@@ -182,37 +164,58 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 				this.open = open;
 			}
 
-			public Impl(Impl<N, ?> copy) { this(copy.getAccess(), copy.getContent(), copy.isOpen()); }
+			public Impl(Impl<N, ?> copy) {
+				this(copy.getAccess(), copy.getContent(), copy.isOpen());
+				dirtiness = copy.dirtiness;
+				synchronized (cachedSpecDirtiness) {
+					cachedSpec = copy.cachedSpec;
+					cachedSpecDirtiness.set(copy.cachedSpecDirtiness.get());
+				}
+			}
 
 
 			/* SECTION getters & setters */
 
 			public IDrawable<N, ?> getAccess() { return access; }
 
-			public void setAccess(IDrawable<N, T> access) { this.access = access; }
+			public void setAccess(IDrawable<N, T> access) {
+				this.access = access;
+				markDirty();
+			}
 
 			public IDrawable<N, ?> getContent() { return content; }
 
-			public void setContent(IDrawable<N, T> content) { this.content = content; }
+			public void setContent(IDrawable<N, T> content) {
+				this.content = content;
+				markDirty();
+			}
 
 
 			@Override
 			public boolean isOpen() { return open; }
 
 			@Override
-			public void setOpen(boolean open) { this.open = open; }
+			public void setOpen(boolean open) {
+				this.open = open;
+				markDirty();
+			}
 
 
 			/* SECTION methods */
 
+			@SuppressWarnings("OptionalAssignedToNull")
 			@Override
-			public Optional<Rectangle<N, ?>> spec() {
-				Optional<? extends Rectangle<N, ?>> aSpec = getAccess().spec(),
-						cSpec = getContent().spec();
-				if (isOpen() && cSpec.isPresent())
-					return aSpec.map(t -> t.min().min(of(cSpec.get().min()))).<Optional<Rectangle<N, ?>>>map(min -> Optional.of(new Rectangle<>(min, aSpec.get().max().max(of(cSpec.get().max())).sum(of(min.negate()))))).orElseGet(() -> castUncheckedUnboxedNonnull(cSpec));
-				else
-					return castUncheckedUnboxedNonnull(aSpec);
+			public Optional<Rectangle.Immutable<N, ?>> spec() {
+				synchronized (cachedSpecDirtiness) {
+					if (isDirty(this, cachedSpecDirtiness) || cachedSpec == null) {
+						Optional<? extends Rectangle<N, ?>> aSpec = getAccess().spec(), cSpec = getContent().spec();
+						if (isOpen() && cSpec.isPresent()) {
+							Rectangle<N, ?> cSpecU = cSpec.get();
+							return cachedSpec = Optional.of(aSpec.map(t -> t.min().min(of(cSpecU.min()))).map(min -> new Rectangle.Immutable<>(min, aSpec.get().max().max(of(cSpecU.max())).sum(of(min.negate())))).orElseGet(() -> new Rectangle.Immutable<>(cSpecU)));
+						} else
+							return cachedSpec = aSpec.map(Rectangle.Immutable::new);
+					} else return cachedSpec;
+				}
 			}
 
 			@Override
@@ -234,40 +237,23 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 			public boolean isImmutable() { return false; }
 
 			@Override
-			@OverridingStatus(group = GROUP, when = When.MAYBE)
-			public int hashCode() {
-				return isImmutable() ? getHashCode(this, super.hashCode(), getContent(), getAccess(), isOpen()) : getHashCode(this, super.hashCode());
-			}
+			@OverridingStatus(group = GROUP)
+			public final int hashCode() { return getHashCode(this, super::hashCode); }
 
+			@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+			@Override
+			@OverridingStatus(group = GROUP)
+			public final boolean equals(Object o) { return isEqual(this, o, super::equals); }
+
+			@SuppressWarnings("Convert2MethodRef")
 			@Override
 			@OverridingStatus(group = GROUP, when = When.MAYBE)
-			public boolean equals(Object o) {
-				return isImmutable() ? isEqual(this, o, super.equals(o),
-						t -> getAccess().equals(t.getAccess()),
-						t -> getContent().equals(t.getContent()),
-						t -> isOpen() == t.isOpen()) : isEqual(this, o, super.equals(o));
-			}
+			@OverridingMethodsMustInvokeSuper
+			public T clone() { return ICloneable.clone(() -> super.clone()); }
 
 			@Override
-			@OverridingStatus(group = GROUP, when = When.MAYBE)
-			public T clone() {
-				T r;
-				try { r = castUncheckedUnboxedNonnull(super.clone()); } catch (CloneNotSupportedException e) {
-					throw unexpected(e);
-				}
-				r.access = access.copy();
-				r.content = content.copy();
-				return r;
-			}
-
-			@Override
-			@OverridingStatus(group = GROUP, when = When.MAYBE)
-			public String toString() {
-				return getToStringString(this, super.toString(),
-						new Object[]{"access", getAccess()},
-						new Object[]{"content", getContent()},
-						new Object[]{"open", isOpen()});
-			}
+			@OverridingStatus(group = GROUP)
+			public final String toString() { return getToStringString(this, super.toString()); }
 
 
 			/* SECTION static classes */
@@ -301,11 +287,11 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 				/* SECTION methods */
 
 				@Override
-				@OverridingStatus(group = GROUP, when = When.NEVER)
+				@OverridingStatus(group = GROUP)
 				public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 				@Override
-				@OverridingStatus(group = GROUP, when = When.NEVER)
+				@OverridingStatus(group = GROUP)
 				public final boolean isImmutable() { return true; }
 			}
 		}
@@ -349,7 +335,10 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 			public TH getTheme() { return theme; }
 
 			@Override
-			public void setTheme(TH theme) { setTheme(this, theme); }
+			public void setTheme(TH theme) {
+				setTheme(this, theme);
+				markDirty();
+			}
 
 
 			/* SECTION methods */
@@ -359,31 +348,6 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 
 			@Override
 			public boolean isImmutable() { return false; }
-
-
-			@Override
-			public int hashCode() {
-				return isImmutable() ? getHashCode(this, super.hashCode(), getTheme()) : getHashCode(this, super.hashCode());
-			}
-
-			@Override
-			public boolean equals(Object o) {
-				return isImmutable() ? isEqual(this, o, super.equals(o),
-						t -> getTheme().equals(t.getTheme())) : isEqual(this, o, super.equals(o));
-			}
-
-			@Override
-			public T clone() {
-				T r = super.clone();
-				r.theme = tryCloneUnboxedNonnull(theme);
-				return r;
-			}
-
-			@Override
-			public String toString() {
-				return IStrictToString.getToStringString(this, super.toString(),
-						new Object[]{"theme", getTheme()});
-			}
 
 
 			/* SECTION static classes */
@@ -421,11 +385,11 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 				/* SECTION methods */
 
 				@Override
-				@OverridingStatus(group = GROUP, when = When.NEVER)
+				@OverridingStatus(group = GROUP)
 				public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 				@Override
-				@OverridingStatus(group = GROUP, when = When.NEVER)
+				@OverridingStatus(group = GROUP)
 				public final boolean isImmutable() { return true; }
 			}
 		}
@@ -458,11 +422,11 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 		/* SECTION methods */
 
 		@Override
-		@OverridingStatus(group = GROUP, when = When.NEVER)
+		@OverridingStatus(group = GROUP)
 		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		@Override
-		@OverridingStatus(group = GROUP, when = When.NEVER)
+		@OverridingStatus(group = GROUP)
 		public final boolean isImmutable() { return true; }
 	}
 }

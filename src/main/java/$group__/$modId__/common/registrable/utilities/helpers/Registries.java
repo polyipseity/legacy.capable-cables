@@ -9,8 +9,8 @@ public enum Registries {
 	/* SECTION static methods */
 
 	@SuppressWarnings("SpellCheckingInspection")
-	public static String getNamespacedUnlocalizedNameForRegistry(ResourceLocation name) { return name.getResourceDomain() + "." + name.getResourcePath(); }
+	public static String getNamespacedUnlocalizedNameForRegistry(ResourceLocation name) { return name.getResourceDomain() + '.' + name.getResourcePath(); }
 
 	@SuppressWarnings("SpellCheckingInspection")
-	public static String getNamespacedUnlocalizedNameForRegistry(String modId, String name) { return modId + "." + name; }
+	public static String getNamespacedUnlocalizedNameForRegistry(String modId, String name) { return modId + '.' + name; }
 }

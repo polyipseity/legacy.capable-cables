@@ -1,8 +1,8 @@
 package $group__.$modId__.common.registrable.items;
 
 import $group__.$modId__.ModThis;
-import $group__.$modId__.common.inventory.ContainerWrench;
-import $group__.$modId__.common.registrable.items.templates.ItemUnstackable;
+import $group__.$modId__.common.inventory.ContainerWrenchAdapter;
+import $group__.$modId__.common.registrable.items.base.ItemUnstackable;
 import $group__.$modId__.common.registrable.utilities.constructs.IRegistrableEventBusSubscriber;
 import $group__.$modId__.utilities.constructs.interfaces.basic.IStruct;
 import $group__.$modId__.utilities.variables.Constants;
@@ -155,7 +155,7 @@ public class ItemWrench extends ItemUnstackable implements IRegistrableEventBusS
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
 		if (playerIn.isSneaking()) {
 			if (!worldIn.isRemote)
-				playerIn.openGui(MOD, ContainerWrench.ID, worldIn, handIn.ordinal(), markUnused(int.class), markUnused(int.class));
+				playerIn.openGui(MOD, ContainerWrenchAdapter.ID, worldIn, handIn.ordinal(), markUnused(int.class), markUnused(int.class));
 			return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
 		}
 		return new ActionResult<>(EnumActionResult.FAIL, playerIn.getHeldItem(handIn));

@@ -9,14 +9,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import javax.annotation.meta.When;
 import java.awt.*;
 
 import static $group__.$modId__.client.gui.utilities.helpers.Guis.bindTexture;
 import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable.tryCloneUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
@@ -44,11 +40,17 @@ public class GuiResource<N extends Number, NT extends Number, T extends GuiResou
 
 	public ResourceLocation getResource() { return resource; }
 
-	public void setResource(ResourceLocation resource) { this.resource = resource; }
+	public void setResource(ResourceLocation resource) {
+		this.resource = resource;
+		markDirty();
+	}
 
 	public Rectangle<NT, ?> getTexture() { return texture; }
 
-	public void setTexture(Rectangle<NT, ?> texture) { this.texture = texture; }
+	public void setTexture(Rectangle<NT, ?> texture) {
+		this.texture = texture;
+		markDirty();
+	}
 
 	@Override
 	@Deprecated
@@ -69,27 +71,6 @@ public class GuiResource<N extends Number, NT extends Number, T extends GuiResou
 
 	@Override
 	public boolean isImmutable() { return false; }
-
-
-	@Override
-	public int hashCode() {
-		return isImmutable() ? getHashCode(this, super.hashCode(), getResource(), getTexture()) : getHashCode(this, super.hashCode());
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		return isImmutable() ? isEqual(this, o, super.equals(o),
-				t -> getResource().equals(t.getResource()),
-				t -> getTexture().equals(t.getTexture())) : isEqual(this, o, super.equals(o));
-	}
-
-	@Override
-	public T clone() {
-		T r = super.clone();
-		r.resource = tryCloneUnboxedNonnull(resource);
-		r.texture = texture.copy();
-		return r;
-	}
 
 
 	/* SECTION static classes */
@@ -117,11 +98,11 @@ public class GuiResource<N extends Number, NT extends Number, T extends GuiResou
 		/* SECTION methods */
 
 		@Override
-		@OverridingStatus(group = GROUP, when = When.NEVER)
+		@OverridingStatus(group = GROUP)
 		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
 
 		@Override
-		@OverridingStatus(group = GROUP, when = When.NEVER)
+		@OverridingStatus(group = GROUP)
 		public final boolean isImmutable() { return true; }
 	}
 }

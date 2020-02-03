@@ -2,7 +2,7 @@ package $group__.$modId__.common.registrable.items;
 
 import $group__.$modId__.common.registrable.Registrable;
 import $group__.$modId__.common.registrable.creativetabs.CreativeTabsThis;
-import $group__.$modId__.common.registrable.items.templates.ItemDefault;
+import $group__.$modId__.common.registrable.items.base.ItemDefault;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;

@@ -464,7 +464,7 @@ task saveCurrentGoodSettings(group: 'build', description: "Saves current good se
         String jsonText = new JsonBuilder(json).toString()
 
         file.write jsonText
-        logger.info "'${convertToCanonicalPath lastGoodSettingsPath}':\n${JsonOutput.prettyPrint(jsonText)}"
+        logger.info "'${convertToCanonicalPath lastGoodSettingsPath}':${System.lineSeparator()}${JsonOutput.prettyPrint(jsonText)}"
     }
 }
 tasks.build.finalizedBy tasks.saveCurrentGoodSettings

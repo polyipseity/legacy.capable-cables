@@ -40,7 +40,7 @@ public enum Guis {
 	public static void drawRect(IDrawable<?, ?> that, Rectangle<?, ?> rect, Color color) { getOrDefaultTheme(that).drawRect(rect, color); }
 
 	public static IThemed.ITheme<?> getOrDefaultTheme(IDrawable<?, ?> parent) {
-		return Casts.<IThemed<?>>castChecked(parent, castUncheckedUnboxedNonnull(IThemed.class)).map(t -> (IThemed.ITheme<?>) t.getTheme()).orElse(castUncheckedUnboxedNonnull(IThemed.EnumTheme.NONE));
+		return Casts.<IThemed<?>>castChecked(parent, castUncheckedUnboxedNonnull(IThemed.class)).map(t -> (IThemed.ITheme<?>) t.getTheme()).orElseGet(() -> castUncheckedUnboxedNonnull(IThemed.EnumTheme.NONE));
 	}
 
 	public static void drawModalRectWithCustomSizedTexture(IDrawable<?, ?> that, Rectangle<?, ?> rect, Rectangle<?, ?> tex) { getOrDefaultTheme(that).drawModalRectWithCustomSizedTexture(rect, tex); }
