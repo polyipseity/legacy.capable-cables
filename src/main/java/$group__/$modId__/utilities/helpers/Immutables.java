@@ -1,6 +1,6 @@
 package $group__.$modId__.utilities.helpers;
 
-import $group__.$modId__.utilities.constructs.interfaces.annotations.ExternalToImmutableMethod;
+import $group__.$modId__.annotations.ExternalToImmutableMethod;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;

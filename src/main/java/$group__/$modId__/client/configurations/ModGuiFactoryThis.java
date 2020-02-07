@@ -1,6 +1,6 @@
 package $group__.$modId__.client.configurations;
 
-import $group__.$modId__.utilities.constructs.classes.Singleton;
+import $group__.$modId__.utilities.Singleton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.client.IModGuiFactory;
@@ -10,6 +10,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.util.Set;
+
+import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 
 /**
  * Provides a customized client configuration screen.
@@ -44,10 +46,10 @@ public class ModGuiFactoryThis extends Singleton implements IModGuiFactory {
 	 * @implNote {@link Mod#guiFactory} requires constructor to be {@code public}
 	 *
 	 * @since 0.0.1.0
-	 * @deprecated replaced with {@link Singleton#getInstance}, used by {@link Mod#guiFactory} only
+	 * @deprecated replaced with {@link Singleton#getSingletonInstance}, used by {@link Mod#guiFactory} only
 	 */
 	@Deprecated
-	public ModGuiFactoryThis() { /* MARK empty */ }
+	public ModGuiFactoryThis() { super(LOGGER); }
 
 
 	/* SECTION methods */

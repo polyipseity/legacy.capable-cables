@@ -3,7 +3,7 @@ package $group__.$modId__.proxies;
 import $group__.$modId__.ModThis;
 import net.minecraftforge.fml.common.event.*;
 
-import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
+import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperation;
 
 public final class ProxyNull extends Proxy {
 	/* SECTION methods */

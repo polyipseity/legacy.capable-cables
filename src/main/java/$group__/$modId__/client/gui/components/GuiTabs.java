@@ -1,17 +1,18 @@
 package $group__.$modId__.client.gui.components;
 
-import $group__.$modId__.client.gui.utilities.constructs.IDrawable;
-import $group__.$modId__.client.gui.utilities.constructs.IDrawableThemed;
-import $group__.$modId__.client.gui.utilities.constructs.IThemed;
-import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
-import $group__.$modId__.utilities.constructs.interfaces.IListDelegated;
-import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
-import $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable;
+import $group__.$modId__.annotations.OverridingStatus;
+import $group__.$modId__.client.gui.coordinates.IDrawableThemed;
+import $group__.$modId__.client.gui.polygons.Rectangle;
+import $group__.$modId__.client.gui.themes.ITheme;
+import $group__.$modId__.client.gui.traits.IDrawable;
+import $group__.$modId__.traits.IListDelegated;
+import $group__.$modId__.traits.extensions.ICloneable;
 import $group__.$modId__.utilities.helpers.Casts;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
@@ -22,14 +23,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IDirty.isDirty;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
+import static $group__.$modId__.traits.basic.IDirty.isDirty;
+import static $group__.$modId__.traits.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
+import static $group__.$modId__.traits.extensions.IStrictEquals.isEqual;
+import static $group__.$modId__.traits.extensions.IStrictHashCode.getHashCode;
+import static $group__.$modId__.traits.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
-import static $group__.$modId__.utilities.helpers.Throwables.rejectIndexOutOfBounds;
-import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
+import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectIndexOutOfBounds;
+import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 import static com.google.common.collect.ImmutableSet.of;
 
@@ -44,14 +45,14 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 
 	@SuppressWarnings("varargs")
 	@SafeVarargs
-	public GuiTabs(int open, E... tabs) { this(castUncheckedUnboxedNonnull(Arrays.asList(tabs)), open); }
+	public GuiTabs(int open, Logger logger, E... tabs) { this(castUncheckedUnboxedNonnull(Arrays.asList(tabs)), open, logger); }
 
-	public GuiTabs(L tabs, int open) {
-		super(tabs);
+	public GuiTabs(L tabs, int open, Logger logger) {
+		super(tabs, logger);
 		setOpen(this, open);
 	}
 
-	public GuiTabs(GuiTabs<N, L, E, ?> copy) { this(copy.getTabs(), copy.getOpen()); }
+	public GuiTabs(GuiTabs<N, L, E, ?> copy) { this(copy.getTabs(), copy.getOpen(), copy.getLogger()); }
 
 
 	/* SECTION static methods */
@@ -74,7 +75,7 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 
 	public void setOpen(int open) {
 		setOpen(this, open);
-		markDirty();
+		markDirty(getLogger());
 	}
 
 	public L getTabs() { return children; }
@@ -82,7 +83,7 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 	public void setTabs(L tabs, int open) {
 		this.children = tabs;
 		setOpen(this, open);
-		markDirty();
+		markDirty(getLogger());
 	}
 
 	@SuppressWarnings("varargs")
@@ -147,25 +148,26 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 			protected IDrawable<N, ?> content;
 			protected boolean open;
 			protected long dirtiness;
+			protected Logger logger;
 
 			@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-			@Nullable
-			protected Optional<Rectangle.Immutable<N, ?>> cachedSpec;
+			@Nullable protected Optional<Rectangle.Immutable<N, ?>> cachedSpec;
 			protected final AtomicLong cachedSpecDirtiness = new AtomicLong();
 
 
 			/* SECTION constructors */
 
-			public Impl(IDrawable<N, ?> access, IDrawable<N, ?> content) { this(access, content, false); }
+			public Impl(IDrawable<N, ?> access, IDrawable<N, ?> content, Logger logger) { this(access, content, false, logger); }
 
-			public Impl(IDrawable<N, ?> access, IDrawable<N, ?> content, boolean open) {
+			public Impl(IDrawable<N, ?> access, IDrawable<N, ?> content, boolean open, Logger logger) {
 				this.access = access;
 				this.content = content;
 				this.open = open;
+				this.logger = logger;
 			}
 
 			public Impl(Impl<N, ?> copy) {
-				this(copy.getAccess(), copy.getContent(), copy.isOpen());
+				this(copy.getAccess(), copy.getContent(), copy.isOpen(), copy.getLogger());
 				dirtiness = copy.dirtiness;
 				synchronized (cachedSpecDirtiness) {
 					cachedSpec = copy.cachedSpec;
@@ -180,14 +182,14 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 
 			public void setAccess(IDrawable<N, T> access) {
 				this.access = access;
-				markDirty();
+				markDirty(getLogger());
 			}
 
 			public IDrawable<N, ?> getContent() { return content; }
 
 			public void setContent(IDrawable<N, T> content) {
 				this.content = content;
-				markDirty();
+				markDirty(getLogger());
 			}
 
 
@@ -197,8 +199,14 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 			@Override
 			public void setOpen(boolean open) {
 				this.open = open;
-				markDirty();
+				markDirty(getLogger());
 			}
+
+			@Override
+			public Logger getLogger() { return logger; }
+
+			@Override
+			public void setLogger(Logger logger) { this.logger = logger; }
 
 
 			/* SECTION methods */
@@ -207,7 +215,7 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 			@Override
 			public Optional<Rectangle.Immutable<N, ?>> spec() {
 				synchronized (cachedSpecDirtiness) {
-					if (isDirty(this, cachedSpecDirtiness) || cachedSpec == null) {
+					if (isDirty(this, cachedSpecDirtiness, getLogger()) || cachedSpec == null) {
 						Optional<? extends Rectangle<N, ?>> aSpec = getAccess().spec(), cSpec = getContent().spec();
 						if (isOpen() && cSpec.isPresent()) {
 							Rectangle<N, ?> cSpecU = cSpec.get();
@@ -249,7 +257,7 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 			@Override
 			@OverridingStatus(group = GROUP, when = When.MAYBE)
 			@OverridingMethodsMustInvokeSuper
-			public T clone() { return ICloneable.clone(() -> super.clone()); }
+			public T clone() { return ICloneable.clone(() -> super.clone(), getLogger()); }
 
 			@Override
 			@OverridingStatus(group = GROUP)
@@ -262,14 +270,18 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 			public static class Immutable<N extends Number, T extends Immutable<N, T>> extends Impl<N, T> {
 				/* SECTION constructors */
 
-				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content) { this(access, content, false); }
+				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content, Logger logger) { this(access, content, false, logger); }
 
-				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content, boolean open) { super(access.toImmutable(), content.toImmutable(), tryToImmutableUnboxedNonnull(open)); }
+				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content, boolean open, Logger logger) { super(access.toImmutable(), content.toImmutable(), tryToImmutableUnboxedNonnull(open, logger), logger); }
 
-				public Immutable(Impl<N, ?> copy) { this(copy.getAccess(), copy.getContent(), copy.isOpen()); }
+				public Immutable(Impl<N, ?> copy) { this(copy.getAccess(), copy.getContent(), copy.isOpen(), copy.getLogger()); }
 
 
 				/* SECTION getters & setters */
+
+				@Override
+				@Deprecated
+				public void setLogger(Logger logger) { throw rejectUnsupportedOperation(); }
 
 				@Override
 				@Deprecated
@@ -298,7 +310,7 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 	}
 
 
-	public interface ITabThemed<N extends Number, TH extends IThemed.ITheme<TH>, T extends ITabThemed<N, TH, T>> extends ITab<N, T>, IDrawableThemed<N, TH, T> {
+	public interface ITabThemed<N extends Number, TH extends ITheme<TH>, T extends ITabThemed<N, TH, T>> extends ITab<N, T>, IDrawableThemed<N, TH, T> {
 		/* SECTION static classes */
 
 		class Impl<N extends Number, TH extends ITheme<TH>, T extends Impl<N, TH, T>> extends ITab.Impl<N, T> implements ITabThemed<N, TH, T> {
@@ -310,14 +322,14 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 
 			/* SECTION constructors */
 
-			public Impl(IDrawable<N, ?> access, IDrawable<N, ?> content, TH theme) { this(access, content, theme, false); }
+			public Impl(IDrawable<N, ?> access, IDrawable<N, ?> content, TH theme, Logger logger) { this(access, content, theme, false, logger); }
 
-			public Impl(IDrawable<N, ?> access, IDrawable<N, ?> content, TH theme, boolean open) {
-				super(access, content, open);
+			public Impl(IDrawable<N, ?> access, IDrawable<N, ?> content, TH theme, boolean open, Logger logger) {
+				super(access, content, open, logger);
 				setTheme(this, theme);
 			}
 
-			public Impl(ITabThemed.Impl<N, TH, ?> copy) { this(copy.getAccess(), copy.getContent(), copy.getTheme(), copy.isOpen()); }
+			public Impl(ITabThemed.Impl<N, TH, ?> copy) { this(copy.getAccess(), copy.getContent(), copy.getTheme(), copy.isOpen(), copy.getLogger()); }
 
 
 			/* SECTION static methods */
@@ -337,7 +349,7 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 			@Override
 			public void setTheme(TH theme) {
 				setTheme(this, theme);
-				markDirty();
+				markDirty(getLogger());
 			}
 
 
@@ -356,14 +368,18 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 			public static class Immutable<N extends Number, TH extends ITheme<TH>, T extends Immutable<N, TH, T>> extends ITabThemed.Impl<N, TH, T> {
 				/* SECTION constructors */
 
-				public Immutable(ITabThemed.Impl<N, TH, ?> copy) { this(copy.getAccess(), copy.getContent(), copy.getTheme()); }
+				public Immutable(ITabThemed.Impl<N, TH, ?> copy) { this(copy.getAccess(), copy.getContent(), copy.getTheme(), copy.getLogger()); }
 
-				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content, TH theme) { this(access.toImmutable(), content.toImmutable(), theme, false); }
+				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content, TH theme, Logger logger) { this(access.toImmutable(), content.toImmutable(), theme, false, logger); }
 
-				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content, TH theme, boolean open) { super(access.toImmutable(), content.toImmutable(), tryToImmutableUnboxedNonnull(theme), tryToImmutableUnboxedNonnull(open)); }
+				public Immutable(IDrawable<N, ?> access, IDrawable<N, ?> content, TH theme, boolean open, Logger logger) { super(access.toImmutable(), content.toImmutable(), tryToImmutableUnboxedNonnull(theme, logger), tryToImmutableUnboxedNonnull(open, logger), logger); }
 
 
 				/* SECTION getters & setters */
+
+				@Override
+				@Deprecated
+				public void setLogger(Logger logger) { throw rejectUnsupportedOperation(); }
 
 				@Override
 				@Deprecated
@@ -401,14 +417,18 @@ public class GuiTabs<N extends Number, L extends List<E>, E extends GuiTabs.ITab
 
 		@SuppressWarnings("varargs")
 		@SafeVarargs
-		public Immutable(int open, E... tabs) { this(castUncheckedUnboxedNonnull(ImmutableList.copyOf(tabs)), open); }
+		public Immutable(int open, Logger logger, E... tabs) { this(castUncheckedUnboxedNonnull(ImmutableList.copyOf(tabs)), open, logger); }
 
-		public Immutable(L tabs, int open) { super(tryToImmutableUnboxedNonnull(tabs), tryToImmutableUnboxedNonnull(open)); }
+		public Immutable(L tabs, int open, Logger logger) { super(tryToImmutableUnboxedNonnull(tabs, logger), tryToImmutableUnboxedNonnull(open, logger), logger); }
 
-		public Immutable(GuiTabs<N, L, E, ?> copy) { this(copy.getTabs(), copy.getOpen()); }
+		public Immutable(GuiTabs<N, L, E, ?> copy) { this(copy.getTabs(), copy.getOpen(), copy.getLogger()); }
 
 
 		/* SECTION getters & setters */
+
+		@Override
+		@Deprecated
+		public void setLogger(Logger logger) { throw rejectUnsupportedOperation(); }
 
 		@Override
 		@Deprecated

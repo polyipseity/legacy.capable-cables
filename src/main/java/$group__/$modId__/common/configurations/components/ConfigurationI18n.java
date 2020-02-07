@@ -1,8 +1,8 @@
 package $group__.$modId__.common.configurations.components;
 
-import $group__.$modId__.utilities.constructs.interfaces.IMapDelegated;
-import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
-import $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable;
+import $group__.$modId__.annotations.OverridingStatus;
+import $group__.$modId__.traits.IMapDelegated;
+import $group__.$modId__.traits.extensions.ICloneable;
 import $group__.$modId__.utilities.helpers.Casts;
 
 import javax.annotation.Nullable;
@@ -14,15 +14,15 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxed;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
+import static $group__.$modId__.traits.basic.IImmutablizable.tryToImmutableUnboxed;
+import static $group__.$modId__.traits.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
+import static $group__.$modId__.traits.extensions.IStrictEquals.isEqual;
+import static $group__.$modId__.traits.extensions.IStrictHashCode.getHashCode;
+import static $group__.$modId__.traits.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
-import static $group__.$modId__.utilities.helpers.MapsExtension.toMapFromValues;
-import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
-import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
+import static $group__.$modId__.utilities.helpers.specific.MapsExtension.toMapFromValues;
+import static $group__.$modId__.utilities.helpers.specific.Optionals.unboxOptional;
+import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
 public class ConfigurationI18n<M extends Map<String, ConfigurationI18n<?, ?>>, T extends ConfigurationI18n<M, T>> implements IMapDelegated<M, String, ConfigurationI18n<?, ?>, T> {
@@ -127,7 +127,7 @@ public class ConfigurationI18n<M extends Map<String, ConfigurationI18n<?, ?>>, T
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
-	public T clone() { return ICloneable.clone(() -> super.clone()); }
+	public T clone() { return ICloneable.clone(() -> super.clone(), LOGGER); }
 
 	@Override
 	@OverridingStatus(group = GROUP)
@@ -154,7 +154,7 @@ public class ConfigurationI18n<M extends Map<String, ConfigurationI18n<?, ?>>, T
 
 		public Immutable(String id, String name, M children) { this(id, name, null, children); }
 
-		public Immutable(String id, String name, @Nullable ConfigurationI18n<?, ?> parent, M children) { super(tryToImmutableUnboxedNonnull(id), tryToImmutableUnboxedNonnull(name), tryToImmutableUnboxed(parent), tryToImmutableUnboxedNonnull(children)); }
+		public Immutable(String id, String name, @Nullable ConfigurationI18n<?, ?> parent, M children) { super(tryToImmutableUnboxedNonnull(id, ), tryToImmutableUnboxedNonnull(name, ), tryToImmutableUnboxed(parent, ), tryToImmutableUnboxedNonnull(children, )); }
 
 
 

@@ -65,8 +65,7 @@ ext {
 
     // COMMENT version
 
-    majorMod = majorMod.toInteger()
-    majorApi = majorApi.toInteger()
+    major = major.toInteger()
     minor = minor.toInteger()
     patch = patch.toInteger()
     this.'final' = this.'final'.toBoolean()
@@ -121,7 +120,7 @@ stringToStringMap(customRepositories).each { String k, List<String> v ->
 
 /* SECTION configuration */
 
-version = "${minecraftVersion}-${majorMod}.${majorApi}.${minor}.${patch}${project.ext.'final' ? '-final' : pre ? '-beta' : releaseCandidate != 0 ? "-rc$releaseCandidate" : ''}"
+version = "${minecraftVersion}-${major}.${minor}.${patch}${project.ext.'final' ? '-final' : pre ? '-beta' : releaseCandidate != 0 ? "-rc$releaseCandidate" : ''}"
 group = group_ // COMMENT http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = project.name
 description = description_

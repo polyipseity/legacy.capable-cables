@@ -1,9 +1,8 @@
 package $group__.$modId__.utilities.helpers;
 
-import $group__.$modId__.utilities.constructs.interfaces.annotations.ExternalCloneMethod;
-import $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable;
-import $group__.$modId__.utilities.helpers.Reflections.Classes.AccessibleObjectAdapter.ConstructorAdapter;
-import $group__.$modId__.utilities.variables.Globals;
+import $group__.$modId__.annotations.ExternalCloneMethod;
+import $group__.$modId__.traits.extensions.ICloneable;
+import $group__.$modId__.utilities.helpers.specific.Throwables;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
@@ -20,10 +19,9 @@ import java.util.function.*;
 import java.util.stream.Collectors;
 
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
-import static $group__.$modId__.utilities.helpers.Reflections.Classes.AccessibleObjectAdapter.setAccessibleWithLogging;
-import static $group__.$modId__.utilities.helpers.Reflections.Classes.newInstance;
-import static $group__.$modId__.utilities.helpers.Throwables.consumeCaught;
-import static $group__.$modId__.utilities.variables.Globals.*;
+import static $group__.$modId__.utilities.helpers.specific.Loggers.EnumMessages.*;
+import static $group__.$modId__.utilities.helpers.specific.Throwables.*;
+import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 
 public enum Copiers {
 	/* MARK empty */;
@@ -46,7 +44,7 @@ public enum Copiers {
 	public static <T> T copySingletonExtends(T copy) { return copy; }
 
 	@ExternalCloneMethod(Object.class)
-	public static <T> T copyEmpty(T copy) { return newInstance(copy.getClass()).<T>flatMap(Casts::castUnchecked).orElseThrow(Globals::rethrowCaughtThrowableStatic); }
+	public static <T> T copyEmpty(T copy) { return tryCall(() -> copy.getClass().newInstance(), LOGGER).<T>flatMap(Casts::castUnchecked).orElseThrow(Throwables::rethrowCaughtThrowableStatic); }
 
 
 	@ExternalCloneMethod(value = {
@@ -68,19 +66,19 @@ public enum Copiers {
 	@SuppressWarnings("SwitchStatementWithTooFewBranches")
 	@ExternalCloneMethod(value = Collection.class, allowExtends = true)
 	public static <C extends Collection<E>, E> C copyCollectionExtends(C copy) {
-		Class<? extends C> cl = castUncheckedUnboxedNonnull(copy.getClass());
+		Class<?> cl = copy.getClass();
 
 		Constructor<?>[] co0s = cl.getDeclaredConstructors();
-		HashMap<ConstructorAdapter<? extends C>, String> cos = new HashMap<>(co0s.length);
+		HashMap<Constructor<C>, String> cos = new HashMap<>(co0s.length);
 		for (Constructor<?> co0 : co0s) {
 			Class<?>[] co0Args = co0.getParameterTypes();
 			switch (co0Args.length) {
 				case 1:
 					Class<?> co0Arg1 = co0Args[0];
 					if (Collection.class.isAssignableFrom(co0Arg1))
-						cos.put(ConstructorAdapter.of(castUncheckedUnboxedNonnull(co0)), "Copy");
+						cos.put(castUncheckedUnboxedNonnull(co0), "Copy");
 					else if (Object[].class.isAssignableFrom(co0Arg1))
-						cos.put(ConstructorAdapter.of(castUncheckedUnboxedNonnull(co0)), "Object[]");
+						cos.put(castUncheckedUnboxedNonnull(co0), "Object[]");
 					break;
 				default:
 					break;
@@ -89,33 +87,34 @@ public enum Copiers {
 
 		@Nullable C r = null;
 		cos:
-		for (Map.Entry<ConstructorAdapter<? extends C>, String> co : cos.entrySet()) {
-			ConstructorAdapter<? extends C> coa = co.getKey();
+		for (Map.Entry<Constructor<C>, String> coe : cos.entrySet()) {
+			Constructor<C> co = coe.getKey();
 
-			setAccessibleWithLogging(coa, "copy constructor", null, cl, true);
+			tryRun(() -> co.setAccessible(true), LOGGER);
+			consumeIfCaughtThrowable(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("copy constructor", co, cl, true), t)));
 			try {
-				switch (co.getValue()) {
+				switch (coe.getValue()) {
 					case "Copy":
-						r = coa.newInstance(copy).orElseThrow(Globals::rethrowCaughtThrowableStatic);
+						r = tryCall(() -> co.newInstance(copy), LOGGER).orElseThrow(Throwables::rethrowCaughtThrowableStatic);
 						try {
 							r.clear();
-							r.addAll(copy.stream().map(ICloneable::tryCloneUnboxed).collect(Collectors.toList())); // COMMENT keep it ordered by collecting stream to list
+							r.addAll(copy.stream().map(o -> ICloneable.tryCloneUnboxed(o, LOGGER)).collect(Collectors.toList())); // COMMENT keep it ordered by collecting stream to list
 						} catch (UnsupportedOperationException e) {
 							// COMMENT copy is (probably) immutable
-							consumeCaught(e);
-							LOGGER.debug("Collection '{}' of class '{}' is (probably) immutable", copy, cl.toGenericString());
+							consumeCaught(e, LOGGER);
+							LOGGER.debug(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Collection '{}' of class '{}' is (probably) immutable", copy, cl.toGenericString()), e));
 						}
 						break cos;
 					case "Object[]":
-						r = coa.newInstance((Object) copy.stream().map(ICloneable::tryCloneUnboxed).toArray()).orElseThrow(Globals::rethrowCaughtThrowableStatic); // COMMENT cast to Object to call the method with the array as 1 object
+						r = tryCall(() -> co.newInstance((Object) copy.stream().map(o -> ICloneable.tryCloneUnboxed(o, LOGGER)).toArray()), LOGGER).orElseThrow(Throwables::rethrowCaughtThrowableStatic); // COMMENT cast to Object to call the method with the array as 1 object
 						break cos;
 				}
 			} catch (Throwable t) {
-				setCaughtThrowableStatic(t);
+				Throwables.setCaughtThrowableStatic(t, LOGGER);
 			}
 		}
 
-		if (r == null) throw rethrowCaughtThrowableStatic();
+		if (r == null) throw Throwables.rethrowCaughtThrowableStatic();
 		return r;
 	}
 

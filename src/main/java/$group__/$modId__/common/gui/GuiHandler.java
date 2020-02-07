@@ -9,9 +9,9 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 
-import static $group__.$modId__.utilities.helpers.MapsExtension.SINGLE_THREAD_MAP_MAKER;
-import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
-import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
+import static $group__.$modId__.utilities.helpers.specific.MapsExtension.MAP_MAKER_SINGLE_THREAD;
+import static $group__.$modId__.utilities.helpers.specific.Optionals.unboxOptional;
+import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectArguments;
 
 public enum GuiHandler implements IGuiHandler {
 	/* SECTION enums */
@@ -20,7 +20,7 @@ public enum GuiHandler implements IGuiHandler {
 
 	/* SECTION static variables */
 
-	public static final ConcurrentMap<Integer, IGuiHandler> GUI_MAP = SINGLE_THREAD_MAP_MAKER.makeMap();
+	public static final ConcurrentMap<Integer, IGuiHandler> GUI_MAP = MAP_MAKER_SINGLE_THREAD.makeMap();
 	protected static final GuiHandlerFunctional DEFAULT = (side, id, player, world, x, y, z) -> {
 		throw rejectArguments(side, id, player, world, x, y, z);
 	};

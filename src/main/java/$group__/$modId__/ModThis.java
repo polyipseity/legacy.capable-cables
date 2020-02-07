@@ -1,40 +1,36 @@
 package $group__.$modId__;
 
+import $group__.$modId__.annotations.Marker;
+import $group__.$modId__.annotations.Property;
 import $group__.$modId__.client.configurations.ModGuiFactoryThis;
-import $group__.$modId__.common.registrable.items.ItemWrench;
+import $group__.$modId__.common.ModContainerNull;
+import $group__.$modId__.common.registrables.items.ItemWrench;
 import $group__.$modId__.proxies.Proxy;
 import $group__.$modId__.proxies.ProxyClient;
 import $group__.$modId__.proxies.ProxyNull;
 import $group__.$modId__.proxies.ProxyServer;
-import $group__.$modId__.utilities.constructs.classes.Singleton;
-import $group__.$modId__.utilities.constructs.classes.concrete.ModContainerNull;
-import $group__.$modId__.utilities.constructs.interfaces.annotations.Marker;
-import $group__.$modId__.utilities.constructs.interfaces.annotations.Property;
-import $group__.$modId__.utilities.helpers.Reflections.Classes.AccessibleObjectAdapter.FieldAdapter;
-import $group__.$modId__.utilities.variables.Globals;
+import $group__.$modId__.utilities.helpers.specific.Throwables;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ListMultimap;
 import net.minecraftforge.common.config.Config;
 import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.event.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.function.BiConsumer;
 
+import static $group__.$modId__.utilities.Singleton.getSingletonInstance;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
-import static $group__.$modId__.utilities.helpers.Reflections.Classes.AccessibleObjectAdapter.FieldAdapter.setModifiers;
-import static $group__.$modId__.utilities.helpers.Reflections.Classes.AccessibleObjectAdapter.setAccessibleWithLogging;
-import static $group__.$modId__.utilities.helpers.Reflections.getPackage;
-import static $group__.$modId__.utilities.helpers.Reflections.isMemberStatic;
-import static $group__.$modId__.utilities.helpers.Throwables.requireRunOnceOnly;
+import static $group__.$modId__.utilities.helpers.Dynamics.Invocations.Fields.FIELD_MODIFIERS_SETTER;
+import static $group__.$modId__.utilities.helpers.Dynamics.*;
+import static $group__.$modId__.utilities.helpers.PreconditionsExtension.requireRunOnceOnly;
+import static $group__.$modId__.utilities.helpers.specific.Loggers.EnumMessages.*;
+import static $group__.$modId__.utilities.helpers.specific.Throwables.*;
 import static $group__.$modId__.utilities.variables.Constants.*;
-import static $group__.$modId__.utilities.variables.Globals.REFLECTIONS_CACHE;
-import static $group__.$modId__.utilities.variables.Globals.rethrowCaughtThrowableStatic;
+import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static net.minecraftforge.fml.common.Mod.EventHandler;
 import static net.minecraftforge.fml.common.Mod.InstanceFactory;
@@ -62,13 +58,12 @@ public enum ModThis {
 			CLASS_SIMPLE_NAME = "ModThis",
 			EVENT_PROCESSOR_VALUE = "event processor",
 			CONTAINER_VALUE = "container";
-	public static final Logger LOGGER = LogManager.getLogger(NAME + '|' + MOD_ID);
 	@Marker(@Property(key = "Field", value = CONTAINER_VALUE))
-	public static final ModContainer CONTAINER = Singleton.getInstance(ModContainerNull.class);
+	public static final ModContainer CONTAINER = getSingletonInstance(ModContainerNull.class, LOGGER);
 	@SidedProxy(modId = MOD_ID,
 			clientSide = PACKAGE + '.' + Proxy.SUBPACKAGE + '.' + ProxyClient.CLASS_SIMPLE_NAME,
 			serverSide = PACKAGE + '.' + Proxy.SUBPACKAGE + '.' + ProxyServer.CLASS_SIMPLE_NAME)
-	public static final Proxy PROXY = Singleton.getInstance(ProxyNull.class);
+	public static final Proxy PROXY = getSingletonInstance(ProxyNull.class, LOGGER);
 	private static final ImmutableMap<Class<? extends FMLEvent>, BiConsumer<?, ? extends FMLEvent>> EVENT_MAP = new ImmutableMap.Builder<Class<? extends FMLEvent>, BiConsumer<?, ? extends FMLEvent>>()
 			.put(FMLConstructionEvent.class, (ModThis m, FMLConstructionEvent e) ->
 					processEvent("Construction", m, e, PROXY::construct))
@@ -107,10 +102,10 @@ public enum ModThis {
 	public static ModThis getInstance() { return INSTANCE; }
 
 	private static <M, E> void processEvent(String name, M mod, E event, BiConsumer<? super M, ? super E> process) {
-		LOGGER.info("{} started", name);
+		LOGGER.info(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} started", name));
 		Stopwatch stopwatch = Stopwatch.createStarted();
 		process.accept(mod, event);
-		LOGGER.info("{} ended ({} <- {} ns)", name, stopwatch.stop(), stopwatch.elapsed(NANOSECONDS));
+		LOGGER.info(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} ended ({} <- {} ns)", name, stopwatch.stop(), stopwatch.elapsed(NANOSECONDS)));
 	}
 
 
@@ -118,7 +113,7 @@ public enum ModThis {
 
 	@Marker(@Property(key = "Method", value = EVENT_PROCESSOR_VALUE))
 	@EventHandler
-	public void processEvent(FMLEvent event) { EVENT_MAP.getOrDefault(event.getClass(), (m, e) -> LOGGER.info("FMLEvent '{}' received, but processing is NOT implemented", e)).accept(castUncheckedUnboxedNonnull(this), castUncheckedUnboxedNonnull(event)); }
+	public void processEvent(FMLEvent event) { EVENT_MAP.getOrDefault(event.getClass(), (m, e) -> LOGGER.info(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("FMLEvent '{}' received, but processing is NOT implemented", e))).accept(castUncheckedUnboxedNonnull(this), castUncheckedUnboxedNonnull(event)); }
 
 
 	/* SECTION static classes */
@@ -177,7 +172,7 @@ public enum ModThis {
 		public Object getNewInstance(FMLModContainer container, Class<?> objectClass, ClassLoader classLoader, Method factoryMarkedMethod) throws Exception {
 			Object r = super.getNewInstance(container, objectClass, classLoader, factoryMarkedMethod);
 
-			// COMMENT get container
+			// COMMENT steal container
 			for (Field f : objectClass.getDeclaredFields()) {
 				if (isMemberStatic(f)) {
 					Marker m = f.getDeclaredAnnotation(Marker.class);
@@ -187,10 +182,15 @@ public enum ModThis {
 							Property mp = mps[0];
 							Class<? extends Field> fc = f.getClass();
 							if (mp.key().equals(fc.getSimpleName()) && mp.value().equals(CONTAINER_VALUE)) {
-								FieldAdapter fa = FieldAdapter.of(f);
-								setAccessibleWithLogging(fa, "container field", null, fc, true);
-								setModifiers(fa, f.getModifiers() & ~Modifier.FINAL);
-								if (!fa.set(null, container)) throw rethrowCaughtThrowableStatic();
+								tryRun(() -> f.setAccessible(true), LOGGER);
+								consumeIfCaughtThrowable(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("container field", f, objectClass, true), t)));
+
+								int fMod = f.getModifiers() & ~Modifier.FINAL;
+								tryRun(() -> FIELD_MODIFIERS_SETTER.invokeExact(f, fMod), LOGGER);
+								consumeIfCaughtThrowable(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_INVOKE_METHOD_HANDLE.makeMessage(FIELD_MODIFIERS_SETTER, f.toGenericString(), fMod), t)));
+
+								tryRun(() -> f.set(null, container), LOGGER);
+								rethrowCaughtThrowableStatic(true);
 								break;
 							}
 						}
@@ -210,12 +210,12 @@ public enum ModThis {
 								Class<? extends FMLModContainer> containerC = container.getClass();
 								for (Field f : containerC.getDeclaredFields()) {
 									if (ListMultimap.class.isAssignableFrom(f.getType()) && !isMemberStatic(f)) {
-										FieldAdapter fa = FieldAdapter.of(f);
 										ListMultimap<Class<? extends FMLEvent>, Method> fv;
 
-										if (!fa.setAccessible(true)) throw rethrowCaughtThrowableStatic();
-										fv = castUncheckedUnboxedNonnull(fa.get(container).orElseThrow(Globals::rethrowCaughtThrowableStatic));
+										f.setAccessible(true);
+										rethrowCaughtThrowableStatic(true);
 
+										fv = castUncheckedUnboxedNonnull(tryCall(() -> f.get(container), LOGGER).orElseThrow(Throwables::rethrowCaughtThrowableStatic));
 										REFLECTIONS_CACHE.get(getPackage(FMLEvent.class)).getSubTypesOf(FMLEvent.class).forEach(t -> fv.put(t, m));
 
 										break;
@@ -233,7 +233,10 @@ public enum ModThis {
 
 		@Override
 		public void setProxy(Field target, Class<?> proxyTarget, Object proxy) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
-			setModifiers(FieldAdapter.of(target), target.getModifiers() & ~Modifier.FINAL);
+			int targetMod = target.getModifiers() & ~Modifier.FINAL;
+			tryRun(() -> FIELD_MODIFIERS_SETTER.invokeExact(target, targetMod), LOGGER);
+			consumeIfCaughtThrowable(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_INVOKE_METHOD_HANDLE.makeMessage(FIELD_MODIFIERS_SETTER, target.toGenericString(), targetMod), t)));
+
 			super.setProxy(target, proxyTarget, proxy);
 		}
 	}

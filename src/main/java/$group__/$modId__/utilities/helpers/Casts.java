@@ -1,15 +1,13 @@
 package $group__.$modId__.utilities.helpers;
 
-import $group__.$modId__.utilities.variables.Globals;
+import $group__.$modId__.utilities.helpers.specific.Throwables;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
 import static $group__.$modId__.utilities.helpers.Assertions.assertNonnull;
-import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
-import static $group__.$modId__.utilities.helpers.Throwables.cast;
-import static $group__.$modId__.utilities.variables.Globals.clearCaughtThrowableStatic;
-import static $group__.$modId__.utilities.variables.Globals.setCaughtThrowableStatic;
+import static $group__.$modId__.utilities.helpers.specific.Optionals.unboxOptional;
+import static $group__.$modId__.utilities.helpers.specific.Throwables.*;
 
 public enum Casts {
 	/* MARK empty */;
@@ -32,9 +30,9 @@ public enum Casts {
 		clearCaughtThrowableStatic();
 		Optional<T> r = Casts.<T>castUnchecked(o).filter(t -> type.isAssignableFrom(t.getClass()));
 		if (!r.isPresent() && o != null)
-			try { throw cast(o, type); } catch (ClassCastException e) { setCaughtThrowableStatic(e); }
+			try { throw cast(o, type); } catch (ClassCastException e) { setCaughtThrowableStatic(e, LOGGER); }
 		return r;
 	}
 
-	public static <T> T castCheckedUnboxedNonnull(Object o, Class<T> type) { return Casts.castChecked(o, type).orElseThrow(Globals::rethrowCaughtThrowableStatic); }
+	public static <T> T castCheckedUnboxedNonnull(Object o, Class<T> type) { return Casts.castChecked(o, type).orElseThrow(Throwables::rethrowCaughtThrowableStatic); }
 }

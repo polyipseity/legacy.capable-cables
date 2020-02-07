@@ -5,7 +5,7 @@ import $group__.$modId__.utilities.variables.Constants;
 import javax.annotation.Nullable;
 
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxed;
-import static $group__.$modId__.utilities.helpers.Throwables.rejectArguments;
+import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectArguments;
 
 /**
  * Contains utilities that are hard or too small to be categorized.
@@ -31,7 +31,7 @@ public enum Miscellaneous {
 	 * @since 0.0.1.0
 	 */
 	public static <T> T markUnused(Class<T> t) {
-		return Constants.PRIMITIVE_DATA_TYPE_MAP.entrySet().stream().filter(e -> e.getKey().isAssignableFrom(t)).findFirst().<T>map(e -> castUncheckedUnboxed(e.getValue())).orElseThrow(() -> rejectArguments(t));
+		return Constants.PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet().stream().filter(e -> e.getKey().isAssignableFrom(t)).findFirst().<T>map(e -> castUncheckedUnboxed(e.getValue())).orElseThrow(() -> rejectArguments(t));
 	}
 
 	/**

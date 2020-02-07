@@ -1,92 +1,95 @@
 package $group__.$modId__.client.gui.components;
 
-import $group__.$modId__.client.gui.utilities.constructs.IDrawable;
-import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
+import $group__.$modId__.annotations.OverridingStatus;
+import $group__.$modId__.client.gui.polygons.Rectangle;
+import $group__.$modId__.client.gui.themes.ITheme;
+import $group__.$modId__.client.gui.traits.IColored;
+import $group__.$modId__.client.gui.traits.IDrawable;
+import $group__.$modId__.client.gui.traits.IThemed;
 import $group__.$modId__.client.gui.utilities.helpers.Guis;
-import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
-import $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable;
+import $group__.$modId__.traits.IStructure;
+import $group__.$modId__.traits.basic.ILogging;
+import $group__.$modId__.traits.extensions.ICloneable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import javax.annotation.meta.When;
 import java.awt.*;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IDirty.isDirty;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
+import static $group__.$modId__.traits.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
+import static $group__.$modId__.traits.extensions.IStrictEquals.isEqual;
+import static $group__.$modId__.traits.extensions.IStrictHashCode.getHashCode;
+import static $group__.$modId__.traits.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
-import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
+import static $group__.$modId__.utilities.helpers.specific.Colors.COLORLESS;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
 @SideOnly(Side.CLIENT)
-public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extends Gui implements IDrawable<N, T> {
+public class GuiRectangle<T extends GuiRectangle<T, N, TH>, N extends Number, TH extends ITheme<TH>> extends Gui implements IStructure<T>, ICloneable<T>, IDrawable, IColored<Color>, IThemed<TH>, ILogging<Logger> {
 	/* SECTION variables */
 
-	protected Rectangle<N, ?> rect;
-	protected Color color;
-	protected long dirtiness;
-
-	@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-	@Nullable
-	protected Optional<Rectangle.Immutable<N, ?>> cachedSpec;
-	protected final AtomicLong cachedSpecDirtiness = new AtomicLong();
+	protected Rectangle<N, ?> rectangle;
+	@Nullable protected Color color;
+	@Nullable protected TH theme;
+	protected Logger logger;
 
 
 	/* SECTION constructors */
 
-	public GuiRectangle(GuiRectangle<N, ?> copy) {
-		this(copy.getRect(), copy.getColor());
-		dirtiness = copy.dirtiness;
-		synchronized (cachedSpecDirtiness) {
-			cachedSpec = copy.cachedSpec;
-			cachedSpecDirtiness.set(copy.cachedSpecDirtiness.get());
-		}
-	}
+	public GuiRectangle(GuiRectangle<N, ?> copy) { this(copy.getRectangle(), copy.getColor(), copy.getTheme(), copy.getLogger()); }
 
-	public GuiRectangle(Rectangle<N, ?> rect, Color color) {
-		this.rect = rect;
+	public GuiRectangle(Rectangle<N, ?> rectangle, @Nullable Color color, @Nullable TH theme, Logger logger) {
+		this.rectangle = rectangle;
 		this.color = color;
+		this.theme = theme;
+		this.logger = logger;
 	}
 
 
 	/* SECTION getters & setters */
 
-	public Rectangle<N, ?> getRect() { return rect; }
+	public Rectangle<N, ?> getRectangle() { return rectangle; }
 
-	public void setRect(Rectangle<N, ?> rect) {
-		this.rect = rect;
-		markDirty();
+	public boolean setRectangle(Rectangle<N, ?> rectangle) {
+		this.rectangle = rectangle;
+		return true;
 	}
 
-	public Color getColor() { return color; }
+	@Override
+	public Optional<Color> getColor() { return Optional.ofNullable(color); }
 
-	public void setColor(Color color) {
+	@Override
+	public boolean setColor(Color color) {
 		this.color = color;
-		markDirty();
+		return true;
+	}
+
+	@Override
+	public Optional<Logger> getLogger() { return Optional.of(logger); }
+
+	@Override
+	public boolean setLogger(Logger logger) {
+		this.logger = logger;
+		return true;
 	}
 
 
 	/* SECTION methods */
 
 	@Override
-	public void draw(Minecraft client) { Guis.drawRect(this, getRect(), getColor()); }
+	public boolean draw(Minecraft client) {
+		Guis.drawRectangle(this, getRectangle(), getColor().orElse(COLORLESS));
+		return true;
+	}
 
-	@SuppressWarnings("OptionalAssignedToNull")
 	@Override
 	public Optional<Rectangle.Immutable<N, ?>> spec() {
-		synchronized (cachedSpecDirtiness) {
-			if (isDirty(this, cachedSpecDirtiness) || cachedSpec == null) {
-				return cachedSpec = Optional.of(new Rectangle.Immutable<>(getRect()));
-			} else return cachedSpec;
-		}
 	}
 
 	@Override
@@ -109,7 +112,7 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 	@Override
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	@OverridingMethodsMustInvokeSuper
-	public T clone() { return ICloneable.clone(() -> super.clone()); }
+	public T clone() { return ICloneable.clone(() -> super.clone(), getLogger()); }
 
 	@Override
 	@OverridingStatus(group = GROUP)
@@ -119,23 +122,31 @@ public class GuiRectangle<N extends Number, T extends GuiRectangle<N, T>> extend
 	/* SECTION static classes */
 
 	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends GuiRectangle<N, T> {
+	public static class Immutable<T extends Immutable<T, N, TH>, N extends Number, TH extends ITheme<TH>> extends GuiRectangle<T, N, TH> {
 		/* SECTION constructors */
 
-		public Immutable(GuiRectangle<N, ?> copy) { this(copy.getRect(), copy.getColor()); }
+		public Immutable(GuiRectangle<N, ?> copy) { this(copy.getRectangle(), copy.getColor(), copy.getLogger()); }
 
-		public Immutable(Rectangle<N, ?> rect, Color color) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(color)); }
+		public Immutable(Rectangle<N, ?> rect, Color color, Logger logger) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(color, logger), logger); }
 
 
 		/* SECTION getters & setters */
 
 		@Override
 		@Deprecated
-		public void setRect(Rectangle<N, ?> rect) { throw rejectUnsupportedOperation(); }
+		public boolean setRectangle(Rectangle<N, ?> rectangle) { return super.setRectangle(rectangle); }
 
 		@Override
 		@Deprecated
-		public void setColor(Color color) { throw rejectUnsupportedOperation(); }
+		public boolean setColor(Color color) { return super.setColor(color); }
+
+		@Override
+		@Deprecated
+		public boolean setTheme(TH theme) { return false; }
+
+		@Override
+		@Deprecated
+		public boolean setLogger(Logger logger) { return false; }
 
 
 		/* SECTION methods */

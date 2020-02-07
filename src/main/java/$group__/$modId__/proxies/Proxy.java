@@ -1,15 +1,16 @@
 package $group__.$modId__.proxies;
 
 import $group__.$modId__.ModThis;
+import $group__.$modId__.common.events.AnnotationProcessingEvent;
 import $group__.$modId__.common.gui.GuiHandler;
-import $group__.$modId__.utilities.constructs.classes.Singleton;
-import $group__.$modId__.utilities.constructs.classes.concrete.AnnotationProcessingEvent;
+import $group__.$modId__.utilities.Singleton;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 
 import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
+import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 import static net.minecraftforge.common.MinecraftForge.EVENT_BUS;
 
 @SuppressWarnings("EmptyMethod")
@@ -18,12 +19,14 @@ public abstract class Proxy extends Singleton {
 
 	public static final String SUBPACKAGE = "proxies";
 
+	protected Proxy() { super(LOGGER); }
+
 
 	/* SECTION methods */
 
 	@OverridingMethodsMustInvokeSuper
 	public void construct(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLConstructionEvent event) {
-		EVENT_BUS.post(new AnnotationProcessingEvent(MOD_ID, event.getASMHarvestedData()));
+		EVENT_BUS.post(new AnnotationProcessingEvent(MOD_ID, event.getASMHarvestedData(), LOGGER));
 	}
 
 	@OverridingMethodsMustInvokeSuper

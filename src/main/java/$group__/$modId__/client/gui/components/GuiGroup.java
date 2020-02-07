@@ -1,32 +1,39 @@
 package $group__.$modId__.client.gui.components;
 
-import $group__.$modId__.client.gui.utilities.constructs.IDrawable;
-import $group__.$modId__.client.gui.utilities.constructs.XY;
-import $group__.$modId__.client.gui.utilities.constructs.polygons.Rectangle;
-import $group__.$modId__.utilities.constructs.interfaces.ICollectionDelegated;
-import $group__.$modId__.utilities.constructs.interfaces.annotations.OverridingStatus;
-import $group__.$modId__.utilities.constructs.interfaces.basic.IDirty;
-import $group__.$modId__.utilities.constructs.interfaces.extensions.ICloneable;
+import $group__.$modId__.annotations.OverridingStatus;
+import $group__.$modId__.client.gui.coordinates.XY;
+import $group__.$modId__.client.gui.polygons.Rectangle;
+import $group__.$modId__.client.gui.traits.IColored;
+import $group__.$modId__.client.gui.traits.IDrawable;
+import $group__.$modId__.client.gui.traits.IThemed;
+import $group__.$modId__.traits.ICollectionDelegated;
+import $group__.$modId__.traits.IStructure;
+import $group__.$modId__.traits.basic.ILogging;
+import $group__.$modId__.traits.extensions.ICloneable;
 import $group__.$modId__.utilities.helpers.Casts;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IDirty.isDirty;
-import static $group__.$modId__.utilities.constructs.interfaces.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictEquals.isEqual;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictHashCode.getHashCode;
-import static $group__.$modId__.utilities.constructs.interfaces.extensions.IStrictToString.getToStringString;
+import static $group__.$modId__.traits.basic.IDirty.isDirty;
+import static $group__.$modId__.traits.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
+import static $group__.$modId__.traits.extensions.IStrictEquals.isEqual;
+import static $group__.$modId__.traits.extensions.IStrictHashCode.getHashCode;
+import static $group__.$modId__.traits.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
-import static $group__.$modId__.utilities.helpers.Optionals.unboxOptional;
-import static $group__.$modId__.utilities.helpers.Throwables.rejectUnsupportedOperation;
+import static $group__.$modId__.utilities.helpers.specific.Optionals.unboxOptional;
+import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 import static com.google.common.collect.ImmutableSet.of;
 
@@ -44,7 +51,7 @@ import static com.google.common.collect.ImmutableSet.of;
  * @since 0.0.1.0
  */
 @SideOnly(Side.CLIENT)
-public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDrawable<N, ?>, T extends GuiGroup<N, C, E, T>> extends Gui implements IDrawable<N, T>, ICollectionDelegated<C, E, T> {
+public class GuiGroup<T extends GuiGroup<T, N, C, E>, N extends Number, C extends Collection<E>, E extends IDrawable> extends Gui implements IStructure<T>, ICloneable<T>, IDrawable, IColored<Color>, IThemed<TH>, ILogging<Logger>, ICollectionDelegated<C, E, T> {
 	/* SECTION variables */
 
 	/**
@@ -53,22 +60,7 @@ public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDraw
 	 * @since 0.0.1.0
 	 */
 	protected C children;
-	protected long dirtiness;
-	@SuppressWarnings("unused")
-	protected final IDirty dirtyCustom = new IDirty() {
-		/* SECTION methods */
-
-		@Override
-		public void markDirty() { getChildren().forEach(IDirty::markDirty); }
-
-		@Override
-		public long getDirtiness() { return getChildren().stream().mapToLong(IDirty::getDirtiness).sum(); }
-	};
-
-	@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-	@Nullable
-	protected Optional<Rectangle.Immutable<N, ?>> cachedSpec;
-	protected final AtomicLong cachedSpecDirtiness = new AtomicLong();
+	protected Logger logger;
 
 
 	/* SECTION constructors */
@@ -77,13 +69,17 @@ public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDraw
 	 * Creates a group containing the provided {@code children}.
 	 *
 	 * @param children {@link #children} of this group
-	 * @see #GuiGroup(E...) varargs version
+	 * @param logger {@link Logger} used for logging
+	 * @see #GuiGroup(Logger, IDrawable[]) varargs version
 	 * @since 0.0.1.0
 	 */
-	public GuiGroup(C children) { this.children = children; }
+	public GuiGroup(C children, Logger logger) {
+		this.children = children;
+		this.logger = logger;
+	}
 
 	/**
-	 * See {@link #GuiGroup(Collection)}.
+	 * See {@link #GuiGroup(Collection, Logger)}.
 	 * <p>
 	 * Parameter {@code children} is in varargs form for convenience.
 	 *
@@ -92,13 +88,14 @@ public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDraw
 	 * {@code java.util.Arrays.ArrayList}.
 	 * Will result in {@link ClassCastException} at a undefined time if not so.
 	 *
+	 * @param logger {@link Logger} used for logging
 	 * @param children {@link #children} of this group
-	 * @see #GuiGroup(Collection) {@link Collection} version
+	 * @see #GuiGroup(Collection, Logger) {@link Collection} version
 	 * @since 0.0.1.0
 	 */
 	@SuppressWarnings("varargs")
 	@SafeVarargs
-	public GuiGroup(E... children) { this(Casts.<C>castUncheckedUnboxedNonnull(Arrays.asList(children))); }
+	public GuiGroup(Logger logger, E... children) { this(castUncheckedUnboxedNonnull(Arrays.asList(children)), logger); }
 
 	/**
 	 * Shallow copy constructor.
@@ -107,14 +104,7 @@ public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDraw
 	 * @see #clone() as-deep-as-possible clone method
 	 * @since 0.0.1.0
 	 */
-	public GuiGroup(GuiGroup<N, C, E, ?> copy) {
-		this(copy.getChildren());
-		dirtiness = copy.dirtiness;
-		synchronized (cachedSpecDirtiness) {
-			cachedSpec = copy.cachedSpec;
-			cachedSpecDirtiness.set(copy.cachedSpecDirtiness.get());
-		}
-	}
+	public GuiGroup(GuiGroup<N, C, E, ?> copy) { this(copy.getChildren(), copy.getLogger()); }
 
 
 	/* SECTION getters & setters */
@@ -138,7 +128,7 @@ public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDraw
 	 */
 	public void setChildren(C children) {
 		this.children = children;
-		markDirty();
+		markDirty(getLogger());
 	}
 
 	/**
@@ -159,6 +149,15 @@ public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDraw
 	@SuppressWarnings("varargs")
 	@SafeVarargs
 	public final void setChildren(E... children) { setChildren(Casts.<C>castUncheckedUnboxedNonnull(Arrays.asList(children))); }
+
+	@Override
+	public Optional<Logger> getLogger() { return Optional.of(logger); }
+
+	@Override
+	public boolean setLogger(Logger logger) {
+		this.logger = logger;
+		return true;
+	}
 
 	/**
 	 * @since 0.0.1.0
@@ -187,11 +186,10 @@ public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDraw
 	 *
 	 * @return the GUI size of this group, optional
 	 */
-	@SuppressWarnings("OptionalAssignedToNull")
 	@Override
 	public Optional<Rectangle.Immutable<N, ?>> spec() {
 		synchronized (cachedSpecDirtiness) {
-			if (isDirty(this, cachedSpecDirtiness) || cachedSpec == null) {
+			if (isDirty(this, cachedSpecDirtiness, getLogger()) || cachedSpec == null) {
 				Collection<E> e = getChildren();
 				if (e.isEmpty()) return cachedSpec = Optional.empty();
 
@@ -236,7 +234,7 @@ public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDraw
 	@SuppressWarnings("Convert2MethodRef")
 	@Override
 	@OverridingStatus(group = GROUP)
-	public final T clone() { return ICloneable.clone(() -> super.clone()); }
+	public final T clone() { return ICloneable.clone(() -> super.clone(), getLogger()); }
 
 	@Override
 	@OverridingStatus(group = GROUP)
@@ -261,24 +259,27 @@ public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDraw
 		/* SECTION constructors */
 
 		/**
-		 * See {@link #GuiGroup(Collection)}.
+		 * See {@link #GuiGroup(Collection, Logger)}.
 		 *
-		 * @param children see {@link #GuiGroup(Collection)}
-		 * @see #GuiGroup(Collection)
+		 * @param children see {@link #GuiGroup(Collection, Logger)}
+		 * @param logger {@link Logger} used for logging
+		 * @see #GuiGroup(Collection, Logger)
 		 * @since 0.0.1.0
 		 */
-		public Immutable(C children) { super(tryToImmutableUnboxedNonnull(children)); }
+		public Immutable(C children, Logger logger) { super(tryToImmutableUnboxedNonnull(children, logger), logger); }
 
 		/**
-		 * See {@link #GuiGroup(E...)}.
+		 * See {@link #GuiGroup(Logger, IDrawable[])}.
 		 *
-		 * @param children see {@link #GuiGroup(E...)}
-		 * @see #GuiGroup(E...)
+		 *
+		 * @param logger {@link Logger} used for logging
+		 * @param children see {@link #GuiGroup(Logger, IDrawable[])}
+		 * @see #GuiGroup(Logger, IDrawable[])
 		 * @since 0.0.1.0
 		 */
 		@SuppressWarnings("varargs")
 		@SafeVarargs
-		public Immutable(E... children) { this(Casts.<C>castUncheckedUnboxedNonnull(ImmutableList.copyOf(children))); }
+		public Immutable(Logger logger, E... children) { this(castUncheckedUnboxedNonnull(ImmutableList.copyOf(children)), logger); }
 
 		/**
 		 * See {@link #GuiGroup(GuiGroup)}.
@@ -287,7 +288,7 @@ public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDraw
 		 * @see #GuiGroup(GuiGroup)
 		 * @since 0.0.1.0
 		 */
-		public Immutable(GuiGroup<N, C, E, ?> copy) { this(copy.getChildren()); }
+		public Immutable(GuiGroup<N, C, E, ?> copy) { this(copy.getChildren(), copy.getLogger()); }
 
 
 		/* SECTION getters & setters */
@@ -295,6 +296,10 @@ public class GuiGroup<N extends Number, C extends Collection<E>, E extends IDraw
 		@Override
 		@Deprecated
 		public void setChildren(C children) { throw rejectUnsupportedOperation(); }
+
+		@Override
+		@Deprecated
+		public void setLogger(Logger logger) { throw rejectUnsupportedOperation(); }
 
 
 		/* SECTION methods */
