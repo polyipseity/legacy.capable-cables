@@ -1,315 +1,93 @@
 package $group__.$modId__.client.gui.components;
 
-import $group__.$modId__.annotations.OverridingStatus;
 import $group__.$modId__.client.gui.coordinates.XY;
 import $group__.$modId__.client.gui.polygons.Rectangle;
-import $group__.$modId__.client.gui.traits.IColored;
+import $group__.$modId__.client.gui.themes.GuiThemedNull;
+import $group__.$modId__.client.gui.themes.ITheme;
 import $group__.$modId__.client.gui.traits.IDrawable;
-import $group__.$modId__.client.gui.traits.IThemed;
-import $group__.$modId__.traits.ICollectionDelegated;
-import $group__.$modId__.traits.IStructure;
-import $group__.$modId__.traits.basic.ILogging;
-import $group__.$modId__.traits.extensions.ICloneable;
-import $group__.$modId__.utilities.helpers.Casts;
+import $group__.$modId__.client.gui.utilities.builders.BuilderGuiDrawable;
+import $group__.$modId__.concurrent.IMutatorImmutablizable;
+import $group__.$modId__.logging.ILogging;
+import $group__.$modId__.utilities.extensions.delegated.ICollectionDelegated;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static $group__.$modId__.traits.basic.IDirty.isDirty;
-import static $group__.$modId__.traits.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.traits.extensions.IStrictEquals.isEqual;
-import static $group__.$modId__.traits.extensions.IStrictHashCode.getHashCode;
-import static $group__.$modId__.traits.extensions.IStrictToString.getToStringString;
+import static $group__.$modId__.concurrent.IMutator.trySetNonnull;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
-import static $group__.$modId__.utilities.helpers.specific.Optionals.unboxOptional;
-import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperation;
-import static $group__.$modId__.utilities.variables.Constants.GROUP;
-import static com.google.common.collect.ImmutableSet.of;
+import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperationIf;
 
-/**
- * Contains a group of {@link IDrawable}.
- * <p>
- * Used for grouping a bunch of {@code IDrawable} into one {@code IDrawable}.
- *
- * @author William So
- * @param <N> type of {@link Number} used for {@link Rectangle}
- * @param <C> type of {@link Collection} used for storing {@code E}
- * @param <E> type of {@link IDrawable} of the children
- * @param <T> type of this object
- * @see IDrawable
- * @since 0.0.1.0
- */
 @SideOnly(Side.CLIENT)
-public class GuiGroup<T extends GuiGroup<T, N, C, E>, N extends Number, C extends Collection<E>, E extends IDrawable> extends Gui implements IStructure<T>, ICloneable<T>, IDrawable, IColored<Color>, IThemed<TH>, ILogging<Logger>, ICollectionDelegated<C, E, T> {
+public class GuiGroup<T extends GuiGroup<T, N, C, TH, CO, E>, N extends Number, C, TH extends ITheme<TH>, CO extends Collection<E>, E extends IDrawable<N>> extends GuiDrawable<T, N, C, TH> implements ICollectionDelegated<CO, E> {
 	/* SECTION variables */
 
-	/**
-	 * Group of {@link E}.
-	 *
-	 * @since 0.0.1.0
-	 */
-	protected C children;
-	protected Logger logger;
+	protected CO children;
 
 
 	/* SECTION constructors */
 
-	/**
-	 * Creates a group containing the provided {@code children}.
-	 *
-	 * @param children {@link #children} of this group
-	 * @param logger {@link Logger} used for logging
-	 * @see #GuiGroup(Logger, IDrawable[]) varargs version
-	 * @since 0.0.1.0
-	 */
-	public GuiGroup(C children, Logger logger) {
-		this.children = children;
-		this.logger = logger;
+	public GuiGroup(CO children, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
+		super(GuiColorNull.getInstance(), GuiThemedNull.getInstance(), mutator, logging);
+		this.children = trySetNonnull(getMutator(), children, true);
 	}
 
-	/**
-	 * See {@link #GuiGroup(Collection, Logger)}.
-	 * <p>
-	 * Parameter {@code children} is in varargs form for convenience.
-	 *
-	 * @implNote
-	 * Type parameter {@link C} is considered compatible with
-	 * {@code java.util.Arrays.ArrayList}.
-	 * Will result in {@link ClassCastException} at a undefined time if not so.
-	 *
-	 * @param logger {@link Logger} used for logging
-	 * @param children {@link #children} of this group
-	 * @see #GuiGroup(Collection, Logger) {@link Collection} version
-	 * @since 0.0.1.0
-	 */
-	@SuppressWarnings("varargs")
-	@SafeVarargs
-	public GuiGroup(Logger logger, E... children) { this(castUncheckedUnboxedNonnull(Arrays.asList(children)), logger); }
+	public GuiGroup(GuiGroup<?, N, ?, ?, ? extends CO, E> copy) { this(copy, copy.getMutator()); }
 
-	/**
-	 * Shallow copy constructor.
-	 *
-	 * @param copy to-be-shallow-copied object
-	 * @see #clone() as-deep-as-possible clone method
-	 * @since 0.0.1.0
-	 */
-	public GuiGroup(GuiGroup<N, C, E, ?> copy) { this(copy.getChildren(), copy.getLogger()); }
+
+	protected GuiGroup(GuiGroup<?, N, ?, ?, ? extends CO, E> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getChildren(), mutator, copy.getLogging()); }
+
+
+	/* SECTION static methods */
+
+	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiGroup<V, N, C, TH, CO, E>, N extends Number, C, TH extends ITheme<TH>, CO extends Collection<E>, E extends IDrawable<N>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGG(CO children, IMutatorImmutablizable<?, ?> mutator) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiGroup<>(children, t.mutator, t.logging))); }
 
 
 	/* SECTION getters & setters */
 
-	/**
-	 * Gets the {@link #children} of this group that will be drawn.
-	 *
-	 * @return the {@code children} of this group
-	 * @since 0.0.1.0
-	 */
-	public C getChildren() { return children; }
+	public CO getChildren() { return children; }
 
-	/**
-	 * Replaces the children of this group, configuring the new children for drawing if
-	 * needed.
-	 *
-	 * @param children new children of this group
-	 * @throws UnsupportedOperationException if immutable
-	 * @see #setChildren(E...) the varargs version
-	 * @since 0.0.1.0
-	 */
-	public void setChildren(C children) {
-		this.children = children;
-		markDirty(getLogger());
-	}
+	public boolean trySetChildren(CO children) { return trySet(t -> this.children = t, children); }
 
-	/**
-	 * See {@link #setChildren(Collection)}.
-	 * <p>
-	 * Parameter {@code children} is in varargs form for convenience.
-	 *
-	 * @implNote
-	 * Type parameter {@link C} is considered compatible with
-	 * {@code java.util.Arrays.ArrayList}.
-	 * Will result in {@code ClassCastException} at a undefined time if not so.
-	 *
-	 * @param children new children of this group
-	 * @throws UnsupportedOperationException if immutable
-	 * @see #setChildren(Collection) the {@code Collection} version
-	 * @since 0.0.1.0
-	 */
-	@SuppressWarnings("varargs")
-	@SafeVarargs
-	public final void setChildren(E... children) { setChildren(Casts.<C>castUncheckedUnboxedNonnull(Arrays.asList(children))); }
+	public Optional<CO> tryGetChildren() { return Optional.of(getChildren()); }
 
-	@Override
-	public Optional<Logger> getLogger() { return Optional.of(logger); }
+	public void setChildren(CO children) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetChildren(children)); }
 
-	@Override
-	public boolean setLogger(Logger logger) {
-		this.logger = logger;
-		return true;
-	}
 
-	/**
-	 * @since 0.0.1.0
-	 * @deprecated replaced with {@link #getChildren}
-	 */
 	@Override
 	@Deprecated
-	public C getCollection() { return getChildren(); }
+	public CO getCollection() { return getChildren(); }
 
-	/**
-	 * @since 0.0.1.0
-	 * @deprecated replaced with {@link #setChildren}
-	 */
 	@Override
 	@Deprecated
-	public void setCollection(C collection) { setChildren(collection); }
+	public void setCollection(CO collection) { setChildren(collection); }
 
 
 	/* SECTION methods */
 
-	/**
-	 * Returns the GUI size of this group.
-	 * <p>
-	 * Returns {@link Optional#empty} if every children has a spec of
-	 * {@code Optional#empty}.
-	 *
-	 * @return the GUI size of this group, optional
-	 */
 	@Override
-	public Optional<Rectangle.Immutable<N, ?>> spec() {
-		synchronized (cachedSpecDirtiness) {
-			if (isDirty(this, cachedSpecDirtiness, getLogger()) || cachedSpec == null) {
-				Collection<E> e = getChildren();
-				if (e.isEmpty()) return cachedSpec = Optional.empty();
+	public boolean tryDraw(Minecraft client) { return children.stream().reduce(false, (t, u) -> u.tryDraw(client) || t, Boolean::logicalOr); }
 
-				List<E> l = new ArrayList<>(e);
-				@Nullable Rectangle<N, ?> f = unboxOptional(l.get(0).spec());
-				List<Rectangle<N, ?>> r = l.subList(1, l.size()).stream().map(E::spec).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
-				if (f == null) {
-					if (r.isEmpty()) return cachedSpec = Optional.empty();
-					else {
-						f = r.get(0);
-						r = r.subList(1, r.size());
-					}
-				}
+	@Override
+	public Optional<Rectangle<?, N>> spec() {
+		Collection<E> c = getChildren();
+		if (c.isEmpty()) return Optional.empty();
 
-				XY<N, ?> min = f.min().min(r.stream().map(Rectangle::min).collect(Collectors.toList()));
-				return cachedSpec = Optional.of(new Rectangle.Immutable<>(min, f.max().max(r.stream().map(Rectangle::max).collect(Collectors.toList())).sum(of(min.negate()))));
-			} else return cachedSpec;
-		}
+		List<Rectangle<?, N>> s = c.stream().map(E::spec).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+		if (s.isEmpty()) return Optional.empty();
+		Rectangle<?, N> f = s.get(0);
+
+		XY<?, N> min = f.min().min(s.stream().map(Rectangle::min).collect(Collectors.toList()));
+		return Optional.of(new Rectangle<>(min, f.max().max(s.stream().map(Rectangle::max).collect(Collectors.toList())).sum(ImmutableList.of(min.negate())), getMutator(), getLogging()));
 	}
 
 
 	@Override
-	public void draw(Minecraft client) { getChildren().forEach(t -> t.draw(client)); }
-
-
-	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }
-
-	@Override
-	public boolean isImmutable() { return false; }
-
-
-	@Override
-	@OverridingStatus(group = GROUP)
-	public final int hashCode() { return getHashCode(this, super::hashCode); }
-
-	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-	@Override
-	@OverridingStatus(group = GROUP)
-	public final boolean equals(Object o) { return isEqual(this, o, super::equals); }
-
-	@SuppressWarnings("Convert2MethodRef")
-	@Override
-	@OverridingStatus(group = GROUP)
-	public final T clone() { return ICloneable.clone(() -> super.clone(), getLogger()); }
-
-	@Override
-	@OverridingStatus(group = GROUP)
-	public final String toString() { return getToStringString(this, super.toString()); }
-
-
-	/* SECTION static classes */
-
-	/**
-	 * Immutable version of {@link GuiGroup}.
-	 *
-	 * @author William So
-	 * @param <N> see {@link GuiGroup}
-	 * @param <C> see {@link GuiGroup}
-	 * @param <E> see {@link GuiGroup}
-	 * @param <T> see {@link GuiGroup}
-	 * @see GuiGroup
-	 * @since 0.0.1.0
-	 */
-	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, C extends Collection<E>, E extends IDrawable<N, ?>, T extends GuiGroup<N, C, E, T>> extends GuiGroup<N, C, E, T> {
-		/* SECTION constructors */
-
-		/**
-		 * See {@link #GuiGroup(Collection, Logger)}.
-		 *
-		 * @param children see {@link #GuiGroup(Collection, Logger)}
-		 * @param logger {@link Logger} used for logging
-		 * @see #GuiGroup(Collection, Logger)
-		 * @since 0.0.1.0
-		 */
-		public Immutable(C children, Logger logger) { super(tryToImmutableUnboxedNonnull(children, logger), logger); }
-
-		/**
-		 * See {@link #GuiGroup(Logger, IDrawable[])}.
-		 *
-		 *
-		 * @param logger {@link Logger} used for logging
-		 * @param children see {@link #GuiGroup(Logger, IDrawable[])}
-		 * @see #GuiGroup(Logger, IDrawable[])
-		 * @since 0.0.1.0
-		 */
-		@SuppressWarnings("varargs")
-		@SafeVarargs
-		public Immutable(Logger logger, E... children) { this(castUncheckedUnboxedNonnull(ImmutableList.copyOf(children)), logger); }
-
-		/**
-		 * See {@link #GuiGroup(GuiGroup)}.
-		 *
-		 * @param copy see {@link #GuiGroup(GuiGroup)}
-		 * @see #GuiGroup(GuiGroup)
-		 * @since 0.0.1.0
-		 */
-		public Immutable(GuiGroup<N, C, E, ?> copy) { this(copy.getChildren(), copy.getLogger()); }
-
-
-		/* SECTION getters & setters */
-
-		@Override
-		@Deprecated
-		public void setChildren(C children) { throw rejectUnsupportedOperation(); }
-
-		@Override
-		@Deprecated
-		public void setLogger(Logger logger) { throw rejectUnsupportedOperation(); }
-
-
-		/* SECTION methods */
-
-		@Override
-		@OverridingStatus(group = GROUP)
-		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
-
-		@Override
-		@OverridingStatus(group = GROUP)
-		public final boolean isImmutable() { return true; }
-	}
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiGroup<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
 }

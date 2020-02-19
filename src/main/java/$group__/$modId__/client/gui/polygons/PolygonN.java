@@ -2,84 +2,94 @@ package $group__.$modId__.client.gui.polygons;
 
 import $group__.$modId__.annotations.OverridingStatus;
 import $group__.$modId__.client.gui.coordinates.XY;
-import $group__.$modId__.traits.IListDelegated;
-import $group__.$modId__.traits.basic.IDirty;
-import $group__.$modId__.traits.basic.ILogging;
-import $group__.$modId__.traits.extensions.ICloneable;
-import com.google.common.collect.ImmutableList;
+import $group__.$modId__.concurrent.IMutatorImmutablizable;
+import $group__.$modId__.concurrent.IMutatorUser;
+import $group__.$modId__.logging.ILogging;
+import $group__.$modId__.logging.ILoggingUser;
+import $group__.$modId__.utilities.extensions.ICloneable;
+import $group__.$modId__.utilities.extensions.IStructure;
+import $group__.$modId__.utilities.extensions.delegated.IListDelegated;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import javax.annotation.meta.When;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-import static $group__.$modId__.traits.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
-import static $group__.$modId__.traits.extensions.IStrictEquals.isEqual;
-import static $group__.$modId__.traits.extensions.IStrictHashCode.getHashCode;
-import static $group__.$modId__.traits.extensions.IStrictToString.getToStringString;
+import static $group__.$modId__.concurrent.IMutator.trySetNonnull;
+import static $group__.$modId__.utilities.extensions.IStrictEquals.areEqual;
+import static $group__.$modId__.utilities.extensions.IStrictHashCode.getHashCode;
+import static $group__.$modId__.utilities.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
-import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperation;
+import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperationIf;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
 @SideOnly(Side.CLIENT)
-public class PolygonN<N extends Number, T extends PolygonN<N, T>> implements IListDelegated<List<XY<N, ?>>, XY<N, ?>, T>, IDirty, ILogging {
+public class PolygonN<T extends PolygonN<T, N, L>, N extends Number, L extends List<XY<?, N>>> implements IStructure<T, T>, ICloneable<T>, IListDelegated<L, XY<?, N>>, IMutatorUser<IMutatorImmutablizable<?, ?>>, ILoggingUser<ILogging<Logger>, Logger> {
 	/* SECTION variables */
 
-	protected List<XY<N, ?>> vertexes;
-	protected long dirtiness;
-	protected Logger logger;
+	protected L vertexes;
+
+	protected IMutatorImmutablizable<?, ?> mutator;
+	protected ILogging<Logger> logging;
 
 
 	/* SECTION constructors */
 
-	@SuppressWarnings("varargs")
-	@SafeVarargs
-	public PolygonN(Logger logger, XY<N, ?>... array) { this(Arrays.asList(array), logger); }
-
-	public PolygonN(List<XY<N, ?>> vertexes, Logger logger) {
-		this.vertexes = vertexes;
-		this.logger = logger;
+	public PolygonN(L vertexes, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
+		this.mutator = trySetNonnull(mutator, mutator, true);
+		this.logging = trySetNonnull(getMutator(), logging, true);
+		this.vertexes = trySetNonnull(getMutator(), vertexes, true);
 	}
 
-	public PolygonN(PolygonN<N, ?> copy) {
-		this(copy.getVertexes(), copy.getLogger());
-		this.dirtiness = copy.dirtiness;
-	}
+	public PolygonN(PolygonN<?, N, L> copy) { this(copy, copy.getMutator()); }
+
+
+	protected PolygonN(PolygonN<?, N, ? extends L> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getVertexes(), mutator, copy.getLogging()); }
 
 
 	/* SECTION getters & setters */
 
-	public List<XY<N, ?>> getVertexes() { return vertexes; }
+	public L getVertexes() { return vertexes; }
 
-	public void setVertexes(List<XY<N, ?>> vertexes) {
-		this.vertexes = vertexes;
-		markDirty(getLogger());
-	}
+	public boolean trySetVertexes(L vertexes) { return trySet(t -> this.vertexes = t, vertexes); }
 
-	@Override
-	public Logger getLogger() { return logger; }
+	public Optional<L> tryGetVertexes() { return Optional.of(getVertexes()); }
+
+	public void setVertexes(L vertexes) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetVertexes(vertexes)); }
 
 	@Override
-	public void setLogger(Logger logger) { this.logger = logger; }
+	public IMutatorImmutablizable<?, ?> getMutator() { return mutator; }
+
+	@Override
+	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t, mutator); }
+
+	@Override
+	public ILogging<Logger> getLogging() { return logging; }
+
+	@Override
+	public boolean trySetLogging(ILogging<Logger> logging) { return trySet(t -> this.logging = t, logging); }
+
 
 	@Override
 	@Deprecated
-	public List<XY<N, ?>> getList() { return getVertexes(); }
+	public L getList() { return getVertexes(); }
 
 	@Override
 	@Deprecated
-	public void setList(List<XY<N, ?>> list) { setVertexes(list); }
+	public void setList(L list) throws UnsupportedOperationException { setVertexes(list); }
 
 
 	/* SECTION methods */
 
-	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }
 
 	@Override
-	public boolean isImmutable() { return false; }
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new PolygonN<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+
+	@Override
+	public boolean isImmutable() { return getMutator().isImmutable(); }
 
 
 	@Override
@@ -89,52 +99,15 @@ public class PolygonN<N extends Number, T extends PolygonN<N, T>> implements ILi
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	@OverridingStatus(group = GROUP)
-	public final boolean equals(Object o) { return isEqual(this, o, super::equals); }
+	public final boolean equals(Object o) { return areEqual(this, o, super::equals); }
 
 	@SuppressWarnings("Convert2MethodRef")
 	@Override
+	@OverridingMethodsMustInvokeSuper
 	@OverridingStatus(group = GROUP, when = When.MAYBE)
 	public T clone() { return ICloneable.clone(() -> super.clone(), getLogger()); }
 
 	@Override
 	@OverridingStatus(group = GROUP)
 	public final String toString() { return getToStringString(this, super.toString()); }
-
-
-	/* SECTION static classes */
-
-	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends PolygonN<N, T> implements IListDelegated.IImmutable<List<XY<N, ?>>, XY<N, ?>, T> {
-		/* SECTION constructors */
-
-		@SuppressWarnings("varargs")
-		@SafeVarargs
-		public Immutable(Logger logger, XY<N, ?>... array) { this(ImmutableList.copyOf(array), logger); }
-
-		public Immutable(List<XY<N, ?>> list, Logger logger) { super(tryToImmutableUnboxedNonnull(list, logger), logger); }
-
-		public Immutable(PolygonN<N, ?> copy) { this(copy.getVertexes(), copy.getLogger()); }
-
-
-		/* SECTION getters & setters */
-
-		@Override
-		@Deprecated
-		public void setLogger(Logger logger) { throw rejectUnsupportedOperation(); }
-
-		@Override
-		@Deprecated
-		public void setVertexes(List<XY<N, ?>> vertexes) { throw rejectUnsupportedOperation(); }
-
-
-		/* SECTION methods */
-
-		@Override
-		@OverridingStatus(group = GROUP)
-		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
-
-		@Override
-		@OverridingStatus(group = GROUP)
-		public final boolean isImmutable() { return true; }
-	}
 }

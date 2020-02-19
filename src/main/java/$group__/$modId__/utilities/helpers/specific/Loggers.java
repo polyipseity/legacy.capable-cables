@@ -71,7 +71,7 @@ public enum Loggers {
 				return new ParameterizedMessage(message,
 						description,
 						clazz.toGenericString(),
-						EnumMessages.optional(name, n -> ", name '" + n + '\''),
+						EnumMessages.optionalNonnull(name, n -> ", name '" + n + '\''),
 						arguments.length == 0 ? STRING_EMPTY : ", arguments '" + Arrays.toString(arguments) + '\'');
 			}
 
@@ -86,7 +86,7 @@ public enum Loggers {
 				return new ParameterizedMessage(message,
 					description,
 					reflected,
-					EnumMessages.optional(clazz, c -> " of class '" + c.toGenericString() + '\''),
+					EnumMessages.optionalNonnull(clazz, c -> " of class '" + c.toGenericString() + '\''),
 					accessible ? STRING_EMPTY : "in");
 			}
 
@@ -101,7 +101,7 @@ public enum Loggers {
 				return new ParameterizedMessage(message,
 						set ? 's' : 'g',
 						field.toGenericString(),
-						EnumMessages.optional(obj, o -> " of object '" + obj + '\''),
+						EnumMessages.optionalNonnull(obj, o -> " of object '" + obj + '\''),
 						field.getDeclaringClass().toGenericString(),
 						set ? " to value '" + value + '\'' : STRING_EMPTY);
 			}
@@ -117,9 +117,9 @@ public enum Loggers {
 				return new ParameterizedMessage(message,
 						description,
 						clazz.toGenericString(),
-						EnumMessages.optional(name, n -> ", name '" + n + '\''),
-						EnumMessages.optional(methodType, a -> ", method type '" + a + '\''),
-						methodType == null ? EnumMessages.optional(typeOrSpecialCaller, s -> ", type '" + s.toGenericString() + '\'') : EnumMessages.optional(typeOrSpecialCaller, s -> ", special caller '" + s.toGenericString() + '\''));
+						EnumMessages.optionalNonnull(name, n -> ", name '" + n + '\''),
+						EnumMessages.optionalNonnull(methodType, a -> ", method type '" + a + '\''),
+						methodType == null ? EnumMessages.optionalNonnull(typeOrSpecialCaller, s -> ", type '" + s.toGenericString() + '\'') : EnumMessages.optionalNonnull(typeOrSpecialCaller, s -> ", special caller '" + s.toGenericString() + '\''));
 			}
 
 			@Override
@@ -134,7 +134,7 @@ public enum Loggers {
 						description,
 						member,
 						lookup,
-						EnumMessages.optional(specialCaller, s -> ", special caller '" + s.toGenericString() + '\''));
+						EnumMessages.optionalNonnull(specialCaller, s -> ", special caller '" + s.toGenericString() + '\''));
 			}
 
 			@Override
@@ -240,6 +240,6 @@ public enum Loggers {
 
 		/* SECTION static methods */
 
-		private static <O> String optional(@Nullable O optional, Function<? super O, ? extends String> whenPresent) { return Optionals.optional(optional, whenPresent, () -> STRING_EMPTY); }
+		private static <O> String optionalNonnull(@Nullable O optional, Function<? super O, ? extends String> whenPresent) { return Optionals.optionalNonnull(optional, whenPresent, () -> STRING_EMPTY); }
 	}
 }

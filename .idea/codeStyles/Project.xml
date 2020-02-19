@@ -19,52 +19,12 @@
     <Properties>
       <option name="KEEP_BLANK_LINES" value="true" />
     </Properties>
-    <codeStyleSettings language="Groovy">
-      <indentOptions>
-        <option name="USE_TAB_CHARACTER" value="true" />
-        <option name="SMART_TABS" value="true" />
-      </indentOptions>
-    </codeStyleSettings>
-    <codeStyleSettings language="HTML">
-      <indentOptions>
-        <option name="USE_TAB_CHARACTER" value="true" />
-        <option name="SMART_TABS" value="true" />
-      </indentOptions>
-    </codeStyleSettings>
-    <codeStyleSettings language="JAVA">
-      <option name="KEEP_SIMPLE_BLOCKS_IN_ONE_LINE" value="true" />
-      <option name="KEEP_SIMPLE_METHODS_IN_ONE_LINE" value="true" />
-      <option name="KEEP_SIMPLE_LAMBDAS_IN_ONE_LINE" value="true" />
-      <option name="KEEP_SIMPLE_CLASSES_IN_ONE_LINE" value="true" />
-      <indentOptions>
-        <option name="USE_TAB_CHARACTER" value="true" />
-        <option name="SMART_TABS" value="true" />
-      </indentOptions>
-      <arrangement>
-        <groups>
-          <group>
-            <type>GETTERS_AND_SETTERS</type>
-            <order>KEEP</order>
-          </group>
-          <group>
-            <type>OVERRIDDEN_METHODS</type>
-            <order>KEEP</order>
-          </group>
-        </groups>
-      </arrangement>
-    </codeStyleSettings>
     <codeStyleSettings language="JSON">
       <indentOptions>
         <option name="USE_TAB_CHARACTER" value="true" />
       </indentOptions>
     </codeStyleSettings>
     <codeStyleSettings language="NBTT">
-      <indentOptions>
-        <option name="USE_TAB_CHARACTER" value="true" />
-        <option name="SMART_TABS" value="true" />
-      </indentOptions>
-    </codeStyleSettings>
-    <codeStyleSettings language="Scala">
       <indentOptions>
         <option name="USE_TAB_CHARACTER" value="true" />
         <option name="SMART_TABS" value="true" />

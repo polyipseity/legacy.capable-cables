@@ -54,13 +54,13 @@ public enum GuiHandler implements IGuiHandler {
 
 		@Nullable
 		@Override
-		default Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) { return unboxOptional(getGuiElement(Side.SERVER, id, player, world, x, y, z)); }
+		default Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) { return unboxOptional(tryGetGuiElement(Side.SERVER, id, player, world, x, y, z)); }
 
 		@Nullable
 		@Override
-		default Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) { return unboxOptional(getGuiElement(Side.CLIENT, id, player, world, x, y, z)); }
+		default Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) { return unboxOptional(tryGetGuiElement(Side.CLIENT, id, player, world, x, y, z)); }
 
 
-		Optional<Object> getGuiElement(Side side, int id, EntityPlayer player, World world, int x, int y, int z);
+		Optional<Object> tryGetGuiElement(Side side, int id, EntityPlayer player, World world, int x, int y, int z);
 	}
 }

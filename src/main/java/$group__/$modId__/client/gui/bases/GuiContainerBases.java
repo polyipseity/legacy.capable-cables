@@ -1,7 +1,7 @@
 package $group__.$modId__.client.gui.bases;
 
 import $group__.$modId__.client.gui.polygons.Rectangle;
-import $group__.$modId__.traits.basic.ISpec;
+import $group__.$modId__.traits.ISpec;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -15,7 +15,8 @@ public enum GuiContainerBases {
 
 	/* SECTION static methods */
 
-	public static <T extends GuiContainer & ISpec<? extends Rectangle<?, ?>>> void initGuiBase(T thisObj, IntConsumer xSizeSetter, IntConsumer ySizeSetter) {
+	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
+	public static <T extends GuiContainer & ISpec<? extends Rectangle<?, ?>>> void initGuiBase(final T thisObj, IntConsumer xSizeSetter, IntConsumer ySizeSetter) {
 		thisObj.spec().map(Rectangle::getSize).ifPresent(t -> {
 			xSizeSetter.accept(t.getX().intValue());
 			ySizeSetter.accept(t.getX().intValue());

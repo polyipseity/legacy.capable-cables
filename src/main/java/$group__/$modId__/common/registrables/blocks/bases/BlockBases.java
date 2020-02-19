@@ -12,5 +12,5 @@ public enum BlockBases {
 	/* SECTION static methods */
 
 	@SuppressWarnings("SpellCheckingInspection")
-	public static Block setUnlocalizedNameBase(Block thisObj, ResourceLocation name) { return thisObj.setUnlocalizedName(getNamespacedUnlocalizedNameForRegistry(name)); }
+	public static Block setUnlocalizedNameBase(final Block thisObj, ResourceLocation name) { return thisObj.setUnlocalizedName(getNamespacedUnlocalizedNameForRegistry(name)); }
 }

@@ -2,22 +2,19 @@ package $group__.$modId__.client.gui.utilities;
 
 import $group__.$modId__.client.gui.coordinates.XY;
 import $group__.$modId__.client.gui.polygons.Rectangle;
-import $group__.$modId__.client.gui.themes.EnumTheme;
 import $group__.$modId__.client.gui.themes.ITheme;
-import $group__.$modId__.client.gui.traits.IDrawable;
-import $group__.$modId__.client.gui.traits.IThemed;
-import $group__.$modId__.utilities.helpers.Casts;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
 import java.awt.Color;
 
-import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.PreconditionsExtension.requireRunOnceOnly;
 import static $group__.$modId__.utilities.variables.Globals.Client.CLIENT;
+import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 import static net.minecraft.client.renderer.GlStateManager.*;
 
 @SuppressWarnings("SpellCheckingInspection")
@@ -39,16 +36,15 @@ public enum Guis {
 
 	public static void bindTexture(ResourceLocation tex) { TEXTURE_MANAGER.bindTexture(tex); }
 
-	public static void drawRectangle(IDrawable<?, ?> that, Rectangle<?, ?> rect, Color color) { getOrDefaultTheme(that).drawRect(rect, color); }
 
-	public static ITheme<?> getOrDefaultTheme(IDrawable<?, ?> parent) {
-		return Casts.<IThemed<?>>castChecked(parent, castUncheckedUnboxedNonnull(IThemed.class)).map(t -> (ITheme<?>) t.getTheme()).orElseGet(() -> castUncheckedUnboxedNonnull(EnumTheme.NONE));
-	}
 
-	public static void drawModalRectWithCustomSizedTexture(IDrawable<?, ?> that, Rectangle<?, ?> rect, Rectangle<?, ?> tex) { getOrDefaultTheme(that).drawModalRectWithCustomSizedTexture(rect, tex); }
+	public static ITheme<?> getOrDefaultTheme(@Nullable ITheme<?> theme) { return theme == null ? ITheme.NULL : theme; }
 
-	public static void drawScaledCustomSizeModalRect(IDrawable<?, ?> that, Rectangle<?, ?> rect, Rectangle<?, ?> tex, XY<?, ?> tile) { getOrDefaultTheme(that).drawScaledCustomSizeModalRect(rect, tex, tile); }
+	public static void drawRectangle(@Nullable ITheme<?> that, Rectangle<?, ?> rect, Color color) { getOrDefaultTheme(that).drawRect(rect, color); }
 
+	public static void drawModalRectWithCustomSizedTexture(@Nullable ITheme<?> theme, Rectangle<?, ?> rect, Rectangle<?, ?> tex) { getOrDefaultTheme(theme).drawModalRectWithCustomSizedTexture(rect, tex); }
+
+	public static void drawScaledCustomSizeModalRect(@Nullable ITheme<?> theme, Rectangle<?, ?> rect, Rectangle<?, ?> tex, XY<?, ?> tile) { getOrDefaultTheme(theme).drawScaledCustomSizeModalRect(rect, tex, tile); }
 
 	public static void translateAndScaleFromTo(Rectangle<?, ?> from, Rectangle<?, ?> to) {
 		XY<?, ?> fromO = from.getOffset(), fromS = from.getSize(),
@@ -64,7 +60,7 @@ public enum Guis {
 	private static final class GuiWithPublicZLevel extends Gui {
 		/* SECTION constructors */
 
-		private GuiWithPublicZLevel() { requireRunOnceOnly(); }
+		private GuiWithPublicZLevel() { requireRunOnceOnly(LOGGER); }
 
 
 		/* SECTION methods */

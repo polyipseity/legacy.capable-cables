@@ -4,6 +4,8 @@ import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
+
 public class AnnotationProcessingEvent extends Event {
 	/* SECTION variables */
 
@@ -14,7 +16,7 @@ public class AnnotationProcessingEvent extends Event {
 
 	/* SECTION constructors */
 
-	public AnnotationProcessingEvent(String modId, ASMDataTable asm, Logger logger) {
+	public AnnotationProcessingEvent(String modId, ASMDataTable asm, @Nullable Logger logger) {
 		this.modId = modId;
 		this.asm = asm;
 		this.logger = logger;

@@ -4,8 +4,8 @@ import $group__.$modId__.ModThis;
 import $group__.$modId__.common.inventory.ContainerWrench;
 import $group__.$modId__.common.registrables.traits.IForgeRegistryEntryExtension;
 import $group__.$modId__.common.registrables.traits.IRegistrableEventBusSubscriber;
-import $group__.$modId__.traits.basic.IStruct;
-import $group__.$modId__.utilities.variables.Constants;
+import $group__.$modId__.traits.IStruct;
+import $group__.$modId__.utilities.helpers.Miscellaneous;
 import buildcraft.api.tools.IToolWrench;
 import cofh.api.item.IToolHammer;
 import net.minecraft.block.Block;
@@ -38,16 +38,14 @@ import static $group__.$modId__.common.registrables.items.bases.ItemUnstackables
 import static $group__.$modId__.common.registrables.utilities.helpers.Registrables.Blocks.checkNoEntityCollision;
 import static $group__.$modId__.common.registrables.utilities.helpers.Registrables.Blocks.getPosition;
 import static $group__.$modId__.common.registrables.utilities.helpers.Registrables.NBTs.*;
-import static $group__.$modId__.utilities.helpers.Miscellaneous.markUnused;
 import static $group__.$modId__.utilities.helpers.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
 import static $group__.$modId__.utilities.helpers.specific.Optionals.unboxOptional;
+import static $group__.$modId__.utilities.variables.Constants.*;
 import static $group__.$modId__.utilities.variables.Globals.LOGGER;
 import static $group__.$modId__.utilities.variables.Globals.MOD;
 
-@Optional.InterfaceList({
-		@Optional.Interface(iface = Constants.COFH_CORE_PACKAGE + ".api.item.IToolHammer", modid = Constants.COFH_CORE_ID),
-		@Optional.Interface(iface = Constants.BUILDCRAFT_API_PACKAGE + ".api.tools.IToolWrench", modid = Constants.BUILDCRAFT_API_ID)
-})
+@Optional.Interface(iface = COFH_CORE_PACKAGE + ".api.item.IToolHammer", modid = COFH_CORE_ID)
+@Optional.Interface(iface = BUILDCRAFT_API_PACKAGE + ".api.tools.IToolWrench", modid = BUILDCRAFT_API_ID)
 public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Item>, IRegistrableEventBusSubscriber, IToolHammer, IToolWrench {
 	/* SECTION static variables */
 
@@ -154,7 +152,7 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
 		if (playerIn.isSneaking()) {
 			if (!worldIn.isRemote)
-				playerIn.openGui(MOD, ContainerWrench.ID, worldIn, handIn.ordinal(), markUnused(int.class), markUnused(int.class));
+				playerIn.openGui(MOD, ContainerWrench.ID, worldIn, handIn.ordinal(), Miscellaneous.getDefaultValueNonnull(int.class), Miscellaneous.getDefaultValueNonnull(int.class));
 			return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
 		}
 		return new ActionResult<>(EnumActionResult.FAIL, playerIn.getHeldItem(handIn));
@@ -168,14 +166,15 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onPlayerInteractsEntity(PlayerInteractEvent.EntityInteract e) {
 		ItemStack stack = e.getItemStack();
-		Item item = stack.getItem();
-		if (item instanceof ItemWrench) {
+		if (stack.getItem() instanceof ItemWrench) {
 			World world = e.getWorld();
 			EntityPlayer player = e.getEntityPlayer();
 			RayTraceResult targetRTR = new RayTraceResult(e.getTarget());
 			EnumHand hand = e.getHand();
+
 			boolean ret = canUse(stack, world, player, targetRTR, hand);
 			if (ret && !world.isRemote) ret = use(stack, world, player, targetRTR, hand);
+
 			e.setCancellationResult(ret ? EnumActionResult.SUCCESS : EnumActionResult.FAIL);
 			e.setCanceled(true);
 		}
@@ -183,28 +182,28 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 
 
 	@Override
-	@Optional.Method(modid = Constants.COFH_CORE_ID)
+	@Optional.Method(modid = COFH_CORE_ID)
 	public boolean isUsable(ItemStack item, EntityLivingBase user, BlockPos pos) { return true; }
 
 	@Override
-	@Optional.Method(modid = Constants.COFH_CORE_ID)
+	@Optional.Method(modid = COFH_CORE_ID)
 	public boolean isUsable(ItemStack item, EntityLivingBase user, Entity entity) { return true; }
 
 	@Override
-	@Optional.Method(modid = Constants.COFH_CORE_ID)
+	@Optional.Method(modid = COFH_CORE_ID)
 	public void toolUsed(ItemStack item, EntityLivingBase user, BlockPos pos) {  /* MARK empty */ }
 
 	@Override
-	@Optional.Method(modid = Constants.COFH_CORE_ID)
+	@Optional.Method(modid = COFH_CORE_ID)
 	public void toolUsed(ItemStack item, EntityLivingBase user, Entity entity) {  /* MARK empty */ }
 
 
 	@Override
-	@Optional.Method(modid = Constants.BUILDCRAFT_API_ID)
+	@Optional.Method(modid = BUILDCRAFT_API_ID)
 	public boolean canWrench(EntityPlayer player, EnumHand hand, ItemStack wrench, RayTraceResult rayTrace) { return true; }
 
 	@Override
-	@Optional.Method(modid = Constants.BUILDCRAFT_API_ID)
+	@Optional.Method(modid = BUILDCRAFT_API_ID)
 	public void wrenchUsed(EntityPlayer player, EnumHand hand, ItemStack wrench, RayTraceResult rayTrace) {  /* MARK empty */ }
 
 

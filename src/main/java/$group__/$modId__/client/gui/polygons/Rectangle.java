@@ -1,137 +1,102 @@
 package $group__.$modId__.client.gui.polygons;
 
-import $group__.$modId__.annotations.OverridingStatus;
 import $group__.$modId__.client.gui.coordinates.XY;
+import $group__.$modId__.concurrent.IMutatorImmutablizable;
+import $group__.$modId__.logging.ILogging;
+import $group__.$modId__.utilities.builders.BuilderStructure;
+import com.google.common.collect.ImmutableList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
 
-import static $group__.$modId__.traits.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
+import java.util.Arrays;
+import java.util.List;
+
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperation;
-import static $group__.$modId__.utilities.variables.Constants.GROUP;
-import static com.google.common.collect.ImmutableSet.of;
 
 @SideOnly(Side.CLIENT)
-public class Rectangle<N extends Number, T extends Rectangle<N, T>> extends Polygon4<N, T> {
+public class Rectangle<T extends Rectangle<T, N>, N extends Number> extends Polygon4<T, N, List<XY<?, N>>> {
 	/* SECTION variables */
 
-	protected XY<N, ?> offset;
-	protected XY<N, ?> size;
+	protected XY<?, N> offset;
+	protected XY<?, N> size;
+
 
 	/* SECTION constructors */
 
-	public Rectangle(N offsetX, N offsetY, N sizeX, N sizeY) { this(new XY<>(offsetX, offsetY, ), new XY<>(sizeX, sizeY, )); }
+	public Rectangle(N offsetX, N offsetY, N sizeX, N sizeY, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) { this(new XY<>(offsetX, offsetY, mutator, logging), new XY<>(sizeX, sizeY, mutator, logging), mutator, logging); }
 
-	public Rectangle(XY<N, ?> offset, XY<N, ?> size) {
-		super(offset.toImmutable(), offset.sumX(size).toImmutable(), offset.sum(of(size)).toImmutable(), offset.sumY(size).toImmutable());
+	public Rectangle(XY<?, N> offset, XY<?, N> size, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
+		super(Arrays.asList(offset.toImmutable(), offset.sumX(size).toImmutable(), offset.sum(ImmutableList.of(size)).toImmutable(), offset.sumY(size).toImmutable()), mutator, logging);
 		this.offset = offset;
 		this.size = size;
 	}
 
-	public Rectangle(Rectangle<N, ?> copy) { this(copy.getOffset(), copy.getSize()); }
+	public Rectangle(Rectangle<?, N> copy) { this(copy, copy.getMutator()); }
+
+
+	protected Rectangle(Rectangle<?, N> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getOffset(), copy.getSize(), mutator, copy.getLogging()); }
+
+
+	/* SECTION constructors */
+
+	public static <T extends BuilderStructure<T, V>, V extends Rectangle<V, N>, N extends Number> BuilderStructure<T, V> newBuilderRectangle(XY<?, N> offset, XY<?, N> size) { return new BuilderStructure<>(t -> castUncheckedUnboxedNonnull(new Rectangle<>(offset, size, t.mutator, t.logging))); }
+
+	public static <T extends BuilderStructure<T, V>, V extends Rectangle<V, N>, N extends Number> BuilderStructure<T, V> newBuilderRectangle(N offsetX, N offsetY, N sizeX, N sizeY) { return new BuilderStructure<>(t -> castUncheckedUnboxedNonnull(new Rectangle<>(offsetX, offsetY, sizeX, sizeY, t.mutator, t.logging))); }
 
 
 	/* SECTION getters & setters */
 
-	public XY<N, ?> getOffset() { return offset; }
+	public XY<?, N> getOffset() { return offset; }
 
-	public void setOffset(XY<N, ?> offset) {
-		XY<N, ?> change = offset.sum(of(getOffset().negate()));
-		replaceAll(t -> t.sum(of(change)).toImmutable());
+	public void setOffset(XY<?, N> offset) {
+		XY<?, N> change = offset.sum(ImmutableList.of(getOffset().negate()));
+		replaceAll(t -> t.sum(ImmutableList.of(change)).toImmutable());
 		this.offset = offset;
-		markDirty(LOGGER);
 	}
 
-	public XY<N, ?> getSize() { return size; }
+	public XY<?, N> getSize() { return size; }
 
-	public void setSize(XY<N, ?> size) {
-		XY<N, ?> change = size.sum(of(getSize().negate()));
+	public void setSize(XY<?, N> size) {
+		XY<?, N> change = size.sum(ImmutableList.of(getSize().negate()));
 		set(1, b().sumX(change).toImmutable());
-		set(2, c().sum(of(change)).toImmutable());
+		set(2, c().sum(ImmutableList.of(change)).toImmutable());
 		set(3, d().sumY(change).toImmutable());
 		this.size = size;
-		markDirty(LOGGER);
 	}
 
-	public final void setOffsetAndSize(Rectangle<N, ?> rect) { setOffsetAndSize(rect.getOffset(), rect.getSize()); }
+	public final void setOffsetAndSize(Rectangle<?, N> rect) { setOffsetAndSize(rect.getOffset(), rect.getSize()); }
 
-	public void setOffsetAndSize(XY<N, ?> offset, XY<N, ?> size) {
+	public void setOffsetAndSize(XY<?, N> offset, XY<?, N> size) {
 		setOffset(offset);
 		setSize(size);
 	}
 
 	@Override
 	@Deprecated
-	public void setA(XY<N, ?> a) { throw rejectUnsupportedOperation(); }
+	public void setA(XY<?, N> a) throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public void setB(XY<N, ?> b) { throw rejectUnsupportedOperation(); }
+	public void setB(XY<?, N> b) throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public void setC(XY<N, ?> c) { throw rejectUnsupportedOperation(); }
+	public void setC(XY<?, N> c) throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public void setD(XY<N, ?> d) { throw rejectUnsupportedOperation(); }
+	public void setD(XY<?, N> d) throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 
 	/* SECTION methods */
 
+	public XY<?, N> max() { return a().max(ImmutableList.of(c())); }
+
+	public XY<?, N> min() { return a().min(ImmutableList.of(c())); }
+	
+
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
-
-
-	public XY<N, ?> max() { return a().max(of(c())); }
-
-	public XY<N, ?> min() { return a().min(of(c())); }
-
-
-	/* SECTION static classes */
-
-	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, T extends Immutable<N, T>> extends Rectangle<N, T> {
-		/* SECTION constructors */
-
-		public Immutable(N offsetX, N offsetY, N sizeX, N sizeY) { this(new XY<>(offsetX, offsetY, ), new XY<>(sizeX, sizeY, )); }
-
-		public Immutable(XY<N, ?> offset, XY<N, ?> size) {
-			super(offset.toImmutable(), size.toImmutable());
-			vertexes = tryToImmutableUnboxedNonnull(vertexes, );
-		}
-
-		public Immutable(Rectangle<N, ?> copy) { this(copy.getOffset(), copy.getSize()); }
-
-
-		/* SECTION getters & setters */
-
-		@Override
-		@Deprecated
-		public void setLogger(Logger logger) { throw rejectUnsupportedOperation(); }
-
-		@Override
-		@Deprecated
-		public void setOffset(XY<N, ?> offset) { throw rejectUnsupportedOperation(); }
-
-		@Override
-		@Deprecated
-		public void setSize(XY<N, ?> size) { throw rejectUnsupportedOperation(); }
-
-		@Override
-		@Deprecated
-		public void setOffsetAndSize(XY<N, ?> offset, XY<N, ?> size) { throw rejectUnsupportedOperation(); }
-
-
-		/* SECTION methods */
-
-		@Override
-		@OverridingStatus(group = GROUP)
-		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
-
-		@Override
-		@OverridingStatus(group = GROUP)
-		public final boolean isImmutable() { return true; }
-	}
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new Rectangle<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
 }

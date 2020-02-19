@@ -2,7 +2,6 @@ package $group__.$modId__.common.registrables.items;
 
 import $group__.$modId__.common.registrables.Registrable;
 import $group__.$modId__.common.registrables.creativetabs.CreativeTabsThis;
-import $group__.$modId__.common.registrables.items.bases.ItemDefault;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -21,7 +20,7 @@ public final class ItemsThis extends Registrable<Item> {
 
 	/* REFERENCE item template */
 	@SuppressWarnings("unused")
-	private static final Item TEMPLATE_ = new ItemDefault() {{
+	private static final Item TEMPLATE_ = new Item() {{
 		// COMMENT below one is required
 		setRegistryName(MOD_ID, "template_");
 		// COMMENT all below are optional

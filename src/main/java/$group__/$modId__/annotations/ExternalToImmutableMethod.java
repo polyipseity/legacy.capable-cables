@@ -1,8 +1,8 @@
 package $group__.$modId__.annotations;
 
+import $group__.$modId__.annotations.IProcessorRuntime.IClass.IElement.IMethod;
 import $group__.$modId__.common.events.AnnotationProcessingEvent;
-import $group__.$modId__.traits.basic.IAnnotationProcessor;
-import $group__.$modId__.traits.basic.IImmutablizable;
+import $group__.$modId__.concurrent.IImmutablizable;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -16,7 +16,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandle;
 
-import static $group__.$modId__.traits.basic.IAnnotationProcessor.getAnnotationProcessorMessage;
+import static $group__.$modId__.annotations.IProcessorRuntime.makeMessage;
 import static $group__.$modId__.utilities.helpers.Dynamics.IMPL_LOOKUP;
 import static $group__.$modId__.utilities.helpers.specific.Loggers.EnumMessages.*;
 import static $group__.$modId__.utilities.helpers.specific.Throwables.consumeIfCaughtThrowable;
@@ -40,7 +40,7 @@ public @interface ExternalToImmutableMethod {
 	/* SECTION static classes */
 
 	@Mod.EventBusSubscriber(modid = MOD_ID)
-	enum AnnotationProcessor implements IAnnotationProcessor.IClass.IElement.IMethod<ExternalToImmutableMethod> {
+	enum ProcessorRuntime implements IMethod<ExternalToImmutableMethod> {
 		/* SECTION enums */
 		INSTANCE;
 
@@ -59,7 +59,7 @@ public @interface ExternalToImmutableMethod {
 		/* SECTION methods */
 
 		@Override
-		public void process(ASMDataTable asm, Logger logger) {
+		public void process(ASMDataTable asm, @Nullable Logger logger) {
 			IMethod.super.process(asm, logger);
 			processed = true;
 		}
@@ -71,7 +71,7 @@ public @interface ExternalToImmutableMethod {
 		public boolean isProcessed() { return processed; }
 
 		@Override
-		public void processMethod(Result<ExternalToImmutableMethod> result, Logger logger) {
+		public void processMethod(Result<ExternalToImmutableMethod> result, @Nullable Logger logger) {
 			ExternalToImmutableMethod a = result.annotations[0];
 			@Nullable ExternalToImmutableMethod ap;
 			@Nullable MethodHandle m = tryCall(() -> IMPL_LOOKUP.unreflect(result.element), logger).orElseGet(() -> {
@@ -82,7 +82,7 @@ public @interface ExternalToImmutableMethod {
 
 			Class<?>[] ks = a.value();
 			if (ks.length == 0) {
-				logger.warn(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage(getAnnotationProcessorMessage(this, "Method '{}' with annotation '{}' has no usage"), m, a));
+				logger.warn(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage(makeMessage(this, "Method '{}' with annotation '{}' has no usage"), m, a));
 				return;
 			}
 			IImmutablizable.EXTERNAL_METHOD_MAP.put(a, m);
@@ -91,10 +91,10 @@ public @interface ExternalToImmutableMethod {
 				ap = IImmutablizable.EXTERNAL_ANNOTATIONS_MAP.get(k);
 				IImmutablizable.EXTERNAL_ANNOTATIONS_MAP.put(k, a);
 				if (ap == null)
-					logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage(getAnnotationProcessorMessage(this, "Registered method '{}' with annotation '{}' for class '{}'"), m, a, k.toGenericString()));
+					logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage(makeMessage(this, "Registered method '{}' with annotation '{}' for class '{}'"), m, a, k.toGenericString()));
 				else {
 					ExternalToImmutableMethod apf = ap;
-					logger.warn(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage(getAnnotationProcessorMessage(this, "Replaced previous method '{}' with annotation '{}' with method '{}' with annotation '{}' for class '{}'"), IImmutablizable.EXTERNAL_METHOD_MAP.get(apf), apf, m, a, k.toGenericString()));
+					logger.warn(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage(makeMessage(this, "Replaced previous method '{}' with annotation '{}' with method '{}' with annotation '{}' for class '{}'"), IImmutablizable.EXTERNAL_METHOD_MAP.get(apf), apf, m, a, k.toGenericString()));
 				}
 			}
 		}

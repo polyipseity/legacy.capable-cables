@@ -12,4 +12,4 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Nonnull
 @TypeQualifierDefault(FIELD)
 @Retention(RUNTIME)
-public @interface FieldsAreNonnullByDefault { /* MARK empty */}
+public @interface FieldsAreNonnullByDefault { /* MARK empty */ }

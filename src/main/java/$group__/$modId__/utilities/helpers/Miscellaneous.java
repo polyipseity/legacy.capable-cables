@@ -1,11 +1,10 @@
 package $group__.$modId__.utilities.helpers;
 
-import $group__.$modId__.utilities.variables.Constants;
-
 import javax.annotation.Nullable;
 
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxed;
-import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectArguments;
+import static $group__.$modId__.utilities.variables.Constants.PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP;
+import static java.util.Objects.requireNonNull;
 
 /**
  * Contains utilities that are hard or too small to be categorized.
@@ -20,31 +19,12 @@ public enum Miscellaneous {
 
 	/* SECTION static methods */
 
-	/**
-	 * Marks something as unused.
-	 *
-	 * @param t a primitive data type
-	 * @param <T> type of parameter {@code t}
-	 * @return default value for parameter type {@code <T>}
-	 * @throws IllegalArgumentException when parameter type {@code <T>} is not a primitive data type
-	 * @see Constants#PRIMITIVE_DATA_TYPE_ARRAY primitive data type array
-	 * @since 0.0.1.0
-	 */
-	public static <T> T markUnused(Class<T> t) {
-		return Constants.PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet().stream().filter(e -> e.getKey().isAssignableFrom(t)).findFirst().<T>map(e -> castUncheckedUnboxed(e.getValue())).orElseThrow(() -> rejectArguments(t));
+	@Nullable
+	public static <T> T getDefaultValue(@Nullable Class<T> type) {
+		return type == null ? null : PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet().stream().filter(e -> e.getKey().isAssignableFrom(type)).findFirst().<T>map(e -> castUncheckedUnboxed(e.getValue())).orElse(null);
 	}
 
-	/**
-	 * Marks something as unused.
-	 *
-	 * @param <T> a non-primitive data type
-	 * @return {@code null}
-	 * @throws NullPointerException when parameter type {@code <T>} is a primitive data type
-	 * @since 0.0.1.0
-	 */
-	@SuppressWarnings("SameReturnValue")
-	@Nullable
-	public static <T> T markUnused() { return null; }
+	public static <T> T getDefaultValueNonnull(Class<T> type) { return requireNonNull(getDefaultValue(type)); }
 
 
 	/**

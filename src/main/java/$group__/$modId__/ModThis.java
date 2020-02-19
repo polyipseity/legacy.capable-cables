@@ -2,13 +2,13 @@ package $group__.$modId__;
 
 import $group__.$modId__.annotations.Marker;
 import $group__.$modId__.annotations.Property;
+import $group__.$modId__.client.ProxyClient;
 import $group__.$modId__.client.configurations.ModGuiFactoryThis;
 import $group__.$modId__.common.ModContainerNull;
 import $group__.$modId__.common.registrables.items.ItemWrench;
 import $group__.$modId__.proxies.Proxy;
-import $group__.$modId__.proxies.ProxyClient;
 import $group__.$modId__.proxies.ProxyNull;
-import $group__.$modId__.proxies.ProxyServer;
+import $group__.$modId__.server.ProxyServer;
 import $group__.$modId__.utilities.helpers.specific.Throwables;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
@@ -26,7 +26,6 @@ import static $group__.$modId__.utilities.Singleton.getSingletonInstance;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.Dynamics.Invocations.Fields.FIELD_MODIFIERS_SETTER;
 import static $group__.$modId__.utilities.helpers.Dynamics.*;
-import static $group__.$modId__.utilities.helpers.PreconditionsExtension.requireRunOnceOnly;
 import static $group__.$modId__.utilities.helpers.specific.Loggers.EnumMessages.*;
 import static $group__.$modId__.utilities.helpers.specific.Throwables.*;
 import static $group__.$modId__.utilities.variables.Constants.*;
@@ -95,11 +94,15 @@ public enum ModThis {
 					processEvent("Disabling", m, e, PROXY::disable)).build();
 
 
-	/* SECTION static methods */
+	/* SECTION static getters & setters */
 
 	@SuppressWarnings("SameReturnValue")
 	@InstanceFactory
+	@Deprecated
 	public static ModThis getInstance() { return INSTANCE; }
+
+
+	/* SECTION static methods */
 
 	private static <M, E> void processEvent(String name, M mod, E event, BiConsumer<? super M, ? super E> process) {
 		LOGGER.info(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} started", name));
@@ -148,14 +151,10 @@ public enum ModThis {
 			@Config.LangKey(Items.LANG_KEY_BASE + ".name")
 			public final Items items = new Items();
 
-			private Behavior() { requireRunOnceOnly(); }
-
 			public static final class Items {
 				public static final String LANG_KEY_BASE = Behavior.LANG_KEY_BASE + ".items";
 				@Config.LangKey(ItemWrench.Configuration.LANG_KEY_BASE + ".name")
 				public final ItemWrench.Configuration wrench = new ItemWrench.Configuration();
-
-				private Items() { requireRunOnceOnly(); }
 			}
 		}
 	}

@@ -1,23 +1,36 @@
 package $group__.$modId__.utilities;
 
 import $group__.$modId__.annotations.OverridingStatus;
-import $group__.$modId__.traits.basic.IDirty;
+import $group__.$modId__.concurrent.IMutator;
+import $group__.$modId__.concurrent.IMutatorImmutablizable;
+import $group__.$modId__.concurrent.IMutatorUser;
+import $group__.$modId__.logging.ILogging;
+import $group__.$modId__.logging.ILoggingUser;
+import $group__.$modId__.traits.IOperable;
+import $group__.$modId__.utilities.builders.BuilderNumberRelative;
+import $group__.$modId__.utilities.extensions.ICloneable;
+import $group__.$modId__.utilities.extensions.IStructure;
 import $group__.$modId__.utilities.helpers.specific.Numbers;
 import $group__.$modId__.utilities.helpers.specific.Throwables;
 import com.google.common.collect.Streams;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
+import javax.annotation.OverridingMethodsMustInvokeSuper;
+import javax.annotation.meta.When;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import static $group__.$modId__.concurrent.IMutator.trySetNonnull;
+import static $group__.$modId__.utilities.extensions.IStrictEquals.areEqual;
+import static $group__.$modId__.utilities.extensions.IStrictHashCode.getHashCode;
+import static $group__.$modId__.utilities.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.specific.Optionals.unboxOptional;
-import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperation;
+import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperationIf;
 import static $group__.$modId__.utilities.variables.Constants.GROUP;
 
-public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T> implements IDirty {
+public class NumberRelative<T extends NumberRelative<T>> extends Number implements IStructure<T, T>, ICloneable<T>, IOperable.INumberOperable<T>, IMutatorUser<IMutatorImmutablizable<?, ?>>, ILoggingUser<ILogging<Logger>, Logger> {
 	/* SECTION static variables */
 
 	private static final long serialVersionUID = -1684871905587506897L;
@@ -29,47 +42,73 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 	@Nullable protected Number parent;
 	@Nullable protected Number offset;
 
-	protected long dirtiness;
+	protected IMutatorImmutablizable<?, ?> mutator;
+	protected ILogging<Logger> logging;
 
 
 	/* SECTION constructors */
 
-	public NumberRelative(Number value) { this(value, null); }
+	public NumberRelative(Number value, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) { this(value, null, mutator, logging); }
 
-	public NumberRelative(Number value, @Nullable Number parent) { this(value, parent, null); }
+	public NumberRelative(Number value, @Nullable Number parent, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) { this(value, parent, null, mutator, logging); }
 
-	public NumberRelative(Number value, @Nullable Number parent, @Nullable Number offset) {
-		this.value = value;
-		this.parent = parent;
-		this.offset = offset;
+	public NumberRelative(Number value, @Nullable Number parent, @Nullable Number offset, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
+		this.mutator = trySetNonnull(mutator, mutator, true);
+		this.logging = trySetNonnull(getMutator(), logging, true);
+		this.value = trySetNonnull(getMutator(), value, true);
+		this.parent = IMutator.trySet(getMutator(), parent, true);
+		this.offset = IMutator.trySet(getMutator(), offset, true);
 	}
 
-	@SuppressWarnings("CopyConstructorMissesField")
-	public NumberRelative(NumberRelative<?> copy) { this(copy.getValue(), unboxOptional(copy.getParent()), unboxOptional(copy.getOffset())); }
+	public NumberRelative(NumberRelative<?> copy) { this(copy, copy.getMutator()); }
+
+
+	protected NumberRelative(NumberRelative<?> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getValue(), copy.getParent(), copy.getOffset(), mutator, copy.getLogging()); }
+
+
+	/* SECTION static methods */
+
+	public static <T extends BuilderNumberRelative<T, V>, V extends NumberRelative<V>> BuilderNumberRelative<T, V> newBuilderNR(Number value) { return new BuilderNumberRelative<>(t -> castUncheckedUnboxedNonnull(new NumberRelative<>(value, t.parent, t.offset, t.mutator, t.logging))); }
 
 
 	/* SECTION getters & setters */
 
 	public Number getValue() { return value; }
 
-	public void setValue(Number value) {
-		this.value = value;
-		markDirty(LOGGER);
-	}
+	public boolean trySetValue(Number value) { return trySet(t -> this.value = t, value); }
 
-	public Optional<Number> getParent() { return Optional.ofNullable(parent); }
+	public Optional<Number> tryGetValue() { return Optional.of(getValue()); }
 
-	public void setParent(@Nullable Number parent) {
-		this.parent = parent;
-		markDirty(LOGGER);
-	}
+	public void setValue(Number value) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetValue(value)); }
 
-	public Optional<Number> getOffset() { return Optional.ofNullable(offset); }
+	@Nullable
+	public Number getParent() { return parent; }
 
-	public void setOffset(@Nullable Number offset) {
-		this.offset = offset;
-		markDirty(LOGGER);
-	}
+	public boolean trySetParent(@Nullable Number parent) { return trySet(t -> this.parent = t, parent); }
+
+	public Optional<Number> tryGetParent() { return Optional.ofNullable(getParent()); }
+
+	public void setParent(@Nullable Number parent) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetParent(parent)); }
+
+	@Nullable
+	public Number getOffset() { return offset; }
+
+	public boolean trySetOffset(Number offset) { return trySet(t -> this.offset = t, offset); }
+
+	public Optional<Number> tryGetOffset() { return Optional.ofNullable(getOffset()); }
+
+	public void setOffset(Number offset) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetOffset(offset)); }
+
+	@Nonnull
+	@Override
+	public IMutatorImmutablizable<?, ?> getMutator() { return mutator; }
+
+	@Override
+	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t, mutator); }
+
+	public ILogging<Logger> getLogging() { return logging; }
+
+	public boolean trySetLogging(ILogging<Logger> logging) { return trySet(t -> this.logging = t, logging); }
 
 
 	/* SECTION methods */
@@ -79,12 +118,10 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 	public T sum(Iterable<? extends Number> o) {
 		T r = copy();
 
-		double p = getParent().map(Number::doubleValue).orElse(1D);
-		r.value = Numbers.sum(getValue(), Streams.stream(o).filter(t -> t instanceof NumberRelative<?>).map(t -> (NumberRelative<?>) t).map(t -> (t.doubleValue() - t.getOffset().map(Number::doubleValue).orElse(0D)) / p).collect(Collectors.toList()), ).orElseThrow(Throwables::rethrowCaughtThrowableStatic);
+		double p = tryGetParent().map(Number::doubleValue).orElse(1D);
+		r.value = Streams.stream(o).filter(t -> t instanceof NumberRelative<?>).reduce(getValue().doubleValue(), (t, u) -> t + (u.doubleValue() - ((NumberRelative<?>) u).tryGetOffset().map(Number::doubleValue).orElse(0D)) / p, Double::sum);
 
-		List<Number> o2 = Streams.stream(o).map(t -> t instanceof NumberRelative<?> ? ((NumberRelative<?>) t).getOffset().map(Number::doubleValue).orElse(0D) : t.doubleValue()).filter(t -> t != 0D).collect(Collectors.toList());
-		getOffset().ifPresent(t -> o2.add(0, t));
-		r.offset = unboxOptional(Numbers.sum(o2, ));
+		r.offset = Streams.stream(o).reduce(tryGetOffset().map(Number::doubleValue).orElse(0D), (t, u) -> t + (u instanceof NumberRelative<?> ? ((NumberRelative<?>) u).tryGetOffset().map(Number::doubleValue).orElse(0D) : u.doubleValue()), Double::sum);
 
 		return r;
 	}
@@ -92,8 +129,8 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 	@Override
 	public T negate() {
 		T r = copy();
-		r.value = Numbers.negate(value).orElseThrow(Throwables::rethrowCaughtThrowableStatic);
-		r.offset = unboxOptional(Numbers.negate(offset));
+		r.value = Numbers.negate(value, getLogger()).orElseThrow(Throwables::rethrowCaughtThrowableStatic);
+		r.offset = unboxOptional(Numbers.negate(offset, getLogger()));
 		return r;
 	}
 
@@ -107,7 +144,7 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 			r.offset = o1.offset;
 		} else {
 			r.value = o;
-			r.parent = offset = null;
+			r.parent = r.offset = null;
 		}
 		return r;
 	}
@@ -120,12 +157,6 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 	}
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(new Immutable<>(this)); }
-
-	@Override
-	public boolean isImmutable() { return false; }
-
-	@Override
 	public int intValue() { return (int) doubleValue(); }
 
 	@Override
@@ -135,56 +166,34 @@ public class NumberRelative<T extends NumberRelative<T>> extends NumberDefault<T
 	public float floatValue() { return (float) doubleValue(); }
 
 	@Override
-	public double doubleValue() { return getParent().map(Number::doubleValue).orElse(1D) * getValue().doubleValue() + getOffset().map(Number::doubleValue).orElse(0D); }
+	public double doubleValue() { return tryGetParent().map(Number::doubleValue).orElse(1D) * getValue().doubleValue() + tryGetOffset().map(Number::doubleValue).orElse(0D); }
 
 
-	/* SECTION static classes */
+	@Override
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new NumberRelative<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
 
-	@javax.annotation.concurrent.Immutable
-	public static class Immutable<T extends NumberRelative<T>> extends NumberRelative<T> {
-		/* SECTION static variables */
-
-		private static final long serialVersionUID = -7462190942914160372L;
+	@Override
+	public boolean isImmutable() { return getMutator().isImmutable(); }
 
 
-		/* SECTION constructors */
+	@Override
+	@OverridingStatus(group = GROUP)
+	public final String toString() { return getToStringString(this, super.toString()); }
 
-		public Immutable(Number value) { this(value, null); }
+	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+	@Override
+	@OverridingStatus(group = GROUP)
+	public final boolean equals(Object o) { return areEqual(this, o, super::equals); }
 
-		public Immutable(Number value, @Nullable Number parent) { this(value, parent, null); }
+	@Override
+	@OverridingStatus(group = GROUP)
+	public final int hashCode() { return getHashCode(this, super::hashCode); }
 
-		public Immutable(Number value, @Nullable Number parent, @Nullable Number offset) { super(value, parent, offset); }
-
-		public Immutable(Immutable<?> c) { this(c.getValue(), unboxOptional(c.getParent()), unboxOptional(c.getOffset())); }
-
-
-		/* SECTION getters & setters */
-
-		@Override
-		@Deprecated
-		public void setLogger(Logger value) { throw rejectUnsupportedOperation(); }
-
-		@Override
-		@Deprecated
-		public void setValue(Number value) { throw rejectUnsupportedOperation(); }
-
-		@Override
-		@Deprecated
-		public void setParent(@Nullable Number parent) { throw rejectUnsupportedOperation(); }
-
-		@Override
-		@Deprecated
-		public void setOffset(@Nullable Number offset) { throw rejectUnsupportedOperation(); }
+	@SuppressWarnings("Convert2MethodRef")
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	@OverridingStatus(group = GROUP, when = When.MAYBE)
+	public T clone() { return ICloneable.clone(() -> super.clone(), getLogger()); }
 
 
-		/* SECTION methods */
-
-		@Override
-		@OverridingStatus(group = GROUP)
-		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
-
-		@Override
-		@OverridingStatus(group = GROUP)
-		public final boolean isImmutable() { return true; }
-	}
 }

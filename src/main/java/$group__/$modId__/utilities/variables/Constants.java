@@ -29,9 +29,12 @@ public enum Constants {
 			BUILDCRAFT_API_ID = "BuildCraftAPI|core", BUILDCRAFT_API_PACKAGE = "buildcraft";
 
 
-	public static final int INITIAL_SIZE_SMALL = 16;
-	public static final int INITIAL_SIZE_MEDIUM = 64;
-	public static final int INITIAL_SIZE_LARGE = 256;
+	public static final int INITIAL_CAPACITY_SCALING_FACTOR = 8;
+	public static final int INITIAL_CAPACITY_0 = 0;
+	public static final int INITIAL_CAPACITY_1 = 1;
+	public static final int INITIAL_CAPACITY_2 = INITIAL_CAPACITY_1 * INITIAL_CAPACITY_SCALING_FACTOR;
+	public static final int INITIAL_CAPACITY_3 = INITIAL_CAPACITY_2 * INITIAL_CAPACITY_SCALING_FACTOR;
+	public static final int INITIAL_CAPACITY_4 = INITIAL_CAPACITY_3 * INITIAL_CAPACITY_SCALING_FACTOR;
 
 
 	public static final int

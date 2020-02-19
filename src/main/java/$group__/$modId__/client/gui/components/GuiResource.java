@@ -1,115 +1,81 @@
 package $group__.$modId__.client.gui.components;
 
-import $group__.$modId__.annotations.OverridingStatus;
 import $group__.$modId__.client.gui.polygons.Rectangle;
 import $group__.$modId__.client.gui.themes.ITheme;
-import $group__.$modId__.client.gui.utilities.helpers.Guis;
+import $group__.$modId__.client.gui.themes.IThemed;
+import $group__.$modId__.client.gui.utilities.builders.BuilderGuiDrawable;
+import $group__.$modId__.client.gui.utilities.Guis;
+import $group__.$modId__.concurrent.IMutatorImmutablizable;
+import $group__.$modId__.logging.ILogging;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
 import java.awt.*;
+import java.util.Optional;
 
-import static $group__.$modId__.client.gui.utilities.helpers.Guis.bindTexture;
-import static $group__.$modId__.traits.basic.IImmutablizable.tryToImmutableUnboxedNonnull;
+import static $group__.$modId__.client.gui.utilities.Guis.bindTexture;
+import static $group__.$modId__.concurrent.IMutator.trySetNonnull;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
-import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperation;
-import static $group__.$modId__.utilities.variables.Constants.GROUP;
+import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperationIf;
 
 @SideOnly(Side.CLIENT)
-public class GuiResource<T extends GuiResource<T, N, TH, NT>, N extends Number, TH extends ITheme<TH>, NT extends Number> extends GuiRectangle<T, N, TH> {
+public class GuiResource<T extends GuiResource<T, N, C, TH, NT>, N extends Number, C extends Color, TH extends ITheme<TH>, NT extends Number> extends GuiRectangle<T, N, C, TH> {
 	/* SECTION variables */
 
 	protected ResourceLocation resource;
-	protected Rectangle<NT, ?> texture;
+	protected Rectangle<?, NT> texture;
 
 
 	/* SECTION constructors */
 
-	public GuiResource(Rectangle<N, ?> rectangle, @Nullable TH theme, Logger logger, ResourceLocation resource, Rectangle<NT, ?> texture) {
-		super(rectangle, null, theme, logger);
-		this.resource = resource;
-		this.texture = texture;
+	public GuiResource(Rectangle<?, N> rectangle, ResourceLocation resource, Rectangle<?, NT> texture, IThemed<TH> themed, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
+		super(rectangle, GuiColorNull.getInstance(), themed, mutator, logging);
+		this.resource = trySetNonnull(getMutator(), resource, true);
+		this.texture = trySetNonnull(getMutator(), texture, true);
 	}
 
-	public GuiResource(GuiResource<?, ? extends N, ? extends TH, ? extends NT> copy) { this(copy.getRectangle(), copy.getResource(), copy.getTexture(), copy.getLogger()); }
+	public GuiResource(GuiResource<?, N, ?, TH, NT> copy) { this(copy, copy.getMutator()); }
+
+
+	protected GuiResource(GuiResource<?, N, ?, TH, NT> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getRectangle(), copy.getResource(), copy.getTexture(), copy.getThemed(), mutator, copy.getLogging()); }
+
+
+	/* SECTION static methods */
+
+	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiResource<V, N, C, TH, NT>, N extends Number, C extends Color, TH extends ITheme<TH>, NT extends Number> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGR(Rectangle<?, N> rectangle, ResourceLocation resource, Rectangle<?, NT> texture) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiResource<>(rectangle, resource, texture, t.themed, t.mutator, t.logging))); }
 
 
 	/* SECTION getters & setters */
 
 	public ResourceLocation getResource() { return resource; }
 
-	public boolean setResource(ResourceLocation resource) {
-		this.resource = resource;
-		return true;
-	}
+	public boolean trySetResource(ResourceLocation resource) { return trySet(t -> this.resource = t, resource); }
 
-	public Rectangle<NT, ?> getTexture() { return texture; }
+	public Optional<ResourceLocation> tryGetResource() { return Optional.of(getResource()); }
 
-	public boolean setTexture(Rectangle<NT, ?> texture) {
-		this.texture = texture;
-		return true;
-	}
+	public void setResource(ResourceLocation resource) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetResource(resource)); }
 
-	@Override
-	@Deprecated
-	public boolean setColor(Color color) { return false; }
+	public Rectangle<?, NT> getTexture() { return texture; }
+
+	public boolean trySetTexture(Rectangle<?, NT> texture) { return trySet(t -> this.texture = t, texture); }
+
+	public Optional<Rectangle<?, NT>> tryGetTexture() { return Optional.of(getTexture()); }
+
+	public void setTexture(Rectangle<?, NT> texture) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetTexture(texture)); }
 
 
 	/* SECTION methods */
 
 	@Override
-	public boolean draw(Minecraft client) {
+	public boolean tryDraw(Minecraft client) {
 		bindTexture(getResource());
-		Guis.drawModalRectWithCustomSizedTexture(this, getRectangle(), getTexture());
+		Guis.drawModalRectWithCustomSizedTexture(getTheme(), getRectangle(), getTexture());
 		return true;
 	}
 
-
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull((Object) new Immutable<>(this)); }
-
-	@Override
-	public boolean isImmutable() { return false; }
-
-
-	/* SECTION static classes */
-
-	@javax.annotation.concurrent.Immutable
-	public static class Immutable<N extends Number, NT extends Number, T extends Immutable<N, NT, T>> extends GuiResource<N, NT, T> {
-		/* SECTION constructors */
-
-		public Immutable(Rectangle<N, ?> rect, ResourceLocation resource, Rectangle<NT, ?> texture, Logger logger) { super(rect.toImmutable(), tryToImmutableUnboxedNonnull(resource, logger), texture.toImmutable(), logger); }
-
-		public Immutable(GuiResource<N, NT, ?> copy) { this(copy.getRectangle(), copy.getResource(), copy.getTexture(), copy.getLogger()); }
-
-
-		/* SECTION getters & setters */
-
-		@Override
-		@Deprecated
-		public void setLogger(Logger logger) { throw rejectUnsupportedOperation(); }
-
-		@Override
-		@Deprecated
-		public boolean setResource(ResourceLocation resource) { throw rejectUnsupportedOperation(); }
-
-		@Override
-		@Deprecated
-		public void setTexture(Rectangle<NT, ?> texture) { throw rejectUnsupportedOperation(); }
-
-
-		/* SECTION methods */
-
-		@Override
-		@OverridingStatus(group = GROUP)
-		public final T toImmutable() { return castUncheckedUnboxedNonnull(this); }
-
-		@Override
-		@OverridingStatus(group = GROUP)
-		public final boolean isImmutable() { return true; }
-	}
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiResource<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
 }

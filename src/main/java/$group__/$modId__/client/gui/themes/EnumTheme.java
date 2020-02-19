@@ -14,11 +14,4 @@ public enum EnumTheme implements ITheme<EnumTheme> {
 	@SuppressWarnings("EmptyMethod")
 	@Override
 	public String toString() { return super.toString(); }
-
-
-	@Override
-	public EnumTheme toImmutable() { return this; }
-
-	@Override
-	public boolean isImmutable() { return true; }
 }

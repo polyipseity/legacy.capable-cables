@@ -1,39 +1,41 @@
 package $group__.$modId__.annotations;
 
-import $group__.$modId__.common.events.AnnotationProcessingEvent;
-import $group__.$modId__.utilities.throwables.AnnotationProcessingException;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.discovery.ASMDataTable;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
-import org.reflections.Reflections;
+import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.SetMultimap;
+import com.google.common.collect.Sets;
 
 import javax.annotation.Nullable;
 import javax.annotation.meta.When;
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Messager;
+import javax.annotation.processing.RoundEnvironment;
+import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
+import javax.tools.Diagnostic;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.lang.reflect.Method;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
-import static $group__.$modId__.traits.basic.IAnnotationProcessor.*;
-import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxed;
-import static $group__.$modId__.utilities.helpers.Dynamics.*;
-import static $group__.$modId__.utilities.helpers.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
-import static $group__.$modId__.utilities.helpers.specific.Throwables.throwThrowable;
-import static $group__.$modId__.utilities.helpers.specific.Throwables.throw_;
-import static $group__.$modId__.utilities.variables.Constants.INITIAL_SIZE_MEDIUM;
-import static $group__.$modId__.utilities.variables.Constants.MOD_ID;
+import static $group__.$modId__.utilities.helpers.Processors.*;
+import static $group__.$modId__.utilities.helpers.Recursions.recurseAsDepthFirstLoopUnboxedNonnull;
+import static $group__.$modId__.utilities.helpers.specific.StreamsExtension.streamSmart;
+import static $group__.$modId__.utilities.variables.Constants.INITIAL_CAPACITY_2;
+import static $group__.$modId__.utilities.variables.Constants.INITIAL_CAPACITY_4;
 import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 @Documented
 @Target(METHOD)
-@Retention(RUNTIME)
+@Retention(SOURCE)
 public @interface OverridingStatus {
 	/* SECTION methods */
 
@@ -44,83 +46,69 @@ public @interface OverridingStatus {
 
 	/* SECTION static classes */
 
-	@Mod.EventBusSubscriber(modid = MOD_ID)
-	enum AnnotationProcessor implements IClass.IElement.IMethod<OverridingStatus> {
-		/* SECTION enums */
-		INSTANCE;
-
-
-		/* SECTION variables */
-
-		private volatile boolean processed = false;
-
-
-		/* SECTION static methods */
-
-		@SubscribeEvent(priority = EventPriority.HIGH)
-		public static void process(AnnotationProcessingEvent event) { if (MOD_ID.equals(event.getModId())) INSTANCE.process(event.getAsm(), event.getLogger()); }
-
-
+	class Processor extends AbstractProcessor {
 		/* SECTION methods */
 
 		@Override
-		public void process(ASMDataTable asm, Logger logger) {
-			IMethod.super.process(asm, logger);
-			processed = true;
-		}
+		public Set<String> getSupportedAnnotationTypes() { return Collections.singleton(OverridingStatus.class.getCanonicalName()); }
 
 		@Override
-		public Class<OverridingStatus> annotationType() { return OverridingStatus.class; }
+		public SourceVersion getSupportedSourceVersion() { return SourceVersion.latest(); }
 
 		@Override
-		public boolean isProcessed() { return processed; }
+		public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+			if (!roundEnv.processingOver()) return false;
 
-		@Override
-		public void processMethod(Result<OverridingStatus> result, Logger logger) {
-			OverridingStatus a = result.annotations[0];
-			When when = a.when();
-			@Nullable Boolean whenB = when == When.ALWAYS ? Boolean.TRUE : when == When.NEVER ? Boolean.FALSE : null;
-			if (when == When.UNKNOWN) return;
+			@SuppressWarnings("UnstableApiUsage") SetMultimap<TypeElement, ExecutableElement> typeToExesMMap = MultimapBuilder.hashKeys(INITIAL_CAPACITY_4).hashSetValues(INITIAL_CAPACITY_2).build();
+			roundEnv.getElementsAnnotatedWith(OverridingStatus.class).forEach(e -> typeToExesMMap.put((TypeElement) e.getEnclosingElement(), (ExecutableElement) e));
 
-			Reflections refs;
-			String g = a.group();
-			try { refs = REFLECTIONS_CACHE.get(g); } catch (ExecutionException e) { throw throwThrowable(e); }
+			Elements elements = processingEnv.getElementUtils();
+			Set<TypeElement> pkgFlat = recurseAsDepthFirstLoopUnboxedNonnull(elements.getPackageElement(""), p -> p.getEnclosedElements().stream().filter(t -> t.asType().getKind() == TypeKind.DECLARED).map(t -> (TypeElement) t).collect(Collectors.toSet()), Element::getEnclosedElements, t -> t.stream().reduce(Collections.emptySet(), Sets::union));
 
-			Class<?> superC = result.clazz;
-			Method superM = result.element;
-			Set<Class<?>> ignore = new HashSet<>(INITIAL_SIZE_MEDIUM);
-			refs.getSubTypesOf(superC).forEach(subC -> {
-				if (isClassAbstract(subC) || ignore.contains(subC)) return;
-				OverridingStatus[] ar = getEffectiveAnnotationsIfInheritingConsidered(this, subC, superM, logger);
-				if (ar.length != 0 && ar[0] != a) {
-					ignore.addAll(refs.getSubTypesOf(subC));
-					return;
-				}
+			Types types = processingEnv.getTypeUtils();
+			Messager messager = processingEnv.getMessager();
+			typeToExesMMap.asMap().forEach((superclass, exes) -> streamSmart(pkgFlat, 1).forEach(subclass -> {
+				if (!isElementAbstract(subclass) && types.isSubtype(subclass.asType(), superclass.asType())) {
+					exes.forEach(superMethod -> {
+						OverridingStatus a = superMethod.getAnnotation(OverridingStatus.class);
 
-				for (Method subM : subC.getDeclaredMethods()) {
-					if (isFormerMethodOverriddenByLatter(superM, subM)) {
-						if (whenB == null || whenB)
-							logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage(getAnnotationProcessorMessage(this, "method '{}' -> @ superclass '{}' ({})"), subM.toGenericString(), superM.toGenericString(), a));
-						else
-							throw throw_(new AnnotationProcessingException(getAnnotationProcessorMessage(this, "Unfulfilled requirement: subclass '" + subC.toGenericString() + "' -X> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "' (" + a + ")," + System.lineSeparator() + "instead: method '" + subM.toGenericString() + "' -> @ superclass '" + superC.toGenericString() + '\'')));
-						return;
-					}
-				}
+						When when = a.when();
+						@Nullable Boolean whenB = when == When.ALWAYS ? Boolean.TRUE : when == When.NEVER ? Boolean.FALSE : null;
+						if (when == When.UNKNOWN) return;
 
-				if (whenB == null || !whenB) {
-					logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage(getAnnotationProcessorMessage(this, "subclass '{}' -X> method '{}' @ superclass '{}' ({})"), subC.toGenericString(), superM.toGenericString(), superC.toGenericString(), a));
-				} else {
-					for (Class<?> superC1 : getIntermediateSuperclasses(subC, castUncheckedUnboxed(superC.getSuperclass()))) {
-						for (Method superM1 : superC1.getDeclaredMethods()) {
-							if (isFormerMethodOverriddenByLatter(superM, superM1) && isMemberFinal(superM1)) {
-								logger.log(superM1.getDeclaringClass().getName().startsWith(g) ? Level.WARN : Level.INFO, getAnnotationProcessorMessage(this, "Impossible requirement: subclass '" + subC.toGenericString() + "' -Y> final method '" + superM1.toGenericString() + "' @ superclass '" + superM1.toGenericString() + "' (" + a + ')'));
-								return;
+						if (getEffectiveAnnotationIfInheritingConsidered(OverridingStatus.class, subclass, superMethod, elements, types) != a) return;
+
+						for (Element subMember : elements.getAllMembers(subclass)) {
+							if (subMember.getKind() == ElementKind.METHOD) {
+								ExecutableElement subMethod = (ExecutableElement) subMember;
+								if (elements.overrides(subMethod, superMethod, subclass)) {
+									if (whenB == null || whenB)
+										messager.printMessage(Diagnostic.Kind.NOTE, "Overrides super method '" + superMethod + '\'', subMethod);
+									else
+										messager.printMessage(Diagnostic.Kind.ERROR, "Requirement unfulfilled: should not override super method '" + superMethod + '\'', subMethod);
+									return;
+								}
 							}
 						}
-					}
-					throw throw_(new AnnotationProcessingException(getAnnotationProcessorMessage(this, "Unfulfilled requirement: subclass '" + subC.toGenericString() + "' -Y> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + "' (" + a + ")," + System.lineSeparator() + "instead: subclass '" + subC.toGenericString() + "' -X> method '" + superM.toGenericString() + "' @ superclass '" + superC.toGenericString() + '\'')));
+
+						if (whenB == null || !whenB) {
+							messager.printMessage(Diagnostic.Kind.NOTE, "Does not override super method '" + superMethod + '\'', subclass);
+						} else {
+							for (TypeElement superclass1 : getIntermediateSuperclasses(subclass, (TypeElement) types.asElement(superclass.getSuperclass()), types)) {
+								for (Element superMethod1 : elements.getAllMembers(superclass1)) {
+									if (superMethod1.getKind() == ElementKind.METHOD && isElementFinal(superMethod1) && elements.overrides((ExecutableElement) superMethod1, superMethod, superclass1)) {
+										messager.printMessage(superclass1.getQualifiedName().toString().startsWith(a.group()) ? Diagnostic.Kind.WARNING : Diagnostic.Kind.NOTE, "Requirement impossible: cannot override final super method '" + superMethod1 + '\'');
+										return;
+									}
+								}
+							}
+							messager.printMessage(Diagnostic.Kind.ERROR, "Requirement unfulfilled: should override super method '" + superMethod + '\'');
+						}
+					});
 				}
-			});
+			}));
+
+			return true;
 		}
 	}
 }

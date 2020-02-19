@@ -30,118 +30,118 @@ public final class ModContainerNull extends Singleton implements ModContainer {
 
 	@Override
 	@Deprecated
-	public String getModId() { throw rejectUnsupportedOperation(); }
+	public String getModId() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public String getName() { throw rejectUnsupportedOperation(); }
+	public String getName() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public String getVersion() { throw rejectUnsupportedOperation(); }
+	public String getVersion() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public File getSource() { throw rejectUnsupportedOperation(); }
+	public File getSource() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public ModMetadata getMetadata() { throw rejectUnsupportedOperation(); }
+	public ModMetadata getMetadata() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public void bindMetadata(MetadataCollection mc) { throw rejectUnsupportedOperation(); }
+	public void bindMetadata(MetadataCollection mc) throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public void setEnabledState(boolean enabled) { throw rejectUnsupportedOperation(); }
+	public void setEnabledState(boolean enabled) throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public Set<ArtifactVersion> getRequirements() { throw rejectUnsupportedOperation(); }
+	public Set<ArtifactVersion> getRequirements() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public List<ArtifactVersion> getDependencies() { throw rejectUnsupportedOperation(); }
+	public List<ArtifactVersion> getDependencies() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public List<ArtifactVersion> getDependants() { throw rejectUnsupportedOperation(); }
+	public List<ArtifactVersion> getDependants() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public String getSortingRules() { throw rejectUnsupportedOperation(); }
+	public String getSortingRules() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public boolean registerBus(@SuppressWarnings("UnstableApiUsage") EventBus bus, LoadController controller) { throw rejectUnsupportedOperation(); }
+	public boolean registerBus(@SuppressWarnings("UnstableApiUsage") EventBus bus, LoadController controller) throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public boolean matches(Object mod) { throw rejectUnsupportedOperation(); }
+	public boolean matches(Object mod) throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public Object getMod() { throw rejectUnsupportedOperation(); }
+	public Object getMod() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public ArtifactVersion getProcessedVersion() { throw rejectUnsupportedOperation(); }
+	public ArtifactVersion getProcessedVersion() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public boolean isImmutable() { throw rejectUnsupportedOperation(); }
+	public boolean isImmutable() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public String getDisplayVersion() { throw rejectUnsupportedOperation(); }
+	public String getDisplayVersion() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public VersionRange acceptableMinecraftVersionRange() { throw rejectUnsupportedOperation(); }
+	public VersionRange acceptableMinecraftVersionRange() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Nullable
 	@Deprecated
-	public Certificate getSigningCertificate() { throw rejectUnsupportedOperation(); }
+	public Certificate getSigningCertificate() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public Map<String, String> getCustomModProperties() { throw rejectUnsupportedOperation(); }
+	public Map<String, String> getCustomModProperties() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public Class<?> getCustomResourcePackClass() { throw rejectUnsupportedOperation(); }
+	public Class<?> getCustomResourcePackClass() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public Map<String, String> getSharedModDescriptor() { throw rejectUnsupportedOperation(); }
+	public Map<String, String> getSharedModDescriptor() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public Disableable canBeDisabled() { throw rejectUnsupportedOperation(); }
+	public Disableable canBeDisabled() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public String getGuiClassName() { throw rejectUnsupportedOperation(); }
+	public String getGuiClassName() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public List<String> getOwnedPackages() { throw rejectUnsupportedOperation(); }
+	public List<String> getOwnedPackages() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public boolean shouldLoadInEnvironment() { throw rejectUnsupportedOperation(); }
+	public boolean shouldLoadInEnvironment() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public URL getUpdateUrl() { throw rejectUnsupportedOperation(); }
+	public URL getUpdateUrl() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public int getClassVersion() { throw rejectUnsupportedOperation(); }
+	public int getClassVersion() throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public void setClassVersion(int classVersion) { throw rejectUnsupportedOperation(); }
+	public void setClassVersion(int classVersion) throws UnsupportedOperationException { throw rejectUnsupportedOperation(); }
 }

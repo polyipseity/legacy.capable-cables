@@ -1,6 +1,6 @@
 package $group__.$modId__.utilities.helpers.specific;
 
-import $group__.$modId__.traits.basic.IOperable;
+import $group__.$modId__.traits.IOperable;
 import $group__.$modId__.utilities.helpers.Casts;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -57,9 +57,9 @@ public enum Numbers {
 	}
 
 
-	public static <N> Optional<N> negate(@Nullable N n) {
+	public static <N> Optional<N> negate(@Nullable N n, @Nullable Logger logger) {
 		if (n instanceof IOperable<?, ?>)
-			return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class)).map(IOperable::negate).flatMap(Casts::castUnchecked);
+			return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class), logger).map(IOperable::negate).flatMap(Casts::castUnchecked);
 		else if (n instanceof Number)
 			return Optional.ofNullable(NUMBER_FROM_STRING_MAP.get(n.getClass())).map(f -> f.apply(TWO_MINUS_SIGNS_PATTERN.matcher(("-" + n)).replaceAll(Matcher.quoteReplacement(StringsExtension.STRING_EMPTY)))).flatMap(Casts::castUnchecked);
 		return Optional.empty();
@@ -69,7 +69,7 @@ public enum Numbers {
 	@SafeVarargs
 	public static <N> Optional<N> sum(Logger logger, N... a) { return sum(asList(a), logger); }
 
-	public static <N> Optional<N> sum(Iterable<? extends N> it, Logger logger) {
+	public static <N> Optional<N> sum(Iterable<? extends N> it, @Nullable Logger logger) {
 		List<? extends N> l = Lists.newArrayList(it);
 		switch (l.size()) {
 			case 0:
@@ -81,9 +81,9 @@ public enum Numbers {
 		}
 	}
 
-	public static <N> Optional<N> sum(@Nullable N n, Iterable<? extends N> it, Logger logger) {
+	public static <N> Optional<N> sum(@Nullable N n, Iterable<? extends N> it, @Nullable Logger logger) {
 		if (n instanceof IOperable<?, ?>)
-			return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class)).flatMap(t -> castChecked(t.sum(it), castUncheckedUnboxedNonnull(t.getClass())));
+			return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class), logger).flatMap(t -> castChecked(t.sum(it), castUncheckedUnboxedNonnull(t.getClass()), logger));
 		else if (n instanceof Number) {
 			Class<? extends N> clazz = castUncheckedUnboxedNonnull(n.getClass());
 			@Nullable Class<?> pClass = PRIMITIVE_TYPE_TO_BOXED_TYPE_BI_MAP.inverse().get(clazz);
@@ -106,9 +106,9 @@ public enum Numbers {
 
 	@SuppressWarnings("varargs")
 	@SafeVarargs
-	public static <N> Optional<N> max(N... a) { return max(asList(a)); }
+	public static <N> Optional<N> max(@Nullable Logger logger, N... a) { return max(asList(a), logger); }
 
-	public static <N> Optional<N> max(Iterable<? extends N> it) {
+	public static <N> Optional<N> max(Iterable<? extends N> it, @Nullable Logger logger) {
 		List<? extends N> l = Lists.newArrayList(it);
 		switch (l.size()) {
 			case 0:
@@ -116,30 +116,30 @@ public enum Numbers {
 			case 1:
 				return Optional.ofNullable(l.get(0));
 			default:
-				return max(l.get(0), l.subList(1, l.size()));
+				return max(l.get(0), l.subList(1, l.size()), logger);
 		}
 	}
 
-	public static <N> Optional<N> max(@Nullable N n, Iterable<? extends N> it) {
+	public static <N> Optional<N> max(@Nullable N n, Iterable<? extends N> it, @Nullable Logger logger) {
 		if (n instanceof IOperable<?, ?>)
-			return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class)).flatMap(t -> castChecked(t.max(it), castUncheckedUnboxedNonnull(t.getClass())));
+			return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class), logger).flatMap(t -> castChecked(t.max(it), castUncheckedUnboxedNonnull(t.getClass()), logger));
 		else if (n instanceof Comparable<?>) {
-			@Nullable Comparable<N> t = castCheckedUnboxed(n, castUncheckedUnboxedNonnull(Comparable.class));
+			@Nullable Comparable<N> t = castCheckedUnboxed(n, castUncheckedUnboxedNonnull(Comparable.class), logger);
 			Iterator<? extends N> itr = it.iterator();
 			while (itr.hasNext() && t != null) {
 				N t1 = itr.next();
-				if (lessThan(t, t1)) t = castCheckedUnboxed(t1, castUncheckedUnboxedNonnull(Comparable.class));
+				if (lessThan(t, t1)) t = castCheckedUnboxed(t1, castUncheckedUnboxedNonnull(Comparable.class), logger);
 			}
-			return castChecked(t, castUncheckedUnboxedNonnull(n.getClass()));
+			return castChecked(t, castUncheckedUnboxedNonnull(n.getClass()), logger);
 		}
 		return Optional.empty();
 	}
 
 	@SuppressWarnings("varargs")
 	@SafeVarargs
-	public static <N> Optional<N> min(N... a) { return min(asList(a)); }
+	public static <N> Optional<N> min(@Nullable Logger logger, N... a) { return min(asList(a), logger); }
 
-	public static <N> Optional<N> min(Iterable<? extends N> it) {
+	public static <N> Optional<N> min(Iterable<? extends N> it, @Nullable Logger logger) {
 		List<? extends N> l = Lists.newArrayList(it);
 		switch (l.size()) {
 			case 0:
@@ -147,21 +147,21 @@ public enum Numbers {
 			case 1:
 				return Optional.ofNullable(l.get(0));
 			default:
-				return min(l.get(0), l.subList(1, l.size()));
+				return min(l.get(0), l.subList(1, l.size()), logger);
 		}
 	}
 
-	public static <N> Optional<N> min(@Nullable N n, Iterable<? extends N> it) {
+	public static <N> Optional<N> min(@Nullable N n, Iterable<? extends N> it, @Nullable Logger logger) {
 		if (n instanceof IOperable<?, ?>)
-			return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class)).flatMap(t -> castChecked(t.min(it), castUncheckedUnboxedNonnull(t.getClass())));
+			return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class), logger).flatMap(t -> castChecked(t.min(it), castUncheckedUnboxedNonnull(t.getClass()), logger));
 		else if (n instanceof Comparable<?>) {
-			@Nullable Comparable<N> t = castCheckedUnboxed(n, castUncheckedUnboxedNonnull(Comparable.class));
+			@Nullable Comparable<N> t = castCheckedUnboxed(n, castUncheckedUnboxedNonnull(Comparable.class), logger);
 			Iterator<? extends N> itr = it.iterator();
 			while (itr.hasNext() && t != null) {
 				N t1 = itr.next();
-				if (greaterThan(t, t1)) t = castCheckedUnboxed(t1, castUncheckedUnboxedNonnull(Comparable.class));
+				if (greaterThan(t, t1)) t = castCheckedUnboxed(t1, castUncheckedUnboxedNonnull(Comparable.class), logger);
 			}
-			return castChecked(t, castUncheckedUnboxedNonnull(n.getClass()));
+			return castChecked(t, castUncheckedUnboxedNonnull(n.getClass()), logger);
 		}
 		return Optional.empty();
 	}

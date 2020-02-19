@@ -1,7 +1,7 @@
 package $group__.$modId__.utilities.helpers;
 
 import $group__.$modId__.annotations.ExternalCloneMethod;
-import $group__.$modId__.traits.extensions.ICloneable;
+import $group__.$modId__.utilities.extensions.ICloneable;
 import $group__.$modId__.utilities.helpers.specific.Throwables;
 import net.minecraft.util.ResourceLocation;
 

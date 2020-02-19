@@ -1,106 +1,107 @@
 package $group__.$modId__.client.gui;
 
-import $group__.$modId__.client.gui.components.GuiResource;
-import $group__.$modId__.client.gui.components.GuiTabs;
-import $group__.$modId__.client.gui.coordinates.NumberRelativeDisplay.X;
-import $group__.$modId__.client.gui.coordinates.NumberRelativeDisplay.Y;
-import $group__.$modId__.client.gui.coordinates.XY;
+import $group__.$modId__.client.gui.components.*;
 import $group__.$modId__.client.gui.polygons.Rectangle;
-import $group__.$modId__.client.gui.themes.EnumTheme;
-import $group__.$modId__.client.gui.traits.IThemed;
-import $group__.$modId__.common.registrables.items.ItemWrench;
-import $group__.$modId__.traits.basic.ILogging;
-import $group__.$modId__.utilities.helpers.specific.Colors;
+import $group__.$modId__.client.gui.themes.ITheme;
+import $group__.$modId__.client.gui.themes.IThemed;
+import $group__.$modId__.client.gui.themes.IThemedUser;
+import $group__.$modId__.concurrent.IMutatorImmutablizable;
+import $group__.$modId__.concurrent.IMutatorUser;
+import $group__.$modId__.logging.ILogging;
+import $group__.$modId__.logging.ILoggingUser;
+import $group__.$modId__.traits.ISpec;
+import $group__.$modId__.utilities.builders.BuilderDefaults;
+import $group__.$modId__.utilities.extensions.IStructure;
 import $group__.$modId__.utilities.variables.Globals;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Container;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
 
-import java.util.List;
+import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static $group__.$modId__.client.gui.bases.GuiContainerBases.initGuiBase;
-import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectArguments;
+import static $group__.$modId__.client.gui.coordinates.NumberRelativeDisplay.X.newBuilderX;
+import static $group__.$modId__.client.gui.coordinates.NumberRelativeDisplay.Y.newBuilderY;
+import static $group__.$modId__.client.gui.polygons.Rectangle.newBuilderRectangle;
+import static $group__.$modId__.client.gui.utilities.builders.BuilderGuiDrawable.KEY_DEFAULT_COLORED;
+import static $group__.$modId__.client.gui.utilities.builders.BuilderGuiDrawable.KEY_DEFAULT_THEMED;
+import static $group__.$modId__.concurrent.IMutator.trySetNonnull;
+import static $group__.$modId__.utilities.builders.BuilderStructure.KEY_DEFAULT_LOGGING;
+import static $group__.$modId__.utilities.builders.BuilderStructure.KEY_DEFAULT_MUTATOR;
+import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
+import static $group__.$modId__.utilities.helpers.specific.Optionals.unboxOptional;
+import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperation;
 
 @SideOnly(Side.CLIENT)
-public class GuiWrench extends GuiContainer implements IThemed<EnumTheme>, ILogging {
-
+public class GuiWrench<T extends GuiWrench<T, TH>, TH extends ITheme<TH>> extends GuiContainer implements IStructure<T, T>, ISpec<Rectangle<?, ?>>, IMutatorUser<IMutatorImmutablizable<?, ?>>, ILoggingUser<ILogging<Logger>, Logger>, IThemedUser<IThemed<TH>, TH> {
 	/* SECTION variables */
 
-	protected GuiTabsThemed<Number, List<GuiTabs.ITab<Number, ?>>, GuiTabs.ITab<Number, ?>, EnumTheme, ?> tabs;
-	protected ItemStack stack;
-	protected EnumTheme theme;
-	protected Logger logger;
+	protected GuiTabs<?, ?, ?, ?, ?, ?> tabs;
+	protected IThemed<TH> themed;
+
+	protected IMutatorImmutablizable<?, ?> mutator;
+	protected ILogging<Logger> logging;
 
 
 	/* SECTION constructors */
 
-	public GuiWrench(Container container, ItemStack stack, Logger logger) { this(container, stack, EnumTheme.NONE, 0, logger); }
-
-	public GuiWrench(Container container, ItemStack stack, EnumTheme theme, int open, Logger logger) {
+	@SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
+	public GuiWrench(Container container, int open, @Nullable TH theme, IMutatorImmutablizable<?, ?> mutator, @Nullable Logger logger) {
 		super(container);
-		if (!(stack.getItem() instanceof ItemWrench)) throw rejectArguments(stack);
-		this.stack = stack;
-		this.theme = theme;
-		this.logger = logger;
+		this.mutator = trySetNonnull(mutator, mutator, true);
+		logging = trySetNonnull(getMutator(), ILogging.of(logger, getMutator()), true);
 
-		tabs = new GuiTabsThemed<>(
-				EnumTheme.NONE,
-				0,
-				logger,
-				new GuiTabs.ITabThemed.Impl<>(
-						new GuiRectangleThemedDrawable<>(
-								new Rectangle<>(new XY<>(new X<>(0.1F), new Y<>(0.1F, -32), ), new XY<>(32, 32, )),
-								new GuiResource<>(
-										new Rectangle<>(new XY<>(new X<>(0.1F), new Y<>(0.1F, -32), ), new XY<>(64, 64, )),
-										Globals.Client.Resources.GUI_WRENCH,
-										Globals.Client.Resources.GUI_WRENCH_INFO,
-										logger
-										),
-								EnumTheme.NONE,
-								logger
-								),
-						new GuiRectangleThemed<>(
-								new Rectangle<>(new XY<>(new X<>(0.1F), new Y<>(0.1F), ), new XY<>(new X<>(0.8F), new Y<>(0.8F), )),
-								Colors.WHITE,
-								EnumTheme.NONE,
-								logger
-								),
-						EnumTheme.NONE,
-						logger
-						));
-		tabs.setOpen(open);
-		tabs.setTheme(theme);
+		themed = trySetNonnull(getMutator(), IThemed.of(theme, getMutator(), getLogging()), true);
+		{
+			Runnable popDefaults = BuilderDefaults
+					.pushDefaultStart(KEY_DEFAULT_MUTATOR, getMutator())
+					.pushDefault(KEY_DEFAULT_LOGGING, getLogging())
+					.pushDefault(KEY_DEFAULT_COLORED, null)
+					.pushDefault(KEY_DEFAULT_THEMED, getThemed()).stopPushing();
+			tabs = GuiTabs.newBuilderGT(
+					Arrays.asList(
+							GuiTab.newBuilderGT(
+									castUncheckedUnboxedNonnull(GuiRectangle.newBuilderGR(newBuilderRectangle(newBuilderX(0.8F).build(), newBuilderY(0.8F).build(), newBuilderX(0.1F).build(), newBuilderY(0.1F).build()).build()).build()),
+									castUncheckedUnboxedNonnull(GuiRectangleMatcher.newBuilderGRM(
+											newBuilderRectangle(32, 32, newBuilderX(0.1F).build(), newBuilderY(0.1F).setOffset(-32).build()).build(),
+											GuiResource.newBuilderGR(
+													newBuilderRectangle(64, 64, newBuilderX(0.1F).build(), newBuilderY(0.1F).setOffset(-32).build()).build(),
+													Globals.Client.Resources.GUI_WRENCH,
+													Globals.Client.Resources.GUI_WRENCH_INFO
+											).build()
+									).build())
+							).build()
+					),
+					open
+			).build();
+			popDefaults.run();
+		}
 	}
-
+	
 
 	/* SECTION getters & setters */
 
-	public GuiTabsThemed<Number, List<GuiTabs.ITab<Number, ?>>, GuiTabs.ITab<Number, ?>, EnumTheme, ?> getTabs() { return tabs; }
-
-	public void setTabs(GuiTabsThemed<Number, List<GuiTabs.ITab<Number, ?>>, GuiTabs.ITab<Number, ?>, EnumTheme, ?> tabs) { this.tabs = tabs; }
-
-	public ItemStack getStack() { return stack; }
-
-	public void setStack(ItemStack stack) { this.stack = stack; }
+	@Override
+	public IThemed<TH> getThemed() { return themed; }
 
 	@Override
-	public Logger getLogger() { return logger; }
+	public boolean trySetThemed(IThemed<TH> themed) { return trySet(t -> this.themed = t, themed); }
 
 	@Override
-	public void setLogger(Logger logger) { this.logger = logger; }
+	public ILogging<Logger> getLogging() { return logging; }
 
 	@Override
-	public EnumTheme getTheme() { return theme; }
+	public boolean trySetLogging(ILogging<Logger> logging) { return trySet(t -> this.logging = t, logging); }
 
 	@Override
-	public void setTheme(EnumTheme theme) {
-		tabs.setTheme(theme);
-		this.theme = theme;
-	}
+	public IMutatorImmutablizable<?, ?> getMutator() { return mutator; }
+
+	@Override
+	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t, mutator); }
 
 
 	/* SECTION methods */
@@ -112,8 +113,16 @@ public class GuiWrench extends GuiContainer implements IThemed<EnumTheme>, ILogg
 	}
 
 	@Override
-	public Optional<Rectangle.Immutable<Number, ?>> spec() { return tabs.spec(); }
+	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) { tabs.tryDraw(mc); }
+
 
 	@Override
-	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) { tabs.draw(mc); }
+	public Optional<Rectangle<?, ?>> spec() { return Optional.ofNullable(unboxOptional(tabs.spec())); }
+
+
+	@Override
+	public T toImmutable() { throw rejectUnsupportedOperation(); }
+
+	@Override
+	public boolean isImmutable() { return getMutator().isImmutable(); }
 }

@@ -1,10 +1,14 @@
 package $group__.$modId__.utilities.variables;
 
 import $group__.$modId__.ModThis;
+import $group__.$modId__.client.gui.coordinates.XY;
 import $group__.$modId__.client.gui.polygons.Rectangle;
 import $group__.$modId__.client.utilities.ResourceLocationTexture;
+import $group__.$modId__.concurrent.MutatorImmutable;
+import $group__.$modId__.logging.ILogging;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -47,10 +51,12 @@ public enum Globals {
 		private static ScaledResolution resolution = new ScaledResolution(CLIENT);
 
 
-		/* SECTION static methods */
+		/* SECTION static getter & setters */
 
 		public static ScaledResolution getResolution() { return resolution; }
 
+
+		/* SECTION static methods */
 
 		public static <T> void registerPreInitGuiListener(T k, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> v) {
 			PRE_INIT_GUI_LISTENER_MAP.put(k, v);
@@ -74,8 +80,8 @@ public enum Globals {
 
 			/* SECTION static variables */
 
-			public static final ResourceLocationTexture GUI_WRENCH = new ResourceLocationTexture("textures/gui/containers/wrench.png", 1024F, 1024F);
-			public static final Rectangle<Float, ?> GUI_WRENCH_INFO = GUI_WRENCH.generateRectangle(-64F, 0F);
+			public static final ResourceLocationTexture GUI_WRENCH = new ResourceLocationTexture(new ResourceLocation("textures/gui/containers/wrench.png"), new XY<>(1024F, 1024F, MutatorImmutable.INSTANCE, ILogging.of(LOGGER, MutatorImmutable.INSTANCE)));
+			public static final Rectangle<?, Float> GUI_WRENCH_INFO = GUI_WRENCH.makeRectangle(new XY<>(-64F, 0F, MutatorImmutable.INSTANCE, ILogging.of(LOGGER, MutatorImmutable.INSTANCE)));
 		}
 	}
 }
