@@ -1,0 +1,25 @@
+//////////////////////////////////////////////////
+// TITLE Gradle Build Script
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+
+/* SECTION application */
+
+apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
+
+
+/* SECTION configuration */
+
+makeSourceTasks {
+    it.inputs.property 'expand_group', project.group
+    it.inputs.property 'expand_modId', modId
+}
+
+makeJUnitPlatformTests()
+
+makeJavadocTasks {
+    it.inputs.property 'expand_group', project.group
+    it.inputs.property 'expand_modId', modId
+}

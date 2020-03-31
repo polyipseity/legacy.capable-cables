@@ -1,0 +1,22 @@
+//////////////////////////////////////////////////
+// TITLE IDE
+//////////////////////////////////////////////////
+
+
+/* SECTION application */
+
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+
+/* SECTION configuration */
+
+// COMMENT append
+afterEvaluate {
+    eclipse.classpath { downloadSources = downloadJavadoc = true }
+    idea.module {
+        downloadSources = downloadJavadoc = true
+        // COMMENT the below code should, but does not work
+        // TODO CODE scopes.RUNTIME.plus << configurations.debug
+    }
+}

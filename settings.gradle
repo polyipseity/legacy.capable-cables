@@ -3,7 +3,16 @@
 //////////////////////////////////////////////////
 
 
-/* SECTION variables */
+/* SECTION configuration */
 
 //noinspection SpellCheckingInspection
 rootProject.name = 'capablecables'
+
+
+/* SECTION sub-projects */
+
+// TODO include ':commons'
+include ':annotations'
+include ':utilities'
+include ':annotations:processors'
+include ':product'

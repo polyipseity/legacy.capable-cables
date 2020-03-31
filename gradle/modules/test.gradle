@@ -1,0 +1,22 @@
+//////////////////////////////////////////////////
+// TITLE Test
+//////////////////////////////////////////////////
+
+
+/* SECTION methods */
+
+project.ext.makeJUnitPlatformTests = {
+    dependencies {
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:+'
+        testImplementation 'org.junit.jupiter:junit-jupiter-params:+'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:+'
+    }
+
+    test {
+        useJUnitPlatform()
+        testLogging {
+            //noinspection GrUnresolvedAccess
+            events 'started', 'passed', 'skipped', 'failed', 'standard_out', 'standard_error'
+        }
+    }
+}

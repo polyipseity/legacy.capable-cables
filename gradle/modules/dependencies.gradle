@@ -1,0 +1,54 @@
+//////////////////////////////////////////////////
+// TITLE Dependencies
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+
+/* SECTION variables */
+
+final String rootDir = "$rootDir${name == 'buildSrc' ? "$separator.." : ''}"
+final String utilitiesDir = "$rootDir${separator}gradle"
+
+
+/* SECTION check */
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply(['stringToStringMap', 'evaluateGString'])
+
+
+/* SECTION configuration */
+
+// COMMENT append
+afterEvaluate {
+    dependencies {
+        // COMMENT you may put jars on which you depend on in ./libs
+        // COMMENT or you may define them like so..
+        // CODE compile 'some.group:artifact:version:classifier'
+        // CODE compile 'some.group:artifact:version'
+
+        // COMMENT real examples
+        // CODE compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
+        // CODE compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
+
+        // COMMENT the 'provided' configuration is for optional dependencies that exist at compile-time but might NOT at runtime.
+        // CODE provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+        // COMMENT the deobf configurations:  'deobfCompile' and 'deobfProvided' are the same as the normal compile and provided,
+        // COMMENT except that these dependencies get remapped to your current MCP mappings
+        // CODE deobfCompile 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+        // CODE deobfProvided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+        // COMMENT for more info...
+        // COMMENT http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
+        // COMMENT http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+        /* COMMENT
+        'compile' is superseded by 'implementation'.
+        'provided' is superseded by 'compileOnly'.
+        'runtime' is superseded by 'runtimeOnly'.
+         */
+
+        stringToStringMap(customDependencies).each { String k, List<String> v -> v.each { dependencies."$k"(evaluateGString(it)) } }
+    }
+}

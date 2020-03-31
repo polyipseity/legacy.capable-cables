@@ -1,0 +1,62 @@
+//////////////////////////////////////////////////
+// TITLE Resources
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+
+/* SECTION variables */
+
+final String rootDir = "$rootDir${name == 'buildSrc' ? "$separator.." : ''}"
+final String utilitiesDir = "$rootDir${separator}gradle"
+
+
+/* SECTION check */
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply(['evaluateGStringString'])
+
+
+/* SECTION methods */
+
+project.ext.makeResourcesTasks = { Closure c ->
+    tasks.withType(ProcessResources) { ProcessResources t ->
+        String taskSourceSetName = name.replace('process', '').replace('Resources', ''),
+               sourceSetName = (taskSourceSetName.empty ? 'main' : taskSourceSetName).uncapitalize()
+
+        t.configure {
+            configure c
+
+            Map<String, Object> e = inputs.properties.findAll { it.key.startsWith 'expand_' }.collectEntries { [it.key.replace('expand_', ''), it.value] } as Map<String, Object>
+
+            // COMMENT replace stuff in the to-be-processed files, nothing else
+            from(sourceSets."$sourceSetName".resources.srcDirs as Set<File>) {
+                include '**/*.in'
+                rename ~/(.*)\.in/, '$1'
+
+                // COMMENT replace variables
+                expand e
+            }
+
+            // COMMENT copy everything else except the processed files
+            from(sourceSets."$sourceSetName".resources.srcDirs as Set<File>) {
+                exclude '**/*.in'
+            }
+
+            Binding eb = new Binding(e)
+            eachFile { it.path = evaluateGStringString it.path, eb }
+        }
+
+        Sync sync = task("sync${name.capitalize()}", type: Sync, description: "Sync $sourceSetName resources.") {
+            from t.destinationDir
+            into tasks."compile${taskSourceSetName}Java".destinationDir
+            preserve { include '**/*.class' }
+        } as Sync
+        t.finalizedBy sync
+
+        tasks.jar.dependsOn task("before${taskSourceSetName}Jar", type: Delete, description: "Prepare $sourceSetName stuff for jaring.") {
+            delete fileTree(dir: t.destinationDir)
+            mustRunAfter sync
+        }
+    }
+}

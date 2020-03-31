@@ -1,0 +1,37 @@
+//////////////////////////////////////////////////
+// TITLE Repositories
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+/* SECTION variables */
+
+final String rootDir = "$rootDir${name == 'buildSrc' ? "$separator.." : ''}"
+final String utilitiesDir = "$rootDir${separator}gradle"
+
+
+/* SECTION check */
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply(['stringToStringMap', 'evaluateGStringString'])
+
+
+/* SECTION configuration */
+
+repositories {
+    gradlePluginPortal()
+    jcenter()
+    mavenCentral()
+    mavenLocal()
+    google()
+}
+
+stringToStringMap(customRepositories).each { String k, List<String> v ->
+    v.each {
+        String[] e = it.split('(?<!\\\\):', 2).collect { evaluateGStringString it.trim().replace('\\:', ':') }
+        repositories."$k" {
+            name = e.first()
+            url = e.last()
+        }
+    }
+}

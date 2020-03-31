@@ -2,9 +2,19 @@
 // TITLE Properties (.properties)
 //////////////////////////////////////////////////
 
+import static java.io.File.separator
+
+
+/* SECTION variables */
+
+final String rootDir = "$rootDir${name == 'buildSrc' ? "$separator.." : ''}"
+final String utilitiesDir = "$rootDir${separator}gradle"
+
+
 /* SECTION check */
 
-if (!project.ext.has('createNewFile')) throw new IllegalStateException('Apply "utilities.gradle" before applying "properties.gradle".')
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply(['createNewFile'])
 
 
 /* SECTION methods */

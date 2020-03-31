@@ -1,0 +1,61 @@
+//////////////////////////////////////////////////
+// TITLE Minecraft Forge
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+
+/* SECTION variables */
+
+final String rootDir = "$rootDir${name == 'buildSrc' ? "$separator.." : ''}"
+final String utilitiesDir = "$rootDir${separator}gradle"
+
+
+/* SECTION check */
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply(['stringToStringMap', 'evaluateGString'])
+
+
+/* SECTION application */
+
+//noinspection SpellCheckingInspection
+apply plugin: 'net.minecraftforge.gradle.forge'
+
+
+/* SECTION configuration */
+
+minecraft {
+    version = minecraftForgeVersion
+    runDir = minecraftRunDir
+
+    // COMMENT the mappings can be changed at any time, and must be in the following format.
+    // COMMENT snapshot_YYYYMMDD   snapshot are built nightly.
+    // COMMENT stable_#            stables are built at the discretion of the MCP team.
+    // COMMENT Use non-default mappings at your own risk. they may NOT always work.
+    // COMMENT simply re-run your setup task after changing the mappings to update your workspace.
+    mappings = minecraftMappings
+    // COMMENT makeObfSourceJar = false // COMMENT an Srg named sources jar is made by default. uncomment this to disable.
+}
+
+configurations {
+    shade
+    implementation.extendsFrom shade
+}
+
+// COMMENT append
+afterEvaluate {
+    jar {
+        exclude 'dummyThing' // COMMENT dumb dummy
+        configurations.shade.each { from(zipTree(it)) { exclude 'META-INF', 'META-INF/**' } }
+    }
+
+    //noinspection SpellCheckingInspection
+    reobf.jar {
+        // COMMENT extraLines 'PK: org/ejml your/new/package/here/ejml' // COMMENT shading example
+        configurations.shade.dependencies.each { if (it.group != group) extraLines "PK: ${it.group} $group.${rootProject.name}/shaded/${it.group}".replace('.', '/') }
+    }
+
+    tasks.runClient.outputs.upToDateWhen { false }
+    tasks.runServer.outputs.upToDateWhen { false }
+}

@@ -1,0 +1,34 @@
+//////////////////////////////////////////////////
+// TITLE Globals
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+
+/* SECTION variables */
+
+final String rootDir = "$rootDir${name == 'buildSrc' ? "$separator.." : ''}"
+final String utilitiesDir = "$rootDir${separator}gradle"
+
+
+/* SECTION check */
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply(['parseArgument'])
+
+
+/* SECTION extra variables */
+
+ext {
+    // COMMENT arguments
+
+    buildType = parseArgument 'buildType', 'BUILD_TYPE', 'DEBUG'
+    update = parseArgument('update', 'UPDATE', false).toBoolean()
+    strictDigestCheck = parseArgument('strictDigestCheck', 'STRICT_DIGEST_CHECK', false).toBoolean()
+
+
+    // COMMENT variables
+
+    lastGoodSettingsPath = "$rootDir${separator}gradle${separator}last-good-settings.json".toString()
+    repositoryDirectory = "$buildDir${separator}repo".toString()
+}

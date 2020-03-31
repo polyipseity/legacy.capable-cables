@@ -1,0 +1,12 @@
+//////////////////////////////////////////////////
+// TITLE Miscellaneous
+//////////////////////////////////////////////////
+
+
+/* SECTION methods */
+
+// COMMENT arguments
+
+project.ext.parseArgument = { String k, String envK, Object defaultV = null ->
+    project.hasProperty(k) ? property(k) : System.getenv(envK) != null ? System.getenv(envK) : defaultV
+}

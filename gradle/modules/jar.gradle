@@ -1,0 +1,31 @@
+//////////////////////////////////////////////////
+// TITLE Jar
+//////////////////////////////////////////////////
+
+
+/* SECTION configuration */
+
+// COMMENT append
+afterEvaluate {
+    task deobfJar(type: Jar, dependsOn: tasks.jar) {
+        from sourceSets.main.java.outputDir
+        classifier 'dev'
+    }
+
+/* CODE
+    task sourceJar(type: Jar, dependsOn: tasks.sourceMainJava) {
+        from sourceSets.main.allSource
+        classifier 'sources'
+    }
+*/
+
+    task javadocJar(type: Jar, dependsOn: tasks.javadoc) {
+        from tasks.javadoc.destinationDir
+        classifier 'javadoc'
+    }
+
+    tasks.withType(org.gradle.jvm.tasks.Jar) { org.gradle.jvm.tasks.Jar t ->
+        exclude { it.directory ? it.path.contains('$') : it.path.endsWith('.in') }
+        if (!name.startsWith('postProcess')) artifacts.archives t
+    }
+}
