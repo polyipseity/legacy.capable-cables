@@ -8,28 +8,28 @@ import java.nio.channels.Channels
 /* SECTION methods */
 
 project.ext.createNewFile = { File f ->
-	f.parentFile.mkdirs()
-	f.createNewFile()
+    f.parentFile.mkdirs()
+    f.createNewFile()
 }
 
 project.ext.createNewFileFromPath = { String s ->
-	File f = file s
-	createNewFile f
-	f
+    File f = file s
+    createNewFile f
+    f
 }
 
 project.ext.download = { String url, File dest ->
-	createNewFile dest
-	FileOutputStream fos = new FileOutputStream(dest)
-	long r = 0
-	try {
-		r = fos.channel.transferFrom(Channels.newChannel(new URL(url).openStream()), 0, Long.MAX_VALUE)
-	} finally {
-		fos.close()
-	}
-	r
+    createNewFile dest
+    FileOutputStream fos = new FileOutputStream(dest)
+    long r = 0
+    try {
+        r = fos.channel.transferFrom(Channels.newChannel(new URL(url).openStream()), 0, Long.MAX_VALUE)
+    } finally {
+        fos.close()
+    }
+    r
 }
 
 project.ext.convertToCanonicalPath = { String p ->
-	file(p).canonicalPath
+    file(p).canonicalPath
 }

@@ -22,6 +22,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.function.BiConsumer;
 
+import static $group__.$modId__.Constants.*;
+import static $group__.$modId__.Globals.LOGGER;
 import static $group__.$modId__.utilities.Constants.MOD_ID;
 import static $group__.$modId__.utilities.Constants.PACKAGE;
 import static $group__.$modId__.utilities.Singleton.getSingletonInstance;
@@ -30,8 +32,6 @@ import static $group__.$modId__.utilities.helpers.Dynamics.Invocations.Fields.FI
 import static $group__.$modId__.utilities.helpers.Dynamics.*;
 import static $group__.$modId__.utilities.helpers.specific.Loggers.EnumMessages.*;
 import static $group__.$modId__.utilities.helpers.specific.Throwables.*;
-import static $group__.$modId__.Constants.*;
-import static $group__.$modId__.Globals.LOGGER;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static net.minecraftforge.fml.common.Mod.EventHandler;
 import static net.minecraftforge.fml.common.Mod.InstanceFactory;
@@ -44,7 +44,8 @@ import static net.minecraftforge.fml.common.Mod.InstanceFactory;
 		useMetadata = true,
 		acceptedMinecraftVersions = ACCEPTED_MINECRAFT_VERSIONS,
 		certificateFingerprint = CERTIFICATE_FINGERPRINT,
-		modLanguageAdapter = PACKAGE + '.' + ModThis.CLASS_SIMPLE_NAME + '$' + ModThis.CustomLanguageAdapter.CLASS_SIMPLE_NAME,
+		modLanguageAdapter =
+				PACKAGE + '.' + ModThis.CLASS_SIMPLE_NAME + '$' + ModThis.CustomLanguageAdapter.CLASS_SIMPLE_NAME,
 		guiFactory = PACKAGE + '.' + ModGuiFactoryThis.SUBPACKAGE + '.' + ModGuiFactoryThis.CLASS_SIMPLE_NAME,
 		updateJSON = UPDATE_JSON
 )
@@ -65,7 +66,8 @@ public enum ModThis {
 			clientSide = PACKAGE + '.' + Proxy.SUBPACKAGE + '.' + ProxyClient.CLASS_SIMPLE_NAME,
 			serverSide = PACKAGE + '.' + Proxy.SUBPACKAGE + '.' + ProxyServer.CLASS_SIMPLE_NAME)
 	public static final Proxy PROXY = getSingletonInstance(ProxyNull.class, LOGGER);
-	private static final ImmutableMap<Class<? extends FMLEvent>, BiConsumer<?, ? extends FMLEvent>> EVENT_MAP = new ImmutableMap.Builder<Class<? extends FMLEvent>, BiConsumer<?, ? extends FMLEvent>>()
+	private static final ImmutableMap<Class<? extends FMLEvent>, BiConsumer<?, ? extends FMLEvent>> EVENT_MAP =
+			new ImmutableMap.Builder<Class<? extends FMLEvent>, BiConsumer<?, ? extends FMLEvent>>()
 			.put(FMLConstructionEvent.class, (ModThis m, FMLConstructionEvent e) ->
 					processEvent("Construction", m, e, PROXY::construct))
 			.put(FMLPreInitializationEvent.class, (ModThis m, FMLPreInitializationEvent e) ->
@@ -110,7 +112,8 @@ public enum ModThis {
 		LOGGER.info(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} started", name));
 		Stopwatch stopwatch = Stopwatch.createStarted();
 		process.accept(mod, event);
-		LOGGER.info(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} ended ({} <- {} ns)", name, stopwatch.stop(), stopwatch.elapsed(NANOSECONDS)));
+		LOGGER.info(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} ended ({} <- {} ns)", name, stopwatch.stop(),
+				stopwatch.elapsed(NANOSECONDS)));
 	}
 
 
@@ -118,7 +121,10 @@ public enum ModThis {
 
 	@Marker(@Property(key = "Method", value = EVENT_PROCESSOR_VALUE))
 	@EventHandler
-	public void processEvent(FMLEvent event) { EVENT_MAP.getOrDefault(event.getClass(), (m, e) -> LOGGER.info(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("FMLEvent '{}' received, but processing is NOT implemented", e))).accept(castUncheckedUnboxedNonnull(this), castUncheckedUnboxedNonnull(event)); }
+	public void processEvent(FMLEvent event) { EVENT_MAP.getOrDefault(event.getClass(),
+			(m, e) -> LOGGER.info(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("FMLEvent '{}' received, but " +
+					"processing is NOT implemented", e))).accept(castUncheckedUnboxedNonnull(this),
+			castUncheckedUnboxedNonnull(event)); }
 
 
 	/* SECTION static classes */
@@ -170,7 +176,8 @@ public enum ModThis {
 		/* SECTION methods */
 
 		@Override
-		public Object getNewInstance(FMLModContainer container, Class<?> objectClass, ClassLoader classLoader, Method factoryMarkedMethod) throws Exception {
+		public Object getNewInstance(FMLModContainer container, Class<?> objectClass, ClassLoader classLoader,
+		                             Method factoryMarkedMethod) throws Exception {
 			Object r = super.getNewInstance(container, objectClass, classLoader, factoryMarkedMethod);
 
 			// COMMENT steal container
@@ -216,7 +223,8 @@ public enum ModThis {
 										f.setAccessible(true);
 										rethrowCaughtThrowableStatic(true);
 
-										fv = castUncheckedUnboxedNonnull(tryCall(() -> f.get(container), LOGGER).orElseThrow(Throwables::rethrowCaughtThrowableStatic));
+										fv =
+												castUncheckedUnboxedNonnull(tryCall(() -> f.get(container), LOGGER).orElseThrow(Throwables::rethrowCaughtThrowableStatic));
 										REFLECTIONS_CACHE.get(getPackage(FMLEvent.class)).getSubTypesOf(FMLEvent.class).forEach(t -> fv.put(t, m));
 
 										break;
@@ -233,7 +241,8 @@ public enum ModThis {
 		}
 
 		@Override
-		public void setProxy(Field target, Class<?> proxyTarget, Object proxy) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+		public void setProxy(Field target, Class<?> proxyTarget, Object proxy) throws IllegalArgumentException,
+				IllegalAccessException, NoSuchFieldException, SecurityException {
 			int targetMod = target.getModifiers() & ~Modifier.FINAL;
 			tryRun(() -> FIELD_MODIFIERS_SETTER.invokeExact(target, targetMod), LOGGER);
 			consumeIfCaughtThrowable(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_INVOKE_METHOD_HANDLE.makeMessage(FIELD_MODIFIERS_SETTER, target.toGenericString(), targetMod), t)));

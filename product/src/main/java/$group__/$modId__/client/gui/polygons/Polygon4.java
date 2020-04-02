@@ -1,8 +1,8 @@
 package $group__.$modId__.client.gui.polygons;
 
 import $group__.$modId__.client.gui.coordinates.XY;
-import $group__.$modId__.utilities.concurrent.IMutatorImmutablizable;
 import $group__.$modId__.logging.ILogging;
+import $group__.$modId__.utilities.concurrent.IMutatorImmutablizable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
@@ -13,7 +13,8 @@ import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonn
 import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectArguments;
 
 @SideOnly(Side.CLIENT)
-public class Polygon4<T extends Polygon4<T, N, L>, N extends Number, L extends List<XY<?, N>>> extends PolygonN<T, N, L> {
+public class Polygon4<T extends Polygon4<T, N, L>, N extends Number, L extends List<XY<?, N>>> extends PolygonN<T, N,
+		L> {
 	/* SECTION constructors */
 
 	public Polygon4(L vertexes, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
@@ -24,7 +25,8 @@ public class Polygon4<T extends Polygon4<T, N, L>, N extends Number, L extends L
 	public Polygon4(Polygon4<?, N, L> copy) { this(copy, copy.getMutator()); }
 
 
-	protected Polygon4(Polygon4<?, N, L> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getVertexes(), mutator, copy.getLogging()); }
+	protected Polygon4(Polygon4<?, N, L> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getVertexes(),
+			mutator, copy.getLogging()); }
 
 
 	/* SECTION getters & setters */
@@ -52,5 +54,6 @@ public class Polygon4<T extends Polygon4<T, N, L>, N extends Number, L extends L
 	/* SECTION methods */
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new Polygon4<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new Polygon4<>(this,
+			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
 }

@@ -97,7 +97,8 @@ public enum Numbers {
 			Iterator<? extends Number> itr = castUncheckedUnboxedNonnull(it.iterator());
 			while (itr.hasNext() && n != null) {
 				N nf = n;
-				n = unboxOptional(tryCall(() -> m.invoke(null, nf, ef.apply(itr.next())), logger).flatMap(Casts::castUnchecked));
+				n =
+						unboxOptional(tryCall(() -> m.invoke(null, nf, ef.apply(itr.next())), logger).flatMap(Casts::castUnchecked));
 			}
 			return Optional.ofNullable(n);
 		}
@@ -159,7 +160,8 @@ public enum Numbers {
 			Iterator<? extends N> itr = it.iterator();
 			while (itr.hasNext() && t != null) {
 				N t1 = itr.next();
-				if (greaterThan(t, t1)) t = castCheckedUnboxed(t1, castUncheckedUnboxedNonnull(Comparable.class), logger);
+				if (greaterThan(t, t1))
+					t = castCheckedUnboxed(t1, castUncheckedUnboxedNonnull(Comparable.class), logger);
 			}
 			return castChecked(t, castUncheckedUnboxedNonnull(n.getClass()), logger);
 		}

@@ -1,18 +1,18 @@
 package $group__.$modId__.client.gui;
 
+import $group__.$modId__.Globals;
 import $group__.$modId__.client.gui.components.*;
 import $group__.$modId__.client.gui.polygons.Rectangle;
 import $group__.$modId__.client.gui.themes.ITheme;
 import $group__.$modId__.client.gui.themes.IThemed;
 import $group__.$modId__.client.gui.themes.IThemedUser;
-import $group__.$modId__.utilities.concurrent.IMutatorImmutablizable;
-import $group__.$modId__.utilities.concurrent.IMutatorUser;
 import $group__.$modId__.logging.ILogging;
 import $group__.$modId__.logging.ILoggingUser;
 import $group__.$modId__.traits.ISpec;
 import $group__.$modId__.utilities.builders.BuilderDefaults;
+import $group__.$modId__.utilities.concurrent.IMutatorImmutablizable;
+import $group__.$modId__.utilities.concurrent.IMutatorUser;
 import $group__.$modId__.utilities.extensions.IStructure;
-import $group__.$modId__.Globals;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Container;
 import net.minecraftforge.fml.relauncher.Side;
@@ -29,9 +29,9 @@ import static $group__.$modId__.client.gui.coordinates.NumberRelativeDisplay.Y.n
 import static $group__.$modId__.client.gui.polygons.Rectangle.newBuilderRectangle;
 import static $group__.$modId__.client.gui.utilities.builders.BuilderGuiDrawable.KEY_DEFAULT_COLORED;
 import static $group__.$modId__.client.gui.utilities.builders.BuilderGuiDrawable.KEY_DEFAULT_THEMED;
-import static $group__.$modId__.utilities.concurrent.IMutator.trySetNonnull;
 import static $group__.$modId__.utilities.builders.BuilderStructure.KEY_DEFAULT_LOGGING;
 import static $group__.$modId__.utilities.builders.BuilderStructure.KEY_DEFAULT_MUTATOR;
+import static $group__.$modId__.utilities.concurrent.IMutator.trySetNonnull;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.specific.Optionals.unboxOptional;
 import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperation;
@@ -50,7 +50,8 @@ public class GuiWrench<T extends GuiWrench<T, TH>, TH extends ITheme<TH>> extend
 	/* SECTION constructors */
 
 	@SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
-	public GuiWrench(Container container, int open, @Nullable TH theme, IMutatorImmutablizable<?, ?> mutator, @Nullable Logger logger) {
+	public GuiWrench(Container container, int open, @Nullable TH theme, IMutatorImmutablizable<?, ?> mutator,
+	                 @Nullable Logger logger) {
 		super(container);
 		this.mutator = trySetNonnull(mutator, mutator, true);
 		logging = trySetNonnull(getMutator(), ILogging.of(logger, getMutator()), true);
@@ -67,9 +68,11 @@ public class GuiWrench<T extends GuiWrench<T, TH>, TH extends ITheme<TH>> extend
 							GuiTab.newBuilderGT(
 									castUncheckedUnboxedNonnull(GuiRectangle.newBuilderGR(newBuilderRectangle(newBuilderX(0.8F).build(), newBuilderY(0.8F).build(), newBuilderX(0.1F).build(), newBuilderY(0.1F).build()).build()).build()),
 									castUncheckedUnboxedNonnull(GuiRectangleMatcher.newBuilderGRM(
-											newBuilderRectangle(32, 32, newBuilderX(0.1F).build(), newBuilderY(0.1F).setOffset(-32).build()).build(),
+											newBuilderRectangle(32, 32, newBuilderX(0.1F).build(),
+													newBuilderY(0.1F).setOffset(-32).build()).build(),
 											GuiResource.newBuilderGR(
-													newBuilderRectangle(64, 64, newBuilderX(0.1F).build(), newBuilderY(0.1F).setOffset(-32).build()).build(),
+													newBuilderRectangle(64, 64, newBuilderX(0.1F).build(),
+															newBuilderY(0.1F).setOffset(-32).build()).build(),
 													Globals.Client.Resources.GUI_WRENCH,
 													Globals.Client.Resources.GUI_WRENCH_INFO
 											).build()
@@ -81,7 +84,7 @@ public class GuiWrench<T extends GuiWrench<T, TH>, TH extends ITheme<TH>> extend
 			popDefaults.run();
 		}
 	}
-	
+
 
 	/* SECTION getters & setters */
 
@@ -101,7 +104,8 @@ public class GuiWrench<T extends GuiWrench<T, TH>, TH extends ITheme<TH>> extend
 	public IMutatorImmutablizable<?, ?> getMutator() { return mutator; }
 
 	@Override
-	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t, mutator); }
+	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t,
+			mutator); }
 
 
 	/* SECTION methods */

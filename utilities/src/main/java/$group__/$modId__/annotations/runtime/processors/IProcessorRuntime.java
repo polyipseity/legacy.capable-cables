@@ -4,7 +4,6 @@ import $group__.$modId__.traits.IStruct;
 import $group__.$modId__.utilities.helpers.Dynamics;
 import $group__.$modId__.utilities.helpers.specific.Throwables;
 import net.minecraftforge.fml.common.discovery.ASMDataTable;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
@@ -40,7 +39,8 @@ public interface IProcessorRuntime<A extends Annotation> {
 		@Override
 		default void process(ASMDataTable asm, @Nullable Logger logger) {
 			Set<ASMDataTable.ASMData> thisAsm = asm.getAll(annotationType().getName());
-			thisAsm.forEach(t -> processClass(new Result(asm, thisAsm, t, Throwables.tryCall(() -> forName(t.getClassName(), false, getClass().getClassLoader()), logger).orElseThrow(Throwables::rethrowCaughtThrowableStatic)), logger));
+			thisAsm.forEach(t -> processClass(new Result(asm, thisAsm, t,
+					Throwables.tryCall(() -> forName(t.getClassName(), false, getClass().getClassLoader()), logger).orElseThrow(Throwables::rethrowCaughtThrowableStatic)), logger));
 		}
 
 		void processClass(Result result, @Nullable Logger logger);
@@ -70,9 +70,12 @@ public interface IProcessorRuntime<A extends Annotation> {
 				@Override
 				default Method findElement(IClass.Result result, @Nullable Logger logger) {
 					String mName = result.currentAsm.getObjectName();
-					@Nullable Method r = Arrays.stream(result.clazz.getDeclaredMethods()).filter(m -> mName.equals(Dynamics.getMethodNameDescriptor(m))).findFirst().orElse(null);
+					@Nullable Method r =
+							Arrays.stream(result.clazz.getDeclaredMethods()).filter(m -> mName.equals(Dynamics.getMethodNameDescriptor(m))).findFirst().orElse(null);
 					if (r == null)
-						throw Throwables.rejectArguments(new NoSuchMethodException(makeMessage(this, "No method name '" + mName + "' in class '" + result.clazz.toGenericString() + '\'')), result.thisAsm);
+						throw Throwables.rejectArguments(new NoSuchMethodException(makeMessage(this, "No method name " +
+								"'" + mName + "' in class '" + result.clazz.toGenericString() + '\'')),
+								result.thisAsm);
 					return r;
 				}
 
@@ -125,7 +128,8 @@ public interface IProcessorRuntime<A extends Annotation> {
 
 			protected Result(Result c) { this(c.asm, c.thisAsm, c.currentAsm, c.clazz); }
 
-			protected Result(ASMDataTable asm, Set<ASMDataTable.ASMData> thisAsm, ASMDataTable.ASMData currentAsm, Class<?> clazz) {
+			protected Result(ASMDataTable asm, Set<ASMDataTable.ASMData> thisAsm, ASMDataTable.ASMData currentAsm,
+			                 Class<?> clazz) {
 				this.asm = asm;
 				this.thisAsm = thisAsm;
 				this.currentAsm = currentAsm;

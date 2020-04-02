@@ -39,7 +39,8 @@ public abstract class GuiDrawable<T extends GuiDrawable<T, N, C, TH>, N extends 
 
 	/* SECTION constructors */
 
-	public GuiDrawable(IColored<C> colored, IThemed<TH> themed, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
+	public GuiDrawable(IColored<C> colored, IThemed<TH> themed, IMutatorImmutablizable<?, ?> mutator,
+	                   ILogging<Logger> logging) {
 		this.mutator = trySetNonnull(mutator, mutator, true);
 		this.colored = trySetNonnull(getMutator(), colored, true);
 		this.themed = trySetNonnull(getMutator(), themed, true);
@@ -59,7 +60,8 @@ public abstract class GuiDrawable<T extends GuiDrawable<T, N, C, TH>, N extends 
 	public IMutatorImmutablizable<?, ?> getMutator() { return mutator; }
 
 	@Override
-	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t, mutator); }
+	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t,
+			mutator); }
 
 	public IColored<C> getColored() { return colored; }
 

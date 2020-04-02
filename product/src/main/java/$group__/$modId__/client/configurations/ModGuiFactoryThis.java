@@ -44,7 +44,6 @@ public class ModGuiFactoryThis extends Singleton implements IModGuiFactory {
 	 * Unused default constructor.
 	 *
 	 * @implNote {@link Mod#guiFactory} requires constructor to be {@code public}
-	 *
 	 * @since 0.0.1.0
 	 * @deprecated replaced with {@link Singleton#getSingletonInstance}, used by {@link Mod#guiFactory} only
 	 */

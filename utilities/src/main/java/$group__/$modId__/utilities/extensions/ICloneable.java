@@ -2,8 +2,8 @@ package $group__.$modId__.utilities.extensions;
 
 import $group__.$modId__.annotations.OverridingStatus;
 import $group__.$modId__.annotations.runtime.ExternalCloneMethod;
-import $group__.$modId__.annotations.runtime.processors.IProcessorRuntime;
 import $group__.$modId__.annotations.runtime.processors.ExternalCloneMethodProcessor;
+import $group__.$modId__.annotations.runtime.processors.IProcessorRuntime;
 import $group__.$modId__.utilities.helpers.Casts;
 import $group__.$modId__.utilities.helpers.specific.Throwables;
 import com.google.common.annotations.Beta;
@@ -47,11 +47,14 @@ public interface ICloneable<T> extends Cloneable {
 
 	Logger LOGGER = LogManager.getLogger(ICloneable.class);
 
-	@Nullable MethodHandle DEFAULT_METHOD = tryCall(() -> IMPL_LOOKUP.findVirtual(Object.class, "clone", methodType(Object.class)), LOGGER).orElseGet(() -> {
+	@Nullable
+	MethodHandle DEFAULT_METHOD = tryCall(() -> IMPL_LOOKUP.findVirtual(Object.class, "clone",
+			methodType(Object.class)), LOGGER).orElseGet(() -> {
 		consumeIfCaughtThrowable(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_FIND_METHOD_HANDLE.makeMessage("clone method", Object.class, "clone", methodType(Object.class)), t)));
 		return null;
 	});
-	@Nullable ExternalCloneMethod DEFAULT_ANNOTATION = DEFAULT_METHOD == null ? null : new ExternalCloneMethod() {
+	@Nullable
+	ExternalCloneMethod DEFAULT_ANNOTATION = DEFAULT_METHOD == null ? null : new ExternalCloneMethod() {
 		/* SECTION methods */
 
 		@Override
@@ -67,7 +70,8 @@ public interface ICloneable<T> extends Cloneable {
 
 	ConcurrentMap<ExternalCloneMethod, MethodHandle> EXTERNAL_METHOD_MAP = MAP_MAKER_MULTI_THREAD_WEAK_KEYS.makeMap();
 	ConcurrentMap<Class<?>, ExternalCloneMethod> EXTERNAL_ANNOTATIONS_MAP = MAP_MAKER_MULTI_THREAD.makeMap();
-	LoadingCache<Class<?>, ExternalCloneMethod> EXTERNAL_ANNOTATIONS_CACHE = CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_4).expireAfterAccess(CACHE_EXPIRATION_ACCESS_DURATION, CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(MULTI_THREAD_THREAD_COUNT).build(new CacheLoader<Class<?>, ExternalCloneMethod>() {
+	LoadingCache<Class<?>, ExternalCloneMethod> EXTERNAL_ANNOTATIONS_CACHE =
+			CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_4).expireAfterAccess(CACHE_EXPIRATION_ACCESS_DURATION, CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(MULTI_THREAD_THREAD_COUNT).build(new CacheLoader<Class<?>, ExternalCloneMethod>() {
 		/* SECTION methods */
 
 		@Override
@@ -75,7 +79,8 @@ public interface ICloneable<T> extends Cloneable {
 			@Nullable ExternalCloneMethod r = EXTERNAL_ANNOTATIONS_MAP.get(key);
 			if (r != null) return r;
 
-			List<Map.Entry<Class<?>, ExternalCloneMethod>> l = EXTERNAL_ANNOTATIONS_MAP.entrySet().stream().filter(t -> t.getValue().allowExtends() && t.getKey().isAssignableFrom(key)).collect(Collectors.toList());
+			List<Map.Entry<Class<?>, ExternalCloneMethod>> l =
+					EXTERNAL_ANNOTATIONS_MAP.entrySet().stream().filter(t -> t.getValue().allowExtends() && t.getKey().isAssignableFrom(key)).collect(Collectors.toList());
 			sss:
 			for (ImmutableSet<Class<?>> ss : getSuperclassesAndInterfaces(key))
 				for (Map.Entry<Class<?>, ExternalCloneMethod> e : l)
@@ -86,7 +91,8 @@ public interface ICloneable<T> extends Cloneable {
 
 			if (r != null) {
 				ExternalCloneMethod rf = r;
-				LOGGER.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Clone method '{}' with annotation '{}' auto-registered for class '{}'", EXTERNAL_METHOD_MAP.get(rf), rf, key.toGenericString()));
+				LOGGER.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Clone method '{}' with annotation '{}' " +
+						"auto-registered for class '{}'", EXTERNAL_METHOD_MAP.get(rf), rf, key.toGenericString()));
 			} else
 				throw throw_(new NoSuchMethodException("No clone method for class '" + key.toGenericString() + '\''));
 
@@ -125,12 +131,13 @@ public interface ICloneable<T> extends Cloneable {
 	 * </ol>
 	 * The result is always wrapped in an {@link Optional} before {@code return}ing.
 	 *
-	 * @param <T> type of parameter {@code o}
-	 * @param o object that will attempt to clone itself
+	 * @param <T>    type of parameter {@code o}
+	 * @param o      object that will attempt to clone itself
 	 * @param logger {@link Logger} used for logging
-	 * @return
-	 * a clone of parameter {@code o} if it successful, else parameter
+	 *
+	 * @return a clone of parameter {@code o} if it successful, else parameter
 	 * {@code o}, wrapped in an {@link Optional}
+	 *
 	 * @see ExternalCloneMethod for the cloning system
 	 * @see #tryCloneUnboxed unboxed version
 	 * @see #tryCloneUnboxedNonnull unboxed nonnull version
@@ -149,19 +156,25 @@ public interface ICloneable<T> extends Cloneable {
 				m = assertNonnull(EXTERNAL_METHOD_MAP.get(EXTERNAL_ANNOTATIONS_CACHE.get(oc)));
 			} catch (ExecutionException e) {
 				setCaughtThrowableStatic(e, logger);
-				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable to clone '{}' object of class '{}' as no clone method is obtained, will not attempt to clone again", o, oc.toGenericString()), e));
+				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable " +
+						"to clone '{}' object of class '{}' as no clone method is obtained, will not attempt to clone " +
+						"again", o, oc.toGenericString()), e));
 				BROKEN_CLASS_SET.add(oc);
 				return Optional.of(o);
 			}
 
 			Optional<T> r = tryCall(() -> m.invoke(o), logger).flatMap(Casts::castUnchecked);
 			consumeIfCaughtThrowable(t -> {
-				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Clone method '{}' failed for object '{}' of class '{}', will NOT attempt to clone again", m, o, oc.toGenericString()), t));
+				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Clone " +
+						"method '{}' failed for object '{}' of class '{}', will NOT attempt to clone again", m, o,
+						oc.toGenericString()), t));
 				BROKEN_CLASS_SET.add(oc);
 			});
 			return r;
 		} else {
-			logger.debug(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable to clone object '{}' of class '{}' as clone method annotation is NOT yet processed, will attempt to clone again", o, oc.toGenericString()), newThrowable()));
+			logger.debug(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable to " +
+					"clone object '{}' of class '{}' as clone method annotation is NOT yet processed, will attempt to " +
+					"clone again", o, oc.toGenericString()), newThrowable()));
 			return Optional.of(o);
 		}
 	}
@@ -171,12 +184,13 @@ public interface ICloneable<T> extends Cloneable {
 	 * <p>
 	 * Useful when you want to get the unwrapped result object.
 	 *
-	 * @param <T> type of parameter {@code o}
-	 * @param o object that will attempt to clone itself
+	 * @param <T>    type of parameter {@code o}
+	 * @param o      object that will attempt to clone itself
 	 * @param logger {@link Logger} used for logging
-	 * @return
-	 * a clone of parameter {@code o} if it successful, else parameter
+	 *
+	 * @return a clone of parameter {@code o} if it successful, else parameter
 	 * {@code o}, nullable
+	 *
 	 * @see #tryClone overloaded version
 	 * @see #tryCloneUnboxedNonnull unboxed nonnull version
 	 * @since 0.0.1.0
@@ -190,12 +204,13 @@ public interface ICloneable<T> extends Cloneable {
 	 * Useful when you want to get the unwrapped result object, and know the returned
 	 * object is nonnull as the parameter {@code o} is nonnull.
 	 *
-	 * @param <T> type of parameter {@code o}
-	 * @param o object that will attempt to clone itself
+	 * @param <T>    type of parameter {@code o}
+	 * @param o      object that will attempt to clone itself
 	 * @param logger {@link Logger} used for logging
-	 * @return
-	 * a clone of parameter {@code o} if it successful, else parameter
+	 *
+	 * @return a clone of parameter {@code o} if it successful, else parameter
 	 * {@code o}
+	 *
 	 * @see #tryClone overloaded version
 	 * @see #tryCloneUnboxed unboxed version
 	 * @since 0.0.1.0
@@ -205,7 +220,8 @@ public interface ICloneable<T> extends Cloneable {
 
 	static <T> T clone(Callable<?> clone, @Nullable Logger logger) {
 		T cloned = tryCall(clone::call, logger).flatMap(Casts::<T>castUnchecked).orElseThrow(Throwables::unexpected);
-		mapFields(castUncheckedUnboxedNonnull(cloned.getClass()), cloned, cloned, o -> tryCloneUnboxed(o, logger), true, logger);
+		mapFields(castUncheckedUnboxedNonnull(cloned.getClass()), cloned, cloned, o -> tryCloneUnboxed(o, logger),
+				true, logger);
 		return cloned;
 	}
 
@@ -219,9 +235,9 @@ public interface ICloneable<T> extends Cloneable {
 	 * incur {@link NoSuchMethodException}, and {@link ClassNotFoundException} if used
 	 * as a method reference.
 	 *
-	 * @implSpec consider this method as {@code final}
-	 *
 	 * @return cloned object of this object
+	 *
+	 * @implSpec consider this method as {@code final}
 	 * @see #clone aliased version
 	 * @since 0.0.1.0
 	 */
@@ -235,10 +251,10 @@ public interface ICloneable<T> extends Cloneable {
 	 * incur {@link NoSuchMethodException}, and {@link ClassNotFoundException} if used
 	 * as a method reference.
 	 *
+	 * @return cloned object of this object
+	 *
 	 * @implSpec must override this method even though {@code Object} overrides it as
 	 * {@link ExternalCloneMethodProcessor} will check it.
-	 *
-	 * @return cloned object of this object
 	 * @see #copy safe version
 	 * @since 0.0.1.0
 	 */

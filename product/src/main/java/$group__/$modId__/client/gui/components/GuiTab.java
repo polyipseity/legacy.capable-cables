@@ -4,8 +4,8 @@ import $group__.$modId__.client.gui.polygons.Rectangle;
 import $group__.$modId__.client.gui.themes.ITheme;
 import $group__.$modId__.client.gui.traits.IDrawable;
 import $group__.$modId__.client.gui.utilities.builders.BuilderGuiDrawable;
-import $group__.$modId__.utilities.concurrent.IMutatorImmutablizable;
 import $group__.$modId__.logging.ILogging;
+import $group__.$modId__.utilities.concurrent.IMutatorImmutablizable;
 import $group__.$modId__.utilities.extensions.delegated.IListDelegated;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
@@ -21,7 +21,8 @@ import static $group__.$modId__.utilities.helpers.specific.Throwables.consumeCau
 import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperationIf;
 
 @SideOnly(Side.CLIENT)
-public class GuiTab<T extends GuiTab<T, N, C, TH, E>, N extends Number, C, TH extends ITheme<TH>, E extends IDrawable<N>> extends GuiGroup<T, N, C, TH, List<E>, E> implements IListDelegated<List<E>, E> {
+public class GuiTab<T extends GuiTab<T, N, C, TH, E>, N extends Number, C, TH extends ITheme<TH>,
+		E extends IDrawable<N>> extends GuiGroup<T, N, C, TH, List<E>, E> implements IListDelegated<List<E>, E> {
 	/* SECTION static variables */
 
 	public static final int INDEX_ACCESS = 0;
@@ -45,12 +46,15 @@ public class GuiTab<T extends GuiTab<T, N, C, TH, E>, N extends Number, C, TH ex
 
 	/* SECTION static methods */
 
-	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiTab<V, N, C, TH, E>, N extends Number, C, TH extends ITheme<TH>, L extends Logger, E extends IDrawable<N>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGT(E access, E content) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiTab<>(access, content, t.mutator, t.logging))); }
+	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiTab<V, N, C, TH, E>, N extends Number, C
+			, TH extends ITheme<TH>, L extends Logger, E extends IDrawable<N>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGT(E access, E content) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiTab<>(access, content, t.mutator, t.logging))); }
 
 
 	/* SECTION getters & setters */
 
 	public boolean isOpen() { return open; }
+
+	public void setOpen(boolean open) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetOpen(open)); }
 
 	public boolean trySetOpen(boolean open) {
 		this.open = open;
@@ -59,9 +63,9 @@ public class GuiTab<T extends GuiTab<T, N, C, TH, E>, N extends Number, C, TH ex
 
 	public Optional<Boolean> tryIsOpen() { return Optional.of(isOpen()); }
 
-	public void setOpen(boolean open) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetOpen(open)); }
-
 	public E getAccess() { return getChildren().get(INDEX_ACCESS); }
+
+	public void setAccess(E access) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetAccess(access)); }
 
 	public boolean trySetAccess(E access) {
 		try {
@@ -75,9 +79,9 @@ public class GuiTab<T extends GuiTab<T, N, C, TH, E>, N extends Number, C, TH ex
 
 	public Optional<E> tryGetAccess() { return Optional.of(getAccess()); }
 
-	public void setAccess(E access) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetAccess(access)); }
-
 	public E getContent() { return getChildren().get(INDEX_CONTENT); }
+
+	public void setContent(E content) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetContent(content)); }
 
 	public boolean trySetContent(E content) {
 		try {
@@ -90,9 +94,6 @@ public class GuiTab<T extends GuiTab<T, N, C, TH, E>, N extends Number, C, TH ex
 	}
 
 	public Optional<E> tryGetContent() { return Optional.of(getContent()); }
-
-	public void setContent(E content) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetContent(content)); }
-
 
 	@Override
 	@Deprecated
@@ -113,5 +114,6 @@ public class GuiTab<T extends GuiTab<T, N, C, TH, E>, N extends Number, C, TH ex
 
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiTab<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiTab<>(this,
+			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
 }

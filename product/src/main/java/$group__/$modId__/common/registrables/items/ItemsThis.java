@@ -41,7 +41,8 @@ public final class ItemsThis extends Registrable<Item> {
 	/* SECTION variables */
 
 	@SuppressWarnings("unused")
-	public final Item wrench = new ItemWrench().setRegistryAndUnlocalizedName(MOD_ID, "wrench").setCreativeTab(CreativeTabsThis.DEFAULT);
+	public final Item wrench =
+			new ItemWrench().setRegistryAndUnlocalizedName(MOD_ID, "wrench").setCreativeTab(CreativeTabsThis.DEFAULT);
 
 
 	/* SECTION constructors */

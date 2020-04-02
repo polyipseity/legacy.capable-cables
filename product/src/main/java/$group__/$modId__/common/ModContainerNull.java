@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperation;
 import static $group__.$modId__.Globals.LOGGER;
+import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperation;
 
 public final class ModContainerNull extends Singleton implements ModContainer {
 	/* SECTION constructors */

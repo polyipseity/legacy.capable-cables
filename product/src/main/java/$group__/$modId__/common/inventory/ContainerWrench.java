@@ -10,15 +10,18 @@ import net.minecraft.item.ItemStack;
 
 import java.util.Optional;
 
+import static $group__.$modId__.Globals.LOGGER;
 import static $group__.$modId__.common.inventory.bases.ContainerBases.canInteractWithBase;
 import static $group__.$modId__.common.inventory.bases.ContainerBases.transferStackInSlotBase;
-import static $group__.$modId__.Globals.LOGGER;
 
 public class ContainerWrench<T extends ContainerWrench<T>> extends Container {
 	/* SECTION static variables */
 
 	@SuppressWarnings("NewExpressionSideOnly")
-	public static final int ID = GuiHandler.INSTANCE.registerGui((side, id, player, world, hand, u, u1) -> Optional.of(side.isClient() ? new GuiWrench<>(new ContainerWrench<>(), 0, EnumTheme.NONE, MutatorMutable.INSTANCE, LOGGER) : new ContainerWrench<>()));
+	public static final int ID =
+			GuiHandler.INSTANCE.registerGui((side, id, player, world, hand, u, u1) -> Optional.of(side.isClient() ?
+					new GuiWrench<>(new ContainerWrench<>(), 0, EnumTheme.NONE, MutatorMutable.INSTANCE, LOGGER) :
+					new ContainerWrench<>()));
 
 
 	/* SECTION constructors */
@@ -32,5 +35,6 @@ public class ContainerWrench<T extends ContainerWrench<T>> extends Container {
 	public boolean canInteractWith(EntityPlayer playerIn) { return canInteractWithBase(); }
 
 	@Override
-	public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) { return transferStackInSlotBase(this, playerIn, index, (p0, p1) -> (p2, p3) -> mergeItemStack(p0, p1, p2, p3)); }
+	public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) { return transferStackInSlotBase(this,
+			playerIn, index, (p0, p1) -> (p2, p3) -> mergeItemStack(p0, p1, p2, p3)); }
 }

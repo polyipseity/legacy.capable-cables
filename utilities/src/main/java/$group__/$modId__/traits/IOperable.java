@@ -43,7 +43,8 @@ public interface IOperable<T extends IOperable<T, A>, A> {
 
 	/* SECTION static classes */
 
-	interface INumberOperable<T extends INumberOperable<T>> extends IOperable<T, Number>, IStructure<T, T>, ICloneable<T>, Comparable<Number> {
+	interface INumberOperable<T extends INumberOperable<T>> extends IOperable<T, Number>, IStructure<T, T>,
+			ICloneable<T>, Comparable<Number> {
 		/* SECTION methods */
 
 		@Override

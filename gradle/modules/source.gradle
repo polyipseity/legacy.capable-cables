@@ -24,7 +24,7 @@ checkApply(['evaluateGStringString', 'createNewFile'])
 project.ext.makeSourceTasks = { Closure c ->
     tasks.withType(AbstractCompile) { AbstractCompile t ->
         String taskSourceSetName = name.replace('compile', ''),
-                sourceSetName = taskSourceSetName.uncapitalize()
+               sourceSetName = taskSourceSetName.uncapitalize()
         sourceSetName = sourceSets.find { sourceSetName.startsWith it.name }?.name
         String language = name.replace "compile", ''
         if (sourceSetName == null) sourceSetName = 'main'

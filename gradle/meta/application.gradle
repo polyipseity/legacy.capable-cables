@@ -21,24 +21,24 @@ for (int i = 0; (hasMethodMap = rootProject.ext.has methodMapName) && !(rootProj
 final Map<String, File> methodMap
 if (hasMethodMap) methodMap = rootProject.ext."$methodMapName"
 else {
-	methodMap = [:]
-	file("$rootDir${separator}gradle").eachFileRecurse(FileType.FILES) {
-		if (!it.name.endsWith('.gradle')) return
-		it.text.findAll(~/project\.ext\.([^ ]+) = \{/) { s, String m ->
-			File p
-			if ((p = methodMap.put(m, it)) != null) throw new IllegalStateException("Repeated utiliy function: '$m' in both '$p.canonicalPath' and '$it.canonicalPath'")
-			false
-		}
-	}
-	rootProject.ext."$methodMapName" = methodMap
+    methodMap = [:]
+    file("$rootDir${separator}gradle").eachFileRecurse(FileType.FILES) {
+        if (!it.name.endsWith('.gradle')) return
+        it.text.findAll(~/project\.ext\.([^ ]+) = \{/) { s, String m ->
+            File p
+            if ((p = methodMap.put(m, it)) != null) throw new IllegalStateException("Repeated utiliy function: '$m' in both '$p.canonicalPath' and '$it.canonicalPath'")
+            false
+        }
+    }
+    rootProject.ext."$methodMapName" = methodMap
 }
 
 
 /* SECTION methods */
 
 project.ext.checkApply = { Iterable<String> functions ->
-	functions.each {
-		File f = methodMap.computeIfAbsent it, { throw new IllegalArgumentException("No such utility method: $it") }
-		if (!ext.has(it)) throw new IllegalStateException("'$f.canonicalPath' is not applied")
-	}
+    functions.each {
+        File f = methodMap.computeIfAbsent it, { throw new IllegalArgumentException("No such utility method: $it") }
+        if (!ext.has(it)) throw new IllegalStateException("'$f.canonicalPath' is not applied")
+    }
 }

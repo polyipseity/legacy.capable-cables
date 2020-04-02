@@ -17,7 +17,8 @@ import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonn
 import static $group__.$modId__.utilities.helpers.PreconditionsExtension.requireRunOnceOnly;
 
 @Immutable
-public class MutatorMutable<T extends MutatorMutable<T, I>, I extends MutatorImmutable<I>> implements Serializable, IStrictObject, IMutatorImmutablizable<T, I> {
+public class MutatorMutable<T extends MutatorMutable<T, I>, I extends MutatorImmutable<I>> implements Serializable,
+		IStrictObject, IMutatorImmutablizable<T, I> {
 	/* SECTION static variables */
 
 	public static final MutatorMutable<?, ?> INSTANCE = new MutatorMutable<>(null);

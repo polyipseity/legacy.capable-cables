@@ -16,7 +16,9 @@ public enum GuiContainerBases {
 	/* SECTION static methods */
 
 	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
-	public static <T extends GuiContainer & ISpec<? extends Rectangle<?, ?>>> void initGuiBase(final T thisObj, IntConsumer xSizeSetter, IntConsumer ySizeSetter) {
+	public static <T extends GuiContainer & ISpec<? extends Rectangle<?, ?>>> void initGuiBase(final T thisObj,
+	                                                                                           IntConsumer xSizeSetter
+			, IntConsumer ySizeSetter) {
 		thisObj.spec().map(Rectangle::getSize).ifPresent(t -> {
 			xSizeSetter.accept(t.getX().intValue());
 			ySizeSetter.accept(t.getX().intValue());

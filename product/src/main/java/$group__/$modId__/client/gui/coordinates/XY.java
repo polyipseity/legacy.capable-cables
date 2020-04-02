@@ -30,7 +30,8 @@ import static $group__.$modId__.utilities.extensions.IStrictToString.getToString
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 
 @SideOnly(Side.CLIENT)
-public class XY<T extends XY<T, N>, N extends Number> implements IStructure<T, T>, ICloneable<T>, IOperable<T, XY<?, N>>, IMutatorUser<IMutatorImmutablizable<?, ?>>, ILoggingUser<ILogging<Logger>, Logger> {
+public class XY<T extends XY<T, N>, N extends Number> implements IStructure<T, T>, ICloneable<T>, IOperable<T, XY<?,
+		N>>, IMutatorUser<IMutatorImmutablizable<?, ?>>, ILoggingUser<ILogging<Logger>, Logger> {
 	/* SECTION variables */
 
 	protected N x;
@@ -51,9 +52,10 @@ public class XY<T extends XY<T, N>, N extends Number> implements IStructure<T, T
 
 	public XY(XY<?, ? extends N> copy) { this(copy, copy.getMutator()); }
 
-	
-	protected XY(XY<?, ? extends N> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getX(), copy.getY(), mutator, copy.getLogging()); }
-	
+
+	protected XY(XY<?, ? extends N> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getX(), copy.getY(),
+			mutator, copy.getLogging()); }
+
 
 	/* SECTION static methods */
 
@@ -89,7 +91,8 @@ public class XY<T extends XY<T, N>, N extends Number> implements IStructure<T, T
 	public IMutatorImmutablizable<?, ?> getMutator() { return mutator; }
 
 	@Override
-	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t, mutator); }
+	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t,
+			mutator); }
 
 	@Override
 	public ILogging<Logger> getLogging() { return logging; }
@@ -97,7 +100,7 @@ public class XY<T extends XY<T, N>, N extends Number> implements IStructure<T, T
 	@Override
 	public boolean trySetLogging(ILogging<Logger> logging) { return trySet(t -> this.logging = t, logging); }
 
-	
+
 	/* SECTION methods */
 
 	@Override
@@ -202,9 +205,10 @@ public class XY<T extends XY<T, N>, N extends Number> implements IStructure<T, T
 		return r;
 	}
 
-	
+
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new XY<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new XY<>(this,
+			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
 
 	@Override
 	public boolean isImmutable() { return getMutator().isImmutable(); }

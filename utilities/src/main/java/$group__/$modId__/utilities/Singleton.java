@@ -21,7 +21,8 @@ import static java.lang.invoke.MethodType.methodType;
 public abstract class Singleton {
 	/* SECTION static variables */
 
-	protected static final ConcurrentMap<Class<?>, Map.Entry<? extends Singleton, String>> INSTANCES = MAP_MAKER_MULTI_THREAD.makeMap();
+	protected static final ConcurrentMap<Class<?>, Map.Entry<? extends Singleton, String>> INSTANCES =
+			MAP_MAKER_MULTI_THREAD.makeMap();
 
 
 	/* SECTION constructors */
@@ -34,11 +35,13 @@ public abstract class Singleton {
 		Map.Entry<? extends Singleton, String> v = immutableEntry(this, sts);
 		@Nullable Map.Entry<? extends Singleton, String> vo = INSTANCES.put(clazz, v);
 		if (vo != null) {
-			logger.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("The singleton instance of '{}' already created, previous stacktrace:{}{}", classGS, lineSeparator(), vo.getValue()));
+			logger.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("The singleton instance of '{}' already " +
+					"created, previous stacktrace:{}{}", classGS, lineSeparator(), vo.getValue()));
 			throw rejectInstantiation();
 		}
 
-		logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("The singleton instance of '{}' created, stacktrace:{}{}", classGS, lineSeparator(), sts));
+		logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("The singleton instance of '{}' created, " +
+				"stacktrace:{}{}", classGS, lineSeparator(), sts));
 	}
 
 
@@ -46,7 +49,8 @@ public abstract class Singleton {
 
 	public static <T extends Singleton> T getSingletonInstance(Class<T> clazz, @Nullable Logger logger) { return tryGetSingletonInstance(clazz, true, t -> tryCallWithLogging(() -> IMPL_LOOKUP.findConstructor(t, methodType(void.class)).invokeExact(), logger).flatMap(Casts::castUnchecked)).orElseThrow(Throwables::rethrowCaughtThrowableStatic); }
 
-	public static <T extends Singleton> Optional<T> tryGetSingletonInstance(Class<T> clazz, boolean instantiate, Function<Class<T>, ? extends Optional<T>> instantiation) {
+	public static <T extends Singleton> Optional<T> tryGetSingletonInstance(Class<T> clazz, boolean instantiate,
+	                                                                        Function<Class<T>, ? extends Optional<T>> instantiation) {
 		Optional<T> r = Optional.ofNullable(INSTANCES.get(clazz)).map(Map.Entry::getKey).flatMap(Casts::castUnchecked);
 		if (!r.isPresent() && instantiate) r = instantiation.apply(clazz);
 		return r;

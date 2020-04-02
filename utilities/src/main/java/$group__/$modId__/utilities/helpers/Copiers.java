@@ -101,7 +101,8 @@ public enum Copiers {
 			try {
 				switch (coe.getValue()) {
 					case "Copy":
-						r = tryCall(() -> co.newInstance(copy), LOGGER).orElseThrow(Throwables::rethrowCaughtThrowableStatic);
+						r =
+								tryCall(() -> co.newInstance(copy), LOGGER).orElseThrow(Throwables::rethrowCaughtThrowableStatic);
 						try {
 							r.clear();
 							r.addAll(copy.stream().map(o -> ICloneable.tryCloneUnboxed(o, LOGGER)).collect(Collectors.toList())); // COMMENT keep it ordered by collecting stream to list
@@ -112,7 +113,9 @@ public enum Copiers {
 						}
 						break cos;
 					case "Object[]":
-						r = tryCall(() -> co.newInstance((Object) copy.stream().map(o -> ICloneable.tryCloneUnboxed(o, LOGGER)).toArray()), LOGGER).orElseThrow(Throwables::rethrowCaughtThrowableStatic); // COMMENT cast to Object to call the method with the array as 1 object
+						r = tryCall(() -> co.newInstance((Object) copy.stream().map(o -> ICloneable.tryCloneUnboxed(o,
+								LOGGER)).toArray()), LOGGER).orElseThrow(Throwables::rethrowCaughtThrowableStatic); //
+						// COMMENT cast to Object to call the method with the array as 1 object
 						break cos;
 				}
 			} catch (Throwable t) {
@@ -135,7 +138,8 @@ public enum Copiers {
 
 
 	@ExternalCloneMethod(Color.class)
-	public static Color copyColor(Color copy) { return new Color(copy.getColorSpace(), copy.getColorComponents(null), copy.getAlpha() / 255F); }
+	public static Color copyColor(Color copy) { return new Color(copy.getColorSpace(), copy.getColorComponents(null),
+			copy.getAlpha() / 255F); }
 
 	@ExternalCloneMethod(ResourceLocation.class)
 	public static ResourceLocation copyResourceLocation(ResourceLocation copy) { return new ResourceLocation(copy.getResourceDomain(), copy.getResourcePath()); }

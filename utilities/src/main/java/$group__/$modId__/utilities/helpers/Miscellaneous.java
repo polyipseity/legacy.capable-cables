@@ -21,7 +21,8 @@ public enum Miscellaneous {
 
 	@Nullable
 	public static <T> T getDefaultValue(@Nullable Class<T> type) {
-		return type == null ? null : PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet().stream().filter(e -> e.getKey().isAssignableFrom(type)).findFirst().<T>map(e -> castUncheckedUnboxed(e.getValue())).orElse(null);
+		return type == null ? null :
+				PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet().stream().filter(e -> e.getKey().isAssignableFrom(type)).findFirst().<T>map(e -> castUncheckedUnboxed(e.getValue())).orElse(null);
 	}
 
 	public static <T> T getDefaultValueNonnull(Class<T> type) { return requireNonNull(getDefaultValue(type)); }
@@ -31,6 +32,7 @@ public enum Miscellaneous {
 	 * Marks something as a {@code synchronized} lock.
 	 *
 	 * @return a new {@code Object}
+	 *
 	 * @since 0.0.1.0
 	 */
 	public static Object newLockObject() { return new Object(); }
@@ -44,7 +46,9 @@ public enum Miscellaneous {
 	 * @param x   {@code return} value
 	 * @param y   any
 	 * @param <T> type of parameter {@code x}
+	 *
 	 * @return parameter {@code x}
+	 *
 	 * @since 0.0.1.0
 	 */
 	public static <T> T K(T x, @SuppressWarnings("unused") Object... y) { return x; }

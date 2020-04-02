@@ -34,7 +34,10 @@ public enum PreconditionsExtension {
 		}
 	}
 
-	public static void checkArrayContentType(Class<?> type, Object... array) { for (@Nullable Object o : array) checkArgument(o == null || type.isAssignableFrom(o.getClass())); }
+	public static void checkArrayContentType(Class<?> type, Object... array) {
+		for (@Nullable Object o : array)
+			checkArgument(o == null || type.isAssignableFrom(o.getClass()));
+	}
 
 
 	public static void requireRunOnceOnly(@Nullable Logger logger) throws IllegalStateException {
@@ -42,10 +45,13 @@ public enum PreconditionsExtension {
 
 		@Nullable Throwable t1 = RAN_ONCE.put(getCallerClass(), t);
 		if (t1 != null) {
-			logger.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Illegal second invocation, previous stacktrace:{}{}", lineSeparator(), getStackTrace(t1)));
-			throw throw_(new IllegalStateException(rejectAttemptString("illegal second invocation", t.getStackTrace())));
+			logger.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Illegal second invocation, previous " +
+					"stacktrace:{}{}", lineSeparator(), getStackTrace(t1)));
+			throw throw_(new IllegalStateException(rejectAttemptString("illegal second invocation",
+					t.getStackTrace())));
 		}
 
-		logger.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("First ONLY invocation, stacktrace:{}{}", lineSeparator(), t));
+		logger.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("First ONLY invocation, stacktrace:{}{}",
+				lineSeparator(), t));
 	}
 }

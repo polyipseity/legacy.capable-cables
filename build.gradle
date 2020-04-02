@@ -138,12 +138,12 @@ task saveCurrentGoodSettings(group: 'build', description: "Saves current good se
     doLast {
         Wrapper wrapper = tasks.wrapper as Wrapper
         Map<String, Object> json = [
-                gradle      : [distributionUrl: wrapper.distributionUrl.replace(wrapper.distributionType.name().toLowerCase(Locale.ROOT), Wrapper.DistributionType.ALL.name().toLowerCase(Locale.ROOT))],
-                minecraft   : [
+                gradle   : [distributionUrl: wrapper.distributionUrl.replace(wrapper.distributionType.name().toLowerCase(Locale.ROOT), Wrapper.DistributionType.ALL.name().toLowerCase(Locale.ROOT))],
+                minecraft: [
                         version : minecraftForgeVersion,
                         mappings: minecraftMappings
                 ],
-                projects    : [:]
+                projects : [:]
         ]
         allprojects.each { project ->
             Map<String, Object> jsonProject = json.projects."$project.path" = [

@@ -12,15 +12,15 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(TYPE)
 public @interface InterfaceIntersection {
-    /* SECTION static classes */;
+	/* SECTION static classes */;
 
-    @Documented
-    @Retention(RUNTIME)
-    @Target(METHOD)
-    @interface InstanceOfMethod { /* MARK empty */ }
+	@Documented
+	@Retention(RUNTIME)
+	@Target(METHOD)
+	@interface InstanceOfMethod { /* MARK empty */}
 
-    @Documented
-    @Retention(RUNTIME)
-    @Target(METHOD)
-    @interface ConversionMethod { /* MARK empty */ }
+	@Documented
+	@Retention(RUNTIME)
+	@Target(METHOD)
+	@interface ConversionMethod { /* MARK empty */}
 }

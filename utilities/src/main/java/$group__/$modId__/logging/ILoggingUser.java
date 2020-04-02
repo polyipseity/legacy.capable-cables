@@ -10,13 +10,11 @@ public interface ILoggingUser<T extends ILogging<L>, L> extends ILogging<L> {
 
 	T getLogging();
 
-	boolean trySetLogging(T logging);
-
-
-	default Optional<T> tryGetLogging() { return Optional.of(getLogging()); }
-
 	default void setLogging(T logging) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetLogging(logging)); }
 
+	boolean trySetLogging(T logging);
+
+	default Optional<T> tryGetLogging() { return Optional.of(getLogging()); }
 
 	@Nullable
 	@Override

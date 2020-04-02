@@ -78,13 +78,15 @@ public enum Registrables {
 		}
 
 		@SuppressWarnings("UnusedReturnValue")
-		public static <C> boolean setChildIfNotNull(NBTTagCompound p, String k, @Nullable C v, TriConsumer<NBTTagCompound, String, C> c) {
+		public static <C> boolean setChildIfNotNull(NBTTagCompound p, String k, @Nullable C v,
+		                                            TriConsumer<NBTTagCompound, String, C> c) {
 			if (v == null) return false;
 			c.accept(p, k, v);
 			return true;
 		}
 
-		public static <C> Optional<C> readChildIfHasKey(@Nullable NBTTagCompound p, String key, Class<C> type, BiFunction<NBTTagCompound, String, C> f) {
+		public static <C> Optional<C> readChildIfHasKey(@Nullable NBTTagCompound p, String key, Class<C> type,
+		                                                BiFunction<NBTTagCompound, String, C> f) {
 			if (p != null && p.hasKey(key, lookupNBTTypeNonnull(type))) return Optional.of(f.apply(p, key));
 			return Optional.empty();
 		}
@@ -100,6 +102,7 @@ public enum Registrables {
 
 		/* SECTION static initializer */
 
-		public static Optional<NBTTagCompound> returnTagIfNotEmpty(NBTTagCompound p) { return p.getSize() == 0 ? Optional.empty() : Optional.of(p); }
+		public static Optional<NBTTagCompound> returnTagIfNotEmpty(NBTTagCompound p) { return p.getSize() == 0 ?
+				Optional.empty() : Optional.of(p); }
 	}
 }

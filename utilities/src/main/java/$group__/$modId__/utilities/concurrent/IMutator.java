@@ -16,6 +16,17 @@ import static java.util.Objects.requireNonNull;
 public interface IMutator {
 	/* SECTION getters & setters */
 
+	@Nullable
+	static <T> T trySet(IMutator mutator, @Nullable T target, boolean initialize) {
+		AtomicReference<T> t = new AtomicReference<T>(target == null ? null :
+				castUncheckedUnboxed(getDefaultValue(target.getClass())));
+		mutator.trySet(t::set, target, initialize);
+		return t.get();
+	}
+
+	static <T> T trySetNonnull(IMutator mutator, T target, boolean initialize) { return requireNonNull(trySet(mutator,
+			target, initialize)); }
+
 	<T> boolean trySet(Consumer<T> setter, @Nullable T target, boolean initialize);
 
 	<T> T mutate(Supplier<T> action, boolean initialize) throws UnsupportedOperationException;
@@ -25,6 +36,9 @@ public interface IMutator {
 
 	@OverridingStatus(group = PACKAGE, when = When.NEVER)
 	default <T> T mutate(Supplier<T> action) throws UnsupportedOperationException { return mutate(action, false); }
+
+
+	/* SECTION methods */
 
 	@OverridingStatus(group = PACKAGE, when = When.NEVER)
 	default void mutate(Runnable action, boolean initialize) throws UnsupportedOperationException {
@@ -36,16 +50,4 @@ public interface IMutator {
 
 	@OverridingStatus(group = PACKAGE, when = When.NEVER)
 	default void mutate(Runnable action) throws UnsupportedOperationException { mutate(action, false); }
-
-
-	/* SECTION methods */
-
-	@Nullable
-	static <T> T trySet(IMutator mutator, @Nullable T target, boolean initialize) {
-		AtomicReference<T> t = new AtomicReference<T>(target == null ? null : castUncheckedUnboxed(getDefaultValue(target.getClass())));
-		mutator.trySet(t::set, target, initialize);
-		return t.get();
-	}
-	
-	static <T> T trySetNonnull(IMutator mutator, T target, boolean initialize) { return requireNonNull(trySet(mutator, target, initialize)); }
 }

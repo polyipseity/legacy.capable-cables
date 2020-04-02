@@ -19,10 +19,9 @@ public interface ILogging<T> {
 	@Nullable
 	T getLogger();
 
+	default void setLogger(@Nullable T logger) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetLogger(logger)); }
+
 	boolean trySetLogger(@Nullable T logger);
 
-
 	default Optional<? extends T> tryGetLogger() { return Optional.ofNullable(getLogger()); }
-
-	default void setLogger(@Nullable T logger) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetLogger(logger)); }
 }

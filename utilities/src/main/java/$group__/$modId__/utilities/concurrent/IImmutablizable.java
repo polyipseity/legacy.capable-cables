@@ -36,8 +36,9 @@ import static java.util.Collections.newSetFromMap;
 /**
  * Indicates this object can be turned into an immutable version of itself.
  *
- * @author William So
  * @param <I> type of the immutable version of this object
+ *
+ * @author William So
  * @see ExternalToImmutableMethod for the to-immutable system
  * @since 0.0.1.0
  */
@@ -48,9 +49,11 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 
 	Logger LOGGER = LogManager.getLogger(IImmutablizable.class);
 
-	ConcurrentMap<ExternalToImmutableMethod, MethodHandle> EXTERNAL_METHOD_MAP = MAP_MAKER_MULTI_THREAD_WEAK_KEYS.makeMap();
+	ConcurrentMap<ExternalToImmutableMethod, MethodHandle> EXTERNAL_METHOD_MAP =
+			MAP_MAKER_MULTI_THREAD_WEAK_KEYS.makeMap();
 	ConcurrentMap<Class<?>, ExternalToImmutableMethod> EXTERNAL_ANNOTATIONS_MAP = MAP_MAKER_MULTI_THREAD.makeMap();
-	LoadingCache<Class<?>, ExternalToImmutableMethod> EXTERNAL_ANNOTATIONS_CACHE = CacheBuilder.newBuilder().initialCapacity(Capacities.INITIAL_CAPACITY_4).concurrencyLevel(Concurrency.MULTI_THREAD_THREAD_COUNT).expireAfterAccess(CACHE_EXPIRATION_ACCESS_DURATION, CACHE_EXPIRATION_ACCESS_TIME_UNIT).build(new CacheLoader<Class<?>, ExternalToImmutableMethod>() {
+	LoadingCache<Class<?>, ExternalToImmutableMethod> EXTERNAL_ANNOTATIONS_CACHE =
+			CacheBuilder.newBuilder().initialCapacity(Capacities.INITIAL_CAPACITY_4).concurrencyLevel(Concurrency.MULTI_THREAD_THREAD_COUNT).expireAfterAccess(CACHE_EXPIRATION_ACCESS_DURATION, CACHE_EXPIRATION_ACCESS_TIME_UNIT).build(new CacheLoader<Class<?>, ExternalToImmutableMethod>() {
 		/* SECTION methods */
 
 		@Override
@@ -58,7 +61,8 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 			@Nullable ExternalToImmutableMethod r = EXTERNAL_ANNOTATIONS_MAP.get(key);
 			if (r != null) return r;
 
-			List<Map.Entry<Class<?>, ExternalToImmutableMethod>> l = EXTERNAL_ANNOTATIONS_CACHE.asMap().entrySet().stream().filter(t -> t.getValue().allowExtends() && t.getKey().isAssignableFrom(key)).collect(Collectors.toList());
+			List<Map.Entry<Class<?>, ExternalToImmutableMethod>> l =
+					EXTERNAL_ANNOTATIONS_CACHE.asMap().entrySet().stream().filter(t -> t.getValue().allowExtends() && t.getKey().isAssignableFrom(key)).collect(Collectors.toList());
 			sss:
 			for (ImmutableSet<Class<?>> ss : getSuperclassesAndInterfaces(key))
 				for (Map.Entry<Class<?>, ExternalToImmutableMethod> e : l)
@@ -69,9 +73,10 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 
 			if (r != null) {
 				ExternalToImmutableMethod rf = r;
-				LOGGER.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("To immutable method '{}' with annotation '{}' auto-registered for class '{}'", EXTERNAL_METHOD_MAP.get(rf), rf, key.toGenericString()));
-			}
-			else
+				LOGGER.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("To immutable method '{}' with annotation" +
+						" '{}' auto-registered for class '{}'", EXTERNAL_METHOD_MAP.get(rf), rf,
+						key.toGenericString()));
+			} else
 				throw throw_(new NoSuchMethodException("No to-immutable method for class '" + key.toGenericString() + '\''));
 
 			return r;
@@ -83,7 +88,6 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 	 * itself.
 	 *
 	 * @implNote using {@link SoftReference} for values to make this into a cache
-	 *
 	 * @see #tryToImmutable
 	 * @since 0.0.1.0
 	 */
@@ -118,12 +122,13 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 	 * </ol>
 	 * The result is always wrapped in an {@link Optional} before {@code return}ing.
 	 *
-	 * @param <T> type of parameter {@code o}
-	 * @param o object that will attempt to turn into an immutable version of itself
+	 * @param <T>    type of parameter {@code o}
+	 * @param o      object that will attempt to turn into an immutable version of itself
 	 * @param logger {@link Logger} used for logging
-	 * @return
-	 * an immutable version of parameter {@code o} if it exists, else parameter
+	 *
+	 * @return an immutable version of parameter {@code o} if it exists, else parameter
 	 * {@code o}, wrapped in an {@link Optional}
+	 *
 	 * @see ExternalToImmutableMethod for the to-immutable system
 	 * @see #tryToImmutableUnboxed unboxed version
 	 * @see #tryToImmutableUnboxedNonnull unboxed nonnull version
@@ -144,19 +149,25 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 				m = EXTERNAL_METHOD_MAP.get(EXTERNAL_ANNOTATIONS_CACHE.get(oc));
 			} catch (ExecutionException e) {
 				setCaughtThrowableStatic(e, logger);
-				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable to immutablize object '{}' of class '{}' as no to immutable method is obtained, will NOT attempt to immutable again", o, oc.toGenericString()), e));
+				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable " +
+						"to immutablize object '{}' of class '{}' as no to immutable method is obtained, will NOT " +
+						"attempt to immutable again", o, oc.toGenericString()), e));
 				BROKEN_CLASS_SET.add(oc);
 				return Optional.of(o);
 			}
 
 			Optional<T> r = tryCall(() -> m.invoke(o), logger).flatMap(Casts::castUnchecked);
 			consumeIfCaughtThrowable(t -> {
-				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("To-immutable method '{}' failed for object '{}' of class '{}', will NOT attempt to immutable again", m, o, oc.toGenericString()), t));
+				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("To" +
+						"-immutable method '{}' failed for object '{}' of class '{}', will NOT attempt to immutable " +
+						"again", m, o, oc.toGenericString()), t));
 				BROKEN_CLASS_SET.add(oc);
 			});
 			return r;
 		} else {
-			logger.debug(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable to immutable object '{}' of class '{}' as to immutable method annotation is NOT yet processed, will attempt to immutable again", o, oc.toGenericString()), newThrowable()));
+			logger.debug(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable to " +
+					"immutable object '{}' of class '{}' as to immutable method annotation is NOT yet processed, will " +
+					"attempt to immutable again", o, oc.toGenericString()), newThrowable()));
 			return Optional.of(o);
 		}
 	}
@@ -166,18 +177,22 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 	 * <p>
 	 * Useful when you want to get the unwrapped result object.
 	 *
-	 * @param <T> type of parameter {@code o}
-	 * @param o object that will attempt to turn into an immutable version of itself
+	 * @param <T>    type of parameter {@code o}
+	 * @param o      object that will attempt to turn into an immutable version of itself
 	 * @param logger {@link Logger} used for logging
-	 * @return
-	 * an immutable version of parameter {@code o} if it exists, else parameter
+	 *
+	 * @return an immutable version of parameter {@code o} if it exists, else parameter
 	 * {@code o}, wrapped in an {@link Optional}
+	 *
 	 * @see #tryToImmutable overloaded version
 	 * @see #tryToImmutableUnboxedNonnull unboxed nonnull version
 	 * @since 0.0.1.0
 	 */
 	@Nullable
-	static <T> T tryToImmutableUnboxed(@Nullable T o, @Nullable Logger logger) { return unboxOptional(tryToImmutable(o, logger)); }
+	static <T> T tryToImmutableUnboxed(@Nullable T o, @Nullable Logger logger) {
+		return unboxOptional(tryToImmutable(o
+				, logger));
+	}
 
 	/**
 	 * See {@link #tryToImmutable}.
@@ -185,12 +200,13 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 	 * Useful when you want to get the unwrapped result object, and know the returned
 	 * object is nonnull as the parameter {@code o} is nonnull.
 	 *
-	 * @param <T> type of parameter {@code o}
-	 * @param o object that will attempt to turn into an immutable version of itself
+	 * @param <T>    type of parameter {@code o}
+	 * @param o      object that will attempt to turn into an immutable version of itself
 	 * @param logger {@link Logger} used for logging
-	 * @return
-	 * an immutable version of parameter {@code o} if it exists, else parameter
+	 *
+	 * @return an immutable version of parameter {@code o} if it exists, else parameter
 	 * {@code o}, nullable
+	 *
 	 * @see #tryToImmutable overloaded version
 	 * @see #tryToImmutableUnboxed unboxed version
 	 * @since 0.0.1.0
@@ -207,6 +223,7 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 	 * {@code true}.
 	 *
 	 * @return the immutable version of this object
+	 *
 	 * @see #isImmutable
 	 * @since 0.0.1.0
 	 */
@@ -220,6 +237,7 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 	 * {@code true}.
 	 *
 	 * @return whether this object is immutable
+	 *
 	 * @see #toImmutable
 	 * @since 0.0.1.0
 	 */

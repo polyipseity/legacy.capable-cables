@@ -17,7 +17,8 @@ import static $group__.$modId__.utilities.helpers.PreconditionsExtension.require
 import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperation;
 
 @Immutable
-public class MutatorImmutable<T extends MutatorImmutable<T>> implements Serializable, IStrictObject, IMutatorImmutablizable<T, T> {
+public class MutatorImmutable<T extends MutatorImmutable<T>> implements Serializable, IStrictObject,
+		IMutatorImmutablizable<T, T> {
 	/* SECTION static variables */
 
 	public static final MutatorImmutable<?> INSTANCE = new MutatorImmutable<>(null);

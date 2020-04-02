@@ -20,17 +20,22 @@ import static com.google.common.collect.Maps.immutableEntry;
 import static java.util.function.Function.identity;
 
 @SideOnly(Side.CLIENT)
-public class BuilderGuiDrawable<T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiDrawable<V, N, C, TH>, N extends Number, C, TH extends ITheme<TH>> extends BuilderStructure<T, V> {
+public class BuilderGuiDrawable<T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiDrawable<V, N, C, TH>,
+		N extends Number, C, TH extends ITheme<TH>> extends BuilderStructure<T, V> {
 	/* SECTION static variables */
 
-	public static final Map.Entry<Class<IColored<?>>, String> KEY_DEFAULT_COLORED = immutableEntry(castUncheckedUnboxedNonnull(IColored.class), "colored");
-	public static final Map.Entry<Class<IThemed<?>>, String> KEY_DEFAULT_THEMED = immutableEntry(castUncheckedUnboxedNonnull(IThemed.class), "themed");
+	public static final Map.Entry<Class<IColored<?>>, String> KEY_DEFAULT_COLORED =
+			immutableEntry(castUncheckedUnboxedNonnull(IColored.class), "colored");
+	public static final Map.Entry<Class<IThemed<?>>, String> KEY_DEFAULT_THEMED =
+			immutableEntry(castUncheckedUnboxedNonnull(IThemed.class), "themed");
 
 
 	/* SECTION variables */
 
-	public IColored<C> colored = castUncheckedUnboxedNonnull(optionalNonnull(peekDefault(KEY_DEFAULT_COLORED), identity(), GuiColorNull::getInstance));
-	public IThemed<TH> themed = castUncheckedUnboxedNonnull(optionalNonnull(peekDefault(KEY_DEFAULT_THEMED), identity(), GuiThemedNull::getInstance));
+	public IColored<C> colored = castUncheckedUnboxedNonnull(optionalNonnull(peekDefault(KEY_DEFAULT_COLORED),
+			identity(), GuiColorNull::getInstance));
+	public IThemed<TH> themed = castUncheckedUnboxedNonnull(optionalNonnull(peekDefault(KEY_DEFAULT_THEMED),
+			identity(), GuiThemedNull::getInstance));
 
 
 	/* SECTION constructor */

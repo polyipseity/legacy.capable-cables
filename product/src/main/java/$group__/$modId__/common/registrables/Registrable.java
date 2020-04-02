@@ -45,17 +45,21 @@ public abstract class Registrable<T extends IForgeRegistryEntry<T>> extends Sing
 				evtRegEd = 0;
 
 		Field[] fs = getClass().getFields();
-		logger.info(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Found {} field{} in '{}'", fs.length, appendSuffixIfPlural(fs.length, "s"), classGS));
+		logger.info(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Found {} field{} in '{}'", fs.length,
+				appendSuffixIfPlural(fs.length, "s"), classGS));
 		for (Field f : fs) {
-			logger.trace(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Processing field '{}'", f.toGenericString()));
+			logger.trace(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Processing field '{}'",
+					f.toGenericString()));
 			Object v = tryCall(() -> f.get(this), logger).orElseThrow(Throwables::rethrowCaughtThrowableStatic);
-			logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Field '{}' value is '{}'", f.toGenericString(), v));
+			logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Field '{}' value is '{}'",
+					f.toGenericString(), v));
 			if (clazz.isAssignableFrom(v.getClass())) {
 				reg.register(castUncheckedUnboxedNonnull(v));
 				if (v instanceof IRegistrableEventBusSubscriber) {
 					MinecraftForge.EVENT_BUS.register(v);
 					evtRegEd++;
-					logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Registered '{}' as '{}'", v, evtRegGS));
+					logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Registered '{}' as '{}'", v,
+							evtRegGS));
 				}
 				regEd++;
 				logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Registered '{}' as '{}'", v, classGS));

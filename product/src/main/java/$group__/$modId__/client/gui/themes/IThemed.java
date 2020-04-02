@@ -1,7 +1,7 @@
 package $group__.$modId__.client.gui.themes;
 
-import $group__.$modId__.utilities.concurrent.IMutatorImmutablizable;
 import $group__.$modId__.logging.ILogging;
+import $group__.$modId__.utilities.concurrent.IMutatorImmutablizable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
@@ -15,7 +15,10 @@ import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsu
 public interface IThemed<T extends ITheme<T>> {
 	/* SECTION static methods */
 
-	static <T extends ITheme<T>, L extends Logger> IThemed<T> of(@Nullable T theme, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) { return theme == null ? GuiThemedNull.getInstance() : new GuiThemed<>(theme, mutator, logging); }
+	static <T extends ITheme<T>, L extends Logger> IThemed<T> of(@Nullable T theme,
+	                                                             IMutatorImmutablizable<?, ?> mutator,
+	                                                             ILogging<Logger> logging) { return theme == null ?
+			GuiThemedNull.getInstance() : new GuiThemed<>(theme, mutator, logging); }
 
 
 	/* SECTION getters & setters */
@@ -23,10 +26,9 @@ public interface IThemed<T extends ITheme<T>> {
 	@Nullable
 	T getTheme();
 
+	default void setTheme(@Nullable T theme) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetTheme(theme)); }
+
 	boolean trySetTheme(@Nullable T theme);
 
-
 	default Optional<? extends T> tryGetTheme() { return Optional.ofNullable(getTheme()); }
-
-	default void setTheme(@Nullable T theme) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetTheme(theme)); }
 }

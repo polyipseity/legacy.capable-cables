@@ -10,13 +10,11 @@ public interface IColoredUser<T extends IColored<C>, C> extends IColored<C> {
 
 	T getColored();
 
-	boolean trySetColored(T colored);
-
-
-	default Optional<T> tryGetColored() { return Optional.of(getColored()); }
-
 	default void setColored(T colored) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetColored(colored)); }
 
+	boolean trySetColored(T colored);
+
+	default Optional<T> tryGetColored() { return Optional.of(getColored()); }
 
 	@Nullable
 	@Override

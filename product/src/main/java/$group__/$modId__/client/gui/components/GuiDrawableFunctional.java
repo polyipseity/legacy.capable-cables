@@ -5,8 +5,8 @@ import $group__.$modId__.client.gui.themes.ITheme;
 import $group__.$modId__.client.gui.themes.IThemed;
 import $group__.$modId__.client.gui.traits.IColored;
 import $group__.$modId__.client.gui.utilities.builders.BuilderGuiDrawable;
-import $group__.$modId__.utilities.concurrent.IMutatorImmutablizable;
 import $group__.$modId__.logging.ILogging;
+import $group__.$modId__.utilities.concurrent.IMutatorImmutablizable;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Logger;
 
@@ -17,7 +17,8 @@ import static $group__.$modId__.utilities.concurrent.IMutator.trySetNonnull;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperationIf;
 
-public class GuiDrawableFunctional<T extends GuiDrawableFunctional<T, N, C, TH>, N extends Number, C, TH extends ITheme<TH>> extends GuiDrawable<T, N, C, TH> {
+public class GuiDrawableFunctional<T extends GuiDrawableFunctional<T, N, C, TH>, N extends Number, C,
+		TH extends ITheme<TH>> extends GuiDrawable<T, N, C, TH> {
 	/* SECTION variables */
 
 	protected Function<? super T, ? extends Boolean> tryDrawFunction;
@@ -26,7 +27,9 @@ public class GuiDrawableFunctional<T extends GuiDrawableFunctional<T, N, C, TH>,
 
 	/* SECTION constructors */
 
-	public GuiDrawableFunctional(Function<? super T, ? extends Boolean> tryDrawFunction, Function<? super T, ? extends Optional<Rectangle<?, N>>> specFunction, IColored<C> colored, IThemed<TH> themed, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
+	public GuiDrawableFunctional(Function<? super T, ? extends Boolean> tryDrawFunction, Function<? super T, ?
+			extends Optional<Rectangle<?, N>>> specFunction, IColored<C> colored, IThemed<TH> themed,
+	                             IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
 		super(colored, themed, mutator, logging);
 		this.tryDrawFunction = trySetNonnull(getMutator(), tryDrawFunction, true);
 		this.specFunction = trySetNonnull(getMutator(), specFunction, true);
@@ -39,26 +42,27 @@ public class GuiDrawableFunctional<T extends GuiDrawableFunctional<T, N, C, TH>,
 
 	/* SECTION static methods */
 
-	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiDrawableFunctional<V, N, C, TH>, L extends Logger, N extends Number, C, TH extends ITheme<TH>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGDF(Function<? super V, ? extends Boolean> tryDrawFunction, Function<? super V, ? extends Optional<Rectangle<?, N>>> specFunction, IMutatorImmutablizable<?, ?> mutator) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiDrawableFunctional<V, N, C, TH>(tryDrawFunction, specFunction, t.colored, t.themed, mutator, t.logging))); }
+	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiDrawableFunctional<V, N, C, TH>,
+			L extends Logger, N extends Number, C, TH extends ITheme<TH>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGDF(Function<? super V, ? extends Boolean> tryDrawFunction, Function<? super V, ? extends Optional<Rectangle<?, N>>> specFunction, IMutatorImmutablizable<?, ?> mutator) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiDrawableFunctional<V, N, C, TH>(tryDrawFunction, specFunction, t.colored, t.themed, mutator, t.logging))); }
 
 
 	/* SECTION getters & setters */
 
 	public Function<? super T, ? extends Boolean> getTryDrawFunction() { return tryDrawFunction; }
 
+	public void setTryDrawFunction(Function<? super T, ? extends Boolean> tryDrawFunction) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetTryDrawFunction(tryDrawFunction)); }
+
 	public boolean trySetTryDrawFunction(Function<? super T, ? extends Boolean> tryDrawFunction) { return trySet(t -> this.tryDrawFunction = t, tryDrawFunction); }
 
 	public Optional<Function<? super T, ? extends Boolean>> tryGetTryDrawFunction() { return Optional.of(getTryDrawFunction()); }
 
-	public void setTryDrawFunction(Function<? super T, ? extends Boolean> tryDrawFunction) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetTryDrawFunction(tryDrawFunction)); }
-
 	public Function<? super T, ? extends Optional<Rectangle<?, N>>> getSpecFunction() { return specFunction; }
+
+	public void setSpecFunction(Function<? super T, ? extends Optional<Rectangle<?, N>>> specFunction) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetSpecFunction(specFunction)); }
 
 	public boolean trySetSpecFunction(Function<? super T, ? extends Optional<Rectangle<?, N>>> specFunction) { return trySet(t -> this.specFunction = t, specFunction); }
 
 	public Optional<Function<? super T, ? extends Optional<? extends Rectangle<?, N>>>> tryGetSpecFunction() { return Optional.of(getSpecFunction()); }
-
-	public void setSpecFunction(Function<? super T, ? extends Optional<Rectangle<?, N>>> specFunction) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetSpecFunction(specFunction)); }
 
 
 	/* SECTION methods */
@@ -71,5 +75,6 @@ public class GuiDrawableFunctional<T extends GuiDrawableFunctional<T, N, C, TH>,
 
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiDrawableFunctional<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this :
+			new GuiDrawableFunctional<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
 }

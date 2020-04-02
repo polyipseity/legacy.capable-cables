@@ -27,50 +27,64 @@ public abstract class Proxy extends Singleton {
 	/* SECTION methods */
 
 	@OverridingMethodsMustInvokeSuper
-	public void construct(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLConstructionEvent event) {
+	public void construct(@SuppressWarnings("unused") ModThis mod,
+	                      @SuppressWarnings("unused") FMLConstructionEvent event) {
 		EVENT_BUS.register(ExternalToImmutableMethodProcessor.class);
 		EVENT_BUS.register(ExternalCloneMethodProcessor.class);
 		EVENT_BUS.post(new AnnotationProcessingEvent(MOD_ID, event.getASMHarvestedData(), LOGGER));
 	}
 
 	@OverridingMethodsMustInvokeSuper
-	public void preInitialize(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLPreInitializationEvent event) {
+	public void preInitialize(@SuppressWarnings("unused") ModThis mod,
+	                          @SuppressWarnings("unused") FMLPreInitializationEvent event) {
 		NetworkRegistry.INSTANCE.registerGuiHandler(mod, GuiHandler.INSTANCE);
 	}
 
 	@OverridingMethodsMustInvokeSuper
-	public void initialize(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLInitializationEvent event) {}
+	public void initialize(@SuppressWarnings("unused") ModThis mod,
+	                       @SuppressWarnings("unused") FMLInitializationEvent event) {}
 
 	@OverridingMethodsMustInvokeSuper
-	public void postInitialize(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLPostInitializationEvent event) {}
+	public void postInitialize(@SuppressWarnings("unused") ModThis mod,
+	                           @SuppressWarnings("unused") FMLPostInitializationEvent event) {}
 
 	@OverridingMethodsMustInvokeSuper
-	public void completeLoading(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLLoadCompleteEvent event) {}
+	public void completeLoading(@SuppressWarnings("unused") ModThis mod,
+	                            @SuppressWarnings("unused") FMLLoadCompleteEvent event) {}
 
 	@OverridingMethodsMustInvokeSuper
-	public void preStartServer(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLServerAboutToStartEvent event) {}
+	public void preStartServer(@SuppressWarnings("unused") ModThis mod,
+	                           @SuppressWarnings("unused") FMLServerAboutToStartEvent event) {}
 
 	@OverridingMethodsMustInvokeSuper
-	public void startServer(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLServerStartingEvent event) {}
+	public void startServer(@SuppressWarnings("unused") ModThis mod,
+	                        @SuppressWarnings("unused") FMLServerStartingEvent event) {}
 
 	@OverridingMethodsMustInvokeSuper
-	public void postStartServer(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLServerStartedEvent event) {}
+	public void postStartServer(@SuppressWarnings("unused") ModThis mod,
+	                            @SuppressWarnings("unused") FMLServerStartedEvent event) {}
 
 	@OverridingMethodsMustInvokeSuper
-	public void stopServer(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLServerStoppingEvent event) {}
+	public void stopServer(@SuppressWarnings("unused") ModThis mod,
+	                       @SuppressWarnings("unused") FMLServerStoppingEvent event) {}
 
 	@OverridingMethodsMustInvokeSuper
-	public void postStopServer(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLServerStoppedEvent event) {}
+	public void postStopServer(@SuppressWarnings("unused") ModThis mod,
+	                           @SuppressWarnings("unused") FMLServerStoppedEvent event) {}
 
 	@OverridingMethodsMustInvokeSuper
-	public void violateFingerprint(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLFingerprintViolationEvent event) {}
+	public void violateFingerprint(@SuppressWarnings("unused") ModThis mod,
+	                               @SuppressWarnings("unused") FMLFingerprintViolationEvent event) {}
 
 	@OverridingMethodsMustInvokeSuper
-	public void processIMCMessages(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLInterModComms.IMCEvent event) {}
+	public void processIMCMessages(@SuppressWarnings("unused") ModThis mod,
+	                               @SuppressWarnings("unused") FMLInterModComms.IMCEvent event) {}
 
 	@OverridingMethodsMustInvokeSuper
-	public void processIDMapping(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLModIdMappingEvent event) {}
+	public void processIDMapping(@SuppressWarnings("unused") ModThis mod,
+	                             @SuppressWarnings("unused") FMLModIdMappingEvent event) {}
 
 	@OverridingMethodsMustInvokeSuper
-	public void disable(@SuppressWarnings("unused") ModThis mod, @SuppressWarnings("unused") FMLModDisabledEvent event) {}
+	public void disable(@SuppressWarnings("unused") ModThis mod,
+	                    @SuppressWarnings("unused") FMLModDisabledEvent event) {}
 }

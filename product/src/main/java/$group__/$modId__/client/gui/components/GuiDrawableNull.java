@@ -20,7 +20,8 @@ import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonn
 import static $group__.$modId__.utilities.helpers.PreconditionsExtension.requireRunOnceOnly;
 
 @Immutable
-public final class GuiDrawableNull<N extends Number> extends Gui implements IDrawable<N>, IStructure<GuiDrawableNull<N>, GuiDrawableNull<N>> {
+public final class GuiDrawableNull<N extends Number> extends Gui implements IDrawable<N>,
+		IStructure<GuiDrawableNull<N>, GuiDrawableNull<N>> {
 	/* SECTION static variables */
 
 	public static final GuiDrawableNull<?> INSTANCE = new GuiDrawableNull<>();

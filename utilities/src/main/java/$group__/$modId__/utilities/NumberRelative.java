@@ -29,7 +29,9 @@ import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonn
 import static $group__.$modId__.utilities.helpers.specific.Optionals.unboxOptional;
 import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperationIf;
 
-public class NumberRelative<T extends NumberRelative<T>> extends Number implements IStructure<T, T>, ICloneable<T>, IOperable.INumberOperable<T>, IMutatorUser<IMutatorImmutablizable<?, ?>>, ILoggingUser<ILogging<Logger>, Logger> {
+public class NumberRelative<T extends NumberRelative<T>> extends Number implements IStructure<T, T>, ICloneable<T>,
+		IOperable.INumberOperable<T>, IMutatorUser<IMutatorImmutablizable<?, ?>>, ILoggingUser<ILogging<Logger>,
+				Logger> {
 	/* SECTION static variables */
 
 	private static final long serialVersionUID = -1684871905587506897L;
@@ -38,8 +40,10 @@ public class NumberRelative<T extends NumberRelative<T>> extends Number implemen
 	/* SECTION variables */
 
 	protected Number value;
-	@Nullable protected Number parent;
-	@Nullable protected Number offset;
+	@Nullable
+	protected Number parent;
+	@Nullable
+	protected Number offset;
 
 	protected IMutatorImmutablizable<?, ?> mutator;
 	protected ILogging<Logger> logging;
@@ -47,11 +51,14 @@ public class NumberRelative<T extends NumberRelative<T>> extends Number implemen
 
 	/* SECTION constructors */
 
-	public NumberRelative(Number value, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) { this(value, null, mutator, logging); }
+	public NumberRelative(Number value, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) { this(value,
+			null, mutator, logging); }
 
-	public NumberRelative(Number value, @Nullable Number parent, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) { this(value, parent, null, mutator, logging); }
+	public NumberRelative(Number value, @Nullable Number parent, IMutatorImmutablizable<?, ?> mutator,
+	                      ILogging<Logger> logging) { this(value, parent, null, mutator, logging); }
 
-	public NumberRelative(Number value, @Nullable Number parent, @Nullable Number offset, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
+	public NumberRelative(Number value, @Nullable Number parent, @Nullable Number offset,
+	                      IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
 		this.mutator = IMutator.trySetNonnull(mutator, mutator, true);
 		this.logging = IMutator.trySetNonnull(getMutator(), logging, true);
 		this.value = IMutator.trySetNonnull(getMutator(), value, true);
@@ -62,7 +69,8 @@ public class NumberRelative<T extends NumberRelative<T>> extends Number implemen
 	public NumberRelative(NumberRelative<?> copy) { this(copy, copy.getMutator()); }
 
 
-	protected NumberRelative(NumberRelative<?> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getValue(), copy.getParent(), copy.getOffset(), mutator, copy.getLogging()); }
+	protected NumberRelative(NumberRelative<?> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getValue(),
+			copy.getParent(), copy.getOffset(), mutator, copy.getLogging()); }
 
 
 	/* SECTION static methods */
@@ -74,36 +82,37 @@ public class NumberRelative<T extends NumberRelative<T>> extends Number implemen
 
 	public Number getValue() { return value; }
 
+	public void setValue(Number value) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetValue(value)); }
+
 	public boolean trySetValue(Number value) { return trySet(t -> this.value = t, value); }
 
 	public Optional<Number> tryGetValue() { return Optional.of(getValue()); }
 
-	public void setValue(Number value) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetValue(value)); }
-
 	@Nullable
 	public Number getParent() { return parent; }
+
+	public void setParent(@Nullable Number parent) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetParent(parent)); }
 
 	public boolean trySetParent(@Nullable Number parent) { return trySet(t -> this.parent = t, parent); }
 
 	public Optional<Number> tryGetParent() { return Optional.ofNullable(getParent()); }
 
-	public void setParent(@Nullable Number parent) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetParent(parent)); }
-
 	@Nullable
 	public Number getOffset() { return offset; }
+
+	public void setOffset(Number offset) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetOffset(offset)); }
 
 	public boolean trySetOffset(Number offset) { return trySet(t -> this.offset = t, offset); }
 
 	public Optional<Number> tryGetOffset() { return Optional.ofNullable(getOffset()); }
-
-	public void setOffset(Number offset) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetOffset(offset)); }
 
 	@Nonnull
 	@Override
 	public IMutatorImmutablizable<?, ?> getMutator() { return mutator; }
 
 	@Override
-	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t, mutator); }
+	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t,
+			mutator); }
 
 	public ILogging<Logger> getLogging() { return logging; }
 
@@ -118,9 +127,13 @@ public class NumberRelative<T extends NumberRelative<T>> extends Number implemen
 		T r = copy();
 
 		double p = tryGetParent().map(Number::doubleValue).orElse(1D);
-		r.value = Streams.stream(o).filter(t -> t instanceof NumberRelative<?>).reduce(getValue().doubleValue(), (t, u) -> t + (u.doubleValue() - ((NumberRelative<?>) u).tryGetOffset().map(Number::doubleValue).orElse(0D)) / p, Double::sum);
+		r.value = Streams.stream(o).filter(t -> t instanceof NumberRelative<?>).reduce(getValue().doubleValue(), (t,
+		                                                                                                          u) -> t + (u.doubleValue() - ((NumberRelative<?>) u).tryGetOffset().map(Number::doubleValue).orElse(0D)) / p, Double::sum);
 
-		r.offset = Streams.stream(o).reduce(tryGetOffset().map(Number::doubleValue).orElse(0D), (t, u) -> t + (u instanceof NumberRelative<?> ? ((NumberRelative<?>) u).tryGetOffset().map(Number::doubleValue).orElse(0D) : u.doubleValue()), Double::sum);
+		r.offset = Streams.stream(o).reduce(tryGetOffset().map(Number::doubleValue).orElse(0D),
+				(t, u) -> t + (u instanceof NumberRelative<?> ?
+						((NumberRelative<?>) u).tryGetOffset().map(Number::doubleValue).orElse(0D) : u.doubleValue()),
+				Double::sum);
 
 		return r;
 	}
@@ -169,7 +182,8 @@ public class NumberRelative<T extends NumberRelative<T>> extends Number implemen
 
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new NumberRelative<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new NumberRelative<>(this,
+			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
 
 	@Override
 	public boolean isImmutable() { return getMutator().isImmutable(); }

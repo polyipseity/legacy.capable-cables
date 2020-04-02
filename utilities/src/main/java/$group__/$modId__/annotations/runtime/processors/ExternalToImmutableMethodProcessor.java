@@ -31,7 +31,8 @@ public enum ExternalToImmutableMethodProcessor implements IProcessorRuntime.ICla
 	/* SECTION static methods */
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public static void process(AnnotationProcessingEvent event) { INSTANCE.process(event.getAsm(), event.getLogger()); }
+	public static void process(AnnotationProcessingEvent event) { INSTANCE.process(event.getAsm(),
+			event.getLogger()); }
 
 
 	/* SECTION methods */
@@ -61,7 +62,8 @@ public enum ExternalToImmutableMethodProcessor implements IProcessorRuntime.ICla
 
 		Class<?>[] ks = a.value();
 		if (ks.length == 0) {
-			logger.warn(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage(makeMessage(this, "Method '{}' with annotation '{}' has no usage"), m, a));
+			logger.warn(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage(makeMessage(this, "Method '{}' with annotation" +
+					" '{}' has no usage"), m, a));
 			return;
 		}
 		EXTERNAL_METHOD_MAP.put(a, m);
@@ -70,10 +72,13 @@ public enum ExternalToImmutableMethodProcessor implements IProcessorRuntime.ICla
 			ap = EXTERNAL_ANNOTATIONS_MAP.get(k);
 			EXTERNAL_ANNOTATIONS_MAP.put(k, a);
 			if (ap == null)
-				logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage(makeMessage(this, "Registered method '{}' with annotation '{}' for class '{}'"), m, a, k.toGenericString()));
+				logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage(makeMessage(this, "Registered method '{}'" +
+						" with annotation '{}' for class '{}'"), m, a, k.toGenericString()));
 			else {
 				ExternalToImmutableMethod apf = ap;
-				logger.warn(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage(makeMessage(this, "Replaced previous method '{}' with annotation '{}' with method '{}' with annotation '{}' for class '{}'"), EXTERNAL_METHOD_MAP.get(apf), apf, m, a, k.toGenericString()));
+				logger.warn(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage(makeMessage(this, "Replaced previous " +
+						"method '{}' with annotation '{}' with method '{}' with annotation '{}' for class '{}'"),
+						EXTERNAL_METHOD_MAP.get(apf), apf, m, a, k.toGenericString()));
 			}
 		}
 	}

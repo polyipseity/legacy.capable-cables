@@ -17,6 +17,7 @@ import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsu
  * Represents an object that may be drawn.
  *
  * @param <N> type of {@link Number}
+ *
  * @author William So
  * @since 0.0.1.0
  */
@@ -30,7 +31,9 @@ public interface IDrawable<N extends Number> extends ISpec<Rectangle<?, N>> {
 	 * Prefer this method over {@link #tryDraw()}.
 	 *
 	 * @param client {@link Minecraft} client
+	 *
 	 * @return whether the operation is completed successfully
+	 *
 	 * @since 0.0.1.0
 	 */
 	@SuppressWarnings("SpellCheckingInspection")
@@ -42,10 +45,10 @@ public interface IDrawable<N extends Number> extends ISpec<Rectangle<?, N>> {
 	 * Useful when you do not have a {@link Minecraft} instance.
 	 * Prefer {@link #tryDraw(Minecraft)} over this method.
 	 *
-	 * @implSpec consider this method {@code final}
-	 *
-	 * @see #tryDraw(Minecraft) overloaded method
 	 * @return whether the operation is completed successfully
+	 *
+	 * @implSpec consider this method {@code final}
+	 * @see #tryDraw(Minecraft) overloaded method
 	 * @since 0.0.1.0
 	 */
 	@OverridingStatus(group = PACKAGE, when = When.NEVER)
@@ -57,6 +60,7 @@ public interface IDrawable<N extends Number> extends ISpec<Rectangle<?, N>> {
 	 * Prefer {@link #tryDraw(Minecraft)} over this method.
 	 *
 	 * @param client {@link Minecraft} client
+	 *
 	 * @throws UnsupportedOperationException if the operation is incomplete
 	 * @see #tryDraw(Minecraft) overloaded method
 	 * @since 0.0.1.0
@@ -69,9 +73,8 @@ public interface IDrawable<N extends Number> extends ISpec<Rectangle<?, N>> {
 	 * <p>
 	 * Prefer {@link #tryDraw()} over this method.
 	 *
-	 * @implSpec consider this method {@code final}
-	 *
 	 * @throws UnsupportedOperationException if the operation is incomplete
+	 * @implSpec consider this method {@code final}
 	 * @see #tryDraw(Minecraft) overloaded method
 	 * @see #draw(Minecraft)
 	 * @since 0.0.1.0

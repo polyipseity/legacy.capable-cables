@@ -31,8 +31,9 @@ public interface IStrictToString {
 	/* SECTION static variables */
 
 	Logger LOGGER = LogManager.getLogger(IStrictToString.class);
-	
-	LoadingCache<Class<?>, BiFunction<Object, String, String>> FUNCTION_MAP = CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_3).expireAfterAccess(CACHE_EXPIRATION_ACCESS_DURATION, CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(k -> {
+
+	LoadingCache<Class<?>, BiFunction<Object, String, String>> FUNCTION_MAP =
+			CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_3).expireAfterAccess(CACHE_EXPIRATION_ACCESS_DURATION, CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(k -> {
 		assert k != null;
 
 		final boolean[] first = {true};

@@ -33,6 +33,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static $group__.$modId__.Constants.*;
+import static $group__.$modId__.Globals.LOGGER;
+import static $group__.$modId__.Globals.MOD;
 import static $group__.$modId__.common.registrables.items.bases.ItemBases.setUnlocalizedNameBase;
 import static $group__.$modId__.common.registrables.items.bases.ItemUnstackables.initUnstackable;
 import static $group__.$modId__.common.registrables.utilities.helpers.Registrables.Blocks.checkNoEntityCollision;
@@ -40,13 +43,11 @@ import static $group__.$modId__.common.registrables.utilities.helpers.Registrabl
 import static $group__.$modId__.common.registrables.utilities.helpers.Registrables.NBTs.*;
 import static $group__.$modId__.utilities.helpers.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
 import static $group__.$modId__.utilities.helpers.specific.Optionals.unboxOptional;
-import static $group__.$modId__.Constants.*;
-import static $group__.$modId__.Globals.LOGGER;
-import static $group__.$modId__.Globals.MOD;
 
 @Optional.Interface(iface = COFH_CORE_PACKAGE + ".api.item.IToolHammer", modid = COFH_CORE_ID)
 @Optional.Interface(iface = BUILDCRAFT_API_PACKAGE + ".api.tools.IToolWrench", modid = BUILDCRAFT_API_ID)
-public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Item>, IRegistrableEventBusSubscriber, IToolHammer, IToolWrench {
+public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Item>, IRegistrableEventBusSubscriber,
+		IToolHammer, IToolWrench {
 	/* SECTION static variables */
 
 	public static final Configuration CONFIGURATION = ModThis.Configuration.behavior.items.wrench;
@@ -60,7 +61,8 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 	/* SECTION static methods */
 
 	@SuppressWarnings("unused")
-	protected static boolean use(ItemStack stack, World world, EntityLivingBase user, RayTraceResult target, EnumHand hand) {
+	protected static boolean use(ItemStack stack, World world, EntityLivingBase user, RayTraceResult target,
+	                             EnumHand hand) {
 		Tag tag = new Tag(stack.getTagCompound());
 		switch (target.typeOfHit) {
 			case BLOCK:
@@ -70,12 +72,14 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 					IBlockState state = Block.getStateById(tag.pickedUpBlockState);
 					Block block = state.getBlock();
 					if (!world.setBlockState(pos, state)) {
-						LOGGER.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot create block state ID {}", tag.pickedUpBlockState));
+						LOGGER.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot create block state ID {}"
+								, tag.pickedUpBlockState));
 						return false;
 					} else if (tag.pickedUpBlockTile != null) {
 						@Nullable TileEntity tile = state.getBlock().createTileEntity(world, state);
 						if (tile == null) {
-							LOGGER.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot create tile entity of block state ID {}", tag.pickedUpBlockState));
+							LOGGER.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot create tile entity of" +
+									" block state ID {}", tag.pickedUpBlockState));
 							return false;
 						}
 						tile.deserializeNBT(tag.pickedUpBlockTile);
@@ -85,9 +89,11 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 					tag.pickedUpBlockState = null;
 					stack.setTagCompound(tag.serializeNBT());
 				} else if (tag.pickedUpEntity != null) {
-					@Nullable EntityLivingBase entity = (EntityLivingBase) EntityList.createEntityFromNBT(tag.pickedUpEntity, world);
+					@Nullable EntityLivingBase entity =
+							(EntityLivingBase) EntityList.createEntityFromNBT(tag.pickedUpEntity, world);
 					if (entity == null) {
-						LOGGER.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot create entity with tag '{}'", tag.pickedUpEntity));
+						LOGGER.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot create entity with tag " +
+								"'{}'", tag.pickedUpEntity));
 						return false;
 					}
 					Vec3d targetPos = getPosition(target);
@@ -97,7 +103,8 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 				} else {
 					BlockPos pos = target.getBlockPos();
 					IBlockState state = user.world.getBlockState(pos);
-					@Nullable TileEntity tile = state.getBlock().hasTileEntity(state) ? world.getTileEntity(pos) : null;
+					@Nullable TileEntity tile = state.getBlock().hasTileEntity(state) ? world.getTileEntity(pos) :
+							null;
 					tag.pickedUpBlockState = Block.getStateId(state);
 					if (tile != null) {
 						tag.pickedUpBlockTile = tile.serializeNBT();
@@ -119,7 +126,8 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 	}
 
 	@SuppressWarnings("unused")
-	protected static boolean canUse(ItemStack stack, World world, EntityLivingBase user, RayTraceResult target, EnumHand hand) {
+	protected static boolean canUse(ItemStack stack, World world, EntityLivingBase user, RayTraceResult target,
+	                                EnumHand hand) {
 		if (!CONFIGURATION.enablePickup) return false;
 		Tag tag = new Tag(stack.getTagCompound());
 		switch (target.typeOfHit) {
@@ -144,23 +152,29 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 	/* SECTION methods */
 
 	@Override
-	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		return worldIn.isRemote || use(player.getHeldItem(hand), worldIn, player, new RayTraceResult(new Vec3d(hitX, hitY, hitZ), facing, pos), hand) ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
+	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand,
+	                                  EnumFacing facing, float hitX, float hitY, float hitZ) {
+		return worldIn.isRemote || use(player.getHeldItem(hand), worldIn, player, new RayTraceResult(new Vec3d(hitX,
+				hitY, hitZ), facing, pos), hand) ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
 	}
 
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
 		if (playerIn.isSneaking()) {
 			if (!worldIn.isRemote)
-				playerIn.openGui(MOD, ContainerWrench.ID, worldIn, handIn.ordinal(), Miscellaneous.getDefaultValueNonnull(int.class), Miscellaneous.getDefaultValueNonnull(int.class));
+				playerIn.openGui(MOD, ContainerWrench.ID, worldIn, handIn.ordinal(),
+						Miscellaneous.getDefaultValueNonnull(int.class),
+						Miscellaneous.getDefaultValueNonnull(int.class));
 			return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
 		}
 		return new ActionResult<>(EnumActionResult.FAIL, playerIn.getHeldItem(handIn));
 	}
 
 	@Override
-	public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-		return canUse(player.getHeldItem(hand), world, player, new RayTraceResult(new Vec3d(hitX, hitY, hitZ), side, pos), hand) ? EnumActionResult.PASS : EnumActionResult.FAIL;
+	public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX
+			, float hitY, float hitZ, EnumHand hand) {
+		return canUse(player.getHeldItem(hand), world, player, new RayTraceResult(new Vec3d(hitX, hitY, hitZ), side,
+				pos), hand) ? EnumActionResult.PASS : EnumActionResult.FAIL;
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGH)
@@ -204,7 +218,8 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 
 	@Override
 	@Optional.Method(modid = BUILDCRAFT_API_ID)
-	public void wrenchUsed(EntityPlayer player, EnumHand hand, ItemStack wrench, RayTraceResult rayTrace) {  /* MARK empty */ }
+	public void wrenchUsed(EntityPlayer player, EnumHand hand, ItemStack wrench, RayTraceResult rayTrace) {  /* MARK
+	empty */ }
 
 
 	@Override
@@ -216,11 +231,13 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 	protected static class Tag implements IStruct, INBTSerializable<NBTTagCompound> {
 		/* SECTION variables */
 
-		@Nullable public NBTTagCompound
+		@Nullable
+		public NBTTagCompound
 				pickedUpBlock,
 				pickedUpBlockTile,
 				pickedUpEntity;
-		@Nullable public Integer
+		@Nullable
+		public Integer
 				pickedUpBlockState;
 
 

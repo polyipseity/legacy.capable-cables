@@ -1,1 +1,26 @@
-{"gradle":{"distributionUrl":"https://services.gradle.org/distributions/gradle-4.10.3-all.zip"},"minecraft":{"version":"1.12.2-14.23.5.2847","mappings":"snapshot_20171003"},"projects":{":":{"dependencies":[]},":annotations":{"dependencies":[]},":product":{"dependencies":[]},":utilities":{"dependencies":[]},":annotations:processors":{"dependencies":[]}}}
+{
+  "gradle": {
+	"distributionUrl": "https://services.gradle.org/distributions/gradle-4.10.3-all.zip"
+  },
+  "minecraft": {
+	"version": "1.12.2-14.23.5.2847",
+	"mappings": "snapshot_20171003"
+  },
+  "projects": {
+	":": {
+	  "dependencies": []
+	},
+	":annotations": {
+	  "dependencies": []
+	},
+	":product": {
+	  "dependencies": []
+	},
+	":utilities": {
+	  "dependencies": []
+	},
+	":annotations:processors": {
+	  "dependencies": []
+	}
+  }
+}

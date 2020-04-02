@@ -6,8 +6,8 @@ import $group__.$modId__.client.gui.themes.GuiThemedNull;
 import $group__.$modId__.client.gui.themes.ITheme;
 import $group__.$modId__.client.gui.traits.IDrawable;
 import $group__.$modId__.client.gui.utilities.builders.BuilderGuiDrawable;
-import $group__.$modId__.utilities.concurrent.IMutatorImmutablizable;
 import $group__.$modId__.logging.ILogging;
+import $group__.$modId__.utilities.concurrent.IMutatorImmutablizable;
 import $group__.$modId__.utilities.extensions.delegated.ICollectionDelegated;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
@@ -25,7 +25,8 @@ import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonn
 import static $group__.$modId__.utilities.helpers.specific.Throwables.rejectUnsupportedOperationIf;
 
 @SideOnly(Side.CLIENT)
-public class GuiGroup<T extends GuiGroup<T, N, C, TH, CO, E>, N extends Number, C, TH extends ITheme<TH>, CO extends Collection<E>, E extends IDrawable<N>> extends GuiDrawable<T, N, C, TH> implements ICollectionDelegated<CO, E> {
+public class GuiGroup<T extends GuiGroup<T, N, C, TH, CO, E>, N extends Number, C, TH extends ITheme<TH>,
+		CO extends Collection<E>, E extends IDrawable<N>> extends GuiDrawable<T, N, C, TH> implements ICollectionDelegated<CO, E> {
 	/* SECTION variables */
 
 	protected CO children;
@@ -46,19 +47,19 @@ public class GuiGroup<T extends GuiGroup<T, N, C, TH, CO, E>, N extends Number, 
 
 	/* SECTION static methods */
 
-	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiGroup<V, N, C, TH, CO, E>, N extends Number, C, TH extends ITheme<TH>, CO extends Collection<E>, E extends IDrawable<N>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGG(CO children, IMutatorImmutablizable<?, ?> mutator) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiGroup<>(children, t.mutator, t.logging))); }
+	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiGroup<V, N, C, TH, CO, E>,
+			N extends Number, C, TH extends ITheme<TH>, CO extends Collection<E>, E extends IDrawable<N>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGG(CO children, IMutatorImmutablizable<?, ?> mutator) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiGroup<>(children, t.mutator, t.logging))); }
 
 
 	/* SECTION getters & setters */
 
 	public CO getChildren() { return children; }
 
+	public void setChildren(CO children) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetChildren(children)); }
+
 	public boolean trySetChildren(CO children) { return trySet(t -> this.children = t, children); }
 
 	public Optional<CO> tryGetChildren() { return Optional.of(getChildren()); }
-
-	public void setChildren(CO children) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetChildren(children)); }
-
 
 	@Override
 	@Deprecated
@@ -72,22 +73,26 @@ public class GuiGroup<T extends GuiGroup<T, N, C, TH, CO, E>, N extends Number, 
 	/* SECTION methods */
 
 	@Override
-	public boolean tryDraw(Minecraft client) { return children.stream().reduce(false, (t, u) -> u.tryDraw(client) || t, Boolean::logicalOr); }
+	public boolean tryDraw(Minecraft client) { return children.stream().reduce(false, (t, u) -> u.tryDraw(client) || t
+			, Boolean::logicalOr); }
 
 	@Override
 	public Optional<Rectangle<?, N>> spec() {
 		Collection<E> c = getChildren();
 		if (c.isEmpty()) return Optional.empty();
 
-		List<Rectangle<?, N>> s = c.stream().map(E::spec).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+		List<Rectangle<?, N>> s =
+				c.stream().map(E::spec).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
 		if (s.isEmpty()) return Optional.empty();
 		Rectangle<?, N> f = s.get(0);
 
 		XY<?, N> min = f.min().min(s.stream().map(Rectangle::min).collect(Collectors.toList()));
-		return Optional.of(new Rectangle<>(min, f.max().max(s.stream().map(Rectangle::max).collect(Collectors.toList())).sum(ImmutableList.of(min.negate())), getMutator(), getLogging()));
+		return Optional.of(new Rectangle<>(min,
+				f.max().max(s.stream().map(Rectangle::max).collect(Collectors.toList())).sum(ImmutableList.of(min.negate())), getMutator(), getLogging()));
 	}
 
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiGroup<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiGroup<>(this,
+			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
 }

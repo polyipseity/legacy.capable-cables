@@ -57,7 +57,8 @@ public enum Globals {
 
 		/* SECTION static methods */
 
-		public static <T> void registerPreInitGuiListener(T k, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> v) {
+		public static <T> void registerPreInitGuiListener(T k, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ?
+				super T> v) {
 			PRE_INIT_GUI_LISTENER_MAP.put(k, v);
 			Thread.currentThread().getUncaughtExceptionHandler();
 		}
@@ -67,7 +68,8 @@ public enum Globals {
 		public static void preInitGui(GuiScreenEvent.InitGuiEvent.Pre e) { PRE_INIT_GUI_LISTENER_MAP.forEach((o, f) -> f.accept(e, castUncheckedUnboxedNonnull(o))); }
 
 		@SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-		public static void preInitGuiForResolution(GuiScreenEvent.InitGuiEvent.Pre e) { resolution = new ScaledResolution(CLIENT); }
+		public static void preInitGuiForResolution(GuiScreenEvent.InitGuiEvent.Pre e) { resolution =
+				new ScaledResolution(CLIENT); }
 
 
 		/* SECTION static classes */
@@ -79,8 +81,11 @@ public enum Globals {
 
 			/* SECTION static variables */
 
-			public static final ResourceLocationTexture GUI_WRENCH = new ResourceLocationTexture(new ResourceLocation("textures/gui/containers/wrench.png"), new XY<>(1024F, 1024F, MutatorImmutable.INSTANCE, ILogging.of(LOGGER, MutatorImmutable.INSTANCE)));
-			public static final Rectangle<?, Float> GUI_WRENCH_INFO = GUI_WRENCH.makeRectangle(new XY<>(-64F, 0F, MutatorImmutable.INSTANCE, ILogging.of(LOGGER, MutatorImmutable.INSTANCE)));
+			public static final ResourceLocationTexture GUI_WRENCH = new ResourceLocationTexture(new ResourceLocation(
+					"textures/gui/containers/wrench.png"), new XY<>(1024F, 1024F, MutatorImmutable.INSTANCE,
+					ILogging.of(LOGGER, MutatorImmutable.INSTANCE)));
+			public static final Rectangle<?, Float> GUI_WRENCH_INFO = GUI_WRENCH.makeRectangle(new XY<>(-64F, 0F,
+					MutatorImmutable.INSTANCE, ILogging.of(LOGGER, MutatorImmutable.INSTANCE)));
 		}
 	}
 }

@@ -1,9 +1,9 @@
 package $group__.$modId__.client.gui.polygons;
 
 import $group__.$modId__.client.gui.coordinates.XY;
-import $group__.$modId__.utilities.concurrent.IMutatorImmutablizable;
 import $group__.$modId__.logging.ILogging;
 import $group__.$modId__.utilities.builders.BuilderStructure;
+import $group__.$modId__.utilities.concurrent.IMutatorImmutablizable;
 import com.google.common.collect.ImmutableList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -25,10 +25,13 @@ public class Rectangle<T extends Rectangle<T, N>, N extends Number> extends Poly
 
 	/* SECTION constructors */
 
-	public Rectangle(N offsetX, N offsetY, N sizeX, N sizeY, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) { this(new XY<>(offsetX, offsetY, mutator, logging), new XY<>(sizeX, sizeY, mutator, logging), mutator, logging); }
+	public Rectangle(N offsetX, N offsetY, N sizeX, N sizeY, IMutatorImmutablizable<?, ?> mutator,
+	                 ILogging<Logger> logging) { this(new XY<>(offsetX, offsetY, mutator, logging), new XY<>(sizeX,
+			sizeY, mutator, logging), mutator, logging); }
 
 	public Rectangle(XY<?, N> offset, XY<?, N> size, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
-		super(Arrays.asList(offset.toImmutable(), offset.sumX(size).toImmutable(), offset.sum(ImmutableList.of(size)).toImmutable(), offset.sumY(size).toImmutable()), mutator, logging);
+		super(Arrays.asList(offset.toImmutable(), offset.sumX(size).toImmutable(),
+				offset.sum(ImmutableList.of(size)).toImmutable(), offset.sumY(size).toImmutable()), mutator, logging);
 		this.offset = offset;
 		this.size = size;
 	}
@@ -36,14 +39,17 @@ public class Rectangle<T extends Rectangle<T, N>, N extends Number> extends Poly
 	public Rectangle(Rectangle<?, N> copy) { this(copy, copy.getMutator()); }
 
 
-	protected Rectangle(Rectangle<?, N> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getOffset(), copy.getSize(), mutator, copy.getLogging()); }
+	protected Rectangle(Rectangle<?, N> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getOffset(),
+			copy.getSize(), mutator, copy.getLogging()); }
 
 
 	/* SECTION constructors */
 
-	public static <T extends BuilderStructure<T, V>, V extends Rectangle<V, N>, N extends Number> BuilderStructure<T, V> newBuilderRectangle(XY<?, N> offset, XY<?, N> size) { return new BuilderStructure<>(t -> castUncheckedUnboxedNonnull(new Rectangle<>(offset, size, t.mutator, t.logging))); }
+	public static <T extends BuilderStructure<T, V>, V extends Rectangle<V, N>, N extends Number> BuilderStructure<T,
+			V> newBuilderRectangle(XY<?, N> offset, XY<?, N> size) { return new BuilderStructure<>(t -> castUncheckedUnboxedNonnull(new Rectangle<>(offset, size, t.mutator, t.logging))); }
 
-	public static <T extends BuilderStructure<T, V>, V extends Rectangle<V, N>, N extends Number> BuilderStructure<T, V> newBuilderRectangle(N offsetX, N offsetY, N sizeX, N sizeY) { return new BuilderStructure<>(t -> castUncheckedUnboxedNonnull(new Rectangle<>(offsetX, offsetY, sizeX, sizeY, t.mutator, t.logging))); }
+	public static <T extends BuilderStructure<T, V>, V extends Rectangle<V, N>, N extends Number> BuilderStructure<T,
+			V> newBuilderRectangle(N offsetX, N offsetY, N sizeX, N sizeY) { return new BuilderStructure<>(t -> castUncheckedUnboxedNonnull(new Rectangle<>(offsetX, offsetY, sizeX, sizeY, t.mutator, t.logging))); }
 
 
 	/* SECTION getters & setters */
@@ -95,8 +101,9 @@ public class Rectangle<T extends Rectangle<T, N>, N extends Number> extends Poly
 	public XY<?, N> max() { return a().max(ImmutableList.of(c())); }
 
 	public XY<?, N> min() { return a().min(ImmutableList.of(c())); }
-	
+
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new Rectangle<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new Rectangle<>(this,
+			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
 }

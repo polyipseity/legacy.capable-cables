@@ -39,7 +39,8 @@ public interface IStrictEquals {
 	LoadingCache<Class<?>, BiFunction<Object, Object, Function<Function<Object, ? extends Boolean>, Boolean>>> FUNCTION_MAP = CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_3).expireAfterAccess(CACHE_EXPIRATION_ACCESS_DURATION, CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(k -> {
 		assert k != null;
 
-		ArrayList<BiFunction<Object, Object, Function<Function<Object, ? extends Boolean>, Boolean>>> efs = new ArrayList<>(INITIAL_CAPACITY_2);
+		ArrayList<BiFunction<Object, Object, Function<Function<Object, ? extends Boolean>, Boolean>>> efs =
+				new ArrayList<>(INITIAL_CAPACITY_2);
 
 		getThisAndSuperclasses(k).forEach(c -> {
 			for (Field f : c.getDeclaredFields()) {
@@ -54,7 +55,8 @@ public interface IStrictEquals {
 		if (efs.isEmpty()) return (t, o) -> z -> t == o;
 
 		// COMMENT prepend
-		efs.add(0, (t, o) -> z -> getLowerAndIntermediateSuperclasses(o.getClass(), castUncheckedUnboxedNonnull(k)).stream().allMatch(ic -> Arrays.stream(ic.getDeclaredFields()).allMatch(Dynamics::isMemberStatic)));
+		efs.add(0,
+				(t, o) -> z -> getLowerAndIntermediateSuperclasses(o.getClass(), castUncheckedUnboxedNonnull(k)).stream().allMatch(ic -> Arrays.stream(ic.getDeclaredFields()).allMatch(Dynamics::isMemberStatic)));
 		efs.add(0, (t, o) -> z -> k.isAssignableFrom(o.getClass()));
 		if (k.getSuperclass() != Object.class) efs.add(0, (t, o) -> z -> z.apply(o));
 

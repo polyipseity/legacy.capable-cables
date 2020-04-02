@@ -11,12 +11,16 @@ public enum Primitives {
 	/* SECTION static variables */
 
 	public static final Class<?>[]
-			PRIMITIVE_TYPE_ARRAY = {int.class, float.class, double.class, long.class, byte.class, short.class, boolean.class, char.class, void.class};
+			PRIMITIVE_TYPE_ARRAY = {int.class, float.class, double.class, long.class, byte.class, short.class,
+			boolean.class, char.class, void.class};
 	public static final ImmutableSet<Class<?>>
 			PRIMITIVE_TYPE_SET = ImmutableSet.copyOf(PRIMITIVE_TYPE_ARRAY);
-	public static final Class<?>[] PRIMITIVE_DATA_TYPE_ARRAY = {int.class, float.class, double.class, long.class, byte.class, short.class, boolean.class, char.class};
-	public static final ImmutableSet<Class<?>> PRIMITIVE_DATA_TYPE_SET = ImmutableSet.copyOf(PRIMITIVE_DATA_TYPE_ARRAY);
-	public static final ImmutableMap<Class<?>, Object> PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP = new ImmutableMap.Builder<Class<?>, Object>()
+	public static final Class<?>[] PRIMITIVE_DATA_TYPE_ARRAY = {int.class, float.class, double.class, long.class,
+			byte.class, short.class, boolean.class, char.class};
+	public static final ImmutableSet<Class<?>> PRIMITIVE_DATA_TYPE_SET =
+			ImmutableSet.copyOf(PRIMITIVE_DATA_TYPE_ARRAY);
+	public static final ImmutableMap<Class<?>, Object> PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP =
+			new ImmutableMap.Builder<Class<?>, Object>()
 			.put(int.class, 0)
 			.put(float.class, 0F)
 			.put(double.class, 0D)
@@ -25,7 +29,8 @@ public enum Primitives {
 			.put(short.class, (short) 0)
 			.put(boolean.class, false)
 			.put(char.class, '\u0000').build();
-	public static final ImmutableBiMap<Class<?>, Class<?>> PRIMITIVE_TYPE_TO_BOXED_TYPE_BI_MAP = new ImmutableBiMap.Builder<Class<?>, Class<?>>()
+	public static final ImmutableBiMap<Class<?>, Class<?>> PRIMITIVE_TYPE_TO_BOXED_TYPE_BI_MAP =
+			new ImmutableBiMap.Builder<Class<?>, Class<?>>()
 			.put(int.class, Integer.class)
 			.put(float.class, Float.class)
 			.put(double.class, Double.class)

@@ -22,7 +22,8 @@ import static $group__.$modId__.utilities.extensions.IStrictHashCode.getHashCode
 import static $group__.$modId__.utilities.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 
-public class GuiThemed<T extends GuiThemed<T, TH>, TH extends ITheme<TH>> implements IStructure<T, T>, ICloneable<T>, IMutatorUser<IMutatorImmutablizable<?, ?>>, IThemed<TH>, ILoggingUser<ILogging<Logger>, Logger> {
+public class GuiThemed<T extends GuiThemed<T, TH>, TH extends ITheme<TH>> implements IStructure<T, T>, ICloneable<T>,
+		IMutatorUser<IMutatorImmutablizable<?, ?>>, IThemed<TH>, ILoggingUser<ILogging<Logger>, Logger> {
 	/* SECTION constructors */
 
 	protected TH theme;
@@ -42,7 +43,8 @@ public class GuiThemed<T extends GuiThemed<T, TH>, TH extends ITheme<TH>> implem
 	public GuiThemed(GuiThemed<?, TH> copy) { this(copy, copy.getMutator()); }
 
 
-	protected GuiThemed(GuiThemed<?, TH> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getTheme(), mutator, copy.logging); }
+	protected GuiThemed(GuiThemed<?, TH> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getTheme(), mutator,
+			copy.logging); }
 
 
 	/* SECTION getters & setters */
@@ -52,14 +54,16 @@ public class GuiThemed<T extends GuiThemed<T, TH>, TH extends ITheme<TH>> implem
 	public TH getTheme() { return theme; }
 
 	@Override
-	public boolean trySetTheme(@Nullable @CheckForNull TH theme) { return theme != null && trySet(t -> this.theme = t, theme); }
+	public boolean trySetTheme(@Nullable @CheckForNull TH theme) { return theme != null && trySet(t -> this.theme = t,
+			theme); }
 
 	@Nonnull
 	@Override
 	public IMutatorImmutablizable<?, ?> getMutator() { return mutator; }
 
 	@Override
-	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t, mutator); }
+	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t,
+			mutator); }
 
 	@Override
 	public ILogging<Logger> getLogging() { return logging; }
@@ -71,7 +75,8 @@ public class GuiThemed<T extends GuiThemed<T, TH>, TH extends ITheme<TH>> implem
 	/* SECTION methods */
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiThemed<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiThemed<>(this,
+			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
 
 	@Override
 	public boolean isImmutable() { return getMutator().isImmutable(); }

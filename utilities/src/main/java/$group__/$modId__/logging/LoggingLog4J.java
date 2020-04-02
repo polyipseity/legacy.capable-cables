@@ -20,7 +20,8 @@ import static $group__.$modId__.utilities.extensions.IStrictHashCode.getHashCode
 import static $group__.$modId__.utilities.extensions.IStrictToString.getToStringString;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 
-public class LoggingLog4J<T extends LoggingLog4J<T, L>, L extends Logger> implements ILogging<L>, IMutatorUser<IMutatorImmutablizable<?, ?>>, IStructure<T, T>, ICloneable<T> {
+public class LoggingLog4J<T extends LoggingLog4J<T, L>, L extends Logger> implements ILogging<L>,
+		IMutatorUser<IMutatorImmutablizable<?, ?>>, IStructure<T, T>, ICloneable<T> {
 	/* SECTION variables */
 
 	protected IMutatorImmutablizable<?, ?> mutator;
@@ -37,7 +38,8 @@ public class LoggingLog4J<T extends LoggingLog4J<T, L>, L extends Logger> implem
 	public LoggingLog4J(LoggingLog4J<?, L> copy) { this(copy, copy.getMutator()); }
 
 
-	protected LoggingLog4J(LoggingLog4J<?, L> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getLogger(), mutator); }
+	protected LoggingLog4J(LoggingLog4J<?, L> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getLogger(),
+			mutator); }
 
 
 	/* SECTION getters & setters */
@@ -47,20 +49,23 @@ public class LoggingLog4J<T extends LoggingLog4J<T, L>, L extends Logger> implem
 	public L getLogger() { return logger; }
 
 	@Override
-	public boolean trySetLogger(@Nullable @CheckForNull L logger) { return logger != null && trySet(t -> this.logger = t, logger); }
+	public boolean trySetLogger(@Nullable @CheckForNull L logger) { return logger != null && trySet(t -> this.logger =
+			t, logger); }
 
 	@Nonnull
 	@Override
 	public IMutatorImmutablizable<?, ?> getMutator() { return mutator; }
 
 	@Override
-	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t, mutator); }
+	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t,
+			mutator); }
 
 
 	/* SECTION methods */
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new LoggingLog4J<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new LoggingLog4J<>(this,
+			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
 
 	@Override
 	public boolean isImmutable() { return false; }

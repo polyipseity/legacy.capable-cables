@@ -46,7 +46,9 @@ ext {
     dependants = processResourcesList dependants
 }
 
-static <E> String processResourcesList(List<E> l) { l.empty ? '[]' : l.toListString().replace('[', '["').replace(']', '"]').replace(', ', '", "') }
+static <E> String processResourcesList(List<E> l) {
+    l.empty ? '[]' : l.toListString().replace('[', '["').replace(']', '"]').replace(', ', '", "')
+}
 
 
 /* SECTION configuration */

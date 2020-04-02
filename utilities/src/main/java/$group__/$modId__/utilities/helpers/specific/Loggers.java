@@ -47,7 +47,8 @@ public enum Loggers {
 			/* SECTION methods */
 
 			@Override
-			protected Message makeMessage1(Object... args) { return new ParameterizedMessage((String) args[0], (Object[]) args[1]); }
+			protected Message makeMessage1(Object... args) { return new ParameterizedMessage((String) args[0],
+					(Object[]) args[1]); }
 		},
 		SUFFIX_WITH_THROWABLE("{}",
 				Message.class, Throwable.class) {
@@ -55,18 +56,20 @@ public enum Loggers {
 
 			private ParameterizedMessage makeMessage0(Message msg, Throwable t) {
 				return new ParameterizedMessage(message,
-					msg.getFormattedMessage(),
-					t);
+						msg.getFormattedMessage(),
+						t);
 			}
 
 			@Override
-			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((Message) args[0], (Throwable) args[1]); }
+			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((Message) args[0],
+					(Throwable) args[1]); }
 		},
 		REFLECTION_UNABLE_TO_GET_MEMBER(PREFIX_REFLECTION + "Unable to get {} of class '{}'{}{}", true, 1,
 				String.class, Class.class, String.class, Class[].class) {
 			/* SECTION methods */
 
-			private ParameterizedMessage makeMessage0(String description, Class<?> clazz, @Nullable String name, Class<?>... arguments) {
+			private ParameterizedMessage makeMessage0(String description, Class<?> clazz, @Nullable String name,
+			                                          Class<?>... arguments) {
 				return new ParameterizedMessage(message,
 						description,
 						clazz.toGenericString(),
@@ -75,28 +78,32 @@ public enum Loggers {
 			}
 
 			@Override
-			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((String) args[0], (Class<?>) args[1], (String) args[2], (Class<?>[]) args[3]); }
+			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((String) args[0],
+					(Class<?>) args[1], (String) args[2], (Class<?>[]) args[3]); }
 		},
 		REFLECTION_UNABLE_TO_SET_ACCESSIBLE(PREFIX_REFLECTION + "Unable to set {} '{}'{} {}accessible", 1,
 				String.class, AccessibleObject.class, Class.class, boolean.class) {
 			/* SECTION methods */
 
-			private ParameterizedMessage makeMessage0(String description, AccessibleObject reflected, @Nullable Class<?> clazz, boolean accessible) {
+			private ParameterizedMessage makeMessage0(String description, AccessibleObject reflected, @Nullable Class<
+					?> clazz, boolean accessible) {
 				return new ParameterizedMessage(message,
-					description,
-					reflected,
-					EnumMessages.optionalNonnull(clazz, c -> " of class '" + c.toGenericString() + '\''),
-					accessible ? "" : "in");
+						description,
+						reflected,
+						EnumMessages.optionalNonnull(clazz, c -> " of class '" + c.toGenericString() + '\''),
+						accessible ? "" : "in");
 			}
 
 			@Override
-			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((String) args[0], (AccessibleObject) args[1], (Class<?>) args[2], (boolean) args[3]); }
+			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((String) args[0],
+					(AccessibleObject) args[1], (Class<?>) args[2], (boolean) args[3]); }
 		},
 		REFLECTION_UNABLE_TO_G_SET_FIELD(PREFIX_REFLECTION + "Unable to {}et field '{}'{} of class '{}'{}", 2,
 				boolean.class, Field.class, Object.class, Object.class) {
 			/* SECTION methods */
 
-			private ParameterizedMessage makeMessage0(boolean set, Field field, @Nullable Object obj, @Nullable Object value) {
+			private ParameterizedMessage makeMessage0(boolean set, Field field, @Nullable Object obj,
+			                                          @Nullable Object value) {
 				return new ParameterizedMessage(message,
 						set ? 's' : 'g',
 						field.toGenericString(),
@@ -106,38 +113,49 @@ public enum Loggers {
 			}
 
 			@Override
-			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((boolean) args[0], (Field) args[1], args[2], args[3]); }
+			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((boolean) args[0],
+					(Field) args[1], args[2], args[3]); }
 		},
 		INVOCATION_UNABLE_TO_FIND_METHOD_HANDLE(PREFIX_INVOCATION + "Unable to find {} of class '{}'{}{}{}", 3,
 				String.class, Class.class, String.class, MethodType.class, Class.class) {
 			/* SECTION methods */
 
-			private ParameterizedMessage makeMessage0(String description, Class<?> clazz, @Nullable String name, @Nullable MethodType methodType, @Nullable Class<?> typeOrSpecialCaller) {
+			private ParameterizedMessage makeMessage0(String description, Class<?> clazz, @Nullable String name,
+			                                          @Nullable MethodType methodType,
+			                                          @Nullable Class<?> typeOrSpecialCaller) {
 				return new ParameterizedMessage(message,
 						description,
 						clazz.toGenericString(),
 						EnumMessages.optionalNonnull(name, n -> ", name '" + n + '\''),
 						EnumMessages.optionalNonnull(methodType, a -> ", method type '" + a + '\''),
-						methodType == null ? EnumMessages.optionalNonnull(typeOrSpecialCaller, s -> ", type '" + s.toGenericString() + '\'') : EnumMessages.optionalNonnull(typeOrSpecialCaller, s -> ", special caller '" + s.toGenericString() + '\''));
+						methodType == null ? EnumMessages.optionalNonnull(typeOrSpecialCaller,
+								s -> ", type '" + s.toGenericString() + '\'') :
+								EnumMessages.optionalNonnull(typeOrSpecialCaller,
+										s -> ", special caller '" + s.toGenericString() + '\''));
 			}
 
 			@Override
-			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((String) args[0], (Class<?>) args[1], (String) args[2], (MethodType) args[3], (Class<?>) args[4]); }
+			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((String) args[0],
+					(Class<?>) args[1], (String) args[2], (MethodType) args[3], (Class<?>) args[4]); }
 		},
-		@SuppressWarnings("SpellCheckingInspection") INVOCATION_UNABLE_TO_UNREFLECT_MEMBER("Unable to unreflect {} '{}' with lookup '{}'{}", 1,
+		@SuppressWarnings("SpellCheckingInspection") INVOCATION_UNABLE_TO_UNREFLECT_MEMBER("Unable to unreflect {} " +
+				"'{}' with lookup '{}'{}", 1,
 				String.class, Member.class, Lookup.class, Class.class) {
 			/* SECTION methods */
 
-			private ParameterizedMessage makeMessage0(String description, Member member, Lookup lookup, @Nullable Class<?> specialCaller) {
+			private ParameterizedMessage makeMessage0(String description, Member member, Lookup lookup,
+			                                          @Nullable Class<?> specialCaller) {
 				return new ParameterizedMessage(message,
 						description,
 						member,
 						lookup,
-						EnumMessages.optionalNonnull(specialCaller, s -> ", special caller '" + s.toGenericString() + '\''));
+						EnumMessages.optionalNonnull(specialCaller,
+								s -> ", special caller '" + s.toGenericString() + '\''));
 			}
 
 			@Override
-			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((String) args[0], (Member) args[1], (Lookup) args[2], (Class<?>) args[3]); }
+			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((String) args[0],
+					(Member) args[1], (Lookup) args[2], (Class<?>) args[3]); }
 		},
 		INVOCATION_UNABLE_TO_INVOKE_METHOD_HANDLE(PREFIX_INVOCATION + "Unable to invoke method handle '{}'{}", true,
 				MethodHandle.class, Object[].class) {
@@ -150,7 +168,8 @@ public enum Loggers {
 			}
 
 			@Override
-			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((MethodHandle) args[0], (Object[]) args[1]); }
+			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((MethodHandle) args[0],
+					(Object[]) args[1]); }
 		};
 
 
@@ -158,8 +177,10 @@ public enum Loggers {
 
 		public final String message;
 		public final Class<?>[] argTypes;
-		@Nullable public final Class<?>[] argTypeOptionals;
-		@Nullable public final Class<?> argVarargs;
+		@Nullable
+		public final Class<?>[] argTypeOptionals;
+		@Nullable
+		public final Class<?> argVarargs;
 
 
 		/* SECTION constructors */
@@ -168,7 +189,8 @@ public enum Loggers {
 
 		EnumMessages(String message, boolean varargs, Class<?>... argTypes) { this(message, varargs, 0, argTypes); }
 
-		EnumMessages(String message, int argTypeOptionals, Class<?>... argTypes) { this(message, false, argTypeOptionals, argTypes); }
+		EnumMessages(String message, int argTypeOptionals, Class<?>... argTypes) { this(message, false,
+				argTypeOptionals, argTypes); }
 
 		EnumMessages(String message, boolean varargs, int argTypeOptionals, Class<?>... argTypes) {
 			this.message = message;
@@ -193,6 +215,9 @@ public enum Loggers {
 
 		/* SECTION methods */
 
+		private static <O> String optionalNonnull(@Nullable O optional,
+		                                          Function<? super O, ? extends String> whenPresent) { return Optionals.optionalNonnull(optional, whenPresent, () -> ""); }
+
 		public final Message makeMessage(Object... args) {
 			checkArgumentTypes(argTypes, args);
 			List<Object> argsList = asList(args);
@@ -202,7 +227,7 @@ public enum Loggers {
 			if (argTypeOptionals != null) {
 				int argTOsL = argTypeOptionals.length, matched = 0;
 				ArrayList<Object> argOptionals = new ArrayList<>(argTOsL);
-				for (int i = 0, j = argTsL - 1;  i < argTOsL && j < argsL; j++) {
+				for (int i = 0, j = argTsL - 1; i < argTOsL && j < argsL; j++) {
 					@Nullable Object arg = args[j];
 					Class<?> argTO = argTypeOptionals[i];
 					if (arg == null || argTO.isAssignableFrom(arg.getClass())) {
@@ -234,11 +259,9 @@ public enum Loggers {
 			return makeMessage1(argsList.toArray());
 		}
 
-		protected Message makeMessage1(Object... args) { return new ParameterizedMessage(message, args); }
-
 
 		/* SECTION static methods */
 
-		private static <O> String optionalNonnull(@Nullable O optional, Function<? super O, ? extends String> whenPresent) { return Optionals.optionalNonnull(optional, whenPresent, () -> ""); }
+		protected Message makeMessage1(Object... args) { return new ParameterizedMessage(message, args); }
 	}
 }

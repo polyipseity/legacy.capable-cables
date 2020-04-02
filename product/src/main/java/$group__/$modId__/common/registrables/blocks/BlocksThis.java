@@ -39,7 +39,8 @@ public final class BlocksThis extends Registrable<Block> {
 	/* SECTION variables */
 
 	@SuppressWarnings("unused")
-	public final Block cable = new BlockCable().setRegistryAndUnlocalizedName(MOD_ID, "cable").setCreativeTab(CreativeTabsThis.DEFAULT);
+	public final Block cable =
+			new BlockCable().setRegistryAndUnlocalizedName(MOD_ID, "cable").setCreativeTab(CreativeTabsThis.DEFAULT);
 
 
 	/* SECTION constructors */

@@ -10,13 +10,11 @@ public interface IThemedUser<T extends IThemed<TH>, TH extends ITheme<TH>> exten
 
 	T getThemed();
 
-	boolean trySetThemed(T themed);
-
-
-	default Optional<T> tryGetThemed() { return Optional.of(getThemed()); }
-
 	default void setThemed(T themed) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetThemed(themed)); }
 
+	boolean trySetThemed(T themed);
+
+	default Optional<T> tryGetThemed() { return Optional.of(getThemed()); }
 
 	@Nullable
 	@Override

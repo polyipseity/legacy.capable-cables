@@ -49,7 +49,8 @@ public enum Dynamics {
 	public static final Unsafe UNSAFE;
 
 
-	public static final LoadingCache<String, org.reflections.Reflections> REFLECTIONS_CACHE = CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_3).expireAfterAccess(CACHE_EXPIRATION_ACCESS_DURATION, CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(t -> {
+	public static final LoadingCache<String, org.reflections.Reflections> REFLECTIONS_CACHE =
+			CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_3).expireAfterAccess(CACHE_EXPIRATION_ACCESS_DURATION, CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(t -> {
 		org.reflections.Reflections r = new org.reflections.Reflections(t);
 		r.expandSuperTypes();
 		return r;
@@ -60,89 +61,6 @@ public enum Dynamics {
 
 	/* SECTION static methods */
 
-	public static boolean isClassAbstract(Class<?> clazz) { return clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()); }
-
-	public static boolean isMemberStatic(Member member) { return Modifier.isStatic(member.getModifiers()); }
-
-	public static boolean isMemberFinal(Member member) { return Modifier.isFinal(member.getModifiers()); }
-
-
-	public static String getPackage(Class<?> clazz) {
-		String r = clazz.getName().replace(clazz.getSimpleName(), "");
-		if (r.endsWith(".")) r = r.substring(0, r.length() - 1);
-		return r;
-	}
-
-
-	public static Class<?> getCurrentClass() { return getClassStackTrace(1); }
-
-	public static Class<?> getCallerClass() { return getClassStackTrace(2); }
-
-	public static Class<?> getClassStackTrace(int depth) { return getClassStackTrace()[1 + depth]; }
-
-	public static Class<?>[] getClassStackTrace() {
-		Class<?>[] r = SecurityManagerReflections.INSTANCE.getClassContext();
-		return Arrays.copyOfRange(r, 1, r.length);
-	}
-
-
-	public static String getMethodNameDescriptor(Method m) { return m.getName() + org.objectweb.asm.Type.getMethodDescriptor(m); }
-
-	public static boolean overrides(Method overrider, Method overridden) {
-		if (!(overridden.getName().equals(overrider.getName()) && overridden.getReturnType().isAssignableFrom(overrider.getReturnType()))) return false;
-		Class<?>[] np = overridden.getParameterTypes(), gp = overrider.getParameterTypes();
-		return np.length == gp.length && IntStream.range(0, np.length).allMatch(i -> gp[i].isAssignableFrom(np[i]));
-	}
-
-
-	public static <U> ImmutableSet<Class<? extends U>> getSuperclasses(@Nullable Class<? extends U> clazz) { return getIntermediateSuperclasses(clazz, null); }
-
-	public static <U> ImmutableSet<Class<? extends U>> getThisAndSuperclasses(@Nullable Class<? extends U> clazz) { return getLowerAndIntermediateSuperclasses(clazz, null); }
-
-	public static <U> ImmutableSet<Class<? extends U>> getIntermediateSuperclasses(@Nullable Class<? extends U> lower, @Nullable Class<U> upper) { return getLowerAndIntermediateSuperclasses(castUncheckedUnboxed(lower != null ? lower.getSuperclass() : null), upper); }
-
-	public static <U> ImmutableSet<Class<? extends U>> getLowerAndIntermediateSuperclasses(@Nullable Class<? extends U> lower, @Nullable Class<U> upper) {
-		ImmutableSet.Builder<Class<? extends U>> r = new ImmutableSet.Builder<>();
-		for (@Nullable Class<?> i = lower; i != upper && i != null; i = i.getSuperclass()) r.add(Casts.<Class<? extends U>>castUncheckedUnboxedNonnull(i));
-		return r.build();
-	}
-
-
-	public static ImmutableSet<ImmutableSet<Class<?>>> getSuperclassesAndInterfaces(@Nullable Class<?> clazz) {
-		ImmutableSet.Builder<ImmutableSet<Class<?>>> r = new ImmutableSet.Builder<>();
-		ImmutableSet<Class<?>> scs = getSuperclasses(clazz);
-		r.add(scs);
-		scs.forEach(sc -> r.add(ImmutableSet.copyOf(sc.getInterfaces())));
-		return r.build();
-	}
-
-
-	static <A extends Annotation> A[] getEffectiveAnnotationsIfInheritingConsidered(IProcessorRuntime<A> processor, Class<?> clazz, Method method, @Nullable Logger logger) {
-		Class<A> aClass = processor.annotationType();
-		String mName = method.getName();
-		Class<?>[] mArgs = method.getParameterTypes();
-
-		A[] r = castUncheckedUnboxedNonnull(Array.newInstance(aClass, 0));
-		sss:
-		for (ImmutableSet<Class<?>> ss : getSuperclassesAndInterfaces(clazz)) {
-			for (Class<?> s : ss) {
-				r = tryCall(() -> s.getDeclaredMethod(mName, mArgs), logger).map(t -> t.getDeclaredAnnotationsByType(aClass)).orElse(r);
-				consumeIfCaughtThrowable(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_GET_MEMBER.makeMessage("method", s, mName, mArgs), t)));
-				if (r.length != 0) break sss;
-			}
-		}
-
-		return r;
-	}
-
-
-	public static Type getGenericSuperclassActualTypeArgument(Class<?> c, int i) throws ClassCastException { return getGenericSuperclassActualTypeArguments(c)[i]; }
-
-	public static Type[] getGenericSuperclassActualTypeArguments(Class<?> c) { return ((ParameterizedType) c.getGenericSuperclass()).getActualTypeArguments(); }
-
-
-	/* SECTION static initializer */
-
 	static {
 		{
 			Lookup implLookup = PUBLIC_LOOKUP;
@@ -150,7 +68,8 @@ public enum Dynamics {
 				if ("IMPL_LOOKUP".equals(f.getName())) {
 					f.setAccessible(true);
 					consumeIfCaughtThrowable(t -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("impl lookup field", f, Lookup.class, true), t));
-					implLookup = tryCall(() -> (Lookup) PUBLIC_LOOKUP.unreflectGetter(f).invokeExact(), LOGGER).orElse(implLookup);
+					implLookup =
+							tryCall(() -> (Lookup) PUBLIC_LOOKUP.unreflectGetter(f).invokeExact(), LOGGER).orElse(implLookup);
 					break;
 				}
 			}
@@ -169,6 +88,88 @@ public enum Dynamics {
 		}
 	}
 
+	public static boolean isClassAbstract(Class<?> clazz) { return clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()); }
+
+	public static boolean isMemberStatic(Member member) { return Modifier.isStatic(member.getModifiers()); }
+
+	public static boolean isMemberFinal(Member member) { return Modifier.isFinal(member.getModifiers()); }
+
+	public static String getPackage(Class<?> clazz) {
+		String r = clazz.getName().replace(clazz.getSimpleName(), "");
+		if (r.endsWith(".")) r = r.substring(0, r.length() - 1);
+		return r;
+	}
+
+	public static Class<?> getCurrentClass() { return getClassStackTrace(1); }
+
+	public static Class<?> getCallerClass() { return getClassStackTrace(2); }
+
+	public static Class<?> getClassStackTrace(int depth) { return getClassStackTrace()[1 + depth]; }
+
+	public static Class<?>[] getClassStackTrace() {
+		Class<?>[] r = SecurityManagerReflections.INSTANCE.getClassContext();
+		return Arrays.copyOfRange(r, 1, r.length);
+	}
+
+	public static String getMethodNameDescriptor(Method m) { return m.getName() + org.objectweb.asm.Type.getMethodDescriptor(m); }
+
+	public static boolean overrides(Method overrider, Method overridden) {
+		if (!(overridden.getName().equals(overrider.getName()) && overridden.getReturnType().isAssignableFrom(overrider.getReturnType())))
+			return false;
+		Class<?>[] np = overridden.getParameterTypes(), gp = overrider.getParameterTypes();
+		return np.length == gp.length && IntStream.range(0, np.length).allMatch(i -> gp[i].isAssignableFrom(np[i]));
+	}
+
+	public static <U> ImmutableSet<Class<? extends U>> getSuperclasses(@Nullable Class<? extends U> clazz) { return getIntermediateSuperclasses(clazz, null); }
+
+	public static <U> ImmutableSet<Class<? extends U>> getThisAndSuperclasses(@Nullable Class<? extends U> clazz) { return getLowerAndIntermediateSuperclasses(clazz, null); }
+
+	public static <U> ImmutableSet<Class<? extends U>> getIntermediateSuperclasses(@Nullable Class<? extends U> lower,
+	                                                                               @Nullable Class<U> upper) { return getLowerAndIntermediateSuperclasses(castUncheckedUnboxed(lower != null ? lower.getSuperclass() : null), upper); }
+
+	public static <U> ImmutableSet<Class<? extends U>> getLowerAndIntermediateSuperclasses(@Nullable Class<? extends U> lower, @Nullable Class<U> upper) {
+		ImmutableSet.Builder<Class<? extends U>> r = new ImmutableSet.Builder<>();
+		for (@Nullable Class<?> i = lower; i != upper && i != null; i = i.getSuperclass())
+			r.add(Casts.<Class<? extends U>>castUncheckedUnboxedNonnull(i));
+		return r.build();
+	}
+
+	public static ImmutableSet<ImmutableSet<Class<?>>> getSuperclassesAndInterfaces(@Nullable Class<?> clazz) {
+		ImmutableSet.Builder<ImmutableSet<Class<?>>> r = new ImmutableSet.Builder<>();
+		ImmutableSet<Class<?>> scs = getSuperclasses(clazz);
+		r.add(scs);
+		scs.forEach(sc -> r.add(ImmutableSet.copyOf(sc.getInterfaces())));
+		return r.build();
+	}
+
+	static <A extends Annotation> A[] getEffectiveAnnotationsIfInheritingConsidered(IProcessorRuntime<A> processor,
+	                                                                                Class<?> clazz, Method method,
+	                                                                                @Nullable Logger logger) {
+		Class<A> aClass = processor.annotationType();
+		String mName = method.getName();
+		Class<?>[] mArgs = method.getParameterTypes();
+
+		A[] r = castUncheckedUnboxedNonnull(Array.newInstance(aClass, 0));
+		sss:
+		for (ImmutableSet<Class<?>> ss : getSuperclassesAndInterfaces(clazz)) {
+			for (Class<?> s : ss) {
+				r =
+						tryCall(() -> s.getDeclaredMethod(mName, mArgs), logger).map(t -> t.getDeclaredAnnotationsByType(aClass)).orElse(r);
+				consumeIfCaughtThrowable(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_GET_MEMBER.makeMessage("method", s, mName, mArgs), t)));
+				if (r.length != 0) break sss;
+			}
+		}
+
+		return r;
+	}
+
+	public static Type getGenericSuperclassActualTypeArgument(Class<?> c, int i) throws ClassCastException { return getGenericSuperclassActualTypeArguments(c)[i]; }
+
+
+	/* SECTION static initializer */
+
+	public static Type[] getGenericSuperclassActualTypeArguments(Class<?> c) { return ((ParameterizedType) c.getGenericSuperclass()).getActualTypeArguments(); }
+
 
 	/* SECTION static classes */
 
@@ -184,7 +185,8 @@ public enum Dynamics {
 
 			/* SECTION static methods */
 
-			public static <T> boolean mapFields(Class<T> common, T from, T to, Function<Object, ?> mapper, boolean supers, @Nullable Logger logger) {
+			public static <T> boolean mapFields(Class<T> common, T from, T to, Function<Object, ?> mapper,
+			                                    boolean supers, @Nullable Logger logger) {
 				final boolean[] r = {true};
 				(supers ? getThisAndSuperclasses(common) : ImmutableList.of(common)).forEach(c -> {
 					for (Field f : c.getDeclaredFields()) {
@@ -214,9 +216,13 @@ public enum Dynamics {
 				return r[0];
 			}
 
-			public static <T> boolean mapFields(Class<T> common, T from, T to, Function<Object, ?> mapper, @Nullable Logger logger) { return mapFields(common, from, to, mapper, true, logger); }
+			public static <T> boolean mapFields(Class<T> common, T from, T to, Function<Object, ?> mapper,
+			                                    @Nullable Logger logger) { return mapFields(common, from, to, mapper,
+					true, logger); }
 
-			public static <T> boolean copyFields(Class<T> common, T from, T to, boolean supers, @Nullable Logger logger) { return mapFields(common, from, to, identity(), supers, logger); }
+			public static <T> boolean copyFields(Class<T> common, T from, T to, boolean supers,
+			                                     @Nullable Logger logger) { return mapFields(common, from, to,
+					identity(), supers, logger); }
 
 			@SuppressWarnings("UnusedReturnValue")
 			public static <T> boolean copyFields(Class<T> common, T from, T to, @Nullable Logger logger) { return copyFields(common, from, to, true, logger); }
@@ -235,12 +241,18 @@ public enum Dynamics {
 
 			/* SECTION static methods */
 
-			public static <T, R> Function<T, R> makeFunction(Lookup lookup, MethodHandle method, Class<R> returnType, Class<T> inputType) throws Throwable {
-				return castUncheckedUnboxedNonnull(metafactory(lookup, "apply", methodType(Function.class), methodType(Object.class, Object.class), method, methodType(returnType, inputType)).getTarget().invokeExact());
+			public static <T, R> Function<T, R> makeFunction(Lookup lookup, MethodHandle method, Class<R> returnType,
+			                                                 Class<T> inputType) throws Throwable {
+				return castUncheckedUnboxedNonnull(metafactory(lookup, "apply", methodType(Function.class),
+						methodType(Object.class, Object.class), method, methodType(returnType, inputType)).getTarget().invokeExact());
 			}
 
-			public static <T, U, R> BiFunction<T, U, R> makeBiFunction(Lookup lookup, MethodHandle method, Class<R> returnType, Class<T> inputType1, Class<U> inputType2) throws Throwable {
-				return castUncheckedUnboxedNonnull(metafactory(lookup, "apply", methodType(BiFunction.class), methodType(Object.class, Object.class, Object.class), method, methodType(returnType, inputType1, inputType2)).getTarget().invokeExact());
+			public static <T, U, R> BiFunction<T, U, R> makeBiFunction(Lookup lookup, MethodHandle method,
+			                                                           Class<R> returnType, Class<T> inputType1,
+			                                                           Class<U> inputType2) throws Throwable {
+				return castUncheckedUnboxedNonnull(metafactory(lookup, "apply", methodType(BiFunction.class),
+						methodType(Object.class, Object.class, Object.class), method, methodType(returnType,
+								inputType1, inputType2)).getTarget().invokeExact());
 			}
 		}
 
@@ -251,7 +263,8 @@ public enum Dynamics {
 
 			/* SECTION static methods */
 
-			public static final MethodHandle FIELD_MODIFIERS_SETTER = assertNonnull(tryCall(() -> IMPL_LOOKUP.findGetter(Field.class, "modifiers", int.class), LOGGER).orElseGet(() -> {
+			public static final MethodHandle FIELD_MODIFIERS_SETTER =
+					assertNonnull(tryCall(() -> IMPL_LOOKUP.findGetter(Field.class, "modifiers", int.class), LOGGER).orElseGet(() -> {
 				consumeIfCaughtThrowable(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_FIND_METHOD_HANDLE.makeMessage("modifiers field", Field.class, "modifiers", null, int.class), t)));
 				return null;
 			}));
@@ -261,10 +274,10 @@ public enum Dynamics {
 
 	private static final class SecurityManagerReflections extends SecurityManager {
 		/* SECTION static variables */
-		
+
 		private static final SecurityManagerReflections INSTANCE = new SecurityManagerReflections();
-		
-		
+
+
 		/* SECTION constructors */
 
 		private SecurityManagerReflections() { requireRunOnceOnly(LOGGER); }
