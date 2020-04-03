@@ -153,7 +153,9 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage(
 						"Unable" +
 								" " +
-								"to immutablize object '{}' of class '{}' as no to immutable method is obtained, will " +
+								"to immutablize object '{}' of class '{}' as no to immutable method is obtained, " +
+								"will" +
+								" " +
 								"NOT " +
 								"attempt to immutable again", o, oc.toGenericString()), e));
 				BROKEN_CLASS_SET.add(oc);

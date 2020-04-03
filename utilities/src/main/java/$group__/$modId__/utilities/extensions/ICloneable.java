@@ -161,7 +161,8 @@ public interface ICloneable<T> extends Cloneable {
 				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage(
 						"Unable" +
 								" " +
-								"to clone '{}' object of class '{}' as no clone method is obtained, will not attempt " +
+								"to clone '{}' object of class '{}' as no clone method is obtained, will not attempt" +
+								" " +
 								"to " +
 								"clone" +
 								" " +
