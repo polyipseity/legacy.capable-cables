@@ -189,7 +189,6 @@ gradle.buildFinished { BuildResult r ->
 
 extractRangemapReplacedMain.doFirst {
     println '=====debug====='
-    println extractRangemapReplacedMain.sources.asPath
-    println file(extractRangemapReplacedMain.sources)
+    println extractRangemapReplacedMain.libs.asPath
     println '=====end====='
 }

@@ -50,6 +50,13 @@ afterEvaluate {
         configurations.shade.dependencies.each { if (it.group != group) extraLines "PK: ${it.group} $group.${rootProject.name}/shaded/${it.group}".replace('.', '/') }
     }
 
+
+    // COMMENT patches
+
+    // COMMENT prevent these tasks not running at all
     tasks.runClient.outputs.upToDateWhen { false }
     tasks.runServer.outputs.upToDateWhen { false }
+
+    // COMMENT if the source directories does not exist, it will fail
+    tasks.extractRangemapReplacedMain.doFirst { it.sources.each { if (!it.exists()) it.mkdirs() } }
 }
