@@ -1,0 +1,100 @@
+//////////////////////////////////////////////////
+// TITLE Mod
+//////////////////////////////////////////////////
+
+import java.util.regex.Pattern
+
+import static java.io.File.separator
+
+
+/* SECTION check */
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply(['makeSourceTasks', 'makeResourcesTasks', 'makeJUnitPlatformTests', 'makeJavadocTasks'])
+
+
+/* SECTION extra variables */
+
+ext {
+    // COMMENT mod
+
+    requiredMods = stringToStringList requiredMods_
+    ext.dependencies = stringToStringList dependencies_
+    dependants = stringToStringList dependants_
+
+    StringBuilder cdSb = new StringBuilder()
+    requiredMods.each { cdSb.append "required:$it;" }
+    ext.dependencies.each {
+        if (cdSb.contains(it as String)) cdSb.replaceFirst Pattern.quote("required:$it"), "required-after:$it"
+        else cdSb.append "after:$it;"
+    }
+    dependants.each {
+        //noinspection GrUnresolvedAccess
+        if (cdSb.contains(m as String)) cdSb.replaceFirst Pattern.quote("required:$it"), "required-before:$it"
+        else cdSb.append "before:$it;"
+    }
+    combinedDependencies = cdSb.append(combinedDependenciesAdditions).toString()
+
+    requiredMods = processResourcesList requiredMods
+    ext.dependencies = processResourcesList ext.dependencies as List<String>
+    dependants = processResourcesList dependants
+}
+
+static <E> String processResourcesList(List<E> l) {
+    l.empty ? '[]' : l.toListString().replace('[', '["').replace(']', '"]').replace(', ', '", "')
+}
+
+
+/* SECTION configuration */
+
+archivesBaseName = rootProject.name
+
+makeSourceTasks {
+    it.inputs.property 'expand_modId', modId
+    it.inputs.property 'expand_name', name_
+    it.inputs.property 'expand_version', version
+    it.inputs.property 'expand_dependencies', combinedDependencies
+    //noinspection SpellCheckingInspection
+    it.inputs.property 'expand_minecraftVersionRange', minecraftVersionRange
+    it.inputs.property 'expand_certificateFingerprint', certificateFingerprint
+    it.inputs.property 'expand_updateJSON', updateJSON
+    it.inputs.property 'expand_group', project.group
+}
+
+makeResourcesTasks {
+    // COMMENT this will ensure that this task is redone when the variables change.
+    it.inputs.property 'expand_modId', modId
+    it.inputs.property 'expand_name', name_
+    it.inputs.property 'expand_description', project.description
+    it.inputs.property 'expand_version', version
+    //noinspection SpellCheckingInspection
+    it.inputs.property 'expand_minecraftVersion', project.minecraft.version
+    it.inputs.property 'expand_url', url
+    it.inputs.property 'expand_updateUrl', updateUrl
+    it.inputs.property 'expand_updateJSON', updateJSON
+    it.inputs.property 'expand_authorList', authorList
+    it.inputs.property 'expand_credits', credits
+    it.inputs.property 'expand_logoFile', logoFile
+    it.inputs.property 'expand_screenshots', screenshots
+    it.inputs.property 'expand_parent', parent_
+    it.inputs.property 'expand_requiredMods', requiredMods
+    it.inputs.property 'expand_dependencies', project.ext.dependencies
+    it.inputs.property 'expand_dependants', dependants
+    it.inputs.property 'expand_pack_format', pack_format
+}
+
+
+makeJUnitPlatformTests()
+
+
+makeJavadocTasks {
+    it.inputs.property 'expand_modId', project.name
+    it.inputs.property 'expand_name', name_
+    it.inputs.property 'expand_version', version
+    it.inputs.property 'expand_dependencies', combinedDependencies
+    //noinspection SpellCheckingInspection
+    it.inputs.property 'expand_minecraftVersionRange', minecraftVersionRange
+    it.inputs.property 'expand_certificateFingerprint', certificateFingerprint
+    it.inputs.property 'expand_updateJSON', updateJSON
+    it.inputs.property 'expand_group', project.group
+}

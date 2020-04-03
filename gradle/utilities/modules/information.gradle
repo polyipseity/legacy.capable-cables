@@ -7,4 +7,4 @@ group = group_ // COMMENT http://maven.apache.org/guides/mini/guide-naming-conve
 description = description_
 
 // COMMENT Need this here so eclipse task generates correctly.
-sourceCompatibility = targetCompatibility = 1.8
+java { sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8 }
