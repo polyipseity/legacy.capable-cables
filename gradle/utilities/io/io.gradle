@@ -14,12 +14,12 @@ project.ext.createNewFile = { File f ->
 
 project.ext.createNewFileFromPath = { String s ->
     File f = file s
-    createNewFile f
+    createNewFile.call f
     f
 }
 
 project.ext.download = { String url, File dest ->
-    createNewFile dest
+    createNewFile.call dest
     FileOutputStream fos = new FileOutputStream(dest)
     long r = 0
     try {

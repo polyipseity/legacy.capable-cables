@@ -92,8 +92,8 @@ public interface ICloneable<T> extends Cloneable {
 					if (r != null) {
 						ExternalCloneMethod rf = r;
 						LOGGER.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Clone method '{}' with " +
-								"annotation '{}' " +
-								"auto-registered for class '{}'", EXTERNAL_METHOD_MAP.get(rf), rf,
+										"annotation '{}' " +
+										"auto-registered for class '{}'", EXTERNAL_METHOD_MAP.get(rf), rf,
 								key.toGenericString()));
 					} else
 						throw throw_(new NoSuchMethodException("No clone method for class '" + key.toGenericString() + '\''));
@@ -158,11 +158,14 @@ public interface ICloneable<T> extends Cloneable {
 				m = assertNonnull(EXTERNAL_METHOD_MAP.get(EXTERNAL_ANNOTATIONS_CACHE.get(oc)));
 			} catch (ExecutionException e) {
 				setCaughtThrowableStatic(e, logger);
-				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable" +
-						" " +
-						"to clone '{}' object of class '{}' as no clone method is obtained, will not attempt to clone" +
-						" " +
-						"again", o, oc.toGenericString()), e));
+				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage(
+						"Unable" +
+								" " +
+								"to clone '{}' object of class '{}' as no clone method is obtained, will not attempt " +
+								"to " +
+								"clone" +
+								" " +
+								"again", o, oc.toGenericString()), e));
 				BROKEN_CLASS_SET.add(oc);
 				return Optional.of(o);
 			}
@@ -178,9 +181,11 @@ public interface ICloneable<T> extends Cloneable {
 			});
 			return r;
 		} else {
-			logger.debug(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable to" +
+			logger.debug(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable " +
+					"to" +
 					" " +
-					"clone object '{}' of class '{}' as clone method annotation is NOT yet processed, will attempt to" +
+					"clone object '{}' of class '{}' as clone method annotation is NOT yet processed, will attempt " +
+					"to" +
 					" " +
 					"clone again", o, oc.toGenericString()), newThrowable()));
 			return Optional.of(o);

@@ -8,7 +8,7 @@ import static java.io.File.separator
 /* SECTION check */
 
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
-checkApply(['parseArgument'])
+checkApply.call(['parseArgument'])
 
 
 /* SECTION extra variables */
@@ -16,9 +16,9 @@ checkApply(['parseArgument'])
 ext {
     // COMMENT arguments
 
-    buildType = parseArgument 'buildType', 'BUILD_TYPE', 'DEBUG'
-    update = parseArgument('update', 'UPDATE', false).toBoolean()
-    strictDigestCheck = parseArgument('strictDigestCheck', 'STRICT_DIGEST_CHECK', false).toBoolean()
+    buildType = parseArgument.call 'buildType', 'BUILD_TYPE', 'DEBUG'
+    update = parseArgument.call('update', 'UPDATE', false).toString().toBoolean()
+    strictDigestCheck = parseArgument.call('strictDigestCheck', 'STRICT_DIGEST_CHECK', false).toString().toBoolean()
 
 
     // COMMENT variables

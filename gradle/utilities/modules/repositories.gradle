@@ -8,7 +8,7 @@ import static java.io.File.separator
 /* SECTION check */
 
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
-checkApply(['stringToStringMap', 'evaluateGStringString'])
+checkApply.call(['stringToStringMap', 'evaluateGStringString'])
 
 
 /* SECTION configuration */
@@ -21,9 +21,9 @@ repositories {
     google()
 }
 
-stringToStringMap(customRepositories).each { String k, List<String> v ->
+stringToStringMap.call(customRepositories).each { String k, List<String> v ->
     v.each {
-        String[] e = it.split('(?<!\\\\):', 2).collect { evaluateGStringString it.trim().replace('\\:', ':') }
+        String[] e = it.split('(?<!\\\\):', 2).collect { evaluateGStringString.call it.trim().replace('\\:', ':') }
         repositories."$k" {
             name = e.first()
             url = e.last()

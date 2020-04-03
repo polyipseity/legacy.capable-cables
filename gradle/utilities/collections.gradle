@@ -9,7 +9,7 @@ project.ext.stringToStringList = { String s -> s == '[]' ? [] : s.substring(1, s
 
 project.ext.stringToStringMap = { String s ->
     Map<String, List<String>> r = [:]
-    (s == '[:]' ? [] : stringToStringList(s)).each {
+    (s == '[:]' ? [] : stringToStringList.call(s)).each {
         List<String> e = it.trim().split('(?<!\\\\):', 2).collect { it.trim().replace('\\:', ':') }
         if (r.containsKey(e.first())) r[e.first()] << e.last()
         else r[e.first()] = [e.last()]

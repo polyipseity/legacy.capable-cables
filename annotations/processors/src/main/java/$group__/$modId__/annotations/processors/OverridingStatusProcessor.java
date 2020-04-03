@@ -74,7 +74,8 @@ public final class OverridingStatusProcessor extends AbstractProcessor {
 									messager.printMessage(Diagnostic.Kind.NOTE,
 											"Overrides super method '" + superMethod + '\'', subMethod);
 								else
-									messager.printMessage(Diagnostic.Kind.ERROR, "Requirement unfulfilled: should not" +
+									messager.printMessage(Diagnostic.Kind.ERROR, "Requirement unfulfilled: should " +
+											"not" +
 											" " +
 											"override super method '" + superMethod + '\'', subMethod);
 								return;

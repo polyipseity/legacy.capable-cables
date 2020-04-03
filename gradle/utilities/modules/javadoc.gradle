@@ -4,7 +4,7 @@
 
 /* SECTION methods */
 
-project.ext.makeJavadocTasks = { Closure c ->
+afterEvaluate {
     tasks.withType(Javadoc) {
         options.tags = ['apiNote:a:"API Note:"', 'implSpec:a:"Implementation Requirements:"', 'implNote:a:"Implementation Note:"']
     }

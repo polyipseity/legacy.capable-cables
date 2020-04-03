@@ -8,12 +8,11 @@ import static java.io.File.separator
 /* SECTION check */
 
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
-checkApply(['stringToStringMap', 'evaluateGString'])
+checkApply.call(['stringToStringMap', 'evaluateGString'])
 
 
 /* SECTION application */
 
-//noinspection SpellCheckingInspection
 apply plugin: 'net.minecraftforge.gradle.forge'
 
 

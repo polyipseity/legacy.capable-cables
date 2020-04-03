@@ -150,10 +150,12 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 				m = EXTERNAL_METHOD_MAP.get(EXTERNAL_ANNOTATIONS_CACHE.get(oc));
 			} catch (ExecutionException e) {
 				setCaughtThrowableStatic(e, logger);
-				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable" +
-						" " +
-						"to immutablize object '{}' of class '{}' as no to immutable method is obtained, will NOT " +
-						"attempt to immutable again", o, oc.toGenericString()), e));
+				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage(
+						"Unable" +
+								" " +
+								"to immutablize object '{}' of class '{}' as no to immutable method is obtained, will " +
+								"NOT " +
+								"attempt to immutable again", o, oc.toGenericString()), e));
 				BROKEN_CLASS_SET.add(oc);
 				return Optional.of(o);
 			}
@@ -167,9 +169,11 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 			});
 			return r;
 		} else {
-			logger.debug(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable to" +
+			logger.debug(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable " +
+					"to" +
 					" " +
-					"immutable object '{}' of class '{}' as to immutable method annotation is NOT yet processed, will" +
+					"immutable object '{}' of class '{}' as to immutable method annotation is NOT yet processed, " +
+					"will" +
 					" " +
 					"attempt to immutable again", o, oc.toGenericString()), newThrowable()));
 			return Optional.of(o);

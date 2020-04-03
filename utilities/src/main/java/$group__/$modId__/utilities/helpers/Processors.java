@@ -45,6 +45,7 @@ public enum Processors {
 	}
 
 
+	@SuppressWarnings("UnstableApiUsage")
 	public static ImmutableSet<ImmutableSet<TypeElement>> getSuperclassesAndInterfaces(TypeElement type, Types types) {
 		ImmutableSet.Builder<ImmutableSet<TypeElement>> r = new ImmutableSet.Builder<>();
 		ImmutableSet<TypeElement> scs = getSuperclasses(type, types);

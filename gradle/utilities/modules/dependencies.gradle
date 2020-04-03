@@ -8,13 +8,14 @@ import static java.io.File.separator
 /* SECTION check */
 
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
-checkApply(['stringToStringMap', 'evaluateGString'])
+checkApply.call(['stringToStringMap', 'evaluateGString'])
 
 
 /* SECTION configuration */
 
 // COMMENT append
 afterEvaluate {
+    //noinspection SpellCheckingInspection
     dependencies {
         // COMMENT you may put jars on which you depend on in ./libs
         // COMMENT or you may define them like so..
@@ -43,6 +44,6 @@ afterEvaluate {
         'runtime' is superseded by 'runtimeOnly'.
          */
 
-        stringToStringMap(customDependencies).each { String k, List<String> v -> v.each { dependencies."$k"(evaluateGString(it)) } }
+        stringToStringMap.call(customDependencies).each { String k, List<String> v -> v.each { dependencies."$k"(evaluateGString.call(it)) } }
     }
 }

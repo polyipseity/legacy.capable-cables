@@ -10,7 +10,7 @@ import static java.io.File.separator
 /* SECTION check */
 
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
-checkApply(['evaluateGStringString', 'createNewFile'])
+checkApply.call(['evaluateGStringString', 'createNewFile'])
 
 
 /* SECTION methods */
@@ -24,7 +24,7 @@ project.ext.makeSourceTasks = { Closure c ->
         if (sourceSetName == null) sourceSetName = 'main'
         else language = language.replace sourceSetName.capitalize(), ''
 
-        Set<File> sourceSet = sourceSets."$sourceSetName"."${language.uncapitalize()}".srcDirs;
+        Set<File> sourceSet = sourceSets."$sourceSetName"."${language.uncapitalize()}".srcDirs
 
         Sync pre = task("preProcess${name.capitalize()}", type: Sync, description: "Prepare sources for processing $sourceSetName $language.") {
             from sourceSet
@@ -36,7 +36,7 @@ project.ext.makeSourceTasks = { Closure c ->
                     // COMMENT standard
                 }
             }
-        }
+        } as Sync
 
         Sync process = task("process${name.capitalize()}", type: Sync, description: "Process $sourceSetName $language.", dependsOn: pre) {
             configure c
@@ -56,7 +56,7 @@ project.ext.makeSourceTasks = { Closure c ->
                 expand e
 
                 Binding eb = new Binding(e)
-                eachFile { it.path = evaluateGStringString it.path, eb }
+                eachFile { it.path = evaluateGStringString.call it.path, eb }
             }
         } as Sync
         t.dependsOn process
@@ -68,7 +68,7 @@ project.ext.makeSourceTasks = { Closure c ->
             classifier "$sourceSetName$language"
             destinationDir = file "$buildDir/debug"
 
-            if (createNewFile(archivePath)) archivePath.text = 'PK\u0005\u0006\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000'
+            if (createNewFile.call(archivePath)) archivePath.text = 'PK\u0005\u0006\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000'
             gradle.projectsEvaluated { rootProject.dependencies.debug files(archivePath) }
         }
 
@@ -94,7 +94,7 @@ afterEvaluate {
     if (buildType == 'DEBUG') tasks.withType(AbstractCompile) {
         //noinspection GrUnresolvedAccess
         options.verbose = true
-        //noinspection SpellCheckingInspection, GrUnresolvedAccess
+        //noinspection GrUnresolvedAccess
         options.compilerArgs << '-Xlint'
     }
 }

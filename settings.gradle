@@ -5,7 +5,6 @@
 
 /* SECTION configuration */
 
-//noinspection SpellCheckingInspection
 rootProject.name = 'capablecables'
 
 

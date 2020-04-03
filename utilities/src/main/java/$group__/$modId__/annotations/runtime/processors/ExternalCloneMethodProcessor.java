@@ -79,7 +79,8 @@ public enum ExternalCloneMethodProcessor implements IMethod<ExternalCloneMethod>
 			else {
 				ExternalCloneMethod apf = ap;
 				logger.warn(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage(IProcessorRuntime.makeMessage(this,
-						"Replaced previous method '{}' with annotation '{}' with method '{}' with annotation '{}' for" +
+						"Replaced previous method '{}' with annotation '{}' with method '{}' with annotation '{}' " +
+								"for" +
 								" " +
 								"class '{}'"), EXTERNAL_METHOD_MAP.get(apf), apf, m, a, k.toGenericString()));
 			}

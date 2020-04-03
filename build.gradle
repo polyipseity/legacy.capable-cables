@@ -15,14 +15,12 @@ buildscript {
     repositories {
         jcenter()
         maven {
-            //noinspection SpellCheckingInspection
             name = 'Minecraft Forge'
             url = 'https://files.minecraftforge.net/maven'
         }
     }
 
     dependencies {
-        //noinspection SpellCheckingInspection
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.+'
     }
     // COMMENT Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
@@ -43,8 +41,8 @@ allprojects {
     /* SECTION extra variables */
 
     ext {
-        utilitiesDir = "$rootDir${separator}gradle${separator}utilities"
-        modulesDir = "$utilitiesDir${separator}modules"
+        utilitiesDir = "$rootDir${separator}gradle${separator}utilities".toString()
+        modulesDir = "$utilitiesDir${separator}modules".toString()
     }
 
 
@@ -100,9 +98,8 @@ loadExt "$rootDir${separator}buildSrc${separator}ext-ra.properties", true
 ext {
     // COMMENT game
 
-    minecraftVersion = (minecraftForgeVersion as String).split('-').first()
-    //noinspection SpellCheckingInspection
-    String[] minecraftVersions = (minecraftVersion as String).split('\\.')
+    minecraftVersion = minecraftForgeVersion.split('-').first()
+    String[] minecraftVersions = minecraftVersion.split('\\.')
     minecraftMajor = minecraftVersions.first().toInteger()
     minecraftMinor = minecraftVersions[1].toInteger()
     minecraftVersionRange = "[$minecraftMajor.$minecraftMinor,$minecraftVersion]".toString()
@@ -158,7 +155,7 @@ gradle.buildFinished { BuildResult r ->
         // COMMENT save last good settings
         logger.info 'Saving last good settings...'
 
-        Wrapper wrapper = tasks.wrapper as Wrapper
+        Wrapper wrapper = tasks.wrapper
         Map<String, Object> json = [
                 gradle   : [distributionUrl: wrapper.distributionUrl.replace(wrapper.distributionType.name().toLowerCase(Locale.ROOT), Wrapper.DistributionType.ALL.name().toLowerCase(Locale.ROOT))],
                 minecraft: [
@@ -190,13 +187,11 @@ gradle.buildFinished { BuildResult r ->
     gradle.gradleUserHomeDir.eachDir { it.eachDirMatch(~/[0-9]+[.-][0-9.+-]+/) { if (it.name != gradle.gradleVersion) delete it } }
 
     // COMMENT Minecraft
-    //noinspection SpellCheckingInspection
     String minecraftCachePath = "$gradle.gradleUserHomeDir.absolutePath${separator}caches${separator}minecraft"
     // COMMENT Minecraft Coder Pack
     File mcpDir = file "$minecraftCachePath${separator}de${separator}oceanlabs${separator}mcp${separator}mcp_snapshot"
     if (mcpDir.exists()) mcpDir.eachDir { if ("snapshot_$it.name".toString() != minecraftMappings) delete it }
     // COMMENT Minecraft Forge
-    //noinspection SpellCheckingInspection
     File minecraftForgeDir = file "$minecraftCachePath${separator}net${separator}minecraftforge${separator}forge"
     if (minecraftForgeDir.exists()) minecraftForgeDir.eachDir { if (it.name != minecraftForgeVersion) delete it }
 }

@@ -21,7 +21,7 @@ final String rootDir = "$projectDir${separator}.."
 
 ext {
     ext.rootDir = rootDir
-    utilitiesDir = "$rootDir${separator}gradle${separator}utilities"
+    utilitiesDir = "$rootDir${separator}gradle${separator}utilities".toString()
 }
 
 
@@ -36,9 +36,8 @@ apply from: "$utilitiesDir${separator}io${separator}properties${separator}ext.pr
 
 /* SECTION extra variables */
 
-loadExt "$rootDir${separator}module.properties"
+loadExt.call "$rootDir${separator}module.properties"
 
-//noinspection SpellCheckingInspection
 ext {
     // COMMENT Gradle
 
@@ -68,7 +67,7 @@ boolean checkMavenMetadata(String metadataUrl, File metadataFile, String properA
     File file = file "$metadataFile.absolutePath.$algorithmName"
     String url = "$metadataUrl.$algorithmName"
     try {
-        download url, file
+        download.call url, file
     } catch (FileNotFoundException e) {
         logger.log LogLevel.WARN, '{} file "{}" for "{}" NOT found', properAlgorithmName, url, metadataUrl
         if (strictDigestCheck) throw e
@@ -85,21 +84,21 @@ boolean checkMavenMetadata(String metadataUrl, File metadataFile, String properA
     }
 }
 
+@SuppressWarnings("GrUnresolvedAccess")
 String getLatestVersionMaven(String metadataUrl, String metadataPath, String filter) {
     File metadataFile = file metadataPath
-    download metadataUrl, metadataFile
+    download.call metadataUrl, metadataFile
 
     checkMavenMetadata metadataUrl, metadataFile, 'MD5', 'md5'
     checkMavenMetadata metadataUrl, metadataFile, 'SHA-1', 'sha1'
 
-    //noinspection GrUnresolvedAccess
     List<String> versions = new XmlSlurper().parse(metadataFile).versioning.versions.children().list().collect { it.text() }
-    List<VersionNumber> filtered = versions.findAll { it.contains(filter) }.collect { VersionNumber.parse(it as String) }.sort()
-    return filtered.empty ? versions.collect { VersionNumber.parse(it as String) }.sort().last() : filtered.last()
+    List<VersionNumber> filtered = versions.findAll { it.contains(filter) }.collect { VersionNumber.parse it }.sort()
+    return filtered.empty ? versions.collect { VersionNumber.parse it }.sort().last() : filtered.last()
 }
 
 void updateGradleWrapperDistributionUrl(String newDistributionUrl) {
-    Wrapper wrapper = tasks.wrapper as Wrapper
+    Wrapper wrapper = tasks.wrapper
     Properties properties = new Properties()
     File propertiesFile = file wrapper.propertiesFile.absolutePath.replace('buildSrc', '')
     FileInputStream fis = new FileInputStream(propertiesFile)
@@ -134,7 +133,7 @@ String readLastGoodSettings() throws FileNotFoundException {
 
 Object parseLastGoodSettings(boolean print) throws FileNotFoundException {
     String jsonText = readLastGoodSettings()
-    if (print) logger.info '{}:{}{}', convertToCanonicalPath(lastGoodSettingsPath), System.lineSeparator(), jsonText
+    if (print) logger.info '{}:{}{}', convertToCanonicalPath.call(lastGoodSettingsPath), System.lineSeparator(), jsonText
     return new JsonSlurper().parseText(jsonText)
 }
 
@@ -142,37 +141,33 @@ Object parseLastGoodSettings(boolean print) throws FileNotFoundException {
 /* SECTION configuration */
 
 if (!update) {
-    logger.lifecycle 'Applying last good settings from "{}"...', convertToCanonicalPath(lastGoodSettingsPath) as String
+    logger.lifecycle 'Applying last good settings from "{}"...', convertToCanonicalPath.call(lastGoodSettingsPath)
     Object json = parseLastGoodSettings true
 
-    //noinspection GrUnresolvedAccess
     updateGradleWrapperDistributionUrl ext.gradleDistributionUrl = json.gradle.distributionUrl as String
 
-    //noinspection GrUnresolvedAccess
     ext.minecraftForgeVersion = json.minecraft.version
-    //noinspection GrUnresolvedAccess
     ext.minecraftMappings = json.minecraft.mappings
 
     ext.lastGoodSettingsJson = readLastGoodSettings()
 }
 if (update) {
     if (gradleDistributionUrl == 'latest') {
-        //noinspection SpellCheckingInspection
-        JsonSlurper jsonSlurper = new JsonSlurper()
+        JsonSlurper jsonParser = new JsonSlurper()
 
         File gradleLatestReleaseNightlyJsonFile = file gradleLatestReleaseNightlyJsonPath
-        download gradleLatestReleaseNightlyJsonUrl.toString(), gradleLatestReleaseNightlyJsonFile
-        Object jsonGradle = jsonSlurper.parse gradleLatestReleaseNightlyJsonFile
+        download.call gradleLatestReleaseNightlyJsonUrl, gradleLatestReleaseNightlyJsonFile
+        Object jsonGradle = jsonParser.parse gradleLatestReleaseNightlyJsonFile
 
         if (jsonGradle.broken) {
             File gradleLatestNightlyJsonFile = file gradleLatestNightlyJsonPath
-            download gradleLatestNightlyJsonUrl.toString(), gradleLatestNightlyJsonFile
-            jsonGradle = jsonSlurper.parse gradleLatestNightlyJsonFile
+            download.call gradleLatestNightlyJsonUrl, gradleLatestNightlyJsonFile
+            jsonGradle = jsonParser.parse gradleLatestNightlyJsonFile
 
             if (jsonGradle.broken) {
                 File gradleAllJsonFile = file gradleAllJsonPath
-                download gradleAllJsonUrl.toString(), gradleAllJsonFile
-                jsonGradle = jsonSlurper.parse gradleAllJsonFile
+                download.call gradleAllJsonUrl, gradleAllJsonFile
+                jsonGradle = jsonParser.parse gradleAllJsonFile
 
                 Map<String, Object> temp
                 for (Map<String, Object> gradleDistributionJson : jsonGradle as List<Map<String, Object>>) {
@@ -185,20 +180,16 @@ if (update) {
                 else throw new FileNotFoundException("Cannot find a working Gradle distribution from '$gradleAllJsonUrl'")
             }
         }
-        //noinspection GrUnresolvedAccess
-        updateGradleWrapperDistributionUrl ext.gradleDistributionUrl = (jsonGradle.downloadUrl as String).replace('bin', 'all')
+        updateGradleWrapperDistributionUrl ext.gradleDistributionUrl = jsonGradle.downloadUrl.replace('bin', 'all') as String
     } else updateGradleWrapperDistributionUrl gradleDistributionUrl.toString()
 
-    //noinspection GrUnresolvedAccess
     project.ext.minecraftForgeVersion = getLatestVersionMaven minecraftForgeMavenMetadataXmlUrl.toString(), minecraftForgeMavenMetadataXmlPath.toString(), minecraftForgeVersion
 
     if (minecraftMappings == 'latest') {
-        //noinspection SpellCheckingInspection
         SimpleDateFormat sdf = new SimpleDateFormat('yyyyMMdd')
-        //noinspection GrUnresolvedAccess
         project.ext.minecraftMappings = "snapshot_${sdf.format(Calendar.instance.time.previous())}"
     }
 }
 
-storeExt "$projectDir${separator}ext-ra.properties", { ['gradleDistributionUrl', 'minecraftForgeVersion', 'minecraftMappings', 'minecraftForgeVersion', 'minecraftMappings', 'lastGoodSettingsJson'].contains it.key }
-storeExt()
+storeExt.call "$projectDir${separator}ext-ra.properties", { ['gradleDistributionUrl', 'minecraftForgeVersion', 'minecraftMappings', 'minecraftForgeVersion', 'minecraftMappings', 'lastGoodSettingsJson'].contains it.key }
+storeExt.call()
