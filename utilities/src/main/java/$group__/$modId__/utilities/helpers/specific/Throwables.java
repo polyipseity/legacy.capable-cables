@@ -39,8 +39,10 @@ public enum Throwables implements IThrowableCatcher {
 
 	public static void clearCaughtThrowableStatic() { INSTANCE.clearCaughtThrowable(); }
 
-	public static void setCaughtThrowableStatic(Throwable t, @Nullable Logger logger) { INSTANCE.setCaughtThrowable(t,
-			logger); }
+	public static void setCaughtThrowableStatic(Throwable t, @Nullable Logger logger) {
+		INSTANCE.setCaughtThrowable(t,
+				logger);
+	}
 
 
 	/* SECTION static methods */
@@ -99,8 +101,10 @@ public enum Throwables implements IThrowableCatcher {
 
 	public static String rejectAttemptString(String msg, @Nullable Object from, @Nullable Object to) { return (from == null ? "A" : "'" + from + "' a") + "ttempted " + msg + (to == null ? "" : " of '" + to + '\''); }
 
-	public static String rejectAttemptString(String msg, StackTraceElement[] st) { return rejectAttemptString(msg,
-			st.length > 3 ? st[3] : null, st.length > 2 ? st[2] : null); }
+	public static String rejectAttemptString(String msg, StackTraceElement[] st) {
+		return rejectAttemptString(msg,
+				st.length > 3 ? st[3] : null, st.length > 2 ? st[2] : null);
+	}
 
 	public static String rejectObjectsString(String msg, Object... objects) { return "Reject " + msg + ": " + Arrays.toString(objects); }
 

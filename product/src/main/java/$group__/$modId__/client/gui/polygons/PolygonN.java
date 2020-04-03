@@ -64,8 +64,10 @@ public class PolygonN<T extends PolygonN<T, N, L>, N extends Number, L extends L
 	public IMutatorImmutablizable<?, ?> getMutator() { return mutator; }
 
 	@Override
-	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t,
-			mutator); }
+	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) {
+		return trySet(t -> this.mutator = t,
+				mutator);
+	}
 
 	@Override
 	public ILogging<Logger> getLogging() { return logging; }
@@ -87,8 +89,10 @@ public class PolygonN<T extends PolygonN<T, N, L>, N extends Number, L extends L
 
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new PolygonN<>(this,
-			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() {
+		return castUncheckedUnboxedNonnull(isImmutable() ? this : new PolygonN<>(this,
+				IMutatorImmutablizable.of(getMutator().toImmutable())));
+	}
 
 	@Override
 	public boolean isImmutable() { return getMutator().isImmutable(); }

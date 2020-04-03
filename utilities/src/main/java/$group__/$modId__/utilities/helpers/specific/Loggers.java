@@ -47,8 +47,10 @@ public enum Loggers {
 			/* SECTION methods */
 
 			@Override
-			protected Message makeMessage1(Object... args) { return new ParameterizedMessage((String) args[0],
-					(Object[]) args[1]); }
+			protected Message makeMessage1(Object... args) {
+				return new ParameterizedMessage((String) args[0],
+						(Object[]) args[1]);
+			}
 		},
 		SUFFIX_WITH_THROWABLE("{}",
 				Message.class, Throwable.class) {
@@ -61,8 +63,10 @@ public enum Loggers {
 			}
 
 			@Override
-			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((Message) args[0],
-					(Throwable) args[1]); }
+			protected ParameterizedMessage makeMessage1(Object... args) {
+				return makeMessage0((Message) args[0],
+						(Throwable) args[1]);
+			}
 		},
 		REFLECTION_UNABLE_TO_GET_MEMBER(PREFIX_REFLECTION + "Unable to get {} of class '{}'{}{}", true, 1,
 				String.class, Class.class, String.class, Class[].class) {
@@ -78,8 +82,10 @@ public enum Loggers {
 			}
 
 			@Override
-			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((String) args[0],
-					(Class<?>) args[1], (String) args[2], (Class<?>[]) args[3]); }
+			protected ParameterizedMessage makeMessage1(Object... args) {
+				return makeMessage0((String) args[0],
+						(Class<?>) args[1], (String) args[2], (Class<?>[]) args[3]);
+			}
 		},
 		REFLECTION_UNABLE_TO_SET_ACCESSIBLE(PREFIX_REFLECTION + "Unable to set {} '{}'{} {}accessible", 1,
 				String.class, AccessibleObject.class, Class.class, boolean.class) {
@@ -95,8 +101,10 @@ public enum Loggers {
 			}
 
 			@Override
-			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((String) args[0],
-					(AccessibleObject) args[1], (Class<?>) args[2], (boolean) args[3]); }
+			protected ParameterizedMessage makeMessage1(Object... args) {
+				return makeMessage0((String) args[0],
+						(AccessibleObject) args[1], (Class<?>) args[2], (boolean) args[3]);
+			}
 		},
 		REFLECTION_UNABLE_TO_G_SET_FIELD(PREFIX_REFLECTION + "Unable to {}et field '{}'{} of class '{}'{}", 2,
 				boolean.class, Field.class, Object.class, Object.class) {
@@ -113,8 +121,10 @@ public enum Loggers {
 			}
 
 			@Override
-			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((boolean) args[0],
-					(Field) args[1], args[2], args[3]); }
+			protected ParameterizedMessage makeMessage1(Object... args) {
+				return makeMessage0((boolean) args[0],
+						(Field) args[1], args[2], args[3]);
+			}
 		},
 		INVOCATION_UNABLE_TO_FIND_METHOD_HANDLE(PREFIX_INVOCATION + "Unable to find {} of class '{}'{}{}{}", 3,
 				String.class, Class.class, String.class, MethodType.class, Class.class) {
@@ -135,8 +145,10 @@ public enum Loggers {
 			}
 
 			@Override
-			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((String) args[0],
-					(Class<?>) args[1], (String) args[2], (MethodType) args[3], (Class<?>) args[4]); }
+			protected ParameterizedMessage makeMessage1(Object... args) {
+				return makeMessage0((String) args[0],
+						(Class<?>) args[1], (String) args[2], (MethodType) args[3], (Class<?>) args[4]);
+			}
 		},
 		@SuppressWarnings("SpellCheckingInspection") INVOCATION_UNABLE_TO_UNREFLECT_MEMBER("Unable to unreflect {} " +
 				"'{}' with lookup '{}'{}", 1,
@@ -154,8 +166,10 @@ public enum Loggers {
 			}
 
 			@Override
-			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((String) args[0],
-					(Member) args[1], (Lookup) args[2], (Class<?>) args[3]); }
+			protected ParameterizedMessage makeMessage1(Object... args) {
+				return makeMessage0((String) args[0],
+						(Member) args[1], (Lookup) args[2], (Class<?>) args[3]);
+			}
 		},
 		INVOCATION_UNABLE_TO_INVOKE_METHOD_HANDLE(PREFIX_INVOCATION + "Unable to invoke method handle '{}'{}", true,
 				MethodHandle.class, Object[].class) {
@@ -168,8 +182,10 @@ public enum Loggers {
 			}
 
 			@Override
-			protected ParameterizedMessage makeMessage1(Object... args) { return makeMessage0((MethodHandle) args[0],
-					(Object[]) args[1]); }
+			protected ParameterizedMessage makeMessage1(Object... args) {
+				return makeMessage0((MethodHandle) args[0],
+						(Object[]) args[1]);
+			}
 		};
 
 
@@ -189,8 +205,10 @@ public enum Loggers {
 
 		EnumMessages(String message, boolean varargs, Class<?>... argTypes) { this(message, varargs, 0, argTypes); }
 
-		EnumMessages(String message, int argTypeOptionals, Class<?>... argTypes) { this(message, false,
-				argTypeOptionals, argTypes); }
+		EnumMessages(String message, int argTypeOptionals, Class<?>... argTypes) {
+			this(message, false,
+					argTypeOptionals, argTypes);
+		}
 
 		EnumMessages(String message, boolean varargs, int argTypeOptionals, Class<?>... argTypes) {
 			this.message = message;

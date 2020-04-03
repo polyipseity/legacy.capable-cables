@@ -51,8 +51,10 @@ public class NumberRelative<T extends NumberRelative<T>> extends Number implemen
 
 	/* SECTION constructors */
 
-	public NumberRelative(Number value, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) { this(value,
-			null, mutator, logging); }
+	public NumberRelative(Number value, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
+		this(value,
+				null, mutator, logging);
+	}
 
 	public NumberRelative(Number value, @Nullable Number parent, IMutatorImmutablizable<?, ?> mutator,
 	                      ILogging<Logger> logging) { this(value, parent, null, mutator, logging); }
@@ -69,8 +71,10 @@ public class NumberRelative<T extends NumberRelative<T>> extends Number implemen
 	public NumberRelative(NumberRelative<?> copy) { this(copy, copy.getMutator()); }
 
 
-	protected NumberRelative(NumberRelative<?> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getValue(),
-			copy.getParent(), copy.getOffset(), mutator, copy.getLogging()); }
+	protected NumberRelative(NumberRelative<?> copy, IMutatorImmutablizable<?, ?> mutator) {
+		this(copy.getValue(),
+				copy.getParent(), copy.getOffset(), mutator, copy.getLogging());
+	}
 
 
 	/* SECTION static methods */
@@ -111,8 +115,10 @@ public class NumberRelative<T extends NumberRelative<T>> extends Number implemen
 	public IMutatorImmutablizable<?, ?> getMutator() { return mutator; }
 
 	@Override
-	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t,
-			mutator); }
+	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) {
+		return trySet(t -> this.mutator = t,
+				mutator);
+	}
 
 	public ILogging<Logger> getLogging() { return logging; }
 
@@ -182,8 +188,10 @@ public class NumberRelative<T extends NumberRelative<T>> extends Number implemen
 
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new NumberRelative<>(this,
-			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() {
+		return castUncheckedUnboxedNonnull(isImmutable() ? this : new NumberRelative<>(this,
+				IMutatorImmutablizable.of(getMutator().toImmutable())));
+	}
 
 	@Override
 	public boolean isImmutable() { return getMutator().isImmutable(); }

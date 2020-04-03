@@ -68,34 +68,35 @@ public enum ModThis {
 	public static final Proxy PROXY = getSingletonInstance(ProxyNull.class, LOGGER);
 	private static final ImmutableMap<Class<? extends FMLEvent>, BiConsumer<?, ? extends FMLEvent>> EVENT_MAP =
 			new ImmutableMap.Builder<Class<? extends FMLEvent>, BiConsumer<?, ? extends FMLEvent>>()
-			.put(FMLConstructionEvent.class, (ModThis m, FMLConstructionEvent e) ->
-					processEvent("Construction", m, e, PROXY::construct))
-			.put(FMLPreInitializationEvent.class, (ModThis m, FMLPreInitializationEvent e) ->
-					processEvent("Pre-initialization", m, e, PROXY::preInitialize))
-			.put(FMLInitializationEvent.class, (ModThis m, FMLInitializationEvent e) ->
-					processEvent("Initialization", m, e, PROXY::initialize))
-			.put(FMLPostInitializationEvent.class, (ModThis m, FMLPostInitializationEvent e) ->
-					processEvent("Post-initialization", m, e, PROXY::postInitialize))
-			.put(FMLLoadCompleteEvent.class, (ModThis m, FMLLoadCompleteEvent e) ->
-					processEvent("Load completion", m, e, PROXY::completeLoading))
-			.put(FMLServerAboutToStartEvent.class, (ModThis m, FMLServerAboutToStartEvent e) ->
-					processEvent("Server pre-starting", m, e, PROXY::preStartServer))
-			.put(FMLServerStartingEvent.class, (ModThis m, FMLServerStartingEvent e) ->
-					processEvent("Server starting", m, e, PROXY::startServer))
-			.put(FMLServerStartedEvent.class, (ModThis m, FMLServerStartedEvent e) ->
-					processEvent("Server post-starting", m, e, PROXY::postStartServer))
-			.put(FMLServerStoppingEvent.class, (ModThis m, FMLServerStoppingEvent e) ->
-					processEvent("Server stopping", m, e, PROXY::stopServer))
-			.put(FMLServerStoppedEvent.class, (ModThis m, FMLServerStoppedEvent e) ->
-					processEvent("Server post-stopping", m, e, PROXY::postStopServer))
-			.put(FMLFingerprintViolationEvent.class, (ModThis m, FMLFingerprintViolationEvent e) ->
-					processEvent("Fingerprint violation", m, e, PROXY::violateFingerprint))
-			.put(FMLInterModComms.IMCEvent.class, (ModThis m, FMLInterModComms.IMCEvent e) ->
-					processEvent("Inter-mod communication messages processing", m, e, PROXY::processIMCMessages))
-			.put(FMLModIdMappingEvent.class, (ModThis m, FMLModIdMappingEvent e) ->
-					processEvent("ID mapping processing", m, e, PROXY::processIDMapping))
-			.put(FMLModDisabledEvent.class, (ModThis m, FMLModDisabledEvent e) ->
-					processEvent("Disabling", m, e, PROXY::disable)).build();
+					.put(FMLConstructionEvent.class, (ModThis m, FMLConstructionEvent e) ->
+							processEvent("Construction", m, e, PROXY::construct))
+					.put(FMLPreInitializationEvent.class, (ModThis m, FMLPreInitializationEvent e) ->
+							processEvent("Pre-initialization", m, e, PROXY::preInitialize))
+					.put(FMLInitializationEvent.class, (ModThis m, FMLInitializationEvent e) ->
+							processEvent("Initialization", m, e, PROXY::initialize))
+					.put(FMLPostInitializationEvent.class, (ModThis m, FMLPostInitializationEvent e) ->
+							processEvent("Post-initialization", m, e, PROXY::postInitialize))
+					.put(FMLLoadCompleteEvent.class, (ModThis m, FMLLoadCompleteEvent e) ->
+							processEvent("Load completion", m, e, PROXY::completeLoading))
+					.put(FMLServerAboutToStartEvent.class, (ModThis m, FMLServerAboutToStartEvent e) ->
+							processEvent("Server pre-starting", m, e, PROXY::preStartServer))
+					.put(FMLServerStartingEvent.class, (ModThis m, FMLServerStartingEvent e) ->
+							processEvent("Server starting", m, e, PROXY::startServer))
+					.put(FMLServerStartedEvent.class, (ModThis m, FMLServerStartedEvent e) ->
+							processEvent("Server post-starting", m, e, PROXY::postStartServer))
+					.put(FMLServerStoppingEvent.class, (ModThis m, FMLServerStoppingEvent e) ->
+							processEvent("Server stopping", m, e, PROXY::stopServer))
+					.put(FMLServerStoppedEvent.class, (ModThis m, FMLServerStoppedEvent e) ->
+							processEvent("Server post-stopping", m, e, PROXY::postStopServer))
+					.put(FMLFingerprintViolationEvent.class, (ModThis m, FMLFingerprintViolationEvent e) ->
+							processEvent("Fingerprint violation", m, e, PROXY::violateFingerprint))
+					.put(FMLInterModComms.IMCEvent.class, (ModThis m, FMLInterModComms.IMCEvent e) ->
+							processEvent("Inter-mod communication messages processing", m, e,
+									PROXY::processIMCMessages))
+					.put(FMLModIdMappingEvent.class, (ModThis m, FMLModIdMappingEvent e) ->
+							processEvent("ID mapping processing", m, e, PROXY::processIDMapping))
+					.put(FMLModDisabledEvent.class, (ModThis m, FMLModDisabledEvent e) ->
+							processEvent("Disabling", m, e, PROXY::disable)).build();
 
 
 	/* SECTION static getters & setters */
@@ -121,10 +122,12 @@ public enum ModThis {
 
 	@Marker(@Property(key = "Method", value = EVENT_PROCESSOR_VALUE))
 	@EventHandler
-	public void processEvent(FMLEvent event) { EVENT_MAP.getOrDefault(event.getClass(),
-			(m, e) -> LOGGER.info(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("FMLEvent '{}' received, but " +
-					"processing is NOT implemented", e))).accept(castUncheckedUnboxedNonnull(this),
-			castUncheckedUnboxedNonnull(event)); }
+	public void processEvent(FMLEvent event) {
+		EVENT_MAP.getOrDefault(event.getClass(),
+				(m, e) -> LOGGER.info(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("FMLEvent '{}' received, but " +
+						"processing is NOT implemented", e))).accept(castUncheckedUnboxedNonnull(this),
+				castUncheckedUnboxedNonnull(event));
+	}
 
 
 	/* SECTION static classes */

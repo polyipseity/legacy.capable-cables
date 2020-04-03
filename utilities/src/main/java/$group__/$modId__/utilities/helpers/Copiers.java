@@ -138,8 +138,10 @@ public enum Copiers {
 
 
 	@ExternalCloneMethod(Color.class)
-	public static Color copyColor(Color copy) { return new Color(copy.getColorSpace(), copy.getColorComponents(null),
-			copy.getAlpha() / 255F); }
+	public static Color copyColor(Color copy) {
+		return new Color(copy.getColorSpace(), copy.getColorComponents(null),
+				copy.getAlpha() / 255F);
+	}
 
 	@ExternalCloneMethod(ResourceLocation.class)
 	public static ResourceLocation copyResourceLocation(ResourceLocation copy) { return new ResourceLocation(copy.getResourceDomain(), copy.getResourcePath()); }

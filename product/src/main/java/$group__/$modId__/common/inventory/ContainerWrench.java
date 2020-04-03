@@ -35,6 +35,8 @@ public class ContainerWrench<T extends ContainerWrench<T>> extends Container {
 	public boolean canInteractWith(EntityPlayer playerIn) { return canInteractWithBase(); }
 
 	@Override
-	public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) { return transferStackInSlotBase(this,
-			playerIn, index, (p0, p1) -> (p2, p3) -> mergeItemStack(p0, p1, p2, p3)); }
+	public ItemStack transferStackInSlot(EntityPlayer playerIn, int index) {
+		return transferStackInSlotBase(this,
+				playerIn, index, (p0, p1) -> (p2, p3) -> mergeItemStack(p0, p1, p2, p3));
+	}
 }

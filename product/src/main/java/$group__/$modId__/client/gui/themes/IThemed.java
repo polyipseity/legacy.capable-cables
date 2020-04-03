@@ -17,8 +17,10 @@ public interface IThemed<T extends ITheme<T>> {
 
 	static <T extends ITheme<T>, L extends Logger> IThemed<T> of(@Nullable T theme,
 	                                                             IMutatorImmutablizable<?, ?> mutator,
-	                                                             ILogging<Logger> logging) { return theme == null ?
-			GuiThemedNull.getInstance() : new GuiThemed<>(theme, mutator, logging); }
+	                                                             ILogging<Logger> logging) {
+		return theme == null ?
+				GuiThemedNull.getInstance() : new GuiThemed<>(theme, mutator, logging);
+	}
 
 
 	/* SECTION getters & setters */

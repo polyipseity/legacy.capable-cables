@@ -104,8 +104,10 @@ public class GuiWrench<T extends GuiWrench<T, TH>, TH extends ITheme<TH>> extend
 	public IMutatorImmutablizable<?, ?> getMutator() { return mutator; }
 
 	@Override
-	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t,
-			mutator); }
+	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) {
+		return trySet(t -> this.mutator = t,
+				mutator);
+	}
 
 
 	/* SECTION methods */

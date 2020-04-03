@@ -3,6 +3,7 @@
 //////////////////////////////////////////////////
 
 import groovy.io.FileType
+
 /* SECTION variables */
 
 String methodMapName = 'methodMap'

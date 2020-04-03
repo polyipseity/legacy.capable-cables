@@ -22,6 +22,8 @@ public interface IMutatorUser<T extends IMutator> extends IMutator {
 	default <T> T mutate(Supplier<T> action, boolean initialize) throws UnsupportedOperationException { return mutate(action, initialize); }
 
 	@Override
-	default <T> boolean trySet(Consumer<T> setter, @Nullable T target, boolean initialize) { return trySet(setter,
-			target, initialize); }
+	default <T> boolean trySet(Consumer<T> setter, @Nullable T target, boolean initialize) {
+		return trySet(setter,
+				target, initialize);
+	}
 }

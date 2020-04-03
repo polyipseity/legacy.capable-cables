@@ -213,6 +213,9 @@ gradle-app.setting
 ####################
 # Custom definitions
 
+# IntelliJ IDEA
+.idea/*.xml
+
 # Minecraft run directory
 run/
 

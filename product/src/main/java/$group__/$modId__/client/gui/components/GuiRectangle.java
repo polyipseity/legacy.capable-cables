@@ -30,7 +30,7 @@ public class GuiRectangle<T extends GuiRectangle<T, N, C, TH>, N extends Number,
 
 	/* SECTION constructors */
 
-	public GuiRectangle(Rectangle<?, N> rectangle, IColored<C> colored, IThemed<TH> themed, IMutatorImmutablizable<?, 
+	public GuiRectangle(Rectangle<?, N> rectangle, IColored<C> colored, IThemed<TH> themed, IMutatorImmutablizable<?,
 			?> mutator, ILogging<Logger> logging) {
 		super(colored, themed, mutator, logging);
 		this.rectangle = trySetNonnull(getMutator(), rectangle, true);
@@ -74,6 +74,8 @@ public class GuiRectangle<T extends GuiRectangle<T, N, C, TH>, N extends Number,
 
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiRectangle<>(this,
-			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() {
+		return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiRectangle<>(this,
+				IMutatorImmutablizable.of(getMutator().toImmutable())));
+	}
 }

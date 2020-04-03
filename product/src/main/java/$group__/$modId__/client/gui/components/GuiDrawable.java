@@ -60,8 +60,10 @@ public abstract class GuiDrawable<T extends GuiDrawable<T, N, C, TH>, N extends 
 	public IMutatorImmutablizable<?, ?> getMutator() { return mutator; }
 
 	@Override
-	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t,
-			mutator); }
+	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) {
+		return trySet(t -> this.mutator = t,
+				mutator);
+	}
 
 	public IColored<C> getColored() { return colored; }
 

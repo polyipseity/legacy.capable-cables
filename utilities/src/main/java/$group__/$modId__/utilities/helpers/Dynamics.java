@@ -51,10 +51,10 @@ public enum Dynamics {
 
 	public static final LoadingCache<String, org.reflections.Reflections> REFLECTIONS_CACHE =
 			CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_3).expireAfterAccess(CACHE_EXPIRATION_ACCESS_DURATION, CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(t -> {
-		org.reflections.Reflections r = new org.reflections.Reflections(t);
-		r.expandSuperTypes();
-		return r;
-	}));
+				org.reflections.Reflections r = new org.reflections.Reflections(t);
+				r.expandSuperTypes();
+				return r;
+			}));
 
 	private static final Logger LOGGER = LogManager.getLogger(Dynamics.class);
 
@@ -217,12 +217,16 @@ public enum Dynamics {
 			}
 
 			public static <T> boolean mapFields(Class<T> common, T from, T to, Function<Object, ?> mapper,
-			                                    @Nullable Logger logger) { return mapFields(common, from, to, mapper,
-					true, logger); }
+			                                    @Nullable Logger logger) {
+				return mapFields(common, from, to, mapper,
+						true, logger);
+			}
 
 			public static <T> boolean copyFields(Class<T> common, T from, T to, boolean supers,
-			                                     @Nullable Logger logger) { return mapFields(common, from, to,
-					identity(), supers, logger); }
+			                                     @Nullable Logger logger) {
+				return mapFields(common, from, to,
+						identity(), supers, logger);
+			}
 
 			@SuppressWarnings("UnusedReturnValue")
 			public static <T> boolean copyFields(Class<T> common, T from, T to, @Nullable Logger logger) { return copyFields(common, from, to, true, logger); }
@@ -265,9 +269,9 @@ public enum Dynamics {
 
 			public static final MethodHandle FIELD_MODIFIERS_SETTER =
 					assertNonnull(tryCall(() -> IMPL_LOOKUP.findGetter(Field.class, "modifiers", int.class), LOGGER).orElseGet(() -> {
-				consumeIfCaughtThrowable(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_FIND_METHOD_HANDLE.makeMessage("modifiers field", Field.class, "modifiers", null, int.class), t)));
-				return null;
-			}));
+						consumeIfCaughtThrowable(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_FIND_METHOD_HANDLE.makeMessage("modifiers field", Field.class, "modifiers", null, int.class), t)));
+						return null;
+					}));
 		}
 	}
 

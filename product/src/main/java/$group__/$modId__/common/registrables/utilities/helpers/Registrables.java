@@ -102,7 +102,9 @@ public enum Registrables {
 
 		/* SECTION static initializer */
 
-		public static Optional<NBTTagCompound> returnTagIfNotEmpty(NBTTagCompound p) { return p.getSize() == 0 ?
-				Optional.empty() : Optional.of(p); }
+		public static Optional<NBTTagCompound> returnTagIfNotEmpty(NBTTagCompound p) {
+			return p.getSize() == 0 ?
+					Optional.empty() : Optional.of(p);
+		}
 	}
 }

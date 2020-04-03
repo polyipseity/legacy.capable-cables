@@ -78,7 +78,8 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 					} else if (tag.pickedUpBlockTile != null) {
 						@Nullable TileEntity tile = state.getBlock().createTileEntity(world, state);
 						if (tile == null) {
-							LOGGER.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot create tile entity of" +
+							LOGGER.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot create tile entity " +
+									"of" +
 									" block state ID {}", tag.pickedUpBlockState));
 							return false;
 						}
@@ -219,7 +220,8 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 	@Override
 	@Optional.Method(modid = BUILDCRAFT_API_ID)
 	public void wrenchUsed(EntityPlayer player, EnumHand hand, ItemStack wrench, RayTraceResult rayTrace) {  /* MARK
-	empty */ }
+	empty */
+	}
 
 
 	@Override

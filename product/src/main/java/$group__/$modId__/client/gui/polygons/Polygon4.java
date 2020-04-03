@@ -25,8 +25,10 @@ public class Polygon4<T extends Polygon4<T, N, L>, N extends Number, L extends L
 	public Polygon4(Polygon4<?, N, L> copy) { this(copy, copy.getMutator()); }
 
 
-	protected Polygon4(Polygon4<?, N, L> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getVertexes(),
-			mutator, copy.getLogging()); }
+	protected Polygon4(Polygon4<?, N, L> copy, IMutatorImmutablizable<?, ?> mutator) {
+		this(copy.getVertexes(),
+				mutator, copy.getLogging());
+	}
 
 
 	/* SECTION getters & setters */
@@ -54,6 +56,8 @@ public class Polygon4<T extends Polygon4<T, N, L>, N extends Number, L extends L
 	/* SECTION methods */
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new Polygon4<>(this,
-			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() {
+		return castUncheckedUnboxedNonnull(isImmutable() ? this : new Polygon4<>(this,
+				IMutatorImmutablizable.of(getMutator().toImmutable())));
+	}
 }

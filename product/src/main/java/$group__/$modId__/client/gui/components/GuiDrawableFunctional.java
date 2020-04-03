@@ -75,6 +75,8 @@ public class GuiDrawableFunctional<T extends GuiDrawableFunctional<T, N, C, TH>,
 
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this :
-			new GuiDrawableFunctional<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() {
+		return castUncheckedUnboxedNonnull(isImmutable() ? this :
+				new GuiDrawableFunctional<>(this, IMutatorImmutablizable.of(getMutator().toImmutable())));
+	}
 }

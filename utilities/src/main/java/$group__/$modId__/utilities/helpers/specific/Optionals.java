@@ -18,8 +18,10 @@ public enum Optionals {
 			extends T> whenAbsent) { return optional == null ? whenAbsent.get() : whenPresent.apply(optional); }
 
 	public static <O, T> T optionalNonnull(@Nullable O optional, Function<? super O, ? extends T> whenPresent,
-	                                       Supplier<? extends T> whenAbsent) { return assertNonnull(optional(optional,
-			whenPresent, whenAbsent)); }
+	                                       Supplier<? extends T> whenAbsent) {
+		return assertNonnull(optional(optional,
+				whenPresent, whenAbsent));
+	}
 
 
 	@Nullable

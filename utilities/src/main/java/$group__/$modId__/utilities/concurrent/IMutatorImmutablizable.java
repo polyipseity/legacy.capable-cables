@@ -22,16 +22,16 @@ public interface IMutatorImmutablizable<T extends IMutator & IImmutablizable<I>,
 			, I> of(T obj) {
 		return obj instanceof IMutatorImmutablizable<?, ?> ? castUncheckedUnboxedNonnull(obj) :
 				new IMutatorImmutablizable<T, I>() {
-			/* SECTION methods */
+					/* SECTION methods */
 
-			@Override
-			public I toImmutable() { return obj.toImmutable(); }
+					@Override
+					public I toImmutable() { return obj.toImmutable(); }
 
-			@Override
-			public <O> boolean trySet(Consumer<O> setter, @Nullable O target, boolean initialize) { return obj.trySet(setter, target, initialize); }
+					@Override
+					public <O> boolean trySet(Consumer<O> setter, @Nullable O target, boolean initialize) { return obj.trySet(setter, target, initialize); }
 
-			@Override
-			public <O> O mutate(Supplier<O> action, boolean initialize) throws UnsupportedOperationException { return obj.mutate(action, initialize); }
-		};
+					@Override
+					public <O> O mutate(Supplier<O> action, boolean initialize) throws UnsupportedOperationException { return obj.mutate(action, initialize); }
+				};
 	}
 }

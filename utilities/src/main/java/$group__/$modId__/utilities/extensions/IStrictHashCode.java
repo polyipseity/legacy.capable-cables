@@ -35,24 +35,26 @@ public interface IStrictHashCode {
 
 	LoadingCache<Class<?>, BiFunction<Object, Supplier<? extends Integer>, Integer>> FUNCTION_MAP =
 			CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_3).expireAfterAccess(CACHE_EXPIRATION_ACCESS_DURATION, CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(k -> {
-		assert k != null;
+				assert k != null;
 
-		ArrayList<BiFunction<Object, Supplier<? extends Integer>, Object>> ffs = new ArrayList<>(INITIAL_CAPACITY_2);
-		if (k.getSuperclass() != Object.class) ffs.add((t, hcs) -> hcs.get());
+				ArrayList<BiFunction<Object, Supplier<? extends Integer>, Object>> ffs =
+						new ArrayList<>(INITIAL_CAPACITY_2);
+				if (k.getSuperclass() != Object.class) ffs.add((t, hcs) -> hcs.get());
 
-		getThisAndSuperclasses(k).forEach(c -> {
-			for (Field f : c.getDeclaredFields()) {
-				if (isMemberStatic(f) || !isMemberFinal(f)) continue;
-				@Nullable MethodHandle fm = unboxOptional(tryCall(() -> IMPL_LOOKUP.unreflectGetter(f), LOGGER));
-				consumeIfCaughtThrowable(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_UNREFLECT_MEMBER.makeMessage("field getter", f, IMPL_LOOKUP), t)));
-				if (fm == null) continue;
+				getThisAndSuperclasses(k).forEach(c -> {
+					for (Field f : c.getDeclaredFields()) {
+						if (isMemberStatic(f) || !isMemberFinal(f)) continue;
+						@Nullable MethodHandle fm = unboxOptional(tryCall(() -> IMPL_LOOKUP.unreflectGetter(f),
+								LOGGER));
+						consumeIfCaughtThrowable(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_UNREFLECT_MEMBER.makeMessage("field getter", f, IMPL_LOOKUP), t)));
+						if (fm == null) continue;
 
-				ffs.add((t, hcs) -> unboxOptional(tryCallWithLogging(() -> fm.invoke(t), LOGGER)));
-			}
-		});
+						ffs.add((t, hcs) -> unboxOptional(tryCallWithLogging(() -> fm.invoke(t), LOGGER)));
+					}
+				});
 
-		return (t, hcs) -> ffs.stream().map(ff -> ff.apply(t, hcs)).collect(Collectors.toList()).hashCode();
-	}));
+				return (t, hcs) -> ffs.stream().map(ff -> ff.apply(t, hcs)).collect(Collectors.toList()).hashCode();
+			}));
 
 
 	/* SECTION static methods */

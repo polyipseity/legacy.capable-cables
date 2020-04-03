@@ -73,8 +73,10 @@ public class GuiGroup<T extends GuiGroup<T, N, C, TH, CO, E>, N extends Number, 
 	/* SECTION methods */
 
 	@Override
-	public boolean tryDraw(Minecraft client) { return children.stream().reduce(false, (t, u) -> u.tryDraw(client) || t
-			, Boolean::logicalOr); }
+	public boolean tryDraw(Minecraft client) {
+		return children.stream().reduce(false, (t, u) -> u.tryDraw(client) || t
+				, Boolean::logicalOr);
+	}
 
 	@Override
 	public Optional<Rectangle<?, N>> spec() {
@@ -93,6 +95,8 @@ public class GuiGroup<T extends GuiGroup<T, N, C, TH, CO, E>, N extends Number, 
 
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiGroup<>(this,
-			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() {
+		return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiGroup<>(this,
+				IMutatorImmutablizable.of(getMutator().toImmutable())));
+	}
 }

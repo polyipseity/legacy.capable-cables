@@ -38,8 +38,10 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 
 	protected NumberRelativeDisplay(Number value, Number parent, @Nullable Number offset, BiConsumer<?
 			super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater, IMutatorImmutablizable<?, ?> mutator,
-	                                ILogging<Logger> logging) { this(value, parent, offset, updater,
-			new AtomicBoolean(true), mutator, logging); }
+	                                ILogging<Logger> logging) {
+		this(value, parent, offset, updater,
+				new AtomicBoolean(true), mutator, logging);
+	}
 
 	protected NumberRelativeDisplay(Number value, Number parent, @Nullable Number offset, BiConsumer<?
 			super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater, AtomicBoolean update, IMutatorImmutablizable<?,
@@ -107,13 +109,17 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 		         ILogging<Logger> logging) { this(value, offset, new AtomicBoolean(true), mutator, logging); }
 
 		public X(Number value, @Nullable Number offset, AtomicBoolean update, IMutatorImmutablizable<?, ?> mutator,
-		         ILogging<Logger> logging) { this(value, getResolution().getScaledWidth_double(), offset, update,
-				mutator, logging); }
+		         ILogging<Logger> logging) {
+			this(value, getResolution().getScaledWidth_double(), offset, update,
+					mutator, logging);
+		}
 
 		public X(Number value, AtomicBoolean update, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) { this(value, null, update, mutator, logging); }
 
-		public X(Number value, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) { this(value,
-				new AtomicBoolean(true), mutator, logging); }
+		public X(Number value, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
+			this(value,
+					new AtomicBoolean(true), mutator, logging);
+		}
 
 		public X(X<?> copy) { this(copy, copy.getMutator()); }
 
@@ -125,9 +131,11 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 			}, update, mutator, logging);
 		}
 
-		protected X(X<?> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getValue(),
-				copy.tryGetParent().orElseThrow(() -> rejectArguments(copy)), unboxOptional(copy.tryGetOffset()),
-				copy.getUpdate(), mutator, copy.getLogging()); }
+		protected X(X<?> copy, IMutatorImmutablizable<?, ?> mutator) {
+			this(copy.getValue(),
+					copy.tryGetParent().orElseThrow(() -> rejectArguments(copy)), unboxOptional(copy.tryGetOffset()),
+					copy.getUpdate(), mutator, copy.getLogging());
+		}
 
 
 		/* SECTION static methods */
@@ -140,8 +148,10 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 		/* SECTION methods */
 
 		@Override
-		public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new X<>(this,
-				IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+		public T toImmutable() {
+			return castUncheckedUnboxedNonnull(isImmutable() ? this : new X<>(this,
+					IMutatorImmutablizable.of(getMutator().toImmutable())));
+		}
 	}
 
 	public static class Y<T extends Y<T>> extends NumberRelativeDisplay<T> {
@@ -156,13 +166,17 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 		         ILogging<Logger> logging) { this(value, offset, new AtomicBoolean(true), mutator, logging); }
 
 		public Y(Number value, @Nullable Number offset, AtomicBoolean update, IMutatorImmutablizable<?, ?> mutator,
-		         ILogging<Logger> logging) { this(value, getResolution().getScaledWidth_double(), offset, update,
-				mutator, logging); }
+		         ILogging<Logger> logging) {
+			this(value, getResolution().getScaledWidth_double(), offset, update,
+					mutator, logging);
+		}
 
 		public Y(Number value, AtomicBoolean update, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) { this(value, null, update, mutator, logging); }
 
-		public Y(Number value, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) { this(value,
-				new AtomicBoolean(true), mutator, logging); }
+		public Y(Number value, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
+			this(value,
+					new AtomicBoolean(true), mutator, logging);
+		}
 
 		public Y(Y<?> copy) { this(copy, copy.getMutator()); }
 
@@ -174,9 +188,11 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 			}, update, mutator, logging);
 		}
 
-		protected Y(Y<?> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getValue(),
-				copy.tryGetParent().orElseThrow(() -> rejectArguments(copy)), unboxOptional(copy.tryGetOffset()),
-				copy.getUpdate(), mutator, copy.getLogging()); }
+		protected Y(Y<?> copy, IMutatorImmutablizable<?, ?> mutator) {
+			this(copy.getValue(),
+					copy.tryGetParent().orElseThrow(() -> rejectArguments(copy)), unboxOptional(copy.tryGetOffset()),
+					copy.getUpdate(), mutator, copy.getLogging());
+		}
 
 
 		/* SECTION static methods */
@@ -189,7 +205,9 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 		/* SECTION methods */
 
 		@Override
-		public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new Y<>(this,
-				IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+		public T toImmutable() {
+			return castUncheckedUnboxedNonnull(isImmutable() ? this : new Y<>(this,
+					IMutatorImmutablizable.of(getMutator().toImmutable())));
+		}
 	}
 }

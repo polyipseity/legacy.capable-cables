@@ -82,8 +82,10 @@ public class ConfigurationI18n<T extends ConfigurationI18n<T, M>, M extends Map<
 
 	public void setParent(ConfigurationI18n<?, ?> parent) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetParent(parent)); }
 
-	public boolean trySetParent(ConfigurationI18n<?, ?> parent) { return trySet(t -> this.parent =
-			new WeakReference<>(t), parent); }
+	public boolean trySetParent(ConfigurationI18n<?, ?> parent) {
+		return trySet(t -> this.parent =
+				new WeakReference<>(t), parent);
+	}
 
 	public Optional<ConfigurationI18n<?, ?>> tryGetParent() { return Optional.ofNullable(getParent()); }
 
@@ -104,8 +106,10 @@ public class ConfigurationI18n<T extends ConfigurationI18n<T, M>, M extends Map<
 	public IMutatorImmutablizable<?, ?> getMutator() { return mutator; }
 
 	@Override
-	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t,
-			mutator); }
+	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) {
+		return trySet(t -> this.mutator = t,
+				mutator);
+	}
 
 	@Override
 	public ILogging<Logger> getLogging() { return logging; }
@@ -117,8 +121,10 @@ public class ConfigurationI18n<T extends ConfigurationI18n<T, M>, M extends Map<
 	/* SECTION methods */
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(new ConfigurationI18n<>(this,
-			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() {
+		return castUncheckedUnboxedNonnull(new ConfigurationI18n<>(this,
+				IMutatorImmutablizable.of(getMutator().toImmutable())));
+	}
 
 	@Override
 	public boolean isImmutable() { return getMutator().isImmutable(); }

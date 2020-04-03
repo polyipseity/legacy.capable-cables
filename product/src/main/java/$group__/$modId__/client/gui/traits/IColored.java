@@ -18,8 +18,10 @@ public interface IColored<T> {
 	/* SECTION static methods */
 
 	static <T, L extends Logger> IColored<T> of(@Nullable T color, IMutatorImmutablizable<?, ?> mutator,
-	                                            ILogging<Logger> logging) { return color == null ?
-			GuiColorNull.getInstance() : new GuiColor<>(color, mutator, logging); }
+	                                            ILogging<Logger> logging) {
+		return color == null ?
+				GuiColorNull.getInstance() : new GuiColor<>(color, mutator, logging);
+	}
 
 
 	/* SECTION getters & setters */

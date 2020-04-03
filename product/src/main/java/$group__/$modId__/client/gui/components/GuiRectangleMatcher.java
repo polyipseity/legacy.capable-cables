@@ -42,8 +42,10 @@ public class GuiRectangleMatcher<T extends GuiRectangleMatcher<T, N, C, TH, D>, 
 
 
 	protected GuiRectangleMatcher(GuiRectangleMatcher<?, N, ?, ?, ? extends D> copy,
-	                              IMutatorImmutablizable<?, ?> mutator) { this(copy.getRectangle(), copy.getDrawable()
-			, mutator, copy.getLogging()); }
+	                              IMutatorImmutablizable<?, ?> mutator) {
+		this(copy.getRectangle(), copy.getDrawable()
+				, mutator, copy.getLogging());
+	}
 
 
 	/* SECTION static methods */
@@ -78,6 +80,8 @@ public class GuiRectangleMatcher<T extends GuiRectangleMatcher<T, N, C, TH, D>, 
 
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiRectangleMatcher<>(this,
-			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() {
+		return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiRectangleMatcher<>(this,
+				IMutatorImmutablizable.of(getMutator().toImmutable())));
+	}
 }

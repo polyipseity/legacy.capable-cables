@@ -34,34 +34,35 @@ public interface IStrictToString {
 
 	LoadingCache<Class<?>, BiFunction<Object, String, String>> FUNCTION_MAP =
 			CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_3).expireAfterAccess(CACHE_EXPIRATION_ACCESS_DURATION, CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(k -> {
-		assert k != null;
+				assert k != null;
 
-		final boolean[] first = {true};
-		ArrayList<BiFunction<Object, String, String>> sfs = new ArrayList<>(INITIAL_CAPACITY_2);
-		getThisAndSuperclasses(k).forEach(c -> {
-			for (Field f : c.getDeclaredFields()) {
-				if (isMemberStatic(f)) continue;
-				String fnp = f.getName() + '=';
-				@Nullable MethodHandle fm = unboxOptional(tryCall(() -> IMPL_LOOKUP.unreflectGetter(f), LOGGER));
-				consumeIfCaughtThrowable(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_UNREFLECT_MEMBER.makeMessage("field getter", f, IMPL_LOOKUP), t)));
+				final boolean[] first = {true};
+				ArrayList<BiFunction<Object, String, String>> sfs = new ArrayList<>(INITIAL_CAPACITY_2);
+				getThisAndSuperclasses(k).forEach(c -> {
+					for (Field f : c.getDeclaredFields()) {
+						if (isMemberStatic(f)) continue;
+						String fnp = f.getName() + '=';
+						@Nullable MethodHandle fm = unboxOptional(tryCall(() -> IMPL_LOOKUP.unreflectGetter(f),
+								LOGGER));
+						consumeIfCaughtThrowable(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_UNREFLECT_MEMBER.makeMessage("field getter", f, IMPL_LOOKUP), t)));
 
-				Function<Object, String> ff;
-				if (fm == null) {
-					@Nullable Throwable cau = getCaughtThrowableStatic();
-					ff = t -> "!!!Thrown{throwable=" + cau + "}!!!";
-				} else ff = t -> fnp + unboxOptional(tryCallWithLogging(() -> fm.invoke(t), LOGGER));
+						Function<Object, String> ff;
+						if (fm == null) {
+							@Nullable Throwable cau = getCaughtThrowableStatic();
+							ff = t -> "!!!Thrown{throwable=" + cau + "}!!!";
+						} else ff = t -> fnp + unboxOptional(tryCallWithLogging(() -> fm.invoke(t), LOGGER));
 
+						if (!first[0]) sfs.add((t, ss) -> ", ");
+						sfs.add((t, ss) -> fnp + ff.apply(t));
+						first[0] = false;
+					}
+				});
 				if (!first[0]) sfs.add((t, ss) -> ", ");
-				sfs.add((t, ss) -> fnp + ff.apply(t));
-				first[0] = false;
-			}
-		});
-		if (!first[0]) sfs.add((t, ss) -> ", ");
-		sfs.add((t, ss) -> "super=" + ss + '}');
+				sfs.add((t, ss) -> "super=" + ss + '}');
 
-		String tcp = k.getSimpleName() + '{';
-		return (t, ss) -> sfs.stream().reduce(tcp, (t1, u) -> t1 + u.apply(t, ss), String::concat);
-	}));
+				String tcp = k.getSimpleName() + '{';
+				return (t, ss) -> sfs.stream().reduce(tcp, (t1, u) -> t1 + u.apply(t, ss), String::concat);
+			}));
 
 
 	/* SECTION static methods */

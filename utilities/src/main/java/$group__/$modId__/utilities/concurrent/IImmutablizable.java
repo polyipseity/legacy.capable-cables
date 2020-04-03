@@ -54,34 +54,35 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 	ConcurrentMap<Class<?>, ExternalToImmutableMethod> EXTERNAL_ANNOTATIONS_MAP = MAP_MAKER_MULTI_THREAD.makeMap();
 	LoadingCache<Class<?>, ExternalToImmutableMethod> EXTERNAL_ANNOTATIONS_CACHE =
 			CacheBuilder.newBuilder().initialCapacity(Capacities.INITIAL_CAPACITY_4).concurrencyLevel(Concurrency.MULTI_THREAD_THREAD_COUNT).expireAfterAccess(CACHE_EXPIRATION_ACCESS_DURATION, CACHE_EXPIRATION_ACCESS_TIME_UNIT).build(new CacheLoader<Class<?>, ExternalToImmutableMethod>() {
-		/* SECTION methods */
+				/* SECTION methods */
 
-		@Override
-		public ExternalToImmutableMethod load(Class<?> key) throws NoSuchMethodException {
-			@Nullable ExternalToImmutableMethod r = EXTERNAL_ANNOTATIONS_MAP.get(key);
-			if (r != null) return r;
+				@Override
+				public ExternalToImmutableMethod load(Class<?> key) throws NoSuchMethodException {
+					@Nullable ExternalToImmutableMethod r = EXTERNAL_ANNOTATIONS_MAP.get(key);
+					if (r != null) return r;
 
-			List<Map.Entry<Class<?>, ExternalToImmutableMethod>> l =
-					EXTERNAL_ANNOTATIONS_CACHE.asMap().entrySet().stream().filter(t -> t.getValue().allowExtends() && t.getKey().isAssignableFrom(key)).collect(Collectors.toList());
-			sss:
-			for (ImmutableSet<Class<?>> ss : getSuperclassesAndInterfaces(key))
-				for (Map.Entry<Class<?>, ExternalToImmutableMethod> e : l)
-					if (ss.contains(e.getKey())) {
-						r = e.getValue();
-						break sss;
-					}
+					List<Map.Entry<Class<?>, ExternalToImmutableMethod>> l =
+							EXTERNAL_ANNOTATIONS_CACHE.asMap().entrySet().stream().filter(t -> t.getValue().allowExtends() && t.getKey().isAssignableFrom(key)).collect(Collectors.toList());
+					sss:
+					for (ImmutableSet<Class<?>> ss : getSuperclassesAndInterfaces(key))
+						for (Map.Entry<Class<?>, ExternalToImmutableMethod> e : l)
+							if (ss.contains(e.getKey())) {
+								r = e.getValue();
+								break sss;
+							}
 
-			if (r != null) {
-				ExternalToImmutableMethod rf = r;
-				LOGGER.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("To immutable method '{}' with annotation" +
-						" '{}' auto-registered for class '{}'", EXTERNAL_METHOD_MAP.get(rf), rf,
-						key.toGenericString()));
-			} else
-				throw throw_(new NoSuchMethodException("No to-immutable method for class '" + key.toGenericString() + '\''));
+					if (r != null) {
+						ExternalToImmutableMethod rf = r;
+						LOGGER.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("To immutable method '{}' with " +
+										"annotation" +
+										" '{}' auto-registered for class '{}'", EXTERNAL_METHOD_MAP.get(rf), rf,
+								key.toGenericString()));
+					} else
+						throw throw_(new NoSuchMethodException("No to-immutable method for class '" + key.toGenericString() + '\''));
 
-			return r;
-		}
-	});
+					return r;
+				}
+			});
 
 	/**
 	 * A {@link Set} of classes that cannot be turned into an immutable version of
@@ -149,7 +150,8 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 				m = EXTERNAL_METHOD_MAP.get(EXTERNAL_ANNOTATIONS_CACHE.get(oc));
 			} catch (ExecutionException e) {
 				setCaughtThrowableStatic(e, logger);
-				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable " +
+				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable" +
+						" " +
 						"to immutablize object '{}' of class '{}' as no to immutable method is obtained, will NOT " +
 						"attempt to immutable again", o, oc.toGenericString()), e));
 				BROKEN_CLASS_SET.add(oc);
@@ -165,8 +167,10 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 			});
 			return r;
 		} else {
-			logger.debug(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable to " +
-					"immutable object '{}' of class '{}' as to immutable method annotation is NOT yet processed, will " +
+			logger.debug(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable to" +
+					" " +
+					"immutable object '{}' of class '{}' as to immutable method annotation is NOT yet processed, will" +
+					" " +
 					"attempt to immutable again", o, oc.toGenericString()), newThrowable()));
 			return Optional.of(o);
 		}

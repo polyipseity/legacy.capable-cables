@@ -72,33 +72,35 @@ public interface ICloneable<T> extends Cloneable {
 	ConcurrentMap<Class<?>, ExternalCloneMethod> EXTERNAL_ANNOTATIONS_MAP = MAP_MAKER_MULTI_THREAD.makeMap();
 	LoadingCache<Class<?>, ExternalCloneMethod> EXTERNAL_ANNOTATIONS_CACHE =
 			CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_4).expireAfterAccess(CACHE_EXPIRATION_ACCESS_DURATION, CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(MULTI_THREAD_THREAD_COUNT).build(new CacheLoader<Class<?>, ExternalCloneMethod>() {
-		/* SECTION methods */
+				/* SECTION methods */
 
-		@Override
-		public ExternalCloneMethod load(Class<?> key) throws NoSuchMethodException {
-			@Nullable ExternalCloneMethod r = EXTERNAL_ANNOTATIONS_MAP.get(key);
-			if (r != null) return r;
+				@Override
+				public ExternalCloneMethod load(Class<?> key) throws NoSuchMethodException {
+					@Nullable ExternalCloneMethod r = EXTERNAL_ANNOTATIONS_MAP.get(key);
+					if (r != null) return r;
 
-			List<Map.Entry<Class<?>, ExternalCloneMethod>> l =
-					EXTERNAL_ANNOTATIONS_MAP.entrySet().stream().filter(t -> t.getValue().allowExtends() && t.getKey().isAssignableFrom(key)).collect(Collectors.toList());
-			sss:
-			for (ImmutableSet<Class<?>> ss : getSuperclassesAndInterfaces(key))
-				for (Map.Entry<Class<?>, ExternalCloneMethod> e : l)
-					if (ss.contains(e.getKey())) {
-						r = e.getValue();
-						break sss;
-					}
+					List<Map.Entry<Class<?>, ExternalCloneMethod>> l =
+							EXTERNAL_ANNOTATIONS_MAP.entrySet().stream().filter(t -> t.getValue().allowExtends() && t.getKey().isAssignableFrom(key)).collect(Collectors.toList());
+					sss:
+					for (ImmutableSet<Class<?>> ss : getSuperclassesAndInterfaces(key))
+						for (Map.Entry<Class<?>, ExternalCloneMethod> e : l)
+							if (ss.contains(e.getKey())) {
+								r = e.getValue();
+								break sss;
+							}
 
-			if (r != null) {
-				ExternalCloneMethod rf = r;
-				LOGGER.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Clone method '{}' with annotation '{}' " +
-						"auto-registered for class '{}'", EXTERNAL_METHOD_MAP.get(rf), rf, key.toGenericString()));
-			} else
-				throw throw_(new NoSuchMethodException("No clone method for class '" + key.toGenericString() + '\''));
+					if (r != null) {
+						ExternalCloneMethod rf = r;
+						LOGGER.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Clone method '{}' with " +
+								"annotation '{}' " +
+								"auto-registered for class '{}'", EXTERNAL_METHOD_MAP.get(rf), rf,
+								key.toGenericString()));
+					} else
+						throw throw_(new NoSuchMethodException("No clone method for class '" + key.toGenericString() + '\''));
 
-			return r;
-		}
-	});
+					return r;
+				}
+			});
 
 	Set<Class<?>> BROKEN_CLASS_SET = newSetFromMap(MAP_MAKER_MULTI_THREAD_WEAK_KEYS.makeMap());
 
@@ -156,8 +158,10 @@ public interface ICloneable<T> extends Cloneable {
 				m = assertNonnull(EXTERNAL_METHOD_MAP.get(EXTERNAL_ANNOTATIONS_CACHE.get(oc)));
 			} catch (ExecutionException e) {
 				setCaughtThrowableStatic(e, logger);
-				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable " +
-						"to clone '{}' object of class '{}' as no clone method is obtained, will not attempt to clone " +
+				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable" +
+						" " +
+						"to clone '{}' object of class '{}' as no clone method is obtained, will not attempt to clone" +
+						" " +
 						"again", o, oc.toGenericString()), e));
 				BROKEN_CLASS_SET.add(oc);
 				return Optional.of(o);
@@ -165,15 +169,19 @@ public interface ICloneable<T> extends Cloneable {
 
 			Optional<T> r = tryCall(() -> m.invoke(o), logger).flatMap(Casts::castUnchecked);
 			consumeIfCaughtThrowable(t -> {
-				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Clone " +
-						"method '{}' failed for object '{}' of class '{}', will NOT attempt to clone again", m, o,
+				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Clone" +
+								" " +
+								"method '{}' failed for object '{}' of class '{}', will NOT attempt to clone again", m
+						, o,
 						oc.toGenericString()), t));
 				BROKEN_CLASS_SET.add(oc);
 			});
 			return r;
 		} else {
-			logger.debug(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable to " +
-					"clone object '{}' of class '{}' as clone method annotation is NOT yet processed, will attempt to " +
+			logger.debug(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable to" +
+					" " +
+					"clone object '{}' of class '{}' as clone method annotation is NOT yet processed, will attempt to" +
+					" " +
 					"clone again", o, oc.toGenericString()), newThrowable()));
 			return Optional.of(o);
 		}

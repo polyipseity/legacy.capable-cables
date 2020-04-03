@@ -73,8 +73,9 @@ public interface IProcessorRuntime<A extends Annotation> {
 					@Nullable Method r =
 							Arrays.stream(result.clazz.getDeclaredMethods()).filter(m -> mName.equals(Dynamics.getMethodNameDescriptor(m))).findFirst().orElse(null);
 					if (r == null)
-						throw Throwables.rejectArguments(new NoSuchMethodException(makeMessage(this, "No method name " +
-								"'" + mName + "' in class '" + result.clazz.toGenericString() + '\'')),
+						throw Throwables.rejectArguments(new NoSuchMethodException(makeMessage(this, "No method name" +
+										" " +
+										"'" + mName + "' in class '" + result.clazz.toGenericString() + '\'')),
 								result.thisAsm);
 					return r;
 				}

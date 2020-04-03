@@ -44,8 +44,10 @@ public class GuiColor<T extends GuiColor<T, C>, C> implements IStructure<T, T>, 
 	public GuiColor(GuiColor<?, C> copy) { this(copy, copy.getMutator()); }
 
 
-	protected GuiColor(GuiColor<?, C> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getColor(), mutator,
-			copy.logging); }
+	protected GuiColor(GuiColor<?, C> copy, IMutatorImmutablizable<?, ?> mutator) {
+		this(copy.getColor(), mutator,
+				copy.logging);
+	}
 
 
 	/* SECTION getters & setters */
@@ -55,15 +57,19 @@ public class GuiColor<T extends GuiColor<T, C>, C> implements IStructure<T, T>, 
 	public C getColor() { return color; }
 
 	@Override
-	public boolean trySetColor(@Nullable @CheckForNull C color) { return color != null && trySet(t -> this.color = t,
-			color); }
+	public boolean trySetColor(@Nullable @CheckForNull C color) {
+		return color != null && trySet(t -> this.color = t,
+				color);
+	}
 
 	@Override
 	public IMutatorImmutablizable<?, ?> getMutator() { return mutator; }
 
 	@Override
-	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t,
-			mutator); }
+	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) {
+		return trySet(t -> this.mutator = t,
+				mutator);
+	}
 
 	@Override
 	public ILogging<Logger> getLogging() { return logging; }
@@ -75,8 +81,10 @@ public class GuiColor<T extends GuiColor<T, C>, C> implements IStructure<T, T>, 
 	/* SECTION methods */
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiColor<>(this,
-			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() {
+		return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiColor<>(this,
+				IMutatorImmutablizable.of(getMutator().toImmutable())));
+	}
 
 	@Override
 	public boolean isImmutable() { return getMutator().isImmutable(); }

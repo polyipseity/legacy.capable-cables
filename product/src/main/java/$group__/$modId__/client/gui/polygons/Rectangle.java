@@ -26,8 +26,10 @@ public class Rectangle<T extends Rectangle<T, N>, N extends Number> extends Poly
 	/* SECTION constructors */
 
 	public Rectangle(N offsetX, N offsetY, N sizeX, N sizeY, IMutatorImmutablizable<?, ?> mutator,
-	                 ILogging<Logger> logging) { this(new XY<>(offsetX, offsetY, mutator, logging), new XY<>(sizeX,
-			sizeY, mutator, logging), mutator, logging); }
+	                 ILogging<Logger> logging) {
+		this(new XY<>(offsetX, offsetY, mutator, logging), new XY<>(sizeX,
+				sizeY, mutator, logging), mutator, logging);
+	}
 
 	public Rectangle(XY<?, N> offset, XY<?, N> size, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
 		super(Arrays.asList(offset.toImmutable(), offset.sumX(size).toImmutable(),
@@ -39,8 +41,10 @@ public class Rectangle<T extends Rectangle<T, N>, N extends Number> extends Poly
 	public Rectangle(Rectangle<?, N> copy) { this(copy, copy.getMutator()); }
 
 
-	protected Rectangle(Rectangle<?, N> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getOffset(),
-			copy.getSize(), mutator, copy.getLogging()); }
+	protected Rectangle(Rectangle<?, N> copy, IMutatorImmutablizable<?, ?> mutator) {
+		this(copy.getOffset(),
+				copy.getSize(), mutator, copy.getLogging());
+	}
 
 
 	/* SECTION constructors */
@@ -104,6 +108,8 @@ public class Rectangle<T extends Rectangle<T, N>, N extends Number> extends Poly
 
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new Rectangle<>(this,
-			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() {
+		return castUncheckedUnboxedNonnull(isImmutable() ? this : new Rectangle<>(this,
+				IMutatorImmutablizable.of(getMutator().toImmutable())));
+	}
 }

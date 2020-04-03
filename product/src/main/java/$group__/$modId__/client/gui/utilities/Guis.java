@@ -37,8 +37,10 @@ public enum Guis {
 	public static void bindTexture(ResourceLocation tex) { TEXTURE_MANAGER.bindTexture(tex); }
 
 
-	public static ITheme<?> getOrDefaultTheme(@Nullable ITheme<?> theme) { return theme == null ? ITheme.NULL :
-			theme; }
+	public static ITheme<?> getOrDefaultTheme(@Nullable ITheme<?> theme) {
+		return theme == null ? ITheme.NULL :
+				theme;
+	}
 
 	public static void drawRectangle(@Nullable ITheme<?> that, Rectangle<?, ?> rect, Color color) { getOrDefaultTheme(that).drawRect(rect, color); }
 

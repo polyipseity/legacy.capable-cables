@@ -33,8 +33,10 @@ public class GuiTabs<T extends GuiTabs<T, N, C, TH, TA, E>, N extends Number, C,
 		setOpen(this, open, true);
 	}
 
-	public GuiTabs(TA tabs, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) { this(tabs, 0, mutator,
-			logging); }
+	public GuiTabs(TA tabs, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
+		this(tabs, 0, mutator,
+				logging);
+	}
 
 	public GuiTabs(GuiTabs<?, N, ?, ?, TA, ? extends E> copy) { this(copy, copy.getMutator()); }
 
@@ -126,6 +128,8 @@ public class GuiTabs<T extends GuiTabs<T, N, C, TH, TA, E>, N extends Number, C,
 	/* SECTION methods */
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiTabs<>(this,
-			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() {
+		return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiTabs<>(this,
+				IMutatorImmutablizable.of(getMutator().toImmutable())));
+	}
 }

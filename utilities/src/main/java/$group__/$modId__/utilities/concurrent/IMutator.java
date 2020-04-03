@@ -24,8 +24,10 @@ public interface IMutator {
 		return t.get();
 	}
 
-	static <T> T trySetNonnull(IMutator mutator, T target, boolean initialize) { return requireNonNull(trySet(mutator,
-			target, initialize)); }
+	static <T> T trySetNonnull(IMutator mutator, T target, boolean initialize) {
+		return requireNonNull(trySet(mutator,
+				target, initialize));
+	}
 
 	<T> boolean trySet(Consumer<T> setter, @Nullable T target, boolean initialize);
 

@@ -114,6 +114,8 @@ public class GuiTab<T extends GuiTab<T, N, C, TH, E>, N extends Number, C, TH ex
 
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiTab<>(this,
-			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() {
+		return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiTab<>(this,
+				IMutatorImmutablizable.of(getMutator().toImmutable())));
+	}
 }

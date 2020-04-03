@@ -81,6 +81,8 @@ public class GuiResource<T extends GuiResource<T, N, C, TH, NT>, N extends Numbe
 	}
 
 	@Override
-	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiResource<>(this,
-			IMutatorImmutablizable.of(getMutator().toImmutable()))); }
+	public T toImmutable() {
+		return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiResource<>(this,
+				IMutatorImmutablizable.of(getMutator().toImmutable())));
+	}
 }
