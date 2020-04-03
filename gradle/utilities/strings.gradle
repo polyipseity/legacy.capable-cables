@@ -1,0 +1,10 @@
+//////////////////////////////////////////////////
+// TITLE Strings
+//////////////////////////////////////////////////
+
+
+/* SECTION methods */
+
+project.ext.evaluateGString = { String s, Binding b = (new Binding(project.properties)) -> new GroovyShell(b).evaluate s }
+
+project.ext.evaluateGStringString = { String s, Binding b = (new Binding(project.properties)) -> ext.evaluateGString "\"\"\"$s\"\"\"", b }

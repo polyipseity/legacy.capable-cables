@@ -1,0 +1,36 @@
+//////////////////////////////////////////////////
+// TITLE Properties (.properties)
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+
+/* SECTION check */
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply(['createNewFile'])
+
+
+/* SECTION methods */
+
+project.ext.storeProperties = { Properties prop, String path, String comment = null ->
+    File f = file path
+    createNewFile f
+    FileOutputStream fos = new FileOutputStream(f)
+    try {
+        prop.store fos, comment
+    } finally {
+        fos.close()
+    }
+}
+
+project.ext.loadProperties = { String path ->
+    Properties prop = new Properties()
+    FileInputStream fis = new FileInputStream(path)
+    try {
+        prop.load fis
+    } finally {
+        fis.close()
+    }
+    prop
+}

@@ -2,12 +2,10 @@
 // TITLE Gradle Build Script
 //////////////////////////////////////////////////
 
-import groovy.io.FileType
 import groovy.json.JsonBuilder
 import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 import net.minecraftforge.gradle.user.TaskSourceCopy
-
-import java.util.regex.Pattern
 
 import static java.io.File.separator
 
@@ -31,26 +29,73 @@ buildscript {
 }
 
 
-/* SECTION application */
+/* SECTION all projects */
 
-plugins {
-    id 'java'
-    id 'scala'
-    id 'eclipse'
-    id 'idea'
+configurations {
+    debug {
+        canBeResolved false
+        canBeConsumed false
+    }
+    runtimeOnly.extendsFrom debug
 }
-//noinspection SpellCheckingInspection
-apply plugin: 'net.minecraftforge.gradle.forge'
 
-apply from: "$rootDir${separator}gradle${separator}utilities.gradle"
-apply from: "$rootDir${separator}gradle${separator}global.gradle"
-apply from: "$rootDir${separator}gradle${separator}io${separator}properties${separator}properties.gradle"
-apply from: "$rootDir${separator}gradle${separator}io${separator}properties${separator}ext.properties.gradle"
+allprojects {
+    /* SECTION extra variables */
+
+    ext {
+        utilitiesDir = "$rootDir${separator}gradle${separator}utilities"
+        modulesDir = "$utilitiesDir${separator}modules"
+    }
 
 
-/* SECTION extension variables */
+    /* SECTION application */
 
-loadExt "$rootDir${separator}buildSrc${separator}ext.properties"
+    apply from: "$modulesDir${separator}plugins.gradle"
+
+    apply from: "$utilitiesDir${separator}miscellaneous.gradle"
+    apply from: "$utilitiesDir${separator}globals.gradle"
+    apply from: "$utilitiesDir${separator}collections.gradle"
+    apply from: "$utilitiesDir${separator}strings.gradle"
+    apply from: "$utilitiesDir${separator}io${separator}io.gradle"
+    apply from: "$utilitiesDir${separator}io${separator}properties${separator}properties.gradle"
+    apply from: "$utilitiesDir${separator}io${separator}properties${separator}ext.properties.gradle"
+
+
+    /* SECTION extra variables */
+
+    loadExt "$projectDir${separator}module.properties"
+
+
+    /* SECTION configuration */
+
+    apply from: "$modulesDir${separator}versioning.gradle"
+    apply from: "$modulesDir${separator}information.gradle"
+
+    apply from: "$modulesDir${separator}configurations.gradle"
+    apply from: "$modulesDir${separator}repositories.gradle"
+    apply from: "$modulesDir${separator}dependencies.gradle"
+
+    apply from: "$modulesDir${separator}source.gradle"
+    apply from: "$modulesDir${separator}resources.gradle"
+    apply from: "$modulesDir${separator}javadoc.gradle"
+    tasks.withType(TaskSourceCopy) { enabled false }
+
+    apply from: "$modulesDir${separator}test.gradle"
+    apply from: "$modulesDir${separator}jar.gradle"
+
+    apply from: "$modulesDir${separator}ide.gradle"
+
+
+    // COMMENT append
+    afterEvaluate { storeExt() }
+}
+
+
+apply from: "$utilitiesDir${separator}throwable.gradle"
+
+/* SECTION extra variables */
+
+loadExt "$rootDir${separator}buildSrc${separator}ext-ra.properties", true
 
 ext {
     // COMMENT game
@@ -63,437 +108,95 @@ ext {
     minecraftVersionRange = "[$minecraftMajor.$minecraftMinor,$minecraftVersion]".toString()
 
 
-    // COMMENT version
-
-    major = major.toInteger()
-    minor = minor.toInteger()
-    patch = patch.toInteger()
-    this.'final' = this.'final'.toBoolean()
-    pre = pre.toBoolean()
-    releaseCandidate = releaseCandidate.toInteger()
-    if (this.'final' && pre) throw new IllegalArgumentException('"final" and "pre" are both "true"!')
-    if ((this.'final' || pre) && releaseCandidate != 0) throw new IllegalArgumentException("'${this.'final' ? 'final' : 'pre'}' is 'true' while 'releaseCandidate' is NOT '0' but '$releaseCandidate'.")
-
-
     // COMMENT mod
 
-    authorList = stringToStringList authorList_
-    screenshots = stringToStringList screenshots_
-    requiredMods = stringToStringList requiredMods_
-    dependencies = stringToStringList dependencies_
-    dependants = stringToStringList dependants_
-
-    StringBuilder cdSb = new StringBuilder()
-    requiredMods.each { cdSb.append "required:$it;" }
-    ext.dependencies.each {
-        if (cdSb.contains(it as String)) cdSb.replaceFirst Pattern.quote("required:$it"), "required-after:$it"
-        else cdSb.append "after:$it;"
-    }
-    dependants.each {
-        //noinspection GrUnresolvedAccess
-        if (cdSb.contains(m as String)) cdSb.replaceFirst Pattern.quote("required:$it"), "required-before:$it"
-        else cdSb.append "before:$it;"
-    }
-    combinedDependencies = cdSb.append(combinedDependenciesAdditions).toString()
+    modId = project.name
 }
 
+/* SECTION application */
 
-/* SECTION repositories */
-
-repositories {
-    gradlePluginPortal()
-    jcenter()
-    mavenCentral()
-    google()
-}
-
-stringToStringMap(customRepositories).each { String k, List<String> v ->
-    v.each {
-        String[] e = it.split('(?<!\\\\):', 2).collect { evaluateGStringString it.trim().replace('\\:', ':') }
-        repositories."$k" {
-            name = e.first()
-            url = e.last()
-        }
-    }
-}
+apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
 
 
 /* SECTION configuration */
 
-version = "${minecraftVersion}-${major}.${minor}.${patch}${project.ext.'final' ? '-final' : pre ? '-beta' : releaseCandidate != 0 ? "-rc$releaseCandidate" : ''}"
-group = group_ // COMMENT http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = project.name
-description = description_
-
-// COMMENT Need this here so eclipse task generates correctly.
-sourceCompatibility = targetCompatibility = 1.8
-
-
-eclipse {
-    classpath {
-        downloadSources = downloadJavadoc = true
-    }
-}
-idea {
-    module {
-        downloadSources = downloadJavadoc = true
-    }
-}
-
-
-//noinspection SpellCheckingInspection
-minecraft {
-    version = minecraftForgeVersion
-    runDir = runDir
-
-    // COMMENT the mappings can be changed at any time, and must be in the following format.
-    // COMMENT snapshot_YYYYMMDD   snapshot are built nightly.
-    // COMMENT stable_#            stables are built at the discretion of the MCP team.
-    // COMMENT Use non-default mappings at your own risk. they may NOT always work.
-    // COMMENT simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = minecraftMappings
-    // COMMENT makeObfSourceJar = false // COMMENT an Srg named sources jar is made by default. uncomment this to disable.
-}
-
-
-configurations {
-    shade
-    compile.extendsFrom shade
-
-    debug
-    compileOnly.extendsFrom debug
-}
-
-
-//noinspection SpellCheckingInspection
-dependencies {
-    // COMMENT you may put jars on which you depend on in ./libs
-    // COMMENT or you may define them like so..
-    // CODE compile 'some.group:artifact:version:classifier'
-    // CODE compile 'some.group:artifact:version'
-
-    // COMMENT real examples
-    // CODE compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
-    // CODE compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
-
-    // COMMENT the 'provided' configuration is for optional dependencies that exist at compile-time but might NOT at runtime.
-    // CODE provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-
-    // COMMENT the deobf configurations:  'deobfCompile' and 'deobfProvided' are the same as the normal compile and provided,
-    // COMMENT except that these dependencies get remapped to your current MCP mappings
-    // CODE deobfCompile 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-    // CODE deobfProvided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-
-    // COMMENT for more info...
-    // COMMENT http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // COMMENT http://www.gradle.org/docs/current/userguide/dependency_management.html
-
-    /* COMMENT
-	'compile' is superseded by 'implementation'.
-	'provided' is superseded by 'compileOnly'.
-	'runtime' is superseded by 'runtimeOnly'.
-	 */
-}
-stringToStringMap(customDependencies).each { String k, List<String> v -> v.each { dependencies.add k, evaluateGStringString(it) } }
-
-
-sourceSets {
-    main
-    test
-    api
-}
-
-
-tasks.withType(TaskSourceCopy) { TaskSourceCopy t ->
-    String sourceSetName = name.replace('source', '').uncapitalize()
-    sourceSetName = sourceSets.find { sourceSetName.startsWith it.name }.name
-    String taskSourceSetName = sourceSetName == 'main' ? '' : sourceSetName.capitalize(),
-           language = name.replace "source${sourceSetName.capitalize()}", ''
-
-    enabled = false
-
-    Sync process = task("process${name.capitalize()}", type: Sync, description: "Process $sourceSetName $language.") {
-        inputs.property 'expand_modId', project.name
-        inputs.property 'expand_name', name_
-        inputs.property 'expand_version', version
-        inputs.property 'expand_dependencies', combinedDependencies
-        //noinspection SpellCheckingInspection
-        inputs.property 'expand_minecraftVersionRange', minecraftVersionRange
-        inputs.property 'expand_certificateFingerprint', certificateFingerprint
-        inputs.property 'expand_updateJSON', updateJSON
-        inputs.property 'expand_group', project.group
-
-        into t.output
-
-        from(temporaryDir) {
-            Map<String, Object> e = [:]
-            inputs.properties.each {
-                if (it.key.startsWith('expand_')) {
-                    String k = it.key.replace('expand_', '')
-                    e.put k, it.value
-                    e.put "${k}__".toString(), it.value
+if (hasProperty('lastGoodSettingsJson')) {
+    gradle.afterProject { Project p ->
+        Object json = new JsonSlurper().parseText(lastGoodSettingsJson)
+        try {
+            json.projects?."$path"?.dependencies?.each { config ->
+                config?.value?.each { dep ->
+                    if (!config.key.startsWith('forgeGradle')) {
+                        p.dependencies.add config.key as String, [group: dep.group, name: dep.name, version: dep.version], { force true }
+                        p.logger.debug "Dependecy overriding with: configuration: $config.key, group: $dep.group, name: $dep.name, version: $dep.version"
+                    }
                 }
             }
-
-            expand e
-
-            Binding eb = new Binding(e)
-            eachFile { it.path = evaluateGStringStringWithBinding it.path, eb }
+        } catch (Exception e) {
+            caughtThrowable e
+            p.logger.log LogLevel.WARN, "'$lastGoodSettingsPath' may be corrupted", e
         }
-    } as Sync
-    t.finalizedBy process
-
-    Sync preProcess = task("preProcess${name.capitalize()}", type: Sync, description: "Prepare sources for processing $sourceSetName $language.") {
-        from t.source
-        into process.temporaryDir
-
-        doLast {
-            destinationDir.eachFileRecurse(FileType.FILES) {
-                it.text = it.text.replace('\\', '\\\\').replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }.replaceAll ~/\$(?!\{)/, '\\\\\\$'
-                // COMMENT standard
-            }
-        }
-    } as Sync
-    Jar postProcess = task("postProcess${name.capitalize()}", type: Jar, description: "Finalize after processing $sourceSetName $language.") {
-        from process.destinationDir
-        classifier "$sourceSetName$language"
-        destinationDir = file "$buildDir/debug"
-
-        createNewFile archivePath
-        dependencies."${"${taskSourceSetName}Compile".uncapitalize()}" files(archivePath)
-    } as Jar
-    process.dependsOn preProcess
-    process.finalizedBy postProcess
-}
-
-
-static <E> String processResourcesList(List<E> l) {
-    l.empty ? '[]' : l.toListString().replace('[', '["').replace(']', '"]').replace(', ', '", "')
-}
-
-tasks.withType(ProcessResources) { ProcessResources t ->
-    String taskSourceSetName = name.replace('process', '').replace('Resources', ''),
-           sourceSetName = (taskSourceSetName.empty ? 'main' : taskSourceSetName).uncapitalize()
-
-    t.configure {
-        // COMMENT this will ensure that this task is redone when the variables change.
-        inputs.property 'expand_modId', project.name
-        inputs.property 'expand_name', name_
-        inputs.property 'expand_description', project.description
-        inputs.property 'expand_version', version
-        //noinspection SpellCheckingInspection
-        inputs.property 'expand_minecraftVersion', project.minecraft.version
-        inputs.property 'expand_url', url
-        inputs.property 'expand_updateUrl', updateUrl
-        inputs.property 'expand_updateJSON', updateJSON
-        inputs.property 'expand_authorList', processResourcesList(authorList as List<String>)
-        inputs.property 'expand_credits', credits
-        inputs.property 'expand_logoFile', logoFile
-        inputs.property 'expand_screenshots', processResourcesList(screenshots as List<String>)
-        inputs.property 'expand_parent', parent_
-        inputs.property 'expand_requiredMods', processResourcesList(requiredMods as List<String>)
-        inputs.property 'expand_dependencies', processResourcesList(project.ext.dependencies as List<String>)
-        inputs.property 'expand_dependants', processResourcesList(dependants as List<String>)
-        inputs.property 'expand_pack_format', pack_format
-
-        Map<String, Object> e = inputs.properties.findAll { it.key.startsWith 'expand_' }.collectEntries { [it.key.replace('expand_', ''), it.value] } as Map<String, Object>
-
-        // COMMENT replace stuff in the to-be-processed files, nothing else
-        from(sourceSets."$sourceSetName".resources.srcDirs as Set<File>) {
-            include '**/*.in'
-            rename ~/(.*)\.in/, '$1'
-
-            // COMMENT replace variables
-            expand e
-        }
-
-        // COMMENT copy everything else except the processed files
-        from(sourceSets."$sourceSetName".resources.srcDirs as Set<File>) {
-            exclude '**/*.in'
-        }
-
-        Binding eb = new Binding(e)
-        eachFile { it.path = evaluateGStringStringWithBinding it.path, eb }
-    }
-
-    Sync sync = task("sync${name.capitalize()}", type: Sync, description: "Sync $sourceSetName resources.") {
-        from t.destinationDir
-        into tasks."compile${taskSourceSetName}Java".destinationDir
-        preserve { include '**/*.class' }
-    } as Sync
-    t.finalizedBy sync
-
-    tasks.jar.dependsOn task("before${taskSourceSetName}Jar", type: Delete, description: "Prepare $sourceSetName stuff for jaring.") {
-        delete fileTree(dir: sync.destinationDir, excludes: ['**/*.class'])
-        mustRunAfter sync
     }
 }
 
-tasks.withType(AbstractCompile) {
-    //noinspection GrUnresolvedAccess
-    options.verbose = true
-    //noinspection SpellCheckingInspection, GrUnresolvedAccess
-    options.compilerArgs << '-Xlint'
-}
-
-
-test {
-    useJUnitPlatform()
-    testLogging {
-        //noinspection GrUnresolvedAccess
-        events 'started', 'passed', 'skipped', 'failed', 'standard_out', 'standard_error'
-    }
-}
-
-
-jar {
-    configurations.shade.each { from(zipTree(it)) { exclude 'META-INF', 'META-INF/**' } }
-}
-
-reobf {
-    //noinspection SpellCheckingInspection
-    jar {
-        // COMMENT extraLines 'PK: org/ejml your/new/package/here/ejml' // COMMENT shading example
-    }
-}
-
-stringToStringMap(customDependencies).each {
-    if (it.key == 'shade') it.value.each {
-        String p = evaluateGStringString(it as String).split(":", 2).first().replace '.', '/'
-        reobf.jar.extraLines "PK: $p ${group.replace '.', '/'}/shaded/$p"
-    }
-}
-
-
-task deobfJar(type: Jar, dependsOn: tasks.jar) {
-    from sourceSets.main.java.outputDir
-    classifier 'dev'
-}
-
-/* CODE
-task sourceJar(type: Jar, dependsOn: tasks.sourceMainJava) {
-    from sourceSets.main.allSource
-    classifier 'sources'
-}
-*/
-
-task javadocJar(type: Jar, dependsOn: tasks.javadoc) {
-    from tasks.javadoc.destinationDir
-    classifier 'javadoc'
-}
-
-tasks.withType(Javadoc) { Javadoc t ->
-    File outputInput = file "$temporaryDir/output"
-
-    finalizedBy task("post${name.capitalize()}", type: Sync, description: "Process $name output for jaring.") {
-        inputs.property 'expand_modId', project.name
-        inputs.property 'expand_name', name_
-        inputs.property 'expand_version', version
-        inputs.property 'expand_dependencies', combinedDependencies
-        //noinspection SpellCheckingInspection
-        inputs.property 'expand_minecraftVersionRange', minecraftVersionRange
-        inputs.property 'expand_certificateFingerprint', certificateFingerprint
-        inputs.property 'expand_updateJSON', updateJSON
-        inputs.property 'expand_group', project.group
-
-        into t.destinationDir
-
-        from(outputInput) {
-            exclude { it.path.contains('$') }
-
-            Map<String, Object> e = [:]
-            inputs.properties.each {
-                if (it.key.startsWith('expand_')) {
-                    String k = it.key.replace('expand_', '')
-                    e.put k, it.value
-                    e.put "${k}__".toString(), it.value
-                }
-            }
-
-            // CODE expand e // COMMENT method code > 65536
-
-            doFirst {
-                t.destinationDir.eachFile(FileType.FILES) {
-                    String text = it.text.replace(':D', '$') // COMMENT specific
-                    /* CODE .replace('\\', '\\\\') */.replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }
-/* CODE .replaceAll ~/\$(?!\{)/, '\\\\\\$' */ // COMMENT standard
-
-                    // COMMENT temp fix for method code > 65536
-                    // TODO use a better fix
-                    e.each { text = text.replace "\${$it.key}", it.value.toString() }
-                    it.text = text
-                }
+afterEvaluate {
+    Project pSub = project(subprojectMain)
+    if (pSub != project) {
+        evaluationDependsOn subprojectMain
+        tasks.each {
+            Task tSub = pSub.tasks.findByName(it.name)
+            if (tSub != null) {
+                it.enabled false
+                it.dependsOn tSub
             }
         }
     }
-
-    destinationDir outputInput
 }
 
-tasks.withType(org.gradle.jvm.tasks.Jar) { org.gradle.jvm.tasks.Jar it ->
-    exclude { it.directory ? it.path.contains('$') : it.path.endsWith('.in') }
-    if (!name.startsWith('postProcess')) artifacts.archives it
-}
-
-
-tasks.runClient.outputs.upToDateWhen { false }
-tasks.runServer.outputs.upToDateWhen { false }
-
-
-task saveCurrentGoodSettings(group: 'build', description: "Saves current good settings to '$lastGoodSettingsPath'.") {
-    outputs.file lastGoodSettingsPath
-
-    doLast {
-        File file = file lastGoodSettingsPath
-        createNewFile file
+gradle.buildFinished { BuildResult r ->
+    if (r.failure == null) {
+        // COMMENT save last good settings
+        logger.info 'Saving last good settings...'
 
         Wrapper wrapper = tasks.wrapper as Wrapper
         Map<String, Object> json = [
-                gradle      : [distributionUrl: wrapper.distributionUrl.replace(wrapper.distributionType.name().toLowerCase(Locale.ROOT), Wrapper.DistributionType.ALL.name().toLowerCase(Locale.ROOT))],
-                dependencies: [],
-                minecraft   : [
+                gradle   : [distributionUrl: wrapper.distributionUrl.replace(wrapper.distributionType.name().toLowerCase(Locale.ROOT), Wrapper.DistributionType.ALL.name().toLowerCase(Locale.ROOT))],
+                minecraft: [
                         version : minecraftForgeVersion,
                         mappings: minecraftMappings
-                ]
+                ],
+                projects : [:]
         ]
-        configurations.each { configuration ->
-            if (configuration.canBeResolved) configuration.resolvedConfiguration.firstLevelModuleDependencies.each { json.dependencies.add([configuration: configuration.name, group: it.moduleGroup, name: it.moduleName, version: it.moduleVersion]) }
-            else configuration.dependencies.each { json.dependencies.add([configuration: configuration.name, group: it.group, name: it.name, version: it.version]) }
+        allprojects.each { project ->
+            Map<String, Object> jsonProject = json.projects."$project.path" = [
+                    dependencies: [:]
+            ]
+            configurations.each { configuration ->
+                List<Object> jsonConfiguration = jsonProject.dependencies."$configuration.name" = []
+                if (configuration.canBeResolved) configuration.resolvedConfiguration.firstLevelModuleDependencies.each { if (it.moduleGroup != null && it.moduleName != 'unspecified' && it.moduleVersion != null) jsonConfiguration << [group: it.moduleGroup, name: it.moduleName, version: it.moduleVersion] }
+                else configuration.dependencies.each { if (it.group != null && it.name != 'unspecified' && it.version != null) jsonConfiguration << [group: it.group, name: it.name, version: it.version] }
+            }
         }
         String jsonText = new JsonBuilder(json).toString()
 
-        file.write jsonText
-        logger.info "'${convertToCanonicalPath lastGoodSettingsPath}':${System.lineSeparator()}${JsonOutput.prettyPrint(jsonText)}"
+        createNewFileFromPath(lastGoodSettingsPath).write jsonText
+        logger.info '{}:{}{}', convertToCanonicalPath(lastGoodSettingsPath), System.lineSeparator(), JsonOutput.prettyPrint(jsonText)
     }
-}
-tasks.build.finalizedBy tasks.saveCurrentGoodSettings
 
+    // COMMENT clean cache
+    logger.info 'Cleaning cache...'
 
-//noinspection SpellCheckingInspection
-task cleanCacheAutomatically(type: Delete, group: 'build', description: 'Clean old items from cache to reduce space usage.', dependsOn: tasks.saveCurrentGoodSettings) {
     // COMMENT Gradle
-
     gradle.gradleUserHomeDir.eachDir { it.eachDirMatch(~/[0-9]+[.-][0-9.+-]+/) { if (it.name != gradle.gradleVersion) delete it } }
 
-
     // COMMENT Minecraft
-
     //noinspection SpellCheckingInspection
     String minecraftCachePath = "$gradle.gradleUserHomeDir.absolutePath${separator}caches${separator}minecraft"
-
-
     // COMMENT Minecraft Coder Pack
     File mcpDir = file "$minecraftCachePath${separator}de${separator}oceanlabs${separator}mcp${separator}mcp_snapshot"
     if (mcpDir.exists()) mcpDir.eachDir { if ("snapshot_$it.name".toString() != minecraftMappings) delete it }
-
-
     // COMMENT Minecraft Forge
-
     //noinspection SpellCheckingInspection
     File minecraftForgeDir = file "$minecraftCachePath${separator}net${separator}minecraftforge${separator}forge"
     if (minecraftForgeDir.exists()) minecraftForgeDir.eachDir { if (it.name != minecraftForgeVersion) delete it }
 }
-tasks.saveCurrentGoodSettings.finalizedBy tasks.cleanCacheAutomatically
-
-
-storeExt()

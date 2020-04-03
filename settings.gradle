@@ -3,7 +3,15 @@
 //////////////////////////////////////////////////
 
 
-/* SECTION variables */
+/* SECTION configuration */
 
 //noinspection SpellCheckingInspection
 rootProject.name = 'capablecables'
+
+
+/* SECTION sub-projects */
+
+include ':annotations'
+include ':utilities'
+include ':annotations:processors'
+include ':product'
