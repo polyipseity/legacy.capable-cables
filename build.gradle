@@ -139,6 +139,20 @@ if (hasProperty('lastGoodSettingsJson')) {
     }
 }
 
+afterEvaluate {
+    Project pSub = project(subprojectMain)
+    if (pSub != project) {
+        evaluationDependsOn subprojectMain
+        tasks.each {
+            Task tSub = pSub.tasks.findByName(it.name)
+            if (tSub != null) {
+                it.enabled false
+                it.dependsOn tSub
+            }
+        }
+    }
+}
+
 gradle.buildFinished { BuildResult r ->
     if (r.failure == null) {
         // COMMENT save last good settings
