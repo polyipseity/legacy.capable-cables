@@ -13,8 +13,11 @@ apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
 /* SECTION configuration */
 
 makeSourceTasks.call {
-    it.inputs.property 'expand_group', project.group
-    it.inputs.property 'expand_modId', modId
+    //noinspection GrUnresolvedAccess
+    it.inputs.properties += [
+            expand_group: project.group,
+            expand_modId: modId
+    ]
 }
 
 makeJUnitPlatformTests.call()

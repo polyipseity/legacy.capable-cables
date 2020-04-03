@@ -49,34 +49,40 @@ static <E> String processResourcesList(List<E> l) {
 archivesBaseName = rootProject.name
 
 makeSourceTasks.call {
-    it.inputs.property 'expand_modId', modId
-    it.inputs.property 'expand_name', name_
-    it.inputs.property 'expand_version', version
-    it.inputs.property 'expand_dependencies', dependenciesString
-    it.inputs.property 'expand_minecraftVersionRange', minecraftVersionRange
-    it.inputs.property 'expand_certificateFingerprint', certificateFingerprint
-    it.inputs.property 'expand_updateJSON', updateJSON
-    it.inputs.property 'expand_group', project.group
+    //noinspection GrUnresolvedAccess
+    it.inputs.properties += [
+            expand_modId: modId,
+            expand_name: name_,
+            expand_version: version,
+                             expand_dependencies: dependenciesString,
+                             expand_minecraftVersionRange: minecraftVersionRange,
+                             expand_certificateFingerprint: certificateFingerprint,
+                             expand_updateJSON: updateJSON,
+                             expand_group: project.group
+    ]
 }
 
 makeResourcesTasks.call {
-    it.inputs.property 'expand_modId', modId
-    it.inputs.property 'expand_name', name_
-    it.inputs.property 'expand_description', project.description
-    it.inputs.property 'expand_version', version
-    it.inputs.property 'expand_minecraftVersion', minecraft.version
-    it.inputs.property 'expand_url', url
-    it.inputs.property 'expand_updateUrl', updateUrl
-    it.inputs.property 'expand_updateJSON', updateJSON
-    it.inputs.property 'expand_authorList', authorList
-    it.inputs.property 'expand_credits', credits
-    it.inputs.property 'expand_logoFile', logoFile
-    it.inputs.property 'expand_screenshots', screenshots
-    it.inputs.property 'expand_parent', parent_
-    it.inputs.property 'expand_requiredMods', requiredMods
-    it.inputs.property 'expand_dependencies', dependencies_
-    it.inputs.property 'expand_dependants', dependants
-    it.inputs.property 'expand_pack_format', pack_format
+    //noinspection GrUnresolvedAccess
+    it.inputs.properties += [
+            expand_modId: modId,
+            expand_name: name_,
+            expand_description: project.description,
+            expand_version: version,
+            expand_minecraftVersion: minecraft.version,
+            expand_url: url,
+            expand_updateUrl: updateUrl,
+            expand_updateJSON: updateJSON,
+            expand_authorList: authorList,
+            expand_credits: credits,
+            expand_logoFile: logoFile,
+            expand_screenshots: screenshots,
+            expand_parent: parent_,
+            expand_requiredMods: requiredMods,
+            expand_dependencies: dependencies_,
+            expand_dependants: dependants,
+            expand_pack_format: pack_format
+    ]
 }
 
 makeJUnitPlatformTests.call()

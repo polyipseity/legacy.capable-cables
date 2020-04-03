@@ -61,7 +61,7 @@ allprojects {
 
     /* SECTION extra variables */
 
-    loadExt "$projectDir${separator}module.properties"
+    loadExt.call "$projectDir${separator}module.properties"
 
 
     /* SECTION configuration */
@@ -85,7 +85,7 @@ allprojects {
 
 
     // COMMENT append
-    afterEvaluate { storeExt() }
+    afterEvaluate { storeExt.call() }
 }
 
 
@@ -93,7 +93,7 @@ apply from: "$utilitiesDir${separator}throwable.gradle"
 
 /* SECTION extra variables */
 
-loadExt "$rootDir${separator}buildSrc${separator}ext-ra.properties", true
+loadExt.call "$rootDir${separator}buildSrc${separator}ext-ra.properties", true
 
 ext {
     // COMMENT game
@@ -130,7 +130,7 @@ if (hasProperty('lastGoodSettingsJson')) {
                 }
             }
         } catch (Exception e) {
-            caughtThrowable e
+            caughtThrowable.call e
             p.logger.log LogLevel.WARN, "'$lastGoodSettingsPath' may be corrupted", e
         }
     }
@@ -174,10 +174,8 @@ gradle.buildFinished { BuildResult r ->
                 else configuration.dependencies.each { if (it.group != null && it.name != 'unspecified' && it.version != null) jsonConfiguration << [group: it.group, name: it.name, version: it.version] }
             }
         }
-        String jsonText = new JsonBuilder(json).toString()
-
-        createNewFileFromPath(lastGoodSettingsPath).write jsonText
-        logger.info '{}:{}{}', convertToCanonicalPath(lastGoodSettingsPath), System.lineSeparator(), JsonOutput.prettyPrint(jsonText)
+        //noinspection GrUnresolvedAccess
+        logger.info '{}:{}{}', convertToCanonicalPath.call(lastGoodSettingsPath), System.lineSeparator(), JsonOutput.prettyPrint(createNewFileFromPath.call(lastGoodSettingsPath).text = new JsonBuilder(json).toString())
     }
 
     // COMMENT clean cache
