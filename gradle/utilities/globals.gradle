@@ -23,6 +23,6 @@ ext {
 
     // COMMENT variables
 
-    lastGoodSettingsPath = "$rootDir${separator}gradle${separator}last-good-settings.json".toString()
+    lastGoodSettingsPath = "$rootDir${separator}gradle${separator}generated${separator}last-good-settings.json".toString()
     repositoryDirectory = "$buildDir${separator}repo".toString()
 }

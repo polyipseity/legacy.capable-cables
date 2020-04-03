@@ -16,7 +16,9 @@ afterEvaluate {
     eclipse.classpath { downloadSources = downloadJavadoc = true }
     idea.module {
         downloadSources = downloadJavadoc = true
+        excludeDirs += [rootProject.file('gradle/generated/'), file(minecraftRunDir)]
+
         // COMMENT the below code should, but does not work
-        // TODO CODE scopes.RUNTIME.plus << configurations.debug
+        // CODE scopes.RUNTIME.plus << configurations.debug
     }
 }
