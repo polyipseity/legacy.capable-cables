@@ -2,11 +2,10 @@
 # Travis CI
 ##################################################
 
-language: java
-
 git:
   depth: 100
 
+language: java
 jdk: openjdk8
 
 os: linux
@@ -25,6 +24,10 @@ matrix:
 
 before_install:
   - chmod +x ./gradlew
+install:
+  - ./gradlew assemble --stacktrace
+script:
+  - ./gradlew check --stacktrace
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock

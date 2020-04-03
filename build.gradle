@@ -43,7 +43,7 @@ allprojects {
     /* SECTION extra variables */
 
     ext {
-        utilitiesDir = "$rootDir${separator}gradle"
+        utilitiesDir = "$rootDir${separator}gradle${separator}utilities"
         modulesDir = "$utilitiesDir${separator}modules"
     }
 
@@ -121,21 +121,29 @@ apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
 /* SECTION configuration */
 
 if (hasProperty('lastGoodSettingsJson')) {
-    gradle.afterProject {
+    gradle.afterProject { Project p ->
         Object json = new JsonSlurper().parseText(lastGoodSettingsJson)
         try {
-            json.projects?."$path"?.dependencies?.each { if (it != null) dependencies.add it.configuration as String, "$it.group:$it.name:$it.version" as String, { force = true } }
+            json.projects?."$path"?.dependencies?.each { config ->
+                config?.value?.each { dep ->
+                    if (!config.key.startsWith('forgeGradle')) {
+                        p.dependencies.add config.key as String, [group: dep.group, name: dep.name, version: dep.version], { force true }
+                        p.logger.debug "Dependecy overriding with: configuration: $config.key, group: $dep.group, name: $dep.name, version: $dep.version"
+                    }
+                }
+            }
         } catch (Exception e) {
             caughtThrowable e
-            logger.info "'$lastGoodSettingsPath' may be corrupted", e
+            p.logger.log LogLevel.WARN, "'$lastGoodSettingsPath' may be corrupted", e
         }
     }
 }
 
-task saveCurrentGoodSettings(group: 'build', description: "Saves current good settings to '$lastGoodSettingsPath'.") {
-    outputs.file lastGoodSettingsPath
+gradle.buildFinished { BuildResult r ->
+    if (r.failure == null) {
+        // COMMENT save last good settings
+        logger.info 'Saving last good settings...'
 
-    doLast {
         Wrapper wrapper = tasks.wrapper as Wrapper
         Map<String, Object> json = [
                 gradle   : [distributionUrl: wrapper.distributionUrl.replace(wrapper.distributionType.name().toLowerCase(Locale.ROOT), Wrapper.DistributionType.ALL.name().toLowerCase(Locale.ROOT))],
@@ -147,46 +155,34 @@ task saveCurrentGoodSettings(group: 'build', description: "Saves current good se
         ]
         allprojects.each { project ->
             Map<String, Object> jsonProject = json.projects."$project.path" = [
-                    dependencies: []
+                    dependencies: [:]
             ]
             configurations.each { configuration ->
-                if (configurations.'default'.extendsFrom.contains(configuration)) {
-                    if (configuration.canBeResolved) configuration.resolvedConfiguration.firstLevelModuleDependencies.each { jsonProject.dependencies.add([configuration: configuration.name, group: it.moduleGroup, name: it.moduleName, version: it.moduleVersion]) }
-                    else configuration.dependencies.each { jsonProject.dependencies.add([configuration: configuration.name, group: it.group, name: it.name, version: it.version]) }
-                }
+                List<Object> jsonConfiguration = jsonProject.dependencies."$configuration.name" = []
+                if (configuration.canBeResolved) configuration.resolvedConfiguration.firstLevelModuleDependencies.each { if (it.moduleGroup != null && it.moduleName != 'unspecified' && it.moduleVersion != null) jsonConfiguration << [group: it.moduleGroup, name: it.moduleName, version: it.moduleVersion] }
+                else configuration.dependencies.each { if (it.group != null && it.name != 'unspecified' && it.version != null) jsonConfiguration << [group: it.group, name: it.name, version: it.version] }
             }
         }
         String jsonText = new JsonBuilder(json).toString()
 
         createNewFileFromPath(lastGoodSettingsPath).write jsonText
-        logger.info('{}:{}{}', convertToCanonicalPath(lastGoodSettingsPath), System.lineSeparator(), JsonOutput.prettyPrint(jsonText))
+        logger.info '{}:{}{}', convertToCanonicalPath(lastGoodSettingsPath), System.lineSeparator(), JsonOutput.prettyPrint(jsonText)
     }
-}
-tasks.build.finalizedBy tasks.saveCurrentGoodSettings
 
+    // COMMENT clean cache
+    logger.info 'Cleaning cache...'
 
-//noinspection SpellCheckingInspection
-task cleanCacheAutomatically(type: Delete, group: 'build', description: 'Clean old items from cache to reduce space usage.', dependsOn: tasks.saveCurrentGoodSettings) {
     // COMMENT Gradle
-
     gradle.gradleUserHomeDir.eachDir { it.eachDirMatch(~/[0-9]+[.-][0-9.+-]+/) { if (it.name != gradle.gradleVersion) delete it } }
 
-
     // COMMENT Minecraft
-
     //noinspection SpellCheckingInspection
     String minecraftCachePath = "$gradle.gradleUserHomeDir.absolutePath${separator}caches${separator}minecraft"
-
-
     // COMMENT Minecraft Coder Pack
     File mcpDir = file "$minecraftCachePath${separator}de${separator}oceanlabs${separator}mcp${separator}mcp_snapshot"
     if (mcpDir.exists()) mcpDir.eachDir { if ("snapshot_$it.name".toString() != minecraftMappings) delete it }
-
-
     // COMMENT Minecraft Forge
-
     //noinspection SpellCheckingInspection
     File minecraftForgeDir = file "$minecraftCachePath${separator}net${separator}minecraftforge${separator}forge"
     if (minecraftForgeDir.exists()) minecraftForgeDir.eachDir { if (it.name != minecraftForgeVersion) delete it }
 }
-tasks.saveCurrentGoodSettings.finalizedBy tasks.cleanCacheAutomatically

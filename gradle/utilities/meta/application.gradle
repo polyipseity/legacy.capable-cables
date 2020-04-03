@@ -3,15 +3,6 @@
 //////////////////////////////////////////////////
 
 import groovy.io.FileType
-
-import static java.io.File.separator;
-
-
-/* SECTION variables */
-
-final String rootDir = "$rootDir${name == 'buildSrc' ? "$separator.." : ''}"
-
-
 /* SECTION variables */
 
 String methodMapName = 'methodMap'
@@ -22,7 +13,7 @@ final Map<String, File> methodMap
 if (hasMethodMap) methodMap = rootProject.ext."$methodMapName"
 else {
     methodMap = [:]
-    file("$rootDir${separator}gradle").eachFileRecurse(FileType.FILES) {
+    file(utilitiesDir).eachFileRecurse(FileType.FILES) {
         if (!it.name.endsWith('.gradle')) return
         it.text.findAll(~/project\.ext\.([^ ]+) = \{/) { s, String m ->
             File p

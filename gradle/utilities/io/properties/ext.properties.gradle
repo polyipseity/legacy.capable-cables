@@ -5,12 +5,6 @@
 import static java.io.File.separator
 
 
-/* SECTION variables */
-
-final String rootDir = "$rootDir${name == 'buildSrc' ? "$separator.." : ''}"
-final String utilitiesDir = "$rootDir${separator}gradle"
-
-
 /* SECTION check */
 
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"

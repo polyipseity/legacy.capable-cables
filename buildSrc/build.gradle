@@ -15,7 +15,14 @@ import static java.io.File.separator
 /* SECTION variables */
 
 final String rootDir = "$projectDir${separator}.."
-final String utilitiesDir = "$rootDir${separator}gradle"
+
+
+/* SECTION extra variables */
+
+ext {
+    ext.rootDir = rootDir
+    utilitiesDir = "$rootDir${separator}gradle${separator}utilities"
+}
 
 
 /* SECTION application */
@@ -119,15 +126,15 @@ void updateGradleWrapperDistributionUrl(String newDistributionUrl) {
     }
 }
 
-String readLastGoodSettings(boolean print) throws FileNotFoundException {
+String readLastGoodSettings() throws FileNotFoundException {
     File jsonFile = file lastGoodSettingsPath
     if (!jsonFile.exists()) throw new FileNotFoundException("'$lastGoodSettingsPath' NOT found, obtain it from the repository")
     jsonFile.text
 }
 
 Object parseLastGoodSettings(boolean print) throws FileNotFoundException {
-    String jsonText = readLastGoodSettings(print)
-    if (print) logger.info('{}:{}{}', convertToCanonicalPath(lastGoodSettingsPath), System.lineSeparator(), jsonText)
+    String jsonText = readLastGoodSettings()
+    if (print) logger.info '{}:{}{}', convertToCanonicalPath(lastGoodSettingsPath), System.lineSeparator(), jsonText
     return new JsonSlurper().parseText(jsonText)
 }
 
@@ -135,7 +142,7 @@ Object parseLastGoodSettings(boolean print) throws FileNotFoundException {
 /* SECTION configuration */
 
 if (!update) {
-    logger.lifecycle('Applying last good settings from "{}"...', convertToCanonicalPath(lastGoodSettingsPath) as String)
+    logger.lifecycle 'Applying last good settings from "{}"...', convertToCanonicalPath(lastGoodSettingsPath) as String
     Object json = parseLastGoodSettings true
 
     //noinspection GrUnresolvedAccess
@@ -146,7 +153,7 @@ if (!update) {
     //noinspection GrUnresolvedAccess
     ext.minecraftMappings = json.minecraft.mappings
 
-    ext.lastGoodSettingsJson = readLastGoodSettings false
+    ext.lastGoodSettingsJson = readLastGoodSettings()
 }
 if (update) {
     if (gradleDistributionUrl == 'latest') {
