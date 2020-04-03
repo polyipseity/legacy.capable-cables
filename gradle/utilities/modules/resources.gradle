@@ -48,7 +48,7 @@ project.ext.makeResourcesTasks = { Closure c ->
         } as Sync
         t.finalizedBy sync
 
-        tasks.jar.dependsOn task("before${taskSourceSetName}Jar", type: Delete, description: "Prepare $sourceSetName stuff for jaring.") {
+        tasks.jar.dependsOn task("pre${taskSourceSetName}Jar", type: Delete, description: "Prepare $sourceSetName stuff for jaring.") {
             delete fileTree(dir: t.destinationDir)
             mustRunAfter sync
         }
