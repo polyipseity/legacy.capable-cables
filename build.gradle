@@ -186,9 +186,3 @@ gradle.buildFinished { BuildResult r ->
     File minecraftForgeDir = file "$minecraftCachePath${separator}net${separator}minecraftforge${separator}forge"
     if (minecraftForgeDir.exists()) minecraftForgeDir.eachDir { if (it.name != minecraftForgeVersion) delete it }
 }
-
-extractRangemapReplacedMain.doFirst {
-    println '=====debug====='
-    println extractRangemapReplacedMain.libs.asPath
-    println '=====end====='
-}
