@@ -215,6 +215,7 @@ gradle-app.setting
 
 # IntelliJ IDEA
 .idea/*.xml
+.idea/.name
 
 # Minecraft run directory
 run/
