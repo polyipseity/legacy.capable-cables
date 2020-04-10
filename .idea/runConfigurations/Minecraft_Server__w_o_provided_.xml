@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Minecraft Server (w/o provided)" type="Application" factoryName="Application" folderName="Minecraft Server">
     <option name="MAIN_CLASS_NAME" value="GradleStartServer" />
-    <module name="capablecables.main" />
+    <module name="capablecables.product.main" />
     <option name="WORKING_DIRECTORY" value="run" />
     <method v="2">
       <option name="Gradle.BeforeRunTask" enabled="true" tasks="makeStart" externalProjectPath="$PROJECT_DIR$" vmOptions="" scriptParameters="" />

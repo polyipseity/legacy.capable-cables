@@ -2,7 +2,7 @@
   <configuration default="false" name="Minecraft Client" type="Application" factoryName="Application" folderName="Minecraft Client" singleton="false">
     <option name="INCLUDE_PROVIDED_SCOPE" value="true" />
     <option name="MAIN_CLASS_NAME" value="GradleStart" />
-    <module name="capablecables.main" />
+    <module name="capablecables.product.main" />
     <option name="WORKING_DIRECTORY" value="run" />
     <RunnerSettings RunnerId="Run" />
     <ConfigurationWrapper RunnerId="Run" />

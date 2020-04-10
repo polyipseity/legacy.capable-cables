@@ -140,12 +140,12 @@ afterEvaluate {
     Project pSub = project(subprojectMain)
     if (pSub != project) {
         evaluationDependsOn subprojectMain
-        tasks.each {
-            Task tSub = pSub.tasks.findByName(it.name)
-            if (tSub != null) {
-                it.enabled false
-                it.dependsOn tSub
-            }
+        pSub.tasks.each {
+            Task t = tasks.findByName(it.name)
+            if (t != null) {
+                t.dependsOn it
+                t.configure { enabled false }
+            } else task it.name, dependsOn: it
         }
     }
 }
