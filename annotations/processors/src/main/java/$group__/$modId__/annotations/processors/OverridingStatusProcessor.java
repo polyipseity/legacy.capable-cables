@@ -1,9 +1,10 @@
 package $group__.$modId__.annotations.processors;
 
 import $group__.$modId__.annotations.OverridingStatus;
+import $group__.$modId__.utilities.helpers.Casts;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
-import com.google.common.collect.Sets;
 
 import javax.annotation.Nullable;
 import javax.annotation.meta.When;
@@ -21,14 +22,13 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import java.util.Collections;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static $group__.$modId__.utilities.helpers.Capacities.INITIAL_CAPACITY_2;
 import static $group__.$modId__.utilities.helpers.Capacities.INITIAL_CAPACITY_4;
 import static $group__.$modId__.utilities.helpers.Processors.*;
-import static $group__.$modId__.utilities.helpers.Recursions.recurseAsDepthFirstLoopUnboxedNonnull;
 import static $group__.$modId__.utilities.helpers.specific.StreamsExtension.streamSmart;
 
+@SuppressWarnings("unused")
 public final class OverridingStatusProcessor extends AbstractProcessor {
 	/* SECTION methods */
 
@@ -40,70 +40,60 @@ public final class OverridingStatusProcessor extends AbstractProcessor {
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-		if (!roundEnv.processingOver()) return false;
+		if (annotations.size() != 1) return false;
 
-		@SuppressWarnings("UnstableApiUsage") SetMultimap<TypeElement, ExecutableElement> typeToExesMMap =
-				MultimapBuilder.hashKeys(INITIAL_CAPACITY_4).hashSetValues(INITIAL_CAPACITY_2).build();
+		SetMultimap<TypeElement, ExecutableElement> typeToExesMMap = MultimapBuilder.hashKeys(INITIAL_CAPACITY_4).hashSetValues(INITIAL_CAPACITY_2).build();
 		roundEnv.getElementsAnnotatedWith(OverridingStatus.class).forEach(e -> typeToExesMMap.put((TypeElement) e.getEnclosingElement(), (ExecutableElement) e));
 
-		Elements elements = processingEnv.getElementUtils();
-		Set<TypeElement> pkgFlat = recurseAsDepthFirstLoopUnboxedNonnull(elements.getPackageElement(""),
-				p -> p.getEnclosedElements().stream().filter(t -> t.asType().getKind() == TypeKind.DECLARED).map(t -> (TypeElement) t).collect(Collectors.toSet()), Element::getEnclosedElements, t -> t.stream().reduce(Collections.emptySet(), Sets::union));
+		Set<TypeElement> pkgFlat = streamSmart(roundEnv.getRootElements(), 5).filter(e -> e.asType().getKind() == TypeKind.DECLARED).map(Casts::<TypeElement>castUncheckedUnboxedNonnull).collect(ImmutableSet.toImmutableSet());
 
+		Elements elements = processingEnv.getElementUtils();
 		Types types = processingEnv.getTypeUtils();
 		Messager messager = processingEnv.getMessager();
-		typeToExesMMap.asMap().forEach((superclass, exes) -> streamSmart(pkgFlat, 1).forEach(subclass -> {
-			if (!isElementAbstract(subclass) && types.isSubtype(subclass.asType(), superclass.asType())) {
+		typeToExesMMap.asMap().forEach((superclass, exes) -> pkgFlat.forEach(subclass -> {
+			if (subclass != superclass && types.isSubtype(types.erasure(subclass.asType()), types.erasure(superclass.asType()))) {
 				exes.forEach(superMethod -> {
 					OverridingStatus a = superMethod.getAnnotation(OverridingStatus.class);
 
 					When when = a.when();
-					@Nullable Boolean whenB = when == When.ALWAYS ? Boolean.TRUE : when == When.NEVER ? Boolean.FALSE
-							: null;
+					@Nullable Boolean whenB = when == When.ALWAYS ? Boolean.TRUE : when == When.NEVER ? Boolean.FALSE : null;
 					if (when == When.UNKNOWN) return;
 
-					if (getEffectiveAnnotationIfInheritingConsidered(OverridingStatus.class, subclass, superMethod,
-							elements, types) != a)
-						return;
-
-					for (Element subMember : elements.getAllMembers(subclass)) {
-						if (subMember.getKind() == ElementKind.METHOD) {
-							ExecutableElement subMethod = (ExecutableElement) subMember;
-							if (elements.overrides(subMethod, superMethod, subclass)) {
-								if (whenB == null || whenB)
-									messager.printMessage(Diagnostic.Kind.NOTE,
-											"Overrides super method '" + superMethod + '\'', subMethod);
-								else
-									messager.printMessage(Diagnostic.Kind.ERROR, "Requirement unfulfilled: should " +
-											"not" +
-											" " +
-											"override super method '" + superMethod + '\'', subMethod);
-								return;
+					@Nullable ExecutableElement subMethod = null;
+					for (Element e : subclass.getEnclosedElements()) {
+						if (e.getKind() == ElementKind.METHOD) {
+							ExecutableElement m = (ExecutableElement) e;
+							if (elements.overrides(m, superMethod, subclass)) {
+								subMethod = m;
+								break;
 							}
 						}
 					}
 
-					if (whenB == null || !whenB) {
-						messager.printMessage(Diagnostic.Kind.NOTE,
-								"Does not override super method '" + superMethod + '\'', subclass);
-					} else {
-						for (TypeElement superclass1 : getIntermediateSuperclasses(subclass,
-								(TypeElement) types.asElement(superclass.getSuperclass()), types)) {
-							for (Element superMethod1 : elements.getAllMembers(superclass1)) {
-								if (superMethod1.getKind() == ElementKind.METHOD && isElementFinal(superMethod1) && elements.overrides((ExecutableElement) superMethod1, superMethod, superclass1)) {
-									messager.printMessage(superclass1.getQualifiedName().toString().startsWith(a.group()) ? Diagnostic.Kind.WARNING : Diagnostic.Kind.NOTE, "Requirement impossible: cannot override final super method '" + superMethod1 + '\'');
-									return;
+					if (subMethod == null) {
+						if (whenB == null)
+							messager.printMessage(Diagnostic.Kind.NOTE, "Does not override super method '" + superMethod + '\'', subclass);
+						else if (whenB) {
+							for (TypeElement superclass1 : getIntermediateSuperclasses(subclass,
+									(TypeElement) types.asElement(superclass.getSuperclass()), types)) {
+								for (Element superMethod1 : superclass1.getEnclosedElements()) {
+									if (superMethod1.getKind() == ElementKind.METHOD && isElementFinal(superMethod1) && elements.overrides((ExecutableElement) superMethod1, superMethod, superclass1)) {
+										messager.printMessage(superclass1.getQualifiedName().toString().startsWith(a.group()) ? Diagnostic.Kind.WARNING : Diagnostic.Kind.NOTE, "Requirement impossible: cannot override final super method '" + superMethod1 + '\'');
+										return;
+									}
 								}
 							}
+							messager.printMessage(Diagnostic.Kind.ERROR, "Requirement unfulfilled: should override super" + ' ' + "method '" + superMethod + '\'');
 						}
-						messager.printMessage(Diagnostic.Kind.ERROR, "Requirement unfulfilled: should override super" +
-								" " +
-								"method '" + superMethod + '\'');
+					} else if (getEffectiveAnnotationWithInheritingConsidered(OverridingStatus.class, subMethod, elements, types).equals(a)) {
+						if (whenB == null)
+							messager.printMessage(Diagnostic.Kind.NOTE, "Overrides super method '" + superMethod + '\'', subMethod);
+						else if (!whenB)
+							messager.printMessage(Diagnostic.Kind.ERROR, "Requirement unfulfilled: should " + "NOT" + ' ' + "override super method '" + superMethod + '\'', subMethod);
 					}
 				});
 			}
 		}));
-
 		return true;
 	}
 }

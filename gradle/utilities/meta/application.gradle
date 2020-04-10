@@ -8,7 +8,7 @@ import groovy.io.FileType
 
 String methodMapName = 'methodMap'
 boolean hasMethodMap
-for (int i = 0; (hasMethodMap = rootProject.ext.has methodMapName) && !(rootProject.ext."$methodMapName" instanceof Map<?, ?>); i++) methodMapName = "methodMap$i"
+for (int i = 0; (hasMethodMap = rootProject.ext.has methodMapName) && !(rootProject.ext."$methodMapName" instanceof Map<?, ?>); ++i) methodMapName = "methodMap$i"
 
 final Map<String, File> methodMap
 if (hasMethodMap) methodMap = rootProject.ext."$methodMapName"

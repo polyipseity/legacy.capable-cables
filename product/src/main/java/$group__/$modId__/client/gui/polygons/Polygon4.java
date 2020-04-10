@@ -56,8 +56,5 @@ public class Polygon4<T extends Polygon4<T, N, L>, N extends Number, L extends L
 	/* SECTION methods */
 
 	@Override
-	public T toImmutable() {
-		return castUncheckedUnboxedNonnull(isImmutable() ? this : new Polygon4<>(this,
-				IMutatorImmutablizable.of(getMutator().toImmutable())));
-	}
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new Polygon4<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
 }

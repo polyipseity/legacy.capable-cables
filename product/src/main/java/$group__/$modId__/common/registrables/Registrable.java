@@ -57,11 +57,11 @@ public abstract class Registrable<T extends IForgeRegistryEntry<T>> extends Sing
 				reg.register(castUncheckedUnboxedNonnull(v));
 				if (v instanceof IRegistrableEventBusSubscriber) {
 					MinecraftForge.EVENT_BUS.register(v);
-					evtRegEd++;
+					++evtRegEd;
 					logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Registered '{}' as '{}'", v,
 							evtRegGS));
 				}
-				regEd++;
+				++regEd;
 				logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Registered '{}' as '{}'", v, classGS));
 			}
 		}

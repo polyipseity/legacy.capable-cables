@@ -16,12 +16,14 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.*;
-import java.util.Arrays;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import static $group__.$modId__.utilities.helpers.Assertions.assertNonnull;
+import static $group__.$modId__.utilities.helpers.Capacities.INITIAL_CAPACITY_2;
 import static $group__.$modId__.utilities.helpers.Capacities.INITIAL_CAPACITY_3;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxed;
 import static $group__.$modId__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
@@ -122,7 +124,7 @@ public enum Dynamics {
 
 	public static <U> ImmutableSet<Class<? extends U>> getSuperclasses(@Nullable Class<? extends U> clazz) { return getIntermediateSuperclasses(clazz, null); }
 
-	public static <U> ImmutableSet<Class<? extends U>> getThisAndSuperclasses(@Nullable Class<? extends U> clazz) { return getLowerAndIntermediateSuperclasses(clazz, null); }
+	public static <U> ImmutableSet<Class<? extends U>> getThisAndSuperclasses(Class<? extends U> clazz) { return getLowerAndIntermediateSuperclasses(clazz, null); }
 
 	public static <U> ImmutableSet<Class<? extends U>> getIntermediateSuperclasses(@Nullable Class<? extends U> lower,
 	                                                                               @Nullable Class<U> upper) { return getLowerAndIntermediateSuperclasses(castUncheckedUnboxed(lower != null ? lower.getSuperclass() : null), upper); }
@@ -134,33 +136,52 @@ public enum Dynamics {
 		return r.build();
 	}
 
-	public static ImmutableSet<ImmutableSet<Class<?>>> getSuperclassesAndInterfaces(@Nullable Class<?> clazz) {
-		ImmutableSet.Builder<ImmutableSet<Class<?>>> r = new ImmutableSet.Builder<>();
+	public static ImmutableSet<ImmutableSet<Class<?>>> getSuperclassesAndInterfaces(Class<?> clazz) {
+		LinkedHashSet<ImmutableSet<Class<?>>> r = new LinkedHashSet<>(INITIAL_CAPACITY_2);
+
 		ImmutableSet<Class<?>> scs = getSuperclasses(clazz);
 		r.add(scs);
-		scs.forEach(sc -> r.add(ImmutableSet.copyOf(sc.getInterfaces())));
-		return r.build();
+		AtomicReference<List<Class<?>>> cur = new AtomicReference<>(Arrays.asList(clazz.getInterfaces()));
+		scs.forEach(sc -> r.add(ImmutableSet.copyOf(cur.getAndUpdate(c -> {
+			List<Class<?>> next = Arrays.asList(sc.getInterfaces());
+			c.forEach(t -> Collections.addAll(next, t.getInterfaces()));
+			return next;
+		}))));
+		while (!cur.get().isEmpty()) r.add(ImmutableSet.copyOf(cur.getAndUpdate(s -> {
+			List<Class<?>> next = new ArrayList<>(INITIAL_CAPACITY_2);
+			s.forEach(t -> Collections.addAll(next, t.getInterfaces()));
+			return next;
+		})));
+
+		r.removeIf(Collection::isEmpty);
+		return ImmutableSet.copyOf(r);
 	}
 
-	static <A extends Annotation> A[] getEffectiveAnnotationsIfInheritingConsidered(IProcessorRuntime<A> processor,
-	                                                                                Class<?> clazz, Method method,
-	                                                                                @Nullable Logger logger) {
+	public static ImmutableSet<ImmutableSet<Class<?>>> getThisAndSuperclassesAndInterfaces(Class<?> type) { return new ImmutableSet.Builder<ImmutableSet<Class<?>>>().add(ImmutableSet.of(type)).addAll(getSuperclassesAndInterfaces(type)).build(); }
+
+	static <A extends Annotation> A[] getEffectiveAnnotationsWithInheritingConsidered(IProcessorRuntime<A> processor, Method method, @Nullable Logger logger) {
 		Class<A> aClass = processor.annotationType();
 		String mName = method.getName();
 		Class<?>[] mArgs = method.getParameterTypes();
 
-		A[] r = castUncheckedUnboxedNonnull(Array.newInstance(aClass, 0));
+		A[] r = method.getDeclaredAnnotationsByType(aClass);
+		if (r.length != 0) return r;
 		sss:
-		for (ImmutableSet<Class<?>> ss : getSuperclassesAndInterfaces(clazz)) {
+		for (ImmutableSet<Class<?>> ss : getSuperclassesAndInterfaces(method.getDeclaringClass())) {
 			for (Class<?> s : ss) {
-				r =
-						tryCall(() -> s.getDeclaredMethod(mName, mArgs), logger).map(t -> t.getDeclaredAnnotationsByType(aClass)).orElse(r);
+				r = tryCall(() -> s.getDeclaredMethod(mName, mArgs), logger).map(t -> t.getDeclaredAnnotationsByType(aClass)).orElse(r);
 				consumeIfCaughtThrowable(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_GET_MEMBER.makeMessage("method", s, mName, mArgs), t)));
 				if (r.length != 0) break sss;
 			}
 		}
 
 		return r;
+	}
+
+	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(IProcessorRuntime<A> processor, Method method, @Nullable Logger logger) throws IllegalArgumentException {
+		A[] r = getEffectiveAnnotationsWithInheritingConsidered(processor, method, logger);
+		if (r.length != 1) rejectArguments(processor.annotationType(), method);
+		return r[0];
 	}
 
 	public static Type getGenericSuperclassActualTypeArgument(Class<?> c, int i) throws ClassCastException { return getGenericSuperclassActualTypeArguments(c)[i]; }

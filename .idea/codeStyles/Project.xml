@@ -31,7 +31,6 @@
       <option name="KEEP_SIMPLE_LAMBDAS_IN_ONE_LINE" value="true" />
       <option name="KEEP_SIMPLE_CLASSES_IN_ONE_LINE" value="true" />
       <option name="KEEP_MULTIPLE_EXPRESSIONS_IN_ONE_LINE" value="true" />
-      <option name="WRAP_LONG_LINES" value="true" />
       <indentOptions>
         <option name="USE_TAB_CHARACTER" value="true" />
         <option name="SMART_TABS" value="true" />

@@ -4,6 +4,4 @@
 @LocalVariablesAreNonnullByDefault
 package $group__.$modId__.annotations;
 
-import mcp.MethodsReturnNonnullByDefault;
-
 import javax.annotation.ParametersAreNonnullByDefault;

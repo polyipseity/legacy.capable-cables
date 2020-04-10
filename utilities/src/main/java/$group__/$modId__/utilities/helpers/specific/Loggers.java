@@ -245,17 +245,17 @@ public enum Loggers {
 			if (argTypeOptionals != null) {
 				int argTOsL = argTypeOptionals.length, matched = 0;
 				ArrayList<Object> argOptionals = new ArrayList<>(argTOsL);
-				for (int i = 0, j = argTsL - 1; i < argTOsL && j < argsL; j++) {
+				for (int i = 0, j = argTsL - 1; i < argTOsL && j < argsL; ++j) {
 					@Nullable Object arg = args[j];
 					Class<?> argTO = argTypeOptionals[i];
 					if (arg == null || argTO.isAssignableFrom(arg.getClass())) {
 						argOptionals.add(i, arg);
-						matched++;
+						++matched;
 					} else argOptionals.add(i, PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.get(argTO));
-					i++;
+					++i;
 				}
 
-				for (int i = 0; i < matched; i++) argsList.remove(argTsL + i);
+				for (int i = 0; i < matched; ++i) argsList.remove(argTsL + i);
 				argsList.addAll(argTsL, argOptionals);
 				argTsL += argTOsL;
 				argsL += argTOsL - matched;

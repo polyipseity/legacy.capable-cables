@@ -28,7 +28,7 @@ public enum PreconditionsExtension {
 	public static void checkArgumentTypes(Class<?>[] types, Object... args) {
 		int typesLength = types.length;
 		checkElementIndex(typesLength - 1, args.length);
-		for (int i = 0; i < typesLength; i++) {
+		for (int i = 0; i < typesLength; ++i) {
 			@Nullable Object arg = args[i];
 			checkArgument(arg == null || types[i].isAssignableFrom(arg.getClass()));
 		}

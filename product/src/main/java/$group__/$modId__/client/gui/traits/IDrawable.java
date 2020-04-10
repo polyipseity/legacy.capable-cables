@@ -36,7 +36,6 @@ public interface IDrawable<N extends Number> extends ISpec<Rectangle<?, N>> {
 	 *
 	 * @since 0.0.1.0
 	 */
-	@SuppressWarnings("SpellCheckingInspection")
 	boolean tryDraw(Minecraft client);
 
 	/**
@@ -65,7 +64,7 @@ public interface IDrawable<N extends Number> extends ISpec<Rectangle<?, N>> {
 	 * @see #tryDraw(Minecraft) overloaded method
 	 * @since 0.0.1.0
 	 */
-	@SuppressWarnings("SpellCheckingInspection")
+	@OverridingStatus(group = PACKAGE, when = When.NEVER)
 	default void draw(Minecraft client) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!tryDraw(client)); }
 
 	/**

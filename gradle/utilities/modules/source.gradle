@@ -91,10 +91,15 @@ project.ext.makeSourceTasks = { Closure c ->
 
 // COMMENT append
 afterEvaluate {
-    if (buildType == 'DEBUG') tasks.withType(AbstractCompile) {
-        //noinspection GrUnresolvedAccess
-        options.verbose = true
-        //noinspection GrUnresolvedAccess
-        options.compilerArgs << '-Xlint'
-    }
+     tasks.withType(AbstractCompile) {
+         //noinspection GrUnresolvedAccess
+         options.fork = false
+         //noinspection GrUnresolvedAccess
+         options.compilerArgs << '-Xlint'
+
+         if (buildType == 'DEBUG') {
+             //noinspection GrUnresolvedAccess
+             options.verbose = true
+         }
+     }
 }

@@ -65,10 +65,10 @@ public class GuiTabs<T extends GuiTabs<T, N, C, TH, TA, E>, N extends Number, C,
 		t.open = trySetNonnull(t.getMutator(), open, initialize);
 
 		int o1 = t.getOpen();
-		final int[] i = {0, 0};
-		boolean r = tabs.stream().allMatch(e -> e.trySetOpen(i[0]++ == o1));
+		final int[] i = {-1, -1};
+		boolean r = tabs.stream().allMatch(e -> e.trySetOpen(++i[0] == o1));
 
-		if (!r) tabs.forEach(e -> e.trySetOpen(i[1]++ == open1));
+		if (!r) tabs.forEach(e -> e.trySetOpen(++i[1] == open1));
 		return r;
 	}
 
