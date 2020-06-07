@@ -17,12 +17,4 @@ ext {
     // COMMENT arguments
 
     buildType = parseArgument.call 'buildType', 'BUILD_TYPE', 'DEBUG'
-    update = parseArgument.call('update', 'UPDATE', false).toString().toBoolean()
-    strictDigestCheck = parseArgument.call('strictDigestCheck', 'STRICT_DIGEST_CHECK', false).toString().toBoolean()
-
-
-    // COMMENT variables
-
-    lastGoodSettingsPath = "$rootDir${separator}gradle${separator}generated${separator}last-good-settings.json".toString()
-    repositoryDirectory = "$buildDir${separator}repo".toString()
 }

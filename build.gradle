@@ -2,11 +2,6 @@
 // TITLE Gradle Build Script
 //////////////////////////////////////////////////
 
-import groovy.json.JsonBuilder
-import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
-import net.minecraftforge.gradle.user.TaskSourceCopy
-
 import static java.io.File.separator
 
 /* SECTION build script */
@@ -14,6 +9,7 @@ import static java.io.File.separator
 buildscript {
     repositories {
         jcenter()
+        gradlePluginPortal()
         maven {
             name = 'Minecraft Forge'
             url = 'https://files.minecraftforge.net/maven'
@@ -21,7 +17,9 @@ buildscript {
     }
 
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.+'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.4'
+        classpath "org.jetbrains.gradle.plugin.idea-ext:org.jetbrains.gradle.plugin.idea-ext.gradle.plugin:0.7"
     }
     // COMMENT Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 }
@@ -76,65 +74,34 @@ allprojects {
     apply from: "$modulesDir${separator}source.gradle"
     apply from: "$modulesDir${separator}resources.gradle"
     apply from: "$modulesDir${separator}javadoc.gradle"
-    tasks.withType(TaskSourceCopy) { enabled false }
 
-    apply from: "$modulesDir${separator}test.gradle"
+    apply from: "$modulesDir${separator}optional${separator}test.gradle"
     apply from: "$modulesDir${separator}jar.gradle"
 
-    apply from: "$modulesDir${separator}ide.gradle"
+    apply from: "$modulesDir${separator}optional${separator}ide.gradle"
 
 
     // COMMENT append
     afterEvaluate { storeExt.call() }
 }
 
-
 apply from: "$utilitiesDir${separator}throwable.gradle"
 
 /* SECTION extra variables */
 
-loadExt.call "$rootDir${separator}buildSrc${separator}ext-ra.properties", true
-
 ext {
-    // COMMENT game
-
-    minecraftVersion = minecraftForgeVersion.split('-').first()
-    String[] minecraftVersions = minecraftVersion.split('\\.')
-    minecraftMajor = minecraftVersions.first().toInteger()
-    minecraftMinor = minecraftVersions[1].toInteger()
-    minecraftVersionRange = "[$minecraftMajor.$minecraftMinor,$minecraftVersion]".toString()
-
-
     // COMMENT mod
-
     modId = project.name
 }
 
 /* SECTION application */
 
 apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
-
+apply from: "$modulesDir${separator}optional${separator}mod.gradle"
+apply from: "$modulesDir${separator}optional${separator}api.gradle"
+apply from: "$modulesDir${separator}optional${separator}publishing.gradle"
 
 /* SECTION configuration */
-
-if (hasProperty('lastGoodSettingsJson')) {
-    gradle.afterProject { Project p ->
-        Object json = new JsonSlurper().parseText(lastGoodSettingsJson)
-        try {
-            json.projects?."$path"?.dependencies?.each { config ->
-                config?.value?.each { dep ->
-                    if (!config.key.startsWith('forgeGradle')) {
-                        p.dependencies.add config.key as String, [group: dep.group, name: dep.name, version: dep.version], { force true }
-                        p.logger.debug "Dependecy overriding with: configuration: $config.key, group: $dep.group, name: $dep.name, version: $dep.version"
-                    }
-                }
-            }
-        } catch (Exception e) {
-            caughtThrowable.call e
-            p.logger.log LogLevel.WARN, "'$lastGoodSettingsPath' may be corrupted", e
-        }
-    }
-}
 
 afterEvaluate {
     Project pSub = project(subprojectMain)
@@ -148,48 +115,4 @@ afterEvaluate {
             } else task it.name, dependsOn: it
         }
     }
-}
-
-gradle.buildFinished { BuildResult r ->
-    if (r.failure == null) {
-        // COMMENT save last good settings
-        logger.info 'Saving last good settings...'
-
-        Wrapper wrapper = tasks.wrapper
-        Map<String, Object> json = [
-                gradle   : [distributionUrl: wrapper.distributionUrl.replace(wrapper.distributionType.name().toLowerCase(Locale.ROOT), Wrapper.DistributionType.ALL.name().toLowerCase(Locale.ROOT))],
-                minecraft: [
-                        version : minecraftForgeVersion,
-                        mappings: minecraftMappings
-                ],
-                projects : [:]
-        ]
-        allprojects.each { project ->
-            Map<String, Object> jsonProject = json.projects."$project.path" = [
-                    dependencies: [:]
-            ]
-            configurations.each { configuration ->
-                List<Object> jsonConfiguration = jsonProject.dependencies."$configuration.name" = []
-                if (configuration.canBeResolved) configuration.resolvedConfiguration.firstLevelModuleDependencies.each { if (it.moduleGroup != null && it.moduleName != 'unspecified' && it.moduleVersion != null) jsonConfiguration << [group: it.moduleGroup, name: it.moduleName, version: it.moduleVersion] }
-                else configuration.dependencies.each { if (it.group != null && it.name != 'unspecified' && it.version != null) jsonConfiguration << [group: it.group, name: it.name, version: it.version] }
-            }
-        }
-        //noinspection GrUnresolvedAccess
-        logger.info '{}:{}{}', convertToCanonicalPath.call(lastGoodSettingsPath), System.lineSeparator(), JsonOutput.prettyPrint(createNewFileFromPath.call(lastGoodSettingsPath).text = new JsonBuilder(json).toString())
-    }
-
-    // COMMENT clean cache
-    logger.info 'Cleaning cache...'
-
-    // COMMENT Gradle
-    gradle.gradleUserHomeDir.eachDir { it.eachDirMatch(~/[0-9]+[.-][0-9.+-]+/) { if (it.name != gradle.gradleVersion) delete it } }
-
-    // COMMENT Minecraft
-    String minecraftCachePath = "$gradle.gradleUserHomeDir.absolutePath${separator}caches${separator}minecraft"
-    // COMMENT Minecraft Coder Pack
-    File mcpDir = file "$minecraftCachePath${separator}de${separator}oceanlabs${separator}mcp${separator}mcp_snapshot"
-    if (mcpDir.exists()) mcpDir.eachDir { if ("snapshot_$it.name".toString() != minecraftMappings) delete it }
-    // COMMENT Minecraft Forge
-    File minecraftForgeDir = file "$minecraftCachePath${separator}net${separator}minecraftforge${separator}forge"
-    if (minecraftForgeDir.exists()) minecraftForgeDir.eachDir { if (it.name != minecraftForgeVersion) delete it }
 }

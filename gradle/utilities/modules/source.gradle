@@ -4,6 +4,8 @@
 
 import groovy.io.FileType
 
+import java.util.regex.Pattern
+
 import static java.io.File.separator
 
 
@@ -32,8 +34,8 @@ project.ext.makeSourceTasks = { Closure c ->
 
             doLast {
                 destinationDir.eachFileRecurse(FileType.FILES) {
-                    it.text = it.text.replace('\\', '\\\\').replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }.replaceAll ~/\$(?!\{)/, '\\\\\\$'
                     // COMMENT standard
+                    it.text = it.text.replace('\\', '\\\\').replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }.replaceAll ~/\$(?!\{)/, '\\\\\\$'
                 }
             }
         } as Sync
@@ -56,12 +58,18 @@ project.ext.makeSourceTasks = { Closure c ->
                 expand e
 
                 Binding eb = new Binding(e)
-                eachFile { it.path = evaluateGStringString.call it.path, eb }
+                eachFile {
+                    it.path = "${evaluateGStringString.call(it.relativePath.parent.pathString, eb).replace '.', separator}$separator${evaluateGStringString.call it.name, eb}"
+                }
             }
         } as Sync
         t.dependsOn process
 
+        println 'asdashbshugsngjingjis'
+        println t.name
+        println t.source.toList()
         t.source = process.destinationDir
+        println t.source.toList()
 
         t.finalizedBy task("postProcess${name.capitalize()}", type: Jar, description: "Finalize after processing $sourceSetName $language.") {
             from process.destinationDir

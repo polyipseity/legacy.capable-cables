@@ -5,6 +5,10 @@
 
 /* SECTION configurations */
 
+sourceSets {
+    api
+}
+
 dependencies {
-    apiImplementation 'org.apiguardian:apiguardian-api:+'
+    apiImplementation 'org.apiguardian:apiguardian-api:1.1.0'
 }

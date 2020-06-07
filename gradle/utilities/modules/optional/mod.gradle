@@ -2,8 +2,6 @@
 // TITLE Mod
 //////////////////////////////////////////////////
 
-import java.util.regex.Pattern
-
 import static java.io.File.separator
 
 
@@ -13,37 +11,6 @@ apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['makeSourceTasks', 'makeResourcesTasks', 'makeJUnitPlatformTests'])
 
 
-/* SECTION extra variables */
-
-ext {
-    // COMMENT mod
-
-    final List<String> requiredMods_ = stringToStringList.call(requiredMods_) as List<String>
-    final List<String> dependencies__ = stringToStringList.call(dependencies__) as List<String>
-    final List<String> dependants_ = stringToStringList.call(dependants_) as List<String>
-
-    StringBuilder cdSb = new StringBuilder()
-    requiredMods_.each { cdSb.append "required:$it;" }
-    dependencies__.each {
-        if (cdSb.contains(it as String)) cdSb.replaceFirst Pattern.quote("required:$it"), "required-after:$it"
-        else cdSb.append "after:$it;"
-    }
-    dependants_.each {
-        if (cdSb.contains(it as String)) cdSb.replaceFirst Pattern.quote("required:$it"), "required-before:$it"
-        else cdSb.append "before:$it;"
-    }
-    dependenciesString = cdSb.append(dependenciesStringAdditions).toString()
-
-    requiredMods = processResourcesList requiredMods_
-    dependencies_ = processResourcesList dependencies__
-    dependants = processResourcesList dependants_
-}
-
-static <E> String processResourcesList(List<E> l) {
-    l.empty ? '[]' : l.toListString().replace('[', '["').replace(']', '"]').replace(', ', '", "')
-}
-
-
 /* SECTION configuration */
 
 archivesBaseName = rootProject.name
@@ -51,37 +18,35 @@ archivesBaseName = rootProject.name
 makeSourceTasks.call { Task it ->
     //noinspection GrUnresolvedAccess
     it.inputs.properties([
-            expand_modId                 : modId,
-            expand_name                  : name_,
-            expand_version               : version,
-            expand_dependencies          : dependenciesString,
-            expand_minecraftVersionRange : minecraftVersionRange,
-            expand_certificateFingerprint: certificateFingerprint,
-            expand_updateJSON            : updateJSON,
-            expand_group                 : project.group
+            expand_group: project.group,
+            expand_modId: modId,
     ])
 }
 
 makeResourcesTasks.call { Task it ->
     //noinspection GrUnresolvedAccess
     it.inputs.properties([
-            expand_modId           : modId,
-            expand_name            : name_,
-            expand_description     : project.description,
-            expand_version         : version,
-            expand_minecraftVersion: minecraft.version,
-            expand_url             : url,
-            expand_updateUrl       : updateUrl,
-            expand_updateJSON      : updateJSON,
-            expand_authorList      : authorList,
-            expand_credits         : credits,
-            expand_logoFile        : logoFile,
-            expand_screenshots     : screenshots,
-            expand_parent          : parent_,
-            expand_requiredMods    : requiredMods,
-            expand_dependencies    : dependencies_,
-            expand_dependants      : dependants,
-            expand_pack_format     : pack_format
+            expand_modLoader         : modLoader,
+            expand_loaderVersion     : loaderVersion,
+            expand_issueTrackerURLKey: issueTrackerURL.empty ? '' : 'issueTrackerURL=',
+            expand_issueTrackerURL   : issueTrackerURL.empty ? '' : "\"$issueTrackerURL\"",
+            expand_showAsResourcePack: showAsResourcePack,
+            expand_modId             : modId,
+            expand_version           : version,
+            expand_displayName       : name_,
+            expand_namespaceKey      : namespace.empty ? '' : 'namespace=',
+            expand_namespace         : namespace.empty ? '' : "\"$namespace\"",
+            expand_updateJSONURLKey  : updateJSONURL.empty ? '' : 'updateJSONURL=',
+            expand_updateJSONURL     : updateJSONURL.empty ? '' : "\"$updateJSONURL\"",
+            expand_displayURLKey     : displayURL.empty ? '' : 'displayURL=',
+            expand_displayURL        : displayURL.empty ? '' : "\"$displayURL\"",
+            expand_logoFile          : logoFile,
+            expand_credits           : credits,
+            expand_authors           : authors,
+            expand_description       : project.description,
+            expand_dependencies      : dependencies_,
+            expand_name              : name_,
+            expand_pack_format       : pack_format,
     ])
 }
 
