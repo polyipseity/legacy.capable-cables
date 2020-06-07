@@ -7,6 +7,7 @@
 
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply plugin: 'org.jetbrains.gradle.plugin.idea-ext'
 
 
 /* SECTION configuration */
@@ -16,7 +17,7 @@ afterEvaluate {
     eclipse.classpath { downloadSources = downloadJavadoc = true }
     idea.module {
         downloadSources = downloadJavadoc = true
-        excludeDirs += [rootProject.file('gradle/generated/'), file(minecraftRunDir)]
+        excludeDirs += [file(minecraftRunDir), file(repositoryDirectoryLocal)]
 
         // COMMENT the below code should, but does not work
         // CODE scopes.RUNTIME.plus << configurations.debug

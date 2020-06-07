@@ -2,6 +2,16 @@
 // TITLE Jar
 //////////////////////////////////////////////////
 
+import static java.io.File.separator
+
+/* SECTION check */
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply.call([])
+
+/* SECTION application */
+
+apply plugin: 'com.github.johnrengelman.shadow'
 
 /* SECTION configuration */
 
@@ -12,12 +22,10 @@ afterEvaluate {
         classifier 'dev'
     }
 
-/* CODE
-    task sourceJar(type: Jar, dependsOn: tasks.sourceMainJava) {
-        from sourceSets.main.allSource
+    task sourceJar(type: Jar, dependsOn: tasks.jar) {
+        from tasks.compileJava.source
         classifier 'sources'
     }
-*/
 
     task javadocJar(type: Jar, dependsOn: tasks.javadoc) {
         from tasks.javadoc.destinationDir

@@ -4,6 +4,8 @@
 
 import groovy.io.FileType
 
+import java.util.regex.Pattern
+
 import static java.io.File.separator
 
 
@@ -17,6 +19,9 @@ checkApply.call(['evaluateGStringString', 'createNewFile'])
 
 project.ext.makeSourceTasks = { Closure c ->
     tasks.withType(AbstractCompile) { AbstractCompile t ->
+        // COMMENT Avoid messing around internal tasks.
+        if (name.contains('_')) return
+
         String taskSourceSetName = name.replace('compile', ''),
                sourceSetName = taskSourceSetName.uncapitalize()
         sourceSetName = sourceSets.find { sourceSetName.startsWith it.name }?.name
@@ -32,8 +37,8 @@ project.ext.makeSourceTasks = { Closure c ->
 
             doLast {
                 destinationDir.eachFileRecurse(FileType.FILES) {
-                    it.text = it.text.replace('\\', '\\\\').replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }.replaceAll ~/\$(?!\{)/, '\\\\\\$'
                     // COMMENT standard
+                    it.text = it.text.replace('\\', '\\\\').replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }.replaceAll ~/\$(?!\{)/, '\\\\\\$'
                 }
             }
         } as Sync
@@ -56,7 +61,9 @@ project.ext.makeSourceTasks = { Closure c ->
                 expand e
 
                 Binding eb = new Binding(e)
-                eachFile { it.path = evaluateGStringString.call it.path, eb }
+                eachFile {
+                    it.path = "${evaluateGStringString.call(it.relativePath.parent.pathString, eb).replace '.', separator}$separator${evaluateGStringString.call it.name, eb}"
+                }
             }
         } as Sync
         t.dependsOn process

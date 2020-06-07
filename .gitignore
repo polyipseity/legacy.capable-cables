@@ -188,6 +188,21 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 ####################
+# Visual Studio Code
+####################
+# Get latest from https://github.com/github/gitignore/blob/master/Global/VisualStudioCode.gitignore.
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
+
+####################
 # Gradle
 ####################
 # Get latest from https://github.com/github/gitignore/blob/master/Gradle.gitignore.
@@ -217,8 +232,16 @@ gradle-app.setting
 .idea/*.xml
 .idea/.name
 
-# Minecraft run directory
-run/
-
 # Custom files
 ext*.properties
+
+# Minecraft generated run configurations
+/.idea/runConfigurations/run*.xml
+
+# Minecraft run directory
+# TODO (Optional) Configurate Minecraft run directory.
+run/
+
+# Minecraft run directory
+# TODO (Optional) Configurate local repository directory.
+/repo/

@@ -20,12 +20,10 @@ jobs:
     strategy:
       matrix:
         build-type: [DEBUG, RELEASE]
-        update: [false, true]
     
     runs-on: ubuntu-latest
     env:
       BUILD_TYPE: ${{ matrix.build-type }}
-      UPDATE: ${{ matrix.update }}
 
     steps:
       - uses: actions/checkout@v2
