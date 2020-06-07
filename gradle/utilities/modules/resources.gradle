@@ -15,6 +15,9 @@ checkApply.call(['evaluateGStringString'])
 
 project.ext.makeResourcesTasks = { Closure c ->
     tasks.withType(ProcessResources) { ProcessResources t ->
+        // COMMENT Avoid messing around internal tasks.
+        if (name.contains('_')) return
+
         String taskSourceSetName = name.replace('process', '').replace('Resources', ''),
                sourceSetName = (taskSourceSetName.empty ? 'main' : taskSourceSetName).uncapitalize()
 

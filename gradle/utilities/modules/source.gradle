@@ -19,6 +19,9 @@ checkApply.call(['evaluateGStringString', 'createNewFile'])
 
 project.ext.makeSourceTasks = { Closure c ->
     tasks.withType(AbstractCompile) { AbstractCompile t ->
+        // COMMENT Avoid messing around internal tasks.
+        if (name.contains('_')) return
+
         String taskSourceSetName = name.replace('compile', ''),
                sourceSetName = taskSourceSetName.uncapitalize()
         sourceSetName = sourceSets.find { sourceSetName.startsWith it.name }?.name
