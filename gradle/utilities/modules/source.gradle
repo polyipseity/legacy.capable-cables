@@ -65,11 +65,7 @@ project.ext.makeSourceTasks = { Closure c ->
         } as Sync
         t.dependsOn process
 
-        println 'asdashbshugsngjingjis'
-        println t.name
-        println t.source.toList()
         t.source = process.destinationDir
-        println t.source.toList()
 
         t.finalizedBy task("postProcess${name.capitalize()}", type: Jar, description: "Finalize after processing $sourceSetName $language.") {
             from process.destinationDir
