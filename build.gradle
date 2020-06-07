@@ -2,6 +2,8 @@
 // TITLE Gradle Build Script
 //////////////////////////////////////////////////
 
+import java.util.regex.Pattern
+
 import static java.io.File.separator
 
 /* SECTION build script */
@@ -90,6 +92,11 @@ apply from: "$utilitiesDir${separator}throwable.gradle"
 /* SECTION extra variables */
 
 ext {
+    // COMMENT game
+    minecraftVersion = minecraftForgeVersion.split('-').first()
+    String[] minecraftVersions = minecraftVersion.split Pattern.quote('.')
+    minecraftVersionMajor = minecraftVersions.first().toInteger()
+    minecraftVersionMinor = minecraftVersions[1].toInteger()
     // COMMENT mod
     modId = project.name
 }
