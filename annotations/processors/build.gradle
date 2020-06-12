@@ -2,7 +2,9 @@
 // TITLE Gradle Build Script
 //////////////////////////////////////////////////
 
-/* SECTION configuration */
+import static java.io.File.separator
+
+apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
 
 makeSourceTasks.call { Task it ->
     //noinspection GrUnresolvedAccess
