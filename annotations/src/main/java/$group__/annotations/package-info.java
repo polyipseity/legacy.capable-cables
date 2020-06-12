@@ -1,0 +1,7 @@
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+@FieldsAreNonnullByDefault
+@LocalVariablesAreNonnullByDefault
+package $group__.annotations;
+
+import javax.annotation.ParametersAreNonnullByDefault;
