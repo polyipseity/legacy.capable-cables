@@ -21,7 +21,6 @@ buildscript {
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
         classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.4'
-        classpath "org.jetbrains.gradle.plugin.idea-ext:org.jetbrains.gradle.plugin.idea-ext.gradle.plugin:0.7"
     }
     // COMMENT Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 }

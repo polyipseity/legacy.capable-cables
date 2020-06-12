@@ -2,15 +2,8 @@
 // TITLE IDE
 //////////////////////////////////////////////////
 
-
-/* SECTION application */
-
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-apply plugin: 'org.jetbrains.gradle.plugin.idea-ext'
-
-
-/* SECTION configuration */
 
 // COMMENT append
 afterEvaluate {
