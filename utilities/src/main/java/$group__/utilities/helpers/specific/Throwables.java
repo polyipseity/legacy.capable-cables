@@ -1,7 +1,6 @@
 package $group__.utilities.helpers.specific;
 
 import $group__.utilities.extensions.ICallableThrowable;
-import $group__.utilities.extensions.IRunnableThrowable;
 import $group__.utilities.throwables.IThrowableCatcher;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.Level;
@@ -39,15 +38,15 @@ public enum Throwables implements IThrowableCatcher {
 
 	public static void clearCaughtThrowableStatic() { INSTANCE.clearCaughtThrowable(); }
 
-	public static void setCaughtThrowableStatic(Throwable t, @Nullable Logger logger) {
-		INSTANCE.setCaughtThrowable(t,
-				logger);
-	}
+	public static void setCaughtThrowableStatic(Throwable t, @Nullable Logger logger) { INSTANCE.setCaughtThrowable(t, logger); }
 
 
 	/* SECTION static methods */
 
-	public static void consumeCaught(Throwable t, @Nullable Logger logger) { logger.catching(Level.DEBUG, t); }
+	public static void consumeCaught(Throwable t, @Nullable Logger logger) {
+		if (logger == null) t.printStackTrace();
+		else logger.catching(Level.DEBUG, t);
+	}
 
 
 	public static <T extends Throwable> T throw_(T t) throws T { throw t; }
@@ -68,28 +67,29 @@ public enum Throwables implements IThrowableCatcher {
 	public static String getCurrentStackTraceString() { return ExceptionUtils.getStackTrace(newThrowable()); }
 
 
-	public static <T> Optional<T> tryCall(ICallableThrowable<T> callable, @Nullable Logger logger) {
+	public static <T> Optional<T> tryCall(Callable<T> callable, @Nullable Logger logger) {
 		clearCaughtThrowableStatic();
 		try {
-			return Optional.ofNullable(callable.callT());
-		} catch (Throwable t) {
-			setCaughtThrowableStatic(t, logger);
+			return Optional.ofNullable(callable.call());
+		} catch (Exception e) {
+			setCaughtThrowableStatic(e, logger);
 			return Optional.empty();
 		}
 	}
 
 	public static <T> Optional<T> tryCallWithLogging(ICallableThrowable<T> callable, @Nullable Logger logger) {
 		Optional<T> r = tryCall(callable, logger);
-		consumeIfCaughtThrowable(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_SIMPLE_MESSAGE.makeMessage("Failed callable"), t)));
+		if (logger != null)
+			consumeIfCaughtThrowable(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_SIMPLE_MESSAGE.makeMessage("Failed callable"), t)));
 		return r;
 	}
 
-	public static void tryRun(IRunnableThrowable runnable, @Nullable Logger logger) {
+	public static void tryRun(Runnable runnable, @Nullable Logger logger) {
 		clearCaughtThrowableStatic();
 		try {
-			runnable.runT();
-		} catch (Throwable t) {
-			setCaughtThrowableStatic(t, logger);
+			runnable.run();
+		} catch (Exception e) {
+			setCaughtThrowableStatic(e, logger);
 		}
 	}
 

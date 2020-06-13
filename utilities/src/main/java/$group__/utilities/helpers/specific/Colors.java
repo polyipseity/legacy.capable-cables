@@ -32,6 +32,6 @@ public enum Colors {
 	/* SECTION static methods */
 
 	public static Color newColor(String s) {
-		return new Color(Integer.parseInt(HASH_PATTERN.matcher(s).replaceAll(Matcher.quoteReplacement("")), 16), true);
+		return new Color(Integer.parseInt(HASH_PATTERN.matcher(s).replaceAll(Matcher.quoteReplacement("")), RADIX_HEX), true);
 	}
 }

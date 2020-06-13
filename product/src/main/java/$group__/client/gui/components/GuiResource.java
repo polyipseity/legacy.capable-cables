@@ -3,7 +3,6 @@ package $group__.client.gui.components;
 import $group__.client.gui.polygons.Rectangle;
 import $group__.client.gui.themes.ITheme;
 import $group__.client.gui.themes.IThemed;
-import $group__.client.gui.utilities.Guis;
 import $group__.client.gui.utilities.builders.BuilderGuiDrawable;
 import $group__.logging.ILogging;
 import $group__.utilities.concurrent.IMutatorImmutablizable;
@@ -47,9 +46,7 @@ public class GuiResource<T extends GuiResource<T, N, C, TH, NT>, N extends Numbe
 
 	/* SECTION static methods */
 
-	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiResource<V, N, C, TH, NT>,
-			N extends Number, C extends Color, TH extends ITheme<TH>, NT extends Number> BuilderGuiDrawable<T, V, N, C
-			, TH> newBuilderGR(Rectangle<?, N> rectangle, ResourceLocation resource, Rectangle<?, NT> texture) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiResource<>(rectangle, resource, texture, t.themed, t.mutator, t.logging))); }
+	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiResource<V, N, C, TH, NT>, N extends Number, C extends Color, TH extends ITheme<TH>, NT extends Number> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGuiResource(Rectangle<?, N> rectangle, ResourceLocation resource, Rectangle<?, NT> texture) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiResource<>(rectangle, resource, texture, t.themed, t.mutator, t.logging))); }
 
 
 	/* SECTION getters & setters */
@@ -76,13 +73,10 @@ public class GuiResource<T extends GuiResource<T, N, C, TH, NT>, N extends Numbe
 	@Override
 	public boolean tryDraw(Minecraft client) {
 		bindTexture(getResource());
-		Guis.drawModalRectWithCustomSizedTexture(getTheme(), getRectangle(), getTexture());
+		GUIs.drawModalRectWithCustomSizedTexture(getTheme(), getRectangle(), getTexture());
 		return true;
 	}
 
 	@Override
-	public T toImmutable() {
-		return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiResource<>(this,
-				IMutatorImmutablizable.of(getMutator().toImmutable())));
-	}
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiResource<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
 }

@@ -66,8 +66,13 @@ public enum Dynamics {
 				if ("IMPL_LOOKUP".equals(f.getName())) {
 					f.setAccessible(true);
 					Throwables.consumeIfCaughtThrowable(t -> Loggers.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(Loggers.EnumMessages.REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("impl lookup field", f, Lookup.class, true), t));
-					implLookup =
-							Throwables.tryCall(() -> (Lookup) PUBLIC_LOOKUP.unreflectGetter(f).invokeExact(), LOGGER).orElse(implLookup);
+					implLookup = tryCall(() -> {
+						try {
+							return (Lookup) PUBLIC_LOOKUP.unreflectGetter(f).invokeExact();
+						} catch (Throwable t) {
+							throw throwThrowable(t);
+						}
+					}, LOGGER).orElse(implLookup);
 					break;
 				}
 			}
@@ -78,7 +83,13 @@ public enum Dynamics {
 			@Nullable Unsafe unsafe = null;
 			for (Field f : Unsafe.class.getDeclaredFields()) {
 				if (f.getType() == Unsafe.class) {
-					unsafe = (Unsafe) Throwables.tryCall(() -> IMPL_LOOKUP.unreflectGetter(f).invokeExact(), LOGGER).orElse(null);
+					unsafe = tryCall(() -> {
+						try {
+							return (Unsafe) IMPL_LOOKUP.unreflectGetter(f).invokeExact();
+						} catch (Throwable t) {
+							throw throwThrowable(t);
+						}
+					}, LOGGER).orElse(null);
 					break;
 				}
 			}
@@ -90,6 +101,7 @@ public enum Dynamics {
 
 	public static boolean isMemberStatic(Member member) { return Modifier.isStatic(member.getModifiers()); }
 
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public static boolean isMemberFinal(Member member) { return Modifier.isFinal(member.getModifiers()); }
 
 	public static String getPackage(Class<?> clazz) {
@@ -166,7 +178,8 @@ public enum Dynamics {
 		for (ImmutableSet<Class<?>> ss : getSuperclassesAndInterfaces(method.getDeclaringClass())) {
 			for (Class<?> s : ss) {
 				r = Throwables.tryCall(() -> s.getDeclaredMethod(mName, mArgs), logger).map(t -> t.getDeclaredAnnotationsByType(aClass)).orElse(r);
-				Throwables.consumeIfCaughtThrowable(t -> logger.warn(() -> Loggers.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(Loggers.EnumMessages.REFLECTION_UNABLE_TO_GET_MEMBER.makeMessage("method", s, mName, mArgs), t)));
+				if (logger != null)
+					consumeIfCaughtThrowable(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_GET_MEMBER.makeMessage("method", s, mName, mArgs), t)));
 				if (r.length != 0) break sss;
 			}
 		}
@@ -210,21 +223,37 @@ public enum Dynamics {
 						if (isMemberStatic(f)) continue;
 
 						Throwables.tryRun(() -> f.setAccessible(true), logger);
-						Throwables.consumeIfCaughtThrowable(t -> logger.warn(() -> Loggers.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(Loggers.EnumMessages.REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("to-be-copied field", f, c, true), t)));
+						if (logger != null)
+							consumeIfCaughtThrowable(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("to-be-copied field", f, c, true), t)));
 
 						@Nullable Object v = Throwables.tryCall(() -> f.get(from), logger).orElse(null);
 						if (Throwables.caughtThrowableStatic()) {
-							logger.warn(() -> Loggers.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(Loggers.EnumMessages.REFLECTION_UNABLE_TO_G_SET_FIELD.makeMessage(false, f, from), Throwables.getCaughtThrowableNonnullStatic()));
+							if (logger != null)
+								logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_G_SET_FIELD.makeMessage(false, f, from), getCaughtThrowableNonnullStatic()));
 							r[0] = false;
 						} else {
 							int fMod = f.getModifiers() & ~Modifier.FINAL;
-							Throwables.tryRun(() -> FIELD_MODIFIERS_SETTER.invokeExact(f, fMod), logger);
-							Throwables.consumeIfCaughtThrowable(t -> logger.warn(() -> Loggers.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(Loggers.EnumMessages.INVOCATION_UNABLE_TO_INVOKE_METHOD_HANDLE.makeMessage(FIELD_MODIFIERS_SETTER, f.toGenericString(), fMod), t)));
+							tryRun(() -> {
+								try {
+									FIELD_MODIFIERS_SETTER.invokeExact(f, fMod);
+								} catch (Throwable t) {
+									throw throwThrowable(t);
+								}
+							}, logger);
+							if (logger != null)
+								consumeIfCaughtThrowable(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_INVOKE_METHOD_HANDLE.makeMessage(FIELD_MODIFIERS_SETTER, f.toGenericString(), fMod), t)));
 
 							Object vf = mapper.apply(v);
-							Throwables.tryRun(() -> f.set(to, vf), logger);
+							tryRun(() -> {
+								try {
+									f.set(to, vf);
+								} catch (IllegalAccessException e) {
+									throw throwThrowable(e);
+								}
+							}, logger);
 							Throwables.consumeIfCaughtThrowable(t -> {
-								logger.warn(() -> Loggers.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(Loggers.EnumMessages.REFLECTION_UNABLE_TO_G_SET_FIELD.makeMessage(true, f, to, vf), t));
+								if (logger != null)
+									logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_G_SET_FIELD.makeMessage(true, f, to, vf), t));
 								r[0] = false;
 							});
 						}
@@ -285,8 +314,8 @@ public enum Dynamics {
 			/* SECTION static methods */
 
 			public static final MethodHandle FIELD_MODIFIERS_SETTER =
-					Assertions.assertNonnull(Throwables.tryCall(() -> IMPL_LOOKUP.findGetter(Field.class, "modifiers", int.class), LOGGER).orElseGet(() -> {
-						Throwables.consumeIfCaughtThrowable(t -> LOGGER.warn(() -> Loggers.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(Loggers.EnumMessages.INVOCATION_UNABLE_TO_FIND_METHOD_HANDLE.makeMessage("modifiers field", Field.class, "modifiers", null, int.class), t)));
+					assertNonnull(tryCall(() -> IMPL_LOOKUP.findSetter(Field.class, "modifiers", int.class), LOGGER).orElseGet(() -> {
+						consumeIfCaughtThrowable(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_FIND_METHOD_HANDLE.makeMessage("modifiers field", Field.class, "modifiers", null, int.class), t)));
 						return null;
 					}));
 		}
@@ -301,7 +330,7 @@ public enum Dynamics {
 
 		/* SECTION constructors */
 
-		private SecurityManagerReflections() { PreconditionsExtension.requireRunOnceOnly(LOGGER); }
+		private SecurityManagerReflections() {}
 
 
 		/* SECTION methods */

@@ -10,6 +10,5 @@ public enum ItemBases {
 
 	/* SECTION static methods */
 
-	@SuppressWarnings("SpellCheckingInspection")
 	public static Item setUnlocalizedNameBase(final Item thisObj, ResourceLocation name) { return thisObj.setUnlocalizedName(Registries.getNamespacedUnlocalizedNameForRegistry(name)); }
 }

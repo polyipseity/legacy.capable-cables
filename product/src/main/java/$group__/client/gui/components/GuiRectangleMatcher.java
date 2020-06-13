@@ -4,7 +4,6 @@ import $group__.client.gui.polygons.Rectangle;
 import $group__.client.gui.themes.GuiThemedNull;
 import $group__.client.gui.themes.ITheme;
 import $group__.client.gui.traits.IDrawable;
-import $group__.client.gui.utilities.Guis;
 import $group__.client.gui.utilities.builders.BuilderGuiDrawable;
 import $group__.logging.ILogging;
 import $group__.utilities.concurrent.IMutatorImmutablizable;
@@ -50,9 +49,7 @@ public class GuiRectangleMatcher<T extends GuiRectangleMatcher<T, N, C, TH, D>, 
 
 	/* SECTION static methods */
 
-	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiRectangleMatcher<V, N, C, TH, D>,
-			N extends Number, C extends Color, TH extends ITheme<TH>, D extends IDrawable<?>> BuilderGuiDrawable<T, V,
-			N, C, TH> newBuilderGRM(Rectangle<?, N> rectangle, D drawable) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiRectangleMatcher<>(rectangle, drawable, t.mutator, t.logging))); }
+	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiRectangleMatcher<V, N, C, TH, D>, N extends Number, C extends Color, TH extends ITheme<TH>, D extends IDrawable<?>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGuiRectangleMatcher(Rectangle<?, N> rectangle, D drawable) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiRectangleMatcher<>(rectangle, drawable, t.mutator, t.logging))); }
 
 
 	/* SECTION getters & setters */
@@ -72,7 +69,7 @@ public class GuiRectangleMatcher<T extends GuiRectangleMatcher<T, N, C, TH, D>, 
 	public boolean tryDraw(Minecraft client) {
 		pushMatrix();
 		D d = getDrawable();
-		d.spec().ifPresent(r -> Guis.translateAndScaleFromTo(r, getRectangle()));
+		d.spec().ifPresent(r -> GUIs.translateAndScaleFromTo(r, getRectangle()));
 		boolean r = d.tryDraw(client);
 		popMatrix();
 		return r;
@@ -80,8 +77,5 @@ public class GuiRectangleMatcher<T extends GuiRectangleMatcher<T, N, C, TH, D>, 
 
 
 	@Override
-	public T toImmutable() {
-		return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiRectangleMatcher<>(this,
-				IMutatorImmutablizable.of(getMutator().toImmutable())));
-	}
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiRectangleMatcher<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
 }

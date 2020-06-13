@@ -22,6 +22,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import javax.annotation.meta.When;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -49,28 +50,28 @@ public class GuiWrench<T extends GuiWrench<T, TH>, TH extends ITheme<TH>> extend
 
 	/* SECTION constructors */
 
-	@SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
+	@SuppressWarnings({"ArraysAsListWithZeroOrOneArgument", "MagicNumber"})
 	public GuiWrench(Container container, int open, @Nullable TH theme, IMutatorImmutablizable<?, ?> mutator,
 	                 @Nullable Logger logger) {
 		super(container);
 		this.mutator = trySetNonnull(mutator, mutator, true);
 		logging = trySetNonnull(getMutator(), ILogging.of(logger, getMutator()), true);
 
-		themed = trySetNonnull(getMutator(), IThemed.of(theme, getMutator(), getLogging()), true);
+		themed = trySetNonnull(getMutator(), IThemed$.MODULE$.of(theme, getMutator(), getLogging()), true);
 		{
 			Runnable popDefaults = BuilderDefaults
 					.pushDefaultStart(KEY_DEFAULT_MUTATOR, getMutator())
 					.pushDefault(KEY_DEFAULT_LOGGING, getLogging())
 					.pushDefault(BuilderGuiDrawable.KEY_DEFAULT_COLORED, null)
 					.pushDefault(BuilderGuiDrawable.KEY_DEFAULT_THEMED, getThemed()).stopPushing();
-			tabs = GuiTabs.newBuilderGT(
+			tabs = GuiTabs.newBuilderGuiTabs(
 					Arrays.asList(
-							GuiTab.newBuilderGT(
-									castUncheckedUnboxedNonnull(GuiRectangle.newBuilderGR(newBuilderRectangle(newBuilderX(0.8F).build(), newBuilderY(0.8F).build(), newBuilderX(0.1F).build(), newBuilderY(0.1F).build()).build()).build()),
-									castUncheckedUnboxedNonnull(GuiRectangleMatcher.newBuilderGRM(
+							GuiTab.newBuilderGuiTab(
+									castUncheckedUnboxedNonnull(GuiRectangle.newBuilderGuiRectangle(newBuilderRectangle(newBuilderX(0.8F).build(), newBuilderY(0.8F).build(), newBuilderX(0.1F).build(), newBuilderY(0.1F).build()).build()).build()),
+									castUncheckedUnboxedNonnull(GuiRectangleMatcher.newBuilderGuiRectangleMatcher(
 											newBuilderRectangle(32, 32, newBuilderX(0.1F).build(),
 													newBuilderY(0.1F).setOffset(-32).build()).build(),
-											GuiResource.newBuilderGR(
+											GuiResource.newBuilderGuiResource(
 													newBuilderRectangle(64, 64, newBuilderX(0.1F).build(),
 															newBuilderY(0.1F).setOffset(-32).build()).build(),
 													Globals.Client.Resources.GUI_WRENCH,
@@ -104,19 +105,13 @@ public class GuiWrench<T extends GuiWrench<T, TH>, TH extends ITheme<TH>> extend
 	public IMutatorImmutablizable<?, ?> getMutator() { return mutator; }
 
 	@Override
-	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) {
-		return trySet(t -> this.mutator = t,
-				mutator);
-	}
+	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t, mutator); }
 
 
 	/* SECTION methods */
 
 	@Override
-	public void initGui() {
-		initGuiBase(this, t -> xSize = t, t -> ySize = t);
-		super.initGui();
-	}
+	public void initGui() { initGuiBase(this, super::initGui, t -> xSize = t, t -> ySize = t); }
 
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) { tabs.tryDraw(mc); }
@@ -131,4 +126,9 @@ public class GuiWrench<T extends GuiWrench<T, TH>, TH extends ITheme<TH>> extend
 
 	@Override
 	public boolean isImmutable() { return getMutator().isImmutable(); }
+
+
+	@Override
+	@OverridingStatus(group = PACKAGE, when = When.NEVER)
+	public final String toString() { return getToStringString(this, super.toString()); }
 }

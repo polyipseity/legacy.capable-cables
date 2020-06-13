@@ -1,6 +1,5 @@
 package $group__.utilities.helpers;
 
-import $group__.utilities.helpers.specific.Loggers;
 import $group__.utilities.helpers.specific.MapsExtension;
 import $group__.utilities.helpers.specific.Throwables;
 import org.apache.logging.log4j.Logger;
@@ -45,13 +44,13 @@ public enum PreconditionsExtension {
 
 		@Nullable Throwable t1 = RAN_ONCE.put(getCallerClass(), t);
 		if (t1 != null) {
-			logger.error(() -> Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Illegal second invocation, previous " +
-					"stacktrace:{}{}", lineSeparator(), getStackTrace(t1)));
+			if (logger != null)
+				logger.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Illegal second invocation, previous stacktrace:{}{}", lineSeparator(), getStackTrace(t1)));
 			throw Throwables.throw_(new IllegalStateException(Throwables.rejectAttemptString("illegal second invocation",
 					t.getStackTrace())));
 		}
 
-		logger.error(() -> Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("First ONLY invocation, stacktrace:{}{}",
-				lineSeparator(), t));
+		if (logger != null)
+			logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("First ONLY invocation, stacktrace:{}{}", lineSeparator(), t));
 	}
 }

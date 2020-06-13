@@ -47,7 +47,7 @@ public interface IStrictEquals {
 				Throwables.consumeIfCaughtThrowable(t -> LOGGER.warn(() -> Loggers.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(Loggers.EnumMessages.INVOCATION_UNABLE_TO_UNREFLECT_MEMBER.makeMessage("field getter", f, IMPL_LOOKUP), t)));
 				if (fm == null) continue;
 
-				efs.add((t, o) -> z -> Throwables.tryCallWithLogging(() -> Objects.equals(fm.invoke(t), fm.invoke(o)), LOGGER).orElse(true));
+				efs.add((t, o) -> z -> tryCallWithLogging(() -> Objects.equals(fm.invokeExact(t), fm.invokeExact(o)), LOGGER).orElse(true));
 			}
 		});
 		if (efs.isEmpty()) return (t, o) -> z -> t == o;

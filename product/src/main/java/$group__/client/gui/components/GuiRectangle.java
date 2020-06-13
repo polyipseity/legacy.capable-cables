@@ -4,7 +4,6 @@ import $group__.client.gui.polygons.Rectangle;
 import $group__.client.gui.themes.ITheme;
 import $group__.client.gui.themes.IThemed;
 import $group__.client.gui.traits.IColored;
-import $group__.client.gui.utilities.Guis;
 import $group__.client.gui.utilities.builders.BuilderGuiDrawable;
 import $group__.logging.ILogging;
 import $group__.utilities.concurrent.IMutatorImmutablizable;
@@ -44,8 +43,7 @@ public class GuiRectangle<T extends GuiRectangle<T, N, C, TH>, N extends Number,
 
 	/* SECTION static methods */
 
-	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiRectangle<V, N, C, TH>, N extends Number
-			, C extends Color, TH extends ITheme<TH>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGR(Rectangle<?, N> rectangle) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiRectangle<>(rectangle, t.colored, t.themed, t.mutator, t.logging))); }
+	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiRectangle<V, N, C, TH>, N extends Number, C extends Color, TH extends ITheme<TH>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGuiRectangle(Rectangle<?, N> rectangle) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiRectangle<>(rectangle, t.colored, t.themed, t.mutator, t.logging))); }
 
 
 	/* SECTION getters & setters */
@@ -64,7 +62,7 @@ public class GuiRectangle<T extends GuiRectangle<T, N, C, TH>, N extends Number,
 	@Override
 	public boolean tryDraw(Minecraft client) {
 		return tryGetColor().map(c -> {
-			Guis.drawRectangle(getTheme(), getRectangle(), c);
+			GUIs.drawRectangle(getTheme(), getRectangle(), c);
 			return true;
 		}).orElse(false);
 	}

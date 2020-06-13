@@ -2,7 +2,6 @@ package $group__.utilities.concurrent;
 
 import $group__.annotations.OverridingStatus;
 import $group__.utilities.Constants;
-import $group__.utilities.helpers.Miscellaneous;
 
 import javax.annotation.Nullable;
 import javax.annotation.meta.When;
@@ -14,12 +13,9 @@ import static $group__.utilities.helpers.Casts.castUncheckedUnboxed;
 import static java.util.Objects.requireNonNull;
 
 public interface IMutator {
-	/* SECTION getters & setters */
-
 	@Nullable
 	static <T> T trySet(IMutator mutator, @Nullable T target, boolean initialize) {
-		AtomicReference<T> t = new AtomicReference<T>(target == null ? null :
-				castUncheckedUnboxed(Miscellaneous.getDefaultValue(target.getClass())));
+		AtomicReference<T> t = new AtomicReference<>(target == null ? null : castUncheckedUnboxed(getDefaultValue(target.getClass())));
 		mutator.trySet(t::set, target, initialize);
 		return t.get();
 	}
@@ -38,9 +34,6 @@ public interface IMutator {
 
 	@OverridingStatus(group = Constants.PACKAGE, when = When.NEVER)
 	default <T> T mutate(Supplier<T> action) throws UnsupportedOperationException { return mutate(action, false); }
-
-
-	/* SECTION methods */
 
 	@OverridingStatus(group = Constants.PACKAGE, when = When.NEVER)
 	default void mutate(Runnable action, boolean initialize) throws UnsupportedOperationException {

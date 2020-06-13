@@ -47,7 +47,7 @@ public interface IStrictHashCode {
 						Throwables.consumeIfCaughtThrowable(t -> LOGGER.warn(() -> Loggers.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(Loggers.EnumMessages.INVOCATION_UNABLE_TO_UNREFLECT_MEMBER.makeMessage("field getter", f, IMPL_LOOKUP), t)));
 						if (fm == null) continue;
 
-						ffs.add((t, hcs) -> Optionals.unboxOptional(Throwables.tryCallWithLogging(() -> fm.invoke(t), LOGGER)));
+						ffs.add((t, hcs) -> unboxOptional(tryCallWithLogging(() -> fm.invokeExact(t), LOGGER)));
 					}
 				});
 

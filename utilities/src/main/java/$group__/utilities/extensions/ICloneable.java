@@ -90,9 +90,7 @@ public interface ICloneable<T> extends Cloneable {
 
 					if (r != null) {
 						ExternalCloneMethod rf = r;
-						LOGGER.debug(() -> Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Clone method '{}' with " +
-										"annotation '{}' " +
-										"auto-registered for class '{}'", EXTERNAL_METHOD_MAP.get(rf), rf,
+						LOGGER.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Clone method '{}' with annotation '{}' auto-registered for class '{}'", EXTERNAL_METHOD_MAP.get(rf), rf,
 								key.toGenericString()));
 					} else
 						throw Throwables.throw_(new NoSuchMethodException("No clone method for class '" + key.toGenericString() + '\''));
@@ -157,37 +155,28 @@ public interface ICloneable<T> extends Cloneable {
 				m = Assertions.assertNonnull(EXTERNAL_METHOD_MAP.get(EXTERNAL_ANNOTATIONS_CACHE.get(oc)));
 			} catch (ExecutionException e) {
 				Throwables.setCaughtThrowableStatic(e, logger);
-				logger.warn(() -> Loggers.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage(
-						"Unable" +
-								" " +
-								"to clone '{}' object of class '{}' as no clone method is obtained, will not attempt" +
-								" " +
-								"to " +
-								"clone" +
-								" " +
-								"again", o, oc.toGenericString()), e));
+				if (logger != null)
+					logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable to clone '{}' object of class '{}' as no clone method is obtained, will not attempt to clone again", o, oc.toGenericString()), e));
 				BROKEN_CLASS_SET.add(oc);
 				return Optional.of(o);
 			}
 
-			Optional<T> r = Throwables.tryCall(() -> m.invoke(o), logger).flatMap(Casts::castUnchecked);
+			Optional<T> r = tryCall(() -> {
+				try {
+					return m.invoke(o);
+				} catch (Throwable t) {
+					throw throwThrowable(t);
+				}
+			}, logger).flatMap(Casts::castUnchecked);
 			Throwables.consumeIfCaughtThrowable(t -> {
-				logger.warn(() -> Loggers.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Clone" +
-								" " +
-								"method '{}' failed for object '{}' of class '{}', will NOT attempt to clone again", m
-						, o,
-						oc.toGenericString()), t));
+				if (logger != null)
+					logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Clone method '{}' failed for object '{}' of class '{}', will NOT attempt to clone again", m, o, oc.toGenericString()), t));
 				BROKEN_CLASS_SET.add(oc);
 			});
 			return r;
 		} else {
-			logger.debug(() -> Loggers.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable " +
-					"to" +
-					" " +
-					"clone object '{}' of class '{}' as clone method annotation is NOT yet processed, will attempt " +
-					"to" +
-					" " +
-					"clone again", o, oc.toGenericString()), Throwables.newThrowable()));
+			if (logger != null)
+				logger.debug(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable to clone object '{}' of class '{}' as clone method annotation is NOT yet processed, will attempt to clone again", o, oc.toGenericString()), newThrowable()));
 			return Optional.of(o);
 		}
 	}

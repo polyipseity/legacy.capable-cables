@@ -7,15 +7,14 @@ import com.google.common.collect.Lists;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 
 import static $group__.utilities.helpers.Casts.*;
-import static $group__.utilities.helpers.Primitives.PRIMITIVE_TYPE_TO_BOXED_TYPE_BI_MAP;
 import static $group__.utilities.helpers.specific.Optionals.unboxOptional;
 import static $group__.utilities.helpers.specific.Patterns.TWO_MINUS_SIGNS_PATTERN;
 import static java.lang.Double.doubleToLongBits;
@@ -28,12 +27,12 @@ public enum Numbers {
 	/* SECTION static variables */
 
 	public static final ImmutableMap<Class<? extends Number>, Function<Number, ? extends Number>> PRIMITIVE_TYPE_FROM_NUMBER_MAP = new ImmutableMap.Builder<Class<? extends Number>, Function<Number, ? extends Number>>()
-			.put(int.class, Number::intValue)
-			.put(float.class, Number::floatValue)
-			.put(double.class, Number::doubleValue)
-			.put(long.class, Number::longValue)
-			.put(byte.class, Number::byteValue)
-			.put(short.class, Number::shortValue).build();
+			.put(Integer.class, Number::intValue)
+			.put(Float.class, Number::floatValue)
+			.put(Double.class, Number::doubleValue)
+			.put(Long.class, Number::longValue)
+			.put(Byte.class, Number::byteValue)
+			.put(Short.class, Number::shortValue).build();
 	public static final ImmutableMap<Class<? extends Number>, Function<String, ? extends Number>> NUMBER_FROM_STRING_MAP = new ImmutableMap.Builder<Class<? extends Number>, Function<String, ? extends Number>>()
 			.put(Integer.class, Integer::valueOf)
 			.put(Float.class, Float::valueOf)
@@ -41,10 +40,18 @@ public enum Numbers {
 			.put(Long.class, Long::valueOf)
 			.put(Byte.class, Byte::valueOf)
 			.put(Short.class, Short::valueOf).build();
+	public static final ImmutableMap<Class<? extends Number>, BiFunction<? extends Number, ? extends Number, ? extends Number>> SUM_MAP = new ImmutableMap.Builder<Class<? extends Number>, BiFunction<? extends Number, ? extends Number, ? extends Number>>()
+			.put(Integer.class, (BiFunction<Integer, Integer, Integer>) Integer::sum)
+			.put(Float.class, (BiFunction<Float, Float, Float>) Float::sum)
+			.put(Double.class, (BiFunction<Double, Double, Double>) Double::sum)
+			.put(Long.class, (BiFunction<Long, Long, Long>) Long::sum)
+			.put(Byte.class, (Byte a, Byte b) -> (byte) (a + b))
+			.put(Short.class, (Short a, Short b) -> (short) (a + b)).build();
 
 
 	/* SECTION static methods */
 
+	@SuppressWarnings("MagicNumber")
 	public static boolean isNegative(Number value) {
 		double vd = value.doubleValue();
 		return (doubleToLongBits(vd) & 0b1000000000000000000000000000000000000000000000000000000000000000L) != 0L && !Double.isNaN(vd);
@@ -80,19 +87,14 @@ public enum Numbers {
 			return Casts.<IOperable<?, N>>castChecked(n, castUncheckedUnboxedNonnull(IOperable.class), logger).flatMap(t -> castChecked(t.sum(it), castUncheckedUnboxedNonnull(t.getClass()), logger));
 		else if (n instanceof Number) {
 			Class<? extends N> clazz = castUncheckedUnboxedNonnull(n.getClass());
-			@Nullable Class<?> pClass = PRIMITIVE_TYPE_TO_BOXED_TYPE_BI_MAP.inverse().get(clazz);
-			if (pClass == null) return Optional.empty();
-
-			@Nullable Method m = unboxOptional(Throwables.tryCall(() -> clazz.getDeclaredMethod("sum", pClass, pClass), logger));
-			Throwables.consumeIfCaughtThrowable(t -> logger.warn(() -> Loggers.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(Loggers.EnumMessages.REFLECTION_UNABLE_TO_GET_MEMBER.makeMessage("sum method", clazz, "sum", pClass, pClass), t)));
-			@Nullable Function<Number, ? extends Number> ef = PRIMITIVE_TYPE_FROM_NUMBER_MAP.get(pClass);
+			@Nullable BiFunction<? extends Number, ? extends Number, ? extends Number> m = SUM_MAP.get(clazz);
+			@Nullable Function<Number, ? extends Number> ef = PRIMITIVE_TYPE_FROM_NUMBER_MAP.get(clazz);
 			if (m == null || ef == null) return Optional.empty();
 
 			Iterator<? extends Number> itr = castUncheckedUnboxedNonnull(it.iterator());
 			while (itr.hasNext() && n != null) {
 				N nf = n;
-				n =
-						unboxOptional(Throwables.tryCall(() -> m.invoke(null, nf, ef.apply(itr.next())), logger).flatMap(Casts::castUnchecked));
+				n = unboxOptional(tryCall(() -> m.apply(castUncheckedUnboxedNonnull(nf), castUncheckedUnboxedNonnull(ef.apply(itr.next()))), logger).flatMap(Casts::castUnchecked));
 			}
 			return Optional.ofNullable(n);
 		}

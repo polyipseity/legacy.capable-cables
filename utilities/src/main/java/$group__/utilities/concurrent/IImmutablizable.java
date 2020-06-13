@@ -8,7 +8,6 @@ import $group__.utilities.Constants;
 import $group__.utilities.helpers.Capacities;
 import $group__.utilities.helpers.Casts;
 import $group__.utilities.helpers.Concurrency;
-import $group__.utilities.helpers.specific.Loggers;
 import $group__.utilities.helpers.specific.MapsExtension;
 import $group__.utilities.helpers.specific.Optionals;
 import $group__.utilities.helpers.specific.Throwables;
@@ -71,9 +70,7 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 
 					if (r != null) {
 						ExternalToImmutableMethod rf = r;
-						LOGGER.debug(() -> Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("To immutable method '{}' with " +
-										"annotation" +
-										" '{}' auto-registered for class '{}'", EXTERNAL_METHOD_MAP.get(rf), rf,
+						LOGGER.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("To immutable method '{}' with annotation '{}' auto-registered for class '{}'", EXTERNAL_METHOD_MAP.get(rf), rf,
 								key.toGenericString()));
 					} else
 						throw Throwables.throw_(new NoSuchMethodException("No to-immutable method for class '" + key.toGenericString() + '\''));
@@ -148,34 +145,25 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 				m = EXTERNAL_METHOD_MAP.get(EXTERNAL_ANNOTATIONS_CACHE.get(oc));
 			} catch (ExecutionException e) {
 				Throwables.setCaughtThrowableStatic(e, logger);
-				logger.warn(() -> Loggers.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage(
-						"Unable" +
-								" " +
-								"to immutablize object '{}' of class '{}' as no to immutable method is obtained, " +
-								"will" +
-								" " +
-								"NOT " +
-								"attempt to immutable again", o, oc.toGenericString()), e));
+				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable to immutablize object '{}' of class '{}' as no to immutable method is obtained, will NOT attempt to immutable again", o, oc.toGenericString()), e));
 				BROKEN_CLASS_SET.add(oc);
 				return Optional.of(o);
 			}
 
-			Optional<T> r = Throwables.tryCall(() -> m.invoke(o), logger).flatMap(Casts::castUnchecked);
+			Optional<T> r = tryCall(() -> {
+				try {
+					return m.invoke(o);
+				} catch (Throwable t) {
+					throw throwThrowable(t);
+				}
+			}, logger).flatMap(Casts::castUnchecked);
 			Throwables.consumeIfCaughtThrowable(t -> {
-				logger.warn(() -> Loggers.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("To" +
-						"-immutable method '{}' failed for object '{}' of class '{}', will NOT attempt to immutable " +
-						"again", m, o, oc.toGenericString()), t));
+				logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("To-immutable method '{}' failed for object '{}' of class '{}', will NOT attempt to immutable again", m, o, oc.toGenericString()), t));
 				BROKEN_CLASS_SET.add(oc);
 			});
 			return r;
 		} else {
-			logger.debug(() -> Loggers.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable " +
-					"to" +
-					" " +
-					"immutable object '{}' of class '{}' as to immutable method annotation is NOT yet processed, " +
-					"will" +
-					" " +
-					"attempt to immutable again", o, oc.toGenericString()), Throwables.newThrowable()));
+			logger.debug(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Unable to immutable object '{}' of class '{}' as to immutable method annotation is NOT yet processed, will attempt to immutable again", o, oc.toGenericString()), newThrowable()));
 			return Optional.of(o);
 		}
 	}

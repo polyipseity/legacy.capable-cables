@@ -75,9 +75,7 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 					} else if (tag.pickedUpBlockTile != null) {
 						@Nullable TileEntity tile = state.getBlock().createTileEntity(world, state);
 						if (tile == null) {
-							Globals.LOGGER.error(() -> Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot create tile entity " +
-									"of" +
-									" block state ID {}", tag.pickedUpBlockState));
+							LOGGER.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot create tile entity of block state ID {}", tag.pickedUpBlockState));
 							return false;
 						}
 						tile.deserializeNBT(tag.pickedUpBlockTile);
@@ -90,8 +88,7 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 					@Nullable EntityLivingBase entity =
 							(EntityLivingBase) EntityList.createEntityFromNBT(tag.pickedUpEntity, world);
 					if (entity == null) {
-						Globals.LOGGER.error(() -> Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot create entity with tag " +
-								"'{}'", tag.pickedUpEntity));
+						LOGGER.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot create entity with tag '{}'", tag.pickedUpEntity));
 						return false;
 					}
 					Vec3d targetPos = Registrables.Blocks.getPosition(target);

@@ -39,7 +39,6 @@ public interface IStrictToString {
 				getThisAndSuperclasses(k).forEach(c -> {
 					for (Field f : c.getDeclaredFields()) {
 						if (isMemberStatic(f)) continue;
-						String fnp = f.getName() + '=';
 						@Nullable MethodHandle fm = Optionals.unboxOptional(Throwables.tryCall(() -> IMPL_LOOKUP.unreflectGetter(f),
 								LOGGER));
 						Throwables.consumeIfCaughtThrowable(t -> LOGGER.warn(() -> Loggers.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(Loggers.EnumMessages.INVOCATION_UNABLE_TO_UNREFLECT_MEMBER.makeMessage("field getter", f, IMPL_LOOKUP), t)));
@@ -48,11 +47,13 @@ public interface IStrictToString {
 						if (fm == null) {
 							@Nullable Throwable cau = Throwables.getCaughtThrowableStatic();
 							ff = t -> "!!!Thrown{throwable=" + cau + "}!!!";
-						} else
-							ff = t -> fnp + Optionals.unboxOptional(Throwables.tryCallWithLogging(() -> fm.invoke(t), LOGGER));
+						} else {
+							String fnp = f.getName() + '=';
+							ff = t -> fnp + unboxOptional(tryCallWithLogging(() -> fm.invoke(t), LOGGER));
+						}
 
 						if (!first[0]) sfs.add((t, ss) -> ", ");
-						sfs.add((t, ss) -> fnp + ff.apply(t));
+						sfs.add((t, ss) -> ff.apply(t));
 						first[0] = false;
 					}
 				});

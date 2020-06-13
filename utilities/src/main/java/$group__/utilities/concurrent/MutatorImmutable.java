@@ -21,10 +21,17 @@ public class MutatorImmutable<T extends MutatorImmutable<T>> implements Serializ
 		IMutatorImmutablizable<T, T> {
 	/* SECTION static variables */
 
-	public static final MutatorImmutable<?> INSTANCE = new MutatorImmutable<>(null);
+	public static final MutatorImmutable<?> INSTANCE;
 
 	private static final Logger LOGGER = LogManager.getLogger(MutatorImmutable.class);
 	private static final long serialVersionUID = -123212561635975024L;
+
+
+	/* SECTION static initializer */
+
+	static {
+		INSTANCE = new MutatorImmutable<>(null);
+	}
 
 
 	/* SECTION constructors */
@@ -32,7 +39,7 @@ public class MutatorImmutable<T extends MutatorImmutable<T>> implements Serializ
 	@SuppressWarnings("unused")
 	protected MutatorImmutable() {}
 
-	private MutatorImmutable(@SuppressWarnings("unused") @Nullable Object u) { requireRunOnceOnly(LOGGER); }
+	private MutatorImmutable(@SuppressWarnings({"unused", "SameParameterValue"}) @Nullable Object u) { requireRunOnceOnly(LOGGER); }
 
 
 	/* SECTION getters & setters */
@@ -60,4 +67,9 @@ public class MutatorImmutable<T extends MutatorImmutable<T>> implements Serializ
 	@Override
 	@OverridingStatus(group = Constants.PACKAGE)
 	public final boolean isImmutable() { return true; }
+
+
+	@Override
+	@OverridingStatus(group = PACKAGE, when = When.NEVER)
+	public final String toString() { return getToStringString(this, super.toString()); }
 }
