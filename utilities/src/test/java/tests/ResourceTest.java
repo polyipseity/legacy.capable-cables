@@ -7,8 +7,6 @@ import org.junit.platform.commons.annotation.Testable;
 
 @Testable
 public class ResourceTest {
-	/* SECTION methods */
-
 	@Test
 	@BeforeEach
 	void testResourcesProperlyCopied() {

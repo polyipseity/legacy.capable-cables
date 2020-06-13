@@ -30,8 +30,6 @@ import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_4;
 
 @SuppressWarnings("unused")
 public final class OverridingStatusProcessor extends AbstractProcessor {
-	/* SECTION methods */
-
 	@Override
 	public Set<String> getSupportedAnnotationTypes() { return Collections.singleton(OverridingStatus.class.getCanonicalName()); }
 

@@ -4,8 +4,6 @@ import java.util.*;
 import java.util.function.UnaryOperator;
 
 public interface IListDelegated<L extends List<E>, E> extends List<E>, ICollectionDelegated<L, E> {
-	/* SECTION methods */
-
 	@Override
 	@Deprecated
 	default L getCollection() { return getList(); }

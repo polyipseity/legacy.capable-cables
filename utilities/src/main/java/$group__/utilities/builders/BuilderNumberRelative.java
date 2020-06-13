@@ -11,21 +11,15 @@ import static $group__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static com.google.common.collect.Maps.immutableEntry;
 
 public class BuilderNumberRelative<T extends BuilderNumberRelative<T, V>, V extends NumberRelative<V>> extends BuilderStructure<T, V> {
-	/* SECTION static variables */
-
 	public static final Map.Entry<Class<Number>, String> KEY_DEFAULT_PARENT = immutableEntry(Number.class, "parent");
 	public static final Map.Entry<Class<Number>, String> KEY_DEFAULT_OFFSET = immutableEntry(Number.class, "offset");
 
-
-	/* SECTION variables */
 
 	@Nullable
 	public Number parent = peekDefault(KEY_DEFAULT_PARENT);
 	@Nullable
 	public Number offset = peekDefault(KEY_DEFAULT_OFFSET);
 
-
-	/* SECTION constructors */
 
 	public BuilderNumberRelative(Function<? super T, ? extends V> constructor) { super(constructor); }
 
@@ -35,8 +29,6 @@ public class BuilderNumberRelative<T extends BuilderNumberRelative<T, V>, V exte
 		offset = copy.offset;
 	}
 
-
-	/* SECTION methods */
 
 	public T setParent(@Nullable Number parent) {
 		this.parent = parent;

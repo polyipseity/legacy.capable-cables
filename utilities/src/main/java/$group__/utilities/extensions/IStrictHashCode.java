@@ -27,8 +27,6 @@ import static $group__.utilities.helpers.Concurrency.MULTI_THREAD_THREAD_COUNT;
 import static $group__.utilities.helpers.Dynamics.*;
 
 public interface IStrictHashCode {
-	/* SECTION static variables */
-
 	Logger LOGGER = LogManager.getLogger(IStrictHashCode.class);
 
 	LoadingCache<Class<?>, BiFunction<Object, Supplier<? extends Integer>, Integer>> FUNCTION_MAP =
@@ -55,12 +53,8 @@ public interface IStrictHashCode {
 			}));
 
 
-	/* SECTION static methods */
-
 	static int getHashCode(final Object thisObj, Supplier<? extends Integer> superHashCode) { return FUNCTION_MAP.getUnchecked(thisObj.getClass()).apply(thisObj, superHashCode); }
 
-
-	/* SECTION methods */
 
 	@Override
 	@OverridingStatus(group = Constants.PACKAGE, when = When.ALWAYS)

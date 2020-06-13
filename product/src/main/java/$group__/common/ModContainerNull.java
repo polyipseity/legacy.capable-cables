@@ -21,12 +21,7 @@ import static $group__.Globals.LOGGER;
 import static $group__.utilities.helpers.specific.Throwables.rejectUnsupportedOperation;
 
 public final class ModContainerNull extends Singleton implements ModContainer {
-	/* SECTION constructors */
-
 	private ModContainerNull() { super(LOGGER); }
-
-
-	/* SECTION methods */
 
 	@Override
 	@Deprecated

@@ -22,8 +22,6 @@ import javax.annotation.meta.When;
  */
 @SideOnly(Side.CLIENT)
 public interface IDrawable<N extends Number> extends ISpec<Rectangle<?, N>> {
-	/* SECTION methods */
-
 	/**
 	 * Tries drawing the given object.
 	 * <p>

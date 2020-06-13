@@ -26,8 +26,6 @@ import static $group__.utilities.helpers.Concurrency.MULTI_THREAD_THREAD_COUNT;
 import static $group__.utilities.helpers.Dynamics.*;
 
 public interface IStrictToString {
-	/* SECTION static variables */
-
 	Logger LOGGER = LogManager.getLogger(IStrictToString.class);
 
 	LoadingCache<Class<?>, BiFunction<Object, String, String>> FUNCTION_MAP =
@@ -65,12 +63,8 @@ public interface IStrictToString {
 			}));
 
 
-	/* SECTION static methods */
-
 	static String getToStringString(final Object thisObj, String superString) { return FUNCTION_MAP.getUnchecked(thisObj.getClass()).apply(thisObj, superString); }
 
-
-	/* SECTION methods */
 
 	@Override
 	@OverridingStatus(group = Constants.PACKAGE, when = When.ALWAYS)

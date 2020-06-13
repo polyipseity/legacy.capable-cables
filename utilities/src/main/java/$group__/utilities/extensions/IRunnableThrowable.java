@@ -4,8 +4,6 @@ import $group__.utilities.helpers.specific.Throwables;
 
 @FunctionalInterface
 public interface IRunnableThrowable extends Runnable {
-	/* SECTION methods */
-
 	void runT() throws Throwable;
 
 	@Override

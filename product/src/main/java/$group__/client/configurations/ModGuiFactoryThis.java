@@ -32,8 +32,6 @@ public class ModGuiFactoryThis extends Singleton implements IModGuiFactory {
 	public ModGuiFactoryThis() { super(Globals.LOGGER); }
 
 
-	/* SECTION methods */
-
 	@Override
 	public void initialize(Minecraft client) { /* MARK empty */ }
 

@@ -22,13 +22,9 @@ import static $group__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 
 public class LoggingLog4J<T extends LoggingLog4J<T, L>, L extends Logger> implements ILogging<L>,
 		IMutatorUser<IMutatorImmutablizable<?, ?>>, IStructure<T, T>, ICloneable<T> {
-	/* SECTION variables */
-
 	protected IMutatorImmutablizable<?, ?> mutator;
 	protected L logger;
 
-
-	/* SECTION constructors */
 
 	public LoggingLog4J(L logger, IMutatorImmutablizable<?, ?> mutator) {
 		this.mutator = trySetNonnull(mutator, mutator, true);
@@ -43,8 +39,6 @@ public class LoggingLog4J<T extends LoggingLog4J<T, L>, L extends Logger> implem
 				mutator);
 	}
 
-
-	/* SECTION getters & setters */
 
 	@Nonnull
 	@Override
@@ -66,8 +60,6 @@ public class LoggingLog4J<T extends LoggingLog4J<T, L>, L extends Logger> implem
 				mutator);
 	}
 
-
-	/* SECTION methods */
 
 	@Override
 	public T toImmutable() {

@@ -3,8 +3,6 @@
 //////////////////////////////////////////////////
 
 
-/* SECTION methods */
-
 // COMMENT arguments
 
 project.ext.parseArgument = { String k, String envK, Object defaultV = null ->

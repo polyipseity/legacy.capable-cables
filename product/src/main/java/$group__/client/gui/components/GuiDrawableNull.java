@@ -22,31 +22,21 @@ import static $group__.utilities.helpers.PreconditionsExtension.requireRunOnceOn
 @Immutable
 public final class GuiDrawableNull<N extends Number> extends Gui implements IDrawable<N>,
 		IStructure<GuiDrawableNull<N>, GuiDrawableNull<N>> {
-	/* SECTION static variables */
-
 	public static final GuiDrawableNull<?> INSTANCE;
 
 	private static final Logger LOGGER = LogManager.getLogger(GuiDrawableNull.class);
 
-
-	/* SECTION static initializer */
 
 	static {
 		INSTANCE = new GuiDrawableNull<>();
 	}
 
 
-	/* SECTION constructors */
-
 	private GuiDrawableNull() { requireRunOnceOnly(LOGGER); }
 
 
-	/* SECTION static methods */
-
 	public static <N extends Number> GuiDrawableNull<N> getInstance() { return castUncheckedUnboxedNonnull(INSTANCE); }
 
-
-	/* SECTION methods */
 
 	@Override
 	public boolean tryDraw(Minecraft client) { return false; }

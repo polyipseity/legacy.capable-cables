@@ -18,31 +18,21 @@ import static $group__.utilities.helpers.PreconditionsExtension.requireRunOnceOn
 
 @Immutable
 public final class GuiColorNull<T> implements IColored<T>, IStructure<GuiColorNull<T>, GuiColorNull<T>> {
-	/* SECTION static variables */
-
 	public static final GuiColorNull<?> INSTANCE;
 
 	private static final Logger LOGGER = LogManager.getLogger(GuiColorNull.class);
 
-
-	/* SECTION static initializer */
 
 	static {
 		INSTANCE = new GuiColorNull<>();
 	}
 
 
-	/* SECTION constructors */
-
 	private GuiColorNull() { requireRunOnceOnly(LOGGER); }
 
 
-	/* SECTION static methods */
-
 	public static <T> GuiColorNull<T> getInstance() { return castUncheckedUnboxedNonnull(INSTANCE); }
 
-
-	/* SECTION methods */
 
 	@Nullable
 	@Override

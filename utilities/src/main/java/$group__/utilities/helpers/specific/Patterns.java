@@ -9,8 +9,6 @@ public enum Patterns {
 	/* MARK empty */;
 
 
-	/* SECTION static variables */
-
 	public static final Pattern
 			HASH_PATTERN = compile(quote("#")),
 			TWO_MINUS_SIGNS_PATTERN = compile(quote("--")),

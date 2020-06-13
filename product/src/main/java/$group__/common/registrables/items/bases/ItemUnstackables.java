@@ -7,7 +7,5 @@ public enum ItemUnstackables {
 	/* MARK empty */;
 
 
-	/* SECTION static methods */
-
 	public static void initUnstackable(Item thisObj) { thisObj.setMaxStackSize(1); }
 }

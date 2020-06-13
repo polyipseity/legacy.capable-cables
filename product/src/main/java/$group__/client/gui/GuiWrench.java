@@ -39,16 +39,11 @@ import static $group__.utilities.helpers.specific.Throwables.rejectUnsupportedOp
 
 @SideOnly(Side.CLIENT)
 public class GuiWrench<T extends GuiWrench<T, TH>, TH extends ITheme<TH>> extends GuiContainer implements IStructure<T, T>, ISpec<Rectangle<?, ?>>, IMutatorUser<IMutatorImmutablizable<?, ?>>, ILoggingUser<ILogging<Logger>, Logger>, IThemedUser<IThemed<TH>, TH> {
-	/* SECTION variables */
-
 	protected GuiTabs<?, ?, ?, ?, ?, ?> tabs;
 	protected IThemed<TH> themed;
 
 	protected IMutatorImmutablizable<?, ?> mutator;
 	protected ILogging<Logger> logging;
-
-
-	/* SECTION constructors */
 
 	@SuppressWarnings({"ArraysAsListWithZeroOrOneArgument", "MagicNumber"})
 	public GuiWrench(Container container, int open, @Nullable TH theme, IMutatorImmutablizable<?, ?> mutator,
@@ -86,9 +81,6 @@ public class GuiWrench<T extends GuiWrench<T, TH>, TH extends ITheme<TH>> extend
 		}
 	}
 
-
-	/* SECTION getters & setters */
-
 	@Override
 	public IThemed<TH> getThemed() { return themed; }
 
@@ -106,9 +98,6 @@ public class GuiWrench<T extends GuiWrench<T, TH>, TH extends ITheme<TH>> extend
 
 	@Override
 	public boolean trySetMutator(IMutatorImmutablizable<?, ?> mutator) { return trySet(t -> this.mutator = t, mutator); }
-
-
-	/* SECTION methods */
 
 	@Override
 	public void initGui() { initGuiBase(this, super::initGui, t -> xSize = t, t -> ySize = t); }

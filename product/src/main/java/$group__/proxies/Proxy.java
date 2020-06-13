@@ -16,14 +16,10 @@ import static net.minecraftforge.common.MinecraftForge.EVENT_BUS;
 
 @SuppressWarnings("EmptyMethod")
 public abstract class Proxy extends Singleton {
-	/* SECTION static variables */
-
 	public static final String SUBPACKAGE = "proxies";
 
 	protected Proxy() { super(LOGGER); }
 
-
-	/* SECTION methods */
 
 	@OverridingMethodsMustInvokeSuper
 	public void construct(@SuppressWarnings("unused") ModThis$ mod,

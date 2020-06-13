@@ -6,8 +6,6 @@ import net.minecraft.block.material.Material;
 public enum Materials {
 	/* MARK empty */;
 
-	/* SECTION static variables */
-
 	public static final Material PETRIFIED_SKY = new Material(MapColor.PURPLE);
 
 

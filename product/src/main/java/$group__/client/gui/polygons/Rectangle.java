@@ -17,13 +17,9 @@ import static $group__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 
 @SideOnly(Side.CLIENT)
 public class Rectangle<T extends Rectangle<T, N>, N extends Number> extends Polygon4<T, N, List<XY<?, N>>> {
-	/* SECTION variables */
-
 	protected XY<?, N> offset;
 	protected XY<?, N> size;
 
-
-	/* SECTION constructors */
 
 	public Rectangle(N offsetX, N offsetY, N sizeX, N sizeY, IMutatorImmutablizable<?, ?> mutator,
 	                 ILogging<Logger> logging) {
@@ -45,16 +41,12 @@ public class Rectangle<T extends Rectangle<T, N>, N extends Number> extends Poly
 	}
 
 
-	/* SECTION constructors */
-
 	public static <T extends BuilderStructure<T, V>, V extends Rectangle<V, N>, N extends Number> BuilderStructure<T,
 			V> newBuilderRectangle(XY<?, N> offset, XY<?, N> size) { return new BuilderStructure<>(t -> castUncheckedUnboxedNonnull(new Rectangle<>(offset, size, t.mutator, t.logging))); }
 
 	public static <T extends BuilderStructure<T, V>, V extends Rectangle<V, N>, N extends Number> BuilderStructure<T,
 			V> newBuilderRectangle(N offsetX, N offsetY, N sizeX, N sizeY) { return new BuilderStructure<>(t -> castUncheckedUnboxedNonnull(new Rectangle<>(offsetX, offsetY, sizeX, sizeY, t.mutator, t.logging))); }
 
-
-	/* SECTION getters & setters */
 
 	public XY<?, N> getOffset() { return offset; }
 
@@ -97,8 +89,6 @@ public class Rectangle<T extends Rectangle<T, N>, N extends Number> extends Poly
 	@Deprecated
 	public void setD(XY<?, N> d) throws UnsupportedOperationException { throw Throwables.rejectUnsupportedOperation(); }
 
-
-	/* SECTION methods */
 
 	public XY<?, N> max() { return a().max(ImmutableList.of(c())); }
 

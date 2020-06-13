@@ -7,8 +7,6 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public interface ICollectionDelegated<C extends Collection<E>, E> extends Collection<E>, IIterableDelegated<C, E> {
-	/* SECTION methods */
-
 	@Override
 	@Deprecated
 	default C getIterable() { return getCollection(); }

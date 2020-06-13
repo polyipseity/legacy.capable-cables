@@ -12,8 +12,6 @@ import static $group__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 @InterfaceIntersection
 public interface IMutatorImmutablizable<T extends IMutator & IImmutablizable<I>,
 		I extends IMutator & IImmutablizable<I>> extends IMutator, IImmutablizable<I> {
-	/* SECTION static methods */
-
 	@InterfaceIntersection.InstanceOfMethod
 	static boolean instanceof_(Object obj) { return obj instanceof IMutator && obj instanceof IImmutablizable<?>; }
 
@@ -22,8 +20,6 @@ public interface IMutatorImmutablizable<T extends IMutator & IImmutablizable<I>,
 			, I> of(T obj) {
 		return obj instanceof IMutatorImmutablizable<?, ?> ? castUncheckedUnboxedNonnull(obj) :
 				new IMutatorImmutablizable<T, I>() {
-					/* SECTION methods */
-
 					@Override
 					public I toImmutable() { return obj.toImmutable(); }
 

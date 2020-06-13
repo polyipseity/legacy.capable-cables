@@ -18,16 +18,11 @@ import static $group__.utilities.helpers.specific.Throwables.consumeIfCaughtThro
 import static $group__.utilities.helpers.specific.Throwables.tryCall;
 
 public enum ExternalCloneMethodProcessor implements IProcessorRuntime.IClass.IElement.IMethod<ExternalCloneMethod> {
-	/* SECTION enums */
 	INSTANCE;
 
 
-	/* SECTION variables */
-
 	private volatile boolean processed = false;
 
-
-	/* SECTION static methods */
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public static void process(AnnotationProcessingEvent event) {
@@ -35,8 +30,6 @@ public enum ExternalCloneMethodProcessor implements IProcessorRuntime.IClass.IEl
 				event.getLogger());
 	}
 
-
-	/* SECTION methods */
 
 	@Override
 	public void process(ASMDataTable asm, @Nullable Logger logger) {

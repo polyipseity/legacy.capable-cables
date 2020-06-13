@@ -6,8 +6,6 @@ import java.util.Set;
 import java.util.Spliterator;
 
 public interface ISetDelegated<S extends Set<E>, E> extends Set<E>, ICollectionDelegated<S, E> {
-	/* SECTION methods */
-
 	@Override
 	@Deprecated
 	default S getCollection() { return getSet(); }

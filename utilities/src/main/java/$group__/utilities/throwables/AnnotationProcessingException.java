@@ -1,12 +1,7 @@
 package $group__.utilities.throwables;
 
 public class AnnotationProcessingException extends RuntimeException {
-	/* SECTION static variables */
-
 	private static final long serialVersionUID = 6003555440382442147L;
-
-
-	/* SECTION constructors */
 
 	public AnnotationProcessingException() { super(); }
 

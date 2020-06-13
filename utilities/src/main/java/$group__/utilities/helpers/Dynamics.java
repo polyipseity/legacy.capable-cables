@@ -36,11 +36,8 @@ import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 
 public enum Dynamics {
-	/* SECTION enums */
 	INSTANCE;
 
-
-	/* SECTION static variables */
 
 	public static final Lookup PUBLIC_LOOKUP = MethodHandles.publicLookup();
 	public static final Lookup IMPL_LOOKUP;
@@ -56,8 +53,6 @@ public enum Dynamics {
 
 	private static final Logger LOGGER = LogManager.getLogger(Dynamics.class);
 
-
-	/* SECTION static methods */
 
 	static {
 		{
@@ -196,24 +191,16 @@ public enum Dynamics {
 	public static Type getGenericSuperclassActualTypeArgument(Class<?> c, int i) throws ClassCastException { return getGenericSuperclassActualTypeArguments(c)[i]; }
 
 
-	/* SECTION static initializer */
-
 	public static Type[] getGenericSuperclassActualTypeArguments(Class<?> c) { return ((ParameterizedType) c.getGenericSuperclass()).getActualTypeArguments(); }
 
-
-	/* SECTION static classes */
 
 	public enum Reflections {
 		/* MARK empty */;
 
 
-		/* SECTION static classes */
-
 		public enum Bulk {
 			/* MARK empty */;
 
-
-			/* SECTION static methods */
 
 			public static <T> boolean mapFields(Class<T> common, T from, T to, Function<Object, ?> mapper,
 			                                    boolean supers, @Nullable Logger logger) {
@@ -283,13 +270,9 @@ public enum Dynamics {
 		/* MARK empty */;
 
 
-		/* SECTION static classes */
-
 		public enum Lambdas {
 			/* MARK empty */;
 
-
-			/* SECTION static methods */
 
 			public static <T, R> Function<T, R> makeFunction(Lookup lookup, MethodHandle method, Class<R> returnType,
 			                                                 Class<T> inputType) throws Throwable {
@@ -311,8 +294,6 @@ public enum Dynamics {
 			/* MARK empty */;
 
 
-			/* SECTION static methods */
-
 			public static final MethodHandle FIELD_MODIFIERS_SETTER =
 					assertNonnull(tryCall(() -> IMPL_LOOKUP.findSetter(Field.class, "modifiers", int.class), LOGGER).orElseGet(() -> {
 						consumeIfCaughtThrowable(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_FIND_METHOD_HANDLE.makeMessage("modifiers field", Field.class, "modifiers", null, int.class), t)));
@@ -323,17 +304,11 @@ public enum Dynamics {
 
 
 	private static final class SecurityManagerReflections extends SecurityManager {
-		/* SECTION static variables */
-
 		private static final SecurityManagerReflections INSTANCE = new SecurityManagerReflections();
 
 
-		/* SECTION constructors */
-
 		private SecurityManagerReflections() {}
 
-
-		/* SECTION methods */
 
 		@Override
 		protected Class<?>[] getClassContext() {

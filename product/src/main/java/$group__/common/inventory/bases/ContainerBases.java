@@ -12,8 +12,6 @@ public enum ContainerBases {
 	/* MARK empty */;
 
 
-	/* SECTION static methods */
-
 	@SuppressWarnings("SameReturnValue")
 	public static boolean canInteractWithBase() { return true; }
 

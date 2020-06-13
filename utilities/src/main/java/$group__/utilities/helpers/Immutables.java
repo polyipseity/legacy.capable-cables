@@ -21,8 +21,6 @@ public enum Immutables {
 	/* MARK empty */;
 
 
-	/* SECTION static methods */
-
 	// COMMENT simple
 
 	@ExternalToImmutableMethod({

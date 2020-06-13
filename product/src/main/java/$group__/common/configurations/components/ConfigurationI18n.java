@@ -26,8 +26,6 @@ import static $group__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.utilities.helpers.specific.Throwables.rejectUnsupportedOperationIf;
 
 public class ConfigurationI18n<T extends ConfigurationI18n<T, M>, M extends Map<String, ConfigurationI18n<?, ?>>> implements IStructure<T, T>, IMapDelegated<M, String, ConfigurationI18n<?, ?>>, IMutatorUser<IMutatorImmutablizable<?, ?>>, ILoggingUser<ILogging<Logger>, Logger> {
-	/* SECTION variables */
-
 	protected String
 			id,
 			name;
@@ -37,8 +35,6 @@ public class ConfigurationI18n<T extends ConfigurationI18n<T, M>, M extends Map<
 	protected IMutatorImmutablizable<?, ?> mutator;
 	protected ILogging<Logger> logging;
 
-
-	/* SECTION constructors */
 
 	public ConfigurationI18n(String id, String name, M children, IMutatorImmutablizable<?, ?> mutator,
 	                         ILogging<Logger> logging) { this(id, name, null, children, mutator, logging); }
@@ -58,8 +54,6 @@ public class ConfigurationI18n<T extends ConfigurationI18n<T, M>, M extends Map<
 
 	protected ConfigurationI18n(ConfigurationI18n<?, ? extends M> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getId(), copy.getName(), copy.getParent(), copy.getChildren(), mutator, copy.getLogging()); }
 
-
-	/* SECTION getters & setters */
 
 	public String getName() { return name; }
 
@@ -117,8 +111,6 @@ public class ConfigurationI18n<T extends ConfigurationI18n<T, M>, M extends Map<
 	@Override
 	public boolean trySetLogging(ILogging<Logger> logging) { return trySet(t -> this.logging = t, logging); }
 
-
-	/* SECTION methods */
 
 	@Override
 	public T toImmutable() {

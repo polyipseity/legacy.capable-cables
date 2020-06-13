@@ -4,8 +4,6 @@
 
 import groovy.io.FileType
 
-/* SECTION variables */
-
 String methodMapName = 'methodMap'
 boolean hasMethodMap
 for (int i = 0; (hasMethodMap = rootProject.ext.has methodMapName) && !(rootProject.ext."$methodMapName" instanceof Map<?, ?>); ++i) methodMapName = "methodMap$i"
@@ -25,8 +23,6 @@ else {
     rootProject.ext."$methodMapName" = methodMap
 }
 
-
-/* SECTION methods */
 
 project.ext.checkApply = { Iterable<String> functions ->
     functions.each {

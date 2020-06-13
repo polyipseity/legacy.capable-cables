@@ -15,8 +15,6 @@ import static $group__.common.inventory.bases.ContainerBases.canInteractWithBase
 import static $group__.common.inventory.bases.ContainerBases.transferStackInSlotBase;
 
 public class ContainerWrench<T extends ContainerWrench<T>> extends Container {
-	/* SECTION static variables */
-
 	@SuppressWarnings("NewExpressionSideOnly")
 	public static final int ID =
 			GuiHandler.INSTANCE.registerGui((side, id, player, world, hand, u, u1) -> Optional.of(side.isClient() ?
@@ -24,12 +22,8 @@ public class ContainerWrench<T extends ContainerWrench<T>> extends Container {
 					new ContainerWrench<>()));
 
 
-	/* SECTION constructors */
-
 	protected ContainerWrench() { super(); }
 
-
-	/* SECTION methods */
 
 	@Override
 	public boolean canInteractWith(EntityPlayer playerIn) { return canInteractWithBase(); }

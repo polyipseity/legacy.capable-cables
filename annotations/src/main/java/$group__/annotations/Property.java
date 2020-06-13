@@ -8,8 +8,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({})
 @Retention(RUNTIME)
 public @interface Property {
-	/* SECTION methods */
-
 	String key() default "";
 
 	String value() default "";

@@ -42,8 +42,6 @@ import static java.util.Collections.newSetFromMap;
 @SuppressWarnings("SpellCheckingInspection")
 @FunctionalInterface
 public interface IImmutablizable<I extends IImmutablizable<I>> {
-	/* SECTION static variables */
-
 	Logger LOGGER = LogManager.getLogger(IImmutablizable.class);
 
 	ConcurrentMap<ExternalToImmutableMethod, MethodHandle> EXTERNAL_METHOD_MAP =
@@ -51,8 +49,6 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 	ConcurrentMap<Class<?>, ExternalToImmutableMethod> EXTERNAL_ANNOTATIONS_MAP = MapsExtension.MAP_MAKER_MULTI_THREAD.makeMap();
 	LoadingCache<Class<?>, ExternalToImmutableMethod> EXTERNAL_ANNOTATIONS_CACHE =
 			CacheBuilder.newBuilder().initialCapacity(Capacities.INITIAL_CAPACITY_4).concurrencyLevel(Concurrency.MULTI_THREAD_THREAD_COUNT).expireAfterAccess(MapsExtension.CACHE_EXPIRATION_ACCESS_DURATION, MapsExtension.CACHE_EXPIRATION_ACCESS_TIME_UNIT).build(new CacheLoader<Class<?>, ExternalToImmutableMethod>() {
-				/* SECTION methods */
-
 				@Override
 				public ExternalToImmutableMethod load(Class<?> key) throws NoSuchMethodException {
 					@Nullable ExternalToImmutableMethod r = EXTERNAL_ANNOTATIONS_MAP.get(key);
@@ -89,8 +85,6 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 	 */
 	Set<Class<?>> BROKEN_CLASS_SET = newSetFromMap(MapsExtension.MAP_MAKER_MULTI_THREAD_WEAK_KEYS.makeMap());
 
-
-	/* SECTION static variables */
 
 	/**
 	 * Attempts to turn the given parameter {@code o} into an immutable version of it.
@@ -209,8 +203,6 @@ public interface IImmutablizable<I extends IImmutablizable<I>> {
 	 */
 	static <T> T tryToImmutableUnboxedNonnull(T o, @Nullable Logger logger) { return tryToImmutable(o, logger).orElseThrow(Throwables::rethrowCaughtThrowableStatic); }
 
-
-	/* SECTION methods */
 
 	/**
 	 * Returns an immutable version of this object.

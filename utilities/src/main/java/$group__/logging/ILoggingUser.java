@@ -6,8 +6,6 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 public interface ILoggingUser<T extends ILogging<L>, L> extends ILogging<L> {
-	/* SECTION getters & setters */
-
 	T getLogging();
 
 	default void setLogging(T logging) throws UnsupportedOperationException { Throwables.rejectUnsupportedOperationIf(!trySetLogging(logging)); }

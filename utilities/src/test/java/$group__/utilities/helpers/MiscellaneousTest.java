@@ -13,8 +13,6 @@ import static tests.TestUtilities.consumeCaught;
 
 @Testable
 public class MiscellaneousTest {
-	/* SECTION methods */
-
 	@Test
 	void testMarkUnused() {
 		// COMMENT positive

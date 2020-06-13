@@ -9,7 +9,5 @@ public enum BlockBases {
 	/* MARK empty */;
 
 
-	/* SECTION static methods */
-
 	public static Block setUnlocalizedNameBase(final Block thisObj, ResourceLocation name) { return thisObj.setUnlocalizedName(getNamespacedUnlocalizedNameForRegistry(name)); }
 }

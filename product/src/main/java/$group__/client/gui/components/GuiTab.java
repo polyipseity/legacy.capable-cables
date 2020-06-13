@@ -23,18 +23,12 @@ import static $group__.utilities.helpers.specific.Throwables.rejectUnsupportedOp
 @SideOnly(Side.CLIENT)
 public class GuiTab<T extends GuiTab<T, N, C, TH, E>, N extends Number, C, TH extends ITheme<TH>,
 		E extends IDrawable<N>> extends GuiGroup<T, N, C, TH, List<E>, E> implements IListDelegated<List<E>, E> {
-	/* SECTION static variables */
-
 	public static final int INDEX_ACCESS = 0;
 	public static final int INDEX_CONTENT = 1;
 
 
-	/* SECTION variables */
-
 	protected boolean open = false;
 
-
-	/* SECTION constructors */
 
 	public GuiTab(E access, E content, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) { super(Arrays.asList(access, content), mutator, logging); }
 
@@ -44,12 +38,8 @@ public class GuiTab<T extends GuiTab<T, N, C, TH, E>, N extends Number, C, TH ex
 	protected GuiTab(GuiTab<?, N, ?, ?, ? extends E> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getAccess(), copy.getContent(), mutator, copy.getLogging()); }
 
 
-	/* SECTION static methods */
-
 	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiTab<V, N, C, TH, E>, N extends Number, C, TH extends ITheme<TH>, L extends Logger, E extends IDrawable<N>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGuiTab(E access, E content) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiTab<>(access, content, t.mutator, t.logging))); }
 
-
-	/* SECTION getters & setters */
 
 	public boolean isOpen() { return open; }
 
@@ -103,8 +93,6 @@ public class GuiTab<T extends GuiTab<T, N, C, TH, E>, N extends Number, C, TH ex
 	@Deprecated
 	public void setList(List<E> list) { setChildren(list); }
 
-
-	/* SECTION methods */
 
 	@Override
 	public boolean tryDraw(Minecraft client) { return isOpen() ? super.tryDraw(client) : getAccess().tryDraw(client); }

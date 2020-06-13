@@ -5,18 +5,12 @@
 import static java.io.File.separator
 
 
-/* SECTION check */
-
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call([])
 
 
-/* SECTION application */
-
 apply plugin: 'maven-publish'
 
-
-/* SECTION configuration */
 
 // Example configuration to allow publishing using the maven-publish task
 // we define a custom artifact that is sourced from the jar output task

@@ -22,18 +22,12 @@ import static $group__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 
 @SideOnly(Side.CLIENT)
 public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> extends NumberRelative<T> {
-	/* SECTION static variables */
-
 	private static final long serialVersionUID = 1046506854640455032L;
 
-
-	/* SECTION variables */
 
 	protected BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater;
 	protected AtomicBoolean update;
 
-
-	/* SECTION constructors */
 
 	protected NumberRelativeDisplay(Number value, Number parent, @Nullable Number offset, BiConsumer<?
 			super GuiScreenEvent.InitGuiEvent.Pre, ? super T> updater, IMutatorImmutablizable<?, ?> mutator,
@@ -56,15 +50,11 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 	protected NumberRelativeDisplay(NumberRelativeDisplay<T> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getValue(), copy.tryGetParent().orElseThrow(() -> Throwables.rejectArguments(mutator, copy)), copy.getOffset(), copy.getUpdater(), copy.getUpdate(), mutator, copy.getLogging()); }
 
 
-	/* SECTION static methods */
-
 	protected static <T extends NumberRelativeDisplay<?>> T initializeInstance(final T thisObj) {
 		Globals.Client.registerPreInitGuiListener(thisObj, castUncheckedUnboxedNonnull(thisObj.getUpdater()));
 		return thisObj;
 	}
 
-
-	/* SECTION getters & setters */
 
 	public BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ? super T> getUpdater() { return updater; }
 
@@ -87,22 +77,14 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 	public void setParent(@Nullable Number parent) throws UnsupportedOperationException { throw Throwables.rejectUnsupportedOperation(); }
 
 
-	/* SECTION methods */
-
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public T clone() { return initializeInstance(super.clone()); }
 
 
-	/* SECTION static classes */
-
 	public static class X<T extends X<T>> extends NumberRelativeDisplay<T> {
-		/* SECTION static variables */
-
 		private static final long serialVersionUID = -7447050543787167053L;
 
-
-		/* SECTION constructors */
 
 		public X(Number value, @Nullable Number offset, IMutatorImmutablizable<?, ?> mutator,
 		         ILogging<Logger> logging) { this(value, offset, new AtomicBoolean(true), mutator, logging); }
@@ -137,14 +119,10 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 		}
 
 
-		/* SECTION static methods */
-
 		public static <T extends BuilderNumberRelative<T, V>, V extends X<V>> BuilderNumberRelative<T, V> newBuilderX(Number value) { return newBuilderX(value, new AtomicBoolean(true)); }
 
 		public static <T extends BuilderNumberRelative<T, V>, V extends X<V>> BuilderNumberRelative<T, V> newBuilderX(Number value, AtomicBoolean update) { return new BuilderNumberRelative<>(t -> castUncheckedUnboxedNonnull(new X<>(value, t.offset, update, t.mutator, t.logging))); }
 
-
-		/* SECTION methods */
 
 		@Override
 		public T toImmutable() {
@@ -154,12 +132,8 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 	}
 
 	public static class Y<T extends Y<T>> extends NumberRelativeDisplay<T> {
-		/* SECTION static variables */
-
 		private static final long serialVersionUID = 4079465691262621348L;
 
-
-		/* SECTION constructors */
 
 		public Y(Number value, @Nullable Number offset, IMutatorImmutablizable<?, ?> mutator,
 		         ILogging<Logger> logging) { this(value, offset, new AtomicBoolean(true), mutator, logging); }
@@ -194,14 +168,10 @@ public abstract class NumberRelativeDisplay<T extends NumberRelativeDisplay<T>> 
 		}
 
 
-		/* SECTION static methods */
-
 		public static <T extends BuilderNumberRelative<T, V>, V extends Y<V>> BuilderNumberRelative<T, V> newBuilderY(Number value) { return newBuilderY(value, new AtomicBoolean(true)); }
 
 		public static <T extends BuilderNumberRelative<T, V>, V extends Y<V>> BuilderNumberRelative<T, V> newBuilderY(Number value, AtomicBoolean update) { return new BuilderNumberRelative<>(t -> castUncheckedUnboxedNonnull(new Y<>(value, t.offset, update, t.mutator, t.logging))); }
 
-
-		/* SECTION methods */
 
 		@Override
 		public T toImmutable() {

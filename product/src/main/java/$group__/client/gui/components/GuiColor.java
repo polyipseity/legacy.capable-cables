@@ -25,15 +25,11 @@ import static $group__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 
 public class GuiColor<T extends GuiColor<T, C>, C> implements IStructure<T, T>, ICloneable<T>,
 		IMutatorUser<IMutatorImmutablizable<?, ?>>, IColored<C>, ILoggingUser<ILogging<Logger>, Logger> {
-	/* SECTION constructors */
-
 	protected C color;
 
 	protected IMutatorImmutablizable<?, ?> mutator;
 	protected ILogging<Logger> logging;
 
-
-	/* SECTION constructors */
 
 	public GuiColor(C color, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
 		this.mutator = trySetNonnull(mutator, mutator, true);
@@ -49,8 +45,6 @@ public class GuiColor<T extends GuiColor<T, C>, C> implements IStructure<T, T>, 
 				copy.logging);
 	}
 
-
-	/* SECTION getters & setters */
 
 	@Nonnull
 	@Override
@@ -77,8 +71,6 @@ public class GuiColor<T extends GuiColor<T, C>, C> implements IStructure<T, T>, 
 	@Override
 	public boolean trySetLogging(ILogging<Logger> logging) { return trySet(t -> this.logging = t, logging); }
 
-
-	/* SECTION methods */
 
 	@Override
 	public T toImmutable() {

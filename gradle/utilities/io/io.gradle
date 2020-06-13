@@ -4,9 +4,6 @@
 
 import java.nio.channels.Channels
 
-
-/* SECTION methods */
-
 project.ext.createNewFile = { File f ->
     f.parentFile.mkdirs()
     f.createNewFile()

@@ -8,8 +8,6 @@ public enum Primitives {
 	/* MARK empty */;
 
 
-	/* SECTION static variables */
-
 	public static final Class<?>[]
 			PRIMITIVE_TYPE_ARRAY = {int.class, float.class, double.class, long.class, byte.class, short.class,
 			boolean.class, char.class, void.class};

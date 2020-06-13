@@ -19,13 +19,9 @@ import static java.lang.System.lineSeparator;
 import static java.lang.invoke.MethodType.methodType;
 
 public abstract class Singleton {
-	/* SECTION static variables */
-
 	protected static final ConcurrentMap<Class<?>, Map.Entry<? extends Singleton, String>> INSTANCES =
 			MAP_MAKER_MULTI_THREAD.makeMap();
 
-
-	/* SECTION constructors */
 
 	protected Singleton(Logger logger) {
 		Class<? extends Singleton> clazz = getClass();
@@ -42,8 +38,6 @@ public abstract class Singleton {
 		logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("The singleton instance of '{}' created, stacktrace:{}{}", classGS, lineSeparator(), sts));
 	}
 
-
-	/* SECTION static methods */
 
 	public static <T extends Singleton> T getSingletonInstance(Class<T> clazz, @Nullable Logger logger) { return tryGetSingletonInstance(clazz, true, t -> tryCallWithLogging(() -> IMPL_LOOKUP.findConstructor(t, methodType(void.class)).invoke(), logger).flatMap(Casts::castUnchecked)).orElseThrow(Throwables::rethrowCaughtThrowableStatic); }
 

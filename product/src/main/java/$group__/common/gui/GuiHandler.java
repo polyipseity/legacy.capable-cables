@@ -13,19 +13,14 @@ import static $group__.utilities.helpers.specific.MapsExtension.MAP_MAKER_SINGLE
 import static $group__.utilities.helpers.specific.Optionals.unboxOptional;
 
 public enum GuiHandler implements IGuiHandler {
-	/* SECTION enums */
 	INSTANCE;
 
-
-	/* SECTION static variables */
 
 	public static final ConcurrentMap<Integer, IGuiHandler> GUI_MAP = MAP_MAKER_SINGLE_THREAD.makeMap();
 	protected static final GuiHandlerFunctional DEFAULT = (side, id, player, world, x, y, z) -> {
 		throw rejectArguments(side, id, player, world, x, y, z);
 	};
 
-
-	/* SECTION methods */
 
 	public int registerGui(GuiHandlerFunctional handler) { return registerGui((IGuiHandler) handler); }
 
@@ -45,12 +40,8 @@ public enum GuiHandler implements IGuiHandler {
 	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) { return GUI_MAP.getOrDefault(id, DEFAULT).getClientGuiElement(id, player, world, x, y, z); }
 
 
-	/* SECTION static classes */
-
 	@FunctionalInterface
 	public interface GuiHandlerFunctional extends IGuiHandler {
-		/* SECTION methods */
-
 		@Nullable
 		@Override
 		default Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) { return unboxOptional(tryGetGuiElement(Side.SERVER, id, player, world, x, y, z)); }

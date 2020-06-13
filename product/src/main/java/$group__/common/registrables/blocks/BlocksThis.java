@@ -15,8 +15,6 @@ import static $group__.Globals.LOGGER;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID)
 public final class BlocksThis extends Registrable<Block> {
-	/* SECTION static variables */
-
 	public static final BlocksThis INSTANCE = getSingletonInstance(BlocksThis.class, LOGGER);
 
 	/* REFERENCE block template */
@@ -36,19 +34,13 @@ public final class BlocksThis extends Registrable<Block> {
 			.setTickRandomly(true); // COMMENT overrides are required for properties unlisted here
 
 
-	/* SECTION variables */
-
 	@SuppressWarnings("unused")
 	public final Block cable =
 			new BlockCable().setRegistryAndUnlocalizedName(Constants.MOD_ID, "cable").setCreativeTab(CreativeTabsThis.DEFAULT);
 
 
-	/* SECTION constructors */
-
 	protected BlocksThis() { super(LOGGER); }
 
-
-	/* SECTION static methods */
 
 	@SubscribeEvent
 	public static void registerStatic(RegistryEvent.Register<Block> event) { INSTANCE.register(event, LOGGER); }

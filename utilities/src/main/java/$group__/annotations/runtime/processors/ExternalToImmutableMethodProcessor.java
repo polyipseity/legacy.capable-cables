@@ -19,22 +19,15 @@ import static $group__.utilities.helpers.specific.Throwables.consumeIfCaughtThro
 import static $group__.utilities.helpers.specific.Throwables.tryCall;
 
 public enum ExternalToImmutableMethodProcessor implements IProcessorRuntime.IClass.IElement.IMethod<ExternalToImmutableMethod> {
-	/* SECTION enums */
 	INSTANCE;
 
-
-	/* SECTION variables */
 
 	private volatile boolean processed = false;
 
 
-	/* SECTION static methods */
-
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public static void process(AnnotationProcessingEvent event) { INSTANCE.process(event.getAsm(), event.getLogger()); }
 
-
-	/* SECTION methods */
 
 	@Override
 	public void process(ASMDataTable asm, @Nullable Logger logger) {

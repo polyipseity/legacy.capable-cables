@@ -13,8 +13,6 @@ public enum Recursions {
 	/* MARK empty */;
 
 
-	/* SECTION static methods */
-
 	public static <T, R> Optional<R> recurseAsDepthFirstLoop(T obj, Function<? super T, ? extends R> function,
 	                                                         Function<? super T, ? extends Iterable<? extends T>> splitter, @Nullable Function<? super Deque<R>, ? extends R> combiner) {
 		ArrayDeque<T> stackT = new ArrayDeque<>(Capacities.INITIAL_CAPACITY_3);

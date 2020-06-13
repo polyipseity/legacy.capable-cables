@@ -23,13 +23,9 @@ import static $group__.utilities.helpers.specific.Throwables.rejectUnsupportedOp
 @SideOnly(Side.CLIENT)
 public class GuiResource<T extends GuiResource<T, N, C, TH, NT>, N extends Number, C extends Color,
 		TH extends ITheme<TH>, NT extends Number> extends GuiRectangle<T, N, C, TH> {
-	/* SECTION variables */
-
 	protected ResourceLocation resource;
 	protected Rectangle<?, NT> texture;
 
-
-	/* SECTION constructors */
 
 	public GuiResource(Rectangle<?, N> rectangle, ResourceLocation resource, Rectangle<?, NT> texture,
 	                   IThemed<TH> themed, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
@@ -44,12 +40,8 @@ public class GuiResource<T extends GuiResource<T, N, C, TH, NT>, N extends Numbe
 	protected GuiResource(GuiResource<?, N, ?, TH, NT> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getRectangle(), copy.getResource(), copy.getTexture(), copy.getThemed(), mutator, copy.getLogging()); }
 
 
-	/* SECTION static methods */
-
 	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiResource<V, N, C, TH, NT>, N extends Number, C extends Color, TH extends ITheme<TH>, NT extends Number> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGuiResource(Rectangle<?, N> rectangle, ResourceLocation resource, Rectangle<?, NT> texture) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiResource<>(rectangle, resource, texture, t.themed, t.mutator, t.logging))); }
 
-
-	/* SECTION getters & setters */
 
 	public ResourceLocation getResource() { return resource; }
 
@@ -67,8 +59,6 @@ public class GuiResource<T extends GuiResource<T, N, C, TH, NT>, N extends Numbe
 
 	public Optional<Rectangle<?, NT>> tryGetTexture() { return Optional.of(getTexture()); }
 
-
-	/* SECTION methods */
 
 	@Override
 	public boolean tryDraw(Minecraft client) {

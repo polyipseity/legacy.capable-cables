@@ -16,8 +16,6 @@ public enum CreativeTabsThis {
 	/* MARK empty */;
 
 
-	/* SECTION static variables */
-
 	public static final CreativeTabs DEFAULT = new CreativeTabs(CreativeTabsBases.initBaseLabel(Constants.MOD_ID)) {
 		@Override
 		@SideOnly(Side.CLIENT)

@@ -31,12 +31,8 @@ import static $group__.utilities.helpers.specific.Throwables.rejectUnsupportedOp
 public class NumberRelative<T extends NumberRelative<T>> extends Number implements IStructure<T, T>, ICloneable<T>,
 		IOperable.INumberOperable<T>, IMutatorUser<IMutatorImmutablizable<?, ?>>, ILoggingUser<ILogging<Logger>,
 				Logger> {
-	/* SECTION static variables */
-
 	private static final long serialVersionUID = -1684871905587506897L;
 
-
-	/* SECTION variables */
 
 	protected Number value;
 	@Nullable
@@ -47,8 +43,6 @@ public class NumberRelative<T extends NumberRelative<T>> extends Number implemen
 	protected IMutatorImmutablizable<?, ?> mutator;
 	protected ILogging<Logger> logging;
 
-
-	/* SECTION constructors */
 
 	public NumberRelative(Number value, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
 		this(value,
@@ -76,12 +70,8 @@ public class NumberRelative<T extends NumberRelative<T>> extends Number implemen
 	}
 
 
-	/* SECTION static methods */
-
 	public static <T extends BuilderNumberRelative<T, V>, V extends NumberRelative<V>> BuilderNumberRelative<T, V> newBuilderNumberRelative(Number value) { return new BuilderNumberRelative<>(t -> castUncheckedUnboxedNonnull(new NumberRelative<>(value, t.parent, t.offset, t.mutator, t.logging))); }
 
-
-	/* SECTION getters & setters */
 
 	public Number getValue() { return value; }
 
@@ -123,8 +113,6 @@ public class NumberRelative<T extends NumberRelative<T>> extends Number implemen
 
 	public boolean trySetLogging(ILogging<Logger> logging) { return trySet(t -> this.logging = t, logging); }
 
-
-	/* SECTION methods */
 
 	@SuppressWarnings("UnstableApiUsage")
 	@Override

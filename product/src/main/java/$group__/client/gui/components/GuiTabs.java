@@ -21,12 +21,8 @@ import static $group__.utilities.helpers.specific.Throwables.rejectUnsupportedOp
 @SideOnly(Side.CLIENT)
 public class GuiTabs<T extends GuiTabs<T, N, C, TH, TA, E>, N extends Number, C, TH extends ITheme<TH>,
 		TA extends List<E>, E extends GuiTab<?, N, ?, ?, ?>> extends GuiGroup<T, N, C, TH, TA, E> implements IListDelegated<TA, E> {
-	/* SECTION variables */
-
 	protected int open = 0;
 
-
-	/* SECTION constructors */
 
 	public GuiTabs(TA tabs, int open, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
 		super(tabs, mutator, logging);
@@ -43,8 +39,6 @@ public class GuiTabs<T extends GuiTabs<T, N, C, TH, TA, E>, N extends Number, C,
 
 	protected GuiTabs(GuiTabs<?, N, ?, ?, TA, ? extends E> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getTabs(), copy.getOpen(), mutator, copy.getLogging()); }
 
-
-	/* SECTION static methods */
 
 	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiTabs<V, N, C, TH, TA, E>,
 			N extends Number, C, TH extends ITheme<TH>, TA extends List<E>, E extends GuiTab<?, N, ?, ?, ?>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGuiTabs(TA tabs) { return newBuilderGuiTabs(tabs, 0); }
@@ -72,8 +66,6 @@ public class GuiTabs<T extends GuiTabs<T, N, C, TH, TA, E>, N extends Number, C,
 		return r;
 	}
 
-
-	/* SECTION getters & setters */
 
 	public int getOpen() { return open; }
 
@@ -124,8 +116,6 @@ public class GuiTabs<T extends GuiTabs<T, N, C, TH, TA, E>, N extends Number, C,
 	@Deprecated
 	public void setList(TA list) { setChildren(list); }
 
-
-	/* SECTION methods */
 
 	@Override
 	public T toImmutable() {

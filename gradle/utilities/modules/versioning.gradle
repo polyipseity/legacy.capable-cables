@@ -3,8 +3,6 @@
 //////////////////////////////////////////////////
 
 
-/* SECTION extra variables */
-
 ext {
     versioned = project.hasProperty('major') && project.hasProperty('minor') && project.hasProperty('patch') && project.hasProperty('final') && project.hasProperty('pre') && project.hasProperty('releaseCandidate')
     if (versioned) {

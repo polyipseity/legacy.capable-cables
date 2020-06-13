@@ -28,12 +28,8 @@ public enum Copiers {
 	/* MARK empty */;
 
 
-	/* SECTION static variables */
-
 	private static final Logger LOGGER = LogManager.getLogger(Copiers.class);
 
-
-	/* SECTION static methods */
 
 	// COMMENT simple
 

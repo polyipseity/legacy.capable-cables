@@ -27,13 +27,9 @@ public enum Registrables {
 	/* MARK empty */;
 
 
-	/* SECTION static classes */
-
 	public enum Blocks {
 		/* MARK empty */;
 
-
-		/* SECTION static methods */
 
 		public static Vec3d getPosition(RayTraceResult rtr) { return new Vec3d(rtr.getBlockPos()).add(rtr.hitVec); }
 
@@ -48,13 +44,9 @@ public enum Registrables {
 		/* MARK empty */;
 
 
-		/* SECTION static variables */
-
 		public static final ImmutableMap<String, Integer> RAW_NBT_TYPE_LOOKUP;
 		public static final ImmutableMap<String, Integer> NBT_TYPE_LOOKUP;
 
-
-		/* SECTION static methods */
 
 		static {
 			HashMap<String, Integer> rawNbtTypeLookup = new HashMap<>(NBTBase.NBT_TYPES.length);
@@ -98,8 +90,6 @@ public enum Registrables {
 			return Optional.ofNullable(ret);
 		}
 
-
-		/* SECTION static initializer */
 
 		public static Optional<NBTTagCompound> returnTagIfNotEmpty(NBTTagCompound p) {
 			return p.getSize() == 0 ?

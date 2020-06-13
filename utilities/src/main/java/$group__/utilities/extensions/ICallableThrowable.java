@@ -7,8 +7,6 @@ import java.util.concurrent.Callable;
 
 @FunctionalInterface
 public interface ICallableThrowable<V> extends Callable<V> {
-	/* SECTION methods */
-
 	@Nullable
 	V callT() throws Throwable;
 

@@ -13,8 +13,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID)
 public final class ItemsThis extends Registrable<Item> {
-	/* SECTION static variables */
-
 	public static final ItemsThis INSTANCE = getSingletonInstance(ItemsThis.class, Globals.LOGGER);
 
 	/* REFERENCE item template */
@@ -37,19 +35,13 @@ public final class ItemsThis extends Registrable<Item> {
 	}};
 
 
-	/* SECTION variables */
-
 	@SuppressWarnings("unused")
 	public final Item wrench =
 			new ItemWrench().setRegistryAndUnlocalizedName(Constants.MOD_ID, "wrench").setCreativeTab(CreativeTabsThis.DEFAULT);
 
 
-	/* SECTION constructors */
-
 	protected ItemsThis() { super(Globals.LOGGER); }
 
-
-	/* SECTION static methods */
 
 	@SubscribeEvent
 	public static void registerStatic(RegistryEvent.Register<Item> event) { INSTANCE.register(event, Globals.LOGGER); }

@@ -11,8 +11,6 @@ public enum Casts {
 	/* MARK empty */;
 
 
-	/* SECTION static methods */
-
 	public static <T> T castUncheckedUnboxedNonnull(Object o) { return Assertions.assertNonnull(castUncheckedUnboxed(o)); }
 
 	@Nullable

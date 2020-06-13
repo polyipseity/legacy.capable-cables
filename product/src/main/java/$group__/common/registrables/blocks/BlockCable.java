@@ -7,8 +7,6 @@ import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
 
 public class BlockCable extends Block implements IForgeRegistryEntryExtension<Block> {
-	/* SECTION constructors */
-
 	protected BlockCable() {
 		super(Materials.PETRIFIED_SKY);
 	}

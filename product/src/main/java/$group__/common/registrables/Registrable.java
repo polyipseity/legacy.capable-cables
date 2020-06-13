@@ -18,20 +18,14 @@ import static $group__.utilities.helpers.Dynamics.getGenericSuperclassActualType
 import static $group__.utilities.helpers.Grammar.appendSuffixIfPlural;
 
 public abstract class Registrable<T extends IForgeRegistryEntry<T>> extends Singleton {
-	/* SECTION variables */
-
 	protected final Class<T> clazz;
 
-
-	/* SECTION constructors */
 
 	protected Registrable(@SuppressWarnings("SameParameterValue") Logger logger) {
 		super(logger);
 		clazz = castUncheckedUnboxedNonnull(getGenericSuperclassActualTypeArgument(getClass(), 0));
 	}
 
-
-	/* SECTION methods */
 
 	@OverridingMethodsMustInvokeSuper
 	protected void register(RegistryEvent.Register<T> event, @SuppressWarnings("SameParameterValue") Logger logger) {

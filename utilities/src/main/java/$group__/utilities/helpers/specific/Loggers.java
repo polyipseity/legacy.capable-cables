@@ -25,27 +25,18 @@ public enum Loggers {
 	/* MARK empty */;
 
 
-	/* SECTION static variables */
-
 	public static final String PREFIX_REFLECTION = "Reflection: ";
 	public static final String PREFIX_INVOCATION = "Invocation: ";
 
 
-	/* SECTION static classes */
-
 	public enum EnumMessages {
-		/* SECTION enums */
 		FACTORY_SIMPLE_MESSAGE("{}",
 				String.class) {
-			/* SECTION methods */
-
 			@Override
 			protected SimpleMessage makeMessage1(Object... args) { return new SimpleMessage((String) args[0]); }
 		},
 		FACTORY_PARAMETERIZED_MESSAGE("{}", true,
 				String.class, Object[].class) {
-			/* SECTION methods */
-
 			@Override
 			protected Message makeMessage1(Object... args) {
 				return new ParameterizedMessage((String) args[0],
@@ -54,8 +45,6 @@ public enum Loggers {
 		},
 		SUFFIX_WITH_THROWABLE("{}",
 				Message.class, Throwable.class) {
-			/* SECTION methods */
-
 			private ParameterizedMessage makeMessage0(Message msg, Throwable t) {
 				return new ParameterizedMessage(message,
 						msg.getFormattedMessage(),
@@ -70,8 +59,6 @@ public enum Loggers {
 		},
 		REFLECTION_UNABLE_TO_GET_MEMBER(PREFIX_REFLECTION + "Unable to get {} of class '{}'{}{}", true, 1,
 				String.class, Class.class, String.class, Class[].class) {
-			/* SECTION methods */
-
 			private ParameterizedMessage makeMessage0(String description, Class<?> clazz, @Nullable String name,
 			                                          Class<?>... arguments) {
 				return new ParameterizedMessage(message,
@@ -89,8 +76,6 @@ public enum Loggers {
 		},
 		REFLECTION_UNABLE_TO_SET_ACCESSIBLE(PREFIX_REFLECTION + "Unable to set {} '{}'{} {}accessible", 1,
 				String.class, AccessibleObject.class, Class.class, boolean.class) {
-			/* SECTION methods */
-
 			private ParameterizedMessage makeMessage0(String description, AccessibleObject reflected, @Nullable Class<
 					?> clazz, boolean accessible) {
 				return new ParameterizedMessage(message,
@@ -108,8 +93,6 @@ public enum Loggers {
 		},
 		REFLECTION_UNABLE_TO_G_SET_FIELD(PREFIX_REFLECTION + "Unable to {}et field '{}'{} of class '{}'{}", 2,
 				boolean.class, Field.class, Object.class, Object.class) {
-			/* SECTION methods */
-
 			private ParameterizedMessage makeMessage0(boolean set, Field field, @Nullable Object obj,
 			                                          @Nullable Object value) {
 				return new ParameterizedMessage(message,
@@ -128,8 +111,6 @@ public enum Loggers {
 		},
 		INVOCATION_UNABLE_TO_FIND_METHOD_HANDLE(PREFIX_INVOCATION + "Unable to find {} of class '{}'{}{}{}", 3,
 				String.class, Class.class, String.class, MethodType.class, Class.class) {
-			/* SECTION methods */
-
 			private ParameterizedMessage makeMessage0(String description, Class<?> clazz, @Nullable String name,
 			                                          @Nullable MethodType methodType,
 			                                          @Nullable Class<?> typeOrSpecialCaller) {
@@ -152,8 +133,6 @@ public enum Loggers {
 		},
 		@SuppressWarnings("SpellCheckingInspection") INVOCATION_UNABLE_TO_UNREFLECT_MEMBER(PREFIX_INVOCATION + "Unable to unreflect {} '{}' with lookup '{}'{}", 1,
 				String.class, Member.class, Lookup.class, Class.class) {
-			/* SECTION methods */
-
 			private ParameterizedMessage makeMessage0(String description, Member member, Lookup lookup,
 			                                          @Nullable Class<?> specialCaller) {
 				return new ParameterizedMessage(message,
@@ -172,8 +151,6 @@ public enum Loggers {
 		},
 		INVOCATION_UNABLE_TO_INVOKE_METHOD_HANDLE(PREFIX_INVOCATION + "Unable to invoke method handle '{}'{}", true,
 				MethodHandle.class, Object[].class) {
-			/* SECTION methods */
-
 			private ParameterizedMessage makeMessage0(MethodHandle method, Object... arguments) {
 				return new ParameterizedMessage(message,
 						method,
@@ -188,8 +165,6 @@ public enum Loggers {
 		};
 
 
-		/* SECTION variables */
-
 		public final String message;
 		public final Class<?>[] argTypes;
 		@Nullable
@@ -197,8 +172,6 @@ public enum Loggers {
 		@Nullable
 		public final Class<?> argVarargs;
 
-
-		/* SECTION constructors */
 
 		EnumMessages(@SuppressWarnings("SameParameterValue") String message, Class<?>... argTypes) { this(message, false, argTypes); }
 
@@ -229,8 +202,6 @@ public enum Loggers {
 			this.argTypes = argTypes;
 		}
 
-
-		/* SECTION methods */
 
 		private static <O> String optionalNonnull(@Nullable O optional,
 		                                          Function<? super O, ? extends String> whenPresent) { return Optionals.optionalNonnull(optional, whenPresent, () -> ""); }
@@ -277,8 +248,6 @@ public enum Loggers {
 			return makeMessage1(argsList.toArray());
 		}
 
-
-		/* SECTION static methods */
 
 		protected Message makeMessage1(Object... args) { return new ParameterizedMessage(message, args); }
 	}

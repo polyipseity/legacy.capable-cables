@@ -24,8 +24,6 @@ public enum Numbers {
 	/* MARK empty */;
 
 
-	/* SECTION static variables */
-
 	public static final ImmutableMap<Class<? extends Number>, Function<Number, ? extends Number>> PRIMITIVE_TYPE_FROM_NUMBER_MAP = new ImmutableMap.Builder<Class<? extends Number>, Function<Number, ? extends Number>>()
 			.put(Integer.class, Number::intValue)
 			.put(Float.class, Number::floatValue)
@@ -48,8 +46,6 @@ public enum Numbers {
 			.put(Byte.class, (Byte a, Byte b) -> (byte) (a + b))
 			.put(Short.class, (Short a, Short b) -> (short) (a + b)).build();
 
-
-	/* SECTION static methods */
 
 	@SuppressWarnings("MagicNumber")
 	public static boolean isNegative(Number value) {

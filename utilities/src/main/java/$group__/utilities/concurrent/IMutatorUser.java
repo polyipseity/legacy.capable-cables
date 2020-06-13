@@ -8,8 +8,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public interface IMutatorUser<T extends IMutator> extends IMutator {
-	/* SECTION getters & setters */
-
 	T getMutator();
 
 	default void setMutator(T mutator) throws UnsupportedOperationException { Throwables.rejectUnsupportedOperationIf(trySetMutator(mutator)); }

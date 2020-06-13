@@ -5,8 +5,6 @@ import net.minecraftforge.fml.common.event.*;
 import static $group__.utilities.helpers.specific.Throwables.rejectUnsupportedOperation;
 
 public final class ProxyNull extends Proxy {
-	/* SECTION methods */
-
 	@Override
 	@Deprecated
 	public void construct(@SuppressWarnings("unused") ModThis$ mod,

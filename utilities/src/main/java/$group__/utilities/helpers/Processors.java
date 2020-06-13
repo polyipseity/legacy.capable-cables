@@ -22,8 +22,6 @@ public enum Processors {
 	/* MARK empty */;
 
 
-	/* SECTION static methods */
-
 	public static boolean isElementAbstract(Element element) { return element.getModifiers().contains(Modifier.ABSTRACT) || element.getKind().isInterface(); }
 
 	public static boolean isElementFinal(Element element) { return element.getModifiers().contains(Modifier.FINAL); }

@@ -19,30 +19,22 @@ import static $group__.utilities.helpers.PreconditionsExtension.requireRunOnceOn
 @Immutable
 public class MutatorMutable<T extends MutatorMutable<T, I>, I extends MutatorImmutable<I>> implements Serializable,
 		IStrictObject, IMutatorImmutablizable<T, I> {
-	/* SECTION static variables */
-
 	public static final MutatorMutable<?, ?> INSTANCE;
 
 	private static final Logger LOGGER = LogManager.getLogger(MutatorMutable.class);
 	private static final long serialVersionUID = -970134255526874348L;
 
 
-	/* SECTION static initializer */
-
 	static {
 		INSTANCE = new MutatorMutable<>(null);
 	}
 
-
-	/* SECTION constructors */
 
 	@SuppressWarnings("unused")
 	protected MutatorMutable() {}
 
 	private MutatorMutable(@SuppressWarnings({"unused", "SameParameterValue"}) @Nullable Object u) { requireRunOnceOnly(LOGGER); }
 
-
-	/* SECTION getters & setters */
 
 	@Override
 	public <A> A mutate(Supplier<A> action, boolean initialize) { return action.get(); }
@@ -53,8 +45,6 @@ public class MutatorMutable<T extends MutatorMutable<T, I>, I extends MutatorImm
 		return true;
 	}
 
-
-	/* SECTION methods */
 
 	@Override
 	public I toImmutable() { return castUncheckedUnboxedNonnull(MutatorImmutable.INSTANCE); }

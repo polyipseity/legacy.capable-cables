@@ -10,11 +10,8 @@ import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_2;
 import static $group__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 
 public enum BuilderDefaults {
-	/* SECTION enum */
 	INSTANCE;
 
-
-	/* SECTION static variables */
 
 	public static final ThreadLocal<ConcurrentMap<Map.Entry<Class<?>, String>, Deque<?>>> DEFAULTS_MAP =
 			ThreadLocal.withInitial(MapsExtension.MAP_MAKER_MULTI_THREAD::makeMap);
@@ -24,8 +21,6 @@ public enum BuilderDefaults {
 			ThreadLocal.withInitial(() -> new ArrayList<>(INITIAL_CAPACITY_2));
 
 
-	/* SECTION static methods */
-
 	public static <T> Deque<T> getDefaults(Map.Entry<Class<T>, String> key) { return castUncheckedUnboxedNonnull(DEFAULTS_MAP.get().computeIfAbsent(castUncheckedUnboxedNonnull(key), c -> new LinkedList<T>())); }
 
 	@Nullable
@@ -33,8 +28,6 @@ public enum BuilderDefaults {
 
 	public static <T> BuilderDefaults pushDefaultStart(Map.Entry<Class<T>, String> key, @Nullable T defaultObj) { return INSTANCE.startPushing().pushDefault(key, defaultObj); }
 
-
-	/* SECTION methods */
 
 	public <T> BuilderDefaults pushDefault(Map.Entry<Class<T>, String> key, @Nullable T defaultObj) {
 		assert PUSHING.get();

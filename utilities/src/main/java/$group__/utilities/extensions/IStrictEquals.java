@@ -30,8 +30,6 @@ import static $group__.utilities.helpers.Concurrency.MULTI_THREAD_THREAD_COUNT;
 import static $group__.utilities.helpers.Dynamics.*;
 
 public interface IStrictEquals {
-	/* SECTION static variables */
-
 	Logger LOGGER = LogManager.getLogger(IStrictEquals.class);
 
 	LoadingCache<Class<?>, BiFunction<Object, Object, Function<Function<Object, ? extends Boolean>, Boolean>>> FUNCTION_MAP = CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_3).expireAfterAccess(MapsExtension.CACHE_EXPIRATION_ACCESS_DURATION, MapsExtension.CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(k -> {
@@ -62,12 +60,8 @@ public interface IStrictEquals {
 	}));
 
 
-	/* SECTION static methods */
-
 	static <T, O> boolean areEqual(final T thisObj, O other, Function<? super O, ? extends Boolean> superEquals) { return FUNCTION_MAP.getUnchecked(thisObj.getClass()).apply(thisObj, other).apply(castUncheckedUnboxedNonnull(superEquals)); }
 
-
-	/* SECTION methods */
 
 	@Override
 	@OverridingStatus(group = Constants.PACKAGE, when = When.ALWAYS)

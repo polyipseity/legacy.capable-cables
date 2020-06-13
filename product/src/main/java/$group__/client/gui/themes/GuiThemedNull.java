@@ -17,21 +17,15 @@ import static $group__.utilities.helpers.PreconditionsExtension.requireRunOnceOn
 
 @Immutable
 public final class GuiThemedNull<T extends ITheme<T>> implements IStructure<GuiThemedNull<T>, GuiThemedNull<T>>, IThemed<T> {
-	/* SECTION static variables */
-
 	public static final GuiThemedNull<?> INSTANCE;
 
 	private static final Logger LOGGER = LogManager.getLogger(GuiThemedNull.class);
 
 
-	/* SECTION static initializer */
-
 	static {
 		INSTANCE = new GuiThemedNull<>();
 	}
 
-
-	/* SECTION constructors */
 
 	protected GuiThemedNull() { requireRunOnceOnly(LOGGER); }
 
@@ -39,12 +33,8 @@ public final class GuiThemedNull<T extends ITheme<T>> implements IStructure<GuiT
 	protected GuiThemedNull(GuiThemedNull<T> copy) { this(); }
 
 
-	/* SECTION static getters & setters */
-
 	public static <T extends ITheme<T>> GuiThemedNull<T> getInstance() { return castUncheckedUnboxedNonnull(INSTANCE); }
 
-
-	/* SECTION methods */
 
 	@Nullable
 	@Override

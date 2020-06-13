@@ -18,16 +18,9 @@ import static $group__.utilities.helpers.specific.Loggers.EnumMessages.SUFFIX_WI
 
 @SuppressWarnings("SpellCheckingInspection")
 public enum Throwables implements IThrowableCatcher {
-	/* SECTION enums */
 	INSTANCE;
 
-
-	/* SECTION static variables */
-
 	public static final ThreadLocal<Throwable> CAUGHT_THROWABLE = new ThreadLocal<>();
-
-
-	/* SECTION static getters & setters */
 
 	@Nullable
 	public static Throwable getCaughtThrowableStatic() { return INSTANCE.getCaughtThrowable(); }
@@ -39,9 +32,6 @@ public enum Throwables implements IThrowableCatcher {
 	public static void clearCaughtThrowableStatic() { INSTANCE.clearCaughtThrowable(); }
 
 	public static void setCaughtThrowableStatic(Throwable t, @Nullable Logger logger) { INSTANCE.setCaughtThrowable(t, logger); }
-
-
-	/* SECTION static methods */
 
 	public static void consumeCaught(Throwable t, @Nullable Logger logger) {
 		if (logger == null) t.printStackTrace();
@@ -158,9 +148,6 @@ public enum Throwables implements IThrowableCatcher {
 	public static void rethrowCaughtThrowableStatic(boolean nullable) throws RuntimeException { INSTANCE.rethrowCaughtThrowable(nullable); }
 
 	public static RuntimeException rethrowCaughtThrowableStatic() throws RuntimeException { throw INSTANCE.rethrowCaughtThrowable(); }
-
-
-	/* SECTION getters & setters */
 
 	@Nullable
 	@Override

@@ -19,13 +19,9 @@ import static $group__.utilities.helpers.specific.Throwables.rejectUnsupportedOp
 
 public class GuiDrawableFunctional<T extends GuiDrawableFunctional<T, N, C, TH>, N extends Number, C,
 		TH extends ITheme<TH>> extends GuiDrawable<T, N, C, TH> {
-	/* SECTION variables */
-
 	protected Function<? super T, ? extends Boolean> tryDrawFunction;
 	protected Function<? super T, ? extends Optional<Rectangle<?, N>>> specFunction;
 
-
-	/* SECTION constructors */
 
 	public GuiDrawableFunctional(Function<? super T, ? extends Boolean> tryDrawFunction, Function<? super T, ?
 			extends Optional<Rectangle<?, N>>> specFunction, IColored<C> colored, IThemed<TH> themed,
@@ -40,12 +36,8 @@ public class GuiDrawableFunctional<T extends GuiDrawableFunctional<T, N, C, TH>,
 	protected GuiDrawableFunctional(GuiDrawableFunctional<T, N, C, TH> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getTryDrawFunction(), copy.getSpecFunction(), copy.getColored(), copy.getThemed(), mutator, copy.getLogging()); }
 
 
-	/* SECTION static methods */
-
 	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiDrawableFunctional<V, N, C, TH>, L extends Logger, N extends Number, C, TH extends ITheme<TH>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGuiDrawableFunctional(Function<? super V, ? extends Boolean> tryDrawFunction, Function<? super V, ? extends Optional<Rectangle<?, N>>> specFunction, IMutatorImmutablizable<?, ?> mutator) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiDrawableFunctional<V, N, C, TH>(tryDrawFunction, specFunction, t.colored, t.themed, mutator, t.logging))); }
 
-
-	/* SECTION getters & setters */
 
 	public Function<? super T, ? extends Boolean> getTryDrawFunction() { return tryDrawFunction; }
 
@@ -63,8 +55,6 @@ public class GuiDrawableFunctional<T extends GuiDrawableFunctional<T, N, C, TH>,
 
 	public Optional<Function<? super T, ? extends Optional<? extends Rectangle<?, N>>>> tryGetSpecFunction() { return Optional.of(getSpecFunction()); }
 
-
-	/* SECTION methods */
 
 	@Override
 	public boolean tryDraw(Minecraft client) { return tryDrawFunction.apply(castUncheckedUnboxedNonnull(this)); }

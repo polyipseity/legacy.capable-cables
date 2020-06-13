@@ -13,8 +13,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target(METHOD)
 public @interface ExternalCloneMethod {
-	/* SECTION methods */
-
 	Class<?>[] value();
 
 	@SuppressWarnings("SameReturnValue") boolean allowExtends() default false;

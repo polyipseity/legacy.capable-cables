@@ -15,8 +15,6 @@ import static $group__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 @SideOnly(Side.CLIENT)
 public class Polygon4<T extends Polygon4<T, N, L>, N extends Number, L extends List<XY<?, N>>> extends PolygonN<T, N,
 		L> {
-	/* SECTION constructors */
-
 	public Polygon4(L vertexes, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
 		super(vertexes, mutator, logging);
 		if (vertexes.size() != 4) throw Throwables.rejectArguments(vertexes);
@@ -29,9 +27,6 @@ public class Polygon4<T extends Polygon4<T, N, L>, N extends Number, L extends L
 		this(copy.getVertexes(),
 				mutator, copy.getLogging());
 	}
-
-
-	/* SECTION getters & setters */
 
 	public XY<?, N> a() { return get(0); }
 
@@ -51,9 +46,6 @@ public class Polygon4<T extends Polygon4<T, N, L>, N extends Number, L extends L
 
 	@Override
 	public boolean trySetVertexes(L vertexes) { return vertexes.size() == 4 && super.trySetVertexes(vertexes); }
-
-
-	/* SECTION methods */
 
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new Polygon4<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }

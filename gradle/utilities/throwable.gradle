@@ -2,7 +2,4 @@
 // TITLE Throwable
 //////////////////////////////////////////////////
 
-
-/* SECTION methods */
-
 project.ext.caughtThrowable = { Throwable t -> logger.debug 'Caught throwable', t }

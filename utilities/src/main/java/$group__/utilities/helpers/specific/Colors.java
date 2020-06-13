@@ -9,8 +9,6 @@ public enum Colors {
 	/* MARK empty */;
 
 
-	/* SECTION static variables */
-
 	@SuppressWarnings("unused")
 	public static final Color
 			WHITE = Color.WHITE,
@@ -28,8 +26,6 @@ public enum Colors {
 			BLUE = Color.BLUE,
 			COLORLESS = newColor("#00000000");
 
-
-	/* SECTION static methods */
 
 	public static Color newColor(String s) {
 		return new Color(Integer.parseInt(HASH_PATTERN.matcher(s).replaceAll(Matcher.quoteReplacement("")), RADIX_HEX), true);

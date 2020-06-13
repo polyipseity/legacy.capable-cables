@@ -12,8 +12,6 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 @Target(METHOD)
 @Retention(SOURCE)
 public @interface OverridingStatus {
-	/* SECTION methods */
-
 	String group();
 
 	When when() default When.UNKNOWN;

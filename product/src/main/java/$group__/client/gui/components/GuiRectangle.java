@@ -22,12 +22,8 @@ import static $group__.utilities.helpers.specific.Throwables.rejectUnsupportedOp
 @SideOnly(Side.CLIENT)
 public class GuiRectangle<T extends GuiRectangle<T, N, C, TH>, N extends Number, C extends Color,
 		TH extends ITheme<TH>> extends GuiDrawable<T, N, C, TH> {
-	/* SECTION variables */
-
 	protected Rectangle<?, N> rectangle;
 
-
-	/* SECTION constructors */
 
 	public GuiRectangle(Rectangle<?, N> rectangle, IColored<C> colored, IThemed<TH> themed, IMutatorImmutablizable<?,
 			?> mutator, ILogging<Logger> logging) {
@@ -41,12 +37,8 @@ public class GuiRectangle<T extends GuiRectangle<T, N, C, TH>, N extends Number,
 	protected GuiRectangle(GuiRectangle<?, N, C, TH> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getRectangle(), copy.getColored(), copy.getThemed(), mutator, copy.getLogging()); }
 
 
-	/* SECTION static methods */
-
 	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiRectangle<V, N, C, TH>, N extends Number, C extends Color, TH extends ITheme<TH>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGuiRectangle(Rectangle<?, N> rectangle) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiRectangle<>(rectangle, t.colored, t.themed, t.mutator, t.logging))); }
 
-
-	/* SECTION getters & setters */
 
 	public Rectangle<?, N> getRectangle() { return rectangle; }
 
@@ -56,8 +48,6 @@ public class GuiRectangle<T extends GuiRectangle<T, N, C, TH>, N extends Number,
 
 	public Optional<Rectangle<?, N>> tryGetRectangle() { return Optional.of(getRectangle()); }
 
-
-	/* SECTION methods */
 
 	@Override
 	public boolean tryDraw(Minecraft client) {

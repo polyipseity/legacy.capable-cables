@@ -6,8 +6,6 @@ import java.util.regex.Pattern
 
 import static java.io.File.separator
 
-/* SECTION build script */
-
 buildscript {
     repositories {
         jcenter()
@@ -25,9 +23,6 @@ buildscript {
     // COMMENT Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 }
 
-
-/* SECTION all projects */
-
 configurations {
     debug {
         canBeResolved false
@@ -37,15 +32,10 @@ configurations {
 }
 
 allprojects {
-    /* SECTION extra variables */
-
     ext {
         utilitiesDir = "$rootDir${separator}gradle${separator}utilities".toString()
         modulesDir = "$utilitiesDir${separator}modules".toString()
     }
-
-
-    /* SECTION application */
 
     apply from: "$modulesDir${separator}plugins.gradle"
 
@@ -57,13 +47,7 @@ allprojects {
     apply from: "$utilitiesDir${separator}io${separator}properties${separator}properties.gradle"
     apply from: "$utilitiesDir${separator}io${separator}properties${separator}ext.properties.gradle"
 
-
-    /* SECTION extra variables */
-
     loadExt.call "$projectDir${separator}module.properties"
-
-
-    /* SECTION configuration */
 
     apply from: "$modulesDir${separator}versioning.gradle"
     apply from: "$modulesDir${separator}information.gradle"
@@ -88,8 +72,6 @@ allprojects {
 
 apply from: "$utilitiesDir${separator}throwable.gradle"
 
-/* SECTION extra variables */
-
 ext {
     // COMMENT game
     minecraftVersion = minecraftForgeVersion.split('-').first()
@@ -100,14 +82,10 @@ ext {
     modId = project.name
 }
 
-/* SECTION application */
-
 apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
 apply from: "$modulesDir${separator}optional${separator}mod.gradle"
 apply from: "$modulesDir${separator}optional${separator}api.gradle"
 apply from: "$modulesDir${separator}optional${separator}publishing.gradle"
-
-/* SECTION configuration */
 
 afterEvaluate {
     Project pSub = project(subprojectMain)

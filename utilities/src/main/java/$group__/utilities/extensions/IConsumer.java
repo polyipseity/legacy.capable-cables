@@ -11,8 +11,6 @@ import java.util.function.Function;
 @InterfaceIntersection
 @FunctionalInterface
 public interface IConsumer<T> extends Consumer<T>, Function<T, Void> {
-	/* SECTION methods */
-
 	@Override
 	@Nullable
 	default Void apply(@Nonnull T t) {
@@ -24,12 +22,8 @@ public interface IConsumer<T> extends Consumer<T>, Function<T, Void> {
 	void accept(@Nonnull T t);
 
 
-	/* SECTION static classes */
-
 	@FunctionalInterface
 	interface IConsumerNullable<T> extends IConsumer<T> {
-		/* SECTION methods */
-
 		@Nullable
 		@Override
 		default Void apply(@Nullable T t) { return IConsumer.super.apply(Assertions.assumeNonnull(t)); }

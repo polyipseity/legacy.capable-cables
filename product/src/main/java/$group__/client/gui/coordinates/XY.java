@@ -32,16 +32,12 @@ import static $group__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 @SideOnly(Side.CLIENT)
 public class XY<T extends XY<T, N>, N extends Number> implements IStructure<T, T>, ICloneable<T>, IOperable<T, XY<?,
 		N>>, IMutatorUser<IMutatorImmutablizable<?, ?>>, ILoggingUser<ILogging<Logger>, Logger> {
-	/* SECTION variables */
-
 	protected N x;
 	protected N y;
 
 	protected IMutatorImmutablizable<?, ?> mutator;
 	protected ILogging<Logger> logging;
 
-
-	/* SECTION constructors */
 
 	public XY(N x, N y, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
 		this.mutator = trySetNonnull(mutator, mutator, true);
@@ -58,8 +54,6 @@ public class XY<T extends XY<T, N>, N extends Number> implements IStructure<T, T
 				mutator, copy.getLogging());
 	}
 
-
-	/* SECTION static methods */
 
 	public static <T extends BuilderStructure<T, V>, V extends XY<V, N>, N extends Number> BuilderStructure<T, V> newBuilderXY(N x, N y) { return new BuilderStructure<>(t -> castUncheckedUnboxedNonnull(new XY<>(x, y, t.mutator, t.logging))); }
 
@@ -78,8 +72,6 @@ public class XY<T extends XY<T, N>, N extends Number> implements IStructure<T, T
 	@SuppressWarnings({"UnstableApiUsage", "rawtypes", "RedundantSuppression"})
 	public static <N extends Number> List<N> extractYs(Iterable<? extends XY<?, N>> o) { return Streams.stream(o).map(XY::getY).collect(Collectors.toList()); }
 
-
-	/* SECTION getters & setters */
 
 	public N getX() { return x; }
 
@@ -104,8 +96,6 @@ public class XY<T extends XY<T, N>, N extends Number> implements IStructure<T, T
 	@Override
 	public boolean trySetLogging(ILogging<Logger> logging) { return trySet(t -> this.logging = t, logging); }
 
-
-	/* SECTION methods */
 
 	@Override
 	@OverridingStatus(group = Constants.PACKAGE, when = When.MAYBE)

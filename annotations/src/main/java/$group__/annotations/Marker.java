@@ -10,7 +10,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 		TYPE_USE})
 @Retention(RUNTIME)
 public @interface Marker {
-	/* SECTION methods */
-
 	Property[] value() default {};
 }

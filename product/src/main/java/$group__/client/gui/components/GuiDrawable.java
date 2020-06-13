@@ -29,15 +29,11 @@ import static $group__.utilities.extensions.IStrictHashCode.getHashCode;
 import static $group__.utilities.extensions.IStrictToString.getToStringString;
 
 public abstract class GuiDrawable<T extends GuiDrawable<T, N, C, TH>, N extends Number, C, TH extends ITheme<TH>> extends Gui implements IStructure<T, T>, ICloneable<T>, IMutatorUser<IMutatorImmutablizable<?, ?>>, ILoggingUser<ILogging<Logger>, Logger>, IColoredUser<IColored<C>, C>, IThemedUser<IThemed<TH>, TH>, IDrawable<N> {
-	/* SECTION variables */
-
 	protected IMutatorImmutablizable<?, ?> mutator;
 	protected ILogging<Logger> logging;
 	protected IColored<C> colored;
 	protected IThemed<TH> themed;
 
-
-	/* SECTION constructors */
 
 	public GuiDrawable(IColored<C> colored, IThemed<TH> themed, IMutatorImmutablizable<?, ?> mutator,
 	                   ILogging<Logger> logging) {
@@ -52,8 +48,6 @@ public abstract class GuiDrawable<T extends GuiDrawable<T, N, C, TH>, N extends 
 
 	protected GuiDrawable(GuiDrawable<?, N, C, TH> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getColored(), copy.getThemed(), mutator, copy.getLogging()); }
 
-
-	/* SECTION getters & setters */
 
 	@Override
 	@Nonnull
@@ -74,8 +68,6 @@ public abstract class GuiDrawable<T extends GuiDrawable<T, N, C, TH>, N extends 
 
 	public boolean trySetLogging(ILogging<Logger> logging) { return trySet(t -> this.logging = t, logging); }
 
-
-	/* SECTION methods */
 
 	@Override
 	public abstract boolean tryDraw(Minecraft client);

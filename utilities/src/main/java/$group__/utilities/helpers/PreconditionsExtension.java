@@ -17,12 +17,8 @@ public enum PreconditionsExtension {
 	/* MARK empty */;
 
 
-	/* SECTION static variables */
-
 	private static final ConcurrentMap<Class<?>, Throwable> RAN_ONCE = MapsExtension.MAP_MAKER_MULTI_THREAD.makeMap();
 
-
-	/* SECTION static methods */
 
 	public static void checkArgumentTypes(Class<?>[] types, Object... args) {
 		int typesLength = types.length;

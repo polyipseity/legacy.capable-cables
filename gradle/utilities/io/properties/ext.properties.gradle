@@ -5,13 +5,9 @@
 import static java.io.File.separator
 
 
-/* SECTION check */
-
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['storeProperties', 'loadProperties'])
 
-
-/* SECTION methods */
 
 project.ext.storeExt = { String path = "$projectDir${separator}ext.properties", Closure<Boolean> filter = { true } -> storeProperties.call new Properties(ext.properties.findAll(filter).collectEntries { [it.key, it.value.toString()] }), path, 'Extra Properties # suppress inspection "UnusedProperty", "SpellCheckingInspection" for whole file' }
 

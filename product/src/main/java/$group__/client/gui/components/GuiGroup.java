@@ -26,12 +26,8 @@ import static $group__.utilities.helpers.specific.Throwables.rejectUnsupportedOp
 
 @SideOnly(Side.CLIENT)
 public class GuiGroup<T extends GuiGroup<T, N, C, TH, CO, E>, N extends Number, C, TH extends ITheme<TH>, CO extends Collection<E>, E extends IDrawable<N>> extends GuiDrawable<T, N, C, TH> implements ICollectionDelegated<CO, E> {
-	/* SECTION variables */
-
 	protected CO children;
 
-
-	/* SECTION constructors */
 
 	public GuiGroup(CO children, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
 		super(GuiColorNull.getInstance(), GuiThemedNull.getInstance(), mutator, logging);
@@ -44,12 +40,8 @@ public class GuiGroup<T extends GuiGroup<T, N, C, TH, CO, E>, N extends Number, 
 	protected GuiGroup(GuiGroup<?, N, ?, ?, ? extends CO, E> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getChildren(), mutator, copy.getLogging()); }
 
 
-	/* SECTION static methods */
-
 	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiGroup<V, N, C, TH, CO, E>, N extends Number, C, TH extends ITheme<TH>, CO extends Collection<E>, E extends IDrawable<N>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGuiGroup(CO children) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiGroup<>(children, t.mutator, t.logging))); }
 
-
-	/* SECTION getters & setters */
 
 	public CO getChildren() { return children; }
 
@@ -67,8 +59,6 @@ public class GuiGroup<T extends GuiGroup<T, N, C, TH, CO, E>, N extends Number, 
 	@Deprecated
 	public void setCollection(CO collection) { setChildren(collection); }
 
-
-	/* SECTION methods */
 
 	@Override
 	public boolean tryDraw(Minecraft client) { return children.stream().reduce(false, (t, u) -> u.tryDraw(client) || t, Boolean::logicalOr); }

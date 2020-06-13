@@ -9,20 +9,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class ResourceLocationTexture extends ResourceLocation {
-	/* SECTION variables */
-
 	public final XY<?, Float> size;
 
-
-	/* SECTION constructors */
 
 	public ResourceLocationTexture(ResourceLocation location, XY<?, Float> size) {
 		super(location.getResourceDomain(), location.getResourcePath());
 		this.size = size;
 	}
 
-
-	/* SECTION methods */
 
 	public Rectangle<?, Float> makeRectangle(XY<?, Float> offset) { return new Rectangle<>(offset, size, MutatorImmutable.INSTANCE, offset.getLogging()); }
 }

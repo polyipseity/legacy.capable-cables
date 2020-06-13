@@ -7,8 +7,6 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 
 public interface IIterableDelegated<I extends Iterable<E>, E> extends Iterable<E>, IAdapter<I> {
-	/* SECTION methods */
-
 	@Override
 	@Deprecated
 	default I get() { return getIterable(); }

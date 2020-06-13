@@ -13,8 +13,6 @@ import java.util.Optional;
  */
 @FunctionalInterface
 public interface ISpec<T> {
-	/* SECTION methods */
-
 	/**
 	 * Returns the spec of this object.
 	 * <p>

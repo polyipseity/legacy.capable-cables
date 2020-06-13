@@ -6,8 +6,6 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 public interface IColoredUser<T extends IColored<C>, C> extends IColored<C> {
-	/* SECTION getters & setters */
-
 	T getColored();
 
 	default void setColored(T colored) throws UnsupportedOperationException { Throwables.rejectUnsupportedOperationIf(!trySetColored(colored)); }

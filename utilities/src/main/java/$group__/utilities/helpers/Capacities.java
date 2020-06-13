@@ -4,9 +4,6 @@ public enum Capacities {
 	/* MARK empty */;
 
 
-	/* SECTION static variables */
-
-
 	public static final int INITIAL_CAPACITY_SCALING_FACTOR = 8;
 	public static final int INITIAL_CAPACITY_0 = 0;
 	public static final int INITIAL_CAPACITY_1 = 1;

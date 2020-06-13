@@ -17,8 +17,6 @@ public enum Miscellaneous {
 	/* MARK empty */;
 
 
-	/* SECTION static methods */
-
 	@Nullable
 	public static <T> T getDefaultValue(@Nullable Class<T> type) { return type == null ? null : PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet().stream().filter(e -> e.getKey().isAssignableFrom(type)).findFirst().<T>map(e -> castUncheckedUnboxed(e.getValue())).orElse(null); }
 

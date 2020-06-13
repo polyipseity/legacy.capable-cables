@@ -18,12 +18,8 @@ import static $group__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 
 @SideOnly(Side.CLIENT)
 public interface ITheme<T extends ITheme<T>> extends IStructure<T, T> {
-	/* SECTION static variables */
-
 	ITheme<?> NULL = EnumThemeNull.INSTANCE;
 
-
-	/* SECTION methods */
 
 	default void drawRect($group__.client.gui.polygons.Rectangle<?, ?> rect, Color color) {
 		Color pColor = new Color(GL11.glGetInteger(GL11.GL_CURRENT_COLOR), true);
@@ -58,14 +54,9 @@ public interface ITheme<T extends ITheme<T>> extends IStructure<T, T> {
 	default boolean isImmutable() { return true; }
 
 
-	/* SECTION static classes */
-
 	enum EnumThemeNull implements ITheme<EnumThemeNull> {
-		/* SECTION enums */
 		INSTANCE;
 
-
-		/* SECTION methods */
 
 		@SuppressWarnings("EmptyMethod")
 		@Override

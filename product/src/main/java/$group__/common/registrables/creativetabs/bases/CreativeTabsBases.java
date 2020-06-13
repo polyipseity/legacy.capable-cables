@@ -8,7 +8,5 @@ public enum CreativeTabsBases {
 	/* MARK empty */;
 
 
-	/* SECTION static methods */
-
 	public static String initBaseLabel(String label) { return getNamespacedUnlocalizedNameForRegistry(Constants.MOD_ID, label); }
 }

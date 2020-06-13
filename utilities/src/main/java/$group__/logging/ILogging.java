@@ -8,12 +8,8 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 public interface ILogging<T> {
-	/* SECTION static methods */
-
 	static <T extends Logger> ILogging<T> of(@Nullable T logger, IMutatorImmutablizable<?, ?> mutator) { return logger == null ? LoggingNull.getInstance() : new LoggingLog4J<>(logger, mutator); }
 
-
-	/* SECTION getters & setters */
 
 	@Nullable
 	T getLogger();

@@ -28,15 +28,11 @@ import static $group__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 
 @SideOnly(Side.CLIENT)
 public class PolygonN<T extends PolygonN<T, N, L>, N extends Number, L extends List<XY<?, N>>> implements IStructure<T, T>, ICloneable<T>, IListDelegated<L, XY<?, N>>, IMutatorUser<IMutatorImmutablizable<?, ?>>, ILoggingUser<ILogging<Logger>, Logger> {
-	/* SECTION variables */
-
 	protected L vertexes;
 
 	protected IMutatorImmutablizable<?, ?> mutator;
 	protected ILogging<Logger> logging;
 
-
-	/* SECTION constructors */
 
 	public PolygonN(L vertexes, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
 		this.mutator = trySetNonnull(mutator, mutator, true);
@@ -49,8 +45,6 @@ public class PolygonN<T extends PolygonN<T, N, L>, N extends Number, L extends L
 
 	protected PolygonN(PolygonN<?, N, ? extends L> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getVertexes(), mutator, copy.getLogging()); }
 
-
-	/* SECTION getters & setters */
 
 	public L getVertexes() { return vertexes; }
 
@@ -84,9 +78,6 @@ public class PolygonN<T extends PolygonN<T, N, L>, N extends Number, L extends L
 	@Override
 	@Deprecated
 	public void setList(L list) throws UnsupportedOperationException { setVertexes(list); }
-
-
-	/* SECTION methods */
 
 
 	@Override

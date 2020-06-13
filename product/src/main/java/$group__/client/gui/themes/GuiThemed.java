@@ -24,15 +24,11 @@ import static $group__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 
 public class GuiThemed<T extends GuiThemed<T, TH>, TH extends ITheme<TH>> implements IStructure<T, T>, ICloneable<T>,
 		IMutatorUser<IMutatorImmutablizable<?, ?>>, IThemed<TH>, ILoggingUser<ILogging<Logger>, Logger> {
-	/* SECTION constructors */
-
 	protected TH theme;
 
 	protected IMutatorImmutablizable<?, ?> mutator;
 	protected ILogging<Logger> logging;
 
-
-	/* SECTION constructors */
 
 	public GuiThemed(TH theme, IMutatorImmutablizable<?, ?> mutator, ILogging<Logger> logging) {
 		this.mutator = trySetNonnull(mutator, mutator, true);
@@ -45,8 +41,6 @@ public class GuiThemed<T extends GuiThemed<T, TH>, TH extends ITheme<TH>> implem
 
 	protected GuiThemed(GuiThemed<?, TH> copy, IMutatorImmutablizable<?, ?> mutator) { this(copy.getTheme(), mutator, copy.logging); }
 
-
-	/* SECTION getters & setters */
 
 	@Nonnull
 	@Override
@@ -68,8 +62,6 @@ public class GuiThemed<T extends GuiThemed<T, TH>, TH extends ITheme<TH>> implem
 	@Override
 	public boolean trySetLogging(ILogging<Logger> logging) { return trySet(t -> this.logging = t, logging); }
 
-
-	/* SECTION methods */
 
 	@Override
 	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiThemed<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }

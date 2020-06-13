@@ -11,8 +11,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public interface IMapDelegated<M extends Map<K, V>, K, V> extends Map<K, V>, IAdapter<M> {
-	/* SECTION methods */
-
 	@Override
 	@Deprecated
 	default M get() { return getMap(); }

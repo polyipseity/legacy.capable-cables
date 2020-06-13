@@ -7,8 +7,6 @@ public enum ResourceLocations {
 	/* MARK empty */;
 
 
-	/* SECTION static methods */
-
 	public static String appendDefaultDomain(String path) { return newResourceLocation(path).toString(); }
 
 	public static ResourceLocation newResourceLocation(String path) { return new ResourceLocation(Constants.MOD_ID, path); }

@@ -24,12 +24,8 @@ import static net.minecraft.client.renderer.GlStateManager.pushMatrix;
 @SideOnly(Side.CLIENT)
 public class GuiRectangleMatcher<T extends GuiRectangleMatcher<T, N, C, TH, D>, N extends Number, C extends Color,
 		TH extends ITheme<TH>, D extends IDrawable<?>> extends GuiRectangle<T, N, C, TH> {
-	/* SECTION variables */
-
 	protected D drawable;
 
-
-	/* SECTION constructors */
 
 	public GuiRectangleMatcher(Rectangle<?, N> rectangle, D drawable, IMutatorImmutablizable<?, ?> mutator,
 	                           ILogging<Logger> logging) {
@@ -47,12 +43,8 @@ public class GuiRectangleMatcher<T extends GuiRectangleMatcher<T, N, C, TH, D>, 
 	}
 
 
-	/* SECTION static methods */
-
 	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiRectangleMatcher<V, N, C, TH, D>, N extends Number, C extends Color, TH extends ITheme<TH>, D extends IDrawable<?>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGuiRectangleMatcher(Rectangle<?, N> rectangle, D drawable) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiRectangleMatcher<>(rectangle, drawable, t.mutator, t.logging))); }
 
-
-	/* SECTION getters & setters */
 
 	public D getDrawable() { return drawable; }
 
@@ -62,8 +54,6 @@ public class GuiRectangleMatcher<T extends GuiRectangleMatcher<T, N, C, TH, D>, 
 
 	public Optional<D> tryGetDrawable() { return Optional.of(getDrawable()); }
 
-
-	/* SECTION methods */
 
 	@Override
 	public boolean tryDraw(Minecraft client) {

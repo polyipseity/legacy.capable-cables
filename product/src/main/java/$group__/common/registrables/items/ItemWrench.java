@@ -45,17 +45,11 @@ import java.util.concurrent.atomic.AtomicReference;
 @Optional.Interface(iface = Constants.BUILDCRAFT_API_PACKAGE + ".api.tools.IToolWrench", modid = Constants.BUILDCRAFT_API_ID)
 public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Item>, IRegistrableEventBusSubscriber,
 		IToolHammer, IToolWrench {
-	/* SECTION static variables */
-
 	public static final Configuration CONFIGURATION = ModThis.Configuration.behavior.items.wrench;
 
 
-	/* SECTION constructors */
-
 	protected ItemWrench() { ItemUnstackables.initUnstackable(this); }
 
-
-	/* SECTION static methods */
 
 	@SuppressWarnings("unused")
 	protected static boolean use(ItemStack stack, World world, EntityLivingBase user, RayTraceResult target,
@@ -144,8 +138,6 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 	}
 
 
-	/* SECTION methods */
-
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand,
 	                                  EnumFacing facing, float hitX, float hitY, float hitZ) {
@@ -222,11 +214,7 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 	public Item setUnlocalizedName(ResourceLocation name) { return ItemBases.setUnlocalizedNameBase(this, name); }
 
 
-	/* SECTION static classes */
-
 	protected static class Tag implements IStruct, INBTSerializable<NBTTagCompound> {
-		/* SECTION variables */
-
 		@Nullable
 		public NBTTagCompound
 				pickedUpBlock,
@@ -237,12 +225,8 @@ public class ItemWrench extends Item implements IForgeRegistryEntryExtension<Ite
 				pickedUpBlockState;
 
 
-		/* SECTION constructors */
-
 		protected Tag(@Nullable NBTTagCompound tag) { deserializeNBT(tag); }
 
-
-		/* SECTION methods */
 
 		@Override
 		@Nullable

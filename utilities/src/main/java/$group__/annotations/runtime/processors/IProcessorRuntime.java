@@ -16,12 +16,8 @@ import java.util.Set;
 import static java.lang.Class.forName;
 
 public interface IProcessorRuntime<A extends Annotation> {
-	/* SECTION static methods */
-
 	static String makeMessage(IProcessorRuntime<?> processor, @Nullable String msg) { return "Processing annotation '" + processor.annotationType() + '\'' + (msg == null || msg.isEmpty() ? "" : ": " + msg); }
 
-
-	/* SECTION methods */
 
 	Class<A> annotationType();
 
@@ -31,11 +27,7 @@ public interface IProcessorRuntime<A extends Annotation> {
 	void process(ASMDataTable asm, @Nullable Logger logger);
 
 
-	/* SECTION static classes */
-
 	interface IClass<A extends Annotation> extends IProcessorRuntime<A> {
-		/* SECTION methods */
-
 		@Override
 		default void process(ASMDataTable asm, @Nullable Logger logger) {
 			Set<ASMDataTable.ASMData> thisAsm = asm.getAll(annotationType().getName());
@@ -46,11 +38,7 @@ public interface IProcessorRuntime<A extends Annotation> {
 		void processClass(Result result, @Nullable Logger logger);
 
 
-		/* SECTION static classes */
-
 		interface IElement<A extends Annotation, AE extends AnnotatedElement> extends IClass<A> {
-			/* SECTION methods */
-
 			@Override
 			default void processClass(IClass.Result result, @Nullable Logger logger) {
 				AE ae = findElement(result, logger);
@@ -62,11 +50,7 @@ public interface IProcessorRuntime<A extends Annotation> {
 			void processElement(Result<A, AE> result, @Nullable Logger logger);
 
 
-			/* SECTION static classes */
-
 			interface IMethod<A extends Annotation> extends IElement<A, Method> {
-				/* SECTION methods */
-
 				@Override
 				default Method findElement(IClass.Result result, @Nullable Logger logger) {
 					String mName = result.currentAsm.getObjectName();
@@ -84,11 +68,7 @@ public interface IProcessorRuntime<A extends Annotation> {
 				void processMethod(Result<A> result, @Nullable Logger logger);
 
 
-				/* SECTION static classes */
-
 				class Result<A extends Annotation> extends IElement.Result<A, Method> {
-					/* SECTION constructors */
-
 					protected Result(Result<? extends A> c) { this((IElement.Result<? extends A, Method>) c); }
 
 					protected Result(IElement.Result<? extends A, Method> result) { super(result); }
@@ -96,13 +76,9 @@ public interface IProcessorRuntime<A extends Annotation> {
 			}
 
 			class Result<A extends Annotation, AE extends AnnotatedElement> extends IClass.Result {
-				/* SECTION variables */
-
 				public final AE element;
 				public final A[] annotations;
 
-
-				/* SECTION constructors */
 
 				protected Result(Result<? extends A, ? extends AE> c) { this(c, c.element, c.annotations); }
 
@@ -115,15 +91,11 @@ public interface IProcessorRuntime<A extends Annotation> {
 		}
 
 		class Result implements IStruct {
-			/* SECTION variables */
-
 			public final ASMDataTable asm;
 			public final Set<ASMDataTable.ASMData> thisAsm;
 			public final ASMDataTable.ASMData currentAsm;
 			public final Class<?> clazz;
 
-
-			/* SECTION constructors */
 
 			protected Result(Result c) { this(c.asm, c.thisAsm, c.currentAsm, c.clazz); }
 

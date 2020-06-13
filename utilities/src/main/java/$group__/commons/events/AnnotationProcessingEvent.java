@@ -7,14 +7,10 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 
 public class AnnotationProcessingEvent extends Event {
-	/* SECTION variables */
-
 	protected final String modId;
 	protected final ASMDataTable asm;
 	protected final Logger logger;
 
-
-	/* SECTION constructors */
 
 	public AnnotationProcessingEvent(String modId, ASMDataTable asm, @Nullable Logger logger) {
 		this.modId = modId;
@@ -22,8 +18,6 @@ public class AnnotationProcessingEvent extends Event {
 		this.logger = logger;
 	}
 
-
-	/* SECTION getters & setters */
 
 	public String getModId() { return modId; }
 

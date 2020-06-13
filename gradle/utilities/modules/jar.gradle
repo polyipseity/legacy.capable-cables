@@ -4,16 +4,10 @@
 
 import static java.io.File.separator
 
-/* SECTION check */
-
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call([])
 
-/* SECTION application */
-
 apply plugin: 'com.github.johnrengelman.shadow'
-
-/* SECTION configuration */
 
 // COMMENT append
 afterEvaluate {

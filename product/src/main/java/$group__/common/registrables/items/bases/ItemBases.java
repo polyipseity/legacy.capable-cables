@@ -8,7 +8,5 @@ public enum ItemBases {
 	/* MARK empty */;
 
 
-	/* SECTION static methods */
-
 	public static Item setUnlocalizedNameBase(final Item thisObj, ResourceLocation name) { return thisObj.setUnlocalizedName(Registries.getNamespacedUnlocalizedNameForRegistry(name)); }
 }

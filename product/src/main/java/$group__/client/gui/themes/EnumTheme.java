@@ -5,11 +5,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public enum EnumTheme implements ITheme<EnumTheme> {
-	/* SECTION enums */
 	NONE;
 
-
-	/* SECTION methods */
 
 	@SuppressWarnings("EmptyMethod")
 	@Override

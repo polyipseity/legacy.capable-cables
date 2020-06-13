@@ -9,8 +9,6 @@ import static $group__.utilities.helpers.specific.Throwables.throwThrowable;
 import static $group__.utilities.helpers.specific.Throwables.unexpected;
 
 public interface IThrowableCatcher {
-	/* SECTION getters & setters */
-
 	@Nullable
 	Throwable getCaughtThrowable();
 
@@ -20,11 +18,7 @@ public interface IThrowableCatcher {
 
 	void clearCaughtThrowable();
 
-
-	/* SECTION methods */
-
 	default boolean caughtThrowable() { return getCaughtThrowable() != null; }
-
 
 	default void rethrowCaughtThrowable(boolean nullable) throws RuntimeException {
 		if (nullable) tryGetCaughtThrowable().ifPresent(Throwables::throwThrowable);

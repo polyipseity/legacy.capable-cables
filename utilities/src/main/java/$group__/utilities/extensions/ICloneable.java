@@ -42,8 +42,6 @@ import static java.lang.invoke.MethodType.methodType;
 import static java.util.Collections.newSetFromMap;
 
 public interface ICloneable<T> extends Cloneable {
-	/* SECTION static variables */
-
 	Logger LOGGER = LogManager.getLogger(ICloneable.class);
 
 	@Nullable
@@ -54,8 +52,6 @@ public interface ICloneable<T> extends Cloneable {
 	});
 	@Nullable
 	ExternalCloneMethod DEFAULT_ANNOTATION = DEFAULT_METHOD == null ? null : new ExternalCloneMethod() {
-		/* SECTION methods */
-
 		@Override
 		public Class<?>[] value() { return new Class<?>[0]; }
 
@@ -71,8 +67,6 @@ public interface ICloneable<T> extends Cloneable {
 	ConcurrentMap<Class<?>, ExternalCloneMethod> EXTERNAL_ANNOTATIONS_MAP = MapsExtension.MAP_MAKER_MULTI_THREAD.makeMap();
 	LoadingCache<Class<?>, ExternalCloneMethod> EXTERNAL_ANNOTATIONS_CACHE =
 			CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_4).expireAfterAccess(MapsExtension.CACHE_EXPIRATION_ACCESS_DURATION, MapsExtension.CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(MULTI_THREAD_THREAD_COUNT).build(new CacheLoader<Class<?>, ExternalCloneMethod>() {
-				/* SECTION methods */
-
 				@Override
 				public ExternalCloneMethod load(Class<?> key) throws NoSuchMethodException {
 					@Nullable ExternalCloneMethod r = EXTERNAL_ANNOTATIONS_MAP.get(key);
@@ -101,8 +95,6 @@ public interface ICloneable<T> extends Cloneable {
 
 	Set<Class<?>> BROKEN_CLASS_SET = newSetFromMap(MapsExtension.MAP_MAKER_MULTI_THREAD_WEAK_KEYS.makeMap());
 
-
-	/* SECTION static methods */
 
 	/**
 	 * Attempts to clone the given parameter {@code o}.
@@ -227,8 +219,6 @@ public interface ICloneable<T> extends Cloneable {
 		return cloned;
 	}
 
-
-	/* SECTION methods */
 
 	/**
 	 * Alias for {@link #clone}.

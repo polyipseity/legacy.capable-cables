@@ -6,7 +6,5 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public final class ProxyClient extends Proxy {
-	/* SECTION static variables */
-
 	public static final String CLASS_SUBPACKAGE_NAME = "client.ProxyClient";
 }

@@ -11,8 +11,6 @@ public enum Optionals {
 	/* MARK empty */;
 
 
-	/* SECTION static methods */
-
 	@Nullable
 	public static <O, T> T optional(@Nullable O optional, Function<? super O, ? extends T> whenPresent, Supplier<?
 			extends T> whenAbsent) { return optional == null ? whenAbsent.get() : whenPresent.apply(optional); }

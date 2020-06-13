@@ -29,13 +29,9 @@ public enum Globals {
 	/* MARK empty */;
 
 
-	/* SECTION static variables */
-
 	public static final ModThis MOD = ModThis.INSTANCE;
 	public static final Logger LOGGER = LogManager.getLogger(NAME + '|' + Constants.MOD_ID);
 
-
-	/* SECTION static classes */
 
 	@SideOnly(Side.CLIENT)
 	@Mod.EventBusSubscriber(value = Side.CLIENT, modid = Constants.MOD_ID)
@@ -43,19 +39,13 @@ public enum Globals {
 		/* MARK empty */;
 
 
-		/* SECTION static variables */
-
 		public static final Minecraft CLIENT = Minecraft.getMinecraft();
 		private static final ConcurrentMap<Object, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ?>> PRE_INIT_GUI_LISTENER_MAP = MapsExtension.MAP_MAKER_SINGLE_THREAD_WEAK_KEYS.makeMap();
 		private static ScaledResolution resolution = new ScaledResolution(CLIENT);
 
 
-		/* SECTION static getter & setters */
-
 		public static ScaledResolution getResolution() { return resolution; }
 
-
-		/* SECTION static methods */
 
 		public static <T> void registerPreInitGuiListener(T k, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ?
 				super T> v) { PRE_INIT_GUI_LISTENER_MAP.put(k, v); }
@@ -68,14 +58,10 @@ public enum Globals {
 		public static void preInitGuiForResolution(GuiScreenEvent.InitGuiEvent.Pre e) { resolution = new ScaledResolution(CLIENT); }
 
 
-		/* SECTION static classes */
-
 		@SuppressWarnings("HardcodedFileSeparator")
 		public enum Resources {
 			/* MARK empty */;
 
-
-			/* SECTION static variables */
 
 			public static final ResourceLocationTexture GUI_WRENCH = new ResourceLocationTexture(new ResourceLocation(MOD_ID, "textures/gui/containers/wrench.png"), new XY<>(1024F, 1024F, MutatorImmutable.INSTANCE,
 					ILogging.of(LOGGER, MutatorImmutable.INSTANCE)));

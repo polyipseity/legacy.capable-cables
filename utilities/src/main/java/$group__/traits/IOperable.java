@@ -14,8 +14,6 @@ import static $group__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static java.util.Arrays.asList;
 
 public interface IOperable<T extends IOperable<T, A>, A> {
-	/* SECTION static methods */
-
 	@SuppressWarnings("varargs")
 	@SafeVarargs
 	static <N extends IOperable<N, A>, A> N sum(N t, A... o) { return t.sum(asList(o)); }
@@ -29,8 +27,6 @@ public interface IOperable<T extends IOperable<T, A>, A> {
 	static <N extends IOperable<N, A>, A> N min(N t, A... o) { return t.min(asList(o)); }
 
 
-	/* SECTION methods */
-
 	T sum(Iterable<? extends A> o);
 
 	T max(Iterable<? extends A> o);
@@ -40,12 +36,8 @@ public interface IOperable<T extends IOperable<T, A>, A> {
 	T negate();
 
 
-	/* SECTION static classes */
-
 	interface INumberOperable<T extends INumberOperable<T>> extends IOperable<T, Number>, IStructure<T, T>,
 			ICloneable<T>, Comparable<Number> {
-		/* SECTION methods */
-
 		@Override
 		@OverridingStatus(group = Constants.PACKAGE, when = When.MAYBE)
 		default T max(Iterable<? extends Number> o) {

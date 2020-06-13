@@ -6,8 +6,6 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 public interface IThemedUser<T extends IThemed<TH>, TH extends ITheme<TH>> extends IThemed<TH> {
-	/* SECTION getters & setters */
-
 	T getThemed();
 
 	default void setThemed(T themed) throws UnsupportedOperationException { Throwables.rejectUnsupportedOperationIf(!trySetThemed(themed)); }
