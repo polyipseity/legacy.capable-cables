@@ -4,18 +4,10 @@
 
 import groovy.io.FileType
 
-import java.util.regex.Pattern
-
 import static java.io.File.separator
-
-
-/* SECTION check */
 
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['evaluateGStringString', 'createNewFile'])
-
-
-/* SECTION methods */
 
 project.ext.makeSourceTasks = { Closure c ->
     tasks.withType(AbstractCompile) { AbstractCompile t ->
@@ -62,7 +54,9 @@ project.ext.makeSourceTasks = { Closure c ->
 
                 Binding eb = new Binding(e)
                 eachFile {
-                    it.path = "${evaluateGStringString.call(it.relativePath.parent.pathString, eb).replace '.', separator}$separator${evaluateGStringString.call it.name, eb}"
+                    //noinspection GrUnresolvedAccess
+                    String parent = evaluateGStringString.call(it.relativePath.parent.pathString, eb).replace '.', separator
+                    it.path = "$parent$separator${evaluateGStringString.call it.name, eb}"
                 }
             }
         } as Sync

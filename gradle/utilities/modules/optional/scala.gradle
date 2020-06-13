@@ -12,8 +12,9 @@ afterEvaluate {
         implementation 'net.minecraftforge:Scorge:3.0.6'
     }
 
-    sourceSets {
-        main {
+    afterEvaluate {
+        sourceSets.configureEach {
+            //noinspection GrUnresolvedAccess
             scala.srcDirs += java.srcDirs
             java.srcDirs = []
         }
