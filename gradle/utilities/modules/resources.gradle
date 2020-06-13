@@ -36,9 +36,7 @@ project.ext.makeResourcesTasks = { Closure c ->
             }
 
             // COMMENT copy everything else except the processed files
-            from(sourceSets."$sourceSetName".resources.srcDirs) {
-                exclude '**/*.in'
-            }
+            from(sourceSets."$sourceSetName".resources.srcDirs) { exclude '**/*.in' }
 
             Binding eb = new Binding(e)
             eachFile { it.path = evaluateGStringString.call it.path, eb }
