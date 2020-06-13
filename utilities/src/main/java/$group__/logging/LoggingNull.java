@@ -19,9 +19,16 @@ import static $group__.utilities.helpers.PreconditionsExtension.requireRunOnceOn
 public final class LoggingNull<T> implements ILogging<T>, IStructure<LoggingNull<T>, LoggingNull<T>> {
 	/* SECTION static variables */
 
-	public static final LoggingNull<?> INSTANCE = new LoggingNull<>();
+	public static final LoggingNull<?> INSTANCE;
 
 	private static final Logger LOGGER = LogManager.getLogger(LoggingNull.class);
+
+
+	/* SECTION static initializer */
+
+	static {
+		INSTANCE = new LoggingNull<>();
+	}
 
 
 	/* SECTION constructors */

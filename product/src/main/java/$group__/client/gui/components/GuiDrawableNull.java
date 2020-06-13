@@ -24,9 +24,16 @@ public final class GuiDrawableNull<N extends Number> extends Gui implements IDra
 		IStructure<GuiDrawableNull<N>, GuiDrawableNull<N>> {
 	/* SECTION static variables */
 
-	public static final GuiDrawableNull<?> INSTANCE = new GuiDrawableNull<>();
+	public static final GuiDrawableNull<?> INSTANCE;
 
 	private static final Logger LOGGER = LogManager.getLogger(GuiDrawableNull.class);
+
+
+	/* SECTION static initializer */
+
+	static {
+		INSTANCE = new GuiDrawableNull<>();
+	}
 
 
 	/* SECTION constructors */

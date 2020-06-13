@@ -16,14 +16,11 @@ public interface IMutatorUser<T extends IMutator> extends IMutator {
 
 	boolean trySetMutator(T mutator);
 
-	default Optional<? extends T> tryGetMutator() { return Optional.ofNullable(getMutator()); }
+	default Optional<? extends T> tryGetMutator() { return Optional.of(getMutator()); }
 
 	@Override
-	default <T> T mutate(Supplier<T> action, boolean initialize) throws UnsupportedOperationException { return mutate(action, initialize); }
+	default <A> A mutate(Supplier<A> action, boolean initialize) throws UnsupportedOperationException { return getMutator().mutate(action, initialize); }
 
 	@Override
-	default <T> boolean trySet(Consumer<T> setter, @Nullable T target, boolean initialize) {
-		return trySet(setter,
-				target, initialize);
-	}
+	default <A> boolean trySet(Consumer<A> setter, @Nullable A target, boolean initialize) { return getMutator().trySet(setter, target, initialize); }
 }

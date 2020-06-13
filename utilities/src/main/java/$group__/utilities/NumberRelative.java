@@ -78,7 +78,7 @@ public class NumberRelative<T extends NumberRelative<T>> extends Number implemen
 
 	/* SECTION static methods */
 
-	public static <T extends BuilderNumberRelative<T, V>, V extends NumberRelative<V>> BuilderNumberRelative<T, V> newBuilderNR(Number value) { return new BuilderNumberRelative<>(t -> castUncheckedUnboxedNonnull(new NumberRelative<>(value, t.parent, t.offset, t.mutator, t.logging))); }
+	public static <T extends BuilderNumberRelative<T, V>, V extends NumberRelative<V>> BuilderNumberRelative<T, V> newBuilderNumberRelative(Number value) { return new BuilderNumberRelative<>(t -> castUncheckedUnboxedNonnull(new NumberRelative<>(value, t.parent, t.offset, t.mutator, t.logging))); }
 
 
 	/* SECTION getters & setters */

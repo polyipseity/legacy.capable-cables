@@ -47,10 +47,10 @@ public class GuiTabs<T extends GuiTabs<T, N, C, TH, TA, E>, N extends Number, C,
 	/* SECTION static methods */
 
 	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiTabs<V, N, C, TH, TA, E>,
-			N extends Number, C, TH extends ITheme<TH>, TA extends List<E>, E extends GuiTab<?, N, ?, ?, ?>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGT(TA tabs) { return newBuilderGT(tabs, 0); }
+			N extends Number, C, TH extends ITheme<TH>, TA extends List<E>, E extends GuiTab<?, N, ?, ?, ?>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGuiTabs(TA tabs) { return newBuilderGuiTabs(tabs, 0); }
 
 	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiTabs<V, N, C, TH, TA, E>,
-			N extends Number, C, TH extends ITheme<TH>, TA extends List<E>, E extends GuiTab<?, N, ?, ?, ?>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGT(TA tabs, int open) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiTabs<>(tabs, open, t.mutator, t.logging))); }
+			N extends Number, C, TH extends ITheme<TH>, TA extends List<E>, E extends GuiTab<?, N, ?, ?, ?>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGuiTabs(TA tabs, int open) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiTabs<>(tabs, open, t.mutator, t.logging))); }
 
 
 	protected static boolean setOpen(GuiTabs<?, ?, ?, ?, ?, ?> t, int open) { return setOpen(t, open, false); }

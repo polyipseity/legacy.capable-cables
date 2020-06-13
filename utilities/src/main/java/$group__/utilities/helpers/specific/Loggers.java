@@ -150,8 +150,7 @@ public enum Loggers {
 						(Class<?>) args[1], (String) args[2], (MethodType) args[3], (Class<?>) args[4]);
 			}
 		},
-		@SuppressWarnings("SpellCheckingInspection") INVOCATION_UNABLE_TO_UNREFLECT_MEMBER("Unable to unreflect {} " +
-				"'{}' with lookup '{}'{}", 1,
+		@SuppressWarnings("SpellCheckingInspection") INVOCATION_UNABLE_TO_UNREFLECT_MEMBER(PREFIX_INVOCATION + "Unable to unreflect {} '{}' with lookup '{}'{}", 1,
 				String.class, Member.class, Lookup.class, Class.class) {
 			/* SECTION methods */
 
@@ -201,7 +200,7 @@ public enum Loggers {
 
 		/* SECTION constructors */
 
-		EnumMessages(String message, Class<?>... argTypes) { this(message, false, argTypes); }
+		EnumMessages(@SuppressWarnings("SameParameterValue") String message, Class<?>... argTypes) { this(message, false, argTypes); }
 
 		EnumMessages(String message, boolean varargs, Class<?>... argTypes) { this(message, varargs, 0, argTypes); }
 
@@ -271,7 +270,8 @@ public enum Loggers {
 				if (varargs == null) varargs = Arrays.copyOfRange(args, argTsL, argsL);
 
 				checkArrayContentType(argVarargs, varargs);
-				argsList = argsList.subList(0, argTsL);
+				argsList.set(argTsL, varargs);
+				argsList = argsList.subList(0, ++argTsL);
 			}
 
 			return makeMessage1(argsList.toArray());

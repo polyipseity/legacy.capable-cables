@@ -56,6 +56,7 @@ public class PolygonN<T extends PolygonN<T, N, L>, N extends Number, L extends L
 
 	public void setVertexes(L vertexes) throws UnsupportedOperationException { Throwables.rejectUnsupportedOperationIf(!trySetVertexes(vertexes)); }
 
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public boolean trySetVertexes(L vertexes) { return trySet(t -> this.vertexes = t, vertexes); }
 
 	public Optional<L> tryGetVertexes() { return Optional.of(getVertexes()); }

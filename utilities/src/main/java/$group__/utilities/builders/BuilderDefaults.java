@@ -26,7 +26,7 @@ public enum BuilderDefaults {
 
 	/* SECTION static methods */
 
-	public static <T> Deque<T> getDefaults(Map.Entry<Class<T>, String> key) { return castUncheckedUnboxedNonnull(DEFAULTS_MAP.get().computeIfAbsent(castUncheckedUnboxedNonnull(key), c -> new ArrayDeque<T>(INITIAL_CAPACITY_2))); }
+	public static <T> Deque<T> getDefaults(Map.Entry<Class<T>, String> key) { return castUncheckedUnboxedNonnull(DEFAULTS_MAP.get().computeIfAbsent(castUncheckedUnboxedNonnull(key), c -> new LinkedList<T>())); }
 
 	@Nullable
 	public static <T> T peekDefault(Map.Entry<Class<T>, String> key) { return getDefaults(key).peek(); }

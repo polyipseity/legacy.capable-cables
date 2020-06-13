@@ -6,12 +6,9 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 public interface IForgeRegistryEntryExtension<V extends IForgeRegistryEntry<V>> extends IForgeRegistryEntry<V> {
 	/* SECTION methods */
 
-	@SuppressWarnings("SpellCheckingInspection")
 	V setUnlocalizedName(ResourceLocation name);
 
-	@SuppressWarnings("SpellCheckingInspection")
 	default V setRegistryAndUnlocalizedName(String modId, String name) { return setRegistryAndUnlocalizedName(new ResourceLocation(modId, name)); }
 
-	@SuppressWarnings("SpellCheckingInspection")
 	default V setRegistryAndUnlocalizedName(ResourceLocation name) { return setUnlocalizedName(name).setRegistryName(name); }
 }

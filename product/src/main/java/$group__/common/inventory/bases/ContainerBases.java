@@ -14,6 +14,7 @@ public enum ContainerBases {
 
 	/* SECTION static methods */
 
+	@SuppressWarnings("SameReturnValue")
 	public static boolean canInteractWithBase() { return true; }
 
 	public static ItemStack transferStackInSlotBase(Container container, EntityPlayer playerIn, int index,

@@ -25,7 +25,7 @@ public abstract class Registrable<T extends IForgeRegistryEntry<T>> extends Sing
 
 	/* SECTION constructors */
 
-	protected Registrable(Logger logger) {
+	protected Registrable(@SuppressWarnings("SameParameterValue") Logger logger) {
 		super(logger);
 		clazz = castUncheckedUnboxedNonnull(getGenericSuperclassActualTypeArgument(getClass(), 0));
 	}

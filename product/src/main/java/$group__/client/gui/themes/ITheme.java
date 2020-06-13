@@ -67,7 +67,9 @@ public interface ITheme<T extends ITheme<T>> extends IStructure<T, T> {
 
 		/* SECTION methods */
 
+		@SuppressWarnings("EmptyMethod")
 		@Override
-		public String toString() { return super.toString(); }
+		@OverridingStatus(group = PACKAGE, when = When.NEVER)
+		public final String toString() { return super.toString(); }
 	}
 }

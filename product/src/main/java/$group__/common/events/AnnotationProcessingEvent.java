@@ -11,6 +11,7 @@ public class AnnotationProcessingEvent extends Event {
 
 	protected final String modId;
 	protected final ASMDataTable asm;
+	@Nullable
 	protected final Logger logger;
 
 
@@ -29,5 +30,6 @@ public class AnnotationProcessingEvent extends Event {
 
 	public ASMDataTable getAsm() { return asm; }
 
+	@Nullable
 	public Logger getLogger() { return logger; }
 }

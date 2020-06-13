@@ -24,8 +24,5 @@ public class ResourceLocationTexture extends ResourceLocation {
 
 	/* SECTION methods */
 
-	public Rectangle<?, Float> makeRectangle(XY<?, Float> offset) {
-		return new Rectangle<>(offset, size,
-				MutatorImmutable.INSTANCE, offset.getLogging());
-	}
+	public Rectangle<?, Float> makeRectangle(XY<?, Float> offset) { return new Rectangle<>(offset, size, MutatorImmutable.INSTANCE, offset.getLogging()); }
 }

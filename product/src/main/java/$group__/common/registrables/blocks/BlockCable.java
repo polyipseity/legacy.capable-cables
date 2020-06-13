@@ -13,7 +13,6 @@ public class BlockCable extends Block implements IForgeRegistryEntryExtension<Bl
 		super(Materials.PETRIFIED_SKY);
 	}
 
-	@SuppressWarnings("SpellCheckingInspection")
 	@Override
 	public Block setUnlocalizedName(ResourceLocation name) { return BlockBases.setUnlocalizedNameBase(this, name); }
 }

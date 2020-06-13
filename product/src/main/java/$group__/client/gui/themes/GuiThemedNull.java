@@ -16,13 +16,19 @@ import static $group__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
 import static $group__.utilities.helpers.PreconditionsExtension.requireRunOnceOnly;
 
 @Immutable
-public final class GuiThemedNull<T extends ITheme<T>> implements IStructure<GuiThemedNull<T>, GuiThemedNull<T>>,
-		IThemed<T> {
+public final class GuiThemedNull<T extends ITheme<T>> implements IStructure<GuiThemedNull<T>, GuiThemedNull<T>>, IThemed<T> {
 	/* SECTION static variables */
 
-	public static final GuiThemedNull<?> INSTANCE = new GuiThemedNull<>();
+	public static final GuiThemedNull<?> INSTANCE;
 
 	private static final Logger LOGGER = LogManager.getLogger(GuiThemedNull.class);
+
+
+	/* SECTION static initializer */
+
+	static {
+		INSTANCE = new GuiThemedNull<>();
+	}
 
 
 	/* SECTION constructors */

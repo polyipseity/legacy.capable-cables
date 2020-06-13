@@ -46,8 +46,7 @@ public class GuiTab<T extends GuiTab<T, N, C, TH, E>, N extends Number, C, TH ex
 
 	/* SECTION static methods */
 
-	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiTab<V, N, C, TH, E>, N extends Number, C
-			, TH extends ITheme<TH>, L extends Logger, E extends IDrawable<N>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGT(E access, E content) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiTab<>(access, content, t.mutator, t.logging))); }
+	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiTab<V, N, C, TH, E>, N extends Number, C, TH extends ITheme<TH>, L extends Logger, E extends IDrawable<N>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGuiTab(E access, E content) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiTab<>(access, content, t.mutator, t.logging))); }
 
 
 	/* SECTION getters & setters */
@@ -56,6 +55,7 @@ public class GuiTab<T extends GuiTab<T, N, C, TH, E>, N extends Number, C, TH ex
 
 	public void setOpen(boolean open) throws UnsupportedOperationException { rejectUnsupportedOperationIf(!trySetOpen(open)); }
 
+	@SuppressWarnings("SameReturnValue")
 	public boolean trySetOpen(boolean open) {
 		this.open = open;
 		return true;

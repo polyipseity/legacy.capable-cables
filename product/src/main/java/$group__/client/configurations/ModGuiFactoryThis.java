@@ -21,24 +21,6 @@ import java.util.Set;
  */
 @SideOnly(Side.CLIENT)
 public class ModGuiFactoryThis extends Singleton implements IModGuiFactory {
-	/* SECTION static variables */
-
-	/**
-	 * {@code package} of this class without the group.
-	 *
-	 * @since 0.0.1.0
-	 */
-	public static final String SUBPACKAGE = "client.configurations";
-	/**
-	 * {@link Class#getSimpleName} of this class.
-	 *
-	 * @since 0.0.1.0
-	 */
-	public static final String CLASS_SIMPLE_NAME = "ModGuiFactoryThis";
-
-
-	/* SECTION constructor */
-
 	/**
 	 * Unused default constructor.
 	 *
@@ -63,7 +45,7 @@ public class ModGuiFactoryThis extends Singleton implements IModGuiFactory {
 	public GuiScreen createConfigGui(GuiScreen parentScreen) { return null; }
 
 	/**
-	 * @since 0.0.1.0
+	 * @since 0.0.1
 	 * @deprecated unused
 	 */
 	@Override

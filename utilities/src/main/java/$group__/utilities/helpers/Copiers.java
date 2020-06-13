@@ -114,7 +114,7 @@ public enum Copiers {
 						break cos;
 					case "Object[]":
 						r = tryCall(() -> co.newInstance((Object) copy.stream().map(o -> ICloneable.tryCloneUnboxed(o,
-								LOGGER)).toArray()), LOGGER).orElseThrow(Throwables::rethrowCaughtThrowableStatic); //
+								LOGGER)).toArray()), LOGGER).orElseThrow(Throwables::rethrowCaughtThrowableStatic);
 						// COMMENT cast to Object to call the method with the array as 1 object
 						break cos;
 				}
@@ -137,10 +137,10 @@ public enum Copiers {
 	public static ReentrantReadWriteLock copyReentrantReadWriteLock(ReentrantReadWriteLock copy) { return new ReentrantReadWriteLock(copy.isFair()); }
 
 
+	@SuppressWarnings("MagicNumber")
 	@ExternalCloneMethod(Color.class)
 	public static Color copyColor(Color copy) {
-		return new Color(copy.getColorSpace(), copy.getColorComponents(null),
-				copy.getAlpha() / 255F);
+		return new Color(copy.getColorSpace(), copy.getColorComponents(null), copy.getAlpha() / 255F);
 	}
 
 	@ExternalCloneMethod(ResourceLocation.class)

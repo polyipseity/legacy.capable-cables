@@ -21,10 +21,17 @@ public class MutatorMutable<T extends MutatorMutable<T, I>, I extends MutatorImm
 		IStrictObject, IMutatorImmutablizable<T, I> {
 	/* SECTION static variables */
 
-	public static final MutatorMutable<?, ?> INSTANCE = new MutatorMutable<>(null);
+	public static final MutatorMutable<?, ?> INSTANCE;
 
 	private static final Logger LOGGER = LogManager.getLogger(MutatorMutable.class);
 	private static final long serialVersionUID = -970134255526874348L;
+
+
+	/* SECTION static initializer */
+
+	static {
+		INSTANCE = new MutatorMutable<>(null);
+	}
 
 
 	/* SECTION constructors */
@@ -32,16 +39,16 @@ public class MutatorMutable<T extends MutatorMutable<T, I>, I extends MutatorImm
 	@SuppressWarnings("unused")
 	protected MutatorMutable() {}
 
-	private MutatorMutable(@SuppressWarnings("unused") @Nullable Object u) { requireRunOnceOnly(LOGGER); }
+	private MutatorMutable(@SuppressWarnings({"unused", "SameParameterValue"}) @Nullable Object u) { requireRunOnceOnly(LOGGER); }
 
 
 	/* SECTION getters & setters */
 
 	@Override
-	public <T> T mutate(Supplier<T> action, boolean initialize) { return action.get(); }
+	public <A> A mutate(Supplier<A> action, boolean initialize) { return action.get(); }
 
 	@Override
-	public <T> boolean trySet(Consumer<T> setter, @Nullable T target, boolean initialize) {
+	public <A> boolean trySet(Consumer<A> setter, @Nullable A target, boolean initialize) {
 		setter.accept(target);
 		return true;
 	}

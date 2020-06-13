@@ -20,10 +20,7 @@ public enum Miscellaneous {
 	/* SECTION static methods */
 
 	@Nullable
-	public static <T> T getDefaultValue(@Nullable Class<T> type) {
-		return type == null ? null :
-				PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet().stream().filter(e -> e.getKey().isAssignableFrom(type)).findFirst().<T>map(e -> castUncheckedUnboxed(e.getValue())).orElse(null);
-	}
+	public static <T> T getDefaultValue(@Nullable Class<T> type) { return type == null ? null : PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet().stream().filter(e -> e.getKey().isAssignableFrom(type)).findFirst().<T>map(e -> castUncheckedUnboxed(e.getValue())).orElse(null); }
 
 	public static <T> T getDefaultValueNonnull(Class<T> type) { return requireNonNull(getDefaultValue(type)); }
 

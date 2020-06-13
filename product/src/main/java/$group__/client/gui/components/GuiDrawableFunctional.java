@@ -42,8 +42,7 @@ public class GuiDrawableFunctional<T extends GuiDrawableFunctional<T, N, C, TH>,
 
 	/* SECTION static methods */
 
-	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiDrawableFunctional<V, N, C, TH>,
-			L extends Logger, N extends Number, C, TH extends ITheme<TH>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGDF(Function<? super V, ? extends Boolean> tryDrawFunction, Function<? super V, ? extends Optional<Rectangle<?, N>>> specFunction, IMutatorImmutablizable<?, ?> mutator) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiDrawableFunctional<V, N, C, TH>(tryDrawFunction, specFunction, t.colored, t.themed, mutator, t.logging))); }
+	public static <T extends BuilderGuiDrawable<T, V, N, C, TH>, V extends GuiDrawableFunctional<V, N, C, TH>, L extends Logger, N extends Number, C, TH extends ITheme<TH>> BuilderGuiDrawable<T, V, N, C, TH> newBuilderGuiDrawableFunctional(Function<? super V, ? extends Boolean> tryDrawFunction, Function<? super V, ? extends Optional<Rectangle<?, N>>> specFunction, IMutatorImmutablizable<?, ?> mutator) { return new BuilderGuiDrawable<>(t -> castUncheckedUnboxedNonnull(new GuiDrawableFunctional<V, N, C, TH>(tryDrawFunction, specFunction, t.colored, t.themed, mutator, t.logging))); }
 
 
 	/* SECTION getters & setters */
@@ -75,8 +74,5 @@ public class GuiDrawableFunctional<T extends GuiDrawableFunctional<T, N, C, TH>,
 
 
 	@Override
-	public T toImmutable() {
-		return castUncheckedUnboxedNonnull(isImmutable() ? this :
-				new GuiDrawableFunctional<>(this, IMutatorImmutablizable.of(getMutator().toImmutable())));
-	}
+	public T toImmutable() { return castUncheckedUnboxedNonnull(isImmutable() ? this : new GuiDrawableFunctional<>(this, IMutatorImmutablizable.of(getMutator().toImmutable()))); }
 }
