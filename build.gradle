@@ -52,7 +52,6 @@ allprojects {
     apply from: "$modulesDir${separator}versioning.gradle"
     apply from: "$modulesDir${separator}information.gradle"
 
-    apply from: "$modulesDir${separator}configurations.gradle"
     apply from: "$modulesDir${separator}repositories.gradle"
     apply from: "$modulesDir${separator}dependencies.gradle"
 
