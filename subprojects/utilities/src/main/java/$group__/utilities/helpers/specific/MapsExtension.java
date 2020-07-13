@@ -28,7 +28,6 @@ public enum MapsExtension {
 	public static final TimeUnit CACHE_EXPIRATION_ACCESS_TIME_UNIT = TimeUnit.MINUTES;
 
 
-
 	public static <T extends Map<K, V>, K, V> T toMapFromValues(T map, Iterable<? extends V> values, Function<?
 			super V, ? extends K> mapper) {
 		values.forEach(t -> map.put(mapper.apply(t), t));

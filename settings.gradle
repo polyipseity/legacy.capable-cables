@@ -4,8 +4,8 @@
 
 rootProject.name = 'capablecables'
 
-include ':annotations'
-include ':utilities'
-include ':utilities:macros'
-include ':annotations:processors'
-include ':product'
+include ':subprojects:annotations'
+include ':subprojects:annotations:processors'
+include ':subprojects:utilities'
+include ':subprojects:utilities:macros'
+include ':subprojects:product'

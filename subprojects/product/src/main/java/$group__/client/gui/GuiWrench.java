@@ -15,8 +15,8 @@ import $group__.utilities.builders.BuilderDefaults;
 import $group__.utilities.concurrent.IMutatorImmutablizable;
 import $group__.utilities.concurrent.IMutatorUser;
 import $group__.utilities.extensions.IStructure;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Container;
+import net.minecraftforge.fml.client.config.GuiCheckBox;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.Logger;
@@ -38,7 +38,7 @@ import static $group__.utilities.helpers.specific.Optionals.unboxOptional;
 import static $group__.utilities.helpers.specific.Throwables.rejectUnsupportedOperation;
 
 @SideOnly(Side.CLIENT)
-public class GuiWrench<T extends GuiWrench<T, TH>, TH extends ITheme<TH>> extends GuiContainer implements IStructure<T, T>, ISpec<Rectangle<?, ?>>, IMutatorUser<IMutatorImmutablizable<?, ?>>, ILoggingUser<ILogging<Logger>, Logger>, IThemedUser<IThemed<TH>, TH> {
+public class GuiWrench<T extends GuiWrench<T, TH>, TH extends ITheme<TH>> extends GuiCheckBox implements IStructure<T, T>, ISpec<Rectangle<?, ?>>, IMutatorUser<IMutatorImmutablizable<?, ?>>, ILoggingUser<ILogging<Logger>, Logger>, IThemedUser<IThemed<TH>, TH> {
 	protected GuiTabs<?, ?, ?, ?, ?, ?> tabs;
 	protected IThemed<TH> themed;
 

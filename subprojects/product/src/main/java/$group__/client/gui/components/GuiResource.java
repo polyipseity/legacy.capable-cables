@@ -1,6 +1,5 @@
 package $group__.client.gui.components;
 
-import $group__.client.gui.polygons.Rectangle;
 import $group__.client.gui.themes.ITheme;
 import $group__.client.gui.themes.IThemed;
 import $group__.client.gui.utilities.builders.BuilderGuiDrawable;
