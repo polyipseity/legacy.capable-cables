@@ -1,8 +1,3 @@
-/**
- * Provides client capabilities.
- *
- * @since 0.0.1.0
- */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault

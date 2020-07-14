@@ -2,7 +2,7 @@
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
 @LocalVariablesAreNonnullByDefault
-package $group__.client.gui.components;
+package $group__.client.gui;
 
 import $group__.annotations.FieldsAreNonnullByDefault;
 import $group__.annotations.LocalVariablesAreNonnullByDefault;
