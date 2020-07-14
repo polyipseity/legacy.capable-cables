@@ -6,10 +6,13 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import static $group__.utilities.helpers.specific.Colors.*;
 import static org.lwjgl.opengl.GL11.*;
 
+@OnlyIn(Dist.CLIENT)
 public enum GUIs {
 	;
 
