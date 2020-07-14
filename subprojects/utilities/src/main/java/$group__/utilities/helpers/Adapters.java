@@ -9,7 +9,7 @@ import java.util.function.Function;
 
 import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_2;
 import static $group__.utilities.helpers.Casts.castUnchecked;
-import static $group__.utilities.helpers.specific.MapsExtension.MAP_MAKER_MULTI_THREAD;
+import static $group__.utilities.helpers.specific.Maps.MAP_MAKER_MULTI_THREAD;
 
 public enum Adapters {
 	;

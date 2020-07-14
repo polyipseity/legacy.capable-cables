@@ -3,7 +3,6 @@ package $group__.utilities;
 public enum Constants {
 	/* MARK empty */;
 
-
 	public static final String
 			MOD_ID = "${modId}",
 			GROUP = "${group}",

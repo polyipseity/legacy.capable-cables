@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_2;
-import static $group__.utilities.helpers.specific.StreamsExtension.streamSmart;
+import static $group__.utilities.helpers.specific.Streams.streamSmart;
 import static $group__.utilities.helpers.specific.Throwables.rejectArguments;
 
 public enum Processors {

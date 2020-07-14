@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 import static $group__.utilities.helpers.Dynamics.IMPL_LOOKUP;
 import static $group__.utilities.helpers.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
-import static $group__.utilities.helpers.specific.MapsExtension.MAP_MAKER_MULTI_THREAD;
+import static $group__.utilities.helpers.specific.Maps.MAP_MAKER_MULTI_THREAD;
 import static $group__.utilities.helpers.specific.Throwables.*;
 import static com.google.common.collect.Maps.immutableEntry;
 import static java.lang.System.lineSeparator;

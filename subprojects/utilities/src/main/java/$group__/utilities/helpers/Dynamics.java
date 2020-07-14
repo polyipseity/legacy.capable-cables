@@ -2,7 +2,7 @@ package $group__.utilities.helpers;
 
 import $group__.annotations.runtime.processors.IProcessorRuntime;
 import $group__.utilities.helpers.specific.Loggers;
-import $group__.utilities.helpers.specific.MapsExtension;
+import $group__.utilities.helpers.specific.Maps;
 import $group__.utilities.helpers.specific.Throwables;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -45,7 +45,7 @@ public enum Dynamics {
 
 
 	public static final LoadingCache<String, org.reflections.Reflections> REFLECTIONS_CACHE =
-			CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_3).expireAfterAccess(MapsExtension.CACHE_EXPIRATION_ACCESS_DURATION, MapsExtension.CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(Concurrency.MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(t -> {
+			CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_3).expireAfterAccess(Maps.CACHE_EXPIRATION_ACCESS_DURATION, Maps.CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(Concurrency.MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(t -> {
 				org.reflections.Reflections r = new org.reflections.Reflections(t);
 				r.expandSuperTypes();
 				return r;

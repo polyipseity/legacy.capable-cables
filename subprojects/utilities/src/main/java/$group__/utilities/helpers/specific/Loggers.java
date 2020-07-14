@@ -16,8 +16,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import static $group__.utilities.helpers.PreconditionsExtension.checkArgumentTypes;
-import static $group__.utilities.helpers.PreconditionsExtension.checkArrayContentType;
+import static $group__.utilities.helpers.Preconditions.checkArgumentTypes;
+import static $group__.utilities.helpers.Preconditions.checkArrayContentType;
 import static $group__.utilities.helpers.Primitives.PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP;
 import static java.util.Arrays.asList;
 

@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 
-import static $group__.utilities.helpers.specific.MapsExtension.MAP_MAKER_SINGLE_THREAD;
+import static $group__.utilities.helpers.specific.Maps.MAP_MAKER_SINGLE_THREAD;
 import static $group__.utilities.helpers.specific.Optionals.unboxOptional;
 
 public enum GuiHandler implements IGuiHandler {

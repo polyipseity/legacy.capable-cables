@@ -1,7 +1,7 @@
 package $group__.client.gui.structures;
 
 import $group__.client.gui.components.GuiComponent;
-import $group__.utilities.helpers.specific.MapsExtension;
+import $group__.utilities.helpers.specific.Maps;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 

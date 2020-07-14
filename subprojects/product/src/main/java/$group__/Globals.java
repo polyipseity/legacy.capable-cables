@@ -6,7 +6,7 @@ import $group__.client.utilities.ResourceLocationTexture;
 import $group__.logging.ILogging;
 import $group__.utilities.Constants;
 import $group__.utilities.concurrent.MutatorImmutable;
-import $group__.utilities.helpers.specific.MapsExtension;
+import $group__.utilities.helpers.specific.Maps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.ResourceLocation;
@@ -40,7 +40,7 @@ public enum Globals {
 
 
 		public static final Minecraft CLIENT = Minecraft.getMinecraft();
-		private static final ConcurrentMap<Object, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ?>> PRE_INIT_GUI_LISTENER_MAP = MapsExtension.MAP_MAKER_SINGLE_THREAD_WEAK_KEYS.makeMap();
+		private static final ConcurrentMap<Object, BiConsumer<? super GuiScreenEvent.InitGuiEvent.Pre, ?>> PRE_INIT_GUI_LISTENER_MAP = Maps.MAP_MAKER_SINGLE_THREAD_WEAK_KEYS.makeMap();
 		private static ScaledResolution resolution = new ScaledResolution(CLIENT);
 
 

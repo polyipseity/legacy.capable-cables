@@ -3,7 +3,7 @@ package $group__.annotations.processors;
 import $group__.annotations.OverridingStatus;
 import $group__.utilities.helpers.Casts;
 import $group__.utilities.helpers.Processors;
-import $group__.utilities.helpers.specific.StreamsExtension;
+import $group__.utilities.helpers.specific.Streams;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
@@ -43,7 +43,7 @@ public final class OverridingStatusProcessor extends AbstractProcessor {
 		SetMultimap<TypeElement, ExecutableElement> typeToExesMMap = MultimapBuilder.hashKeys(INITIAL_CAPACITY_4).hashSetValues(INITIAL_CAPACITY_2).build();
 		roundEnv.getElementsAnnotatedWith(OverridingStatus.class).forEach(e -> typeToExesMMap.put((TypeElement) e.getEnclosingElement(), (ExecutableElement) e));
 
-		Set<TypeElement> pkgFlat = StreamsExtension.streamSmart(roundEnv.getRootElements(), 5).filter(e -> e.asType().getKind() == TypeKind.DECLARED).map(Casts::<TypeElement>castUncheckedUnboxedNonnull).collect(ImmutableSet.toImmutableSet());
+		Set<TypeElement> pkgFlat = Streams.streamSmart(roundEnv.getRootElements(), 5).filter(e -> e.asType().getKind() == TypeKind.DECLARED).map(Casts::<TypeElement>castUncheckedUnboxedNonnull).collect(ImmutableSet.toImmutableSet());
 
 		Elements elements = processingEnv.getElementUtils();
 		Types types = processingEnv.getTypeUtils();
