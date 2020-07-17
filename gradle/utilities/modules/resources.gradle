@@ -36,6 +36,12 @@ project.ext.makeResourcesTasks = { Closure c ->
 
             Binding eb = new Binding(e)
             eachFile { it.path = evaluateGStringString.call it.path, eb }
+
+            doLast {
+                List<File> markedForDeletion = []
+                destinationDir.eachDirRecurse { if (it.directorySize() == 0) markedForDeletion << it }
+                markedForDeletion.each { it.deleteDir() }
+            }
         }
     }
 }
