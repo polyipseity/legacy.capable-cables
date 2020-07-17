@@ -1,7 +1,12 @@
 package $group__;
 
 public enum Constants {
-	/* MARK empty */;
+	;
+
+	public static final String
+			MOD_ID = "${modId}",
+			GROUP = "${group}",
+			NAME = "${name}";
 
 	@SuppressWarnings({"SpellCheckingInspection", "RedundantSuppression"})
 	public static final String

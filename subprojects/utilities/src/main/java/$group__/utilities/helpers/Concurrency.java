@@ -1,11 +1,11 @@
 package $group__.utilities.helpers;
 
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.api.distmarker.Dist;
 
 public enum Concurrency {
-	/* MARK empty */;
+	;
 
-
-	public static final int MULTI_THREAD_THREAD_COUNT = Side.values().length;
-	public static final int SINGLE_THREAD_THREAD_COUNT = 1;
+	public static final int
+			MULTI_THREAD_THREAD_COUNT = Dist.values().length,
+			SINGLE_THREAD_THREAD_COUNT = 1;
 }

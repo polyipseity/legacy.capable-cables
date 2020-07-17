@@ -2,6 +2,7 @@ package $group__.client.gui.structures;
 
 import $group__.client.gui.components.GuiComponent;
 import $group__.utilities.helpers.specific.Maps;
+import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -16,42 +17,56 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static $group__.utilities.helpers.specific.Throwables.unexpected;
-
 @OnlyIn(Dist.CLIENT)
 public final class GuiAnchors implements Consumer<Rectangle2D> {
-	protected final ConcurrentMap<AnchorSide, Anchor> anchors = MapsExtension.MAP_MAKER_SINGLE_THREAD.makeMap();
+	protected final ConcurrentMap<AnchorSide, Anchor> anchors = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
+	public double border;
+
+	public GuiAnchors(double border) { this.border = border; }
+
+	public GuiAnchors() { this(0); }
 
 	@Override
 	public void accept(Rectangle2D from) { anchors.values().removeIf(anchor -> !anchor.apply(from)); }
 
-	public void add(Anchor anchor) {
-		switch (anchor.fromSide) {
-			case UP:
-			case DOWN:
-				remove(AnchorSide.VERTICAL);
-				break;
-			case VERTICAL:
-				remove(AnchorSide.UP);
-				remove(AnchorSide.DOWN);
-				break;
-			case LEFT:
-			case RIGHT:
-				remove(AnchorSide.HORIZONTAL);
-				break;
-			case HORIZONTAL:
-				remove(AnchorSide.LEFT);
-				remove(AnchorSide.RIGHT);
-				break;
-			default:
-				throw unexpected();
+	public void add(Anchor... anchors) {
+		for (Anchor anchor : anchors) {
+			switch (anchor.fromSide) {
+				case UP:
+				case DOWN:
+					remove(AnchorSide.VERTICAL);
+					break;
+				case VERTICAL:
+					remove(AnchorSide.UP);
+					remove(AnchorSide.DOWN);
+					break;
+				case LEFT:
+				case RIGHT:
+					remove(AnchorSide.HORIZONTAL);
+					break;
+				case HORIZONTAL:
+					remove(AnchorSide.LEFT);
+					remove(AnchorSide.RIGHT);
+					break;
+				default:
+					throw BecauseOf.unexpected();
+			}
+			this.anchors.put(anchor.fromSide, anchor);
 		}
-		anchors.put(anchor.fromSide, anchor);
 	}
 
-	public void remove(AnchorSide side) { anchors.remove(side); }
+	public void remove(AnchorSide... sides) { for (AnchorSide side : sides) anchors.remove(side); }
 
-	private enum AnchorSide {
+	public Anchor[] getAnchorsToMatch(GuiComponent to) {
+		return new Anchor[]{
+				new Anchor(to, AnchorSide.UP, AnchorSide.UP),
+				new Anchor(to, AnchorSide.DOWN, AnchorSide.DOWN),
+				new Anchor(to, AnchorSide.LEFT, AnchorSide.LEFT),
+				new Anchor(to, AnchorSide.RIGHT, AnchorSide.RIGHT)
+		};
+	}
+
+	public enum AnchorSide {
 		UP {
 			@Override
 			public AnchorSide getOpposite() { return DOWN; }
@@ -141,7 +156,7 @@ public final class GuiAnchors implements Consumer<Rectangle2D> {
 	}
 
 	@Immutable
-	public static final class Anchor implements Function<Rectangle2D, Boolean> {
+	public final class Anchor implements Function<Rectangle2D, Boolean> {
 		public final WeakReference<GuiComponent> to;
 		public final AnchorSide fromSide;
 		public final AnchorSide toSide;
@@ -160,7 +175,7 @@ public final class GuiAnchors implements Consumer<Rectangle2D> {
 		public Boolean apply(Rectangle2D from) {
 			@Nullable GuiComponent toCopy = to.get();
 			if (toCopy == null) return false;
-			fromSide.getSetter().accept(from, fromSide.getApplyBorder().apply(toSide.getGetter().apply(toCopy.getRectangleView()), border));
+			fromSide.getSetter().accept(from, fromSide.getApplyBorder().apply(toSide.getGetter().apply(toCopy.getRectangleView()), GuiAnchors.this.border + border));
 			return true;
 		}
 	}

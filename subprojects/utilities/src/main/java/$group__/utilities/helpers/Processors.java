@@ -1,5 +1,6 @@
 package $group__.utilities.helpers;
 
+import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableSet;
 
 import javax.annotation.Nullable;
@@ -16,11 +17,9 @@ import java.util.stream.Collectors;
 
 import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_2;
 import static $group__.utilities.helpers.specific.Streams.streamSmart;
-import static $group__.utilities.helpers.specific.Throwables.rejectArguments;
 
 public enum Processors {
-	/* MARK empty */;
-
+	;
 
 	public static boolean isElementAbstract(Element element) { return element.getModifiers().contains(Modifier.ABSTRACT) || element.getKind().isInterface(); }
 
@@ -91,7 +90,7 @@ public enum Processors {
 
 	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Class<A> annotationType, ExecutableElement executable, Elements elements, Types types) throws IllegalArgumentException {
 		A[] r = getEffectiveAnnotationsWithInheritingConsidered(annotationType, executable, elements, types);
-		if (r.length != 1) rejectArguments(annotationType, executable);
+		if (r.length != 1) throw BecauseOf.illegalArgument("annotationType", annotationType, "executable", executable);
 		return r[0];
 	}
 }

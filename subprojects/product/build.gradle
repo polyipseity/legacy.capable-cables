@@ -11,7 +11,6 @@ apply from: "$utilitiesDir${separator}io${separator}io.gradle"
 apply from: "$utilitiesDir${separator}io${separator}properties${separator}properties.gradle"
 apply from: "$utilitiesDir${separator}io${separator}properties${separator}ext.properties.gradle"
 
-apply from: "$modulesDir${separator}optional${separator}scala.gradle"
 apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
 apply from: "$modulesDir${separator}optional${separator}mod.gradle"
 
@@ -20,6 +19,7 @@ makeSourceTasks.call { Task it ->
 	it.inputs.properties([
 			expand_group: project.group,
 			expand_modId: modId,
+			expand_name : name_,
 	])
 }
 

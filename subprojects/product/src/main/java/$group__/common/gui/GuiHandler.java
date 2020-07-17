@@ -1,9 +1,10 @@
 package $group__.common.gui;
 
-import net.minecraft.entity.player.EntityPlayer;
+import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.network.IGuiHandler;
-import net.minecraftforge.fml.relauncher.Side;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -15,10 +16,9 @@ import static $group__.utilities.helpers.specific.Optionals.unboxOptional;
 public enum GuiHandler implements IGuiHandler {
 	INSTANCE;
 
-
 	public static final ConcurrentMap<Integer, IGuiHandler> GUI_MAP = MAP_MAKER_SINGLE_THREAD.makeMap();
-	protected static final GuiHandlerFunctional DEFAULT = (side, id, player, world, x, y, z) -> {
-		throw rejectArguments(side, id, player, world, x, y, z);
+	protected static final GuiHandlerFunctional DEFAULT = (distribution, id, player, world, x, y, z) -> {
+		throw BecauseOf.illegalArgument("id", id);
 	};
 
 
@@ -33,24 +33,23 @@ public enum GuiHandler implements IGuiHandler {
 
 	@Nullable
 	@Override
-	public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) { return GUI_MAP.getOrDefault(id, DEFAULT).getServerGuiElement(id, player, world, x, y, z); }
+	public Object getServerGuiElement(int id, PlayerEntity player, World world, int x, int y, int z) { return GUI_MAP.getOrDefault(id, DEFAULT).getServerGuiElement(id, player, world, x, y, z); }
 
 	@Nullable
 	@Override
-	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) { return GUI_MAP.getOrDefault(id, DEFAULT).getClientGuiElement(id, player, world, x, y, z); }
+	public Object getClientGuiElement(int id, PlayerEntity player, World world, int x, int y, int z) { return GUI_MAP.getOrDefault(id, DEFAULT).getClientGuiElement(id, player, world, x, y, z); }
 
 
 	@FunctionalInterface
 	public interface GuiHandlerFunctional extends IGuiHandler {
-		@Nullable
-		@Override
-		default Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) { return unboxOptional(tryGetGuiElement(Side.SERVER, id, player, world, x, y, z)); }
+		Optional<Object> tryGetGuiElement(Dist distribution, int id, PlayerEntity player, World world, int x, int y, int z);
 
 		@Nullable
 		@Override
-		default Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) { return unboxOptional(tryGetGuiElement(Side.CLIENT, id, player, world, x, y, z)); }
+		default Object getServerGuiElement(int id, PlayerEntity player, World world, int x, int y, int z) { return unboxOptional(tryGetGuiElement(Dist.DEDICATED_SERVER, id, player, world, x, y, z)); }
 
-
-		Optional<Object> tryGetGuiElement(Side side, int id, EntityPlayer player, World world, int x, int y, int z);
+		@Nullable
+		@Override
+		default Object getClientGuiElement(int id, PlayerEntity player, World world, int x, int y, int z) { return unboxOptional(tryGetGuiElement(Dist.CLIENT, id, player, world, x, y, z)); }
 	}
 }

@@ -40,7 +40,7 @@ public enum TextComponents {
 
 	public static void openURI(URI uri) { Util.getOSType().openURI(uri); }
 
-	public static void renderComponentHoverEffect(Minecraft game, @Nullable ITextComponent component, int mouseX, int mouseY, int width, int height, FontRenderer font) {
+	public static void renderComponentHoverEffect(Minecraft client, @Nullable ITextComponent component, int mouseX, int mouseY, int width, int height, FontRenderer font) {
 		if (component != null && component.getStyle().getHoverEvent() != null) {
 			HoverEvent event = component.getStyle().getHoverEvent();
 			if (event.getAction() == HoverEvent.Action.SHOW_ITEM) {
@@ -52,9 +52,9 @@ public enum TextComponents {
 
 				if (stack.isEmpty())
 					Tooltips.renderTooltip(TextFormatting.RED + "Invalid Item!", mouseX, mouseY, width, height, font);
-				else Tooltips.renderTooltip(game, stack, mouseX, mouseY, width, height, font);
+				else Tooltips.renderTooltip(client, stack, mouseX, mouseY, width, height, font);
 			} else if (event.getAction() == HoverEvent.Action.SHOW_ENTITY) {
-				if (game.gameSettings.advancedItemTooltips) {
+				if (client.gameSettings.advancedItemTooltips) {
 					try {
 						CompoundNBT nbt = JsonToNBT.getTagFromJson(event.getValue().getString());
 						List<String> list = Lists.newArrayList();
@@ -73,7 +73,7 @@ public enum TextComponents {
 					}
 				}
 			} else if (event.getAction() == HoverEvent.Action.SHOW_TEXT) {
-				Tooltips.renderTooltip(game.fontRenderer.listFormattedStringToWidth(event.getValue().getFormattedText(), Math.max(width / 2, Tooltips.TOOLTIP_WIDTH_MAX)), mouseX, mouseY, width, height, font);
+				Tooltips.renderTooltip(client.fontRenderer.listFormattedStringToWidth(event.getValue().getFormattedText(), Math.max(width / 2, Tooltips.TOOLTIP_WIDTH_MAX)), mouseX, mouseY, width, height, font);
 			}
 
 			GlStateManager.disableLighting();

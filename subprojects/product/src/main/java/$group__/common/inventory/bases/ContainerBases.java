@@ -1,21 +1,20 @@
 package $group__.common.inventory.bases;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 
 import java.util.List;
 import java.util.function.BiFunction;
 
 public enum ContainerBases {
-	/* MARK empty */;
-
+	;
 
 	@SuppressWarnings("SameReturnValue")
 	public static boolean canInteractWithBase() { return true; }
 
-	public static ItemStack transferStackInSlotBase(Container container, EntityPlayer playerIn, int index,
+	public static ItemStack transferStackInSlotBase(Container container, PlayerEntity playerIn, int index,
 	                                                BiFunction<ItemStack, Integer, BiFunction<Integer, Boolean,
 			                                                Boolean>> mergeItemStackFunction) {
 		List<Slot> inv = container.inventorySlots;

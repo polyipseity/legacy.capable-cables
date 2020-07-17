@@ -1,1 +1,1 @@
-${group}.${modId}.annotations.processors.OverridingStatusProcessor,isolating
+${group}.annotations.processors.OverridingStatusProcessor,isolating

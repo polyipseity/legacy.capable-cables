@@ -12,7 +12,6 @@ makeSourceTasks.call { Task it ->
     //noinspection GrUnresolvedAccess
     it.inputs.properties([
             expand_group: project.group,
-            expand_modId: modId
     ])
 }
 

@@ -1,17 +1,11 @@
 package $group__.common.registrables.materials;
 
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialColor;
+import net.minecraft.block.material.PushReaction;
 
 public enum Materials {
-	/* MARK empty */;
+	;
 
-	public static final Material PETRIFIED_SKY = new Material(MapColor.PURPLE);
-
-
-	/* REFERENCE material template */
-
-	@SuppressWarnings("unused")
-	private static final Material TEMPLATE_ = new Material(MapColor.AIR)
-			.setReplaceable(); // COMMENT overrides are required for unlisted here
+	public static final Material PETRIFIED_SKY = new Material(MaterialColor.PURPLE, false, true, true, true, false, false, false, PushReaction.NORMAL);
 }

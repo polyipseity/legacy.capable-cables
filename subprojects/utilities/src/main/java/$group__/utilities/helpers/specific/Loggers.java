@@ -25,8 +25,10 @@ public enum Loggers {
 	/* MARK empty */;
 
 
-	public static final String PREFIX_REFLECTION = "Reflection: ";
-	public static final String PREFIX_INVOCATION = "Invocation: ";
+	public static final String
+			PREFIX_MOD_LIFECYCLE = "Mod lifecycle: ",
+			PREFIX_REFLECTION = "Reflection: ",
+			PREFIX_INVOCATION = "Invocation: ";
 
 
 	public enum EnumMessages {
@@ -41,6 +43,18 @@ public enum Loggers {
 			protected Message makeMessage1(Object... args) {
 				return new ParameterizedMessage((String) args[0],
 						(Object[]) args[1]);
+			}
+		},
+		PREFIX_MOD_LIFECYCLE_MESSAGE(PREFIX_MOD_LIFECYCLE + "{}", false,
+				Message.class) {
+			private ParameterizedMessage makeMessage0(Message msg) {
+				return new ParameterizedMessage(message,
+						msg.getFormattedMessage());
+			}
+
+			@Override
+			protected Message makeMessage1(Object... args) {
+				return makeMessage0((Message) args[0]);
 			}
 		},
 		SUFFIX_WITH_THROWABLE("{}",
@@ -131,7 +145,7 @@ public enum Loggers {
 						(Class<?>) args[1], (String) args[2], (MethodType) args[3], (Class<?>) args[4]);
 			}
 		},
-		@SuppressWarnings("SpellCheckingInspection") INVOCATION_UNABLE_TO_UNREFLECT_MEMBER(PREFIX_INVOCATION + "Unable to unreflect {} '{}' with lookup '{}'{}", 1,
+		INVOCATION_UNABLE_TO_UN_REFLECT_MEMBER(PREFIX_INVOCATION + "Unable to un-reflect {} '{}' with lookup '{}'{}", 1,
 				String.class, Member.class, Lookup.class, Class.class) {
 			private ParameterizedMessage makeMessage0(String description, Member member, Lookup lookup,
 			                                          @Nullable Class<?> specialCaller) {

@@ -1,3 +1,0 @@
-package $group__.compat.convert
-
-object JavaConvertersExtension extends DecorateAsJavaExtension with DecorateAsScalaExtension

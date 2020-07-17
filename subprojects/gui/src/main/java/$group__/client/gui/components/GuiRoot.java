@@ -1,10 +1,11 @@
 package $group__.client.gui.components;
 
 import $group__.client.gui.utilities.Backgrounds;
-import $group__.client.gui.utilities.GUIs;
+import $group__.client.gui.utilities.GuiUtilities;
 import $group__.client.gui.utilities.TextComponents;
 import $group__.client.gui.utilities.Tooltips;
 import $group__.utilities.helpers.Adapters;
+import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.IGuiEventListener;
@@ -14,7 +15,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 @OnlyIn(Dist.CLIENT)
@@ -26,6 +26,10 @@ public class GuiRoot extends GuiContainer {
 	public GuiRoot(ITextComponent title) { screen = new ScreenAdapted(title); }
 
 	protected GuiRoot(ScreenAdapted screen) { this.screen = screen; }
+
+	@Override
+	@Deprecated
+	protected void onAdded(GuiContainer parent) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
 
 	@Override
 	protected void onInitialize() {
@@ -40,6 +44,10 @@ public class GuiRoot extends GuiContainer {
 	}
 
 	@Override
+	@Deprecated
+	protected void onRemoved(GuiContainer parent) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
+
+	@Override
 	protected void onClose() {
 		super.onClose();
 		screen.getMinecraft().displayGuiScreen(null);
@@ -49,21 +57,9 @@ public class GuiRoot extends GuiContainer {
 
 	////////// Screen Compatibility //////////
 
-	public ScreenAdapted asScreen() { return screen; }
+	protected ScreenAdapted asScreen() { return screen; }
 
-	@Override
-	public boolean isDragging() { return screen.isDragging(); }
-
-	@Override
-	public void setDragging(boolean dragging) { screen.setDragging(dragging); }
-
-	@Nullable
-	@Override
-	public IGuiEventListener getFocused() { return screen.getFocused(); }
-
-	@Override
-	public void setFocused(@Nullable IGuiEventListener focused) { screen.setFocused(focused); }
-
+	@SuppressWarnings("deprecation")
 	protected class ScreenAdapted extends Screen {
 		protected ScreenAdapted(ITextComponent title) { super(title); }
 
@@ -80,9 +76,8 @@ public class GuiRoot extends GuiContainer {
 		protected void init() { GuiRoot.this.onInitialize(); }
 
 		@Override
-		@Deprecated
-		public void resize(Minecraft game, int width, int height) {
-			super.resize(game, width, height);
+		public void resize(Minecraft client, int width, int height) {
+			super.resize(client, width, height);
 			//GuiRoot.this.onResize(); // resize calls init
 		}
 
@@ -100,7 +95,7 @@ public class GuiRoot extends GuiContainer {
 		public void onClose() { GuiRoot.this.onClose(); }
 
 		@Override
-		public void removed() { GuiRoot.this.onRemoved(); }
+		public void removed() { GuiRoot.this.onDestroy(); }
 
 		@Override
 		public boolean keyPressed(int key, int scanCode, int modifiers) { return GuiRoot.this.keyPressed(key, scanCode, modifiers); }
@@ -124,7 +119,7 @@ public class GuiRoot extends GuiContainer {
 		public boolean charTyped(char codePoint, int modifiers) { return GuiRoot.this.charTyped(codePoint, modifiers); }
 
 		@Override
-		public boolean changeFocus(boolean forward) { return GuiRoot.this.changeFocus(forward); }
+		public boolean changeFocus(boolean next) { return GuiRoot.this.changeFocus(next); }
 
 		@Override
 		public void mouseMoved(double mouseX, double mouseY) { GuiRoot.this.mouseMoved(mouseX, mouseY); }
@@ -166,32 +161,32 @@ public class GuiRoot extends GuiContainer {
 
 		@Override
 		@Deprecated
-		protected void hLine(int x1, int x2, int y, int color) { GUIs.hLine(x1, x2, y, color); }
+		protected void hLine(int x1, int x2, int y, int color) { GuiUtilities.hLine(x1, x2, y, color); }
 
 		@Override
 		@Deprecated
-		protected void vLine(int x, int y1, int y2, int color) { GUIs.vLine(x, y1, y2, color); }
+		protected void vLine(int x, int y1, int y2, int color) { GuiUtilities.vLine(x, y1, y2, color); }
 
 		@Override
 		@Deprecated
-		protected void fillGradient(int x1, int y1, int x2, int y2, int colorY1, int colorY2) { GUIs.fillGradient(x1, y1, x2, y2, blitOffset, colorY1, colorY2); }
+		protected void fillGradient(int x1, int y1, int x2, int y2, int colorY1, int colorY2) { GuiUtilities.fillGradient(x1, y1, x2, y2, blitOffset, colorY1, colorY2); }
 
 		@Override
 		@Deprecated
-		public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { GUIs.drawCenteredString(font, string, x, y, color); }
+		public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { GuiUtilities.drawCenteredString(font, string, x, y, color); }
 
 		@Override
 		@Deprecated
-		public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { GUIs.drawRightAlignedString(font, string, x, y, color); }
+		public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { GuiUtilities.drawRightAlignedString(font, string, x, y, color); }
 
 		@Override
 		@Deprecated
-		public void drawString(FontRenderer font, String string, int x, int y, int color) { GUIs.drawString(font, string, x, y, color); }
+		public void drawString(FontRenderer font, String string, int x, int y, int color) { GuiUtilities.drawString(font, string, x, y, color); }
 
 		@SuppressWarnings("MagicNumber")
 		@Override
 		@Deprecated
-		public void blit(int x, int y, int u, int v, int xLength, int yLength) { GUIs.blit(x, y, blitOffset, u, v, xLength, yLength, 256, 256); }
+		public void blit(int x, int y, int u, int v, int xLength, int yLength) { GuiUtilities.blit(x, y, blitOffset, u, v, xLength, yLength, 256, 256); }
 
 		@Override
 		@Deprecated

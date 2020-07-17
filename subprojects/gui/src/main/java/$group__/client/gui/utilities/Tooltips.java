@@ -19,17 +19,17 @@ public enum Tooltips {
 	;
 	public static final int TOOLTIP_WIDTH_MAX = 200;
 
-	public static List<String> getTooltipFromItem(Minecraft game, ItemStack stack) {
-		List<ITextComponent> tt = stack.getTooltip(game.player, game.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
+	public static List<String> getTooltipFromItem(Minecraft client, ItemStack stack) {
+		List<ITextComponent> tt = stack.getTooltip(client.player, client.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
 		List<String> r = Lists.newArrayList();
 		for (ITextComponent text : tt) r.add(text.getFormattedText());
 		return r;
 	}
 
-	public static void renderTooltip(Minecraft game, ItemStack stack, int mouseX, int mouseY, int width, int height, FontRenderer fontDefault) {
+	public static void renderTooltip(Minecraft client, ItemStack stack, int mouseX, int mouseY, int width, int height, FontRenderer fontDefault) {
 		@Nullable FontRenderer font = stack.getItem().getFontRenderer(stack);
 		GuiUtils.preItemToolTip(stack);
-		renderTooltip(getTooltipFromItem(game, stack), mouseX, mouseY, width, height, (font == null ? fontDefault : font));
+		renderTooltip(getTooltipFromItem(client, stack), mouseX, mouseY, width, height, (font == null ? fontDefault : font));
 		GuiUtils.postItemToolTip();
 	}
 

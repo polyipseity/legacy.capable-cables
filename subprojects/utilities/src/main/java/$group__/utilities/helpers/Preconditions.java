@@ -1,21 +1,21 @@
 package $group__.utilities.helpers;
 
 import $group__.utilities.helpers.specific.Maps;
-import $group__.utilities.helpers.specific.Throwables;
+import $group__.utilities.helpers.specific.ThrowableUtilities;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.ConcurrentMap;
 
 import static $group__.utilities.helpers.Dynamics.getCallerClass;
+import static $group__.utilities.helpers.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkElementIndex;
 import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 public enum Preconditions {
-	/* MARK empty */;
-
+	;
 
 	private static final ConcurrentMap<Class<?>, Throwable> RAN_ONCE = Maps.MAP_MAKER_MULTI_THREAD.makeMap();
 
@@ -36,14 +36,13 @@ public enum Preconditions {
 
 
 	public static void requireRunOnceOnly(@Nullable Logger logger) throws IllegalStateException {
-		Throwable t = Throwables.newThrowable();
+		Throwable t = ThrowableUtilities.create();
 
 		@Nullable Throwable t1 = RAN_ONCE.put(getCallerClass(), t);
 		if (t1 != null) {
 			if (logger != null)
 				logger.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Illegal second invocation, previous stacktrace:{}{}", lineSeparator(), getStackTrace(t1)));
-			throw Throwables.throw_(new IllegalStateException(Throwables.rejectAttemptString("illegal second invocation",
-					t.getStackTrace())));
+			throw new IllegalStateException("Illegal second invocation", t);
 		}
 
 		if (logger != null)

@@ -3,7 +3,7 @@ package $group__.utilities.helpers.specific;
 import java.awt.*;
 import java.util.regex.Matcher;
 
-import static $group__.utilities.Constants.RADIX_HEX;
+import static $group__.utilities.helpers.RadixUtilities.RADIX_HEX;
 import static $group__.utilities.helpers.specific.Patterns.HASH_PATTERN;
 
 public enum Colors {

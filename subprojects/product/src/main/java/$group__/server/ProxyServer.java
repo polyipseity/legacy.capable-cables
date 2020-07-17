@@ -1,4 +1,4 @@
-package $group__.client;
+package $group__.server;
 
 import $group__.proxies.Proxy;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -6,11 +6,11 @@ import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
 import org.apache.logging.log4j.Logger;
 
-import static net.minecraftforge.api.distmarker.Dist.CLIENT;
+import static net.minecraftforge.api.distmarker.Dist.DEDICATED_SERVER;
 
-@OnlyIn(CLIENT)
-public final class ProxyClient extends Proxy implements IProxyClient {
-	public ProxyClient(Logger logger) { super(logger); }
+@OnlyIn(DEDICATED_SERVER)
+public final class ProxyServer extends Proxy implements IProxyServer {
+	public ProxyServer(Logger logger) { super(logger); }
 
 	@Override
 	public boolean onModLifecycle(ModLifecycleEvent event) {

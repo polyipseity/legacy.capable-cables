@@ -22,7 +22,7 @@ public enum Backgrounds {
 	@SuppressWarnings("MagicNumber")
 	public static void renderBackground(Screen screen, int z, int vOffset) {
 		if (screen.getMinecraft().world != null) {
-			GUIs.fillGradient(0, 0, screen.width, screen.height, z, 0xc0101010, 0xd0101010);
+			GuiUtilities.fillGradient(0, 0, screen.width, screen.height, z, 0xc0101010, 0xd0101010);
 			drawnBackground(screen);
 		} else renderDirtBackground(screen, vOffset);
 	}
