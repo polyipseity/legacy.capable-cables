@@ -5,13 +5,9 @@
 import static java.io.File.separator
 
 
-/* SECTION check */
-
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['evaluateGStringString'])
 
-
-/* SECTION methods */
 
 project.ext.makeResourcesTasks = { Closure c ->
     tasks.withType(ProcessResources) { ProcessResources t ->
@@ -36,12 +32,16 @@ project.ext.makeResourcesTasks = { Closure c ->
             }
 
             // COMMENT copy everything else except the processed files
-            from(sourceSets."$sourceSetName".resources.srcDirs) {
-                exclude '**/*.in'
-            }
+            from(sourceSets."$sourceSetName".resources.srcDirs) { exclude '**/*.in' }
 
             Binding eb = new Binding(e)
             eachFile { it.path = evaluateGStringString.call it.path, eb }
+
+            doLast {
+                List<File> markedForDeletion = []
+                destinationDir.eachDirRecurse { if (it.directorySize() == 0) markedForDeletion << it }
+                markedForDeletion.each { it.deleteDir() }
+            }
         }
     }
 }

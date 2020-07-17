@@ -1,0 +1,53 @@
+//////////////////////////////////////////////////
+// TITLE Gradle Build Script
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+apply from: "$utilitiesDir${separator}miscellaneous.gradle"
+apply from: "$utilitiesDir${separator}globals.gradle"
+apply from: "$utilitiesDir${separator}collections.gradle"
+apply from: "$utilitiesDir${separator}io${separator}io.gradle"
+apply from: "$utilitiesDir${separator}io${separator}properties${separator}properties.gradle"
+apply from: "$utilitiesDir${separator}io${separator}properties${separator}ext.properties.gradle"
+
+apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
+apply from: "$modulesDir${separator}optional${separator}mod.gradle"
+
+makeSourceTasks.call { Task it ->
+	//noinspection GrUnresolvedAccess
+	it.inputs.properties([
+			expand_group: project.group,
+			expand_modId: modId,
+			expand_name : name_,
+	])
+}
+
+makeResourcesTasks.call { Task it ->
+	//noinspection GrUnresolvedAccess
+	it.inputs.properties([
+			expand_modLoader         : modLoader,
+			expand_loaderVersion     : loaderVersion,
+			expand_issueTrackerURLKey: issueTrackerURL.empty ? '' : 'issueTrackerURL=',
+			expand_issueTrackerURL   : issueTrackerURL.empty ? '' : "\"$issueTrackerURL\"",
+			expand_showAsResourcePack: showAsResourcePack,
+			expand_modId             : modId,
+			expand_version           : version,
+			expand_displayName       : name_,
+			expand_namespaceKey      : namespace.empty ? '' : 'namespace=',
+			expand_namespace         : namespace.empty ? '' : "\"$namespace\"",
+			expand_updateJSONURLKey  : updateJSONURL.empty ? '' : 'updateJSONURL=',
+			expand_updateJSONURL     : updateJSONURL.empty ? '' : "\"$updateJSONURL\"",
+			expand_displayURLKey     : displayURL.empty ? '' : 'displayURL=',
+			expand_displayURL        : displayURL.empty ? '' : "\"$displayURL\"",
+			expand_logoFile          : logoFile,
+			expand_credits           : credits,
+			expand_authors           : authors,
+			expand_description       : project.description,
+			expand_dependencies      : dependencies_,
+			expand_name              : name_,
+			expand_pack_format       : pack_format,
+	])
+}
+
+makeJUnitPlatformTests.call()

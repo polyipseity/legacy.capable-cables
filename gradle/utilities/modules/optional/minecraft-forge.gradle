@@ -5,18 +5,12 @@
 import static java.io.File.separator
 
 
-/* SECTION check */
-
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['stringToStringMap', 'evaluateGString'])
 
 
-/* SECTION application */
-
 apply plugin: 'net.minecraftforge.gradle'
 
-
-/* SECTION configuration */
 
 minecraft {
     // The mappings can be changed at any time, and must be in the following format.
@@ -28,63 +22,6 @@ minecraft {
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     if (!accessTransformerPath.empty) accessTransformer = file accessTransformerPath
-
-    // Default run configurations.
-    // These can be tweaked, removed, or duplicated as needed.
-    runs {
-        //noinspection SpellCheckingInspection
-        client {
-            workingDirectory file(minecraftRunDir)
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            //noinspection GroovyAssignabilityCheck
-            mods.create(modId) {
-                //noinspection GroovyAssignabilityCheck
-                source sourceSets.main
-            }
-        }
-
-        //noinspection SpellCheckingInspection
-        server {
-            workingDirectory file(minecraftRunDir)
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            //noinspection GroovyAssignabilityCheck
-            mods.create(modId) {
-                //noinspection GroovyAssignabilityCheck
-                source sourceSets.main
-            }
-        }
-
-        //noinspection SpellCheckingInspection
-        data {
-            workingDirectory file(minecraftRunDir)
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            args '--mod', modId, '--all', '--output', file('src/generated/resources/')
-
-            //noinspection GroovyAssignabilityCheck
-            mods.create(modId) {
-                //noinspection GroovyAssignabilityCheck
-                source sourceSets.main
-            }
-        }
-    }
 }
 
 //noinspection SpellCheckingInspection

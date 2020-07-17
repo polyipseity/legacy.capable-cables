@@ -4,14 +4,8 @@
 
 import static java.io.File.separator
 
-
-/* SECTION check */
-
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['parseArgument'])
-
-
-/* SECTION extra variables */
 
 ext {
     // COMMENT arguments

@@ -6,8 +6,6 @@ import java.util.regex.Pattern
 
 import static java.io.File.separator
 
-/* SECTION build script */
-
 buildscript {
     repositories {
         jcenter()
@@ -21,13 +19,9 @@ buildscript {
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
         classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.4'
-        classpath "org.jetbrains.gradle.plugin.idea-ext:org.jetbrains.gradle.plugin.idea-ext.gradle.plugin:0.7"
     }
     // COMMENT Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 }
-
-
-/* SECTION all projects */
 
 configurations {
     debug {
@@ -38,15 +32,10 @@ configurations {
 }
 
 allprojects {
-    /* SECTION extra variables */
-
     ext {
         utilitiesDir = "$rootDir${separator}gradle${separator}utilities".toString()
         modulesDir = "$utilitiesDir${separator}modules".toString()
     }
-
-
-    /* SECTION application */
 
     apply from: "$modulesDir${separator}plugins.gradle"
 
@@ -58,18 +47,11 @@ allprojects {
     apply from: "$utilitiesDir${separator}io${separator}properties${separator}properties.gradle"
     apply from: "$utilitiesDir${separator}io${separator}properties${separator}ext.properties.gradle"
 
-
-    /* SECTION extra variables */
-
     loadExt.call "$projectDir${separator}module.properties"
-
-
-    /* SECTION configuration */
 
     apply from: "$modulesDir${separator}versioning.gradle"
     apply from: "$modulesDir${separator}information.gradle"
 
-    apply from: "$modulesDir${separator}configurations.gradle"
     apply from: "$modulesDir${separator}repositories.gradle"
     apply from: "$modulesDir${separator}dependencies.gradle"
 
@@ -89,8 +71,6 @@ allprojects {
 
 apply from: "$utilitiesDir${separator}throwable.gradle"
 
-/* SECTION extra variables */
-
 ext {
     // COMMENT game
     minecraftVersion = minecraftForgeVersion.split('-').first()
@@ -101,14 +81,9 @@ ext {
     modId = project.name
 }
 
-/* SECTION application */
-
 apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
-apply from: "$modulesDir${separator}optional${separator}mod.gradle"
 apply from: "$modulesDir${separator}optional${separator}api.gradle"
 apply from: "$modulesDir${separator}optional${separator}publishing.gradle"
-
-/* SECTION configuration */
 
 afterEvaluate {
     Project pSub = project(subprojectMain)
@@ -120,6 +95,13 @@ afterEvaluate {
                 t.dependsOn it
                 t.configure { enabled false }
             } else task it.name, dependsOn: it
+        }
+        pSub.tasks.whenTaskAdded { Task tSub ->
+            Task t = tasks.findByName(tSub.name)
+            if (t != null) {
+                t.dependsOn tSub
+                t.configure { enabled false }
+            } else task tSub.name, dependsOn: tSub
         }
     }
 }

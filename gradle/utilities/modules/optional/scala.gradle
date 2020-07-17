@@ -1,0 +1,24 @@
+//////////////////////////////////////////////////
+// TITLE Scala
+//////////////////////////////////////////////////
+
+apply plugin: 'scala'
+
+// COMMENT append
+afterEvaluate {
+    dependencies {
+        // COMMENT check https://github.com/MinecraftForge/Scorge
+        implementation "org.scala-lang:scala-library:2.13.1"
+        implementation 'net.minecraftforge:Scorge:3.0.6'
+    }
+
+    afterEvaluate {
+        sourceSets.configureEach {
+            //noinspection GrUnresolvedAccess
+            scala.srcDirs += java.srcDirs
+            java.srcDirs = []
+        }
+    }
+
+    tasks.withType(ScalaCompile) { options.compilerArgs << '-Xexperimental' }
+}

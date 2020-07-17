@@ -2,15 +2,10 @@
 // TITLE Gradle Settings
 //////////////////////////////////////////////////
 
-
-/* SECTION configuration */
-
 rootProject.name = 'capablecables'
 
-
-/* SECTION sub-projects */
-
-include ':annotations'
-include ':utilities'
-include ':annotations:processors'
-include ':product'
+include ':subprojects:annotations'
+include ':subprojects:annotations:processors'
+include ':subprojects:utilities'
+include ':subprojects:gui'
+include ':subprojects:product'

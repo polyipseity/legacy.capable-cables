@@ -2,7 +2,4 @@
 // TITLE Plugins
 //////////////////////////////////////////////////
 
-/* SECTION application */
-
 apply plugin: 'java-library'
-apply plugin: 'scala'

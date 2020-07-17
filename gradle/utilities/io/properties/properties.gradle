@@ -5,13 +5,9 @@
 import static java.io.File.separator
 
 
-/* SECTION check */
-
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['createNewFile'])
 
-
-/* SECTION methods */
 
 project.ext.storeProperties = { Properties prop, String path, String comment = null ->
     File f = file path
