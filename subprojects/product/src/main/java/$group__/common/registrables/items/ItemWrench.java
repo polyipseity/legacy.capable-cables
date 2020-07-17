@@ -206,7 +206,7 @@ public class ItemWrench extends Item {
 				NBTs.readChildIfHasKey(tag, "pickup", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(pickup::set);
 				{
 					NBTs.readChildIfHasKey(pickup.get(), "block", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(t -> pickedUpBlock = t);
-					NBTs.readChildIfHasKey(pickedUpBlock, "state", () -> new IntNBT(0), CompoundNBT::getInt).ifPresent(t -> pickedUpBlockState = t);
+					NBTs.readChildIfHasKey(pickedUpBlock, "state", () -> IntNBT.valueOf(0), CompoundNBT::getInt).ifPresent(t -> pickedUpBlockState = t);
 					NBTs.readChildIfHasKey(pickedUpBlock, "tile", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(t -> pickedUpBlockTile = t);
 				}
 				NBTs.readChildIfHasKey(pickup.get(), "entity", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(t -> pickedUpEntity = t);

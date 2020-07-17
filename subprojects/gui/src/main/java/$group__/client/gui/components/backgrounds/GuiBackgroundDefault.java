@@ -10,5 +10,5 @@ import java.awt.geom.Point2D;
 @OnlyIn(Dist.CLIENT)
 public class GuiBackgroundDefault extends GuiBackground {
 	@Override
-	public void renderBackground(Screen screen, Point2D mouse, float partialTicks) { Backgrounds.renderBackground(screen, 0); }
+	public void renderBackground(Screen screen, Point2D mouse, float partialTicks) { Backgrounds.renderBackground(screen); }
 }

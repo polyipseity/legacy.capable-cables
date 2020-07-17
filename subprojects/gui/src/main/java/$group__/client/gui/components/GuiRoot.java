@@ -169,7 +169,7 @@ public class GuiRoot extends GuiContainer {
 
 		@Override
 		@Deprecated
-		protected void fillGradient(int x1, int y1, int x2, int y2, int colorY1, int colorY2) { GuiUtilities.fillGradient(x1, y1, x2, y2, blitOffset, colorY1, colorY2); }
+		protected void fillGradient(int x1, int y1, int x2, int y2, int colorY1, int colorY2) { GuiUtilities.fillGradient(x1, y1, x2, y2, getBlitOffset(), colorY1, colorY2); }
 
 		@Override
 		@Deprecated
@@ -186,15 +186,15 @@ public class GuiRoot extends GuiContainer {
 		@SuppressWarnings("MagicNumber")
 		@Override
 		@Deprecated
-		public void blit(int x, int y, int u, int v, int xLength, int yLength) { GuiUtilities.blit(x, y, blitOffset, u, v, xLength, yLength, 256, 256); }
+		public void blit(int x, int y, int u, int v, int xLength, int yLength) { GuiUtilities.blit(x, y, getBlitOffset(), u, v, xLength, yLength, 256, 256); }
 
 		@Override
 		@Deprecated
-		public void renderBackground() { Backgrounds.renderBackground(this, blitOffset); }
+		public void renderBackground() { Backgrounds.renderBackground(this, getBlitOffset()); }
 
 		@Override
 		@Deprecated
-		public void renderBackground(int vOffset) { Backgrounds.renderBackground(this, blitOffset, vOffset); }
+		public void renderBackground(int vOffset) { Backgrounds.renderBackground(this, vOffset); }
 
 		@Override
 		@Deprecated

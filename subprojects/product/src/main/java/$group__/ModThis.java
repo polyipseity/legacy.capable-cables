@@ -12,8 +12,6 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
 
-import java.util.function.Supplier;
-
 import static $group__.Constants.MOD_ID;
 import static $group__.Globals.LOGGER;
 import static $group__.common.registrables.blocks.BlocksThis.BLOCKS;
@@ -24,7 +22,7 @@ import static $group__.utilities.helpers.specific.Loggers.EnumMessages.PREFIX_MO
 @Mod(MOD_ID)
 @EventBusSubscriber(bus = Bus.MOD)
 public final class ModThis extends Singleton {
-	public final IProxy proxy = DistExecutor.runForDist(ModThis::getProxyClientSupplier, ModThis::getProxyServerSupplier);
+	public final IProxy proxy = DistExecutor.unsafeRunForDist(() -> ModThis::getProxyClientSupplier, () -> ModThis::getProxyServerSupplier);
 
 	public ModThis() {
 		super(LOGGER);
@@ -37,9 +35,9 @@ public final class ModThis extends Singleton {
 
 	public static String getNamespacePrefixedName(String name) { return MOD_ID + '.' + name; }
 
-	private static Supplier<IProxy> getProxyClientSupplier() { return () -> new ProxyClient(LOGGER); }
+	private static IProxy getProxyClientSupplier() { return new ProxyClient(LOGGER); }
 
-	private static Supplier<IProxy> getProxyServerSupplier() { return () -> new ProxyServer(LOGGER); }
+	private static IProxy getProxyServerSupplier() { return new ProxyServer(LOGGER); }
 
 	@SubscribeEvent
 	protected void onModLifecycleEvent(ModLifecycleEvent event) {
