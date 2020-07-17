@@ -239,9 +239,7 @@ ext*.properties
 /.idea/runConfigurations/*run*.xml
 
 # Minecraft run directory
-# TODO (Optional) Configurate Minecraft run directory.
 run/
 
 # Minecraft run directory
-# TODO (Optional) Configurate local repository directory.
 /repo/
