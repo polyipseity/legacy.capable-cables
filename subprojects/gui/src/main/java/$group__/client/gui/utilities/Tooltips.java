@@ -6,17 +6,19 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.client.config.GuiUtils;
+import net.minecraftforge.fml.client.gui.GuiUtils;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-@OnlyIn(Dist.CLIENT)
+import static net.minecraftforge.api.distmarker.Dist.CLIENT;
+
+@OnlyIn(CLIENT)
 public enum Tooltips {
 	;
+
 	public static final int TOOLTIP_WIDTH_MAX = 200;
 
 	public static List<String> getTooltipFromItem(Minecraft client, ItemStack stack) {

@@ -3,7 +3,6 @@ package $group__.client.gui.utilities;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonSyntaxException;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -40,6 +39,10 @@ public enum TextComponents {
 
 	public static void openURI(URI uri) { Util.getOSType().openURI(uri); }
 
+	/**
+	 * @see Screen#renderComponentHoverEffect(ITextComponent, int, int)
+	 */
+	@SuppressWarnings("JavadocReference")
 	public static void renderComponentHoverEffect(Minecraft client, @Nullable ITextComponent component, int mouseX, int mouseY, int width, int height, FontRenderer font) {
 		if (component != null && component.getStyle().getHoverEvent() != null) {
 			HoverEvent event = component.getStyle().getHoverEvent();
@@ -75,11 +78,12 @@ public enum TextComponents {
 			} else if (event.getAction() == HoverEvent.Action.SHOW_TEXT) {
 				Tooltips.renderTooltip(client.fontRenderer.listFormattedStringToWidth(event.getValue().getFormattedText(), Math.max(width / 2, Tooltips.TOOLTIP_WIDTH_MAX)), mouseX, mouseY, width, height, font);
 			}
-
-			GlStateManager.disableLighting();
 		}
 	}
 
+	/**
+	 * @see Screen#handleComponentClicked(ITextComponent)
+	 */
 	public static boolean handleComponentClicked(Screen screen, BiConsumer<String, Boolean> insertTextMethod, BiConsumer<String, Boolean> sendMessageMethod, @Nullable ITextComponent component) {
 		if (component != null) {
 			@Nullable ClickEvent event = component.getStyle().getClickEvent();
