@@ -236,7 +236,7 @@ gradle-app.setting
 ext*.properties
 
 # Minecraft generated run configurations
-/.idea/runConfigurations/run*.xml
+/.idea/runConfigurations/*run*.xml
 
 # Minecraft run directory
 # TODO (Optional) Configurate Minecraft run directory.
