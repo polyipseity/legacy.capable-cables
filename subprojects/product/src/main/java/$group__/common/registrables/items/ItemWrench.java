@@ -49,7 +49,7 @@ public class ItemWrench extends Item {
 				BlockRayTraceResult targetBlock = (BlockRayTraceResult) target;
 				if (tag.pickedUpBlock != null) {
 					BlockPos pos = BlockUtilities.getPlacePosition(targetBlock);
-					//noinspection ConstantConditions
+					assert tag.pickedUpBlockState != null;
 					BlockState state = Block.getStateById(tag.pickedUpBlockState);
 					if (!world.setBlockState(pos, state)) {
 						LOGGER.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot create block state ID {}"
@@ -115,6 +115,7 @@ public class ItemWrench extends Item {
 						BlockPos targetPos = BlockUtilities.getPlacePosition(targetBlock);
 						assert tag.pickedUpBlockState != null;
 						BlockState state = Block.getStateById(tag.pickedUpBlockState);
+						// todo blacklist and whitelist system
 						return state.isValidPosition(world, targetPos) && BlockUtilities.checkNoEntityCollision(state, world, targetPos);
 					}
 					return true;

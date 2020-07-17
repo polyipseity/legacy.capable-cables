@@ -2,7 +2,7 @@ package $group__.client;
 
 import $group__.proxies.Proxy;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
 import org.apache.logging.log4j.Logger;
 
@@ -15,8 +15,8 @@ public final class ProxyClient extends Proxy implements IProxyClient {
 	@Override
 	public boolean onModLifecycle(ModLifecycleEvent event) {
 		if (super.onModLifecycle(event)) return true;
-		else if (event instanceof FMLDedicatedServerSetupEvent)
-			return processEvent("Server setup", event, this::onSetupSided);
+		else if (event instanceof FMLClientSetupEvent)
+			return processEvent("Client setup", event, this::onSetupSided);
 		return false;
 	}
 }

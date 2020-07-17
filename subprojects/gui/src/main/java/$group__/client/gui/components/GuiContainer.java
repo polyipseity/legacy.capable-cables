@@ -49,10 +49,10 @@ public class GuiContainer extends GuiComponent {
 			}
 			children.add(component);
 			component.onAdded(this);
-			if (State.INITIALIZED.isReachedBy(state)) component.onInitialize();
+			if (EnumState.INITIALIZED.isReachedBy(state)) component.onInitialize();
 			resize = true;
 		}
-		if (resize && State.READY.isReachedBy(state)) onResize();
+		if (resize && EnumState.READY.isReachedBy(state)) onResize();
 	}
 
 	public void remove(GuiComponent... components) {
@@ -67,7 +67,7 @@ public class GuiContainer extends GuiComponent {
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void render(Point2D mouse, float partialTicks) {
-		if (State.READY.isReachedBy(state))
+		if (EnumState.READY.isReachedBy(state))
 			children.forEach(c -> c.render(toRelativePointForComponent(c, mouse), partialTicks));
 	}
 

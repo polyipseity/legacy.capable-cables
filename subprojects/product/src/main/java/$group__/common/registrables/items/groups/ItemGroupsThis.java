@@ -6,13 +6,13 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import static $group__.ModThis.getResourceLocation;
+import static $group__.ModThis.getNamespacePrefixedName;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 public enum ItemGroupsThis {
 	;
 
-	public static final ItemGroup DEFAULT = new ItemGroup(getResourceLocation("default").toString()) {
+	public static final ItemGroup DEFAULT = new ItemGroup(getNamespacePrefixedName("default")) {
 		@Override
 		@OnlyIn(CLIENT)
 		public ItemStack createIcon() { return new ItemStack(ItemsThis.WRENCH.orElseThrow(BecauseOf::unexpected)); }

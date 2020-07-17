@@ -19,7 +19,7 @@ public abstract class GuiBackground extends GuiComponent {
 
 	@Override
 	public void render(Point2D mouse, float partialTicks) {
-		if (State.READY.isReachedBy(state)) {
+		if (EnumState.READY.isReachedBy(state)) {
 			Screen screen = Adapters.get(GuiRoot.class, Screen.class, GuiRoot.TO_SCREEN_ADAPTER_DEFAULT).orElseThrow(BecauseOf::unexpected).apply(getRoot().orElseThrow(BecauseOf::unexpected));
 			renderBackground(screen, mouse, partialTicks);
 			Backgrounds.drawnBackground(screen);

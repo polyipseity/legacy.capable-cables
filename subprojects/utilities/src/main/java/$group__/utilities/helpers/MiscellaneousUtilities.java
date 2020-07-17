@@ -11,7 +11,7 @@ import static java.util.Objects.requireNonNull;
  * See each method's description for more details.
  *
  * @author William So
- * @since 0.0.1.0
+ * @since 0.0.1
  */
 public enum MiscellaneousUtilities {
 	/* MARK empty */;
@@ -28,7 +28,7 @@ public enum MiscellaneousUtilities {
 	 *
 	 * @return a new {@code Object}
 	 *
-	 * @since 0.0.1.0
+	 * @since 0.0.1
 	 */
 	public static Object newLockObject() { return new Object(); }
 
@@ -44,7 +44,7 @@ public enum MiscellaneousUtilities {
 	 *
 	 * @return parameter {@code x}
 	 *
-	 * @since 0.0.1.0
+	 * @since 0.0.1
 	 */
 	public static <T> T K(T x, @SuppressWarnings("unused") Object... y) { return x; }
 }
