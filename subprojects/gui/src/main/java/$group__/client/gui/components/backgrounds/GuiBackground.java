@@ -15,14 +15,13 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
 public abstract class GuiBackground extends GuiComponent {
-	public abstract void renderBackground(Screen screen, Point2D mouse, float partialTicks);
+	public void renderBackground(Screen screen, Point2D mouse, float partialTicks) { Backgrounds.drawnBackground(screen); }
 
 	@Override
 	public void render(Point2D mouse, float partialTicks) {
 		if (EnumState.READY.isReachedBy(state)) {
 			Screen screen = Adapters.get(GuiRoot.class, Screen.class, GuiRoot.TO_SCREEN_ADAPTER_DEFAULT).orElseThrow(BecauseOf::unexpected).apply(getRoot().orElseThrow(BecauseOf::unexpected));
 			renderBackground(screen, mouse, partialTicks);
-			Backgrounds.drawnBackground(screen);
 		}
 	}
 

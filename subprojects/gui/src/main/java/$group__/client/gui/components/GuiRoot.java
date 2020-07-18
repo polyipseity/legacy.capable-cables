@@ -133,7 +133,7 @@ public class GuiRoot extends GuiContainer {
 
 		@Override
 		@Deprecated
-		protected void renderTooltip(ItemStack item, int mouseX, int mouseY) { Tooltips.renderTooltip(getMinecraft(), item, mouseX, mouseY, width, height, font); }
+		protected void renderTooltip(ItemStack item, int mouseX, int mouseY) { Tooltips.renderTooltip(getMinecraft(), width, height, font, itemRenderer, item, mouseX, mouseY); }
 
 		@Override
 		@Deprecated
@@ -141,23 +141,23 @@ public class GuiRoot extends GuiContainer {
 
 		@Override
 		@Deprecated
-		public void renderTooltip(String tooltip, int mouseX, int mouseY) { Tooltips.renderTooltip(tooltip, mouseX, mouseY, width, height, font); }
+		public void renderTooltip(String tooltip, int mouseX, int mouseY) { Tooltips.renderTooltip(width, height, font, itemRenderer, tooltip, mouseX, mouseY); }
 
 		@Override
 		@Deprecated
-		public void renderTooltip(List<String> tooltip, int mouseX, int mouseY) { Tooltips.renderTooltip(tooltip, mouseX, mouseY, width, height, font); }
+		public void renderTooltip(List<String> tooltip, int mouseX, int mouseY) { Tooltips.renderTooltip(width, height, font, itemRenderer, tooltip, mouseX, mouseY); }
 
 		@Override
 		@Deprecated
-		public void renderTooltip(List<String> tooltip, int mouseX, int mouseY, FontRenderer font) { Tooltips.renderTooltip(tooltip, mouseX, mouseY, width, height, font); }
+		public void renderTooltip(List<String> tooltip, int mouseX, int mouseY, FontRenderer font) { Tooltips.renderTooltip(width, height, itemRenderer, tooltip, mouseX, mouseY, font); }
 
 		@Override
 		@Deprecated
-		protected void renderComponentHoverEffect(ITextComponent component, int mouseX, int mouseY) { TextComponents.renderComponentHoverEffect(getMinecraft(), component, mouseX, mouseY, width, height, font); }
+		protected void renderComponentHoverEffect(ITextComponent component, int mouseX, int mouseY) { TextComponents.renderComponentHoverEffect(getMinecraft(), width, height, font, component, mouseX, mouseY); }
 
 		@Override
 		@Deprecated
-		public boolean handleComponentClicked(ITextComponent component) { return TextComponents.handleComponentClicked(this, this::insertText, this::sendMessage, component); }
+		public boolean handleComponentClicked(ITextComponent component) { return TextComponents.handleComponentClicked(this, component); }
 
 		@Override
 		@Deprecated
@@ -190,14 +190,14 @@ public class GuiRoot extends GuiContainer {
 
 		@Override
 		@Deprecated
-		public void renderBackground() { Backgrounds.renderBackground(this, getBlitOffset()); }
+		public void renderBackground() { Backgrounds.renderBackground(getMinecraft(), width, height); }
 
 		@Override
 		@Deprecated
-		public void renderBackground(int vOffset) { Backgrounds.renderBackground(this, vOffset); }
+		public void renderBackground(int blitOffset) { Backgrounds.renderBackground(getMinecraft(), width, height, blitOffset); }
 
 		@Override
 		@Deprecated
-		public void renderDirtBackground(int vOffset) { Backgrounds.renderDirtBackground(this, vOffset); }
+		public void renderDirtBackground(int blitOffset) { Backgrounds.renderDirtBackground(getMinecraft(), width, height, blitOffset); }
 	}
 }

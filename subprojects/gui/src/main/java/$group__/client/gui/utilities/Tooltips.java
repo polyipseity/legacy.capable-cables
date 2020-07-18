@@ -1,16 +1,12 @@
 package $group__.client.gui.utilities;
 
-import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.client.gui.GuiUtils;
 
-import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
 
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
@@ -19,25 +15,61 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 public enum Tooltips {
 	;
 
-	public static final int TOOLTIP_WIDTH_MAX = 200;
-
+	/**
+	 * @see Screen#getTooltipFromItem(ItemStack)
+	 */
 	public static List<String> getTooltipFromItem(Minecraft client, ItemStack stack) {
-		List<ITextComponent> tt = stack.getTooltip(client.player, client.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
-		List<String> r = Lists.newArrayList();
-		for (ITextComponent text : tt) r.add(text.getFormattedText());
-		return r;
+		return ScreenUtility.INSTANCE
+				.setClient_(client)
+				.getTooltipFromItem(stack);
 	}
 
-	public static void renderTooltip(Minecraft client, ItemStack stack, int mouseX, int mouseY, int width, int height, FontRenderer fontDefault) {
-		@Nullable FontRenderer font = stack.getItem().getFontRenderer(stack);
-		GuiUtils.preItemToolTip(stack);
-		renderTooltip(getTooltipFromItem(client, stack), mouseX, mouseY, width, height, (font == null ? fontDefault : font));
-		GuiUtils.postItemToolTip();
+	/**
+	 * @see Screen#renderTooltip(ItemStack, int, int)
+	 */
+	@SuppressWarnings("JavadocReference")
+	public static void renderTooltip(Minecraft client, int width, int height, FontRenderer font, ItemRenderer itemRenderer, ItemStack item, int mouseX, int mouseY) {
+		ScreenUtility.INSTANCE
+				.setClient_(client)
+				.setWidth_(width)
+				.setHeight_(height)
+				.setFont_(font)
+				.setItemRenderer_(itemRenderer)
+				.renderTooltip(item, mouseX, mouseY);
 	}
 
-	public static void renderTooltip(String tooltip, int mouseX, int mouseY, int width, int height, FontRenderer font) {
-		renderTooltip(Collections.singletonList(tooltip), mouseX, mouseY, width, height, font);
+	/**
+	 * @see Screen#renderTooltip(String, int, int)
+	 */
+	public static void renderTooltip(int width, int height, FontRenderer font, ItemRenderer itemRenderer, String tooltip, int mouseX, int mouseY) {
+		ScreenUtility.INSTANCE
+				.setWidth_(width)
+				.setHeight_(height)
+				.setFont_(font)
+				.setItemRenderer_(itemRenderer)
+				.renderTooltip(tooltip, mouseX, mouseY);
 	}
 
-	public static void renderTooltip(List<String> tooltip, int mouseX, int mouseY, int width, int height, FontRenderer font) { GuiUtils.drawHoveringText(tooltip, mouseX, mouseY, width, height, -1, font); }
+	/**
+	 * @see Screen#renderTooltip(List, int, int)
+	 */
+	public static void renderTooltip(int width, int height, FontRenderer font, ItemRenderer itemRenderer, List<String> tooltip, int mouseX, int mouseY) {
+		ScreenUtility.INSTANCE
+				.setWidth_(width)
+				.setHeight_(height)
+				.setFont_(font)
+				.setItemRenderer_(itemRenderer)
+				.renderTooltip(tooltip, mouseX, mouseY);
+	}
+
+	/**
+	 * @see Screen#renderTooltip(List, int, int, FontRenderer)
+	 */
+	public static void renderTooltip(int width, int height, ItemRenderer itemRenderer, List<String> tooltip, int mouseX, int mouseY, FontRenderer font) {
+		ScreenUtility.INSTANCE
+				.setWidth_(width)
+				.setHeight_(height)
+				.setItemRenderer_(itemRenderer)
+				.renderTooltip(tooltip, mouseX, mouseY, font);
+	}
 }
