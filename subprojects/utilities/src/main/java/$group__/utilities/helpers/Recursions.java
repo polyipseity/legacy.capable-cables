@@ -13,7 +13,7 @@ public enum Recursions {
 
 	@SuppressWarnings("UnusedReturnValue")
 	public static <T, R> Optional<R> recurseAsDepthFirstLoop(T obj, Function<? super T, ? extends R> function,
-	                                                         Function<? super T, ? extends Iterable<? extends T>> splitter, @Nullable Consumer<? super T> reDiscoverer, @Nullable Function<? super Deque<R>, ? extends R> combiner) {
+	                                                         Function<? super T, ? extends Iterable<? extends T>> splitter, @Nullable Consumer<? super T> rediscoverEr, @Nullable Function<? super Deque<R>, ? extends R> combiner) {
 		ArrayDeque<T> stackT = new ArrayDeque<>(Capacities.INITIAL_CAPACITY_3);
 		@Nullable ArrayDeque<R> listR = combiner == null ? null : new ArrayDeque<>(Capacities.INITIAL_CAPACITY_3);
 		stackT.push(obj);
@@ -25,8 +25,8 @@ public enum Recursions {
 				R r = function.apply(t);
 				if (listR != null) listR.add(r);
 				splitter.apply(t).forEach(stackT::push);
-			} else if (reDiscoverer != null)
-				reDiscoverer.accept(t);
+			} else if (rediscoverEr != null)
+				rediscoverEr.accept(t);
 		}
 
 		return listR == null ? Optional.empty() : Optional.ofNullable(combiner.apply(listR));
@@ -35,7 +35,7 @@ public enum Recursions {
 
 	@SuppressWarnings("UnusedReturnValue")
 	public static <T, R> Optional<R> recurseAsBreadthFirstLoop(T obj, Function<? super T, ? extends R> function,
-	                                                           Function<? super T, ? extends Iterable<? extends T>> splitter, @Nullable Consumer<? super T> reDiscoverer, @Nullable Function<? super Deque<R>, ? extends R> combiner) {
+	                                                           Function<? super T, ? extends Iterable<? extends T>> splitter, @Nullable Consumer<? super T> rediscoverEr, @Nullable Function<? super Deque<R>, ? extends R> combiner) {
 		ArrayDeque<T> stackT = new ArrayDeque<>(Capacities.INITIAL_CAPACITY_3);
 		@Nullable ArrayDeque<R> listR = combiner == null ? null : new ArrayDeque<>(Capacities.INITIAL_CAPACITY_3);
 		stackT.add(obj);
@@ -47,8 +47,8 @@ public enum Recursions {
 				R r = function.apply(t);
 				if (listR != null) listR.add(r);
 				splitter.apply(t).forEach(stackT::addLast);
-			} else if (reDiscoverer != null)
-				reDiscoverer.accept(t);
+			} else if (rediscoverEr != null)
+				rediscoverEr.accept(t);
 		}
 
 		return listR == null ? Optional.empty() : Optional.ofNullable(combiner.apply(listR));

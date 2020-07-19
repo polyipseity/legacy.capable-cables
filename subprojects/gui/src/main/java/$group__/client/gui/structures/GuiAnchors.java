@@ -5,10 +5,12 @@ import $group__.client.gui.traits.IGuiReRectangleHandler;
 import $group__.utilities.helpers.Recursions;
 import $group__.utilities.helpers.specific.Maps;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.helpers.specific.ThrowableUtilities.Try;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import javax.annotation.Nullable;
@@ -21,8 +23,12 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-@OnlyIn(Dist.CLIENT)
-public final class GuiAnchors {
+import static net.minecraftforge.api.distmarker.Dist.CLIENT;
+
+@OnlyIn(CLIENT)
+public final class GuiAnchors implements Cloneable {
+	private static final Logger LOGGER = LogManager.getLogger();
+
 	private final ConcurrentMap<AnchorSide, Anchor> anchors = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
 	public double border;
 
@@ -65,6 +71,10 @@ public final class GuiAnchors {
 			if (anchor != null) anchor.onRemoved();
 		}
 	}
+
+	public boolean isEmpty() { return anchors.isEmpty(); }
+
+	public void clear() { remove(AnchorSide.values()); }
 
 	public Anchor[] getAnchorsToMatch(GuiComponent from, GuiComponent to) {
 		return new Anchor[]{
@@ -164,8 +174,17 @@ public final class GuiAnchors {
 		public abstract BiFunction<Double, Double, Double> getApplyBorder();
 	}
 
+	@SuppressWarnings("Convert2MethodRef")
+	@Override
+	public Object clone() {
+		Try.run(() -> super.clone(), LOGGER);
+		GuiAnchors ret = new GuiAnchors(border);
+		anchors.forEach((side, anchor) -> ret.add((Anchor) anchor.clone()));
+		return ret;
+	}
+
 	@Immutable
-	public final class Anchor implements TriConsumer<IGuiReRectangleHandler, GuiComponent, Rectangle2D> {
+	public final class Anchor implements Cloneable, TriConsumer<IGuiReRectangleHandler, GuiComponent, Rectangle2D> {
 		public final WeakReference<GuiComponent> from;
 		public final WeakReference<GuiComponent> to;
 		public final AnchorSide fromSide;
@@ -200,7 +219,7 @@ public final class GuiAnchors {
 			if (!reRectangle(handler, invoker, old)) {
 				@Nullable GuiComponent toCopy = to.get();
 				if (toCopy != null)
-					toCopy.getListeners().reRectangle.remove(this);
+					toCopy.listeners.reRectangle.remove(this);
 				remove(fromSide);
 			}
 		}
@@ -208,13 +227,13 @@ public final class GuiAnchors {
 		private void onAdded() {
 			@Nullable GuiComponent toCopy = to.get();
 			if (toCopy != null)
-				toCopy.getListeners().reRectangle.add(this);
+				toCopy.listeners.reRectangle.add(this);
 		}
 
 		private void onRemoved() {
 			@Nullable GuiComponent toCopy = to.get();
 			if (toCopy != null)
-				toCopy.getListeners().reRectangle.remove(this);
+				toCopy.listeners.reRectangle.remove(this);
 		}
 
 		private void checkNoCycles() {
@@ -223,7 +242,7 @@ public final class GuiAnchors {
 					anchor -> null,
 					anchor -> {
 						@Nullable GuiComponent toCopy = to.get();
-						return toCopy == null ? ImmutableList.of() : toCopy.getAnchors().getAnchorsView().values();
+						return toCopy == null ? ImmutableList.of() : toCopy.anchors.getAnchorsView().values();
 					},
 					anchor -> {
 						throw new IllegalStateException("Anchor cycle from '" + anchor.to.get() + " to " + anchor.from.get());
@@ -231,5 +250,9 @@ public final class GuiAnchors {
 					anchors -> null
 			);
 		}
+
+		@SuppressWarnings("Convert2MethodRef")
+		@Override
+		public Object clone() { return Try.call(() -> super.clone(), LOGGER); }
 	}
 }

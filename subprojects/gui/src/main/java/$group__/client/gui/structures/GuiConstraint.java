@@ -1,7 +1,10 @@
 package $group__.client.gui.structures;
 
+import $group__.utilities.helpers.specific.ThrowableUtilities.Try;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -10,20 +13,24 @@ import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 
 @OnlyIn(Dist.CLIENT)
-public final class GuiConstraints implements Consumer<Rectangle2D> {
+public final class GuiConstraint implements Cloneable, Consumer<Rectangle2D> {
 	public static final int CONSTRAINT_NONE_VALUE = -1;
-	public static final GuiConstraints CONSTRAINTS_NONE = new GuiConstraints(
-			new Rectangle(CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE),
-			new Rectangle(CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE));
+	private static final Rectangle2D CONSTRAINT_RECTANGLE_NONE = new Rectangle(CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE);
+	private static final GuiConstraint CONSTRAINT_NONE = new GuiConstraint(getConstraintRectangleNone(), getConstraintRectangleNone());
+	private static final Logger LOGGER = LogManager.getLogger();
 
 	public final Rectangle2D min, max;
 	@Nullable
 	private Rectangle2D minLastCorrected, maxLastCorrected;
 
-	public GuiConstraints(Rectangle2D min, Rectangle2D max) {
+	public GuiConstraint(Rectangle2D min, Rectangle2D max) {
 		this.min = min;
 		this.max = max;
 	}
+
+	public static GuiConstraint getConstraintNone() { return (GuiConstraint) CONSTRAINT_NONE.clone(); }
+
+	public static Rectangle2D getConstraintRectangleNone() { return (Rectangle2D) CONSTRAINT_RECTANGLE_NONE.clone(); }
 
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public static boolean isNoneValue(double value) { return value == CONSTRAINT_NONE_VALUE; }
@@ -67,5 +74,12 @@ public final class GuiConstraints implements Consumer<Rectangle2D> {
 				d -> max.setRect(max.getX(), max.getY(), max.getWidth(), d));
 		minLastCorrected = (Rectangle2D) min.clone();
 		maxLastCorrected = (Rectangle2D) max.clone();
+	}
+
+	@SuppressWarnings("Convert2MethodRef")
+	@Override
+	public Object clone() {
+		Try.run(() -> super.clone(), LOGGER);
+		return new GuiConstraint((Rectangle2D) min.clone(), (Rectangle2D) max.clone());
 	}
 }

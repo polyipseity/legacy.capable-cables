@@ -18,7 +18,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
@@ -36,6 +38,13 @@ public abstract class GuiRoot extends GuiContainer implements IGuiLifecycleHandl
 	public boolean isPaused() { return false; }
 
 	@Override
+	public void reRectangle(GuiComponent invoker) { reRectangle(invoker, getRectangle()); }
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void reRectangle(GuiComponent invoker, Rectangle2D rectangle) { setRectangle(this, invoker, rectangle); }
+
+	@Override
 	public void initialize(GuiComponent invoker) { onInitialize(this, invoker); }
 
 	@Override
@@ -49,8 +58,8 @@ public abstract class GuiRoot extends GuiContainer implements IGuiLifecycleHandl
 
 	@Override
 	public void onInitialize(IGuiLifecycleHandler handler, GuiComponent invoker) {
-		reRectangle(this, new Rectangle(0, 0, getScreen().width, getScreen().height));
 		super.onInitialize(handler, invoker);
+		reRectangle(this, new Rectangle(0, 0, getScreen().width, getScreen().height));
 	}
 
 	@Override
@@ -69,7 +78,7 @@ public abstract class GuiRoot extends GuiContainer implements IGuiLifecycleHandl
 
 	////////// Screen Compatibility //////////
 
-	protected Screen getScreen() { return screen; }
+	public Screen getScreen() { return screen; }
 
 	@SuppressWarnings("deprecation")
 	protected class ScreenAdapted extends Screen {

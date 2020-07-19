@@ -2,7 +2,7 @@ package $group__.client.gui.components;
 
 import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.structures.GuiAnchors;
-import $group__.client.gui.structures.GuiConstraints;
+import $group__.client.gui.structures.GuiConstraint;
 import $group__.client.gui.traits.IGuiLifecycleHandler;
 import $group__.client.gui.traits.IGuiReRectangleHandler;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
@@ -25,25 +25,36 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_1;
 import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_2;
 import static $group__.utilities.helpers.specific.ComparableUtilities.greaterThanOrEqualTo;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
-	protected final Listeners listeners = new Listeners();
+	public final Listeners listeners = new Listeners();
 	@Nullable
 	protected WeakReference<GuiContainer> parent = null;
 	protected final Rectangle2D rectangle = new Rectangle();
-	protected final GuiAnchors anchors = new GuiAnchors();
-	protected final GuiConstraints constraints = GuiConstraints.CONSTRAINTS_NONE;
+	public final GuiAnchors anchors = new GuiAnchors();
+	public List<GuiConstraint> constraints = new ArrayList<>(INITIAL_CAPACITY_1);
 	protected EnumState state = EnumState.NEW;
 
 	public void render(MatrixStack matrix, Point2D mouse, float partialTicks) {}
 
+	protected Point2D toAbsolutePoint(Point2D point) {
+		Point2D pointAbs = new Point2D.Double(point.getX() + getRectangle().getX(), point.getY() + getRectangle().getY());
+		if (parent != null) {
+			@Nullable GuiContainer parentCopy = parent.get();
+			if (parentCopy != null)
+				return parentCopy.toAbsolutePoint(pointAbs);
+		}
+		return pointAbs;
+	}
+
 	public void setRectangle(IGuiReRectangleHandler handler, GuiComponent invoker, Rectangle2D rectangle) {
 		Rectangle2D old = getRectangleView();
 		getRectangle().setRect(rectangle);
-		getConstraints().accept(getRectangle());
+		constraints.forEach(c -> c.accept(getRectangle()));
 		onReRectangle(handler, invoker, old);
 	}
 
@@ -64,7 +75,8 @@ public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
 	public void onInitialize(IGuiLifecycleHandler handler, GuiComponent invoker) {
 		setState(EnumState.READY);
 		if (!getRoot().isPresent() || !getLifecycleHandler().isPresent() || !getReRectangleHandler().isPresent())
-			listeners.initialize.forEach(l -> l.accept(handler, invoker));
+			throw new IllegalStateException("Root or handlers not set!");
+		listeners.initialize.forEach(l -> l.accept(handler, invoker));
 	}
 
 	@OverridingMethodsMustInvokeSuper
@@ -118,12 +130,6 @@ public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
 	public Rectangle2D getRectangleView() { return (Rectangle2D) rectangle.clone(); }
 
 	protected Rectangle2D getRectangle() { return rectangle; }
-
-	public GuiAnchors getAnchors() { return anchors; }
-
-	public GuiConstraints getConstraints() { return constraints; }
-
-	public Listeners getListeners() { return listeners; }
 
 	public enum EnumState {
 		NEW {
