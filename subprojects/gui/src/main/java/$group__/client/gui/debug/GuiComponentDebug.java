@@ -79,8 +79,8 @@ final class GuiDebug extends GuiRootWindows<ContainerDebug> {
 	@SuppressWarnings("MagicNumber")
 	GuiDebug(ITextComponent title, ContainerDebug container) {
 		super(title, new GuiBackgroundDefault(), container);
-		add(new GuiWindow(new Rectangle2D.Double(0, 0, 100, 100), Color.WHITE),
-				new GuiWindow(new Rectangle2D.Double(100, 100, 200, 200), Color.WHITE));
+		add(new GuiWindow(new Rectangle2D.Double(0, 0, 50, 50), Color.WHITE),
+				new GuiWindow(new Rectangle2D.Double(50, 50, 100, 100), Color.WHITE));
 	}
 }
 
