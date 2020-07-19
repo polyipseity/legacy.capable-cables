@@ -101,8 +101,8 @@ public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
 		listeners.reRectangle.forEach(l -> l.accept(handler, invoker, old));
 	}
 
-	public Optional<? extends GuiRoot> getRoot() {
-		if (this instanceof GuiRoot) return Optional.of((GuiRoot) this);
+	public Optional<? extends GuiRoot<?>> getRoot() {
+		if (this instanceof GuiRoot<?>) return Optional.of((GuiRoot<?>) this);
 		else if (parent != null) return Optional.ofNullable(parent.get()).flatMap(GuiComponent::getRoot);
 		return Optional.empty();
 	}

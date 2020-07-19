@@ -66,7 +66,7 @@ public class GuiContainer extends GuiComponent {
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void render(MatrixStack matrix, Point2D mouse, float partialTicks) {
-		GuiRoot root = getRoot().orElseThrow(BecauseOf::unexpected);
+		GuiRoot<?> root = getRoot().orElseThrow(BecauseOf::unexpected);
 		if (EnumState.READY.isReachedBy(getState())) {
 			RenderSystem.pushMatrix();
 			getChildren().forEach(c -> {

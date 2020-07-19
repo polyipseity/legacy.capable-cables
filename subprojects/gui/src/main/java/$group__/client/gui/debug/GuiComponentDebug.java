@@ -7,7 +7,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.IHasContainer;
 import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -62,9 +64,31 @@ public enum GuiComponentDebug {
 	}
 
 	@OnlyIn(CLIENT)
-	public static void registerGuiFactory() {
+	public static <T extends Screen & IHasContainer<ContainerDebug>> void registerGuiFactory() {
 		assert ContainerDebug.type != null;
-		ScreenManager.registerFactory(ContainerDebug.type, (container, inv, title) -> new GuiDebug(title, container).getContainerScreen());
+		// COMMENT compilation error without the cast
+		ScreenManager.registerFactory(ContainerDebug.type, (ScreenManager.IScreenFactory<ContainerDebug, T>) (container, inv, title) -> new GuiDebug(title, container).getContainerScreen());
+	}
+}
+
+@OnlyIn(CLIENT)
+final class GuiDebug extends GuiRootWindows<ContainerDebug> {
+	GuiDebug(ITextComponent title, ContainerDebug container) { super(title, container); }
+}
+
+final class ContainerDebug extends Container {
+	@Nullable
+	static ContainerType<ContainerDebug> type;
+	private final TileEntity tileEntity;
+
+	ContainerDebug(int id, World world, BlockPos pos) {
+		super(type, id);
+		tileEntity = requireNonNull(world.getTileEntity(pos));
+	}
+
+	@Override
+	public boolean canInteractWith(PlayerEntity playerIn) {
+		return isWithinUsableDistance(IWorldPosCallable.of(requireNonNull(tileEntity.getWorld()), tileEntity.getPos()), playerIn, BlockDebug.INSTANCE);
 	}
 }
 
@@ -106,25 +130,4 @@ final class TileEntityDebug extends TileEntity implements IContainerProvider {
 
 	@Override
 	public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) { return new ContainerDebug(id, requireNonNull(getWorld()), getPos()); }
-}
-
-final class ContainerDebug extends Container {
-	@Nullable
-	static ContainerType<ContainerDebug> type;
-	private final TileEntity tileEntity;
-
-	ContainerDebug(int id, World world, BlockPos pos) {
-		super(type, id);
-		tileEntity = requireNonNull(world.getTileEntity(pos));
-	}
-
-	@Override
-	public boolean canInteractWith(PlayerEntity playerIn) {
-		return isWithinUsableDistance(IWorldPosCallable.of(requireNonNull(tileEntity.getWorld()), tileEntity.getPos()), playerIn, BlockDebug.INSTANCE);
-	}
-}
-
-@OnlyIn(CLIENT)
-final class GuiDebug extends GuiRootWindows<ContainerDebug> {
-	GuiDebug(ITextComponent title, ContainerDebug container) { super(title, container); }
 }
