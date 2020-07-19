@@ -123,7 +123,7 @@ public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
 
 	protected void setState(EnumState state) {
 		if (!getState().getValidNextStates().contains(state))
-			throw BecauseOf.illegalArgument("state", state);
+			throw BecauseOf.illegalArgument("getState()", getState(), "state", state);
 		this.state = state;
 	}
 
