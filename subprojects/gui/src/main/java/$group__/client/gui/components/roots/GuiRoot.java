@@ -2,6 +2,7 @@ package $group__.client.gui.components.roots;
 
 import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiContainer;
+import $group__.client.gui.components.backgrounds.GuiBackground;
 import $group__.client.gui.traits.IGuiLifecycleHandler;
 import $group__.client.gui.traits.IGuiReRectangleHandler;
 import $group__.client.gui.utilities.Backgrounds;
@@ -25,6 +26,7 @@ import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
+import java.util.Optional;
 
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
@@ -35,17 +37,31 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 	protected final C container;
 	protected final Lazy<Screen> screen;
 
-	protected GuiRoot(ITextComponent title) { this(title, null); }
+	protected GuiRoot(ITextComponent title, @Nullable GuiBackground background) { this(title, background, null); }
 
-	protected GuiRoot(ITextComponent title, @Nullable C container) {
+	protected GuiRoot(ITextComponent title, @Nullable GuiBackground background, @Nullable C container) {
 		super(new Rectangle2D.Double());
 		this.container = container;
 		screen = Lazy.of(() -> container == null ? new ScreenAdapted(title) : new ScreenAdaptedWithContainer(title));
+		setBackground(background);
 	}
 
 	public boolean isPaused() { return false; }
 
 	public int getCloseKey() { return GLFW_KEY_ESCAPE; }
+
+	public Optional<GuiBackground> getBackground() {
+		if (!getChildren().isEmpty()) {
+			GuiComponent ret = getChildren().get(0);
+			if (ret instanceof GuiBackground) return Optional.of((GuiBackground) ret);
+		}
+		return Optional.empty();
+	}
+
+	public void setBackground(@Nullable GuiBackground background) {
+		getBackground().ifPresent(this::remove);
+		if (background != null) add(0, background);
+	}
 
 	@Override
 	public void reRectangle(GuiComponent invoker) { reRectangle(invoker, getRectangle()); }
@@ -80,7 +96,7 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 
 	@Override
 	@Deprecated
-	public final void onAdded(GuiContainer parent) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
+	public final void onAdded(GuiContainer parent, int index) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
 
 	@Override
 	@Deprecated

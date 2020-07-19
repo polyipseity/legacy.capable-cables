@@ -61,10 +61,12 @@ public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
 	}
 
 	@OverridingMethodsMustInvokeSuper
-	public void onAdded(GuiContainer parent) {
+	public void onAdded(GuiContainer parent, int index) {
 		this.parent = new WeakReference<>(parent);
 		listeners.added.forEach(l -> l.accept(parent));
 	}
+
+	public void onMoved(int index) {}
 
 	@OverridingMethodsMustInvokeSuper
 	public void onRemoved(GuiContainer parent) {

@@ -29,11 +29,11 @@ public abstract class GuiBackground extends GuiComponent {
 	}
 
 	@Override
-	public void onAdded(GuiContainer parent) {
+	public void onAdded(GuiContainer parent, int index) {
 		if (!(parent instanceof GuiRoot)) throw BecauseOf.illegalArgument("parent", parent);
 		if (parent.getChildrenView().indexOf(this) != 0)
 			throw new IllegalStateException("Illegal background GUI component index");
 		anchors.add(anchors.getAnchorsToMatch(this, parent));
-		super.onAdded(parent);
+		super.onAdded(parent, index);
 	}
 }

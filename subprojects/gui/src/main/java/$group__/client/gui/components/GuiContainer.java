@@ -35,6 +35,27 @@ public class GuiContainer extends GuiComponent {
 
 	protected static Point2D toRelativePointForComponent(GuiComponent component, Point2D point) { return new Point2D.Double(point.getX() - component.getRectangleView().getX(), point.getY() - component.getRectangleView().getY()); }
 
+	protected void add(int index, GuiComponent component) {
+		if (component == this) throw BecauseOf.illegalArgument("component", component);
+		if (component.parent != null) {
+			@Nullable GuiContainer parentOld = component.parent.get();
+			if (parentOld != null) parentOld.remove(component);
+		}
+		getChildren().add(index, component);
+		component.onAdded(this, index);
+		if (EnumState.READY.isReachedBy(getState())) {
+			new IGuiLifecycleHandler.Initializer(component).initialize(this);
+			getReRectangleHandler().orElseThrow(BecauseOf::unexpected).reRectangle(this);
+		}
+	}
+
+	public void move(int index, GuiComponent component) {
+		if (getChildren().remove(component)) {
+			getChildren().add(index, component);
+			component.onMoved(index);
+		}
+	}
+
 	public void add(GuiComponent... components) {
 		boolean reRect = false;
 		for (GuiComponent component : components) {
@@ -44,7 +65,7 @@ public class GuiContainer extends GuiComponent {
 				if (parentOld != null) parentOld.remove(component);
 			}
 			getChildren().add(component);
-			component.onAdded(this);
+			component.onAdded(this, getChildren().lastIndexOf(component));
 			if (EnumState.READY.isReachedBy(getState())) {
 				new IGuiLifecycleHandler.Initializer(component).initialize(this);
 				reRect = true;
@@ -83,13 +104,6 @@ public class GuiContainer extends GuiComponent {
 			});
 			RenderSystem.popMatrix();
 		}
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void onAdded(GuiContainer parent) {
-		super.onAdded(parent);
-		getChildren().forEach(c -> c.onAdded(parent));
 	}
 
 	@Override

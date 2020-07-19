@@ -2,6 +2,7 @@ package $group__.client.gui.components.roots;
 
 import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiWindow;
+import $group__.client.gui.components.backgrounds.GuiBackground;
 import $group__.client.gui.traits.IGuiReRectangleHandler;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
@@ -22,9 +23,9 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 public class GuiRootWindows<C extends Container> extends GuiRoot<C> {
 	protected List<GuiWindow> windows = new ArrayList<>(INITIAL_CAPACITY_2);
 
-	public GuiRootWindows(ITextComponent title) { this(title, null); }
+	public GuiRootWindows(ITextComponent title, @Nullable GuiBackground background) { this(title, background, null); }
 
-	public GuiRootWindows(ITextComponent title, @Nullable C container) { super(title, container); }
+	public GuiRootWindows(ITextComponent title, @Nullable GuiBackground background, @Nullable C container) { super(title, background, container); }
 
 	@Override
 	public void setRectangle(IGuiReRectangleHandler handler, GuiComponent invoker, java.awt.geom.Rectangle2D rectangle) {
@@ -39,19 +40,34 @@ public class GuiRootWindows<C extends Container> extends GuiRoot<C> {
 		getWindows().forEach(w -> w.reRectangle(invoker));
 	}
 
-	public void add(GuiWindow... windows) {
+	protected void add(@Nullable GuiBackground background, GuiWindow... windows) {
+		if (background != null) super.add(background);
 		super.add(windows);
 		getWindows().addAll(Arrays.asList(windows));
+	}
+
+	public void add(GuiWindow... windows) {
+		add(null, windows);
 	}
 
 	@Override
 	@Deprecated
 	public void add(GuiComponent... components) {
+		@Nullable GuiBackground background = null;
+		GuiWindow[] windows = new GuiWindow[components.length];
+		int i = 0;
 		for (GuiComponent component : components) {
-			if (!(component instanceof GuiWindow))
+			if (component instanceof GuiBackground && background == null)
+				background = (GuiBackground) component;
+			else if (component instanceof GuiWindow)
+				windows[i++] = (GuiWindow) component;
+			else
 				throw BecauseOf.illegalArgument("components", Arrays.toString(components), "component", component);
 		}
-		add(Arrays.copyOf(components, components.length, GuiWindow[].class));
+		if (background == null)
+			add(windows);
+		else
+			add(background, Arrays.copyOf(windows, windows.length - 1));
 	}
 
 	@Override
