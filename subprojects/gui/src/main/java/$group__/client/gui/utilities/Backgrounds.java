@@ -19,7 +19,13 @@ public enum Backgrounds {
 	/**
 	 * @see Screen#renderBackground()
 	 */
-	public static void renderBackground(@Nullable Minecraft client, int width, int height) { renderBackground(client, width, height, 0); }
+	public static void renderBackground(@Nullable Minecraft client, int width, int height) {
+		ScreenUtility.INSTANCE
+				.setClient_(client)
+				.setWidth_(width)
+				.setHeight_(height)
+				.renderBackground();
+	}
 
 	/**
 	 * @see Screen#renderBackground(int)
