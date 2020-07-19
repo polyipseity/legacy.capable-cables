@@ -27,6 +27,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 
 @OnlyIn(CLIENT)
 public abstract class GuiRoot<C extends Container> extends GuiContainer implements IGuiLifecycleHandler, IGuiReRectangleHandler {
@@ -42,6 +43,8 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 	}
 
 	public boolean isPaused() { return false; }
+
+	public int getCloseKey() { return GLFW_KEY_ESCAPE; }
 
 	@Override
 	public void reRectangle(GuiComponent invoker) { reRectangle(invoker, getRectangle()); }
@@ -81,6 +84,15 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 	@Override
 	@Deprecated
 	public final void onRemoved(GuiContainer parent) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
+
+	@Override
+	public boolean onKeyPressed(int key, int scanCode, int modifiers) {
+		if (key == getCloseKey()) {
+			close(this);
+			return true;
+		}
+		return super.onKeyPressed(key, scanCode, modifiers);
+	}
 
 	////////// Screen Compatibility //////////
 
@@ -162,7 +174,7 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 
 		@Override
 		@Deprecated
-		public boolean shouldCloseOnEsc() { return false; }
+		public boolean shouldCloseOnEsc() { return getCloseKey() == GLFW_KEY_ESCAPE; }
 
 		@Override
 		@Deprecated
