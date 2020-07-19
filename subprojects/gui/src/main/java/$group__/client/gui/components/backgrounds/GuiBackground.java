@@ -10,11 +10,14 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
 public abstract class GuiBackground extends GuiComponent {
+	public GuiBackground() { super(new Rectangle2D.Double()); }
+
 	public void renderBackground(MatrixStack matrix, Screen screen, Point2D mouse, float partialTicks) { Backgrounds.drawnBackground(screen); }
 
 	@Override

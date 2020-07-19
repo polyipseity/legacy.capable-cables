@@ -38,6 +38,7 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 	protected GuiRoot(ITextComponent title) { this(title, null); }
 
 	protected GuiRoot(ITextComponent title, @Nullable C container) {
+		super(new Rectangle2D.Double());
 		this.container = container;
 		screen = Lazy.of(() -> container == null ? new ScreenAdapted(title) : new ScreenAdaptedWithContainer(title));
 	}

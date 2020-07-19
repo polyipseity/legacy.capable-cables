@@ -16,6 +16,8 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 public class GuiWindow extends GuiContainer implements IGuiReRectangleHandler {
 	public static final int WINDOW_VISIBLE_BORDER_MINIMUM = 5;
 
+	public GuiWindow(Rectangle2D rectangle) { super(rectangle); }
+
 	@Override
 	public void render(MatrixStack matrix, Point2D mouse, float partialTicks) {
 		super.render(matrix, mouse, partialTicks);

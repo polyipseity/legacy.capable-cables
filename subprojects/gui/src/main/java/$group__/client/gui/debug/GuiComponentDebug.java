@@ -72,7 +72,9 @@ public enum GuiComponentDebug {
 
 @OnlyIn(CLIENT)
 final class GuiDebug extends GuiRootWindows<ContainerDebug> {
-	GuiDebug(ITextComponent title, ContainerDebug container) { super(title, container); }
+	GuiDebug(ITextComponent title, ContainerDebug container) {
+		super(title, container);
+	}
 }
 
 final class ContainerDebug extends Container {

@@ -34,10 +34,12 @@ public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
 	public final Listeners listeners = new Listeners();
 	@Nullable
 	protected WeakReference<GuiContainer> parent = null;
-	protected final Rectangle2D rectangle = new Rectangle();
+	protected final Rectangle2D rectangle;
 	public final GuiAnchors anchors = new GuiAnchors();
 	public List<GuiConstraint> constraints = new ArrayList<>(INITIAL_CAPACITY_1);
 	protected EnumState state = EnumState.NEW;
+
+	public GuiComponent(Rectangle2D rectangle) { this.rectangle = rectangle; }
 
 	public void render(MatrixStack matrix, Point2D mouse, float partialTicks) {}
 
