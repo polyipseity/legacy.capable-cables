@@ -15,7 +15,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.IContainerProvider;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
@@ -25,6 +24,7 @@ import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -42,6 +42,7 @@ public enum GuiComponentDebug {
 	;
 
 	public static final String PATH = "debug_gui_component";
+	public static final ITextComponent DISPLAY_NAME = new StringTextComponent("Component-based GUI Debug GUI");
 
 	public static Block getBlockEntry() { return BlockDebug.INSTANCE; }
 
@@ -91,7 +92,7 @@ final class ContainerDebug extends Container {
 }
 
 final class BlockDebug extends Block {
-	public static final BlockDebug INSTANCE = new BlockDebug();
+	static final BlockDebug INSTANCE = new BlockDebug();
 	private static final Logger LOGGER = LogManager.getLogger();
 
 	private BlockDebug() {
@@ -120,12 +121,15 @@ final class BlockDebug extends Block {
 	}
 }
 
-final class TileEntityDebug extends TileEntity implements IContainerProvider {
+final class TileEntityDebug extends TileEntity implements INamedContainerProvider {
 	@Nullable
 	static TileEntityType<TileEntityDebug> type;
 
-	public TileEntityDebug() { super(requireNonNull(type)); }
+	TileEntityDebug() { super(requireNonNull(type)); }
 
 	@Override
 	public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) { return new ContainerDebug(id, requireNonNull(getWorld()), getPos()); }
+
+	@Override
+	public ITextComponent getDisplayName() { return GuiComponentDebug.DISPLAY_NAME; }
 }
