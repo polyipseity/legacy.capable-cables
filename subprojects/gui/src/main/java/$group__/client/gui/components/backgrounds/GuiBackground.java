@@ -2,7 +2,7 @@ package $group__.client.gui.components.backgrounds;
 
 import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiContainer;
-import $group__.client.gui.components.GuiRoot;
+import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.utilities.Backgrounds;
 import $group__.utilities.helpers.Adapters;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
@@ -19,18 +19,18 @@ public abstract class GuiBackground extends GuiComponent {
 
 	@Override
 	public void render(Point2D mouse, float partialTicks) {
-		if (EnumState.READY.isReachedBy(state)) {
+		if (EnumState.READY.isReachedBy(getState())) {
 			Screen screen = Adapters.get(GuiRoot.class, Screen.class, GuiRoot.TO_SCREEN_ADAPTER_DEFAULT).orElseThrow(BecauseOf::unexpected).apply(getRoot().orElseThrow(BecauseOf::unexpected));
 			renderBackground(screen, mouse, partialTicks);
 		}
 	}
 
 	@Override
-	protected void onAdded(GuiContainer parent) {
+	public void onAdded(GuiContainer parent) {
 		if (!(parent instanceof GuiRoot)) throw BecauseOf.illegalArgument("parent", parent);
-		if (parent.getChildren().indexOf(this) != 0)
+		if (parent.getChildrenView().indexOf(this) != 0)
 			throw new IllegalStateException("Illegal background GUI component index");
-		anchors.add(anchors.getAnchorsToMatch(parent));
+		anchors.add(anchors.getAnchorsToMatch(this, parent));
 		super.onAdded(parent);
 	}
 }

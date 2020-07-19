@@ -1,5 +1,9 @@
-package $group__.client.gui.components;
+package $group__.client.gui.components.roots;
 
+import $group__.client.gui.components.GuiComponent;
+import $group__.client.gui.components.GuiContainer;
+import $group__.client.gui.traits.IGuiLifecycleHandler;
+import $group__.client.gui.traits.IGuiReRectangleHandler;
 import $group__.client.gui.utilities.Backgrounds;
 import $group__.client.gui.utilities.GuiUtilities;
 import $group__.client.gui.utilities.TextComponents;
@@ -12,52 +16,60 @@ import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.awt.*;
 import java.util.List;
 
-@OnlyIn(Dist.CLIENT)
-public class GuiRoot extends GuiContainer {
-	public static final int TO_SCREEN_ADAPTER_DEFAULT = Adapters.register(GuiRoot.class, Screen.class, GuiRoot::asScreen);
+import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
-	protected final ScreenAdapted screen;
+@OnlyIn(CLIENT)
+public abstract class GuiRoot extends GuiContainer implements IGuiLifecycleHandler, IGuiReRectangleHandler {
+	public static final int TO_SCREEN_ADAPTER_DEFAULT = Adapters.register(GuiRoot.class, Screen.class, GuiRoot::getScreen);
 
-	public GuiRoot(ITextComponent title) { screen = new ScreenAdapted(title); }
+	protected final Screen screen;
 
-	protected GuiRoot(ScreenAdapted screen) { this.screen = screen; }
+	protected GuiRoot(ITextComponent title) { screen = new ScreenAdapted(title); }
 
-	@Override
-	@Deprecated
-	protected void onAdded(GuiContainer parent) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
-
-	@Override
-	protected void onInitialize() {
-		super.onInitialize();
-		onResize();
-	}
-
-	@Override
-	protected void onResize() {
-		rectangle.setRect(0, 0, screen.width, screen.height);
-		super.onResize();
-	}
-
-	@Override
-	@Deprecated
-	protected void onRemoved(GuiContainer parent) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
-
-	@Override
-	protected void onClose() {
-		super.onClose();
-		screen.getMinecraft().displayGuiScreen(null);
-	}
+	protected GuiRoot(Screen screen) { this.screen = screen; }
 
 	public boolean isPaused() { return false; }
 
+	@Override
+	public void initialize(GuiComponent invoker) { onInitialize(this, invoker); }
+
+	@Override
+	public void tick(GuiComponent invoker) { onTick(this, invoker); }
+
+	@Override
+	public void close(GuiComponent invoker) { onClose(this, invoker); }
+
+	@Override
+	public void destroy(GuiComponent invoker) { onDestroyed(this, invoker); }
+
+	@Override
+	public void onInitialize(IGuiLifecycleHandler handler, GuiComponent invoker) {
+		reRectangle(this, new Rectangle(0, 0, getScreen().width, getScreen().height));
+		super.onInitialize(handler, invoker);
+	}
+
+	@Override
+	public void onClose(IGuiLifecycleHandler handler, GuiComponent invoker) {
+		super.onClose(handler, invoker);
+		getScreen().getMinecraft().displayGuiScreen(null);
+	}
+
+	@Override
+	@Deprecated
+	public final void onAdded(GuiContainer parent) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
+
+	@Override
+	@Deprecated
+	public final void onRemoved(GuiContainer parent) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
+
 	////////// Screen Compatibility //////////
 
-	protected ScreenAdapted asScreen() { return screen; }
+	protected Screen getScreen() { return screen; }
 
 	@SuppressWarnings("deprecation")
 	protected class ScreenAdapted extends Screen {
@@ -73,7 +85,7 @@ public class GuiRoot extends GuiContainer {
 		public boolean isPauseScreen() { return isPaused(); }
 
 		@Override
-		protected void init() { GuiRoot.this.onInitialize(); }
+		protected void init() { GuiRoot.this.initialize(GuiRoot.this); }
 
 		@Override
 		public void resize(Minecraft client, int width, int height) {
@@ -85,17 +97,17 @@ public class GuiRoot extends GuiContainer {
 		@Deprecated
 		public void setSize(int width, int height) {
 			super.setSize(width, height);
-			rectangle.setRect(rectangle.getX(), rectangle.getY(), width, height);
+			GuiRoot.this.reRectangle(GuiRoot.this, new Rectangle(0, 0, width, height));
 		}
 
 		@Override
-		public void tick() { GuiRoot.this.onTick(); }
+		public void tick() { GuiRoot.this.tick(GuiRoot.this); }
 
 		@Override
-		public void onClose() { GuiRoot.this.onClose(); }
+		public void onClose() { GuiRoot.this.close(GuiRoot.this); }
 
 		@Override
-		public void removed() { GuiRoot.this.onDestroy(); }
+		public void removed() { GuiRoot.this.destroy(GuiRoot.this); }
 
 		@Override
 		public boolean keyPressed(int key, int scanCode, int modifiers) { return GuiRoot.this.keyPressed(key, scanCode, modifiers); }

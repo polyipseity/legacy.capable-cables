@@ -1,20 +1,19 @@
 package $group__.utilities.helpers;
 
-import $group__.utilities.helpers.specific.Optionals;
-
 import javax.annotation.Nullable;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public enum Recursions {
 	/* MARK empty */;
 
-
+	@SuppressWarnings("UnusedReturnValue")
 	public static <T, R> Optional<R> recurseAsDepthFirstLoop(T obj, Function<? super T, ? extends R> function,
-	                                                         Function<? super T, ? extends Iterable<? extends T>> splitter, @Nullable Function<? super Deque<R>, ? extends R> combiner) {
+	                                                         Function<? super T, ? extends Iterable<? extends T>> splitter, @Nullable Consumer<? super T> reDiscoverer, @Nullable Function<? super Deque<R>, ? extends R> combiner) {
 		ArrayDeque<T> stackT = new ArrayDeque<>(Capacities.INITIAL_CAPACITY_3);
 		@Nullable ArrayDeque<R> listR = combiner == null ? null : new ArrayDeque<>(Capacities.INITIAL_CAPACITY_3);
 		stackT.push(obj);
@@ -26,22 +25,17 @@ public enum Recursions {
 				R r = function.apply(t);
 				if (listR != null) listR.add(r);
 				splitter.apply(t).forEach(stackT::push);
-			}
+			} else if (reDiscoverer != null)
+				reDiscoverer.accept(t);
 		}
 
 		return listR == null ? Optional.empty() : Optional.ofNullable(combiner.apply(listR));
 	}
 
-	@Nullable
-	public static <T, R> R recurseAsDepthFirstLoopUnboxed(T obj, Function<? super T, ? extends R> function, Function<?
-			super T, ? extends Iterable<? extends T>> splitter, @Nullable Function<? super Deque<R>, ? extends R> combiner) { return Optionals.unboxOptional(recurseAsDepthFirstLoop(obj, function, splitter, combiner)); }
 
-	public static <T, R> R recurseAsDepthFirstLoopUnboxedNonnull(T obj, Function<? super T, ? extends R> function,
-	                                                             Function<? super T, ? extends Iterable<? extends T>> splitter, @Nullable Function<? super Deque<R>, ? extends R> combiner) { return Assertions.assertNonnull(recurseAsDepthFirstLoopUnboxed(obj, function, splitter, combiner)); }
-
-
+	@SuppressWarnings("UnusedReturnValue")
 	public static <T, R> Optional<R> recurseAsBreadthFirstLoop(T obj, Function<? super T, ? extends R> function,
-	                                                           Function<? super T, ? extends Iterable<? extends T>> splitter, @Nullable Function<? super Deque<R>, ? extends R> combiner) {
+	                                                           Function<? super T, ? extends Iterable<? extends T>> splitter, @Nullable Consumer<? super T> reDiscoverer, @Nullable Function<? super Deque<R>, ? extends R> combiner) {
 		ArrayDeque<T> stackT = new ArrayDeque<>(Capacities.INITIAL_CAPACITY_3);
 		@Nullable ArrayDeque<R> listR = combiner == null ? null : new ArrayDeque<>(Capacities.INITIAL_CAPACITY_3);
 		stackT.add(obj);
@@ -53,18 +47,10 @@ public enum Recursions {
 				R r = function.apply(t);
 				if (listR != null) listR.add(r);
 				splitter.apply(t).forEach(stackT::addLast);
-			}
+			} else if (reDiscoverer != null)
+				reDiscoverer.accept(t);
 		}
 
 		return listR == null ? Optional.empty() : Optional.ofNullable(combiner.apply(listR));
 	}
-
-	@Nullable
-	public static <T, R> R recurseAsBreadthFirstLoopUnboxed(T obj, Function<? super T, ? extends R> function,
-	                                                        Function<? super T, ? extends Iterable<? extends T>> splitter, @Nullable Function<? super Deque<R>, ? extends R> combiner) { return Optionals.unboxOptional(recurseAsBreadthFirstLoop(obj, function, splitter, combiner)); }
-
-	public static <T, R> R recurseAsBreadthFirstLoopUnboxedNonnull(T obj, Function<? super T, ? extends R> function,
-	                                                               Function<? super T,
-			                                                               ? extends Iterable<? extends T>> splitter,
-	                                                               @Nullable Function<? super Deque<R>, ? extends R> combiner) { return Assertions.assertNonnull(recurseAsBreadthFirstLoopUnboxed(obj, function, splitter, combiner)); }
 }
