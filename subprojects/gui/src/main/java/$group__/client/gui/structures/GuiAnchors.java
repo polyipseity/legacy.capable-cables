@@ -55,11 +55,15 @@ public final class GuiAnchors {
 					throw BecauseOf.unexpected();
 			}
 			this.anchors.put(anchor.fromSide, anchor);
+			anchor.onAdded();
 		}
 	}
 
 	public void remove(AnchorSide... sides) {
-		for (AnchorSide side : sides) anchors.remove(side);
+		for (AnchorSide side : sides) {
+			@Nullable Anchor anchor = anchors.remove(side);
+			if (anchor != null) anchor.onRemoved();
+		}
 	}
 
 	public Anchor[] getAnchorsToMatch(GuiComponent from, GuiComponent to) {
@@ -178,7 +182,6 @@ public final class GuiAnchors {
 			this.border = border;
 
 			checkNoCycles();
-			to.getListeners().reRectangle.add(this);
 		}
 
 		public boolean reRectangle(IGuiReRectangleHandler handler, GuiComponent invoker, Rectangle2D old) {
@@ -200,6 +203,18 @@ public final class GuiAnchors {
 					toCopy.getListeners().reRectangle.remove(this);
 				remove(fromSide);
 			}
+		}
+
+		private void onAdded() {
+			@Nullable GuiComponent toCopy = to.get();
+			if (toCopy != null)
+				toCopy.getListeners().reRectangle.add(this);
+		}
+
+		private void onRemoved() {
+			@Nullable GuiComponent toCopy = to.get();
+			if (toCopy != null)
+				toCopy.getListeners().reRectangle.remove(this);
 		}
 
 		private void checkNoCycles() {
