@@ -247,7 +247,7 @@ public final class GuiAnchors implements Cloneable {
 					anchor -> {
 						throw new IllegalStateException("Anchor cycle from '" + anchor.to.get() + " to " + anchor.from.get());
 					},
-					anchors -> null
+					null
 			);
 		}
 
