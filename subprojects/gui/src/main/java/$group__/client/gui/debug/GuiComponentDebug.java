@@ -1,5 +1,6 @@
 package $group__.client.gui.debug;
 
+import $group__.client.gui.components.GuiWindow;
 import $group__.client.gui.components.backgrounds.GuiBackgroundDefault;
 import $group__.client.gui.components.roots.GuiRootWindows;
 import $group__.utilities.helpers.Preconditions;
@@ -35,6 +36,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import java.awt.geom.Rectangle2D;
 
 import static java.util.Objects.requireNonNull;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
@@ -73,8 +75,11 @@ public enum GuiComponentDebug {
 
 @OnlyIn(CLIENT)
 final class GuiDebug extends GuiRootWindows<ContainerDebug> {
+	@SuppressWarnings("MagicNumber")
 	GuiDebug(ITextComponent title, ContainerDebug container) {
 		super(title, new GuiBackgroundDefault(), container);
+		add(new GuiWindow(new Rectangle2D.Double(0, 0, 100, 100)),
+				new GuiWindow(new Rectangle2D.Double(100, 100, 200, 200)));
 	}
 }
 
