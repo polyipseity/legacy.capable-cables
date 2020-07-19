@@ -31,8 +31,6 @@ public class GuiContainer extends GuiComponent {
 	protected GuiComponent focused = null;
 	protected boolean dragging = false;
 
-	public GuiContainer(GuiComponent... components) { add(components); }
-
 	protected static Point2D toRelativePointForComponent(GuiComponent component, Point2D point) { return new Point2D.Double(point.getX() - component.getRectangleView().getX(), point.getY() - component.getRectangleView().getY()); }
 
 	public void add(GuiComponent... components) {

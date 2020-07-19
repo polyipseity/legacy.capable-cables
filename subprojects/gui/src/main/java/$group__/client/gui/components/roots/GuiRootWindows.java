@@ -22,7 +22,7 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 public class GuiRootWindows<C extends Container> extends GuiRoot<C> {
 	protected List<GuiWindow> windows = new ArrayList<>(INITIAL_CAPACITY_2);
 
-	public GuiRootWindows(ITextComponent title) {this(title, null);}
+	public GuiRootWindows(ITextComponent title) { this(title, null); }
 
 	public GuiRootWindows(ITextComponent title, @Nullable C container) { super(title, container); }
 
