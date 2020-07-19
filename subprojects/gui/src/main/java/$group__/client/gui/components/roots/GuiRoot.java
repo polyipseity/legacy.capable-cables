@@ -8,16 +8,19 @@ import $group__.client.gui.utilities.Backgrounds;
 import $group__.client.gui.utilities.GuiUtilities;
 import $group__.client.gui.utilities.TextComponents;
 import $group__.client.gui.utilities.Tooltips;
-import $group__.utilities.helpers.Adapters;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.gui.IHasContainer;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.util.Lazy;
 
+import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -26,14 +29,17 @@ import java.util.List;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
-public abstract class GuiRoot extends GuiContainer implements IGuiLifecycleHandler, IGuiReRectangleHandler {
-	public static final int TO_SCREEN_ADAPTER_DEFAULT = Adapters.register(GuiRoot.class, Screen.class, GuiRoot::getScreen);
+public abstract class GuiRoot<C extends Container> extends GuiContainer implements IGuiLifecycleHandler, IGuiReRectangleHandler {
+	@Nullable
+	protected final C container;
+	protected final Lazy<Screen> screen;
 
-	protected final Screen screen;
+	protected GuiRoot(ITextComponent title) { this(title, null); }
 
-	protected GuiRoot(ITextComponent title) { screen = new ScreenAdapted(title); }
-
-	protected GuiRoot(Screen screen) { this.screen = screen; }
+	protected GuiRoot(ITextComponent title, @Nullable C container) {
+		this.container = container;
+		screen = Lazy.of(() -> container == null ? new ScreenAdapted(title) : new ScreenAdaptedWithContainer(title));
+	}
 
 	public boolean isPaused() { return false; }
 
@@ -78,7 +84,13 @@ public abstract class GuiRoot extends GuiContainer implements IGuiLifecycleHandl
 
 	////////// Screen Compatibility //////////
 
-	public Screen getScreen() { return screen; }
+	public Screen getScreen() { return screen.get(); }
+
+	@SuppressWarnings("unchecked")
+	public <T extends Screen & IHasContainer<C>> T getContainerScreen() {
+		if (container == null) throw BecauseOf.unsupportedOperation();
+		return (T) screen.get();
+	}
 
 	@SuppressWarnings("deprecation")
 	protected class ScreenAdapted extends Screen {
@@ -220,5 +232,15 @@ public abstract class GuiRoot extends GuiContainer implements IGuiLifecycleHandl
 		@Override
 		@Deprecated
 		public void renderDirtBackground(int blitOffset) { Backgrounds.renderDirtBackground(getMinecraft(), width, height, blitOffset); }
+	}
+
+	protected class ScreenAdaptedWithContainer extends ScreenAdapted implements IHasContainer<C> {
+		protected ScreenAdaptedWithContainer(ITextComponent title) { super(title); }
+
+		@Override
+		public C getContainer() {
+			assert container != null;
+			return container;
+		}
 	}
 }

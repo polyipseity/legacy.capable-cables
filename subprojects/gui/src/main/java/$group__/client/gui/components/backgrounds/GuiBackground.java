@@ -4,7 +4,6 @@ import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiContainer;
 import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.utilities.Backgrounds;
-import $group__.utilities.helpers.Adapters;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.screen.Screen;
@@ -21,7 +20,7 @@ public abstract class GuiBackground extends GuiComponent {
 	@Override
 	public void render(MatrixStack matrix, Point2D mouse, float partialTicks) {
 		if (EnumState.READY.isReachedBy(getState())) {
-			Screen screen = Adapters.get(GuiRoot.class, Screen.class, GuiRoot.TO_SCREEN_ADAPTER_DEFAULT).orElseThrow(BecauseOf::unexpected).apply(getRoot().orElseThrow(BecauseOf::unexpected));
+			Screen screen = getRoot().orElseThrow(BecauseOf::unexpected).getScreen();
 			renderBackground(matrix, screen, mouse, partialTicks);
 		}
 	}
