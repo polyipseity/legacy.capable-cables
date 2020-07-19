@@ -1,5 +1,6 @@
 package $group__.client;
 
+import $group__.client.gui.debug.GuiComponentDebug;
 import $group__.proxies.Proxy;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -18,5 +19,11 @@ public final class ProxyClient extends Proxy implements IProxyClient {
 		else if (event instanceof FMLClientSetupEvent)
 			return processEvent("Client setup", event, this::onSetupSided);
 		return false;
+	}
+
+	@Override
+	public void onSetupClient(FMLClientSetupEvent event) {
+		// todo add debug flag
+		GuiComponentDebug.registerGuiFactory();
 	}
 }

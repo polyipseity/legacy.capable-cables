@@ -22,7 +22,6 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.IWorldPosCallable;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
@@ -42,23 +41,22 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 public enum GuiComponentDebug {
 	;
 
-	public static Block getBlockEntry(ResourceLocation name) { return BlockDebug.INSTANCE.setRegistryName(name); }
+	public static final String PATH = "debug_gui_component";
 
-	public static TileEntityType<TileEntityDebug> getTileEntityEntry(ResourceLocation name) {
-		if (TileEntityDebug.type == null) {
+	public static Block getBlockEntry() { return BlockDebug.INSTANCE; }
+
+	public static TileEntityType<TileEntityDebug> getTileEntityEntry() {
+		if (TileEntityDebug.type == null)
 			TileEntityDebug.type = TileEntityType.Builder.create(TileEntityDebug::new, BlockDebug.INSTANCE).build(null);
-			TileEntityDebug.type.setRegistryName(name);
-		}
 		return TileEntityDebug.type;
 	}
 
-	public static ContainerType<ContainerDebug> getContainerEntry(ResourceLocation name) {
+	public static ContainerType<ContainerDebug> getContainerEntry() {
 		if (ContainerDebug.type == null) {
 			ContainerDebug.type = IForgeContainerType.create((windowId, inv, data) -> {
 				assert Minecraft.getInstance().world != null;
 				return new ContainerDebug(windowId, Minecraft.getInstance().world, data.readBlockPos());
 			});
-			ContainerDebug.type.setRegistryName(name);
 		}
 		return ContainerDebug.type;
 	}

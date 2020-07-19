@@ -1,4 +1,4 @@
-package $group__.common.inventory;
+package $group__.common.registrables.inventory;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Container;
@@ -7,8 +7,8 @@ import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nullable;
 
-import static $group__.common.inventory.bases.ContainerBases.canInteractWithBase;
-import static $group__.common.inventory.bases.ContainerBases.transferStackInSlotBase;
+import static $group__.common.registrables.inventory.bases.ContainerBases.canInteractWithBase;
+import static $group__.common.registrables.inventory.bases.ContainerBases.transferStackInSlotBase;
 
 public class ContainerWrench<T extends ContainerWrench<T>> extends Container {
 	protected ContainerWrench(@Nullable ContainerType<?> type, int id) {

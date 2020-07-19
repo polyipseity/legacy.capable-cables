@@ -1,5 +1,7 @@
 package $group__.common.registrables.items;
 
+import $group__.client.gui.debug.GuiComponentDebug;
+import $group__.common.registrables.blocks.BlocksThis;
 import $group__.common.registrables.items.groups.ItemGroupsThis;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.item.BlockItem;
@@ -9,7 +11,6 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import static $group__.Constants.MOD_ID;
-import static $group__.common.registrables.blocks.BlocksThis.CABLE;
 
 public enum ItemsThis {
 	;
@@ -18,5 +19,9 @@ public enum ItemsThis {
 
 	public static final RegistryObject<Item> WRENCH = ITEMS.register("wrench", ItemWrench::new);
 
-	public static final RegistryObject<Item> CABLE_ITEM = ITEMS.register(CABLE.getId().getPath(), () -> new BlockItem(CABLE.orElseThrow(BecauseOf::unexpected), new Item.Properties().group(ItemGroupsThis.DEFAULT)));
+	public static final RegistryObject<Item> CABLE = ITEMS.register(BlocksThis.CABLE.getId().getPath(), () -> new BlockItem(BlocksThis.CABLE.orElseThrow(BecauseOf::unexpected), new Item.Properties().group(ItemGroupsThis.DEFAULT)));
+
+	// todo add debug flag
+	@SuppressWarnings("unused")
+	private static final RegistryObject<Item> DEBUG_GUI_COMPONENT = ITEMS.register(GuiComponentDebug.PATH, () -> new BlockItem(GuiComponentDebug.getBlockEntry(), new Item.Properties().group(ItemGroupsThis.DEFAULT)));
 }

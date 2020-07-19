@@ -1,4 +1,4 @@
-package $group__.common.inventory.bases;
+package $group__.common.registrables.inventory.bases;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Container;
