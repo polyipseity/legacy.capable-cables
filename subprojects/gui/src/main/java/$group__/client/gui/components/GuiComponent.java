@@ -134,15 +134,15 @@ public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
 	public enum EnumState {
 		NEW {
 			@Override
-			public EnumSet<EnumState> getValidNextStates() { return EnumSet.of(NEW, READY); }
+			public EnumSet<EnumState> getValidNextStates() { return EnumSet.of(NEW, READY, DESTROYED); }
 		},
 		READY {
 			@Override
-			public EnumSet<EnumState> getValidNextStates() { return EnumSet.of(READY, CLOSED); }
+			public EnumSet<EnumState> getValidNextStates() { return EnumSet.of(READY, CLOSED, DESTROYED); }
 		},
 		CLOSED {
 			@Override
-			public EnumSet<EnumState> getValidNextStates() { return EnumSet.of(CLOSED, DESTROYED, NEW); }
+			public EnumSet<EnumState> getValidNextStates() { return EnumSet.of(CLOSED, NEW, DESTROYED); }
 		},
 		DESTROYED {
 			@Override
