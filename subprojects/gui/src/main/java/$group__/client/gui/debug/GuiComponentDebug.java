@@ -120,13 +120,12 @@ final class BlockDebug extends Block {
 	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 		if (!worldIn.isRemote) {
 			TileEntity tileEntity = requireNonNull(worldIn.getTileEntity(pos));
-			if (tileEntity instanceof INamedContainerProvider) {
+			if (tileEntity instanceof INamedContainerProvider)
 				NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) tileEntity, tileEntity.getPos());
-			} else
+			else
 				throw BecauseOf.unexpected();
-			return ActionResultType.SUCCESS;
 		}
-		return super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
+		return ActionResultType.SUCCESS;
 	}
 }
 
