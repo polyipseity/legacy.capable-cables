@@ -6,6 +6,7 @@ import $group__.client.gui.structures.GuiConstraints;
 import $group__.client.gui.traits.IGuiLifecycleHandler;
 import $group__.client.gui.traits.IGuiReRectangleHandler;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.IRenderable;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -37,7 +38,7 @@ public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
 	protected final GuiConstraints constraints = GuiConstraints.CONSTRAINTS_NONE;
 	protected EnumState state = EnumState.NEW;
 
-	public void render(Point2D mouse, float partialTicks) {}
+	public void render(MatrixStack matrix, Point2D mouse, float partialTicks) {}
 
 	public void setRectangle(IGuiReRectangleHandler handler, GuiComponent invoker, Rectangle2D rectangle) {
 		Rectangle2D old = getRectangleView();
@@ -162,5 +163,5 @@ public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
 
 	@Override
 	@Deprecated
-	public final void render(int mouseX, int mouseY, float partialTicks) { render(new Point(mouseX, mouseY), partialTicks); }
+	public final void render(int mouseX, int mouseY, float partialTicks) { render(new MatrixStack(), new Point(mouseX, mouseY), partialTicks); }
 }

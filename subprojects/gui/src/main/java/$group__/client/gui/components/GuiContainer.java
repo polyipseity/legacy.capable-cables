@@ -1,14 +1,18 @@
 package $group__.client.gui.components;
 
 import $group__.client.gui.traits.IGuiLifecycleHandler;
+import $group__.client.gui.utilities.Renders;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -60,9 +64,17 @@ public class GuiContainer extends GuiComponent {
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void render(Point2D mouse, float partialTicks) {
-		if (EnumState.READY.isReachedBy(getState()))
-			getChildren().forEach(c -> c.render(toRelativePointForComponent(c, mouse), partialTicks));
+	public void render(MatrixStack matrix, Point2D mouse, float partialTicks) {
+		if (EnumState.READY.isReachedBy(getState())) {
+			RenderSystem.pushMatrix();
+			getChildren().forEach(c -> {
+				matrix.push();
+				Renders.translateAndScaleFromTo(matrix, new Rectangle2D.Double(0, 0, getRectangle().getWidth(), getRectangle().getHeight()), c.getRectangle());
+				c.render(matrix, toRelativePointForComponent(c, mouse), partialTicks);
+				matrix.pop();
+			});
+			RenderSystem.popMatrix();
+		}
 	}
 
 	@Override
