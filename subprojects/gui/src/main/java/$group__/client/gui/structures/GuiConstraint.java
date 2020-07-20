@@ -1,7 +1,6 @@
 package $group__.client.gui.structures;
 
 import $group__.utilities.helpers.specific.ThrowableUtilities.Try;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,7 +11,9 @@ import java.awt.geom.Rectangle2D;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
 
-@OnlyIn(Dist.CLIENT)
+import static net.minecraftforge.api.distmarker.Dist.CLIENT;
+
+@OnlyIn(CLIENT)
 public final class GuiConstraint implements Cloneable, Consumer<Rectangle2D> {
 	public static final int CONSTRAINT_NONE_VALUE = -1;
 	private static final Rectangle2D CONSTRAINT_RECTANGLE_NONE = new Rectangle(CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE);

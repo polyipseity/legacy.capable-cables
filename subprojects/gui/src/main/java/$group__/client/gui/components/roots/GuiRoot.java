@@ -5,16 +5,14 @@ import $group__.client.gui.components.GuiContainer;
 import $group__.client.gui.components.backgrounds.GuiBackground;
 import $group__.client.gui.traits.IGuiLifecycleHandler;
 import $group__.client.gui.traits.IGuiReRectangleHandler;
-import $group__.client.gui.utilities.Backgrounds;
-import $group__.client.gui.utilities.GuiUtilities;
-import $group__.client.gui.utilities.TextComponents;
-import $group__.client.gui.utilities.Tooltips;
+import $group__.client.gui.utilities.*;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.IHasContainer;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
@@ -121,6 +119,7 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 		return (T) screen.get();
 	}
 
+	@OnlyIn(CLIENT)
 	@SuppressWarnings("deprecation")
 	protected class ScreenAdapted extends Screen {
 		protected ScreenAdapted(ITextComponent title) { super(title); }
@@ -223,32 +222,32 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 
 		@Override
 		@Deprecated
-		protected void hLine(int x1, int x2, int y, int color) { GuiUtilities.hLine(x1, x2, y, color); }
+		protected void hLine(int x1, int x2, int y, int color) { GuiUtilities.hLine(Matrices.getIdentity(), x1, x2, y, color); }
 
 		@Override
 		@Deprecated
-		protected void vLine(int x, int y1, int y2, int color) { GuiUtilities.vLine(x, y1, y2, color); }
+		protected void vLine(int x, int y1, int y2, int color) { GuiUtilities.vLine(Matrices.getIdentity(), x, y1, y2, color); }
 
 		@Override
 		@Deprecated
-		protected void fillGradient(int x1, int y1, int x2, int y2, int colorY1, int colorY2) { GuiUtilities.fillGradient(x1, y1, x2, y2, getBlitOffset(), colorY1, colorY2); }
+		protected void fillGradient(int x1, int y1, int x2, int y2, int y1Color, int y2Color) { GuiUtilities.fillGradient(Matrices.getIdentity(), new Point(x1, y1), new Point(x2, y2), y1Color, y2Color, getBlitOffset()); }
 
 		@Override
 		@Deprecated
-		public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { GuiUtilities.drawCenteredString(font, string, x, y, color); }
+		public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { GuiUtilities.drawCenteredString(Matrices.getIdentity(), font, string, new Point(x, y), color); }
 
 		@Override
 		@Deprecated
-		public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { GuiUtilities.drawRightAlignedString(font, string, x, y, color); }
+		public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { GuiUtilities.drawRightAlignedString(Matrices.getIdentity(), font, string, new Point(x, y), color); }
 
 		@Override
 		@Deprecated
-		public void drawString(FontRenderer font, String string, int x, int y, int color) { GuiUtilities.drawString(font, string, x, y, color); }
+		public void drawString(FontRenderer font, String string, int x, int y, int color) { GuiUtilities.drawString(Matrices.getIdentity(), font, string, new Point(x, y), color); }
 
 		@SuppressWarnings("MagicNumber")
 		@Override
 		@Deprecated
-		public void blit(int x, int y, int u, int v, int xLength, int yLength) { GuiUtilities.blit(x, y, getBlitOffset(), u, v, xLength, yLength, 256, 256); }
+		public void blit(int x, int y, int u, int v, int xLength, int yLength) { GuiUtilities.blit(Matrices.getIdentity(), new Vector3f(x, y, getBlitOffset()), new Point(u, v), new Dimension(xLength, yLength), new Dimension(256, 256)); }
 
 		@Override
 		@Deprecated
@@ -263,6 +262,7 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 		public void renderDirtBackground(int blitOffset) { Backgrounds.renderDirtBackground(getMinecraft(), width, height, blitOffset); }
 	}
 
+	@OnlyIn(CLIENT)
 	protected class ScreenAdaptedWithContainer extends ScreenAdapted implements IHasContainer<C> {
 		protected ScreenAdaptedWithContainer(ITextComponent title) { super(title); }
 

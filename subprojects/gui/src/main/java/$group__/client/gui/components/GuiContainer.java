@@ -1,13 +1,13 @@
 package $group__.client.gui.components;
 
 import $group__.client.gui.components.roots.GuiRoot;
+import $group__.client.gui.structures.GuiDragInfo;
 import $group__.client.gui.traits.IGuiLifecycleHandler;
 import $group__.client.gui.traits.IGuiReRectangleHandler;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.renderer.Matrix4f;
-import net.minecraft.client.renderer.Vector4f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
@@ -31,17 +31,10 @@ public class GuiContainer extends GuiComponent {
 	protected List<GuiComponent> children = new ArrayList<>(INITIAL_CAPACITY_2);
 	@Nullable
 	protected GuiComponent focused = null;
-	protected boolean dragging = false;
+	@Nullable
+	protected GuiDragInfo drag = null;
 
 	public GuiContainer(Rectangle2D rectangle) { super(rectangle); }
-
-	protected static Point2D toRelativePointWithMatrix(Matrix4f matrix, Point2D point) {
-		Vector4f vec = new Vector4f((float) point.getX(), (float) point.getY(), 0, 1);
-		Matrix4f matInv = matrix.copy();
-		if (matInv.invert())
-			vec.transform(matInv);
-		return new Point2D.Double(vec.getX(), vec.getY());
-	}
 
 	protected void add(int index, GuiComponent component) {
 		if (component == this) throw BecauseOf.illegalArgument("component", component);
@@ -110,7 +103,7 @@ public class GuiContainer extends GuiComponent {
 				matrix.push();
 				Point2D xyAbs = toAbsolutePointWithMatrix(transformMatrixForComponent(matrix, c).getLast().getMatrix(), new Point2D.Double(0, rectC.getHeight()));
 				GL11.glEnable(GL11.GL_SCISSOR_TEST);
-				GL11.glScissor((int) toGLNativeCoordinate(xyAbs.getX()), (int) toGLNativeCoordinate(root.getRectangle().getHeight() - xyAbs.getY()), (int) toGLNativeCoordinate(rectC.getWidth()), (int) toGLNativeCoordinate(rectC.getHeight()));
+				GL11.glScissor((int) toNativeCoordinate(xyAbs.getX()), (int) toNativeCoordinate(root.getRectangle().getHeight() - xyAbs.getY()), (int) toNativeCoordinate(rectC.getWidth()), (int) toNativeCoordinate(rectC.getHeight()));
 				c.render(matrix, mouse, partialTicks);
 				GL11.glDisable(GL11.GL_SCISSOR_TEST);
 				matrix.pop();
@@ -155,22 +148,31 @@ public class GuiContainer extends GuiComponent {
 
 	@Override
 	public boolean onMouseClicked(MatrixStack matrix, Point2D mouse, int button) {
-		for (GuiComponent child : getChildren()) {
+		return getChildMouseOver(matrix, mouse).filter(c -> {
 			matrix.push();
-			boolean clicked = child.onMouseClicked(transformMatrixForComponent(matrix, child), mouse, button);
+			boolean ret = c.onMouseClicked(transformMatrixForComponent(matrix, c), mouse, button);
 			matrix.pop();
-			if (clicked) {
-				focused = child;
-				if (button == GLFW_MOUSE_BUTTON_LEFT) dragging = true;
-				return true;
+			if (ret) {
+				focused = c;
+				if (button == GLFW_MOUSE_BUTTON_LEFT)
+					drag = new GuiDragInfo(c, mouse);
 			}
-		}
-		return false;
+			return ret;
+		}).isPresent();
 	}
 
 	@Override
+	public boolean onMouseDragging(MatrixStack matrix, Rectangle2D mouse, int button) { return drag != null && drag.dragged.onMouseDragging(matrix, mouse, button); }
+
+	@Override
 	public boolean onMouseReleased(MatrixStack matrix, Point2D mouse, int button) {
-		dragging = false;
+		if (drag != null) {
+			matrix.push();
+			boolean ret = drag.dragged.onMouseDragged(transformMatrixForComponent(matrix, drag.dragged), drag, mouse, button);
+			matrix.pop();
+			drag = null;
+			if (ret) return true;
+		}
 		return getChildMouseOver(matrix, mouse).filter(c -> {
 			matrix.push();
 			boolean ret = c.onMouseReleased(transformMatrixForComponent(matrix, c), mouse, button);
@@ -230,8 +232,12 @@ public class GuiContainer extends GuiComponent {
 		}
 	}
 
+	protected boolean isBeingDragged() { return getParent().map(p -> p.drag).filter(d -> d.dragged == this).isPresent(); }
+
+	protected Optional<GuiDragInfo> getDragForThis() { return getParent().map(p -> p.drag).filter(d -> d.dragged == this); }
+
 	protected Optional<GuiComponent> getChildMouseOver(MatrixStack matrix, Point2D mouse) {
-		for (GuiComponent child : getChildren()) {
+		for (GuiComponent child : Lists.reverse(getChildren())) {
 			matrix.push();
 			boolean over = child.isMouseOver(transformMatrixForComponent(matrix, child), mouse);
 			matrix.pop();

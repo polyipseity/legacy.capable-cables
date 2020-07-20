@@ -3,94 +3,152 @@ package $group__.client.gui.utilities;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-@OnlyIn(Dist.CLIENT)
+import java.awt.geom.Dimension2D;
+import java.awt.geom.Point2D;
+
+import static $group__.client.gui.utilities.Matrices.*;
+import static net.minecraftforge.api.distmarker.Dist.CLIENT;
+
+@OnlyIn(CLIENT)
 public enum GuiUtilities {
 	;
+
+	public static void drawRectangle(Matrix4f matrix, Point2D p1, Point2D p2, int color) {
+		hLine(matrix, p1.getX(), p2.getX(), p1.getY(), color);
+		vLine(matrix, p1.getX(), p1.getY(), p2.getY(), color);
+		hLine(matrix, p1.getX(), p2.getX(), p2.getY(), color);
+		vLine(matrix, p2.getX(), p1.getY(), p2.getY(), color);
+	}
 
 	/**
 	 * @see AbstractGui#hLine(int, int, int, int)
 	 */
 	@SuppressWarnings("JavadocReference")
-	public static void hLine(int x1, int x2, int y, int color) {
+	public static void hLine(Matrix4f matrix, double x1, double x2, double y, int color) {
 		ScreenUtility.INSTANCE
-				.hLine(x1, x2, y, color);
+				.hLine((int) transformX(x1, matrix), (int) transformX(x2, matrix), (int) transformY(y, matrix), color);
 	}
 
 	/**
 	 * @see AbstractGui#vLine(int, int, int, int)
 	 */
 	@SuppressWarnings("JavadocReference")
-	public static void vLine(int x, int y1, int y2, int color) {
+	public static void vLine(Matrix4f matrix, double x, double y1, double y2, int color) {
 		ScreenUtility.INSTANCE
-				.vLine(x, y1, y2, color);
+				.vLine((int) transformX(x, matrix), (int) transformY(y1, matrix), (int) transformY(y2, matrix), color);
 	}
 
 	/**
 	 * @see AbstractGui#fill(int, int, int, int, int)
 	 */
-	public static void fill(int x1, int y1, int x2, int y2, int color) { AbstractGui.fill(x1, y1, x2, y2, color); }
+	@Deprecated
+	public static void fill(Point2D p1, Point2D p2, int color) { AbstractGui.fill((int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY(), color); }
 
 	/**
 	 * @see AbstractGui#fill(Matrix4f, int, int, int, int, int)
 	 */
-	public static void fill(Matrix4f matrix, int x1, int y1, int x2, int y2, int color) { AbstractGui.fill(matrix, x1, y1, x2, y2, color); }
+	public static void fill(Matrix4f matrix, Point2D p1, Point2D p2, int color) { AbstractGui.fill(matrix, (int) p1.getX(), (int) p1.getY(), (int) p2.getX(), (int) p2.getY(), color); }
 
 	/**
 	 * @see AbstractGui#fillGradient(int, int, int, int, int, int)
 	 */
 	@SuppressWarnings("JavadocReference")
-	public static void fillGradient(int x1, int y1, int x2, int y2, int colorY1, int colorY2, int blitOffset) {
+	public static void fillGradient(Matrix4f matrix, Point2D p1, Point2D p2, int p1Color, int p2Color, int blitOffset) {
+		Point2D xy1 = (Point2D) p1.clone(),
+				xy2 = (Point2D) p2.clone();
+		transformPoint(xy1, matrix);
+		transformPoint(xy2, matrix);
 		ScreenUtility.INSTANCE
 				.setBlitOffset_(blitOffset)
-				.fillGradient(x1, y1, x2, y2, colorY1, colorY2);
+				.fillGradient((int) xy1.getX(), (int) xy1.getY(), (int) xy2.getX(), (int) xy2.getY(), p1Color, p2Color);
 	}
 
 	/**
 	 * @see AbstractGui#drawCenteredString(FontRenderer, String, int, int, int)
 	 */
-	public static void drawCenteredString(FontRenderer font, String string, int x, int y, int color) {
+	public static void drawCenteredString(Matrix4f matrix, FontRenderer font, String string, Point2D p, int color) {
+		Point2D xy = (Point2D) p.clone();
+		transformPoint(xy, matrix);
 		ScreenUtility.INSTANCE
-				.drawCenteredString(font, string, x, y, color);
+				.drawCenteredString(font, string, (int) xy.getX(), (int) xy.getY(), color);
 	}
 
 	/**
 	 * @see AbstractGui#drawRightAlignedString(FontRenderer, String, int, int, int)
 	 */
-	@SuppressWarnings("SuspiciousNameCombination")
-	public static void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) {
+	public static void drawRightAlignedString(Matrix4f matrix, FontRenderer font, String string, Point2D p, int color) {
+		Point2D xy = (Point2D) p.clone();
+		transformPoint(xy, matrix);
 		ScreenUtility.INSTANCE
-				.drawRightAlignedString(font, string, x, y, color);
+				.drawRightAlignedString(font, string, (int) xy.getX(), (int) xy.getY(), color);
 	}
 
 	/**
 	 * @see AbstractGui#drawString(FontRenderer, String, int, int, int)
 	 */
-	public static void drawString(FontRenderer font, String string, int x, int y, int color) {
+	public static void drawString(Matrix4f matrix, FontRenderer font, String string, Point2D p, int color) {
+		Point2D xy = (Point2D) p.clone();
+		transformPoint(xy, matrix);
 		ScreenUtility.INSTANCE
-				.drawString(font, string, x, y, color);
+				.drawString(font, string, (int) xy.getX(), (int) xy.getY(), color);
 	}
 
 	/**
 	 * @see AbstractGui#blit(int, int, int, int, int, TextureAtlasSprite)
 	 */
-	public static void blit(int x, int y, int z, int xLength, int yLength, TextureAtlasSprite sprite) { AbstractGui.blit(x, y, z, xLength, yLength, sprite); }
+	public static void blit(Matrix4f matrix, Vector3f position, Dimension2D dimension, TextureAtlasSprite sprite) {
+		Vector3f vec = position.copy();
+		Dimension2D dim = (Dimension2D) dimension.clone();
+		transformVector3f(vec, matrix);
+		transformDimension(dim, matrix);
+		AbstractGui.blit((int) vec.getX(), (int) vec.getY(), (int) vec.getZ(),
+				(int) dim.getWidth(), (int) dim.getHeight(), sprite);
+	}
 
 	/**
 	 * @see AbstractGui#blit(int, int, int, float, float, int, int, int, int)
 	 */
-	public static void blit(int x, int y, int blitOffset, float u, float v, int xSize, int ySize, int textureWidth, int textureHeight) { AbstractGui.blit(x, y, blitOffset, u, v, xSize, ySize, textureWidth, textureHeight); }
+	public static void blit(Matrix4f matrix, Vector3f position, Point2D spritePosition, Dimension2D dimension, Dimension2D textureDimension) {
+		Vector3f vec = position.copy();
+		Dimension2D dim = (Dimension2D) dimension.clone();
+		transformVector3f(vec, matrix);
+		transformDimension(dim, matrix);
+		AbstractGui.blit((int) vec.getX(), (int) vec.getY(), (int) vec.getZ(),
+				(float) spritePosition.getX(), (float) spritePosition.getY(),
+				(int) dim.getWidth(), (int) dim.getHeight(),
+				(int) textureDimension.getWidth(), (int) textureDimension.getHeight());
+	}
 
 	/**
 	 * @see AbstractGui#blit(int, int, int, int, float, float, int, int, int, int)
 	 */
-	public static void blit(int x, int y, int xSize, int ySize, float u, float v, int uSize, int vSize, int textureWidth, int textureHeight) { AbstractGui.blit(x, y, xSize, ySize, uSize, vSize, textureWidth, textureHeight); }
+	public static void blit(Matrix4f matrix, Point2D position, Dimension2D dimension, Point2D spritePosition, Dimension2D spriteDimension, Dimension2D textureDimension) {
+		Point2D p = (Point2D) position.clone();
+		Dimension2D dim = (Dimension2D) dimension.clone();
+		transformPoint(p, matrix);
+		transformDimension(dim, matrix);
+		AbstractGui.blit((int) p.getX(), (int) p.getY(),
+				(int) dim.getWidth(), (int) dim.getHeight(),
+				(float) spritePosition.getX(), (float) spritePosition.getY(),
+				(int) spriteDimension.getWidth(), (int) spriteDimension.getHeight(),
+				(int) textureDimension.getWidth(), (int) textureDimension.getHeight());
+	}
 
 	/**
 	 * @see AbstractGui#blit(int, int, float, float, int, int, int, int)
 	 */
-	public static void blit(int x, int y, float u, float v, int xLength, int yLength, int uSize, int vSize) { AbstractGui.blit(x, y, u, v, xLength, yLength, uSize, vSize); }
+	public static void blit(Matrix4f matrix, Point2D position, Point2D spritePosition, Dimension2D dimension, Dimension2D textureDimension) {
+		Point2D p = (Point2D) position.clone();
+		Dimension2D dim = (Dimension2D) dimension.clone();
+		transformPoint(p, matrix);
+		transformDimension(dim, matrix);
+		AbstractGui.blit((int) p.getX(), (int) p.getY(),
+				(float) spritePosition.getX(), (float) spritePosition.getY(),
+				(int) dim.getWidth(), (int) dim.getHeight(),
+				(int) textureDimension.getWidth(), (int) textureDimension.getHeight());
+	}
 }

@@ -5,12 +5,12 @@ import $group__.client.gui.structures.GuiAnchors;
 import $group__.client.gui.structures.GuiConstraint;
 import $group__.client.gui.traits.IGuiLifecycleHandler;
 import $group__.client.gui.traits.IGuiReRectangleHandler;
+import $group__.client.gui.utilities.Matrices;
 import $group__.utilities.helpers.Casts;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.IRenderable;
 import net.minecraft.client.renderer.Matrix4f;
-import net.minecraft.client.renderer.Vector4f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.util.TriConsumer;
@@ -18,6 +18,7 @@ import org.apache.logging.log4j.util.TriConsumer;
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
+import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.ref.WeakReference;
@@ -33,7 +34,7 @@ import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_2;
 import static $group__.utilities.helpers.specific.ComparableUtilities.greaterThanOrEqualTo;
 
 @OnlyIn(Dist.CLIENT)
-public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
+public class GuiComponent implements IRenderable, IGuiEventListenerComponent {
 	public final Listeners listeners = new Listeners();
 	@Nullable
 	protected WeakReference<GuiContainer> parent = null;
@@ -46,14 +47,58 @@ public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
 
 	public void render(MatrixStack matrix, Point2D mouse, float partialTicks) {}
 
-	protected Point2D toAbsolutePointWithMatrix(Matrix4f matrix, Point2D point) {
-		Vector4f vec = new Vector4f((float) point.getX(), (float) point.getY(), 0, 1);
-		vec.transform(matrix);
-		return new Point2D.Double(vec.getX(), vec.getY());
+	public static Point2D toAbsolutePointWithMatrix(Matrix4f matrix, Point2D point) {
+		Point2D p = (Point2D) point.clone();
+		Matrices.transformPoint(p, matrix);
+		return p;
 	}
 
-	protected double toGLNativeCoordinate(double d) {
-		return d * getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected).getScreen().getMinecraft().getMainWindow().getGuiScaleFactor();
+	public static Point2D toRelativePointWithMatrix(Matrix4f matrix, Point2D point) {
+		Point2D p = (Point2D) point.clone();
+		Matrix4f mat = matrix.copy();
+		if (mat.invert())
+			Matrices.transformPoint(p, mat);
+		return p;
+	}
+
+	protected double toScaledCoordinate(double d) { return d / getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected).getScreen().getMinecraft().getMainWindow().getGuiScaleFactor(); }
+
+	protected double toNativeCoordinate(double d) { return d * getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected).getScreen().getMinecraft().getMainWindow().getGuiScaleFactor(); }
+
+	protected Point2D toScaledPoint(Point2D point) {
+		Point2D p = (Point2D) point.clone();
+		p.setLocation(toScaledCoordinate(p.getX()), toScaledCoordinate(p.getY()));
+		return p;
+	}
+
+	protected Point2D toNativePoint(Point2D point) {
+		Point2D p = (Point2D) point.clone();
+		p.setLocation(toNativeCoordinate(p.getX()), toNativeCoordinate(p.getY()));
+		return p;
+	}
+
+	protected Dimension2D toNativeDimension(Dimension2D dimension) {
+		Dimension2D dim = (Dimension2D) dimension.clone();
+		dim.setSize(toNativeCoordinate(dim.getWidth()), toNativeCoordinate(dim.getHeight()));
+		return dim;
+	}
+
+	protected Dimension2D toScaledDimension(Dimension2D dimension) {
+		Dimension2D dim = (Dimension2D) dimension.clone();
+		dim.setSize(toScaledCoordinate(dim.getWidth()), toScaledCoordinate(dim.getHeight()));
+		return dim;
+	}
+
+	protected Rectangle2D toScaledRectangle(Rectangle2D rectangle) {
+		Rectangle2D r = (Rectangle2D) rectangle.clone();
+		r.setFrame(toScaledPoint(new Point2D.Double(rectangle.getX(), rectangle.getY())), toScaledDimension(new Dimension((int) rectangle.getWidth(), (int) rectangle.getHeight())));
+		return r;
+	}
+
+	protected Rectangle2D toNativeRectangle(Rectangle2D rectangle) {
+		Rectangle2D r = (Rectangle2D) rectangle.clone();
+		r.setFrame(toNativePoint(new Point2D.Double(rectangle.getX(), rectangle.getY())), toNativeDimension(new Dimension((int) rectangle.getWidth(), (int) rectangle.getHeight())));
+		return r;
 	}
 
 	public void setRectangle(IGuiReRectangleHandler handler, GuiComponent invoker, Rectangle2D rectangle) {
@@ -136,6 +181,15 @@ public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
 	public Rectangle2D getRectangleView() { return (Rectangle2D) rectangle.clone(); }
 
 	protected Rectangle2D getRectangle() { return rectangle; }
+
+	@Override
+	public final GuiComponent getComponent() { return this; }
+
+	@Override
+	public boolean isMouseOver(MatrixStack matrix, Point2D mouse) {
+		Point2D p = toRelativePointWithMatrix(matrix.getLast().getMatrix(), mouse);
+		return p.getX() >= 0 && p.getX() < getRectangle().getWidth() && p.getY() >= 0 && p.getY() < getRectangle().getHeight();
+	}
 
 	public enum EnumState {
 		NEW {
