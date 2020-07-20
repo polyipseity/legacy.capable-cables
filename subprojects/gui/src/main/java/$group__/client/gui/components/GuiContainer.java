@@ -2,10 +2,10 @@ package $group__.client.gui.components;
 
 import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.traits.IGuiLifecycleHandler;
+import $group__.client.gui.traits.IGuiReRectangleHandler;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
@@ -45,7 +45,7 @@ public class GuiContainer extends GuiComponent {
 		component.onAdded(this, index);
 		if (EnumState.READY.isReachedBy(getState())) {
 			new IGuiLifecycleHandler.Initializer(component).initialize(this);
-			getReRectangleHandler().orElseThrow(BecauseOf::unexpected).reRectangle(this);
+			getNearestParentThatIs(IGuiReRectangleHandler.class).orElseThrow(BecauseOf::unexpected).reRectangle(this);
 		}
 	}
 
@@ -71,7 +71,8 @@ public class GuiContainer extends GuiComponent {
 				reRect = true;
 			}
 		}
-		if (reRect) getReRectangleHandler().orElseThrow(BecauseOf::unexpected).reRectangle(this);
+		if (reRect)
+			getNearestParentThatIs(IGuiReRectangleHandler.class).orElseThrow(BecauseOf::unexpected).reRectangle(this);
 	}
 
 	public void remove(GuiComponent... components) {
@@ -81,13 +82,14 @@ public class GuiContainer extends GuiComponent {
 			component.onRemoved(this);
 			if (EnumState.READY.isReachedBy(getState())) reRect = true;
 		}
-		if (reRect) getReRectangleHandler().orElseThrow(BecauseOf::unexpected).reRectangle(this);
+		if (reRect)
+			getNearestParentThatIs(IGuiReRectangleHandler.class).orElseThrow(BecauseOf::unexpected).reRectangle(this);
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void render(MatrixStack matrix, Point2D mouse, float partialTicks) {
-		GuiRoot<?> root = getRoot().orElseThrow(BecauseOf::unexpected);
+		GuiRoot<?> root = getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected);
 		if (EnumState.READY.isReachedBy(getState())) {
 			getChildren().forEach(c -> {
 				Rectangle2D rectC = c.getRectangle();
@@ -95,7 +97,7 @@ public class GuiContainer extends GuiComponent {
 				matrix.translate(rectC.getX(), rectC.getY(), 0);
 				GL11.glEnable(GL11.GL_SCISSOR_TEST);
 				Point2D xyAbs = toAbsolutePoint(new Point2D.Double(rectC.getX(), rectC.getY()));
-				GL11.glScissor((int) xyAbs.getX(), (int) (root.getScreen().height - xyAbs.getY()), (int) rectC.getWidth(), (int) rectC.getHeight());
+				GL11.glScissor((int) xyAbs.getX(), (int) ((root.getRectangle().getHeight() - xyAbs.getY())), (int) rectC.getWidth(), (int) rectC.getHeight());
 				c.render(matrix, toRelativePointForComponent(c, mouse), partialTicks);
 				GL11.glScissor(0, 0, root.getScreen().width, root.getScreen().height);
 				GL11.glDisable(GL11.GL_SCISSOR_TEST);

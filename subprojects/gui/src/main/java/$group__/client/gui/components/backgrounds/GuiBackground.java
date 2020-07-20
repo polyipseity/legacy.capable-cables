@@ -23,7 +23,7 @@ public abstract class GuiBackground extends GuiComponent {
 	@Override
 	public void render(MatrixStack matrix, Point2D mouse, float partialTicks) {
 		if (EnumState.READY.isReachedBy(getState())) {
-			Screen screen = getRoot().orElseThrow(BecauseOf::unexpected).getScreen();
+			Screen screen = getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected).getScreen();
 			renderBackground(matrix, screen, mouse, partialTicks);
 		}
 	}

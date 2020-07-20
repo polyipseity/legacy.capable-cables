@@ -5,6 +5,7 @@ import $group__.client.gui.structures.GuiAnchors;
 import $group__.client.gui.structures.GuiConstraint;
 import $group__.client.gui.traits.IGuiLifecycleHandler;
 import $group__.client.gui.traits.IGuiReRectangleHandler;
+import $group__.utilities.helpers.Casts;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.IRenderable;
@@ -45,12 +46,7 @@ public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
 
 	protected Point2D toAbsolutePoint(Point2D point) {
 		Point2D pointAbs = new Point2D.Double(point.getX() + getRectangle().getX(), point.getY() + getRectangle().getY());
-		if (parent != null) {
-			@Nullable GuiContainer parentCopy = parent.get();
-			if (parentCopy != null)
-				return parentCopy.toAbsolutePoint(pointAbs);
-		}
-		return pointAbs;
+		return getParent().map(p -> p.toAbsolutePoint(pointAbs)).orElse(pointAbs);
 	}
 
 	public void setRectangle(IGuiReRectangleHandler handler, GuiComponent invoker, Rectangle2D rectangle) {
@@ -66,7 +62,7 @@ public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
 		listeners.added.forEach(l -> l.accept(parent));
 	}
 
-	public void onMoved(int index) {}
+	public void onMoved(@SuppressWarnings("unused") int index) {}
 
 	@OverridingMethodsMustInvokeSuper
 	public void onRemoved(GuiContainer parent) {
@@ -78,7 +74,9 @@ public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
 	@OverridingMethodsMustInvokeSuper
 	public void onInitialize(IGuiLifecycleHandler handler, GuiComponent invoker) {
 		setState(EnumState.READY);
-		if (!getRoot().isPresent() || !getLifecycleHandler().isPresent() || !getReRectangleHandler().isPresent())
+		if (!getNearestParentThatIs(GuiRoot.class).isPresent() ||
+				!getNearestParentThatIs(IGuiLifecycleHandler.class).isPresent() ||
+				!getNearestParentThatIs(IGuiReRectangleHandler.class).isPresent())
 			throw new IllegalStateException("Root or handlers not set!");
 		listeners.initialize.forEach(l -> l.accept(handler, invoker));
 	}
@@ -105,22 +103,19 @@ public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
 		listeners.reRectangle.forEach(l -> l.accept(handler, invoker, old));
 	}
 
-	public Optional<? extends GuiRoot<?>> getRoot() {
-		if (this instanceof GuiRoot<?>) return Optional.of((GuiRoot<?>) this);
-		else if (parent != null) return Optional.ofNullable(parent.get()).flatMap(GuiComponent::getRoot);
+	public Optional<GuiContainer> getParent() {
+		if (parent != null) {
+			@Nullable GuiContainer ret = parent.get();
+			if (ret != null) return Optional.of(ret);
+		}
 		return Optional.empty();
 	}
 
-	public Optional<? extends IGuiLifecycleHandler> getLifecycleHandler() {
-		if (this instanceof IGuiLifecycleHandler) return Optional.of((IGuiLifecycleHandler) this);
-		else if (parent != null) return Optional.ofNullable(parent.get()).flatMap(GuiComponent::getLifecycleHandler);
-		return Optional.empty();
-	}
-
-	public Optional<? extends IGuiReRectangleHandler> getReRectangleHandler() {
-		if (this instanceof IGuiReRectangleHandler) return Optional.of((IGuiReRectangleHandler) this);
-		else if (parent != null) return Optional.ofNullable(parent.get()).flatMap(GuiComponent::getReRectangleHandler);
-		return Optional.empty();
+	public <T> Optional<T> getNearestParentThatIs(Class<T> clazz) {
+		if (clazz.isAssignableFrom(getClass()))
+			return Casts.castUnchecked(this);
+		else
+			return getParent().flatMap(p -> p.getNearestParentThatIs(clazz));
 	}
 
 	public EnumState getState() { return state; }

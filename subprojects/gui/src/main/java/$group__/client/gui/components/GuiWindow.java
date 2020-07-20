@@ -1,5 +1,6 @@
 package $group__.client.gui.components;
 
+import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.structures.GuiConstraint;
 import $group__.client.gui.traits.IGuiReRectangleHandler;
 import $group__.client.gui.utilities.GuiUtilities;
@@ -32,7 +33,7 @@ public class GuiWindow extends GuiContainer implements IGuiReRectangleHandler {
 
 	@Override
 	public void setRectangle(IGuiReRectangleHandler handler, GuiComponent invoker, Rectangle2D rectangle) {
-		Rectangle2D rectangleRoot = getRoot().orElseThrow(BecauseOf::unexpected).getRectangleView();
+		Rectangle2D rectangleRoot = getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected).getRectangleView();
 		GuiConstraint constraint = new GuiConstraint(GuiConstraint.getConstraintRectangleNone(), new Rectangle2D.Double(rectangleRoot.getMaxX() - WINDOW_VISIBLE_BORDER_MINIMUM, rectangleRoot.getMaxY() - WINDOW_VISIBLE_BORDER_MINIMUM, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE));
 		constraints.add(constraint);
 		super.setRectangle(handler, invoker, rectangle);
