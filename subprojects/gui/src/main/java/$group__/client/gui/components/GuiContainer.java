@@ -182,9 +182,9 @@ public class GuiContainer extends GuiComponent {
 			else if (next) i = 0;
 			else i = getChildren().size();
 
-			ListIterator<? extends GuiComponent> iterator = getChildren().listIterator(i);
+			ListIterator<GuiComponent> iterator = getChildren().listIterator(i);
 			BooleanSupplier canAdvance = next ? iterator::hasNext : iterator::hasPrevious;
-			Supplier<? extends GuiComponent> advance = next ? iterator::next : iterator::previous;
+			Supplier<GuiComponent> advance = next ? iterator::next : iterator::previous;
 
 			while (canAdvance.getAsBoolean()) {
 				GuiComponent advanced = advance.get();
@@ -199,7 +199,7 @@ public class GuiContainer extends GuiComponent {
 		}
 	}
 
-	protected Optional<? extends GuiComponent> getChildMouseOver(Point2D mouse) {
+	protected Optional<GuiComponent> getChildMouseOver(Point2D mouse) {
 		for (GuiComponent child : getChildren())
 			if (child.isMouseOver(toRelativePointForComponent(child, mouse))) return Optional.of(child);
 		return Optional.empty();
