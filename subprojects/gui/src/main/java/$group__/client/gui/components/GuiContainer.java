@@ -89,7 +89,6 @@ public class GuiContainer extends GuiComponent {
 	public void render(MatrixStack matrix, Point2D mouse, float partialTicks) {
 		GuiRoot<?> root = getRoot().orElseThrow(BecauseOf::unexpected);
 		if (EnumState.READY.isReachedBy(getState())) {
-			RenderSystem.pushMatrix();
 			getChildren().forEach(c -> {
 				Rectangle2D rectC = c.getRectangle();
 				matrix.push();
@@ -102,7 +101,6 @@ public class GuiContainer extends GuiComponent {
 				GL11.glDisable(GL11.GL_SCISSOR_TEST);
 				matrix.pop();
 			});
-			RenderSystem.popMatrix();
 		}
 	}
 
