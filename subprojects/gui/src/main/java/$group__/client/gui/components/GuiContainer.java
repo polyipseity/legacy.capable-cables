@@ -6,6 +6,8 @@ import $group__.client.gui.traits.IGuiReRectangleHandler;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.Vector4f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
@@ -33,7 +35,13 @@ public class GuiContainer extends GuiComponent {
 
 	public GuiContainer(Rectangle2D rectangle) { super(rectangle); }
 
-	protected static Point2D toRelativePointForComponent(GuiComponent component, Point2D point) { return new Point2D.Double(point.getX() - component.getRectangleView().getX(), point.getY() - component.getRectangleView().getY()); }
+	protected static Point2D toRelativePointWithMatrix(Matrix4f matrix, Point2D point) {
+		Vector4f vec = new Vector4f((float) point.getX(), (float) point.getY(), 0, 1);
+		Matrix4f matInv = matrix.copy();
+		if (matInv.invert())
+			vec.transform(matInv);
+		return new Point2D.Double(vec.getX(), vec.getY());
+	}
 
 	protected void add(int index, GuiComponent component) {
 		if (component == this) throw BecauseOf.illegalArgument("component", component);
@@ -86,19 +94,24 @@ public class GuiContainer extends GuiComponent {
 			getNearestParentThatIs(IGuiReRectangleHandler.class).orElseThrow(BecauseOf::unexpected).reRectangle(this);
 	}
 
+	protected MatrixStack transformMatrixForComponent(MatrixStack matrix, GuiComponent component) {
+		Rectangle2D rectC = component.getRectangle();
+		matrix.translate(rectC.getX(), rectC.getY(), 0);
+		return matrix;
+	}
+
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void render(MatrixStack matrix, Point2D mouse, float partialTicks) {
-		GuiRoot<?> root = getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected);
 		if (EnumState.READY.isReachedBy(getState())) {
+			GuiRoot<?> root = getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected);
 			getChildren().forEach(c -> {
 				Rectangle2D rectC = c.getRectangle();
 				matrix.push();
-				matrix.translate(rectC.getX(), rectC.getY(), 0);
+				Point2D xyAbs = toAbsolutePointWithMatrix(transformMatrixForComponent(matrix, c).getLast().getMatrix(), new Point2D.Double(0, rectC.getHeight()));
 				GL11.glEnable(GL11.GL_SCISSOR_TEST);
-				Point2D xyAbs = toAbsolutePoint(new Point2D.Double(rectC.getX(), rectC.getMaxY()));
 				GL11.glScissor((int) toGLNativeCoordinate(xyAbs.getX()), (int) toGLNativeCoordinate(root.getRectangle().getHeight() - xyAbs.getY()), (int) toGLNativeCoordinate(rectC.getWidth()), (int) toGLNativeCoordinate(rectC.getHeight()));
-				c.render(matrix, toRelativePointForComponent(c, mouse), partialTicks);
+				c.render(matrix, mouse, partialTicks);
 				GL11.glDisable(GL11.GL_SCISSOR_TEST);
 				matrix.pop();
 			});
@@ -134,12 +147,19 @@ public class GuiContainer extends GuiComponent {
 	}
 
 	@Override
-	public void onMouseMoved(Point2D mouse) { getChildren().forEach(c -> c.onMouseMoved(toRelativePointForComponent(c, mouse))); }
+	public void onMouseMoved(MatrixStack matrix, Point2D mouse) {
+		matrix.push();
+		getChildren().forEach(c -> c.onMouseMoved(transformMatrixForComponent(matrix, c), mouse));
+		matrix.pop();
+	}
 
 	@Override
-	public boolean onMouseClicked(Point2D mouse, int button) {
+	public boolean onMouseClicked(MatrixStack matrix, Point2D mouse, int button) {
 		for (GuiComponent child : getChildren()) {
-			if (child.onMouseClicked(toRelativePointForComponent(child, mouse), button)) {
+			matrix.push();
+			boolean clicked = child.onMouseClicked(transformMatrixForComponent(matrix, child), mouse, button);
+			matrix.pop();
+			if (clicked) {
 				focused = child;
 				if (button == GLFW_MOUSE_BUTTON_LEFT) dragging = true;
 				return true;
@@ -149,13 +169,25 @@ public class GuiContainer extends GuiComponent {
 	}
 
 	@Override
-	public boolean onMouseReleased(Point2D mouse, int button) {
+	public boolean onMouseReleased(MatrixStack matrix, Point2D mouse, int button) {
 		dragging = false;
-		return getChildMouseOver(mouse).filter(c -> c.onMouseReleased(toRelativePointForComponent(c, mouse), button)).isPresent();
+		return getChildMouseOver(matrix, mouse).filter(c -> {
+			matrix.push();
+			boolean ret = c.onMouseReleased(transformMatrixForComponent(matrix, c), mouse, button);
+			matrix.pop();
+			return ret;
+		}).isPresent();
 	}
 
 	@Override
-	public boolean onMouseScrolled(Point2D mouse, double scrollDelta) { return getChildMouseOver(mouse).filter(c -> c.onMouseScrolled(toRelativePointForComponent(c, mouse), scrollDelta)).isPresent(); }
+	public boolean onMouseScrolled(MatrixStack matrix, Point2D mouse, double scrollDelta) {
+		return getChildMouseOver(matrix, mouse).filter(c -> {
+			matrix.push();
+			boolean ret = c.onMouseScrolled(transformMatrixForComponent(matrix, c), mouse, scrollDelta);
+			matrix.pop();
+			return ret;
+		}).isPresent();
+	}
 
 	@Override
 	public boolean onKeyPressed(int key, int scanCode, int modifiers) { return focused != null && focused.onKeyPressed(key, scanCode, modifiers); }
@@ -198,9 +230,13 @@ public class GuiContainer extends GuiComponent {
 		}
 	}
 
-	protected Optional<GuiComponent> getChildMouseOver(Point2D mouse) {
-		for (GuiComponent child : getChildren())
-			if (child.isMouseOver(toRelativePointForComponent(child, mouse))) return Optional.of(child);
+	protected Optional<GuiComponent> getChildMouseOver(MatrixStack matrix, Point2D mouse) {
+		for (GuiComponent child : getChildren()) {
+			matrix.push();
+			boolean over = child.isMouseOver(transformMatrixForComponent(matrix, child), mouse);
+			matrix.pop();
+			if (over) return Optional.of(child);
+		}
 		return Optional.empty();
 	}
 }

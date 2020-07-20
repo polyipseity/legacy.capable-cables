@@ -17,7 +17,11 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
 public class GuiWindow extends GuiContainer implements IGuiReRectangleHandler {
-	public static final int WINDOW_VISIBLE_BORDER_MINIMUM = 5;
+	// TODO make value not hardcoded through themes
+	public static final int
+			WINDOW_RE_RECTANGLE_WIDTH = 5, // COMMENT external
+			WINDOW_DRAG_BAR_WIDTH = 5, // COMMENT internal top
+			WINDOW_VISIBLE_BORDER_MINIMUM = 5;
 	public Color color;
 
 	public GuiWindow(Rectangle2D rectangle, Color color) {
@@ -26,9 +30,16 @@ public class GuiWindow extends GuiContainer implements IGuiReRectangleHandler {
 	}
 
 	@Override
+	protected MatrixStack transformMatrixForComponent(MatrixStack matrix, GuiComponent component) {
+		MatrixStack mat = super.transformMatrixForComponent(matrix, component);
+		mat.translate(0, WINDOW_DRAG_BAR_WIDTH, 0);
+		return mat;
+	}
+
+	@Override
 	public void render(MatrixStack matrix, Point2D mouse, float partialTicks) {
 		if (EnumState.READY.isReachedBy(getState())) {
-			GuiUtilities.fill(matrix.getLast().getMatrix(), 0, 0, (int) getRectangle().getMaxX(), (int) getRectangle().getMaxY(), color.getRGB());
+			GuiUtilities.fill(matrix.getLast().getMatrix(), 0, 0, (int) getRectangle().getWidth(), (int) getRectangle().getHeight(), color.getRGB());
 			super.render(matrix, mouse, partialTicks);
 		}
 	}

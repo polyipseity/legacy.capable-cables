@@ -9,6 +9,8 @@ import $group__.utilities.helpers.Casts;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.IRenderable;
+import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.Vector4f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.util.TriConsumer;
@@ -44,9 +46,10 @@ public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
 
 	public void render(MatrixStack matrix, Point2D mouse, float partialTicks) {}
 
-	protected Point2D toAbsolutePoint(Point2D point) {
-		Point2D pointAbs = new Point2D.Double(point.getX() + getRectangle().getX(), point.getY() + getRectangle().getY());
-		return getParent().map(p -> p.toAbsolutePoint(pointAbs)).orElse(pointAbs);
+	protected Point2D toAbsolutePointWithMatrix(Matrix4f matrix, Point2D point) {
+		Vector4f vec = new Vector4f((float) point.getX(), (float) point.getY(), 0, 1);
+		vec.transform(matrix);
+		return new Point2D.Double(vec.getX(), vec.getY());
 	}
 
 	protected double toGLNativeCoordinate(double d) {
