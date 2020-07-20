@@ -49,6 +49,10 @@ public class GuiComponent implements IRenderable, IGuiEventListenerImproved {
 		return getParent().map(p -> p.toAbsolutePoint(pointAbs)).orElse(pointAbs);
 	}
 
+	protected double toGLNativeCoordinate(double d) {
+		return d * getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected).getScreen().getMinecraft().getMainWindow().getGuiScaleFactor();
+	}
+
 	public void setRectangle(IGuiReRectangleHandler handler, GuiComponent invoker, Rectangle2D rectangle) {
 		Rectangle2D old = getRectangleView();
 		getRectangle().setRect(rectangle);

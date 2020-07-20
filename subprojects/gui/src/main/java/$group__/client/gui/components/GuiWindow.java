@@ -27,8 +27,10 @@ public class GuiWindow extends GuiContainer implements IGuiReRectangleHandler {
 
 	@Override
 	public void render(MatrixStack matrix, Point2D mouse, float partialTicks) {
-		GuiUtilities.fill(matrix.getLast().getMatrix(), (int) getRectangle().getX(), (int) getRectangle().getY(), (int) getRectangle().getMaxX(), (int) getRectangle().getMaxY(), color.getRGB());
-		super.render(matrix, mouse, partialTicks);
+		if (EnumState.READY.isReachedBy(getState())) {
+			GuiUtilities.fill(matrix.getLast().getMatrix(), 0, 0, (int) getRectangle().getMaxX(), (int) getRectangle().getMaxY(), color.getRGB());
+			super.render(matrix, mouse, partialTicks);
+		}
 	}
 
 	@Override

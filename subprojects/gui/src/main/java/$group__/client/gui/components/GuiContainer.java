@@ -96,10 +96,9 @@ public class GuiContainer extends GuiComponent {
 				matrix.push();
 				matrix.translate(rectC.getX(), rectC.getY(), 0);
 				GL11.glEnable(GL11.GL_SCISSOR_TEST);
-				Point2D xyAbs = toAbsolutePoint(new Point2D.Double(rectC.getX(), rectC.getY()));
-				GL11.glScissor((int) xyAbs.getX(), (int) ((root.getRectangle().getHeight() - xyAbs.getY())), (int) rectC.getWidth(), (int) rectC.getHeight());
+				Point2D xyAbs = toAbsolutePoint(new Point2D.Double(rectC.getX(), rectC.getMaxY()));
+				GL11.glScissor((int) toGLNativeCoordinate(xyAbs.getX()), (int) toGLNativeCoordinate(root.getRectangle().getHeight() - xyAbs.getY()), (int) toGLNativeCoordinate(rectC.getWidth()), (int) toGLNativeCoordinate(rectC.getHeight()));
 				c.render(matrix, toRelativePointForComponent(c, mouse), partialTicks);
-				GL11.glScissor(0, 0, root.getScreen().width, root.getScreen().height);
 				GL11.glDisable(GL11.GL_SCISSOR_TEST);
 				matrix.pop();
 			});
