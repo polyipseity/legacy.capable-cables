@@ -88,7 +88,7 @@ public class GuiWindow extends GuiContainer implements IGuiReRectangleHandler {
 	public void reRectangle(GuiComponent invoker, Rectangle2D rectangle) { setRectangle(this, invoker, rectangle); }
 
 	@Override
-	public boolean onMouseClicked(MatrixStack matrix, Point2D mouse, int button) { return super.onMouseClicked(matrix, mouse, button) || toRelativePointWithMatrix(matrix.getLast().getMatrix(), mouse).getY() < WINDOW_DRAG_BAR_THICKNESS; }
+	public boolean onMouseClicked(MatrixStack matrix, Point2D mouse, int button) { return super.onMouseClicked(matrix, mouse, button) || ReferenceConverters.toRelativePoint(matrix.getLast().getMatrix(), mouse).getY() < WINDOW_DRAG_BAR_THICKNESS; }
 
 	@Override
 	public boolean onMouseDragging(MatrixStack matrix, Rectangle2D mouse, int button) { return super.onMouseDragging(matrix, mouse, button) || isBeingDragged(); }

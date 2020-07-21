@@ -101,9 +101,9 @@ public class GuiContainer extends GuiComponent {
 			getChildren().forEach(c -> {
 				Rectangle2D rectC = c.getRectangle();
 				matrix.push();
-				Point2D xyAbs = toAbsolutePointWithMatrix(transformMatrixForComponent(matrix, c).getLast().getMatrix(), new Point2D.Double(0, rectC.getHeight()));
+				Point2D xyAbs = ReferenceConverters.toAbsolutePoint(transformMatrixForComponent(matrix, c).getLast().getMatrix(), new Point2D.Double(0, rectC.getHeight()));
 				GL11.glEnable(GL11.GL_SCISSOR_TEST);
-				GL11.glScissor((int) toNativeCoordinate(xyAbs.getX()), (int) toNativeCoordinate(root.getRectangle().getHeight() - xyAbs.getY()), (int) toNativeCoordinate(rectC.getWidth()), (int) toNativeCoordinate(rectC.getHeight()));
+				GL11.glScissor((int) coordinateConverters.toNativeCoordinate(xyAbs.getX()), (int) coordinateConverters.toNativeCoordinate(root.getRectangle().getHeight() - xyAbs.getY()), (int) coordinateConverters.toNativeCoordinate(rectC.getWidth()), (int) coordinateConverters.toNativeCoordinate(rectC.getHeight()));
 				c.render(matrix, mouse, partialTicks);
 				GL11.glDisable(GL11.GL_SCISSOR_TEST);
 				matrix.pop();
