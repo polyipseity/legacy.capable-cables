@@ -1,4 +1,4 @@
-package $group__.utilities.helpers.specific;
+package $group__.utilities.specific;
 
 import com.google.common.collect.MapMaker;
 
@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_3;
-import static $group__.utilities.helpers.Concurrency.MULTI_THREAD_THREAD_COUNT;
-import static $group__.utilities.helpers.Concurrency.SINGLE_THREAD_THREAD_COUNT;
+import static $group__.utilities.Capacities.INITIAL_CAPACITY_3;
+import static $group__.utilities.Concurrency.MULTI_THREAD_THREAD_COUNT;
+import static $group__.utilities.Concurrency.SINGLE_THREAD_THREAD_COUNT;
 
 public enum Maps {
 	/* MARK empty */;

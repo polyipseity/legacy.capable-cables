@@ -1,10 +1,10 @@
-package $group__.utilities.helpers.specific;
+package $group__.utilities.specific;
 
 import java.awt.*;
 import java.util.regex.Matcher;
 
-import static $group__.utilities.helpers.RadixUtilities.RADIX_HEX;
-import static $group__.utilities.helpers.specific.Patterns.HASH_PATTERN;
+import static $group__.utilities.RadixUtilities.RADIX_HEX;
+import static $group__.utilities.specific.Patterns.HASH_PATTERN;
 
 public enum Colors {
 	;

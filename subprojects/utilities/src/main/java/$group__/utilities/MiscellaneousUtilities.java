@@ -1,9 +1,9 @@
-package $group__.utilities.helpers;
+package $group__.utilities;
 
 import javax.annotation.Nullable;
 
-import static $group__.utilities.helpers.Casts.castUncheckedUnboxed;
-import static $group__.utilities.helpers.Primitives.PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP;
+import static $group__.utilities.Casts.castUncheckedUnboxed;
+import static $group__.utilities.Primitives.PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP;
 import static java.util.Objects.requireNonNull;
 
 /**

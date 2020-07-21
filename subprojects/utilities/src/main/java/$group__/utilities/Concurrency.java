@@ -1,4 +1,4 @@
-package $group__.utilities.helpers;
+package $group__.utilities;
 
 import net.minecraftforge.api.distmarker.Dist;
 

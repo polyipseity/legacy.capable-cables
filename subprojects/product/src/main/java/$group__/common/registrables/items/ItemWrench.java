@@ -4,7 +4,7 @@ import $group__.common.registrables.items.groups.ItemGroupsThis;
 import $group__.common.registrables.utilities.helpers.RegistrableUtilities.BlockUtilities;
 import $group__.common.registrables.utilities.helpers.RegistrableUtilities.NBTs;
 import $group__.common.registrables.utilities.helpers.RegistrableUtilities.RayTraceResults;
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
@@ -33,8 +33,8 @@ import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static $group__.Globals.LOGGER;
-import static $group__.utilities.helpers.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
-import static $group__.utilities.helpers.specific.Optionals.unboxOptional;
+import static $group__.utilities.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
+import static $group__.utilities.specific.Optionals.unboxOptional;
 
 public class ItemWrench extends Item {
 	protected ItemWrench() {

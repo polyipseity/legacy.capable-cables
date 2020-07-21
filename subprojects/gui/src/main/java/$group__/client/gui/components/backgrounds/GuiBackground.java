@@ -5,7 +5,7 @@ import $group__.client.gui.components.GuiContainer;
 import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.structures.AffineTransformStack;
 import $group__.client.gui.utilities.GuiUtilities;
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.api.distmarker.OnlyIn;
 

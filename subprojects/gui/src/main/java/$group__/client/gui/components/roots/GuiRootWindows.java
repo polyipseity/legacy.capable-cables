@@ -4,7 +4,7 @@ import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiWindow;
 import $group__.client.gui.components.backgrounds.GuiBackground;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.util.text.ITextComponent;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_2;
+import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)

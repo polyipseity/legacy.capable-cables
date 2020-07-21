@@ -12,7 +12,7 @@ import $group__.client.gui.utilities.GuiUtilities.DrawingUtilities;
 import $group__.client.gui.utilities.TextComponents;
 import $group__.client.gui.utilities.Tooltips;
 import $group__.client.gui.utilities.Transforms.AffineTransforms;
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.IGuiEventListener;
@@ -32,7 +32,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.Optional;
 
-import static $group__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
+import static $group__.utilities.Casts.castUncheckedUnboxedNonnull;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 

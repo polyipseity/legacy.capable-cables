@@ -1,4 +1,4 @@
-package $group__.utilities.helpers.specific;
+package $group__.utilities.specific;
 
 import java.util.Collection;
 import java.util.function.Supplier;

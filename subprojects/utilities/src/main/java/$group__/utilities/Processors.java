@@ -1,6 +1,6 @@
-package $group__.utilities.helpers;
+package $group__.utilities;
 
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableSet;
 
 import javax.annotation.Nullable;
@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_2;
-import static $group__.utilities.helpers.specific.Streams.streamSmart;
+import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
+import static $group__.utilities.specific.Streams.streamSmart;
 
 public enum Processors {
 	;

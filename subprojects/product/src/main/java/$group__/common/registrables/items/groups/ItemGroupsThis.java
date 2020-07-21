@@ -1,7 +1,7 @@
 package $group__.common.registrables.items.groups;
 
 import $group__.common.registrables.items.ItemsThis;
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.OnlyIn;

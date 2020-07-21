@@ -1,6 +1,6 @@
 package $group__;
 
-import $group__.utilities.helpers.specific.Maps;
+import $group__.utilities.specific.Maps;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;

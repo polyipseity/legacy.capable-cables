@@ -6,7 +6,7 @@ import $group__.client.gui.structures.GuiDragInfo;
 import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
 import $group__.client.gui.utilities.GuiUtilities.UnboxingUtilities;
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import net.minecraftforge.api.distmarker.Dist;
@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_2;
+import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 @OnlyIn(Dist.CLIENT)

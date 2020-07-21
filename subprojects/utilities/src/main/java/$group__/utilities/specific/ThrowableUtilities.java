@@ -1,4 +1,4 @@
-package $group__.utilities.helpers.specific;
+package $group__.utilities.specific;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.Level;
@@ -9,12 +9,12 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_3;
-import static $group__.utilities.helpers.Dynamics.UNSAFE;
-import static $group__.utilities.helpers.Dynamics.getCallerClass;
-import static $group__.utilities.helpers.specific.Loggers.EnumMessages.FACTORY_SIMPLE_MESSAGE;
-import static $group__.utilities.helpers.specific.Loggers.EnumMessages.SUFFIX_WITH_THROWABLE;
-import static $group__.utilities.helpers.specific.ThrowableUtilities.ThrowableCatcher.*;
+import static $group__.utilities.Capacities.INITIAL_CAPACITY_3;
+import static $group__.utilities.Dynamics.UNSAFE;
+import static $group__.utilities.Dynamics.getCallerClass;
+import static $group__.utilities.specific.Loggers.EnumMessages.FACTORY_SIMPLE_MESSAGE;
+import static $group__.utilities.specific.Loggers.EnumMessages.SUFFIX_WITH_THROWABLE;
+import static $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher.*;
 
 public enum ThrowableUtilities {
 	;

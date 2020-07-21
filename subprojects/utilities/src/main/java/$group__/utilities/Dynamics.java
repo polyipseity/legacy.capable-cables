@@ -1,9 +1,9 @@
-package $group__.utilities.helpers;
+package $group__.utilities;
 
-import $group__.utilities.helpers.specific.Maps;
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
-import $group__.utilities.helpers.specific.ThrowableUtilities.ThrowableCatcher;
-import $group__.utilities.helpers.specific.ThrowableUtilities.Try;
+import $group__.utilities.specific.Maps;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher;
+import $group__.utilities.specific.ThrowableUtilities.Try;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -25,13 +25,13 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
-import static $group__.utilities.helpers.Assertions.assertNonnull;
-import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_2;
-import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_3;
-import static $group__.utilities.helpers.Casts.castUncheckedUnboxed;
-import static $group__.utilities.helpers.Casts.castUncheckedUnboxedNonnull;
-import static $group__.utilities.helpers.Dynamics.Invocations.Fields.FIELD_MODIFIERS_SETTER;
-import static $group__.utilities.helpers.specific.Loggers.EnumMessages.*;
+import static $group__.utilities.Assertions.assertNonnull;
+import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
+import static $group__.utilities.Capacities.INITIAL_CAPACITY_3;
+import static $group__.utilities.Casts.castUncheckedUnboxed;
+import static $group__.utilities.Casts.castUncheckedUnboxedNonnull;
+import static $group__.utilities.Dynamics.Invocations.Fields.FIELD_MODIFIERS_SETTER;
+import static $group__.utilities.specific.Loggers.EnumMessages.*;
 import static java.lang.invoke.LambdaMetafactory.metafactory;
 import static java.lang.invoke.MethodType.methodType;
 import static java.util.Objects.requireNonNull;

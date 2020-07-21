@@ -1,7 +1,7 @@
 package $group__.client.gui.traits.handlers;
 
 import $group__.client.gui.components.GuiComponent;
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;

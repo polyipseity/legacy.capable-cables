@@ -1,8 +1,8 @@
-package $group__.utilities.helpers;
+package $group__.utilities;
 
-import $group__.utilities.helpers.specific.Optionals;
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
-import $group__.utilities.helpers.specific.ThrowableUtilities.ThrowableCatcher;
+import $group__.utilities.specific.Optionals;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;

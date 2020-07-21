@@ -2,10 +2,10 @@ package $group__.client.gui.structures;
 
 import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
-import $group__.utilities.helpers.Recursions;
-import $group__.utilities.helpers.specific.Maps;
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
-import $group__.utilities.helpers.specific.ThrowableUtilities.Try;
+import $group__.utilities.Recursions;
+import $group__.utilities.specific.Maps;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.specific.ThrowableUtilities.Try;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.minecraftforge.api.distmarker.OnlyIn;

@@ -1,6 +1,6 @@
 package $group__.client.gui.utilities;
 
-import $group__.utilities.helpers.Preconditions;
+import $group__.utilities.Preconditions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;

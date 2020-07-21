@@ -1,4 +1,4 @@
-package $group__.utilities.helpers.specific;
+package $group__.utilities.specific;
 
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.ParameterizedMessage;
@@ -16,9 +16,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import static $group__.utilities.helpers.Preconditions.checkArgumentTypes;
-import static $group__.utilities.helpers.Preconditions.checkArrayContentType;
-import static $group__.utilities.helpers.Primitives.PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP;
+import static $group__.utilities.Preconditions.checkArgumentTypes;
+import static $group__.utilities.Preconditions.checkArrayContentType;
+import static $group__.utilities.Primitives.PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP;
 import static java.util.Arrays.asList;
 
 public enum Loggers {

@@ -7,8 +7,8 @@ import $group__.client.gui.structures.GuiConstraint;
 import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
 import $group__.client.gui.utilities.Transforms.AffineTransforms;
-import $group__.utilities.helpers.Casts;
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.Casts;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.util.TriConsumer;
 
@@ -24,10 +24,10 @@ import java.util.function.Consumer;
 
 import static $group__.client.gui.structures.GuiConstraint.CONSTRAINT_NONE_VALUE;
 import static $group__.client.gui.structures.GuiConstraint.getConstraintRectangleNone;
-import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_1;
-import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_2;
-import static $group__.utilities.helpers.MiscellaneousUtilities.K;
-import static $group__.utilities.helpers.specific.ComparableUtilities.greaterThanOrEqualTo;
+import static $group__.utilities.Capacities.INITIAL_CAPACITY_1;
+import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
+import static $group__.utilities.MiscellaneousUtilities.K;
+import static $group__.utilities.specific.ComparableUtilities.greaterThanOrEqualTo;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)

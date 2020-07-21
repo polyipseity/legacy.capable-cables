@@ -1,4 +1,4 @@
-package $group__.utilities.helpers;
+package $group__.utilities;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -7,9 +7,9 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
-import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_2;
-import static $group__.utilities.helpers.Casts.castUnchecked;
-import static $group__.utilities.helpers.specific.Maps.MAP_MAKER_MULTI_THREAD;
+import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
+import static $group__.utilities.Casts.castUnchecked;
+import static $group__.utilities.specific.Maps.MAP_MAKER_MULTI_THREAD;
 
 public enum Adapters {
 	;

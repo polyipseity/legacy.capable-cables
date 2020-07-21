@@ -1,6 +1,6 @@
 package $group__.client.gui.utilities;
 
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.util.concurrent.AtomicDouble;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.Matrix4f;

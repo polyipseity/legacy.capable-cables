@@ -1,6 +1,6 @@
 package $group__.client.gui.structures;
 
-import $group__.utilities.helpers.specific.ThrowableUtilities.Try;
+import $group__.utilities.specific.ThrowableUtilities.Try;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

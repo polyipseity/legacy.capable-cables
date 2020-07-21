@@ -1,12 +1,13 @@
 package $group__.utilities.helpers;
 
+import $group__.utilities.MiscellaneousUtilities;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.annotation.Testable;
 
-import static $group__.utilities.helpers.MiscellaneousUtilities.getDefaultValue;
-import static $group__.utilities.helpers.MiscellaneousUtilities.getDefaultValueNonnull;
-import static $group__.utilities.helpers.Primitives.PRIMITIVE_DATA_TYPE_SET;
-import static $group__.utilities.helpers.Primitives.PRIMITIVE_TYPE_SET;
+import static $group__.utilities.MiscellaneousUtilities.getDefaultValue;
+import static $group__.utilities.MiscellaneousUtilities.getDefaultValueNonnull;
+import static $group__.utilities.Primitives.PRIMITIVE_DATA_TYPE_SET;
+import static $group__.utilities.Primitives.PRIMITIVE_TYPE_SET;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.fail;
 import static tests.TestUtilities.consumeCaught;

@@ -1,14 +1,14 @@
-package $group__.utilities.helpers;
+package $group__.utilities;
 
-import $group__.utilities.helpers.specific.Maps;
-import $group__.utilities.helpers.specific.ThrowableUtilities;
+import $group__.utilities.specific.Maps;
+import $group__.utilities.specific.ThrowableUtilities;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.ConcurrentMap;
 
-import static $group__.utilities.helpers.Dynamics.getCallerClass;
-import static $group__.utilities.helpers.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
+import static $group__.utilities.Dynamics.getCallerClass;
+import static $group__.utilities.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkElementIndex;
 import static java.lang.System.lineSeparator;

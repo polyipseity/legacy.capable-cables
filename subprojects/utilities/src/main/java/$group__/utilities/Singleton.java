@@ -1,6 +1,5 @@
 package $group__.utilities;
 
-import $group__.utilities.helpers.Casts;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
@@ -9,10 +8,10 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
-import static $group__.utilities.helpers.Dynamics.IMPL_LOOKUP;
-import static $group__.utilities.helpers.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
-import static $group__.utilities.helpers.specific.Maps.MAP_MAKER_MULTI_THREAD;
-import static $group__.utilities.helpers.specific.ThrowableUtilities.*;
+import static $group__.utilities.Dynamics.IMPL_LOOKUP;
+import static $group__.utilities.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
+import static $group__.utilities.specific.Maps.MAP_MAKER_MULTI_THREAD;
+import static $group__.utilities.specific.ThrowableUtilities.*;
 import static com.google.common.collect.Maps.immutableEntry;
 import static java.lang.System.lineSeparator;
 import static java.lang.invoke.MethodType.methodType;

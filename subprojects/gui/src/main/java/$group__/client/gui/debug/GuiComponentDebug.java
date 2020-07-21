@@ -3,7 +3,7 @@ package $group__.client.gui.debug;
 import $group__.client.gui.components.GuiWindow;
 import $group__.client.gui.components.backgrounds.GuiBackgroundDefault;
 import $group__.client.gui.components.roots.GuiRootWindows;
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -38,7 +38,7 @@ import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
-import static $group__.utilities.helpers.Preconditions.requireRunOnceOnly;
+import static $group__.utilities.Preconditions.requireRunOnceOnly;
 import static java.util.Objects.requireNonNull;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 

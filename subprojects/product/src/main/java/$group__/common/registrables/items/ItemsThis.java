@@ -3,7 +3,7 @@ package $group__.common.registrables.items;
 import $group__.client.gui.debug.GuiComponentDebug;
 import $group__.common.registrables.blocks.BlocksThis;
 import $group__.common.registrables.items.groups.ItemGroupsThis;
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.RegistryObject;

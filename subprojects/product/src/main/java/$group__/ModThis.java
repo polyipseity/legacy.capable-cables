@@ -19,8 +19,8 @@ import static $group__.common.registrables.blocks.BlocksThis.BLOCKS;
 import static $group__.common.registrables.inventory.ContainersThis.CONTAINERS;
 import static $group__.common.registrables.items.ItemsThis.ITEMS;
 import static $group__.common.registrables.tileentities.TileEntityTypesThis.TILE_ENTITIES;
-import static $group__.utilities.helpers.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
-import static $group__.utilities.helpers.specific.Loggers.EnumMessages.PREFIX_MOD_LIFECYCLE_MESSAGE;
+import static $group__.utilities.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
+import static $group__.utilities.specific.Loggers.EnumMessages.PREFIX_MOD_LIFECYCLE_MESSAGE;
 
 @Mod(MOD_ID)
 @EventBusSubscriber(bus = Bus.MOD)

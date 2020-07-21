@@ -1,6 +1,6 @@
-package $group__.utilities.helpers.specific;
+package $group__.utilities.specific;
 
-import $group__.utilities.helpers.Assertions;
+import $group__.utilities.Assertions;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
