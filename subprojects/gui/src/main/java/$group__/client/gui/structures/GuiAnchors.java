@@ -183,6 +183,7 @@ public final class GuiAnchors implements Cloneable {
 		return ret;
 	}
 
+	@OnlyIn(CLIENT)
 	@Immutable
 	public final class Anchor implements Cloneable, TriConsumer<IGuiReRectangleHandler, GuiComponent, Rectangle2D> {
 		public final WeakReference<GuiComponent> from;

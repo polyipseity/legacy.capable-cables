@@ -161,6 +161,7 @@ public class GuiComponent implements IRenderable, IGuiEventListenerComponent {
 		public boolean isReachedBy(EnumState state) { return greaterThanOrEqualTo(state, this); }
 	}
 
+	@OnlyIn(CLIENT)
 	public static class Listeners {
 		public final List<Consumer<? super GuiContainer>>
 				added = new ArrayList<>(INITIAL_CAPACITY_2),
