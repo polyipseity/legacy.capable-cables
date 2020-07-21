@@ -1,59 +1,65 @@
 package $group__.client.gui.components;
 
 import $group__.client.gui.components.roots.GuiRoot;
+import $group__.client.gui.structures.AffineTransformStack;
 import $group__.client.gui.structures.GuiAnchors;
 import $group__.client.gui.structures.GuiConstraint;
-import $group__.client.gui.traits.IGuiLifecycleHandler;
-import $group__.client.gui.traits.IGuiReRectangleHandler;
-import $group__.client.gui.utilities.Matrices;
+import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
+import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
+import $group__.client.gui.utilities.Transforms.AffineTransforms;
 import $group__.utilities.helpers.Casts;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.gui.IRenderable;
-import net.minecraft.client.renderer.Matrix4f;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
-import java.awt.geom.Dimension2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.*;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static $group__.client.gui.structures.GuiConstraint.CONSTRAINT_NONE_VALUE;
+import static $group__.client.gui.structures.GuiConstraint.getConstraintRectangleNone;
 import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_1;
 import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_2;
+import static $group__.utilities.helpers.MiscellaneousUtilities.K;
 import static $group__.utilities.helpers.specific.ComparableUtilities.greaterThanOrEqualTo;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
-public class GuiComponent implements IRenderable, IGuiEventListenerComponent {
+public abstract class GuiComponent implements IRenderableComponent, IGuiEventListenerComponent {
+	private static final GuiConstraint CONSTRAINT_MINIMUM = new GuiConstraint(new Rectangle2D.Double(CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE, 1, 1), getConstraintRectangleNone());
+	private static final Rectangle2D SHAPE_PLACEHOLDER = new Rectangle2D.Double(0, 0, 1, 1);
 	public final Listeners listeners = new Listeners();
 	@Nullable
 	protected WeakReference<GuiContainer> parent = null;
-	protected final Rectangle2D rectangle;
+	public final Deque<GuiConstraint> constraints = new ArrayDeque<>(INITIAL_CAPACITY_1);
 	public final GuiAnchors anchors = new GuiAnchors();
-	public List<GuiConstraint> constraints = new ArrayList<>(INITIAL_CAPACITY_1);
+	protected Shape shape; // COMMENT relative shape
 	protected EnumState state = EnumState.NEW;
 	public final CoordinateConverters coordinateConverters = new CoordinateConverters();
 
-	public GuiComponent(Rectangle2D rectangle) { this.rectangle = rectangle; }
+	public GuiComponent(Shape shape) { this.shape = shape; }
 
-	public void render(MatrixStack matrix, Point2D mouse, float partialTicks) {}
+	public static GuiConstraint getConstraintMinimum() { return (GuiConstraint) CONSTRAINT_MINIMUM.clone(); }
 
-	public void setRectangle(IGuiReRectangleHandler handler, GuiComponent invoker, Rectangle2D rectangle) {
-		Rectangle2D old = getRectangleView();
-		getRectangle().setRect(rectangle);
-		constraints.forEach(c -> c.accept(getRectangle()));
-		onReRectangle(handler, invoker, old);
+	public static Rectangle2D getShapePlaceholder() { return (Rectangle2D) SHAPE_PLACEHOLDER.clone(); }
+
+	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {}
+
+	public void setBounds(IGuiReshapeHandler handler, GuiComponent invoker, Rectangle2D rectangle) {
+		Rectangle2D r = (Rectangle2D) rectangle.clone();
+		constraints.push(getConstraintMinimum());
+		constraints.forEach(c -> c.accept(r));
+		constraints.pop();
+		onReshape(handler, invoker, K(getShape(), shape = adaptToBounds(handler, invoker, r)));
 	}
+
+	protected Shape adaptToBounds(IGuiReshapeHandler handler, GuiComponent invoker, Rectangle2D rectangle) { return AffineTransforms.getTransformFromTo(getShape().getBounds2D(), rectangle).createTransformedShape(getShape()); }
 
 	@OverridingMethodsMustInvokeSuper
 	public void onAdded(GuiContainer parent, int index) {
@@ -75,7 +81,7 @@ public class GuiComponent implements IRenderable, IGuiEventListenerComponent {
 		setState(EnumState.READY);
 		if (!getNearestParentThatIs(GuiRoot.class).isPresent() ||
 				!getNearestParentThatIs(IGuiLifecycleHandler.class).isPresent() ||
-				!getNearestParentThatIs(IGuiReRectangleHandler.class).isPresent())
+				!getNearestParentThatIs(IGuiReshapeHandler.class).isPresent())
 			throw new IllegalStateException("Root or handlers not set!");
 		listeners.initialize.forEach(l -> l.accept(handler, invoker));
 	}
@@ -98,8 +104,8 @@ public class GuiComponent implements IRenderable, IGuiEventListenerComponent {
 	}
 
 	@OverridingMethodsMustInvokeSuper
-	public void onReRectangle(IGuiReRectangleHandler handler, GuiComponent invoker, Rectangle2D old) {
-		listeners.reRectangle.forEach(l -> l.accept(handler, invoker, old));
+	public void onReshape(IGuiReshapeHandler handler, GuiComponent invoker, Shape old) {
+		listeners.reshape.forEach(l -> l.accept(handler, invoker, old));
 	}
 
 	public Optional<GuiContainer> getParent() {
@@ -125,18 +131,15 @@ public class GuiComponent implements IRenderable, IGuiEventListenerComponent {
 		this.state = state;
 	}
 
-	public Rectangle2D getRectangleView() { return (Rectangle2D) rectangle.clone(); }
+	public Shape getShapeView() { return AffineTransforms.getIdentity().createTransformedShape(shape); }
 
-	protected Rectangle2D getRectangle() { return rectangle; }
+	protected Shape getShape() { return shape; }
 
 	@Override
 	public final GuiComponent getComponent() { return this; }
 
 	@Override
-	public boolean isMouseOver(MatrixStack matrix, Point2D mouse) {
-		Point2D p = ReferenceConverters.toRelativePoint(matrix.getLast().getMatrix(), mouse);
-		return p.getX() >= 0 && p.getX() < getRectangle().getWidth() && p.getY() >= 0 && p.getY() < getRectangle().getHeight();
-	}
+	public boolean isMouseOver(AffineTransformStack stack, Point2D mouse) { return stack.delegated.peek().createTransformedShape(getShape()).contains(mouse); }
 
 	public enum EnumState {
 		NEW {
@@ -171,29 +174,15 @@ public class GuiComponent implements IRenderable, IGuiEventListenerComponent {
 				tick = new ArrayList<>(INITIAL_CAPACITY_2),
 				close = new ArrayList<>(INITIAL_CAPACITY_2),
 				destroyed = new ArrayList<>(INITIAL_CAPACITY_2);
-		public final List<TriConsumer<? super IGuiReRectangleHandler, ? super GuiComponent, ? super Rectangle2D>>
-				reRectangle = new ArrayList<>(INITIAL_CAPACITY_2);
+		public final List<TriConsumer<? super IGuiReshapeHandler, ? super GuiComponent, ? super Shape>>
+				reshape = new ArrayList<>(INITIAL_CAPACITY_2);
 	}
-
-	@Override
-	@Deprecated
-	public final void render(int mouseX, int mouseY, float partialTicks) { render(new MatrixStack(), new Point(mouseX, mouseY), partialTicks); }
 
 	@OnlyIn(CLIENT)
 	public static class ReferenceConverters {
-		public static Point2D toAbsolutePoint(Matrix4f matrix, Point2D point) {
-			Point2D p = (Point2D) point.clone();
-			Matrices.transformPoint(p, matrix);
-			return p;
-		}
+		public static Point2D toAbsolutePoint(AffineTransform transform, Point2D point) { return transform.transform(point, null); }
 
-		public static Point2D toRelativePoint(Matrix4f matrix, Point2D point) {
-			Point2D p = (Point2D) point.clone();
-			Matrix4f mat = matrix.copy();
-			if (mat.invert())
-				Matrices.transformPoint(p, mat);
-			return p;
-		}
+		public static Point2D toRelativePoint(AffineTransform transform, Point2D point) throws NoninvertibleTransformException { return transform.inverseTransform(point, null); }
 	}
 
 	@OnlyIn(CLIENT)

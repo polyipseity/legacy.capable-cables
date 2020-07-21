@@ -61,7 +61,7 @@ public enum Dynamics {
 			for (Field f : Lookup.class.getDeclaredFields()) {
 				if ("IMPL_LOOKUP".equals(f.getName())) {
 					f.setAccessible(true);
-					ThrowableCatcher.consumeIfCaught(t -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("impl lookup field", f, Lookup.class, true), t));
+					ThrowableCatcher.acceptIfCaught(t -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("impl lookup field", f, Lookup.class, true), t));
 					implLookup = Try.call(() -> (Lookup) PUBLIC_LOOKUP.unreflectGetter(f).invokeExact(), LOGGER).orElse(implLookup);
 					break;
 				}
@@ -161,7 +161,7 @@ public enum Dynamics {
 			for (Class<?> s : ss) {
 				r = Try.call(() -> s.getDeclaredMethod(mName, mArgs), logger).map(t -> t.getDeclaredAnnotationsByType(annotationType)).orElse(r);
 				if (logger != null)
-					ThrowableCatcher.consumeIfCaught(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_GET_MEMBER.makeMessage("method", s, mName, mArgs), t)));
+					ThrowableCatcher.acceptIfCaught(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_GET_MEMBER.makeMessage("method", s, mName, mArgs), t)));
 				if (r.length != 0) break sss;
 			}
 		}
@@ -200,7 +200,7 @@ public enum Dynamics {
 
 						Try.run(() -> f.setAccessible(true), logger);
 						if (logger != null)
-							ThrowableCatcher.consumeIfCaught(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("to-be-copied field", f, c, true), t)));
+							ThrowableCatcher.acceptIfCaught(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("to-be-copied field", f, c, true), t)));
 
 						@Nullable Object v = Try.call(() -> f.get(from), logger).orElse(null);
 						if (ThrowableCatcher.caught()) {
@@ -211,11 +211,11 @@ public enum Dynamics {
 							int fMod = f.getModifiers() & ~Modifier.FINAL;
 							Try.run(() -> FIELD_MODIFIERS_SETTER.invokeExact(f, fMod), logger);
 							if (logger != null)
-								ThrowableCatcher.consumeIfCaught(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_INVOKE_METHOD_HANDLE.makeMessage(FIELD_MODIFIERS_SETTER, f.toGenericString(), fMod), t)));
+								ThrowableCatcher.acceptIfCaught(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_INVOKE_METHOD_HANDLE.makeMessage(FIELD_MODIFIERS_SETTER, f.toGenericString(), fMod), t)));
 
 							Object vf = mapper.apply(v);
 							Try.run(() -> f.set(to, vf), logger);
-							ThrowableCatcher.consumeIfCaught(t -> {
+							ThrowableCatcher.acceptIfCaught(t -> {
 								if (logger != null)
 									logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_G_SET_FIELD.makeMessage(true, f, to, vf), t));
 								r[0] = false;
@@ -273,7 +273,7 @@ public enum Dynamics {
 
 			public static final MethodHandle FIELD_MODIFIERS_SETTER =
 					assertNonnull(Try.call(() -> IMPL_LOOKUP.findSetter(Field.class, "modifiers", int.class), LOGGER).orElseGet(() -> {
-						ThrowableCatcher.consumeIfCaught(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_FIND_METHOD_HANDLE.makeMessage("modifiers field", Field.class, "modifiers", null, int.class), t)));
+						ThrowableCatcher.acceptIfCaught(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_FIND_METHOD_HANDLE.makeMessage("modifiers field", Field.class, "modifiers", null, int.class), t)));
 						return null;
 					}));
 		}

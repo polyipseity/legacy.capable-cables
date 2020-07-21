@@ -18,41 +18,41 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @SuppressWarnings("UnusedReturnValue")
 @OnlyIn(CLIENT)
-public final class ScreenUtility extends Screen {
-	public static final ScreenUtility INSTANCE = new ScreenUtility();
+public final class GuiScreenUtility extends Screen {
+	public static final GuiScreenUtility INSTANCE = new GuiScreenUtility();
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	private ScreenUtility() {
+	private GuiScreenUtility() {
 		super(new StringTextComponent(""));
 		Preconditions.requireRunOnceOnly(LOGGER);
 	}
 
-	public ScreenUtility setClient_(@Nullable Minecraft client) {
+	public GuiScreenUtility setClient_(@Nullable Minecraft client) {
 		minecraft = client;
 		return this;
 	}
 
-	public ScreenUtility setWidth_(int width) {
+	public GuiScreenUtility setWidth_(int width) {
 		this.width = width;
 		return this;
 	}
 
-	public ScreenUtility setHeight_(int height) {
+	public GuiScreenUtility setHeight_(int height) {
 		this.height = height;
 		return this;
 	}
 
-	public ScreenUtility setBlitOffset_(int blitOffset) {
+	public GuiScreenUtility setBlitOffset_(int blitOffset) {
 		setBlitOffset(blitOffset);
 		return this;
 	}
 
-	public ScreenUtility setFont_(FontRenderer font) {
+	public GuiScreenUtility setFont_(FontRenderer font) {
 		this.font = font;
 		return this;
 	}
 
-	public ScreenUtility setItemRenderer_(ItemRenderer itemRenderer) {
+	public GuiScreenUtility setItemRenderer_(ItemRenderer itemRenderer) {
 		this.itemRenderer = itemRenderer;
 		return this;
 	}

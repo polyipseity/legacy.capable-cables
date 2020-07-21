@@ -1,13 +1,14 @@
 package $group__.client.gui.components;
 
 import $group__.client.gui.components.roots.GuiRoot;
+import $group__.client.gui.structures.AffineTransformStack;
 import $group__.client.gui.structures.GuiDragInfo;
-import $group__.client.gui.traits.IGuiLifecycleHandler;
-import $group__.client.gui.traits.IGuiReRectangleHandler;
+import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
+import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
+import $group__.client.gui.utilities.GuiUtilities.UnboxingUtilities;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
@@ -46,7 +47,7 @@ public class GuiContainer extends GuiComponent {
 		component.onAdded(this, index);
 		if (EnumState.READY.isReachedBy(getState())) {
 			new IGuiLifecycleHandler.Initializer(component).initialize(this);
-			getNearestParentThatIs(IGuiReRectangleHandler.class).orElseThrow(BecauseOf::unexpected).reRectangle(this);
+			getNearestParentThatIs(IGuiReshapeHandler.class).orElseThrow(BecauseOf::unexpected).reshape(this);
 		}
 	}
 
@@ -73,7 +74,7 @@ public class GuiContainer extends GuiComponent {
 			}
 		}
 		if (reRect)
-			getNearestParentThatIs(IGuiReRectangleHandler.class).orElseThrow(BecauseOf::unexpected).reRectangle(this);
+			getNearestParentThatIs(IGuiReshapeHandler.class).orElseThrow(BecauseOf::unexpected).reshape(this);
 	}
 
 	public void remove(GuiComponent... components) {
@@ -84,30 +85,30 @@ public class GuiContainer extends GuiComponent {
 			if (EnumState.READY.isReachedBy(getState())) reRect = true;
 		}
 		if (reRect)
-			getNearestParentThatIs(IGuiReRectangleHandler.class).orElseThrow(BecauseOf::unexpected).reRectangle(this);
+			getNearestParentThatIs(IGuiReshapeHandler.class).orElseThrow(BecauseOf::unexpected).reshape(this);
 	}
 
-	protected MatrixStack transformMatrixForComponent(MatrixStack matrix, GuiComponent component) {
-		Rectangle2D rectC = component.getRectangle();
-		matrix.translate(rectC.getX(), rectC.getY(), 0);
-		return matrix;
+	protected void transformTransform(AffineTransformStack stack) {
+		Rectangle2D bound = getShape().getBounds2D();
+		stack.delegated.peek().translate(bound.getX(), bound.getY());
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void render(MatrixStack matrix, Point2D mouse, float partialTicks) {
+	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		if (EnumState.READY.isReachedBy(getState())) {
 			GuiRoot<?> root = getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected);
+
+			stack.push();
+			transformTransform(stack);
+			////GL11.glEnable(GL11.GL_SCISSOR_TEST);
 			getChildren().forEach(c -> {
-				Rectangle2D rectC = c.getRectangle();
-				matrix.push();
-				Point2D xyAbs = ReferenceConverters.toAbsolutePoint(transformMatrixForComponent(matrix, c).getLast().getMatrix(), new Point2D.Double(0, rectC.getHeight()));
-				GL11.glEnable(GL11.GL_SCISSOR_TEST);
-				GL11.glScissor((int) coordinateConverters.toNativeCoordinate(xyAbs.getX()), (int) coordinateConverters.toNativeCoordinate(root.getRectangle().getHeight() - xyAbs.getY()), (int) coordinateConverters.toNativeCoordinate(rectC.getWidth()), (int) coordinateConverters.toNativeCoordinate(rectC.getHeight()));
-				c.render(matrix, mouse, partialTicks);
-				GL11.glDisable(GL11.GL_SCISSOR_TEST);
-				matrix.pop();
+				Rectangle2D bounds = stack.delegated.peek().createTransformedShape(c.getShape().getBounds2D()).getBounds2D();
+
+				UnboxingUtilities.acceptRectangle(new Rectangle2D.Double(bounds.getX(), bounds.getMaxY(), bounds.getWidth(), bounds.getHeight()), (x, y) -> (w, h) -> GL11.glScissor((int) coordinateConverters.toNativeCoordinate(x), (int) coordinateConverters.toNativeCoordinate(root.getRectangleView().getHeight() - y), (int) coordinateConverters.toNativeCoordinate(w), (int) coordinateConverters.toNativeCoordinate(h)));
+				c.render(stack, mouse, partialTicks);
 			});
+			stack.delegated.pop();
 		}
 	}
 
@@ -140,18 +141,20 @@ public class GuiContainer extends GuiComponent {
 	}
 
 	@Override
-	public void onMouseMoved(MatrixStack matrix, Point2D mouse) {
-		matrix.push();
-		getChildren().forEach(c -> c.onMouseMoved(transformMatrixForComponent(matrix, c), mouse));
-		matrix.pop();
+	public void onMouseMoved(AffineTransformStack stack, Point2D mouse) {
+		stack.push();
+		transformTransform(stack);
+		getChildren().forEach(c -> c.onMouseMoved(stack, mouse));
+		stack.delegated.pop();
 	}
 
 	@Override
-	public boolean onMouseClicked(MatrixStack matrix, Point2D mouse, int button) {
-		return getChildMouseOver(matrix, mouse).filter(c -> {
-			matrix.push();
-			boolean ret = c.onMouseClicked(transformMatrixForComponent(matrix, c), mouse, button);
-			matrix.pop();
+	public boolean onMouseClicked(AffineTransformStack stack, Point2D mouse, int button) {
+		return getChildMouseOver(stack, mouse).filter(c -> {
+			stack.push();
+			transformTransform(stack);
+			boolean ret = c.onMouseClicked(stack, mouse, button);
+			stack.delegated.pop();
 			if (ret) {
 				focused = c;
 				if (button == GLFW_MOUSE_BUTTON_LEFT)
@@ -162,31 +165,34 @@ public class GuiContainer extends GuiComponent {
 	}
 
 	@Override
-	public boolean onMouseDragging(MatrixStack matrix, Rectangle2D mouse, int button) { return drag != null && drag.dragged.onMouseDragging(matrix, mouse, button); }
+	public boolean onMouseDragging(AffineTransformStack stack, Rectangle2D mouse, int button) { return drag != null && drag.dragged.onMouseDragging(stack, mouse, button); }
 
 	@Override
-	public boolean onMouseReleased(MatrixStack matrix, Point2D mouse, int button) {
+	public boolean onMouseReleased(AffineTransformStack stack, Point2D mouse, int button) {
 		if (drag != null) {
-			matrix.push();
-			boolean ret = drag.dragged.onMouseDragged(transformMatrixForComponent(matrix, drag.dragged), drag, mouse, button);
-			matrix.pop();
+			stack.push();
+			transformTransform(stack);
+			boolean ret = drag.dragged.onMouseDragged(stack, drag, mouse, button);
+			stack.delegated.pop();
 			drag = null;
 			if (ret) return true;
 		}
-		return getChildMouseOver(matrix, mouse).filter(c -> {
-			matrix.push();
-			boolean ret = c.onMouseReleased(transformMatrixForComponent(matrix, c), mouse, button);
-			matrix.pop();
+		return getChildMouseOver(stack, mouse).filter(c -> {
+			stack.push();
+			transformTransform(stack);
+			boolean ret = c.onMouseReleased(stack, mouse, button);
+			stack.delegated.pop();
 			return ret;
 		}).isPresent();
 	}
 
 	@Override
-	public boolean onMouseScrolled(MatrixStack matrix, Point2D mouse, double scrollDelta) {
-		return getChildMouseOver(matrix, mouse).filter(c -> {
-			matrix.push();
-			boolean ret = c.onMouseScrolled(transformMatrixForComponent(matrix, c), mouse, scrollDelta);
-			matrix.pop();
+	public boolean onMouseScrolled(AffineTransformStack stack, Point2D mouse, double scrollDelta) {
+		return getChildMouseOver(stack, mouse).filter(c -> {
+			stack.push();
+			transformTransform(stack);
+			boolean ret = c.onMouseScrolled(stack, mouse, scrollDelta);
+			stack.delegated.pop();
 			return ret;
 		}).isPresent();
 	}
@@ -236,13 +242,16 @@ public class GuiContainer extends GuiComponent {
 
 	protected Optional<GuiDragInfo> getDragForThis() { return getParent().map(p -> p.drag).filter(d -> d.dragged == this); }
 
-	protected Optional<GuiComponent> getChildMouseOver(MatrixStack matrix, Point2D mouse) {
-		for (GuiComponent child : Lists.reverse(getChildren())) {
-			matrix.push();
-			boolean over = child.isMouseOver(transformMatrixForComponent(matrix, child), mouse);
-			matrix.pop();
-			if (over) return Optional.of(child);
+	protected Optional<GuiComponent> getChildMouseOver(AffineTransformStack stack, Point2D mouse) {
+		stack.push();
+		transformTransform(stack);
+		for (GuiComponent c : Lists.reverse(getChildren())) {
+			if (c.isMouseOver(stack, mouse)) {
+				stack.delegated.pop();
+				return Optional.of(c);
+			}
 		}
+		stack.delegated.pop();
 		return Optional.empty();
 	}
 }

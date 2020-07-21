@@ -1,4 +1,4 @@
-package $group__.client.gui.traits;
+package $group__.client.gui.traits.handlers;
 
 import $group__.client.gui.components.GuiComponent;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;

@@ -17,7 +17,7 @@ public enum TextComponents {
 	 */
 	@SuppressWarnings("JavadocReference")
 	public static void renderComponentHoverEffect(Minecraft client, int width, int height, FontRenderer font, ITextComponent component, int mouseX, int mouseY) {
-		ScreenUtility.INSTANCE
+		GuiScreenUtility.INSTANCE
 				.setClient_(client)
 				.setWidth_(width)
 				.setHeight_(height)

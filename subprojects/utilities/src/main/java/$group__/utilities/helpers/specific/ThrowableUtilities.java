@@ -62,7 +62,7 @@ public enum ThrowableUtilities {
 			else logger.catching(Level.DEBUG, t);
 		}
 
-		public static void consumeIfCaught(Consumer<? super Throwable> consumer) {
+		public static void acceptIfCaught(Consumer<? super Throwable> consumer) {
 			if (caught()) consumer.accept(retrieve().orElseThrow(BecauseOf::unexpected));
 		}
 	}
@@ -92,7 +92,7 @@ public enum ThrowableUtilities {
 		public static <V> Optional<V> withLogging(Supplier<? extends Optional<V>> delegation, @Nullable Logger logger) {
 			Optional<V> r = delegation.get();
 			if (logger != null)
-				consumeIfCaught(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_SIMPLE_MESSAGE.makeMessage("Failed try"), t)));
+				acceptIfCaught(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_SIMPLE_MESSAGE.makeMessage("Failed try"), t)));
 			return r;
 		}
 

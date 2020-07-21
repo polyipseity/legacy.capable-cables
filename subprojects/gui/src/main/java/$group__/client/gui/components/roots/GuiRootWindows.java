@@ -3,7 +3,7 @@ package $group__.client.gui.components.roots;
 import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiWindow;
 import $group__.client.gui.components.backgrounds.GuiBackground;
-import $group__.client.gui.traits.IGuiReRectangleHandler;
+import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.inventory.container.Container;
@@ -11,7 +11,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
-import java.awt.geom.Rectangle2D;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,16 +28,16 @@ public class GuiRootWindows<C extends Container> extends GuiRoot<C> {
 	public GuiRootWindows(ITextComponent title, @Nullable GuiBackground background, @Nullable C container) { super(title, background, container); }
 
 	@Override
-	public void setRectangle(IGuiReRectangleHandler handler, GuiComponent invoker, java.awt.geom.Rectangle2D rectangle) {
+	public void setBounds(IGuiReshapeHandler handler, GuiComponent invoker, java.awt.geom.Rectangle2D rectangle) {
 		anchors.clear();
 		constraints.clear();
-		super.setRectangle(handler, invoker, rectangle);
+		super.setBounds(handler, invoker, rectangle);
 	}
 
 	@Override
-	public void reRectangle(GuiComponent invoker, Rectangle2D rectangle) {
-		super.reRectangle(invoker, rectangle);
-		getWindows().forEach(w -> w.reRectangle(invoker));
+	public void reshape(GuiComponent invoker, Shape shape) {
+		super.reshape(invoker, shape);
+		getWindows().forEach(w -> w.reshape(invoker));
 	}
 
 	protected void add(@Nullable GuiBackground background, GuiWindow... windows) {

@@ -19,7 +19,7 @@ public enum Tooltips {
 	 * @see Screen#getTooltipFromItem(ItemStack)
 	 */
 	public static List<String> getTooltipFromItem(Minecraft client, ItemStack stack) {
-		return ScreenUtility.INSTANCE
+		return GuiScreenUtility.INSTANCE
 				.setClient_(client)
 				.getTooltipFromItem(stack);
 	}
@@ -29,7 +29,7 @@ public enum Tooltips {
 	 */
 	@SuppressWarnings("JavadocReference")
 	public static void renderTooltip(Minecraft client, int width, int height, FontRenderer font, ItemRenderer itemRenderer, ItemStack item, int mouseX, int mouseY) {
-		ScreenUtility.INSTANCE
+		GuiScreenUtility.INSTANCE
 				.setClient_(client)
 				.setWidth_(width)
 				.setHeight_(height)
@@ -42,7 +42,7 @@ public enum Tooltips {
 	 * @see Screen#renderTooltip(String, int, int)
 	 */
 	public static void renderTooltip(int width, int height, FontRenderer font, ItemRenderer itemRenderer, String tooltip, int mouseX, int mouseY) {
-		ScreenUtility.INSTANCE
+		GuiScreenUtility.INSTANCE
 				.setWidth_(width)
 				.setHeight_(height)
 				.setFont_(font)
@@ -54,7 +54,7 @@ public enum Tooltips {
 	 * @see Screen#renderTooltip(List, int, int)
 	 */
 	public static void renderTooltip(int width, int height, FontRenderer font, ItemRenderer itemRenderer, List<String> tooltip, int mouseX, int mouseY) {
-		ScreenUtility.INSTANCE
+		GuiScreenUtility.INSTANCE
 				.setWidth_(width)
 				.setHeight_(height)
 				.setFont_(font)
@@ -66,7 +66,7 @@ public enum Tooltips {
 	 * @see Screen#renderTooltip(List, int, int, FontRenderer)
 	 */
 	public static void renderTooltip(int width, int height, ItemRenderer itemRenderer, List<String> tooltip, int mouseX, int mouseY, FontRenderer font) {
-		ScreenUtility.INSTANCE
+		GuiScreenUtility.INSTANCE
 				.setWidth_(width)
 				.setHeight_(height)
 				.setItemRenderer_(itemRenderer)

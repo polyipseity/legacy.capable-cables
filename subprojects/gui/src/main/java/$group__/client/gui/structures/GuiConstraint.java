@@ -6,7 +6,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
@@ -16,7 +15,7 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 @OnlyIn(CLIENT)
 public final class GuiConstraint implements Cloneable, Consumer<Rectangle2D> {
 	public static final int CONSTRAINT_NONE_VALUE = -1;
-	private static final Rectangle2D CONSTRAINT_RECTANGLE_NONE = new Rectangle(CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE);
+	private static final Rectangle2D CONSTRAINT_RECTANGLE_NONE = new Rectangle2D.Double(CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE);
 	private static final GuiConstraint CONSTRAINT_NONE = new GuiConstraint(getConstraintRectangleNone(), getConstraintRectangleNone());
 	private static final Logger LOGGER = LogManager.getLogger();
 

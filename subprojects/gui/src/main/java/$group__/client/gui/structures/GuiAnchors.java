@@ -1,7 +1,7 @@
 package $group__.client.gui.structures;
 
 import $group__.client.gui.components.GuiComponent;
-import $group__.client.gui.traits.IGuiReRectangleHandler;
+import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
 import $group__.utilities.helpers.Recursions;
 import $group__.utilities.helpers.specific.Maps;
 import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
@@ -15,6 +15,7 @@ import org.apache.logging.log4j.util.TriConsumer;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.lang.ref.WeakReference;
@@ -185,7 +186,7 @@ public final class GuiAnchors implements Cloneable {
 
 	@OnlyIn(CLIENT)
 	@Immutable
-	public final class Anchor implements Cloneable, TriConsumer<IGuiReRectangleHandler, GuiComponent, Rectangle2D> {
+	public final class Anchor implements Cloneable, TriConsumer<IGuiReshapeHandler, GuiComponent, Shape> {
 		public final WeakReference<GuiComponent> from;
 		public final WeakReference<GuiComponent> to;
 		public final AnchorSide fromSide;
@@ -204,23 +205,23 @@ public final class GuiAnchors implements Cloneable {
 			checkNoCycles();
 		}
 
-		public boolean reRectangle(IGuiReRectangleHandler handler, GuiComponent invoker, Rectangle2D old) {
+		public boolean reRectangle(IGuiReshapeHandler handler, GuiComponent invoker) {
 			@Nullable GuiComponent
 					fromCopy = from.get(),
 					toCopy = to.get();
 			if (fromCopy == null || toCopy == null) return false;
-			Rectangle2D rectangle = fromCopy.getRectangleView();
-			fromSide.getSetter().accept(rectangle, fromSide.getApplyBorder().apply(toSide.getGetter().apply(toCopy.getRectangleView()), GuiAnchors.this.border + border));
-			fromCopy.setRectangle(handler, invoker, rectangle);
+			Rectangle2D rectangle = fromCopy.getShapeView().getBounds2D();
+			fromSide.getSetter().accept(rectangle, fromSide.getApplyBorder().apply(toSide.getGetter().apply(toCopy.getShapeView().getBounds2D()), GuiAnchors.this.border + border));
+			fromCopy.setBounds(handler, invoker, rectangle);
 			return true;
 		}
 
 		@Override
-		public void accept(IGuiReRectangleHandler handler, GuiComponent invoker, Rectangle2D old) {
-			if (!reRectangle(handler, invoker, old)) {
+		public void accept(IGuiReshapeHandler handler, GuiComponent invoker, Shape old) {
+			if (!reRectangle(handler, invoker)) {
 				@Nullable GuiComponent toCopy = to.get();
 				if (toCopy != null)
-					toCopy.listeners.reRectangle.remove(this);
+					toCopy.listeners.reshape.remove(this);
 				remove(fromSide);
 			}
 		}
@@ -228,13 +229,13 @@ public final class GuiAnchors implements Cloneable {
 		private void onAdded() {
 			@Nullable GuiComponent toCopy = to.get();
 			if (toCopy != null)
-				toCopy.listeners.reRectangle.add(this);
+				toCopy.listeners.reshape.add(this);
 		}
 
 		private void onRemoved() {
 			@Nullable GuiComponent toCopy = to.get();
 			if (toCopy != null)
-				toCopy.listeners.reRectangle.remove(this);
+				toCopy.listeners.reshape.remove(this);
 		}
 
 		private void checkNoCycles() {
