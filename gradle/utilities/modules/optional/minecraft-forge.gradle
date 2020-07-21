@@ -79,7 +79,7 @@ afterEvaluate {
     shadowJar {
         configurations = [project.configurations.shade]
         // CODE relocate 'org.ejml', 'your.new.package.here.ejml' // COMMENT shading example
-        project.configurations.shade.resolvedConfiguration.resolvedArtifacts.each {
+        if (buildType == 'RELEASE') project.configurations.shade.resolvedConfiguration.resolvedArtifacts.each {
             if (it.moduleVersion.id.group != project.group) {
                 relocate it.moduleVersion.id.group, "${project.group}.shaded${project.path.replace ':', '.'}.${it.moduleVersion.id.group}"
                 relocate it.moduleVersion.id.name, "${project.group}.shaded${project.path.replace ':', '.'}.${it.moduleVersion.id.group}"

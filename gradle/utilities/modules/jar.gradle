@@ -27,7 +27,7 @@ afterEvaluate {
     }
 
     tasks.withType(org.gradle.jvm.tasks.Jar) { org.gradle.jvm.tasks.Jar t ->
-        exclude { it.file != null && it.directory ? it.path.contains('$') : it.path.endsWith('.in') }
+        if (buildType == 'RELEASE') exclude { it.file != null && it.directory ? it.path.contains('$') : it.path.endsWith('.in') }
         artifacts.archives t
     }
 }

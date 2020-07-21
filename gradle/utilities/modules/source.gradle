@@ -39,9 +39,9 @@ project.ext.makeSourceTasks = { Closure c ->
             configure c
 
             into temporaryDir
-
             from(pre.temporaryDir) {
                 Map<String, Object> e = [:]
+                if (buildType == 'DEBUG') inputs.property 'expand_group', '$group__'
                 inputs.properties.each {
                     if (it.key.startsWith('expand_')) {
                         String k = it.key.replace('expand_', '')
@@ -67,10 +67,10 @@ project.ext.makeSourceTasks = { Closure c ->
         t.finalizedBy task("postProcess${name.capitalize()}", type: Jar, description: "Finalize after processing $sourceSetName $language.") {
             from process.destinationDir
             classifier "$sourceSetName$language"
-            destinationDir = file "$buildDir/debug"
+            destinationDir = file "$buildDir${separator}replaced"
 
             if (createNewFile.call(archivePath)) archivePath.text = 'PK\u0005\u0006\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000'
-            gradle.projectsEvaluated { rootProject.dependencies.debug files(archivePath) }
+            gradle.projectsEvaluated { rootProject.dependencies.replaced files(archivePath) }
         }
 
         tasks.withType(Javadoc) { Javadoc t2 ->

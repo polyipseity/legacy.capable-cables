@@ -24,11 +24,11 @@ buildscript {
 }
 
 configurations {
-    debug {
+    replaced {
         canBeResolved false
         canBeConsumed false
     }
-    runtimeOnly.extendsFrom debug
+    runtimeOnly.extendsFrom replaced
 }
 
 allprojects {
