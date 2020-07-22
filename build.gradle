@@ -28,7 +28,6 @@ configurations {
         canBeResolved false
         canBeConsumed false
     }
-    runtimeOnly.extendsFrom replaced
 }
 
 allprojects {
