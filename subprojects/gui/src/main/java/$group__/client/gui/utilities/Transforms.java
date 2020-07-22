@@ -1,7 +1,6 @@
 package $group__.client.gui.utilities;
 
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
-import com.google.common.util.concurrent.AtomicDouble;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Vector4f;
@@ -20,11 +19,19 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 public enum Transforms {
 	;
 
+	public static final int MATRIX_ARRAY_LENGTH = 16;
+
+	private static final Vector4f VECTOR = new Vector4f();
+	private static final Point2D
+			POINT = new Point2D.Double(),
+			POINT_2 = new Point2D.Double();
+
+	public static int toArrayIndex(int row, int column) { return row * 4 + column; }
+
 	@OnlyIn(CLIENT)
 	public enum Matrices {
 		;
 
-		public static final int MATRIX_ARRAY_LENGTH = 16;
 		private static final Matrix4f IDENTITY = new Matrix4f();
 
 		static {
@@ -42,45 +49,35 @@ public enum Transforms {
 			matrix.scale((float) scaleX, (float) scaleY, 1);
 		}
 
+		private static final FloatBuffer TO_AFFINE_TRANSFORM_BUFFER = FloatBuffer.allocate(MATRIX_ARRAY_LENGTH);
+
 		public static double transformX(double x, Matrix4f matrix) {
-			AtomicDouble d = new AtomicDouble();
-			transform(() -> new Vector4f((float) x, 0, 0, 1),
-					vec -> d.set(vec.getX()), matrix);
-			return d.get();
+			VECTOR.set((float) x, 0, 0, 1);
+			transform(() -> VECTOR, vec -> {}, matrix);
+			return VECTOR.getX();
 		}
 
 		public static double transformY(double y, Matrix4f matrix) {
-			AtomicDouble d = new AtomicDouble();
-			transform(() -> new Vector4f(0, (float) y, 0, 1),
-					vec -> d.set(vec.getY()), matrix);
-			return d.get();
+			VECTOR.set(0, (float) y, 0, 1);
+			transform(() -> VECTOR, vec -> {}, matrix);
+			return VECTOR.getY();
 		}
 
 		public static double transformZ(double z, Matrix4f matrix) {
-			AtomicDouble d = new AtomicDouble();
-			transform(() -> new Vector4f(0, 0, (float) z, 1),
-					vec -> d.set(vec.getZ()), matrix);
-			return d.get();
+			VECTOR.set(0, 0, (float) z, 1);
+			transform(() -> VECTOR, vec -> {}, matrix);
+			return VECTOR.getZ();
 		}
 
 		public static double transformW(double w, Matrix4f matrix) {
-			AtomicDouble d = new AtomicDouble();
-			transform(() -> new Vector4f(0, 0, 0, (float) w),
-					vec -> d.set(vec.getW()), matrix);
-			return d.get();
+			VECTOR.set(0, 0, 0, (float) w);
+			transform(() -> VECTOR, vec -> {}, matrix);
+			return VECTOR.getW();
 		}
 
 		public static void transformPoint(Point2D point, Matrix4f matrix) {
-			transform(() -> new Vector4f((float) point.getX(), (float) point.getY(), 0, 1),
-					vec -> point.setLocation(vec.getX(), vec.getY()), matrix);
-		}
-
-		public static void transformRectangle(Rectangle2D rectangle, Matrix4f matrix) {
-			Point2D p = new Point2D.Double();
-			transform(() -> new Vector4f((float) rectangle.getX(), (float) rectangle.getY(), 0, 1),
-					vec -> p.setLocation(vec.getX(), vec.getY()), matrix);
-			transform(() -> new Vector4f((float) rectangle.getMaxX(), (float) rectangle.getMaxY(), 0, 1),
-					vec -> rectangle.setFrameFromDiagonal(p.getX(), p.getY(), vec.getX(), vec.getY()), matrix);
+			VECTOR.set((float) point.getX(), (float) point.getY(), 0, 1);
+			transform(() -> VECTOR, vec -> point.setLocation(vec.getX(), vec.getY()), matrix);
 		}
 
 		public static <T extends Vector4f> void transform(Supplier<? extends T> supplier, Consumer<? super T> consumer, Matrix4f matrix) {
@@ -89,18 +86,22 @@ public enum Transforms {
 			consumer.accept(vec);
 		}
 
-		public static AffineTransform toAffineTransform(Matrix4f matrix) {
-			// COMMENT not all matrix data are converted
-			FloatBuffer buffer = FloatBuffer.allocate(MATRIX_ARRAY_LENGTH);
-			matrix.write(buffer);
-			return new AffineTransform(
-					buffer.get(toArrayIndex(0, 0)), buffer.get(toArrayIndex(1, 0)),
-					buffer.get(toArrayIndex(0, 1)), buffer.get(toArrayIndex(1, 1)),
-					buffer.get(toArrayIndex(0, 3)), buffer.get(toArrayIndex(1, 3))
-			);
+		public static void transformRectangle(Rectangle2D rectangle, Matrix4f matrix) {
+			VECTOR.set((float) rectangle.getX(), (float) rectangle.getY(), 0, 1);
+			transform(() -> VECTOR, vec -> POINT.setLocation(vec.getX(), vec.getY()), matrix);
+			VECTOR.set((float) rectangle.getMaxX(), (float) rectangle.getMaxY(), 0, 1);
+			transform(() -> VECTOR, vec -> rectangle.setFrameFromDiagonal(POINT.getX(), POINT.getY(), vec.getX(), vec.getY()), matrix);
 		}
 
-		public static int toArrayIndex(int row, int column) { return row * 4 + column; }
+		public static AffineTransform toAffineTransform(Matrix4f matrix) {
+			// COMMENT not all matrix data are converted
+			matrix.write(TO_AFFINE_TRANSFORM_BUFFER);
+			return new AffineTransform(
+					TO_AFFINE_TRANSFORM_BUFFER.get(toArrayIndex(0, 0)), TO_AFFINE_TRANSFORM_BUFFER.get(toArrayIndex(1, 0)),
+					TO_AFFINE_TRANSFORM_BUFFER.get(toArrayIndex(0, 1)), TO_AFFINE_TRANSFORM_BUFFER.get(toArrayIndex(1, 1)),
+					TO_AFFINE_TRANSFORM_BUFFER.get(toArrayIndex(0, 3)), TO_AFFINE_TRANSFORM_BUFFER.get(toArrayIndex(1, 3))
+			);
+		}
 	}
 
 	@OnlyIn(CLIENT)
@@ -121,31 +122,25 @@ public enum Transforms {
 			return transform;
 		}
 
+		private static final double[]
+				TO_MATRIX_FLAT_MATRIX = new double[6];
+		private static final float[] TO_MATRIX_MATRIX_4F = {
+				-1, -1, 0, -1,
+				-1, -1, 0, -1,
+				0, 0, 1, 0,
+				0, 0, 0, 1,
+		};
+
 		public static double transformX(double x, AffineTransform transform) {
-			AtomicDouble d = new AtomicDouble();
-			transform(() -> new Point2D.Double(x, 0),
-					p -> d.set(p.getX()), transform);
-			return d.get();
+			POINT.setLocation(x, 0);
+			transform(() -> POINT, p -> {}, transform);
+			return POINT.getX();
 		}
 
 		public static double transformY(double y, AffineTransform transform) {
-			AtomicDouble d = new AtomicDouble();
-			transform(() -> new Point2D.Double(0, y),
-					p -> d.set(p.getY()), transform);
-			return d.get();
-		}
-
-		public static void transformPoint(Point2D point, AffineTransform transform) {
-			transform(() -> point,
-					p -> {}, transform);
-		}
-
-		public static void transformRectangle(Rectangle2D rectangle, AffineTransform transform) {
-			Point2D p = new Point2D.Double(rectangle.getX(), rectangle.getY());
-			transform(() -> p,
-					p2 -> {}, transform);
-			transform(() -> new Point2D.Double(rectangle.getMaxX(), rectangle.getMaxY()),
-					p2 -> rectangle.setFrameFromDiagonal(p.getX(), p.getY(), p2.getX(), p2.getY()), transform);
+			POINT.setLocation(0, y);
+			transform(() -> POINT, p -> {}, transform);
+			return POINT.getY();
 		}
 
 		public static <T extends Point2D> void transform(Supplier<? extends T> supplier, Consumer<? super T> consumer, AffineTransform transform) {
@@ -154,15 +149,24 @@ public enum Transforms {
 			consumer.accept(p);
 		}
 
+		public static void transformPoint(Point2D point, AffineTransform transform) { transform(() -> point, p -> {}, transform); }
+
+		public static void transformRectangle(Rectangle2D rectangle, AffineTransform transform) {
+			POINT.setLocation(rectangle.getX(), rectangle.getY());
+			POINT_2.setLocation(rectangle.getMaxX(), rectangle.getMaxY());
+			transform(() -> POINT, p2 -> {}, transform);
+			transform(() -> POINT_2, p2 -> rectangle.setFrameFromDiagonal(POINT.getX(), POINT.getY(), p2.getX(), p2.getY()), transform);
+		}
+
 		public static Matrix4f toMatrix(AffineTransform transform) {
-			double[] matD3x2 = new double[6];
-			transform.getMatrix(matD3x2);
-			return new Matrix4f(new float[]{
-					(float) matD3x2[0], (float) matD3x2[2], 0, (float) matD3x2[4],
-					(float) matD3x2[1], (float) matD3x2[3], 0, (float) matD3x2[5],
-					0, 0, 1, 0,
-					0, 0, 0, 1,
-			});
+			transform.getMatrix(TO_MATRIX_FLAT_MATRIX);
+			TO_MATRIX_FLAT_MATRIX[toArrayIndex(0, 0)] = TO_MATRIX_FLAT_MATRIX[0];
+			TO_MATRIX_FLAT_MATRIX[toArrayIndex(1, 0)] = TO_MATRIX_FLAT_MATRIX[1];
+			TO_MATRIX_FLAT_MATRIX[toArrayIndex(0, 1)] = TO_MATRIX_FLAT_MATRIX[2];
+			TO_MATRIX_FLAT_MATRIX[toArrayIndex(1, 1)] = TO_MATRIX_FLAT_MATRIX[3];
+			TO_MATRIX_FLAT_MATRIX[toArrayIndex(0, 3)] = TO_MATRIX_FLAT_MATRIX[4];
+			TO_MATRIX_FLAT_MATRIX[toArrayIndex(1, 3)] = TO_MATRIX_FLAT_MATRIX[5];
+			return new Matrix4f(TO_MATRIX_MATRIX_4F);
 		}
 	}
 }
