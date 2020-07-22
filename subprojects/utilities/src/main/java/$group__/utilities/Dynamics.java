@@ -27,7 +27,6 @@ import java.util.stream.IntStream;
 
 import static $group__.utilities.Assertions.assertNonnull;
 import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
-import static $group__.utilities.Capacities.INITIAL_CAPACITY_3;
 import static $group__.utilities.Casts.castUncheckedUnboxed;
 import static $group__.utilities.Casts.castUncheckedUnboxedNonnull;
 import static $group__.utilities.Dynamics.Invocations.Fields.FIELD_MODIFIERS_SETTER;
@@ -46,7 +45,7 @@ public enum Dynamics {
 
 
 	public static final LoadingCache<String, org.reflections.Reflections> REFLECTIONS_CACHE =
-			CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_3).expireAfterAccess(Maps.CACHE_EXPIRATION_ACCESS_DURATION, Maps.CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(Concurrency.MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(t -> {
+			CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_2).expireAfterAccess(Maps.CACHE_EXPIRATION_ACCESS_DURATION, Maps.CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(Concurrency.MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(t -> {
 				org.reflections.Reflections r = new org.reflections.Reflections(t);
 				r.expandSuperTypes();
 				return r;

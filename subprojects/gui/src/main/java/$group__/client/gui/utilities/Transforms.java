@@ -160,12 +160,12 @@ public enum Transforms {
 
 		public static Matrix4f toMatrix(AffineTransform transform) {
 			transform.getMatrix(TO_MATRIX_FLAT_MATRIX);
-			TO_MATRIX_FLAT_MATRIX[toArrayIndex(0, 0)] = TO_MATRIX_FLAT_MATRIX[0];
-			TO_MATRIX_FLAT_MATRIX[toArrayIndex(1, 0)] = TO_MATRIX_FLAT_MATRIX[1];
-			TO_MATRIX_FLAT_MATRIX[toArrayIndex(0, 1)] = TO_MATRIX_FLAT_MATRIX[2];
-			TO_MATRIX_FLAT_MATRIX[toArrayIndex(1, 1)] = TO_MATRIX_FLAT_MATRIX[3];
-			TO_MATRIX_FLAT_MATRIX[toArrayIndex(0, 3)] = TO_MATRIX_FLAT_MATRIX[4];
-			TO_MATRIX_FLAT_MATRIX[toArrayIndex(1, 3)] = TO_MATRIX_FLAT_MATRIX[5];
+			TO_MATRIX_MATRIX_4F[toArrayIndex(0, 0)] = (float) TO_MATRIX_FLAT_MATRIX[0];
+			TO_MATRIX_MATRIX_4F[toArrayIndex(1, 0)] = (float) TO_MATRIX_FLAT_MATRIX[1];
+			TO_MATRIX_MATRIX_4F[toArrayIndex(0, 1)] = (float) TO_MATRIX_FLAT_MATRIX[2];
+			TO_MATRIX_MATRIX_4F[toArrayIndex(1, 1)] = (float) TO_MATRIX_FLAT_MATRIX[3];
+			TO_MATRIX_MATRIX_4F[toArrayIndex(0, 3)] = (float) TO_MATRIX_FLAT_MATRIX[4];
+			TO_MATRIX_MATRIX_4F[toArrayIndex(1, 3)] = (float) TO_MATRIX_FLAT_MATRIX[5];
 			return new Matrix4f(TO_MATRIX_MATRIX_4F);
 		}
 	}

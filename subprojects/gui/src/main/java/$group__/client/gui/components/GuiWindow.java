@@ -50,8 +50,9 @@ public class GuiWindow extends GuiContainer implements IGuiReshapeHandler, IGuiS
 
 	@Override
 	public void setBounds(IGuiReshapeHandler handler, GuiComponent invoker, Rectangle2D rectangle) {
-		Rectangle2D rectangleRoot = getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected).getRectangleView();
-		GuiConstraint constraint = new GuiConstraint(new Rectangle2D.Double(0, 0, WINDOW_VISIBLE_MINIMUM, WINDOW_VISIBLE_MINIMUM), new Rectangle2D.Double(rectangleRoot.getMaxX() - WINDOW_VISIBLE_MINIMUM, rectangleRoot.getMaxY() - WINDOW_VISIBLE_MINIMUM, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE));
+		GuiRoot<?> root = GuiCache.Keys.ROOT.get(this);
+		Rectangle2D rRoot = root.getRectangleView();
+		GuiConstraint constraint = new GuiConstraint(new Rectangle2D.Double(0, 0, WINDOW_VISIBLE_MINIMUM, WINDOW_VISIBLE_MINIMUM), new Rectangle2D.Double(rRoot.getMaxX() - WINDOW_VISIBLE_MINIMUM, rRoot.getMaxY() - WINDOW_VISIBLE_MINIMUM, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE));
 		constraints.add(constraint);
 		super.setBounds(handler, invoker, rectangle);
 		constraints.remove(constraint);
@@ -106,10 +107,14 @@ public class GuiWindow extends GuiContainer implements IGuiReshapeHandler, IGuiS
 
 	@Override
 	public boolean onMouseClicked(AffineTransformStack stack, Point2D mouse, int button) {
-		return super.onMouseClicked(stack, mouse, button) ||
-				stack.delegated.peek().createTransformedShape(
-						new Rectangle2D.Double(getRectangle().getX(), getRectangle().getY(),
-								getRectangle().getWidth(), WINDOW_DRAG_BAR_THICKNESS)).contains(mouse);
+		if (super.onMouseClicked(stack, mouse, button)) return true;
+		if (stack.delegated.peek().createTransformedShape(
+				new Rectangle2D.Double(getRectangle().getX(), getRectangle().getY(),
+						getRectangle().getWidth(), WINDOW_DRAG_BAR_THICKNESS)).contains(mouse)) {
+			getParent().orElseThrow(BecauseOf::unexpected).moveToTop(this);
+			return true;
+		}
+		return false;
 	}
 
 	@Override

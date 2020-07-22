@@ -47,7 +47,7 @@ public class GuiContainer extends GuiComponent {
 		component.onAdded(this, index);
 		if (EnumState.READY.isReachedBy(getState())) {
 			new IGuiLifecycleHandler.Initializer(component).initialize(this);
-			getNearestParentThatIs(IGuiReshapeHandler.class).orElseThrow(BecauseOf::unexpected).reshape(this);
+			GuiCache.Keys.RESHAPE_HANDLER.<IGuiReshapeHandler>get(this).reshape(this);
 		}
 	}
 
@@ -57,6 +57,8 @@ public class GuiContainer extends GuiComponent {
 			component.onMoved(index);
 		}
 	}
+
+	public void moveToTop(GuiComponent component) { move(getChildren().size() - 1, component); }
 
 	public void add(GuiComponent... components) {
 		boolean reRect = false;
@@ -73,8 +75,7 @@ public class GuiContainer extends GuiComponent {
 				reRect = true;
 			}
 		}
-		if (reRect)
-			getNearestParentThatIs(IGuiReshapeHandler.class).orElseThrow(BecauseOf::unexpected).reshape(this);
+		if (reRect) GuiCache.Keys.RESHAPE_HANDLER.<IGuiReshapeHandler>get(this).reshape(this);
 	}
 
 	public void remove(GuiComponent... components) {
@@ -84,8 +85,7 @@ public class GuiContainer extends GuiComponent {
 			component.onRemoved(this);
 			if (EnumState.READY.isReachedBy(getState())) reRect = true;
 		}
-		if (reRect)
-			getNearestParentThatIs(IGuiReshapeHandler.class).orElseThrow(BecauseOf::unexpected).reshape(this);
+		if (reRect) GuiCache.Keys.RESHAPE_HANDLER.<IGuiReshapeHandler>get(this).reshape(this);
 	}
 
 	protected void transformTransform(AffineTransformStack stack) {
@@ -97,11 +97,11 @@ public class GuiContainer extends GuiComponent {
 	@OverridingMethodsMustInvokeSuper
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		if (EnumState.READY.isReachedBy(getState())) {
-			GuiRoot<?> root = getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected);
+			GuiRoot<?> root = GuiCache.Keys.ROOT.get(this);
 
 			stack.push();
 			transformTransform(stack);
-			////GL11.glEnable(GL11.GL_SCISSOR_TEST);
+			////TODO GL11.glEnable(GL11.GL_SCISSOR_TEST);
 			getChildren().forEach(c -> {
 				Rectangle2D bounds = stack.delegated.peek().createTransformedShape(c.getShape().getBounds2D()).getBounds2D();
 

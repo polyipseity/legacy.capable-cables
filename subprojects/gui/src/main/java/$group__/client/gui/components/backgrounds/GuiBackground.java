@@ -22,8 +22,8 @@ public abstract class GuiBackground extends GuiComponent {
 	@Override
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		if (EnumState.READY.isReachedBy(getState())) {
-			Screen screen = getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected).getScreen();
-			renderBackground(stack, screen, mouse, partialTicks);
+			GuiRoot<?> root = GuiCache.Keys.ROOT.get(this);
+			renderBackground(stack, root.getScreen(), mouse, partialTicks);
 		}
 	}
 
