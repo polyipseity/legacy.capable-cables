@@ -2,14 +2,16 @@ package $group__.client.gui.components;
 
 import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.structures.AffineTransformStack;
+import $group__.client.gui.structures.EnumGuiMouseClickResult;
+import $group__.client.gui.structures.EnumGuiState;
+import $group__.client.gui.structures.GuiCache.CacheKey;
 import $group__.client.gui.structures.GuiDragInfo;
 import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
-import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
+import $group__.client.gui.utilities.GLUtilities;
 import $group__.client.gui.utilities.GuiUtilities.UnboxingUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
 
@@ -25,13 +27,13 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
+import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
-@OnlyIn(Dist.CLIENT)
+@OnlyIn(CLIENT)
 public class GuiContainer extends GuiComponent {
 	protected List<GuiComponent> children = new ArrayList<>(INITIAL_CAPACITY_2);
 	@Nullable
-	protected GuiComponent focused = null;
+	protected GuiComponent focused = null, hovering = null;
 	@Nullable
 	protected GuiDragInfo drag = null;
 
@@ -45,9 +47,9 @@ public class GuiContainer extends GuiComponent {
 		}
 		getChildren().add(index, component);
 		component.onAdded(this, index);
-		if (EnumState.READY.isReachedBy(getState())) {
+		if (EnumGuiState.READY.isReachedBy(getState())) {
 			new IGuiLifecycleHandler.Initializer(component).initialize(this);
-			GuiCache.Keys.RESHAPE_HANDLER.<IGuiReshapeHandler>get(this).reshape(this);
+			CacheKey.RESHAPE_HANDLER.get(this).reshape(this);
 		}
 	}
 
@@ -70,12 +72,12 @@ public class GuiContainer extends GuiComponent {
 			}
 			getChildren().add(component);
 			component.onAdded(this, getChildren().lastIndexOf(component));
-			if (EnumState.READY.isReachedBy(getState())) {
+			if (EnumGuiState.READY.isReachedBy(getState())) {
 				new IGuiLifecycleHandler.Initializer(component).initialize(this);
 				reRect = true;
 			}
 		}
-		if (reRect) GuiCache.Keys.RESHAPE_HANDLER.<IGuiReshapeHandler>get(this).reshape(this);
+		if (reRect) CacheKey.RESHAPE_HANDLER.get(this).reshape(this);
 	}
 
 	public void remove(GuiComponent... components) {
@@ -83,9 +85,9 @@ public class GuiContainer extends GuiComponent {
 		for (GuiComponent component : components) {
 			getChildren().remove(component);
 			component.onRemoved(this);
-			if (EnumState.READY.isReachedBy(getState())) reRect = true;
+			if (EnumGuiState.READY.isReachedBy(getState())) reRect = true;
 		}
-		if (reRect) GuiCache.Keys.RESHAPE_HANDLER.<IGuiReshapeHandler>get(this).reshape(this);
+		if (reRect) CacheKey.RESHAPE_HANDLER.get(this).reshape(this);
 	}
 
 	protected void transformTransform(AffineTransformStack stack) {
@@ -96,18 +98,27 @@ public class GuiContainer extends GuiComponent {
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-		if (EnumState.READY.isReachedBy(getState())) {
-			GuiRoot<?> root = GuiCache.Keys.ROOT.get(this);
+		if (EnumGuiState.READY.isReachedBy(getState())) {
+			GuiRoot<?> root = CacheKey.ROOT.get(this);
 
 			stack.push();
 			transformTransform(stack);
-			////TODO GL11.glEnable(GL11.GL_SCISSOR_TEST);
+			GLUtilities.push("GL_SCISSOR_TEST",
+					() -> GL11.glEnable(GL11.GL_SCISSOR_TEST),
+					() -> GL11.glDisable(GL11.GL_SCISSOR_TEST));
 			getChildren().forEach(c -> {
 				Rectangle2D bounds = stack.delegated.peek().createTransformedShape(c.getShape().getBounds2D()).getBounds2D();
+				UnboxingUtilities.acceptRectangle(
+						new Rectangle2D.Double(bounds.getX(), bounds.getMaxY(), bounds.getWidth(), bounds.getHeight()),
+						(x, y) -> (w, h) ->
+								GLUtilities.push("glScissor",
+										() -> GL11.glScissor((int) coordinateConverters.toNativeCoordinate(x), (int) coordinateConverters.toNativeCoordinate(root.getRectangleView().getHeight() - y), (int) coordinateConverters.toNativeCoordinate(w), (int) coordinateConverters.toNativeCoordinate(h)),
+										GLUtilities.GL_SCISSOR_FALLBACK));
 
-				UnboxingUtilities.acceptRectangle(new Rectangle2D.Double(bounds.getX(), bounds.getMaxY(), bounds.getWidth(), bounds.getHeight()), (x, y) -> (w, h) -> GL11.glScissor((int) coordinateConverters.toNativeCoordinate(x), (int) coordinateConverters.toNativeCoordinate(root.getRectangleView().getHeight() - y), (int) coordinateConverters.toNativeCoordinate(w), (int) coordinateConverters.toNativeCoordinate(h)));
 				c.render(stack, mouse, partialTicks);
+				GLUtilities.pop("glScissor");
 			});
+			GLUtilities.pop("GL_SCISSOR_TEST");
 			stack.delegated.pop();
 		}
 	}
@@ -141,31 +152,49 @@ public class GuiContainer extends GuiComponent {
 	}
 
 	@Override
-	public void onMouseMoved(AffineTransformStack stack, Point2D mouse) {
+	@OverridingMethodsMustInvokeSuper
+	public void onMouseHovering(AffineTransformStack stack, Point2D mouse) {
 		stack.push();
 		transformTransform(stack);
-		getChildren().forEach(c -> c.onMouseMoved(stack, mouse));
+		GuiComponent hovering = getChildMouseOver(stack, mouse).orElse(this);
+		if (hovering != this.hovering) {
+			if (this.hovering != null) this.hovering.onMouseHovered(stack, mouse);
+			this.hovering = hovering;
+			hovering.onMouseHover(stack, mouse);
+		}
+		if (hovering != this) hovering.onMouseHovering(stack, mouse);
 		stack.delegated.pop();
 	}
 
 	@Override
-	public boolean onMouseClicked(AffineTransformStack stack, Point2D mouse, int button) {
-		return getChildMouseOver(stack, mouse).filter(c -> {
+	@OverridingMethodsMustInvokeSuper
+	public void onMouseHovered(AffineTransformStack stack, Point2D mouse) {
+		if (hovering != null) {
 			stack.push();
 			transformTransform(stack);
-			boolean ret = c.onMouseClicked(stack, mouse, button);
+			hovering.onMouseHovered(stack, mouse);
 			stack.delegated.pop();
-			if (ret) {
-				focused = c;
-				if (button == GLFW_MOUSE_BUTTON_LEFT)
-					drag = new GuiDragInfo(c, mouse);
-			}
-			return ret;
-		}).isPresent();
+			hovering = null;
+		}
 	}
 
 	@Override
-	public boolean onMouseDragging(AffineTransformStack stack, Rectangle2D mouse, int button) { return drag != null && drag.dragged.onMouseDragging(stack, mouse, button); }
+	public EnumGuiMouseClickResult onMouseClicked(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) {
+		if (this.drag != null) return EnumGuiMouseClickResult.PASS;
+		return getChildMouseOver(stack, mouse).map(c -> {
+			stack.push();
+			transformTransform(stack);
+			GuiDragInfo dragC = new GuiDragInfo(c, mouse, button);
+			EnumGuiMouseClickResult ret = c.onMouseClicked(stack, dragC, mouse, button);
+			stack.delegated.pop();
+			if (ret.result) focused = c;
+			if (ret == EnumGuiMouseClickResult.DRAG) this.drag = dragC;
+			return ret;
+		}).orElse(EnumGuiMouseClickResult.PASS);
+	}
+
+	@Override
+	public boolean onMouseDragging(AffineTransformStack stack, GuiDragInfo drag, Rectangle2D mouse, int button) { return this.drag != null && this.drag.dragged.onMouseDragging(stack, this.drag, mouse, button); }
 
 	@Override
 	public boolean onMouseReleased(AffineTransformStack stack, Point2D mouse, int button) {
@@ -198,10 +227,17 @@ public class GuiContainer extends GuiComponent {
 	}
 
 	@Override
-	public boolean onKeyPressed(int key, int scanCode, int modifiers) { return focused != null && focused.onKeyPressed(key, scanCode, modifiers); }
+	public boolean onKeyPressed(int key, int scanCode, int modifiers) {
+		super.onKeyPressed(key, scanCode, modifiers);
+		return focused != null && focused.onKeyPressed(key, scanCode, modifiers);
+	}
 
 	@Override
-	public boolean onKeyReleased(int key, int scanCode, int modifiers) { return focused != null && focused.onKeyReleased(key, scanCode, modifiers); }
+	public boolean onKeyReleased(int key, int scanCode, int modifiers) {
+		boolean ret = focused != null && focused.onKeyReleased(key, scanCode, modifiers);
+		super.onKeyReleased(key, scanCode, modifiers);
+		return ret;
+	}
 
 	@Override
 	public boolean onCharTyped(char codePoint, int modifiers) { return focused != null && focused.onCharTyped(codePoint, modifiers); }
@@ -238,7 +274,7 @@ public class GuiContainer extends GuiComponent {
 		}
 	}
 
-	protected boolean isBeingDragged() { return getParent().map(p -> p.drag).filter(d -> d.dragged == this).isPresent(); }
+	protected boolean isBeingDragged() { return getParent().map(p -> p.drag).filter(d -> d.dragged == this).filter(d -> drag == null).isPresent(); }
 
 	protected Optional<GuiDragInfo> getDragForThis() { return getParent().map(p -> p.drag).filter(d -> d.dragged == this); }
 

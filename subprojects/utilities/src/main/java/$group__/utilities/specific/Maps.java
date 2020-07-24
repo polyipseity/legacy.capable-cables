@@ -15,14 +15,10 @@ public enum Maps {
 
 
 	public static final MapMaker
-			MAP_MAKER_SINGLE_THREAD =
-			new MapMaker().initialCapacity(INITIAL_CAPACITY_3).concurrencyLevel(SINGLE_THREAD_THREAD_COUNT),
-			MAP_MAKER_MULTI_THREAD =
-					new MapMaker().initialCapacity(INITIAL_CAPACITY_3).concurrencyLevel(MULTI_THREAD_THREAD_COUNT),
-			MAP_MAKER_SINGLE_THREAD_WEAK_KEYS =
-					new MapMaker().initialCapacity(INITIAL_CAPACITY_3).concurrencyLevel(SINGLE_THREAD_THREAD_COUNT).weakKeys(),
-			MAP_MAKER_MULTI_THREAD_WEAK_KEYS =
-					new MapMaker().initialCapacity(INITIAL_CAPACITY_3).concurrencyLevel(MULTI_THREAD_THREAD_COUNT).weakKeys();
+			MAP_MAKER_SINGLE_THREAD = new MapMaker().initialCapacity(INITIAL_CAPACITY_3).concurrencyLevel(SINGLE_THREAD_THREAD_COUNT),
+			MAP_MAKER_MULTI_THREAD = new MapMaker().initialCapacity(INITIAL_CAPACITY_3).concurrencyLevel(MULTI_THREAD_THREAD_COUNT),
+			MAP_MAKER_SINGLE_THREAD_WEAK_KEYS = new MapMaker().initialCapacity(INITIAL_CAPACITY_3).concurrencyLevel(SINGLE_THREAD_THREAD_COUNT).weakKeys(),
+			MAP_MAKER_MULTI_THREAD_WEAK_KEYS = new MapMaker().initialCapacity(INITIAL_CAPACITY_3).concurrencyLevel(MULTI_THREAD_THREAD_COUNT).weakKeys();
 
 	public static final long CACHE_EXPIRATION_ACCESS_DURATION = 15;
 	public static final TimeUnit CACHE_EXPIRATION_ACCESS_TIME_UNIT = TimeUnit.MINUTES;

@@ -4,9 +4,12 @@ import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiContainer;
 import $group__.client.gui.components.backgrounds.GuiBackground;
 import $group__.client.gui.structures.AffineTransformStack;
+import $group__.client.gui.structures.EnumGuiMouseClickResult;
+import $group__.client.gui.structures.GuiDragInfo;
 import $group__.client.gui.traits.IGuiShapeRectangle;
 import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
+import $group__.client.gui.utilities.GLUtilities;
 import $group__.client.gui.utilities.GuiUtilities;
 import $group__.client.gui.utilities.GuiUtilities.DrawingUtilities;
 import $group__.client.gui.utilities.TextComponents;
@@ -22,17 +25,18 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Optional;
 
 import static $group__.utilities.Casts.castUncheckedUnboxedNonnull;
+import static java.util.Objects.requireNonNull;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 
@@ -41,6 +45,7 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 	@Nullable
 	protected final C container;
 	protected final Screen screen;
+	protected final FakeParent fakeParent = new FakeParent();
 
 	protected GuiRoot(ITextComponent title, @Nullable GuiBackground background) { this(title, background, null); }
 
@@ -55,9 +60,10 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 	protected Shape adaptToBounds(IGuiReshapeHandler handler, GuiComponent invoker, Rectangle2D rectangle) { return rectangle; }
 
 	@Override
+	@OverridingMethodsMustInvokeSuper
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
+		GLUtilities.resetAll();
 		super.render(stack, mouse, partialTicks);
-		GL11.glDisable(GL11.GL_SCISSOR_TEST);
 	}
 
 	public boolean isPaused() { return false; }
@@ -110,7 +116,28 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 	@Override
 	public void onClose(IGuiLifecycleHandler handler, GuiComponent invoker) {
 		super.onClose(handler, invoker);
+
+		// COMMENT synthetic events
+		Point2D cursor = GLUtilities.getCursorPos();
+		if (fakeParent.drag != null)
+			onMouseDragged(new AffineTransformStack(), fakeParent.drag, (Point2D) cursor.clone(), fakeParent.drag.button);
+		onMouseHovered(new AffineTransformStack(), (Point2D) cursor.clone());
+		new ArrayDeque<>(keyPresses).forEach(k -> onKeyReleased(k.key, k.scanCode, k.modifiers));
+
 		getScreen().getMinecraft().displayGuiScreen(null);
+	}
+
+	@Override
+	public EnumGuiMouseClickResult onMouseClicked(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) {
+		EnumGuiMouseClickResult ret = super.onMouseClicked(stack, drag, mouse, button);
+		if (ret.result) fakeParent.drag = drag;
+		return ret;
+	}
+
+	@Override
+	public boolean onMouseReleased(AffineTransformStack stack, Point2D mouse, int button) {
+		fakeParent.drag = null;
+		return super.onMouseReleased(stack, mouse, button);
 	}
 
 	@Override
@@ -128,6 +155,21 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 			return true;
 		}
 		return super.onKeyPressed(key, scanCode, modifiers);
+	}
+
+	@Override
+	public GuiDragInfo getDragInfo() { return requireNonNull(fakeParent.drag); }
+
+	@Override
+	protected boolean isBeingDragged() { return fakeParent.drag != null; }
+
+	@Override
+	protected boolean isBeingHovered() { return true; }
+
+	@OnlyIn(CLIENT)
+	protected static class FakeParent {
+		@Nullable
+		protected GuiDragInfo drag = null;
 	}
 
 	////////// Screen Compatibility //////////

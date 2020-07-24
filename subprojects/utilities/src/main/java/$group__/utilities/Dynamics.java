@@ -31,6 +31,7 @@ import static $group__.utilities.Casts.castUncheckedUnboxed;
 import static $group__.utilities.Casts.castUncheckedUnboxedNonnull;
 import static $group__.utilities.Dynamics.Invocations.Fields.FIELD_MODIFIERS_SETTER;
 import static $group__.utilities.specific.Loggers.EnumMessages.*;
+import static $group__.utilities.specific.Optionals.unboxOptional;
 import static java.lang.invoke.LambdaMetafactory.metafactory;
 import static java.lang.invoke.MethodType.methodType;
 import static java.util.Objects.requireNonNull;
@@ -72,7 +73,7 @@ public enum Dynamics {
 			@Nullable Unsafe unsafe = null;
 			for (Field f : Unsafe.class.getDeclaredFields()) {
 				if (f.getType() == Unsafe.class) {
-					unsafe = Try.call(() -> (Unsafe) IMPL_LOOKUP.unreflectGetter(f).invokeExact(), LOGGER).orElse(null);
+					unsafe = unboxOptional(Try.call(() -> (Unsafe) IMPL_LOOKUP.unreflectGetter(f).invokeExact(), LOGGER));
 					break;
 				}
 			}

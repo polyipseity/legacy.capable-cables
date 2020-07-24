@@ -3,6 +3,7 @@ package $group__.client.gui.components;
 import $group__.annotations.OverridingStatus;
 import $group__.client.gui.ConstantsGui;
 import $group__.client.gui.structures.AffineTransformStack;
+import $group__.client.gui.structures.EnumGuiMouseClickResult;
 import $group__.client.gui.structures.GuiDragInfo;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -18,13 +19,19 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 public interface IGuiEventListenerComponent extends IGuiEventListener {
 	GuiComponent getComponent();
 
-	default void onMouseMoved(AffineTransformStack stack, Point2D mouse) {}
+	GuiDragInfo getDragInfo();
 
-	default boolean onMouseClicked(AffineTransformStack stack, Point2D mouse, int button) { return false; }
+	default void onMouseHover(AffineTransformStack stack, Point2D mouse) {}
+
+	default void onMouseHovering(AffineTransformStack stack, Point2D mouse) {}
+
+	default void onMouseHovered(AffineTransformStack stack, Point2D mouse) {}
+
+	default EnumGuiMouseClickResult onMouseClicked(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) { return EnumGuiMouseClickResult.PASS; }
 
 	default boolean onMouseReleased(AffineTransformStack stack, Point2D mouse, int button) { return false; }
 
-	default boolean onMouseDragging(AffineTransformStack stack, Rectangle2D mouse, int button) { return false; }
+	default boolean onMouseDragging(AffineTransformStack stack, GuiDragInfo drag, Rectangle2D mouse, int button) { return false; }
 
 	default boolean onMouseDragged(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) { return false; }
 
@@ -45,12 +52,12 @@ public interface IGuiEventListenerComponent extends IGuiEventListener {
 	@Override
 	@Deprecated
 	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-	default void mouseMoved(double mouseX, double mouseY) { onMouseMoved(new AffineTransformStack(), new Point2D.Double(mouseX, mouseY)); }
+	default void mouseMoved(double mouseX, double mouseY) { onMouseHovering(new AffineTransformStack(), new Point2D.Double(mouseX, mouseY)); }
 
 	@Override
 	@Deprecated
 	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-	default boolean mouseClicked(double mouseX, double mouseY, int button) { return onMouseClicked(new AffineTransformStack(), new Point2D.Double(mouseX, mouseY), button); }
+	default boolean mouseClicked(double mouseX, double mouseY, int button) { return onMouseClicked(new AffineTransformStack(), new GuiDragInfo(getComponent(), new Point2D.Double(mouseX, mouseY), button), new Point2D.Double(mouseX, mouseY), button).result; }
 
 	@Override
 	@Deprecated
@@ -60,7 +67,7 @@ public interface IGuiEventListenerComponent extends IGuiEventListener {
 	@Override
 	@Deprecated
 	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-	default boolean mouseDragged(double mouseX, double mouseY, int button, double mouseXDiff, double mouseYDiff) { return onMouseDragging(new AffineTransformStack(), new Rectangle2D.Double(mouseX, mouseY, mouseXDiff, mouseYDiff), button); }
+	default boolean mouseDragged(double mouseX, double mouseY, int button, double mouseXDiff, double mouseYDiff) { return onMouseDragging(new AffineTransformStack(), getDragInfo(), new Rectangle2D.Double(mouseX, mouseY, mouseXDiff, mouseYDiff), button); }
 
 	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
 	@Deprecated

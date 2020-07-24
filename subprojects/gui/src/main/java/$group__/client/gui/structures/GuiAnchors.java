@@ -17,12 +17,8 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.RectangularShape;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
@@ -30,33 +26,33 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 public final class GuiAnchors implements Cloneable {
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	private final ConcurrentMap<AnchorSide, Anchor> anchors = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
+	private final ConcurrentMap<EnumGuiSide, Anchor> anchors = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
 	public double border;
 
 	public GuiAnchors(double border) { this.border = border; }
 
 	public GuiAnchors() { this(0); }
 
-	public ImmutableMap<AnchorSide, Anchor> getAnchorsView() { return ImmutableMap.copyOf(anchors); }
+	public ImmutableMap<EnumGuiSide, Anchor> getAnchorsView() { return ImmutableMap.copyOf(anchors); }
 
 	public void add(Anchor... anchors) {
 		for (Anchor anchor : anchors) {
 			switch (anchor.fromSide) {
 				case UP:
 				case DOWN:
-					remove(AnchorSide.VERTICAL);
+					remove(EnumGuiSide.VERTICAL);
 					break;
 				case VERTICAL:
-					remove(AnchorSide.UP);
-					remove(AnchorSide.DOWN);
+					remove(EnumGuiSide.UP);
+					remove(EnumGuiSide.DOWN);
 					break;
 				case LEFT:
 				case RIGHT:
-					remove(AnchorSide.HORIZONTAL);
+					remove(EnumGuiSide.HORIZONTAL);
 					break;
 				case HORIZONTAL:
-					remove(AnchorSide.LEFT);
-					remove(AnchorSide.RIGHT);
+					remove(EnumGuiSide.LEFT);
+					remove(EnumGuiSide.RIGHT);
 					break;
 				default:
 					throw BecauseOf.unexpected();
@@ -66,8 +62,8 @@ public final class GuiAnchors implements Cloneable {
 		}
 	}
 
-	public void remove(AnchorSide... sides) {
-		for (AnchorSide side : sides) {
+	public void remove(EnumGuiSide... sides) {
+		for (EnumGuiSide side : sides) {
 			@Nullable Anchor anchor = anchors.remove(side);
 			if (anchor != null) anchor.onRemoved();
 		}
@@ -75,104 +71,15 @@ public final class GuiAnchors implements Cloneable {
 
 	public boolean isEmpty() { return anchors.isEmpty(); }
 
-	public void clear() { remove(AnchorSide.values()); }
+	public void clear() { remove(EnumGuiSide.values()); }
 
 	public Anchor[] getAnchorsToMatch(GuiComponent from, GuiComponent to) {
 		return new Anchor[]{
-				new Anchor(from, to, AnchorSide.UP, AnchorSide.UP),
-				new Anchor(from, to, AnchorSide.DOWN, AnchorSide.DOWN),
-				new Anchor(from, to, AnchorSide.LEFT, AnchorSide.LEFT),
-				new Anchor(from, to, AnchorSide.RIGHT, AnchorSide.RIGHT)
+				new Anchor(from, to, EnumGuiSide.UP, EnumGuiSide.UP),
+				new Anchor(from, to, EnumGuiSide.DOWN, EnumGuiSide.DOWN),
+				new Anchor(from, to, EnumGuiSide.LEFT, EnumGuiSide.LEFT),
+				new Anchor(from, to, EnumGuiSide.RIGHT, EnumGuiSide.RIGHT)
 		};
-	}
-
-	public enum AnchorSide {
-		UP {
-			@Override
-			public AnchorSide getOpposite() { return DOWN; }
-
-			@Override
-			public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getY; }
-
-			@Override
-			public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), i, r.getMaxX(), r.getMaxY()); }
-
-			@Override
-			public BiFunction<Double, Double, Double> getApplyBorder() { return Double::sum; }
-		},
-		DOWN {
-			@Override
-			public AnchorSide getOpposite() { return UP; }
-
-			@Override
-			public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getMaxY; }
-
-			@Override
-			public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), r.getY(), r.getMaxX(), i); }
-
-			@Override
-			public BiFunction<Double, Double, Double> getApplyBorder() { return (i, b) -> i - b; }
-		},
-		LEFT {
-			@Override
-			public AnchorSide getOpposite() { return RIGHT; }
-
-			@Override
-			public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getX; }
-
-			@Override
-			public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromDiagonal(i, r.getY(), r.getMaxX(), r.getMaxY()); }
-
-			@Override
-			public BiFunction<Double, Double, Double> getApplyBorder() { return Double::sum; }
-		},
-		RIGHT {
-			@Override
-			public AnchorSide getOpposite() { return LEFT; }
-
-			@Override
-			public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getMaxX; }
-
-			@Override
-			public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), r.getY(), i, r.getMaxY()); }
-
-			@Override
-			public BiFunction<Double, Double, Double> getApplyBorder() { return (i, b) -> i - b; }
-		},
-		HORIZONTAL {
-			@Override
-			public AnchorSide getOpposite() { return VERTICAL; }
-
-			@Override
-			public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getCenterX; }
-
-			@Override
-			public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromCenter(i, r.getCenterY(), r.getX() + i - r.getCenterX(), r.getY()); }
-
-			@Override
-			public BiFunction<Double, Double, Double> getApplyBorder() { return (i, b) -> i; }
-		},
-		VERTICAL {
-			@Override
-			public AnchorSide getOpposite() { return HORIZONTAL; }
-
-			@Override
-			public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getCenterY; }
-
-			@Override
-			public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromCenter(i, r.getCenterY(), r.getX() + i - r.getCenterX(), r.getY()); }
-
-			@Override
-			public BiFunction<Double, Double, Double> getApplyBorder() { return (i, b) -> i; }
-		};
-
-		public abstract AnchorSide getOpposite();
-
-		public abstract Function<Rectangle2D, Double> getGetter();
-
-		public abstract BiConsumer<Rectangle2D, Double> getSetter();
-
-		public abstract BiFunction<Double, Double, Double> getApplyBorder();
 	}
 
 	@SuppressWarnings("Convert2MethodRef")
@@ -189,13 +96,13 @@ public final class GuiAnchors implements Cloneable {
 	public final class Anchor implements Cloneable, TriConsumer<IGuiReshapeHandler, GuiComponent, Shape> {
 		public final WeakReference<GuiComponent> from;
 		public final WeakReference<GuiComponent> to;
-		public final AnchorSide fromSide;
-		public final AnchorSide toSide;
+		public final EnumGuiSide fromSide;
+		public final EnumGuiSide toSide;
 		public final double border;
 
-		public Anchor(GuiComponent from, GuiComponent to, AnchorSide fromSide, AnchorSide toSide) { this(from, to, fromSide, toSide, 0); }
+		public Anchor(GuiComponent from, GuiComponent to, EnumGuiSide fromSide, EnumGuiSide toSide) { this(from, to, fromSide, toSide, 0); }
 
-		public Anchor(GuiComponent from, GuiComponent to, AnchorSide fromSide, AnchorSide toSide, double border) {
+		public Anchor(GuiComponent from, GuiComponent to, EnumGuiSide fromSide, EnumGuiSide toSide, double border) {
 			this.from = new WeakReference<>(from);
 			this.to = new WeakReference<>(to);
 			this.fromSide = fromSide;

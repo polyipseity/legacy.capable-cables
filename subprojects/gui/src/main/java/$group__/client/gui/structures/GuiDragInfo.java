@@ -11,9 +11,11 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 public final class GuiDragInfo {
 	public final GuiComponent dragged;
 	public final Point2D start;
+	public final int button;
 
-	public GuiDragInfo(GuiComponent dragged, Point2D start) {
+	public GuiDragInfo(GuiComponent dragged, Point2D start, int button) {
 		this.dragged = dragged;
 		this.start = start;
+		this.button = button;
 	}
 }

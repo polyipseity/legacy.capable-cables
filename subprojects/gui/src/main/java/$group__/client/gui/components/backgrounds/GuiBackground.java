@@ -4,6 +4,8 @@ import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiContainer;
 import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.structures.AffineTransformStack;
+import $group__.client.gui.structures.EnumGuiState;
+import $group__.client.gui.structures.GuiCache.CacheKey;
 import $group__.client.gui.utilities.GuiUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.client.gui.screen.Screen;
@@ -21,8 +23,8 @@ public abstract class GuiBackground extends GuiComponent {
 
 	@Override
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-		if (EnumState.READY.isReachedBy(getState())) {
-			GuiRoot<?> root = GuiCache.Keys.ROOT.get(this);
+		if (EnumGuiState.READY.isReachedBy(getState())) {
+			GuiRoot<?> root = CacheKey.ROOT.get(this);
 			renderBackground(stack, root.getScreen(), mouse, partialTicks);
 		}
 	}
