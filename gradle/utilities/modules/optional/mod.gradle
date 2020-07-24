@@ -42,7 +42,14 @@ minecraft {
 			args '--mod', modId, '--all', '--output', file('src/generated/resources/')
 		}
 	}
+
 	afterEvaluate {
+		configurations.runtimeClasspath.allDependencies.each { dependency ->
+			// COMMENT Add resources of non-mod modules
+			if (dependency instanceof ProjectDependency)
+				sourceSets.main.resources.srcDirs dependency.dependencyProject.sourceSets.main.resources.srcDirs
+		}
+
 		runs.configureEach {
 			workingDirectory file(minecraftRunDir)
 			if (project != rootProject) ideaModule "${rootProject.name}${project.path.replace ':', '.'}.main"
@@ -50,11 +57,11 @@ minecraft {
 
 			mods.create(modId) {
 				source sourceSets.main
-				afterEvaluate {
-					// COMMENT add non-mod modules for correct classloading behavior
-					configurations.runtimeClasspath.allDependencies.each { dependency ->
-						if (dependency instanceof ProjectDependency) source((SourceSet) dependency.dependencyProject.sourceSets.main)
-					}
+
+				configurations.runtimeClasspath.allDependencies.each { dependency ->
+					// COMMENT Add non-mod modules for correct classloading behavior
+					if (dependency instanceof ProjectDependency)
+						source dependency.dependencyProject.sourceSets.main as SourceSet
 				}
 			}
 		}
