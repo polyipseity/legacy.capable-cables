@@ -160,7 +160,7 @@ public abstract class GuiComponent implements IRenderableComponent, IGuiEventLis
 	protected boolean isBeingHovered() { return getParent().filter(p -> p.hovering == this && (!(this instanceof GuiContainer) || ((GuiContainer) this).hovering == null)).isPresent(); }
 
 	@Override
-	public GuiDragInfo getDragInfo() { return getParent().map(p -> p.drag).orElseThrow(BecauseOf::unexpected); }
+	public Optional<GuiDragInfo> getDragInfo() { return getParent().map(p -> p.drag); }
 
 	@Override
 	public final GuiComponent getComponent() { return this; }

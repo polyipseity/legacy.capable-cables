@@ -27,6 +27,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
+import static $group__.utilities.specific.Optionals.unboxOptional;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
@@ -156,13 +157,13 @@ public class GuiContainer extends GuiComponent {
 	public void onMouseHovering(AffineTransformStack stack, Point2D mouse) {
 		stack.push();
 		transformTransform(stack);
-		GuiComponent hovering = getChildMouseOver(stack, mouse).orElse(this);
+		@Nullable GuiComponent hovering = unboxOptional(getChildMouseOver(stack, mouse));
 		if (hovering != this.hovering) {
 			if (this.hovering != null) this.hovering.onMouseHovered(stack, mouse);
 			this.hovering = hovering;
-			hovering.onMouseHover(stack, mouse);
+			if (hovering != null) hovering.onMouseHover(stack, mouse);
 		}
-		if (hovering != this) hovering.onMouseHovering(stack, mouse);
+		if (hovering != null) hovering.onMouseHovering(stack, mouse);
 		stack.delegated.pop();
 	}
 

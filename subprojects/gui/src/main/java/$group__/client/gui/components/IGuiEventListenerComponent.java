@@ -11,6 +11,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import javax.annotation.meta.When;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Optional;
 
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
@@ -19,7 +20,7 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 public interface IGuiEventListenerComponent extends IGuiEventListener {
 	GuiComponent getComponent();
 
-	GuiDragInfo getDragInfo();
+	Optional<GuiDragInfo> getDragInfo();
 
 	default void onMouseHover(AffineTransformStack stack, Point2D mouse) {}
 
@@ -67,7 +68,9 @@ public interface IGuiEventListenerComponent extends IGuiEventListener {
 	@Override
 	@Deprecated
 	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-	default boolean mouseDragged(double mouseX, double mouseY, int button, double mouseXDiff, double mouseYDiff) { return onMouseDragging(new AffineTransformStack(), getDragInfo(), new Rectangle2D.Double(mouseX, mouseY, mouseXDiff, mouseYDiff), button); }
+	default boolean mouseDragged(double mouseX, double mouseY, int button, double mouseXDiff, double mouseYDiff) {
+		return getDragInfo().filter(d -> onMouseDragging(new AffineTransformStack(), d, new Rectangle2D.Double(mouseX, mouseY, mouseXDiff, mouseYDiff), button)).isPresent();
+	}
 
 	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
 	@Deprecated

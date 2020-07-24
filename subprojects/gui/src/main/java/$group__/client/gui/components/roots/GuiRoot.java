@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static $group__.utilities.Casts.castUncheckedUnboxedNonnull;
-import static java.util.Objects.requireNonNull;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 
@@ -158,7 +157,7 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 	}
 
 	@Override
-	public GuiDragInfo getDragInfo() { return requireNonNull(fakeParent.drag); }
+	public Optional<GuiDragInfo> getDragInfo() { return Optional.ofNullable(fakeParent.drag); }
 
 	@Override
 	protected boolean isBeingDragged() { return fakeParent.drag != null; }
