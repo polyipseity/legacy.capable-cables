@@ -10,14 +10,14 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
 public abstract class GuiButton extends GuiContainer {
 	@SuppressWarnings("CanBeFinal")
-	protected ColorData colors;
+	public ColorData colors;
 
 	public GuiButton(Shape shape, ColorData colors) {
 		super(shape);
@@ -32,8 +32,8 @@ public abstract class GuiButton extends GuiContainer {
 			AffineTransform transform = stack.delegated.peek();
 			Shape transformed = transform.createTransformedShape(getShape());
 			if (isBeingDragged() && transformed.contains(mouse)) {
-				ObjectUtilities.drawShape(transformed, true, colors.clicked, 0);
-				ObjectUtilities.drawShape(transformed, false, colors.clickedBorder, 0);
+				ObjectUtilities.drawShape(transformed, true, colors.clicking, 0);
+				ObjectUtilities.drawShape(transformed, false, colors.clickingBorder, 0);
 			} else {
 				ObjectUtilities.drawShape(transformed, true, colors.base, 0);
 				ObjectUtilities.drawShape(transformed, false, colors.baseBorder, 0);
@@ -53,12 +53,13 @@ public abstract class GuiButton extends GuiContainer {
 	public boolean onMouseDragged(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) { return onButtonClicked(button); }
 
 	@OnlyIn(CLIENT)
+	@SuppressWarnings("UnusedReturnValue")
 	public static class ColorData {
 		public Color
 				base = Color.DARK_GRAY,
 				baseBorder = Color.DARK_GRAY,
-				clicked = Color.GRAY,
-				clickedBorder = Color.GRAY;
+				clicking = Color.GRAY,
+				clickingBorder = Color.GRAY;
 
 		public ColorData setBase(Color base) {
 			this.base = base;
@@ -70,13 +71,13 @@ public abstract class GuiButton extends GuiContainer {
 			return this;
 		}
 
-		public ColorData setClicked(Color clicked) {
-			this.clicked = clicked;
+		public ColorData setClicking(Color clicking) {
+			this.clicking = clicking;
 			return this;
 		}
 
-		public ColorData setClickedBorder(Color clickedBorder) {
-			this.clickedBorder = clickedBorder;
+		public ColorData setClickingBorder(Color clickingBorder) {
+			this.clickingBorder = clickingBorder;
 			return this;
 		}
 	}
@@ -84,14 +85,14 @@ public abstract class GuiButton extends GuiContainer {
 	@OnlyIn(CLIENT)
 	public static class Functional extends GuiButton {
 		@SuppressWarnings("CanBeFinal")
-		protected Function<Integer, Boolean> function;
+		protected BiFunction<GuiButton.Functional, Integer, Boolean> function;
 
-		public Functional(Shape shape, ColorData colors, Function<Integer, Boolean> function) {
+		public Functional(Shape shape, ColorData colors, BiFunction<GuiButton.Functional, Integer, Boolean> function) {
 			super(shape, colors);
 			this.function = function;
 		}
 
 		@Override
-		protected boolean onButtonClicked(int button) { return function.apply(button); }
+		protected boolean onButtonClicked(int button) { return function.apply(this, button); }
 	}
 }

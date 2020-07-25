@@ -1,5 +1,6 @@
 package $group__.client.gui.debug;
 
+import $group__.client.gui.components.GuiButton;
 import $group__.client.gui.components.GuiWindow;
 import $group__.client.gui.components.backgrounds.GuiBackgroundDefault;
 import $group__.client.gui.components.roots.GuiRootWindows;
@@ -33,10 +34,13 @@ import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.fml.network.NetworkHooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Random;
 
 import static $group__.utilities.Preconditions.requireRunOnceOnly;
 import static java.util.Objects.requireNonNull;
@@ -79,8 +83,31 @@ final class GuiDebug extends GuiRootWindows<ContainerDebug> {
 	@SuppressWarnings("MagicNumber")
 	GuiDebug(ITextComponent title, ContainerDebug container) {
 		super(title, new GuiBackgroundDefault(), container);
-		add(new GuiWindow(new Rectangle2D.Double(0, 0, 50, 50), Color.WHITE, Color.BLACK, Color.DARK_GRAY),
-				new GuiWindow(new Rectangle2D.Double(50, 50, 100, 100), Color.WHITE, Color.BLACK, Color.DARK_GRAY));
+		{
+			GuiWindow window1 = new GuiWindow(new Rectangle2D.Double(10, 10, 100, 100), Color.WHITE, Color.BLACK, Color.DARK_GRAY);
+			GuiWindow window2 = new GuiWindow(new Rectangle2D.Double(50, 50, 200, 200), Color.WHITE, Color.BLACK, Color.DARK_GRAY);
+			{
+				GuiButton button;
+				{
+					Random random = new Random();
+					button = new GuiButton.Functional(new Ellipse2D.Double(20, 20, 80, 80),
+							new GuiButton.ColorData(),
+							(b, i) -> {
+								if (i == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+									b.colors.setBase(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+											.setBaseBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+											.setClicking(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+											.setClickingBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()));
+									return true;
+								} else return false;
+							});
+				}
+
+				window2.add(button);
+			}
+
+			add(window1, window2);
+		}
 	}
 }
 
