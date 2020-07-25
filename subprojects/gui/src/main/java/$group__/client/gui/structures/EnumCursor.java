@@ -54,6 +54,7 @@ public enum EnumCursor {
 		return logger;
 	}
 
+	@SuppressWarnings("EmptyMethod")
 	public static void preload() {}
 
 	public static long createCursor(ResourceLocation location, Point2D hotspot) throws IOException {

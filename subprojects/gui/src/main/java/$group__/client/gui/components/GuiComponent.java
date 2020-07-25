@@ -39,7 +39,7 @@ public abstract class GuiComponent implements IRenderableComponent, IGuiEventLis
 	public final GuiAnchors anchors = new GuiAnchors();
 	protected Shape shape; // COMMENT relative shape
 	protected EnumGuiState state = EnumGuiState.NEW;
-	protected Deque<GuiKeyPressInfo> keyPresses = new ArrayDeque<>(INITIAL_CAPACITY_2);
+	protected final Deque<GuiKeyPressInfo> keyPresses = new ArrayDeque<>(INITIAL_CAPACITY_2);
 	public final GuiCache cache = new GuiCache();
 	public final CoordinateConverters coordinateConverters = new CoordinateConverters();
 
@@ -70,6 +70,7 @@ public abstract class GuiComponent implements IRenderableComponent, IGuiEventLis
 		listeners.added.forEach(l -> l.accept(parent));
 	}
 
+	@SuppressWarnings("EmptyMethod")
 	public void onMoved(@SuppressWarnings("unused") int index) {}
 
 	@OverridingMethodsMustInvokeSuper

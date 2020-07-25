@@ -65,8 +65,10 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 		super.render(stack, mouse, partialTicks);
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	public boolean isPaused() { return false; }
 
+	@SuppressWarnings("SameReturnValue")
 	public int getCloseKey() { return GLFW_KEY_ESCAPE; }
 
 	public Optional<GuiBackground> getBackground() {
@@ -291,7 +293,7 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 
 		@Override
 		@Deprecated
-		protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) { DrawingUtilities.fillGradient(AffineTransforms.getIdentity(), GuiUtilities.ObjectUtilities.fromDiagonal(new Point2D.Double(x1, y1), new Point2D.Double(x2, y2)), colorTop, colorBottom, getBlitOffset()); }
+		protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) { DrawingUtilities.fillGradient(AffineTransforms.getIdentity(), GuiUtilities.ObjectUtilities.getRectangleFromDiagonal(new Point2D.Double(x1, y1), new Point2D.Double(x2, y2)), colorTop, colorBottom, getBlitOffset()); }
 
 		@Override
 		@Deprecated

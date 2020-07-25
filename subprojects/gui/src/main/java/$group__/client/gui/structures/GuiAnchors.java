@@ -27,6 +27,7 @@ public final class GuiAnchors implements Cloneable {
 	private static final Logger LOGGER = LogManager.getLogger();
 
 	private final ConcurrentMap<EnumGuiSide, Anchor> anchors = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
+	@SuppressWarnings("CanBeFinal")
 	public double border;
 
 	public GuiAnchors(double border) { this.border = border; }

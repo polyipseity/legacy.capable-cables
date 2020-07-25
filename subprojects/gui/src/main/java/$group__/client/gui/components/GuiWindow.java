@@ -99,7 +99,7 @@ public class GuiWindow extends GuiContainer implements IGuiReshapeHandler, IGuiS
 			AffineTransform transform = stack.delegated.peek();
 			DrawingUtilities.fill(transform, getRectangle(), colorBorder.getRGB());
 			DrawingUtilities.fill(transform,
-					ObjectUtilities.fromDiagonal(
+					ObjectUtilities.getRectangleFromDiagonal(
 							new Point2D.Double(getRectangle().getX(), getRectangle().getY() + WINDOW_DRAG_BAR_THICKNESS),
 							new Point2D.Double(getRectangle().getMaxX(), getRectangle().getMaxY())
 					), colorBackground.getRGB());

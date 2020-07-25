@@ -21,7 +21,7 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
 public class GuiRootWindows<C extends Container> extends GuiRoot<C> {
-	protected List<GuiWindow> windows = new ArrayList<>(INITIAL_CAPACITY_2);
+	protected final List<GuiWindow> windows = new ArrayList<>(INITIAL_CAPACITY_2);
 
 	public GuiRootWindows(ITextComponent title, @Nullable GuiBackground background) { this(title, background, null); }
 

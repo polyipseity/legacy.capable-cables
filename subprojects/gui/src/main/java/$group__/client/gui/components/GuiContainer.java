@@ -17,6 +17,7 @@ import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -32,15 +33,15 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
 public class GuiContainer extends GuiComponent {
-	protected List<GuiComponent> children = new ArrayList<>(INITIAL_CAPACITY_2);
+	protected final List<GuiComponent> children = new ArrayList<>(INITIAL_CAPACITY_2);
 	@Nullable
 	protected GuiComponent focused = null, hovering = null;
 	@Nullable
 	protected GuiDragInfo drag = null;
 
-	public GuiContainer(Rectangle2D rectangle) { super(rectangle); }
+	public GuiContainer(Shape shape) { super(shape); }
 
-	protected void add(int index, GuiComponent component) {
+	protected void add(@SuppressWarnings("SameParameterValue") int index, GuiComponent component) {
 		if (component == this) throw BecauseOf.illegalArgument("component", component);
 		if (component.parent != null) {
 			@Nullable GuiContainer parentOld = component.parent.get();
@@ -180,6 +181,7 @@ public class GuiContainer extends GuiComponent {
 	}
 
 	@Override
+	@OverridingMethodsMustInvokeSuper
 	public EnumGuiMouseClickResult onMouseClicked(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) {
 		if (this.drag != null) return EnumGuiMouseClickResult.PASS;
 		return getChildMouseOver(stack, mouse).map(c -> {
@@ -195,9 +197,11 @@ public class GuiContainer extends GuiComponent {
 	}
 
 	@Override
+	@OverridingMethodsMustInvokeSuper
 	public boolean onMouseDragging(AffineTransformStack stack, GuiDragInfo drag, Rectangle2D mouse, int button) { return this.drag != null && this.drag.dragged.onMouseDragging(stack, this.drag, mouse, button); }
 
 	@Override
+	@OverridingMethodsMustInvokeSuper
 	public boolean onMouseReleased(AffineTransformStack stack, Point2D mouse, int button) {
 		if (drag != null) {
 			stack.push();
@@ -217,6 +221,7 @@ public class GuiContainer extends GuiComponent {
 	}
 
 	@Override
+	@OverridingMethodsMustInvokeSuper
 	public boolean onMouseScrolled(AffineTransformStack stack, Point2D mouse, double scrollDelta) {
 		return getChildMouseOver(stack, mouse).filter(c -> {
 			stack.push();
@@ -228,12 +233,14 @@ public class GuiContainer extends GuiComponent {
 	}
 
 	@Override
+	@OverridingMethodsMustInvokeSuper
 	public boolean onKeyPressed(int key, int scanCode, int modifiers) {
 		super.onKeyPressed(key, scanCode, modifiers);
 		return focused != null && focused.onKeyPressed(key, scanCode, modifiers);
 	}
 
 	@Override
+	@OverridingMethodsMustInvokeSuper
 	public boolean onKeyReleased(int key, int scanCode, int modifiers) {
 		boolean ret = focused != null && focused.onKeyReleased(key, scanCode, modifiers);
 		super.onKeyReleased(key, scanCode, modifiers);
@@ -241,6 +248,7 @@ public class GuiContainer extends GuiComponent {
 	}
 
 	@Override
+	@OverridingMethodsMustInvokeSuper
 	public boolean onCharTyped(char codePoint, int modifiers) { return focused != null && focused.onCharTyped(codePoint, modifiers); }
 
 	public ImmutableList<GuiComponent> getChildrenView() { return ImmutableList.copyOf(getChildren()); }

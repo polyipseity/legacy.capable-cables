@@ -1,20 +1,24 @@
 package $group__.client.gui.utilities;
 
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Dimension2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.*;
+import java.awt.geom.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
@@ -159,10 +163,58 @@ public enum GuiUtilities {
 	public enum ObjectUtilities {
 		;
 
-		public static Rectangle2D fromDiagonal(Point2D p1, Point2D p2) {
+		public static Rectangle2D getRectangleFromDiagonal(Point2D p1, Point2D p2) {
 			Rectangle2D ret = new Rectangle2D.Double();
 			ret.setFrameFromDiagonal(p1, p2);
 			return ret;
+		}
+
+		public static void drawShape(Shape shape, boolean filled, Color color, float z) {
+			PathIterator path = shape.getPathIterator(null, 1);
+			@Nullable Point2D start = null, current = null;
+			int r = color.getRed(), g = color.getGreen(), b = color.getBlue(), a = color.getAlpha();
+
+			// TODO: Wait for a better system for such
+			RenderSystem.disableTexture();
+			RenderSystem.enableBlend();
+			RenderSystem.disableAlphaTest();
+			RenderSystem.defaultBlendFunc();
+			RenderSystem.shadeModel(GL11.GL_FLAT);
+			Tessellator tessellator = Tessellator.getInstance();
+			BufferBuilder buffer = tessellator.getBuffer();
+			// TODO: concave and self-intersecting polygons
+			buffer.begin(filled ? GL11.GL_POLYGON : GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+			while (!path.isDone()) {
+				double[] segment = new double[6];
+				switch (path.currentSegment(segment)) {
+					case PathIterator.SEG_MOVETO:
+						start = new Point2D.Double(segment[0], segment[1]);
+						current = start;
+						break;
+					case PathIterator.SEG_LINETO:
+						if (current == null) throw BecauseOf.unexpected();
+						buffer.pos(current.getX(), current.getY(), z).color(r, g, b, a).endVertex();
+						buffer.pos(segment[0], segment[1], z).color(r, g, b, a).endVertex();
+						current = new Point2D.Double(segment[0], segment[1]);
+						break;
+					case PathIterator.SEG_CLOSE:
+						if (current == null) throw BecauseOf.unexpected();
+						buffer.pos(current.getX(), current.getY(), z).color(r, g, b, a).endVertex();
+						buffer.pos(start.getX(), start.getY(), z).color(r, g, b, a).endVertex();
+						current = start;
+						break;
+					default:
+						throw BecauseOf.unexpected();
+				}
+				path.next();
+			}
+			tessellator.draw();
+
+			// TODO: Wait for a better system for such
+			RenderSystem.shadeModel(GL11.GL_SMOOTH);
+			RenderSystem.disableBlend();
+			RenderSystem.enableAlphaTest();
+			RenderSystem.enableTexture();
 		}
 	}
 
