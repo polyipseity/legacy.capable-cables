@@ -1,11 +1,11 @@
 package $group__.client.gui.components;
 
-import $group__.client.gui.structures.AffineTransformStack;
-import $group__.client.gui.structures.EnumGuiMouseClickResult;
-import $group__.client.gui.structures.EnumGuiState;
-import $group__.client.gui.structures.GuiDragInfo;
+import $group__.client.gui.structures.*;
+import $group__.client.gui.utilities.GLUtilities;
 import $group__.client.gui.utilities.GuiUtilities.ObjectUtilities;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.system.MemoryUtil;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -50,7 +50,19 @@ public abstract class GuiButton extends GuiContainer {
 	}
 
 	@Override
-	public boolean onMouseDragged(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) { return onButtonClicked(button); }
+	public boolean onMouseDragged(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) {
+		if (super.onMouseDragged(stack, drag, mouse, button)) return true;
+		return stack.delegated.peek().createTransformedShape(getShape()).contains(mouse) && onButtonClicked(button);
+	}
+
+	@Override
+	public void onMouseHover(AffineTransformStack stack, Point2D mouse) { GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), EnumCursor.STANDARD_HAND_CURSOR.handle); }
+
+	@Override
+	public void onMouseHovered(AffineTransformStack stack, Point2D mouse) {
+		super.onMouseHovered(stack, mouse);
+		GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), MemoryUtil.NULL);
+	}
 
 	@OnlyIn(CLIENT)
 	@SuppressWarnings("UnusedReturnValue")

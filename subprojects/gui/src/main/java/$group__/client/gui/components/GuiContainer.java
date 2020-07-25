@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
@@ -101,27 +103,25 @@ public class GuiContainer extends GuiComponent {
 	@OverridingMethodsMustInvokeSuper
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		if (EnumGuiState.READY.isReachedBy(getState())) {
-			GuiRoot<?> root = CacheKey.ROOT.get(this);
-
-			stack.push();
-			transformTransform(stack);
-			GLUtilities.push("GL_SCISSOR_TEST",
-					() -> GL11.glEnable(GL11.GL_SCISSOR_TEST),
-					() -> GL11.glDisable(GL11.GL_SCISSOR_TEST));
-			getChildren().forEach(c -> {
-				Rectangle2D bounds = stack.delegated.peek().createTransformedShape(c.getShape().getBounds2D()).getBounds2D();
-				UnboxingUtilities.acceptRectangle(
-						new Rectangle2D.Double(bounds.getX(), bounds.getMaxY(), bounds.getWidth(), bounds.getHeight()),
-						(x, y) -> (w, h) ->
-								GLUtilities.push("glScissor",
-										() -> GL11.glScissor((int) coordinateConverters.toNativeCoordinate(x), (int) coordinateConverters.toNativeCoordinate(root.getRectangleView().getHeight() - y), (int) coordinateConverters.toNativeCoordinate(w), (int) coordinateConverters.toNativeCoordinate(h)),
-										GLUtilities.GL_SCISSOR_FALLBACK));
-
-				c.render(stack, mouse, partialTicks);
-				GLUtilities.pop("glScissor");
+			consumeChildTransformed(stack, s -> {
+				GuiRoot<?> root = CacheKey.ROOT.get(this);
+				// TODO fix glScissor not working
+				GLUtilities.push("GL_SCISSOR_TEST",
+						() -> GL11.glEnable(GL11.GL_SCISSOR_TEST),
+						() -> GL11.glDisable(GL11.GL_SCISSOR_TEST));
+				getChildren().forEach(c -> {
+					Rectangle2D bounds = s.delegated.peek().createTransformedShape(c.getShape().getBounds2D()).getBounds2D();
+					UnboxingUtilities.acceptRectangle(
+							new Rectangle2D.Double(bounds.getX(), bounds.getMaxY(), bounds.getWidth(), bounds.getHeight()),
+							(x, y) -> (w, h) ->
+									GLUtilities.push("glScissor",
+											() -> GL11.glScissor((int) coordinateConverters.toNativeCoordinate(x), (int) coordinateConverters.toNativeCoordinate(root.getRectangleView().getHeight() - y), (int) coordinateConverters.toNativeCoordinate(w), (int) coordinateConverters.toNativeCoordinate(h)),
+											GLUtilities.GL_SCISSOR_FALLBACK));
+					c.render(s, mouse, partialTicks);
+					GLUtilities.pop("glScissor");
+				});
+				GLUtilities.pop("GL_SCISSOR_TEST");
 			});
-			GLUtilities.pop("GL_SCISSOR_TEST");
-			stack.delegated.pop();
 		}
 	}
 
@@ -156,80 +156,66 @@ public class GuiContainer extends GuiComponent {
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void onMouseHovering(AffineTransformStack stack, Point2D mouse) {
-		stack.push();
-		transformTransform(stack);
-		@Nullable GuiComponent hovering = unboxOptional(getChildMouseOver(stack, mouse));
-		if (hovering != this.hovering) {
-			if (this.hovering != null) this.hovering.onMouseHovered(stack, mouse);
-			this.hovering = hovering;
-			if (hovering != null) hovering.onMouseHover(stack, mouse);
-		}
-		if (hovering != null) hovering.onMouseHovering(stack, mouse);
-		stack.delegated.pop();
+		consumeChildTransformed(stack, s -> {
+			@Nullable GuiComponent hovering = unboxOptional(getChildMouseOver(s, mouse));
+			if (hovering != this.hovering) {
+				if (this.hovering != null) this.hovering.onMouseHovered(s, mouse);
+				this.hovering = hovering;
+				if (hovering != null) hovering.onMouseHover(s, mouse);
+			}
+			if (hovering != null) hovering.onMouseHovering(s, mouse);
+		});
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void onMouseHovered(AffineTransformStack stack, Point2D mouse) {
-		if (hovering != null) {
-			stack.push();
-			transformTransform(stack);
-			hovering.onMouseHovered(stack, mouse);
-			stack.delegated.pop();
+		if (hovering == null) return;
+		consumeChildTransformed(stack, s -> {
+			hovering.onMouseHovered(s, mouse);
 			hovering = null;
-		}
+		});
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public EnumGuiMouseClickResult onMouseClicked(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) {
 		if (this.drag != null) return EnumGuiMouseClickResult.PASS;
-		return getChildMouseOver(stack, mouse).map(c -> {
-			stack.push();
-			transformTransform(stack);
+		return applyChildTransformed(stack, s -> getChildMouseOver(s, mouse).map(c -> {
 			GuiDragInfo dragC = new GuiDragInfo(c, mouse, button);
-			EnumGuiMouseClickResult ret = c.onMouseClicked(stack, dragC, mouse, button);
-			stack.delegated.pop();
+			EnumGuiMouseClickResult ret = c.onMouseClicked(s, dragC, mouse, button);
 			if (ret.result) focused = c;
 			if (ret == EnumGuiMouseClickResult.DRAG) this.drag = dragC;
 			return ret;
-		}).orElse(EnumGuiMouseClickResult.PASS);
+		}).orElse(EnumGuiMouseClickResult.PASS));
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public boolean onMouseDragging(AffineTransformStack stack, GuiDragInfo drag, Rectangle2D mouse, int button) { return this.drag != null && this.drag.dragged.onMouseDragging(stack, this.drag, mouse, button); }
+	public boolean onMouseDragging(AffineTransformStack stack, GuiDragInfo drag, Rectangle2D mouse, int button) {
+		return this.drag != null && applyChildTransformed(stack, s -> this.drag.dragged.onMouseDragging(s, this.drag, mouse, button));
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public boolean onMouseDragged(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) {
+		return this.drag != null && applyChildTransformed(stack, s -> {
+			boolean ret = this.drag.dragged.onMouseDragged(s, this.drag, mouse, button);
+			this.drag = null;
+			return ret;
+		});
+	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public boolean onMouseReleased(AffineTransformStack stack, Point2D mouse, int button) {
-		if (drag != null) {
-			stack.push();
-			transformTransform(stack);
-			boolean ret = drag.dragged.onMouseDragged(stack, drag, mouse, button);
-			stack.delegated.pop();
-			drag = null;
-			if (ret) return true;
-		}
-		return getChildMouseOver(stack, mouse).filter(c -> {
-			stack.push();
-			transformTransform(stack);
-			boolean ret = c.onMouseReleased(stack, mouse, button);
-			stack.delegated.pop();
-			return ret;
-		}).isPresent();
+		return applyChildTransformed(stack, s -> getChildMouseOver(s, mouse).filter(c -> c.onMouseReleased(s, mouse, button)).isPresent());
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public boolean onMouseScrolled(AffineTransformStack stack, Point2D mouse, double scrollDelta) {
-		return getChildMouseOver(stack, mouse).filter(c -> {
-			stack.push();
-			transformTransform(stack);
-			boolean ret = c.onMouseScrolled(stack, mouse, scrollDelta);
-			stack.delegated.pop();
-			return ret;
-		}).isPresent();
+		return applyChildTransformed(stack, s -> getChildMouseOver(s, mouse).filter(c -> c.onMouseScrolled(s, mouse, scrollDelta)).isPresent());
 	}
 
 	@Override
@@ -283,20 +269,34 @@ public class GuiContainer extends GuiComponent {
 		}
 	}
 
-	protected boolean isBeingDragged() { return getParent().map(p -> p.drag).filter(d -> d.dragged == this).filter(d -> drag == null).isPresent(); }
+	@Override
+	protected boolean isBeingDragged() { return drag == null && super.isBeingDragged(); }
+
+	@Override
+	protected boolean isBeingHovered() { return hovering == null && super.isBeingHovered(); }
 
 	protected Optional<GuiDragInfo> getDragForThis() { return getParent().map(p -> p.drag).filter(d -> d.dragged == this); }
 
 	protected Optional<GuiComponent> getChildMouseOver(AffineTransformStack stack, Point2D mouse) {
+		for (GuiComponent c : Lists.reverse(getChildren())) {
+			if (c.isMouseOver(stack, mouse))
+				return Optional.of(c);
+		}
+		return Optional.empty();
+	}
+
+	protected <R> R applyChildTransformed(AffineTransformStack stack, Function<AffineTransformStack, R> call) {
 		stack.push();
 		transformTransform(stack);
-		for (GuiComponent c : Lists.reverse(getChildren())) {
-			if (c.isMouseOver(stack, mouse)) {
-				stack.delegated.pop();
-				return Optional.of(c);
-			}
-		}
+		R ret = call.apply(stack);
 		stack.delegated.pop();
-		return Optional.empty();
+		return ret;
+	}
+
+	protected void consumeChildTransformed(AffineTransformStack stack, Consumer<AffineTransformStack> call) {
+		stack.push();
+		transformTransform(stack);
+		call.accept(stack);
+		stack.delegated.pop();
 	}
 }

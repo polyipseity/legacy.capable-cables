@@ -39,6 +39,7 @@ import static $group__.utilities.Casts.castUncheckedUnboxedNonnull;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 
+// TODO fix onChangeFocus will never be called
 @OnlyIn(CLIENT)
 public abstract class GuiRoot<C extends Container> extends GuiContainer implements IGuiShapeRectangle, IGuiLifecycleHandler, IGuiReshapeHandler {
 	@Nullable
@@ -137,7 +138,10 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 
 	@Override
 	public boolean onMouseReleased(AffineTransformStack stack, Point2D mouse, int button) {
-		fakeParent.drag = null;
+		if (fakeParent.drag != null) {
+			onMouseDragged(stack, fakeParent.drag, mouse, button);
+			fakeParent.drag = null;
+		}
 		return super.onMouseReleased(stack, mouse, button);
 	}
 

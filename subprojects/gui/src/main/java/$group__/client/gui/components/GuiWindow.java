@@ -26,6 +26,7 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.EnumSet;
+import java.util.Optional;
 
 import static $group__.client.gui.structures.GuiConstraint.CONSTRAINT_NONE_VALUE;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
@@ -38,30 +39,23 @@ public class GuiWindow extends GuiContainer implements IGuiReshapeHandler, IGuiS
 			WINDOW_DRAG_BAR_THICKNESS = 5, // COMMENT internal top
 			WINDOW_VISIBLE_MINIMUM = 5;
 	private static final Logger LOGGER = LogManager.getLogger();
-	public Color
-			colorBorder,
-			colorBackground,
-			colorDragging;
-	protected Rectangle2D
-			rectangleDraggable,
-			rectangleClickable;
-	@Nullable
-	protected Point2D resizeBase = null;
+	@SuppressWarnings("CanBeFinal")
+	protected ColorData colors;
+	protected Rectangle2D rectangleDraggable, rectangleClickable;
 	@Nullable
 	protected EnumCursor cursor = null;
 	@Nullable
 	protected GuiDragInfoWindow dragInfoWindow = null;
 
 
-	public GuiWindow(Rectangle2D rectangle, Color colorBorder, Color colorBackground, Color colorDragging) {
+	public GuiWindow(Rectangle2D rectangle, ColorData colors) {
 		super(rectangle);
+		this.colors = colors;
+
 		rectangleDraggable = new Rectangle2D.Double(rectangle.getX(), rectangle.getY(),
 				rectangle.getWidth(), WINDOW_DRAG_BAR_THICKNESS);
 		rectangleClickable = UnboxingUtilities.applyRectangle(rectangle,
 				(x, y) -> (w, h) -> new Rectangle2D.Double(x - WINDOW_RESHAPE_THICKNESS, y - WINDOW_RESHAPE_THICKNESS, w + WINDOW_RESHAPE_THICKNESS * 2, h + WINDOW_RESHAPE_THICKNESS * 2));
-		this.colorBorder = colorBorder;
-		this.colorBackground = colorBackground;
-		this.colorDragging = colorDragging;
 	}
 
 	protected Rectangle2D getRectangle() { return (Rectangle2D) super.getShape(); }
@@ -97,12 +91,12 @@ public class GuiWindow extends GuiContainer implements IGuiReshapeHandler, IGuiS
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		if (EnumGuiState.READY.isReachedBy(getState())) {
 			AffineTransform transform = stack.delegated.peek();
-			DrawingUtilities.fill(transform, getRectangle(), colorBorder.getRGB());
+			DrawingUtilities.fill(transform, getRectangle(), colors.border.getRGB());
 			DrawingUtilities.fill(transform,
 					ObjectUtilities.getRectangleFromDiagonal(
 							new Point2D.Double(getRectangle().getX(), getRectangle().getY() + WINDOW_DRAG_BAR_THICKNESS),
 							new Point2D.Double(getRectangle().getMaxX(), getRectangle().getMaxY())
-					), colorBackground.getRGB());
+					), colors.background.getRGB());
 			super.render(stack, mouse, partialTicks);
 			if (isBeingDragged()) {
 				Rectangle2D r = getRectangleView();
@@ -111,7 +105,7 @@ public class GuiWindow extends GuiContainer implements IGuiReshapeHandler, IGuiS
 				GLUtilities.push("GL_SCISSOR_TEST",
 						() -> GL11.glDisable(GL11.GL_SCISSOR_TEST),
 						() -> GL11.glDisable(GL11.GL_SCISSOR_TEST));
-				DrawingUtilities.drawRectangle(transform, r, colorDragging.getRGB());
+				DrawingUtilities.drawRectangle(transform, r, colors.dragging.getRGB());
 				GLUtilities.pop("GL_SCISSOR_TEST");
 			}
 		}
@@ -161,25 +155,26 @@ public class GuiWindow extends GuiContainer implements IGuiReshapeHandler, IGuiS
 		EnumGuiMouseClickResult ret = super.onMouseClicked(stack, drag, mouse, button);
 		if (ret.result || button != GLFW.GLFW_MOUSE_BUTTON_LEFT) return ret;
 		if (stack.delegated.peek().createTransformedShape(rectangleDraggable).contains(mouse)) {
-			dragInfoWindow = new GuiDragInfoWindow(drag, EnumGuiDragType.REPOSITION, null);
+			dragInfoWindow = new GuiDragInfoWindow(drag, EnumGuiDragType.REPOSITION, null, null);
 			ret = EnumGuiMouseClickResult.DRAG;
 		} else {
 			Shape transformed = stack.delegated.peek().createTransformedShape(getShape());
 			if (!transformed.contains(mouse)) {
 				EnumSet<EnumGuiSide> sides = EnumGuiSide.getSidesMouseOver(transformed.getBounds2D(), mouse);
-				dragInfoWindow = new GuiDragInfoWindow(drag, EnumGuiDragType.RESIZE, sides);
+				@Nullable Point2D base = null;
 				if (sides.contains(EnumGuiSide.UP) && sides.contains(EnumGuiSide.LEFT))
-					resizeBase = new Point2D.Double(getRectangle().getMaxX(), getRectangle().getMaxY());
+					base = new Point2D.Double(getRectangle().getMaxX(), getRectangle().getMaxY());
 				else if (sides.contains(EnumGuiSide.DOWN) && sides.contains(EnumGuiSide.RIGHT))
-					resizeBase = new Point2D.Double(getRectangle().getX(), getRectangle().getY());
+					base = new Point2D.Double(getRectangle().getX(), getRectangle().getY());
 				else if (sides.contains(EnumGuiSide.UP) && sides.contains(EnumGuiSide.RIGHT))
-					resizeBase = new Point2D.Double(getRectangle().getX(), getRectangle().getMaxY());
+					base = new Point2D.Double(getRectangle().getX(), getRectangle().getMaxY());
 				else if (sides.contains(EnumGuiSide.DOWN) && sides.contains(EnumGuiSide.LEFT))
-					resizeBase = new Point2D.Double(getRectangle().getMaxX(), getRectangle().getY());
+					base = new Point2D.Double(getRectangle().getMaxX(), getRectangle().getY());
+				dragInfoWindow = new GuiDragInfoWindow(drag, EnumGuiDragType.RESIZE, sides, base);
 				ret = EnumGuiMouseClickResult.DRAG;
 			}
 		}
-		if (ret.result) getParent().orElseThrow(BecauseOf::unexpected).moveToTop(this);
+		// TODO implement focus get event for if (ret.result) getParent().orElseThrow(BecauseOf::unexpected).moveToTop(this);
 		return ret;
 	}
 
@@ -189,10 +184,10 @@ public class GuiWindow extends GuiContainer implements IGuiReshapeHandler, IGuiS
 			return true;
 		if (isBeingDragged()) {
 			if (cursor != null) {
-				if (cursor == EnumCursor.EXTENSION_RESIZE_NW_SE_CURSOR
-						|| cursor == EnumCursor.EXTENSION_RESIZE_NE_SW_CURSOR) {
-					assert resizeBase != null;
-					EnumSet<EnumGuiSide> sides = EnumGuiSide.getSidesMouseOver(new Rectangle2D.Double(resizeBase.getX(), resizeBase.getY(), 0, 0), new Point2D.Double(mouse.getMaxX(), mouse.getMaxY()));
+				assert dragInfoWindow != null;
+				if (dragInfoWindow.base != null) {
+					Point2D base = dragInfoWindow.base;
+					EnumSet<EnumGuiSide> sides = EnumGuiSide.getSidesMouseOver(new Rectangle2D.Double(base.getX(), base.getY(), 0, 0), new Point2D.Double(mouse.getMaxX(), mouse.getMaxY()));
 					if (sides.contains(EnumGuiSide.UP) && sides.contains(EnumGuiSide.LEFT)
 							|| sides.contains(EnumGuiSide.DOWN) && sides.contains(EnumGuiSide.RIGHT))
 						cursor = EnumCursor.EXTENSION_RESIZE_NW_SE_CURSOR;
@@ -209,17 +204,46 @@ public class GuiWindow extends GuiContainer implements IGuiReshapeHandler, IGuiS
 
 	@Override
 	public boolean onMouseDragged(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) {
-		Rectangle2D r = getRectangle();
-		assert dragInfoWindow != null;
-		dragInfoWindow.handle(stack.delegated.peek(), r, mouse);
-		reshape(this, r);
-		resizeBase = null;
-		dragInfoWindow = null;
-		return true;
+		if (isBeingDragged()) {
+			Rectangle2D r = getRectangle();
+			assert dragInfoWindow != null;
+			dragInfoWindow.handle(stack.delegated.peek(), r, mouse);
+			reshape(this, r);
+			dragInfoWindow = null;
+			return true;
+		}
+		return super.onMouseDragged(stack, drag, mouse, button);
 	}
 
 	@Override
 	public boolean isMouseOver(AffineTransformStack stack, Point2D mouse) { return isBeingDragged() || stack.delegated.peek().createTransformedShape(rectangleClickable).contains(mouse); }
+
+	@Override
+	protected Optional<GuiComponent> getChildMouseOver(AffineTransformStack stack, Point2D mouse) { return super.getChildMouseOver(stack, mouse).filter(c -> stack.delegated.get(stack.delegated.size() - 2).createTransformedShape(getShape()).contains(mouse)); }
+
+	@OnlyIn(CLIENT)
+	@SuppressWarnings("UnusedReturnValue")
+	public static class ColorData {
+		public Color
+				background = Color.BLACK,
+				border = Color.WHITE,
+				dragging = Color.DARK_GRAY;
+
+		public ColorData setBackground(Color background) {
+			this.background = background;
+			return this;
+		}
+
+		public ColorData setBorder(Color border) {
+			this.border = border;
+			return this;
+		}
+
+		public ColorData setDragging(Color dragging) {
+			this.dragging = dragging;
+			return this;
+		}
+	}
 
 	@OnlyIn(CLIENT)
 	public enum EnumGuiDragType {
@@ -234,11 +258,14 @@ public class GuiWindow extends GuiContainer implements IGuiReshapeHandler, IGuiS
 		public final EnumGuiDragType type;
 		@Nullable
 		public final EnumSet<EnumGuiSide> sides;
+		@Nullable
+		public final Point2D base;
 
-		public GuiDragInfoWindow(GuiDragInfo decorated, EnumGuiDragType type, @Nullable EnumSet<EnumGuiSide> sides) {
+		public GuiDragInfoWindow(GuiDragInfo decorated, EnumGuiDragType type, @Nullable EnumSet<EnumGuiSide> sides, @Nullable Point2D base) {
 			this.decorated = decorated;
 			this.type = type;
 			this.sides = sides;
+			this.base = base;
 
 			if (type == EnumGuiDragType.RESIZE) {
 				if (sides == null)
@@ -250,8 +277,8 @@ public class GuiWindow extends GuiContainer implements IGuiReshapeHandler, IGuiS
 						throw BecauseOf.illegalArgument("sides", sides);
 				});
 			} else {
-				if (sides != null)
-					throw BecauseOf.illegalArgument("type", type, "sides", sides);
+				if (sides != null || base != null)
+					throw BecauseOf.illegalArgument("type", type, "sides", sides, "base", base);
 			}
 		}
 
@@ -271,8 +298,10 @@ public class GuiWindow extends GuiContainer implements IGuiReshapeHandler, IGuiS
 					break;
 				case RESIZE:
 					assert sides != null;
-					for (EnumGuiSide side : sides)
-						side.getSetter().accept(rectangle, side.getAxis().getCoordinate(mouse));
+					for (EnumGuiSide side : sides) {
+						EnumGuiAxis axis = side.getAxis();
+						side.getSetter().accept(rectangle, side.getGetter().apply(rectangle) + axis.getCoordinate(end) - axis.getCoordinate(start));
+					}
 					break;
 				default:
 					throw BecauseOf.unexpected();

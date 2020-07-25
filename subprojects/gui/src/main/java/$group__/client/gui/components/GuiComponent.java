@@ -153,12 +153,9 @@ public abstract class GuiComponent implements IRenderableComponent, IGuiEventLis
 
 	protected Shape getShape() { return shape; }
 
-	protected boolean isBeingDragged() {
-		return getParent().map(p -> p.drag)
-				.filter(d -> d.dragged == this && (!(this instanceof GuiContainer) || ((GuiContainer) this).drag == null)).isPresent();
-	}
+	protected boolean isBeingDragged() { return getParent().map(p -> p.drag).filter(d -> d.dragged == this).isPresent(); }
 
-	protected boolean isBeingHovered() { return getParent().filter(p -> p.hovering == this && (!(this instanceof GuiContainer) || ((GuiContainer) this).hovering == null)).isPresent(); }
+	protected boolean isBeingHovered() { return getParent().filter(p -> p.hovering == this).isPresent(); }
 
 	@Override
 	public Optional<GuiDragInfo> getDragInfo() { return getParent().map(p -> p.drag); }

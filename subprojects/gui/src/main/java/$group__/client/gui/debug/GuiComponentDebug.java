@@ -84,13 +84,13 @@ final class GuiDebug extends GuiRootWindows<ContainerDebug> {
 	GuiDebug(ITextComponent title, ContainerDebug container) {
 		super(title, new GuiBackgroundDefault(), container);
 		{
-			GuiWindow window1 = new GuiWindow(new Rectangle2D.Double(10, 10, 100, 100), Color.WHITE, Color.BLACK, Color.DARK_GRAY);
-			GuiWindow window2 = new GuiWindow(new Rectangle2D.Double(50, 50, 200, 200), Color.WHITE, Color.BLACK, Color.DARK_GRAY);
+			GuiWindow window1 = new GuiWindow(new Rectangle2D.Double(10, 10, 100, 100), new GuiWindow.ColorData());
+			GuiWindow window2 = new GuiWindow(new Rectangle2D.Double(50, 50, 200, 200), new GuiWindow.ColorData());
 			{
 				GuiButton button;
 				{
 					Random random = new Random();
-					button = new GuiButton.Functional(new Ellipse2D.Double(20, 20, 80, 80),
+					button = new GuiButton.Functional(new Ellipse2D.Double(0, 0, 100, 100),
 							new GuiButton.ColorData(),
 							(b, i) -> {
 								if (i == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
