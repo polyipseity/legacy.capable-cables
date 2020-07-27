@@ -1,9 +1,7 @@
 package $group__.client.gui.structures;
 
-import $group__.utilities.specific.ThrowableUtilities.Try;
+import $group__.utilities.traits.ICopyable;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.awt.geom.Rectangle2D;
@@ -13,11 +11,10 @@ import java.util.function.DoubleConsumer;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
-public final class GuiConstraint implements Cloneable, Consumer<Rectangle2D> {
+public final class GuiConstraint implements ICopyable, Consumer<Rectangle2D> {
 	public static final int CONSTRAINT_NONE_VALUE = -1;
 	private static final Rectangle2D CONSTRAINT_RECTANGLE_NONE = new Rectangle2D.Double(CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE);
 	private static final GuiConstraint CONSTRAINT_NONE = new GuiConstraint(getConstraintRectangleNone(), getConstraintRectangleNone());
-	private static final Logger LOGGER = LogManager.getLogger();
 
 	public final Rectangle2D min, max;
 	@Nullable
@@ -28,7 +25,7 @@ public final class GuiConstraint implements Cloneable, Consumer<Rectangle2D> {
 		this.max = max;
 	}
 
-	public static GuiConstraint getConstraintNone() { return (GuiConstraint) CONSTRAINT_NONE.clone(); }
+	public static GuiConstraint getConstraintNone() { return CONSTRAINT_NONE.copy(); }
 
 	public static Rectangle2D getConstraintRectangleNone() { return (Rectangle2D) CONSTRAINT_RECTANGLE_NONE.clone(); }
 
@@ -42,6 +39,7 @@ public final class GuiConstraint implements Cloneable, Consumer<Rectangle2D> {
 		}
 	}
 
+	@Override
 	public void accept(Rectangle2D rectangle) {
 		double x = rectangle.getX(),
 				y = rectangle.getY(),
@@ -76,10 +74,6 @@ public final class GuiConstraint implements Cloneable, Consumer<Rectangle2D> {
 		maxLastCorrected = (Rectangle2D) max.clone();
 	}
 
-	@SuppressWarnings("Convert2MethodRef")
 	@Override
-	public Object clone() {
-		Try.run(() -> super.clone(), LOGGER);
-		return new GuiConstraint((Rectangle2D) min.clone(), (Rectangle2D) max.clone());
-	}
+	public GuiConstraint copy() { return new GuiConstraint((Rectangle2D) min.clone(), (Rectangle2D) max.clone()); }
 }

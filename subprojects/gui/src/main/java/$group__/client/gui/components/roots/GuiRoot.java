@@ -38,29 +38,40 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
+import static $group__.utilities.Capacities.INITIAL_CAPACITY_1;
 import static $group__.utilities.Casts.castUncheckedUnboxedNonnull;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 
 @OnlyIn(CLIENT)
-public abstract class GuiRoot<C extends Container> extends GuiContainer implements IGuiShapeRectangle, IGuiLifecycleHandler, IGuiReshapeHandler {
-	@Nullable
-	protected final C container;
-	protected final Screen screen;
+public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container> extends GuiContainer<D> implements IGuiShapeRectangle, IGuiLifecycleHandler, IGuiReshapeHandler {
+	public final Screen screen;
 	protected final FakeParent fakeParent = new FakeParent();
 
-	protected GuiRoot(ITextComponent title, @Nullable GuiBackground background, Logger logger) { this(title, background, null, logger); }
+	protected GuiRoot(ITextComponent title, D data) {
+		super(getShapePlaceholder(), data);
+		screen = makeScreen(title, data.container != null);
 
-	protected GuiRoot(ITextComponent title, @Nullable GuiBackground background, @Nullable C container, Logger logger) {
-		super(getShapePlaceholder(), logger);
-		this.container = container;
-		screen = container == null ? new ScreenAdapted(title) : new ScreenAdaptedWithContainer(title);
-		setBackground(background);
+		data.events.dBackgroundSet.add(par -> {
+			if (par.previous != null) remove(par.previous);
+			if (par.current != null) add(0, par.current);
+		});
+		data.setBackground(data.background);
 	}
 
+	@SuppressWarnings("SameReturnValue")
+	public boolean isPaused() { return false; }
+
+	@SuppressWarnings("SameReturnValue")
+	public int getCloseKey() { return GLFW.GLFW_KEY_ESCAPE; }
+
+	protected Screen makeScreen(ITextComponent title, boolean hasContainer) { return hasContainer ? new ScreenAdaptedWithContainer(title) : new ScreenAdapted(title); }
+
 	@Override
-	protected Shape adaptToBounds(IGuiReshapeHandler handler, GuiComponent invoker, Rectangle2D rectangle) { return rectangle; }
+	protected Shape adaptToBounds(IGuiReshapeHandler handler, GuiComponent<?> invoker, Rectangle2D rectangle) { return rectangle; }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -70,27 +81,14 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 		super.render(stack, mouse, partialTicks);
 	}
 
-	@SuppressWarnings("SameReturnValue")
-	public boolean isPaused() { return false; }
-
-	@SuppressWarnings("SameReturnValue")
-	public int getCloseKey() { return GLFW.GLFW_KEY_ESCAPE; }
+	@Override
+	public void constrain(AffineTransformStack stack) {
+		data.constraints.clear();
+		super.constrain(stack);
+	}
 
 	@SuppressWarnings("SameReturnValue")
 	public int getFocusChangeKey() { return GLFW.GLFW_KEY_TAB; }
-
-	public Optional<GuiBackground> getBackground() {
-		if (!getChildren().isEmpty()) {
-			GuiComponent ret = getChildren().get(0);
-			if (ret instanceof GuiBackground) return Optional.of((GuiBackground) ret);
-		}
-		return Optional.empty();
-	}
-
-	public void setBackground(@Nullable GuiBackground background) {
-		getBackground().ifPresent(this::remove);
-		if (background != null) add(0, background);
-	}
 
 	protected Rectangle2D getRectangle() { return (Rectangle2D) super.getShape(); }
 
@@ -98,41 +96,46 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 	public Rectangle2D getRectangleView() { return (Rectangle2D) getRectangle().clone(); }
 
 	@Override
-	public void reshape(GuiComponent invoker) { reshape(invoker, getRectangle()); }
+	public void reshape(GuiComponent<?> invoker) { reshape(invoker, getRectangle()); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void reshape(GuiComponent invoker, Shape shape) { setBounds(this, invoker, shape.getBounds2D()); }
+	public void reshape(GuiComponent<?> invoker, Shape shape) { setBounds(this, invoker, shape.getBounds2D()); }
 
 	@Override
-	public void initialize(GuiComponent invoker) { onInitialize(this, invoker); }
+	public void initialize(GuiComponent<?> invoker) { onInitialize(this, invoker); }
 
 	@Override
-	public void tick(GuiComponent invoker) { onTick(this, invoker); }
+	public void tick(GuiComponent<?> invoker) { onTick(this, invoker); }
 
 	@Override
-	public void close(GuiComponent invoker) { onClose(this, invoker); }
+	public void close(GuiComponent<?> invoker) { onClose(this, invoker); }
 
 	@Override
-	public void destroy(GuiComponent invoker) { onDestroyed(this, invoker); }
+	public void destroy(GuiComponent<?> invoker) { onDestroyed(this, invoker); }
 
 	@Override
-	public void onInitialize(IGuiLifecycleHandler handler, GuiComponent invoker) {
+	public void onInitialize(IGuiLifecycleHandler handler, GuiComponent<?> invoker) {
 		super.onInitialize(handler, invoker);
 		reshape(this, new Rectangle2D.Double(0, 0, getScreen().width, getScreen().height));
 	}
 
 	@Override
-	public void onClose(IGuiLifecycleHandler handler, GuiComponent invoker) {
+	public void onReshape(IGuiReshapeHandler handler, GuiComponent<?> invoker, Shape shapePrevious) {
+		data.anchors.clear();
+		super.onReshape(handler, invoker, shapePrevious);
+	}
+
+	@Override
+	public void onClose(IGuiLifecycleHandler handler, GuiComponent<?> invoker) {
 		super.onClose(handler, invoker);
 
 		// COMMENT synthetic events
 		AffineTransformStack stack = new AffineTransformStack();
 		Point2D cursor = GLUtilities.getCursorPos();
-		Map<Integer, GuiDragInfo> drags = new HashMap<>(this.drags);
-		drags.forEach((i, d) -> onMouseDragged(stack, d, (Point2D) cursor.clone(), i));
+		data.getDragsView().forEach((i, d) -> onMouseDragged(stack, d, (Point2D) cursor.clone(), i));
 		onMouseHovered(new AffineTransformStack(), (Point2D) cursor.clone());
-		new ArrayDeque<>(keyPresses).forEach(k -> onKeyReleased(k.key, k.scanCode, k.modifiers));
+		new ArrayDeque<>(data.getKeyPresses()).forEach(k -> onKeyReleased(k.key, k.scanCode, k.modifiers));
 
 		getScreen().getMinecraft().displayGuiScreen(null);
 	}
@@ -146,18 +149,17 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 
 	@Override
 	public boolean onMouseReleased(AffineTransformStack stack, Point2D mouse, int button) {
-		Map<Integer, GuiDragInfo> drags = new HashMap<>(this.drags);
-		drags.forEach((i, d) -> onMouseDragged(stack, d, mouse, i));
+		data.getDragsView().forEach((i, d) -> onMouseDragged(stack, d, mouse, i));
 		return super.onMouseReleased(stack, mouse, button);
 	}
 
 	@Override
 	@Deprecated
-	public final void onAdded(GuiContainer parent, int index) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
+	public final void onAdded(GuiContainer<?> parentCurrent, int index) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
 
 	@Override
 	@Deprecated
-	public final void onRemoved(GuiContainer parent) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
+	public final void onRemoved(GuiContainer<?> parentPrevious) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
 
 	@Override
 	public boolean onKeyPressed(int key, int scanCode, int modifiers) {
@@ -174,23 +176,57 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 	public Optional<GuiDragInfo> getDragInfo(int button) { return Optional.ofNullable(fakeParent.drags.get(button)); }
 
 	@Override
-	protected boolean isBeingDragged() { return drags.isEmpty() && !fakeParent.drags.isEmpty(); }
+	protected boolean isBeingDragged() { return data.getDragsView().isEmpty() && !fakeParent.drags.isEmpty(); }
 
 	@Override
 	protected boolean isBeingHovered() { return true; }
+
+	public <T extends Screen & IHasContainer<C>> T getContainerScreen() {
+		if (data.container == null) throw BecauseOf.unsupportedOperation();
+		return castUncheckedUnboxedNonnull(getScreen());
+	}
 
 	@OnlyIn(CLIENT)
 	protected static class FakeParent {
 		protected Map<Integer, GuiDragInfo> drags = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
 	}
 
+	@OnlyIn(CLIENT)
+	public static class Data<E extends Events, C extends Container> extends GuiContainer.Data<E> {
+		@Nullable
+		public final C container;
+		@Nullable
+		protected GuiBackground<?, ?> background;
+
+		public Data(E events, Supplier<Logger> logger, @Nullable GuiBackground<?, ?> background, @Nullable C container) {
+			super(events, logger);
+			this.container = container;
+			this.background = background;
+		}
+
+		public Optional<GuiBackground<?, ?>> getBackground() { return Optional.ofNullable(background); }
+
+		public void setBackground(@Nullable GuiBackground<?, ?> background) { events.fire(events.dBackgroundSet, new Events.DBackgroundSetParameter(this.background, this.background = background)); }
+	}
+
 	////////// Screen Compatibility //////////
 
 	public Screen getScreen() { return screen; }
 
-	public <T extends Screen & IHasContainer<C>> T getContainerScreen() {
-		if (container == null) throw BecauseOf.unsupportedOperation();
-		return castUncheckedUnboxedNonnull(getScreen());
+	@OnlyIn(CLIENT)
+	public static class Events extends GuiComponent.Events {
+		public final List<Consumer<DBackgroundSetParameter>> dBackgroundSet = new ArrayList<>(INITIAL_CAPACITY_1);
+
+		@OnlyIn(CLIENT)
+		public static final class DBackgroundSetParameter {
+			@Nullable
+			public final GuiBackground<?, ?> previous, current;
+
+			public DBackgroundSetParameter(@Nullable GuiBackground<?, ?> previous, @Nullable GuiBackground<?, ?> current) {
+				this.previous = previous;
+				this.current = current;
+			}
+		}
 	}
 
 	@OnlyIn(CLIENT)
@@ -337,13 +373,13 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 	}
 
 	@OnlyIn(CLIENT)
-	protected class ScreenAdaptedWithContainer extends ScreenAdapted implements IHasContainer<C> {
+	protected class ScreenAdaptedWithContainer extends ScreenAdapted implements IHasContainer<Container> {
 		protected ScreenAdaptedWithContainer(ITextComponent title) { super(title); }
 
 		@Override
-		public C getContainer() {
-			assert container != null;
-			return container;
+		public Container getContainer() {
+			assert data.container != null;
+			return data.container;
 		}
 	}
 }

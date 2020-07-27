@@ -13,6 +13,7 @@ import $group__.utilities.MiscellaneousUtilities;
 import $group__.utilities.specific.Maps;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.Logger;
@@ -33,63 +34,54 @@ import static $group__.utilities.specific.Optionals.unboxOptional;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
-public class GuiContainer extends GuiComponent {
-	protected final List<GuiComponent> children = new ArrayList<>(INITIAL_CAPACITY_2);
-	@Nullable
-	protected GuiComponent focused = null, hovering = null;
-	protected Map<Integer, GuiDragInfo> drags = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
+public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D> {
+	protected final List<GuiComponent<?>> children = new ArrayList<>(INITIAL_CAPACITY_2);
 
-	public GuiContainer(Shape shape, Logger logger) { super(shape, logger); }
+	public GuiContainer(Shape shape, D data) { super(shape, data); }
 
-	protected void add(@SuppressWarnings("SameParameterValue") int index, GuiComponent component) {
+	protected void add(@SuppressWarnings("SameParameterValue") int index, GuiComponent<?> component) {
 		if (component == this) throw BecauseOf.illegalArgument("component", component);
-		if (component.parent != null) {
-			@Nullable GuiContainer parentOld = component.parent.get();
-			if (parentOld != null) parentOld.remove(component);
-		}
+		component.getParent().ifPresent(p -> p.remove(component));
 		getChildren().add(index, component);
 		component.onAdded(this, index);
-		if (EnumGuiState.READY.isReachedBy(getState())) {
+		if (EnumGuiState.READY.isReachedBy(data.getState())) {
 			new IGuiLifecycleHandler.Initializer(component).initialize(this);
 			CacheKey.RESHAPE_HANDLER.get(this).reshape(this);
 		}
 	}
 
-	public void move(int index, GuiComponent component) {
+	public void move(int index, GuiComponent<?> component) {
 		if (getChildren().remove(component)) {
 			getChildren().add(index, component);
 			component.onMoved(index);
 		}
 	}
 
-	public void moveToTop(GuiComponent component) { move(getChildren().size() - 1, component); }
+	public void moveToTop(GuiComponent<?> component) { move(getChildren().size() - 1, component); }
 
-	public void add(GuiComponent... components) {
-		boolean reRect = false;
-		for (GuiComponent component : components) {
+	public void add(GuiComponent<?>... components) {
+		boolean reshape = false;
+		for (GuiComponent<?> component : components) {
 			if (component == this) throw BecauseOf.illegalArgument("components", components);
-			if (component.parent != null) {
-				@Nullable GuiContainer parentOld = component.parent.get();
-				if (parentOld != null) parentOld.remove(component);
-			}
+			component.getParent().ifPresent(p -> p.remove(component));
 			getChildren().add(component);
 			component.onAdded(this, getChildren().lastIndexOf(component));
-			if (EnumGuiState.READY.isReachedBy(getState())) {
+			if (EnumGuiState.READY.isReachedBy(data.getState())) {
 				new IGuiLifecycleHandler.Initializer(component).initialize(this);
-				reRect = true;
+				reshape = true;
 			}
 		}
-		if (reRect) CacheKey.RESHAPE_HANDLER.get(this).reshape(this);
+		if (reshape) CacheKey.RESHAPE_HANDLER.get(this).reshape(this);
 	}
 
-	public void remove(GuiComponent... components) {
-		boolean reRect = false;
-		for (GuiComponent component : components) {
+	public void remove(GuiComponent<?>... components) {
+		boolean reshape = false;
+		for (GuiComponent<?> component : components) {
 			getChildren().remove(component);
 			component.onRemoved(this);
-			if (EnumGuiState.READY.isReachedBy(getState())) reRect = true;
+			if (EnumGuiState.READY.isReachedBy(data.getState())) reshape = true;
 		}
-		if (reRect) CacheKey.RESHAPE_HANDLER.get(this).reshape(this);
+		if (reshape) CacheKey.RESHAPE_HANDLER.get(this).reshape(this);
 	}
 
 	protected void transformChildren(AffineTransformStack stack) {
@@ -100,7 +92,7 @@ public class GuiContainer extends GuiComponent {
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-		if (EnumGuiState.READY.isReachedBy(getState())) {
+		if (EnumGuiState.READY.isReachedBy(data.getState())) {
 			GLStacks.push("GL_SCISSOR_TEST",
 					() -> GL11.glEnable(GL11.GL_SCISSOR_TEST),
 					() -> GL11.glDisable(GL11.GL_SCISSOR_TEST));
@@ -130,28 +122,28 @@ public class GuiContainer extends GuiComponent {
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void onInitialize(IGuiLifecycleHandler handler, GuiComponent invoker) {
+	public void onInitialize(IGuiLifecycleHandler handler, GuiComponent<?> invoker) {
 		super.onInitialize(handler, invoker);
 		getChildren().forEach(component -> component.onInitialize(handler, invoker));
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void onTick(IGuiLifecycleHandler handler, GuiComponent invoker) {
+	public void onTick(IGuiLifecycleHandler handler, GuiComponent<?> invoker) {
 		super.onTick(handler, invoker);
 		children.forEach(component -> component.onTick(handler, invoker));
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void onClose(IGuiLifecycleHandler handler, GuiComponent invoker) {
+	public void onClose(IGuiLifecycleHandler handler, GuiComponent<?> invoker) {
 		children.forEach(component -> component.onClose(handler, invoker));
 		super.onClose(handler, invoker);
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void onDestroyed(IGuiLifecycleHandler handler, GuiComponent invoker) {
+	public void onDestroyed(IGuiLifecycleHandler handler, GuiComponent<?> invoker) {
 		children.forEach(component -> component.onDestroyed(handler, invoker));
 		super.onDestroyed(handler, invoker);
 	}
@@ -159,24 +151,22 @@ public class GuiContainer extends GuiComponent {
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void onMouseHovering(AffineTransformStack stack, Point2D mouse) {
-		@Nullable GuiComponent hovering = unboxOptional(getChildMouseOver(stack, mouse));
-		if (hovering != this.hovering) {
-			if (this.hovering != null)
-				runChildTransformed(stack, this.hovering, () -> this.hovering.onMouseHovered(stack, mouse));
-			this.hovering = hovering;
-			if (hovering != null) runChildTransformed(stack, hovering, () -> hovering.onMouseHover(stack, mouse));
+		@Nullable GuiComponent<?> hovering = unboxOptional(getChildMouseOver(stack, mouse));
+		if (hovering != data.hovering) {
+			data.getHovering().ifPresent(h -> runChildTransformed(stack, h, () -> h.onMouseHovered(stack, mouse)));
+			data.hovering = hovering;
+			data.getHovering().ifPresent(h -> runChildTransformed(stack, h, () -> h.onMouseHover(stack, mouse)));
 		}
-		if (hovering != null) runChildTransformed(stack, hovering, () -> hovering.onMouseHovering(stack, mouse));
+		data.getHovering().ifPresent(h -> runChildTransformed(stack, h, () -> h.onMouseHovering(stack, mouse)));
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void onMouseHovered(AffineTransformStack stack, Point2D mouse) {
-		if (hovering == null) return;
-		runChildTransformed(stack, hovering, () -> {
-			hovering.onMouseHovered(stack, mouse);
-			hovering = null;
-		});
+		data.getHovering().ifPresent(h -> runChildTransformed(stack, h, () -> {
+			h.onMouseHovered(stack, mouse);
+			data.hovering = null;
+		}));
 	}
 
 	@Override
@@ -185,8 +175,8 @@ public class GuiContainer extends GuiComponent {
 		return getChildMouseOver(stack, mouse).map(c -> getChildTransformed(stack, c, () -> {
 			GuiDragInfo dragC = new GuiDragInfo(c, mouse, button);
 			EnumGuiMouseClickResult ret = c.onMouseClicked(stack, dragC, mouse, button);
-			if (ret.result) setFocused(c);
-			if (ret == EnumGuiMouseClickResult.DRAG) drags.put(button, dragC);
+			if (ret.result) data.setFocused(c);
+			if (ret == EnumGuiMouseClickResult.DRAG) data.drags.put(button, dragC);
 			return ret;
 		})).orElse(EnumGuiMouseClickResult.PASS);
 	}
@@ -194,15 +184,15 @@ public class GuiContainer extends GuiComponent {
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public boolean onMouseDragging(AffineTransformStack stack, GuiDragInfo drag, Rectangle2D mouse, int button) {
-		return Optional.ofNullable(this.drags.get(button)).map(d -> getChildTransformed(stack, d.dragged, () -> d.dragged.onMouseDragging(stack, d, mouse, button))).orElse(false);
+		return Optional.ofNullable(data.drags.get(button)).map(d -> getChildTransformed(stack, d.dragged, () -> d.dragged.onMouseDragging(stack, d, mouse, button))).orElse(false);
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public boolean onMouseDragged(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) {
-		return Optional.ofNullable(this.drags.get(button)).map(d -> getChildTransformed(stack, d.dragged, () -> {
+		return Optional.ofNullable(data.drags.get(button)).map(d -> getChildTransformed(stack, d.dragged, () -> {
 			boolean ret = d.dragged.onMouseDragged(stack, d, mouse, button);
-			this.drags.remove(button);
+			data.drags.remove(button);
 			return ret;
 		})).orElse(false);
 	}
@@ -223,79 +213,70 @@ public class GuiContainer extends GuiComponent {
 	@OverridingMethodsMustInvokeSuper
 	public boolean onKeyPressed(int key, int scanCode, int modifiers) {
 		super.onKeyPressed(key, scanCode, modifiers);
-		return focused != null && focused.onKeyPressed(key, scanCode, modifiers);
+		return data.getFocused().filter(f -> f.onKeyPressed(key, scanCode, modifiers)).isPresent();
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public boolean onKeyReleased(int key, int scanCode, int modifiers) {
-		boolean ret = focused != null && focused.onKeyReleased(key, scanCode, modifiers);
+		boolean ret = data.getFocused().filter(f -> f.onKeyReleased(key, scanCode, modifiers)).isPresent();
 		super.onKeyReleased(key, scanCode, modifiers);
 		return ret;
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public boolean onCharTyped(char codePoint, int modifiers) { return focused != null && focused.onCharTyped(codePoint, modifiers); }
+	public boolean onCharTyped(char codePoint, int modifiers) { return data.getFocused().filter(f -> f.onCharTyped(codePoint, modifiers)).isPresent(); }
 
-	public ImmutableList<GuiComponent> getChildrenView() { return ImmutableList.copyOf(getChildren()); }
+	public ImmutableList<GuiComponent<?>> getChildrenView() { return ImmutableList.copyOf(getChildren()); }
 
-	protected List<GuiComponent> getChildren() { return children; }
+	protected List<GuiComponent<?>> getChildren() { return children; }
 
 	@Override
 	public boolean onChangeFocus(boolean next) {
-		boolean hasFocused = focused != null;
-		if (hasFocused && focused.onChangeFocus(next)) return true;
+		Optional<GuiComponent<?>> foc = data.getFocused();
+		if (foc.filter(f -> f.onChangeFocus(next)).isPresent())
+			return true;
 		else {
-			int j = getChildren().indexOf(focused);
-			int i;
-			if (hasFocused && j >= 0) i = j + (next ? 1 : 0);
-			else if (next) i = 0;
-			else i = getChildren().size();
+			int i = foc.filter(f -> getChildren().contains(f))
+					.map(f -> getChildren().indexOf(f) + (next ? 1 : 0))
+					.orElseGet(() -> next ? 0 : getChildren().size());
 
-			ListIterator<GuiComponent> iterator = getChildren().listIterator(i);
+			ListIterator<GuiComponent<?>> iterator = getChildren().listIterator(i);
 			BooleanSupplier canAdvance = next ? iterator::hasNext : iterator::hasPrevious;
-			Supplier<GuiComponent> advance = next ? iterator::next : iterator::previous;
+			Supplier<GuiComponent<?>> advance = next ? iterator::next : iterator::previous;
 
 			while (canAdvance.getAsBoolean()) {
-				GuiComponent advanced = advance.get();
+				GuiComponent<?> advanced = advance.get();
 				if (advanced.onChangeFocus(next)) {
-					setFocused(advanced);
+					data.setFocused(advanced);
 					return true;
 				}
 			}
 
-			setFocused(null);
+			data.setFocused(null);
 			return false;
 		}
 	}
 
 	@Override
-	protected boolean isBeingDragged() { return drags.isEmpty() && super.isBeingDragged(); }
+	protected boolean isBeingDragged() { return data.drags.isEmpty() && super.isBeingDragged(); }
 
 	@Override
-	protected boolean isBeingHovered() { return hovering == null && super.isBeingHovered(); }
+	protected boolean isBeingHovered() { return !data.getHovering().isPresent() && super.isBeingHovered(); }
 
 	@Override
-	protected boolean isBeingFocused() { return focused == null && super.isBeingFocused(); }
+	protected boolean isBeingFocused() { return !data.getFocused().isPresent() && super.isBeingFocused(); }
 
-	protected void setFocused(@Nullable GuiComponent component) {
-		if (focused != null)
-			focused.onFocusLost(component);
-		@Nullable GuiComponent from = MiscellaneousUtilities.K(focused, focused = component);
-		if (focused != null)
-			focused.onFocusGet(from);
-	}
-
-	protected Optional<GuiComponent> getChildMouseOver(AffineTransformStack stack, Point2D mouse) {
-		for (GuiComponent c : Lists.reverse(getChildren())) {
+	protected Optional<GuiComponent<?>> getChildMouseOver(AffineTransformStack stack, Point2D mouse) {
+		for (GuiComponent<?> c : Lists.reverse(getChildren())) {
 			if (getChildTransformed(stack, c, () -> c.isMouseOver(stack, mouse)))
 				return Optional.of(c);
 		}
 		return Optional.empty();
 	}
 
-	protected <R> R getChildTransformed(AffineTransformStack stack, GuiComponent child, Supplier<R> call) {
+	protected <R> R getChildTransformed(AffineTransformStack stack, GuiComponent<?> child, Supplier<R> call) {
 		stack.push();
 		transformChildren(stack);
 		stack.push();
@@ -306,10 +287,32 @@ public class GuiContainer extends GuiComponent {
 		return ret;
 	}
 
-	protected void runChildTransformed(AffineTransformStack stack, GuiComponent child, Runnable call) {
+	protected void runChildTransformed(AffineTransformStack stack, GuiComponent<?> child, Runnable call) {
 		getChildTransformed(stack, child, () -> {
 			call.run();
 			return null;
 		});
+	}
+
+	public static class Data<E extends Events> extends GuiComponent.Data<E> {
+		@Nullable
+		protected GuiComponent<?> focused = null, hovering = null;
+		protected Map<Integer, GuiDragInfo> drags = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
+
+		public Data(E events, Supplier<Logger> logger) {
+			super(events, logger);
+		}
+
+		public Optional<GuiComponent<?>> getFocused() { return Optional.ofNullable(focused); }
+
+		protected void setFocused(@Nullable GuiComponent<?> component) {
+			getFocused().ifPresent(f -> f.onFocusLost(component));
+			@Nullable GuiComponent<?> from = MiscellaneousUtilities.KNullable(focused, focused = component);
+			getFocused().ifPresent(f -> f.onFocusGet(from));
+		}
+
+		public Optional<GuiComponent<?>> getHovering() { return Optional.ofNullable(hovering); }
+
+		public ImmutableMap<Integer, GuiDragInfo> getDragsView() { return ImmutableMap.copyOf(drags); }
 	}
 }

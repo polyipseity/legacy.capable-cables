@@ -19,7 +19,7 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 @SuppressWarnings("DeprecatedIsStillUsed")
 @OnlyIn(CLIENT)
 public interface IGuiEventListenerComponent extends IGuiEventListener {
-	GuiComponent getComponent();
+	GuiComponent<?> getComponent();
 
 	Optional<GuiDragInfo> getDragInfo(int button);
 
@@ -49,9 +49,9 @@ public interface IGuiEventListenerComponent extends IGuiEventListener {
 
 	default boolean onChangeFocus(boolean next) { return false; }
 
-	default void onFocusLost(@Nullable GuiComponent to) {}
+	default void onFocusLost(@Nullable GuiComponent<?> to) {}
 
-	default void onFocusGet(@Nullable GuiComponent from) {}
+	default void onFocusGet(@Nullable GuiComponent<?> from) {}
 
 	////////// Deprecated //////////
 
@@ -78,6 +78,7 @@ public interface IGuiEventListenerComponent extends IGuiEventListener {
 	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
 	default boolean mouseDragged(double mouseX, double mouseY, int button, double mouseXDiff, double mouseYDiff) { return getDragInfo(button).filter(d -> onMouseDragging(new AffineTransformStack(), d, new Rectangle2D.Double(mouseX, mouseY, mouseXDiff, mouseYDiff), button)).isPresent(); }
 
+	@Override
 	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
 	@Deprecated
 	default boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) { return onMouseScrolled(new AffineTransformStack(), new Point2D.Double(mouseX, mouseY), scrollDelta); }

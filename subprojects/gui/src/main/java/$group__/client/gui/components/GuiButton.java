@@ -12,18 +12,13 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
-public abstract class GuiButton extends GuiContainer {
-	@SuppressWarnings("CanBeFinal")
-	public ColorData colors;
-
-	public GuiButton(Shape shape, ColorData colors, Logger logger) {
-		super(shape, logger);
-		this.colors = colors;
-	}
+public abstract class GuiButton<D extends GuiButton.Data<?, ?>> extends GuiContainer<D> {
+	public GuiButton(Shape shape, D data) { super(shape, data); }
 
 	protected abstract boolean onButtonClicked(int button);
 
@@ -31,18 +26,18 @@ public abstract class GuiButton extends GuiContainer {
 
 	@Override
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-		if (EnumGuiState.READY.isReachedBy(getState())) {
+		if (EnumGuiState.READY.isReachedBy(data.getState())) {
 			AffineTransform transform = stack.delegated.peek();
 			Shape transformed = transform.createTransformedShape(getShape());
 			if (isBeingDragged() && transformed.contains(mouse)) {
-				ObjectUtilities.drawShape(transformed, true, colors.clicking, 0);
-				ObjectUtilities.drawShape(transformed, false, colors.clickingBorder, 0);
+				ObjectUtilities.drawShape(transformed, true, data.colors.clicking, 0);
+				ObjectUtilities.drawShape(transformed, false, data.colors.clickingBorder, 0);
 			} else if (isBeingHovered()) {
-				ObjectUtilities.drawShape(transformed, true, colors.hovering, 0);
-				ObjectUtilities.drawShape(transformed, false, colors.hoveringBorder, 0);
+				ObjectUtilities.drawShape(transformed, true, data.colors.hovering, 0);
+				ObjectUtilities.drawShape(transformed, false, data.colors.hoveringBorder, 0);
 			} else {
-				ObjectUtilities.drawShape(transformed, true, colors.base, 0);
-				ObjectUtilities.drawShape(transformed, false, colors.baseBorder, 0);
+				ObjectUtilities.drawShape(transformed, true, data.colors.base, 0);
+				ObjectUtilities.drawShape(transformed, false, data.colors.baseBorder, 0);
 			}
 			super.render(stack, mouse, partialTicks);
 		}
@@ -71,59 +66,75 @@ public abstract class GuiButton extends GuiContainer {
 	}
 
 	@OnlyIn(CLIENT)
-	@SuppressWarnings("UnusedReturnValue")
-	public static class ColorData {
-		public Color
-				base = Color.DARK_GRAY, baseBorder = Color.DARK_GRAY,
-				hovering = Color.GRAY, hoveringBorder = Color.GRAY,
-				clicking = Color.LIGHT_GRAY, clickingBorder = Color.LIGHT_GRAY;
+	public static class Data<E extends Events, C extends Data.ColorData> extends GuiContainer.Data<E> {
+		public C colors;
 
-		public ColorData setBase(Color base) {
-			this.base = base;
-			return this;
+		public Data(E events, Supplier<Logger> logger, C colors) {
+			super(events, logger);
+			this.colors = colors;
 		}
 
-		public ColorData setBaseBorder(Color baseBorder) {
-			this.baseBorder = baseBorder;
-			return this;
-		}
+		@OnlyIn(CLIENT)
+		@SuppressWarnings("UnusedReturnValue")
+		public static class ColorData {
+			public Color
+					base = Color.DARK_GRAY, baseBorder = Color.DARK_GRAY,
+					hovering = Color.GRAY, hoveringBorder = Color.GRAY,
+					clicking = Color.LIGHT_GRAY, clickingBorder = Color.LIGHT_GRAY;
 
-		public ColorData setHovering(Color hovering) {
-			this.hovering = hovering;
-			return this;
-		}
+			public ColorData setBase(Color base) {
+				this.base = base;
+				return this;
+			}
 
-		public ColorData setHoveringBorder(Color hoveringBorder) {
-			this.hoveringBorder = hoveringBorder;
-			return this;
-		}
+			public ColorData setBaseBorder(Color baseBorder) {
+				this.baseBorder = baseBorder;
+				return this;
+			}
 
-		public ColorData setClicking(Color clicking) {
-			this.clicking = clicking;
-			return this;
-		}
+			public ColorData setHovering(Color hovering) {
+				this.hovering = hovering;
+				return this;
+			}
 
-		public ColorData setClickingBorder(Color clickingBorder) {
-			this.clickingBorder = clickingBorder;
-			return this;
+			public ColorData setHoveringBorder(Color hoveringBorder) {
+				this.hoveringBorder = hoveringBorder;
+				return this;
+			}
+
+			public ColorData setClicking(Color clicking) {
+				this.clicking = clicking;
+				return this;
+			}
+
+			public ColorData setClickingBorder(Color clickingBorder) {
+				this.clickingBorder = clickingBorder;
+				return this;
+			}
 		}
 	}
 
 	@OnlyIn(CLIENT)
-	public static class Functional extends GuiButton {
-		@SuppressWarnings("CanBeFinal")
-		protected BiFunction<GuiButton.Functional, Integer, Boolean> filter, activator;
+	public static class Functional<D extends Functional.Data<?, ?>> extends GuiButton<D> {
+		public Functional(Shape shape, D data) { super(shape, data); }
 
-		public Functional(Shape shape, ColorData colors, BiFunction<GuiButton.Functional, Integer, Boolean> filter, BiFunction<GuiButton.Functional, Integer, Boolean> activator, Logger logger) {
-			super(shape, colors, logger);
-			this.filter = filter;
-			this.activator = activator;
+		@Override
+		protected boolean onButtonClicked(int button) { return data.filter.apply(this, button); }
+
+		@Override
+		protected boolean onButtonActivated(int button) { return data.activator.apply(this, button); }
+
+		@OnlyIn(CLIENT)
+		public static class Data<E extends Events, C extends GuiButton.Data.ColorData> extends GuiButton.Data<E, C> {
+			protected BiFunction<GuiButton.Functional<?>, Integer, Boolean> filter, activator;
+
+			public Data(E events, Supplier<Logger> logger, C colors,
+			            BiFunction<GuiButton.Functional<?>, Integer, Boolean> filter,
+			            BiFunction<GuiButton.Functional<?>, Integer, Boolean> activator) {
+				super(events, logger, colors);
+				this.filter = filter;
+				this.activator = activator;
+			}
 		}
-
-		@Override
-		protected boolean onButtonClicked(int button) { return filter.apply(this, button); }
-
-		@Override
-		protected boolean onButtonActivated(int button) { return activator.apply(this, button); }
 	}
 }

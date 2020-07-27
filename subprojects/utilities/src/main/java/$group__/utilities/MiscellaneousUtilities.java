@@ -47,4 +47,7 @@ public enum MiscellaneousUtilities {
 	 * @since 0.0.1
 	 */
 	public static <T> T K(T x, @SuppressWarnings("unused") Object... y) { return x; }
+
+	@Nullable
+	public static <T> T KNullable(@Nullable T x, @SuppressWarnings("unused") Object... y) { return x; }
 }

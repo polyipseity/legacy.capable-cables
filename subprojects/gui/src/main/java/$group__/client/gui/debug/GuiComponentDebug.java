@@ -1,8 +1,10 @@
 package $group__.client.gui.debug;
 
 import $group__.client.gui.components.GuiButton;
+import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiWindow;
 import $group__.client.gui.components.backgrounds.GuiBackgroundDefault;
+import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.components.roots.GuiRootWindows;
 import $group__.client.gui.structures.AffineTransformStack;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
@@ -82,15 +84,19 @@ public enum GuiComponentDebug {
 }
 
 @OnlyIn(CLIENT)
-final class GuiDebug extends GuiRootWindows<ContainerDebug> {
+final class GuiDebug extends GuiRootWindows<GuiRoot.Data<GuiRoot.Events, ContainerDebug>, ContainerDebug> {
 	private static final Logger LOGGER = LogManager.getLogger();
 
 	@SuppressWarnings("MagicNumber")
 	GuiDebug(ITextComponent title, ContainerDebug container) {
-		super(title, new GuiBackgroundDefault(LOGGER), container, LOGGER);
+		super(title,
+				new Data<>(new Events(), GuiDebug::getLogger, new GuiBackgroundDefault<>(
+						new GuiComponent.Data<>(new GuiComponent.Events(), GuiDebug::getLogger)), container));
 		{
-			GuiWindow window1 = new GuiWindow(new Rectangle2D.Double(10, 10, 100, 100), new GuiWindow.ColorData(), LOGGER);
-			GuiWindow window2 = new GuiWindow(new Rectangle2D.Double(50, 50, 200, 200), new GuiWindow.ColorData(), LOGGER) {
+			GuiWindow<?> window1 = new GuiWindow<>(new Rectangle2D.Double(10, 10, 100, 100),
+					new GuiWindow.Data<>(new GuiComponent.Events(), GuiDebug::getLogger, new GuiWindow.Data.ColorData()));
+			GuiWindow<?> window2 = new GuiWindow<GuiWindow.Data<?, ?>>(new Rectangle2D.Double(50, 50, 200, 200),
+					new GuiWindow.Data<>(new GuiComponent.Events(), GuiDebug::getLogger, new GuiWindow.Data.ColorData())) {
 				protected double window2Angle = 0;
 
 				@Override
@@ -110,21 +116,21 @@ final class GuiDebug extends GuiRootWindows<ContainerDebug> {
 				}
 			};
 			{
-				GuiButton button;
+				GuiButton<?> button;
 				{
 					Random random = new Random();
-					button = new GuiButton.Functional(new Ellipse2D.Double(0, 0, 100, 100),
-							new GuiButton.ColorData(),
-							(b, i) -> i == GLFW.GLFW_MOUSE_BUTTON_LEFT,
-							(b, i) -> {
-								b.colors.setBase(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-										.setBaseBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-										.setHovering(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-										.setHoveringBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-										.setClicking(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-										.setClickingBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()));
-								return true;
-							}, LOGGER);
+					button = new GuiButton.Functional<>(new Ellipse2D.Double(0, 0, 100, 100),
+							new GuiButton.Functional.Data<>(new GuiComponent.Events(), GuiDebug::getLogger, new GuiButton.Data.ColorData(),
+									(b, i) -> i == GLFW.GLFW_MOUSE_BUTTON_LEFT,
+									(b, i) -> {
+										b.data.colors.setBase(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+												.setBaseBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+												.setHovering(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+												.setHoveringBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+												.setClicking(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+												.setClickingBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()));
+										return true;
+									}));
 				}
 
 				window2.add(button);
@@ -133,6 +139,8 @@ final class GuiDebug extends GuiRootWindows<ContainerDebug> {
 			add(window1, window2);
 		}
 	}
+
+	private static Logger getLogger() { return LOGGER; }
 }
 
 final class ContainerDebug extends Container {

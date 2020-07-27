@@ -35,6 +35,7 @@ public class Dimension2DDouble extends Dimension2D implements Serializable {
 		return new Dimension2DDouble(width, height);
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Dimension2DDouble) {
 			Dimension2DDouble d = (Dimension2DDouble) obj;
@@ -43,10 +44,12 @@ public class Dimension2DDouble extends Dimension2D implements Serializable {
 		return false;
 	}
 
+	@Override
 	public int hashCode() {
 		double sum = width + height;
 		return (int) (sum * (sum + 1) / 2 + width);
 	}
 
+	@Override
 	public String toString() { return getClass().getName() + "[width=" + width + ",height=" + height + ']'; }
 }
