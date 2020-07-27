@@ -11,6 +11,7 @@ import $group__.client.gui.traits.IGuiShapeRectangle;
 import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
 import $group__.client.gui.utilities.GLUtilities;
+import $group__.client.gui.utilities.GLUtilities.GLStacks;
 import $group__.client.gui.utilities.GuiUtilities;
 import $group__.client.gui.utilities.GuiUtilities.DrawingUtilities;
 import $group__.client.gui.utilities.TextComponents;
@@ -64,7 +65,7 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-		GLUtilities.resetAll();
+		GLStacks.resetAll();
 		constrain(stack);
 		super.render(stack, mouse, partialTicks);
 	}

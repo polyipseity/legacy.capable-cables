@@ -6,7 +6,7 @@ import $group__.client.gui.structures.EnumGuiState;
 import $group__.client.gui.structures.GuiCache.CacheKey;
 import $group__.client.gui.structures.GuiDragInfo;
 import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
-import $group__.client.gui.utilities.GLUtilities;
+import $group__.client.gui.utilities.GLUtilities.GLStacks;
 import $group__.client.gui.utilities.GuiUtilities.ObjectUtilities;
 import $group__.client.gui.utilities.GuiUtilities.UnboxingUtilities;
 import $group__.utilities.MiscellaneousUtilities;
@@ -101,7 +101,7 @@ public class GuiContainer extends GuiComponent {
 	@OverridingMethodsMustInvokeSuper
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		if (EnumGuiState.READY.isReachedBy(getState())) {
-			GLUtilities.push("GL_SCISSOR_TEST",
+			GLStacks.push("GL_SCISSOR_TEST",
 					() -> GL11.glEnable(GL11.GL_SCISSOR_TEST),
 					() -> GL11.glDisable(GL11.GL_SCISSOR_TEST));
 			int[] boundsBox = new int[4]; // TODO replace glScissor with stencil buffer perhaps
@@ -111,13 +111,13 @@ public class GuiContainer extends GuiComponent {
 						CoordinateConverters.toNativeRectangle(this,
 								ObjectUtilities.getRectangleExpanded(stack.delegated.peek().createTransformedShape(c.getShape().getBounds2D()).getBounds2D()))
 								.createIntersection(new Rectangle2D.Double(boundsBox[0], boundsBox[1], boundsBox[2], boundsBox[3])),
-						(x, y) -> (w, h) -> GLUtilities.push("glScissor",
+						(x, y) -> (w, h) -> GLStacks.push("glScissor",
 								() -> GL11.glScissor(x.intValue(), y.intValue(), w.intValue(), h.intValue()),
-								GLUtilities.GL_SCISSOR_FALLBACK));
+								GLStacks.GL_SCISSOR_FALLBACK));
 				c.render(stack, mouse, partialTicks);
-				GLUtilities.pop("glScissor");
+				GLStacks.pop("glScissor");
 			}));
-			GLUtilities.pop("GL_SCISSOR_TEST");
+			GLStacks.pop("GL_SCISSOR_TEST");
 		}
 	}
 

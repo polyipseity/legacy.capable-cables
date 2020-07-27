@@ -5,6 +5,7 @@ import $group__.client.gui.structures.GuiCache.CacheKey;
 import $group__.client.gui.traits.IGuiShapeRectangle;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
 import $group__.client.gui.utilities.GLUtilities;
+import $group__.client.gui.utilities.GLUtilities.GLStacks;
 import $group__.client.gui.utilities.GuiUtilities.DrawingUtilities;
 import $group__.client.gui.utilities.GuiUtilities.UnboxingUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
@@ -101,11 +102,11 @@ public class GuiWindow extends GuiContainer implements IGuiReshapeHandler, IGuiS
 				AffineTransform transformR = stackR.delegated.pop();
 				reshape(this, c);
 				UnboxingUtilities.acceptRectangle(r, (x, y) -> (w, h) -> r.setRect(x, y, w - 1, h - 1));
-				GLUtilities.push("GL_SCISSOR_TEST",
+				GLStacks.push("GL_SCISSOR_TEST",
 						() -> GL11.glDisable(GL11.GL_SCISSOR_TEST),
 						() -> GL11.glDisable(GL11.GL_SCISSOR_TEST));
 				DrawingUtilities.drawRectangle(transformR, r, colors.dragging.getRGB());
-				GLUtilities.pop("GL_SCISSOR_TEST");
+				GLStacks.pop("GL_SCISSOR_TEST");
 			}
 		}
 	}
