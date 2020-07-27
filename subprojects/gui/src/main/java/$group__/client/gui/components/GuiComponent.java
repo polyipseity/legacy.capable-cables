@@ -44,7 +44,6 @@ public abstract class GuiComponent implements IRenderableComponent, IGuiEventLis
 	protected EnumGuiState state = EnumGuiState.NEW;
 	protected final Deque<GuiKeyPressInfo> keyPresses = new ArrayDeque<>(INITIAL_CAPACITY_2);
 	public final GuiCache cache = new GuiCache();
-	public final CoordinateConverters coordinateConverters = new CoordinateConverters();
 
 	public GuiComponent(Shape shape, Logger logger) {
 		this.shape = shape;
@@ -198,51 +197,55 @@ public abstract class GuiComponent implements IRenderableComponent, IGuiEventLis
 	}
 
 	@OnlyIn(CLIENT)
-	public static class ReferenceConverters {
+	public enum ReferenceConverters {
+		;
+
 		public static Point2D toAbsolutePoint(AffineTransform transform, Point2D point) { return transform.transform(point, null); }
 
 		public static Point2D toRelativePoint(AffineTransform transform, Point2D point) throws NoninvertibleTransformException { return transform.inverseTransform(point, null); }
 	}
 
 	@OnlyIn(CLIENT)
-	public class CoordinateConverters {
-		public double toScaledCoordinate(double d) { return d / CacheKey.MAIN_WINDOW.get(GuiComponent.this).getGuiScaleFactor(); }
+	public enum CoordinateConverters {
+		;
 
-		public double toNativeCoordinate(double d) { return d * CacheKey.MAIN_WINDOW.get(GuiComponent.this).getGuiScaleFactor(); }
+		public static double toScaledCoordinate(GuiComponent component, double d) { return d / CacheKey.MAIN_WINDOW.get(component).getGuiScaleFactor(); }
 
-		public Point2D toScaledPoint(Point2D point) {
+		public static double toNativeCoordinate(GuiComponent component, double d) { return d * CacheKey.MAIN_WINDOW.get(component).getGuiScaleFactor(); }
+
+		public static Point2D toScaledPoint(GuiComponent component, Point2D point) {
 			Point2D p = (Point2D) point.clone();
-			p.setLocation(toScaledCoordinate(p.getX()), toScaledCoordinate(CacheKey.MAIN_WINDOW.get(GuiComponent.this).getFramebufferHeight() - p.getY()));
+			p.setLocation(toScaledCoordinate(component, p.getX()), toScaledCoordinate(component, CacheKey.MAIN_WINDOW.get(component).getFramebufferHeight() - p.getY()));
 			return p;
 		}
 
-		public Point2D toNativePoint(Point2D point) {
+		public static Point2D toNativePoint(GuiComponent component, Point2D point) {
 			Point2D p = (Point2D) point.clone();
-			p.setLocation(toNativeCoordinate(p.getX()), toNativeCoordinate(CacheKey.ROOT.get(GuiComponent.this).getRectangleView().getHeight() - p.getY()));
+			p.setLocation(toNativeCoordinate(component, p.getX()), toNativeCoordinate(component, CacheKey.ROOT.get(component).getRectangleView().getHeight() - p.getY()));
 			return p;
 		}
 
-		public Dimension2D toNativeDimension(Dimension2D dimension) {
+		public static Dimension2D toNativeDimension(GuiComponent component, Dimension2D dimension) {
 			Dimension2D dim = (Dimension2D) dimension.clone();
-			dim.setSize(toNativeCoordinate(dim.getWidth()), toNativeCoordinate(dim.getHeight()));
+			dim.setSize(toNativeCoordinate(component, dim.getWidth()), toNativeCoordinate(component, dim.getHeight()));
 			return dim;
 		}
 
-		public Dimension2D toScaledDimension(Dimension2D dimension) {
+		public static Dimension2D toScaledDimension(GuiComponent component, Dimension2D dimension) {
 			Dimension2D dim = (Dimension2D) dimension.clone();
-			dim.setSize(toScaledCoordinate(dim.getWidth()), toScaledCoordinate(dim.getHeight()));
+			dim.setSize(toScaledCoordinate(component, dim.getWidth()), toScaledCoordinate(component, dim.getHeight()));
 			return dim;
 		}
 
-		public Rectangle2D toScaledRectangle(Rectangle2D rectangle) {
+		public static Rectangle2D toScaledRectangle(GuiComponent component, Rectangle2D rectangle) {
 			Rectangle2D r = (Rectangle2D) rectangle.clone();
-			r.setFrame(toScaledPoint(new Point2D.Double(rectangle.getX(), rectangle.getMaxY())), toScaledDimension(new Dimension2DDouble(rectangle.getWidth(), rectangle.getHeight())));
+			r.setFrame(toScaledPoint(component, new Point2D.Double(rectangle.getX(), rectangle.getMaxY())), toScaledDimension(component, new Dimension2DDouble(rectangle.getWidth(), rectangle.getHeight())));
 			return r;
 		}
 
-		public Rectangle2D toNativeRectangle(Rectangle2D rectangle) {
+		public static Rectangle2D toNativeRectangle(GuiComponent component, Rectangle2D rectangle) {
 			Rectangle2D r = (Rectangle2D) rectangle.clone();
-			r.setFrame(toNativePoint(new Point2D.Double(rectangle.getX(), rectangle.getMaxY())), toNativeDimension(new Dimension2DDouble(rectangle.getWidth(), rectangle.getHeight())));
+			r.setFrame(toNativePoint(component, new Point2D.Double(rectangle.getX(), rectangle.getMaxY())), toNativeDimension(component, new Dimension2DDouble(rectangle.getWidth(), rectangle.getHeight())));
 			return r;
 		}
 	}

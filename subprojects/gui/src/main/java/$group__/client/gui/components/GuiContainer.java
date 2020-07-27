@@ -108,7 +108,7 @@ public class GuiContainer extends GuiComponent {
 			GL11.glGetIntegerv(GL11.GL_SCISSOR_BOX, boundsBox);
 			getChildren().forEach(c -> runChildTransformed(stack, c, () -> {
 				UnboxingUtilities.acceptRectangle(
-						coordinateConverters.toNativeRectangle(
+						CoordinateConverters.toNativeRectangle(this,
 								ObjectUtilities.getRectangleExpanded(stack.delegated.peek().createTransformedShape(c.getShape().getBounds2D()).getBounds2D()))
 								.createIntersection(new Rectangle2D.Double(boundsBox[0], boundsBox[1], boundsBox[2], boundsBox[3])),
 						(x, y) -> (w, h) -> GLUtilities.push("glScissor",
