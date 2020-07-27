@@ -4,6 +4,7 @@ import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiContainer;
 import $group__.client.gui.components.backgrounds.GuiBackground;
 import $group__.client.gui.structures.AffineTransformStack;
+import $group__.client.gui.structures.Dimension2DDouble;
 import $group__.client.gui.structures.EnumGuiMouseClickResult;
 import $group__.client.gui.structures.GuiDragInfo;
 import $group__.client.gui.traits.IGuiShapeRectangle;
@@ -15,6 +16,7 @@ import $group__.client.gui.utilities.GuiUtilities.DrawingUtilities;
 import $group__.client.gui.utilities.TextComponents;
 import $group__.client.gui.utilities.Tooltips;
 import $group__.client.gui.utilities.Transforms.AffineTransforms;
+import $group__.utilities.specific.Maps;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -25,21 +27,21 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.apache.logging.log4j.Logger;
+import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayDeque;
 import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static $group__.utilities.Casts.castUncheckedUnboxedNonnull;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 
-// TODO fix onChangeFocus will never be called
 @OnlyIn(CLIENT)
 public abstract class GuiRoot<C extends Container> extends GuiContainer implements IGuiShapeRectangle, IGuiLifecycleHandler, IGuiReshapeHandler {
 	@Nullable
@@ -47,10 +49,10 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 	protected final Screen screen;
 	protected final FakeParent fakeParent = new FakeParent();
 
-	protected GuiRoot(ITextComponent title, @Nullable GuiBackground background) { this(title, background, null); }
+	protected GuiRoot(ITextComponent title, @Nullable GuiBackground background, Logger logger) { this(title, background, null, logger); }
 
-	protected GuiRoot(ITextComponent title, @Nullable GuiBackground background, @Nullable C container) {
-		super(getShapePlaceholder());
+	protected GuiRoot(ITextComponent title, @Nullable GuiBackground background, @Nullable C container, Logger logger) {
+		super(getShapePlaceholder(), logger);
 		this.container = container;
 		screen = container == null ? new ScreenAdapted(title) : new ScreenAdaptedWithContainer(title);
 		setBackground(background);
@@ -63,6 +65,7 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 	@OverridingMethodsMustInvokeSuper
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		GLUtilities.resetAll();
+		constrain(stack);
 		super.render(stack, mouse, partialTicks);
 	}
 
@@ -70,7 +73,10 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 	public boolean isPaused() { return false; }
 
 	@SuppressWarnings("SameReturnValue")
-	public int getCloseKey() { return GLFW_KEY_ESCAPE; }
+	public int getCloseKey() { return GLFW.GLFW_KEY_ESCAPE; }
+
+	@SuppressWarnings("SameReturnValue")
+	public int getFocusChangeKey() { return GLFW.GLFW_KEY_TAB; }
 
 	public Optional<GuiBackground> getBackground() {
 		if (!getChildren().isEmpty()) {
@@ -120,9 +126,10 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 		super.onClose(handler, invoker);
 
 		// COMMENT synthetic events
+		AffineTransformStack stack = new AffineTransformStack();
 		Point2D cursor = GLUtilities.getCursorPos();
-		if (fakeParent.drag != null)
-			onMouseDragged(new AffineTransformStack(), fakeParent.drag, (Point2D) cursor.clone(), fakeParent.drag.button);
+		Map<Integer, GuiDragInfo> drags = new HashMap<>(this.drags);
+		drags.forEach((i, d) -> onMouseDragged(stack, d, (Point2D) cursor.clone(), i));
 		onMouseHovered(new AffineTransformStack(), (Point2D) cursor.clone());
 		new ArrayDeque<>(keyPresses).forEach(k -> onKeyReleased(k.key, k.scanCode, k.modifiers));
 
@@ -132,16 +139,14 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 	@Override
 	public EnumGuiMouseClickResult onMouseClicked(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) {
 		EnumGuiMouseClickResult ret = super.onMouseClicked(stack, drag, mouse, button);
-		if (ret.result) fakeParent.drag = drag;
+		if (ret.result) fakeParent.drags.put(button, drag);
 		return ret;
 	}
 
 	@Override
 	public boolean onMouseReleased(AffineTransformStack stack, Point2D mouse, int button) {
-		if (fakeParent.drag != null) {
-			onMouseDragged(stack, fakeParent.drag, mouse, button);
-			fakeParent.drag = null;
-		}
+		Map<Integer, GuiDragInfo> drags = new HashMap<>(this.drags);
+		drags.forEach((i, d) -> onMouseDragged(stack, d, mouse, i));
 		return super.onMouseReleased(stack, mouse, button);
 	}
 
@@ -159,22 +164,23 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 			close(this);
 			return true;
 		}
+		if (key == getFocusChangeKey() && onChangeFocus((modifiers & GLFW.GLFW_MOD_SHIFT) == 0))
+			return true;
 		return super.onKeyPressed(key, scanCode, modifiers);
 	}
 
 	@Override
-	public Optional<GuiDragInfo> getDragInfo() { return Optional.ofNullable(fakeParent.drag); }
+	public Optional<GuiDragInfo> getDragInfo(int button) { return Optional.ofNullable(fakeParent.drags.get(button)); }
 
 	@Override
-	protected boolean isBeingDragged() { return fakeParent.drag != null; }
+	protected boolean isBeingDragged() { return drags.isEmpty() && !fakeParent.drags.isEmpty(); }
 
 	@Override
 	protected boolean isBeingHovered() { return true; }
 
 	@OnlyIn(CLIENT)
 	protected static class FakeParent {
-		@Nullable
-		protected GuiDragInfo drag = null;
+		protected Map<Integer, GuiDragInfo> drags = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
 	}
 
 	////////// Screen Compatibility //////////
@@ -314,7 +320,7 @@ public abstract class GuiRoot<C extends Container> extends GuiContainer implemen
 		@SuppressWarnings("MagicNumber")
 		@Override
 		@Deprecated
-		public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(AffineTransforms.getIdentity(), new Rectangle2D.Double(x, y, w, h), new Point2D.Double(u, v), new Dimension(256, 256), getBlitOffset()); }
+		public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(AffineTransforms.getIdentity(), new Rectangle2D.Double(x, y, w, h), new Point2D.Double(u, v), new Dimension2DDouble(256, 256), getBlitOffset()); }
 
 		@Override
 		@Deprecated

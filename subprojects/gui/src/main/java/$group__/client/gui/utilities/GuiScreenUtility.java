@@ -58,12 +58,6 @@ public final class GuiScreenUtility extends Screen {
 	}
 
 	@Override
-	public void hLine(int x1, int x2, int y, int color) { super.hLine(x1, x2, y, color); }
-
-	@Override
-	public void vLine(int x, int y1, int y2, int color) { super.vLine(x, y1, y2, color); }
-
-	@Override
 	public void fillGradient(int x1, int y1, int x2, int y2, int colorY1, int colorY2) { super.fillGradient(x1, y1, x2, y2, colorY1, colorY2); }
 
 	@Override

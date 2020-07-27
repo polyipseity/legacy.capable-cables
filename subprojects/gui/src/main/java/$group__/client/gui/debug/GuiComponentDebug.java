@@ -4,6 +4,7 @@ import $group__.client.gui.components.GuiButton;
 import $group__.client.gui.components.GuiWindow;
 import $group__.client.gui.components.backgrounds.GuiBackgroundDefault;
 import $group__.client.gui.components.roots.GuiRootWindows;
+import $group__.client.gui.structures.AffineTransformStack;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -38,7 +39,9 @@ import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Random;
 
@@ -80,27 +83,48 @@ public enum GuiComponentDebug {
 
 @OnlyIn(CLIENT)
 final class GuiDebug extends GuiRootWindows<ContainerDebug> {
+	private static final Logger LOGGER = LogManager.getLogger();
+
 	@SuppressWarnings("MagicNumber")
 	GuiDebug(ITextComponent title, ContainerDebug container) {
-		super(title, new GuiBackgroundDefault(), container);
+		super(title, new GuiBackgroundDefault(LOGGER), container, LOGGER);
 		{
-			GuiWindow window1 = new GuiWindow(new Rectangle2D.Double(10, 10, 100, 100), new GuiWindow.ColorData());
-			GuiWindow window2 = new GuiWindow(new Rectangle2D.Double(50, 50, 200, 200), new GuiWindow.ColorData());
+			GuiWindow window1 = new GuiWindow(new Rectangle2D.Double(10, 10, 100, 100), new GuiWindow.ColorData(), LOGGER);
+			GuiWindow window2 = new GuiWindow(new Rectangle2D.Double(50, 50, 200, 200), new GuiWindow.ColorData(), LOGGER) {
+				protected double window2Angle = 0;
+
+				@Override
+				public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
+					window2Angle += 0.25 * partialTicks;
+					window2Angle %= 360;
+					super.render(stack, mouse, partialTicks);
+				}
+
+				@Override
+				protected void transformThis(AffineTransformStack stack) {
+					super.transformThis(stack);
+					Rectangle2D r = getRectangle();
+					AffineTransform transform = stack.delegated.peek();
+					transform.rotate(Math.toRadians(window2Angle), r.getX() + 50, r.getY() + 50);
+					transform.scale(1.5, 0.5);
+				}
+			};
 			{
 				GuiButton button;
 				{
 					Random random = new Random();
 					button = new GuiButton.Functional(new Ellipse2D.Double(0, 0, 100, 100),
 							new GuiButton.ColorData(),
+							(b, i) -> i == GLFW.GLFW_MOUSE_BUTTON_LEFT,
 							(b, i) -> {
-								if (i == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-									b.colors.setBase(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-											.setBaseBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-											.setClicking(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-											.setClickingBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()));
-									return true;
-								} else return false;
-							});
+								b.colors.setBase(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+										.setBaseBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+										.setHovering(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+										.setHoveringBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+										.setClicking(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+										.setClickingBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()));
+								return true;
+							}, LOGGER);
 				}
 
 				window2.add(button);

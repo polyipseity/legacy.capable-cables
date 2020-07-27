@@ -10,6 +10,7 @@ import $group__.client.gui.utilities.GuiUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.geom.Point2D;
 
@@ -17,7 +18,7 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
 public abstract class GuiBackground extends GuiComponent {
-	public GuiBackground() { super(getShapePlaceholder()); }
+	public GuiBackground(Logger logger) { super(getShapePlaceholder(), logger); }
 
 	public void renderBackground(AffineTransformStack stack, Screen screen, Point2D mouse, float partialTicks) { GuiUtilities.GuiBackgrounds.drawnBackground(screen); }
 

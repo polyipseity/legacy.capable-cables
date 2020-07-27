@@ -12,4 +12,9 @@ public interface IGuiReshapeHandler {
 	void reshape(GuiComponent invoker);
 
 	void reshape(GuiComponent invoker, Shape shape);
+
+	default void reshape(GuiComponent invoker, GuiComponent target, Shape shape) {
+		target.setBounds(this, invoker, shape.getBounds2D());
+		reshape(invoker);
+	}
 }

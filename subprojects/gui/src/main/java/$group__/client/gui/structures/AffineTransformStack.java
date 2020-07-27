@@ -15,4 +15,11 @@ public class AffineTransformStack {
 
 	@SuppressWarnings("UnusedReturnValue")
 	public AffineTransform push() { return delegated.push((AffineTransform) delegated.peek().clone()); }
+
+	public AffineTransformStack copy() {
+		AffineTransformStack ret = new AffineTransformStack();
+		ret.delegated.clear();
+		delegated.forEach(t -> ret.delegated.add((AffineTransform) t.clone()));
+		return ret;
+	}
 }

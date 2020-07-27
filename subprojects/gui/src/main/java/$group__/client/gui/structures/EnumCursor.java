@@ -1,6 +1,7 @@
 package $group__.client.gui.structures;
 
 import $group__.client.gui.ConfigurationGui;
+import $group__.client.gui.utilities.GuiUtilities;
 import $group__.utilities.client.ResourceUtilities;
 import $group__.utilities.client.specific.ImageUtilities;
 import $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher;
@@ -60,7 +61,8 @@ public enum EnumCursor {
 	public static long createCursor(ResourceLocation location, Point2D hotspot) throws IOException {
 		try (GLFWImage i = ImageUtilities.toGLFWImageCursor(NativeImage.read(NativeImage.PixelFormat.RGBA,
 				ResourceUtilities.getResource(location).getInputStream()))) {
-			return GLFW.glfwCreateCursor(i, (int) hotspot.getX(), (int) hotspot.getY());
+			Point hotspotF = GuiUtilities.ObjectUtilities.getPointFloor(hotspot);
+			return GLFW.glfwCreateCursor(i, hotspotF.x, hotspotF.y);
 		}
 	}
 }

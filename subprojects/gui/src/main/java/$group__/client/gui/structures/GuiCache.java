@@ -14,6 +14,7 @@ import $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.client.MainWindow;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.LogManager;
@@ -95,13 +96,13 @@ public class GuiCache {
 					((GuiContainer) component).getChildrenView().forEach(this::invalidate);
 			}
 		};
-		public static final CacheKey<Double> SCALE_FACTOR = new CacheKey<Double>(new ResourceLocation(null, "scale_factor")) {
+		public static final CacheKey<MainWindow> MAIN_WINDOW = new CacheKey<MainWindow>(new ResourceLocation(null, "scale_factor")) {
 			@Override
 			public void initialize(GuiComponent component) { component.listeners.initialize.add((h, i) -> invalidate(component)); }
 
 			@Override
-			public Double get(GuiComponent component) {
-				return ThrowableUtilities.Try.call(() -> component.cache.delegated.get(key, () -> ROOT.get(component).getScreen().getMinecraft().getMainWindow().getGuiScaleFactor()), LOGGER).flatMap(Casts::<Double>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
+			public MainWindow get(GuiComponent component) {
+				return ThrowableUtilities.Try.call(() -> component.cache.delegated.get(key, () -> ROOT.get(component).getScreen().getMinecraft().getMainWindow()), LOGGER).flatMap(Casts::<MainWindow>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
 			}
 		};
 		public final ResourceLocation key;

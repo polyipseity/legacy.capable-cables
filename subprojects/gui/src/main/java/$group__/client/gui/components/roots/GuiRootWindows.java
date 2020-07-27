@@ -3,12 +3,14 @@ package $group__.client.gui.components.roots;
 import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiWindow;
 import $group__.client.gui.components.backgrounds.GuiBackground;
-import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
+import $group__.client.gui.structures.AffineTransformStack;
+import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -23,15 +25,14 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 public class GuiRootWindows<C extends Container> extends GuiRoot<C> {
 	protected final List<GuiWindow> windows = new ArrayList<>(INITIAL_CAPACITY_2);
 
-	public GuiRootWindows(ITextComponent title, @Nullable GuiBackground background) { this(title, background, null); }
+	public GuiRootWindows(ITextComponent title, @Nullable GuiBackground background, Logger logger) { this(title, background, null, logger); }
 
-	public GuiRootWindows(ITextComponent title, @Nullable GuiBackground background, @Nullable C container) { super(title, background, container); }
+	public GuiRootWindows(ITextComponent title, @Nullable GuiBackground background, @Nullable C container, Logger logger) { super(title, background, container, logger); }
 
 	@Override
-	public void setBounds(IGuiReshapeHandler handler, GuiComponent invoker, java.awt.geom.Rectangle2D rectangle) {
-		anchors.clear();
+	public void constrain(AffineTransformStack stack) {
 		constraints.clear();
-		super.setBounds(handler, invoker, rectangle);
+		super.constrain(stack);
 	}
 
 	@Override
@@ -75,6 +76,12 @@ public class GuiRootWindows<C extends Container> extends GuiRoot<C> {
 		super.remove(components);
 		List<GuiComponent> cl = Arrays.asList(components);
 		getWindows().removeIf(cl::contains);
+	}
+
+	@Override
+	public void onTick(IGuiLifecycleHandler handler, GuiComponent invoker) {
+		anchors.clear();
+		super.onTick(handler, invoker);
 	}
 
 	public ImmutableList<GuiWindow> getWindowsView() { return ImmutableList.copyOf(getWindows()); }

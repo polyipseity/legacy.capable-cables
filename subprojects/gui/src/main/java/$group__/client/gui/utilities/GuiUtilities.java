@@ -34,40 +34,41 @@ public enum GuiUtilities {
 		;
 
 		public static void drawRectangle(AffineTransform transform, Rectangle2D rectangle, int color) {
-			hLine(transform, rectangle.getX(), rectangle.getMaxX(), rectangle.getY(), color);
-			vLine(transform, rectangle.getX(), rectangle.getY(), rectangle.getMaxY(), color);
-			hLine(transform, rectangle.getX(), rectangle.getMaxX(), rectangle.getMaxY(), color);
-			vLine(transform, rectangle.getMaxX(), rectangle.getY(), rectangle.getMaxY(), color);
+			Rectangle rF = ObjectUtilities.getRectangleExpanded(rectangle);
+			hLine(transform, rF.getX(), rF.getMaxX(), rF.getY(), color);
+			vLine(transform, rF.getX(), rF.getY(), rF.getMaxY(), color);
+			hLine(transform, rF.getX(), rF.getMaxX(), rF.getMaxY(), color);
+			vLine(transform, rF.getMaxX(), rF.getY(), rF.getMaxY(), color);
 		}
 
 		/**
 		 * @see AbstractGui#hLine(int, int, int, int)
 		 */
 		@SuppressWarnings("JavadocReference")
-		public static void hLine(AffineTransform transform, double x1, double x2, double y, int color) {
-			GuiScreenUtility.INSTANCE
-					.hLine((int) transformX(x1, transform), (int) transformX(x2, transform), (int) transformY(y, transform), color);
-		}
+		public static void hLine(AffineTransform transform, double x1, double x2, double y, int color) { fill(transform, new Rectangle2D.Double(x1, y, Math.abs(x2 - x1), 1), color); }
 
 		/**
 		 * @see AbstractGui#vLine(int, int, int, int)
 		 */
 		@SuppressWarnings("JavadocReference")
-		public static void vLine(AffineTransform transform, double x, double y1, double y2, int color) {
-			GuiScreenUtility.INSTANCE
-					.vLine((int) transformX(x, transform), (int) transformY(y1, transform), (int) transformY(y2, transform), color);
-		}
+		public static void vLine(AffineTransform transform, double x, double y1, double y2, int color) { fill(transform, new Rectangle2D.Double(x, y1, 1, Math.abs(y2 - y1)), color); }
 
 		/**
 		 * @see AbstractGui#fill(int, int, int, int, int)
 		 */
 		@Deprecated
-		public static void fill(Rectangle2D rectangle, int color) { AbstractGui.fill((int) rectangle.getX(), (int) rectangle.getY(), (int) rectangle.getMaxX(), (int) rectangle.getMaxY(), color); }
+		public static void fill(Rectangle2D rectangle, int color) {
+			Rectangle rF = ObjectUtilities.getRectangleExpanded(rectangle);
+			AbstractGui.fill((int) rF.getX(), (int) rF.getY(), (int) rF.getMaxX(), (int) rF.getMaxY(), color);
+		}
 
 		/**
 		 * @see AbstractGui#fill(Matrix4f, int, int, int, int, int)
 		 */
-		public static void fill(AffineTransform transform, Rectangle2D rectangle, int color) { AbstractGui.fill(toMatrix(transform), (int) rectangle.getX(), (int) rectangle.getY(), (int) rectangle.getMaxX(), (int) rectangle.getMaxY(), color); }
+		public static void fill(AffineTransform transform, Rectangle2D rectangle, int color) {
+			Rectangle rF = ObjectUtilities.getRectangleExpanded(rectangle);
+			AbstractGui.fill(toMatrix(transform), (int) rF.getX(), (int) rF.getY(), (int) rF.getMaxX(), (int) rF.getMaxY(), color);
+		}
 
 		/**
 		 * @see AbstractGui#fillGradient(int, int, int, int, int, int)
@@ -76,9 +77,10 @@ public enum GuiUtilities {
 		public static void fillGradient(AffineTransform transform, Rectangle2D rectangle, int colorTop, int colorBottom, int blitOffset) {
 			Rectangle2D r = (Rectangle2D) rectangle.clone();
 			transformRectangle(rectangle, transform);
+			Rectangle rF = ObjectUtilities.getRectangleExpanded(r);
 			GuiScreenUtility.INSTANCE
 					.setBlitOffset_(blitOffset)
-					.fillGradient((int) rectangle.getX(), (int) rectangle.getY(), (int) rectangle.getMaxX(), (int) rectangle.getMaxY(), colorTop, colorBottom);
+					.fillGradient((int) rF.getX(), (int) rF.getY(), (int) rF.getMaxX(), (int) rF.getMaxY(), colorTop, colorBottom);
 		}
 
 		/**
@@ -87,8 +89,9 @@ public enum GuiUtilities {
 		public static void drawCenteredString(AffineTransform transform, FontRenderer font, String string, Point2D p, int color) {
 			Point2D xy = (Point2D) p.clone();
 			transformPoint(xy, transform);
+			Point xyF = ObjectUtilities.getPointFloor(xy);
 			GuiScreenUtility.INSTANCE
-					.drawCenteredString(font, string, (int) xy.getX(), (int) xy.getY(), color);
+					.drawCenteredString(font, string, (int) xyF.getX(), (int) xyF.getY(), color);
 		}
 
 		/**
@@ -97,8 +100,9 @@ public enum GuiUtilities {
 		public static void drawRightAlignedString(AffineTransform transform, FontRenderer font, String string, Point2D p, int color) {
 			Point2D xy = (Point2D) p.clone();
 			transformPoint(xy, transform);
+			Point xyF = ObjectUtilities.getPointFloor(xy);
 			GuiScreenUtility.INSTANCE
-					.drawRightAlignedString(font, string, (int) xy.getX(), (int) xy.getY(), color);
+					.drawRightAlignedString(font, string, (int) xyF.getX(), (int) xyF.getY(), color);
 		}
 
 		/**
@@ -107,8 +111,9 @@ public enum GuiUtilities {
 		public static void drawString(AffineTransform transform, FontRenderer font, String string, Point2D p, int color) {
 			Point2D xy = (Point2D) p.clone();
 			transformPoint(xy, transform);
+			Point xyF = ObjectUtilities.getPointFloor(xy);
 			GuiScreenUtility.INSTANCE
-					.drawString(font, string, (int) xy.getX(), (int) xy.getY(), color);
+					.drawString(font, string, (int) xyF.getX(), (int) xyF.getY(), color);
 		}
 
 		/**
@@ -117,8 +122,9 @@ public enum GuiUtilities {
 		public static void blit(AffineTransform transform, Rectangle2D gui, TextureAtlasSprite sprite, double z) {
 			Rectangle2D g = (Rectangle2D) gui.clone();
 			transformRectangle(g, transform);
-			AbstractGui.blit((int) g.getX(), (int) g.getY(), (int) z,
-					(int) g.getWidth(), (int) g.getHeight(), sprite);
+			Rectangle gF = ObjectUtilities.getRectangleExpanded(g);
+			AbstractGui.blit((int) gF.getX(), (int) gF.getY(), (int) Math.floor(z),
+					(int) gF.getWidth(), (int) gF.getHeight(), sprite);
 		}
 
 		/**
@@ -127,10 +133,12 @@ public enum GuiUtilities {
 		public static void blit(AffineTransform transform, Rectangle2D gui, Point2D sprite, Dimension2D texture, double z) {
 			Rectangle2D g = (Rectangle2D) gui.clone();
 			transformRectangle(g, transform);
-			AbstractGui.blit((int) g.getX(), (int) g.getY(), (int) z,
+			Rectangle gF = ObjectUtilities.getRectangleExpanded(g);
+			Dimension textureF = ObjectUtilities.getDimensionFloor(texture);
+			AbstractGui.blit((int) gF.getX(), (int) gF.getY(), (int) z,
 					(float) sprite.getX(), (float) sprite.getY(),
-					(int) g.getWidth(), (int) g.getHeight(),
-					(int) texture.getWidth(), (int) texture.getHeight());
+					(int) gF.getWidth(), (int) gF.getHeight(),
+					(int) textureF.getWidth(), (int) textureF.getHeight());
 		}
 
 		/**
@@ -139,11 +147,14 @@ public enum GuiUtilities {
 		public static void blit(AffineTransform transform, Rectangle2D gui, Rectangle2D sprite, Dimension2D texture) {
 			Rectangle2D g = (Rectangle2D) gui.clone();
 			transformRectangle(g, transform);
-			AbstractGui.blit((int) g.getX(), (int) g.getY(),
-					(int) g.getWidth(), (int) g.getHeight(),
+			Rectangle gF = ObjectUtilities.getRectangleExpanded(g),
+					spriteF = ObjectUtilities.getRectangleExpanded(sprite);
+			Dimension textureF = ObjectUtilities.getDimensionFloor(texture);
+			AbstractGui.blit((int) gF.getX(), (int) gF.getY(),
+					(int) gF.getWidth(), (int) gF.getHeight(),
 					(float) sprite.getX(), (float) sprite.getY(),
-					(int) sprite.getWidth(), (int) sprite.getHeight(),
-					(int) texture.getWidth(), (int) texture.getHeight());
+					(int) spriteF.getWidth(), (int) spriteF.getHeight(),
+					(int) textureF.getWidth(), (int) textureF.getHeight());
 		}
 
 		/**
@@ -152,10 +163,12 @@ public enum GuiUtilities {
 		public static void blit(AffineTransform transform, Rectangle2D gui, Point2D sprite, Dimension2D texture) {
 			Rectangle2D g = (Rectangle2D) gui.clone();
 			transformRectangle(g, transform);
-			AbstractGui.blit((int) g.getX(), (int) g.getY(),
+			Rectangle gF = ObjectUtilities.getRectangleExpanded(g);
+			Dimension textureF = ObjectUtilities.getDimensionFloor(texture);
+			AbstractGui.blit((int) gF.getX(), (int) gF.getY(),
 					(float) sprite.getX(), (float) sprite.getY(),
-					(int) g.getWidth(), (int) g.getHeight(),
-					(int) texture.getWidth(), (int) texture.getHeight());
+					(int) gF.getWidth(), (int) gF.getHeight(),
+					(int) textureF.getWidth(), (int) textureF.getHeight());
 		}
 	}
 
@@ -169,8 +182,22 @@ public enum GuiUtilities {
 			return ret;
 		}
 
-		public static void drawShape(Shape shape, boolean filled, Color color, float z) {
-			PathIterator path = shape.getPathIterator(null, 1);
+		public static Point getPointFloor(Point2D point) { return new Point((int) Math.floor(point.getX()), (int) Math.floor(point.getY())); }
+
+		public static Point getPointCeil(Point2D point) { return new Point((int) Math.ceil(point.getX()), (int) Math.ceil(point.getY())); }
+
+		public static Dimension getDimensionFloor(Dimension2D dimension) { return new Dimension((int) Math.floor(dimension.getWidth()), (int) Math.floor(dimension.getHeight())); }
+
+		public static Rectangle getRectangleExpanded(Rectangle2D rectangle) {
+			Rectangle ret = new Rectangle();
+			ret.setFrameFromDiagonal(getPointFloor(new Point2D.Double(rectangle.getX(), rectangle.getY())), getPointCeil(new Point2D.Double(rectangle.getMaxX(), rectangle.getMaxY())));
+			return ret;
+		}
+
+		public static void drawShape(Shape shape, boolean filled, Color color, float z) { drawShape(null, shape, filled, color, z); }
+
+		public static void drawShape(@Nullable AffineTransform transform, Shape shape, boolean filled, Color color, float z) {
+			PathIterator path = shape.getPathIterator(transform, 1);
 			@Nullable Point2D start = null, current = null;
 			int r = color.getRed(), g = color.getGreen(), b = color.getBlue(), a = color.getAlpha();
 

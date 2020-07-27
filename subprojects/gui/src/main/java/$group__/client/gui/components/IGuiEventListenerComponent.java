@@ -8,6 +8,7 @@ import $group__.client.gui.structures.GuiDragInfo;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import javax.annotation.Nullable;
 import javax.annotation.meta.When;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -20,7 +21,7 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 public interface IGuiEventListenerComponent extends IGuiEventListener {
 	GuiComponent getComponent();
 
-	Optional<GuiDragInfo> getDragInfo();
+	Optional<GuiDragInfo> getDragInfo(int button);
 
 	default void onMouseHover(AffineTransformStack stack, Point2D mouse) {}
 
@@ -48,6 +49,10 @@ public interface IGuiEventListenerComponent extends IGuiEventListener {
 
 	default boolean onChangeFocus(boolean next) { return false; }
 
+	default void onFocusLost(@Nullable GuiComponent to) {}
+
+	default void onFocusGet(@Nullable GuiComponent from) {}
+
 	////////// Deprecated //////////
 
 	@Override
@@ -58,7 +63,10 @@ public interface IGuiEventListenerComponent extends IGuiEventListener {
 	@Override
 	@Deprecated
 	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-	default boolean mouseClicked(double mouseX, double mouseY, int button) { return onMouseClicked(new AffineTransformStack(), new GuiDragInfo(getComponent(), new Point2D.Double(mouseX, mouseY), button), new Point2D.Double(mouseX, mouseY), button).result; }
+	default boolean mouseClicked(double mouseX, double mouseY, int button) {
+		AffineTransformStack stack = new AffineTransformStack();
+		return onMouseClicked(stack, new GuiDragInfo(getComponent(), new Point2D.Double(mouseX, mouseY), button), new Point2D.Double(mouseX, mouseY), button).result;
+	}
 
 	@Override
 	@Deprecated
@@ -68,9 +76,7 @@ public interface IGuiEventListenerComponent extends IGuiEventListener {
 	@Override
 	@Deprecated
 	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-	default boolean mouseDragged(double mouseX, double mouseY, int button, double mouseXDiff, double mouseYDiff) {
-		return getDragInfo().filter(d -> onMouseDragging(new AffineTransformStack(), d, new Rectangle2D.Double(mouseX, mouseY, mouseXDiff, mouseYDiff), button)).isPresent();
-	}
+	default boolean mouseDragged(double mouseX, double mouseY, int button, double mouseXDiff, double mouseYDiff) { return getDragInfo(button).filter(d -> onMouseDragging(new AffineTransformStack(), d, new Rectangle2D.Double(mouseX, mouseY, mouseXDiff, mouseYDiff), button)).isPresent(); }
 
 	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
 	@Deprecated

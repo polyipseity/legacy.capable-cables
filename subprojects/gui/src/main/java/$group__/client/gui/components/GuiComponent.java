@@ -7,7 +7,9 @@ import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
 import $group__.client.gui.utilities.Transforms.AffineTransforms;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.specific.ThrowableUtilities.Try;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import javax.annotation.Nullable;
@@ -38,13 +40,15 @@ public abstract class GuiComponent implements IRenderableComponent, IGuiEventLis
 	public final Deque<GuiConstraint> constraints = new ArrayDeque<>(INITIAL_CAPACITY_1);
 	public final GuiAnchors anchors = new GuiAnchors();
 	protected Shape shape; // COMMENT relative shape
+	protected Logger logger;
 	protected EnumGuiState state = EnumGuiState.NEW;
 	protected final Deque<GuiKeyPressInfo> keyPresses = new ArrayDeque<>(INITIAL_CAPACITY_2);
 	public final GuiCache cache = new GuiCache();
 	public final CoordinateConverters coordinateConverters = new CoordinateConverters();
 
-	public GuiComponent(Shape shape) {
+	public GuiComponent(Shape shape, Logger logger) {
 		this.shape = shape;
+		this.logger = logger; // TODO wrap color and object as a state object
 		CacheKey.initializeAll(this);
 	}
 
@@ -54,15 +58,26 @@ public abstract class GuiComponent implements IRenderableComponent, IGuiEventLis
 
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {}
 
+	@OverridingMethodsMustInvokeSuper
+	public void constrain(AffineTransformStack stack) {
+		AffineTransform transform = stack.delegated.peek();
+		Rectangle2D r = transform.createTransformedShape(getShape()).getBounds2D(),
+				r2 = (Rectangle2D) r.clone();
+		constraints.forEach(c -> c.accept(r2));
+		if (!r.equals(r2))
+			Try.call(() -> AffineTransforms.getTransformFromTo(r, r2), logger).ifPresent(t -> CacheKey.RESHAPE_HANDLER.get(this).reshape(this, this, t.createTransformedShape(getShape())));
+	}
+
 	public void setBounds(IGuiReshapeHandler handler, GuiComponent invoker, Rectangle2D rectangle) {
 		Rectangle2D r = (Rectangle2D) rectangle.clone();
-		constraints.push(getConstraintMinimum());
-		constraints.forEach(c -> c.accept(r));
-		constraints.pop();
+		getConstraintMinimum().accept(r);
 		onReshape(handler, invoker, K(getShape(), shape = adaptToBounds(handler, invoker, r)));
 	}
 
 	protected Shape adaptToBounds(IGuiReshapeHandler handler, GuiComponent invoker, Rectangle2D rectangle) { return AffineTransforms.getTransformFromTo(getShape().getBounds2D(), rectangle).createTransformedShape(getShape()); }
+
+	@SuppressWarnings("EmptyMethod")
+	protected void transformThis(AffineTransformStack stack) {}
 
 	@OverridingMethodsMustInvokeSuper
 	public void onAdded(GuiContainer parent, int index) {
@@ -153,12 +168,14 @@ public abstract class GuiComponent implements IRenderableComponent, IGuiEventLis
 
 	protected Shape getShape() { return shape; }
 
-	protected boolean isBeingDragged() { return getParent().map(p -> p.drag).filter(d -> d.dragged == this).isPresent(); }
+	protected boolean isBeingDragged() { return getParent().filter(d -> d.drags.values().stream().anyMatch(dI -> dI.dragged == this)).isPresent(); }
 
 	protected boolean isBeingHovered() { return getParent().filter(p -> p.hovering == this).isPresent(); }
 
+	protected boolean isBeingFocused() { return getParent().filter(p -> p.focused == this).isPresent(); }
+
 	@Override
-	public Optional<GuiDragInfo> getDragInfo() { return getParent().map(p -> p.drag); }
+	public Optional<GuiDragInfo> getDragInfo(int button) { return getParent().map(p -> p.drags.get(button)); }
 
 	@Override
 	public final GuiComponent getComponent() { return this; }
@@ -189,19 +206,19 @@ public abstract class GuiComponent implements IRenderableComponent, IGuiEventLis
 
 	@OnlyIn(CLIENT)
 	public class CoordinateConverters {
-		public double toScaledCoordinate(double d) { return d / CacheKey.SCALE_FACTOR.get(GuiComponent.this); }
+		public double toScaledCoordinate(double d) { return d / CacheKey.MAIN_WINDOW.get(GuiComponent.this).getGuiScaleFactor(); }
 
-		public double toNativeCoordinate(double d) { return d * CacheKey.SCALE_FACTOR.get(GuiComponent.this); }
+		public double toNativeCoordinate(double d) { return d * CacheKey.MAIN_WINDOW.get(GuiComponent.this).getGuiScaleFactor(); }
 
 		public Point2D toScaledPoint(Point2D point) {
 			Point2D p = (Point2D) point.clone();
-			p.setLocation(toScaledCoordinate(p.getX()), toScaledCoordinate(p.getY()));
+			p.setLocation(toScaledCoordinate(p.getX()), toScaledCoordinate(CacheKey.MAIN_WINDOW.get(GuiComponent.this).getFramebufferHeight() - p.getY()));
 			return p;
 		}
 
 		public Point2D toNativePoint(Point2D point) {
 			Point2D p = (Point2D) point.clone();
-			p.setLocation(toNativeCoordinate(p.getX()), toNativeCoordinate(p.getY()));
+			p.setLocation(toNativeCoordinate(p.getX()), toNativeCoordinate(CacheKey.ROOT.get(GuiComponent.this).getRectangleView().getHeight() - p.getY()));
 			return p;
 		}
 
@@ -219,13 +236,13 @@ public abstract class GuiComponent implements IRenderableComponent, IGuiEventLis
 
 		public Rectangle2D toScaledRectangle(Rectangle2D rectangle) {
 			Rectangle2D r = (Rectangle2D) rectangle.clone();
-			r.setFrame(toScaledPoint(new Point2D.Double(rectangle.getX(), rectangle.getY())), toScaledDimension(new Dimension((int) rectangle.getWidth(), (int) rectangle.getHeight())));
+			r.setFrame(toScaledPoint(new Point2D.Double(rectangle.getX(), rectangle.getMaxY())), toScaledDimension(new Dimension2DDouble(rectangle.getWidth(), rectangle.getHeight())));
 			return r;
 		}
 
 		public Rectangle2D toNativeRectangle(Rectangle2D rectangle) {
 			Rectangle2D r = (Rectangle2D) rectangle.clone();
-			r.setFrame(toNativePoint(new Point2D.Double(rectangle.getX(), rectangle.getY())), toNativeDimension(new Dimension((int) rectangle.getWidth(), (int) rectangle.getHeight())));
+			r.setFrame(toNativePoint(new Point2D.Double(rectangle.getX(), rectangle.getMaxY())), toNativeDimension(new Dimension2DDouble(rectangle.getWidth(), rectangle.getHeight())));
 			return r;
 		}
 	}
