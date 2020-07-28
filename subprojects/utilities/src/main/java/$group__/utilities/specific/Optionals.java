@@ -8,6 +8,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public enum Optionals {
+	// TODO delete
 	/* MARK empty */;
 
 

@@ -107,9 +107,9 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 	public void onMouseHovering(AffineTransformStack stack, Point2D mouse) {
 		super.onMouseHovering(stack, mouse);
 		if (isBeingHovered() && !isBeingDragged()) {
-			@Nullable Point2D cur = Try.call(() -> ReferenceConverters.toRelativePoint(stack.delegated.peek(), mouse), data.logger.get()).orElse(null);
-			if (cur != null && !getShape().contains(cur)) {
-				EnumSet<EnumGuiSide> sides = EnumGuiSide.getSidesMouseOver(getRectangle(), cur);
+			Try.call(() -> ReferenceConverters.toRelativePoint(stack.delegated.peek(), mouse), data.logger.get())
+					.filter(c -> !getShape().contains(c)).map(c -> {
+				EnumSet<EnumGuiSide> sides = EnumGuiSide.getSidesMouseOver(getRectangle(), c);
 				if (sides.contains(EnumGuiSide.UP) && sides.contains(EnumGuiSide.LEFT)
 						|| sides.contains(EnumGuiSide.DOWN) && sides.contains(EnumGuiSide.RIGHT))
 					data.cursor = EnumCursor.EXTENSION_RESIZE_NW_SE_CURSOR;
@@ -122,10 +122,12 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 					data.cursor = EnumCursor.STANDARD_RESIZE_VERTICAL_CURSOR;
 				else throw BecauseOf.unexpected();
 				GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), data.cursor.handle);
-			} else {
+				return c;
+			}).orElseGet(() -> {
 				data.cursor = null;
 				GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), MemoryUtil.NULL);
-			}
+				return null;
+			});
 		}
 	}
 
@@ -143,23 +145,22 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 		if (stack.delegated.peek().createTransformedShape(CacheKeys.RECTANGLE_DRAGGABLE.get(this)).contains(mouse)) {
 			data.dragWindow = new GuiDragInfoWindow(drag, EnumGuiDragType.REPOSITION, null, null);
 			return EnumGuiMouseClickResult.DRAG;
-		} else {
-			@Nullable Point2D cur = Try.call(() -> ReferenceConverters.toRelativePoint(stack.delegated.peek(), mouse), data.logger.get()).orElse(null);
-			if (cur != null && !getShape().contains(cur)) {
-				EnumSet<EnumGuiSide> sides = EnumGuiSide.getSidesMouseOver(getRectangle(), cur);
-				@Nullable Point2D base = null;
-				if (sides.contains(EnumGuiSide.UP) && sides.contains(EnumGuiSide.LEFT))
-					base = new Point2D.Double(getRectangle().getMaxX(), getRectangle().getMaxY());
-				else if (sides.contains(EnumGuiSide.DOWN) && sides.contains(EnumGuiSide.RIGHT))
-					base = new Point2D.Double(getRectangle().getX(), getRectangle().getY());
-				else if (sides.contains(EnumGuiSide.UP) && sides.contains(EnumGuiSide.RIGHT))
-					base = new Point2D.Double(getRectangle().getX(), getRectangle().getMaxY());
-				else if (sides.contains(EnumGuiSide.DOWN) && sides.contains(EnumGuiSide.LEFT))
-					base = new Point2D.Double(getRectangle().getMaxX(), getRectangle().getY());
-				data.dragWindow = new GuiDragInfoWindow(drag, EnumGuiDragType.RESIZE, sides, base);
-				return EnumGuiMouseClickResult.DRAG;
-			}
-		}
+		} else if (Try.call(() -> ReferenceConverters.toRelativePoint(stack.delegated.peek(), mouse), data.logger.get())
+				.filter(c -> !getShape().contains(c)).map(c -> {
+					EnumSet<EnumGuiSide> sides = EnumGuiSide.getSidesMouseOver(getRectangle(), c);
+					@Nullable Point2D base = null;
+					if (sides.contains(EnumGuiSide.UP) && sides.contains(EnumGuiSide.LEFT))
+						base = new Point2D.Double(getRectangle().getMaxX(), getRectangle().getMaxY());
+					else if (sides.contains(EnumGuiSide.DOWN) && sides.contains(EnumGuiSide.RIGHT))
+						base = new Point2D.Double(getRectangle().getX(), getRectangle().getY());
+					else if (sides.contains(EnumGuiSide.UP) && sides.contains(EnumGuiSide.RIGHT))
+						base = new Point2D.Double(getRectangle().getX(), getRectangle().getMaxY());
+					else if (sides.contains(EnumGuiSide.DOWN) && sides.contains(EnumGuiSide.LEFT))
+						base = new Point2D.Double(getRectangle().getMaxX(), getRectangle().getY());
+					data.dragWindow = new GuiDragInfoWindow(drag, EnumGuiDragType.RESIZE, sides, base);
+					return true;
+				}).orElse(false))
+			return EnumGuiMouseClickResult.DRAG;
 		return EnumGuiMouseClickResult.CLICK;
 	}
 

@@ -1,10 +1,10 @@
 package $group__.utilities;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 import static $group__.utilities.Casts.castUncheckedUnboxed;
 import static $group__.utilities.Primitives.PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP;
-import static java.util.Objects.requireNonNull;
 
 /**
  * Contains utilities that are hard or too small to be categorized.
@@ -16,11 +16,7 @@ import static java.util.Objects.requireNonNull;
 public enum MiscellaneousUtilities {
 	/* MARK empty */;
 
-
-	@Nullable
-	public static <T> T getDefaultValue(@Nullable Class<T> type) { return type == null ? null : PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet().stream().filter(e -> e.getKey().isAssignableFrom(type)).findFirst().<T>map(e -> castUncheckedUnboxed(e.getValue())).orElse(null); }
-
-	public static <T> T getDefaultValueNonnull(Class<T> type) { return requireNonNull(getDefaultValue(type)); }
+	public static <T> Optional<T> getDefaultValue(@Nullable Class<T> type) { return Optional.ofNullable(type).flatMap(tClass -> PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet().stream().filter(e -> e.getKey().isAssignableFrom(tClass)).findFirst().map(e -> castUncheckedUnboxed(e.getValue()))); }
 
 
 	/**
