@@ -134,7 +134,7 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 
 				GLStacks.pop("stencilFunc");
 			}));
-// int[] r = new int[10000];GL11.glReadPixels(200, 200, 100, 100, GL11.GL_STENCIL_INDEX, GL11.GL_INT, r);r TODO REMOVE THIS AFTER DEBUG
+
 			GLStacks.pop("stencilMask");
 			GLStacks.pop("GL_STENCIL_TEST");
 		} else {
