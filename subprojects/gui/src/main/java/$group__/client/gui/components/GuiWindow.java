@@ -43,10 +43,17 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 
 	public GuiWindow(Rectangle2D rectangle, D data) { super(rectangle, data); }
 
-	protected Rectangle2D getRectangle() { return (Rectangle2D) super.getShape(); }
+	@Override
+	protected Shape adaptToBounds(IGuiReshapeHandler handler, GuiComponent<?> invoker, Rectangle2D rectangle) { return rectangle; }
 
 	@Override
-	public Rectangle2D getRectangleView() { return (Rectangle2D) getRectangle().clone(); }
+	public boolean isMouseOver(AffineTransformStack stack, Point2D mouse) { return isBeingDragged() || stack.delegated.peek().createTransformedShape(CacheKeys.RECTANGLE_CLICKABLE.get(this)).contains(mouse); }
+
+	@Override
+	protected void transformChildren(AffineTransformStack stack) {
+		super.transformChildren(stack);
+		stack.delegated.peek().translate(0, WINDOW_DRAG_BAR_THICKNESS);
+	}
 
 	@Override
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
@@ -81,13 +88,22 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 	}
 
 	@Override
-	protected Shape adaptToBounds(IGuiReshapeHandler handler, GuiComponent<?> invoker, Rectangle2D rectangle) { return rectangle; }
+	protected Optional<GuiComponent<?>> getChildMouseOver(AffineTransformStack stack, Point2D mouse) { return isBeingDragged() ? Optional.empty() : super.getChildMouseOver(stack, mouse).filter(c -> stack.delegated.peek().createTransformedShape(getShape()).contains(mouse)); }
 
 	@Override
-	protected void transformChildren(AffineTransformStack stack) {
-		super.transformChildren(stack);
-		stack.delegated.peek().translate(0, WINDOW_DRAG_BAR_THICKNESS);
-	}
+	public Rectangle2D getRectangleView() { return (Rectangle2D) getRectangle().clone(); }
+
+	protected Rectangle2D getRectangle() { return (Rectangle2D) super.getShape(); }
+
+	@Override
+	public void onFocusGet(@Nullable GuiComponent<?> from) { getParent().orElseThrow(BecauseOf::unexpected).moveToTop(this); }
+
+	@Override
+	public void reshape(GuiComponent<?> invoker, Shape shape) { setBounds(this, invoker, shape.getBounds2D()); }
+
+
+	@Override
+	public void reshape(GuiComponent<?> invoker) { reshape(invoker, getRectangle()); }
 
 	@Override
 	public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
@@ -96,12 +112,6 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 		super.renderPre(stack, mouse, partialTicks);
 		data.constraints.remove(constraint);
 	}
-
-	@Override
-	public void reshape(GuiComponent<?> invoker) { reshape(invoker, getRectangle()); }
-
-	@Override
-	public void reshape(GuiComponent<?> invoker, Shape shape) { setBounds(this, invoker, shape.getBounds2D()); }
 
 	@Override
 	public void onMouseHovering(AffineTransformStack stack, Point2D mouse) {
@@ -200,14 +210,6 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 		return super.onMouseDragged(stack, drag, mouse, button);
 	}
 
-	@Override
-	public void onFocusGet(@Nullable GuiComponent<?> from) { getParent().orElseThrow(BecauseOf::unexpected).moveToTop(this); }
-
-	@Override
-	public boolean isMouseOver(AffineTransformStack stack, Point2D mouse) { return isBeingDragged() || stack.delegated.peek().createTransformedShape(CacheKeys.RECTANGLE_CLICKABLE.get(this)).contains(mouse); }
-
-	@Override
-	protected Optional<GuiComponent<?>> getChildMouseOver(AffineTransformStack stack, Point2D mouse) { return isBeingDragged() ? Optional.empty() : super.getChildMouseOver(stack, mouse).filter(c -> stack.delegated.peek().createTransformedShape(getShape()).contains(mouse)); }
 
 	@OnlyIn(CLIENT)
 	public enum CacheKeys {

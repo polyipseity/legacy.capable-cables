@@ -18,12 +18,12 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 public abstract class GuiBackground<D extends GuiComponent.Data<E>, E extends GuiComponent.Events> extends GuiComponent<D> {
 	public GuiBackground(D data) { super(getShapePlaceholder(), data); }
 
-	public void renderBackground(AffineTransformStack stack, Screen screen, Point2D mouse, float partialTicks) { GuiUtilities.GuiBackgrounds.drawnBackground(screen); }
-
 	@Override
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		renderBackground(stack, CacheKey.ROOT.get(this).getScreen(), mouse, partialTicks);
 	}
+
+	public void renderBackground(AffineTransformStack stack, Screen screen, Point2D mouse, float partialTicks) { GuiUtilities.GuiBackgrounds.drawnBackground(screen); }
 
 	@Override
 	public void onAdded(GuiContainer<?> parentCurrent, int index) {

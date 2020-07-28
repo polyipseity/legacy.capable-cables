@@ -21,9 +21,9 @@ public final class GuiAnchors {
 	@SuppressWarnings("CanBeFinal")
 	public double border;
 
-	public GuiAnchors(double border) { this.border = border; }
-
 	public GuiAnchors() { this(0); }
+
+	public GuiAnchors(double border) { this.border = border; }
 
 	public ImmutableMap<EnumGuiSide, Anchor> getAnchorsView() { return ImmutableMap.copyOf(anchors); }
 
@@ -106,16 +106,6 @@ public final class GuiAnchors {
 			return true;
 		}
 
-		private void onAdded() {
-			to.data.events.cReshape.add(listCReshape);
-			to.data.events.cDestroyed.add(listCDestroyed);
-		}
-
-		private void onRemoved() {
-			to.data.events.cReshape.remove(listCReshape);
-			to.data.events.cDestroyed.remove(listCDestroyed);
-		}
-
 		private void checkNoCycles() {
 			Recursions.<Anchor, Void>recurseAsDepthFirstLoop(
 					this,
@@ -126,6 +116,16 @@ public final class GuiAnchors {
 					},
 					null
 			);
+		}
+
+		private void onAdded() {
+			to.data.events.cReshape.add(listCReshape);
+			to.data.events.cDestroyed.add(listCDestroyed);
+		}
+
+		private void onRemoved() {
+			to.data.events.cReshape.remove(listCReshape);
+			to.data.events.cDestroyed.remove(listCDestroyed);
 		}
 	}
 }

@@ -10,19 +10,19 @@ checkApply.call(['stringToStringMap', 'evaluateGStringString'])
 
 
 repositories {
-    gradlePluginPortal()
-    jcenter()
-    mavenCentral()
-    mavenLocal()
-    google()
+	gradlePluginPortal()
+	jcenter()
+	mavenCentral()
+	mavenLocal()
+	google()
 }
 
 stringToStringMap.call(customRepositories).each { String k, List<String> v ->
-    v.each {
-        String[] e = it.split('(?<!\\\\):', 2).collect { evaluateGStringString.call it.trim().replace('\\:', ':') }
-        repositories."$k" {
-            name = e.first()
-            url = e.last()
-        }
-    }
+	v.each {
+		String[] e = it.split('(?<!\\\\):', 2).collect { evaluateGStringString.call it.trim().replace('\\:', ':') }
+		repositories."$k" {
+			name = e.first()
+			url = e.last()
+		}
+	}
 }

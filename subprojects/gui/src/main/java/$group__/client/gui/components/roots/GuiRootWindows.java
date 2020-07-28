@@ -30,6 +30,8 @@ public class GuiRootWindows<D extends GuiRoot.Data<?, C>, C extends Container> e
 		getWindows().forEach(w -> w.reshape(invoker));
 	}
 
+	protected List<GuiWindow<?>> getWindows() { return windows; }
+
 	protected void add(@Nullable GuiBackground<?, ?> background, GuiWindow<?>... windows) {
 		if (background != null) super.add(background);
 		super.add(windows);
@@ -68,6 +70,4 @@ public class GuiRootWindows<D extends GuiRoot.Data<?, C>, C extends Container> e
 	}
 
 	public ImmutableList<GuiWindow<?>> getWindowsView() { return ImmutableList.copyOf(getWindows()); }
-
-	protected List<GuiWindow<?>> getWindows() { return windows; }
 }

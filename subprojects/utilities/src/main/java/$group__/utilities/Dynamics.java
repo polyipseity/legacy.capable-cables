@@ -95,14 +95,14 @@ public enum Dynamics {
 
 	public static Class<?> getCurrentClass() { return getClassStackTrace(1); }
 
-	public static Class<?> getCallerClass() { return getClassStackTrace(2); }
-
 	public static Class<?> getClassStackTrace(int depth) { return getClassStackTrace()[1 + depth]; }
 
 	public static Class<?>[] getClassStackTrace() {
 		Class<?>[] r = SecurityManagerReflections.INSTANCE.getClassContext();
 		return Arrays.copyOfRange(r, 1, r.length);
 	}
+
+	public static Class<?> getCallerClass() { return getClassStackTrace(2); }
 
 	public static String getMethodNameDescriptor(Method m) { return m.getName() + org.objectweb.asm.Type.getMethodDescriptor(m); }
 
@@ -113,12 +113,7 @@ public enum Dynamics {
 		return np.length == gp.length && IntStream.range(0, np.length).allMatch(i -> gp[i].isAssignableFrom(np[i]));
 	}
 
-	public static <U> ImmutableSet<Class<? extends U>> getSuperclasses(@Nullable Class<? extends U> clazz) { return getIntermediateSuperclasses(clazz, null); }
-
 	public static <U> ImmutableSet<Class<? extends U>> getThisAndSuperclasses(Class<? extends U> clazz) { return getLowerAndIntermediateSuperclasses(clazz, null); }
-
-	public static <U> ImmutableSet<Class<? extends U>> getIntermediateSuperclasses(@Nullable Class<? extends U> lower,
-	                                                                               @Nullable Class<U> upper) { return getLowerAndIntermediateSuperclasses(castUncheckedUnboxed(lower != null ? lower.getSuperclass() : null), upper); }
 
 	public static <U> ImmutableSet<Class<? extends U>> getLowerAndIntermediateSuperclasses(@Nullable Class<? extends U> lower, @Nullable Class<U> upper) {
 		ImmutableSet.Builder<Class<? extends U>> r = new ImmutableSet.Builder<>();
@@ -126,6 +121,8 @@ public enum Dynamics {
 			r.add(Casts.<Class<? extends U>>castUncheckedUnboxedNonnull(i));
 		return r.build();
 	}
+
+	public static ImmutableSet<ImmutableSet<Class<?>>> getThisAndSuperclassesAndInterfaces(Class<?> type) { return new ImmutableSet.Builder<ImmutableSet<Class<?>>>().add(ImmutableSet.of(type)).addAll(getSuperclassesAndInterfaces(type)).build(); }
 
 	public static ImmutableSet<ImmutableSet<Class<?>>> getSuperclassesAndInterfaces(Class<?> clazz) {
 		LinkedHashSet<ImmutableSet<Class<?>>> r = new LinkedHashSet<>(INITIAL_CAPACITY_2);
@@ -148,7 +145,18 @@ public enum Dynamics {
 		return ImmutableSet.copyOf(r);
 	}
 
-	public static ImmutableSet<ImmutableSet<Class<?>>> getThisAndSuperclassesAndInterfaces(Class<?> type) { return new ImmutableSet.Builder<ImmutableSet<Class<?>>>().add(ImmutableSet.of(type)).addAll(getSuperclassesAndInterfaces(type)).build(); }
+	public static <U> ImmutableSet<Class<? extends U>> getSuperclasses(@Nullable Class<? extends U> clazz) { return getIntermediateSuperclasses(clazz, null); }
+
+	public static <U> ImmutableSet<Class<? extends U>> getIntermediateSuperclasses(@Nullable Class<? extends U> lower,
+	                                                                               @Nullable Class<U> upper) { return getLowerAndIntermediateSuperclasses(castUncheckedUnboxed(lower != null ? lower.getSuperclass() : null), upper); }
+
+	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Class<A> annotationType, Method method, @Nullable Logger logger) throws IllegalArgumentException {
+		A[] r = getEffectiveAnnotationsWithInheritingConsidered(annotationType, method, logger);
+		if (r.length != 1) throw BecauseOf.illegalArgument(
+				"annotationType", annotationType,
+				"method", method);
+		return r[0];
+	}
 
 	static <A extends Annotation> A[] getEffectiveAnnotationsWithInheritingConsidered(Class<A> annotationType, Method method, @Nullable Logger logger) {
 		String mName = method.getName();
@@ -169,14 +177,6 @@ public enum Dynamics {
 		return r;
 	}
 
-	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Class<A> annotationType, Method method, @Nullable Logger logger) throws IllegalArgumentException {
-		A[] r = getEffectiveAnnotationsWithInheritingConsidered(annotationType, method, logger);
-		if (r.length != 1) throw BecauseOf.illegalArgument(
-				"annotationType", annotationType,
-				"method", method);
-		return r[0];
-	}
-
 	public static Type getGenericSuperclassActualTypeArgument(Class<?> c, int i) throws ClassCastException { return getGenericSuperclassActualTypeArguments(c)[i]; }
 
 
@@ -190,6 +190,12 @@ public enum Dynamics {
 		public enum Bulk {
 			/* MARK empty */;
 
+
+			public static <T> boolean mapFields(Class<T> common, T from, T to, Function<Object, ?> mapper,
+			                                    @Nullable Logger logger) {
+				return mapFields(common, from, to, mapper,
+						true, logger);
+			}
 
 			public static <T> boolean mapFields(Class<T> common, T from, T to, Function<Object, ?> mapper,
 			                                    boolean supers, @Nullable Logger logger) {
@@ -226,20 +232,14 @@ public enum Dynamics {
 				return r[0];
 			}
 
-			public static <T> boolean mapFields(Class<T> common, T from, T to, Function<Object, ?> mapper,
-			                                    @Nullable Logger logger) {
-				return mapFields(common, from, to, mapper,
-						true, logger);
-			}
+			@SuppressWarnings("UnusedReturnValue")
+			public static <T> boolean copyFields(Class<T> common, T from, T to, @Nullable Logger logger) { return copyFields(common, from, to, true, logger); }
 
 			public static <T> boolean copyFields(Class<T> common, T from, T to, boolean supers,
 			                                     @Nullable Logger logger) {
 				return mapFields(common, from, to,
 						identity(), supers, logger);
 			}
-
-			@SuppressWarnings("UnusedReturnValue")
-			public static <T> boolean copyFields(Class<T> common, T from, T to, @Nullable Logger logger) { return copyFields(common, from, to, true, logger); }
 		}
 	}
 

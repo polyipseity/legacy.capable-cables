@@ -16,11 +16,11 @@ public class ContainerWrench<T extends ContainerWrench<T>> extends Container {
 	}
 
 	@Override
-	public boolean canInteractWith(PlayerEntity playerIn) { return canInteractWithBase(); }
-
-	@Override
 	public ItemStack transferStackInSlot(PlayerEntity playerIn, int index) {
 		return transferStackInSlotBase(this,
 				playerIn, index, (p0, p1) -> (p2, p3) -> mergeItemStack(p0, p1, p2, p3));
 	}
+
+	@Override
+	public boolean canInteractWith(PlayerEntity playerIn) { return canInteractWithBase(); }
 }

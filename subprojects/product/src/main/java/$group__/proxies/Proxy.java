@@ -16,14 +16,6 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 public abstract class Proxy extends Singleton implements IProxy {
 	protected Proxy(Logger logger) { super(logger); }
 
-	protected static <M, E extends ModLifecycleEvent> boolean processEvent(String name, E event, Consumer<? super E> processor) {
-		LOGGER.info(() -> PREFIX_MOD_LIFECYCLE_MESSAGE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} started", name)).getFormattedMessage());
-		Stopwatch stopwatch = Stopwatch.createStarted();
-		processor.accept(event);
-		LOGGER.info(() -> PREFIX_MOD_LIFECYCLE_MESSAGE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} ended ({} <- {} ns)", name, stopwatch.stop(), stopwatch.elapsed(NANOSECONDS))).getFormattedMessage());
-		return true;
-	}
-
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public boolean onModLifecycle(ModLifecycleEvent event) {
@@ -42,5 +34,13 @@ public abstract class Proxy extends Singleton implements IProxy {
 		else if (event instanceof FMLModIdMappingEvent)
 			return processEvent("Mod ID mapping", (FMLModIdMappingEvent) event, this::onModIdMapping);
 		return false;
+	}
+
+	protected static <M, E extends ModLifecycleEvent> boolean processEvent(String name, E event, Consumer<? super E> processor) {
+		LOGGER.info(() -> PREFIX_MOD_LIFECYCLE_MESSAGE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} started", name)).getFormattedMessage());
+		Stopwatch stopwatch = Stopwatch.createStarted();
+		processor.accept(event);
+		LOGGER.info(() -> PREFIX_MOD_LIFECYCLE_MESSAGE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} ended ({} <- {} ns)", name, stopwatch.stop(), stopwatch.elapsed(NANOSECONDS))).getFormattedMessage());
+		return true;
 	}
 }

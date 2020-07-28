@@ -23,10 +23,6 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 public abstract class GuiButton<D extends GuiButton.Data<?, ?>> extends GuiContainer<D> {
 	public GuiButton(Shape shape, D data) { super(shape, data); }
 
-	protected abstract boolean onButtonClicked(int button);
-
-	protected abstract boolean onButtonActivated(int button);
-
 	@Override
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		AffineTransform transform = stack.delegated.peek();
@@ -45,11 +41,19 @@ public abstract class GuiButton<D extends GuiButton.Data<?, ?>> extends GuiConta
 	}
 
 	@Override
+	public void onMouseHovered(AffineTransformStack stack, Point2D mouse) {
+		super.onMouseHovered(stack, mouse);
+		GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), MemoryUtil.NULL);
+	}
+
+	@Override
 	public EnumGuiMouseClickResult onMouseClicked(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) {
 		EnumGuiMouseClickResult ret = super.onMouseClicked(stack, drag, mouse, button);
 		if (ret.result) return ret;
 		return onButtonClicked(button) ? EnumGuiMouseClickResult.DRAG : EnumGuiMouseClickResult.PASS;
 	}
+
+	protected abstract boolean onButtonClicked(int button);
 
 	@Override
 	public boolean onMouseDragged(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) {
@@ -57,14 +61,10 @@ public abstract class GuiButton<D extends GuiButton.Data<?, ?>> extends GuiConta
 		return stack.delegated.peek().createTransformedShape(getShape()).contains(mouse) && onButtonActivated(button);
 	}
 
-	@Override
-	public void onMouseHover(AffineTransformStack stack, Point2D mouse) { GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), EnumCursor.STANDARD_HAND_CURSOR.handle); }
+	protected abstract boolean onButtonActivated(int button);
 
 	@Override
-	public void onMouseHovered(AffineTransformStack stack, Point2D mouse) {
-		super.onMouseHovered(stack, mouse);
-		GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), MemoryUtil.NULL);
-	}
+	public void onMouseHover(AffineTransformStack stack, Point2D mouse) { GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), EnumCursor.STANDARD_HAND_CURSOR.handle); }
 
 	@OnlyIn(CLIENT)
 	public static class Data<E extends Events, C extends Data.ColorData> extends GuiContainer.Data<E> {

@@ -33,6 +33,7 @@ public enum Transforms {
 		;
 
 		private static final Matrix4f IDENTITY = new Matrix4f();
+		private static final FloatBuffer TO_AFFINE_TRANSFORM_BUFFER = FloatBuffer.allocate(MATRIX_ARRAY_LENGTH);
 
 		static {
 			IDENTITY.setIdentity();
@@ -49,12 +50,16 @@ public enum Transforms {
 			matrix.scale((float) scaleX, (float) scaleY, 1);
 		}
 
-		private static final FloatBuffer TO_AFFINE_TRANSFORM_BUFFER = FloatBuffer.allocate(MATRIX_ARRAY_LENGTH);
-
 		public static double transformX(double x, Matrix4f matrix) {
 			VECTOR.set((float) x, 0, 0, 1);
 			transform(() -> VECTOR, vec -> {}, matrix);
 			return VECTOR.getX();
+		}
+
+		public static <T extends Vector4f> void transform(Supplier<? extends T> supplier, Consumer<? super T> consumer, Matrix4f matrix) {
+			T vec = supplier.get();
+			vec.transform(matrix);
+			consumer.accept(vec);
 		}
 
 		public static double transformY(double y, Matrix4f matrix) {
@@ -80,12 +85,6 @@ public enum Transforms {
 			transform(() -> VECTOR, vec -> point.setLocation(vec.getX(), vec.getY()), matrix);
 		}
 
-		public static <T extends Vector4f> void transform(Supplier<? extends T> supplier, Consumer<? super T> consumer, Matrix4f matrix) {
-			T vec = supplier.get();
-			vec.transform(matrix);
-			consumer.accept(vec);
-		}
-
 		public static void transformRectangle(Rectangle2D rectangle, Matrix4f matrix) {
 			VECTOR.set((float) rectangle.getX(), (float) rectangle.getY(), 0, 1);
 			transform(() -> VECTOR, vec -> POINT.setLocation(vec.getX(), vec.getY()), matrix);
@@ -109,6 +108,14 @@ public enum Transforms {
 		;
 
 		private static final AffineTransform IDENTITY = new AffineTransform();
+		private static final double[]
+				TO_MATRIX_FLAT_MATRIX = new double[6];
+		private static final float[] TO_MATRIX_MATRIX_4F = {
+				-1, -1, 0, -1,
+				-1, -1, 0, -1,
+				0, 0, 1, 0,
+				0, 0, 0, 1,
+		};
 
 		public static AffineTransform getIdentity() { return (AffineTransform) IDENTITY.clone(); }
 
@@ -122,31 +129,22 @@ public enum Transforms {
 			return transform;
 		}
 
-		private static final double[]
-				TO_MATRIX_FLAT_MATRIX = new double[6];
-		private static final float[] TO_MATRIX_MATRIX_4F = {
-				-1, -1, 0, -1,
-				-1, -1, 0, -1,
-				0, 0, 1, 0,
-				0, 0, 0, 1,
-		};
-
 		public static double transformX(double x, AffineTransform transform) {
 			POINT.setLocation(x, 0);
 			transform(() -> POINT, p -> {}, transform);
 			return POINT.getX();
 		}
 
-		public static double transformY(double y, AffineTransform transform) {
-			POINT.setLocation(0, y);
-			transform(() -> POINT, p -> {}, transform);
-			return POINT.getY();
-		}
-
 		public static <T extends Point2D> void transform(Supplier<? extends T> supplier, Consumer<? super T> consumer, AffineTransform transform) {
 			T p = supplier.get();
 			transform.transform(p, p);
 			consumer.accept(p);
+		}
+
+		public static double transformY(double y, AffineTransform transform) {
+			POINT.setLocation(0, y);
+			transform(() -> POINT, p -> {}, transform);
+			return POINT.getY();
 		}
 
 		public static void transformPoint(Point2D point, AffineTransform transform) { transform(() -> point, p -> {}, transform); }

@@ -9,8 +9,8 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
 public interface IProxyClient extends IProxy {
-	default void onSetupClient(FMLClientSetupEvent event) {}
-
 	@Override
 	default <T extends ModLifecycleEvent> void onSetupSided(T event) { onSetupClient((FMLClientSetupEvent) event); }
+
+	default void onSetupClient(FMLClientSetupEvent event) {}
 }

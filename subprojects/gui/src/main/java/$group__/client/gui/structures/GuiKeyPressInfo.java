@@ -19,6 +19,11 @@ public final class GuiKeyPressInfo {
 	}
 
 	@Override
+	public int hashCode() {
+		return Objects.hash(key, scanCode, modifiers);
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
@@ -26,10 +31,5 @@ public final class GuiKeyPressInfo {
 		return key == that.key &&
 				scanCode == that.scanCode &&
 				modifiers == that.modifiers;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(key, scanCode, modifiers);
 	}
 }

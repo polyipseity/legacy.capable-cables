@@ -46,12 +46,7 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 		this.data = data;
 	}
 
-	public static GuiConstraint getConstraintMinimum() { return CONSTRAINT_MINIMUM.copy(); }
-
 	public static Rectangle2D getShapePlaceholder() { return (Rectangle2D) SHAPE_PLACEHOLDER.clone(); }
-
-	@Override
-	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -64,6 +59,11 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 			Try.call(() -> AffineTransforms.getTransformFromTo(r, r2), data.logger.get()).ifPresent(t -> CacheKey.RESHAPE_HANDLER.get(this).reshape(this, this, t.createTransformedShape(getShape())));
 	}
 
+	public static GuiConstraint getConstraintMinimum() { return CONSTRAINT_MINIMUM.copy(); }
+
+	@Override
+	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {}
+
 	public void writeStencil(AffineTransformStack stack, Point2D mouse, float partialTicks, boolean increment) {
 		if (increment)
 			GuiUtilities.DrawingUtilities.drawShape(stack.delegated.peek(), shape, true, Color.WHITE, 0);
@@ -75,6 +75,13 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 		Rectangle2D r = (Rectangle2D) rectangle.clone();
 		getConstraintMinimum().accept(r);
 		onReshape(handler, invoker, K(getShape(), shape = adaptToBounds(handler, invoker, r)));
+	}
+
+	protected Shape getShape() { return shape; }
+
+	@OverridingMethodsMustInvokeSuper
+	public void onReshape(IGuiReshapeHandler handler, GuiComponent<?> invoker, Shape shapePrevious) {
+		data.events.fire(data.events.cReshape, new Events.CReshapeParameter(this, handler, invoker, shapePrevious));
 	}
 
 	protected Shape adaptToBounds(IGuiReshapeHandler handler, GuiComponent<?> invoker, Rectangle2D rectangle) { return AffineTransforms.getTransformFromTo(getShape().getBounds2D(), rectangle).createTransformedShape(getShape()); }
@@ -125,10 +132,31 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 		data.events.fire(data.events.cDestroyed, new Events.CDestroyedParameter(this, handler, invoker));
 	}
 
-	@OverridingMethodsMustInvokeSuper
-	public void onReshape(IGuiReshapeHandler handler, GuiComponent<?> invoker, Shape shapePrevious) {
-		data.events.fire(data.events.cReshape, new Events.CReshapeParameter(this, handler, invoker, shapePrevious));
+	public <T> Optional<T> getNearestParentThatIs(Class<T> clazz) {
+		if (clazz.isAssignableFrom(getClass()))
+			return castUnchecked(this);
+		else
+			return getParent().flatMap(p -> p.getNearestParentThatIs(clazz));
 	}
+
+	public Shape getShapeView() { return AffineTransforms.getIdentity().createTransformedShape(shape); }
+
+	protected boolean isBeingDragged() { return getParent().filter(d -> d.data.drags.values().stream().anyMatch(dI -> dI.dragged == this)).isPresent(); }
+
+	public Optional<GuiContainer<?>> getParent() {
+		if (parent != null) {
+			@Nullable GuiContainer<?> ret = parent.get();
+			if (ret != null) return Optional.of(ret);
+		}
+		return Optional.empty();
+	}
+
+	protected boolean isBeingHovered() { return getParent().filter(p -> p.data.hovering == this).isPresent(); }
+
+	protected boolean isBeingFocused() { return getParent().filter(p -> p.data.focused == this).isPresent(); }
+
+	@Override
+	public boolean isMouseOver(AffineTransformStack stack, Point2D mouse) { return stack.delegated.peek().createTransformedShape(getShape()).contains(mouse); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -144,39 +172,15 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 		return false;
 	}
 
-	public Optional<GuiContainer<?>> getParent() {
-		if (parent != null) {
-			@Nullable GuiContainer<?> ret = parent.get();
-			if (ret != null) return Optional.of(ret);
-		}
-		return Optional.empty();
-	}
-
-	public <T> Optional<T> getNearestParentThatIs(Class<T> clazz) {
-		if (clazz.isAssignableFrom(getClass()))
-			return castUnchecked(this);
-		else
-			return getParent().flatMap(p -> p.getNearestParentThatIs(clazz));
-	}
-
-	public Shape getShapeView() { return AffineTransforms.getIdentity().createTransformedShape(shape); }
-
-	protected Shape getShape() { return shape; }
-
-	protected boolean isBeingDragged() { return getParent().filter(d -> d.data.drags.values().stream().anyMatch(dI -> dI.dragged == this)).isPresent(); }
-
-	protected boolean isBeingHovered() { return getParent().filter(p -> p.data.hovering == this).isPresent(); }
-
-	protected boolean isBeingFocused() { return getParent().filter(p -> p.data.focused == this).isPresent(); }
-
-	@Override
-	public boolean isMouseOver(AffineTransformStack stack, Point2D mouse) { return stack.delegated.peek().createTransformedShape(getShape()).contains(mouse); }
-
 	@OnlyIn(CLIENT)
 	public enum CoordinateConverters {
 		;
 
-		public static double toNativeCoordinate(GuiComponent<?> component, double d) { return d * Minecraft.getInstance().getMainWindow().getGuiScaleFactor(); }
+		public static Rectangle2D toScaledRectangle(GuiComponent<?> component, Rectangle2D rectangle) {
+			Rectangle2D r = (Rectangle2D) rectangle.clone();
+			r.setFrame(toScaledPoint(component, new Point2D.Double(rectangle.getX(), rectangle.getMaxY())), toScaledDimension(component, new Dimension2DDouble(rectangle.getWidth(), rectangle.getHeight())));
+			return r;
+		}
 
 		public static Point2D toScaledPoint(GuiComponent<?> component, Point2D point) {
 			Point2D p = (Point2D) point.clone();
@@ -184,7 +188,19 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 			return p;
 		}
 
+		public static Dimension2D toScaledDimension(GuiComponent<?> component, Dimension2D dimension) {
+			Dimension2D dim = (Dimension2D) dimension.clone();
+			dim.setSize(toScaledCoordinate(component, dim.getWidth()), toScaledCoordinate(component, dim.getHeight()));
+			return dim;
+		}
+
 		public static double toScaledCoordinate(GuiComponent<?> component, double d) { return d / Minecraft.getInstance().getMainWindow().getGuiScaleFactor(); }
+
+		public static Rectangle2D toNativeRectangle(GuiComponent<?> component, Rectangle2D rectangle) {
+			Rectangle2D r = (Rectangle2D) rectangle.clone();
+			r.setFrame(toNativePoint(component, new Point2D.Double(rectangle.getX(), rectangle.getMaxY())), toNativeDimension(component, new Dimension2DDouble(rectangle.getWidth(), rectangle.getHeight())));
+			return r;
+		}
 
 		public static Point2D toNativePoint(GuiComponent<?> component, Point2D point) {
 			Point2D p = (Point2D) point.clone();
@@ -198,23 +214,16 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 			return dim;
 		}
 
-		public static Dimension2D toScaledDimension(GuiComponent<?> component, Dimension2D dimension) {
-			Dimension2D dim = (Dimension2D) dimension.clone();
-			dim.setSize(toScaledCoordinate(component, dim.getWidth()), toScaledCoordinate(component, dim.getHeight()));
-			return dim;
-		}
+		public static double toNativeCoordinate(GuiComponent<?> component, double d) { return d * Minecraft.getInstance().getMainWindow().getGuiScaleFactor(); }
+	}
 
-		public static Rectangle2D toScaledRectangle(GuiComponent<?> component, Rectangle2D rectangle) {
-			Rectangle2D r = (Rectangle2D) rectangle.clone();
-			r.setFrame(toScaledPoint(component, new Point2D.Double(rectangle.getX(), rectangle.getMaxY())), toScaledDimension(component, new Dimension2DDouble(rectangle.getWidth(), rectangle.getHeight())));
-			return r;
-		}
+	@OnlyIn(CLIENT)
+	public enum ReferenceConverters {
+		;
 
-		public static Rectangle2D toNativeRectangle(GuiComponent<?> component, Rectangle2D rectangle) {
-			Rectangle2D r = (Rectangle2D) rectangle.clone();
-			r.setFrame(toNativePoint(component, new Point2D.Double(rectangle.getX(), rectangle.getMaxY())), toNativeDimension(component, new Dimension2DDouble(rectangle.getWidth(), rectangle.getHeight())));
-			return r;
-		}
+		public static Point2D toAbsolutePoint(AffineTransform transform, Point2D point) { return transform.transform(point, null); }
+
+		public static Point2D toRelativePoint(AffineTransform transform, Point2D point) throws NoninvertibleTransformException { return transform.inverseTransform(point, null); }
 	}
 
 	@OnlyIn(CLIENT)
@@ -232,6 +241,8 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 			this.logger = logger;
 		}
 
+		public ImmutableList<GuiKeyPressInfo> getKeyPresses() { return ImmutableList.copyOf(keyPresses); }
+
 		public EnumGuiState getState() { return state; }
 
 		protected void setState(EnumGuiState state) {
@@ -240,16 +251,7 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 			this.state = state;
 		}
 
-		public ImmutableList<GuiKeyPressInfo> getKeyPresses() { return ImmutableList.copyOf(keyPresses); }
-	}
 
-	@OnlyIn(CLIENT)
-	public enum ReferenceConverters {
-		;
-
-		public static Point2D toAbsolutePoint(AffineTransform transform, Point2D point) { return transform.transform(point, null); }
-
-		public static Point2D toRelativePoint(AffineTransform transform, Point2D point) throws NoninvertibleTransformException { return transform.inverseTransform(point, null); }
 	}
 
 	@OnlyIn(CLIENT)

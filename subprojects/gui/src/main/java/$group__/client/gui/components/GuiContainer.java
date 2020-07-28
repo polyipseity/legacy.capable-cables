@@ -54,14 +54,26 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 		}
 	}
 
+	public void remove(GuiComponent<?>... components) {
+		boolean reshape = false;
+		for (GuiComponent<?> component : components) {
+			getChildren().remove(component);
+			component.onRemoved(this);
+			if (EnumGuiState.READY.isReachedBy(data.getState())) reshape = true;
+		}
+		if (reshape) CacheKey.RESHAPE_HANDLER.get(this).reshape(this);
+	}
+
+	protected List<GuiComponent<?>> getChildren() { return children; }
+
+	public void moveToTop(GuiComponent<?> component) { move(getChildren().size() - 1, component); }
+
 	public void move(int index, GuiComponent<?> component) {
 		if (getChildren().remove(component)) {
 			getChildren().add(index, component);
 			component.onMoved(index);
 		}
 	}
-
-	public void moveToTop(GuiComponent<?> component) { move(getChildren().size() - 1, component); }
 
 	public void add(GuiComponent<?>... components) {
 		boolean reshape = false;
@@ -78,19 +90,11 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 		if (reshape) CacheKey.RESHAPE_HANDLER.get(this).reshape(this);
 	}
 
-	public void remove(GuiComponent<?>... components) {
-		boolean reshape = false;
-		for (GuiComponent<?> component : components) {
-			getChildren().remove(component);
-			component.onRemoved(this);
-			if (EnumGuiState.READY.isReachedBy(data.getState())) reshape = true;
-		}
-		if (reshape) CacheKey.RESHAPE_HANDLER.get(this).reshape(this);
-	}
-
-	protected void transformChildren(AffineTransformStack stack) {
-		Rectangle2D bound = getShape().getBounds2D();
-		stack.delegated.peek().translate(bound.getX(), bound.getY());
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
+		super.renderPre(stack, mouse, partialTicks);
+		getChildren().forEach(c -> runChildTransformed(stack, c, () -> c.renderPre(stack, mouse, partialTicks)));
 	}
 
 	@Override
@@ -160,13 +164,6 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-		super.renderPre(stack, mouse, partialTicks);
-		getChildren().forEach(c -> runChildTransformed(stack, c, () -> c.renderPre(stack, mouse, partialTicks)));
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
 	public void onInitialize(IGuiLifecycleHandler handler, GuiComponent<?> invoker) {
 		super.onInitialize(handler, invoker);
 		getChildren().forEach(component -> component.onInitialize(handler, invoker));
@@ -191,6 +188,53 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 	public void onDestroyed(IGuiLifecycleHandler handler, GuiComponent<?> invoker) {
 		children.forEach(component -> component.onDestroyed(handler, invoker));
 		super.onDestroyed(handler, invoker);
+	}
+
+	@Override
+	protected boolean isBeingDragged() { return data.drags.isEmpty() && super.isBeingDragged(); }
+
+	@Override
+	protected boolean isBeingHovered() { return !data.getHovering().isPresent() && super.isBeingHovered(); }
+
+	@Override
+	protected boolean isBeingFocused() { return !data.getFocused().isPresent() && super.isBeingFocused(); }
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public boolean onKeyPressed(int key, int scanCode, int modifiers) {
+		super.onKeyPressed(key, scanCode, modifiers);
+		return data.getFocused().filter(f -> f.onKeyPressed(key, scanCode, modifiers)).isPresent();
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public boolean onKeyReleased(int key, int scanCode, int modifiers) {
+		boolean ret = data.getFocused().filter(f -> f.onKeyReleased(key, scanCode, modifiers)).isPresent();
+		super.onKeyReleased(key, scanCode, modifiers);
+		return ret;
+	}
+
+	protected void runChildTransformed(AffineTransformStack stack, GuiComponent<?> child, Runnable call) {
+		getChildTransformed(stack, child, () -> {
+			call.run();
+			return null;
+		});
+	}
+
+	protected <R> R getChildTransformed(AffineTransformStack stack, GuiComponent<?> child, Supplier<R> call) {
+		stack.push();
+		transformChildren(stack);
+		stack.push();
+		child.transformThis(stack);
+		R ret = call.get();
+		stack.delegated.pop();
+		stack.delegated.pop();
+		return ret;
+	}
+
+	protected void transformChildren(AffineTransformStack stack) {
+		Rectangle2D bound = getShape().getBounds2D();
+		stack.delegated.peek().translate(bound.getX(), bound.getY());
 	}
 
 	@Override
@@ -231,6 +275,12 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
+	public boolean onMouseReleased(AffineTransformStack stack, Point2D mouse, int button) {
+		return getChildMouseOver(stack, mouse).filter(c -> getChildTransformed(stack, c, () -> c.onMouseReleased(stack, mouse, button))).isPresent();
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
 	public boolean onMouseDragging(AffineTransformStack stack, GuiDragInfo drag, Rectangle2D mouse, int button) {
 		return Optional.ofNullable(data.drags.get(button)).map(d -> getChildTransformed(stack, d.dragged, () -> d.dragged.onMouseDragging(stack, d, mouse, button))).orElse(false);
 	}
@@ -247,38 +297,13 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public boolean onMouseReleased(AffineTransformStack stack, Point2D mouse, int button) {
-		return getChildMouseOver(stack, mouse).filter(c -> getChildTransformed(stack, c, () -> c.onMouseReleased(stack, mouse, button))).isPresent();
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
 	public boolean onMouseScrolled(AffineTransformStack stack, Point2D mouse, double scrollDelta) {
 		return getChildMouseOver(stack, mouse).filter(c -> getChildTransformed(stack, c, () -> c.onMouseScrolled(stack, mouse, scrollDelta))).isPresent();
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public boolean onKeyPressed(int key, int scanCode, int modifiers) {
-		super.onKeyPressed(key, scanCode, modifiers);
-		return data.getFocused().filter(f -> f.onKeyPressed(key, scanCode, modifiers)).isPresent();
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public boolean onKeyReleased(int key, int scanCode, int modifiers) {
-		boolean ret = data.getFocused().filter(f -> f.onKeyReleased(key, scanCode, modifiers)).isPresent();
-		super.onKeyReleased(key, scanCode, modifiers);
-		return ret;
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
 	public boolean onCharTyped(char codePoint, int modifiers) { return data.getFocused().filter(f -> f.onCharTyped(codePoint, modifiers)).isPresent(); }
-
-	public ImmutableList<GuiComponent<?>> getChildrenView() { return ImmutableList.copyOf(getChildren()); }
-
-	protected List<GuiComponent<?>> getChildren() { return children; }
 
 	@Override
 	public boolean onChangeFocus(boolean next) {
@@ -307,14 +332,7 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 		}
 	}
 
-	@Override
-	protected boolean isBeingDragged() { return data.drags.isEmpty() && super.isBeingDragged(); }
-
-	@Override
-	protected boolean isBeingHovered() { return !data.getHovering().isPresent() && super.isBeingHovered(); }
-
-	@Override
-	protected boolean isBeingFocused() { return !data.getFocused().isPresent() && super.isBeingFocused(); }
+	public ImmutableList<GuiComponent<?>> getChildrenView() { return ImmutableList.copyOf(getChildren()); }
 
 	protected Optional<GuiComponent<?>> getChildMouseOver(AffineTransformStack stack, Point2D mouse) {
 		for (GuiComponent<?> c : Lists.reverse(getChildren())) {
@@ -322,24 +340,6 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 				return Optional.of(c);
 		}
 		return Optional.empty();
-	}
-
-	protected <R> R getChildTransformed(AffineTransformStack stack, GuiComponent<?> child, Supplier<R> call) {
-		stack.push();
-		transformChildren(stack);
-		stack.push();
-		child.transformThis(stack);
-		R ret = call.get();
-		stack.delegated.pop();
-		stack.delegated.pop();
-		return ret;
-	}
-
-	protected void runChildTransformed(AffineTransformStack stack, GuiComponent<?> child, Runnable call) {
-		getChildTransformed(stack, child, () -> {
-			call.run();
-			return null;
-		});
 	}
 
 	public static class Data<E extends Events> extends GuiComponent.Data<E> {
@@ -351,6 +351,10 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 			super(events, logger);
 		}
 
+		public Optional<GuiComponent<?>> getHovering() { return Optional.ofNullable(hovering); }
+
+		public ImmutableMap<Integer, GuiDragInfo> getDragsView() { return ImmutableMap.copyOf(drags); }
+
 		public Optional<GuiComponent<?>> getFocused() { return Optional.ofNullable(focused); }
 
 		protected void setFocused(@Nullable GuiComponent<?> component) {
@@ -359,8 +363,6 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 			getFocused().ifPresent(f -> f.onFocusGet(from));
 		}
 
-		public Optional<GuiComponent<?>> getHovering() { return Optional.ofNullable(hovering); }
 
-		public ImmutableMap<Integer, GuiDragInfo> getDragsView() { return ImmutableMap.copyOf(drags); }
 	}
 }

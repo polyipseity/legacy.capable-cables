@@ -191,11 +191,6 @@ public enum Loggers {
 
 		EnumMessages(String message, boolean varargs, Class<?>... argTypes) { this(message, varargs, 0, argTypes); }
 
-		EnumMessages(String message, int argTypeOptionals, Class<?>... argTypes) {
-			this(message, false,
-					argTypeOptionals, argTypes);
-		}
-
 		EnumMessages(String message, boolean varargs, int argTypeOptionals, Class<?>... argTypes) {
 			this.message = message;
 			int argTypesL = argTypes.length;
@@ -216,6 +211,10 @@ public enum Loggers {
 			this.argTypes = argTypes;
 		}
 
+		EnumMessages(String message, int argTypeOptionals, Class<?>... argTypes) {
+			this(message, false,
+					argTypeOptionals, argTypes);
+		}
 
 		private static <O> String optionalNonnull(@Nullable O optional,
 		                                          Function<? super O, ? extends String> whenPresent) { return Optionals.optionalNonnull(optional, whenPresent, () -> ""); }

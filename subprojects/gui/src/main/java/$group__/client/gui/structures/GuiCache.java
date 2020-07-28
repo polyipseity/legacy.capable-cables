@@ -38,6 +38,13 @@ public class GuiCache {
 	public static abstract class CacheKey<C extends GuiComponent<?>, T> {
 		public static final CacheKey<GuiComponent<?>, GuiRoot<?, ?>> ROOT = new CacheKey<GuiComponent<?>, GuiRoot<?, ?>>(getKey("root")) {
 			@Override
+			public void invalidate(GuiComponent<?> component) {
+				super.invalidate(component);
+				if (component instanceof GuiContainer)
+					((GuiContainer<?>) component).getChildrenView().forEach(this::invalidate);
+			}
+
+			@Override
 			public void initialize(GuiComponent<?> component) {
 				super.initialize(component);
 				component.data.events.cAdded.add(par -> invalidate(component));
@@ -48,15 +55,15 @@ public class GuiCache {
 			public GuiRoot<?, ?> get0(GuiComponent<?> component) {
 				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected)), component.data.logger.get()).flatMap(Casts::<GuiRoot<?, ?>>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
 			}
-
+		};
+		public static final CacheKey<GuiComponent<?>, IGuiLifecycleHandler> LIFECYCLE_HANDLER = new CacheKey<GuiComponent<?>, IGuiLifecycleHandler>(getKey("lifecycle_handler")) {
 			@Override
 			public void invalidate(GuiComponent<?> component) {
 				super.invalidate(component);
 				if (component instanceof GuiContainer)
 					((GuiContainer<?>) component).getChildrenView().forEach(this::invalidate);
 			}
-		};
-		public static final CacheKey<GuiComponent<?>, IGuiLifecycleHandler> LIFECYCLE_HANDLER = new CacheKey<GuiComponent<?>, IGuiLifecycleHandler>(getKey("lifecycle_handler")) {
+
 			@Override
 			public void initialize(GuiComponent<?> component) {
 				super.initialize(component);
@@ -68,15 +75,15 @@ public class GuiCache {
 			public IGuiLifecycleHandler get0(GuiComponent<?> component) {
 				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(IGuiLifecycleHandler.class).orElseThrow(BecauseOf::unexpected)), component.data.logger.get()).flatMap(Casts::<IGuiLifecycleHandler>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
 			}
-
+		};
+		public static final CacheKey<GuiComponent<?>, IGuiReshapeHandler> RESHAPE_HANDLER = new CacheKey<GuiComponent<?>, IGuiReshapeHandler>(getKey("reshape_handler")) {
 			@Override
 			public void invalidate(GuiComponent<?> component) {
 				super.invalidate(component);
 				if (component instanceof GuiContainer)
 					((GuiContainer<?>) component).getChildrenView().forEach(this::invalidate);
 			}
-		};
-		public static final CacheKey<GuiComponent<?>, IGuiReshapeHandler> RESHAPE_HANDLER = new CacheKey<GuiComponent<?>, IGuiReshapeHandler>(getKey("reshape_handler")) {
+
 			@Override
 			public void initialize(GuiComponent<?> component) {
 				super.initialize(component);
@@ -87,13 +94,6 @@ public class GuiCache {
 			@Override
 			public IGuiReshapeHandler get0(GuiComponent<?> component) {
 				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(IGuiReshapeHandler.class).orElseThrow(BecauseOf::unexpected)), component.data.logger.get()).flatMap(Casts::<IGuiReshapeHandler>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
-			}
-
-			@Override
-			public void invalidate(GuiComponent<?> component) {
-				super.invalidate(component);
-				if (component instanceof GuiContainer)
-					((GuiContainer<?>) component).getChildrenView().forEach(this::invalidate);
 			}
 		};
 		public static final CacheKey<GuiComponent<?>, Integer> Z = new CacheKey<GuiComponent<?>, Integer>(getKey("z")) {
@@ -128,11 +128,11 @@ public class GuiCache {
 		}
 
 		@OverridingMethodsMustInvokeSuper
-		public void invalidate(C component) { component.data.cache.delegated.invalidate(key); }
-
-		@OverridingMethodsMustInvokeSuper
 		protected void initialize(C component) { component.data.events.cDestroyed.add(par -> initialized.remove(component)); }
 
 		protected abstract T get0(C component);
+
+		@OverridingMethodsMustInvokeSuper
+		public void invalidate(C component) { component.data.cache.delegated.invalidate(key); }
 	}
 }

@@ -26,35 +26,18 @@ public enum ThrowableUtilities {
 		throw BecauseOf.unexpected();
 	}
 
-	public static Throwable create() { return new Throwable("Instantiated throwable"); }
-
 	public static String getCurrentStackTraceString() { return ExceptionUtils.getStackTrace(create()); }
+
+	public static Throwable create() { return new Throwable("Instantiated throwable"); }
 
 	public enum ThrowableCatcher {
 		;
 
 		public static final ThreadLocal<Throwable> CAUGHT_THROWABLE = new ThreadLocal<>();
 
-		public static Optional<Throwable> retrieve() { return Optional.ofNullable(CAUGHT_THROWABLE.get()); }
-
 		public static void catch_(Throwable t, @Nullable Logger logger) {
 			log(t, logger);
 			CAUGHT_THROWABLE.set(t);
-		}
-
-		public static void clear() { CAUGHT_THROWABLE.set(null); }
-
-		public static boolean caught() { return retrieve().isPresent(); }
-
-		public static void rethrow(boolean nullable) {
-			if (nullable) retrieve().ifPresent(ThrowableUtilities::propagate);
-			else throw propagate(retrieve().orElseThrow(BecauseOf::unexpected));
-		}
-
-		@SuppressWarnings("ConstantConditions")
-		public static RuntimeException rethrow() throws RuntimeException {
-			rethrow(false);
-			throw BecauseOf.unexpected();
 		}
 
 		public static void log(Throwable t, @Nullable Logger logger) {
@@ -62,9 +45,26 @@ public enum ThrowableUtilities {
 			else logger.catching(Level.DEBUG, t);
 		}
 
+		public static void clear() { CAUGHT_THROWABLE.set(null); }
+
+		@SuppressWarnings("ConstantConditions")
+		public static RuntimeException rethrow() throws RuntimeException {
+			rethrow(false);
+			throw BecauseOf.unexpected();
+		}
+
+		public static void rethrow(boolean nullable) {
+			if (nullable) retrieve().ifPresent(ThrowableUtilities::propagate);
+			else throw propagate(retrieve().orElseThrow(BecauseOf::unexpected));
+		}
+
+		public static Optional<Throwable> retrieve() { return Optional.ofNullable(CAUGHT_THROWABLE.get()); }
+
 		public static void acceptIfCaught(Consumer<? super Throwable> consumer) {
 			if (caught()) consumer.accept(retrieve().orElseThrow(BecauseOf::unexpected));
 		}
+
+		public static boolean caught() { return retrieve().isPresent(); }
 	}
 
 	public enum Try {

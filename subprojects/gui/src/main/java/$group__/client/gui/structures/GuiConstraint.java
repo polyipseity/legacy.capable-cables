@@ -27,17 +27,14 @@ public final class GuiConstraint implements ICopyable, Consumer<Rectangle2D> {
 
 	public static GuiConstraint getConstraintNone() { return CONSTRAINT_NONE.copy(); }
 
-	public static Rectangle2D getConstraintRectangleNone() { return (Rectangle2D) CONSTRAINT_RECTANGLE_NONE.clone(); }
-
-	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
-	public static boolean isNoneValue(double value) { return value == CONSTRAINT_NONE_VALUE; }
-
 	private static void correct(double min, double max, DoubleConsumer minSetter, DoubleConsumer maxSetter) {
 		if (!isNoneValue(min) && !isNoneValue(max) && min > max) {
 			minSetter.accept(max);
 			maxSetter.accept(min);
 		}
 	}
+
+	public static Rectangle2D getConstraintRectangleNone() { return (Rectangle2D) CONSTRAINT_RECTANGLE_NONE.clone(); }
 
 	@Override
 	public void accept(Rectangle2D rectangle) {
@@ -73,6 +70,9 @@ public final class GuiConstraint implements ICopyable, Consumer<Rectangle2D> {
 		minLastCorrected = (Rectangle2D) min.clone();
 		maxLastCorrected = (Rectangle2D) max.clone();
 	}
+
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
+	public static boolean isNoneValue(double value) { return value == CONSTRAINT_NONE_VALUE; }
 
 	@Override
 	public GuiConstraint copy() { return new GuiConstraint((Rectangle2D) min.clone(), (Rectangle2D) max.clone()); }

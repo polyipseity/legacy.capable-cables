@@ -27,13 +27,13 @@ public enum GLUtilities {
 	public static final int
 			GL_MASK_ALL_BITS = 0xFFFFFFFF;
 
-	public static long getWindowHandle() { return Minecraft.getInstance().getMainWindow().getHandle(); }
-
 	public static Point2D getCursorPos() {
 		double[] xPos = new double[1], yPos = new double[1];
 		GLFW.glfwGetCursorPos(getWindowHandle(), xPos, yPos);
 		return new Point2D.Double(xPos[0], yPos[0]);
 	}
+
+	public static long getWindowHandle() { return Minecraft.getInstance().getMainWindow().getHandle(); }
 
 	@OnlyIn(CLIENT)
 	public enum GLStacks {
@@ -51,8 +51,6 @@ public enum GLUtilities {
 
 
 		private static final ConcurrentMap<String, Deque<GLCall>> STACKS = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
-
-		private static Deque<GLCall> getStack(String name) { return STACKS.computeIfAbsent(name, s -> new ArrayDeque<>(INITIAL_CAPACITY_2)); }
 
 		public static void push(String name, Runnable action, Runnable fallback) {
 			getStack(name).push(new GLCall(action, fallback));
@@ -78,6 +76,8 @@ public enum GLUtilities {
 					pop(name);
 			}
 		}
+
+		private static Deque<GLCall> getStack(String name) { return STACKS.computeIfAbsent(name, s -> new ArrayDeque<>(INITIAL_CAPACITY_2)); }
 
 		@OnlyIn(CLIENT)
 		private static class GLCall implements Runnable {

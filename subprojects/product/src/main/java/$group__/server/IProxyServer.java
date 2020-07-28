@@ -9,8 +9,8 @@ import static net.minecraftforge.api.distmarker.Dist.DEDICATED_SERVER;
 
 @OnlyIn(DEDICATED_SERVER)
 public interface IProxyServer extends IProxy {
-	default void onSetupServer(FMLDedicatedServerSetupEvent event) {}
-
 	@Override
 	default <T extends ModLifecycleEvent> void onSetupSided(T event) { onSetupServer((FMLDedicatedServerSetupEvent) event); }
+
+	default void onSetupServer(FMLDedicatedServerSetupEvent event) {}
 }

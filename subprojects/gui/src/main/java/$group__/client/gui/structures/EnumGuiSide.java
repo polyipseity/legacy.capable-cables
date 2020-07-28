@@ -129,11 +129,11 @@ public enum EnumGuiSide {
 		return sides;
 	}
 
+	public boolean isMouseOver(Rectangle2D rectangle, Point2D mouse) { return false; }
+
 	public abstract EnumGuiAxis getAxis();
 
 	public abstract EnumGuiSide getOpposite();
-
-	public boolean isMouseOver(Rectangle2D rectangle, Point2D mouse) { return false; }
 
 	public abstract Function<Rectangle2D, Double> getGetter();
 

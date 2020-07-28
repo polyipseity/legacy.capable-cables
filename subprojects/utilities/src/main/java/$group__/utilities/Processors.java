@@ -25,12 +25,7 @@ public enum Processors {
 
 	public static boolean isElementFinal(Element element) { return element.getModifiers().contains(Modifier.FINAL); }
 
-
-	public static ImmutableSet<TypeElement> getSuperclasses(TypeElement type, Types types) { return getIntermediateSuperclasses(type, null, types); }
-
 	public static ImmutableSet<TypeElement> getThisAndSuperclasses(TypeElement type, Types types) { return getLowerAndIntermediateSuperclasses(type, null, types); }
-
-	public static ImmutableSet<TypeElement> getIntermediateSuperclasses(TypeElement lower, @Nullable TypeElement upper, Types types) { return getLowerAndIntermediateSuperclasses((TypeElement) types.asElement(lower.getSuperclass()), upper, types); }
 
 	public static ImmutableSet<TypeElement> getLowerAndIntermediateSuperclasses(@Nullable TypeElement lower, @Nullable TypeElement upper, Types types) {
 		ImmutableSet.Builder<TypeElement> r = new ImmutableSet.Builder<>();
@@ -40,6 +35,7 @@ public enum Processors {
 		return r.build();
 	}
 
+	public static ImmutableSet<ImmutableSet<TypeElement>> getThisAndSuperclassesAndInterfaces(TypeElement type, Types types) { return new ImmutableSet.Builder<ImmutableSet<TypeElement>>().add(ImmutableSet.of(type)).addAll(getSuperclassesAndInterfaces(type, types)).build(); }
 
 	public static ImmutableSet<ImmutableSet<TypeElement>> getSuperclassesAndInterfaces(TypeElement type, Types types) {
 		LinkedHashSet<ImmutableSet<TypeElement>> r = new LinkedHashSet<>(INITIAL_CAPACITY_2);
@@ -62,7 +58,15 @@ public enum Processors {
 		return ImmutableSet.copyOf(r);
 	}
 
-	public static ImmutableSet<ImmutableSet<TypeElement>> getThisAndSuperclassesAndInterfaces(TypeElement type, Types types) { return new ImmutableSet.Builder<ImmutableSet<TypeElement>>().add(ImmutableSet.of(type)).addAll(getSuperclassesAndInterfaces(type, types)).build(); }
+	public static ImmutableSet<TypeElement> getSuperclasses(TypeElement type, Types types) { return getIntermediateSuperclasses(type, null, types); }
+
+	public static ImmutableSet<TypeElement> getIntermediateSuperclasses(TypeElement lower, @Nullable TypeElement upper, Types types) { return getLowerAndIntermediateSuperclasses((TypeElement) types.asElement(lower.getSuperclass()), upper, types); }
+
+	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Class<A> annotationType, ExecutableElement executable, Elements elements, Types types) throws IllegalArgumentException {
+		A[] r = getEffectiveAnnotationsWithInheritingConsidered(annotationType, executable, elements, types);
+		if (r.length != 1) throw BecauseOf.illegalArgument("annotationType", annotationType, "executable", executable);
+		return r[0];
+	}
 
 	public static <A extends Annotation> A[] getEffectiveAnnotationsWithInheritingConsidered(Class<A> annotationType, ExecutableElement executable, Elements elements, Types types) {
 		A[] r = executable.getAnnotationsByType(annotationType);
@@ -86,11 +90,5 @@ public enum Processors {
 		}
 
 		return r;
-	}
-
-	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Class<A> annotationType, ExecutableElement executable, Elements elements, Types types) throws IllegalArgumentException {
-		A[] r = getEffectiveAnnotationsWithInheritingConsidered(annotationType, executable, elements, types);
-		if (r.length != 1) throw BecauseOf.illegalArgument("annotationType", annotationType, "executable", executable);
-		return r[0];
 	}
 }
