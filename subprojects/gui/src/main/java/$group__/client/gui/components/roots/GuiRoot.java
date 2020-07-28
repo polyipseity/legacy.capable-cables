@@ -3,10 +3,7 @@ package $group__.client.gui.components.roots;
 import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiContainer;
 import $group__.client.gui.components.backgrounds.GuiBackground;
-import $group__.client.gui.structures.AffineTransformStack;
-import $group__.client.gui.structures.Dimension2DDouble;
-import $group__.client.gui.structures.EnumGuiMouseClickResult;
-import $group__.client.gui.structures.GuiDragInfo;
+import $group__.client.gui.structures.*;
 import $group__.client.gui.traits.IGuiShapeRectangle;
 import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
@@ -42,6 +39,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static $group__.utilities.Capacities.INITIAL_CAPACITY_1;
+import static $group__.utilities.Capacities.INITIAL_CAPACITY_3;
 import static $group__.utilities.Casts.castUncheckedUnboxedNonnull;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
@@ -50,16 +48,17 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container> extends GuiContainer<D> implements IGuiShapeRectangle, IGuiLifecycleHandler, IGuiReshapeHandler {
 	public final Screen screen;
 	protected final FakeParent fakeParent = new FakeParent();
+	protected List<Runnable> tasks = new ArrayList<>(INITIAL_CAPACITY_3);
 
 	protected GuiRoot(ITextComponent title, D data) {
 		super(getShapePlaceholder(), data);
 		screen = makeScreen(title, data.container != null);
 
 		data.events.dBackgroundSet.add(par -> {
-			if (par.previous != null) remove(par.previous);
+			if (par.previous != null) remove(par.previous); // TODO add schedule function for render
 			if (par.current != null) add(0, par.current);
 		});
-		data.setBackground(data.background);
+		schedule(() -> data.setBackground(data.background));
 	}
 
 	@SuppressWarnings("SameReturnValue")
@@ -70,6 +69,8 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 
 	protected Screen makeScreen(ITextComponent title, boolean hasContainer) { return hasContainer ? new ScreenAdaptedWithContainer(title) : new ScreenAdapted(title); }
 
+	public void schedule(Runnable task) { tasks.add(task); }
+
 	@Override
 	protected Shape adaptToBounds(IGuiReshapeHandler handler, GuiComponent<?> invoker, Rectangle2D rectangle) { return rectangle; }
 
@@ -77,8 +78,12 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 	@OverridingMethodsMustInvokeSuper
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		GLStacks.resetAll();
-		constrain(stack);
-		super.render(stack, mouse, partialTicks);
+		tasks.forEach(Runnable::run);
+		tasks.clear();
+		if (EnumGuiState.READY.isReachedBy(data.getState())) {
+			constrain(stack);
+			super.render(stack, mouse, partialTicks);
+		}
 	}
 
 	@Override

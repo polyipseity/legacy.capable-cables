@@ -113,7 +113,7 @@ public class GuiCache {
 
 		public CacheKey(ResourceLocation key) { this.key = key; }
 
-		private static ResourceLocation getKey(String path) { return new ResourceLocation(CacheKey.class.toString().toLowerCase(Locale.ROOT), path); }
+		private static ResourceLocation getKey(String path) { return new ResourceLocation(GuiCache.class.getSimpleName().toLowerCase(Locale.ROOT), path); }
 
 		public T get(C component) {
 			if (initialized.add(component)) initialize(component);

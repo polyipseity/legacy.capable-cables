@@ -254,7 +254,7 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 			}
 		};
 
-		private static ResourceLocation getKey(String path) { return new ResourceLocation(CacheKey.class.toString().toLowerCase(Locale.ROOT), path); }
+		private static ResourceLocation getKey(String path) { return new ResourceLocation(GuiWindow.class.getSimpleName().toLowerCase(Locale.ROOT), path); }
 	}
 
 	@OnlyIn(CLIENT)
