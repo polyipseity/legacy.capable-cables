@@ -16,12 +16,11 @@ import java.util.Optional;
 
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
-@SuppressWarnings("DeprecatedIsStillUsed")
 @OnlyIn(CLIENT)
-public interface IGuiEventListenerComponent extends IGuiEventListener {
-	GuiComponent<?> getComponent();
+public interface IGuiEventListenerComponent {
+	default boolean isMouseOver(AffineTransformStack stack, Point2D mouse) { return false; }
 
-	Optional<GuiDragInfo> getDragInfo(int button);
+	default void onMouseMoved(AffineTransformStack stack, Point2D mouse) {}
 
 	default void onMouseHover(AffineTransformStack stack, Point2D mouse) {}
 
@@ -39,8 +38,6 @@ public interface IGuiEventListenerComponent extends IGuiEventListener {
 
 	default boolean onMouseScrolled(AffineTransformStack stack, Point2D mouse, double scrollDelta) { return false; }
 
-	default boolean isMouseOver(AffineTransformStack stack, Point2D mouse) { return false; }
-
 	default boolean onKeyPressed(int key, int scanCode, int modifiers) { return false; }
 
 	default boolean onKeyReleased(int key, int scanCode, int modifiers) { return false; }
@@ -53,58 +50,63 @@ public interface IGuiEventListenerComponent extends IGuiEventListener {
 
 	default void onFocusGet(@Nullable GuiComponent<?> from) {}
 
-	////////// Deprecated //////////
+	@SuppressWarnings("DeprecatedIsStillUsed")
+	@OnlyIn(CLIENT)
+	interface Bridge extends IGuiEventListenerComponent, IGuiEventListener {
+		@Override
+		@Deprecated
+		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
+		default void mouseMoved(double mouseX, double mouseY) { onMouseMoved(getTransformStack(), new Point2D.Double(mouseX, mouseY)); }
 
-	@Override
-	@Deprecated
-	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-	default void mouseMoved(double mouseX, double mouseY) { onMouseHovering(new AffineTransformStack(), new Point2D.Double(mouseX, mouseY)); }
+		AffineTransformStack getTransformStack();
 
-	@Override
-	@Deprecated
-	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-	default boolean mouseClicked(double mouseX, double mouseY, int button) {
-		AffineTransformStack stack = new AffineTransformStack();
-		return onMouseClicked(stack, new GuiDragInfo(getComponent(), new Point2D.Double(mouseX, mouseY), button), new Point2D.Double(mouseX, mouseY), button).result;
+		@Override
+		@Deprecated
+		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
+		default boolean mouseClicked(double mouseX, double mouseY, int button) { return onMouseClicked(getTransformStack(), new GuiDragInfo(getComponent(), new Point2D.Double(mouseX, mouseY), button), new Point2D.Double(mouseX, mouseY), button).result; }
+
+		GuiComponent<?> getComponent();
+
+		@Override
+		@Deprecated
+		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
+		default boolean mouseReleased(double mouseX, double mouseY, int button) { return onMouseReleased(getTransformStack(), new Point2D.Double(mouseX, mouseY), button); }
+
+		@Override
+		@Deprecated
+		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
+		default boolean mouseDragged(double mouseX, double mouseY, int button, double mouseXDiff, double mouseYDiff) { return getDragInfo(button).filter(d -> onMouseDragging(getTransformStack(), d, new Rectangle2D.Double(mouseX, mouseY, mouseXDiff, mouseYDiff), button)).isPresent(); }
+
+		Optional<GuiDragInfo> getDragInfo(int button);
+
+		@Override
+		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
+		@Deprecated
+		default boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) { return onMouseScrolled(getTransformStack(), new Point2D.Double(mouseX, mouseY), scrollDelta); }
+
+		@Override
+		@Deprecated
+		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
+		default boolean keyPressed(int key, int scanCode, int modifiers) { return onKeyPressed(key, scanCode, modifiers); }
+
+		@Override
+		@Deprecated
+		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
+		default boolean keyReleased(int key, int scanCode, int modifiers) { return onKeyReleased(key, scanCode, modifiers); }
+
+		@Override
+		@Deprecated
+		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
+		default boolean charTyped(char codePoint, int modifiers) { return onCharTyped(codePoint, modifiers); }
+
+		@Override
+		@Deprecated
+		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
+		default boolean changeFocus(boolean next) { return onChangeFocus(next); }
+
+		@Override
+		@Deprecated
+		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
+		default boolean isMouseOver(double mouseX, double mouseY) { return isMouseOver(getTransformStack(), new Point2D.Double(mouseX, mouseY)); }
 	}
-
-	@Override
-	@Deprecated
-	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-	default boolean mouseReleased(double mouseX, double mouseY, int button) { return onMouseReleased(new AffineTransformStack(), new Point2D.Double(mouseX, mouseY), button); }
-
-	@Override
-	@Deprecated
-	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-	default boolean mouseDragged(double mouseX, double mouseY, int button, double mouseXDiff, double mouseYDiff) { return getDragInfo(button).filter(d -> onMouseDragging(new AffineTransformStack(), d, new Rectangle2D.Double(mouseX, mouseY, mouseXDiff, mouseYDiff), button)).isPresent(); }
-
-	@Override
-	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-	@Deprecated
-	default boolean mouseScrolled(double mouseX, double mouseY, double scrollDelta) { return onMouseScrolled(new AffineTransformStack(), new Point2D.Double(mouseX, mouseY), scrollDelta); }
-
-	@Override
-	@Deprecated
-	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-	default boolean isMouseOver(double mouseX, double mouseY) { return isMouseOver(new AffineTransformStack(), new Point2D.Double(mouseX, mouseY)); }
-
-	@Override
-	@Deprecated
-	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-	default boolean keyPressed(int key, int scanCode, int modifiers) { return onKeyPressed(key, scanCode, modifiers); }
-
-	@Override
-	@Deprecated
-	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-	default boolean keyReleased(int key, int scanCode, int modifiers) { return onKeyReleased(key, scanCode, modifiers); }
-
-	@Override
-	@Deprecated
-	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-	default boolean charTyped(char codePoint, int modifiers) { return onCharTyped(codePoint, modifiers); }
-
-	@Override
-	@Deprecated
-	@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-	default boolean changeFocus(boolean next) { return onChangeFocus(next); }
 }

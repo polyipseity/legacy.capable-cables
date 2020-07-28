@@ -2,6 +2,7 @@ package $group__.client.gui.components.roots;
 
 import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiContainer;
+import $group__.client.gui.components.IGuiEventListenerComponent;
 import $group__.client.gui.components.backgrounds.GuiBackground;
 import $group__.client.gui.structures.*;
 import $group__.client.gui.traits.IGuiShapeRectangle;
@@ -45,9 +46,10 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 
 @OnlyIn(CLIENT)
-public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container> extends GuiContainer<D> implements IGuiShapeRectangle, IGuiLifecycleHandler, IGuiReshapeHandler {
+public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container> extends GuiContainer<D> implements IGuiEventListenerComponent.Bridge, IGuiShapeRectangle, IGuiLifecycleHandler, IGuiReshapeHandler {
 	public final Screen screen;
 	protected final FakeParent fakeParent = new FakeParent();
+	protected final AffineTransformStack stack = new AffineTransformStack();
 	protected List<Runnable> tasks = new ArrayList<>(INITIAL_CAPACITY_3);
 
 	protected GuiRoot(ITextComponent title, D data) {
@@ -55,7 +57,7 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 		screen = makeScreen(title, data.container != null);
 
 		data.events.dBackgroundSet.add(par -> {
-			if (par.previous != null) remove(par.previous); // TODO add schedule function for render
+			if (par.previous != null) remove(par.previous);
 			if (par.current != null) add(0, par.current);
 		});
 		schedule(() -> data.setBackground(data.background));
@@ -78,8 +80,12 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 	@OverridingMethodsMustInvokeSuper
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		GLStacks.resetAll();
+
 		tasks.forEach(Runnable::run);
 		tasks.clear();
+
+		onMouseHovering(stack, mouse);
+
 		if (EnumGuiState.READY.isReachedBy(data.getState())) {
 			constrain(stack);
 			super.render(stack, mouse, partialTicks);
@@ -142,7 +148,8 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 		onMouseHovered(new AffineTransformStack(), (Point2D) cursor.clone());
 		new ArrayDeque<>(data.getKeyPresses()).forEach(k -> onKeyReleased(k.key, k.scanCode, k.modifiers));
 
-		getScreen().getMinecraft().displayGuiScreen(null);
+		Minecraft client = getScreen().getMinecraft();
+		client.deferTask(() -> client.displayGuiScreen(null));
 	}
 
 	@Override
@@ -176,6 +183,12 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 			return true;
 		return super.onKeyPressed(key, scanCode, modifiers);
 	}
+
+	@Override
+	public GuiComponent<?> getComponent() { return this; }
+
+	@Override
+	public AffineTransformStack getTransformStack() { return stack; }
 
 	@Override
 	public Optional<GuiDragInfo> getDragInfo(int button) { return Optional.ofNullable(fakeParent.drags.get(button)); }
@@ -243,7 +256,7 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 		public void render(int mouseX, int mouseY, float partialTicks) { GuiRoot.this.render(mouseX, mouseY, partialTicks); }
 
 		@Override
-		public List<? extends IGuiEventListener> children() { return GuiRoot.this.children; }
+		public List<? extends IGuiEventListener> children() { return Collections.emptyList(); }
 
 		@Override
 		public boolean isPauseScreen() { return isPaused(); }

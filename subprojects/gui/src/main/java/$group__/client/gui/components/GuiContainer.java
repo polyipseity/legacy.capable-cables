@@ -149,6 +149,9 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 	}
 
 	@Override
+	public void onMouseMoved(AffineTransformStack stack, Point2D mouse) { getChildMouseOver(stack, mouse).ifPresent(c -> runChildTransformed(stack, c, () -> c.onMouseMoved(stack, mouse))); }
+
+	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void onMouseHovering(AffineTransformStack stack, Point2D mouse) {
 		@Nullable GuiComponent<?> hovering = unboxOptional(getChildMouseOver(stack, mouse));

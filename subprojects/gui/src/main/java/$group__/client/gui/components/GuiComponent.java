@@ -160,12 +160,6 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 	protected boolean isBeingFocused() { return getParent().filter(p -> p.data.focused == this).isPresent(); }
 
 	@Override
-	public Optional<GuiDragInfo> getDragInfo(int button) { return getParent().map(p -> p.data.drags.get(button)); }
-
-	@Override
-	public final GuiComponent<?> getComponent() { return this; }
-
-	@Override
 	public boolean isMouseOver(AffineTransformStack stack, Point2D mouse) { return stack.delegated.peek().createTransformedShape(getShape()).contains(mouse); }
 
 	@OnlyIn(CLIENT)
@@ -258,7 +252,7 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 		public final List<Consumer<CDestroyedParameter>> cDestroyed = new ArrayList<>(INITIAL_CAPACITY_2);
 		public final List<Consumer<CReshapeParameter>> cReshape = new ArrayList<>(INITIAL_CAPACITY_2);
 
-		public <T> void fire(List<Consumer<T>> listeners, T parameter) { listeners.forEach(l -> l.accept(parameter)); }
+		public <T> void fire(List<Consumer<T>> listeners, T parameter) { ImmutableList.copyOf(listeners).forEach(l -> l.accept(parameter)); }
 
 		@OnlyIn(CLIENT)
 		public static abstract class CParameter {

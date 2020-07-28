@@ -60,8 +60,8 @@ public class GuiCache {
 			@Override
 			public void initialize(GuiComponent<?> component) {
 				super.initialize(component);
-				component.data.events.cAdded.add(c -> invalidate(component));
-				component.data.events.cRemoved.add(c -> invalidate(component));
+				component.data.events.cAdded.add(par -> invalidate(component));
+				component.data.events.cRemoved.add(par -> invalidate(component));
 			}
 
 			@Override
@@ -80,8 +80,8 @@ public class GuiCache {
 			@Override
 			public void initialize(GuiComponent<?> component) {
 				super.initialize(component);
-				component.data.events.cAdded.add(c -> invalidate(component));
-				component.data.events.cRemoved.add(c -> invalidate(component));
+				component.data.events.cAdded.add(par -> invalidate(component));
+				component.data.events.cRemoved.add(par -> invalidate(component));
 			}
 
 			@Override
