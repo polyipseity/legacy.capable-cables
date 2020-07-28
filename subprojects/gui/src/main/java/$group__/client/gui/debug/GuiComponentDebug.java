@@ -97,21 +97,21 @@ final class GuiDebug extends GuiRootWindows<GuiRoot.Data<GuiRoot.Events, Contain
 					new GuiWindow.Data<>(new GuiComponent.Events(), GuiDebug::getLogger, new GuiWindow.Data.ColorData()));
 			GuiWindow<?> window2 = new GuiWindow<GuiWindow.Data<?, ?>>(new Rectangle2D.Double(50, 50, 200, 200),
 					new GuiWindow.Data<>(new GuiComponent.Events(), GuiDebug::getLogger, new GuiWindow.Data.ColorData())) {
-				protected double window2Angle = 0;
+				protected double rotation = 0;
 
 				@Override
-				public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-					window2Angle += 0.25 * partialTicks;
-					window2Angle %= 360;
-					super.render(stack, mouse, partialTicks);
+				public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
+					rotation = (rotation + 0.25 * partialTicks) % 360;
+					super.renderPre(stack, mouse, partialTicks);
 				}
 
 				@Override
 				protected void transformThis(AffineTransformStack stack) {
+					// COMMENT I will probably not support transforms with windows due to its draggable and resizable properties...
 					super.transformThis(stack);
 					Rectangle2D r = getRectangle();
 					AffineTransform transform = stack.delegated.peek();
-					transform.rotate(Math.toRadians(window2Angle), r.getX() + 50, r.getY() + 50);
+					transform.rotate(Math.toRadians(rotation), r.getX() + 50, r.getY() + 50);
 					transform.scale(1.5, 0.5);
 				}
 			};

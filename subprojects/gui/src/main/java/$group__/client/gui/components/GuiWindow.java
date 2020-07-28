@@ -7,11 +7,12 @@ import $group__.client.gui.traits.IGuiShapeRectangle;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
 import $group__.client.gui.utilities.GLUtilities;
 import $group__.client.gui.utilities.GLUtilities.GLStacks;
+import $group__.client.gui.utilities.GuiUtilities;
 import $group__.client.gui.utilities.GuiUtilities.DrawingUtilities;
-import $group__.client.gui.utilities.GuiUtilities.UnboxingUtilities;
 import $group__.utilities.Casts;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import $group__.utilities.specific.ThrowableUtilities.Try;
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.Logger;
@@ -48,11 +49,35 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 	public Rectangle2D getRectangleView() { return (Rectangle2D) getRectangle().clone(); }
 
 	@Override
-	public void constrain(AffineTransformStack stack) {
-		GuiConstraint constraint = CacheKeys.CONSTRAINT.get(this);
-		data.constraints.add(constraint);
-		super.constrain(stack);
-		data.constraints.remove(constraint);
+	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
+		AffineTransform transform = stack.delegated.peek();
+		DrawingUtilities.fill(transform, getRectangle(), data.colors.background.getRGB(), 0);
+		DrawingUtilities.fill(transform, CacheKeys.RECTANGLE_DRAGGABLE.get(this), data.colors.border.getRGB(), 0);
+		super.render(stack, mouse, partialTicks);
+		if (isBeingDragged()) {
+			data.getDragWindow().ifPresent(d -> {
+				Rectangle2D c = getRectangleView(), r = getRectangleView();
+				d.handle(transform, r, mouse);
+				reshape(this, r);
+				AffineTransformStack stackR = stack.copy();
+				stackR.delegated.pop();
+				transformThis(stackR);
+				AffineTransform transformR = stackR.delegated.pop();
+				reshape(this, c);
+				GuiUtilities.ObjectUtilities.acceptRectangle(r, (x, y) -> (w, h) -> r.setRect(x, y, w - 1, h - 1));
+				if (Minecraft.getInstance().getFramebuffer().isStencilEnabled()) {
+					GLStacks.push("GL_STENCIL_TEST",
+							() -> GL11.glDisable(GL11.GL_STENCIL_TEST), () -> GL11.glDisable(GL11.GL_STENCIL_TEST));
+					DrawingUtilities.drawRectangle(transformR, r, data.colors.dragging.getRGB(), 0);
+					GLStacks.pop("GL_STENCIL_TEST");
+				} else {
+					GLStacks.push("GL_SCISSOR_TEST",
+							() -> GL11.glDisable(GL11.GL_SCISSOR_TEST), () -> GL11.glDisable(GL11.GL_SCISSOR_TEST));
+					DrawingUtilities.drawRectangle(transformR, r, data.colors.dragging.getRGB(), 0);
+					GLStacks.pop("GL_SCISSOR_TEST");
+				}
+			});
+		}
 	}
 
 	@Override
@@ -65,31 +90,11 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 	}
 
 	@Override
-	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-		if (EnumGuiState.READY.isReachedBy(data.getState())) {
-			AffineTransform transform = stack.delegated.peek();
-			DrawingUtilities.fill(transform, getRectangle(), data.colors.background.getRGB());
-			DrawingUtilities.fill(transform, CacheKeys.RECTANGLE_DRAGGABLE.get(this), data.colors.border.getRGB());
-			super.render(stack, mouse, partialTicks);
-			if (isBeingDragged()) {
-				data.getDragWindow().ifPresent(d -> {
-					Rectangle2D c = getRectangleView(), r = getRectangleView();
-					d.handle(transform, r, mouse);
-					reshape(this, r);
-					AffineTransformStack stackR = stack.copy();
-					stackR.delegated.pop();
-					transformThis(stackR);
-					AffineTransform transformR = stackR.delegated.pop();
-					reshape(this, c);
-					UnboxingUtilities.acceptRectangle(r, (x, y) -> (w, h) -> r.setRect(x, y, w - 1, h - 1));
-					GLStacks.push("GL_SCISSOR_TEST",
-							() -> GL11.glDisable(GL11.GL_SCISSOR_TEST),
-							() -> GL11.glDisable(GL11.GL_SCISSOR_TEST));
-					DrawingUtilities.drawRectangle(transformR, r, data.colors.dragging.getRGB());
-					GLStacks.pop("GL_SCISSOR_TEST");
-				});
-			}
-		}
+	public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
+		GuiConstraint constraint = CacheKeys.CONSTRAINT.get(this);
+		data.constraints.add(constraint);
+		super.renderPre(stack, mouse, partialTicks);
+		data.constraints.remove(constraint);
 	}
 
 	@Override
@@ -232,7 +237,7 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 			@Override
 			public Rectangle2D get0(GuiWindow<?> component) {
 				return Try.call(() -> component.data.cache.delegated.get(key, () ->
-								UnboxingUtilities.applyRectangle(component.getRectangle(), (x, y) -> (w, h) ->
+								GuiUtilities.ObjectUtilities.applyRectangle(component.getRectangle(), (x, y) -> (w, h) ->
 										new Rectangle2D.Double(x - WINDOW_RESHAPE_THICKNESS, y - WINDOW_RESHAPE_THICKNESS, w + WINDOW_RESHAPE_THICKNESS * 2, h + WINDOW_RESHAPE_THICKNESS * 2))),
 						component.data.logger.get()).flatMap(Casts::<Rectangle2D>castUnchecked).orElseThrow(BecauseOf::unexpected);
 			}

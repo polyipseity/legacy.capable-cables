@@ -1,8 +1,11 @@
 package $group__.client.gui.components;
 
-import $group__.client.gui.structures.*;
+import $group__.client.gui.structures.AffineTransformStack;
+import $group__.client.gui.structures.EnumCursor;
+import $group__.client.gui.structures.EnumGuiMouseClickResult;
+import $group__.client.gui.structures.GuiDragInfo;
 import $group__.client.gui.utilities.GLUtilities;
-import $group__.client.gui.utilities.GuiUtilities.ObjectUtilities;
+import $group__.client.gui.utilities.GuiUtilities;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
@@ -26,21 +29,19 @@ public abstract class GuiButton<D extends GuiButton.Data<?, ?>> extends GuiConta
 
 	@Override
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-		if (EnumGuiState.READY.isReachedBy(data.getState())) {
-			AffineTransform transform = stack.delegated.peek();
-			Shape transformed = transform.createTransformedShape(getShape());
-			if (isBeingDragged() && transformed.contains(mouse)) {
-				ObjectUtilities.drawShape(transformed, true, data.colors.clicking, 0);
-				ObjectUtilities.drawShape(transformed, false, data.colors.clickingBorder, 0);
-			} else if (isBeingHovered()) {
-				ObjectUtilities.drawShape(transformed, true, data.colors.hovering, 0);
-				ObjectUtilities.drawShape(transformed, false, data.colors.hoveringBorder, 0);
-			} else {
-				ObjectUtilities.drawShape(transformed, true, data.colors.base, 0);
-				ObjectUtilities.drawShape(transformed, false, data.colors.baseBorder, 0);
-			}
-			super.render(stack, mouse, partialTicks);
+		AffineTransform transform = stack.delegated.peek();
+		Shape transformed = transform.createTransformedShape(getShape());
+		if (isBeingDragged() && transformed.contains(mouse)) {
+			GuiUtilities.DrawingUtilities.drawShape(transformed, true, data.colors.clicking, 0);
+			GuiUtilities.DrawingUtilities.drawShape(transformed, false, data.colors.clickingBorder, 0);
+		} else if (isBeingHovered()) {
+			GuiUtilities.DrawingUtilities.drawShape(transformed, true, data.colors.hovering, 0);
+			GuiUtilities.DrawingUtilities.drawShape(transformed, false, data.colors.hoveringBorder, 0);
+		} else {
+			GuiUtilities.DrawingUtilities.drawShape(transformed, true, data.colors.base, 0);
+			GuiUtilities.DrawingUtilities.drawShape(transformed, false, data.colors.baseBorder, 0);
 		}
+		super.render(stack, mouse, partialTicks);
 	}
 
 	@Override

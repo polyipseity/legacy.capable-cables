@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -33,53 +34,52 @@ public enum GuiUtilities {
 	public enum DrawingUtilities {
 		;
 
-		public static void drawRectangle(AffineTransform transform, Rectangle2D rectangle, int color) {
+		public static void drawRectangle(AffineTransform transform, Rectangle2D rectangle, int color, int z) {
 			Rectangle rF = ObjectUtilities.getRectangleExpanded(rectangle);
-			hLine(transform, rF.getX(), rF.getMaxX(), rF.getY(), color);
-			vLine(transform, rF.getX(), rF.getY(), rF.getMaxY(), color);
-			hLine(transform, rF.getX(), rF.getMaxX(), rF.getMaxY(), color);
-			vLine(transform, rF.getMaxX(), rF.getY(), rF.getMaxY(), color);
+			hLine(transform, rF.getX(), rF.getMaxX(), rF.getY(), color, z);
+			vLine(transform, rF.getX(), rF.getY(), rF.getMaxY(), color, z);
+			hLine(transform, rF.getX(), rF.getMaxX(), rF.getMaxY(), color, z);
+			vLine(transform, rF.getMaxX(), rF.getY(), rF.getMaxY(), color, z);
 		}
 
 		/**
 		 * @see AbstractGui#hLine(int, int, int, int)
 		 */
 		@SuppressWarnings("JavadocReference")
-		public static void hLine(AffineTransform transform, double x1, double x2, double y, int color) { fill(transform, new Rectangle2D.Double(x1, y, Math.abs(x2 - x1), 1), color); }
+		public static void hLine(AffineTransform transform, double x1, double x2, double y, int color, int z) { fill(transform, new Rectangle2D.Double(x1, y, Math.abs(x2 - x1), 1), color, z); }
 
 		/**
 		 * @see AbstractGui#vLine(int, int, int, int)
 		 */
 		@SuppressWarnings("JavadocReference")
-		public static void vLine(AffineTransform transform, double x, double y1, double y2, int color) { fill(transform, new Rectangle2D.Double(x, y1, 1, Math.abs(y2 - y1)), color); }
+		public static void vLine(AffineTransform transform, double x, double y1, double y2, int color, int z) { fill(transform, new Rectangle2D.Double(x, y1, 1, Math.abs(y2 - y1)), color, z); }
+
+		/**
+		 * @see AbstractGui#fill(Matrix4f, int, int, int, int, int)
+		 */
+		public static void fill(AffineTransform transform, Rectangle2D rectangle, int color, int z) {
+			Rectangle rF = ObjectUtilities.getRectangleExpanded(rectangle);
+			Matrix4f m = toMatrix(transform);
+			if (z != 0) m.translate(new Vector3f(0, 0, z));
+			AbstractGui.fill(m, (int) rF.getX(), (int) rF.getY(), (int) rF.getMaxX(), (int) rF.getMaxY(), color);
+		}
 
 		/**
 		 * @see AbstractGui#fill(int, int, int, int, int)
 		 */
 		@Deprecated
-		public static void fill(Rectangle2D rectangle, int color) {
-			Rectangle rF = ObjectUtilities.getRectangleExpanded(rectangle);
-			AbstractGui.fill((int) rF.getX(), (int) rF.getY(), (int) rF.getMaxX(), (int) rF.getMaxY(), color);
-		}
-
-		/**
-		 * @see AbstractGui#fill(Matrix4f, int, int, int, int, int)
-		 */
-		public static void fill(AffineTransform transform, Rectangle2D rectangle, int color) {
-			Rectangle rF = ObjectUtilities.getRectangleExpanded(rectangle);
-			AbstractGui.fill(toMatrix(transform), (int) rF.getX(), (int) rF.getY(), (int) rF.getMaxX(), (int) rF.getMaxY(), color);
-		}
+		public static void fill(Rectangle2D rectangle, int color, int z) { fill(new AffineTransform(), rectangle, color, z); }
 
 		/**
 		 * @see AbstractGui#fillGradient(int, int, int, int, int, int)
 		 */
 		@SuppressWarnings("JavadocReference")
-		public static void fillGradient(AffineTransform transform, Rectangle2D rectangle, int colorTop, int colorBottom, int blitOffset) {
+		public static void fillGradient(AffineTransform transform, Rectangle2D rectangle, int colorTop, int colorBottom, int z) {
 			Rectangle2D r = (Rectangle2D) rectangle.clone();
 			transformRectangle(rectangle, transform);
 			Rectangle rF = ObjectUtilities.getRectangleExpanded(r);
 			GuiScreenUtility.INSTANCE
-					.setBlitOffset_(blitOffset)
+					.setBlitOffset_(z)
 					.fillGradient((int) rF.getX(), (int) rF.getY(), (int) rF.getMaxX(), (int) rF.getMaxY(), colorTop, colorBottom);
 		}
 
@@ -170,29 +170,6 @@ public enum GuiUtilities {
 					(int) gF.getWidth(), (int) gF.getHeight(),
 					(int) textureF.getWidth(), (int) textureF.getHeight());
 		}
-	}
-
-	@OnlyIn(CLIENT)
-	public enum ObjectUtilities {
-		;
-
-		public static Rectangle2D getRectangleFromDiagonal(Point2D p1, Point2D p2) {
-			Rectangle2D ret = new Rectangle2D.Double();
-			ret.setFrameFromDiagonal(p1, p2);
-			return ret;
-		}
-
-		public static Point getPointFloor(Point2D point) { return new Point((int) Math.floor(point.getX()), (int) Math.floor(point.getY())); }
-
-		public static Point getPointCeil(Point2D point) { return new Point((int) Math.ceil(point.getX()), (int) Math.ceil(point.getY())); }
-
-		public static Dimension getDimensionFloor(Dimension2D dimension) { return new Dimension((int) Math.floor(dimension.getWidth()), (int) Math.floor(dimension.getHeight())); }
-
-		public static Rectangle getRectangleExpanded(Rectangle2D rectangle) {
-			Rectangle ret = new Rectangle();
-			ret.setFrameFromDiagonal(getPointFloor(new Point2D.Double(rectangle.getX(), rectangle.getY())), getPointCeil(new Point2D.Double(rectangle.getMaxX(), rectangle.getMaxY())));
-			return ret;
-		}
 
 		public static void drawShape(Shape shape, boolean filled, Color color, float z) { drawShape(null, shape, filled, color, z); }
 
@@ -246,8 +223,26 @@ public enum GuiUtilities {
 	}
 
 	@OnlyIn(CLIENT)
-	public enum UnboxingUtilities {
+	public enum ObjectUtilities {
 		;
+
+		public static Rectangle2D getRectangleFromDiagonal(Point2D p1, Point2D p2) {
+			Rectangle2D ret = new Rectangle2D.Double();
+			ret.setFrameFromDiagonal(p1, p2);
+			return ret;
+		}
+
+		public static Dimension getDimensionFloor(Dimension2D dimension) { return new Dimension((int) Math.floor(dimension.getWidth()), (int) Math.floor(dimension.getHeight())); }
+
+		public static Rectangle getRectangleExpanded(Rectangle2D rectangle) {
+			Rectangle ret = new Rectangle();
+			ret.setFrameFromDiagonal(getPointFloor(new Point2D.Double(rectangle.getX(), rectangle.getY())), getPointCeil(new Point2D.Double(rectangle.getMaxX(), rectangle.getMaxY())));
+			return ret;
+		}
+
+		public static Point getPointFloor(Point2D point) { return new Point((int) Math.floor(point.getX()), (int) Math.floor(point.getY())); }
+
+		public static Point getPointCeil(Point2D point) { return new Point((int) Math.ceil(point.getX()), (int) Math.ceil(point.getY())); }
 
 		public static <T> T applyPoint(Point2D point, BiFunction<Double, Double, T> user) { return user.apply(point.getX(), point.getY()); }
 

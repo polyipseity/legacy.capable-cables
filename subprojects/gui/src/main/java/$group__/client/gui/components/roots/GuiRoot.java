@@ -3,13 +3,16 @@ package $group__.client.gui.components.roots;
 import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiContainer;
 import $group__.client.gui.components.IGuiEventListenerComponent;
+import $group__.client.gui.components.IRenderableComponent;
 import $group__.client.gui.components.backgrounds.GuiBackground;
-import $group__.client.gui.structures.*;
+import $group__.client.gui.structures.AffineTransformStack;
+import $group__.client.gui.structures.Dimension2DDouble;
+import $group__.client.gui.structures.EnumGuiMouseClickResult;
+import $group__.client.gui.structures.GuiDragInfo;
 import $group__.client.gui.traits.IGuiShapeRectangle;
 import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
 import $group__.client.gui.utilities.GLUtilities;
-import $group__.client.gui.utilities.GLUtilities.GLStacks;
 import $group__.client.gui.utilities.GuiUtilities;
 import $group__.client.gui.utilities.GuiUtilities.DrawingUtilities;
 import $group__.client.gui.utilities.TextComponents;
@@ -17,6 +20,7 @@ import $group__.client.gui.utilities.Tooltips;
 import $group__.client.gui.utilities.Transforms.AffineTransforms;
 import $group__.utilities.specific.Maps;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.IGuiEventListener;
@@ -28,6 +32,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
@@ -46,7 +51,7 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 
 @OnlyIn(CLIENT)
-public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container> extends GuiContainer<D> implements IGuiEventListenerComponent.Bridge, IGuiShapeRectangle, IGuiLifecycleHandler, IGuiReshapeHandler {
+public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container> extends GuiContainer<D> implements IRenderableComponent.IBridge, IGuiEventListenerComponent.IBridge, IGuiShapeRectangle, IGuiLifecycleHandler, IGuiReshapeHandler {
 	public final Screen screen;
 	protected final FakeParent fakeParent = new FakeParent();
 	protected final AffineTransformStack stack = new AffineTransformStack();
@@ -79,23 +84,17 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-		GLStacks.resetAll();
-
+		GLUtilities.GLStacks.clearAll();
+		RenderSystem.clear(GL11.GL_STENCIL_BUFFER_BIT, Minecraft.IS_RUNNING_ON_MAC);
 		tasks.forEach(Runnable::run);
 		tasks.clear();
-
-		onMouseHovering(stack, mouse);
-
-		if (EnumGuiState.READY.isReachedBy(data.getState())) {
-			constrain(stack);
-			super.render(stack, mouse, partialTicks);
-		}
+		super.render(stack, mouse, partialTicks);
 	}
 
 	@Override
-	public void constrain(AffineTransformStack stack) {
+	public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		data.constraints.clear();
-		super.constrain(stack);
+		super.renderPre(stack, mouse, partialTicks);
 	}
 
 	@SuppressWarnings("SameReturnValue")
@@ -185,7 +184,7 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 	}
 
 	@Override
-	public GuiComponent<?> getComponent() { return this; }
+	public GuiRoot<?, ?> getRoot() { return this; }
 
 	@Override
 	public AffineTransformStack getTransformStack() { return stack; }
@@ -350,11 +349,11 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 
 		@Override
 		@Deprecated
-		protected void hLine(int x1, int x2, int y, int color) { DrawingUtilities.hLine(AffineTransforms.getIdentity(), x1, x2, y, color); }
+		protected void hLine(int x1, int x2, int y, int color) { DrawingUtilities.hLine(AffineTransforms.getIdentity(), x1, x2, y, color, getBlitOffset()); }
 
 		@Override
 		@Deprecated
-		protected void vLine(int x, int y1, int y2, int color) { DrawingUtilities.vLine(AffineTransforms.getIdentity(), x, y1, y2, color); }
+		protected void vLine(int x, int y1, int y2, int color) { DrawingUtilities.vLine(AffineTransforms.getIdentity(), x, y1, y2, color, getBlitOffset()); }
 
 		@Override
 		@Deprecated

@@ -4,7 +4,6 @@ import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiContainer;
 import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.structures.AffineTransformStack;
-import $group__.client.gui.structures.EnumGuiState;
 import $group__.client.gui.structures.GuiCache.CacheKey;
 import $group__.client.gui.utilities.GuiUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
@@ -23,8 +22,7 @@ public abstract class GuiBackground<D extends GuiComponent.Data<E>, E extends Gu
 
 	@Override
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-		if (EnumGuiState.READY.isReachedBy(data.getState()))
-			renderBackground(stack, CacheKey.ROOT.get(this).getScreen(), mouse, partialTicks);
+		renderBackground(stack, CacheKey.ROOT.get(this).getScreen(), mouse, partialTicks);
 	}
 
 	@Override

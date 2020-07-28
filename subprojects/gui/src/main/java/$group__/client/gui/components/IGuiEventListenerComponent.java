@@ -5,6 +5,7 @@ import $group__.client.gui.ConstantsGui;
 import $group__.client.gui.structures.AffineTransformStack;
 import $group__.client.gui.structures.EnumGuiMouseClickResult;
 import $group__.client.gui.structures.GuiDragInfo;
+import $group__.client.gui.traits.IScreenBridge;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -12,7 +13,6 @@ import javax.annotation.Nullable;
 import javax.annotation.meta.When;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Optional;
 
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
@@ -52,20 +52,16 @@ public interface IGuiEventListenerComponent {
 
 	@SuppressWarnings("DeprecatedIsStillUsed")
 	@OnlyIn(CLIENT)
-	interface Bridge extends IGuiEventListenerComponent, IGuiEventListener {
+	interface IBridge extends IScreenBridge, IGuiEventListenerComponent, IGuiEventListener {
 		@Override
 		@Deprecated
 		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
 		default void mouseMoved(double mouseX, double mouseY) { onMouseMoved(getTransformStack(), new Point2D.Double(mouseX, mouseY)); }
 
-		AffineTransformStack getTransformStack();
-
 		@Override
 		@Deprecated
 		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-		default boolean mouseClicked(double mouseX, double mouseY, int button) { return onMouseClicked(getTransformStack(), new GuiDragInfo(getComponent(), new Point2D.Double(mouseX, mouseY), button), new Point2D.Double(mouseX, mouseY), button).result; }
-
-		GuiComponent<?> getComponent();
+		default boolean mouseClicked(double mouseX, double mouseY, int button) { return onMouseClicked(getTransformStack(), new GuiDragInfo(getRoot(), new Point2D.Double(mouseX, mouseY), button), new Point2D.Double(mouseX, mouseY), button).result; }
 
 		@Override
 		@Deprecated
@@ -76,8 +72,6 @@ public interface IGuiEventListenerComponent {
 		@Deprecated
 		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
 		default boolean mouseDragged(double mouseX, double mouseY, int button, double mouseXDiff, double mouseYDiff) { return getDragInfo(button).filter(d -> onMouseDragging(getTransformStack(), d, new Rectangle2D.Double(mouseX, mouseY, mouseXDiff, mouseYDiff), button)).isPresent(); }
-
-		Optional<GuiDragInfo> getDragInfo(int button);
 
 		@Override
 		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)

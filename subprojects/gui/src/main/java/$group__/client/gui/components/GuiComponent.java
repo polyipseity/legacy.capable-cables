@@ -5,10 +5,12 @@ import $group__.client.gui.structures.*;
 import $group__.client.gui.structures.GuiCache.CacheKey;
 import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
+import $group__.client.gui.utilities.GuiUtilities;
 import $group__.client.gui.utilities.Transforms.AffineTransforms;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import $group__.utilities.specific.ThrowableUtilities.Try;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.Logger;
 
@@ -51,14 +53,22 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 	@Override
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {}
 
+	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void constrain(AffineTransformStack stack) {
+	public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		AffineTransform transform = stack.delegated.peek();
 		Rectangle2D r = transform.createTransformedShape(getShape()).getBounds2D(),
 				r2 = (Rectangle2D) r.clone();
 		data.constraints.forEach(c -> c.accept(r2));
 		if (!r.equals(r2))
 			Try.call(() -> AffineTransforms.getTransformFromTo(r, r2), data.logger.get()).ifPresent(t -> CacheKey.RESHAPE_HANDLER.get(this).reshape(this, this, t.createTransformedShape(getShape())));
+	}
+
+	public void writeStencil(AffineTransformStack stack, Point2D mouse, float partialTicks, boolean increment) {
+		if (increment)
+			GuiUtilities.DrawingUtilities.drawShape(stack.delegated.peek(), shape, true, Color.WHITE, 0);
+		else
+			GuiUtilities.DrawingUtilities.drawShape(stack.delegated.peek(), shape.getBounds2D(), true, Color.BLACK, 0);
 	}
 
 	public void setBounds(IGuiReshapeHandler handler, GuiComponent<?> invoker, Rectangle2D rectangle) {
@@ -166,15 +176,15 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 	public enum CoordinateConverters {
 		;
 
-		public static double toScaledCoordinate(GuiComponent<?> component, double d) { return d / CacheKey.MAIN_WINDOW.get(component).getGuiScaleFactor(); }
-
-		public static double toNativeCoordinate(GuiComponent<?> component, double d) { return d * CacheKey.MAIN_WINDOW.get(component).getGuiScaleFactor(); }
+		public static double toNativeCoordinate(GuiComponent<?> component, double d) { return d * Minecraft.getInstance().getMainWindow().getGuiScaleFactor(); }
 
 		public static Point2D toScaledPoint(GuiComponent<?> component, Point2D point) {
 			Point2D p = (Point2D) point.clone();
-			p.setLocation(toScaledCoordinate(component, p.getX()), toScaledCoordinate(component, CacheKey.MAIN_WINDOW.get(component).getFramebufferHeight() - p.getY()));
+			p.setLocation(toScaledCoordinate(component, p.getX()), toScaledCoordinate(component, Minecraft.getInstance().getMainWindow().getFramebufferHeight() - p.getY()));
 			return p;
 		}
+
+		public static double toScaledCoordinate(GuiComponent<?> component, double d) { return d / Minecraft.getInstance().getMainWindow().getGuiScaleFactor(); }
 
 		public static Point2D toNativePoint(GuiComponent<?> component, Point2D point) {
 			Point2D p = (Point2D) point.clone();

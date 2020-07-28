@@ -14,5 +14,5 @@ public class GuiBackgroundDefault<D extends GuiComponent.Data<E>, E extends GuiC
 	public GuiBackgroundDefault(D data) { super(data); }
 
 	@Override
-	public void renderBackground(AffineTransformStack stack, Screen screen, Point2D mouse, float partialTicks) { GuiUtilities.GuiBackgrounds.renderBackground(screen.getMinecraft(), screen.width, screen.height); }
+	public void renderBackground(AffineTransformStack stack, Screen screen, Point2D mouse, float partialTicks) { GuiUtilities.GuiBackgrounds.renderBackground(screen.getMinecraft(), screen.width, screen.height, 0); }
 }

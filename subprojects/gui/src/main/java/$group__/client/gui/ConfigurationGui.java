@@ -1,6 +1,7 @@
 package $group__.client.gui;
 
 import $group__.client.gui.structures.EnumCursor;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
@@ -27,6 +28,7 @@ public enum ConfigurationGui {
 	}
 
 	public static void loadComplete() {
+		Minecraft.getInstance().getFramebuffer().enableStencil();
 		EnumCursor.preload();
 	}
 }
