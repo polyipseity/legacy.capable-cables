@@ -91,10 +91,9 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 		if (reshape) CacheKey.RESHAPE_HANDLER.get(this).reshape(this);
 	}
 
-	@SuppressWarnings("ConstantConditions")
 	protected static boolean onChangeFocusWithThisFocusable(GuiContainer<?> self, Function<Boolean, Boolean> superMethod, boolean next) {
-		return next ? self.getParent().map(GuiContainer::isBeingFocused).orElseGet(() -> !self.isBeingFocused()) || superMethod.apply(true) :
-				!self.isBeingFocused() && (superMethod.apply(false) || true);
+		return next ? !self.data.getFocused().isPresent() && !self.isBeingFocused() || superMethod.apply(true)
+				: superMethod.apply(false) || !self.isBeingFocused();
 	}
 
 	@Override
@@ -325,7 +324,6 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 
 	@Override
 	public boolean onChangeFocus(boolean next) {
-		// TODO does not seem like working
 		Optional<GuiComponent<?>> foc = data.getFocused();
 		if (foc.filter(f -> f.data.isActive() && f.onChangeFocus(next)).isPresent())
 			return true;
