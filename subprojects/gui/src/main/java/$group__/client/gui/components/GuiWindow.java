@@ -37,9 +37,9 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> implements IGuiReshapeHandler, IGuiShapeRectangle {
 	// TODO make value not hardcoded through themes
 	public static final int
-			WINDOW_RESHAPE_THICKNESS = 5, // COMMENT external
-			WINDOW_DRAG_BAR_THICKNESS = 5, // COMMENT internal top
-			WINDOW_VISIBLE_MINIMUM = 5;
+			WINDOW_RESHAPE_THICKNESS = 10, // COMMENT external
+			WINDOW_DRAG_BAR_THICKNESS = 10, // COMMENT internal top
+			WINDOW_VISIBLE_MINIMUM = 10;
 
 	public GuiWindow(Rectangle2D rectangle, D data) { super(rectangle, data); }
 
@@ -47,7 +47,7 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 	protected Shape adaptToBounds(IGuiReshapeHandler handler, GuiComponent<?> invoker, Rectangle2D rectangle) { return rectangle; }
 
 	@Override
-	public boolean isMouseOver(AffineTransformStack stack, Point2D mouse) { return isBeingDragged() || stack.delegated.peek().createTransformedShape(CacheKeys.RECTANGLE_CLICKABLE.get(this)).contains(mouse); }
+	public boolean contains(AffineTransformStack stack, Point2D point) { return data.isActive() && (isBeingDragged() || stack.delegated.peek().createTransformedShape(CacheKeys.RECTANGLE_CLICKABLE.get(this)).contains(point)); }
 
 	@Override
 	protected void transformChildren(AffineTransformStack stack) {

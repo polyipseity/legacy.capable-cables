@@ -5,29 +5,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.annotation.Testable;
 
 import static $group__.utilities.MiscellaneousUtilities.getDefaultValue;
-import static $group__.utilities.MiscellaneousUtilities.getDefaultValueNonnull;
 import static $group__.utilities.Primitives.PRIMITIVE_DATA_TYPE_SET;
-import static $group__.utilities.Primitives.PRIMITIVE_TYPE_SET;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
-import static tests.TestUtilities.consumeCaught;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Testable
 public class MiscellaneousUtilitiesTest {
 	@Test
 	void testMarkUnused() {
 		// COMMENT positive
-		PRIMITIVE_DATA_TYPE_SET.forEach(MiscellaneousUtilities::getDefaultValueNonnull);
-		assertNull(getDefaultValue(null));
+		PRIMITIVE_DATA_TYPE_SET.forEach(type -> assertTrue(MiscellaneousUtilities.getDefaultValue(type).isPresent()));
 
 		// COMMENT negative
-		try {
-			PRIMITIVE_TYPE_SET.forEach(MiscellaneousUtilities::getDefaultValueNonnull);
-			fail("Should have caught NullPointerException");
-		} catch (NullPointerException e) { consumeCaught(e); }
-		try {
-			getDefaultValueNonnull(Object.class);
-			fail("Should have caught NullPointerException");
-		} catch (NullPointerException e) { consumeCaught(e); }
+		assertFalse(getDefaultValue(null).isPresent());
+		assertFalse(getDefaultValue(Object.class).isPresent());
 	}
 }

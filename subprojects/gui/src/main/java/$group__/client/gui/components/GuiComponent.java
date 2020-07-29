@@ -5,8 +5,10 @@ import $group__.client.gui.structures.*;
 import $group__.client.gui.structures.GuiCache.CacheKey;
 import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
+import $group__.client.gui.utilities.GLUtilities;
 import $group__.client.gui.utilities.GuiUtilities;
 import $group__.client.gui.utilities.Transforms.AffineTransforms;
+import $group__.utilities.specific.Streams;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import $group__.utilities.specific.ThrowableUtilities.Try;
 import com.google.common.collect.ImmutableList;
@@ -22,12 +24,13 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static $group__.client.gui.structures.GuiConstraint.CONSTRAINT_NONE_VALUE;
 import static $group__.client.gui.structures.GuiConstraint.getConstraintRectangleNone;
-import static $group__.utilities.Capacities.INITIAL_CAPACITY_1;
-import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
+import static $group__.utilities.Capacities.*;
 import static $group__.utilities.Casts.castUnchecked;
 import static $group__.utilities.MiscellaneousUtilities.K;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
@@ -40,23 +43,28 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 	@Nullable
 	protected WeakReference<GuiContainer<?>> parent = null;
 	protected Shape shape; // COMMENT relative-to-parent shape
+	protected List<Runnable> tasks = new ArrayList<>(INITIAL_CAPACITY_3);
 
 	public GuiComponent(Shape shape, D data) {
 		this.shape = shape;
 		this.data = data;
+
+		data.events.dActivate.add(this::onActivate);
+		data.events.dDeactivate.add(this::onDeactivate);
+		schedule(() -> data.setActive(data.isActive()));
 	}
+
+	public void onActivate(Events.DActivateParameter parameter) {}
 
 	public static Rectangle2D getShapePlaceholder() { return (Rectangle2D) SHAPE_PLACEHOLDER.clone(); }
 
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-		AffineTransform transform = stack.delegated.peek();
-		Rectangle2D r = transform.createTransformedShape(getShape()).getBounds2D(),
-				r2 = (Rectangle2D) r.clone();
-		data.constraints.forEach(c -> c.accept(r2));
-		if (!r.equals(r2))
-			Try.call(() -> AffineTransforms.getTransformFromTo(r, r2), data.logger.get()).ifPresent(t -> CacheKey.RESHAPE_HANDLER.get(this).reshape(this, this, t.createTransformedShape(getShape())));
+	public void onDeactivate(Events.DDeactivateParameter parameter) {
+		GuiRoot<?, ?> root = CacheKey.ROOT.get(this);
+		AffineTransformStack stack = new AffineTransformStack();
+		Point2D cursor = GLUtilities.getCursorPos();
+		getDragInfo().forEach((b, d) -> root.getDragInfo(b).ifPresent(dR -> root.onMouseDragged(stack, dR, (Point2D) cursor.clone(), b)));
+		data.getKeysPressingView().forEach(k -> root.onKeyReleased(k.key, k.scanCode, k.modifiers));
+		getParent().ifPresent(p -> p.data.setFocused(null));
 	}
 
 	public static GuiConstraint getConstraintMinimum() { return CONSTRAINT_MINIMUM.copy(); }
@@ -88,6 +96,10 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 
 	@SuppressWarnings("EmptyMethod")
 	protected void transformThis(AffineTransformStack stack) {}
+
+	public void schedule(Runnable task) { tasks.add(task); }
+
+	protected Map<Integer, GuiDragInfo> getDragInfo() { return getParent().map(p -> Streams.streamSmart(p.data.drags.values(), 1).filter(d -> d.dragged == this).collect(Collectors.toMap(d -> d.button, Function.identity()))).orElse(Collections.emptyMap()); }
 
 	@OverridingMethodsMustInvokeSuper
 	public void onAdded(GuiContainer<?> parentCurrent, int index) {
@@ -156,19 +168,32 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 	protected boolean isBeingFocused() { return getParent().filter(p -> p.data.focused == this).isPresent(); }
 
 	@Override
-	public boolean isMouseOver(AffineTransformStack stack, Point2D mouse) { return stack.delegated.peek().createTransformedShape(getShape()).contains(mouse); }
+	@OverridingMethodsMustInvokeSuper
+	public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
+		tasks.forEach(Runnable::run);
+		tasks.clear();
+		AffineTransform transform = stack.delegated.peek();
+		Rectangle2D r = transform.createTransformedShape(getShape()).getBounds2D(),
+				r2 = (Rectangle2D) r.clone();
+		data.constraints.forEach(c -> c.accept(r2));
+		if (!r.equals(r2))
+			Try.call(() -> AffineTransforms.getTransformFromTo(r, r2), data.logger.get()).ifPresent(t -> CacheKey.RESHAPE_HANDLER.get(this).reshape(this, this, t.createTransformedShape(getShape())));
+	}
+
+	@Override
+	public boolean contains(AffineTransformStack stack, Point2D mouse) { return data.isActive() && stack.delegated.peek().createTransformedShape(getShape()).contains(mouse); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public boolean onKeyPressed(int key, int scanCode, int modifiers) {
-		data.keyPresses.addLast(new GuiKeyPressInfo(key, scanCode, modifiers));
+		data.keysPressing.addLast(new GuiKeyPressInfo(key, scanCode, modifiers));
 		return false;
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public boolean onKeyReleased(int key, int scanCode, int modifiers) {
-		data.keyPresses.removeFirstOccurrence(new GuiKeyPressInfo(key, scanCode, modifiers));
+		data.keysPressing.removeFirstOccurrence(new GuiKeyPressInfo(key, scanCode, modifiers));
 		return false;
 	}
 
@@ -232,7 +257,9 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 		public final GuiAnchors anchors = new GuiAnchors();
 		public final GuiCache cache = new GuiCache();
 		public final E events;
-		protected final Deque<GuiKeyPressInfo> keyPresses = new ArrayDeque<>(INITIAL_CAPACITY_2);
+		protected final Deque<GuiKeyPressInfo> keysPressing = new ArrayDeque<>(INITIAL_CAPACITY_2);
+		public boolean visible = true;
+		protected boolean active = true;
 		public Supplier<Logger> logger;
 		protected EnumGuiState state = EnumGuiState.NEW;
 
@@ -241,7 +268,7 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 			this.logger = logger;
 		}
 
-		public ImmutableList<GuiKeyPressInfo> getKeyPresses() { return ImmutableList.copyOf(keyPresses); }
+		public ImmutableList<GuiKeyPressInfo> getKeysPressingView() { return ImmutableList.copyOf(keysPressing); }
 
 		public EnumGuiState getState() { return state; }
 
@@ -251,7 +278,15 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 			this.state = state;
 		}
 
+		public boolean isActive() { return active; }
 
+		public void setActive(boolean active) {
+			if (this.active != active) {
+				this.active = active;
+				if (active) events.fire(events.dActivate, new Events.DActivateParameter());
+				else events.fire(events.dDeactivate, new Events.DDeactivateParameter());
+			}
+		}
 	}
 
 	@OnlyIn(CLIENT)
@@ -263,6 +298,8 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 		public final List<Consumer<CCloseParameter>> cClose = new ArrayList<>(INITIAL_CAPACITY_2);
 		public final List<Consumer<CDestroyedParameter>> cDestroyed = new ArrayList<>(INITIAL_CAPACITY_2);
 		public final List<Consumer<CReshapeParameter>> cReshape = new ArrayList<>(INITIAL_CAPACITY_2);
+		public final List<Consumer<DActivateParameter>> dActivate = new ArrayList<>(INITIAL_CAPACITY_2);
+		public final List<Consumer<DDeactivateParameter>> dDeactivate = new ArrayList<>(INITIAL_CAPACITY_2);
 
 		public <T> void fire(List<Consumer<T>> listeners, T parameter) { ImmutableList.copyOf(listeners).forEach(l -> l.accept(parameter)); }
 
@@ -271,6 +308,11 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 			public final GuiComponent<?> component;
 
 			protected CParameter(GuiComponent<?> component) { this.component = component; }
+		}
+
+		@OnlyIn(CLIENT)
+		public static abstract class DParameter {
+			protected DParameter() {}
 		}
 
 		@OnlyIn(CLIENT)
@@ -358,5 +400,11 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 				this.shapePrevious = shapePrevious;
 			}
 		}
+
+		@OnlyIn(CLIENT)
+		public static class DActivateParameter extends DParameter {}
+
+		@OnlyIn(CLIENT)
+		public static class DDeactivateParameter extends DParameter {}
 	}
 }

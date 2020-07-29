@@ -5,7 +5,7 @@ import $group__.client.gui.ConstantsGui;
 import $group__.client.gui.structures.AffineTransformStack;
 import $group__.client.gui.structures.EnumGuiMouseClickResult;
 import $group__.client.gui.structures.GuiDragInfo;
-import $group__.client.gui.traits.IScreenBridge;
+import $group__.client.gui.traits.IScreenAdapter;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -18,7 +18,7 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
 public interface IGuiEventListenerComponent {
-	default boolean isMouseOver(AffineTransformStack stack, Point2D mouse) { return false; }
+	default boolean contains(AffineTransformStack stack, Point2D mouse) { return false; }
 
 	default void onMouseMoved(AffineTransformStack stack, Point2D mouse) {}
 
@@ -52,7 +52,7 @@ public interface IGuiEventListenerComponent {
 
 	@SuppressWarnings("DeprecatedIsStillUsed")
 	@OnlyIn(CLIENT)
-	interface IBridge extends IScreenBridge, IGuiEventListenerComponent, IGuiEventListener {
+	interface IAdapter extends IScreenAdapter, IGuiEventListenerComponent, IGuiEventListener {
 		@Override
 		@Deprecated
 		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
@@ -66,7 +66,11 @@ public interface IGuiEventListenerComponent {
 		@Override
 		@Deprecated
 		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-		default boolean mouseReleased(double mouseX, double mouseY, int button) { return onMouseReleased(getTransformStack(), new Point2D.Double(mouseX, mouseY), button); }
+		default boolean mouseReleased(double mouseX, double mouseY, int button) {
+			Point2D mouse = new Point2D.Double(mouseX, mouseY);
+			getDragInfo().forEach((i, d) -> onMouseDragged(getTransformStack(), d, (Point2D) mouse.clone(), i));
+			return onMouseReleased(getTransformStack(), mouse, button);
+		}
 
 		@Override
 		@Deprecated
@@ -101,6 +105,6 @@ public interface IGuiEventListenerComponent {
 		@Override
 		@Deprecated
 		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
-		default boolean isMouseOver(double mouseX, double mouseY) { return isMouseOver(getTransformStack(), new Point2D.Double(mouseX, mouseY)); }
+		default boolean isMouseOver(double mouseX, double mouseY) { return contains(getTransformStack(), new Point2D.Double(mouseX, mouseY)); }
 	}
 }

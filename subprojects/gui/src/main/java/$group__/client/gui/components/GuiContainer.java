@@ -31,6 +31,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.*;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
@@ -90,11 +91,10 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 		if (reshape) CacheKey.RESHAPE_HANDLER.get(this).reshape(this);
 	}
 
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-		super.renderPre(stack, mouse, partialTicks);
-		getChildren().forEach(c -> runChildTransformed(stack, c, () -> c.renderPre(stack, mouse, partialTicks)));
+	@SuppressWarnings("ConstantConditions")
+	protected static boolean onChangeFocusWithThisFocusable(GuiContainer<?> self, Function<Boolean, Boolean> superMethod, boolean next) {
+		return next ? self.getParent().map(GuiContainer::isBeingFocused).orElseGet(() -> !self.isBeingFocused()) || superMethod.apply(true) :
+				!self.isBeingFocused() && (superMethod.apply(false) || true);
 	}
 
 	@Override
@@ -108,36 +108,39 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 			GLStacks.push("stencilMask",
 					() -> RenderSystem.stencilMask(GLUtilities.GL_MASK_ALL_BITS), GLStacks.STENCIL_MASK_FALLBACK);
 
-			getChildren().forEach(c -> runChildTransformed(stack, c, () -> {
-				GLStacks.push("stencilFunc",
-						() -> RenderSystem.stencilFunc(GL11.GL_EQUAL, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLStacks.STENCIL_FUNC_FALLBACK);
-				GLStacks.push("stencilOp",
-						() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL14.GL_INCR_WRAP, GL14.GL_INCR_WRAP), GLStacks.STENCIL_OP_FALLBACK);
-				GLStacks.push("colorMask",
-						() -> RenderSystem.colorMask(false, false, false, false), GLStacks.COLOR_MASK_FALLBACK);
-				c.writeStencil(stack, mouse, partialTicks, true);
-				GLStacks.pop("colorMask");
-				GLStacks.pop("stencilOp");
-				GLStacks.pop("stencilFunc");
+			getChildren().forEach(c -> {
+				if (c.data.visible)
+					runChildTransformed(stack, c, () -> {
+						GLStacks.push("stencilFunc",
+								() -> RenderSystem.stencilFunc(GL11.GL_EQUAL, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLStacks.STENCIL_FUNC_FALLBACK);
+						GLStacks.push("stencilOp",
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL14.GL_INCR_WRAP, GL14.GL_INCR_WRAP), GLStacks.STENCIL_OP_FALLBACK);
+						GLStacks.push("colorMask",
+								() -> RenderSystem.colorMask(false, false, false, false), GLStacks.COLOR_MASK_FALLBACK);
+						c.writeStencil(stack, mouse, partialTicks, true);
+						GLStacks.pop("colorMask");
+						GLStacks.pop("stencilOp");
+						GLStacks.pop("stencilFunc");
 
-				GLStacks.push("stencilFunc",
-						() -> RenderSystem.stencilFunc(GL11.GL_LESS, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLStacks.STENCIL_FUNC_FALLBACK);
+						GLStacks.push("stencilFunc",
+								() -> RenderSystem.stencilFunc(GL11.GL_LESS, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLStacks.STENCIL_FUNC_FALLBACK);
 
-				GLStacks.push("stencilOp",
-						() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP), GLStacks.STENCIL_OP_FALLBACK);
-				c.render(stack, mouse, partialTicks);
-				GLStacks.pop("stencilOp");
+						GLStacks.push("stencilOp",
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP), GLStacks.STENCIL_OP_FALLBACK);
+						c.render(stack, mouse, partialTicks);
+						GLStacks.pop("stencilOp");
 
-				GLStacks.push("stencilOp",
-						() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_REPLACE, GL11.GL_REPLACE), GLStacks.STENCIL_OP_FALLBACK);
-				GLStacks.push("colorMask",
-						() -> RenderSystem.colorMask(false, false, false, false), GLStacks.COLOR_MASK_FALLBACK);
-				c.writeStencil(stack, mouse, partialTicks, false);
-				GLStacks.pop("colorMask");
-				GLStacks.pop("stencilOp");
+						GLStacks.push("stencilOp",
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_REPLACE, GL11.GL_REPLACE), GLStacks.STENCIL_OP_FALLBACK);
+						GLStacks.push("colorMask",
+								() -> RenderSystem.colorMask(false, false, false, false), GLStacks.COLOR_MASK_FALLBACK);
+						c.writeStencil(stack, mouse, partialTicks, false);
+						GLStacks.pop("colorMask");
+						GLStacks.pop("stencilOp");
 
-				GLStacks.pop("stencilFunc");
-			}));
+						GLStacks.pop("stencilFunc");
+					});
+			});
 
 			GLStacks.pop("stencilMask");
 			GLStacks.pop("GL_STENCIL_TEST");
@@ -147,17 +150,20 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 					() -> GL11.glDisable(GL11.GL_SCISSOR_TEST));
 			int[] boundsBox = new int[4];
 			GLState.getIntegerValue(GL11.GL_SCISSOR_BOX, boundsBox);
-			getChildren().forEach(c -> runChildTransformed(stack, c, () -> {
-				ObjectUtilities.acceptRectangle(
-						CoordinateConverters.toNativeRectangle(this,
-								ObjectUtilities.getRectangleExpanded(stack.delegated.peek().createTransformedShape(c.getShape().getBounds2D()).getBounds2D()))
-								.createIntersection(new Rectangle2D.Double(boundsBox[0], boundsBox[1], boundsBox[2], boundsBox[3])),
-						(x, y) -> (w, h) -> GLStacks.push("glScissor",
-								() -> GLState.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{x.intValue(), y.intValue(), w.intValue(), h.intValue()},
-										(i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3])), GLStacks.GL_SCISSOR_FALLBACK));
-				c.render(stack, mouse, partialTicks);
-				GLStacks.pop("glScissor");
-			}));
+			getChildren().forEach(c -> {
+				if (c.data.visible)
+					runChildTransformed(stack, c, () -> {
+						ObjectUtilities.acceptRectangle(
+								CoordinateConverters.toNativeRectangle(this,
+										ObjectUtilities.getRectangleExpanded(stack.delegated.peek().createTransformedShape(c.getShape().getBounds2D()).getBounds2D()))
+										.createIntersection(new Rectangle2D.Double(boundsBox[0], boundsBox[1], boundsBox[2], boundsBox[3])),
+								(x, y) -> (w, h) -> GLStacks.push("glScissor",
+										() -> GLState.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{x.intValue(), y.intValue(), w.intValue(), h.intValue()},
+												(i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3])), GLStacks.GL_SCISSOR_FALLBACK));
+						c.render(stack, mouse, partialTicks);
+						GLStacks.pop("glScissor");
+					});
+			});
 			GLStacks.pop("GL_SCISSOR_TEST");
 		}
 	}
@@ -306,7 +312,20 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 	public boolean onCharTyped(char codePoint, int modifiers) { return data.getFocused().filter(f -> f.onCharTyped(codePoint, modifiers)).isPresent(); }
 
 	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
+		super.renderPre(stack, mouse, partialTicks);
+		getChildren().forEach(c -> {
+			if (c.data.visible)
+				runChildTransformed(stack, c, () -> c.renderPre(stack, mouse, partialTicks));
+		});
+	}
+
+	public ImmutableList<GuiComponent<?>> getChildrenView() { return ImmutableList.copyOf(getChildren()); }
+
+	@Override
 	public boolean onChangeFocus(boolean next) {
+		// TODO does not seem like working
 		Optional<GuiComponent<?>> foc = data.getFocused();
 		if (foc.filter(f -> f.onChangeFocus(next)).isPresent())
 			return true;
@@ -332,11 +351,9 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 		}
 	}
 
-	public ImmutableList<GuiComponent<?>> getChildrenView() { return ImmutableList.copyOf(getChildren()); }
-
 	protected Optional<GuiComponent<?>> getChildMouseOver(AffineTransformStack stack, Point2D mouse) {
 		for (GuiComponent<?> c : Lists.reverse(getChildren())) {
-			if (getChildTransformed(stack, c, () -> c.isMouseOver(stack, mouse)))
+			if (getChildTransformed(stack, c, () -> c.contains(stack, mouse)))
 				return Optional.of(c);
 		}
 		return Optional.empty();
@@ -362,7 +379,5 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 			@Nullable GuiComponent<?> from = MiscellaneousUtilities.KNullable(focused, focused = component);
 			getFocused().ifPresent(f -> f.onFocusGet(from));
 		}
-
-
 	}
 }

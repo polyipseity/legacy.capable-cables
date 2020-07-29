@@ -20,6 +20,7 @@ import $group__.client.gui.utilities.Tooltips;
 import $group__.client.gui.utilities.Transforms.AffineTransforms;
 import $group__.utilities.specific.Maps;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
+import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -45,17 +46,15 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static $group__.utilities.Capacities.INITIAL_CAPACITY_1;
-import static $group__.utilities.Capacities.INITIAL_CAPACITY_3;
 import static $group__.utilities.Casts.castUncheckedUnboxedNonnull;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 
 @OnlyIn(CLIENT)
-public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container> extends GuiContainer<D> implements IRenderableComponent.IBridge, IGuiEventListenerComponent.IBridge, IGuiShapeRectangle, IGuiLifecycleHandler, IGuiReshapeHandler {
+public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container> extends GuiContainer<D> implements IRenderableComponent.IAdapter, IGuiEventListenerComponent.IAdapter, IGuiShapeRectangle, IGuiLifecycleHandler, IGuiReshapeHandler {
 	public final Screen screen;
 	protected final FakeParent fakeParent = new FakeParent();
 	protected final AffineTransformStack stack = new AffineTransformStack();
-	protected List<Runnable> tasks = new ArrayList<>(INITIAL_CAPACITY_3);
 
 	protected GuiRoot(ITextComponent title, D data) {
 		super(getShapePlaceholder(), data);
@@ -69,8 +68,6 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 	}
 
 	protected Screen makeScreen(ITextComponent title, boolean hasContainer) { return hasContainer ? new ScreenAdaptedWithContainer(title) : new ScreenAdapted(title); }
-
-	public void schedule(Runnable task) { tasks.add(task); }
 
 	@SuppressWarnings("SameReturnValue")
 	public boolean isPaused() { return false; }
@@ -97,8 +94,6 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		GLUtilities.GLStacks.clearAll();
 		RenderSystem.clear(GL11.GL_STENCIL_BUFFER_BIT, Minecraft.IS_RUNNING_ON_MAC);
-		tasks.forEach(Runnable::run);
-		tasks.clear();
 		super.render(stack, mouse, partialTicks);
 	}
 
@@ -152,8 +147,8 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 		AffineTransformStack stack = new AffineTransformStack();
 		Point2D cursor = GLUtilities.getCursorPos();
 		data.getDragsView().forEach((i, d) -> onMouseDragged(stack, d, (Point2D) cursor.clone(), i));
-		onMouseHovered(new AffineTransformStack(), (Point2D) cursor.clone());
-		new ArrayDeque<>(data.getKeyPresses()).forEach(k -> onKeyReleased(k.key, k.scanCode, k.modifiers));
+		onMouseHovered(new AffineTransformStack(), cursor);
+		data.getKeysPressingView().forEach(k -> onKeyReleased(k.key, k.scanCode, k.modifiers));
 
 		Minecraft client = getScreen().getMinecraft();
 		client.deferTask(() -> client.displayGuiScreen(null));
@@ -180,12 +175,6 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 		return ret;
 	}
 
-	@Override
-	public boolean onMouseReleased(AffineTransformStack stack, Point2D mouse, int button) {
-		data.getDragsView().forEach((i, d) -> onMouseDragged(stack, d, mouse, i));
-		return super.onMouseReleased(stack, mouse, button);
-	}
-
 	public Screen getScreen() { return screen; }
 
 	@Override
@@ -199,6 +188,9 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 
 	@Override
 	public Optional<GuiDragInfo> getDragInfo(int button) { return Optional.ofNullable(fakeParent.drags.get(button)); }
+
+	@Override
+	public Map<Integer, GuiDragInfo> getDragInfo() { return ImmutableMap.copyOf(fakeParent.drags); }
 
 	public <T extends Screen & IHasContainer<C>> T getContainerScreen() {
 		if (data.container == null) throw BecauseOf.unsupportedOperation();
@@ -233,7 +225,7 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 		public final List<Consumer<DBackgroundSetParameter>> dBackgroundSet = new ArrayList<>(INITIAL_CAPACITY_1);
 
 		@OnlyIn(CLIENT)
-		public static final class DBackgroundSetParameter {
+		public static final class DBackgroundSetParameter extends DParameter {
 			@Nullable
 			public final GuiBackground<?, ?> previous, current;
 

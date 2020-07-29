@@ -7,6 +7,7 @@ import $group__.client.gui.components.backgrounds.GuiBackgroundDefault;
 import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.components.roots.GuiRootWindows;
 import $group__.client.gui.structures.AffineTransformStack;
+import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -98,6 +99,7 @@ final class GuiDebug extends GuiRootWindows<GuiRoot.Data<GuiRoot.Events, Contain
 			GuiWindow<?> window2 = new GuiWindow<GuiWindow.Data<?, ?>>(new Rectangle2D.Double(50, 50, 200, 200),
 					new GuiWindow.Data<>(new GuiComponent.Events(), GuiDebug::getLogger, new GuiWindow.Data.ColorData())) {
 				protected double rotation = 0;
+				protected int tick = 0;
 
 				@Override
 				public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
@@ -114,23 +116,44 @@ final class GuiDebug extends GuiRootWindows<GuiRoot.Data<GuiRoot.Events, Contain
 					transform.rotate(Math.toRadians(rotation), r.getX() + 50, r.getY() + 50);
 					transform.scale(1.5, 0.5);
 				}
+
+				@Override
+				public void onTick(IGuiLifecycleHandler handler, GuiComponent<?> invoker) {
+					tick = (tick + 1) % 100;
+					if (tick == 0)
+						data.setActive(!data.isActive());
+					super.onTick(handler, invoker);
+				}
 			};
 			{
 				GuiButton<?> button;
 				{
 					Random random = new Random();
-					button = new GuiButton.Functional<>(new Ellipse2D.Double(0, 0, 100, 100),
-							new GuiButton.Functional.Data<>(new GuiComponent.Events(), GuiDebug::getLogger, new GuiButton.Data.ColorData(),
-									(b, i) -> i == GLFW.GLFW_MOUSE_BUTTON_LEFT,
-									(b, i) -> {
-										b.data.colors.setBase(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-												.setBaseBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-												.setHovering(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-												.setHoveringBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-												.setClicking(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-												.setClickingBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()));
-										return true;
-									}));
+					button = new GuiButton<GuiButton.Data<?, ?>>(new Ellipse2D.Double(0, 0, 100, 100),
+							new GuiButton.Data<>(new GuiComponent.Events(), GuiDebug::getLogger, new GuiButton.Data.ColorData())) {
+						@Override
+						protected boolean onButtonKeyboardPressed(int key, int scanCode, int modifiers) { return key == GLFW.GLFW_KEY_ENTER; }
+
+						@Override
+						protected boolean onButtonMousePressed(int button) { return button == GLFW.GLFW_MOUSE_BUTTON_LEFT; }
+
+						@Override
+						protected boolean onButtonMouseReleased(int button) { return button == GLFW.GLFW_MOUSE_BUTTON_LEFT && onActivate(); }
+
+						protected boolean onActivate() {
+							data.colors.setBase(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+									.setBaseBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+									.setHovering(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+									.setHoveringBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+									.setClicking(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
+									.setClickingBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()));
+							data.visible = !data.visible;
+							return true;
+						}
+
+						@Override
+						protected boolean onButtonKeyboardReleased(int key, int scanCode, int modifiers) { return key == GLFW.GLFW_KEY_ENTER && onActivate(); }
+					};
 				}
 
 				window2.add(button);

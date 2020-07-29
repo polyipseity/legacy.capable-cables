@@ -14,20 +14,21 @@ import org.lwjgl.system.MemoryUtil;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
 public abstract class GuiButton<D extends GuiButton.Data<?, ?>> extends GuiContainer<D> {
+	protected boolean keyPressing = false;
+
 	public GuiButton(Shape shape, D data) { super(shape, data); }
 
 	@Override
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		AffineTransform transform = stack.delegated.peek();
 		Shape transformed = transform.createTransformedShape(getShape());
-		if (isBeingDragged() && transformed.contains(mouse)) {
+		if (keyPressing || (isBeingDragged() && transformed.contains(mouse))) {
 			GuiUtilities.DrawingUtilities.drawShape(transformed, true, data.colors.clicking, 0);
 			GuiUtilities.DrawingUtilities.drawShape(transformed, false, data.colors.clickingBorder, 0);
 		} else if (isBeingHovered()) {
@@ -47,24 +48,34 @@ public abstract class GuiButton<D extends GuiButton.Data<?, ?>> extends GuiConta
 	}
 
 	@Override
-	public EnumGuiMouseClickResult onMouseClicked(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) {
-		EnumGuiMouseClickResult ret = super.onMouseClicked(stack, drag, mouse, button);
-		if (ret.result) return ret;
-		return onButtonClicked(button) ? EnumGuiMouseClickResult.DRAG : EnumGuiMouseClickResult.PASS;
-	}
+	public boolean onKeyPressed(int key, int scanCode, int modifiers) { return super.onKeyPressed(key, scanCode, modifiers) || (keyPressing = onButtonKeyboardPressed(key, scanCode, modifiers)); }
 
-	protected abstract boolean onButtonClicked(int button);
+	protected abstract boolean onButtonKeyboardPressed(int key, int scanCode, int modifiers);
+
+	@SuppressWarnings("ConstantConditions")
+	@Override
+	public boolean onKeyReleased(int key, int scanCode, int modifiers) { return super.onKeyReleased(key, scanCode, modifiers) || keyPressing && onButtonKeyboardReleased(key, scanCode, modifiers) && !(keyPressing = false); }
 
 	@Override
-	public boolean onMouseDragged(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) {
-		if (super.onMouseDragged(stack, drag, mouse, button)) return true;
-		return stack.delegated.peek().createTransformedShape(getShape()).contains(mouse) && onButtonActivated(button);
+	public EnumGuiMouseClickResult onMouseClicked(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) {
+		EnumGuiMouseClickResult ret = super.onMouseClicked(stack, drag, mouse, button);
+		return ret.result ? ret : onButtonMousePressed(button) ? EnumGuiMouseClickResult.DRAG : EnumGuiMouseClickResult.PASS;
 	}
 
-	protected abstract boolean onButtonActivated(int button);
+	protected abstract boolean onButtonMousePressed(int button);
+
+	@Override
+	public boolean onMouseDragged(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) { return super.onMouseDragged(stack, drag, mouse, button) || stack.delegated.peek().createTransformedShape(getShape()).contains(mouse) && onButtonMouseReleased(button); }
 
 	@Override
 	public void onMouseHover(AffineTransformStack stack, Point2D mouse) { GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), EnumCursor.STANDARD_HAND_CURSOR.handle); }
+
+	protected abstract boolean onButtonMouseReleased(int button);
+
+	@Override
+	public boolean onChangeFocus(boolean next) { return onChangeFocusWithThisFocusable(this, super::onChangeFocus, next); }
+
+	protected abstract boolean onButtonKeyboardReleased(int key, int scanCode, int modifiers);
 
 	@OnlyIn(CLIENT)
 	public static class Data<E extends Events, C extends Data.ColorData> extends GuiContainer.Data<E> {
@@ -111,30 +122,6 @@ public abstract class GuiButton<D extends GuiButton.Data<?, ?>> extends GuiConta
 			public ColorData setClickingBorder(Color clickingBorder) {
 				this.clickingBorder = clickingBorder;
 				return this;
-			}
-		}
-	}
-
-	@OnlyIn(CLIENT)
-	public static class Functional<D extends Functional.Data<?, ?>> extends GuiButton<D> {
-		public Functional(Shape shape, D data) { super(shape, data); }
-
-		@Override
-		protected boolean onButtonClicked(int button) { return data.filter.apply(this, button); }
-
-		@Override
-		protected boolean onButtonActivated(int button) { return data.activator.apply(this, button); }
-
-		@OnlyIn(CLIENT)
-		public static class Data<E extends Events, C extends GuiButton.Data.ColorData> extends GuiButton.Data<E, C> {
-			protected BiFunction<GuiButton.Functional<?>, Integer, Boolean> filter, activator;
-
-			public Data(E events, Supplier<Logger> logger, C colors,
-			            BiFunction<GuiButton.Functional<?>, Integer, Boolean> filter,
-			            BiFunction<GuiButton.Functional<?>, Integer, Boolean> activator) {
-				super(events, logger, colors);
-				this.filter = filter;
-				this.activator = activator;
 			}
 		}
 	}

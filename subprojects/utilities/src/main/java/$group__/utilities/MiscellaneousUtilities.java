@@ -1,9 +1,11 @@
 package $group__.utilities;
 
+import $group__.utilities.specific.Streams;
+
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-import static $group__.utilities.Casts.castUncheckedUnboxed;
+import static $group__.utilities.Casts.castUnchecked;
 import static $group__.utilities.Primitives.PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP;
 
 /**
@@ -16,7 +18,11 @@ import static $group__.utilities.Primitives.PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE
 public enum MiscellaneousUtilities {
 	/* MARK empty */;
 
-	public static <T> Optional<T> getDefaultValue(@Nullable Class<T> type) { return Optional.ofNullable(type).flatMap(tClass -> PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet().stream().filter(e -> e.getKey().isAssignableFrom(tClass)).findFirst().map(e -> castUncheckedUnboxed(e.getValue()))); }
+	public static <T> Optional<T> getDefaultValue(@Nullable Class<T> type) {
+		return Optional.ofNullable(type)
+				.flatMap(tClass -> Streams.streamSmart(PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet(), 3).filter(e -> e.getKey().isAssignableFrom(tClass)).findFirst())
+				.flatMap(e -> castUnchecked(e.getValue()));
+	}
 
 
 	/**

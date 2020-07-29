@@ -19,9 +19,7 @@ public abstract class GuiBackground<D extends GuiComponent.Data<E>, E extends Gu
 	public GuiBackground(D data) { super(getShapePlaceholder(), data); }
 
 	@Override
-	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-		renderBackground(stack, CacheKey.ROOT.get(this).getScreen(), mouse, partialTicks);
-	}
+	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) { renderBackground(stack, CacheKey.ROOT.get(this).getScreen(), mouse, partialTicks); }
 
 	public void renderBackground(AffineTransformStack stack, Screen screen, Point2D mouse, float partialTicks) { GuiUtilities.GuiBackgrounds.drawnBackground(screen); }
 

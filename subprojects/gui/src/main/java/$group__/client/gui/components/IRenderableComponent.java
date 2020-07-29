@@ -4,7 +4,7 @@ import $group__.annotations.OverridingStatus;
 import $group__.client.gui.ConstantsGui;
 import $group__.client.gui.structures.AffineTransformStack;
 import $group__.client.gui.structures.EnumGuiState;
-import $group__.client.gui.traits.IScreenBridge;
+import $group__.client.gui.traits.IScreenAdapter;
 import net.minecraft.client.gui.IRenderable;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -23,13 +23,13 @@ public interface IRenderableComponent {
 	////////// Deprecated //////////
 
 	@OnlyIn(CLIENT)
-	interface IBridge extends IScreenBridge, IRenderableComponent, IRenderable {
+	interface IAdapter extends IScreenAdapter, IRenderableComponent, IRenderable {
 		@Override
 		@Deprecated
 		@OverridingStatus(group = ConstantsGui.GROUP, when = When.NEVER)
 		default void render(int mouseX, int mouseY, float partialTicks) {
 			Point2D mouse = new Point2D.Double(mouseX, mouseY);
-			if (EnumGuiState.READY.isReachedBy(getRoot().data.getState())) {
+			if (getRoot().data.visible && EnumGuiState.READY.isReachedBy(getRoot().data.getState())) {
 				renderPre(getTransformStack(), mouse, partialTicks);
 				render(getTransformStack(), mouse, partialTicks);
 			}
