@@ -282,9 +282,13 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 
 		public void setActive(boolean active) {
 			if (this.active != active) {
-				this.active = active;
-				if (active) events.fire(events.dActivate, new Events.DActivateParameter());
-				else events.fire(events.dDeactivate, new Events.DDeactivateParameter());
+				if (active) {
+					this.active = true;
+					events.fire(events.dActivate, new Events.DActivateParameter());
+				} else {
+					events.fire(events.dDeactivate, new Events.DDeactivateParameter());
+					this.active = false;
+				}
 			}
 		}
 	}

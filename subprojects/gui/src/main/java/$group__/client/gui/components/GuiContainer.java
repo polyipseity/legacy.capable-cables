@@ -209,13 +209,13 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 	@OverridingMethodsMustInvokeSuper
 	public boolean onKeyPressed(int key, int scanCode, int modifiers) {
 		super.onKeyPressed(key, scanCode, modifiers);
-		return data.getFocused().filter(f -> f.onKeyPressed(key, scanCode, modifiers)).isPresent();
+		return data.getFocused().filter(f -> f.data.isActive() && f.onKeyPressed(key, scanCode, modifiers)).isPresent();
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public boolean onKeyReleased(int key, int scanCode, int modifiers) {
-		boolean ret = data.getFocused().filter(f -> f.onKeyReleased(key, scanCode, modifiers)).isPresent();
+		boolean ret = data.getFocused().filter(f -> f.data.isActive() && f.onKeyReleased(key, scanCode, modifiers)).isPresent();
 		super.onKeyReleased(key, scanCode, modifiers);
 		return ret;
 	}
@@ -288,13 +288,13 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public boolean onMouseDragging(AffineTransformStack stack, GuiDragInfo drag, Rectangle2D mouse, int button) {
-		return Optional.ofNullable(data.drags.get(button)).map(d -> getChildTransformed(stack, d.dragged, () -> d.dragged.onMouseDragging(stack, d, mouse, button))).orElse(false);
+		return Optional.ofNullable(data.drags.get(button)).filter(d -> d.dragged.data.isActive() && getChildTransformed(stack, d.dragged, () -> d.dragged.onMouseDragging(stack, d, mouse, button))).isPresent();
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public boolean onMouseDragged(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) {
-		return Optional.ofNullable(data.drags.get(button)).map(d -> getChildTransformed(stack, d.dragged, () -> {
+		return Optional.ofNullable(data.drags.get(button)).map(d -> d.dragged.data.isActive() && getChildTransformed(stack, d.dragged, () -> {
 			boolean ret = d.dragged.onMouseDragged(stack, d, mouse, button);
 			data.drags.remove(button);
 			return ret;
@@ -309,7 +309,7 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public boolean onCharTyped(char codePoint, int modifiers) { return data.getFocused().filter(f -> f.onCharTyped(codePoint, modifiers)).isPresent(); }
+	public boolean onCharTyped(char codePoint, int modifiers) { return data.getFocused().filter(f -> f.data.isActive() && f.onCharTyped(codePoint, modifiers)).isPresent(); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -327,7 +327,7 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 	public boolean onChangeFocus(boolean next) {
 		// TODO does not seem like working
 		Optional<GuiComponent<?>> foc = data.getFocused();
-		if (foc.filter(f -> f.onChangeFocus(next)).isPresent())
+		if (foc.filter(f -> f.data.isActive() && f.onChangeFocus(next)).isPresent())
 			return true;
 		else {
 			int i = foc.filter(f -> getChildren().contains(f))
@@ -340,7 +340,7 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 
 			while (canAdvance.getAsBoolean()) {
 				GuiComponent<?> advanced = advance.get();
-				if (advanced.onChangeFocus(next)) {
+				if (advanced.data.isActive() && advanced.onChangeFocus(next)) {
 					data.setFocused(advanced);
 					return true;
 				}
