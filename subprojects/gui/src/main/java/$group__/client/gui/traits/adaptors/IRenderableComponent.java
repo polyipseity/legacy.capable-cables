@@ -15,7 +15,7 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 @SuppressWarnings("SpellCheckingInspection")
 @OnlyIn(CLIENT)
 public interface IRenderableComponent {
-	void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks);
+	void renderTick(AffineTransformStack stack, Point2D mouse, float partialTicks);
 
 	void render(AffineTransformStack stack, Point2D mouse, float partialTicks);
 
@@ -29,7 +29,7 @@ public interface IRenderableComponent {
 		default void render(int mouseX, int mouseY, float partialTicks) {
 			Point2D mouse = new Point2D.Double(mouseX, mouseY);
 			if (getRoot().data.visible && EnumGuiState.READY.isReachedBy(getRoot().data.getState())) {
-				renderPre(getTransformStack(), mouse, partialTicks);
+				renderTick(getTransformStack(), mouse, partialTicks);
 				render(getTransformStack(), mouse, partialTicks);
 			}
 			getRoot().onMouseHovering(getTransformStack(), mouse);

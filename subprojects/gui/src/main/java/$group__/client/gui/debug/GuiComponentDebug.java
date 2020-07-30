@@ -102,9 +102,9 @@ final class GuiDebug extends GuiRootWindows<GuiRoot.Data<GuiRoot.Events, Contain
 				protected int tick = 0;
 
 				@Override
-				public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
+				public void renderTick(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 					rotation = (rotation + 0.25 * partialTicks) % 360;
-					super.renderPre(stack, mouse, partialTicks);
+					super.renderTick(stack, mouse, partialTicks);
 				}
 
 				@Override

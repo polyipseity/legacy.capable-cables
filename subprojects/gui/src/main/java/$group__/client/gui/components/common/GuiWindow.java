@@ -37,6 +37,7 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
 public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> implements IGuiReshapeHandler, IGuiShapeRectangle {
+	// TODO make window scroll bars, maybe create a new component, and embed into this
 	// TODO make value not hardcoded through themes
 	public static final int
 			WINDOW_RESHAPE_THICKNESS = 10, // COMMENT external
@@ -108,10 +109,10 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 	public void reshape(GuiComponent<?> invoker) { reshape(invoker, getRectangle()); }
 
 	@Override
-	public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
+	public void renderTick(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		GuiConstraint constraint = CacheKeys.CONSTRAINT.get(this);
 		data.constraints.add(constraint);
-		super.renderPre(stack, mouse, partialTicks);
+		super.renderTick(stack, mouse, partialTicks);
 		data.constraints.remove(constraint);
 	}
 

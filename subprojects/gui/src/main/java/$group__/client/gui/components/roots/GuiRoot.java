@@ -102,9 +102,9 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 	}
 
 	@Override
-	public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
+	public void renderTick(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		data.constraints.clear();
-		super.renderPre(stack, mouse, partialTicks);
+		super.renderTick(stack, mouse, partialTicks);
 	}
 
 	@Override

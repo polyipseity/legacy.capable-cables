@@ -312,11 +312,11 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-		super.renderPre(stack, mouse, partialTicks);
+	public void renderTick(AffineTransformStack stack, Point2D mouse, float partialTicks) {
+		super.renderTick(stack, mouse, partialTicks);
 		getChildren().forEach(c -> {
 			if (c.data.visible)
-				runChildTransformed(stack, c, () -> c.renderPre(stack, mouse, partialTicks));
+				runChildTransformed(stack, c, () -> c.renderTick(stack, mouse, partialTicks));
 		});
 	}
 
