@@ -1,6 +1,6 @@
 package $group__.utilities;
 
-public enum Grammar {
+public enum GrammarUtilities {
 	/* MARK empty */;
 
 

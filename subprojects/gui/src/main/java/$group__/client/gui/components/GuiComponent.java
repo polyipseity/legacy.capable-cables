@@ -10,7 +10,7 @@ import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
 import $group__.client.gui.utilities.GLUtilities;
 import $group__.client.gui.utilities.GuiUtilities;
 import $group__.client.gui.utilities.TransformUtilities.AffineTransformUtilities;
-import $group__.utilities.specific.Streams;
+import $group__.utilities.specific.StreamUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import $group__.utilities.specific.ThrowableUtilities.Try;
 import com.google.common.collect.ImmutableList;
@@ -32,9 +32,10 @@ import java.util.stream.Collectors;
 
 import static $group__.client.gui.structures.GuiConstraint.CONSTRAINT_NONE_VALUE;
 import static $group__.client.gui.structures.GuiConstraint.getConstraintRectangleNone;
-import static $group__.utilities.Capacities.*;
-import static $group__.utilities.Casts.castUnchecked;
-import static $group__.utilities.MiscellaneousUtilities.K;
+import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SINGLE;
+import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
+import static $group__.utilities.CastUtilities.castUnchecked;
+import static $group__.utilities.MiscellaneousUtilities.k;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
@@ -45,7 +46,7 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 	@Nullable
 	protected WeakReference<GuiContainer<?>> parent = null;
 	protected Shape shape; // COMMENT relative-to-parent shape
-	protected List<Runnable> tasks = new ArrayList<>(INITIAL_CAPACITY_3);
+	protected List<Runnable> tasks = new ArrayList<>(INITIAL_CAPACITY_SMALL);
 
 	public GuiComponent(Shape shape, D data) {
 		this.shape = shape;
@@ -84,7 +85,7 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 	public void setBounds(IGuiReshapeHandler handler, GuiComponent<?> invoker, Rectangle2D rectangle) {
 		Rectangle2D r = (Rectangle2D) rectangle.clone();
 		getConstraintMinimum().accept(r);
-		onReshape(handler, invoker, K(getShape(), shape = adaptToBounds(handler, invoker, r)));
+		onReshape(handler, invoker, k(getShape(), shape = adaptToBounds(handler, invoker, r)));
 	}
 
 	protected Shape getShape() { return shape; }
@@ -101,7 +102,7 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 
 	public void schedule(Runnable task) { tasks.add(task); }
 
-	protected Map<Integer, GuiDragInfo> getDragInfo() { return getParent().map(p -> Streams.streamSmart(p.data.drags.values(), 1).filter(d -> d.dragged == this).collect(Collectors.toMap(d -> d.button, Function.identity()))).orElse(Collections.emptyMap()); }
+	protected Map<Integer, GuiDragInfo> getDragInfo() { return getParent().map(p -> StreamUtilities.streamSmart(p.data.drags.values(), 1).filter(d -> d.dragged == this).collect(Collectors.toMap(d -> d.button, Function.identity()))).orElse(Collections.emptyMap()); }
 
 	@OverridingMethodsMustInvokeSuper
 	public void onAdded(GuiContainer<?> parentCurrent, int index) {
@@ -148,7 +149,7 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 
 	public <T> Optional<T> getNearestParentThatIs(Class<T> clazz) {
 		if (clazz.isAssignableFrom(getClass()))
-			return castUnchecked(this);
+			return Optional.of(castUnchecked(this));
 		else
 			return getParent().flatMap(p -> p.getNearestParentThatIs(clazz));
 	}
@@ -256,11 +257,11 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 
 	@OnlyIn(CLIENT)
 	public static class Data<E extends Events> {
-		public final Deque<GuiConstraint> constraints = new ArrayDeque<>(INITIAL_CAPACITY_1);
+		public final Deque<GuiConstraint> constraints = new ArrayDeque<>(INITIAL_CAPACITY_SINGLE);
 		public final GuiAnchors anchors = new GuiAnchors();
 		public final GuiCache cache = new GuiCache();
 		public final E events;
-		protected final Deque<GuiKeyPressInfo> keysPressing = new ArrayDeque<>(INITIAL_CAPACITY_2);
+		protected final Deque<GuiKeyPressInfo> keysPressing = new ArrayDeque<>(INITIAL_CAPACITY_SMALL);
 		public boolean visible = true;
 		protected boolean active = true;
 		public Supplier<Logger> logger;
@@ -298,15 +299,15 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 
 	@OnlyIn(CLIENT)
 	public static class Events {
-		public final List<Consumer<CAddedParameter>> cAdded = new ArrayList<>(INITIAL_CAPACITY_2);
-		public final List<Consumer<CRemovedParameter>> cRemoved = new ArrayList<>(INITIAL_CAPACITY_2);
-		public final List<Consumer<CInitializeParameter>> cInitialize = new ArrayList<>(INITIAL_CAPACITY_2);
-		public final List<Consumer<CTickParameter>> cTick = new ArrayList<>(INITIAL_CAPACITY_2);
-		public final List<Consumer<CCloseParameter>> cClose = new ArrayList<>(INITIAL_CAPACITY_2);
-		public final List<Consumer<CDestroyedParameter>> cDestroyed = new ArrayList<>(INITIAL_CAPACITY_2);
-		public final List<Consumer<CReshapeParameter>> cReshape = new ArrayList<>(INITIAL_CAPACITY_2);
-		public final List<Consumer<DActivateParameter>> dActivate = new ArrayList<>(INITIAL_CAPACITY_2);
-		public final List<Consumer<DDeactivateParameter>> dDeactivate = new ArrayList<>(INITIAL_CAPACITY_2);
+		public final List<Consumer<CAddedParameter>> cAdded = new ArrayList<>(INITIAL_CAPACITY_SMALL);
+		public final List<Consumer<CRemovedParameter>> cRemoved = new ArrayList<>(INITIAL_CAPACITY_SMALL);
+		public final List<Consumer<CInitializeParameter>> cInitialize = new ArrayList<>(INITIAL_CAPACITY_SMALL);
+		public final List<Consumer<CTickParameter>> cTick = new ArrayList<>(INITIAL_CAPACITY_SMALL);
+		public final List<Consumer<CCloseParameter>> cClose = new ArrayList<>(INITIAL_CAPACITY_SMALL);
+		public final List<Consumer<CDestroyedParameter>> cDestroyed = new ArrayList<>(INITIAL_CAPACITY_SMALL);
+		public final List<Consumer<CReshapeParameter>> cReshape = new ArrayList<>(INITIAL_CAPACITY_SMALL);
+		public final List<Consumer<DActivateParameter>> dActivate = new ArrayList<>(INITIAL_CAPACITY_SMALL);
+		public final List<Consumer<DDeactivateParameter>> dDeactivate = new ArrayList<>(INITIAL_CAPACITY_SMALL);
 
 		public <T> void fire(List<Consumer<T>> listeners, T parameter) { ImmutableList.copyOf(listeners).forEach(l -> l.accept(parameter)); }
 

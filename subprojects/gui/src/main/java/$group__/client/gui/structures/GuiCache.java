@@ -5,9 +5,9 @@ import $group__.client.gui.components.GuiContainer;
 import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
-import $group__.utilities.Casts;
-import $group__.utilities.Concurrency;
-import $group__.utilities.specific.Maps;
+import $group__.utilities.CastUtilities;
+import $group__.utilities.ConcurrencyUtilities;
+import $group__.utilities.specific.MapUtilities;
 import $group__.utilities.specific.ThrowableUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher;
@@ -22,17 +22,17 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
-import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
-import static $group__.utilities.Capacities.INITIAL_CAPACITY_3;
+import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_LARGE;
+import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
 public class GuiCache {
 	public final Cache<ResourceLocation, Object> delegated =
 			CacheBuilder.newBuilder()
-					.initialCapacity(INITIAL_CAPACITY_2)
-					.expireAfterAccess(Maps.CACHE_EXPIRATION_ACCESS_DURATION, Maps.CACHE_EXPIRATION_ACCESS_TIME_UNIT)
-					.concurrencyLevel(Concurrency.SINGLE_THREAD_THREAD_COUNT).build();
+					.initialCapacity(INITIAL_CAPACITY_SMALL)
+					.expireAfterAccess(MapUtilities.CACHE_EXPIRATION_ACCESS_DURATION, MapUtilities.CACHE_EXPIRATION_ACCESS_TIME_UNIT)
+					.concurrencyLevel(ConcurrencyUtilities.SINGLE_THREAD_THREAD_COUNT).build();
 
 	@OnlyIn(CLIENT)
 	public static abstract class CacheKey<C extends GuiComponent<?>, T> {
@@ -53,7 +53,7 @@ public class GuiCache {
 
 			@Override
 			public GuiRoot<?, ?> get0(GuiComponent<?> component) {
-				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected)), component.data.logger.get()).flatMap(Casts::<GuiRoot<?, ?>>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
+				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected)), component.data.logger.get()).map(CastUtilities::<GuiRoot<?, ?>>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
 			}
 		};
 		public static final CacheKey<GuiComponent<?>, IGuiLifecycleHandler> LIFECYCLE_HANDLER = new CacheKey<GuiComponent<?>, IGuiLifecycleHandler>(getKey("lifecycle_handler")) {
@@ -73,7 +73,7 @@ public class GuiCache {
 
 			@Override
 			public IGuiLifecycleHandler get0(GuiComponent<?> component) {
-				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(IGuiLifecycleHandler.class).orElseThrow(BecauseOf::unexpected)), component.data.logger.get()).flatMap(Casts::<IGuiLifecycleHandler>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
+				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(IGuiLifecycleHandler.class).orElseThrow(BecauseOf::unexpected)), component.data.logger.get()).map(CastUtilities::<IGuiLifecycleHandler>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
 			}
 		};
 		public static final CacheKey<GuiComponent<?>, IGuiReshapeHandler> RESHAPE_HANDLER = new CacheKey<GuiComponent<?>, IGuiReshapeHandler>(getKey("reshape_handler")) {
@@ -93,7 +93,7 @@ public class GuiCache {
 
 			@Override
 			public IGuiReshapeHandler get0(GuiComponent<?> component) {
-				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(IGuiReshapeHandler.class).orElseThrow(BecauseOf::unexpected)), component.data.logger.get()).flatMap(Casts::<IGuiReshapeHandler>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
+				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(IGuiReshapeHandler.class).orElseThrow(BecauseOf::unexpected)), component.data.logger.get()).map(CastUtilities::<IGuiReshapeHandler>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
 			}
 		};
 		public static final CacheKey<GuiComponent<?>, Integer> Z = new CacheKey<GuiComponent<?>, Integer>(getKey("z")) {
@@ -116,7 +116,7 @@ public class GuiCache {
 		};
 
 		public final ResourceLocation key;
-		protected final Set<C> initialized = new HashSet<>(INITIAL_CAPACITY_3);
+		protected final Set<C> initialized = new HashSet<>(INITIAL_CAPACITY_LARGE);
 
 		public CacheKey(ResourceLocation key) { this.key = key; }
 

@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 
+// todo maybe replace
 public class ConfigurationI18n {
 	protected String translationKey;
 	@Nullable

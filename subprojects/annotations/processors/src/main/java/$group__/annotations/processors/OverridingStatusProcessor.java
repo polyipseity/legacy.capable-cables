@@ -1,9 +1,9 @@
 package $group__.annotations.processors;
 
 import $group__.annotations.OverridingStatus;
-import $group__.utilities.Casts;
-import $group__.utilities.Processors;
-import $group__.utilities.specific.Streams;
+import $group__.utilities.CastUtilities;
+import $group__.utilities.ProcessorUtilities;
+import $group__.utilities.specific.StreamUtilities;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
@@ -25,8 +25,8 @@ import javax.tools.Diagnostic;
 import java.util.Collections;
 import java.util.Set;
 
-import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
-import static $group__.utilities.Capacities.INITIAL_CAPACITY_4;
+import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_ENORMOUS;
+import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
 @SuppressWarnings("unused")
 public final class OverridingStatusProcessor extends AbstractProcessor {
@@ -40,10 +40,10 @@ public final class OverridingStatusProcessor extends AbstractProcessor {
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 		if (annotations.size() != 1) return false;
 
-		SetMultimap<TypeElement, ExecutableElement> typeToExesMMap = MultimapBuilder.hashKeys(INITIAL_CAPACITY_4).hashSetValues(INITIAL_CAPACITY_2).build();
+		@SuppressWarnings("UnstableApiUsage") SetMultimap<TypeElement, ExecutableElement> typeToExesMMap = MultimapBuilder.hashKeys(INITIAL_CAPACITY_ENORMOUS).hashSetValues(INITIAL_CAPACITY_SMALL).build();
 		roundEnv.getElementsAnnotatedWith(OverridingStatus.class).forEach(e -> typeToExesMMap.put((TypeElement) e.getEnclosingElement(), (ExecutableElement) e));
 
-		Set<TypeElement> pkgFlat = Streams.streamSmart(roundEnv.getRootElements(), 5).filter(e -> e.asType().getKind() == TypeKind.DECLARED).map(Casts::<TypeElement>castUncheckedUnboxedNonnull).collect(ImmutableSet.toImmutableSet());
+		@SuppressWarnings("UnstableApiUsage") Set<TypeElement> pkgFlat = StreamUtilities.streamSmart(roundEnv.getRootElements(), 5).filter(e -> e.asType().getKind() == TypeKind.DECLARED).map(CastUtilities::<TypeElement>castUnchecked).collect(ImmutableSet.toImmutableSet());
 
 		Elements elements = processingEnv.getElementUtils();
 		Types types = processingEnv.getTypeUtils();
@@ -72,10 +72,10 @@ public final class OverridingStatusProcessor extends AbstractProcessor {
 						if (whenB == null)
 							messager.printMessage(Diagnostic.Kind.NOTE, "Does not override super method '" + superMethod + '\'', subclass);
 						else if (whenB) {
-							for (TypeElement superclass1 : Processors.getIntermediateSuperclasses(subclass,
+							for (TypeElement superclass1 : ProcessorUtilities.getIntermediateSuperclasses(subclass,
 									(TypeElement) types.asElement(superclass.getSuperclass()), types)) {
 								for (Element superMethod1 : superclass1.getEnclosedElements()) {
-									if (superMethod1.getKind() == ElementKind.METHOD && Processors.isElementFinal(superMethod1) && elements.overrides((ExecutableElement) superMethod1, superMethod, superclass1)) {
+									if (superMethod1.getKind() == ElementKind.METHOD && ProcessorUtilities.isElementFinal(superMethod1) && elements.overrides((ExecutableElement) superMethod1, superMethod, superclass1)) {
 										messager.printMessage(superclass1.getQualifiedName().toString().startsWith(a.group()) ? Diagnostic.Kind.WARNING : Diagnostic.Kind.NOTE, "Requirement impossible: cannot override final super method '" + superMethod1 + '\'');
 										return;
 									}
@@ -83,7 +83,7 @@ public final class OverridingStatusProcessor extends AbstractProcessor {
 							}
 							messager.printMessage(Diagnostic.Kind.ERROR, "Requirement unfulfilled: should override super" + ' ' + "method '" + superMethod + '\'');
 						}
-					} else if (Processors.getEffectiveAnnotationWithInheritingConsidered(OverridingStatus.class, subMethod, elements, types).equals(a)) {
+					} else if (ProcessorUtilities.getEffectiveAnnotationWithInheritingConsidered(OverridingStatus.class, subMethod, elements, types).equals(a)) {
 						if (whenB == null)
 							messager.printMessage(Diagnostic.Kind.NOTE, "Overrides super method '" + superMethod + '\'', subMethod);
 						else if (!whenB)

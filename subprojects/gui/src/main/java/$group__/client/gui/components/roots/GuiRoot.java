@@ -18,7 +18,7 @@ import $group__.client.gui.utilities.GuiUtilities.DrawingUtilities;
 import $group__.client.gui.utilities.TextComponentUtilities;
 import $group__.client.gui.utilities.TooltipUtilities;
 import $group__.client.gui.utilities.TransformUtilities.AffineTransformUtilities;
-import $group__.utilities.specific.Maps;
+import $group__.utilities.specific.MapUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -40,13 +40,17 @@ import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.*;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static $group__.utilities.Capacities.INITIAL_CAPACITY_1;
-import static $group__.utilities.Casts.castUncheckedUnboxedNonnull;
+import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SINGLE;
+import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_TINY;
+import static $group__.utilities.CastUtilities.castUnchecked;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 
@@ -190,16 +194,16 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 	public Optional<GuiDragInfo> getDragInfo(int button) { return Optional.ofNullable(fakeParent.drags.get(button)); }
 
 	@Override
-	public Map<Integer, GuiDragInfo> getDragInfo() { return ImmutableMap.copyOf(fakeParent.drags); }
+	public ImmutableMap<Integer, GuiDragInfo> getDragInfo() { return ImmutableMap.copyOf(fakeParent.drags); }
 
 	public <T extends Screen & IHasContainer<C>> T getContainerScreen() {
 		if (data.container == null) throw BecauseOf.unsupportedOperation();
-		return castUncheckedUnboxedNonnull(getScreen());
+		return castUnchecked(getScreen());
 	}
 
 	@OnlyIn(CLIENT)
 	protected static class FakeParent {
-		protected Map<Integer, GuiDragInfo> drags = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
+		protected ConcurrentMap<Integer, GuiDragInfo> drags = MapUtilities.getMapMakerSingleThread().initialCapacity(INITIAL_CAPACITY_TINY).makeMap();
 	}
 
 	@OnlyIn(CLIENT)
@@ -222,7 +226,7 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 
 	@OnlyIn(CLIENT)
 	public static class Events extends GuiComponent.Events {
-		public final List<Consumer<DBackgroundSetParameter>> dBackgroundSet = new ArrayList<>(INITIAL_CAPACITY_1);
+		public final List<Consumer<DBackgroundSetParameter>> dBackgroundSet = new ArrayList<>(INITIAL_CAPACITY_SINGLE);
 
 		@OnlyIn(CLIENT)
 		public static final class DBackgroundSetParameter extends DParameter {

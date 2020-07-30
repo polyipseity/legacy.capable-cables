@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
-import static $group__.utilities.specific.Streams.streamSmart;
+import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
+import static $group__.utilities.specific.StreamUtilities.streamSmart;
 
-public enum Processors {
+public enum ProcessorUtilities {
 	;
 
 	public static boolean isElementAbstract(Element element) { return element.getModifiers().contains(Modifier.ABSTRACT) || element.getKind().isInterface(); }
@@ -38,7 +38,7 @@ public enum Processors {
 	public static ImmutableSet<ImmutableSet<TypeElement>> getThisAndSuperclassesAndInterfaces(TypeElement type, Types types) { return new ImmutableSet.Builder<ImmutableSet<TypeElement>>().add(ImmutableSet.of(type)).addAll(getSuperclassesAndInterfaces(type, types)).build(); }
 
 	public static ImmutableSet<ImmutableSet<TypeElement>> getSuperclassesAndInterfaces(TypeElement type, Types types) {
-		LinkedHashSet<ImmutableSet<TypeElement>> r = new LinkedHashSet<>(INITIAL_CAPACITY_2);
+		LinkedHashSet<ImmutableSet<TypeElement>> r = new LinkedHashSet<>(INITIAL_CAPACITY_SMALL);
 
 		ImmutableSet<TypeElement> scs = getSuperclasses(type, types);
 		r.add(scs);
@@ -49,7 +49,7 @@ public enum Processors {
 			return next;
 		}))));
 		while (!cur.get().isEmpty()) r.add(ImmutableSet.copyOf(cur.getAndUpdate(c -> {
-			List<TypeElement> next = new ArrayList<>(INITIAL_CAPACITY_2);
+			List<TypeElement> next = new ArrayList<>(INITIAL_CAPACITY_SMALL);
 			c.forEach(t -> next.addAll(streamSmart(t.getInterfaces(), 2).map(m -> (TypeElement) types.asElement(m)).collect(Collectors.toList())));
 			return next;
 		})));

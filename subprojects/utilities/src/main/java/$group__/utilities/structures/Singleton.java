@@ -1,24 +1,25 @@
-package $group__.utilities;
+package $group__.utilities.structures;
 
+import $group__.utilities.CapacityUtilities;
+import $group__.utilities.CastUtilities;
+import $group__.utilities.specific.MapUtilities;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
-import static $group__.utilities.Dynamics.IMPL_LOOKUP;
-import static $group__.utilities.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
-import static $group__.utilities.specific.Maps.MAP_MAKER_MULTI_THREAD;
+import static $group__.utilities.DynamicUtilities.IMPL_LOOKUP;
+import static $group__.utilities.specific.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
 import static $group__.utilities.specific.ThrowableUtilities.*;
 import static com.google.common.collect.Maps.immutableEntry;
 import static java.lang.System.lineSeparator;
 import static java.lang.invoke.MethodType.methodType;
 
 public abstract class Singleton {
-	protected static final ConcurrentMap<Class<?>, Map.Entry<? extends Singleton, String>> INSTANCES =
-			MAP_MAKER_MULTI_THREAD.makeMap();
+	protected static final Map<Class<?>, Map.Entry<? extends Singleton, String>> INSTANCES = Collections.synchronizedMap(MapUtilities.getMapMakerSingleThread().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap());
 
 
 	protected Singleton(Logger logger) {
@@ -37,11 +38,11 @@ public abstract class Singleton {
 	}
 
 
-	public static <T extends Singleton> T getSingletonInstance(Class<T> clazz, @Nullable Logger logger) { return tryGetSingletonInstance(clazz, true, t -> Try.withLogging(() -> Try.call(() -> IMPL_LOOKUP.findConstructor(t, methodType(void.class)).invoke(), logger), logger).flatMap(Casts::castUnchecked)).orElseThrow(ThrowableCatcher::rethrow); }
+	public static <T extends Singleton> T getSingletonInstance(Class<T> clazz, @Nullable Logger logger) { return tryGetSingletonInstance(clazz, true, t -> Try.withLogging(() -> Try.call(() -> IMPL_LOOKUP.findConstructor(t, methodType(void.class)).invoke(), logger), logger).map(CastUtilities::castUnchecked)).orElseThrow(ThrowableCatcher::rethrow); }
 
 	public static <T extends Singleton> Optional<T> tryGetSingletonInstance(Class<T> clazz, boolean instantiate,
 	                                                                        Function<Class<T>, ? extends Optional<T>> instantiation) {
-		Optional<T> r = Optional.ofNullable(INSTANCES.get(clazz)).map(Map.Entry::getKey).flatMap(Casts::castUnchecked);
+		Optional<T> r = Optional.ofNullable(INSTANCES.get(clazz)).map(Map.Entry::getKey).map(CastUtilities::castUnchecked);
 		if (!r.isPresent() && instantiate) r = instantiation.apply(clazz);
 		return r;
 	}

@@ -1,6 +1,6 @@
 package $group__.utilities.specific;
 
-public class Strings {
+public class StringUtilities {
 	/* MARK empty */;
 
 

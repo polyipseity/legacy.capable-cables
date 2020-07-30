@@ -11,7 +11,7 @@ import $group__.client.gui.utilities.GLUtilities;
 import $group__.client.gui.utilities.GLUtilities.GLStacksUtilities;
 import $group__.client.gui.utilities.GuiUtilities;
 import $group__.client.gui.utilities.GuiUtilities.DrawingUtilities;
-import $group__.utilities.Casts;
+import $group__.utilities.CastUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import $group__.utilities.specific.ThrowableUtilities.Try;
 import net.minecraft.client.Minecraft;
@@ -119,27 +119,26 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 	public void onMouseHovering(AffineTransformStack stack, Point2D mouse) {
 		super.onMouseHovering(stack, mouse);
 		if (isBeingHovered() && !isBeingDragged()) {
-			Try.call(() -> ReferenceConverters.toRelativePoint(stack.delegated.peek(), mouse), data.logger.get())
-					.filter(c -> !getShape().contains(c)).map(c -> {
-				EnumSet<EnumGuiSide> sides = EnumGuiSide.getSidesMouseOver(getRectangle(), c);
-				if (sides.contains(EnumGuiSide.UP) && sides.contains(EnumGuiSide.LEFT)
-						|| sides.contains(EnumGuiSide.DOWN) && sides.contains(EnumGuiSide.RIGHT))
-					data.cursor = EnumCursor.EXTENSION_RESIZE_NW_SE_CURSOR;
-				else if (sides.contains(EnumGuiSide.UP) && sides.contains(EnumGuiSide.RIGHT)
-						|| sides.contains(EnumGuiSide.DOWN) && sides.contains(EnumGuiSide.LEFT))
-					data.cursor = EnumCursor.EXTENSION_RESIZE_NE_SW_CURSOR;
-				else if (sides.contains(EnumGuiSide.LEFT) || sides.contains(EnumGuiSide.RIGHT))
-					data.cursor = EnumCursor.STANDARD_RESIZE_HORIZONTAL_CURSOR;
-				else if (sides.contains(EnumGuiSide.UP) || sides.contains(EnumGuiSide.DOWN))
-					data.cursor = EnumCursor.STANDARD_RESIZE_VERTICAL_CURSOR;
-				else throw BecauseOf.unexpected();
-				GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), data.cursor.handle);
-				return c;
-			}).orElseGet(() -> {
+			if (!Try.call(() -> ReferenceConverters.toRelativePoint(stack.delegated.peek(), mouse), data.logger.get())
+					.filter(c -> !getShape().contains(c)).filter(c -> {
+						EnumSet<EnumGuiSide> sides = EnumGuiSide.getSidesMouseOver(getRectangle(), c);
+						if (sides.contains(EnumGuiSide.UP) && sides.contains(EnumGuiSide.LEFT)
+								|| sides.contains(EnumGuiSide.DOWN) && sides.contains(EnumGuiSide.RIGHT))
+							data.cursor = EnumCursor.EXTENSION_RESIZE_NW_SE_CURSOR;
+						else if (sides.contains(EnumGuiSide.UP) && sides.contains(EnumGuiSide.RIGHT)
+								|| sides.contains(EnumGuiSide.DOWN) && sides.contains(EnumGuiSide.LEFT))
+							data.cursor = EnumCursor.EXTENSION_RESIZE_NE_SW_CURSOR;
+						else if (sides.contains(EnumGuiSide.LEFT) || sides.contains(EnumGuiSide.RIGHT))
+							data.cursor = EnumCursor.STANDARD_RESIZE_HORIZONTAL_CURSOR;
+						else if (sides.contains(EnumGuiSide.UP) || sides.contains(EnumGuiSide.DOWN))
+							data.cursor = EnumCursor.STANDARD_RESIZE_VERTICAL_CURSOR;
+						else throw BecauseOf.unexpected();
+						GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), data.cursor.handle);
+						return true;
+					}).isPresent()) {
 				data.cursor = null;
 				GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), MemoryUtil.NULL);
-				return null;
-			});
+			}
 		}
 	}
 
@@ -229,7 +228,7 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 				return Try.call(() -> component.data.cache.delegated.get(key, () ->
 								new Rectangle2D.Double(component.getRectangle().getX(), component.getRectangle().getY(),
 										component.getRectangle().getWidth(), WINDOW_DRAG_BAR_THICKNESS)),
-						component.data.logger.get()).flatMap(Casts::<Rectangle2D>castUnchecked).orElseThrow(BecauseOf::unexpected);
+						component.data.logger.get()).map(CastUtilities::<Rectangle2D>castUnchecked).orElseThrow(BecauseOf::unexpected);
 			}
 		};
 		public static final CacheKey<GuiWindow<?>, Rectangle2D> RECTANGLE_CLICKABLE = new CacheKey<GuiWindow<?>, Rectangle2D>(getKey("rectangle_clickable")) {
@@ -244,7 +243,7 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 				return Try.call(() -> component.data.cache.delegated.get(key, () ->
 								GuiUtilities.ObjectUtilities.applyRectangle(component.getRectangle(), (x, y) -> (w, h) ->
 										new Rectangle2D.Double(x - WINDOW_RESHAPE_THICKNESS, y - WINDOW_RESHAPE_THICKNESS, w + WINDOW_RESHAPE_THICKNESS * 2, h + WINDOW_RESHAPE_THICKNESS * 2))),
-						component.data.logger.get()).flatMap(Casts::<Rectangle2D>castUnchecked).orElseThrow(BecauseOf::unexpected);
+						component.data.logger.get()).map(CastUtilities::<Rectangle2D>castUnchecked).orElseThrow(BecauseOf::unexpected);
 			}
 		};
 		public static final CacheKey<GuiWindow<?>, GuiConstraint> CONSTRAINT = new CacheKey<GuiWindow<?>, GuiConstraint>(getKey("constraint")) {
@@ -260,7 +259,7 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 					Rectangle2D rRoot = CacheKey.ROOT.get(component).getRectangleView();
 					return new GuiConstraint(new Rectangle2D.Double(0, 0, WINDOW_VISIBLE_MINIMUM, WINDOW_VISIBLE_MINIMUM),
 							new Rectangle2D.Double(rRoot.getMaxX() - WINDOW_VISIBLE_MINIMUM, rRoot.getMaxY() - WINDOW_VISIBLE_MINIMUM, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE));
-				}), component.data.logger.get()).flatMap(Casts::<GuiConstraint>castUnchecked).orElseThrow(BecauseOf::unexpected);
+				}), component.data.logger.get()).map(CastUtilities::<GuiConstraint>castUnchecked).orElseThrow(BecauseOf::unexpected);
 			}
 		};
 

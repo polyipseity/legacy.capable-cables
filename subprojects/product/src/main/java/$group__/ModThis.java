@@ -3,7 +3,7 @@ package $group__;
 import $group__.client.ProxyClient;
 import $group__.proxies.IProxy;
 import $group__.server.ProxyServer;
-import $group__.utilities.Singleton;
+import $group__.utilities.structures.Singleton;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -19,8 +19,8 @@ import static $group__.common.registrables.blocks.BlocksThis.BLOCKS;
 import static $group__.common.registrables.inventory.ContainersThis.CONTAINERS;
 import static $group__.common.registrables.items.ItemsThis.ITEMS;
 import static $group__.common.registrables.tileentities.TileEntityTypesThis.TILE_ENTITIES;
-import static $group__.utilities.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
-import static $group__.utilities.specific.Loggers.EnumMessages.PREFIX_MOD_LIFECYCLE_MESSAGE;
+import static $group__.utilities.specific.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
+import static $group__.utilities.specific.LoggerUtilities.EnumMessages.PREFIX_MOD_LIFECYCLE_MESSAGE;
 
 @Mod(MOD_ID)
 @EventBusSubscriber(bus = Bus.MOD)

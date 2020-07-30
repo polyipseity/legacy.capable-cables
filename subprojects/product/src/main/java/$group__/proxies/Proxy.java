@@ -1,6 +1,6 @@
 package $group__.proxies;
 
-import $group__.utilities.Singleton;
+import $group__.utilities.structures.Singleton;
 import com.google.common.base.Stopwatch;
 import net.minecraftforge.fml.event.lifecycle.*;
 import org.apache.logging.log4j.Logger;
@@ -9,8 +9,8 @@ import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.function.Consumer;
 
 import static $group__.Globals.LOGGER;
-import static $group__.utilities.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
-import static $group__.utilities.specific.Loggers.EnumMessages.PREFIX_MOD_LIFECYCLE_MESSAGE;
+import static $group__.utilities.specific.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
+import static $group__.utilities.specific.LoggerUtilities.EnumMessages.PREFIX_MOD_LIFECYCLE_MESSAGE;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 public abstract class Proxy extends Singleton implements IProxy {

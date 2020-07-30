@@ -1,8 +1,8 @@
 package $group__.client.gui.structures;
 
 import $group__.client.gui.components.GuiComponent;
-import $group__.utilities.Recursions;
-import $group__.utilities.specific.Maps;
+import $group__.utilities.RecursionUtilities;
+import $group__.utilities.specific.MapUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableMap;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -17,7 +17,7 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
 public final class GuiAnchors {
-	private final ConcurrentMap<EnumGuiSide, Anchor> anchors = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
+	private final ConcurrentMap<EnumGuiSide, Anchor> anchors = MapUtilities.getMapMakerSingleThread().initialCapacity(EnumGuiSide.values().length).makeMap();
 	@SuppressWarnings("CanBeFinal")
 	public double border;
 
@@ -107,7 +107,7 @@ public final class GuiAnchors {
 		}
 
 		private void checkNoCycles() {
-			Recursions.<Anchor, Void>recurseAsDepthFirstLoop(
+			RecursionUtilities.<Anchor, Void>recurseAsDepthFirstLoop(
 					this,
 					anchor -> null,
 					anchor -> to.data.anchors.getAnchorsView().values(),

@@ -1,9 +1,9 @@
 package $group__.common.registrables.items;
 
 import $group__.common.registrables.items.groups.ItemGroupsThis;
-import $group__.common.registrables.utilities.helpers.RegistrableUtilities.BlockUtilities;
-import $group__.common.registrables.utilities.helpers.RegistrableUtilities.NBTs;
-import $group__.common.registrables.utilities.helpers.RegistrableUtilities.RayTraceResults;
+import $group__.common.registrables.utilities.RegistrableUtilities.BlockUtilities;
+import $group__.common.registrables.utilities.RegistrableUtilities.NBTUtilities;
+import $group__.common.registrables.utilities.RegistrableUtilities.RayTraceResultUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -30,11 +30,11 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static $group__.Globals.LOGGER;
-import static $group__.utilities.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
-import static $group__.utilities.specific.Optionals.unboxOptional;
+import static $group__.utilities.specific.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
 
 public class ItemWrench extends Item {
 	protected ItemWrench() {
@@ -43,7 +43,7 @@ public class ItemWrench extends Item {
 
 	@Override
 	public ActionResultType onItemUse(ItemUseContext context) {
-		BlockRayTraceResult targetBlock = RayTraceResults.getBlockRayTraceResultFromItemUseContext(context);
+		BlockRayTraceResult targetBlock = RayTraceResultUtilities.getBlockRayTraceResultFromItemUseContext(context);
 		if (!canUse(context.getItem(), context.getWorld(), context.getPlayer(), targetBlock))
 			return ActionResultType.PASS;
 		return context.getWorld().isRemote || use(context.getItem(), context.getWorld(), targetBlock) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
@@ -101,15 +101,17 @@ public class ItemWrench extends Item {
 					tag.pickedUpBlockState = null;
 					stack.setTag(tag.serializeNBT());
 				} else if (tag.pickedUpEntity != null) {
-					@Nullable LivingEntity entity = unboxOptional(EntityType.loadEntityUnchecked(tag.pickedUpEntity, world).filter(LivingEntity.class::isInstance).map(LivingEntity.class::cast));
-					if (entity == null) {
+					Optional<LivingEntity> entity = EntityType.loadEntityUnchecked(tag.pickedUpEntity, world).filter(LivingEntity.class::isInstance).map(LivingEntity.class::cast);
+					if (!entity.filter(e -> {
+						BlockPos targetPos = BlockUtilities.getPlacePosition(targetBlock);
+						e.setPosition(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+						world.addEntity(e);
+						tag.pickedUpEntity = null;
+						return true;
+					}).isPresent()) {
 						LOGGER.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot create entity with tag '{}'", tag.pickedUpEntity));
 						return false;
 					}
-					BlockPos targetPos = BlockUtilities.getPlacePosition(targetBlock);
-					entity.setPosition(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-					world.addEntity(entity);
-					tag.pickedUpEntity = null;
 				} else {
 					BlockPos pos = targetBlock.getPos();
 					BlockState state = world.getBlockState(pos);
@@ -187,28 +189,28 @@ public class ItemWrench extends Item {
 				CompoundNBT pickup = new CompoundNBT();
 				{
 					CompoundNBT pickedUpBlock = new CompoundNBT();
-					NBTs.setChildIfNotNull(pickedUpBlock, "state", pickedUpBlockState, CompoundNBT::putInt);
-					NBTs.setChildIfNotNull(pickedUpBlock, "tile", pickedUpBlockTile, CompoundNBT::put);
-					if (NBTs.setTagIfNotEmpty(pickup, "block", pickedUpBlock))
+					NBTUtilities.setChildIfNotNull(pickedUpBlock, "state", pickedUpBlockState, CompoundNBT::putInt);
+					NBTUtilities.setChildIfNotNull(pickedUpBlock, "tile", pickedUpBlockTile, CompoundNBT::put);
+					if (NBTUtilities.setTagIfNotEmpty(pickup, "block", pickedUpBlock))
 						this.pickedUpBlock = pickedUpBlock;
 				}
-				NBTs.setChildIfNotNull(pickup, "entity", pickedUpEntity, CompoundNBT::put);
-				NBTs.setTagIfNotEmpty(tag, "pickup", pickup);
+				NBTUtilities.setChildIfNotNull(pickup, "entity", pickedUpEntity, CompoundNBT::put);
+				NBTUtilities.setTagIfNotEmpty(tag, "pickup", pickup);
 			}
-			return unboxOptional(NBTs.returnTagIfNotEmpty(tag));
+			return NBTUtilities.returnTagIfNotEmpty(tag).orElse(null);
 		}
 
 		@Override
 		public void deserializeNBT(@Nullable CompoundNBT tag) {
 			{
 				AtomicReference<CompoundNBT> pickup = new AtomicReference<>();
-				NBTs.readChildIfHasKey(tag, "pickup", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(pickup::set);
+				NBTUtilities.readChildIfHasKey(tag, "pickup", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(pickup::set);
 				{
-					NBTs.readChildIfHasKey(pickup.get(), "block", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(t -> pickedUpBlock = t);
-					NBTs.readChildIfHasKey(pickedUpBlock, "state", () -> IntNBT.valueOf(0), CompoundNBT::getInt).ifPresent(t -> pickedUpBlockState = t);
-					NBTs.readChildIfHasKey(pickedUpBlock, "tile", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(t -> pickedUpBlockTile = t);
+					NBTUtilities.readChildIfHasKey(pickup.get(), "block", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(t -> pickedUpBlock = t);
+					NBTUtilities.readChildIfHasKey(pickedUpBlock, "state", () -> IntNBT.valueOf(0), CompoundNBT::getInt).ifPresent(t -> pickedUpBlockState = t);
+					NBTUtilities.readChildIfHasKey(pickedUpBlock, "tile", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(t -> pickedUpBlockTile = t);
 				}
-				NBTs.readChildIfHasKey(pickup.get(), "entity", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(t -> pickedUpEntity = t);
+				NBTUtilities.readChildIfHasKey(pickup.get(), "entity", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(t -> pickedUpEntity = t);
 			}
 		}
 	}

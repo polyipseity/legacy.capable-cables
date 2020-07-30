@@ -1,23 +1,24 @@
 package $group__.utilities;
 
-import $group__.utilities.specific.Maps;
+import $group__.utilities.specific.MapUtilities;
 import $group__.utilities.specific.ThrowableUtilities;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Collections;
+import java.util.Map;
 
-import static $group__.utilities.Dynamics.getCallerClass;
-import static $group__.utilities.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
+import static $group__.utilities.DynamicUtilities.getCallerClass;
+import static $group__.utilities.specific.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkElementIndex;
 import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
-public enum Preconditions {
+public enum PreconditionUtilities {
 	;
 
-	private static final ConcurrentMap<Class<?>, Throwable> RAN_ONCE = Maps.MAP_MAKER_MULTI_THREAD.makeMap();
+	private static final Map<Class<?>, Throwable> RAN_ONCE = Collections.synchronizedMap(MapUtilities.getMapMakerSingleThread().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_LARGE).makeMap());
 
 
 	public static void checkArgumentTypes(Class<?>[] types, Object... args) {

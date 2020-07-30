@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public enum Streams {
+public enum StreamUtilities {
 	/* MARK empty */;
 
 

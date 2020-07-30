@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.annotation.Testable;
 
 import static $group__.utilities.MiscellaneousUtilities.getDefaultValue;
-import static $group__.utilities.Primitives.PRIMITIVE_DATA_TYPE_SET;
+import static $group__.utilities.PrimitiveUtilities.PRIMITIVE_DATA_TYPE_SET;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

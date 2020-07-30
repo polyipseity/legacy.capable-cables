@@ -11,7 +11,7 @@ import $group__.client.gui.utilities.GLUtilities.GLStacksUtilities;
 import $group__.client.gui.utilities.GLUtilities.GLStateUtilities;
 import $group__.client.gui.utilities.GuiUtilities.ObjectUtilities;
 import $group__.utilities.MiscellaneousUtilities;
-import $group__.utilities.specific.Maps;
+import $group__.utilities.specific.MapUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -34,13 +34,13 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
-import static $group__.utilities.specific.Optionals.unboxOptional;
+import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
+import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_TINY;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
 public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D> {
-	protected final List<GuiComponent<?>> children = new ArrayList<>(INITIAL_CAPACITY_2);
+	protected final List<GuiComponent<?>> children = new ArrayList<>(INITIAL_CAPACITY_SMALL);
 
 	public GuiContainer(Shape shape, D data) { super(shape, data); }
 
@@ -248,7 +248,7 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void onMouseHovering(AffineTransformStack stack, Point2D mouse) {
-		@Nullable GuiComponent<?> hovering = unboxOptional(getChildMouseOver(stack, mouse));
+		@Nullable GuiComponent<?> hovering = getChildMouseOver(stack, mouse).orElse(null);
 		if (hovering != data.hovering) {
 			data.getHovering().ifPresent(h -> runChildTransformed(stack, h, () -> h.onMouseHovered(stack, mouse)));
 			data.hovering = hovering;
@@ -360,7 +360,7 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 	public static class Data<E extends Events> extends GuiComponent.Data<E> {
 		@Nullable
 		protected GuiComponent<?> focused = null, hovering = null;
-		protected Map<Integer, GuiDragInfo> drags = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
+		protected Map<Integer, GuiDragInfo> drags = MapUtilities.getMapMakerSingleThread().initialCapacity(INITIAL_CAPACITY_TINY).makeMap();
 
 		public Data(E events, Supplier<Logger> logger) {
 			super(events, logger);
@@ -374,7 +374,7 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 
 		protected void setFocused(@Nullable GuiComponent<?> component) {
 			getFocused().ifPresent(f -> f.onFocusLost(component));
-			@Nullable GuiComponent<?> from = MiscellaneousUtilities.KNullable(focused, focused = component);
+			@Nullable GuiComponent<?> from = MiscellaneousUtilities.kNullable(focused, focused = component);
 			getFocused().ifPresent(f -> f.onFocusGet(from));
 		}
 	}

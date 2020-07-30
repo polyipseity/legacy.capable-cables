@@ -2,7 +2,7 @@ package $group__.utilities;
 
 import net.minecraftforge.api.distmarker.Dist;
 
-public enum Concurrency {
+public enum ConcurrencyUtilities {
 	;
 
 	public static final int

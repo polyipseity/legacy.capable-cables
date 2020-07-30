@@ -1,7 +1,8 @@
 package $group__.client.gui.utilities;
 
-import $group__.utilities.specific.Loggers;
-import $group__.utilities.specific.Maps;
+import $group__.utilities.CapacityUtilities;
+import $group__.utilities.specific.LoggerUtilities;
+import $group__.utilities.specific.MapUtilities;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
@@ -17,7 +18,7 @@ import java.util.Deque;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
 
-import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
+import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_MEDIUM;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
@@ -50,7 +51,7 @@ public enum GLUtilities {
 		private static final Logger LOGGER = LogManager.getLogger();
 
 
-		private static final ConcurrentMap<String, Deque<GLCall>> STACKS = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
+		private static final ConcurrentMap<String, Deque<GLCall>> STACKS = MapUtilities.getMapMakerSingleThread().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 
 		public static void push(String name, Runnable action, Runnable fallback) {
 			getStack(name).push(new GLCall(action, fallback));
@@ -71,13 +72,13 @@ public enum GLUtilities {
 		public static void clear(String name) {
 			Deque<GLCall> stack = getStack(name);
 			if (!stack.isEmpty()) {
-				LOGGER.warn(Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} leak: {}: {} not popped", GLStacksUtilities.class.getSimpleName(), name, stack.size()));
+				LOGGER.warn(LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} leak: {}: {} not popped", GLStacksUtilities.class.getSimpleName(), name, stack.size()));
 				while (!stack.isEmpty())
 					pop(name);
 			}
 		}
 
-		private static Deque<GLCall> getStack(String name) { return STACKS.computeIfAbsent(name, s -> new ArrayDeque<>(INITIAL_CAPACITY_2)); }
+		private static Deque<GLCall> getStack(String name) { return STACKS.computeIfAbsent(name, s -> new ArrayDeque<>(INITIAL_CAPACITY_MEDIUM)); }
 
 		@OnlyIn(CLIENT)
 		private static class GLCall implements Runnable {
@@ -97,7 +98,7 @@ public enum GLUtilities {
 	public enum GLStateUtilities {
 		;
 
-		private static final ConcurrentMap<Integer, Object> STATE = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
+		private static final ConcurrentMap<Integer, Object> STATE = MapUtilities.getMapMakerSingleThread().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 
 		public static int getInteger(int name) { return (int) STATE.computeIfAbsent(name, GL11::glGetInteger); }
 

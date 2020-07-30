@@ -14,14 +14,15 @@ import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
-import static $group__.utilities.Preconditions.checkArgumentTypes;
-import static $group__.utilities.Preconditions.checkArrayContentType;
-import static $group__.utilities.Primitives.PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP;
+import static $group__.utilities.PreconditionUtilities.checkArgumentTypes;
+import static $group__.utilities.PreconditionUtilities.checkArrayContentType;
+import static $group__.utilities.PrimitiveUtilities.PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP;
 import static java.util.Arrays.asList;
 
-public enum Loggers {
+public enum LoggerUtilities {
 	/* MARK empty */;
 
 
@@ -216,8 +217,7 @@ public enum Loggers {
 					argTypeOptionals, argTypes);
 		}
 
-		private static <O> String optionalNonnull(@Nullable O optional,
-		                                          Function<? super O, ? extends String> whenPresent) { return Optionals.optionalNonnull(optional, whenPresent, () -> ""); }
+		private static <O> String optionalNonnull(@Nullable O optional, Function<? super O, String> whenPresent) { return Optional.ofNullable(optional).map(whenPresent).orElse(""); }
 
 		public final Message makeMessage(Object... args) {
 			checkArgumentTypes(argTypes, args);

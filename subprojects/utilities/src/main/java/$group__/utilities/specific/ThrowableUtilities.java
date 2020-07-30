@@ -9,11 +9,11 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static $group__.utilities.Capacities.INITIAL_CAPACITY_3;
-import static $group__.utilities.Dynamics.UNSAFE;
-import static $group__.utilities.Dynamics.getCallerClass;
-import static $group__.utilities.specific.Loggers.EnumMessages.FACTORY_SIMPLE_MESSAGE;
-import static $group__.utilities.specific.Loggers.EnumMessages.SUFFIX_WITH_THROWABLE;
+import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_LARGE;
+import static $group__.utilities.DynamicUtilities.UNSAFE;
+import static $group__.utilities.DynamicUtilities.getCallerClass;
+import static $group__.utilities.specific.LoggerUtilities.EnumMessages.FACTORY_SIMPLE_MESSAGE;
+import static $group__.utilities.specific.LoggerUtilities.EnumMessages.SUFFIX_WITH_THROWABLE;
 import static $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher.*;
 
 public enum ThrowableUtilities {
@@ -123,7 +123,7 @@ public enum ThrowableUtilities {
 
 		public static IllegalArgumentException illegalArgument(Object... arguments) throws IllegalArgumentException {
 			assert arguments.length % 2 == 0;
-			StringBuilder msg = new StringBuilder(INITIAL_CAPACITY_3);
+			StringBuilder msg = new StringBuilder(INITIAL_CAPACITY_LARGE);
 			boolean value = false;
 			for (Object argument : arguments) {
 				msg.append(value ? argument + ", " : argument + ": ");

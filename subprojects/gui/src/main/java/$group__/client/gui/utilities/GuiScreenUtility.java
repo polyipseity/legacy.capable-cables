@@ -1,6 +1,6 @@
 package $group__.client.gui.utilities;
 
-import $group__.utilities.Preconditions;
+import $group__.utilities.PreconditionUtilities;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -24,7 +24,7 @@ public final class GuiScreenUtility extends Screen {
 
 	private GuiScreenUtility() {
 		super(new StringTextComponent(""));
-		Preconditions.requireRunOnceOnly(LOGGER);
+		PreconditionUtilities.requireRunOnceOnly(LOGGER);
 	}
 
 	public GuiScreenUtility setClient_(@Nullable Minecraft client) {

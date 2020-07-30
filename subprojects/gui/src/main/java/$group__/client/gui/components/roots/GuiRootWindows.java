@@ -15,12 +15,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
+import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
 public class GuiRootWindows<D extends GuiRoot.Data<?, C>, C extends Container> extends GuiRoot<D, C> {
-	protected final List<GuiWindow<?>> windows = new ArrayList<>(INITIAL_CAPACITY_2);
+	protected final List<GuiWindow<?>> windows = new ArrayList<>(INITIAL_CAPACITY_SMALL);
 
 	public GuiRootWindows(ITextComponent title, D data) { super(title, data); }
 

@@ -1,4 +1,4 @@
-package $group__.common.registrables.utilities.helpers;
+package $group__.common.registrables.utilities;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemUseContext;
@@ -29,7 +29,7 @@ public enum RegistrableUtilities {
 		}
 	}
 
-	public enum RayTraceResults {
+	public enum RayTraceResultUtilities {
 		;
 
 		public static BlockRayTraceResult getBlockRayTraceResultFromItemUseContext(ItemUseContext context) {return getBlockRayTraceResultFromItemUseContext(context, false);}
@@ -37,7 +37,7 @@ public enum RegistrableUtilities {
 		public static BlockRayTraceResult getBlockRayTraceResultFromItemUseContext(ItemUseContext context, boolean isInside) { return new BlockRayTraceResult(context.getHitVec(), context.getFace(), context.getPos(), false); }
 	}
 
-	public enum NBTs {
+	public enum NBTUtilities {
 		;
 
 		@SuppressWarnings("UnusedReturnValue")

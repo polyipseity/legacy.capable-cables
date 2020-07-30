@@ -48,7 +48,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Random;
 
-import static $group__.utilities.Preconditions.requireRunOnceOnly;
+import static $group__.utilities.PreconditionUtilities.requireRunOnceOnly;
 import static java.util.Objects.requireNonNull;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 

@@ -1,13 +1,12 @@
 package $group__.utilities;
 
-import $group__.utilities.specific.Maps;
+import $group__.utilities.specific.MapUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.specific.ThrowableUtilities.Try;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,19 +24,14 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
-import static $group__.utilities.Assertions.assertNonnull;
-import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
-import static $group__.utilities.Casts.castUncheckedUnboxed;
-import static $group__.utilities.Casts.castUncheckedUnboxedNonnull;
-import static $group__.utilities.Dynamics.Invocations.Fields.FIELD_MODIFIERS_SETTER;
-import static $group__.utilities.specific.Loggers.EnumMessages.*;
-import static $group__.utilities.specific.Optionals.unboxOptional;
+import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
+import static $group__.utilities.CastUtilities.castUnchecked;
+import static $group__.utilities.CastUtilities.castUncheckedNullable;
+import static $group__.utilities.specific.LoggerUtilities.EnumMessages.*;
 import static java.lang.invoke.LambdaMetafactory.metafactory;
 import static java.lang.invoke.MethodType.methodType;
-import static java.util.Objects.requireNonNull;
-import static java.util.function.Function.identity;
 
-public enum Dynamics {
+public enum DynamicUtilities {
 	INSTANCE;
 
 	public static final Lookup PUBLIC_LOOKUP = MethodHandles.publicLookup();
@@ -46,38 +40,40 @@ public enum Dynamics {
 
 
 	public static final LoadingCache<String, org.reflections.Reflections> REFLECTIONS_CACHE =
-			CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_2).expireAfterAccess(Maps.CACHE_EXPIRATION_ACCESS_DURATION, Maps.CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(Concurrency.MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(t -> {
+			CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_SMALL).expireAfterAccess(MapUtilities.CACHE_EXPIRATION_ACCESS_DURATION, MapUtilities.CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(ConcurrencyUtilities.MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(t -> {
 				org.reflections.Reflections r = new org.reflections.Reflections(t);
 				r.expandSuperTypes();
 				return r;
 			}));
 
-	private static final Logger LOGGER = LogManager.getLogger(Dynamics.class);
+	private static final Logger LOGGER = LogManager.getLogger(DynamicUtilities.class);
 
 
 	static {
 		{
-			Lookup implLookup = PUBLIC_LOOKUP;
+			Optional<Lookup> implLookup = Optional.empty();
 			for (Field f : Lookup.class.getDeclaredFields()) {
-				if ("IMPL_LOOKUP".equals(f.getName())) {
-					f.setAccessible(true);
-					ThrowableCatcher.acceptIfCaught(t -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("impl lookup field", f, Lookup.class, true), t));
-					implLookup = Try.call(() -> (Lookup) PUBLIC_LOOKUP.unreflectGetter(f).invokeExact(), LOGGER).orElse(implLookup);
+				Try.run(() -> f.setAccessible(true), LOGGER);
+				ThrowableCatcher.acceptIfCaught(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("impl lookup field", f, Lookup.class, true), t)));
+
+				implLookup = Try.call(() -> (Lookup) PUBLIC_LOOKUP.unreflectGetter(f).invokeExact(), LOGGER).filter(l -> l.lookupModes() == 0);
+
+				Try.run(() -> f.setAccessible(false), LOGGER);
+				if (implLookup.isPresent())
 					break;
-				}
 			}
-			IMPL_LOOKUP = implLookup;
+			IMPL_LOOKUP = implLookup.orElse(PUBLIC_LOOKUP);
 		}
 
 		{
-			@Nullable Unsafe unsafe = null;
+			Optional<Unsafe> unsafe = Optional.empty();
 			for (Field f : Unsafe.class.getDeclaredFields()) {
 				if (f.getType() == Unsafe.class) {
-					unsafe = unboxOptional(Try.call(() -> (Unsafe) IMPL_LOOKUP.unreflectGetter(f).invokeExact(), LOGGER));
+					unsafe = Try.call(() -> (Unsafe) IMPL_LOOKUP.unreflectGetter(f).invokeExact(), LOGGER);
 					break;
 				}
 			}
-			UNSAFE = requireNonNull(unsafe);
+			UNSAFE = unsafe.orElseThrow(BecauseOf::unexpected);
 		}
 	}
 
@@ -115,17 +111,10 @@ public enum Dynamics {
 
 	public static <U> ImmutableSet<Class<? extends U>> getThisAndSuperclasses(Class<? extends U> clazz) { return getLowerAndIntermediateSuperclasses(clazz, null); }
 
-	public static <U> ImmutableSet<Class<? extends U>> getLowerAndIntermediateSuperclasses(@Nullable Class<? extends U> lower, @Nullable Class<U> upper) {
-		ImmutableSet.Builder<Class<? extends U>> r = new ImmutableSet.Builder<>();
-		for (@Nullable Class<?> i = lower; i != upper && i != null; i = i.getSuperclass())
-			r.add(Casts.<Class<? extends U>>castUncheckedUnboxedNonnull(i));
-		return r.build();
-	}
-
 	public static ImmutableSet<ImmutableSet<Class<?>>> getThisAndSuperclassesAndInterfaces(Class<?> type) { return new ImmutableSet.Builder<ImmutableSet<Class<?>>>().add(ImmutableSet.of(type)).addAll(getSuperclassesAndInterfaces(type)).build(); }
 
 	public static ImmutableSet<ImmutableSet<Class<?>>> getSuperclassesAndInterfaces(Class<?> clazz) {
-		LinkedHashSet<ImmutableSet<Class<?>>> r = new LinkedHashSet<>(INITIAL_CAPACITY_2);
+		LinkedHashSet<ImmutableSet<Class<?>>> r = new LinkedHashSet<>(INITIAL_CAPACITY_SMALL);
 
 		ImmutableSet<Class<?>> scs = getSuperclasses(clazz);
 		r.add(scs);
@@ -136,7 +125,7 @@ public enum Dynamics {
 			return next;
 		}))));
 		while (!cur.get().isEmpty()) r.add(ImmutableSet.copyOf(cur.getAndUpdate(s -> {
-			List<Class<?>> next = new ArrayList<>(INITIAL_CAPACITY_2);
+			List<Class<?>> next = new ArrayList<>(INITIAL_CAPACITY_SMALL);
 			s.forEach(t -> Collections.addAll(next, t.getInterfaces()));
 			return next;
 		})));
@@ -148,7 +137,14 @@ public enum Dynamics {
 	public static <U> ImmutableSet<Class<? extends U>> getSuperclasses(@Nullable Class<? extends U> clazz) { return getIntermediateSuperclasses(clazz, null); }
 
 	public static <U> ImmutableSet<Class<? extends U>> getIntermediateSuperclasses(@Nullable Class<? extends U> lower,
-	                                                                               @Nullable Class<U> upper) { return getLowerAndIntermediateSuperclasses(castUncheckedUnboxed(lower != null ? lower.getSuperclass() : null), upper); }
+	                                                                               @Nullable Class<U> upper) { return getLowerAndIntermediateSuperclasses(castUncheckedNullable(lower != null ? lower.getSuperclass() : null), upper); }
+
+	public static <U> ImmutableSet<Class<? extends U>> getLowerAndIntermediateSuperclasses(@Nullable Class<? extends U> lower, @Nullable Class<U> upper) {
+		ImmutableSet.Builder<Class<? extends U>> r = new ImmutableSet.Builder<>();
+		for (@Nullable Class<?> i = lower; i != upper && i != null; i = i.getSuperclass())
+			r.add(CastUtilities.<Class<? extends U>>castUnchecked(i));
+		return r.build();
+	}
 
 	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Class<A> annotationType, Method method, @Nullable Logger logger) throws IllegalArgumentException {
 		A[] r = getEffectiveAnnotationsWithInheritingConsidered(annotationType, method, logger);
@@ -179,103 +175,29 @@ public enum Dynamics {
 
 	public static Type getGenericSuperclassActualTypeArgument(Class<?> c, int i) throws ClassCastException { return getGenericSuperclassActualTypeArguments(c)[i]; }
 
-
 	public static Type[] getGenericSuperclassActualTypeArguments(Class<?> c) { return ((ParameterizedType) c.getGenericSuperclass()).getActualTypeArguments(); }
 
-
-	public enum Reflections {
+	public enum InvocationUtilities {
 		/* MARK empty */;
 
 
-		public enum Bulk {
-			/* MARK empty */;
-
-
-			public static <T> boolean mapFields(Class<T> common, T from, T to, Function<Object, ?> mapper,
-			                                    @Nullable Logger logger) {
-				return mapFields(common, from, to, mapper,
-						true, logger);
-			}
-
-			public static <T> boolean mapFields(Class<T> common, T from, T to, Function<Object, ?> mapper,
-			                                    boolean supers, @Nullable Logger logger) {
-				final boolean[] r = {true};
-				(supers ? getThisAndSuperclasses(common) : ImmutableList.of(common)).forEach(c -> {
-					for (Field f : c.getDeclaredFields()) {
-						if (isMemberStatic(f)) continue;
-
-						Try.run(() -> f.setAccessible(true), logger);
-						if (logger != null)
-							ThrowableCatcher.acceptIfCaught(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("to-be-copied field", f, c, true), t)));
-
-						@Nullable Object v = Try.call(() -> f.get(from), logger).orElse(null);
-						if (ThrowableCatcher.caught()) {
-							if (logger != null)
-								logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_G_SET_FIELD.makeMessage(false, f, from), ThrowableCatcher.retrieve().orElseThrow(BecauseOf::unexpected)));
-							r[0] = false;
-						} else {
-							int fMod = f.getModifiers() & ~Modifier.FINAL;
-							Try.run(() -> FIELD_MODIFIERS_SETTER.invokeExact(f, fMod), logger);
-							if (logger != null)
-								ThrowableCatcher.acceptIfCaught(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_INVOKE_METHOD_HANDLE.makeMessage(FIELD_MODIFIERS_SETTER, f.toGenericString(), fMod), t)));
-
-							Object vf = mapper.apply(v);
-							Try.run(() -> f.set(to, vf), logger);
-							ThrowableCatcher.acceptIfCaught(t -> {
-								if (logger != null)
-									logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_G_SET_FIELD.makeMessage(true, f, to, vf), t));
-								r[0] = false;
-							});
-						}
-					}
-				});
-				return r[0];
-			}
-
-			@SuppressWarnings("UnusedReturnValue")
-			public static <T> boolean copyFields(Class<T> common, T from, T to, @Nullable Logger logger) { return copyFields(common, from, to, true, logger); }
-
-			public static <T> boolean copyFields(Class<T> common, T from, T to, boolean supers,
-			                                     @Nullable Logger logger) {
-				return mapFields(common, from, to,
-						identity(), supers, logger);
-			}
-		}
-	}
-
-	public enum Invocations {
-		/* MARK empty */;
-
-
-		public enum Lambdas {
+		public enum LambdaMetafactoryUtilities {
 			/* MARK empty */;
 
 
 			public static <T, R> Function<T, R> makeFunction(Lookup lookup, MethodHandle method, Class<R> returnType,
 			                                                 Class<T> inputType) throws Throwable {
-				return castUncheckedUnboxedNonnull(metafactory(lookup, "apply", methodType(Function.class),
+				return castUnchecked(metafactory(lookup, "apply", methodType(Function.class),
 						methodType(Object.class, Object.class), method, methodType(returnType, inputType)).getTarget().invokeExact());
 			}
 
 			public static <T, U, R> BiFunction<T, U, R> makeBiFunction(Lookup lookup, MethodHandle method,
 			                                                           Class<R> returnType, Class<T> inputType1,
 			                                                           Class<U> inputType2) throws Throwable {
-				return castUncheckedUnboxedNonnull(metafactory(lookup, "apply", methodType(BiFunction.class),
+				return castUnchecked(metafactory(lookup, "apply", methodType(BiFunction.class),
 						methodType(Object.class, Object.class, Object.class), method, methodType(returnType,
 								inputType1, inputType2)).getTarget().invokeExact());
 			}
-		}
-
-
-		public enum Fields {
-			/* MARK empty */;
-
-
-			public static final MethodHandle FIELD_MODIFIERS_SETTER =
-					assertNonnull(Try.call(() -> IMPL_LOOKUP.findSetter(Field.class, "modifiers", int.class), LOGGER).orElseGet(() -> {
-						ThrowableCatcher.acceptIfCaught(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(INVOCATION_UNABLE_TO_FIND_METHOD_HANDLE.makeMessage("modifiers field", Field.class, "modifiers", null, int.class), t)));
-						return null;
-					}));
 		}
 	}
 
@@ -283,9 +205,7 @@ public enum Dynamics {
 	private static final class SecurityManagerReflections extends SecurityManager {
 		private static final SecurityManagerReflections INSTANCE = new SecurityManagerReflections();
 
-
 		private SecurityManagerReflections() {}
-
 
 		@Override
 		protected Class<?>[] getClassContext() {

@@ -2,7 +2,7 @@ package $group__.utilities.specific;
 
 import static java.lang.Double.doubleToLongBits;
 
-public enum Numbers {
+public enum NumberUtilities {
 	;
 
 	@SuppressWarnings("MagicNumber")
