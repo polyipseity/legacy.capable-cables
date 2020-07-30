@@ -7,8 +7,8 @@ import static java.io.File.separator
 final String rootDir = "$projectDir${separator}.."
 
 ext {
-    ext.rootDir = rootDir
-    utilitiesDir = "$rootDir${separator}gradle${separator}utilities".toString()
+	ext.rootDir = rootDir
+	utilitiesDir = "$rootDir${separator}gradle${separator}utilities".toString()
 }
 
 
@@ -21,32 +21,32 @@ loadExt.call "$rootDir${separator}module.properties"
 
 
 void updateGradleWrapperDistributionUrl(String newDistributionUrl) {
-    Wrapper wrapper = tasks.wrapper
-    Properties properties = new Properties()
-    File propertiesFile = file wrapper.propertiesFile.absolutePath.replace('buildSrc', '')
-    FileInputStream fis = new FileInputStream(propertiesFile)
-    try {
-        properties.load fis
-    } finally {
-        fis.close()
-    }
-    String oldDistributionUrl = properties.distributionUrl
-    URL newDistribution = new URL(newDistributionUrl)
-    if (new URL(oldDistributionUrl) != newDistribution) {
-        { ->
-            HttpURLConnection huc = newDistribution.openConnection() as HttpURLConnection
-            huc.requestMethod = 'HEAD'
-            if (huc.responseCode != HttpURLConnection.HTTP_OK) throw new FileNotFoundException("'$newDistributionUrl' returns '$huc.responseCode' instead of '$HttpURLConnection.HTTP_OK'")
-        }.call()
-        properties.distributionUrl = newDistributionUrl
-        FileOutputStream fos = new FileOutputStream(propertiesFile)
-        try {
-            properties.store fos, null
-        } finally {
-            fos.close()
-        }
-        throw new IllegalStateException("Gradle wrapper distribution URL updated from '$oldDistributionUrl' to '$newDistributionUrl', re-run the build to apply the changes")
-    }
+	Wrapper wrapper = tasks.wrapper
+	Properties properties = new Properties()
+	File propertiesFile = file wrapper.propertiesFile.absolutePath.replace('buildSrc', '')
+	FileInputStream fis = new FileInputStream(propertiesFile)
+	try {
+		properties.load fis
+	} finally {
+		fis.close()
+	}
+	String oldDistributionUrl = properties.distributionUrl
+	URL newDistribution = new URL(newDistributionUrl)
+	if (new URL(oldDistributionUrl) != newDistribution) {
+		{ ->
+			HttpURLConnection huc = newDistribution.openConnection() as HttpURLConnection
+			huc.requestMethod = 'HEAD'
+			if (huc.responseCode != HttpURLConnection.HTTP_OK) throw new FileNotFoundException("'$newDistributionUrl' returns '$huc.responseCode' instead of '$HttpURLConnection.HTTP_OK'")
+		}.call()
+		properties.distributionUrl = newDistributionUrl
+		FileOutputStream fos = new FileOutputStream(propertiesFile)
+		try {
+			properties.store fos, null
+		} finally {
+			fos.close()
+		}
+		throw new IllegalStateException("Gradle wrapper distribution URL updated from '$oldDistributionUrl' to '$newDistributionUrl', re-run the build to apply the changes")
+	}
 }
 
 

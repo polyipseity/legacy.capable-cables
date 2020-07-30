@@ -17,27 +17,27 @@ apply plugin: 'maven-publish'
 // and then declare that to be published
 // Note you'll need to add a repository here
 publishing {
-    publications {
-        //noinspection GroovyAssignabilityCheck
-        mavenJava(MavenPublication) {
-            if (tasks.hasProperty('shadowJar'))
-                //noinspection GroovyAssignabilityCheck
-                artifact tasks.shadowJar
-            //noinspection GroovyAssignabilityCheck
-            artifact tasks.jar
-            //noinspection GroovyAssignabilityCheck
-            artifact tasks.deobfJar
-            //noinspection GroovyAssignabilityCheck
-            artifact tasks.javadocJar
-            //noinspection GroovyAssignabilityCheck
-            artifact tasks.sourceJar
-        }
-    }
-    repositories {
-        if (!repositoryDirectoryLocal.empty) {
-            maven {
-                url "file:///${rootProject.file(repositoryDirectoryLocal).absolutePath}"
-            }
-        }
-    }
+	publications {
+		//noinspection GroovyAssignabilityCheck
+		mavenJava(MavenPublication) {
+			if (tasks.hasProperty('shadowJar'))
+			//noinspection GroovyAssignabilityCheck
+				artifact tasks.shadowJar
+			//noinspection GroovyAssignabilityCheck
+			artifact tasks.jar
+			//noinspection GroovyAssignabilityCheck
+			artifact tasks.deobfJar
+			//noinspection GroovyAssignabilityCheck
+			artifact tasks.javadocJar
+			//noinspection GroovyAssignabilityCheck
+			artifact tasks.sourceJar
+		}
+	}
+	repositories {
+		if (!repositoryDirectoryLocal.empty) {
+			maven {
+				url "file:///${rootProject.file(repositoryDirectoryLocal).absolutePath}"
+			}
+		}
+	}
 }

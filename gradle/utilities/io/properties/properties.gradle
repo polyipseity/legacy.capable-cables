@@ -10,23 +10,23 @@ checkApply.call(['createNewFile'])
 
 
 project.ext.storeProperties = { Properties prop, String path, String comment = null ->
-    File f = file path
-    createNewFile.call f
-    FileOutputStream fos = new FileOutputStream(f)
-    try {
-        prop.store fos, comment
-    } finally {
-        fos.close()
-    }
+	File f = file path
+	createNewFile.call f
+	FileOutputStream fos = new FileOutputStream(f)
+	try {
+		prop.store fos, comment
+	} finally {
+		fos.close()
+	}
 }
 
 project.ext.loadProperties = { String path ->
-    Properties prop = new Properties()
-    FileInputStream fis = new FileInputStream(path)
-    try {
-        prop.load fis
-    } finally {
-        fis.close()
-    }
-    prop
+	Properties prop = new Properties()
+	FileInputStream fis = new FileInputStream(path)
+	try {
+		prop.load fis
+	} finally {
+		fis.close()
+	}
+	prop
 }

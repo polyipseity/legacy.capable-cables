@@ -7,12 +7,12 @@ apply plugin: 'idea'
 
 // COMMENT append
 afterEvaluate {
-    eclipse.classpath { downloadSources = downloadJavadoc = true }
-    idea.module {
-        downloadSources = downloadJavadoc = true
-        excludeDirs += [file(minecraftRunDir), file(repositoryDirectoryLocal)]
+	eclipse.classpath { downloadSources = downloadJavadoc = true }
+	idea.module {
+		downloadSources = downloadJavadoc = true
+		excludeDirs += [file(minecraftRunDir), file(repositoryDirectoryLocal)]
 
-        // COMMENT the below code should, but does not work
-        // CODE scopes.RUNTIME.plus << configurations.debug
-    }
+		// COMMENT the below code should, but does not work
+		// CODE scopes.RUNTIME.plus << configurations.debug
+	}
 }

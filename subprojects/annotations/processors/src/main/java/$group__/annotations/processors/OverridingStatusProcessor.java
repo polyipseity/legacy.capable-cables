@@ -1,9 +1,9 @@
 package $group__.annotations.processors;
 
 import $group__.annotations.OverridingStatus;
-import $group__.utilities.helpers.Casts;
-import $group__.utilities.helpers.Processors;
-import $group__.utilities.helpers.specific.Streams;
+import $group__.utilities.Casts;
+import $group__.utilities.Processors;
+import $group__.utilities.specific.Streams;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
@@ -25,8 +25,8 @@ import javax.tools.Diagnostic;
 import java.util.Collections;
 import java.util.Set;
 
-import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_2;
-import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_4;
+import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
+import static $group__.utilities.Capacities.INITIAL_CAPACITY_4;
 
 @SuppressWarnings("unused")
 public final class OverridingStatusProcessor extends AbstractProcessor {

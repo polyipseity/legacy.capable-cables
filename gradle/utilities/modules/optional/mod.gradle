@@ -2,64 +2,37 @@
 // TITLE Mod
 //////////////////////////////////////////////////
 
+import static java.io.File.separator
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply.call(['stringToStringList'])
+
 archivesBaseName = rootProject.name
+
 minecraft {
 	// Default run configurations.
 	// These can be tweaked, removed, or duplicated as needed.
 	runs {
 		//noinspection SpellCheckingInspection
 		client {
-			workingDirectory file(minecraftRunDir)
-			if (project != rootProject) ideaModule "${rootProject.name}${project.path.replace ':', '.'}.main"
-
 			// Recommended logging data for a userdev environment
 			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
 			// Recommended logging level for the console
 			property 'forge.logging.console.level', 'debug'
-
-			//noinspection GroovyAssignabilityCheck
-			mods.create(modId) {
-				//noinspection GroovyAssignabilityCheck
-				source sourceSets.main
-				afterEvaluate {
-					// COMMENT add non-mod modules for correct classloading behavior
-					configurations.runtimeClasspath.allDependencies.each { dependency ->
-						if (dependency instanceof ProjectDependency) source((SourceSet) dependency.dependencyProject.sourceSets.main)
-					}
-				}
-			}
 		}
 
 		//noinspection SpellCheckingInspection
 		server {
-			workingDirectory file(minecraftRunDir)
-			if (project != rootProject) ideaModule "${rootProject.name}${project.path.replace ':', '.'}.main"
-
 			// Recommended logging data for a userdev environment
 			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
 			// Recommended logging level for the console
 			property 'forge.logging.console.level', 'debug'
-
-			//noinspection GroovyAssignabilityCheck
-			mods.create(modId) {
-				//noinspection GroovyAssignabilityCheck
-				source sourceSets.main
-				afterEvaluate {
-					// COMMENT add non-mod modules for correct classloading behavior
-					configurations.runtimeClasspath.allDependencies.each { dependency ->
-						if (dependency instanceof ProjectDependency) source((SourceSet) dependency.dependencyProject.sourceSets.main)
-					}
-				}
-			}
 		}
 
 		//noinspection SpellCheckingInspection
 		data {
-			workingDirectory file(minecraftRunDir)
-			if (project != rootProject) ideaModule "${rootProject.name}${project.path.replace ':', '.'}.main"
-
 			// Recommended logging data for a userdev environment
 			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
@@ -67,16 +40,28 @@ minecraft {
 			property 'forge.logging.console.level', 'debug'
 
 			args '--mod', modId, '--all', '--output', file('src/generated/resources/')
+		}
+	}
 
-			//noinspection GroovyAssignabilityCheck
+	afterEvaluate {
+		configurations.runtimeClasspath.allDependencies.each { dependency ->
+			// COMMENT Add resources of non-mod modules
+			if (dependency instanceof ProjectDependency)
+				sourceSets.main.resources.srcDirs dependency.dependencyProject.sourceSets.main.resources.srcDirs
+		}
+
+		runs.configureEach {
+			workingDirectory file(minecraftRunDir)
+			if (project != rootProject) ideaModule "${rootProject.name}${project.path.replace ':', '.'}.main"
+			jvmArgs stringToStringList.call(minecraftJvmArguments) as List<String>
+
 			mods.create(modId) {
-				//noinspection GroovyAssignabilityCheck
 				source sourceSets.main
-				afterEvaluate {
-					// COMMENT add non-mod modules for correct classloading behavior
-					configurations.runtimeClasspath.allDependencies.each { dependency ->
-						if (dependency instanceof ProjectDependency) source((SourceSet) dependency.dependencyProject.sourceSets.main)
-					}
+
+				configurations.runtimeClasspath.allDependencies.each { dependency ->
+					// COMMENT Add non-mod modules for correct classloading behavior
+					if (dependency instanceof ProjectDependency)
+						source dependency.dependencyProject.sourceSets.main as SourceSet
 				}
 			}
 		}

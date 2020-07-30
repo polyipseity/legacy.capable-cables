@@ -10,38 +10,39 @@ checkApply.call(['evaluateGStringString'])
 
 
 project.ext.makeResourcesTasks = { Closure c ->
-    tasks.withType(ProcessResources) { ProcessResources t ->
-        // COMMENT Avoid messing around internal tasks.
-        if (name.contains('_')) return
+	tasks.withType(ProcessResources) { ProcessResources t ->
+		// COMMENT Avoid messing around internal tasks.
+		if (name.contains('_')) return
 
-        String taskSourceSetName = name.replace('process', '').replace('Resources', ''),
-               sourceSetName = (taskSourceSetName.empty ? 'main' : taskSourceSetName).uncapitalize()
+		String taskSourceSetName = name.replace('process', '').replace('Resources', ''),
+		       sourceSetName = (taskSourceSetName.empty ? 'main' : taskSourceSetName).uncapitalize()
 
-        t.configure {
-            configure c
+		t.configure {
+			configure c
 
-            Map<String, Object> e = inputs.properties.findAll { it.key.startsWith 'expand_' }.collectEntries { [it.key.replace('expand_', ''), it.value] } as Map<String, Object>
+			if (buildType == 'DEBUG') inputs.property 'expand_group', '$group__'
+			Map<String, Object> e = inputs.properties.findAll { it.key.startsWith 'expand_' }.collectEntries { [it.key.replace('expand_', ''), it.value] } as Map<String, Object>
 
-            // COMMENT replace stuff in the to-be-processed files, nothing else
-            rename ~/(.*)\.in/, '$1'
-            from(sourceSets."$sourceSetName".resources.srcDirs) {
-                include '**/*.in'
+			// COMMENT replace stuff in the to-be-processed files, nothing else
+			rename ~/(.*)\.in/, '$1'
+			from(sourceSets."$sourceSetName".resources.srcDirs) {
+				include '**/*.in'
 
-                // COMMENT replace variables
-                expand e
-            }
+				// COMMENT replace variables
+				expand e
+			}
 
-            // COMMENT copy everything else except the processed files
-            from(sourceSets."$sourceSetName".resources.srcDirs) { exclude '**/*.in' }
+			// COMMENT copy everything else except the processed files
+			from(sourceSets."$sourceSetName".resources.srcDirs) { exclude '**/*.in' }
 
-            Binding eb = new Binding(e)
-            eachFile { it.path = evaluateGStringString.call it.path, eb }
+			Binding eb = new Binding(e)
+			eachFile { it.path = evaluateGStringString.call it.path, eb }
 
-            doLast {
-                List<File> markedForDeletion = []
-                destinationDir.eachDirRecurse { if (it.directorySize() == 0) markedForDeletion << it }
-                markedForDeletion.each { it.deleteDir() }
-            }
-        }
-    }
+			doLast {
+				List<File> markedForDeletion = []
+				destinationDir.eachDirRecurse { if (it.directorySize() == 0) markedForDeletion << it }
+				markedForDeletion.each { it.deleteDir() }
+			}
+		}
+	}
 }

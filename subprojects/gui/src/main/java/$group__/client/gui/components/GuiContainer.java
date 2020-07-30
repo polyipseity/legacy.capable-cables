@@ -1,185 +1,381 @@
 package $group__.client.gui.components;
 
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import $group__.client.gui.structures.AffineTransformStack;
+import $group__.client.gui.structures.EnumGuiMouseClickResult;
+import $group__.client.gui.structures.EnumGuiState;
+import $group__.client.gui.structures.GuiCache.CacheKey;
+import $group__.client.gui.structures.GuiDragInfo;
+import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
+import $group__.client.gui.utilities.GLUtilities;
+import $group__.client.gui.utilities.GLUtilities.GLStacksUtilities;
+import $group__.client.gui.utilities.GLUtilities.GLStateUtilities;
+import $group__.client.gui.utilities.GuiUtilities.ObjectUtilities;
+import $group__.utilities.MiscellaneousUtilities;
+import $group__.utilities.specific.Maps;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
-import net.minecraftforge.api.distmarker.Dist;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.apache.logging.log4j.Logger;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL14;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static $group__.utilities.helpers.Capacities.INITIAL_CAPACITY_2;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
+import static $group__.utilities.Capacities.INITIAL_CAPACITY_2;
+import static $group__.utilities.specific.Optionals.unboxOptional;
+import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
-@OnlyIn(Dist.CLIENT)
-public class GuiContainer extends GuiComponent {
-	protected List<GuiComponent> children = new ArrayList<>(INITIAL_CAPACITY_2);
-	@Nullable
-	protected GuiComponent focused = null;
-	protected boolean dragging = false;
+@OnlyIn(CLIENT)
+public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D> {
+	protected final List<GuiComponent<?>> children = new ArrayList<>(INITIAL_CAPACITY_2);
 
-	public GuiContainer(GuiComponent... components) { add(components); }
+	public GuiContainer(Shape shape, D data) { super(shape, data); }
 
-	protected static Point2D toRelativePointForComponent(GuiComponent component, Point2D point) { return new Point2D.Double(point.getX() - component.getRectangleView().getX(), point.getY() - component.getRectangleView().getY()); }
-
-	public Optional<Rectangle2D> getPreferredRectangle() {
-		Rectangle2D rectangle = new Rectangle();
-		children.forEach(c -> Rectangle2D.union(rectangle, c.getPreferredRectangle().orElseGet(c::getRectangleView), rectangle));
-		return Optional.of(rectangle);
-	}
-
-	public List<GuiComponent> getChildren() { return ImmutableList.copyOf(children); }
-
-	public void add(GuiComponent... components) {
-		boolean resize = false;
-		for (GuiComponent component : components) {
-			if (component == this) throw BecauseOf.illegalArgument("components", components);
-			if (component.parent != null) {
-				@Nullable GuiContainer parentOld = component.parent.get();
-				if (parentOld != null) parentOld.remove(component);
-			}
-			children.add(component);
-			component.onAdded(this);
-			if (EnumState.INITIALIZED.isReachedBy(state)) component.onInitialize();
-			resize = true;
+	protected void add(@SuppressWarnings("SameParameterValue") int index, GuiComponent<?> component) {
+		if (component == this) throw BecauseOf.illegalArgument("component", component);
+		component.getParent().ifPresent(p -> p.remove(component));
+		getChildren().add(index, component);
+		component.onAdded(this, index);
+		if (EnumGuiState.READY.isReachedBy(data.getState())) {
+			new IGuiLifecycleHandler.Initializer(component).initialize(this);
+			CacheKey.RESHAPE_HANDLER.get(this).reshape(this);
 		}
-		if (resize && EnumState.READY.isReachedBy(state)) onResize();
 	}
 
-	public void remove(GuiComponent... components) {
-		for (GuiComponent component : components) {
-			children.remove(component);
+	public void remove(GuiComponent<?>... components) {
+		boolean reshape = false;
+		for (GuiComponent<?> component : components) {
+			getChildren().remove(component);
 			component.onRemoved(this);
+			if (EnumGuiState.READY.isReachedBy(data.getState())) reshape = true;
+		}
+		if (reshape) CacheKey.RESHAPE_HANDLER.get(this).reshape(this);
+	}
+
+	protected List<GuiComponent<?>> getChildren() { return children; }
+
+	public void moveToTop(GuiComponent<?> component) { move(getChildren().size() - 1, component); }
+
+	public void move(int index, GuiComponent<?> component) {
+		if (getChildren().remove(component)) {
+			getChildren().add(index, component);
+			component.onMoved(index);
 		}
 	}
 
-	public void remove(int... indexes) { for (int index : indexes) children.remove(index).onRemoved(this); }
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void render(Point2D mouse, float partialTicks) {
-		if (EnumState.READY.isReachedBy(state))
-			children.forEach(c -> c.render(toRelativePointForComponent(c, mouse), partialTicks));
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	protected void onAdded(GuiContainer parent) {
-		super.onAdded(parent);
-		children.forEach(c -> c.onAdded(parent));
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	protected void onResize() {
-		super.onResize();
-		children.forEach(GuiComponent::onResize);
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	protected void onTick() { children.forEach(GuiComponent::onTick); }
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	protected void onInitialize() {
-		super.onInitialize();
-		children.forEach(GuiComponent::onInitialize);
-	}
-
-	@Override
-	protected void onRemoved(GuiContainer parent) {
-		super.onRemoved(parent);
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	protected void onClose() {
-		children.forEach(GuiComponent::onClose);
-		super.onClose();
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	protected void onDestroy() {
-		children.forEach(GuiComponent::onDestroy);
-		super.onDestroy();
-	}
-
-	@Override
-	public void onMouseMoved(Point2D mouse) { children.forEach(c -> c.onMouseMoved(toRelativePointForComponent(c, mouse))); }
-
-	@Override
-	public boolean onMouseClicked(Point2D mouse, int button) {
-		for (GuiComponent child : children) {
-			if (child.onMouseClicked(toRelativePointForComponent(child, mouse), button)) {
-				focused = child;
-				if (button == GLFW_MOUSE_BUTTON_LEFT) dragging = true;
-				return true;
+	public void add(GuiComponent<?>... components) {
+		boolean reshape = false;
+		for (GuiComponent<?> component : components) {
+			if (component == this) throw BecauseOf.illegalArgument("components", components);
+			component.getParent().ifPresent(p -> p.remove(component));
+			getChildren().add(component);
+			component.onAdded(this, getChildren().lastIndexOf(component));
+			if (EnumGuiState.READY.isReachedBy(data.getState())) {
+				new IGuiLifecycleHandler.Initializer(component).initialize(this);
+				reshape = true;
 			}
 		}
-		return false;
+		if (reshape) CacheKey.RESHAPE_HANDLER.get(this).reshape(this);
+	}
+
+	protected static boolean onChangeFocusWithThisFocusable(GuiContainer<?> self, Function<Boolean, Boolean> superMethod, boolean next) {
+		return next ? !self.data.getFocused().isPresent() && !self.isBeingFocused() || superMethod.apply(true)
+				: superMethod.apply(false) || !self.isBeingFocused();
 	}
 
 	@Override
-	public boolean onMouseReleased(Point2D mouse, int button) {
-		dragging = false;
-		return getChildMouseOver(mouse).filter(c -> c.onMouseReleased(toRelativePointForComponent(c, mouse), button)).isPresent();
+	@OverridingMethodsMustInvokeSuper
+	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
+		if (Minecraft.getInstance().getFramebuffer().isStencilEnabled()) {
+			int stencilRef = Math.floorMod(CacheKey.Z.get(this), (int) Math.pow(2, GLStateUtilities.getInteger(GL11.GL_STENCIL_BITS)));
+
+			GLStacksUtilities.push("GL_STENCIL_TEST",
+					() -> GL11.glEnable(GL11.GL_STENCIL_TEST), () -> GL11.glDisable(GL11.GL_STENCIL_TEST));
+			GLStacksUtilities.push("stencilMask",
+					() -> RenderSystem.stencilMask(GLUtilities.GL_MASK_ALL_BITS), GLStacksUtilities.STENCIL_MASK_FALLBACK);
+
+			getChildren().forEach(c -> {
+				if (c.data.visible)
+					runChildTransformed(stack, c, () -> {
+						GLStacksUtilities.push("stencilFunc",
+								() -> RenderSystem.stencilFunc(GL11.GL_EQUAL, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLStacksUtilities.STENCIL_FUNC_FALLBACK);
+						GLStacksUtilities.push("stencilOp",
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL14.GL_INCR_WRAP, GL14.GL_INCR_WRAP), GLStacksUtilities.STENCIL_OP_FALLBACK);
+						GLStacksUtilities.push("colorMask",
+								() -> RenderSystem.colorMask(false, false, false, false), GLStacksUtilities.COLOR_MASK_FALLBACK);
+						c.writeStencil(stack, mouse, partialTicks, true);
+						GLStacksUtilities.pop("colorMask");
+						GLStacksUtilities.pop("stencilOp");
+						GLStacksUtilities.pop("stencilFunc");
+
+						GLStacksUtilities.push("stencilFunc",
+								() -> RenderSystem.stencilFunc(GL11.GL_LESS, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLStacksUtilities.STENCIL_FUNC_FALLBACK);
+
+						GLStacksUtilities.push("stencilOp",
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP), GLStacksUtilities.STENCIL_OP_FALLBACK);
+						c.render(stack, mouse, partialTicks);
+						GLStacksUtilities.pop("stencilOp");
+
+						GLStacksUtilities.push("stencilOp",
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_REPLACE, GL11.GL_REPLACE), GLStacksUtilities.STENCIL_OP_FALLBACK);
+						GLStacksUtilities.push("colorMask",
+								() -> RenderSystem.colorMask(false, false, false, false), GLStacksUtilities.COLOR_MASK_FALLBACK);
+						c.writeStencil(stack, mouse, partialTicks, false);
+						GLStacksUtilities.pop("colorMask");
+						GLStacksUtilities.pop("stencilOp");
+
+						GLStacksUtilities.pop("stencilFunc");
+					});
+			});
+
+			GLStacksUtilities.pop("stencilMask");
+			GLStacksUtilities.pop("GL_STENCIL_TEST");
+		} else {
+			GLStacksUtilities.push("GL_SCISSOR_TEST",
+					() -> GL11.glEnable(GL11.GL_SCISSOR_TEST),
+					() -> GL11.glDisable(GL11.GL_SCISSOR_TEST));
+			int[] boundsBox = new int[4];
+			GLStateUtilities.getIntegerValue(GL11.GL_SCISSOR_BOX, boundsBox);
+			getChildren().forEach(c -> {
+				if (c.data.visible)
+					runChildTransformed(stack, c, () -> {
+						ObjectUtilities.acceptRectangle(
+								CoordinateConverters.toNativeRectangle(this,
+										ObjectUtilities.getRectangleExpanded(stack.delegated.peek().createTransformedShape(c.getShape().getBounds2D()).getBounds2D()))
+										.createIntersection(new Rectangle2D.Double(boundsBox[0], boundsBox[1], boundsBox[2], boundsBox[3])),
+								(x, y) -> (w, h) -> GLStacksUtilities.push("glScissor",
+										() -> GLStateUtilities.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{x.intValue(), y.intValue(), w.intValue(), h.intValue()},
+												(i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3])), GLStacksUtilities.GL_SCISSOR_FALLBACK));
+						c.render(stack, mouse, partialTicks);
+						GLStacksUtilities.pop("glScissor");
+					});
+			});
+			GLStacksUtilities.pop("GL_SCISSOR_TEST");
+		}
 	}
 
 	@Override
-	public boolean onMouseScrolled(Point2D mouse, double scrollDelta) { return getChildMouseOver(mouse).filter(c -> c.onMouseScrolled(toRelativePointForComponent(c, mouse), scrollDelta)).isPresent(); }
+	@OverridingMethodsMustInvokeSuper
+	public void onInitialize(IGuiLifecycleHandler handler, GuiComponent<?> invoker) {
+		super.onInitialize(handler, invoker);
+		getChildren().forEach(component -> component.onInitialize(handler, invoker));
+	}
 
 	@Override
-	public boolean onKeyPressed(int key, int scanCode, int modifiers) { return focused != null && focused.onKeyPressed(key, scanCode, modifiers); }
+	@OverridingMethodsMustInvokeSuper
+	public void onTick(IGuiLifecycleHandler handler, GuiComponent<?> invoker) {
+		super.onTick(handler, invoker);
+		children.forEach(component -> component.onTick(handler, invoker));
+	}
 
 	@Override
-	public boolean onKeyReleased(int key, int scanCode, int modifiers) { return focused != null && focused.onKeyReleased(key, scanCode, modifiers); }
+	@OverridingMethodsMustInvokeSuper
+	public void onClose(IGuiLifecycleHandler handler, GuiComponent<?> invoker) {
+		children.forEach(component -> component.onClose(handler, invoker));
+		super.onClose(handler, invoker);
+	}
 
 	@Override
-	public boolean onCharTyped(char codePoint, int modifiers) { return focused != null && focused.onCharTyped(codePoint, modifiers); }
+	@OverridingMethodsMustInvokeSuper
+	public void onDestroyed(IGuiLifecycleHandler handler, GuiComponent<?> invoker) {
+		children.forEach(component -> component.onDestroyed(handler, invoker));
+		super.onDestroyed(handler, invoker);
+	}
+
+	@Override
+	protected boolean isBeingDragged() { return data.drags.isEmpty() && super.isBeingDragged(); }
+
+	@Override
+	protected boolean isBeingHovered() { return !data.getHovering().isPresent() && super.isBeingHovered(); }
+
+	@Override
+	protected boolean isBeingFocused() { return !data.getFocused().isPresent() && super.isBeingFocused(); }
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public boolean onKeyPressed(int key, int scanCode, int modifiers) {
+		super.onKeyPressed(key, scanCode, modifiers);
+		return data.getFocused().filter(f -> f.data.isActive() && f.onKeyPressed(key, scanCode, modifiers)).isPresent();
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public boolean onKeyReleased(int key, int scanCode, int modifiers) {
+		boolean ret = data.getFocused().filter(f -> f.data.isActive() && f.onKeyReleased(key, scanCode, modifiers)).isPresent();
+		super.onKeyReleased(key, scanCode, modifiers);
+		return ret;
+	}
+
+	protected void runChildTransformed(AffineTransformStack stack, GuiComponent<?> child, Runnable call) {
+		getChildTransformed(stack, child, () -> {
+			call.run();
+			return null;
+		});
+	}
+
+	protected <R> R getChildTransformed(AffineTransformStack stack, GuiComponent<?> child, Supplier<R> call) {
+		stack.push();
+		transformChildren(stack);
+		stack.push();
+		child.transformThis(stack);
+		R ret = call.get();
+		stack.delegated.pop();
+		stack.delegated.pop();
+		return ret;
+	}
+
+	protected void transformChildren(AffineTransformStack stack) {
+		Rectangle2D bound = getShape().getBounds2D();
+		stack.delegated.peek().translate(bound.getX(), bound.getY());
+	}
+
+	@Override
+	public void onMouseMoved(AffineTransformStack stack, Point2D mouse) { getChildMouseOver(stack, mouse).ifPresent(c -> runChildTransformed(stack, c, () -> c.onMouseMoved(stack, mouse))); }
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void onMouseHovering(AffineTransformStack stack, Point2D mouse) {
+		@Nullable GuiComponent<?> hovering = unboxOptional(getChildMouseOver(stack, mouse));
+		if (hovering != data.hovering) {
+			data.getHovering().ifPresent(h -> runChildTransformed(stack, h, () -> h.onMouseHovered(stack, mouse)));
+			data.hovering = hovering;
+			data.getHovering().ifPresent(h -> runChildTransformed(stack, h, () -> h.onMouseHover(stack, mouse)));
+		}
+		data.getHovering().ifPresent(h -> runChildTransformed(stack, h, () -> h.onMouseHovering(stack, mouse)));
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void onMouseHovered(AffineTransformStack stack, Point2D mouse) {
+		data.getHovering().ifPresent(h -> runChildTransformed(stack, h, () -> {
+			h.onMouseHovered(stack, mouse);
+			data.hovering = null;
+		}));
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public EnumGuiMouseClickResult onMouseClicked(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) {
+		return getChildMouseOver(stack, mouse).map(c -> getChildTransformed(stack, c, () -> {
+			GuiDragInfo dragC = new GuiDragInfo(c, mouse, button);
+			EnumGuiMouseClickResult ret = c.onMouseClicked(stack, dragC, mouse, button);
+			if (ret.result) data.setFocused(c);
+			if (ret == EnumGuiMouseClickResult.DRAG) data.drags.put(button, dragC);
+			return ret;
+		})).orElse(EnumGuiMouseClickResult.PASS);
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public boolean onMouseReleased(AffineTransformStack stack, Point2D mouse, int button) {
+		return getChildMouseOver(stack, mouse).filter(c -> getChildTransformed(stack, c, () -> c.onMouseReleased(stack, mouse, button))).isPresent();
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public boolean onMouseDragging(AffineTransformStack stack, GuiDragInfo drag, Rectangle2D mouse, int button) {
+		return Optional.ofNullable(data.drags.get(button)).filter(d -> d.dragged.data.isActive() && getChildTransformed(stack, d.dragged, () -> d.dragged.onMouseDragging(stack, d, mouse, button))).isPresent();
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public boolean onMouseDragged(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) {
+		return Optional.ofNullable(data.drags.get(button)).map(d -> d.dragged.data.isActive() && getChildTransformed(stack, d.dragged, () -> {
+			boolean ret = d.dragged.onMouseDragged(stack, d, mouse, button);
+			data.drags.remove(button);
+			return ret;
+		})).orElse(false);
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public boolean onMouseScrolled(AffineTransformStack stack, Point2D mouse, double scrollDelta) {
+		return getChildMouseOver(stack, mouse).filter(c -> getChildTransformed(stack, c, () -> c.onMouseScrolled(stack, mouse, scrollDelta))).isPresent();
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public boolean onCharTyped(char codePoint, int modifiers) { return data.getFocused().filter(f -> f.data.isActive() && f.onCharTyped(codePoint, modifiers)).isPresent(); }
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
+		super.renderPre(stack, mouse, partialTicks);
+		getChildren().forEach(c -> {
+			if (c.data.visible)
+				runChildTransformed(stack, c, () -> c.renderPre(stack, mouse, partialTicks));
+		});
+	}
+
+	public ImmutableList<GuiComponent<?>> getChildrenView() { return ImmutableList.copyOf(getChildren()); }
 
 	@Override
 	public boolean onChangeFocus(boolean next) {
-		boolean hasFocused = focused != null;
-		if (hasFocused && focused.onChangeFocus(next)) return true;
+		Optional<GuiComponent<?>> foc = data.getFocused();
+		if (foc.filter(f -> f.data.isActive() && f.onChangeFocus(next)).isPresent())
+			return true;
 		else {
-			int j = children.indexOf(focused);
-			int i;
-			if (hasFocused && j >= 0) i = j + (next ? 1 : 0);
-			else if (next) i = 0;
-			else i = children.size();
+			int i = foc.filter(f -> getChildren().contains(f))
+					.map(f -> getChildren().indexOf(f) + (next ? 1 : 0))
+					.orElseGet(() -> next ? 0 : getChildren().size());
 
-			ListIterator<? extends GuiComponent> iterator = children.listIterator(i);
+			ListIterator<GuiComponent<?>> iterator = getChildren().listIterator(i);
 			BooleanSupplier canAdvance = next ? iterator::hasNext : iterator::hasPrevious;
-			Supplier<? extends GuiComponent> advance = next ? iterator::next : iterator::previous;
+			Supplier<GuiComponent<?>> advance = next ? iterator::next : iterator::previous;
 
 			while (canAdvance.getAsBoolean()) {
-				GuiComponent advanced = advance.get();
-				if (advanced.onChangeFocus(next)) {
-					focused = advanced;
+				GuiComponent<?> advanced = advance.get();
+				if (advanced.data.isActive() && advanced.onChangeFocus(next)) {
+					data.setFocused(advanced);
 					return true;
 				}
 			}
 
-			focused = null;
+			data.setFocused(null);
 			return false;
 		}
 	}
 
-	protected Optional<? extends GuiComponent> getChildMouseOver(Point2D mouse) {
-		for (GuiComponent child : children)
-			if (child.isMouseOver(toRelativePointForComponent(child, mouse))) return Optional.of(child);
+	protected Optional<GuiComponent<?>> getChildMouseOver(AffineTransformStack stack, Point2D mouse) {
+		for (GuiComponent<?> c : Lists.reverse(getChildren())) {
+			if (getChildTransformed(stack, c, () -> c.contains(stack, mouse)))
+				return Optional.of(c);
+		}
 		return Optional.empty();
 	}
-}
 
+	public static class Data<E extends Events> extends GuiComponent.Data<E> {
+		@Nullable
+		protected GuiComponent<?> focused = null, hovering = null;
+		protected Map<Integer, GuiDragInfo> drags = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
+
+		public Data(E events, Supplier<Logger> logger) {
+			super(events, logger);
+		}
+
+		public Optional<GuiComponent<?>> getHovering() { return Optional.ofNullable(hovering); }
+
+		public ImmutableMap<Integer, GuiDragInfo> getDragsView() { return ImmutableMap.copyOf(drags); }
+
+		public Optional<GuiComponent<?>> getFocused() { return Optional.ofNullable(focused); }
+
+		protected void setFocused(@Nullable GuiComponent<?> component) {
+			getFocused().ifPresent(f -> f.onFocusLost(component));
+			@Nullable GuiComponent<?> from = MiscellaneousUtilities.KNullable(focused, focused = component);
+			getFocused().ifPresent(f -> f.onFocusGet(from));
+		}
+	}
+}

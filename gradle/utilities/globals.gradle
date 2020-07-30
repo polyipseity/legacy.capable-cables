@@ -8,7 +8,7 @@ apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['parseArgument'])
 
 ext {
-    // COMMENT arguments
+	// COMMENT arguments
 
-    buildType = parseArgument.call 'buildType', 'BUILD_TYPE', 'DEBUG'
+	buildType = parseArgument.call 'buildType', 'BUILD_TYPE', 'DEBUG'
 }

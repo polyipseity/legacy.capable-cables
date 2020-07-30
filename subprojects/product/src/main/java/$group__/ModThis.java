@@ -5,6 +5,7 @@ import $group__.proxies.IProxy;
 import $group__.server.ProxyServer;
 import $group__.utilities.Singleton;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -15,9 +16,11 @@ import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
 import static $group__.Constants.MOD_ID;
 import static $group__.Globals.LOGGER;
 import static $group__.common.registrables.blocks.BlocksThis.BLOCKS;
+import static $group__.common.registrables.inventory.ContainersThis.CONTAINERS;
 import static $group__.common.registrables.items.ItemsThis.ITEMS;
-import static $group__.utilities.helpers.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
-import static $group__.utilities.helpers.specific.Loggers.EnumMessages.PREFIX_MOD_LIFECYCLE_MESSAGE;
+import static $group__.common.registrables.tileentities.TileEntityTypesThis.TILE_ENTITIES;
+import static $group__.utilities.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
+import static $group__.utilities.specific.Loggers.EnumMessages.PREFIX_MOD_LIFECYCLE_MESSAGE;
 
 @Mod(MOD_ID)
 @EventBusSubscriber(bus = Bus.MOD)
@@ -26,9 +29,12 @@ public final class ModThis extends Singleton {
 
 	public ModThis() {
 		super(LOGGER);
-		Bus.MOD.bus().get().register(this);
-		BLOCKS.register(Bus.MOD.bus().get());
-		ITEMS.register(Bus.MOD.bus().get());
+		IEventBus eventBusMod = Bus.MOD.bus().get();
+		eventBusMod.register(this);
+		BLOCKS.register(eventBusMod);
+		ITEMS.register(eventBusMod);
+		TILE_ENTITIES.register(eventBusMod);
+		CONTAINERS.register(eventBusMod);
 	}
 
 	public static ResourceLocation getResourceLocation(String path) { return new ResourceLocation(MOD_ID, path); }

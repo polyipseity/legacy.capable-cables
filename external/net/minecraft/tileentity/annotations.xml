@@ -1,0 +1,5 @@
+<root>
+	<item name='net.minecraft.tileentity.TileEntityType.Builder net.minecraft.tileentity.TileEntityType&lt;T&gt; build(com.mojang.datafixers.types.Type&lt;?&gt;) 0'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
+</root>

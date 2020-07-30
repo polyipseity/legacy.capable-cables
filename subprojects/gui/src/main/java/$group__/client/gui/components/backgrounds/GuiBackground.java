@@ -2,10 +2,11 @@ package $group__.client.gui.components.backgrounds;
 
 import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiContainer;
-import $group__.client.gui.components.GuiRoot;
-import $group__.client.gui.utilities.Backgrounds;
-import $group__.utilities.helpers.Adapters;
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import $group__.client.gui.components.roots.GuiRoot;
+import $group__.client.gui.structures.AffineTransformStack;
+import $group__.client.gui.structures.GuiCache.CacheKey;
+import $group__.client.gui.utilities.GuiUtilities;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -14,24 +15,20 @@ import java.awt.geom.Point2D;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
-public abstract class GuiBackground extends GuiComponent {
-	public abstract void renderBackground(Screen screen, Point2D mouse, float partialTicks);
+public abstract class GuiBackground<D extends GuiComponent.Data<E>, E extends GuiComponent.Events> extends GuiComponent<D> {
+	public GuiBackground(D data) { super(getShapePlaceholder(), data); }
 
 	@Override
-	public void render(Point2D mouse, float partialTicks) {
-		if (EnumState.READY.isReachedBy(state)) {
-			Screen screen = Adapters.get(GuiRoot.class, Screen.class, GuiRoot.TO_SCREEN_ADAPTER_DEFAULT).orElseThrow(BecauseOf::unexpected).apply(getRoot().orElseThrow(BecauseOf::unexpected));
-			renderBackground(screen, mouse, partialTicks);
-			Backgrounds.drawnBackground(screen);
-		}
-	}
+	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) { renderBackground(stack, CacheKey.ROOT.get(this).getScreen(), mouse, partialTicks); }
+
+	public void renderBackground(AffineTransformStack stack, Screen screen, Point2D mouse, float partialTicks) { GuiUtilities.GuiBackgrounds.drawnBackground(screen); }
 
 	@Override
-	protected void onAdded(GuiContainer parent) {
-		if (!(parent instanceof GuiRoot)) throw BecauseOf.illegalArgument("parent", parent);
-		if (parent.getChildren().indexOf(this) != 0)
+	public void onAdded(GuiContainer<?> parentCurrent, int index) {
+		if (!(parentCurrent instanceof GuiRoot)) throw BecauseOf.illegalArgument("parentCurrent", parentCurrent);
+		if (parentCurrent.getChildrenView().indexOf(this) != 0)
 			throw new IllegalStateException("Illegal background GUI component index");
-		anchors.add(anchors.getAnchorsToMatch(parent));
-		super.onAdded(parent);
+		data.anchors.add(data.anchors.getAnchorsToMatch(this, parentCurrent));
+		super.onAdded(parentCurrent, index);
 	}
 }

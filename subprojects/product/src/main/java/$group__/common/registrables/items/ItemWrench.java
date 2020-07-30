@@ -4,7 +4,7 @@ import $group__.common.registrables.items.groups.ItemGroupsThis;
 import $group__.common.registrables.utilities.helpers.RegistrableUtilities.BlockUtilities;
 import $group__.common.registrables.utilities.helpers.RegistrableUtilities.NBTs;
 import $group__.common.registrables.utilities.helpers.RegistrableUtilities.RayTraceResults;
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
@@ -33,14 +33,47 @@ import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static $group__.Globals.LOGGER;
-import static $group__.utilities.helpers.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
-import static $group__.utilities.helpers.specific.Optionals.unboxOptional;
+import static $group__.utilities.specific.Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
+import static $group__.utilities.specific.Optionals.unboxOptional;
 
 public class ItemWrench extends Item {
 	protected ItemWrench() {
 		super(new Item.Properties().group(ItemGroupsThis.DEFAULT).maxStackSize(1));
 	}
 
+	@Override
+	public ActionResultType onItemUse(ItemUseContext context) {
+		BlockRayTraceResult targetBlock = RayTraceResults.getBlockRayTraceResultFromItemUseContext(context);
+		if (!canUse(context.getItem(), context.getWorld(), context.getPlayer(), targetBlock))
+			return ActionResultType.PASS;
+		return context.getWorld().isRemote || use(context.getItem(), context.getWorld(), targetBlock) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
+	}
+
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
+	protected static boolean canUse(ItemStack stack, World world, @Nullable LivingEntity user, RayTraceResult target) {
+		Tag tag = new Tag(stack.getTag());
+		switch (target.getType()) {
+			case BLOCK:
+				BlockRayTraceResult targetBlock = (BlockRayTraceResult) target;
+				if (user != null && user.isSneaking()) {
+					if (tag.pickedUpBlock != null) {
+						BlockPos targetPos = BlockUtilities.getPlacePosition(targetBlock);
+						assert tag.pickedUpBlockState != null;
+						BlockState state = Block.getStateById(tag.pickedUpBlockState);
+						// todo blacklist and whitelist system
+						return state.isValidPosition(world, targetPos) && BlockUtilities.checkNoEntityCollision(state, world, targetPos);
+					}
+					return true;
+				}
+				break;
+			case ENTITY:
+				EntityRayTraceResult targetEntity = (EntityRayTraceResult) target;
+				return user != null && user.isSneaking() && tag.pickedUpEntity == null && tag.pickedUpBlock == null && targetEntity.getEntity() instanceof LivingEntity;
+			default:
+				throw BecauseOf.unexpected();
+		}
+		return false;
+	}
 
 	protected static boolean use(ItemStack stack, World world, RayTraceResult target) {
 		Tag tag = new Tag(stack.getTag());
@@ -68,7 +101,7 @@ public class ItemWrench extends Item {
 					tag.pickedUpBlockState = null;
 					stack.setTag(tag.serializeNBT());
 				} else if (tag.pickedUpEntity != null) {
-					@Nullable LivingEntity entity = unboxOptional(EntityType.loadEntityUnchecked(tag.pickedUpEntity, world).filter(e -> e instanceof LivingEntity).map(e -> (LivingEntity) e));
+					@Nullable LivingEntity entity = unboxOptional(EntityType.loadEntityUnchecked(tag.pickedUpEntity, world).filter(LivingEntity.class::isInstance).map(LivingEntity.class::cast));
 					if (entity == null) {
 						LOGGER.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot create entity with tag '{}'", tag.pickedUpEntity));
 						return false;
@@ -102,40 +135,6 @@ public class ItemWrench extends Item {
 				throw BecauseOf.unexpected();
 		}
 		return true;
-	}
-
-	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
-	protected static boolean canUse(ItemStack stack, World world, @Nullable LivingEntity user, RayTraceResult target) {
-		Tag tag = new Tag(stack.getTag());
-		switch (target.getType()) {
-			case BLOCK:
-				BlockRayTraceResult targetBlock = (BlockRayTraceResult) target;
-				if (user != null && user.isSneaking()) {
-					if (tag.pickedUpBlock != null) {
-						BlockPos targetPos = BlockUtilities.getPlacePosition(targetBlock);
-						assert tag.pickedUpBlockState != null;
-						BlockState state = Block.getStateById(tag.pickedUpBlockState);
-						// todo blacklist and whitelist system
-						return state.isValidPosition(world, targetPos) && BlockUtilities.checkNoEntityCollision(state, world, targetPos);
-					}
-					return true;
-				}
-				break;
-			case ENTITY:
-				EntityRayTraceResult targetEntity = (EntityRayTraceResult) target;
-				return user != null && user.isSneaking() && tag.pickedUpEntity == null && tag.pickedUpBlock == null && targetEntity.getEntity() instanceof LivingEntity;
-			default:
-				throw BecauseOf.unexpected();
-		}
-		return false;
-	}
-
-	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
-		BlockRayTraceResult targetBlock = RayTraceResults.getBlockRayTraceResultFromItemUseContext(context);
-		if (!canUse(context.getItem(), context.getWorld(), context.getPlayer(), targetBlock))
-			return ActionResultType.PASS;
-		return context.getWorld().isRemote || use(context.getItem(), context.getWorld(), targetBlock) ? ActionResultType.SUCCESS : ActionResultType.FAIL;
 	}
 
 	@Override

@@ -1,182 +1,131 @@
 package $group__.client.gui.structures;
 
 import $group__.client.gui.components.GuiComponent;
-import $group__.utilities.helpers.specific.Maps;
-import $group__.utilities.helpers.specific.ThrowableUtilities.BecauseOf;
-import net.minecraftforge.api.distmarker.Dist;
+import $group__.utilities.Recursions;
+import $group__.utilities.specific.Maps;
+import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
+import com.google.common.collect.ImmutableMap;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.RectangularShape;
-import java.lang.ref.WeakReference;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
-@OnlyIn(Dist.CLIENT)
-public final class GuiAnchors implements Consumer<Rectangle2D> {
-	protected final ConcurrentMap<AnchorSide, Anchor> anchors = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
+import static net.minecraftforge.api.distmarker.Dist.CLIENT;
+
+@OnlyIn(CLIENT)
+public final class GuiAnchors {
+	private final ConcurrentMap<EnumGuiSide, Anchor> anchors = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();
+	@SuppressWarnings("CanBeFinal")
 	public double border;
-
-	public GuiAnchors(double border) { this.border = border; }
 
 	public GuiAnchors() { this(0); }
 
-	@Override
-	public void accept(Rectangle2D from) { anchors.values().removeIf(anchor -> !anchor.apply(from)); }
+	public GuiAnchors(double border) { this.border = border; }
+
+	public ImmutableMap<EnumGuiSide, Anchor> getAnchorsView() { return ImmutableMap.copyOf(anchors); }
 
 	public void add(Anchor... anchors) {
 		for (Anchor anchor : anchors) {
 			switch (anchor.fromSide) {
 				case UP:
 				case DOWN:
-					remove(AnchorSide.VERTICAL);
+					remove(EnumGuiSide.VERTICAL);
 					break;
 				case VERTICAL:
-					remove(AnchorSide.UP);
-					remove(AnchorSide.DOWN);
+					remove(EnumGuiSide.UP);
+					remove(EnumGuiSide.DOWN);
 					break;
 				case LEFT:
 				case RIGHT:
-					remove(AnchorSide.HORIZONTAL);
+					remove(EnumGuiSide.HORIZONTAL);
 					break;
 				case HORIZONTAL:
-					remove(AnchorSide.LEFT);
-					remove(AnchorSide.RIGHT);
+					remove(EnumGuiSide.LEFT);
+					remove(EnumGuiSide.RIGHT);
 					break;
 				default:
 					throw BecauseOf.unexpected();
 			}
 			this.anchors.put(anchor.fromSide, anchor);
+			anchor.onAdded();
 		}
 	}
 
-	public void remove(AnchorSide... sides) { for (AnchorSide side : sides) anchors.remove(side); }
+	public void remove(EnumGuiSide... sides) {
+		for (EnumGuiSide side : sides) {
+			@Nullable Anchor anchor = anchors.remove(side);
+			if (anchor != null) anchor.onRemoved();
+		}
+	}
 
-	public Anchor[] getAnchorsToMatch(GuiComponent to) {
+	public boolean isEmpty() { return anchors.isEmpty(); }
+
+	public void clear() { remove(EnumGuiSide.values()); }
+
+	public Anchor[] getAnchorsToMatch(GuiComponent<?> from, GuiComponent<?> to) {
 		return new Anchor[]{
-				new Anchor(to, AnchorSide.UP, AnchorSide.UP),
-				new Anchor(to, AnchorSide.DOWN, AnchorSide.DOWN),
-				new Anchor(to, AnchorSide.LEFT, AnchorSide.LEFT),
-				new Anchor(to, AnchorSide.RIGHT, AnchorSide.RIGHT)
+				new Anchor(from, to, EnumGuiSide.UP, EnumGuiSide.UP),
+				new Anchor(from, to, EnumGuiSide.DOWN, EnumGuiSide.DOWN),
+				new Anchor(from, to, EnumGuiSide.LEFT, EnumGuiSide.LEFT),
+				new Anchor(from, to, EnumGuiSide.RIGHT, EnumGuiSide.RIGHT)
 		};
 	}
 
-	public enum AnchorSide {
-		UP {
-			@Override
-			public AnchorSide getOpposite() { return DOWN; }
-
-			@Override
-			public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getY; }
-
-			@Override
-			public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), i, r.getMaxX(), r.getMaxY()); }
-
-			@Override
-			public BiFunction<Double, Double, Double> getApplyBorder() { return Double::sum; }
-		},
-		DOWN {
-			@Override
-			public AnchorSide getOpposite() { return UP; }
-
-			@Override
-			public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getMaxY; }
-
-			@Override
-			public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), r.getY(), r.getMaxX(), i); }
-
-			@Override
-			public BiFunction<Double, Double, Double> getApplyBorder() { return (i, b) -> i - b; }
-		},
-		LEFT {
-			@Override
-			public AnchorSide getOpposite() { return RIGHT; }
-
-			@Override
-			public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getX; }
-
-			@Override
-			public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromDiagonal(i, r.getY(), r.getMaxX(), r.getMaxY()); }
-
-			@Override
-			public BiFunction<Double, Double, Double> getApplyBorder() { return Double::sum; }
-		},
-		RIGHT {
-			@Override
-			public AnchorSide getOpposite() { return LEFT; }
-
-			@Override
-			public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getMaxX; }
-
-			@Override
-			public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), r.getY(), i, r.getMaxY()); }
-
-			@Override
-			public BiFunction<Double, Double, Double> getApplyBorder() { return (i, b) -> i - b; }
-		},
-		HORIZONTAL {
-			@Override
-			public AnchorSide getOpposite() { return VERTICAL; }
-
-			@Override
-			public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getCenterX; }
-
-			@Override
-			public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromCenter(i, r.getCenterY(), r.getX() + i - r.getCenterX(), r.getY()); }
-
-			@Override
-			public BiFunction<Double, Double, Double> getApplyBorder() { return (i, b) -> i; }
-		},
-		VERTICAL {
-			@Override
-			public AnchorSide getOpposite() { return HORIZONTAL; }
-
-			@Override
-			public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getCenterY; }
-
-			@Override
-			public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromCenter(i, r.getCenterY(), r.getX() + i - r.getCenterX(), r.getY()); }
-
-			@Override
-			public BiFunction<Double, Double, Double> getApplyBorder() { return (i, b) -> i; }
-		};
-
-		public abstract AnchorSide getOpposite();
-
-		public abstract Function<Rectangle2D, Double> getGetter();
-
-		public abstract BiConsumer<Rectangle2D, Double> getSetter();
-
-		public abstract BiFunction<Double, Double, Double> getApplyBorder();
-	}
-
+	@OnlyIn(CLIENT)
 	@Immutable
-	public final class Anchor implements Function<Rectangle2D, Boolean> {
-		public final WeakReference<GuiComponent> to;
-		public final AnchorSide fromSide;
-		public final AnchorSide toSide;
+	public final class Anchor {
+		public final GuiComponent<?> from;
+		public final GuiComponent<?> to;
+		public final EnumGuiSide fromSide;
+		public final EnumGuiSide toSide;
 		public final double border;
+		private final Consumer<GuiComponent.Events.CReshapeParameter> listCReshape;
+		private final Consumer<GuiComponent.Events.CDestroyedParameter> listCDestroyed;
 
-		public Anchor(GuiComponent to, AnchorSide fromSide, AnchorSide toSide) { this(to, fromSide, toSide, 0); }
+		public Anchor(GuiComponent<?> from, GuiComponent<?> to, EnumGuiSide fromSide, EnumGuiSide toSide) { this(from, to, fromSide, toSide, 0); }
 
-		public Anchor(GuiComponent to, AnchorSide fromSide, AnchorSide toSide, double border) {
-			this.to = new WeakReference<>(to);
+		public Anchor(GuiComponent<?> from, GuiComponent<?> to, EnumGuiSide fromSide, EnumGuiSide toSide, double border) {
+			this.from = from;
+			this.to = to;
 			this.fromSide = fromSide;
 			this.toSide = toSide;
 			this.border = border;
+
+			listCReshape = par -> { if (!reshape(par)) remove(fromSide); };
+			listCDestroyed = par -> remove(fromSide);
+			checkNoCycles();
 		}
 
-		@Override
-		public Boolean apply(Rectangle2D from) {
-			@Nullable GuiComponent toCopy = to.get();
-			if (toCopy == null) return false;
-			fromSide.getSetter().accept(from, fromSide.getApplyBorder().apply(toSide.getGetter().apply(toCopy.getRectangleView()), GuiAnchors.this.border + border));
+		public boolean reshape(GuiComponent.Events.CReshapeParameter parameter) {
+			Rectangle2D rectangle = from.getShapeView().getBounds2D();
+			fromSide.getSetter().accept(rectangle, fromSide.getApplyBorder().apply(toSide.getGetter().apply(to.getShapeView().getBounds2D()), GuiAnchors.this.border + border));
+			from.setBounds(parameter.handler, parameter.invoker, rectangle);
 			return true;
+		}
+
+		private void checkNoCycles() {
+			Recursions.<Anchor, Void>recurseAsDepthFirstLoop(
+					this,
+					anchor -> null,
+					anchor -> to.data.anchors.getAnchorsView().values(),
+					anchor -> {
+						throw new IllegalStateException("Anchor cycle from '" + anchor.to + " to " + anchor.from);
+					},
+					null
+			);
+		}
+
+		private void onAdded() {
+			to.data.events.cReshape.add(listCReshape);
+			to.data.events.cDestroyed.add(listCDestroyed);
+		}
+
+		private void onRemoved() {
+			to.data.events.cReshape.remove(listCReshape);
+			to.data.events.cDestroyed.remove(listCDestroyed);
 		}
 	}
 }
