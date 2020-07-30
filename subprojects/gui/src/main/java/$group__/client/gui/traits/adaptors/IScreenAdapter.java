@@ -1,4 +1,4 @@
-package $group__.client.gui.traits;
+package $group__.client.gui.traits.adaptors;
 
 import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.structures.AffineTransformStack;

@@ -2,22 +2,22 @@ package $group__.client.gui.components.roots;
 
 import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiContainer;
-import $group__.client.gui.components.IGuiEventListenerComponent;
-import $group__.client.gui.components.IRenderableComponent;
 import $group__.client.gui.components.backgrounds.GuiBackground;
 import $group__.client.gui.structures.AffineTransformStack;
 import $group__.client.gui.structures.Dimension2DDouble;
 import $group__.client.gui.structures.EnumGuiMouseClickResult;
 import $group__.client.gui.structures.GuiDragInfo;
-import $group__.client.gui.traits.IGuiShapeRectangle;
+import $group__.client.gui.traits.adaptors.IGuiEventListenerComponent;
+import $group__.client.gui.traits.adaptors.IRenderableComponent;
 import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
+import $group__.client.gui.traits.shapes.IGuiShapeRectangle;
 import $group__.client.gui.utilities.GLUtilities;
 import $group__.client.gui.utilities.GuiUtilities;
 import $group__.client.gui.utilities.GuiUtilities.DrawingUtilities;
-import $group__.client.gui.utilities.TextComponents;
-import $group__.client.gui.utilities.Tooltips;
-import $group__.client.gui.utilities.Transforms.AffineTransforms;
+import $group__.client.gui.utilities.TextComponentUtilities;
+import $group__.client.gui.utilities.TooltipUtilities;
+import $group__.client.gui.utilities.TransformUtilities.AffineTransformUtilities;
 import $group__.utilities.specific.Maps;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableMap;
@@ -67,7 +67,7 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 		schedule(() -> data.setBackground(data.background));
 	}
 
-	protected Screen makeScreen(ITextComponent title, boolean hasContainer) { return hasContainer ? new ScreenAdaptedWithContainer(title) : new ScreenAdapted(title); }
+	protected Screen makeScreen(ITextComponent title, boolean hasContainer) { return hasContainer ? new ScreenAdaptorWithContainer(title) : new ScreenAdaptor(title); }
 
 	@SuppressWarnings("SameReturnValue")
 	public boolean isPaused() { return false; }
@@ -92,7 +92,7 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-		GLUtilities.GLStacks.clearAll();
+		GLUtilities.GLStacksUtilities.clearAll();
 		RenderSystem.clear(GL11.GL_STENCIL_BUFFER_BIT, Minecraft.IS_RUNNING_ON_MAC);
 		super.render(stack, mouse, partialTicks);
 	}
@@ -238,8 +238,8 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 
 	@OnlyIn(CLIENT)
 	@SuppressWarnings("deprecation")
-	protected class ScreenAdapted extends Screen {
-		protected ScreenAdapted(ITextComponent title) { super(title); }
+	protected class ScreenAdaptor extends Screen {
+		protected ScreenAdaptor(ITextComponent title) { super(title); }
 
 		@Override
 		public void render(int mouseX, int mouseY, float partialTicks) { GuiRoot.this.render(mouseX, mouseY, partialTicks); }
@@ -256,31 +256,31 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 
 		@Override
 		@Deprecated
-		protected void renderTooltip(ItemStack item, int mouseX, int mouseY) { Tooltips.renderTooltip(getMinecraft(), width, height, font, itemRenderer, item, mouseX, mouseY); }
+		protected void renderTooltip(ItemStack item, int mouseX, int mouseY) { TooltipUtilities.renderTooltip(getMinecraft(), width, height, font, itemRenderer, item, mouseX, mouseY); }
 
 		@Override
 		@Deprecated
-		public List<String> getTooltipFromItem(ItemStack item) { return Tooltips.getTooltipFromItem(getMinecraft(), item); }
+		public List<String> getTooltipFromItem(ItemStack item) { return TooltipUtilities.getTooltipFromItem(getMinecraft(), item); }
 
 		@Override
 		@Deprecated
-		public void renderTooltip(String tooltip, int mouseX, int mouseY) { Tooltips.renderTooltip(width, height, font, itemRenderer, tooltip, mouseX, mouseY); }
+		public void renderTooltip(String tooltip, int mouseX, int mouseY) { TooltipUtilities.renderTooltip(width, height, font, itemRenderer, tooltip, mouseX, mouseY); }
 
 		@Override
 		@Deprecated
-		public void renderTooltip(List<String> tooltip, int mouseX, int mouseY) { Tooltips.renderTooltip(width, height, font, itemRenderer, tooltip, mouseX, mouseY); }
+		public void renderTooltip(List<String> tooltip, int mouseX, int mouseY) { TooltipUtilities.renderTooltip(width, height, font, itemRenderer, tooltip, mouseX, mouseY); }
 
 		@Override
 		@Deprecated
-		public void renderTooltip(List<String> tooltip, int mouseX, int mouseY, FontRenderer font) { Tooltips.renderTooltip(width, height, itemRenderer, tooltip, mouseX, mouseY, font); }
+		public void renderTooltip(List<String> tooltip, int mouseX, int mouseY, FontRenderer font) { TooltipUtilities.renderTooltip(width, height, itemRenderer, tooltip, mouseX, mouseY, font); }
 
 		@Override
 		@Deprecated
-		protected void renderComponentHoverEffect(ITextComponent component, int mouseX, int mouseY) { TextComponents.renderComponentHoverEffect(getMinecraft(), width, height, font, component, mouseX, mouseY); }
+		protected void renderComponentHoverEffect(ITextComponent component, int mouseX, int mouseY) { TextComponentUtilities.renderComponentHoverEffect(getMinecraft(), width, height, font, component, mouseX, mouseY); }
 
 		@Override
 		@Deprecated
-		public boolean handleComponentClicked(ITextComponent component) { return TextComponents.handleComponentClicked(this, component); }
+		public boolean handleComponentClicked(ITextComponent component) { return TextComponentUtilities.handleComponentClicked(this, component); }
 
 		@Override
 		@Deprecated
@@ -351,40 +351,40 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 
 		@Override
 		@Deprecated
-		protected void hLine(int x1, int x2, int y, int color) { DrawingUtilities.hLine(AffineTransforms.getIdentity(), x1, x2, y, color, getBlitOffset()); }
+		protected void hLine(int x1, int x2, int y, int color) { DrawingUtilities.hLine(AffineTransformUtilities.getIdentity(), x1, x2, y, color, getBlitOffset()); }
 
 		@Override
 		@Deprecated
-		protected void vLine(int x, int y1, int y2, int color) { DrawingUtilities.vLine(AffineTransforms.getIdentity(), x, y1, y2, color, getBlitOffset()); }
+		protected void vLine(int x, int y1, int y2, int color) { DrawingUtilities.vLine(AffineTransformUtilities.getIdentity(), x, y1, y2, color, getBlitOffset()); }
 
 		@Override
 		@Deprecated
-		protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) { DrawingUtilities.fillGradient(AffineTransforms.getIdentity(), GuiUtilities.ObjectUtilities.getRectangleFromDiagonal(new Point2D.Double(x1, y1), new Point2D.Double(x2, y2)), colorTop, colorBottom, getBlitOffset()); }
+		protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) { DrawingUtilities.fillGradient(AffineTransformUtilities.getIdentity(), GuiUtilities.ObjectUtilities.getRectangleFromDiagonal(new Point2D.Double(x1, y1), new Point2D.Double(x2, y2)), colorTop, colorBottom, getBlitOffset()); }
 
 		@Override
 		@Deprecated
-		public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawCenteredString(AffineTransforms.getIdentity(), font, string, new Point2D.Double(x, y), color); }
+		public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawCenteredString(AffineTransformUtilities.getIdentity(), font, string, new Point2D.Double(x, y), color); }
 
 		@Override
 		@Deprecated
-		public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawRightAlignedString(AffineTransforms.getIdentity(), font, string, new Point2D.Double(x, y), color); }
+		public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawRightAlignedString(AffineTransformUtilities.getIdentity(), font, string, new Point2D.Double(x, y), color); }
 
 		@Override
 		@Deprecated
-		public void drawString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawString(AffineTransforms.getIdentity(), font, string, new Point2D.Double(x, y), color); }
+		public void drawString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawString(AffineTransformUtilities.getIdentity(), font, string, new Point2D.Double(x, y), color); }
 
 		@SuppressWarnings("MagicNumber")
 		@Override
 		@Deprecated
-		public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(AffineTransforms.getIdentity(), new Rectangle2D.Double(x, y, w, h), new Point2D.Double(u, v), new Dimension2DDouble(256, 256), getBlitOffset()); }
+		public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(AffineTransformUtilities.getIdentity(), new Rectangle2D.Double(x, y, w, h), new Point2D.Double(u, v), new Dimension2DDouble(256, 256), getBlitOffset()); }
 	}
 
 	////////// Screen Compatibility //////////
 
 
 	@OnlyIn(CLIENT)
-	protected class ScreenAdaptedWithContainer extends ScreenAdapted implements IHasContainer<Container> {
-		protected ScreenAdaptedWithContainer(ITextComponent title) { super(title); }
+	protected class ScreenAdaptorWithContainer extends ScreenAdaptor implements IHasContainer<Container> {
+		protected ScreenAdaptorWithContainer(ITextComponent title) { super(title); }
 
 		@Override
 		public Container getContainer() {

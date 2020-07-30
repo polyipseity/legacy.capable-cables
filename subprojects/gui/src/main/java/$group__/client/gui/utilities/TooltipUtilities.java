@@ -12,7 +12,7 @@ import java.util.List;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
-public enum Tooltips {
+public enum TooltipUtilities {
 	;
 
 	/**

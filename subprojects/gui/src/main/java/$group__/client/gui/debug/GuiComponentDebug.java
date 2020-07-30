@@ -1,9 +1,9 @@
 package $group__.client.gui.debug;
 
-import $group__.client.gui.components.GuiButton;
 import $group__.client.gui.components.GuiComponent;
-import $group__.client.gui.components.GuiWindow;
 import $group__.client.gui.components.backgrounds.GuiBackgroundDefault;
+import $group__.client.gui.components.common.GuiButton;
+import $group__.client.gui.components.common.GuiWindow;
 import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.components.roots.GuiRootWindows;
 import $group__.client.gui.structures.AffineTransformStack;

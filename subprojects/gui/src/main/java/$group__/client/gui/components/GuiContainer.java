@@ -7,8 +7,8 @@ import $group__.client.gui.structures.GuiCache.CacheKey;
 import $group__.client.gui.structures.GuiDragInfo;
 import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
 import $group__.client.gui.utilities.GLUtilities;
-import $group__.client.gui.utilities.GLUtilities.GLStacks;
-import $group__.client.gui.utilities.GLUtilities.GLState;
+import $group__.client.gui.utilities.GLUtilities.GLStacksUtilities;
+import $group__.client.gui.utilities.GLUtilities.GLStateUtilities;
 import $group__.client.gui.utilities.GuiUtilities.ObjectUtilities;
 import $group__.utilities.MiscellaneousUtilities;
 import $group__.utilities.specific.Maps;
@@ -100,55 +100,55 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 	@OverridingMethodsMustInvokeSuper
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		if (Minecraft.getInstance().getFramebuffer().isStencilEnabled()) {
-			int stencilRef = Math.floorMod(CacheKey.Z.get(this), (int) Math.pow(2, GLState.getInteger(GL11.GL_STENCIL_BITS)));
+			int stencilRef = Math.floorMod(CacheKey.Z.get(this), (int) Math.pow(2, GLStateUtilities.getInteger(GL11.GL_STENCIL_BITS)));
 
-			GLStacks.push("GL_STENCIL_TEST",
+			GLStacksUtilities.push("GL_STENCIL_TEST",
 					() -> GL11.glEnable(GL11.GL_STENCIL_TEST), () -> GL11.glDisable(GL11.GL_STENCIL_TEST));
-			GLStacks.push("stencilMask",
-					() -> RenderSystem.stencilMask(GLUtilities.GL_MASK_ALL_BITS), GLStacks.STENCIL_MASK_FALLBACK);
+			GLStacksUtilities.push("stencilMask",
+					() -> RenderSystem.stencilMask(GLUtilities.GL_MASK_ALL_BITS), GLStacksUtilities.STENCIL_MASK_FALLBACK);
 
 			getChildren().forEach(c -> {
 				if (c.data.visible)
 					runChildTransformed(stack, c, () -> {
-						GLStacks.push("stencilFunc",
-								() -> RenderSystem.stencilFunc(GL11.GL_EQUAL, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLStacks.STENCIL_FUNC_FALLBACK);
-						GLStacks.push("stencilOp",
-								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL14.GL_INCR_WRAP, GL14.GL_INCR_WRAP), GLStacks.STENCIL_OP_FALLBACK);
-						GLStacks.push("colorMask",
-								() -> RenderSystem.colorMask(false, false, false, false), GLStacks.COLOR_MASK_FALLBACK);
+						GLStacksUtilities.push("stencilFunc",
+								() -> RenderSystem.stencilFunc(GL11.GL_EQUAL, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLStacksUtilities.STENCIL_FUNC_FALLBACK);
+						GLStacksUtilities.push("stencilOp",
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL14.GL_INCR_WRAP, GL14.GL_INCR_WRAP), GLStacksUtilities.STENCIL_OP_FALLBACK);
+						GLStacksUtilities.push("colorMask",
+								() -> RenderSystem.colorMask(false, false, false, false), GLStacksUtilities.COLOR_MASK_FALLBACK);
 						c.writeStencil(stack, mouse, partialTicks, true);
-						GLStacks.pop("colorMask");
-						GLStacks.pop("stencilOp");
-						GLStacks.pop("stencilFunc");
+						GLStacksUtilities.pop("colorMask");
+						GLStacksUtilities.pop("stencilOp");
+						GLStacksUtilities.pop("stencilFunc");
 
-						GLStacks.push("stencilFunc",
-								() -> RenderSystem.stencilFunc(GL11.GL_LESS, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLStacks.STENCIL_FUNC_FALLBACK);
+						GLStacksUtilities.push("stencilFunc",
+								() -> RenderSystem.stencilFunc(GL11.GL_LESS, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLStacksUtilities.STENCIL_FUNC_FALLBACK);
 
-						GLStacks.push("stencilOp",
-								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP), GLStacks.STENCIL_OP_FALLBACK);
+						GLStacksUtilities.push("stencilOp",
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP), GLStacksUtilities.STENCIL_OP_FALLBACK);
 						c.render(stack, mouse, partialTicks);
-						GLStacks.pop("stencilOp");
+						GLStacksUtilities.pop("stencilOp");
 
-						GLStacks.push("stencilOp",
-								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_REPLACE, GL11.GL_REPLACE), GLStacks.STENCIL_OP_FALLBACK);
-						GLStacks.push("colorMask",
-								() -> RenderSystem.colorMask(false, false, false, false), GLStacks.COLOR_MASK_FALLBACK);
+						GLStacksUtilities.push("stencilOp",
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_REPLACE, GL11.GL_REPLACE), GLStacksUtilities.STENCIL_OP_FALLBACK);
+						GLStacksUtilities.push("colorMask",
+								() -> RenderSystem.colorMask(false, false, false, false), GLStacksUtilities.COLOR_MASK_FALLBACK);
 						c.writeStencil(stack, mouse, partialTicks, false);
-						GLStacks.pop("colorMask");
-						GLStacks.pop("stencilOp");
+						GLStacksUtilities.pop("colorMask");
+						GLStacksUtilities.pop("stencilOp");
 
-						GLStacks.pop("stencilFunc");
+						GLStacksUtilities.pop("stencilFunc");
 					});
 			});
 
-			GLStacks.pop("stencilMask");
-			GLStacks.pop("GL_STENCIL_TEST");
+			GLStacksUtilities.pop("stencilMask");
+			GLStacksUtilities.pop("GL_STENCIL_TEST");
 		} else {
-			GLStacks.push("GL_SCISSOR_TEST",
+			GLStacksUtilities.push("GL_SCISSOR_TEST",
 					() -> GL11.glEnable(GL11.GL_SCISSOR_TEST),
 					() -> GL11.glDisable(GL11.GL_SCISSOR_TEST));
 			int[] boundsBox = new int[4];
-			GLState.getIntegerValue(GL11.GL_SCISSOR_BOX, boundsBox);
+			GLStateUtilities.getIntegerValue(GL11.GL_SCISSOR_BOX, boundsBox);
 			getChildren().forEach(c -> {
 				if (c.data.visible)
 					runChildTransformed(stack, c, () -> {
@@ -156,14 +156,14 @@ public class GuiContainer<D extends GuiContainer.Data<?>> extends GuiComponent<D
 								CoordinateConverters.toNativeRectangle(this,
 										ObjectUtilities.getRectangleExpanded(stack.delegated.peek().createTransformedShape(c.getShape().getBounds2D()).getBounds2D()))
 										.createIntersection(new Rectangle2D.Double(boundsBox[0], boundsBox[1], boundsBox[2], boundsBox[3])),
-								(x, y) -> (w, h) -> GLStacks.push("glScissor",
-										() -> GLState.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{x.intValue(), y.intValue(), w.intValue(), h.intValue()},
-												(i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3])), GLStacks.GL_SCISSOR_FALLBACK));
+								(x, y) -> (w, h) -> GLStacksUtilities.push("glScissor",
+										() -> GLStateUtilities.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{x.intValue(), y.intValue(), w.intValue(), h.intValue()},
+												(i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3])), GLStacksUtilities.GL_SCISSOR_FALLBACK));
 						c.render(stack, mouse, partialTicks);
-						GLStacks.pop("glScissor");
+						GLStacksUtilities.pop("glScissor");
 					});
 			});
-			GLStacks.pop("GL_SCISSOR_TEST");
+			GLStacksUtilities.pop("GL_SCISSOR_TEST");
 		}
 	}
 

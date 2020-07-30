@@ -1,11 +1,11 @@
-package $group__.client.gui.components;
+package $group__.client.gui.traits.adaptors;
 
 import $group__.annotations.OverridingStatus;
 import $group__.client.gui.ConstantsGui;
+import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.structures.AffineTransformStack;
 import $group__.client.gui.structures.EnumGuiMouseClickResult;
 import $group__.client.gui.structures.GuiDragInfo;
-import $group__.client.gui.traits.IScreenAdapter;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -50,7 +50,6 @@ public interface IGuiEventListenerComponent {
 
 	default void onFocusGet(@Nullable GuiComponent<?> from) {}
 
-	@SuppressWarnings("DeprecatedIsStillUsed")
 	@OnlyIn(CLIENT)
 	interface IAdapter extends IScreenAdapter, IGuiEventListenerComponent, IGuiEventListener {
 		@Override

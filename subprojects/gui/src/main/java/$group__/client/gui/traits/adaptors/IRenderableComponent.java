@@ -1,10 +1,9 @@
-package $group__.client.gui.components;
+package $group__.client.gui.traits.adaptors;
 
 import $group__.annotations.OverridingStatus;
 import $group__.client.gui.ConstantsGui;
 import $group__.client.gui.structures.AffineTransformStack;
 import $group__.client.gui.structures.EnumGuiState;
-import $group__.client.gui.traits.IScreenAdapter;
 import net.minecraft.client.gui.IRenderable;
 import net.minecraftforge.api.distmarker.OnlyIn;
 

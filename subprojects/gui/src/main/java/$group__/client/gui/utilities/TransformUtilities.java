@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
-public enum Transforms {
+public enum TransformUtilities {
 	;
 
 	public static final int MATRIX_ARRAY_LENGTH = 16;
@@ -29,7 +29,7 @@ public enum Transforms {
 	public static int toArrayIndex(int row, int column) { return row * 4 + column; }
 
 	@OnlyIn(CLIENT)
-	public enum Matrices {
+	public enum MatrixUtilities {
 		;
 
 		private static final Matrix4f IDENTITY = new Matrix4f();
@@ -104,7 +104,7 @@ public enum Transforms {
 	}
 
 	@OnlyIn(CLIENT)
-	public enum AffineTransforms {
+	public enum AffineTransformUtilities {
 		;
 
 		private static final AffineTransform IDENTITY = new AffineTransform();

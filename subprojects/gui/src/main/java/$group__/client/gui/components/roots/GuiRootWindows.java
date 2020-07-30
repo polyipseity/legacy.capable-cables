@@ -1,8 +1,8 @@
 package $group__.client.gui.components.roots;
 
 import $group__.client.gui.components.GuiComponent;
-import $group__.client.gui.components.GuiWindow;
 import $group__.client.gui.components.backgrounds.GuiBackground;
+import $group__.client.gui.components.common.GuiWindow;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.inventory.container.Container;

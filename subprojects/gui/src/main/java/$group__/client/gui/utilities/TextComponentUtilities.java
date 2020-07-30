@@ -9,7 +9,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
-public enum TextComponents {
+public enum TextComponentUtilities {
 	;
 
 	/**

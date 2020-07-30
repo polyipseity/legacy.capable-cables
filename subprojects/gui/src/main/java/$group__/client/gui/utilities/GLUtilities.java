@@ -36,12 +36,12 @@ public enum GLUtilities {
 	public static long getWindowHandle() { return Minecraft.getInstance().getMainWindow().getHandle(); }
 
 	@OnlyIn(CLIENT)
-	public enum GLStacks {
+	public enum GLStacksUtilities {
 		;
 
 		public static final Runnable GL_SCISSOR_FALLBACK = () -> {
 			MainWindow window = Minecraft.getInstance().getMainWindow();
-			GLState.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{0, 0, window.getFramebufferWidth(), window.getFramebufferHeight()}, (i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3]));
+			GLStateUtilities.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{0, 0, window.getFramebufferWidth(), window.getFramebufferHeight()}, (i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3]));
 		},
 				STENCIL_MASK_FALLBACK = () -> RenderSystem.stencilMask(GLUtilities.GL_MASK_ALL_BITS),
 				STENCIL_FUNC_FALLBACK = () -> RenderSystem.stencilFunc(GL11.GL_ALWAYS, 0, GLUtilities.GL_MASK_ALL_BITS),
@@ -64,14 +64,14 @@ public enum GLUtilities {
 		}
 
 		public static void clearAll() {
-			STACKS.keySet().forEach(GLStacks::clear);
+			STACKS.keySet().forEach(GLStacksUtilities::clear);
 			STACKS.clear();
 		}
 
 		public static void clear(String name) {
 			Deque<GLCall> stack = getStack(name);
 			if (!stack.isEmpty()) {
-				LOGGER.warn(Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} leak: {}: {} not popped", GLStacks.class.getSimpleName(), name, stack.size()));
+				LOGGER.warn(Loggers.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} leak: {}: {} not popped", GLStacksUtilities.class.getSimpleName(), name, stack.size()));
 				while (!stack.isEmpty())
 					pop(name);
 			}
@@ -94,7 +94,7 @@ public enum GLUtilities {
 	}
 
 	@OnlyIn(CLIENT)
-	public enum GLState {
+	public enum GLStateUtilities {
 		;
 
 		private static final ConcurrentMap<Integer, Object> STATE = Maps.MAP_MAKER_SINGLE_THREAD.makeMap();

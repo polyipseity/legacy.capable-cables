@@ -1,12 +1,14 @@
-package $group__.client.gui.components;
+package $group__.client.gui.components.common;
 
-import $group__.client.gui.components.GuiWindow.GuiDragInfoWindow.EnumGuiDragType;
+import $group__.client.gui.components.GuiComponent;
+import $group__.client.gui.components.GuiContainer;
+import $group__.client.gui.components.common.GuiWindow.GuiDragInfoWindow.EnumGuiDragType;
 import $group__.client.gui.structures.*;
 import $group__.client.gui.structures.GuiCache.CacheKey;
-import $group__.client.gui.traits.IGuiShapeRectangle;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
+import $group__.client.gui.traits.shapes.IGuiShapeRectangle;
 import $group__.client.gui.utilities.GLUtilities;
-import $group__.client.gui.utilities.GLUtilities.GLStacks;
+import $group__.client.gui.utilities.GLUtilities.GLStacksUtilities;
 import $group__.client.gui.utilities.GuiUtilities;
 import $group__.client.gui.utilities.GuiUtilities.DrawingUtilities;
 import $group__.utilities.Casts;
@@ -73,15 +75,15 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 				reshape(this, c);
 				GuiUtilities.ObjectUtilities.acceptRectangle(r, (x, y) -> (w, h) -> r.setRect(x, y, w - 1, h - 1));
 				if (Minecraft.getInstance().getFramebuffer().isStencilEnabled()) {
-					GLStacks.push("GL_STENCIL_TEST",
+					GLStacksUtilities.push("GL_STENCIL_TEST",
 							() -> GL11.glDisable(GL11.GL_STENCIL_TEST), () -> GL11.glDisable(GL11.GL_STENCIL_TEST));
 					DrawingUtilities.drawRectangle(transformR, r, data.colors.dragging.getRGB(), 0);
-					GLStacks.pop("GL_STENCIL_TEST");
+					GLStacksUtilities.pop("GL_STENCIL_TEST");
 				} else {
-					GLStacks.push("GL_SCISSOR_TEST",
+					GLStacksUtilities.push("GL_SCISSOR_TEST",
 							() -> GL11.glDisable(GL11.GL_SCISSOR_TEST), () -> GL11.glDisable(GL11.GL_SCISSOR_TEST));
 					DrawingUtilities.drawRectangle(transformR, r, data.colors.dragging.getRGB(), 0);
-					GLStacks.pop("GL_SCISSOR_TEST");
+					GLStacksUtilities.pop("GL_SCISSOR_TEST");
 				}
 			});
 		}

@@ -1,4 +1,4 @@
-package $group__.client.gui.traits;
+package $group__.client.gui.traits.shapes;
 
 import net.minecraftforge.api.distmarker.OnlyIn;
 

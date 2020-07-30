@@ -1,5 +1,6 @@
-package $group__.client.gui.components;
+package $group__.client.gui.components.common;
 
+import $group__.client.gui.components.GuiContainer;
 import $group__.client.gui.structures.AffineTransformStack;
 import $group__.client.gui.structures.EnumCursor;
 import $group__.client.gui.structures.EnumGuiMouseClickResult;

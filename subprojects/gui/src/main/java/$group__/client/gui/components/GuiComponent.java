@@ -3,11 +3,13 @@ package $group__.client.gui.components;
 import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.structures.*;
 import $group__.client.gui.structures.GuiCache.CacheKey;
+import $group__.client.gui.traits.adaptors.IGuiEventListenerComponent;
+import $group__.client.gui.traits.adaptors.IRenderableComponent;
 import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
 import $group__.client.gui.utilities.GLUtilities;
 import $group__.client.gui.utilities.GuiUtilities;
-import $group__.client.gui.utilities.Transforms.AffineTransforms;
+import $group__.client.gui.utilities.TransformUtilities.AffineTransformUtilities;
 import $group__.utilities.specific.Streams;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import $group__.utilities.specific.ThrowableUtilities.Try;
@@ -92,7 +94,7 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 		data.events.fire(data.events.cReshape, new Events.CReshapeParameter(this, handler, invoker, shapePrevious));
 	}
 
-	protected Shape adaptToBounds(IGuiReshapeHandler handler, GuiComponent<?> invoker, Rectangle2D rectangle) { return AffineTransforms.getTransformFromTo(getShape().getBounds2D(), rectangle).createTransformedShape(getShape()); }
+	protected Shape adaptToBounds(IGuiReshapeHandler handler, GuiComponent<?> invoker, Rectangle2D rectangle) { return AffineTransformUtilities.getTransformFromTo(getShape().getBounds2D(), rectangle).createTransformedShape(getShape()); }
 
 	@SuppressWarnings("EmptyMethod")
 	protected void transformThis(AffineTransformStack stack) {}
@@ -151,7 +153,7 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 			return getParent().flatMap(p -> p.getNearestParentThatIs(clazz));
 	}
 
-	public Shape getShapeView() { return AffineTransforms.getIdentity().createTransformedShape(shape); }
+	public Shape getShapeView() { return AffineTransformUtilities.getIdentity().createTransformedShape(shape); }
 
 	protected boolean isBeingDragged() { return getParent().filter(d -> d.data.drags.values().stream().anyMatch(dI -> dI.dragged == this)).isPresent(); }
 
@@ -165,6 +167,7 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 
 	protected boolean isBeingHovered() { return getParent().filter(p -> p.data.hovering == this).isPresent(); }
 
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	protected boolean isBeingFocused() { return getParent().filter(p -> p.data.focused == this).isPresent(); }
 
 	@Override
@@ -177,7 +180,7 @@ public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IR
 				r2 = (Rectangle2D) r.clone();
 		data.constraints.forEach(c -> c.accept(r2));
 		if (!r.equals(r2))
-			Try.call(() -> AffineTransforms.getTransformFromTo(r, r2), data.logger.get()).ifPresent(t -> CacheKey.RESHAPE_HANDLER.get(this).reshape(this, this, t.createTransformedShape(getShape())));
+			Try.call(() -> AffineTransformUtilities.getTransformFromTo(r, r2), data.logger.get()).ifPresent(t -> CacheKey.RESHAPE_HANDLER.get(this).reshape(this, this, t.createTransformedShape(getShape())));
 	}
 
 	@Override

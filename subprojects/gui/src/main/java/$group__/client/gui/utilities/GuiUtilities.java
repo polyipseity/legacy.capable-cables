@@ -23,7 +23,7 @@ import java.awt.geom.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-import static $group__.client.gui.utilities.Transforms.AffineTransforms.*;
+import static $group__.client.gui.utilities.TransformUtilities.AffineTransformUtilities.*;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
