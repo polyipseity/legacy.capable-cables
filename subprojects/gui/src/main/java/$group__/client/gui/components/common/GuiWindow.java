@@ -217,7 +217,7 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 	public enum CacheKeys {
 		;
 
-		public static final CacheKey<GuiWindow<?>, Rectangle2D> RECTANGLE_DRAGGABLE = new CacheKey<GuiWindow<?>, Rectangle2D>(getKey("rectangle_draggable")) {
+		public static final CacheKey<GuiWindow<?>, Rectangle2D> RECTANGLE_DRAGGABLE = new CacheKey<GuiWindow<?>, Rectangle2D>("rectangle_draggable") {
 			@Override
 			public void initialize(GuiWindow<?> component) {
 				super.initialize(component);
@@ -232,7 +232,7 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 						component.data.logger.get()).map(CastUtilities::<Rectangle2D>castUnchecked).orElseThrow(BecauseOf::unexpected);
 			}
 		};
-		public static final CacheKey<GuiWindow<?>, Rectangle2D> RECTANGLE_CLICKABLE = new CacheKey<GuiWindow<?>, Rectangle2D>(getKey("rectangle_clickable")) {
+		public static final CacheKey<GuiWindow<?>, Rectangle2D> RECTANGLE_CLICKABLE = new CacheKey<GuiWindow<?>, Rectangle2D>("rectangle_clickable") {
 			@Override
 			public void initialize(GuiWindow<?> component) {
 				super.initialize(component);
@@ -247,7 +247,7 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 						component.data.logger.get()).map(CastUtilities::<Rectangle2D>castUnchecked).orElseThrow(BecauseOf::unexpected);
 			}
 		};
-		public static final CacheKey<GuiWindow<?>, GuiConstraint> CONSTRAINT = new CacheKey<GuiWindow<?>, GuiConstraint>(getKey("constraint")) {
+		public static final CacheKey<GuiWindow<?>, GuiConstraint> CONSTRAINT = new CacheKey<GuiWindow<?>, GuiConstraint>("constraint") {
 			@Override
 			public void initialize(GuiWindow<?> component) {
 				super.initialize(component);

@@ -41,6 +41,8 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 @OnlyIn(CLIENT)
 public abstract class GuiComponent<D extends GuiComponent.Data<?>> implements IRenderableComponent, IGuiEventListenerComponent {
 	// todo add animation system
+	// todo add name
+	// todo cache transform
 	private static final GuiConstraint CONSTRAINT_MINIMUM = new GuiConstraint(new Rectangle2D.Double(CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE, 1, 1), getConstraintRectangleNone());
 	private static final Rectangle2D SHAPE_PLACEHOLDER = new Rectangle2D.Double(0, 0, 1, 1);
 	public final D data;

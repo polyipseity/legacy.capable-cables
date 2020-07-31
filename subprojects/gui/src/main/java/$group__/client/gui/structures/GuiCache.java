@@ -7,18 +7,18 @@ import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.ConcurrencyUtilities;
+import $group__.utilities.DynamicUtilities;
+import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.specific.MapUtilities;
 import $group__.utilities.specific.ThrowableUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
@@ -28,7 +28,7 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
 public class GuiCache {
-	public final Cache<ResourceLocation, Object> delegated =
+	public final Cache<String, Object> delegated =
 			CacheBuilder.newBuilder()
 					.initialCapacity(INITIAL_CAPACITY_SMALL)
 					.expireAfterAccess(MapUtilities.CACHE_EXPIRATION_ACCESS_DURATION, MapUtilities.CACHE_EXPIRATION_ACCESS_TIME_UNIT)
@@ -36,7 +36,7 @@ public class GuiCache {
 
 	@OnlyIn(CLIENT)
 	public static abstract class CacheKey<C extends GuiComponent<?>, T> {
-		public static final CacheKey<GuiComponent<?>, GuiRoot<?, ?>> ROOT = new CacheKey<GuiComponent<?>, GuiRoot<?, ?>>(getKey("root")) {
+		public static final CacheKey<GuiComponent<?>, GuiRoot<?, ?>> ROOT = new CacheKey<GuiComponent<?>, GuiRoot<?, ?>>("root") {
 			@Override
 			public void invalidate(GuiComponent<?> component) {
 				super.invalidate(component);
@@ -56,7 +56,7 @@ public class GuiCache {
 				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected)), component.data.logger.get()).map(CastUtilities::<GuiRoot<?, ?>>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
 			}
 		};
-		public static final CacheKey<GuiComponent<?>, IGuiLifecycleHandler> LIFECYCLE_HANDLER = new CacheKey<GuiComponent<?>, IGuiLifecycleHandler>(getKey("lifecycle_handler")) {
+		public static final CacheKey<GuiComponent<?>, IGuiLifecycleHandler> LIFECYCLE_HANDLER = new CacheKey<GuiComponent<?>, IGuiLifecycleHandler>("lifecycle_handler") {
 			@Override
 			public void invalidate(GuiComponent<?> component) {
 				super.invalidate(component);
@@ -76,7 +76,7 @@ public class GuiCache {
 				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(IGuiLifecycleHandler.class).orElseThrow(BecauseOf::unexpected)), component.data.logger.get()).map(CastUtilities::<IGuiLifecycleHandler>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
 			}
 		};
-		public static final CacheKey<GuiComponent<?>, IGuiReshapeHandler> RESHAPE_HANDLER = new CacheKey<GuiComponent<?>, IGuiReshapeHandler>(getKey("reshape_handler")) {
+		public static final CacheKey<GuiComponent<?>, IGuiReshapeHandler> RESHAPE_HANDLER = new CacheKey<GuiComponent<?>, IGuiReshapeHandler>("reshape_handler") {
 			@Override
 			public void invalidate(GuiComponent<?> component) {
 				super.invalidate(component);
@@ -96,7 +96,7 @@ public class GuiCache {
 				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(IGuiReshapeHandler.class).orElseThrow(BecauseOf::unexpected)), component.data.logger.get()).map(CastUtilities::<IGuiReshapeHandler>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
 			}
 		};
-		public static final CacheKey<GuiComponent<?>, Integer> Z = new CacheKey<GuiComponent<?>, Integer>(getKey("z")) {
+		public static final CacheKey<GuiComponent<?>, Integer> Z = new CacheKey<GuiComponent<?>, Integer>("z") {
 			@Override
 			protected void initialize(GuiComponent<?> component) {
 				super.initialize(component);
@@ -115,12 +115,10 @@ public class GuiCache {
 			}
 		};
 
-		public final ResourceLocation key;
+		public final String key;
 		protected final Set<C> initialized = new HashSet<>(INITIAL_CAPACITY_LARGE);
 
-		public CacheKey(ResourceLocation key) { this.key = key; }
-
-		private static ResourceLocation getKey(String path) { return new ResourceLocation(GuiCache.class.getSimpleName().toLowerCase(Locale.ROOT), path); }
+		public CacheKey(String key) { this.key = NamespaceUtilities.getNamespacePrefixedString(":", DynamicUtilities.getCallerClass().getName(), key); }
 
 		public T get(C component) {
 			if (initialized.add(component)) initialize(component);

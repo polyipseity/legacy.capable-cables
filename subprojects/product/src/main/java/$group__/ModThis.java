@@ -3,6 +3,7 @@ package $group__;
 import $group__.client.ProxyClient;
 import $group__.proxies.IProxy;
 import $group__.server.ProxyServer;
+import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.structures.Singleton;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -39,7 +40,7 @@ public final class ModThis extends Singleton {
 
 	public static ResourceLocation getResourceLocation(String path) { return new ResourceLocation(MOD_ID, path); }
 
-	public static String getNamespacePrefixedName(String name) { return MOD_ID + '.' + name; }
+	public static String getNamespacePrefixedString(String separator, String string) { return NamespaceUtilities.getNamespacePrefixedString(separator, MOD_ID, string); }
 
 	private static IProxy getProxyClientSupplier() { return new ProxyClient(LOGGER); }
 
