@@ -113,10 +113,6 @@ public enum ThrowableUtilities {
 
 		public static ClassCastException classCast(Object obj, Class<?> clazz) throws ClassCastException { throw new ClassCastException("'" + obj + "' cannot be casted to '" + clazz.toGenericString() + '\''); }
 
-		public static NullPointerException nullPointer() throws NullPointerException { throw new NullPointerException(); }
-
-		public static UnsupportedOperationException unsupportedOperation() throws UnsupportedOperationException { throw new UnsupportedOperationException(); }
-
 		public static RuntimeException instantiation() throws RuntimeException { throw propagate(new InstantiationException(getCallerClass().toGenericString())); }
 
 		public static InternalError unexpected() throws InternalError { throw new InternalError(); }

@@ -3,7 +3,6 @@ package $group__.client.gui.structures;
 import $group__.client.gui.components.GuiComponent;
 import $group__.utilities.RecursionUtilities;
 import $group__.utilities.specific.MapUtilities;
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableMap;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -47,7 +46,7 @@ public final class GuiAnchors {
 					remove(EnumGuiSide.RIGHT);
 					break;
 				default:
-					throw BecauseOf.unexpected();
+					throw new InternalError();
 			}
 			this.anchors.put(anchor.fromSide, anchor);
 			anchor.onAdded();

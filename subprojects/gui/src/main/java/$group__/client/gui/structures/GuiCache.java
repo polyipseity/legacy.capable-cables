@@ -9,7 +9,6 @@ import $group__.utilities.CastUtilities;
 import $group__.utilities.ConcurrencyUtilities;
 import $group__.utilities.specific.MapUtilities;
 import $group__.utilities.specific.ThrowableUtilities;
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -52,8 +51,8 @@ public class GuiCache {
 			}
 
 			@Override
-			public GuiRoot<?, ?> get0(GuiComponent<?> component) {
-				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(GuiRoot.class).orElseThrow(BecauseOf::unexpected)), component.data.logger.get()).map(CastUtilities::<GuiRoot<?, ?>>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
+			public GuiRoot<?, ?, ?> get0(GuiComponent<?, ?> component) {
+				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(GuiRoot.class).orElseThrow(InternalError::new)), component.data.logger.get()).map(CastUtilities::<GuiRoot<?, ?, ?>>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
 			}
 		};
 		public static final CacheKey<GuiComponent<?>, IGuiLifecycleHandler> LIFECYCLE_HANDLER = new CacheKey<GuiComponent<?>, IGuiLifecycleHandler>(getKey("lifecycle_handler")) {
@@ -63,7 +62,8 @@ public class GuiCache {
 				if (component instanceof GuiContainer)
 					((GuiContainer<?>) component).getChildrenView().forEach(this::invalidate);
 			}
-
+		};
+		public static final CacheKey<GuiComponent<?, ?>, IGuiLifecycleHandler> LIFECYCLE_HANDLER = new CacheKey<GuiComponent<?, ?>, IGuiLifecycleHandler>("lifecycle_handler") {
 			@Override
 			public void initialize(GuiComponent<?> component) {
 				super.initialize(component);
@@ -72,8 +72,8 @@ public class GuiCache {
 			}
 
 			@Override
-			public IGuiLifecycleHandler get0(GuiComponent<?> component) {
-				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(IGuiLifecycleHandler.class).orElseThrow(BecauseOf::unexpected)), component.data.logger.get()).map(CastUtilities::<IGuiLifecycleHandler>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
+			public IGuiLifecycleHandler get0(GuiComponent<?, ?> component) {
+				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(IGuiLifecycleHandler.class).orElseThrow(InternalError::new)), component.data.logger.get()).map(CastUtilities::<IGuiLifecycleHandler>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
 			}
 		};
 		public static final CacheKey<GuiComponent<?>, IGuiReshapeHandler> RESHAPE_HANDLER = new CacheKey<GuiComponent<?>, IGuiReshapeHandler>(getKey("reshape_handler")) {
@@ -83,7 +83,8 @@ public class GuiCache {
 				if (component instanceof GuiContainer)
 					((GuiContainer<?>) component).getChildrenView().forEach(this::invalidate);
 			}
-
+		};
+		public static final CacheKey<GuiComponent<?, ?>, IGuiReshapeHandler> RESHAPE_HANDLER = new CacheKey<GuiComponent<?, ?>, IGuiReshapeHandler>("reshape_handler") {
 			@Override
 			public void initialize(GuiComponent<?> component) {
 				super.initialize(component);
@@ -92,8 +93,15 @@ public class GuiCache {
 			}
 
 			@Override
-			public IGuiReshapeHandler get0(GuiComponent<?> component) {
-				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(IGuiReshapeHandler.class).orElseThrow(BecauseOf::unexpected)), component.data.logger.get()).map(CastUtilities::<IGuiReshapeHandler>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
+			public IGuiReshapeHandler get0(GuiComponent<?, ?> component) {
+				return ThrowableUtilities.Try.call(() -> component.data.cache.delegated.get(key, () -> component.getNearestParentThatIs(IGuiReshapeHandler.class).orElseThrow(InternalError::new)), component.data.logger.get()).map(CastUtilities::<IGuiReshapeHandler>castUnchecked).orElseThrow(ThrowableCatcher::rethrow);
+			}
+
+			@Override
+			public void invalidate(GuiComponent<?, ?> component) {
+				super.invalidate(component);
+				if (component instanceof GuiContainer)
+					((GuiContainer<?, ?>) component).getChildrenView().forEach(this::invalidate);
 			}
 		};
 		public static final CacheKey<GuiComponent<?>, Integer> Z = new CacheKey<GuiComponent<?>, Integer>(getKey("z")) {

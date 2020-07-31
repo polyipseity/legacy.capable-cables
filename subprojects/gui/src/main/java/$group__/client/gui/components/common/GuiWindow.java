@@ -108,12 +108,7 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 	public void reshape(GuiComponent<?> invoker) { reshape(invoker, getRectangle()); }
 
 	@Override
-	public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-		GuiConstraint constraint = CacheKeys.CONSTRAINT.get(this);
-		data.constraints.add(constraint);
-		super.renderPre(stack, mouse, partialTicks);
-		data.constraints.remove(constraint);
-	}
+	public void reshape(GuiComponent<?, ?> invoker, Shape shape) { setBounds(this, invoker, shape.getBounds2D()); }
 
 	@Override
 	public void onMouseHovering(AffineTransformStack stack, Point2D mouse) {
@@ -132,7 +127,7 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 							data.cursor = EnumCursor.STANDARD_RESIZE_HORIZONTAL_CURSOR;
 						else if (sides.contains(EnumGuiSide.UP) || sides.contains(EnumGuiSide.DOWN))
 							data.cursor = EnumCursor.STANDARD_RESIZE_VERTICAL_CURSOR;
-						else throw BecauseOf.unexpected();
+						else throw new InternalError();
 						GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), data.cursor.handle);
 						return true;
 					}).isPresent()) {
@@ -141,6 +136,17 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 			}
 		}
 	}
+
+	@Override
+	public void renderPre(AffineTransformStack stack, Point2D mouse, float partialTicks) {
+		GuiConstraint constraint = CacheKeys.CONSTRAINT.get(this);
+		data.constraints.add(constraint);
+		super.renderPre(stack, mouse, partialTicks);
+		data.constraints.remove(constraint);
+	}
+
+	@Override
+	protected Optional<GuiComponent<?, ?>> getChildMouseOver(AffineTransformStack stack, Point2D mouse) { return isBeingDragged() ? Optional.empty() : super.getChildMouseOver(stack, mouse).filter(c -> stack.delegated.peek().createTransformedShape(getShape()).contains(mouse)); }
 
 	@Override
 	public void onMouseHovered(AffineTransformStack stack, Point2D mouse) {
@@ -243,7 +249,7 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 				return Try.call(() -> component.data.cache.delegated.get(key, () ->
 								GuiUtilities.ObjectUtilities.applyRectangle(component.getRectangle(), (x, y) -> (w, h) ->
 										new Rectangle2D.Double(x - WINDOW_RESHAPE_THICKNESS, y - WINDOW_RESHAPE_THICKNESS, w + WINDOW_RESHAPE_THICKNESS * 2, h + WINDOW_RESHAPE_THICKNESS * 2))),
-						component.data.logger.get()).map(CastUtilities::<Rectangle2D>castUnchecked).orElseThrow(BecauseOf::unexpected);
+						component.data.logger.get()).map(CastUtilities::<Rectangle2D>castUnchecked).orElseThrow(InternalError::new);
 			}
 		};
 		public static final CacheKey<GuiWindow<?>, GuiConstraint> CONSTRAINT = new CacheKey<GuiWindow<?>, GuiConstraint>(getKey("constraint")) {
@@ -259,7 +265,7 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 					Rectangle2D rRoot = CacheKey.ROOT.get(component).getRectangleView();
 					return new GuiConstraint(new Rectangle2D.Double(0, 0, WINDOW_VISIBLE_MINIMUM, WINDOW_VISIBLE_MINIMUM),
 							new Rectangle2D.Double(rRoot.getMaxX() - WINDOW_VISIBLE_MINIMUM, rRoot.getMaxY() - WINDOW_VISIBLE_MINIMUM, CONSTRAINT_NONE_VALUE, CONSTRAINT_NONE_VALUE));
-				}), component.data.logger.get()).map(CastUtilities::<GuiConstraint>castUnchecked).orElseThrow(BecauseOf::unexpected);
+				}), component.data.logger.get()).map(CastUtilities::<GuiConstraint>castUnchecked).orElseThrow(InternalError::new);
 			}
 		};
 
@@ -352,7 +358,7 @@ public class GuiWindow<D extends GuiWindow.Data<?, ?>> extends GuiContainer<D> i
 					}
 					break;
 				default:
-					throw BecauseOf.unexpected();
+					throw new InternalError();
 			}
 		}
 
