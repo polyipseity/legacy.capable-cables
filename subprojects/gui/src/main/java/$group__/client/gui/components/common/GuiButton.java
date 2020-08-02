@@ -1,10 +1,7 @@
 package $group__.client.gui.components.common;
 
 import $group__.client.gui.components.GuiContainer;
-import $group__.client.gui.structures.AffineTransformStack;
-import $group__.client.gui.structures.EnumCursor;
-import $group__.client.gui.structures.EnumGuiMouseClickResult;
-import $group__.client.gui.structures.GuiDragInfo;
+import $group__.client.gui.structures.*;
 import $group__.client.gui.utilities.GLUtilities;
 import $group__.client.gui.utilities.GuiUtilities;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -20,15 +17,15 @@ import java.util.function.Supplier;
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 @OnlyIn(CLIENT)
-public abstract class GuiButton<D extends GuiButton.Data<?, ?>> extends GuiContainer<D> {
+public abstract class GuiButton<S extends ShapeDescriptor<?>, D extends GuiButton.Data<?, ?>> extends GuiContainer<S, D> {
 	protected boolean keyPressing = false;
 
-	public GuiButton(Shape shape, D data) { super(shape, data); }
+	public GuiButton(S shape, D data) { super(shape, data); }
 
 	@Override
 	public void render(AffineTransformStack stack, Point2D mouse, float partialTicks) {
 		AffineTransform transform = stack.delegated.peek();
-		Shape transformed = transform.createTransformedShape(getShape());
+		Shape transformed = transform.createTransformedShape(getShapeDescriptor().getShape());
 		if (keyPressing || (isBeingDragged() && transformed.contains(mouse))) {
 			GuiUtilities.DrawingUtilities.drawShape(transformed, true, data.colors.clicking, 0);
 			GuiUtilities.DrawingUtilities.drawShape(transformed, false, data.colors.clickingBorder, 0);
@@ -66,7 +63,7 @@ public abstract class GuiButton<D extends GuiButton.Data<?, ?>> extends GuiConta
 	protected abstract boolean onButtonMousePressed(int button);
 
 	@Override
-	public boolean onMouseDragged(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) { return super.onMouseDragged(stack, drag, mouse, button) || stack.delegated.peek().createTransformedShape(getShape()).contains(mouse) && onButtonMouseReleased(button); }
+	public boolean onMouseDragged(AffineTransformStack stack, GuiDragInfo drag, Point2D mouse, int button) { return super.onMouseDragged(stack, drag, mouse, button) || stack.delegated.peek().createTransformedShape(getShapeDescriptor().getShape()).contains(mouse) && onButtonMouseReleased(button); }
 
 	@Override
 	public void onMouseHover(AffineTransformStack stack, Point2D mouse) { GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), EnumCursor.STANDARD_HAND_CURSOR.handle); }

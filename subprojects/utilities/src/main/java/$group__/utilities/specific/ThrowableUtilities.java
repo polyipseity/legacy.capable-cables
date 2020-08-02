@@ -23,7 +23,7 @@ public enum ThrowableUtilities {
 
 	public static RuntimeException propagate(Throwable t) throws RuntimeException {
 		UNSAFE.throwException(t);
-		throw BecauseOf.unexpected();
+		throw new InternalError();
 	}
 
 	public static String getCurrentStackTraceString() { return ExceptionUtils.getStackTrace(create()); }
@@ -50,18 +50,18 @@ public enum ThrowableUtilities {
 		@SuppressWarnings("ConstantConditions")
 		public static RuntimeException rethrow() throws RuntimeException {
 			rethrow(false);
-			throw BecauseOf.unexpected();
+			throw new InternalError();
 		}
 
 		public static void rethrow(boolean nullable) {
 			if (nullable) retrieve().ifPresent(ThrowableUtilities::propagate);
-			else throw propagate(retrieve().orElseThrow(BecauseOf::unexpected));
+			else throw propagate(retrieve().orElseThrow(InternalError::new));
 		}
 
 		public static Optional<Throwable> retrieve() { return Optional.ofNullable(CAUGHT_THROWABLE.get()); }
 
 		public static void acceptIfCaught(Consumer<? super Throwable> consumer) {
-			if (caught()) consumer.accept(retrieve().orElseThrow(BecauseOf::unexpected));
+			if (caught()) consumer.accept(retrieve().orElseThrow(InternalError::new));
 		}
 
 		public static boolean caught() { return retrieve().isPresent(); }
@@ -118,8 +118,6 @@ public enum ThrowableUtilities {
 		public static UnsupportedOperationException unsupportedOperation() throws UnsupportedOperationException { throw new UnsupportedOperationException(); }
 
 		public static RuntimeException instantiation() throws RuntimeException { throw propagate(new InstantiationException(getCallerClass().toGenericString())); }
-
-		public static InternalError unexpected() throws InternalError { throw new InternalError(); }
 
 		public static IllegalArgumentException illegalArgument(Object... arguments) throws IllegalArgumentException {
 			assert arguments.length % 2 == 0;

@@ -73,7 +73,7 @@ public enum DynamicUtilities {
 					break;
 				}
 			}
-			UNSAFE = unsafe.orElseThrow(BecauseOf::unexpected);
+			UNSAFE = unsafe.orElseThrow(InternalError::new);
 		}
 	}
 

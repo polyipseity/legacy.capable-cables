@@ -3,15 +3,11 @@ package $group__.client.gui.components.roots;
 import $group__.client.gui.components.GuiComponent;
 import $group__.client.gui.components.GuiContainer;
 import $group__.client.gui.components.backgrounds.GuiBackground;
-import $group__.client.gui.structures.AffineTransformStack;
-import $group__.client.gui.structures.Dimension2DDouble;
-import $group__.client.gui.structures.EnumGuiMouseClickResult;
-import $group__.client.gui.structures.GuiDragInfo;
+import $group__.client.gui.structures.*;
 import $group__.client.gui.traits.adaptors.IGuiEventListenerComponent;
 import $group__.client.gui.traits.adaptors.IRenderableComponent;
 import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
 import $group__.client.gui.traits.handlers.IGuiReshapeHandler;
-import $group__.client.gui.traits.shapes.IGuiShapeRectangle;
 import $group__.client.gui.utilities.GLUtilities;
 import $group__.client.gui.utilities.GuiUtilities;
 import $group__.client.gui.utilities.GuiUtilities.DrawingUtilities;
@@ -19,7 +15,6 @@ import $group__.client.gui.utilities.TextComponentUtilities;
 import $group__.client.gui.utilities.TooltipUtilities;
 import $group__.client.gui.utilities.TransformUtilities.AffineTransformUtilities;
 import $group__.utilities.specific.MapUtilities;
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
@@ -46,6 +41,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SINGLE;
@@ -55,13 +51,13 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 
 @OnlyIn(CLIENT)
-public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container> extends GuiContainer<D> implements IRenderableComponent.IAdapter, IGuiEventListenerComponent.IAdapter, IGuiShapeRectangle, IGuiLifecycleHandler, IGuiReshapeHandler {
+public abstract class GuiRoot<S extends ShapeDescriptor<? extends Rectangle2D>, D extends GuiRoot.Data<?, C>, C extends Container> extends GuiContainer<S, D> implements IRenderableComponent.IAdapter, IGuiEventListenerComponent.IAdapter, IGuiLifecycleHandler, IGuiReshapeHandler<S> {
 	public final Screen screen;
 	protected final FakeParent fakeParent = new FakeParent();
 	protected final AffineTransformStack stack = new AffineTransformStack();
 
-	protected GuiRoot(ITextComponent title, D data) {
-		super(getShapePlaceholder(), data);
+	protected GuiRoot(ITextComponent title, Function<? super Rectangle2D, ? extends S> shape, D data) {
+		super(shape.apply(getShapePlaceholder()), data);
 		screen = makeScreen(title, data.container != null);
 
 		data.events.dBackgroundSet.add(par -> {
@@ -77,21 +73,18 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 	public boolean isPaused() { return false; }
 
 	@Override
-	protected Shape adaptToBounds(IGuiReshapeHandler handler, GuiComponent<?> invoker, Rectangle2D rectangle) { return rectangle; }
-
-	@Override
-	public void onReshape(IGuiReshapeHandler handler, GuiComponent<?> invoker, Shape shapePrevious) {
+	public void onReshape(IGuiReshapeHandler<?> handler, GuiComponent<?, ?> invoker, Shape shapePrevious) {
 		data.anchors.clear();
 		super.onReshape(handler, invoker, shapePrevious);
 	}
 
 	@Override
 	@Deprecated
-	public final void onAdded(GuiContainer<?> parentCurrent, int index) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
+	public final void onAdded(GuiContainer<?, ?> parentCurrent, int index) throws UnsupportedOperationException { throw new UnsupportedOperationException(); }
 
 	@Override
 	@Deprecated
-	public final void onRemoved(GuiContainer<?> parentPrevious) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
+	public final void onRemoved(GuiContainer<?, ?> parentPrevious) throws UnsupportedOperationException { throw new UnsupportedOperationException(); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -108,43 +101,22 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 	}
 
 	@Override
-	public void reshape(GuiComponent<?> invoker) { reshape(invoker, getRectangle()); }
+	public void initialize(GuiComponent<?, ?> invoker) { onInitialize(this, invoker); }
 
-	protected Rectangle2D getRectangle() { return (Rectangle2D) super.getShape(); }
+	@Override
+	public void reshape(GuiComponent<?, ?> invoker) { reshape(invoker, s -> {}); }
 
 	@SuppressWarnings("SameReturnValue")
 	public int getFocusChangeKey() { return GLFW.GLFW_KEY_TAB; }
 
 	@Override
-	public void initialize(GuiComponent<?> invoker) { onInitialize(this, invoker); }
-
-	@Override
-	public Rectangle2D getRectangleView() { return (Rectangle2D) getRectangle().clone(); }
-
-	@Override
-	public void onInitialize(IGuiLifecycleHandler handler, GuiComponent<?> invoker) {
+	public void onInitialize(IGuiLifecycleHandler handler, GuiComponent<?, ?> invoker) {
 		super.onInitialize(handler, invoker);
-		reshape(this, new Rectangle2D.Double(0, 0, getScreen().width, getScreen().height));
+		reshape(this, s -> s.getShape().setRect(0, 0, getScreen().width, getScreen().height));
 	}
 
 	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void reshape(GuiComponent<?> invoker, Shape shape) { setBounds(this, invoker, shape.getBounds2D()); }
-
-	@Override
-	protected boolean isBeingDragged() { return data.getDragsView().isEmpty() && !fakeParent.drags.isEmpty(); }
-
-	@Override
-	protected boolean isBeingHovered() { return true; }
-
-	@Override
-	public void tick(GuiComponent<?> invoker) { onTick(this, invoker); }
-
-	@Override
-	public void close(GuiComponent<?> invoker) { onClose(this, invoker); }
-
-	@Override
-	public void onClose(IGuiLifecycleHandler handler, GuiComponent<?> invoker) {
+	public void onClose(IGuiLifecycleHandler handler, GuiComponent<?, ?> invoker) {
 		super.onClose(handler, invoker);
 
 		// COMMENT synthetic events
@@ -157,6 +129,28 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 		Minecraft client = getScreen().getMinecraft();
 		client.deferTask(() -> client.displayGuiScreen(null));
 	}
+
+	@Override
+	public void tick(GuiComponent<?, ?> invoker) { onTick(this, invoker); }
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void reshape(GuiComponent<?, ?> invoker, Consumer<? super S> transformer) { transformShape(this, invoker, transformer); }
+
+	@Override
+	protected boolean isBeingDragged() { return data.getDragsView().isEmpty() && !fakeParent.drags.isEmpty(); }
+
+	@Override
+	protected boolean isBeingHovered() { return true; }
+
+	@Override
+	public void close(GuiComponent<?, ?> invoker) { onClose(this, invoker); }
+
+	@Override
+	public void destroy(GuiComponent<?, ?> invoker) { onDestroyed(this, invoker); }
+
+	@Override
+	public GuiRoot<?, ?, ?> getRoot() { return this; }
 
 	@Override
 	public boolean onKeyPressed(int key, int scanCode, int modifiers) {
@@ -181,48 +175,37 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 
 	public Screen getScreen() { return screen; }
 
-	@Override
-	public void destroy(GuiComponent<?> invoker) { onDestroyed(this, invoker); }
-
-	@Override
-	public AffineTransformStack getTransformStack() { return stack; }
-
-	@Override
-	public GuiRoot<?, ?> getRoot() { return this; }
-
-	@Override
-	public Optional<GuiDragInfo> getDragInfo(int button) { return Optional.ofNullable(fakeParent.drags.get(button)); }
-
-	@Override
-	public ImmutableMap<Integer, GuiDragInfo> getDragInfo() { return ImmutableMap.copyOf(fakeParent.drags); }
-
 	public <T extends Screen & IHasContainer<C>> T getContainerScreen() {
-		if (data.container == null) throw BecauseOf.unsupportedOperation();
+		if (data.container == null) throw new UnsupportedOperationException();
 		return castUnchecked(getScreen());
 	}
 
-	@OnlyIn(CLIENT)
-	protected static class FakeParent {
-		protected ConcurrentMap<Integer, GuiDragInfo> drags = MapUtilities.getMapMakerSingleThread().initialCapacity(INITIAL_CAPACITY_TINY).makeMap();
-	}
+	@Override
+	public AffineTransformStack getTransformStack() { return stack; }
 
 	@OnlyIn(CLIENT)
 	public static class Data<E extends Events, C extends Container> extends GuiContainer.Data<E> {
 		@Nullable
 		public final C container;
 		@Nullable
-		protected GuiBackground<?, ?> background;
+		protected GuiBackground<?, ?, ?> background;
 
-		public Data(E events, Supplier<Logger> logger, @Nullable GuiBackground<?, ?> background, @Nullable C container) {
+		public Data(E events, Supplier<Logger> logger, @Nullable GuiBackground<?, ?, ?> background, @Nullable C container) {
 			super(events, logger);
 			this.container = container;
 			this.background = background;
 		}
 
-		public Optional<GuiBackground<?, ?>> getBackground() { return Optional.ofNullable(background); }
+		public Optional<GuiBackground<?, ?, ?>> getBackground() { return Optional.ofNullable(background); }
 
-		public void setBackground(@Nullable GuiBackground<?, ?> background) { events.fire(events.dBackgroundSet, new Events.DBackgroundSetParameter(this.background, this.background = background)); }
+		public void setBackground(@Nullable GuiBackground<?, ?, ?> background) { events.fire(events.dBackgroundSet, new Events.DBackgroundSetParameter(this.background, this.background = background)); }
 	}
+
+	@Override
+	public Optional<GuiDragInfo> getDragInfo(int button) { return Optional.ofNullable(fakeParent.drags.get(button)); }
+
+	@Override
+	public ImmutableMap<Integer, GuiDragInfo> getDragInfo() { return ImmutableMap.copyOf(fakeParent.drags); }
 
 	@OnlyIn(CLIENT)
 	public static class Events extends GuiComponent.Events {
@@ -231,13 +214,18 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 		@OnlyIn(CLIENT)
 		public static final class DBackgroundSetParameter extends DParameter {
 			@Nullable
-			public final GuiBackground<?, ?> previous, current;
+			public final GuiBackground<?, ?, ?> previous, current;
 
-			public DBackgroundSetParameter(@Nullable GuiBackground<?, ?> previous, @Nullable GuiBackground<?, ?> current) {
+			public DBackgroundSetParameter(@Nullable GuiBackground<?, ?, ?> previous, @Nullable GuiBackground<?, ?, ?> current) {
 				this.previous = previous;
 				this.current = current;
 			}
 		}
+	}
+
+	@OnlyIn(CLIENT)
+	protected static class FakeParent {
+		protected ConcurrentMap<Integer, GuiDragInfo> drags = MapUtilities.getMapMakerSingleThread().initialCapacity(INITIAL_CAPACITY_TINY).makeMap();
 	}
 
 	@OnlyIn(CLIENT)
@@ -290,7 +278,7 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 		@Deprecated
 		public void setSize(int width, int height) {
 			super.setSize(width, height);
-			GuiRoot.this.reshape(GuiRoot.this, new Rectangle2D.Double(0, 0, width, height));
+			GuiRoot.this.reshape(GuiRoot.this, s -> s.getShape().setRect(0, 0, width, height));
 		}
 
 		@Override
@@ -382,6 +370,7 @@ public abstract class GuiRoot<D extends GuiRoot.Data<?, C>, C extends Container>
 		@Deprecated
 		public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(AffineTransformUtilities.getIdentity(), new Rectangle2D.Double(x, y, w, h), new Point2D.Double(u, v), new Dimension2DDouble(256, 256), getBlitOffset()); }
 	}
+
 
 	////////// Screen Compatibility //////////
 

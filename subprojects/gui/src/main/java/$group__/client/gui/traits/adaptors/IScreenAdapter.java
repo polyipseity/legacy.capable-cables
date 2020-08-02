@@ -14,7 +14,7 @@ import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 public interface IScreenAdapter {
 	AffineTransformStack getTransformStack();
 
-	GuiRoot<?, ?> getRoot();
+	GuiRoot<?, ?, ?> getRoot();
 
 	Map<Integer, GuiDragInfo> getDragInfo();
 

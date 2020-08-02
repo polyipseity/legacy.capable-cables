@@ -7,8 +7,9 @@ import $group__.client.gui.components.common.GuiWindow;
 import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.components.roots.GuiRootWindows;
 import $group__.client.gui.structures.AffineTransformStack;
+import $group__.client.gui.structures.ShapeDescriptor;
 import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
+import $group__.client.gui.utilities.GuiUtilities;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -40,9 +41,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 
-import javax.annotation.Nullable;
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -60,76 +59,60 @@ public enum GuiComponentDebug {
 
 	public static Block getBlockEntry() { return BlockDebug.INSTANCE; }
 
-	public static TileEntityType<TileEntityDebug> getTileEntityEntry() {
-		if (TileEntityDebug.type == null)
-			TileEntityDebug.type = TileEntityType.Builder.create(TileEntityDebug::new, BlockDebug.INSTANCE).build(null);
-		return TileEntityDebug.type;
-	}
+	public static TileEntityType<TileEntityDebug> getTileEntityEntry() { return TileEntityDebug.Type.INSTANCE; }
 
-	public static ContainerType<ContainerDebug> getContainerEntry() {
-		if (ContainerDebug.type == null) {
-			ContainerDebug.type = IForgeContainerType.create((windowId, inv, data) -> {
-				assert Minecraft.getInstance().world != null;
-				return new ContainerDebug(windowId, Minecraft.getInstance().world, data.readBlockPos());
-			});
-		}
-		return ContainerDebug.type;
-	}
+	public static ContainerType<ContainerDebug> getContainerEntry() { return ContainerDebug.Type.INSTANCE; }
 
 	@OnlyIn(CLIENT)
 	public static <T extends Screen & IHasContainer<ContainerDebug>> void registerGuiFactory() {
-		assert ContainerDebug.type != null;
 		// COMMENT compilation error without the cast
-		ScreenManager.registerFactory(ContainerDebug.type, (ScreenManager.IScreenFactory<ContainerDebug, T>) (container, inv, title) -> new GuiDebug(title, container).getContainerScreen());
+		ScreenManager.registerFactory(ContainerDebug.Type.INSTANCE, (ScreenManager.IScreenFactory<ContainerDebug, T>) (container, inv, title) -> new GuiDebug(title, container).getContainerScreen());
 	}
 }
 
 @OnlyIn(CLIENT)
-final class GuiDebug extends GuiRootWindows<GuiRoot.Data<GuiRoot.Events, ContainerDebug>, ContainerDebug> {
+final class GuiDebug extends GuiRootWindows<ShapeDescriptor.Rectangular<Rectangle2D>, GuiRoot.Data<GuiRoot.Events, ContainerDebug>, ContainerDebug> {
 	private static final Logger LOGGER = LogManager.getLogger();
 
 	@SuppressWarnings("MagicNumber")
 	GuiDebug(ITextComponent title, ContainerDebug container) {
-		super(title,
-				new Data<>(new Events(), GuiDebug::getLogger, new GuiBackgroundDefault<>(
+		super(title, ShapeDescriptor.Rectangular::new,
+				new Data<>(new Events(), GuiDebug::getLogger, new GuiBackgroundDefault<>(ShapeDescriptor.Rectangular::new,
 						new GuiComponent.Data<>(new GuiComponent.Events(), GuiDebug::getLogger)), container));
 		{
-			GuiWindow<?> window1 = new GuiWindow<>(new Rectangle2D.Double(10, 10, 100, 100),
+			GuiWindow<?, ?> window1 = new GuiWindow<>(new ShapeDescriptor.Rectangular<>(new Rectangle2D.Double(10, 10, 100, 100)),
 					new GuiWindow.Data<>(new GuiComponent.Events(), GuiDebug::getLogger, new GuiWindow.Data.ColorData()));
-			GuiWindow<?> window2 = new GuiWindow<GuiWindow.Data<?, ?>>(new Rectangle2D.Double(50, 50, 200, 200),
+			GuiWindow<?, ?> window2 = new GuiWindow<ShapeDescriptor.Rectangular<Rectangle2D.Double>, GuiWindow.Data<GuiComponent.Events, GuiWindow.Data.ColorData>>(new ShapeDescriptor.Rectangular<>(new Rectangle2D.Double(50, 50, 200, 200)),
 					new GuiWindow.Data<>(new GuiComponent.Events(), GuiDebug::getLogger, new GuiWindow.Data.ColorData())) {
-				protected double rotation = 0;
-				protected int tick = 0;
+				protected final Rectangle2D current = new Rectangle2D.Double();
+				protected final Random random = new Random();
+				protected double tick = 0;
 
 				@Override
 				public void renderTick(AffineTransformStack stack, Point2D mouse, float partialTicks) {
-					rotation = (rotation + 0.25 * partialTicks) % 360;
+					tick = (tick + partialTicks) % 360;
+					if (tick % 120 == 0) {
+						GuiUtilities.ObjectUtilities.acceptRectangle(getShapeDescriptor().getShape(), (x, y) -> (w, h) -> current.setFrame(x * random.nextDouble() * 2, y * random.nextDouble() * 2, w * random.nextDouble() * 2, y * random.nextDouble() * 2));
+						data.setActive(!data.isActive());
+					}
+					reshape(this, this, s -> s.adapt(current));
 					super.renderTick(stack, mouse, partialTicks);
 				}
 
 				@Override
-				protected void transformThis(AffineTransformStack stack) {
-					// COMMENT I will probably not support transforms with windows due to its draggable and resizable properties...
-					super.transformThis(stack);
-					Rectangle2D r = getRectangle();
-					AffineTransform transform = stack.delegated.peek();
-					transform.rotate(Math.toRadians(rotation), r.getX() + 50, r.getY() + 50);
-					transform.scale(1.5, 0.5);
-				}
-
-				@Override
-				public void onTick(IGuiLifecycleHandler handler, GuiComponent<?> invoker) {
-					tick = (tick + 1) % 100;
-					if (tick == 0)
+				public void onTick(IGuiLifecycleHandler handler, GuiComponent<?, ?> invoker) {
+					tick = (tick + 1) % 360;
+					if (tick % 120 == 0)
 						data.setActive(!data.isActive());
 					super.onTick(handler, invoker);
 				}
 			};
 			{
-				GuiButton<?> button;
+				GuiButton<?, ?> button;
 				{
 					Random random = new Random();
-					button = new GuiButton<GuiButton.Data<?, ?>>(new Ellipse2D.Double(0, 0, 100, 100),
+					// FIXME ellipse
+					button = new GuiButton<ShapeDescriptor.Rectangular<?>, GuiButton.Data<?, ?>>(new ShapeDescriptor.Rectangular<>(new Ellipse2D.Double(0, 0, 100, 100)),
 							new GuiButton.Data<>(new GuiComponent.Events(), GuiDebug::getLogger, new GuiButton.Data.ColorData())) {
 						@Override
 						protected boolean onButtonKeyboardPressed(int key, int scanCode, int modifiers) { return key == GLFW.GLFW_KEY_ENTER; }
@@ -167,18 +150,25 @@ final class GuiDebug extends GuiRootWindows<GuiRoot.Data<GuiRoot.Events, Contain
 }
 
 final class ContainerDebug extends Container {
-	@Nullable
-	static ContainerType<ContainerDebug> type;
 	private final TileEntity tileEntity;
 
 	ContainerDebug(int id, World world, BlockPos pos) {
-		super(type, id);
+		super(Type.INSTANCE, id);
 		tileEntity = requireNonNull(world.getTileEntity(pos));
 	}
 
 	@Override
 	public boolean canInteractWith(PlayerEntity playerIn) {
 		return isWithinUsableDistance(IWorldPosCallable.of(requireNonNull(tileEntity.getWorld()), tileEntity.getPos()), playerIn, BlockDebug.INSTANCE);
+	}
+
+	enum Type {
+		;
+
+		static final ContainerType<ContainerDebug> INSTANCE = IForgeContainerType.create((windowId, inv, data) -> {
+			assert Minecraft.getInstance().world != null;
+			return new ContainerDebug(windowId, Minecraft.getInstance().world, data.readBlockPos());
+		});
 	}
 }
 
@@ -205,21 +195,24 @@ final class BlockDebug extends Block {
 			if (tileEntity instanceof INamedContainerProvider)
 				NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) tileEntity, tileEntity.getPos());
 			else
-				throw BecauseOf.unexpected();
+				throw new InternalError();
 		}
 		return ActionResultType.SUCCESS;
 	}
 }
 
 final class TileEntityDebug extends TileEntity implements INamedContainerProvider {
-	@Nullable
-	static TileEntityType<TileEntityDebug> type;
-
-	TileEntityDebug() { super(requireNonNull(type)); }
+	TileEntityDebug() { super(requireNonNull(Type.INSTANCE)); }
 
 	@Override
 	public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) { return new ContainerDebug(id, requireNonNull(getWorld()), getPos()); }
 
 	@Override
 	public ITextComponent getDisplayName() { return GuiComponentDebug.DISPLAY_NAME; }
+
+	enum Type {
+		;
+
+		static final TileEntityType<TileEntityDebug> INSTANCE = TileEntityType.Builder.create(TileEntityDebug::new, BlockDebug.INSTANCE).build(null);
+	}
 }

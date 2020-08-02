@@ -46,9 +46,9 @@ public interface IGuiEventListenerComponent {
 
 	default boolean onChangeFocus(boolean next) { return false; }
 
-	default void onFocusLost(@Nullable GuiComponent<?> to) {}
+	default void onFocusLost(@Nullable GuiComponent<?, ?> to) {}
 
-	default void onFocusGet(@Nullable GuiComponent<?> from) {}
+	default void onFocusGet(@Nullable GuiComponent<?, ?> from) {}
 
 	@OnlyIn(CLIENT)
 	interface IAdapter extends IScreenAdapter, IGuiEventListenerComponent, IGuiEventListener {

@@ -3,7 +3,6 @@ package $group__.client.gui.structures;
 import $group__.client.gui.components.GuiComponent;
 import $group__.utilities.RecursionUtilities;
 import $group__.utilities.specific.MapUtilities;
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableMap;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -47,7 +46,7 @@ public final class GuiAnchors {
 					remove(EnumGuiSide.RIGHT);
 					break;
 				default:
-					throw BecauseOf.unexpected();
+					throw new InternalError();
 			}
 			this.anchors.put(anchor.fromSide, anchor);
 			anchor.onAdded();
@@ -65,7 +64,7 @@ public final class GuiAnchors {
 
 	public void clear() { remove(EnumGuiSide.values()); }
 
-	public Anchor[] getAnchorsToMatch(GuiComponent<?> from, GuiComponent<?> to) {
+	public Anchor[] getAnchorsToMatch(GuiComponent<?, ?> from, GuiComponent<?, ?> to) {
 		return new Anchor[]{
 				new Anchor(from, to, EnumGuiSide.UP, EnumGuiSide.UP),
 				new Anchor(from, to, EnumGuiSide.DOWN, EnumGuiSide.DOWN),
@@ -77,17 +76,17 @@ public final class GuiAnchors {
 	@OnlyIn(CLIENT)
 	@Immutable
 	public final class Anchor {
-		public final GuiComponent<?> from;
-		public final GuiComponent<?> to;
+		public final GuiComponent<?, ?> from;
+		public final GuiComponent<?, ?> to;
 		public final EnumGuiSide fromSide;
 		public final EnumGuiSide toSide;
 		public final double border;
 		private final Consumer<GuiComponent.Events.CReshapeParameter> listCReshape;
 		private final Consumer<GuiComponent.Events.CDestroyedParameter> listCDestroyed;
 
-		public Anchor(GuiComponent<?> from, GuiComponent<?> to, EnumGuiSide fromSide, EnumGuiSide toSide) { this(from, to, fromSide, toSide, 0); }
+		public Anchor(GuiComponent<?, ?> from, GuiComponent<?, ?> to, EnumGuiSide fromSide, EnumGuiSide toSide) { this(from, to, fromSide, toSide, 0); }
 
-		public Anchor(GuiComponent<?> from, GuiComponent<?> to, EnumGuiSide fromSide, EnumGuiSide toSide, double border) {
+		public Anchor(GuiComponent<?, ?> from, GuiComponent<?, ?> to, EnumGuiSide fromSide, EnumGuiSide toSide, double border) {
 			this.from = from;
 			this.to = to;
 			this.fromSide = fromSide;
@@ -100,9 +99,9 @@ public final class GuiAnchors {
 		}
 
 		public boolean reshape(GuiComponent.Events.CReshapeParameter parameter) {
-			Rectangle2D rectangle = from.getShapeView().getBounds2D();
-			fromSide.getSetter().accept(rectangle, fromSide.getApplyBorder().apply(toSide.getGetter().apply(to.getShapeView().getBounds2D()), GuiAnchors.this.border + border));
-			from.setBounds(parameter.handler, parameter.invoker, rectangle);
+			Rectangle2D rectangle = from.getShapeDescriptor().getShape().getBounds2D();
+			fromSide.getSetter().accept(rectangle, fromSide.getApplyBorder().apply(toSide.getGetter().apply(to.getShapeDescriptor().getShape().getBounds2D()), GuiAnchors.this.border + border));
+			from.transformShape(parameter.handler, parameter.invoker, s -> s.adapt(rectangle));
 			return true;
 		}
 
