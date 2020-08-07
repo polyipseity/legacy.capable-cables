@@ -10,9 +10,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
 import org.apache.logging.log4j.Logger;
 
-import static net.minecraftforge.api.distmarker.Dist.CLIENT;
-
-@OnlyIn(CLIENT)
+@OnlyIn(Dist.CLIENT)
 public final class ProxyClient extends Proxy implements IProxyClient {
 	public ProxyClient(Logger logger) { super(logger); }
 

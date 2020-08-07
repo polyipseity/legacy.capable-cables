@@ -20,7 +20,7 @@ public enum MiscellaneousUtilities {
 
 	public static <T> Optional<T> getDefaultValue(@Nullable Class<T> type) {
 		return Optional.ofNullable(type)
-				.flatMap(tClass -> StreamUtilities.streamSmart(PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet(), 3).filter(e -> e.getKey().isAssignableFrom(tClass)).findFirst())
+				.flatMap(tClass -> StreamUtilities.streamSmart(PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet(), 3).unordered().filter(e -> e.getKey().isAssignableFrom(tClass)).findFirst())
 				.map(e -> castUnchecked(e.getValue()));
 	}
 

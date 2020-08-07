@@ -18,7 +18,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 public enum PreconditionUtilities {
 	;
 
-	private static final Map<Class<?>, Throwable> RAN_ONCE = Collections.synchronizedMap(MapUtilities.getMapMakerSingleThread().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_LARGE).makeMap());
+	private static final Map<Class<?>, Throwable> RAN_ONCE = Collections.synchronizedMap(MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_LARGE).makeMap());
 
 
 	public static void checkArgumentTypes(Class<?>[] types, Object... args) {
@@ -26,13 +26,13 @@ public enum PreconditionUtilities {
 		checkElementIndex(typesLength - 1, args.length);
 		for (int i = 0; i < typesLength; ++i) {
 			@Nullable Object arg = args[i];
-			checkArgument(arg == null || types[i].isAssignableFrom(arg.getClass()));
+			checkArgument(arg == null || types[i].isInstance(arg));
 		}
 	}
 
 	public static void checkArrayContentType(Class<?> type, Object... array) {
 		for (@Nullable Object o : array)
-			checkArgument(o == null || type.isAssignableFrom(o.getClass()));
+			checkArgument(o == null || type.isInstance(o));
 	}
 
 

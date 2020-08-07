@@ -1,14 +1,13 @@
 package $group__.client.gui;
 
-import $group__.client.gui.structures.EnumCursor;
+import $group__.client.gui.core.structures.EnumCursor;
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 
-import static net.minecraftforge.api.distmarker.Dist.CLIENT;
-
-@OnlyIn(CLIENT)
+@OnlyIn(Dist.CLIENT)
 public enum ConfigurationGui {
 	;
 

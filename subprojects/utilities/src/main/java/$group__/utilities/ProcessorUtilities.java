@@ -1,6 +1,8 @@
 package $group__.utilities;
 
+import $group__.utilities.specific.StreamUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import javax.annotation.Nullable;
@@ -16,7 +18,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
-import static $group__.utilities.specific.StreamUtilities.streamSmart;
 
 public enum ProcessorUtilities {
 	;
@@ -37,20 +38,21 @@ public enum ProcessorUtilities {
 
 	public static ImmutableSet<ImmutableSet<TypeElement>> getThisAndSuperclassesAndInterfaces(TypeElement type, Types types) { return new ImmutableSet.Builder<ImmutableSet<TypeElement>>().add(ImmutableSet.of(type)).addAll(getSuperclassesAndInterfaces(type, types)).build(); }
 
+	@SuppressWarnings("UnstableApiUsage")
 	public static ImmutableSet<ImmutableSet<TypeElement>> getSuperclassesAndInterfaces(TypeElement type, Types types) {
 		LinkedHashSet<ImmutableSet<TypeElement>> r = new LinkedHashSet<>(INITIAL_CAPACITY_SMALL);
 
 		ImmutableSet<TypeElement> scs = getSuperclasses(type, types);
 		r.add(scs);
-		AtomicReference<List<TypeElement>> cur = new AtomicReference<>(streamSmart(type.getInterfaces(), 2).map(m -> (TypeElement) types.asElement(m)).collect(Collectors.toList()));
+		AtomicReference<List<TypeElement>> cur = new AtomicReference<>(StreamUtilities.streamSmart(type.getInterfaces(), 2).sequential().map(m -> (TypeElement) types.asElement(m)).collect(ImmutableList.toImmutableList()));
 		scs.forEach(sc -> r.add(ImmutableSet.copyOf(cur.getAndUpdate(c -> {
-			List<TypeElement> next = streamSmart(sc.getInterfaces(), 2).map(m -> (TypeElement) types.asElement(m)).collect(Collectors.toList());
-			c.forEach(t -> next.addAll(streamSmart(t.getInterfaces(), 2).map(m -> (TypeElement) types.asElement(m)).collect(Collectors.toList())));
+			List<TypeElement> next = StreamUtilities.streamSmart(sc.getInterfaces(), 2).sequential().map(m -> (TypeElement) types.asElement(m)).collect(Collectors.toList());
+			c.forEach(t -> next.addAll(StreamUtilities.streamSmart(t.getInterfaces(), 2).sequential().map(m -> (TypeElement) types.asElement(m)).collect(ImmutableList.toImmutableList())));
 			return next;
 		}))));
 		while (!cur.get().isEmpty()) r.add(ImmutableSet.copyOf(cur.getAndUpdate(c -> {
 			List<TypeElement> next = new ArrayList<>(INITIAL_CAPACITY_SMALL);
-			c.forEach(t -> next.addAll(streamSmart(t.getInterfaces(), 2).map(m -> (TypeElement) types.asElement(m)).collect(Collectors.toList())));
+			c.forEach(t -> next.addAll(StreamUtilities.streamSmart(t.getInterfaces(), 2).sequential().map(m -> (TypeElement) types.asElement(m)).collect(ImmutableList.toImmutableList())));
 			return next;
 		})));
 
@@ -64,7 +66,8 @@ public enum ProcessorUtilities {
 
 	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Class<A> annotationType, ExecutableElement executable, Elements elements, Types types) throws IllegalArgumentException {
 		A[] r = getEffectiveAnnotationsWithInheritingConsidered(annotationType, executable, elements, types);
-		if (r.length != 1) throw BecauseOf.illegalArgument("annotationType", annotationType, "executable", executable);
+		if (r.length != 1)
+			throw BecauseOf.illegalArgument("Too many or not enough annotations", "annotationType", annotationType, "executable", executable);
 		return r[0];
 	}
 

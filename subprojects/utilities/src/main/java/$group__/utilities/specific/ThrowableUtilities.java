@@ -113,18 +113,23 @@ public enum ThrowableUtilities {
 
 		public static ClassCastException classCast(Object obj, Class<?> clazz) throws ClassCastException { throw new ClassCastException("'" + obj + "' cannot be casted to '" + clazz.toGenericString() + '\''); }
 
-		public static NullPointerException nullPointer() throws NullPointerException { throw new NullPointerException(); }
-
-		public static UnsupportedOperationException unsupportedOperation() throws UnsupportedOperationException { throw new UnsupportedOperationException(); }
-
 		public static RuntimeException instantiation() throws RuntimeException { throw propagate(new InstantiationException(getCallerClass().toGenericString())); }
 
-		public static IllegalArgumentException illegalArgument(Object... arguments) throws IllegalArgumentException {
+		public static IllegalArgumentException illegalArgument(String message, Object... arguments) throws IllegalArgumentException {
 			assert arguments.length % 2 == 0;
 			StringBuilder msg = new StringBuilder(INITIAL_CAPACITY_LARGE);
-			boolean value = false;
+			msg.append(message).append(": ");
+			boolean comma = false, value = false;
 			for (Object argument : arguments) {
-				msg.append(value ? argument + ", " : argument + ": ");
+				if (value) {
+					msg.append(": ");
+				} else {
+					if (comma)
+						msg.append(", ");
+					else
+						comma = true;
+				}
+				msg.append(argument);
 				value = !value;
 			}
 			throw new IllegalArgumentException(msg.toString());

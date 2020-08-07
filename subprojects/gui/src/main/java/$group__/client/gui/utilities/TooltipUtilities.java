@@ -5,13 +5,12 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.List;
 
-import static net.minecraftforge.api.distmarker.Dist.CLIENT;
-
-@OnlyIn(CLIENT)
+@OnlyIn(Dist.CLIENT)
 public enum TooltipUtilities {
 	;
 

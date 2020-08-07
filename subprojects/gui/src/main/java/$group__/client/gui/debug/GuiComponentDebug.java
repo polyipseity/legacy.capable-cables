@@ -8,8 +8,7 @@ import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.components.roots.GuiRootWindows;
 import $group__.client.gui.structures.AffineTransformStack;
 import $group__.client.gui.structures.ShapeDescriptor;
-import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
-import $group__.client.gui.utilities.GuiUtilities;
+import $group__.client.gui.utilities.GuiObjectUtilities;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -34,6 +33,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.fml.network.NetworkHooks;
@@ -49,7 +49,6 @@ import java.util.Random;
 
 import static $group__.utilities.PreconditionUtilities.requireRunOnceOnly;
 import static java.util.Objects.requireNonNull;
-import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
 public enum GuiComponentDebug {
 	;
@@ -63,15 +62,15 @@ public enum GuiComponentDebug {
 
 	public static ContainerType<ContainerDebug> getContainerEntry() { return ContainerDebug.Type.INSTANCE; }
 
-	@OnlyIn(CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	public static <T extends Screen & IHasContainer<ContainerDebug>> void registerGuiFactory() {
 		// COMMENT compilation error without the cast
 		ScreenManager.registerFactory(ContainerDebug.Type.INSTANCE, (ScreenManager.IScreenFactory<ContainerDebug, T>) (container, inv, title) -> new GuiDebug(title, container).getContainerScreen());
 	}
 }
 
-@OnlyIn(CLIENT)
-final class GuiDebug extends GuiRootWindows<ShapeDescriptor.Rectangular<Rectangle2D>, GuiRoot.Data<GuiRoot.Events, ContainerDebug>, ContainerDebug> {
+@OnlyIn(Dist.CLIENT)
+final class GuiDebug extends GuiManagerWindows<ShapeDescriptor.Rectangular<Rectangle2D>, GuiManagers.Data<GuiManagers.Events, ContainerDebug>, ContainerDebug> {
 	private static final Logger LOGGER = LogManager.getLogger();
 
 	@SuppressWarnings("MagicNumber")
@@ -80,7 +79,14 @@ final class GuiDebug extends GuiRootWindows<ShapeDescriptor.Rectangular<Rectangl
 				new Data<>(new Events(), GuiDebug::getLogger, new GuiBackgroundDefault<>(ShapeDescriptor.Rectangular::new,
 						new GuiComponent.Data<>(new GuiComponent.Events(), GuiDebug::getLogger)), container));
 		{
-			GuiWindow<?, ?> window1 = new GuiWindow<>(new ShapeDescriptor.Rectangular<>(new Rectangle2D.Double(10, 10, 100, 100)),
+			GuiWindow<GuiWindow.Model<?>, GuiWindow.View<?, ?>, GuiWindow.Controller<?, IGuiComponent<?, ?, ?>>, IGuiComponent<?, ?, ?>> window1 = new GuiWindow<>();
+			window1.setModel(new GuiWindow.Model<>(window1));
+			window1.setView(new GuiWindow.View<>(window1));
+			window1.getView().setShapeDescriptor(window1.getView().new ShapeDescriptor<>(
+					new Rectangle2D.Double(10, 10, 100, 100),
+					new GuiAnchorSet<>(null)));
+			window1.setController(new GuiWindow.Controller<>(window1));
+			GuiWindow<?, ?, ?, ?> window1 = new GuiWindow<>(new ShapeDescriptor.Rectangular<>(,
 					new GuiWindow.Data<>(new GuiComponent.Events(), GuiDebug::getLogger, new GuiWindow.Data.ColorData()));
 			GuiWindow<?, ?> window2 = new GuiWindow<ShapeDescriptor.Rectangular<Rectangle2D.Double>, GuiWindow.Data<GuiComponent.Events, GuiWindow.Data.ColorData>>(new ShapeDescriptor.Rectangular<>(new Rectangle2D.Double(50, 50, 200, 200)),
 					new GuiWindow.Data<>(new GuiComponent.Events(), GuiDebug::getLogger, new GuiWindow.Data.ColorData())) {
@@ -89,10 +95,10 @@ final class GuiDebug extends GuiRootWindows<ShapeDescriptor.Rectangular<Rectangl
 				protected double tick = 0;
 
 				@Override
-				public void renderTick(AffineTransformStack stack, Point2D mouse, float partialTicks) {
+				public void renderTick(final AffineTransformStack stack, Point2D mouse, float partialTicks) {
 					tick = (tick + partialTicks) % 360;
 					if (tick % 120 == 0) {
-						GuiUtilities.ObjectUtilities.acceptRectangle(getShapeDescriptor().getShape(), (x, y) -> (w, h) -> current.setFrame(x * random.nextDouble() * 2, y * random.nextDouble() * 2, w * random.nextDouble() * 2, y * random.nextDouble() * 2));
+						GuiObjectUtilities.acceptRectangular(getShapeDescriptor().getShape(), (x, y) -> (w, h) -> current.setFrame(x * random.nextDouble() * 2, y * random.nextDouble() * 2, w * random.nextDouble() * 2, y * random.nextDouble() * 2));
 						data.setActive(!data.isActive());
 					}
 					reshape(this, this, s -> s.adapt(current));

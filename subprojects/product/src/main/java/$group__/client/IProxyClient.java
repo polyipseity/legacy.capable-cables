@@ -5,9 +5,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
 
-import static net.minecraftforge.api.distmarker.Dist.CLIENT;
-
-@OnlyIn(CLIENT)
+@OnlyIn(Dist.CLIENT)
 public interface IProxyClient extends IProxy {
 	@Override
 	default <T extends ModLifecycleEvent> void onSetupSided(T event) { onSetupClient((FMLClientSetupEvent) event); }

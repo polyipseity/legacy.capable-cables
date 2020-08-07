@@ -148,7 +148,7 @@ public enum DynamicUtilities {
 
 	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Class<A> annotationType, Method method, @Nullable Logger logger) throws IllegalArgumentException {
 		A[] r = getEffectiveAnnotationsWithInheritingConsidered(annotationType, method, logger);
-		if (r.length != 1) throw BecauseOf.illegalArgument(
+		if (r.length != 1) throw BecauseOf.illegalArgument("Too many or not enough annotations",
 				"annotationType", annotationType,
 				"method", method);
 		return r[0];

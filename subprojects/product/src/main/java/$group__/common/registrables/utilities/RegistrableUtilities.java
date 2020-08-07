@@ -40,14 +40,12 @@ public enum RegistrableUtilities {
 	public enum NBTUtilities {
 		;
 
-		@SuppressWarnings("UnusedReturnValue")
 		public static boolean setTagIfNotEmpty(CompoundNBT p, String k, CompoundNBT v) {
 			if (v.size() == 0) return false;
 			p.put(k, v);
 			return true;
 		}
 
-		@SuppressWarnings("UnusedReturnValue")
 		public static <T> boolean setChildIfNotNull(CompoundNBT p, String k, @Nullable T v, TriConsumer<CompoundNBT, String, ? super T> c) {
 			if (v == null) return false;
 			c.accept(p, k, v);

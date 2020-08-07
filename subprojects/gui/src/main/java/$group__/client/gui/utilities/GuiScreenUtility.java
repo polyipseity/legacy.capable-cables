@@ -8,16 +8,14 @@ import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 
-import static net.minecraftforge.api.distmarker.Dist.CLIENT;
-
-@SuppressWarnings("UnusedReturnValue")
-@OnlyIn(CLIENT)
+@OnlyIn(Dist.CLIENT)
 public final class GuiScreenUtility extends Screen {
 	public static final GuiScreenUtility INSTANCE = new GuiScreenUtility();
 	private static final Logger LOGGER = LogManager.getLogger();

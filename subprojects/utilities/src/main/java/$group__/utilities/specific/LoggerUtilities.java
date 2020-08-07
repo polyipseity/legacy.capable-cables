@@ -228,14 +228,13 @@ public enum LoggerUtilities {
 			if (argTypeOptionals != null) {
 				int argTOsL = argTypeOptionals.length, matched = 0;
 				ArrayList<Object> argOptionals = new ArrayList<>(argTOsL);
-				for (int i = 0, j = argTsL - 1; i < argTOsL && j < argsL; ++j) {
+				for (int i = 0, j = argTsL - 1; i < argTOsL && j < argsL; ++i, ++j) {
 					@Nullable Object arg = args[j];
 					Class<?> argTO = argTypeOptionals[i];
-					if (arg == null || argTO.isAssignableFrom(arg.getClass())) {
+					if (arg == null || argTO.isInstance(arg)) {
 						argOptionals.add(i, arg);
 						++matched;
 					} else argOptionals.add(i, PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.get(argTO));
-					++i;
 				}
 
 				for (int i = 0; i < matched; ++i) argsList.remove(argTsL + i);

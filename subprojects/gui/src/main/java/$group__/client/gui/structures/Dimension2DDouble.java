@@ -1,15 +1,22 @@
 package $group__.client.gui.structures;
 
+import $group__.utilities.ObjectUtilities;
+import $group__.utilities.specific.MapUtilities;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.awt.geom.Dimension2D;
 import java.beans.Transient;
 import java.io.Serializable;
+import java.util.function.Function;
 
-import static net.minecraftforge.api.distmarker.Dist.CLIENT;
-
-@OnlyIn(CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class Dimension2DDouble extends Dimension2D implements Serializable {
+	public static final ImmutableList<Function<Dimension2DDouble, Object>> OBJECT_VARIABLES = ImmutableList.of(Dimension2DDouble::getWidth, Dimension2DDouble::getHeight);
+	public static final ImmutableMap<String, Function<Dimension2DDouble, Object>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
+			ImmutableList.of("width", "height"), OBJECT_VARIABLES));
 	private static final long serialVersionUID = 4432299344969417136L;
 	protected double width, height;
 
@@ -37,19 +44,13 @@ public class Dimension2DDouble extends Dimension2D implements Serializable {
 
 	@Override
 	public int hashCode() {
-		double sum = width + height;
-		return (int) (sum * (sum + 1) / 2 + width);
+		return ObjectUtilities.hashCode(this, null, OBJECT_VARIABLES);
 	}
 
+	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof Dimension2DDouble) {
-			Dimension2DDouble d = (Dimension2DDouble) obj;
-			return (width == d.width) && (height == d.height);
-		}
-		return false;
-	}
+	public boolean equals(Object obj) { return ObjectUtilities.equals(this, obj, true, null, OBJECT_VARIABLES); }
 
 	@Override
-	public String toString() { return getClass().getName() + "[width=" + width + ",height=" + height + ']'; }
+	public String toString() { return ObjectUtilities.toString(this, super::toString, OBJECT_VARIABLES_MAP); }
 }
