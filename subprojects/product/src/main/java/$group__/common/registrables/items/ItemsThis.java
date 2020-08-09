@@ -1,6 +1,6 @@
 package $group__.common.registrables.items;
 
-import $group__.client.gui.debug.GuiComponentDebug;
+import $group__.client.ui.debug.GuiComponentDebug;
 import $group__.common.registrables.blocks.BlocksThis;
 import $group__.common.registrables.items.groups.ItemGroupsThis;
 import net.minecraft.item.BlockItem;

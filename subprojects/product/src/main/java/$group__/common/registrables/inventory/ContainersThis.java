@@ -1,6 +1,6 @@
 package $group__.common.registrables.inventory;
 
-import $group__.client.gui.debug.GuiComponentDebug;
+import $group__.client.ui.debug.GuiComponentDebug;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;

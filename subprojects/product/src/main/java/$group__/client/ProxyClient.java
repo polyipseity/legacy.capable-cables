@@ -1,8 +1,8 @@
 package $group__.client;
 
 import $group__.Constants;
-import $group__.client.gui.ConfigurationGui;
-import $group__.client.gui.debug.GuiComponentDebug;
+import $group__.client.ui.ConfigurationUI;
+import $group__.client.ui.debug.GuiComponentDebug;
 import $group__.proxies.Proxy;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -24,7 +24,7 @@ public final class ProxyClient extends Proxy implements IProxyClient {
 
 	@Override
 	public void onSetupClient(FMLClientSetupEvent event) {
-		ConfigurationGui.setup(Constants.MOD_ID);
+		ConfigurationUI.setup(Constants.MOD_ID);
 
 		// todo add debug flag
 		GuiComponentDebug.registerGuiFactory();
@@ -32,6 +32,6 @@ public final class ProxyClient extends Proxy implements IProxyClient {
 
 	@Override
 	public void onLoadComplete(FMLLoadCompleteEvent event) {
-		ConfigurationGui.loadComplete();
+		ConfigurationUI.loadComplete();
 	}
 }

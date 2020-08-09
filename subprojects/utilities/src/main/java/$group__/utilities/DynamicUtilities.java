@@ -79,10 +79,6 @@ public enum DynamicUtilities {
 
 	public static boolean isClassAbstract(Class<?> clazz) { return clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()); }
 
-	public static boolean isMemberStatic(Member member) { return Modifier.isStatic(member.getModifiers()); }
-
-	public static boolean isMemberFinal(Member member) { return Modifier.isFinal(member.getModifiers()); }
-
 	public static String getPackage(Class<?> clazz) {
 		String r = clazz.getName().replace(clazz.getSimpleName(), "");
 		if (r.endsWith(".")) r = r.substring(0, r.length() - 1);
