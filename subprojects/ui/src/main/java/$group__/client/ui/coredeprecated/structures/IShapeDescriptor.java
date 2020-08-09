@@ -1,6 +1,6 @@
 package $group__.client.ui.coredeprecated.structures;
 
-import $group__.client.ui.mvvm.views.domlike.components.IUIComponentDOMLike;
+import $group__.client.ui.mvvm.views.components.IUIComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -27,7 +27,7 @@ public interface IShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>> {
 
 	Shape getShapeProcessed();
 
-	Optional<IUIComponentDOMLike.IGuiView<?, ?>> getView();
+	Optional<IUIComponent.IGuiView<?, ?>> getView();
 
 	List<IUIConstraint> getConstraintsView();
 

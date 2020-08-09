@@ -2,9 +2,9 @@ package $group__.client.ui.coredeprecated.extensions;
 
 import $group__.client.ui.coredeprecated.IUIExtension;
 import $group__.client.ui.coredeprecated.events.EventUIComponentHierarchyChanged;
-import $group__.client.ui.mvvm.views.domlike.UIContainerDOMLikeComponentDOMLike;
-import $group__.client.ui.mvvm.views.domlike.components.IUIComponentDOMLike;
-import $group__.client.ui.mvvm.views.domlike.components.IUIComponentManagerDOMLike;
+import $group__.client.ui.mvvm.views.UIContainerComponent;
+import $group__.client.ui.mvvm.views.components.IUIComponent;
+import $group__.client.ui.mvvm.views.components.IUIComponentManager;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.ConcurrencyUtilities;
 import $group__.utilities.events.EnumEventHookStage;
@@ -32,9 +32,9 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 @OnlyIn(Dist.CLIENT)
 public class UIExtensionCache implements IUIExtension {
 	public static final ResourceLocation KEY = new ResourceLocation("cache");
-	public static final Registry.RegistryObject<IUIExtension.IType<UIExtensionCache, IUIComponentDOMLike>> TYPE = IUIExtension.Reg.INSTANCE.register(KEY, new IUIExtension.IType<UIExtensionCache, IUIComponentDOMLike>() {
+	public static final Registry.RegistryObject<IUIExtension.IType<UIExtensionCache, IUIComponent>> TYPE = IUIExtension.Reg.INSTANCE.register(KEY, new IUIExtension.IType<UIExtensionCache, IUIComponent>() {
 		@Override
-		public Optional<UIExtensionCache> get(IUIComponentDOMLike component) { return component.getExtension(KEY).map(CastUtilities::castUnchecked); }
+		public Optional<UIExtensionCache> get(IUIComponent component) { return component.getExtension(KEY).map(CastUtilities::castUnchecked); }
 
 		@Override
 		public ResourceLocation getKey() { return KEY; }
@@ -46,7 +46,7 @@ public class UIExtensionCache implements IUIExtension {
 					.concurrencyLevel(ConcurrencyUtilities.SINGLE_THREAD_THREAD_COUNT).build();
 
 	@Override
-	public void onExtensionAdd(IUIComponentDOMLike container) {}
+	public void onExtensionAdd(IUIComponent container) {}
 
 	@Override
 	public void onExtensionRemove() {}
@@ -59,10 +59,10 @@ public class UIExtensionCache implements IUIExtension {
 	@OnlyIn(Dist.CLIENT)
 	public enum CacheUniversal {
 		;
-		public static final Registry.RegistryObject<UIExtensionCache.IType<IUIComponentManagerDOMLike, IUIComponentDOMLike>> MANAGER =
+		public static final Registry.RegistryObject<UIExtensionCache.IType<IUIComponentManager, IUIComponent>> MANAGER =
 				Reg.INSTANCE.register(new ResourceLocation("manager"),
-						(Function<? super ResourceLocation, ? extends IType<IUIComponentManagerDOMLike, IUIComponentDOMLike>>)
-								k -> new IType.Impl<IUIComponentManagerDOMLike, IUIComponentDOMLike>(k) {
+						(Function<? super ResourceLocation, ? extends IType<IUIComponentManager, IUIComponent>>)
+								k -> new IType.Impl<IUIComponentManager, IUIComponent>(k) {
 									{ Bus.FORGE.bus().get().register(this); }
 
 									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
@@ -72,24 +72,24 @@ public class UIExtensionCache implements IUIExtension {
 									}
 
 									@Override
-									public Optional<IUIComponentManagerDOMLike> get(IUIComponentDOMLike component) {
+									public Optional<IUIComponentManager> get(IUIComponent component) {
 										return TYPE.getValue().get(component).flatMap(cache -> Try.call(() -> cache.getDelegated().get(getKey(),
-												() -> IUIComponentDOMLike.getYoungestParentInstanceOf(component, IUIComponentManagerDOMLike.class)),
+												() -> IUIComponent.getYoungestParentInstanceOf(component, IUIComponentManager.class)),
 												getLogger()
 										).map(CastUtilities::castUnchecked));
 									}
 
 									@Override
-									public void invalidate(IUIComponentDOMLike component) {
+									public void invalidate(IUIComponent component) {
 										super.invalidate(component);
-										if (component instanceof UIContainerDOMLikeComponentDOMLike)
-											((UIContainerDOMLikeComponentDOMLike) component).getChildrenView().forEach(this::invalidate);
+										if (component instanceof UIContainerComponent)
+											((UIContainerComponent) component).getChildrenView().forEach(this::invalidate);
 									}
 								});
-		public static final Registry.RegistryObject<UIExtensionCache.IType<Integer, IUIComponentDOMLike>> Z =
+		public static final Registry.RegistryObject<UIExtensionCache.IType<Integer, IUIComponent>> Z =
 				Reg.INSTANCE.register(new ResourceLocation("z"),
-						(Function<? super ResourceLocation, ? extends IType<Integer, IUIComponentDOMLike>>)
-								k -> new IType.Impl<Integer, IUIComponentDOMLike>(k) {
+						(Function<? super ResourceLocation, ? extends IType<Integer, IUIComponent>>)
+								k -> new IType.Impl<Integer, IUIComponent>(k) {
 									{ Bus.FORGE.bus().get().register(this); }
 
 									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
@@ -99,13 +99,13 @@ public class UIExtensionCache implements IUIExtension {
 									}
 
 									@Override
-									public Optional<Integer> get(IUIComponentDOMLike component) {
+									public Optional<Integer> get(IUIComponent component) {
 										return TYPE.getValue().get(component).flatMap(cache -> Try.call(() -> cache.getDelegated().get(getKey(),
 												() -> {
 													int ret = -1;
-													for (Optional<? extends IUIComponentDOMLike> parent = Optional.of(component);
+													for (Optional<? extends IUIComponent> parent = Optional.of(component);
 													     parent.isPresent();
-													     parent = parent.flatMap(IUIComponentDOMLike::getParent))
+													     parent = parent.flatMap(IUIComponent::getParent))
 														++ret;
 													return ret;
 												}), getLogger()).flatMap(CastUtilities::castUnchecked));
@@ -114,7 +114,7 @@ public class UIExtensionCache implements IUIExtension {
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public interface IType<T, C extends IUIComponentDOMLike> {
+	public interface IType<T, C extends IUIComponent> {
 		Optional<T> get(C component);
 
 		@OverridingMethodsMustInvokeSuper
@@ -123,7 +123,7 @@ public class UIExtensionCache implements IUIExtension {
 		ResourceLocation getKey();
 
 		@OnlyIn(Dist.CLIENT)
-		abstract class Impl<T, C extends IUIComponentDOMLike> implements IType<T, C> {
+		abstract class Impl<T, C extends IUIComponent> implements IType<T, C> {
 			protected final ResourceLocation key;
 			protected final Logger logger = LogManager.getLogger();
 

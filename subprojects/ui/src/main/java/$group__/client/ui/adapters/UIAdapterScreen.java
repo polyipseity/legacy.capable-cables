@@ -2,11 +2,11 @@ package $group__.client.ui.adapters;
 
 import $group__.client.ui.coredeprecated.IUIExtension;
 import $group__.client.ui.coredeprecated.structures.AffineTransformStack;
-import $group__.client.ui.coredeprecated.structures.UIKeyboardKeyPressData;
-import $group__.client.ui.coredeprecated.structures.UIMouseButtonPressData;
+import $group__.client.ui.mvvm.structures.IUIDataKeyboardKeyPress;
+import $group__.client.ui.mvvm.structures.IUIDataMouseButtonClick;
 import $group__.client.ui.coredeprecated.structures.IShapeDescriptor;
-import $group__.client.ui.mvvm.views.domlike.components.IUIComponentDOMLike;
-import $group__.client.ui.structures.Dimension2DDouble;
+import $group__.client.ui.mvvm.views.components.IUIComponent;
+import $group__.client.ui.mvvm.structures.Dimension2DDouble;
 import $group__.client.ui.utilities.*;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.client.GLUtilities;
@@ -100,15 +100,15 @@ public class UIAdapterScreen
 		AffineTransformStack stack = getManager().getCleanTransformStack();
 		{
 			// COMMENT generate ONGOING synthetic events
-			IUIComponentDOMLike.IGuiController.IManager<?, ?> controller = getManager().getController();
-			controller.onFocus(stack, IUIComponentDOMLike.EnumStage.ONGOING);
+			IUIComponent.IGuiController.IManager<?, ?> controller = getManager().getController();
+			controller.onFocus(stack, IUIComponent.EnumStage.ONGOING);
 			controller.getKeyboardKeysBeingPressedView().forEach((c, k) ->
-					controller.onKeyboardKeyPress(stack, IUIComponentDOMLike.EnumStage.ONGOING,
+					controller.onKeyboardKeyPress(stack, IUIComponent.EnumStage.ONGOING,
 							k.getData()));
 			Point2D cursor = GLUtilities.getCursorPos();
 			controller.getMouseButtonsBeingPressedView().forEach((c, m) ->
-					controller.onMouseButtonPress(stack, IUIComponentDOMLike.EnumStage.ONGOING,
-							new UIMouseButtonPressData(cursor, m.getData().getButton())));
+					controller.onMouseButtonPress(stack, IUIComponent.EnumStage.ONGOING,
+							new IUIDataMouseButtonClick(cursor, m.getData().getButton())));
 		}
 		getManager().getView().render(stack, new Point2D.Double(mouseX, mouseY), partialTicks);
 	}
@@ -124,7 +124,7 @@ public class UIAdapterScreen
 			changeFocus((modifiers & GLFW.GLFW_MOD_SHIFT) == 0);
 			return true;
 		}
-		return getManager().getController().onKeyboardKeyPress(getManager().getCleanTransformStack(), IUIComponentDOMLike.EnumStage.START, new UIKeyboardKeyPressData(key, scanCode, modifiers));
+		return getManager().getController().onKeyboardKeyPress(getManager().getCleanTransformStack(), IUIComponent.EnumStage.START, new IUIDataKeyboardKeyPress(key, scanCode, modifiers));
 	}
 
 	@Override
@@ -180,7 +180,7 @@ public class UIAdapterScreen
 		AffineTransformStack stack = getManager().getCleanTransformStack();
 		getManager().getModel().initialize(stack);
 		// COMMENT generate START synthetic events
-		getManager().getController().onMouseHover(stack, IUIComponentDOMLike.EnumStage.START, GLUtilities.getCursorPos());
+		getManager().getController().onMouseHover(stack, IUIComponent.EnumStage.START, GLUtilities.getCursorPos());
 	}
 
 	@Override
@@ -193,15 +193,15 @@ public class UIAdapterScreen
 		AffineTransformStack stack = getManager().getCleanTransformStack();
 		{
 			// COMMENT generate END synthetic events
-			IUIComponentDOMLike.IGuiController.IManager<?, ?> controller = getManager().getController();
+			IUIComponent.IGuiController.IManager<?, ?> controller = getManager().getController();
 			controller.getKeyboardKeysBeingPressedView().forEach((c, k) ->
-					controller.onKeyboardKeyPress(stack, IUIComponentDOMLike.EnumStage.END,
+					controller.onKeyboardKeyPress(stack, IUIComponent.EnumStage.END,
 							k.getData()));
 			Point2D cursor = GLUtilities.getCursorPos();
 			controller.getMouseButtonsBeingPressedView().forEach((c, m) ->
-					controller.onMouseButtonPress(stack, IUIComponentDOMLike.EnumStage.END,
-							new UIMouseButtonPressData(cursor, m.getData().getButton())));
-			controller.onMouseHover(stack, IUIComponentDOMLike.EnumStage.END, cursor);
+					controller.onMouseButtonPress(stack, IUIComponent.EnumStage.END,
+							new IUIDataMouseButtonClick(cursor, m.getData().getButton())));
+			controller.onMouseHover(stack, IUIComponent.EnumStage.END, cursor);
 			controller.setFocus(stack, null);
 		}
 		getManager().getModel().close(stack);
@@ -236,11 +236,11 @@ public class UIAdapterScreen
 
 	@Override
 	@Deprecated
-	public boolean mouseClicked(double mouseX, double mouseY, int button) { return getManager().getController().onMouseButtonPress(getManager().getCleanTransformStack(), IUIComponentDOMLike.EnumStage.START, new UIMouseButtonPressData(new Point2D.Double(mouseX, mouseY), button)); }
+	public boolean mouseClicked(double mouseX, double mouseY, int button) { return getManager().getController().onMouseButtonPress(getManager().getCleanTransformStack(), IUIComponent.EnumStage.START, new IUIDataMouseButtonClick(new Point2D.Double(mouseX, mouseY), button)); }
 
 	@Override
 	@Deprecated
-	public boolean mouseReleased(double mouseX, double mouseY, int button) { return getManager().getController().onMouseButtonPress(getManager().getCleanTransformStack(), IUIComponentDOMLike.EnumStage.END, new UIMouseButtonPressData(new Point2D.Double(mouseX, mouseY), button)); }
+	public boolean mouseReleased(double mouseX, double mouseY, int button) { return getManager().getController().onMouseButtonPress(getManager().getCleanTransformStack(), IUIComponent.EnumStage.END, new IUIDataMouseButtonClick(new Point2D.Double(mouseX, mouseY), button)); }
 
 	@Override
 	@Deprecated
@@ -252,7 +252,7 @@ public class UIAdapterScreen
 
 	@Override
 	@Deprecated
-	public boolean keyReleased(int key, int scanCode, int modifiers) { return getManager().getController().onKeyboardKeyPress(getManager().getCleanTransformStack(), IUIComponentDOMLike.EnumStage.END, new UIKeyboardKeyPressData(key, scanCode, modifiers)); }
+	public boolean keyReleased(int key, int scanCode, int modifiers) { return getManager().getController().onKeyboardKeyPress(getManager().getCleanTransformStack(), IUIComponent.EnumStage.END, new IUIDataKeyboardKeyPress(key, scanCode, modifiers)); }
 
 	@Override
 	@Deprecated
@@ -316,9 +316,9 @@ public class UIAdapterScreen
 		@OnlyIn(Dist.CLIENT)
 		public static class GuiExtensionContainer implements IUIExtension {
 			public static final ResourceLocation KEY = new ResourceLocation("container");
-			public static final Registry.RegistryObject<IType<GuiExtensionContainer, IUIComponentDOMLike>> TYPE = Reg.INSTANCE.register(KEY, new IType<GuiExtensionContainer, IUIComponentDOMLike>() {
+			public static final Registry.RegistryObject<IType<GuiExtensionContainer, IUIComponent>> TYPE = Reg.INSTANCE.register(KEY, new IType<GuiExtensionContainer, IUIComponent>() {
 				@Override
-				public Optional<GuiExtensionContainer> get(IUIComponentDOMLike component) { return component.getExtension(KEY).map(CastUtilities::castUnchecked); }
+				public Optional<GuiExtensionContainer> get(IUIComponent component) { return component.getExtension(KEY).map(CastUtilities::castUnchecked); }
 
 				@Override
 				public ResourceLocation getKey() { return KEY; }
@@ -333,7 +333,7 @@ public class UIAdapterScreen
 			public IType<?, ?> getType() { return TYPE.getValue(); }
 
 			@Override
-			public void onExtensionAdd(IUIComponentDOMLike container) {}
+			public void onExtensionAdd(IUIComponent container) {}
 
 			@Override
 			public void onExtensionRemove() {}
@@ -342,9 +342,9 @@ public class UIAdapterScreen
 
 	public static class GuiExtensionScreen implements IUIExtension {
 		public static final ResourceLocation KEY = new ResourceLocation("container");
-		public static final Registry.RegistryObject<IType<GuiExtensionScreen, IUIComponentDOMLike>> TYPE = Reg.INSTANCE.register(KEY, new IType<GuiExtensionScreen, IUIComponentDOMLike>() {
+		public static final Registry.RegistryObject<IType<GuiExtensionScreen, IUIComponent>> TYPE = Reg.INSTANCE.register(KEY, new IType<GuiExtensionScreen, IUIComponent>() {
 			@Override
-			public Optional<GuiExtensionScreen> get(IUIComponentDOMLike component) { return component.getExtension(KEY).map(CastUtilities::castUnchecked); }
+			public Optional<GuiExtensionScreen> get(IUIComponent component) { return component.getExtension(KEY).map(CastUtilities::castUnchecked); }
 
 			@Override
 			public ResourceLocation getKey() { return KEY; }
@@ -359,7 +359,7 @@ public class UIAdapterScreen
 		public IType<?, ?> getType() { return TYPE.getValue(); }
 
 		@Override
-		public void onExtensionAdd(IUIComponentDOMLike container) {}
+		public void onExtensionAdd(IUIComponent container) {}
 
 		@Override
 		public void onExtensionRemove() {}

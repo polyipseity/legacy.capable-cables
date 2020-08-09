@@ -1,6 +1,6 @@
 package $group__.client.ui.utilities;
 
-import $group__.client.ui.structures.Dimension2DDouble;
+import $group__.client.ui.mvvm.structures.Dimension2DDouble;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;

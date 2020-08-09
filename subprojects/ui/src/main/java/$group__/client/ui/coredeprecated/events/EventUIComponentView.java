@@ -1,7 +1,7 @@
 package $group__.client.ui.coredeprecated.events;
 
 import $group__.client.ui.coredeprecated.structures.AffineTransformStack;
-import $group__.client.ui.mvvm.views.domlike.components.IUIComponentDOMLike;
+import $group__.client.ui.mvvm.views.components.IUIComponent;
 import $group__.utilities.events.EnumEventHookStage;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -12,7 +12,7 @@ import java.awt.geom.Point2D;
 public abstract class EventUIComponentView extends EventUIComponent.Outbound {
 	protected final AffineTransformStack stack;
 
-	protected EventUIComponentView(EnumEventHookStage stage, IUIComponentDOMLike component, final AffineTransformStack stack) {
+	protected EventUIComponentView(EnumEventHookStage stage, IUIComponent component, final AffineTransformStack stack) {
 		super(stage, component);
 		this.stack = stack;
 	}
@@ -24,7 +24,7 @@ public abstract class EventUIComponentView extends EventUIComponent.Outbound {
 		protected final Point2D cursor;
 		protected final float partialTicks;
 
-		public Render(EnumEventHookStage stage, IUIComponentDOMLike component, final AffineTransformStack stack, Point2D cursor, float partialTicks) {
+		public Render(EnumEventHookStage stage, IUIComponent component, final AffineTransformStack stack, Point2D cursor, float partialTicks) {
 			super(stage, component, stack);
 			this.cursor = (Point2D) cursor.clone();
 			this.partialTicks = partialTicks;

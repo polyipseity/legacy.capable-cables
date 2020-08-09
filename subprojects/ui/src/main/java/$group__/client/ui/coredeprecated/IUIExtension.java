@@ -1,6 +1,6 @@
 package $group__.client.ui.coredeprecated;
 
-import $group__.client.ui.mvvm.views.domlike.components.IUIComponentDOMLike;
+import $group__.client.ui.mvvm.views.components.IUIComponent;
 import $group__.utilities.interfaces.IExtension;
 import $group__.utilities.specific.ThrowableUtilities;
 import $group__.utilities.structures.Registry;
@@ -14,11 +14,11 @@ import org.apache.logging.log4j.Logger;
 import java.util.Optional;
 
 @OnlyIn(Dist.CLIENT)
-public interface IUIExtension extends IExtension<IUIComponentDOMLike> {
+public interface IUIExtension extends IExtension<IUIComponent> {
 	IType<?, ?> getType();
 
 	@OnlyIn(Dist.CLIENT)
-	interface IType<T extends IUIExtension, C extends IUIComponentDOMLike> {
+	interface IType<T extends IUIExtension, C extends IUIComponent> {
 		Optional<T> get(C component);
 
 		ResourceLocation getKey();

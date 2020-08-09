@@ -2,11 +2,11 @@ package $group__.client.ui.debug;
 
 import $group__.client.ui.coredeprecated.structures.AffineTransformStack;
 import $group__.client.ui.coredeprecated.structures.UIAnchorSet;
-import $group__.client.ui.mvvm.views.domlike.UIDOMLikeDOMLikeComponentDOMLike;
-import $group__.client.ui.mvvm.views.domlike.components.IUIComponentDOMLike;
-import $group__.client.ui.mvvm.views.domlike.components.minecraft.common.UIButtonDOMLikeComponentDOMLike;
-import $group__.client.ui.mvvm.views.domlike.components.minecraft.common.UIWindowDOMLikeComponentDOMLike;
-import $group__.client.ui.structures.ShapeDescriptor;
+import $group__.client.ui.mvvm.views.UIDOMLikeComponent;
+import $group__.client.ui.mvvm.views.components.IUIComponent;
+import $group__.client.ui.mvvm.views.components.minecraft.common.UIButtonComponent;
+import $group__.client.ui.mvvm.views.components.minecraft.common.UIWindowComponent;
+import $group__.client.ui.mvvm.structures.ShapeDescriptor;
 import $group__.client.ui.utilities.UIObjectUtilities;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -76,19 +76,19 @@ final class UIDebug extends GuiManagerWindows<ShapeDescriptor.Rectangular<Rectan
 	UIDebug(ITextComponent title, ContainerDebug container) {
 		super(title, ShapeDescriptor.Rectangular::new,
 				new Data<>(new Events(), UIDebug::getLogger, new GuiBackgroundDefault<>(ShapeDescriptor.Rectangular::new,
-						new UIDOMLikeDOMLikeComponentDOMLike.Data<>(new UIDOMLikeDOMLikeComponentDOMLike.Events(), UIDebug::getLogger)), container));
+						new UIDOMLikeComponent.Data<>(new UIDOMLikeComponent.Events(), UIDebug::getLogger)), container));
 		{
-			UIWindowDOMLikeComponentDOMLike<UIWindowDOMLikeComponentDOMLike.Model, UIWindowDOMLikeComponentDOMLike.View<?, ?>, UIWindowDOMLikeComponentDOMLike.Controller, IUIComponentDOMLike> window1 = new UIWindowDOMLikeComponentDOMLike<>();
-			window1.setModel(new UIWindowDOMLikeComponentDOMLike.Model<>(window1));
-			window1.setView(new UIWindowDOMLikeComponentDOMLike.View<>(window1));
+			UIWindowComponent<UIWindowComponent.Model, UIWindowComponent.View<?, ?>, UIWindowComponent.Controller, IUIComponent> window1 = new UIWindowComponent<>();
+			window1.setModel(new UIWindowComponent.Model<>(window1));
+			window1.setView(new UIWindowComponent.View<>(window1));
 			window1.getView().setShapeDescriptor(window1.getView().new ShapeDescriptor<>(
 					new Rectangle2D.Double(10, 10, 100, 100),
 					new UIAnchorSet<>(null)));
-			window1.setController(new UIWindowDOMLikeComponentDOMLike.Controller<>(window1));
-			UIWindowDOMLikeComponentDOMLike<?, ?, ?, ?> window1 = new UIWindowDOMLikeComponentDOMLike<>(new ShapeDescriptor.Rectangular<>(,
-					new UIWindowDOMLikeComponentDOMLike.Data<>(new UIDOMLikeDOMLikeComponentDOMLike.Events(), UIDebug::getLogger, new UIWindowDOMLikeComponentDOMLike.Data.ColorData()));
-			UIWindowDOMLikeComponentDOMLike<?, ?> window2 = new UIWindowDOMLikeComponentDOMLike<ShapeDescriptor.Rectangular<Rectangle2D.Double>, UIWindowDOMLikeComponentDOMLike.Data<UIDOMLikeDOMLikeComponentDOMLike.Events, UIWindowDOMLikeComponentDOMLike.Data.ColorData>>(new ShapeDescriptor.Rectangular<>(new Rectangle2D.Double(50, 50, 200, 200)),
-					new UIWindowDOMLikeComponentDOMLike.Data<>(new UIDOMLikeDOMLikeComponentDOMLike.Events(), UIDebug::getLogger, new UIWindowDOMLikeComponentDOMLike.Data.ColorData())) {
+			window1.setController(new UIWindowComponent.Controller<>(window1));
+			UIWindowComponent<?, ?, ?, ?> window1 = new UIWindowComponent<>(new ShapeDescriptor.Rectangular<>(,
+					new UIWindowComponent.Data<>(new UIDOMLikeComponent.Events(), UIDebug::getLogger, new UIWindowComponent.Data.ColorData()));
+			UIWindowComponent<?, ?> window2 = new UIWindowComponent<ShapeDescriptor.Rectangular<Rectangle2D.Double>, UIWindowComponent.Data<UIDOMLikeComponent.Events, UIWindowComponent.Data.ColorData>>(new ShapeDescriptor.Rectangular<>(new Rectangle2D.Double(50, 50, 200, 200)),
+					new UIWindowComponent.Data<>(new UIDOMLikeComponent.Events(), UIDebug::getLogger, new UIWindowComponent.Data.ColorData())) {
 				protected final Rectangle2D current = new Rectangle2D.Double();
 				protected final Random random = new Random();
 				protected double tick = 0;
@@ -105,7 +105,7 @@ final class UIDebug extends GuiManagerWindows<ShapeDescriptor.Rectangular<Rectan
 				}
 
 				@Override
-				public void onTick(IGuiLifecycleHandler handler, UIDOMLikeDOMLikeComponentDOMLike<?, ?> invoker) {
+				public void onTick(IGuiLifecycleHandler handler, UIDOMLikeComponent<?, ?> invoker) {
 					tick = (tick + 1) % 360;
 					if (tick % 120 == 0)
 						data.setActive(!data.isActive());
@@ -113,12 +113,12 @@ final class UIDebug extends GuiManagerWindows<ShapeDescriptor.Rectangular<Rectan
 				}
 			};
 			{
-				UIButtonDOMLikeComponentDOMLike<?, ?> button;
+				UIButtonComponent<?, ?> button;
 				{
 					Random random = new Random();
 					// FIXME ellipse
-					button = new UIButtonDOMLikeComponentDOMLike<ShapeDescriptor.Rectangular<?>, UIButtonDOMLikeComponentDOMLike.Data<?, ?>>(new ShapeDescriptor.Rectangular<>(new Ellipse2D.Double(0, 0, 100, 100)),
-							new UIButtonDOMLikeComponentDOMLike.Data<>(new UIDOMLikeDOMLikeComponentDOMLike.Events(), UIDebug::getLogger, new UIButtonDOMLikeComponentDOMLike.Data.ColorData())) {
+					button = new UIButtonComponent<ShapeDescriptor.Rectangular<?>, UIButtonComponent.Data<?, ?>>(new ShapeDescriptor.Rectangular<>(new Ellipse2D.Double(0, 0, 100, 100)),
+							new UIButtonComponent.Data<>(new UIDOMLikeComponent.Events(), UIDebug::getLogger, new UIButtonComponent.Data.ColorData())) {
 						@Override
 						protected boolean onButtonKeyboardPressed(int key, int scanCode, int modifiers) { return key == GLFW.GLFW_KEY_ENTER; }
 
