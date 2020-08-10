@@ -1,0 +1,8 @@
+<root>
+	<item name='org.w3c.dom.NamedNodeMap org.w3c.dom.Node getNamedItem(java.lang.String)'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
+	<item name='org.w3c.dom.Node java.lang.String getNamespaceURI()'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
+</root>

@@ -18,7 +18,11 @@ public class ObservableField<T> implements IObservableField<T> {
 	}
 
 	@Override
-	public void subscribe(@NonNull Observer<? super T> observer) { getNotifier().subscribe(observer); }	@Override
+	public void subscribe(@NonNull Observer<? super T> observer) { getNotifier().subscribe(observer); }
+
+	protected Subject<T> getNotifier() { return notifier; }
+
+	@Override
 	public void setValue(T value) {
 		if (!getValue().equals(value)) {
 			this.value = value;
@@ -27,7 +31,7 @@ public class ObservableField<T> implements IObservableField<T> {
 	}
 
 	@Override
-	public Class<T> getGenericClass() { return genericClass; }	protected Subject<T> getNotifier() { return notifier; }
+	public Class<T> getGenericClass() { return genericClass; }
 
 	@Override
 	public T getValue() { return value; }

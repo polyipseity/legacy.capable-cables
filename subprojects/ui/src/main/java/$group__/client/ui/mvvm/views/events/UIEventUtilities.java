@@ -146,7 +146,7 @@ public enum UIEventUtilities {
 				throws IllegalArgumentException {
 			if (!isEventValid(event))
 				throw BecauseOf.illegalArgument("Invalid event",
-						"event.getClass()", event.getClass().getName(),
+						"event.getClass()", event.getClass(),
 						"event.getType()", event.getType(),
 						"event", event);
 		}

@@ -15,5 +15,5 @@ public enum CastUtilities {
 	@Nullable
 	public static <T> T castUncheckedNullable(@Nullable Object obj) { return (T) obj; }
 
-	public static <T> Optional<T> castChecked(@Nullable Object obj, @Nullable Logger logger) { return Try.call(() -> castUncheckedNullable(obj), logger); }
+	public static <T> Optional<T> castChecked(Class<T> clazz, @Nullable Object obj, @Nullable Logger logger) { return Try.call(() -> clazz.cast(obj), logger); }
 }
