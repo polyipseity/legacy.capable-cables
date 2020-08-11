@@ -13,15 +13,7 @@ public abstract class EventUIShapeDescriptor extends EventUI {
 
 	public IShapeDescriptor<?, ?> getShapeDescriptor() { return shapeDescriptor; }
 
-	public static abstract class Inbound extends EventUIShapeDescriptor {
-		protected Inbound(EnumEventHookStage stage, IShapeDescriptor<?, ?> shapeDescriptor) { super(stage, shapeDescriptor); }
-	}
-
-	public static abstract class Outbound extends EventUIShapeDescriptor {
-		protected Outbound(EnumEventHookStage stage, IShapeDescriptor<?, ?> shapeDescriptor) { super(stage, shapeDescriptor); }
-	}
-
-	public static class Modify extends Outbound {
+	public static class Modify extends EventUIShapeDescriptor {
 		public Modify(EnumEventHookStage stage, IShapeDescriptor<?, ?> shapeDescriptor) { super(stage, shapeDescriptor); }
 	}
 }

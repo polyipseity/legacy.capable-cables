@@ -51,8 +51,8 @@ import static java.util.Objects.requireNonNull;
 public enum GuiComponentDebug {
 	;
 
-	public static final String PATH = "debug_gui_component";
-	public static final ITextComponent DISPLAY_NAME = new StringTextComponent("Component-based GUI Debug GUI");
+	public static final String PATH = "debug_gui_mvvm";
+	public static final ITextComponent DISPLAY_NAME = new StringTextComponent("MVVM GUI Debug GUI");
 
 	public static Block getBlockEntry() { return BlockDebug.INSTANCE; }
 

@@ -13,11 +13,4 @@ public abstract class EventUIComponent extends EventUI {
 
 	public IUIComponent getComponent() { return component; }
 
-	public static abstract class Inbound extends EventUIComponent {
-		protected Inbound(EnumEventHookStage stage, IUIComponent component) { super(stage, component); }
-	}
-
-	public static abstract class Outbound extends EventUIComponent {
-		protected Outbound(EnumEventHookStage stage, IUIComponent component) { super(stage, component); }
-	}
 }

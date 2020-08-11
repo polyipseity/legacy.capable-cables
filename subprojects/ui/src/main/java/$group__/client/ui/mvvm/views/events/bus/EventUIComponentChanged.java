@@ -6,7 +6,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public abstract class EventUIComponentChanged<T> extends EventUIComponent.Outbound {
+public abstract class EventUIComponentChanged<T> extends EventUIComponent {
 	protected final T previous, next;
 
 	protected EventUIComponentChanged(EnumEventHookStage stage, IUIComponent component, T previous, T next) {
