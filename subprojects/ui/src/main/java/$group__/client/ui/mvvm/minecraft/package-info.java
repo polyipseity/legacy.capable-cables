@@ -2,7 +2,7 @@
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
 @LocalVariablesAreNonnullByDefault
-package $group__.client.ui.mvvm.views.core;
+package $group__.client.ui.mvvm.minecraft;
 
 import $group__.annotations.FieldsAreNonnullByDefault;
 import $group__.annotations.LocalVariablesAreNonnullByDefault;

@@ -2,7 +2,7 @@
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
 @LocalVariablesAreNonnullByDefault
-package $group__.client.ui.coredeprecated.events;
+package $group__.utilities.client.minecraft;
 
 import $group__.annotations.FieldsAreNonnullByDefault;
 import $group__.annotations.LocalVariablesAreNonnullByDefault;

@@ -2,7 +2,7 @@
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
 @LocalVariablesAreNonnullByDefault
-package $group__.client.ui.adapters;
+package $group__.client.ui.utilities.minecraft;
 
 import $group__.annotations.FieldsAreNonnullByDefault;
 import $group__.annotations.LocalVariablesAreNonnullByDefault;
