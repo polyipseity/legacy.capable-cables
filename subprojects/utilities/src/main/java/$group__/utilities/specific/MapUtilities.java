@@ -1,10 +1,9 @@
 package $group__.utilities.specific;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.MapMaker;
-import com.google.common.collect.Maps;
 
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static $group__.utilities.ConcurrencyUtilities.MULTI_THREAD_THREAD_COUNT;
@@ -32,8 +31,22 @@ public enum MapUtilities {
 		return new MapMaker().concurrencyLevel(MULTI_THREAD_THREAD_COUNT).weakKeys();
 	}
 
+	@SafeVarargs
+	public static <K, V> Map<K, V> concatMaps(Map<? extends K, ? extends V>... maps) {
+		List<Iterable<? extends K>> keys = new ArrayList<>(maps.length);
+		List<Iterable<? extends V>> values = new ArrayList<>(maps.length);
+		int size = 0;
+		for (Map<? extends K, ? extends V> map : maps) {
+			Collection<? extends K> mk = map.keySet();
+			size += mk.size();
+			keys.add(mk);
+			values.add(map.values());
+		}
+		return stitchIterables(size, Iterables.concat(keys), Iterables.concat(values));
+	}
+
 	public static <K, V> Map<K, V> stitchIterables(int size, Iterable<? extends K> keys, Iterable<? extends V> values) {
-		Map<K, V> ret = Maps.newHashMapWithExpectedSize(size);
+		Map<K, V> ret = new HashMap<>(size);
 
 		Iterator<? extends V> iteratorValues = values.iterator();
 		keys.forEach(k -> {

@@ -2,17 +2,18 @@ package $group__.client.ui.mvvm.binding;
 
 import $group__.client.ui.mvvm.core.binding.IBindingField;
 import $group__.client.ui.mvvm.core.binding.IObservableField;
+import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class BindingField<T> implements IBindingField<T> {
 	@Nullable
-	protected final String string;
+	protected final ResourceLocation bindingKey;
 	protected final IObservableField<T> field;
 
-	public BindingField(@Nullable String string, IObservableField<T> field) {
-		this.string = string;
+	public BindingField(@Nullable ResourceLocation bindingKey, IObservableField<T> field) {
+		this.bindingKey = bindingKey;
 		this.field = field;
 	}
 
@@ -20,5 +21,5 @@ public class BindingField<T> implements IBindingField<T> {
 	public IObservableField<T> getField() { return field; }
 
 	@Override
-	public Optional<String> getString() { return Optional.ofNullable(string); }
+	public Optional<ResourceLocation> getBindingKey() { return Optional.ofNullable(bindingKey); }
 }

@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nonnull;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public interface IBindingField<T> extends IHasGenericClass<T>, IHasBindingString {
+public interface IBindingField<T> extends IField<T>, IHasGenericClass<T>, IHasBindingString {
 	Logger LOGGER = LogManager.getLogger();
 
 	static <T> DisposableObserver<T> createSynchronizationObserver(IBindingField<T> from, Iterable<IBindingField<T>> to, AtomicBoolean isSource) {
@@ -20,7 +20,7 @@ public interface IBindingField<T> extends IHasGenericClass<T>, IHasBindingString
 				if (isSource.getAndSet(false)) {
 					to.forEach(k -> {
 						if (!k.equals(from))
-							k.getField().setValue(o);
+							k.setValue(o);
 					});
 					isSource.set(true);
 				}
@@ -28,7 +28,7 @@ public interface IBindingField<T> extends IHasGenericClass<T>, IHasBindingString
 
 			@Override
 			public void onError(@NonNull Throwable e) {
-				ThrowableCatcher.log(e, LOGGER);
+				ThrowableCatcher.catch_(e, LOGGER);
 				dispose();
 			}
 
@@ -41,5 +41,11 @@ public interface IBindingField<T> extends IHasGenericClass<T>, IHasBindingString
 	default Class<T> getGenericClass() { return getField().getGenericClass(); }
 
 	IObservableField<T> getField();
+
+	@Override
+	default T getValue() { return getField().getValue(); }
+
+	@Override
+	default void setValue(T value) { getField().setValue(value); }
 }
 

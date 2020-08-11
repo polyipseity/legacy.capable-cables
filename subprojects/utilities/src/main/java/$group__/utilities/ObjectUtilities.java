@@ -1,6 +1,12 @@
 package $group__.utilities;
 
+import $group__.utilities.specific.MapUtilities;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -13,13 +19,13 @@ public enum ObjectUtilities {
 	public static final IntSupplier HASH_CODE_SUPER_METHOD_DEFAULT = () -> 1;
 
 	public static <T> boolean equals(T self, @Nullable Object other, boolean acceptSubclasses, @Nullable Function<? super Object, ? extends Boolean> superMethod, Iterable<? extends Function<? super T, ?>> variables) {
-		if (self == other)
+		if (self.equals(other))
 			return true;
 		if (acceptSubclasses) {
 			if (!self.getClass().isInstance(other))
 				return false;
 		} else {
-			if (other == null || self.getClass() != other.getClass())
+			if (other == null || !self.getClass().equals(other.getClass()))
 				return false;
 		}
 		if (superMethod != null && !superMethod.apply(other))
@@ -59,5 +65,12 @@ public enum ObjectUtilities {
 		if (superMethod != null)
 			ret.append(superMethod.get());
 		return ret.toString();
+	}
+
+	public static <T> ImmutableList<Function<? super T, ?>> extendsObjectVariables(Iterable<? extends Function<? super T, ?>> extended, Iterable<? extends Function<? super T, ?>> self) { return ImmutableList.copyOf(Iterables.concat(extended, self)); }
+
+	public static <T> ImmutableMap<String, Function<? super T, ?>> extendsObjectVariablesMap(Collection<? extends Function<? super T, ?>> variables, Map<? extends String, ? extends Function<? super T, ?>> extended, Iterable<? extends String> self) {
+		return ImmutableMap.copyOf(
+				MapUtilities.stitchIterables(variables.size(), Iterables.concat(extended.keySet(), self), variables));
 	}
 }

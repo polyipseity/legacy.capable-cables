@@ -8,6 +8,7 @@ import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.specific.MapUtilities;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
+import net.minecraft.util.ResourceLocation;
 import sun.misc.Cleaner;
 
 import java.util.*;
@@ -15,8 +16,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Binder implements IBinder {
-	protected final ConcurrentMap<String, FieldBinding<?>> fieldBindings = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap();
-	protected final ConcurrentMap<String, MethodBinding<?>> methodBindings = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<ResourceLocation, FieldBinding<?>> fieldBindings = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<ResourceLocation, MethodBinding<?>> methodBindings = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap();
 
 	@Override
 	public boolean bindFields(Iterable<IBindingField<?>> fields) {
@@ -39,7 +40,7 @@ public class Binder implements IBinder {
 			FieldBinding<?> b = getFieldBinding(s);
 			ret[0] |= b.remove(fs);
 			if (b.isEmpty())
-				getFieldBindings().remove(b.getString());
+				getFieldBindings().remove(b.getBindingKey());
 		});
 		return ret[0];
 	}
@@ -51,7 +52,7 @@ public class Binder implements IBinder {
 			MethodBinding<?> b = getMethodBinding(s);
 			ret[0] |= b.remove(ms);
 			if (b.isEmpty())
-				getMethodBindings().remove(b.getString());
+				getMethodBindings().remove(b.getBindingKey());
 		});
 		return ret[0];
 	}
@@ -72,23 +73,23 @@ public class Binder implements IBinder {
 		return ret[0];
 	}
 
-	protected MethodBinding<?> getMethodBinding(String string) { return getMethodBindings().computeIfAbsent(string, MethodBinding::new); }
+	protected MethodBinding<?> getMethodBinding(ResourceLocation bindingKey) { return getMethodBindings().computeIfAbsent(bindingKey, MethodBinding::new); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<String, MethodBinding<?>> getMethodBindings() { return methodBindings; }
+	protected ConcurrentMap<ResourceLocation, MethodBinding<?>> getMethodBindings() { return methodBindings; }
 
-	protected FieldBinding<?> getFieldBinding(String string) { return getFieldBindings().computeIfAbsent(string, FieldBinding::new); }
+	protected FieldBinding<?> getFieldBinding(ResourceLocation bindingKey) { return getFieldBindings().computeIfAbsent(bindingKey, FieldBinding::new); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<String, FieldBinding<?>> getFieldBindings() { return fieldBindings; }
+	protected ConcurrentMap<ResourceLocation, FieldBinding<?>> getFieldBindings() { return fieldBindings; }
 
 	protected static class FieldBinding<T> {
-		protected final String string;
+		protected final ResourceLocation bindingKey;
 		protected final Map<IBindingField<T>, Disposable> fields = new HashMap<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
 		protected final AtomicBoolean isSource = new AtomicBoolean();
 
-		public FieldBinding(String string) {
-			this.string = string;
+		public FieldBinding(ResourceLocation bindingKey) {
+			this.bindingKey = bindingKey;
 			{
 				final Map<IBindingField<T>, Disposable> fieldsCopy = getFields();
 				// TODO see if the lambda will have an implicit ref to this
@@ -101,27 +102,27 @@ public class Binder implements IBinder {
 
 		public boolean add(Iterable<IBindingField<?>> fields) {
 			final boolean[] ret = {false};
-			IBinder.<T, IBindingField<T>, IBindingField<?>>checkAndCastBindings(getString(),
+			IBinder.<T, IBindingField<T>, IBindingField<?>>checkAndCastBindings(getBindingKey(),
 					getFields().keySet().stream().findAny().map(IHasGenericClass::getGenericClass).orElse(null),
 					fields)
 					.forEach(f -> {
 						if (!getFields().containsKey(f)) {
 							DisposableObserver<T> d = IBindingField.createSynchronizationObserver(f, getFields().keySet(), getIsSource());
 							getFields().put(f, d);
-							f.getField().subscribe(d);
+							f.getField().getNotifier().subscribe(d);
 							ret[0] = true;
 						}
-			});
+					});
 			return ret[0];
 		}
 
-		public String getString() { return string; }
+		public ResourceLocation getBindingKey() { return bindingKey; }
 
 		public AtomicBoolean getIsSource() { return isSource; }
 
 		public boolean remove(Iterable<IBindingField<?>> fields) {
 			final boolean[] ret = {false};
-			IBinder.<T, IBindingField<T>, IBindingField<?>>checkAndCastBindings(getString(),
+			IBinder.<T, IBindingField<T>, IBindingField<?>>checkAndCastBindings(getBindingKey(),
 					getFields().keySet().stream().findAny().map(IHasGenericClass::getGenericClass).orElse(null),
 					fields)
 					.forEach(f -> {
@@ -147,12 +148,12 @@ public class Binder implements IBinder {
 	}
 
 	protected static class MethodBinding<T> {
-		protected final String string;
+		protected final ResourceLocation bindingKey;
 		protected final Map<IBindingMethod.ISource<T>, Disposable> sources = new HashMap<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
 		protected final Set<IBindingMethod.IDestination<T>> destinations = new HashSet<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
 
-		public MethodBinding(String string) {
-			this.string = string;
+		public MethodBinding(ResourceLocation bindingKey) {
+			this.bindingKey = bindingKey;
 			{
 				Map<IBindingMethod.ISource<T>, Disposable> sourcesCopy = getSources();
 				// TODO see if the lambda will have an implicit ref to this
@@ -166,7 +167,7 @@ public class Binder implements IBinder {
 		@SuppressWarnings("SuspiciousMethodCalls")
 		public boolean add(Iterable<IBindingMethod<?>> methods) {
 			final boolean[] ret = {false};
-			IBinder.<T, IBindingMethod<T>, IBindingMethod<?>>checkAndCastBindings(getString(),
+			IBinder.<T, IBindingMethod<T>, IBindingMethod<?>>checkAndCastBindings(getBindingKey(),
 					getSources().keySet().stream().findAny().map(IHasGenericClass::getGenericClass).orElse(null),
 					methods)
 					.forEach(m -> {
@@ -175,7 +176,7 @@ public class Binder implements IBinder {
 								if (!getSources().containsKey(m)) {
 									DisposableObserver<T> d = IBindingMethod.ISource.createDelegatingObserver(getDestinations());
 									IBindingMethod.ISource<T> s = (IBindingMethod.ISource<T>) m;
-									s.subscribe(d);
+									s.getNotifier().subscribe(d);
 									getSources().put(s, d);
 									ret[0] = true;
 								}
@@ -190,7 +191,7 @@ public class Binder implements IBinder {
 			return ret[0];
 		}
 
-		public String getString() { return string; }
+		public ResourceLocation getBindingKey() { return bindingKey; }
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 		protected Set<IBindingMethod.IDestination<T>> getDestinations() { return destinations; }
@@ -198,7 +199,7 @@ public class Binder implements IBinder {
 		@SuppressWarnings("SuspiciousMethodCalls")
 		public boolean remove(Iterable<IBindingMethod<?>> methods) {
 			final boolean[] ret = {false};
-			IBinder.<T, IBindingMethod<T>, IBindingMethod<?>>checkAndCastBindings(getString(),
+			IBinder.<T, IBindingMethod<T>, IBindingMethod<?>>checkAndCastBindings(getBindingKey(),
 					getSources().keySet().stream().findAny().map(IHasGenericClass::getGenericClass).orElse(null),
 					methods)
 					.forEach(m -> {

@@ -1,13 +1,12 @@
 package $group__.client.ui.mvvm.structures;
 
-import $group__.client.ui.coredeprecated.events.EventUIShapeDescriptor;
-import $group__.client.ui.coredeprecated.structures.IUIAnchorSet;
-import $group__.client.ui.coredeprecated.structures.IUIConstraint;
-import $group__.client.ui.coredeprecated.structures.IShapeDescriptor;
-import $group__.client.ui.mvvm.views.components.IUIComponent;
-import $group__.client.ui.utilities.UIObjectUtilities;
+import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
+import $group__.client.ui.mvvm.core.structures.IUIAnchorSet;
+import $group__.client.ui.mvvm.core.structures.IUIConstraint;
+import $group__.client.ui.mvvm.views.events.bus.EventUIShapeDescriptor;
+import $group__.client.ui.utilities.minecraft.UIObjectUtilities;
 import $group__.utilities.CapacityUtilities;
-import $group__.utilities.client.TransformUtilities.AffineTransformUtilities;
+import $group__.utilities.client.minecraft.TransformUtilities.AffineTransformUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
@@ -20,25 +19,21 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
-import static $group__.client.ui.coredeprecated.structures.IShapeDescriptor.checkIsBeingModified;
+import static $group__.client.ui.mvvm.core.structures.IShapeDescriptor.checkIsBeingModified;
 
 @OnlyIn(Dist.CLIENT)
 public abstract class ShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>> implements IShapeDescriptor<S, A> {
 	protected final A anchorSet;
 	protected S shape;
 	protected final List<IUIConstraint> constraints = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
-	protected final WeakReference<IUIComponent.IGuiView<?, ?>> view;
 	protected boolean beingModified = false;
 
-	public ShapeDescriptor(IUIComponent.IGuiView<?, ?> view, S shape, A anchorSet) {
-		this.view = new WeakReference<>(view);
+	public ShapeDescriptor(S shape, A anchorSet) {
 		this.shape = shape;
 		this.anchorSet = anchorSet;
 	}
@@ -47,10 +42,7 @@ public abstract class ShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>
 	public Shape getShapeProcessed() { return UIObjectUtilities.copyShape(getShape()); }
 
 	@Override
-	public Optional<IUIComponent.IGuiView<?, ?>> getView() { return Optional.ofNullable(view.get()); }
-
-	@Override
-	public ImmutableList<IUIConstraint> getConstraintsView() { return ImmutableList.copyOf(getConstraints()); }
+	public List<IUIConstraint> getConstraintsView() { return ImmutableList.copyOf(getConstraints()); }
 
 	@Override
 	public List<IUIConstraint> getConstraintsRef()
@@ -85,7 +77,7 @@ public abstract class ShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>
 
 	@OnlyIn(Dist.CLIENT)
 	public static class Generic<A extends IUIAnchorSet<?>> extends ShapeDescriptor<Shape, A> {
-		public Generic(IUIComponent.IGuiView<?, ?> view, Shape shape, A anchorSet) { super(view, shape, anchorSet); }
+		public Generic(Shape shape, A anchorSet) { super(shape, anchorSet); }
 
 		@Override
 		@OverridingMethodsMustInvokeSuper
@@ -154,7 +146,7 @@ public abstract class ShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>
 
 	@OnlyIn(Dist.CLIENT)
 	public static class Rectangular<S extends RectangularShape, A extends IUIAnchorSet<?>> extends ShapeDescriptor<S, A> {
-		public Rectangular(IUIComponent.IGuiView<?, ?> view, S shape, A anchorSet) { super(view, shape, anchorSet); }
+		public Rectangular(S shape, A anchorSet) { super(shape, anchorSet); }
 
 		@Override
 		@OverridingMethodsMustInvokeSuper

@@ -1,6 +1,6 @@
 package $group__.common.registrables.tileentities;
 
-import $group__.client.ui.debug.GuiComponentDebug;
+import $group__.client.ui.mvvm.minecraft.debug.GuiComponentDebug;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;

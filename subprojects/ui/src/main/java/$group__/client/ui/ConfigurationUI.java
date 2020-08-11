@@ -1,6 +1,6 @@
 package $group__.client.ui;
 
-import $group__.client.ui.coredeprecated.structures.EnumCursor;
+import $group__.client.ui.mvvm.structures.EnumCursor;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;

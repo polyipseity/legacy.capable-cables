@@ -9,6 +9,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.observers.DisposableObserver;
+import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,23 +17,24 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 // TODO mark as only UI thread
+// TODO add binding transformers
 public interface IBinder {
 	Logger LOGGER = LogManager.getLogger();
 
-	static <B extends IHasBindingString> Multimap<String, B> sortAndTrimBindings(Iterable<B> bindings) {
-		@SuppressWarnings("UnstableApiUsage") Multimap<String, B> ret = MultimapBuilder
+	static <B extends IHasBindingString> Multimap<ResourceLocation, B> sortAndTrimBindings(Iterable<B> bindings) {
+		@SuppressWarnings("UnstableApiUsage") Multimap<ResourceLocation, B> ret = MultimapBuilder
 				.hashKeys(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)
 				.hashSetValues(CapacityUtilities.INITIAL_CAPACITY_TINY).build();
-		bindings.forEach(f -> f.getString().ifPresent(s -> ret.put(s, f)));
+		bindings.forEach(f -> f.getBindingKey().ifPresent(rl -> ret.put(rl, f)));
 		return ret;
 	}
 
-	static <T, B extends IHasBindingString & IHasGenericClass<T>, BF extends IHasBindingString & IHasGenericClass<?>> Iterable<B> checkAndCastBindings(String string, @Nullable Class<T> clazz, Iterable<BF> bindings) {
+	static <T, B extends IHasBindingString & IHasGenericClass<T>, BF extends IHasBindingString & IHasGenericClass<?>> Iterable<B> checkAndCastBindings(ResourceLocation bindingKey, @Nullable Class<T> clazz, Iterable<BF> bindings) {
 		for (BF b : bindings) {
-			if (!b.getString().orElse(string).equals(string))
+			if (!b.getBindingKey().map(bindingKey::equals).orElse(true))
 				throw BecauseOf.illegalArgument("The strings of all bindings are not the same",
-						"b.getString()", b.getString(),
-						"string", string,
+						"b.getBindingKey()", b.getBindingKey(),
+						"bindingKey", bindingKey,
 						"b", b,
 						"bindings", bindings);
 
@@ -69,7 +71,7 @@ public interface IBinder {
 
 			@Override
 			public void onError(@NonNull Throwable e) {
-				ThrowableCatcher.log(e, LOGGER);
+				ThrowableCatcher.catch_(e, LOGGER);
 				dispose();
 			}
 

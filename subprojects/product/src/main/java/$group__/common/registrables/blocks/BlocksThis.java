@@ -1,6 +1,6 @@
 package $group__.common.registrables.blocks;
 
-import $group__.client.ui.debug.GuiComponentDebug;
+import $group__.client.ui.mvvm.minecraft.debug.GuiComponentDebug;
 import net.minecraft.block.Block;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;

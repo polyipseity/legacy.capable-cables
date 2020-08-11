@@ -1,24 +1,16 @@
 package $group__.client.ui.mvvm.structures;
 
 import $group__.client.ui.mvvm.core.structures.IUIDataMouseButtonClick;
-import $group__.client.ui.mvvm.views.components.IUIComponent;
 import $group__.utilities.ObjectUtilities;
-import $group__.utilities.specific.MapUtilities;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import jdk.nashorn.internal.ir.annotations.Immutable;
 
 import java.awt.geom.Point2D;
-import java.util.function.Function;
 
 @Immutable
 public final class UIDataMouseButtonClick implements IUIDataMouseButtonClick {
-	public static final ImmutableList<Function<UIDataMouseButtonClick, Object>> OBJECT_VARIABLES = ImmutableList.of(
-			UIDataMouseButtonClick::getCursorPositionView, UIDataMouseButtonClick::getButton);
-	public static final ImmutableMap<String, Function<UIDataMouseButtonClick, Object>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
-			ImmutableList.of("cursor", "button"), OBJECT_VARIABLES));
 	protected final Point2D cursorPosition;
 	protected final int button;
+	protected final long timestamp = System.currentTimeMillis();
 
 	public UIDataMouseButtonClick(Point2D cursorPosition) { this(cursorPosition, MOUSE_BUTTON_NULL); }
 
@@ -45,17 +37,9 @@ public final class UIDataMouseButtonClick implements IUIDataMouseButtonClick {
 	@Override
 	public String toString() { return ObjectUtilities.toString(this, super::toString, OBJECT_VARIABLES_MAP); }
 
-	public static class Tracked {
-		protected final IUIComponent component;
-		protected final UIDataMouseButtonClick data;
+	@Override
+	public long getTimestampMills() { return timestamp; }
 
-		public Tracked(IUIComponent component, UIDataMouseButtonClick data) {
-			this.component = component;
-			this.data = data;
-		}
-
-		public IUIComponent getComponent() { return component; }
-
-		public UIDataMouseButtonClick getData() { return data; }
-	}
+	@Override
+	public IUIDataMouseButtonClick recreate() { return new UIDataMouseButtonClick(getCursorPosition(), getButton()); }
 }

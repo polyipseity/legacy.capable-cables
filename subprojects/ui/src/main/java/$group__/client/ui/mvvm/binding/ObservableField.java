@@ -1,42 +1,36 @@
 package $group__.client.ui.mvvm.binding;
 
 import $group__.client.ui.mvvm.core.binding.IObservableField;
-import io.reactivex.rxjava3.annotations.NonNull;
-import io.reactivex.rxjava3.core.Observer;
+import $group__.utilities.interfaces.IHasGenericClass;
+import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import io.reactivex.rxjava3.subjects.Subject;
 
-public class ObservableField<T> implements IObservableField<T> {
-	protected final Class<T> genericClass;
-	protected final Subject<T> notifier;
+public class ObservableField<T>
+		extends IHasGenericClass.Impl<T>
+		implements IObservableField<T> {
+	protected final Subject<T> notifierSubject;
 	protected T value;
 
 	public ObservableField(Class<T> genericClass, T value) {
-		this.genericClass = genericClass;
+		super(genericClass);
 		this.value = value;
-		this.notifier = BehaviorSubject.createDefault(value);
+		this.notifierSubject = BehaviorSubject.createDefault(value);
 	}
 
 	@Override
-	public void subscribe(@NonNull Observer<? super T> observer) { getNotifier().subscribe(observer); }
+	public ObservableSource<T> getNotifier() { return getNotifierSubject(); }
 
-	protected Subject<T> getNotifier() { return notifier; }
+	protected Subject<T> getNotifierSubject() { return notifierSubject; }
 
 	@Override
 	public void setValue(T value) {
 		if (!getValue().equals(value)) {
 			this.value = value;
-			getNotifier().onNext(value);
+			getNotifierSubject().onNext(value);
 		}
 	}
 
 	@Override
-	public Class<T> getGenericClass() { return genericClass; }
-
-	@Override
 	public T getValue() { return value; }
-
-
-
-
 }

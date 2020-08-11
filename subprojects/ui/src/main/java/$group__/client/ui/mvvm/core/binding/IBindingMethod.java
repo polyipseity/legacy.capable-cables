@@ -20,7 +20,7 @@ public interface IBindingMethod<T> extends IHasGenericClass<T>, IHasBindingStrin
 		DESTINATION
 	}
 
-	interface ISource<T> extends IBindingMethod<T>, ObservableSource<T> {
+	interface ISource<T> extends IBindingMethod<T> {
 		static <T> DisposableObserver<T> createDelegatingObserver(Iterable<IDestination<T>> destinations) {
 			return new DisposableObserver<T>() {
 				@Override
@@ -28,7 +28,7 @@ public interface IBindingMethod<T> extends IHasGenericClass<T>, IHasBindingStrin
 
 				@Override
 				public void onError(@NonNull Throwable e) {
-					ThrowableCatcher.log(e, LOGGER);
+					ThrowableCatcher.catch_(e, LOGGER);
 					dispose();
 				}
 
@@ -39,10 +39,18 @@ public interface IBindingMethod<T> extends IHasGenericClass<T>, IHasBindingStrin
 
 		@Override
 		default EnumType getType() { return EnumType.SOURCE; }
+
+		ObservableSource<T> getNotifier();
+
+		void invoke(T argument);
 	}
 
-	interface IDestination<T> extends IBindingMethod<T>, Consumer<T> {
+	interface IDestination<T>
+			extends IBindingMethod<T>, Consumer<T> {
 		@Override
 		default EnumType getType() { return EnumType.DESTINATION; }
+
+		@Override
+		void accept(T argument);
 	}
 }

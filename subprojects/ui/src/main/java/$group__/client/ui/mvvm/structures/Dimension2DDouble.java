@@ -14,9 +14,11 @@ import java.util.function.Function;
 
 @OnlyIn(Dist.CLIENT)
 public class Dimension2DDouble extends Dimension2D implements Serializable {
-	public static final ImmutableList<Function<Dimension2DDouble, Object>> OBJECT_VARIABLES = ImmutableList.of(Dimension2DDouble::getWidth, Dimension2DDouble::getHeight);
+	public static final ImmutableList<Function<Dimension2DDouble, Object>> OBJECT_VARIABLES = ImmutableList.of(
+			Dimension2DDouble::getWidth, Dimension2DDouble::getHeight);
 	public static final ImmutableMap<String, Function<Dimension2DDouble, Object>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
-			ImmutableList.of("width", "height"), OBJECT_VARIABLES));
+			ImmutableList.of("width", "height"),
+			OBJECT_VARIABLES));
 	private static final long serialVersionUID = 4432299344969417136L;
 	protected double width, height;
 

@@ -2,7 +2,7 @@ package $group__.client;
 
 import $group__.Constants;
 import $group__.client.ui.ConfigurationUI;
-import $group__.client.ui.debug.GuiComponentDebug;
+import $group__.client.ui.mvvm.minecraft.debug.GuiComponentDebug;
 import $group__.proxies.Proxy;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;

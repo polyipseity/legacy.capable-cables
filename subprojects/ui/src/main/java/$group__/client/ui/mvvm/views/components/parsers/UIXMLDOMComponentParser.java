@@ -2,16 +2,17 @@ package $group__.client.ui.mvvm.views.components.parsers;
 
 import $group__.client.ui.ConfigurationUI;
 import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
+import $group__.client.ui.mvvm.core.views.components.IUIComponent;
+import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
+import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
+import $group__.client.ui.mvvm.core.views.components.parsers.IUIResourceParser;
 import $group__.client.ui.mvvm.structures.UIPropertyMappingValue;
-import $group__.client.ui.mvvm.views.core.components.IUIComponent;
-import $group__.client.ui.mvvm.views.core.components.IUIComponentContainer;
-import $group__.client.ui.mvvm.views.core.components.IUIComponentManager;
-import $group__.client.ui.mvvm.views.core.components.parsers.IUIResourceParser;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.DynamicUtilities;
 import $group__.utilities.TreeUtilities;
-import $group__.utilities.client.ResourceUtilities;
+import $group__.utilities.client.minecraft.ResourceUtilities;
+import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.specific.DOMUtilities;
 import $group__.utilities.specific.MapUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
@@ -41,7 +42,9 @@ import java.lang.invoke.MethodType;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 
-public class UIXMLDOMComponentParser<T extends IUIComponentManager> implements IUIResourceParser<T, Document> {
+public class UIXMLDOMComponentParser<T extends IUIComponentManager>
+		extends IHasGenericClass.Impl<T>
+		implements IUIResourceParser<T, Document> {
 	@SuppressWarnings("HardcodedFileSeparator")
 	public static final ResourceLocation SCHEMA_LOCATION = new ResourceLocation(ConfigurationUI.getModId(), "ui/schemas/components.xsd");
 	private static final Logger LOGGER = LogManager.getLogger();
@@ -49,12 +52,11 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager> implements I
 			SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
 					.newSchema(new StreamSource(ResourceUtilities.getResource(SCHEMA_LOCATION).getInputStream())), LOGGER).orElseThrow(ThrowableCatcher::rethrow);
 
-	protected final Class<T> genericClass;
 	protected ConcurrentMap<String, String> aliases = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 	@Nullable
 	protected UIComponentPrototype prototype;
 
-	public UIXMLDOMComponentParser(Class<T> genericClass) { this.genericClass = genericClass; }
+	public UIXMLDOMComponentParser(Class<T> genericClass) { super(genericClass); }
 
 	@Override
 	public void parseResource(Document resource) throws IOException, SAXException, ClassNotFoundException {
@@ -139,9 +141,6 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager> implements I
 
 	protected static String getClassFromMaybeAlias(ConcurrentMap<String, String> aliases, String maybeAlias) { return aliases.getOrDefault(maybeAlias, maybeAlias); }
 
-	@Override
-	public Class<T> getGenericClass() { return genericClass; }
-
 	protected static class UIComponentPrototype {
 		private static final Logger LOGGER = LogManager.getLogger();
 		protected final String className;
@@ -162,9 +161,9 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager> implements I
 
 		protected Map<String, IUIPropertyMappingValue> getPropertyMapping() { return propertyMapping; }
 
-		public IUIComponent<?> createComponent() throws Throwable {
+		public IUIComponent createComponent() throws Throwable {
 			MethodHandle constructor = DynamicUtilities.IMPL_LOOKUP.findConstructor(Class.forName(getClassName()), MethodType.methodType(void.class, Map.class));
-			IUIComponent<?> ret = (IUIComponent<?>) constructor.invoke(getPropertyMapping());
+			IUIComponent ret = (IUIComponent) constructor.invoke(getPropertyMapping());
 			if (!getChildren().isEmpty()) {
 				if (!(ret instanceof IUIComponentContainer))
 					throw BecauseOf.illegalArgument("Component type is not a container",
