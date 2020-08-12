@@ -10,4 +10,6 @@ public interface IUIEventTarget {
 	boolean dispatchEvent(IUIEvent event);
 
 	boolean isActive();
+
+	boolean isFocusable();
 }

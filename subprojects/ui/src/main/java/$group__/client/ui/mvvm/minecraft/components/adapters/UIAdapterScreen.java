@@ -15,6 +15,7 @@ import $group__.client.ui.mvvm.minecraft.core.extensions.IUIExtensionScreenProvi
 import $group__.client.ui.mvvm.structures.Dimension2DDouble;
 import $group__.client.ui.mvvm.structures.UIDataKeyboardKeyPress;
 import $group__.client.ui.mvvm.structures.UIDataMouseButtonClick;
+import $group__.client.ui.utilities.InputUtilities;
 import $group__.client.ui.utilities.UIObjectUtilities;
 import $group__.client.ui.utilities.minecraft.DrawingUtilities;
 import $group__.client.ui.utilities.minecraft.TextComponentUtilities;
@@ -69,13 +70,8 @@ public class UIAdapterScreen
 
 	public UIAdapterScreen(ITextComponent titleIn, I infrastructure) { this(titleIn, infrastructure, ImmutableSet.of(GLFW.GLFW_KEY_ESCAPE), ImmutableSet.of(GLFW.GLFW_KEY_TAB)); }
 
-	public UIAdapterScreen(ITextComponent titleIn, I infrastructure, Set<Integer> closeKeys, Set<Integer> changeFocusKeys) {
-		super(titleIn);
-		this.infrastructure = infrastructure;
-		this.closeKeys = new HashSet<>(closeKeys);
-		this.changeFocusKeys = new HashSet<>(changeFocusKeys);
-		IExtensionContainer.addExtensionSafe(getInfrastructure(), new UIExtensionScreen<>(IUIInfrastructure.class, this));
-	}
+	@Nullable
+	protected IUIEventTarget focus;
 
 	@Override
 	public I getInfrastructure() { return infrastructure; }
@@ -122,22 +118,8 @@ public class UIAdapterScreen
 	@Deprecated
 	public void render(int mouseX, int mouseY, float partialTicks) { getInfrastructure().getView().render(new Point2D.Double(mouseX, mouseY), partialTicks); }
 
-	@Override
-	@Deprecated
-	public boolean keyPressed(int key, int scanCode, int modifiers) {
-		if (getCloseKeys().contains(key)) {
-			onClose();
-			return true;
-		}
-		if (getChangeFocusKeys().contains(key)) {
-			changeFocus((modifiers & GLFW.GLFW_MOD_SHIFT) == 0);
-			return true;
-		}
-		return UIEventUtilities.dispatchEvent(
-				addEventKeyboard(this, UIEventUtilities.Factory.createEventKeyDown(
-						getInfrastructure().getView().getFocus(),
-						new UIDataKeyboardKeyPress(key, scanCode, modifiers))));
-	}
+	@Nullable
+	protected UIDataMouseButtonClick lastMouseClickData = null;
 
 	protected static <E extends IUIEventKeyboard> E addEventKeyboard(UIAdapterScreen<?> self, E event) {
 		self.getKeyboardKeysBeingPressed().put(event.getData().getKey(), event);
@@ -205,6 +187,38 @@ public class UIAdapterScreen
 	@Deprecated
 	public void tick() { getInfrastructure().tick(); }
 
+	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
+	public UIAdapterScreen(ITextComponent titleIn, I infrastructure, Set<Integer> closeKeys, Set<Integer> changeFocusKeys) {
+		super(titleIn);
+		this.infrastructure = infrastructure;
+		this.closeKeys = new HashSet<>(closeKeys);
+		this.changeFocusKeys = new HashSet<>(changeFocusKeys);
+		IExtensionContainer.addExtensionSafe(getInfrastructure(), new UIExtensionScreen<>(IUIInfrastructure.class, this));
+	}
+
+	protected static Optional<IUIEventKeyboard> removeEventKeyboard(UIAdapterScreen<?> self, int key) { return Optional.ofNullable(self.getKeyboardKeysBeingPressed().remove(key)); }
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected Map<Integer, IUIEventMouse> getMouseButtonsBeingPressed() { return mouseButtonsBeingPressed; }
+
+	protected static Optional<IUIEventMouse> removeEventMouse(UIAdapterScreen<?> self, int key) { return Optional.ofNullable(self.getMouseButtonsBeingPressed().remove(key)); }
+
+	@Override
+	@Deprecated
+	public boolean keyPressed(int key, int scanCode, int modifiers) {
+		if (getCloseKeys().contains(key)) {
+			onClose();
+			return true;
+		}
+		if (getChangeFocusKeys().contains(key)) {
+			changeFocus((modifiers & GLFW.GLFW_MOD_SHIFT) == 0);
+			return true;
+		}
+		return getFocus().filter(f -> UIEventUtilities.dispatchEvent(
+				addEventKeyboard(this, UIEventUtilities.Factory.createEventKeyDown(f,
+						new UIDataKeyboardKeyPress(key, scanCode, modifiers))))).isPresent();
+	}
+
 	@Override
 	@Deprecated
 	public void removed() {
@@ -218,18 +232,14 @@ public class UIAdapterScreen
 					removeEventMouse(this, k).ifPresent(e2 ->
 							UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e2, cp))));
 			setTargetBeingHoveredByMouse(null, new UIDataMouseButtonClick(cp));
+			setLastMouseClickData(null, null);
+			setFocus(null);
 		}
 		getInfrastructure().removed();
 	}
 
-	protected static Optional<IUIEventKeyboard> removeEventKeyboard(UIAdapterScreen<?> self, int key) { return Optional.ofNullable(self.getKeyboardKeysBeingPressed().remove(key)); }
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Map<Integer, IUIEventMouse> getMouseButtonsBeingPressed() { return mouseButtonsBeingPressed; }
-
-	protected static Optional<IUIEventMouse> removeEventMouse(UIAdapterScreen<?> self, int key) { return Optional.ofNullable(self.getMouseButtonsBeingPressed().remove(key)); }
-
-	protected void setTargetBeingHoveredByMouse(@Nullable IUIEventTarget targetBeingHoveredByMouse, IUIDataMouseButtonClick data) {
+	@SuppressWarnings("UnusedReturnValue")
+	protected boolean setTargetBeingHoveredByMouse(@Nullable IUIEventTarget targetBeingHoveredByMouse, IUIDataMouseButtonClick data) {
 		Optional<IUIEventTarget> o = getTargetBeingHoveredByMouse();
 		Optional<IUIEventTarget> n = Optional.ofNullable(targetBeingHoveredByMouse);
 		if (!n.equals(o)) {
@@ -261,7 +271,21 @@ public class UIAdapterScreen
 								UIEventUtilities.Factory.createEventMouseEnter((IUIEventTarget) t2, data, o.orElse(null)));
 				});
 			});
+			return true;
 		}
+		return false;
+	}
+
+	protected boolean setLastMouseClickData(@Nullable UIDataMouseButtonClick newMouseClickData, @Nullable IUIEventTarget target) {
+		boolean ret = getLastMouseClickData()
+				.flatMap(dl -> Optional.ofNullable(newMouseClickData)
+						.filter(d -> {
+							assert target != null;
+							return InputUtilities.isDoubleClick(dl, d)
+									&& UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClickDouble(target, d));
+						})).isPresent();
+		this.lastMouseClickData = newMouseClickData;
+		return ret;
 	}
 
 	protected Optional<IUIEventTarget> getTargetBeingHoveredByMouse() { return Optional.ofNullable(targetBeingHoveredByMouse); }
@@ -293,6 +317,28 @@ public class UIAdapterScreen
 		// COMMENT resize calls init
 	}
 
+	protected Optional<UIDataMouseButtonClick> getLastMouseClickData() { return Optional.ofNullable(lastMouseClickData); }
+
+	protected Optional<IUIEventTarget> getFocus() { return Optional.ofNullable(focus); }
+
+	protected boolean setFocus(@Nullable IUIEventTarget focus) {
+		Optional<IUIEventTarget> p = getFocus(), n = Optional.ofNullable(focus);
+		if (!p.equals(n)) {
+			@Nullable IUIEventTarget pv = p.orElse(null);
+			p.ifPresent(f -> UIEventUtilities.dispatchEvent(
+					UIEventUtilities.Factory.createEventFocusOutPre(f, focus)));
+			n.ifPresent(f -> UIEventUtilities.dispatchEvent(
+					UIEventUtilities.Factory.createEventFocusInPre(f, pv)));
+			this.focus = focus;
+			p.ifPresent(f -> UIEventUtilities.dispatchEvent(
+					UIEventUtilities.Factory.createEventFocusOutPost(f, focus)));
+			n.ifPresent(f -> UIEventUtilities.dispatchEvent(
+					UIEventUtilities.Factory.createEventFocusInPost(f, pv)));
+			return true;
+		}
+		return false;
+	}
+
 	@Override
 	@Deprecated
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
@@ -300,8 +346,12 @@ public class UIAdapterScreen
 		Point2D cp = new Point2D.Double(mouseX, mouseY);
 		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(cp);
 		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
-		return UIEventUtilities.dispatchEvent(addEventMouse(this, UIEventUtilities.Factory.createEventMouseDown(t, d)))
-				| UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClick(t, d));
+		boolean ret = UIEventUtilities.dispatchEvent(addEventMouse(this, UIEventUtilities.Factory.createEventMouseDown(t, d)))
+				| UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClick(t, d))
+				| setLastMouseClickData(d, t);
+		if (t.isFocusable())
+			setFocus(t);
+		return ret;
 	}
 
 	protected static <E extends IUIEventMouse> E addEventMouse(UIAdapterScreen<?> self, E event) {
@@ -341,13 +391,13 @@ public class UIAdapterScreen
 	@Override
 	@Deprecated
 	public boolean charTyped(char codePoint, int modifiers) {
-		return UIEventUtilities.dispatchEvent(
-				UIEventUtilities.Factory.createEventChar(getInfrastructure().getView().getFocus(), codePoint, modifiers));
+		return getFocus().filter(f -> UIEventUtilities.dispatchEvent(
+				UIEventUtilities.Factory.createEventChar(f, codePoint, modifiers))).isPresent();
 	}
 
 	@Override
 	@Deprecated
-	public boolean changeFocus(boolean next) { return getInfrastructure().getView().changeFocus(next); }
+	public boolean changeFocus(boolean next) { return setFocus(getInfrastructure().getView().changeFocus(getFocus().orElse(null), next).orElse(null)); }
 
 	@Override
 	@Deprecated
@@ -397,6 +447,7 @@ public class UIAdapterScreen
 
 		protected final C container;
 
+		@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 		protected WithContainer(ITextComponent titleIn, I manager, C container) {
 			super(titleIn, manager);
 			this.container = container;

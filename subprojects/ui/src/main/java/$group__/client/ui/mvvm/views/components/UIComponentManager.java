@@ -7,6 +7,7 @@ import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
 import $group__.client.ui.mvvm.core.views.components.extensions.caches.IUIExtensionCache;
+import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;
 import $group__.client.ui.mvvm.structures.AffineTransformStack;
 import $group__.client.ui.mvvm.views.components.extensions.UIExtensionCache;
 import $group__.client.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
@@ -25,6 +26,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,8 +36,6 @@ import java.util.function.Function;
 public abstract class UIComponentManager<SD extends IShapeDescriptor<?, ?>>
 		extends UIComponentContainer
 		implements IUIComponentManager<SD> {
-	protected IUIComponent focus = this;
-
 	public UIComponentManager(Map<String, IUIPropertyMappingValue> propertyMapping) { super(propertyMapping); }
 
 	@Override
@@ -51,14 +51,13 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?, ?>>
 	public boolean reshape(Function<? super SD, Boolean> action) throws ConcurrentModificationException { return getShapeDescriptor().modify(getShapeDescriptor(), action); }
 
 	@Override
-	public boolean changeFocus(boolean next) {
-		@SuppressWarnings("UnstableApiUsage") ImmutableList<IUIComponent> focs = getChildrenFlat().stream().sequential().filter(IUIComponent::isFocusable).collect(ImmutableList.toImmutableList()); // TODO cache this
-		assert !focs.isEmpty();
-		IUIComponent foc = focs.get(Math.max(focs.indexOf(getFocus()), 0) + (next ? 1 : -1) % focs.size());
-		if (foc.equals(getFocus()))
-			return false;
-		setFocus(foc);
-		return true;
+	public Optional<IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) {
+		if (currentFocus instanceof IUIComponent) {
+			@SuppressWarnings("UnstableApiUsage") ImmutableList<IUIComponent> focs = getChildrenFlat().stream().sequential().filter(IUIComponent::isFocusable).collect(ImmutableList.toImmutableList()); // TODO cache this
+			assert !focs.isEmpty();
+			return Optional.ofNullable(focs.get(Math.max(focs.indexOf(currentFocus), 0) + (next ? 1 : -1) % focs.size()));
+		}
+		return Optional.of(this);
 	}
 
 	@Override
@@ -80,15 +79,6 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?, ?>>
 		}
 		IAffineTransformStack.popMultiple(stack, popTimes);
 		return Optional.ofNullable(action.apply(component, stack));
-	}
-
-	@Override
-	public IUIComponent getFocus() { return focus; }
-
-	@Override
-	public void setFocus(IUIComponent focus) {
-		// TODO focus events
-		this.focus = focus;
 	}
 
 	@Override

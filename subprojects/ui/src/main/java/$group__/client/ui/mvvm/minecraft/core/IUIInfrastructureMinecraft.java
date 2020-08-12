@@ -7,7 +7,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public interface IUIInfrastructureMinecraft<V extends IUIViewMinecraft, VM extends IUIViewModelMinecraft<?>, B extends IBinder>
+public interface IUIInfrastructureMinecraft<V extends IUIViewMinecraft<?>, VM extends IUIViewModelMinecraft<?>, B extends IBinder>
 		extends IUIInfrastructure<V, VM, B>, IUICommonMinecraft {
 	@Override
 	default void tick() {

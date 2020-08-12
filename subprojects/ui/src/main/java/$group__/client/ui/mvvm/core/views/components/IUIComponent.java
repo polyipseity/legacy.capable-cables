@@ -40,9 +40,7 @@ public interface IUIComponent
 
 	Optional<IUIComponentContainer> getParent();
 
-	static boolean isBeingFocused(IUIComponent component) { return component.getManager().map(IUIComponentManager::getFocus).map(component::equals).orElse(false); }
-
-	default Optional<IUIComponentManager> getManager() { return UIExtensionCache.CacheUniversal.MANAGER.getValue().get(this); }
+	default Optional<IUIComponentManager<?>> getManager() { return UIExtensionCache.CacheUniversal.MANAGER.getValue().get(this); }
 
 	static ImmutableList<IUIComponent> computeComponentPath(IUIComponent component) {
 		ImmutableList.Builder<IUIComponent> builder = ImmutableList.builder();
@@ -69,6 +67,7 @@ public interface IUIComponent
 
 	void setActive(boolean active);
 
+	@Override
 	default boolean isFocusable() { return false; }
 
 	@Override

@@ -3,6 +3,7 @@ package $group__.client.ui.mvvm.core.views.components;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.views.IUIReshapeExplicitly;
+import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;
 import $group__.utilities.CapacityUtilities;
 
 import javax.annotation.Nullable;
@@ -46,13 +47,9 @@ public interface IUIComponentManager<SD extends IShapeDescriptor<?, ?>>
 
 	List<IUIComponent> getChildrenFlat();
 
-	boolean changeFocus(boolean next);
+	Optional<IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next);
 
 	IUIComponent getComponentAtPoint(Point2D point);
-
-	IUIComponent getFocus();
-
-	void setFocus(IUIComponent focus);
 
 	@Override
 	SD getShapeDescriptor();

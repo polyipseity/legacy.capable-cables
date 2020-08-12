@@ -33,10 +33,7 @@ public class UIViewComponent<SD extends IShapeDescriptor<?, ?>, M extends IUICom
 	public IAffineTransformStack getCleanTransformStack() { return getManager().getCleanTransformStack(); }
 
 	@Override
-	public IUIEventTarget getFocus() { return getManager().getFocus(); }
-
-	@Override
-	public boolean changeFocus(boolean next) { return getManager().changeFocus(next); }
+	public Optional<IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) { return getManager().changeFocus(currentFocus, next); }
 
 	@Override
 	public SD getShapeDescriptor() { return getManager().getShapeDescriptor(); }
@@ -54,6 +51,4 @@ public class UIViewComponent<SD extends IShapeDescriptor<?, ?>, M extends IUICom
 
 	@Override
 	public void setInfrastructure(@Nullable IUIInfrastructure<?, ?, ?> infrastructure) { this.infrastructure = new WeakReference<>(infrastructure); }
-
-
 }
