@@ -1,8 +1,6 @@
 package $group__.client.ui.mvvm.core.structures;
 
 import $group__.client.ui.mvvm.structures.UIConstraint;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -15,7 +13,6 @@ import static $group__.client.ui.mvvm.core.structures.IUIConstraint.CONSTRAINT_N
 import static $group__.client.ui.mvvm.core.structures.IUIConstraint.Constants.getConstraintNullRectangleView;
 
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-@OnlyIn(Dist.CLIENT)
 public interface IShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>> {
 	static void checkIsBeingModified(IShapeDescriptor<?, ?> shapeDescriptor) throws IllegalStateException {
 		if (!shapeDescriptor.isBeingModified())
@@ -48,7 +45,6 @@ public interface IShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>> {
 	boolean transform(AffineTransform transform)
 			throws IllegalStateException;
 
-	@OnlyIn(Dist.CLIENT)
 	enum Constants {
 		;
 

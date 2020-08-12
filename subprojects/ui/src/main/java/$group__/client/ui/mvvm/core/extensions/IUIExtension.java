@@ -6,26 +6,42 @@ import $group__.utilities.specific.ThrowableUtilities;
 import $group__.utilities.structures.Registry;
 import $group__.utilities.structures.Singleton;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
-@OnlyIn(Dist.CLIENT)
 public interface IUIExtension<C extends IExtensionContainer<?, ?>>
 		extends IExtension<C> {
 	IType<?, ?> getType();
 
-	@OnlyIn(Dist.CLIENT)
-	interface IType<T extends IUIExtension<C>, C extends IExtensionContainer<?, ?>> {
-		Optional<T> get(C component);
+	interface IType<V extends IUIExtension<I>, I extends IExtensionContainer<?, ?>> {
+		Optional<V> get(I instance);
 
 		ResourceLocation getKey();
+
+		class Impl<V extends IUIExtension<I>, I extends IExtensionContainer<?, ?>>
+				implements IType<V, I> {
+			protected final ResourceLocation key;
+			protected final BiFunction<? super IType<V, I>, ? super I, ? extends Optional<? extends V>> getter;
+
+			public Impl(ResourceLocation key, BiFunction<? super IType<V, I>, ? super I, ? extends Optional<? extends V>> getter) {
+				this.key = key;
+				this.getter = getter;
+			}
+
+			@Override
+			public Optional<V> get(I instance) { return getGetter().apply(this, instance).map(Function.identity()); }
+
+			@Override
+			public ResourceLocation getKey() { return key; }
+
+			protected BiFunction<? super IType<V, I>, ? super I, ? extends Optional<? extends V>> getGetter() { return getter; }
+		}
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	final class RegUIExtension extends Registry<ResourceLocation, IType<?, ?>> {
 		private static final Logger LOGGER = LogManager.getLogger();
 		public static final RegUIExtension INSTANCE = Singleton.getSingletonInstance(RegUIExtension.class, LOGGER);

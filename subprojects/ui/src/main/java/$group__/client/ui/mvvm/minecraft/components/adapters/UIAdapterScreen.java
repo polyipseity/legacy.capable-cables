@@ -1,5 +1,6 @@
 package $group__.client.ui.mvvm.minecraft.components.adapters;
 
+import $group__.client.ui.events.ui.UIEventUtilities;
 import $group__.client.ui.mvvm.core.IUIInfrastructure;
 import $group__.client.ui.mvvm.core.adapters.IUIAdapter;
 import $group__.client.ui.mvvm.core.extensions.IUIExtension;
@@ -14,8 +15,11 @@ import $group__.client.ui.mvvm.minecraft.core.extensions.IUIExtensionScreenProvi
 import $group__.client.ui.mvvm.structures.Dimension2DDouble;
 import $group__.client.ui.mvvm.structures.UIDataKeyboardKeyPress;
 import $group__.client.ui.mvvm.structures.UIDataMouseButtonClick;
-import $group__.client.ui.utilities.UIEventUtilities;
-import $group__.client.ui.utilities.minecraft.*;
+import $group__.client.ui.utilities.UIObjectUtilities;
+import $group__.client.ui.utilities.minecraft.DrawingUtilities;
+import $group__.client.ui.utilities.minecraft.TextComponentUtilities;
+import $group__.client.ui.utilities.minecraft.TooltipUtilities;
+import $group__.client.ui.utilities.minecraft.UIBackgrounds;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.client.minecraft.GLUtilities;
 import $group__.utilities.client.minecraft.TransformUtilities;
@@ -34,7 +38,6 @@ import net.minecraft.client.gui.IHasContainer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -195,7 +198,7 @@ public class UIAdapterScreen
 	@Deprecated
 	protected void init() {
 		setSize(width, height);
-		getInfrastructure().initialize();
+		// COMMENT constructor is favored over initialize
 	}
 
 	@Override
@@ -407,13 +410,8 @@ public class UIAdapterScreen
 		public static class UIExtensionContainer<C extends IUIInfrastructure<?, ?, ?>>
 				extends IHasGenericClass.Impl<C>
 				implements IUIExtensionContainerProvider<C> {
-			public static final Registry.RegistryObject<IType<IUIExtensionContainerProvider<IUIInfrastructure<?, ?, ?>>, IUIInfrastructure<?, ?, ?>>> TYPE = RegUIExtension.INSTANCE.register(KEY, new IType<IUIExtensionContainerProvider<IUIInfrastructure<?, ?, ?>>, IUIInfrastructure<?, ?, ?>>() {
-				@Override
-				public Optional<IUIExtensionContainerProvider<IUIInfrastructure<?, ?, ?>>> get(IUIInfrastructure<?, ?, ?> component) { return component.getExtension(KEY).map(CastUtilities::castUnchecked); }
-
-				@Override
-				public ResourceLocation getKey() { return KEY; }
-			});
+			public static final Registry.RegistryObject<IType<IUIExtensionContainerProvider<IUIInfrastructure<?, ?, ?>>, IUIInfrastructure<?, ?, ?>>> TYPE =
+					RegUIExtension.INSTANCE.registerApply(KEY, k -> new IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
 
 			protected final Container container;
 
@@ -434,13 +432,8 @@ public class UIAdapterScreen
 	public static class UIExtensionScreen<C extends IUIInfrastructure<?, ?, ?>>
 			extends IHasGenericClass.Impl<C>
 			implements IUIExtensionScreenProvider<C> {
-		public static final Registry.RegistryObject<IType<IUIExtensionScreenProvider<IUIInfrastructure<?, ?, ?>>, IUIInfrastructure<?, ?, ?>>> TYPE = RegUIExtension.INSTANCE.register(KEY, new IType<IUIExtensionScreenProvider<IUIInfrastructure<?, ?, ?>>, IUIInfrastructure<?, ?, ?>>() {
-			@Override
-			public Optional<IUIExtensionScreenProvider<IUIInfrastructure<?, ?, ?>>> get(IUIInfrastructure<?, ?, ?> component) { return component.getExtension(KEY).map(CastUtilities::castUnchecked); }
-
-			@Override
-			public ResourceLocation getKey() { return KEY; }
-		});
+		public static final Registry.RegistryObject<IType<IUIExtensionScreenProvider<IUIInfrastructure<?, ?, ?>>, IUIInfrastructure<?, ?, ?>>> TYPE =
+				RegUIExtension.INSTANCE.registerApply(KEY, k -> new IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
 		protected final UIAdapterScreen<?> adapter;
 
 		public UIExtensionScreen(Class<C> genericClass, UIAdapterScreen<?> adapter) {

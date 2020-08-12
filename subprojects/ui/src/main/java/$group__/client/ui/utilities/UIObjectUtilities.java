@@ -1,9 +1,7 @@
-package $group__.client.ui.utilities.minecraft;
+package $group__.client.ui.utilities;
 
 import $group__.client.ui.mvvm.structures.Dimension2DDouble;
 import $group__.utilities.client.minecraft.TransformUtilities.AffineTransformUtilities;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.awt.*;
 import java.awt.geom.Dimension2D;
@@ -16,7 +14,6 @@ import java.util.function.BiFunction;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-@OnlyIn(Dist.CLIENT)
 public enum UIObjectUtilities {
 	;
 

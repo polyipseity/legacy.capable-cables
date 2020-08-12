@@ -2,10 +2,7 @@ package $group__.client.ui.mvvm.views.events.bus;
 
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.utilities.events.EnumEventHookStage;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
-@OnlyIn(Dist.CLIENT)
 public abstract class EventUIComponentChanged<T> extends EventUIComponent {
 	protected final T previous, next;
 

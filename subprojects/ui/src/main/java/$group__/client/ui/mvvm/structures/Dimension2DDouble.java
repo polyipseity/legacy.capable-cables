@@ -4,15 +4,12 @@ import $group__.utilities.ObjectUtilities;
 import $group__.utilities.specific.MapUtilities;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.awt.geom.Dimension2D;
 import java.beans.Transient;
 import java.io.Serializable;
 import java.util.function.Function;
 
-@OnlyIn(Dist.CLIENT)
 public class Dimension2DDouble extends Dimension2D implements Serializable {
 	public static final ImmutableList<Function<Dimension2DDouble, Object>> OBJECT_VARIABLES = ImmutableList.of(
 			Dimension2DDouble::getWidth, Dimension2DDouble::getHeight);

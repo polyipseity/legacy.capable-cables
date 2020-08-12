@@ -3,13 +3,10 @@ package $group__.client.ui.mvvm.structures;
 import $group__.client.ui.mvvm.core.structures.IUIConstraint;
 import $group__.utilities.interfaces.ICopyable;
 import jdk.nashorn.internal.ir.annotations.Immutable;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.awt.geom.Rectangle2D;
 import java.util.function.DoubleConsumer;
 
-@OnlyIn(Dist.CLIENT)
 @Immutable
 public final class UIConstraint implements IUIConstraint, ICopyable {
 	protected final Rectangle2D rectangleMin;

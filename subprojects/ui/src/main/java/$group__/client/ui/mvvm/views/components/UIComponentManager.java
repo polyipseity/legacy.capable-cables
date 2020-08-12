@@ -6,7 +6,7 @@ import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
-import $group__.client.ui.mvvm.core.views.components.extensions.IUIExtensionCache;
+import $group__.client.ui.mvvm.core.views.components.extensions.caches.IUIExtensionCache;
 import $group__.client.ui.mvvm.structures.AffineTransformStack;
 import $group__.client.ui.mvvm.views.components.extensions.UIExtensionCache;
 import $group__.client.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
@@ -22,7 +22,8 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.geom.Point2D;
 import java.util.*;
@@ -49,36 +50,15 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?, ?>>
 	@Override
 	public boolean reshape(Function<? super SD, Boolean> action) throws ConcurrentModificationException { return getShapeDescriptor().modify(getShapeDescriptor(), action); }
 
-	public enum CacheManager {
-		;
-
-		public static final Registry.RegistryObject<IUIExtensionCache.IType<List<IUIComponent>, IUIComponentManager>> CHILDREN_FLAT =
-				IUIExtensionCache.RegUICache.INSTANCE.register(new ResourceLocation(
-								NamespaceUtilities.getNamespacePrefixedString(".", "manager", "children_flat")),
-						(Function<? super ResourceLocation, ? extends IUIExtensionCache.IType<List<IUIComponent>, IUIComponentManager>>)
-								k -> new IUIExtensionCache.IType.Impl<List<IUIComponent>, IUIComponentManager>(k) {
-									{ Mod.EventBusSubscriber.Bus.FORGE.bus().get().register(this); }
-
-									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-									protected void onParentChanged(EventUIComponentHierarchyChanged.Parent event) {
-										// TODO probably wrong event
-										if (event.getStage() == EnumEventHookStage.POST)
-											invalidate(event.getComponent());
-									}
-
-									@Override
-									public Optional<List<IUIComponent>> get(IUIComponentManager component) {
-										return UIExtensionCache.TYPE.getValue().get(component).flatMap(cache -> ThrowableUtilities.Try.call(() ->
-												cache.getDelegated().get(getKey(), () -> {
-													List<IUIComponent> ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
-													TreeUtilities.<IUIComponent, Object>visitNodesDepthFirst(component,
-															ret::add,
-															p -> p instanceof IUIComponentContainer ?
-																	((IUIComponentContainer) p).getChildrenView() : ImmutableSet.of(), null, null);
-													return ret;
-												}), getLogger()).map(CastUtilities::castUnchecked));
-									}
-								});
+	@Override
+	public boolean changeFocus(boolean next) {
+		@SuppressWarnings("UnstableApiUsage") ImmutableList<IUIComponent> focs = getChildrenFlat().stream().sequential().filter(IUIComponent::isFocusable).collect(ImmutableList.toImmutableList()); // TODO cache this
+		assert !focs.isEmpty();
+		IUIComponent foc = focs.get(Math.max(focs.indexOf(getFocus()), 0) + (next ? 1 : -1) % focs.size());
+		if (foc.equals(getFocus()))
+			return false;
+		setFocus(foc);
+		return true;
 	}
 
 	@Override
@@ -114,15 +94,36 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?, ?>>
 	@Override
 	public List<IUIComponent> getChildrenFlat() { return CacheManager.CHILDREN_FLAT.getValue().get(this).orElseThrow(InternalError::new); }
 
-	@Override
-	public boolean changeFocus(boolean next) {
-		ImmutableList<IUIComponent> focs = getChildrenFlat().stream().sequential().filter(IUIComponent::isFocusable).collect(ImmutableList.toImmutableList()); // TODO cache this
-		assert !focs.isEmpty();
-		IUIComponent foc = focs.get(Math.max(focs.indexOf(getFocus()), 0) + (next ? 1 : -1) % focs.size());
-		if (foc.equals(getFocus()))
-			return false;
-		setFocus(foc);
-		return true;
+	public enum CacheManager {
+		;
+
+		private static final Logger LOGGER = LogManager.getLogger();
+
+		public static final Registry.RegistryObject<IUIExtensionCache.IType<List<IUIComponent>, IUIComponent>> CHILDREN_FLAT =
+				IUIExtensionCache.RegUICache.INSTANCE.registerApply(new ResourceLocation(
+								NamespaceUtilities.getNamespacePrefixedString(".", "manager", "children_flat")),
+						k -> new IUIExtensionCache.IType.Impl<>(k,
+								(t, i) -> UIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> ThrowableUtilities.Try.call(() ->
+										cache.getDelegated().get(t.getKey(), () -> {
+											List<IUIComponent> ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
+											TreeUtilities.<IUIComponent, Object>visitNodesDepthFirst(i,
+													ret::add,
+													p -> p instanceof IUIComponentContainer ?
+															((IUIComponentContainer) p).getChildrenView() : ImmutableSet.of(), null, null);
+											return ret;
+										}), LOGGER).map(CastUtilities::castUnchecked)),
+								(t, i) -> {
+									IUIExtensionCache.IType.invalidate(i, t.getKey());
+									if (i instanceof IUIComponentContainer)
+										((IUIComponentContainer) i).getChildrenView().forEach(t::invalidate);
+								},
+								t -> new Object() {
+									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+									protected void onParentChanged(EventUIComponentHierarchyChanged.Parent event) {
+										if (event.getStage() == EnumEventHookStage.POST)
+											t.invalidate(event.getComponent());
+									}
+								}));
 	}
 
 	@Override

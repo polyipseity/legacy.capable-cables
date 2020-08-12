@@ -1,5 +1,6 @@
 package $group__.client.ui.mvvm.structures;
 
+import $group__.client.ui.events.bus.EventBusEntryPoint;
 import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.structures.IUIAnchor;
 import $group__.client.ui.mvvm.core.structures.IUIAnchorSet;
@@ -8,11 +9,8 @@ import $group__.utilities.ObjectUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import sun.misc.Cleaner;
 
 import javax.annotation.Nullable;
@@ -23,7 +21,6 @@ import java.util.ConcurrentModificationException;
 import java.util.Optional;
 import java.util.function.Function;
 
-@OnlyIn(Dist.CLIENT)
 @Immutable
 public final class UIAnchor implements IUIAnchor {
 	public static final ImmutableList<Function<? super UIAnchor, ?>> OBJECT_VARIABLES = ObjectUtilities.extendsObjectVariables(IUIAnchor.OBJECT_VARIABLES,
@@ -86,14 +83,14 @@ public final class UIAnchor implements IUIAnchor {
 	@Override
 	public void onContainerAdded(IUIAnchorSet<?> container) {
 		setContainer(container);
-		Bus.FORGE.bus().get().register(this);
+		EventBusEntryPoint.INSTANCE.register(this);
 		Cleaner.create(container, this::onContainerRemoved);
 		anchor(container.getFrom());
 	}
 
 	@Override
 	public void onContainerRemoved() {
-		Bus.FORGE.bus().get().unregister(this);
+		EventBusEntryPoint.INSTANCE.unregister(this);
 		setContainer(null);
 	}
 

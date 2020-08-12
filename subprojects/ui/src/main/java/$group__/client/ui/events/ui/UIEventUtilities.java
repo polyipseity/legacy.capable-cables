@@ -1,4 +1,4 @@
-package $group__.client.ui.utilities;
+package $group__.client.ui.events.ui;
 
 import $group__.client.ui.mvvm.core.structures.IUIDataKeyboardKeyPress;
 import $group__.client.ui.mvvm.core.structures.IUIDataMouseButtonClick;

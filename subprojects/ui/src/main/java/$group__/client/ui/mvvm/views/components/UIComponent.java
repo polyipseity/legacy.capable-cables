@@ -1,5 +1,6 @@
 package $group__.client.ui.mvvm.views.components;
 
+import $group__.client.ui.events.ui.UIEventTarget;
 import $group__.client.ui.mvvm.binding.BindingMethodSource;
 import $group__.client.ui.mvvm.core.binding.IBinderAction;
 import $group__.client.ui.mvvm.core.binding.IBindingField;
@@ -16,7 +17,6 @@ import $group__.client.ui.mvvm.core.views.events.IUIEvent;
 import $group__.client.ui.mvvm.structures.ShapeDescriptor;
 import $group__.client.ui.mvvm.structures.UIAnchorSet;
 import $group__.client.ui.mvvm.views.components.extensions.UIExtensionCache;
-import $group__.client.ui.mvvm.views.events.ui.UIEventTarget;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.extensions.IExtensionContainer;

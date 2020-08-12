@@ -5,8 +5,7 @@ import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.structures.ShapeDescriptor;
 import $group__.client.ui.mvvm.structures.UIAnchorSet;
 import $group__.client.ui.mvvm.views.components.minecraft.common.UIButtonComponentMinecraft;
-import $group__.client.ui.mvvm.views.components.minecraft.common.UIWindowComponentMinecraft;
-import $group__.client.ui.utilities.minecraft.UIObjectUtilities;
+import $group__.client.ui.utilities.UIObjectUtilities;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -77,17 +76,17 @@ final class UIDebug extends GuiManagerWindows<ShapeDescriptor.Rectangular<Rectan
 				new Data<>(new Events(), UIDebug::getLogger, new GuiBackgroundDefault<>(ShapeDescriptor.Rectangular::new,
 						new UIComponentMinecraft.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger)), container));
 		{
-			UIWindowComponentMinecraft<UIWindowComponentMinecraft.Model, UIWindowComponentMinecraft.View<?, ?>, UIWindowComponentMinecraft.Controller, IUIComponent> window1 = new UIWindowComponentMinecraft<>();
-			window1.setModel(new UIWindowComponentMinecraft.Model<>(window1));
-			window1.setView(new UIWindowComponentMinecraft.View<>(window1));
+			$group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow<$group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Model, $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.View<?, ?>, $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Controller, IUIComponent> window1 = new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow<>();
+			window1.setModel(new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Model<>(window1));
+			window1.setView(new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.View<>(window1));
 			window1.getView().setShapeDescriptor(window1.getView().new ShapeDescriptor<>(
 					new Rectangle2D.Double(10, 10, 100, 100),
 					new UIAnchorSet<>(null)));
-			window1.setController(new UIWindowComponentMinecraft.Controller<>(window1));
-			UIWindowComponentMinecraft<?, ?, ?, ?> window1 = new UIWindowComponentMinecraft<>(new ShapeDescriptor.Rectangular<>(
-					new UIWindowComponentMinecraft.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new UIWindowComponentMinecraft.Data.ColorData()));
-			UIWindowComponentMinecraft<?, ?> window2 = new UIWindowComponentMinecraft<ShapeDescriptor.Rectangular<Rectangle2D.Double>, UIWindowComponentMinecraft.Data<UIComponentMinecraft.Events, UIWindowComponentMinecraft.Data.ColorData>>(new ShapeDescriptor.Rectangular<>(new Rectangle2D.Double(50, 50, 200, 200)),
-					new UIWindowComponentMinecraft.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new UIWindowComponentMinecraft.Data.ColorData())) {
+			window1.setController(new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Controller<>(window1));
+			$group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow<?, ?, ?, ?> window1 = new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow<>(new ShapeDescriptor.Rectangular<>(
+					new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Data.ColorData()));
+			$group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow<?, ?> window2 = new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow<ShapeDescriptor.Rectangular<Rectangle2D.Double>, $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Data<UIComponentMinecraft.Events, $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Data.ColorData>>(new ShapeDescriptor.Rectangular<>(new Rectangle2D.Double(50, 50, 200, 200)),
+					new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Data.ColorData())) {
 				protected final Rectangle2D current = new Rectangle2D.Double();
 				protected final Random random = new Random();
 				protected double tick = 0;

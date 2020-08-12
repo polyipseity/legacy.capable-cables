@@ -4,15 +4,13 @@ import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.structures.IUIAnchorSet;
 import $group__.client.ui.mvvm.core.structures.IUIConstraint;
 import $group__.client.ui.mvvm.views.events.bus.EventUIShapeDescriptor;
-import $group__.client.ui.utilities.minecraft.UIObjectUtilities;
+import $group__.client.ui.utilities.UIObjectUtilities;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.client.minecraft.TransformUtilities.AffineTransformUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventUtilities;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
@@ -26,7 +24,6 @@ import java.util.function.Function;
 
 import static $group__.client.ui.mvvm.core.structures.IShapeDescriptor.checkIsBeingModified;
 
-@OnlyIn(Dist.CLIENT)
 public abstract class ShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>> implements IShapeDescriptor<S, A> {
 	protected final A anchorSet;
 	protected S shape;
@@ -75,7 +72,6 @@ public abstract class ShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>
 
 	protected void setBeingModified(boolean beingModified) { this.beingModified = beingModified; }
 
-	@OnlyIn(Dist.CLIENT)
 	public static class Generic<A extends IUIAnchorSet<?>> extends ShapeDescriptor<Shape, A> {
 		public Generic(Shape shape, A anchorSet) { super(shape, anchorSet); }
 
@@ -144,7 +140,6 @@ public abstract class ShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>
 		return false;
 	}
 
-	@OnlyIn(Dist.CLIENT)
 	public static class Rectangular<S extends RectangularShape, A extends IUIAnchorSet<?>> extends ShapeDescriptor<S, A> {
 		public Rectangular(S shape, A anchorSet) { super(shape, anchorSet); }
 

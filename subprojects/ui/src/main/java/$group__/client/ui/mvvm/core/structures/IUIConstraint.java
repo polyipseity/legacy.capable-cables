@@ -1,12 +1,8 @@
 package $group__.client.ui.mvvm.core.structures;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import java.awt.geom.Rectangle2D;
 import java.util.function.Consumer;
 
-@OnlyIn(Dist.CLIENT)
 public interface IUIConstraint extends Consumer<Rectangle2D> {
 	int CONSTRAINT_NULL_VALUE = -1;
 
@@ -45,7 +41,6 @@ public interface IUIConstraint extends Consumer<Rectangle2D> {
 	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	static boolean isNull(double v) { return v == CONSTRAINT_NULL_VALUE; }
 
-	@OnlyIn(Dist.CLIENT)
 	enum Constants {
 		;
 

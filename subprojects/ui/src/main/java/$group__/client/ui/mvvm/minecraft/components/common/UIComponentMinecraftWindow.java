@@ -1,19 +1,18 @@
-package $group__.client.ui.mvvm.views.components.minecraft.common;
+package $group__.client.ui.mvvm.minecraft.components.common;
 
-import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
-import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
-import $group__.client.ui.mvvm.core.structures.IUIAnchorSet;
-import $group__.client.ui.mvvm.core.structures.IUIConstraint;
+import $group__.client.ui.mvvm.core.structures.*;
+import $group__.client.ui.mvvm.core.views.IUIReshapeExplicitly;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
-import $group__.client.ui.mvvm.core.views.components.extensions.IUIExtensionCache;
+import $group__.client.ui.mvvm.core.views.components.extensions.caches.IUIExtensionCache;
+import $group__.client.ui.mvvm.core.views.components.extensions.caches.UICacheShapeDescriptor;
 import $group__.client.ui.mvvm.structures.*;
 import $group__.client.ui.mvvm.structures.ShapeDescriptor.Rectangular;
+import $group__.client.ui.mvvm.views.components.UIComponentContainer;
 import $group__.client.ui.mvvm.views.components.extensions.UIExtensionCache;
-import $group__.client.ui.mvvm.views.components.minecraft.common.UIWindowComponentMinecraft.GuiDragInfoWindow.EnumGuiDragType;
 import $group__.client.ui.mvvm.views.events.bus.EventUIShapeDescriptor;
 import $group__.client.ui.utilities.ReferenceUtilities;
+import $group__.client.ui.utilities.UIObjectUtilities;
 import $group__.client.ui.utilities.minecraft.DrawingUtilities;
-import $group__.client.ui.utilities.minecraft.UIObjectUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.client.minecraft.GLUtilities;
@@ -22,13 +21,14 @@ import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import $group__.utilities.specific.ThrowableUtilities.Try;
 import $group__.utilities.structures.Registry;
+import UIComponentMinecraftWindow.GuiDragInfoWindow.EnumGuiDragType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -41,7 +41,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ConcurrentModificationException;
 import java.util.EnumSet;
-import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -49,14 +49,9 @@ import java.util.function.Supplier;
 
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
 
-/*
-button
- */
 @OnlyIn(Dist.CLIENT)
-public class UIWindowComponentMinecraft
-		<M extends IGuiModel<?>, V extends IUIComponent.IGuiView<?, ?>, C extends IUIComponent.IGuiController.IContainer<?, CH>,
-				CH extends IUIComponent>
-		extends UIContainerComponentMinecraft {
+public class UIComponentMinecraftWindow
+		extends UIComponentContainer implements IUIReshapeExplicitly<ShapeDescriptor.Rectangular<?, ?>> {
 	// TODO make window scroll bars, maybe create a new component, and embed into this
 	// TODO make value not hardcoded through themes
 	public static final int
@@ -64,10 +59,20 @@ public class UIWindowComponentMinecraft
 			WINDOW_DRAG_BAR_THICKNESS = 10, // COMMENT internal top
 			WINDOW_VISIBLE_MINIMUM = 10;
 
+	public UIComponentMinecraftWindow(Map<String, IUIPropertyMappingValue> propertyMapping) {
+		super(propertyMapping);
+	}
+
 	@Override
 	public boolean contains(final IAffineTransformStack stack, Point2D point) {
 		return isBeingDragged(this) || stack.getDelegated().peek().createTransformedShape(CacheGuiWindow.RECTANGLE_CLICKABLE.get(this)).contains(point);
 	}
+
+	@Override
+	protected ShapeDescriptor.Rectangular<?, ?> createShapeDescriptor() { return new Rectangular<>(getShapePlaceholderView(), new UIAnchorSet<>(this::getShapeDescriptor)); }
+
+	@Override
+	public ShapeDescriptor.Rectangular<?, ?> getShapeDescriptor() { return (Rectangular<?, ?>) super.getShapeDescriptor(); }
 
 	@Override
 	public void render(final IAffineTransformStack stack, Point2D mouse, float partialTicks) {
@@ -156,9 +161,6 @@ public class UIWindowComponentMinecraft
 	}
 
 	@Override
-	public void reshape(UIComponentMinecraft<?, ?> invoker) { reshape(invoker, s -> {}); }
-
-	@Override
 	public void reshape(UIComponentMinecraft<?, ?> invoker, Consumer<? super S> transformer) {
 		transformShape(this, invoker, transformer);
 		// TODO resizing logic
@@ -218,103 +220,92 @@ public class UIWindowComponentMinecraft
 		return false;
 	}
 
+	@Override
+	public boolean reshape(Function<? super Rectangular<?, ?>, Boolean> action) throws ConcurrentModificationException { return getShapeDescriptor().modify(getShapeDescriptor(), action); }
+
 	@OnlyIn(Dist.CLIENT)
 	public enum CacheGuiWindow {
 		;
-		public static final Registry.RegistryObject<UIExtensionCache.IType<Rectangle2D, UIWindowComponentMinecraft<?, ?, ?, ?>>> RECTANGLE_DRAGGABLE =
-				IUIExtensionCache.RegUICache.INSTANCE.register(new ResourceLocation(
+
+		private static final Logger LOGGER = LogManager.getLogger();
+
+		public static final Registry.RegistryObject<UIExtensionCache.IType<Rectangle2D, IUIComponent>> RECTANGLE_DRAGGABLE =
+				IUIExtensionCache.RegUICache.INSTANCE.registerApply(new ResourceLocation(
 								NamespaceUtilities.getNamespacePrefixedString(".", "window", "rectangle_draggable")),
-						(Function<? super ResourceLocation, ? extends UIExtensionCache.IType<Rectangle2D, UIWindowComponentMinecraft<?, ?, ?, ?>>>)
-								k -> new UIExtensionCache.IType.Impl<Rectangle2D, UIWindowComponentMinecraft<?, ?, ?, ?>>(k) {
-									{ Bus.FORGE.bus().get().register(this); }
-
-									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-									protected void onShapeDescriptorReshape(EventUIShapeDescriptor.Modify event) {
-										if (event.getStage() == EnumEventHookStage.POST) {
-											event.getShapeDescriptor().getView()
-													.flatMap(IUIComponent.IGuiView::getComponent)
-													.filter(UIWindowComponentMinecraft.class::isInstance)
-													.ifPresent(c -> invalidate((UIWindowComponentMinecraft<?, ?, ?, ?>) c));
-										}
-									}
-
-									@Override
-									public Optional<Rectangle2D> get(UIWindowComponentMinecraft<?, ?, ?, ?> component) {
-										return UIExtensionCache.TYPE.getValue().get(component).flatMap(cache -> Try.call(() -> cache.getDelegated().get(getKey(),
-												() -> {
-													Rectangle2D bounds = component.getView().getShapeDescriptor().getShapeProcessed().getBounds2D();
-													return new Rectangle2D.Double(
-															bounds.getX(),
-															bounds.getY(),
-															bounds.getWidth(),
-															WINDOW_DRAG_BAR_THICKNESS);
-												}), getLogger()).flatMap(CastUtilities::castUnchecked));
-									}
-								});
-		public static final Registry.RegistryObject<UIExtensionCache.IType<Rectangle2D, UIWindowComponentMinecraft<?, ?, ?, ?>>> RECTANGLE_CLICKABLE =
-				IUIExtensionCache.RegUICache.INSTANCE.register(new ResourceLocation(
-								NamespaceUtilities.getNamespacePrefixedString(".", "window", "rectangle_clickable")),
-						(Function<? super ResourceLocation, ? extends UIExtensionCache.IType<Rectangle2D, UIWindowComponentMinecraft<?, ?, ?, ?>>>)
-								k -> new UIExtensionCache.IType.Impl<Rectangle2D, UIWindowComponentMinecraft<?, ?, ?, ?>>(k) {
-									{ Bus.FORGE.bus().get().register(this); }
-
-									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-									protected void onShapeDescriptorReshape(EventUIShapeDescriptor.Modify event) {
-										if (event.getStage() == EnumEventHookStage.POST) {
-											event.getShapeDescriptor().getView()
-													.flatMap(IUIComponent.IGuiView::getComponent)
-													.filter(UIWindowComponentMinecraft.class::isInstance)
-													.ifPresent(c -> invalidate((UIWindowComponentMinecraft<?, ?, ?, ?>) c));
-										}
-									}
-
-									@Override
-									public Optional<Rectangle2D> get(UIWindowComponentMinecraft<?, ?, ?, ?> component) {
-										return UIExtensionCache.TYPE.getValue().get(component).flatMap(cache -> Try.call(() -> cache.getDelegated().get(getKey(),
-												() -> UIObjectUtilities.applyRectangular(component.getView().getShapeDescriptor().getShapeProcessed().getBounds2D(), (x, y) -> (w, h) ->
-														new Rectangle2D.Double(x - WINDOW_RESHAPE_THICKNESS, y - WINDOW_RESHAPE_THICKNESS, w + (WINDOW_RESHAPE_THICKNESS << 1), h + (WINDOW_RESHAPE_THICKNESS << 1)))), getLogger()).flatMap(CastUtilities::castUnchecked));
-									}
-								});
-		public static final Registry.RegistryObject<UIExtensionCache.IType<IUIConstraint, UIWindowComponentMinecraft<?, ?, ?, ?>>> CONSTRAINT =
-				IUIExtensionCache.RegUICache.INSTANCE.register(new ResourceLocation(
-								NamespaceUtilities.getNamespacePrefixedString(".", "window", "constraint")),
-						(Function<? super ResourceLocation, ? extends UIExtensionCache.IType<IUIConstraint, UIWindowComponentMinecraft<?, ?, ?, ?>>>)
-								k -> new UIExtensionCache.IType.Impl<IUIConstraint, UIWindowComponentMinecraft<?, ?, ?, ?>>(k) {
-									{ Bus.FORGE.bus().get().register(this); }
-
-									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-									protected void onShapeDescriptorReshape(EventUIShapeDescriptor.Modify event) {
-										if (event.getStage() == EnumEventHookStage.POST) {
-											event.getShapeDescriptor().getView()
-													.flatMap(IUIComponent.IGuiView::getComponent)
-													.filter(UIWindowComponentMinecraft.class::isInstance)
-													.ifPresent(c -> invalidate((UIWindowComponentMinecraft<?, ?, ?, ?>) c));
-										}
-									}
-
-									@Override
-									public Optional<IUIConstraint> get(UIWindowComponentMinecraft<?, ?, ?, ?> component) {
-										return UIExtensionCache.TYPE.getValue().get(component).flatMap(cache -> Try.call(() -> cache.getDelegated().get(getKey(),
-												() -> {
-													return new UIConstraint(new Rectangle2D.Double(0, 0, WINDOW_VISIBLE_MINIMUM, WINDOW_VISIBLE_MINIMUM),
-															new Rectangle2D.Double(rRoot.getMaxX() - WINDOW_VISIBLE_MINIMUM, rRoot.getMaxY() - WINDOW_VISIBLE_MINIMUM, IUIConstraint.CONSTRAINT_NULL_VALUE, IUIConstraint.CONSTRAINT_NULL_VALUE));
-												}), getLogger()).flatMap(CastUtilities::castUnchecked));
-										return Try.call(() -> component.data.cache.delegated.get(key, () -> {
-											Rectangle2D bounds = component.getView().getShapeDescriptor().getShapeProcessed().getBounds2D();
+						k -> new UICacheShapeDescriptor<>(k,
+								(t, i) -> UIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> Try.call(() -> cache.getDelegated().get(t.getKey(),
+										() -> {
+											Rectangle2D bounds = i.getShapeDescriptor().getShapeProcessed().getBounds2D();
 											return new Rectangle2D.Double(
 													bounds.getX(),
 													bounds.getY(),
 													bounds.getWidth(),
 													WINDOW_DRAG_BAR_THICKNESS);
-										}), getLogger()).map(CastUtilities::<Rectangle2D>castUnchecked).orElseThrow(InternalError::new);
-									}
-								});
-
-		private static ResourceLocation getKey(String path) { return new ResourceLocation(UIWindowComponentMinecraft.class.getSimpleName().toLowerCase(Locale.ROOT), path); }
+										}), LOGGER).flatMap(CastUtilities::castUnchecked)),
+								(t, i) -> IUIExtensionCache.IType.invalidate(i, t.getKey()),
+								t -> {
+									UICacheShapeDescriptor<Rectangle2D, IUIComponent> tc = (UICacheShapeDescriptor<Rectangle2D, IUIComponent>) t;
+									return new Object() {
+										@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+										protected void onShapeDescriptorReshape(EventUIShapeDescriptor.Modify event) {
+											if (event.getStage() == EnumEventHookStage.POST) {
+												UICacheShapeDescriptor.getInstanceFromShapeDescriptor(tc.getInstancesView(), event.getShapeDescriptor())
+														.ifPresent(tc::invalidate);
+											}
+										}
+									};
+								}));
+		public static final Registry.RegistryObject<UIExtensionCache.IType<Rectangle2D, IUIComponent>> RECTANGLE_CLICKABLE =
+				IUIExtensionCache.RegUICache.INSTANCE.registerApply(new ResourceLocation(
+								NamespaceUtilities.getNamespacePrefixedString(".", "window", "rectangle_clickable")),
+						k -> new UICacheShapeDescriptor<>(k,
+								(t, i) -> UIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> Try.call(() -> cache.getDelegated().get(t.getKey(),
+										() -> UIObjectUtilities.applyRectangular(i.getShapeDescriptor().getShapeProcessed().getBounds2D(), (x, y) -> (w, h) ->
+												new Rectangle2D.Double(x - WINDOW_RESHAPE_THICKNESS, y - WINDOW_RESHAPE_THICKNESS, w + (WINDOW_RESHAPE_THICKNESS << 1), h + (WINDOW_RESHAPE_THICKNESS << 1)))), LOGGER).flatMap(CastUtilities::castUnchecked)),
+								(t, i) -> IUIExtensionCache.IType.invalidate(i, t.getKey()),
+								t -> {
+									UICacheShapeDescriptor<Rectangle2D, IUIComponent> tc = (UICacheShapeDescriptor<Rectangle2D, IUIComponent>) t;
+									return new Object() {
+										@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+										protected void onShapeDescriptorReshape(EventUIShapeDescriptor.Modify event) {
+											if (event.getStage() == EnumEventHookStage.POST) {
+												UICacheShapeDescriptor.getInstanceFromShapeDescriptor(tc.getInstancesView(), event.getShapeDescriptor())
+														.ifPresent(tc::invalidate);
+											}
+										}
+									};
+								}));
+		public static final Registry.RegistryObject<UIExtensionCache.IType<IUIConstraint, IUIComponent>> CONSTRAINT =
+				IUIExtensionCache.RegUICache.INSTANCE.registerApply(new ResourceLocation(
+								NamespaceUtilities.getNamespacePrefixedString(".", "window", "constraint")),
+						k -> new UICacheShapeDescriptor<>(k,
+								(t, i) -> UIExtensionCache.TYPE.getValue().get(i)
+										.flatMap(cache -> i.getManager()
+												.map(m -> m.getShapeDescriptor().getShapeProcessed().getBounds2D())
+												.flatMap(mb -> Try.call(() -> cache.getDelegated().get(t.getKey(), () ->
+														new UIConstraint(
+																new Rectangle2D.Double(0, 0, WINDOW_VISIBLE_MINIMUM, WINDOW_VISIBLE_MINIMUM),
+																new Rectangle2D.Double(mb.getMaxX() - WINDOW_VISIBLE_MINIMUM, mb.getMaxY() - WINDOW_VISIBLE_MINIMUM,
+																		IUIConstraint.CONSTRAINT_NULL_VALUE, IUIConstraint.CONSTRAINT_NULL_VALUE))), LOGGER)
+														.flatMap(CastUtilities::castUnchecked))),
+								(t, i) -> IUIExtensionCache.IType.invalidate(i, t.getKey()),
+								t -> {
+									UICacheShapeDescriptor<IUIConstraint, IUIComponent> tc = (UICacheShapeDescriptor<IUIConstraint, IUIComponent>) t;
+									return new Object() {
+										@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+										protected void onShapeDescriptorReshape(EventUIShapeDescriptor.Modify event) {
+											if (event.getStage() == EnumEventHookStage.POST) {
+												UICacheShapeDescriptor.getInstanceFromShapeDescriptor(tc.getInstancesView(), event.getShapeDescriptor())
+														.ifPresent(tc::invalidate);
+											}
+										}
+									};
+								}));
 	}
 
+
 	@OnlyIn(Dist.CLIENT)
-	public static class View<C extends UIWindowComponentMinecraft<?, ?, ?, ?>, SD extends IShapeDescriptor<? extends Rectangle2D, ?>> extends UIContainerComponentMinecraft.View {
+	public static class View<C extends UIComponentMinecraftWindow, SD extends IShapeDescriptor<? extends Rectangle2D, ?>> extends UIContainerComponentMinecraft.View {
 		public View(C component) { super(component); }
 
 		@OnlyIn(Dist.CLIENT)

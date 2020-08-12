@@ -1,13 +1,9 @@
 package $group__.client.ui.mvvm.structures;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import java.util.EnumSet;
 
 import static $group__.utilities.specific.ComparableUtilities.greaterThanOrEqualTo;
 
-@OnlyIn(Dist.CLIENT)
 public enum EnumUIState {
 	NEW {
 		@Override

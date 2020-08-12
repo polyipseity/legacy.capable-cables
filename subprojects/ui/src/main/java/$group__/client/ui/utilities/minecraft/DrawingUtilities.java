@@ -1,5 +1,6 @@
 package $group__.client.ui.utilities.minecraft;
 
+import $group__.client.ui.utilities.UIObjectUtilities;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;

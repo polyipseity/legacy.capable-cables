@@ -23,7 +23,7 @@ public abstract class Registry<K, V> extends Singleton {
 		this.logger = logger;
 	}
 
-	public <VL extends V> RegistryObject<VL> register(K key, Function<? super K, ? extends VL> value) {
+	public <VL extends V> RegistryObject<VL> registerApply(K key, Function<? super K, ? extends VL> value) {
 		return register(key, value.apply(key));
 	}
 

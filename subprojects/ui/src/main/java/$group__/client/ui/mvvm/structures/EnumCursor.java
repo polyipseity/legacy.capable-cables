@@ -1,15 +1,13 @@
 package $group__.client.ui.mvvm.structures;
 
 import $group__.client.ui.ConfigurationUI;
-import $group__.client.ui.utilities.minecraft.UIObjectUtilities;
+import $group__.client.ui.utilities.UIObjectUtilities;
 import $group__.utilities.client.minecraft.ResourceUtilities;
 import $group__.utilities.client.minecraft.specific.ImageUtilities;
 import $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.specific.ThrowableUtilities.Try;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
@@ -21,7 +19,6 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.function.Supplier;
 
-@OnlyIn(Dist.CLIENT)
 public enum EnumCursor {
 	STANDARD_ARROW_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR)),
 	STANDARD_I_BEAM_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_IBEAM_CURSOR)),

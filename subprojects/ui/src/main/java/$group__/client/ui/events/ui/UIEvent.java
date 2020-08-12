@@ -1,4 +1,4 @@
-package $group__.client.ui.mvvm.views.events.ui;
+package $group__.client.ui.events.ui;
 
 import $group__.client.ui.mvvm.core.views.events.IUIEvent;
 import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;

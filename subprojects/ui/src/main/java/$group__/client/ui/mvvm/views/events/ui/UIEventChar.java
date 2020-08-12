@@ -1,5 +1,6 @@
 package $group__.client.ui.mvvm.views.events.ui;
 
+import $group__.client.ui.events.ui.UIEvent;
 import $group__.client.ui.mvvm.core.views.events.IUIEventChar;
 import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;
 import net.minecraft.util.ResourceLocation;

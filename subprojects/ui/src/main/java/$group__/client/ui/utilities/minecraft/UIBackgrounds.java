@@ -5,7 +5,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.fml.common.Mod;
 
 import javax.annotation.Nullable;
 
@@ -13,7 +12,7 @@ import javax.annotation.Nullable;
 public enum UIBackgrounds {
 	;
 
-	public static void notifyBackgroundDrawn(Screen screen) { Mod.EventBusSubscriber.Bus.FORGE.bus().get().post(new GuiScreenEvent.BackgroundDrawnEvent(screen)); }
+	public static void notifyBackgroundDrawn(Screen screen) { EventBusEntryPoint.INSTANCE.post(new GuiScreenEvent.BackgroundDrawnEvent(screen)); }
 
 	/**
 	 * @see Screen#renderBackground()

@@ -1,5 +1,6 @@
 package $group__.client.ui.mvvm.views.events.ui;
 
+import $group__.client.ui.events.ui.UIEvent;
 import $group__.client.ui.mvvm.core.structures.IUIDataMouseButtonClick;
 import $group__.client.ui.mvvm.core.views.events.IUIEventMouse;
 import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;

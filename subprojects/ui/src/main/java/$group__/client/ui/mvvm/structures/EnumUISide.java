@@ -1,8 +1,5 @@
 package $group__.client.ui.mvvm.structures;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
@@ -11,7 +8,6 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-@OnlyIn(Dist.CLIENT)
 public enum EnumUISide {
 	UP {
 		@Override

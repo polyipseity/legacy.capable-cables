@@ -1,11 +1,7 @@
 package $group__.client.ui.mvvm.structures;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
 import java.awt.geom.Point2D;
 
-@OnlyIn(Dist.CLIENT)
 public enum EnumUIAxis {
 	X {
 		@Override

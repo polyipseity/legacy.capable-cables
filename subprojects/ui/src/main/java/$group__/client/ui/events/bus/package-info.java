@@ -2,7 +2,7 @@
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
 @LocalVariablesAreNonnullByDefault
-package $group__.client.ui.mvvm.minecraft.components.common;
+package $group__.client.ui.events.bus;
 
 import $group__.annotations.FieldsAreNonnullByDefault;
 import $group__.annotations.LocalVariablesAreNonnullByDefault;

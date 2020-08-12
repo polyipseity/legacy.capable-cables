@@ -1,20 +1,20 @@
 package $group__.client.ui.mvvm.minecraft.extensions;
 
+import $group__.client.ui.mvvm.core.extensions.IUIExtension;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
 import $group__.client.ui.mvvm.minecraft.core.extensions.IUIExtensionMinecraft;
 import $group__.client.ui.mvvm.views.components.extensions.UIExtensionCache;
+import $group__.client.ui.utilities.UIObjectUtilities;
 import $group__.client.ui.utilities.minecraft.CoordinateUtilities;
 import $group__.client.ui.utilities.minecraft.DrawingUtilities;
-import $group__.client.ui.utilities.minecraft.UIObjectUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.client.minecraft.GLUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;
 import $group__.utilities.structures.Registry;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
@@ -23,19 +23,13 @@ import org.lwjgl.opengl.GL14;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Optional;
 
 @OnlyIn(Dist.CLIENT)
 public abstract class UIExtensionMinecraft<C extends IUIComponent>
 		extends ExtensionContainerAware<C>
 		implements IUIExtensionMinecraft<C> {
-	public static final Registry.RegistryObject<IType<IUIExtensionMinecraft<IUIComponent>, IUIComponent>> TYPE = RegUIExtension.INSTANCE.register(KEY, new IType<IUIExtensionMinecraft<IUIComponent>, IUIComponent>() {
-		@Override
-		public Optional<IUIExtensionMinecraft<IUIComponent>> get(IUIComponent component) { return component.getExtension(KEY).map(CastUtilities::castUnchecked); }
-
-		@Override
-		public ResourceLocation getKey() { return KEY; }
-	});
+	public static final Registry.RegistryObject<IType<IUIExtensionMinecraft<IUIComponent>, IUIComponent>> TYPE =
+			IUIExtension.RegUIExtension.INSTANCE.registerApply(KEY, k -> new IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
 
 	public UIExtensionMinecraft(Class<C> genericClass) { super(genericClass); }
 

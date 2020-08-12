@@ -6,8 +6,6 @@ import $group__.client.ui.mvvm.core.structures.IUIAnchorSet;
 import $group__.utilities.specific.MapUtilities;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.EnumSet;
 import java.util.Map;
@@ -16,7 +14,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
-@OnlyIn(Dist.CLIENT)
 public class UIAnchorSet<A extends IUIAnchor> implements IUIAnchorSet<A> {
 	protected final ConcurrentMap<EnumUISide, A> anchors = MapUtilities.getMapMakerSingleThreaded().initialCapacity(EnumUISide.values().length).makeMap();
 	protected final Supplier<? extends IShapeDescriptor<?, ?>> from;
