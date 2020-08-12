@@ -53,7 +53,7 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?, ?>>
 	@Override
 	public Optional<IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) {
 		if (currentFocus instanceof IUIComponent) {
-			@SuppressWarnings("UnstableApiUsage") ImmutableList<IUIComponent> focs = getChildrenFlat().stream().sequential().filter(IUIComponent::isFocusable).collect(ImmutableList.toImmutableList()); // TODO cache this
+			@SuppressWarnings("UnstableApiUsage") ImmutableList<IUIComponent> focs = getChildrenFlat().stream().sequential().filter(IUIComponent::isFocusable).collect(ImmutableList.toImmutableList()); // TODO cache this maybe
 			assert !focs.isEmpty();
 			return Optional.ofNullable(focs.get(Math.max(focs.indexOf(currentFocus), 0) + (next ? 1 : -1) % focs.size()));
 		}

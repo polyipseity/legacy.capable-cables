@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
 public interface IBinder {
 	Logger LOGGER = LogManager.getLogger();
 
-	static <B extends IHasBindingString> Multimap<ResourceLocation, B> sortAndTrimBindings(Iterable<B> bindings) {
+	static <B extends IHasBindingKey> Multimap<ResourceLocation, B> sortAndTrimBindings(Iterable<B> bindings) {
 		@SuppressWarnings("UnstableApiUsage") Multimap<ResourceLocation, B> ret = MultimapBuilder
 				.hashKeys(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)
 				.hashSetValues(CapacityUtilities.INITIAL_CAPACITY_TINY).build();
@@ -29,7 +29,7 @@ public interface IBinder {
 		return ret;
 	}
 
-	static <T, B extends IHasBindingString & IHasGenericClass<T>, BF extends IHasBindingString & IHasGenericClass<?>> Iterable<B> checkAndCastBindings(ResourceLocation bindingKey, @Nullable Class<T> clazz, Iterable<BF> bindings) {
+	static <T, B extends IHasBindingKey & IHasGenericClass<T>, BF extends IHasBindingKey & IHasGenericClass<?>> Iterable<B> checkAndCastBindings(ResourceLocation bindingKey, @Nullable Class<T> clazz, Iterable<BF> bindings) {
 		for (BF b : bindings) {
 			if (!b.getBindingKey().map(bindingKey::equals).orElse(true))
 				throw BecauseOf.illegalArgument("The strings of all bindings are not the same",

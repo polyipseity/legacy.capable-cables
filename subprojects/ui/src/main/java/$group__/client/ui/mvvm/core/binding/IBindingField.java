@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nonnull;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public interface IBindingField<T> extends IField<T>, IHasGenericClass<T>, IHasBindingString {
+public interface IBindingField<T> extends IField<T>, IHasGenericClass<T>, IHasBindingKey {
 	Logger LOGGER = LogManager.getLogger();
 
 	static <T> DisposableObserver<T> createSynchronizationObserver(IBindingField<T> from, Iterable<IBindingField<T>> to, AtomicBoolean isSource) {

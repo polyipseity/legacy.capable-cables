@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public interface IExtensionContainer<K, V extends IExtension<? extends K, ?>> {
 	Logger LOGGER = LogManager.getLogger();
@@ -18,9 +19,9 @@ public interface IExtensionContainer<K, V extends IExtension<? extends K, ?>> {
 
 	Optional<V> addExtension(V extension);
 
-	static <K, V extends IExtension<? extends K, ? super C>, C extends IExtensionContainer<K, ? super V>> Optional<? super V> addExtensionDecorated(C container, V extension, BiFunction<? super C, ? super Optional<? super V>, ? extends V> function) {
-		Optional<? super V> o = container.getExtension(extension.getType().getKey());
-		return container.addExtension(function.apply(container, o));
+	static <K, V extends IExtension<? extends K, ? super C>, C extends IExtensionContainer<K, V>, VL extends V> Optional<V> addExtensionDecorated(C container, K key, Function<? super V, ? extends V> extension, BiFunction<? super C, ? super V, ? extends Optional<? extends V>> function) {
+		Optional<V> o = container.getExtension(key);
+		return function.apply(container, extension.apply(o.orElse(null))).map(Function.identity());
 	}
 
 	static <K, V extends IExtension<? super K, ?>> Optional<V> getExtension(Map<K, V> extensions, K key) { return Optional.ofNullable(extensions.get(key)); }

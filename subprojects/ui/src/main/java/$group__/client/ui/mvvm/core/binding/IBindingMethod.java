@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.function.Consumer;
 
-public interface IBindingMethod<T> extends IHasGenericClass<T>, IHasBindingString {
+public interface IBindingMethod<T> extends IHasGenericClass<T>, IHasBindingKey {
 	Logger LOGGER = LogManager.getLogger();
 
 	EnumType getType();

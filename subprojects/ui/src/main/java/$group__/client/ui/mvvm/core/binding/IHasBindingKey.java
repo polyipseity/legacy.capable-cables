@@ -4,7 +4,7 @@ import net.minecraft.util.ResourceLocation;
 
 import java.util.Optional;
 
-public interface IHasBindingString {
-	// TODO USE RESOURCELOCATION
+@FunctionalInterface
+public interface IHasBindingKey {
 	Optional<ResourceLocation> getBindingKey();
 }
