@@ -47,7 +47,7 @@ public class UIComponent
 	private static final Rectangle2D SHAPE_PLACEHOLDER = new Rectangle2D.Double(0, 0, 1, 1);
 	protected final Map<String, IUIPropertyMappingValue> propertyMapping;
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
-	protected final ConcurrentMap<ResourceLocation, IUIExtension<? extends IUIComponent>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<ResourceLocation, IUIExtension<? extends ResourceLocation, ? super IUIComponent>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected final ConcurrentMap<ResourceLocation, IBindingMethod.ISource<?>> eventTargetBindingMethods = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	// todo add animation system
 	// todo add name
@@ -66,12 +66,12 @@ public class UIComponent
 		this.visible = IHasBinding.createBindingField(Boolean.class, getPropertyMapping().get(PROPERTY_VISIBLE), Boolean::valueOf, true);
 		this.active = IHasBinding.createBindingField(Boolean.class, getPropertyMapping().get(PROPERTY_ACTIVE), Boolean::valueOf, true);
 
-		IExtensionContainer.addExtensionSafe(this, new UIExtensionCache<>(IUIComponent.class));
+		IExtensionContainer.addExtensionSafe(this, new UIExtensionCache());
 		this.shapeDescriptor = createShapeDescriptor();
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Map<String, IUIPropertyMappingValue> getPropertyMapping() { return propertyMapping; }
+	protected final Map<String, IUIPropertyMappingValue> getPropertyMapping() { return propertyMapping; }
 
 	protected IShapeDescriptor<?, ?> createShapeDescriptor() { return new ShapeDescriptor.Generic<>(getShapePlaceholderView(), new UIAnchorSet<>(this::getShapeDescriptor)); }
 
@@ -103,22 +103,19 @@ public class UIComponent
 	protected void setParent(@Nullable IUIComponentContainer parent) { this.parent = new WeakReference<>(parent); }
 
 	@Override
-	public Optional<IUIExtension<? extends IUIComponent>> getExtension(ResourceLocation key) { return Optional.ofNullable(getExtensions().get(key)); }
+	public Optional<IUIExtension<? extends ResourceLocation, ? super IUIComponent>> addExtension(IUIExtension<? extends ResourceLocation, ? super IUIComponent> extension) { return IExtensionContainer.addExtension(this, getExtensions(), extension.getType().getKey(), extension); }
 
 	@Override
-	public Optional<IUIExtension<? extends IUIComponent>> addExtension(IUIExtension<? extends IUIComponent> extension) {
-		IUIExtension.RegUIExtension.checkExtensionRegistered(extension);
-		return IExtensionContainer.addExtension(this, getExtensions(), extension.getType().getKey(), extension);
-	}
+	public Optional<IUIExtension<? extends ResourceLocation, ? super IUIComponent>> removeExtension(ResourceLocation key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
 
 	@Override
-	public Optional<IUIExtension<? extends IUIComponent>> removeExtension(ResourceLocation key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
+	public Optional<IUIExtension<? extends ResourceLocation, ? super IUIComponent>> getExtension(ResourceLocation key) { return Optional.ofNullable(getExtensions().get(key)); }
 
 	@Override
-	public Map<ResourceLocation, IUIExtension<? extends IUIComponent>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
+	public Map<ResourceLocation, IUIExtension<? extends ResourceLocation, ? super IUIComponent>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<ResourceLocation, IUIExtension<? extends IUIComponent>> getExtensions() { return extensions; }
+	protected ConcurrentMap<ResourceLocation, IUIExtension<? extends ResourceLocation, ? super IUIComponent>> getExtensions() { return extensions; }
 
 	@Override
 	public ObservableSource<IBinderAction> getBinderNotifier() { return getBinderNotifierSubject(); }

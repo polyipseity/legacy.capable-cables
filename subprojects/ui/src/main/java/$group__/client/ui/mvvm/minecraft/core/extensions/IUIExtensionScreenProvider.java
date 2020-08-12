@@ -11,9 +11,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import java.util.Set;
 
 @OnlyIn(Dist.CLIENT)
-public interface IUIExtensionScreenProvider<C extends IUIInfrastructure<?, ?, ?>>
-		extends IUIExtension<C> {
-	ResourceLocation KEY = new ResourceLocation(NamespaceUtilities.NAMESPACE_DEFAULT_PREFIX + "screen");
+public interface IUIExtensionScreenProvider
+		extends IUIExtension<ResourceLocation, IUIInfrastructure<?, ?, ?>> {
+	ResourceLocation KEY = new ResourceLocation(NamespaceUtilities.NAMESPACE_DEFAULT, AREA_UI + ".screen");
 
 	Screen getScreen();
 

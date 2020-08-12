@@ -11,9 +11,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import java.awt.geom.Point2D;
 
 @OnlyIn(Dist.CLIENT)
-public interface IUIExtensionMinecraft<C extends IUIComponent>
-		extends IUIExtension<C> {
-	ResourceLocation KEY = new ResourceLocation(NamespaceUtilities.NAMESPACE_DEFAULT_PREFIX + "container");
+public interface IUIExtensionMinecraft
+		extends IUIExtension<ResourceLocation, IUIComponent> {
+	ResourceLocation KEY = new ResourceLocation(NamespaceUtilities.NAMESPACE_DEFAULT, AREA_UI + ".container");
 
 	void render(final IAffineTransformStack stack, Point2D cursorPosition, double partialTicks);
 

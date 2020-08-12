@@ -10,6 +10,7 @@ import $group__.utilities.CastUtilities;
 import $group__.utilities.ConcurrencyUtilities;
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.events.EnumEventHookStage;
+import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.specific.MapUtilities;
@@ -27,11 +28,11 @@ import java.util.Optional;
 
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
-public class UIExtensionCache<C extends IExtensionContainer<? super ResourceLocation, ?>>
-		extends IHasGenericClass.Impl<C>
-		implements IUIExtensionCache<C> {
-	public static final Registry.RegistryObject<IUIExtension.IType<IUIExtensionCache<IExtensionContainer<? super ResourceLocation, ?>>, IExtensionContainer<? super ResourceLocation, ?>>> TYPE =
-			IUIExtension.RegUIExtension.INSTANCE.registerApply(KEY, k -> new IUIExtension.IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
+public class UIExtensionCache
+		extends IHasGenericClass.Impl<IExtensionContainer<ResourceLocation, ?>>
+		implements IUIExtensionCache {
+	public static final Registry.RegistryObject<IUIExtension.IType<ResourceLocation, IUIExtensionCache, IExtensionContainer<ResourceLocation, ?>>> TYPE =
+			RegExtension.INSTANCE.registerApply(KEY, k -> new IUIExtension.IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
 
 	protected final Cache<ResourceLocation, Object> cache =
 			CacheBuilder.newBuilder()
@@ -39,20 +40,22 @@ public class UIExtensionCache<C extends IExtensionContainer<? super ResourceLoca
 					.expireAfterAccess(MapUtilities.CACHE_EXPIRATION_ACCESS_DURATION, MapUtilities.CACHE_EXPIRATION_ACCESS_TIME_UNIT)
 					.concurrencyLevel(ConcurrencyUtilities.SINGLE_THREAD_THREAD_COUNT).build();
 
-	public UIExtensionCache(Class<C> genericClass) { super(genericClass); }
-
-	@Override
-	public IUIExtension.IType<?, ?> getType() { return TYPE.getValue(); }
+	public UIExtensionCache() {
+		super(CastUtilities.castUnchecked(IExtensionContainer.class)); // COMMENT should not matter in this case
+	}
 
 	@Override
 	public Cache<ResourceLocation, Object> getDelegated() { return cache; }
+
+	@Override
+	public IExtension.IType<? extends ResourceLocation, ?, ? extends IExtensionContainer<ResourceLocation, ?>> getType() { return TYPE.getValue(); }
 
 	public enum CacheUniversal {
 		;
 		private static final Logger LOGGER = LogManager.getLogger();
 
 		public static final Registry.RegistryObject<IType<IUIComponentManager<?>, IUIComponent>> MANAGER =
-				RegUICache.INSTANCE.registerApply(new ResourceLocation(NamespaceUtilities.NAMESPACE_DEFAULT_PREFIX + "manager"),
+				RegUICache.INSTANCE.registerApply(generateKey("manager"),
 						k -> new IType.Impl<>(k,
 								(t, i) ->
 										TYPE.getValue().get(i).flatMap(cache -> Try.call(() -> cache.getDelegated()
@@ -72,7 +75,7 @@ public class UIExtensionCache<C extends IExtensionContainer<? super ResourceLoca
 									}
 								}));
 		public static final Registry.RegistryObject<IType<Integer, IUIComponent>> Z =
-				RegUICache.INSTANCE.registerApply(new ResourceLocation(NamespaceUtilities.NAMESPACE_DEFAULT_PREFIX + 'z'),
+				RegUICache.INSTANCE.registerApply(generateKey("z"),
 						k -> new IType.Impl<>(k,
 								(t, i) -> TYPE.getValue().get(i).flatMap(cache -> Try.call(() -> cache.getDelegated().get(t.getKey(),
 										() -> {
@@ -95,5 +98,7 @@ public class UIExtensionCache<C extends IExtensionContainer<? super ResourceLoca
 											t.invalidate(event.getComponent());
 									}
 								}));
+
+		private static ResourceLocation generateKey(String name) { return new ResourceLocation(NamespaceUtilities.NAMESPACE_DEFAULT, "universal." + name); }
 	}
 }

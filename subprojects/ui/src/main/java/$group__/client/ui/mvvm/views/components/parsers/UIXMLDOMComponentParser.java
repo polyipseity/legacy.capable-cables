@@ -42,7 +42,7 @@ import java.lang.invoke.MethodType;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 
-public class UIXMLDOMComponentParser<T extends IUIComponentManager>
+public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 		extends IHasGenericClass.Impl<T>
 		implements IUIResourceParser<T, Document> {
 	@SuppressWarnings("HardcodedFileSeparator")
@@ -66,13 +66,17 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager>
 		@Nullable String namespaceURI = root.getNamespaceURI();
 
 		DOMUtilities.getChildrenByTagNameNS(root, namespaceURI, "alias").forEach(a ->
-				getAliases().put(a.getAttributes().getNamedItem("name").getNodeValue(), a.getAttributes().getNamedItem("class").getNodeValue()));
+				getAliases().put(Optional.ofNullable(a.getAttributes().getNamedItem("name"))
+								.orElseThrow(InternalError::new).getNodeValue(),
+						Optional.ofNullable(a.getAttributes().getNamedItem("class"))
+								.orElseThrow(InternalError::new).getNodeValue()));
 		Node managerNode = DOMUtilities.getChildrenByTagNameNS(root, namespaceURI, "component").stream().unordered().findAny().orElseThrow(() ->
 				BecauseOf.illegalArgument("Component manager not found",
 						"resource", resource));
 
 		{
-			String managerClassName = getClassFromMaybeAlias(getAliases(), managerNode.getAttributes().getNamedItem("class").getNodeValue());
+			String managerClassName = getClassFromMaybeAlias(getAliases(), Optional.ofNullable(managerNode.getAttributes().getNamedItem("class"))
+					.orElseThrow(InternalError::new).getNodeValue());
 			Class<?> managerClass = Class.forName(managerClassName);
 			if (!getGenericClass().equals(managerClass))
 				throw BecauseOf.illegalArgument("Component manager type does not match",
@@ -86,17 +90,20 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager>
 					NodeListList i = NodeListList.wrap(n.getChildNodes());
 					@SuppressWarnings("MismatchedQueryAndUpdateOfCollection") Map<String, IUIPropertyMappingValue> propertyMapping = new HashMap<>(i.size() - 1);
 					DOMUtilities.getChildrenByTagNameNS(n, namespaceURI, "property").forEach(p ->
-							propertyMapping.put(p.getAttributes().getNamedItem("key").getNodeValue(),
+							propertyMapping.put(Optional.ofNullable(p.getAttributes().getNamedItem("key"))
+											.orElseThrow(InternalError::new).getNodeValue(),
 									new UIPropertyMappingValue(Optional.ofNullable(p.getAttributes().getNamedItem("value"))
 											.orElseThrow(InternalError::new).getNodeValue(), null)));
 					DOMUtilities.getChildrenByTagNameNS(n, namespaceURI, "binding").forEach(p ->
-							propertyMapping.put(p.getAttributes().getNamedItem("key").getNodeValue(),
+							propertyMapping.put(Optional.ofNullable(p.getAttributes().getNamedItem("key"))
+											.orElseThrow(InternalError::new).getNodeValue(),
 									new UIPropertyMappingValue(Optional.ofNullable(p.getAttributes().getNamedItem("value"))
 											.map(Node::getNodeValue).orElse(null),
 											Optional.ofNullable(p.getAttributes().getNamedItem("binding"))
 													.orElseThrow(InternalError::new).getNodeValue())));
 					return new UIComponentPrototype(
-							getClassFromMaybeAlias(getAliases(), n.getAttributes().getNamedItem("class").getNodeValue()),
+							getClassFromMaybeAlias(getAliases(), Optional.ofNullable(n.getAttributes().getNamedItem("class"))
+									.orElseThrow(InternalError::new).getNodeValue()),
 							propertyMapping);
 				},
 				n -> NodeListList.wrap(
@@ -154,6 +161,7 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager>
 
 		public String getClassName() { return className; }
 
+		@SuppressWarnings("UnusedReturnValue")
 		public boolean addChildren(Iterable<? extends UIComponentPrototype> children) { return Iterables.addAll(getChildren(), children); }
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
@@ -163,7 +171,7 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager>
 
 		public IUIComponent createComponent() throws Throwable {
 			MethodHandle constructor = DynamicUtilities.IMPL_LOOKUP.findConstructor(Class.forName(getClassName()), MethodType.methodType(void.class, Map.class));
-			IUIComponent ret = (IUIComponent) constructor.invoke(getPropertyMapping());
+			IUIComponent ret = IUIComponent.createComponent(() -> Try.call(() -> (IUIComponent) constructor.invoke(getPropertyMapping()), LOGGER).orElseThrow(ThrowableCatcher::rethrow));
 			if (!getChildren().isEmpty()) {
 				if (!(ret instanceof IUIComponentContainer))
 					throw BecauseOf.illegalArgument("Component type is not a container",

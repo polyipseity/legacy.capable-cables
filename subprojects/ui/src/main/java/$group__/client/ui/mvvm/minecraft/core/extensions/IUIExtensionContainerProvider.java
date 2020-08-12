@@ -9,9 +9,9 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public interface IUIExtensionContainerProvider<C extends IUIInfrastructure<?, ?, ?>>
-		extends IUIExtension<C> {
-	ResourceLocation KEY = new ResourceLocation(NamespaceUtilities.NAMESPACE_DEFAULT_PREFIX + "container");
+public interface IUIExtensionContainerProvider
+		extends IUIExtension<ResourceLocation, IUIInfrastructure<?, ?, ?>> {
+	ResourceLocation KEY = new ResourceLocation(NamespaceUtilities.NAMESPACE_DEFAULT, AREA_UI + ".container");
 
 	Container getContainer();
 }

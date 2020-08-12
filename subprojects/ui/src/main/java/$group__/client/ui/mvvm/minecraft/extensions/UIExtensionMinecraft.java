@@ -1,6 +1,5 @@
 package $group__.client.ui.mvvm.minecraft.extensions;
 
-import $group__.client.ui.mvvm.core.extensions.IUIExtension;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
@@ -15,6 +14,7 @@ import $group__.utilities.extensions.ExtensionContainerAware;
 import $group__.utilities.structures.Registry;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
@@ -25,13 +25,15 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 @OnlyIn(Dist.CLIENT)
-public abstract class UIExtensionMinecraft<C extends IUIComponent>
-		extends ExtensionContainerAware<C>
-		implements IUIExtensionMinecraft<C> {
-	public static final Registry.RegistryObject<IType<IUIExtensionMinecraft<IUIComponent>, IUIComponent>> TYPE =
-			IUIExtension.RegUIExtension.INSTANCE.registerApply(KEY, k -> new IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
+public abstract class UIExtensionMinecraft
+		extends ExtensionContainerAware<ResourceLocation, IUIComponent>
+		implements IUIExtensionMinecraft {
+	public static final Registry.RegistryObject<IType<ResourceLocation, IUIExtensionMinecraft, IUIComponent>> TYPE =
+			RegExtension.INSTANCE.registerApply(KEY, k -> new IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
 
-	public UIExtensionMinecraft(Class<C> genericClass) { super(genericClass); }
+	public UIExtensionMinecraft() {
+		super(CastUtilities.castUnchecked(IUIComponent.class)); // COMMENT should not matter in this case
+	}
 
 	@Override
 	public void render(final IAffineTransformStack stack, Point2D cursorPosition, double partialTicks) {
@@ -172,5 +174,5 @@ public abstract class UIExtensionMinecraft<C extends IUIComponent>
 	}
 
 	@Override
-	public IType<?, ?> getType() { return TYPE.getValue(); }
+	public IType<? super ResourceLocation, ?, ? extends IUIComponent> getType() { return TYPE.getValue(); }
 }

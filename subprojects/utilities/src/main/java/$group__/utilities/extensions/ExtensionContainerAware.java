@@ -7,9 +7,9 @@ import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.lang.ref.WeakReference;
 import java.util.Optional;
 
-public abstract class ExtensionContainerAware<C extends IExtensionContainer<?, ?>>
+public abstract class ExtensionContainerAware<K, C extends IExtensionContainer<? super K, ?>>
 		extends IHasGenericClass.Impl<C>
-		implements IExtension<C> {
+		implements IExtension<K, C> {
 	protected WeakReference<C> container = new WeakReference<>(null);
 
 	public ExtensionContainerAware(Class<C> genericClass) { super(genericClass); }

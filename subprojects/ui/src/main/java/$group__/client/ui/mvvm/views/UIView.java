@@ -4,6 +4,7 @@ import $group__.client.ui.mvvm.core.binding.IBinderAction;
 import $group__.client.ui.mvvm.core.extensions.IUIExtension;
 import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.views.IUIView;
+import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.specific.MapUtilities;
 import com.google.common.collect.ImmutableMap;
@@ -35,7 +36,7 @@ public abstract class UIView<SD extends IShapeDescriptor<?, ?>>
 
 	@Override
 	public Optional<IUIExtension<? extends IUIView<?>>> addExtension(IUIExtension<? extends IUIView<?>> extension) {
-		IUIExtension.RegUIExtension.checkExtensionRegistered(extension);
+		IExtension.RegExtension.checkExtensionRegistered(extension);
 		return IExtensionContainer.addExtension(this, getExtensions(), extension.getType().getKey(), extension);
 	}
 

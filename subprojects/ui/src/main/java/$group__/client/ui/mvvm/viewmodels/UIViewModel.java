@@ -5,6 +5,7 @@ import $group__.client.ui.mvvm.core.binding.IBindingField;
 import $group__.client.ui.mvvm.core.extensions.IUIExtension;
 import $group__.client.ui.mvvm.core.models.IUIModel;
 import $group__.client.ui.mvvm.core.viewmodels.IUIViewModel;
+import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.specific.MapUtilities;
 import com.google.common.collect.ImmutableMap;
@@ -49,7 +50,7 @@ public class UIViewModel<M extends IUIModel> implements IUIViewModel<M> {
 
 	@Override
 	public Optional<IUIExtension<? extends IUIViewModel<?>>> addExtension(IUIExtension<? extends IUIViewModel<?>> extension) {
-		IUIExtension.RegUIExtension.checkExtensionRegistered(extension);
+		IExtension.RegExtension.checkExtensionRegistered(extension);
 		return IExtensionContainer.addExtension(this, getExtensions(), extension.getType().getKey(), extension);
 	}
 

@@ -90,8 +90,7 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?, ?>>
 		private static final Logger LOGGER = LogManager.getLogger();
 
 		public static final Registry.RegistryObject<IUIExtensionCache.IType<List<IUIComponent>, IUIComponent>> CHILDREN_FLAT =
-				IUIExtensionCache.RegUICache.INSTANCE.registerApply(new ResourceLocation(
-								NamespaceUtilities.getNamespacePrefixedString(".", "manager", "children_flat")),
+				IUIExtensionCache.RegUICache.INSTANCE.registerApply(generateKey("children_flat"),
 						k -> new IUIExtensionCache.IType.Impl<>(k,
 								(t, i) -> UIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> ThrowableUtilities.Try.call(() ->
 										cache.getDelegated().get(t.getKey(), () -> {
@@ -114,6 +113,8 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?, ?>>
 											t.invalidate(event.getComponent());
 									}
 								}));
+
+		private static ResourceLocation generateKey(String name) { return new ResourceLocation(NamespaceUtilities.NAMESPACE_DEFAULT, "manager." + name); }
 	}
 
 	@Override

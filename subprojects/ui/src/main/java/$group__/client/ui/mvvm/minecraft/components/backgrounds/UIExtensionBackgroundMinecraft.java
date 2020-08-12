@@ -13,6 +13,7 @@ import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.extensions.ExtensionContainerAware;
 import $group__.utilities.structures.Registry;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -23,17 +24,19 @@ import java.awt.geom.Point2D;
 import java.util.function.Predicate;
 
 @OnlyIn(Dist.CLIENT)
-public abstract class UIExtensionBackgroundMinecraft<C extends IUIViewComponentMinecraft<?, ?>>
-		extends ExtensionContainerAware<C>
-		implements IUIExtensionBackgroundRenderer<C> {
-	public static final Registry.RegistryObject<IUIExtension.IType<IUIExtensionBackgroundRenderer<IUIViewComponentMinecraft<?, ?>>, IUIViewComponentMinecraft<?, ?>>> TYPE =
-			IUIExtension.RegUIExtension.INSTANCE.registerApply(KEY, k -> new IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
+public abstract class UIExtensionBackgroundMinecraft
+		extends ExtensionContainerAware<ResourceLocation, IUIViewComponentMinecraft<?, ?>>
+		implements IUIExtensionBackgroundRenderer {
+	public static final Registry.RegistryObject<IUIExtension.IType<ResourceLocation, IUIExtensionBackgroundRenderer, IUIViewComponentMinecraft<?, ?>>> TYPE =
+			RegExtension.INSTANCE.registerApply(KEY, k -> new IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
 
-	public UIExtensionBackgroundMinecraft(Class<C> genericClass) { super(genericClass); }
+	public UIExtensionBackgroundMinecraft() {
+		super(CastUtilities.castUnchecked(IUIViewComponentMinecraft.class)); // COMMENT the generics should not matter here
+	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void onExtensionAdded(C container) {
+	public void onExtensionAdded(IUIViewComponentMinecraft<?, ?> container) {
 		super.onExtensionAdded(container);
 		EventBusEntryPoint.INSTANCE.register(this);
 		Cleaner.create(container, this::onExtensionRemoved);
@@ -59,22 +62,18 @@ public abstract class UIExtensionBackgroundMinecraft<C extends IUIViewComponentM
 	protected void renderBackground(Screen screen, Point2D mouse, double partialTicks) { UIBackgrounds.notifyBackgroundDrawn(screen); }
 
 	@Override
-	public IType<?, ?> getType() { return TYPE.getValue(); }
+	public IType<? extends ResourceLocation, ?, ? extends IUIViewComponentMinecraft<?, ?>> getType() { return TYPE.getValue(); }
 
 	@OnlyIn(Dist.CLIENT)
-	public static class Default<C extends IUIViewComponentMinecraft<?, ?>>
-			extends UIExtensionBackgroundMinecraft<C> {
-		public Default(Class<C> genericClass) { super(genericClass); }
-
+	public static class Default
+			extends UIExtensionBackgroundMinecraft {
 		@Override
 		protected void renderBackground(Screen screen, Point2D mouse, double partialTicks) { UIBackgrounds.renderBackgroundAndNotify(screen.getMinecraft(), screen.width, screen.height, 0); }
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public static class Dirt<C extends IUIViewComponentMinecraft<?, ?>>
-			extends UIExtensionBackgroundMinecraft<C> {
-		public Dirt(Class<C> genericClass) { super(genericClass); }
-
+	public static class Dirt
+			extends UIExtensionBackgroundMinecraft {
 		@Override
 		protected void renderBackground(Screen screen, Point2D mouse, double partialTicks) { UIBackgrounds.renderDirtBackgroundAndNotify(screen.getMinecraft(), screen.width, screen.height, 0); }
 	}

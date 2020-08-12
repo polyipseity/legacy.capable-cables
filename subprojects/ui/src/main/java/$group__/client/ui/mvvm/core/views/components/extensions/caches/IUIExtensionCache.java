@@ -18,24 +18,24 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public interface IUIExtensionCache<C extends IExtensionContainer<? super ResourceLocation, ?>>
-		extends IUIExtension<C> {
-	ResourceLocation KEY = new ResourceLocation(NamespaceUtilities.NAMESPACE_DEFAULT_PREFIX + "cache");
+public interface IUIExtensionCache
+		extends IUIExtension<ResourceLocation, IExtensionContainer<ResourceLocation, ?>> {
+	ResourceLocation KEY = new ResourceLocation(NamespaceUtilities.NAMESPACE_DEFAULT, AREA_UI + ".cache");
 
 	Cache<ResourceLocation, Object> getDelegated();
 
-	interface IType<V, I extends IExtensionContainer<? super ResourceLocation, ?>> {
+	interface IType<V, I extends IExtensionContainer<ResourceLocation, ?>> {
 		Optional<V> get(I instance);
 
 		default void invalidate(I instance) { invalidate(instance, getKey()); }
 
-		static void invalidate(IExtensionContainer<? super ResourceLocation, ?> instance, ResourceLocation key) {
+		static void invalidate(IExtensionContainer<ResourceLocation, ?> instance, ResourceLocation key) {
 			UIExtensionCache.TYPE.getValue().get(instance).ifPresent(c -> c.getDelegated().invalidate(key));
 		}
 
 		ResourceLocation getKey();
 
-		class Impl<V, I extends IExtensionContainer<? super ResourceLocation, ?>> implements IType<V, I> {
+		class Impl<V, I extends IExtensionContainer<ResourceLocation, ?>> implements IType<V, I> {
 			protected final ResourceLocation key;
 			protected final BiFunction<? super IType<V, I>, ? super I, ? extends Optional<? extends V>> getter;
 			protected final BiConsumer<? super IType<V, I>, ? super I> invalidator;
