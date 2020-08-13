@@ -65,7 +65,7 @@ public enum UIComponentDebug {
 	public static ContainerType<ContainerDebug> getContainerEntry() { return ContainerDebug.Type.INSTANCE; }
 
 	@OnlyIn(Dist.CLIENT)
-	public static void registerGuiFactory() { ScreenManager.registerFactory(ContainerDebug.Type.INSTANCE, UIDebugFactory.INSTANCE); }
+	public static void registerUIFactory() { ScreenManager.registerFactory(ContainerDebug.Type.INSTANCE, UIDebugFactory.INSTANCE); }
 }
 
 @SuppressWarnings("HardcodedFileSeparator")
@@ -80,11 +80,12 @@ enum UIDebugFactory
 			new UIXMLDOMComponentParser<>(UIComponentManagerMinecraft.class);
 
 	static {
-		Try.run(() -> PARSER.parseResource(DocumentBuilderFactory
-				.newInstance()
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true); // TODO somehow make sure that this is called
+		Try.run(() -> PARSER.parseResource(dbf
 				.newDocumentBuilder()
 				.parse(ResourceUtilities.getResource(
-						new ResourceLocation(ConfigurationUI.getModId(), "ui/debug_ui.xml"))
+						new ResourceLocation(ConfigurationUI.getModId(), "ui/schemas/components_test.xml"))
 						.getInputStream())), LOGGER);
 		ThrowableCatcher.rethrow(true);
 	}

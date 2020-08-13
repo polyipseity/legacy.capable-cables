@@ -28,14 +28,15 @@ import static $group__.utilities.specific.LoggerUtilities.EnumMessages.PREFIX_MO
 public final class ModThis extends Singleton {
 	public final IProxy proxy = DistExecutor.unsafeRunForDist(() -> ModThis::getProxyClientSupplier, () -> ModThis::getProxyServerSupplier);
 
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public ModThis() {
 		super(LOGGER);
 		IEventBus eventBusMod = Bus.MOD.bus().get();
-		eventBusMod.register(this);
 		BLOCKS.register(eventBusMod);
 		ITEMS.register(eventBusMod);
 		TILE_ENTITIES.register(eventBusMod);
 		CONTAINERS.register(eventBusMod);
+		eventBusMod.register(this);
 	}
 
 	public static ResourceLocation getResourceLocation(String path) { return new ResourceLocation(MOD_ID, path); }

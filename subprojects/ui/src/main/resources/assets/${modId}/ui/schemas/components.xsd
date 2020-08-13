@@ -1,55 +1,46 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:ui="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
            targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
-           version="1.0" xml:lang="EN">
+           elementFormDefault="qualified"
+           version="1.0"
+           xmlns:ui="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
+           xml:lang="EN">
 	<xs:element name="ui" id="ui">
 		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="xs:openAttrs">
-					<xs:sequence>
-						<xs:element ref="ui:alias" minOccurs="0" maxOccurs="unbounded"/>
-						<xs:element ref="ui:component"/>
-					</xs:sequence>
-				</xs:extension>
-			</xs:complexContent>
+			<xs:sequence>
+				<xs:element ref="ui:alias" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:component"/>
+			</xs:sequence>
+			<xs:anyAttribute namespace="##other" processContents="lax"/>
 		</xs:complexType>
 	</xs:element>
 
 	<xs:element name="alias" id="alias">
 		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="xs:annotated">
-					<xs:attribute name="name" type="xs:string" use="required"/>
-					<xs:attribute name="class" type="xs:string" use="required"/>
-				</xs:extension>
-			</xs:complexContent>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="class" type="xs:string" use="required"/>
 		</xs:complexType>
 	</xs:element>
 
 	<xs:element name="component" id="component">
 		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="xs:annotated">
-					<xs:sequence>
-						<xs:choice minOccurs="0" maxOccurs="unbounded">
-							<xs:element ref="ui:property"/>
-							<xs:element ref="ui:binding"/>
-						</xs:choice>
-						<xs:element ref="ui:componentContainer"/>
-					</xs:sequence>
-					<xs:attribute name="class" type="xs:string" use="required"/>
-				</xs:extension>
-			</xs:complexContent>
+			<xs:sequence>
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element ref="ui:property"/>
+					<xs:element ref="ui:binding"/>
+				</xs:choice>
+				<xs:element ref="ui:componentContainer"/>
+			</xs:sequence>
+			<xs:attribute name="class" type="xs:string" use="required"/>
 		</xs:complexType>
 	</xs:element>
 
 	<xs:element name="property" id="property">
 		<xs:complexType>
 			<xs:complexContent>
-				<xs:extension base="ui:propertyType">
-					<xs:attribute name="value" use="required"/>
-				</xs:extension>
+				<xs:restriction base="ui:propertyType">
+					<xs:attribute name="value" type="xs:string" use="required"/>
+				</xs:restriction>
 			</xs:complexContent>
 		</xs:complexType>
 	</xs:element>
@@ -57,23 +48,15 @@
 
 	<xs:element name="componentContainer" id="componentContainer">
 		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="xs:annotated">
-					<xs:sequence>
-						<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
-					</xs:sequence>
-				</xs:extension>
-			</xs:complexContent>
+			<xs:sequence>
+				<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 
 	<xs:complexType name="propertyType" id="propertyType">
-		<xs:complexContent>
-			<xs:extension base="xs:annotated">
-				<xs:attribute name="key" type="xs:string" use="required"/>
-				<xs:attribute name="value" type="xs:string"/>
-			</xs:extension>
-		</xs:complexContent>
+		<xs:attribute name="key" type="xs:string" use="required"/>
+		<xs:attribute name="value" type="xs:string"/>
 	</xs:complexType>
 
 	<xs:complexType name="bindingType" id="bindingType">

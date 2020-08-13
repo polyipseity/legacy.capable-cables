@@ -5,4 +5,7 @@
 	<item name='org.w3c.dom.Node java.lang.String getNamespaceURI()'>
 		<annotation name='javax.annotation.Nullable'/>
 	</item>
+	<item name='org.w3c.dom.Node org.w3c.dom.NamedNodeMap getAttributes()'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
 </root>

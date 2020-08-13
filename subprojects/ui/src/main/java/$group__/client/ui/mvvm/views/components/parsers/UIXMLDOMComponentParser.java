@@ -66,17 +66,17 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 		Element root = resource.getDocumentElement();
 		@Nullable String namespaceURI = root.getNamespaceURI();
 
-		DOMUtilities.getChildrenByTagNameNS(root, namespaceURI, "alias").forEach(a ->
-				getAliases().put(Optional.ofNullable(a.getAttributes().getNamedItem("name"))
+		DOMUtilities.getChildrenByTagNameNS(root, namespaceURI, "alias").forEach(al ->
+				getAliases().put(Optional.ofNullable(al.getAttributes()).map(a -> a.getNamedItem("name"))
 								.orElseThrow(InternalError::new).getNodeValue(),
-						Optional.ofNullable(a.getAttributes().getNamedItem("class"))
+						Optional.ofNullable(al.getAttributes()).map(a -> a.getNamedItem("class"))
 								.orElseThrow(InternalError::new).getNodeValue()));
 		Node managerNode = DOMUtilities.getChildrenByTagNameNS(root, namespaceURI, "component").stream().unordered().findAny().orElseThrow(() ->
 				BecauseOf.illegalArgument("Component manager not found",
 						"resource", resource));
 
 		{
-			String managerClassName = getClassFromMaybeAlias(getAliases(), Optional.ofNullable(managerNode.getAttributes().getNamedItem("class"))
+			String managerClassName = getClassFromMaybeAlias(getAliases(), Optional.ofNullable(managerNode.getAttributes()).map(a -> a.getNamedItem("class"))
 					.orElseThrow(InternalError::new).getNodeValue());
 			Class<?> managerClass = Class.forName(managerClassName);
 			if (!getGenericClass().equals(managerClass))
@@ -89,31 +89,31 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 		setPrototype(TreeUtilities.visitNodesDepthFirst(managerNode,
 				n -> {
 					NodeListList i = NodeListList.wrap(n.getChildNodes());
-					@SuppressWarnings("MismatchedQueryAndUpdateOfCollection") Map<String, IUIPropertyMappingValue> propertyMapping = new HashMap<>(i.size() - 1);
+					Map<String, IUIPropertyMappingValue> propertyMapping = new HashMap<>(i.size());
 					DOMUtilities.getChildrenByTagNameNS(n, namespaceURI, "property").forEach(p ->
-							propertyMapping.put(Optional.ofNullable(p.getAttributes().getNamedItem("key"))
+							propertyMapping.put(Optional.ofNullable(p.getAttributes()).map(a -> a.getNamedItem("key"))
 											.orElseThrow(InternalError::new).getNodeValue(),
-									new UIPropertyMappingValue(Optional.ofNullable(p.getAttributes().getNamedItem("value"))
+									new UIPropertyMappingValue(Optional.ofNullable(p.getAttributes()).map(a -> a.getNamedItem("value"))
 											.orElseThrow(InternalError::new).getNodeValue(), null)));
 					DOMUtilities.getChildrenByTagNameNS(n, namespaceURI, "binding").forEach(p ->
-							propertyMapping.put(Optional.ofNullable(p.getAttributes().getNamedItem("key"))
+							propertyMapping.put(Optional.ofNullable(p.getAttributes()).map(a -> a.getNamedItem("key"))
 											.orElseThrow(InternalError::new).getNodeValue(),
-									new UIPropertyMappingValue(Optional.ofNullable(p.getAttributes().getNamedItem("value"))
+									new UIPropertyMappingValue(Optional.ofNullable(p.getAttributes()).map(a -> a.getNamedItem("value"))
 											.map(Node::getNodeValue).orElse(null),
-											Optional.ofNullable(p.getAttributes().getNamedItem("binding"))
+											Optional.ofNullable(p.getAttributes()).map(a -> a.getNamedItem("binding"))
 													.orElseThrow(InternalError::new).getNodeValue())));
 					return new UIComponentPrototype(
-							getClassFromMaybeAlias(getAliases(), Optional.ofNullable(n.getAttributes().getNamedItem("class"))
+							getClassFromMaybeAlias(getAliases(), Optional.ofNullable(n.getAttributes()).map(a -> a.getNamedItem("class"))
 									.orElseThrow(InternalError::new).getNodeValue()),
 							propertyMapping);
 				},
-				n -> NodeListList.wrap(
+				n -> DOMUtilities.getChildrenByTagNameNS(
 						DOMUtilities.getChildrenByTagNameNS(n, namespaceURI, "componentContainer").stream().unordered()
 								.findAny()
 								.orElseThrow(() ->
 										BecauseOf.illegalArgument("Component container not found",
 												"n", n,
-												"resource", resource)).getChildNodes())
+												"resource", resource)), namespaceURI, "component")
 				,
 				(p, c) -> {
 					p.addChildren(c);

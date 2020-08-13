@@ -28,7 +28,7 @@ public final class ProxyClient extends Proxy implements IProxyClient {
 		ConfigurationUI.setup(Constants.MOD_ID);
 
 		// todo add debug flag
-		UIComponentDebug.registerGuiFactory();
+		UIComponentDebug.registerUIFactory();
 	}
 
 	@Override
