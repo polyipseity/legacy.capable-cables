@@ -3,7 +3,10 @@ package $group__.client.ui.events.ui;
 import $group__.client.ui.mvvm.core.views.events.IUIEvent;
 import $group__.client.ui.mvvm.core.views.events.IUIEventListener;
 
-public abstract class UIEventListener<E extends IUIEvent> implements IUIEventListener<E> {
+import java.util.function.Consumer;
+
+public abstract class UIEventListener<E extends IUIEvent>
+		implements IUIEventListener<E> {
 	protected boolean removed = false;
 
 	@Override

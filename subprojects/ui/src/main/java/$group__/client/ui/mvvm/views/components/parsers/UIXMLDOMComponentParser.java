@@ -56,7 +56,7 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 	@Nullable
 	protected UIComponentPrototype prototype;
 
-	public UIXMLDOMComponentParser(Class<T> genericClass) { super(genericClass); }
+	public UIXMLDOMComponentParser(Class<T> managerClass) { super(managerClass); }
 
 	@Override
 	public void parseResource(Document resource) throws IOException, SAXException, ClassNotFoundException {

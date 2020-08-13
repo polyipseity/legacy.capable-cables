@@ -1,5 +1,6 @@
 package $group__.utilities.interfaces;
 
+@SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface ICopyable {
-	Object copy();
+	ICopyable copy();
 }

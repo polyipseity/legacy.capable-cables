@@ -4,7 +4,7 @@ import net.minecraft.util.ResourceLocation;
 
 import java.util.Optional;
 
-@FunctionalInterface
+@SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface IHasBindingKey {
 	Optional<ResourceLocation> getBindingKey();
 }

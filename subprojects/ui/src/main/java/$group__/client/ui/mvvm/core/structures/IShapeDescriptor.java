@@ -30,7 +30,7 @@ public interface IShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>> {
 
 	A getAnchorSet();
 
-	<T extends IShapeDescriptor<?, ?>> boolean modify(T self, Function<? super T, Boolean> action)
+	<T extends IShapeDescriptor<?, ?>> boolean modify(T self, Function<? super T, ? extends Boolean> action)
 			throws ConcurrentModificationException;
 
 	boolean setShape(S shape)

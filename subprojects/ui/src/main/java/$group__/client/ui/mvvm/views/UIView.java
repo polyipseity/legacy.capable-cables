@@ -23,7 +23,7 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
 public abstract class UIView<SD extends IShapeDescriptor<?, ?>>
 		implements IUIView<SD> {
-	protected final ConcurrentMap<ResourceLocation, IUIExtension<? extends IUIView<?>>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<ResourceLocation, IUIExtension<ResourceLocation, ? extends IUIView<?>>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 
 	@Override
@@ -32,23 +32,23 @@ public abstract class UIView<SD extends IShapeDescriptor<?, ?>>
 	protected Subject<IBinderAction> getBinderNotifierSubject() { return binderNotifierSubject; }
 
 	@Override
-	public Optional<IUIExtension<? extends IUIView<?>>> getExtension(ResourceLocation key) { return Optional.ofNullable(getExtensions().get(key)); }
-
-	@Override
-	public Optional<IUIExtension<? extends IUIView<?>>> addExtension(IUIExtension<? extends IUIView<?>> extension) {
+	public Optional<IUIExtension<ResourceLocation, ? extends IUIView<?>>> addExtension(IUIExtension<ResourceLocation, ? extends IUIView<?>> extension) {
 		IExtension.RegExtension.checkExtensionRegistered(extension);
 		return IExtensionContainer.addExtension(this, getExtensions(), extension.getType().getKey(), extension);
 	}
 
 	@Override
-	public Optional<IUIExtension<? extends IUIView<?>>> removeExtension(ResourceLocation key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
+	public Optional<IUIExtension<ResourceLocation, ? extends IUIView<?>>> removeExtension(ResourceLocation key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
 
 	@Override
-	public Map<ResourceLocation, IUIExtension<? extends IUIView<?>>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
+	public Optional<IUIExtension<ResourceLocation, ? extends IUIView<?>>> getExtension(ResourceLocation key) { return Optional.ofNullable(getExtensions().get(key)); }
+
+	@Override
+	public Map<ResourceLocation, IUIExtension<ResourceLocation, ? extends IUIView<?>>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<ResourceLocation, IUIExtension<? extends IUIView<?>>> getExtensions() { return extensions; }
+	protected ConcurrentMap<ResourceLocation, IUIExtension<ResourceLocation, ? extends IUIView<?>>> getExtensions() { return extensions; }
 
 	@Override
-	public boolean reshape(Function<? super SD, Boolean> action) throws ConcurrentModificationException { return getShapeDescriptor().modify(getShapeDescriptor(), action); }
+	public boolean reshape(Function<? super SD, ? extends Boolean> action) throws ConcurrentModificationException { return getShapeDescriptor().modify(getShapeDescriptor(), action); }
 }

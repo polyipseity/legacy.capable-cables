@@ -5,6 +5,7 @@ import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.structures.ShapeDescriptor;
 import $group__.client.ui.mvvm.structures.UIAnchorSet;
 import $group__.client.ui.mvvm.views.components.minecraft.common.UIButtonComponentMinecraft;
+import $group__.client.ui.mvvm.views.components.parsers.UIXMLDOMComponentParser;
 import $group__.client.ui.utilities.UIObjectUtilities;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -63,6 +64,14 @@ public enum GuiComponentDebug {
 	public static <T extends Screen & IHasContainer<ContainerDebug>> void registerGuiFactory() {
 		// COMMENT compilation error without the cast
 		ScreenManager.registerFactory(ContainerDebug.Type.INSTANCE, (ScreenManager.IScreenFactory<ContainerDebug, T>) (container, inv, title) -> new UIDebug(title, container).getContainerScreen());
+	}
+}
+
+enum UIDebugFactory {
+	;
+
+	public static void getUI() {
+		new UIXMLDOMComponentParser<>();
 	}
 }
 

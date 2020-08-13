@@ -50,7 +50,7 @@ public abstract class ShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public <T extends IShapeDescriptor<?, ?>> boolean modify(T self, Function<? super T, Boolean> action)
+	public <T extends IShapeDescriptor<?, ?>> boolean modify(T self, Function<? super T, ? extends Boolean> action)
 			throws ConcurrentModificationException {
 		if (!self.equals(this))
 			throw BecauseOf.illegalArgument("'self' does not equal to 'this'", "this", this, "self", self);
@@ -94,7 +94,7 @@ public abstract class ShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>
 		}
 	}
 
-	protected <T extends IShapeDescriptor<?, ?>> boolean modify0(T self, Function<? super T, Boolean> action) {
+	protected <T extends IShapeDescriptor<?, ?>> boolean modify0(T self, Function<? super T, ? extends Boolean> action) {
 		boolean ret = action.apply(self);
 		Rectangle2D current = getShape().getBounds2D(), bounds = (Rectangle2D) current.clone();
 		getConstraints().forEach(c -> c.accept(bounds));

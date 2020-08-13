@@ -17,7 +17,8 @@ import net.minecraft.util.ResourceLocation;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public class UIEventTarget implements IUIEventTarget {
+public class UIEventTarget
+		implements IUIEventTarget {
 	@SuppressWarnings("UnstableApiUsage")
 	protected final SetMultimap<ResourceLocation, IUIEventListenerWithParameters> eventTargetListeners = MultimapBuilder
 			.hashKeys(CapacityUtilities.INITIAL_CAPACITY_SMALL)
@@ -69,6 +70,9 @@ public class UIEventTarget implements IUIEventTarget {
 
 		return !ls.isEmpty();
 	}
+
+	@Override
+	public boolean isFocusable() { return false; }
 
 	@Override
 	public boolean isActive() { return true; }

@@ -2,14 +2,10 @@ package $group__.client.ui.mvvm.structures;
 
 import $group__.client.ui.mvvm.core.structures.IUIDataKeyboardKeyPress;
 import $group__.utilities.ObjectUtilities;
-import $group__.utilities.specific.ThrowableUtilities.Try;
 import jdk.nashorn.internal.ir.annotations.Immutable;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Immutable
 public final class UIDataKeyboardKeyPress implements IUIDataKeyboardKeyPress, Cloneable {
-	private static final Logger LOGGER = LogManager.getLogger();
 	protected final int key, scanCode, modifiers;
 	protected final long timestamp = System.currentTimeMillis();
 
@@ -35,9 +31,8 @@ public final class UIDataKeyboardKeyPress implements IUIDataKeyboardKeyPress, Cl
 	@Override
 	public boolean equals(Object obj) { return ObjectUtilities.equals(this, obj, false, null, OBJECT_VARIABLES); }
 
-	@SuppressWarnings("Convert2MethodRef")
 	@Override
-	public UIDataKeyboardKeyPress clone() { return (UIDataKeyboardKeyPress) Try.call(() -> super.clone(), LOGGER).orElseThrow(InternalError::new); }
+	public UIDataKeyboardKeyPress clone() throws CloneNotSupportedException { return (UIDataKeyboardKeyPress) super.clone(); }
 
 	@Override
 	public long getTimestampMills() { return timestamp; }

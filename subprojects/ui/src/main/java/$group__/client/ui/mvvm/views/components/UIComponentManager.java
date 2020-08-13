@@ -48,7 +48,7 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?, ?>>
 	}
 
 	@Override
-	public boolean reshape(Function<? super SD, Boolean> action) throws ConcurrentModificationException { return getShapeDescriptor().modify(getShapeDescriptor(), action); }
+	public boolean reshape(Function<? super SD, ? extends Boolean> action) throws ConcurrentModificationException { return getShapeDescriptor().modify(getShapeDescriptor(), action); }
 
 	@Override
 	public Optional<IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) {

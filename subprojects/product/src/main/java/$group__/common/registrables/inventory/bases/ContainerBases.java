@@ -16,7 +16,7 @@ public enum ContainerBases {
 
 	public static ItemStack transferStackInSlotBase(Container container, PlayerEntity playerIn, int index,
 	                                                BiFunction<ItemStack, Integer, BiFunction<Integer, Boolean,
-			                                                Boolean>> mergeItemStackFunction) {
+			                                                ? extends Boolean>> mergeItemStackFunction) {
 		List<Slot> inv = container.inventorySlots;
 		Slot s = inv.get(index);
 		if (s != null && s.getHasStack()) {

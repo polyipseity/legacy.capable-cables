@@ -438,6 +438,7 @@ public class UIAdapterScreen
 	@Override
 	@Deprecated
 	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+		// TODO test if release works when multiple buttons are clicked
 		return removeEventMouse(this, button).map(e ->
 				UIEventUtilities.dispatchEvent(
 						UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e, new Point2D.Double(mouseX, mouseY)))).orElse(false);

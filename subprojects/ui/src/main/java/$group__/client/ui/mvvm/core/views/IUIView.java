@@ -14,7 +14,7 @@ import java.util.Optional;
 
 // TODO mark as only UI thread
 public interface IUIView<SD extends IShapeDescriptor<?, ?>>
-		extends IUICommon, IUIReshapeExplicitly<SD>, IHasBinding, IExtensionContainer<ResourceLocation, IUIExtension<? extends IUIView<?>>> {
+		extends IUICommon, IUIReshapeExplicitly<SD>, IHasBinding, IExtensionContainer<ResourceLocation, IUIExtension<ResourceLocation, ? extends IUIView<?>>> {
 	IUIEventTarget getTargetAtPoint(Point2D point);
 
 	Optional<IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next);

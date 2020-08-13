@@ -1,6 +1,6 @@
 package $group__.utilities.interfaces;
 
-@FunctionalInterface
+@SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface IHasGenericClass<T> {
 	Class<T> getGenericClass();
 

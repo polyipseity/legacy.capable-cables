@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@FunctionalInterface
+@SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface IHasBinding {
 	Logger LOGGER = LogManager.getLogger();
 
