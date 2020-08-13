@@ -13,7 +13,6 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.io.IOException;
@@ -22,7 +21,7 @@ import java.util.function.Supplier;
 public enum EnumCursor {
 	STANDARD_ARROW_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR)),
 	STANDARD_I_BEAM_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_IBEAM_CURSOR)),
-	STANDARD_CROSSHAIR_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_CROSSHAIR_CURSOR)),
+	STANDARD_CROSS_HAIR_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_CROSSHAIR_CURSOR)),
 	STANDARD_HAND_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR)),
 	STANDARD_RESIZE_HORIZONTAL_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_HRESIZE_CURSOR)),
 	STANDARD_RESIZE_VERTICAL_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_VRESIZE_CURSOR)),
@@ -30,26 +29,19 @@ public enum EnumCursor {
 	EXTENSION_RESIZE_NW_SE_CURSOR(() -> {
 		return Try.call(() -> createCursor(
 				new ResourceLocation(ConfigurationUI.getModId(), "textures/cursors/aero_nwse/32x32.png"),
-				new Point(8, 8)), getLogger()).orElseThrow(ThrowableCatcher::rethrow);
+				new Point(8, 8)), LoggerHolder.LOGGER).orElseThrow(ThrowableCatcher::rethrow);
 	}),
 	@SuppressWarnings({"SpellCheckingInspection", "HardcodedFileSeparator"})
 	EXTENSION_RESIZE_NE_SW_CURSOR(() -> {
 		return Try.call(() -> createCursor(
 				new ResourceLocation(ConfigurationUI.getModId(), "textures/cursors/aero_nesw/32x32.png"),
-				new Point(8, 8)), getLogger()).orElseThrow(ThrowableCatcher::rethrow);
+				new Point(8, 8)), LoggerHolder.LOGGER).orElseThrow(ThrowableCatcher::rethrow);
 	}),
 	;
 
-	@Nullable
-	private static Logger logger;
-	public final long handle;
+	protected final long handle;
 
 	EnumCursor(Supplier<Long> handle) { this.handle = handle.get(); }
-
-	private static Logger getLogger() {
-		if (logger == null) logger = LogManager.getLogger();
-		return logger;
-	}
 
 	@SuppressWarnings("EmptyMethod")
 	public static void preload() {}
@@ -60,5 +52,13 @@ public enum EnumCursor {
 			Point hotspotF = UIObjectUtilities.getPointFloor(hotspot);
 			return GLFW.glfwCreateCursor(i, hotspotF.x, hotspotF.y);
 		}
+	}
+
+	public long getHandle() { return handle; }
+
+	protected enum LoggerHolder {
+		;
+
+		private static final Logger LOGGER = LogManager.getLogger();
 	}
 }

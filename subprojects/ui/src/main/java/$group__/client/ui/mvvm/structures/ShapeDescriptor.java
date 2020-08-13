@@ -1,6 +1,7 @@
 package $group__.client.ui.mvvm.structures;
 
 import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
+import $group__.client.ui.mvvm.core.structures.IUIAnchor;
 import $group__.client.ui.mvvm.core.structures.IUIAnchorSet;
 import $group__.client.ui.mvvm.core.structures.IUIConstraint;
 import $group__.client.ui.mvvm.views.events.bus.EventUIShapeDescriptor;
@@ -24,13 +25,13 @@ import java.util.function.Function;
 
 import static $group__.client.ui.mvvm.core.structures.IShapeDescriptor.checkIsBeingModified;
 
-public abstract class ShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>> implements IShapeDescriptor<S, A> {
-	protected final A anchorSet;
+public abstract class ShapeDescriptor<S extends Shape> implements IShapeDescriptor<S> {
+	protected final IUIAnchorSet<IUIAnchor> anchorSet;
 	protected S shape;
 	protected final List<IUIConstraint> constraints = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 	protected boolean beingModified = false;
 
-	public ShapeDescriptor(S shape, A anchorSet) {
+	public ShapeDescriptor(S shape, IUIAnchorSet<IUIAnchor> anchorSet) {
 		this.shape = shape;
 		this.anchorSet = anchorSet;
 	}
@@ -49,8 +50,11 @@ public abstract class ShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>
 	}
 
 	@Override
+	public IUIAnchorSet<IUIAnchor> getAnchorSet() { return anchorSet; }
+
+	@Override
 	@OverridingMethodsMustInvokeSuper
-	public <T extends IShapeDescriptor<?, ?>> boolean modify(T self, Function<? super T, ? extends Boolean> action)
+	public <T extends IShapeDescriptor<?>> boolean modify(T self, Function<? super T, ? extends Boolean> action)
 			throws ConcurrentModificationException {
 		if (!self.equals(this))
 			throw BecauseOf.illegalArgument("'self' does not equal to 'this'", "this", this, "self", self);
@@ -64,16 +68,22 @@ public abstract class ShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>
 		return ret;
 	}
 
-	@Override
-	public A getAnchorSet() { return anchorSet; }
-
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected List<IUIConstraint> getConstraints() { return constraints; }
 
 	protected void setBeingModified(boolean beingModified) { this.beingModified = beingModified; }
 
-	public static class Generic<A extends IUIAnchorSet<?>> extends ShapeDescriptor<Shape, A> {
-		public Generic(Shape shape, A anchorSet) { super(shape, anchorSet); }
+	protected <T extends IShapeDescriptor<?>> boolean modify0(T self, Function<? super T, ? extends Boolean> action) {
+		boolean ret = action.apply(self);
+		Rectangle2D current = getShape().getBounds2D(), bounds = (Rectangle2D) current.clone();
+		getConstraints().forEach(c -> c.accept(bounds));
+		Constants.getConstraintMinimumView().accept(bounds);
+		bound(bounds);
+		return ret;
+	}
+
+	public static class Generic extends ShapeDescriptor<Shape> {
+		public Generic(Shape shape, IUIAnchorSet<IUIAnchor> anchorSet) { super(shape, anchorSet); }
 
 		@Override
 		@OverridingMethodsMustInvokeSuper
@@ -92,15 +102,6 @@ public abstract class ShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>
 			setShape(transform.createTransformedShape(getShape()));
 			return true;
 		}
-	}
-
-	protected <T extends IShapeDescriptor<?, ?>> boolean modify0(T self, Function<? super T, ? extends Boolean> action) {
-		boolean ret = action.apply(self);
-		Rectangle2D current = getShape().getBounds2D(), bounds = (Rectangle2D) current.clone();
-		getConstraints().forEach(c -> c.accept(bounds));
-		Constants.getConstraintMinimumView().accept(bounds);
-		bound(bounds);
-		return ret;
 	}
 
 	@Override
@@ -140,8 +141,11 @@ public abstract class ShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>
 		return false;
 	}
 
-	public static class Rectangular<S extends RectangularShape, A extends IUIAnchorSet<?>> extends ShapeDescriptor<S, A> {
-		public Rectangular(S shape, A anchorSet) { super(shape, anchorSet); }
+	public static class Rectangular<S extends RectangularShape> extends ShapeDescriptor<S> {
+		public Rectangular(S shape, IUIAnchorSet<IUIAnchor> anchorSet) { super(shape, anchorSet); }
+
+		@Override
+		public Shape getShapeProcessed() { return (Shape) getShape().clone(); }
 
 		@Override
 		@OverridingMethodsMustInvokeSuper
@@ -164,6 +168,4 @@ public abstract class ShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>
 			return true;
 		}
 	}
-
-
 }

@@ -1,6 +1,6 @@
 package $group__.common.registrables.items;
 
-import $group__.client.ui.mvvm.minecraft.debug.GuiComponentDebug;
+import $group__.client.ui.mvvm.minecraft.debug.UIComponentDebug;
 import $group__.common.registrables.blocks.BlocksThis;
 import $group__.common.registrables.items.groups.ItemGroupsThis;
 import net.minecraft.item.BlockItem;
@@ -14,7 +14,7 @@ import static $group__.Constants.MOD_ID;
 public enum ItemsThis {
 	;
 
-	public static final DeferredRegister<Item> ITEMS = new DeferredRegister<>(ForgeRegistries.ITEMS, MOD_ID);
+	public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
 
 	public static final RegistryObject<Item> WRENCH = ITEMS.register("wrench", ItemWrench::new);
 
@@ -22,5 +22,5 @@ public enum ItemsThis {
 
 	// todo add debug flag
 	@SuppressWarnings("unused")
-	private static final RegistryObject<Item> DEBUG_GUI_COMPONENT = ITEMS.register(GuiComponentDebug.PATH, () -> new BlockItem(GuiComponentDebug.getBlockEntry(), new Item.Properties().group(ItemGroupsThis.DEFAULT)));
+	private static final RegistryObject<Item> DEBUG_GUI_COMPONENT = ITEMS.register(UIComponentDebug.PATH, () -> new BlockItem(UIComponentDebug.getBlockEntry(), new Item.Properties().group(ItemGroupsThis.DEFAULT)));
 }

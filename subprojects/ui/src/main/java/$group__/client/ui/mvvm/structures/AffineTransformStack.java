@@ -13,6 +13,7 @@ public class AffineTransformStack implements IAffineTransformStack {
 	private static final Logger LOGGER = LogManager.getLogger();
 	protected final Stack<AffineTransform> delegated = new Stack<>();
 
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public AffineTransformStack() {
 		getDelegated().push(new AffineTransform());
 		{
@@ -27,15 +28,15 @@ public class AffineTransformStack implements IAffineTransformStack {
 
 	@Override
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	public Stack<AffineTransform> getDelegated() { return delegated; }
+	public final Stack<AffineTransform> getDelegated() { return delegated; }
 
 	@Override
 	@SuppressWarnings("UnusedReturnValue")
 	public AffineTransform push() { return getDelegated().push((AffineTransform) getDelegated().peek().clone()); }
 
 	@Override
-	public IAffineTransformStack copy() {
-		IAffineTransformStack ret = new AffineTransformStack();
+	public AffineTransformStack copy() {
+		AffineTransformStack ret = new AffineTransformStack();
 		ret.getDelegated().clear();
 		getDelegated().forEach(t -> ret.getDelegated().add((AffineTransform) t.clone()));
 		return ret;

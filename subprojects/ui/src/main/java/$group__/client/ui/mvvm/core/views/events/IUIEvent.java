@@ -5,7 +5,7 @@ import net.minecraft.util.ResourceLocation;
 
 public interface IUIEvent {
 	String
-			TYPE_SELECT_STRING = NamespaceUtilities.NAMESPACE_DEFAULT_PREFIX + "select";
+			TYPE_SELECT_STRING = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "select";
 	ResourceLocation
 			TYPE_SELECT = new ResourceLocation(TYPE_SELECT_STRING);
 

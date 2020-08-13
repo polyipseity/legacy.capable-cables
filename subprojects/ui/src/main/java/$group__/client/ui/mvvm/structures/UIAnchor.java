@@ -27,14 +27,14 @@ public final class UIAnchor implements IUIAnchor {
 			ImmutableList.of(UIAnchor::getContainer));
 	public static final ImmutableMap<String, Function<? super UIAnchor, ?>> OBJECT_VARIABLES_MAP = ObjectUtilities.extendsObjectVariablesMap(OBJECT_VARIABLES, IUIAnchor.OBJECT_VARIABLES_MAP,
 			ImmutableList.of("container"));
-	protected final IShapeDescriptor<?, ?> to;
+	protected final IShapeDescriptor<?> to;
 	protected final EnumUISide fromSide, toSide;
 	protected final double borderThickness;
 	protected WeakReference<IUIAnchorSet<?>> container = new WeakReference<>(null);
 
-	public UIAnchor(IShapeDescriptor<?, ?> to, EnumUISide fromSide, EnumUISide toSide) { this(to, fromSide, toSide, 0); }
+	public UIAnchor(IShapeDescriptor<?> to, EnumUISide fromSide, EnumUISide toSide) { this(to, fromSide, toSide, 0); }
 
-	public UIAnchor(IShapeDescriptor<?, ?> to, EnumUISide fromSide, EnumUISide toSide, double borderThickness) {
+	public UIAnchor(IShapeDescriptor<?> to, EnumUISide fromSide, EnumUISide toSide, double borderThickness) {
 		this.to = to;
 		this.fromSide = fromSide;
 		this.toSide = toSide;
@@ -48,7 +48,7 @@ public final class UIAnchor implements IUIAnchor {
 	}
 
 	@Override
-	public IShapeDescriptor<?, ?> getTo() { return to; }
+	public IShapeDescriptor<?> getTo() { return to; }
 
 	protected Optional<IUIAnchorSet<?>> getContainer() { return Optional.ofNullable(container.get()); }
 
@@ -58,7 +58,7 @@ public final class UIAnchor implements IUIAnchor {
 	public double getBorderThickness() { return borderThickness; }
 
 	@Override
-	public void anchor(IShapeDescriptor<?, ?> from) {
+	public void anchor(IShapeDescriptor<?> from) {
 		Rectangle2D bounds = from.getShapeProcessed().getBounds2D();
 		getFromSide().getSetter().accept(bounds,
 				getFromSide().getApplyBorder().apply(

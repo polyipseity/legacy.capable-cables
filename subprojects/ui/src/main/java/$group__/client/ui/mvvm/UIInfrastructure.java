@@ -25,13 +25,14 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
 public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, B extends IBinder>
 		implements IUIInfrastructure<V, VM, B> {
-	protected final ConcurrentMap<ResourceLocation, IUIExtension<? extends IUIInfrastructure<?, ?, ?>>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<ResourceLocation, IUIExtension<ResourceLocation, ? super IUIInfrastructure<?, ?, ?>>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected final Set<Disposable> binderDisposables = new HashSet<>(2);
 	protected V view;
 	protected VM viewModel;
 	protected B binder;
 	protected boolean bound = false;
 
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public UIInfrastructure(V view, VM viewModel, B binder) {
 		this.view = view;
 		this.viewModel = viewModel;
@@ -42,10 +43,10 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 	}
 
 	@Override
-	public V getView() { return view; }
+	public final V getView() { return view; }
 
 	@Override
-	public VM getViewModel() { return viewModel; }
+	public final VM getViewModel() { return viewModel; }
 
 	@Override
 	public B getBinder() { return binder; }
@@ -110,20 +111,20 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 	}
 
 	@Override
-	public Optional<IUIExtension<? extends IUIInfrastructure<?, ?, ?>>> getExtension(ResourceLocation key) { return Optional.ofNullable(getExtensions().get(key)); }
-
-	@Override
-	public Optional<IUIExtension<? extends IUIInfrastructure<?, ?, ?>>> addExtension(IUIExtension<? extends IUIInfrastructure<?, ?, ?>> extension) {
+	public Optional<IUIExtension<ResourceLocation, ? super IUIInfrastructure<?, ?, ?>>> addExtension(IUIExtension<ResourceLocation, ? super IUIInfrastructure<?, ?, ?>> extension) {
 		IExtension.RegExtension.checkExtensionRegistered(extension);
 		return IExtensionContainer.addExtension(this, getExtensions(), extension.getType().getKey(), extension);
 	}
 
 	@Override
-	public Optional<IUIExtension<? extends IUIInfrastructure<?, ?, ?>>> removeExtension(ResourceLocation key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
+	public Optional<IUIExtension<ResourceLocation, ? super IUIInfrastructure<?, ?, ?>>> removeExtension(ResourceLocation key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
 
 	@Override
-	public Map<ResourceLocation, IUIExtension<? extends IUIInfrastructure<?, ?, ?>>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
+	public Optional<IUIExtension<ResourceLocation, ? super IUIInfrastructure<?, ?, ?>>> getExtension(ResourceLocation key) { return Optional.ofNullable(getExtensions().get(key)); }
+
+	@Override
+	public Map<ResourceLocation, IUIExtension<ResourceLocation, ? super IUIInfrastructure<?, ?, ?>>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<ResourceLocation, IUIExtension<? extends IUIInfrastructure<?, ?, ?>>> getExtensions() { return extensions; }
+	protected ConcurrentMap<ResourceLocation, IUIExtension<ResourceLocation, ? super IUIInfrastructure<?, ?, ?>>> getExtensions() { return extensions; }
 }

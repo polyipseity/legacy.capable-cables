@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.core.structures;
 
-import $group__.utilities.interfaces.ICloneable;
+import $group__.utilities.interfaces.ICopyable;
 import $group__.utilities.specific.MapUtilities;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -10,7 +10,8 @@ import java.awt.geom.Point2D;
 import java.util.function.Function;
 
 @Immutable
-public interface IUIDataMouseButtonClick extends ICloneable {
+public interface IUIDataMouseButtonClick
+		extends ICopyable {
 	int MOUSE_BUTTON_NULL = -1;
 	ImmutableList<Function<IUIDataMouseButtonClick, Object>> OBJECT_VARIABLES = ImmutableList.of(
 			IUIDataMouseButtonClick::getCursorPositionView, IUIDataMouseButtonClick::getButton, IUIDataMouseButtonClick::getTimestampMills);

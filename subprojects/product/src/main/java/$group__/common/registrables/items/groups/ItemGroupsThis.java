@@ -3,6 +3,7 @@ package $group__.common.registrables.items.groups;
 import $group__.common.registrables.items.ItemsThis;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import static $group__.ModThis.getNamespacePrefixedString;

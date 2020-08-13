@@ -85,7 +85,7 @@ public class UIExtensionCache
 											     parent = parent.flatMap(IUIComponent::getParent))
 												++ret;
 											return ret;
-										}), LOGGER).flatMap(CastUtilities::castUnchecked)),
+										}), LOGGER).map(CastUtilities::castUnchecked)),
 								(t, i) -> {
 									IType.invalidate(i, t.getKey());
 									if (i instanceof IUIComponentContainer)
@@ -99,6 +99,6 @@ public class UIExtensionCache
 									}
 								}));
 
-		private static ResourceLocation generateKey(String name) { return new ResourceLocation(NamespaceUtilities.NAMESPACE_DEFAULT, "universal." + name); }
+		private static ResourceLocation generateKey(String name) { return new ResourceLocation(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, "universal." + name); }
 	}
 }

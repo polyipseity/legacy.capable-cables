@@ -42,6 +42,7 @@ import java.lang.invoke.MethodType;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 
+// TODO make facade
 public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 		extends IHasGenericClass.Impl<T>
 		implements IUIResourceParser<T, Document> {
@@ -135,7 +136,7 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 	public T createUI() {
 		return getPrototype()
 				.map(c -> Try.call(c::createComponent, LOGGER).orElseThrow(ThrowableCatcher::rethrow))
-				.map(c -> CastUtilities.castChecked(getGenericClass(), c, LOGGER).orElseThrow(ThrowableCatcher::rethrow))
+				.map(CastUtilities::<T>castUnchecked)
 				.orElseThrow(() -> new IllegalStateException("Prototype has not been created"));
 	}
 

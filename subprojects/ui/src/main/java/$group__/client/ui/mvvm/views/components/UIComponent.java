@@ -42,8 +42,8 @@ public class UIComponent
 		extends UIEventTarget
 		implements IUIComponent {
 	public static final String
-			PROPERTY_VISIBLE = NamespaceUtilities.NAMESPACE_DEFAULT + "visible",
-			PROPERTY_ACTIVE = NamespaceUtilities.NAMESPACE_DEFAULT + "active";
+			PROPERTY_VISIBLE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT + "visible",
+			PROPERTY_ACTIVE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT + "active";
 	private static final Rectangle2D SHAPE_PLACEHOLDER = new Rectangle2D.Double(0, 0, 1, 1);
 	protected final Map<String, IUIPropertyMappingValue> propertyMapping;
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
@@ -52,28 +52,28 @@ public class UIComponent
 	// todo add animation system
 	// todo add name
 	// todo cache transform
-	protected final IShapeDescriptor<?, ?> shapeDescriptor;
+	protected final IShapeDescriptor<?> shapeDescriptor;
 	@UIProperty(PROPERTY_VISIBLE)
 	protected final IBindingField<Boolean> visible;
 	@UIProperty(PROPERTY_ACTIVE)
 	protected final IBindingField<Boolean> active;
 	protected WeakReference<IUIComponentContainer> parent = new WeakReference<>(null);
 
-	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
+	@SuppressWarnings({"OverridableMethodCallDuringObjectConstruction", "ThisEscapedInObjectConstruction"})
 	public UIComponent(Map<String, IUIPropertyMappingValue> propertyMapping) {
 		this.propertyMapping = new HashMap<>(propertyMapping);
 
 		this.visible = IHasBinding.createBindingField(Boolean.class, getPropertyMapping().get(PROPERTY_VISIBLE), Boolean::valueOf, true);
 		this.active = IHasBinding.createBindingField(Boolean.class, getPropertyMapping().get(PROPERTY_ACTIVE), Boolean::valueOf, true);
 
-		IExtensionContainer.addExtensionSafe(this, new UIExtensionCache());
 		this.shapeDescriptor = createShapeDescriptor();
+		IExtensionContainer.addExtensionSafe(this, new UIExtensionCache());
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected final Map<String, IUIPropertyMappingValue> getPropertyMapping() { return propertyMapping; }
 
-	protected IShapeDescriptor<?, ?> createShapeDescriptor() { return new ShapeDescriptor.Generic<>(getShapePlaceholderView(), new UIAnchorSet<>(this::getShapeDescriptor)); }
+	protected IShapeDescriptor<?> createShapeDescriptor() { return new ShapeDescriptor.Generic(getShapePlaceholderView(), new UIAnchorSet<>(this::getShapeDescriptor)); }
 
 	public static Rectangle2D getShapePlaceholderView() { return (Rectangle2D) SHAPE_PLACEHOLDER.clone(); }
 
@@ -81,7 +81,7 @@ public class UIComponent
 	public Optional<IUIComponentContainer> getParent() { return Optional.ofNullable(parent.get()); }
 
 	@Override
-	public IShapeDescriptor<?, ?> getShapeDescriptor() { return shapeDescriptor; }
+	public IShapeDescriptor<?> getShapeDescriptor() { return shapeDescriptor; }
 
 	@Override
 	public boolean isVisible() { return getVisible().getValue(); }
@@ -124,6 +124,7 @@ public class UIComponent
 
 	@Override
 	public boolean dispatchEvent(IUIEvent event) {
+		boolean ret = super.dispatchEvent(event);
 		ResourceLocation type = event.getType();
 		CastUtilities.<IBindingMethod.ISource<? extends IUIEvent>>castUnchecked( // COMMENT should match
 				Optional.<IBindingMethod.ISource<?>>ofNullable(getEventTargetBindingMethods().get(type))
@@ -132,7 +133,7 @@ public class UIComponent
 							getEventTargetBindingMethods().put(type, r);
 							return r;
 						})).invoke(CastUtilities.castUnchecked(event)); // COMMENT should match
-		return super.dispatchEvent(event);
+		return ret;
 	}
 
 	@Override

@@ -16,11 +16,11 @@ import java.util.function.Supplier;
 
 public class UIAnchorSet<A extends IUIAnchor> implements IUIAnchorSet<A> {
 	protected final ConcurrentMap<EnumUISide, A> anchors = MapUtilities.getMapMakerSingleThreaded().initialCapacity(EnumUISide.values().length).makeMap();
-	protected final Supplier<? extends IShapeDescriptor<?, ?>> from;
+	protected final Supplier<? extends IShapeDescriptor<?>> from;
 
-	public UIAnchorSet(Supplier<? extends IShapeDescriptor<?, ?>> from) { this.from = from; }
+	public UIAnchorSet(Supplier<? extends IShapeDescriptor<?>> from) { this.from = from; }
 
-	public static Set<UIAnchor> getAnchorsToMatch(IShapeDescriptor<?, ?> to, double borderThickness) {
+	public static Set<UIAnchor> getAnchorsToMatch(IShapeDescriptor<?> to, double borderThickness) {
 		return Sets.newHashSet(
 				new UIAnchor(to, EnumUISide.UP, EnumUISide.DOWN, borderThickness),
 				new UIAnchor(to, EnumUISide.DOWN, EnumUISide.UP, borderThickness),
@@ -74,7 +74,7 @@ public class UIAnchorSet<A extends IUIAnchor> implements IUIAnchorSet<A> {
 	public Map<EnumUISide, A> getAnchorsView() { return ImmutableMap.copyOf(getAnchors()); }
 
 	@Override
-	public IShapeDescriptor<?, ?> getFrom() { return from.get(); }
+	public IShapeDescriptor<?> getFrom() { return from.get(); }
 
 	@Override
 	public boolean clear() { return removeSides(EnumSet.allOf(EnumUISide.class)); }

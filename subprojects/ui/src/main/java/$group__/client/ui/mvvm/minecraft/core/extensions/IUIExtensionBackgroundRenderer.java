@@ -10,5 +10,5 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public interface IUIExtensionBackgroundRenderer
 		extends IUIExtension<ResourceLocation, IUIViewComponentMinecraft<?, ?>> {
-	ResourceLocation KEY = new ResourceLocation(NamespaceUtilities.NAMESPACE_DEFAULT, AREA_UI + ".background");
+	ResourceLocation KEY = new ResourceLocation(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, AREA_UI + ".background");
 }

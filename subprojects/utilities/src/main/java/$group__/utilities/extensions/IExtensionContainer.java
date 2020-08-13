@@ -15,11 +15,11 @@ public interface IExtensionContainer<K, V extends IExtension<? extends K, ?>> {
 	Logger LOGGER = LogManager.getLogger();
 
 	@SuppressWarnings("UnusedReturnValue")
-	static <K, V extends IExtension<? extends K, ? super C>, C extends IExtensionContainer<K, ? super V>> Optional<? super V> addExtensionSafe(C container, V extension) { return container.addExtension(extension); }
+	static <K, V extends IExtension<? extends K, ? super C>, C extends IExtensionContainer<K, V>> Optional<V> addExtensionSafe(C container, V extension) { return container.addExtension(extension); }
 
 	Optional<V> addExtension(V extension);
 
-	static <K, V extends IExtension<? extends K, ? super C>, C extends IExtensionContainer<K, V>, VL extends V> Optional<V> addExtensionDecorated(C container, K key, Function<? super V, ? extends V> extension, BiFunction<? super C, ? super V, ? extends Optional<? extends V>> function) {
+	static <K, V extends IExtension<? extends K, ? super C>, C extends IExtensionContainer<K, V>> Optional<V> addExtensionDecorated(C container, K key, BiFunction<? super C, ? super V, ? extends Optional<? extends V>> function, Function<? super V, ? extends V> extension) {
 		Optional<V> o = container.getExtension(key);
 		return function.apply(container, extension.apply(o.orElse(null))).map(Function.identity());
 	}

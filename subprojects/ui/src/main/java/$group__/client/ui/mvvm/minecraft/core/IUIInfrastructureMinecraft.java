@@ -8,14 +8,17 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public interface IUIInfrastructureMinecraft<V extends IUIViewMinecraft<?>, VM extends IUIViewModelMinecraft<?>, B extends IBinder>
-		extends IUIInfrastructure<V, VM, B>, IUICommonMinecraft {
-	@Override
+		extends IUIInfrastructure<V, VM, B> {
+	default void initialize() {
+		getViewModel().initialize();
+		getView().initialize();
+	}
+
 	default void tick() {
 		getViewModel().tick();
 		getView().tick();
 	}
 
-	@Override
 	default void removed() {
 		getViewModel().removed();
 		getView().removed();

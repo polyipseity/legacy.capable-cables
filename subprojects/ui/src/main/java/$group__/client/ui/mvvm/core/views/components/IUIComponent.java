@@ -64,7 +64,7 @@ public interface IUIComponent
 		return builder.build().reverse();
 	}
 
-	IShapeDescriptor<?, ?> getShapeDescriptor();
+	IShapeDescriptor<?> getShapeDescriptor();
 
 	boolean isVisible();
 

@@ -2,8 +2,9 @@ package $group__.client;
 
 import $group__.Constants;
 import $group__.client.ui.ConfigurationUI;
-import $group__.client.ui.mvvm.minecraft.debug.GuiComponentDebug;
+import $group__.client.ui.mvvm.minecraft.debug.UIComponentDebug;
 import $group__.proxies.Proxy;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
@@ -27,7 +28,7 @@ public final class ProxyClient extends Proxy implements IProxyClient {
 		ConfigurationUI.setup(Constants.MOD_ID);
 
 		// todo add debug flag
-		GuiComponentDebug.registerGuiFactory();
+		UIComponentDebug.registerGuiFactory();
 	}
 
 	@Override

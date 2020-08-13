@@ -1,5 +1,6 @@
 package $group__.client.ui.utilities.minecraft;
 
+import $group__.client.ui.events.bus.EventBusEntryPoint;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.api.distmarker.Dist;

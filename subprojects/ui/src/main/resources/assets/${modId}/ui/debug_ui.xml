@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ui:ui xmlns:ui="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components" xml:lang="EN">
+	<ui:alias name="manager" class="$group__.client.ui.mvvm.minecraft.components.UIComponentManagerMinecraft"/>
+	<ui:alias name="window" class="$group__.client.ui.mvvm.minecraft.components.common.UIComponentMinecraftWindow"/>
+	<ui:alias name="button" class="$group__.client.ui.mvvm.minecraft.components.common.UIComponentMinecraftButton"/>
+	<ui:component class="manager">
+		<ui:componentContainer>
+			<ui:component class="window">
+				<annotation>
+					<documentation>
+						10 10 100 100
+					</documentation>
+				</annotation>
+				<ui:componentContainer>
+
+				</ui:componentContainer>
+			</ui:component>
+			<ui:component class="window">
+				<annotation>
+					<documentation>
+						50 50 200 200
+					</documentation>
+				</annotation>
+				<ui:componentContainer>
+					<ui:component class="button">
+						<annotation>
+							<documentation>
+								0 0 100 100
+							</documentation>
+						</annotation>
+						<ui:componentContainer>
+
+						</ui:componentContainer>
+					</ui:component>
+				</ui:componentContainer>
+			</ui:component>
+		</ui:componentContainer>
+	</ui:component>
+</ui:ui>

@@ -15,7 +15,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class UICacheShapeDescriptor<V, I extends IExtensionContainer<? super ResourceLocation, ?>>
+public class UICacheShapeDescriptor<V, I extends IExtensionContainer<ResourceLocation, ?>>
 		extends IUIExtensionCache.IType.Impl<V, I> {
 	protected final Set<I> instances = Collections.newSetFromMap(
 			MapUtilities.getMapMakerSingleThreadedWithWeakKeys().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap());
@@ -24,7 +24,7 @@ public class UICacheShapeDescriptor<V, I extends IExtensionContainer<? super Res
 		super(key, getter, invalidator, eventListenerFunction);
 	}
 
-	public static Optional<IUIComponent> getInstanceFromShapeDescriptor(Set<? extends IUIComponent> instances, IShapeDescriptor<?, ?> shapeDescriptor) {
+	public static Optional<IUIComponent> getInstanceFromShapeDescriptor(Set<? extends IUIComponent> instances, IShapeDescriptor<?> shapeDescriptor) {
 		for (IUIComponent i : instances) {
 			if (shapeDescriptor.equals(i.getShapeDescriptor()))
 				return Optional.of(i);

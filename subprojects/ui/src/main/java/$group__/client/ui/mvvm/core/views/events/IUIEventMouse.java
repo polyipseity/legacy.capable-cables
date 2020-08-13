@@ -9,15 +9,15 @@ import java.util.Optional;
 public interface IUIEventMouse extends IUIEvent {
 	@SuppressWarnings({"SpellCheckingInspection", "RedundantSuppression"})
 	String
-			TYPE_CLICK_STRING = NamespaceUtilities.NAMESPACE_DEFAULT_PREFIX + "click",
-			TYPE_CLICK_DOUBLE_STRING = NamespaceUtilities.NAMESPACE_DEFAULT_PREFIX + "dblclick",
-			TYPE_MOUSE_DOWN_STRING = NamespaceUtilities.NAMESPACE_DEFAULT_PREFIX + "mousedown",
-			TYPE_MOUSE_ENTER_STRING = NamespaceUtilities.NAMESPACE_DEFAULT_PREFIX + "mouseenter",
-			TYPE_MOUSE_LEAVE_STRING = NamespaceUtilities.NAMESPACE_DEFAULT_PREFIX + "mouseleave",
-			TYPE_MOUSE_MOVE_STRING = NamespaceUtilities.NAMESPACE_DEFAULT_PREFIX + "mousemove",
-			TYPE_MOUSE_LEAVE_SELF_STRING = NamespaceUtilities.NAMESPACE_DEFAULT_PREFIX + "mouseout",
-			TYPE_MOUSE_ENTER_SELF_STRING = NamespaceUtilities.NAMESPACE_DEFAULT_PREFIX + "mouseover",
-			TYPE_MOUSE_UP_STRING = NamespaceUtilities.NAMESPACE_DEFAULT_PREFIX + "mouseup";
+			TYPE_CLICK_STRING = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "click",
+			TYPE_CLICK_DOUBLE_STRING = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "dblclick",
+			TYPE_MOUSE_DOWN_STRING = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "mousedown",
+			TYPE_MOUSE_ENTER_STRING = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "mouseenter",
+			TYPE_MOUSE_LEAVE_STRING = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "mouseleave",
+			TYPE_MOUSE_MOVE_STRING = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "mousemove",
+			TYPE_MOUSE_LEAVE_SELF_STRING = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "mouseout",
+			TYPE_MOUSE_ENTER_SELF_STRING = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "mouseover",
+			TYPE_MOUSE_UP_STRING = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "mouseup";
 	ResourceLocation
 			TYPE_CLICK = new ResourceLocation(TYPE_CLICK_STRING),
 			TYPE_CLICK_DOUBLE = new ResourceLocation(TYPE_CLICK_DOUBLE_STRING),

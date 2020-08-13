@@ -21,7 +21,7 @@ import java.util.function.Function;
 
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
-public abstract class UIView<SD extends IShapeDescriptor<?, ?>>
+public abstract class UIView<SD extends IShapeDescriptor<?>>
 		implements IUIView<SD> {
 	protected final ConcurrentMap<ResourceLocation, IUIExtension<ResourceLocation, ? extends IUIView<?>>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();

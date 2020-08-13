@@ -13,8 +13,8 @@ import static $group__.client.ui.mvvm.core.structures.IUIConstraint.CONSTRAINT_N
 import static $group__.client.ui.mvvm.core.structures.IUIConstraint.Constants.getConstraintNullRectangleView;
 
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-public interface IShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>> {
-	static void checkIsBeingModified(IShapeDescriptor<?, ?> shapeDescriptor) throws IllegalStateException {
+public interface IShapeDescriptor<S extends Shape> {
+	static void checkIsBeingModified(IShapeDescriptor<?> shapeDescriptor) throws IllegalStateException {
 		if (!shapeDescriptor.isBeingModified())
 			throw new IllegalStateException("Not marked as being modified");
 	}
@@ -28,9 +28,9 @@ public interface IShapeDescriptor<S extends Shape, A extends IUIAnchorSet<?>> {
 	List<IUIConstraint> getConstraintsRef()
 			throws IllegalStateException;
 
-	A getAnchorSet();
+	IUIAnchorSet<IUIAnchor> getAnchorSet();
 
-	<T extends IShapeDescriptor<?, ?>> boolean modify(T self, Function<? super T, ? extends Boolean> action)
+	<T extends IShapeDescriptor<?>> boolean modify(T self, Function<? super T, ? extends Boolean> action)
 			throws ConcurrentModificationException;
 
 	boolean setShape(S shape)

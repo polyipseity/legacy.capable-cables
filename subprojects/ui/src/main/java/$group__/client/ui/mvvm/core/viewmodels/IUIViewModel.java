@@ -9,7 +9,7 @@ import net.minecraft.util.ResourceLocation;
 
 // TODO need to consider about threading
 public interface IUIViewModel<M extends IUIModel>
-		extends IUICommon, IHasBinding, IExtensionContainer<ResourceLocation, IUIExtension<? extends IUIViewModel<?>>> {
+		extends IUICommon, IHasBinding, IExtensionContainer<ResourceLocation, IUIExtension<ResourceLocation, ? super IUIViewModel<?>>> {
 	M getModel();
 
 	void setModel(M model);

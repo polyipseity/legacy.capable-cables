@@ -1,19 +1,25 @@
 package $group__.client.ui.mvvm.minecraft.debug;
 
-import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
-import $group__.client.ui.mvvm.core.views.components.IUIComponent;
-import $group__.client.ui.mvvm.structures.ShapeDescriptor;
-import $group__.client.ui.mvvm.structures.UIAnchorSet;
-import $group__.client.ui.mvvm.views.components.minecraft.common.UIButtonComponentMinecraft;
+import $group__.client.ui.ConfigurationUI;
+import $group__.client.ui.mvvm.binding.Binder;
+import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
+import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
+import $group__.client.ui.mvvm.core.views.components.parsers.IUIResourceParser;
+import $group__.client.ui.mvvm.minecraft.UIInfrastructureMinecraft;
+import $group__.client.ui.mvvm.minecraft.components.UIComponentManagerMinecraft;
+import $group__.client.ui.mvvm.minecraft.components.UIViewComponentMinecraft;
+import $group__.client.ui.mvvm.minecraft.components.adapters.UIAdapterScreen;
+import $group__.client.ui.mvvm.minecraft.viewmodels.UIViewModelMinecraft;
+import $group__.client.ui.mvvm.models.UIModel;
 import $group__.client.ui.mvvm.views.components.parsers.UIXMLDOMComponentParser;
-import $group__.client.ui.utilities.UIObjectUtilities;
+import $group__.utilities.client.minecraft.ResourceUtilities;
+import $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher;
+import $group__.utilities.specific.ThrowableUtilities.Try;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.IHasContainer;
 import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -25,6 +31,7 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.IWorldPosCallable;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
@@ -37,22 +44,19 @@ import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.fml.network.NetworkHooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.glfw.GLFW;
+import org.w3c.dom.Document;
 
-import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.geom.Rectangle2D;
-import java.util.Random;
 
 import static $group__.utilities.PreconditionUtilities.requireRunOnceOnly;
 import static java.util.Objects.requireNonNull;
 
-public enum GuiComponentDebug {
+public enum UIComponentDebug {
 	;
 
-	public static final String PATH = "debug_gui_mvvm";
-	public static final ITextComponent DISPLAY_NAME = new StringTextComponent("MVVM GUI Debug GUI");
+	public static final String PATH = "debug_ui";
+	public static final ITextComponent DISPLAY_NAME = new StringTextComponent("MVVM GUI Debug UI");
 
 	public static Block getBlockEntry() { return BlockDebug.INSTANCE; }
 
@@ -61,20 +65,53 @@ public enum GuiComponentDebug {
 	public static ContainerType<ContainerDebug> getContainerEntry() { return ContainerDebug.Type.INSTANCE; }
 
 	@OnlyIn(Dist.CLIENT)
-	public static <T extends Screen & IHasContainer<ContainerDebug>> void registerGuiFactory() {
-		// COMMENT compilation error without the cast
-		ScreenManager.registerFactory(ContainerDebug.Type.INSTANCE, (ScreenManager.IScreenFactory<ContainerDebug, T>) (container, inv, title) -> new UIDebug(title, container).getContainerScreen());
-	}
+	public static void registerGuiFactory() { ScreenManager.registerFactory(ContainerDebug.Type.INSTANCE, UIDebugFactory.INSTANCE); }
 }
 
-enum UIDebugFactory {
+@SuppressWarnings("HardcodedFileSeparator")
+@OnlyIn(Dist.CLIENT)
+enum UIDebugFactory
+		implements ScreenManager.IScreenFactory<ContainerDebug, UIAdapterScreen.WithContainer<UIInfrastructureMinecraft<UIViewComponentMinecraft<IShapeDescriptor<? extends Rectangle2D>, IUIComponentManager<IShapeDescriptor<? extends Rectangle2D>>>, UIDebugFactory.ViewModel, Binder>, ContainerDebug>> {
+	INSTANCE,
 	;
 
-	public static void getUI() {
-		new UIXMLDOMComponentParser<>();
+	private static final Logger LOGGER = LogManager.getLogger();
+	private static final IUIResourceParser<UIComponentManagerMinecraft, Document> PARSER =
+			new UIXMLDOMComponentParser<>(UIComponentManagerMinecraft.class);
+
+	static {
+		Try.run(() -> PARSER.parseResource(DocumentBuilderFactory
+				.newInstance()
+				.newDocumentBuilder()
+				.parse(ResourceUtilities.getResource(
+						new ResourceLocation(ConfigurationUI.getModId(), "ui/debug_ui.xml"))
+						.getInputStream())), LOGGER);
+		ThrowableCatcher.rethrow(true);
+	}
+
+	@Override
+	public UIAdapterScreen.WithContainer<UIInfrastructureMinecraft<UIViewComponentMinecraft<IShapeDescriptor<? extends Rectangle2D>, IUIComponentManager<IShapeDescriptor<? extends Rectangle2D>>>, ViewModel, Binder>, ContainerDebug> create(ContainerDebug container, PlayerInventory inv, ITextComponent title) {
+		return new UIAdapterScreen.WithContainer<>(UIComponentDebug.DISPLAY_NAME, new UIInfrastructureMinecraft<>(
+				new UIViewComponentMinecraft<>(UIDebugFactory.getUI()),
+				new ViewModel(),
+				new Binder()), container);
+	}
+
+	private static IUIComponentManager<IShapeDescriptor<? extends Rectangle2D>> getUI() { return PARSER.createUI(); }
+
+	@OnlyIn(Dist.CLIENT)
+	protected static final class ViewModel
+			extends UIViewModelMinecraft<Model> {
+		ViewModel() { super(new Model()); }
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	private static final class Model
+			extends UIModel {
 	}
 }
 
+/* TODO
 @OnlyIn(Dist.CLIENT)
 final class UIDebug extends GuiManagerWindows<ShapeDescriptor.Rectangular<Rectangle2D>, GuiManagers.Data<GuiManagers.Events, ContainerDebug>, ContainerDebug> {
 	private static final Logger LOGGER = LogManager.getLogger();
@@ -85,17 +122,17 @@ final class UIDebug extends GuiManagerWindows<ShapeDescriptor.Rectangular<Rectan
 				new Data<>(new Events(), UIDebug::getLogger, new GuiBackgroundDefault<>(ShapeDescriptor.Rectangular::new,
 						new UIComponentMinecraft.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger)), container));
 		{
-			$group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow<$group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Model, $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.View<?, ?>, $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Controller, IUIComponent> window1 = new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow<>();
-			window1.setModel(new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Model<>(window1));
-			window1.setView(new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.View<>(window1));
+			UIComponentMinecraftWindow<UIComponentMinecraftWindow.Model, UIComponentMinecraftWindow.View<?, ?>, UIComponentMinecraftWindow.Controller, IUIComponent> window1 = new UIComponentMinecraftWindow<>();
+			window1.setModel(new UIComponentMinecraftWindow.Model<>(window1));
+			window1.setView(new UIComponentMinecraftWindow.View<>(window1));
 			window1.getView().setShapeDescriptor(window1.getView().new ShapeDescriptor<>(
 					new Rectangle2D.Double(10, 10, 100, 100),
 					new UIAnchorSet<>(null)));
-			window1.setController(new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Controller<>(window1));
-			$group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow<?, ?, ?, ?> window1 = new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow<>(new ShapeDescriptor.Rectangular<>(
-					new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Data.ColorData()));
-			$group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow<?, ?> window2 = new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow<ShapeDescriptor.Rectangular<Rectangle2D.Double>, $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Data<UIComponentMinecraft.Events, $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Data.ColorData>>(new ShapeDescriptor.Rectangular<>(new Rectangle2D.Double(50, 50, 200, 200)),
-					new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new $group__.client.ui.mvvm.views.components.minecraft.common.UIComponentMinecraftWindow.Data.ColorData())) {
+			window1.setController(new UIComponentMinecraftWindow.Controller<>(window1));
+			UIComponentMinecraftWindow<?, ?, ?, ?> window1 = new UIComponentMinecraftWindow<>(new ShapeDescriptor.Rectangular<>(
+					new UIComponentMinecraftWindow.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new UIComponentMinecraftWindow.Data.ColorData()));
+			UIComponentMinecraftWindow<?, ?> window2 = new UIComponentMinecraftWindow<ShapeDescriptor.Rectangular<Rectangle2D.Double>, UIComponentMinecraftWindow.Data<UIComponentMinecraft.Events, UIComponentMinecraftWindow.Data.ColorData>>(new ShapeDescriptor.Rectangular<>(new Rectangle2D.Double(50, 50, 200, 200)),
+					new UIComponentMinecraftWindow.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new UIComponentMinecraftWindow.Data.ColorData())) {
 				protected final Rectangle2D current = new Rectangle2D.Double();
 				protected final Random random = new Random();
 				protected double tick = 0;
@@ -120,11 +157,11 @@ final class UIDebug extends GuiManagerWindows<ShapeDescriptor.Rectangular<Rectan
 				}
 			};
 			{
-				UIButtonComponentMinecraft<?, ?> button;
+				UIButtonComponentMinecraft button;
 				{
 					Random random = new Random();
 					// FIXME ellipse
-					button = new UIButtonComponentMinecraft<ShapeDescriptor.Rectangular<?>, UIButtonComponentMinecraft.Data<?, ?>>(new ShapeDescriptor.Rectangular<>(new Ellipse2D.Double(0, 0, 100, 100)),
+					button = new UIButtonComponentMinecraft(new ShapeDescriptor.Rectangular<>(new Ellipse2D.Double(0, 0, 100, 100)),
 							new UIButtonComponentMinecraft.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new UIButtonComponentMinecraft.Data.ColorData())) {
 						@Override
 						protected boolean onButtonKeyboardPressed(int key, int scanCode, int modifiers) { return key == GLFW.GLFW_KEY_ENTER; }
@@ -159,7 +196,7 @@ final class UIDebug extends GuiManagerWindows<ShapeDescriptor.Rectangular<Rectan
 	}
 
 	private static Logger getLogger() { return LOGGER; }
-}
+}*/
 
 final class ContainerDebug extends Container {
 	private final TileEntity tileEntity;
@@ -220,7 +257,7 @@ final class TileEntityDebug extends TileEntity implements INamedContainerProvide
 	public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) { return new ContainerDebug(id, requireNonNull(getWorld()), getPos()); }
 
 	@Override
-	public ITextComponent getDisplayName() { return GuiComponentDebug.DISPLAY_NAME; }
+	public ITextComponent getDisplayName() { return UIComponentDebug.DISPLAY_NAME; }
 
 	enum Type {
 		;

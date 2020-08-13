@@ -13,7 +13,7 @@ public interface IUIAnchor {
 	ImmutableMap<String, Function<? super IUIAnchor, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
 			ImmutableList.of("to", "fromSide", "toSide", "borderThickness"), OBJECT_VARIABLES));
 
-	IShapeDescriptor<?, ?> getTo();
+	IShapeDescriptor<?> getTo();
 
 	EnumUISide getFromSide();
 
@@ -21,7 +21,7 @@ public interface IUIAnchor {
 
 	double getBorderThickness();
 
-	void anchor(IShapeDescriptor<?, ?> from);
+	void anchor(IShapeDescriptor<?> from);
 
 	void onContainerAdded(IUIAnchorSet<?> container);
 

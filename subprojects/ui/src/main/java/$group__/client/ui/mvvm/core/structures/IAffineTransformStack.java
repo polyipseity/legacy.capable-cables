@@ -17,12 +17,11 @@ public interface IAffineTransformStack
 			ImmutableList.of("delegated"),
 			OBJECT_VARIABLES));
 
-	static void popMultiple(IAffineTransformStack stack, int times) {
+	static void popMultiple(final IAffineTransformStack stack, int times) {
 		for (; times > 0; --times)
 			stack.getDelegated().pop();
 	}
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	Stack<AffineTransform> getDelegated();
 
 	@SuppressWarnings("UnusedReturnValue")

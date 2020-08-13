@@ -5,16 +5,16 @@ import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.utilities.events.EnumEventHookStage;
 
 public abstract class EventUIShapeDescriptor extends EventUI {
-	protected final IShapeDescriptor<?, ?> shapeDescriptor;
+	protected final IShapeDescriptor<?> shapeDescriptor;
 
-	protected EventUIShapeDescriptor(EnumEventHookStage stage, IShapeDescriptor<?, ?> shapeDescriptor) {
+	protected EventUIShapeDescriptor(EnumEventHookStage stage, IShapeDescriptor<?> shapeDescriptor) {
 		super(stage);
 		this.shapeDescriptor = shapeDescriptor;
 	}
 
-	public IShapeDescriptor<?, ?> getShapeDescriptor() { return shapeDescriptor; }
+	public IShapeDescriptor<?> getShapeDescriptor() { return shapeDescriptor; }
 
 	public static class Modify extends EventUIShapeDescriptor {
-		public Modify(EnumEventHookStage stage, IShapeDescriptor<?, ?> shapeDescriptor) { super(stage, shapeDescriptor); }
+		public Modify(EnumEventHookStage stage, IShapeDescriptor<?> shapeDescriptor) { super(stage, shapeDescriptor); }
 	}
 }

@@ -7,12 +7,15 @@ import jdk.nashorn.internal.ir.annotations.Immutable;
 @Immutable
 public final class UIDataKeyboardKeyPress implements IUIDataKeyboardKeyPress, Cloneable {
 	protected final int key, scanCode, modifiers;
-	protected final long timestamp = System.currentTimeMillis();
+	protected final long timestamp;
 
-	public UIDataKeyboardKeyPress(int key, int scanCode, int modifiers) {
+	public UIDataKeyboardKeyPress(int key, int scanCode, int modifiers) { this(key, scanCode, modifiers, System.currentTimeMillis()); }
+
+	protected UIDataKeyboardKeyPress(int key, int scanCode, int modifiers, long timestamp) {
 		this.key = key;
 		this.scanCode = scanCode;
 		this.modifiers = modifiers;
+		this.timestamp = timestamp;
 	}
 
 	@Override
@@ -42,4 +45,7 @@ public final class UIDataKeyboardKeyPress implements IUIDataKeyboardKeyPress, Cl
 
 	@Override
 	public IUIDataKeyboardKeyPress recreate() { return new UIDataKeyboardKeyPress(getKey(), getScanCode(), getModifiers()); }
+
+	@Override
+	public UIDataKeyboardKeyPress copy() { return new UIDataKeyboardKeyPress(getKey(), getScanCode(), getModifiers(), getTimestampMills()); }
 }

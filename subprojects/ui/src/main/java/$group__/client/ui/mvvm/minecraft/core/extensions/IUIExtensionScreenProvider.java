@@ -13,7 +13,7 @@ import java.util.Set;
 @OnlyIn(Dist.CLIENT)
 public interface IUIExtensionScreenProvider
 		extends IUIExtension<ResourceLocation, IUIInfrastructure<?, ?, ?>> {
-	ResourceLocation KEY = new ResourceLocation(NamespaceUtilities.NAMESPACE_DEFAULT, AREA_UI + ".screen");
+	ResourceLocation KEY = new ResourceLocation(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, AREA_UI + ".screen");
 
 	Screen getScreen();
 

@@ -77,12 +77,13 @@ public enum UIEventUtilities {
 		;
 
 		static {
+			// TODO is defaulta action needed
 			/* SECTION DOM */
 			// COMMENT load
 			// COMMENT unload
 			// COMMENT abort
 			// COMMENT error
-			RegUIEvent.INSTANCE.register(IUIEvent.TYPE_SELECT, IUIEvent.class);
+			RegUIEvent.INSTANCE.register(IUIEvent.TYPE_SELECT, IUIEvent.class); // TODO implement
 			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_OUT_POST, IUIEventFocus.class);
 			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_IN_POST, IUIEventFocus.class);
 			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_IN_PRE, IUIEventFocus.class);
@@ -184,8 +185,7 @@ public enum UIEventUtilities {
 		}
 
 		public static boolean isEventValid(IUIEvent event) {
-			return Optional.ofNullable(event.getType())
-					.map(et -> INSTANCE.getDelegated().get(et))
+			return Optional.ofNullable(INSTANCE.getDelegated().get(event.getType()))
 					.map(RegistryObject::getValue)
 					.map(ec -> ec.isInstance(event))
 					.orElse(false);

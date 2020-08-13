@@ -53,6 +53,7 @@ import java.util.concurrent.ConcurrentMap;
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
 // TODO maybe make some utilities from here
+// TODO activation events
 @OnlyIn(Dist.CLIENT)
 public class UIAdapterScreen
 		<I extends IUIInfrastructureMinecraft<?, ?, ?>>
@@ -74,6 +75,7 @@ public class UIAdapterScreen
 	@Nullable
 	protected IUIEventTarget focus;
 
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public UIAdapterScreen(ITextComponent titleIn, I infrastructure, Set<Integer> closeKeys, Set<Integer> changeFocusKeys) {
 		super(titleIn);
 		this.infrastructure = infrastructure;
@@ -170,44 +172,12 @@ public class UIAdapterScreen
 	@Deprecated
 	public boolean handleComponentClicked(ITextComponent component) { return TextComponentUtilities.handleComponentClicked(this, component); }
 
-	@OnlyIn(Dist.CLIENT)
-	public static class WithContainer
-			<I extends IUIInfrastructureMinecraft<?, ?, ?>,
-					C extends Container>
-			extends UIAdapterScreen<I>
-			implements IHasContainer<C> {
-
-		protected final C container;
-
-		protected WithContainer(ITextComponent titleIn, I manager, C container) {
-			super(titleIn, manager);
-			this.container = container;
-			IExtensionContainer.addExtensionSafe(getInfrastructure(), new UIExtensionContainer(getContainer()));
-		}
-
-		@Override
-		public final C getContainer() { return container; }
-
-		@OnlyIn(Dist.CLIENT)
-		public static class UIExtensionContainer
-				extends IHasGenericClass.Impl<IUIInfrastructure<?, ?, ?>>
-				implements IUIExtensionContainerProvider {
-			public static final Registry.RegistryObject<IType<ResourceLocation, IUIExtensionContainerProvider, IUIInfrastructure<?, ?, ?>>> TYPE =
-					RegExtension.INSTANCE.registerApply(KEY, k -> new IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
-
-			protected final Container container;
-
-			public UIExtensionContainer(Container container) {
-				super(CastUtilities.castUnchecked(IUIInfrastructure.class)); // COMMENT class should not care about it
-				this.container = container;
-			}
-
-			@Override
-			public Container getContainer() { return container; }
-
-			@Override
-			public IType<? super ResourceLocation, ?, ? extends IUIInfrastructure<?, ?, ?>> getType() { return TYPE.getValue(); }
-		}
+	@Override
+	@Deprecated
+	protected void init() {
+		IUIInfrastructure.bindSafe(getInfrastructure());
+		setSize(width, height);
+		getInfrastructure().initialize();
 	}
 
 	@Override
@@ -224,46 +194,32 @@ public class UIAdapterScreen
 	@Deprecated
 	public List<? extends IGuiEventListener> children() { return ImmutableList.of(); }
 
-	@OnlyIn(Dist.CLIENT)
-	public static class UIExtensionScreen
-			extends IHasGenericClass.Impl<IUIInfrastructure<?, ?, ?>>
-			implements IUIExtensionScreenProvider {
-		public static final Registry.RegistryObject<IType<ResourceLocation, IUIExtensionScreenProvider, IUIInfrastructure<?, ?, ?>>> TYPE =
-				RegExtension.INSTANCE.registerApply(KEY, k -> new IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
-		protected final UIAdapterScreen<?> adapter;
-
-		public UIExtensionScreen(UIAdapterScreen<?> adapter) {
-			super(CastUtilities.castUnchecked(IUIInfrastructure.class)); // COMMENT class should not care about it
-			this.adapter = adapter;
-		}
-
-		@Override
-		public Screen getScreen() { return getAdapter(); }
-
-		@Override
-		public Set<Integer> getCloseKeys() { return getAdapter().getCloseKeys(); }
-
-		@Override
-		public Set<Integer> getChangeFocusKeys() { return getAdapter().getChangeFocusKeys(); }
-
-		@Override
-		public boolean isPaused() { return getAdapter().isPaused(); }
-
-		@Override
-		public void setPaused(boolean paused) { getAdapter().setPaused(paused); }
-
-		protected UIAdapterScreen<?> getAdapter() { return adapter; }
-
-		@Override
-		public IType<? super ResourceLocation, ?, ? extends IUIInfrastructure<?, ?, ?>> getType() { return TYPE.getValue(); }
+	@Override
+	@Deprecated
+	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+		// TODO double click
+		// TODO should implement prevent default?
+		Point2D cp = new Point2D.Double(mouseX, mouseY);
+		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
+		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(cp);
+		boolean ret = UIEventUtilities.dispatchEvent(addEventMouse(this, UIEventUtilities.Factory.createEventMouseDown(t, d)));
+		if (t.isFocusable())
+			setFocus(t);
+		return ret;
 	}
 
 	@Override
 	@Deprecated
-	protected void init() {
-		IUIInfrastructure.bindSafe(getInfrastructure());
-		setSize(width, height);
-		// COMMENT constructor is favored over initialize
+	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+		// TODO test if release works when multiple buttons are clicked
+		Point2D cp = new Point2D.Double(mouseX, mouseY);
+		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
+		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(cp);
+		return removeEventMouse(this, button).map(e ->
+				UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e, new Point2D.Double(mouseX, mouseY)))
+						| (t.equals(e.getTarget())
+						&& UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClick(e.getTarget(), d)) | setLastMouseClickData(d, e.getTarget())))
+				.orElse(false);
 	}
 
 	@Override
@@ -415,19 +371,44 @@ public class UIAdapterScreen
 		return false;
 	}
 
-	@Override
-	@Deprecated
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		// TODO double click
-		Point2D cp = new Point2D.Double(mouseX, mouseY);
-		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(cp);
-		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
-		boolean ret = UIEventUtilities.dispatchEvent(addEventMouse(this, UIEventUtilities.Factory.createEventMouseDown(t, d)))
-				| UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClick(t, d))
-				| setLastMouseClickData(d, t);
-		if (t.isFocusable())
-			setFocus(t);
-		return ret;
+	@OnlyIn(Dist.CLIENT)
+	public static class WithContainer
+			<I extends IUIInfrastructureMinecraft<?, ?, ?>,
+					C extends Container>
+			extends UIAdapterScreen<I>
+			implements IHasContainer<C> {
+
+		protected final C container;
+
+		public WithContainer(ITextComponent titleIn, I manager, C container) {
+			super(titleIn, manager);
+			this.container = container;
+			IExtensionContainer.addExtensionSafe(getInfrastructure(), new UIExtensionContainer(getContainer()));
+		}
+
+		@Override
+		public final C getContainer() { return container; }
+
+		@OnlyIn(Dist.CLIENT)
+		public static class UIExtensionContainer
+				extends IHasGenericClass.Impl<IUIInfrastructure<?, ?, ?>>
+				implements IUIExtensionContainerProvider {
+			public static final Registry.RegistryObject<IType<ResourceLocation, IUIExtensionContainerProvider, IUIInfrastructure<?, ?, ?>>> TYPE =
+					RegExtension.INSTANCE.registerApply(KEY, k -> new IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
+
+			protected final Container container;
+
+			public UIExtensionContainer(Container container) {
+				super(CastUtilities.castUnchecked(IUIInfrastructure.class)); // COMMENT class should not care about it
+				this.container = container;
+			}
+
+			@Override
+			public Container getContainer() { return container; }
+
+			@Override
+			public IType<? extends ResourceLocation, ?, ? extends IUIInfrastructure<?, ?, ?>> getType() { return TYPE.getValue(); }
+		}
 	}
 
 	protected static <E extends IUIEventMouse> E addEventMouse(UIAdapterScreen<?> self, E event) {
@@ -435,13 +416,38 @@ public class UIAdapterScreen
 		return event;
 	}
 
-	@Override
-	@Deprecated
-	public boolean mouseReleased(double mouseX, double mouseY, int button) {
-		// TODO test if release works when multiple buttons are clicked
-		return removeEventMouse(this, button).map(e ->
-				UIEventUtilities.dispatchEvent(
-						UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e, new Point2D.Double(mouseX, mouseY)))).orElse(false);
+	@OnlyIn(Dist.CLIENT)
+	public static class UIExtensionScreen
+			extends IHasGenericClass.Impl<IUIInfrastructure<?, ?, ?>>
+			implements IUIExtensionScreenProvider {
+		public static final Registry.RegistryObject<IType<ResourceLocation, IUIExtensionScreenProvider, IUIInfrastructure<?, ?, ?>>> TYPE =
+				RegExtension.INSTANCE.registerApply(KEY, k -> new IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
+		protected final UIAdapterScreen<?> adapter;
+
+		public UIExtensionScreen(UIAdapterScreen<?> adapter) {
+			super(CastUtilities.castUnchecked(IUIInfrastructure.class)); // COMMENT class should not care about it
+			this.adapter = adapter;
+		}
+
+		@Override
+		public Screen getScreen() { return getAdapter(); }
+
+		@Override
+		public Set<Integer> getCloseKeys() { return getAdapter().getCloseKeys(); }
+
+		@Override
+		public Set<Integer> getChangeFocusKeys() { return getAdapter().getChangeFocusKeys(); }
+
+		@Override
+		public boolean isPaused() { return getAdapter().isPaused(); }
+
+		@Override
+		public void setPaused(boolean paused) { getAdapter().setPaused(paused); }
+
+		protected UIAdapterScreen<?> getAdapter() { return adapter; }
+
+		@Override
+		public IType<? extends ResourceLocation, ?, ? extends IUIInfrastructure<?, ?, ?>> getType() { return TYPE.getValue(); }
 	}
 
 	@Override

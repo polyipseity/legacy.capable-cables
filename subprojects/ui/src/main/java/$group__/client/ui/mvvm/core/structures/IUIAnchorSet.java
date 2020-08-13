@@ -26,7 +26,7 @@ public interface IUIAnchorSet<A extends IUIAnchor> extends Consumer<Rectangle2D>
 
 	Map<EnumUISide, A> getAnchorsView();
 
-	IShapeDescriptor<?, ?> getFrom();
+	IShapeDescriptor<?> getFrom();
 
 	default boolean isEmpty() { return getAnchorsView().isEmpty(); }
 

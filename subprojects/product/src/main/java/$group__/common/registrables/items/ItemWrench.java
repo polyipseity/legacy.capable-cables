@@ -4,7 +4,6 @@ import $group__.common.registrables.items.groups.ItemGroupsThis;
 import $group__.common.registrables.utilities.RegistrableUtilities.BlockUtilities;
 import $group__.common.registrables.utilities.RegistrableUtilities.NBTUtilities;
 import $group__.common.registrables.utilities.RegistrableUtilities.RayTraceResultUtilities;
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
@@ -70,7 +69,7 @@ public class ItemWrench extends Item {
 				EntityRayTraceResult targetEntity = (EntityRayTraceResult) target;
 				return user != null && user.isSneaking() && tag.pickedUpEntity == null && tag.pickedUpBlock == null && targetEntity.getEntity() instanceof LivingEntity;
 			default:
-				throw BecauseOf.unexpected();
+				throw new InternalError();
 		}
 		return false;
 	}
@@ -134,7 +133,7 @@ public class ItemWrench extends Item {
 				entity.remove(false);
 				break;
 			default:
-				throw BecauseOf.unexpected();
+				throw new InternalError();
 		}
 		return true;
 	}
@@ -177,9 +176,8 @@ public class ItemWrench extends Item {
 		public Integer
 				pickedUpBlockState;
 
-
+		@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 		protected Tag(@Nullable CompoundNBT tag) { deserializeNBT(tag); }
-
 
 		@Override
 		@Nullable

@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public abstract class UIComponentManager<SD extends IShapeDescriptor<?, ?>>
+public abstract class UIComponentManager<SD extends IShapeDescriptor<?>>
 		extends UIComponentContainer
 		implements IUIComponentManager<SD> {
 	public UIComponentManager(Map<String, IUIPropertyMappingValue> propertyMapping) { super(propertyMapping); }
@@ -114,7 +114,7 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?, ?>>
 									}
 								}));
 
-		private static ResourceLocation generateKey(String name) { return new ResourceLocation(NamespaceUtilities.NAMESPACE_DEFAULT, "manager." + name); }
+		private static ResourceLocation generateKey(@SuppressWarnings("SameParameterValue") String name) { return new ResourceLocation(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, "manager." + name); }
 	}
 
 	@Override
@@ -126,6 +126,4 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?, ?>>
 		IAffineTransformStack.popMultiple(stack, popTimes.get());
 		return path.get(path.size() - 1);
 	}
-
-
 }

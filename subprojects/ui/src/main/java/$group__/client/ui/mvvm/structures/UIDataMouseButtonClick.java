@@ -10,13 +10,16 @@ import java.awt.geom.Point2D;
 public final class UIDataMouseButtonClick implements IUIDataMouseButtonClick {
 	protected final Point2D cursorPosition;
 	protected final int button;
-	protected final long timestamp = System.currentTimeMillis();
+	protected final long timestamp;
 
 	public UIDataMouseButtonClick(Point2D cursorPosition) { this(cursorPosition, MOUSE_BUTTON_NULL); }
 
-	public UIDataMouseButtonClick(Point2D cursorPosition, int button) {
+	public UIDataMouseButtonClick(Point2D cursorPosition, int button) { this(cursorPosition, button, System.currentTimeMillis()); }
+
+	protected UIDataMouseButtonClick(Point2D cursorPosition, int button, long timestamp) {
 		this.cursorPosition = (Point2D) cursorPosition.clone();
 		this.button = button;
+		this.timestamp = timestamp;
 	}
 
 	@Override
@@ -42,4 +45,7 @@ public final class UIDataMouseButtonClick implements IUIDataMouseButtonClick {
 
 	@Override
 	public IUIDataMouseButtonClick recreate() { return new UIDataMouseButtonClick(getCursorPosition(), getButton()); }
+
+	@Override
+	public UIDataMouseButtonClick copy() { return new UIDataMouseButtonClick(getCursorPosition(), getButton(), getTimestampMills()); }
 }

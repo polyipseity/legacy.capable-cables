@@ -9,7 +9,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import java.awt.geom.Point2D;
 
 @OnlyIn(Dist.CLIENT)
-public interface IUIViewMinecraft<SD extends IShapeDescriptor<?, ?>>
+public interface IUIViewMinecraft<SD extends IShapeDescriptor<?>>
 		extends IUIView<SD>, IUICommonMinecraft {
 	void render(Point2D cursorPosition, double partialTicks);
 }

@@ -5,4 +5,4 @@ import $group__.utilities.extensions.IExtensionContainer;
 import net.minecraft.util.ResourceLocation;
 
 public interface IUIModel
-		extends IExtensionContainer<ResourceLocation, IUIExtension<? extends IUIModel>> {}
+		extends IExtensionContainer<ResourceLocation, IUIExtension<ResourceLocation, ? super IUIModel>> {}

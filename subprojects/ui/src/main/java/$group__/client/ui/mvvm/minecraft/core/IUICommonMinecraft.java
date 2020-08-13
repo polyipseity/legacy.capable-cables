@@ -7,6 +7,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public interface IUICommonMinecraft
 		extends IUICommon {
+	void initialize();
+
 	void tick();
 
 	void removed();

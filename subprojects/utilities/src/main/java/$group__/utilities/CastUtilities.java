@@ -1,8 +1,5 @@
 package $group__.utilities;
 
-import $group__.utilities.specific.ThrowableUtilities.Try;
-import org.apache.logging.log4j.Logger;
-
 import javax.annotation.Nullable;
 import java.util.Optional;
 
@@ -15,5 +12,9 @@ public enum CastUtilities {
 	@Nullable
 	public static <T> T castUncheckedNullable(@Nullable Object obj) { return (T) obj; }
 
-	public static <T> Optional<T> castChecked(Class<T> clazz, @Nullable Object obj, @Nullable Logger logger) { return Try.call(() -> clazz.cast(obj), logger); }
+	public static <T> Optional<T> castChecked(Class<T> clazz, @Nullable Object obj) {
+		if (clazz.isInstance(obj))
+			return Optional.of(clazz.cast(obj));
+		return Optional.empty();
+	}
 }

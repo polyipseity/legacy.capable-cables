@@ -15,7 +15,7 @@ import java.awt.geom.Point2D;
 import java.lang.ref.WeakReference;
 import java.util.Optional;
 
-public class UIViewComponent<SD extends IShapeDescriptor<?, ?>, M extends IUIComponentManager<? extends SD>>
+public class UIViewComponent<SD extends IShapeDescriptor<?>, M extends IUIComponentManager<? extends SD>>
 		extends UIView<SD>
 		implements IUIViewComponent<SD, M> {
 	protected final M manager;

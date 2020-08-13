@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface UIProperty {
+public @interface UIMethod {
 	String value();
 	// TODO make this annotation do something?
 }

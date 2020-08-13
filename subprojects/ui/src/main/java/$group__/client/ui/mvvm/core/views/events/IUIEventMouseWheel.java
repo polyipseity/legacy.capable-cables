@@ -5,7 +5,7 @@ import net.minecraft.util.ResourceLocation;
 
 public interface IUIEventMouseWheel extends IUIEventMouse {
 	String
-			TYPE_WHEEL_STRING = NamespaceUtilities.NAMESPACE_DEFAULT_PREFIX + "wheel";
+			TYPE_WHEEL_STRING = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "wheel";
 	ResourceLocation
 			TYPE_WHEEL = new ResourceLocation(TYPE_WHEEL_STRING);
 

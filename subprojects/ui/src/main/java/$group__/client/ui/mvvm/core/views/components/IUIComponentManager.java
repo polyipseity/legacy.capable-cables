@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
-public interface IUIComponentManager<SD extends IShapeDescriptor<?, ?>>
+public interface IUIComponentManager<SD extends IShapeDescriptor<?>>
 		extends IUIComponent, IUIReshapeExplicitly<SD> {
 	@SuppressWarnings("ObjectAllocationInLoop")
 	static List<IUIComponent> getComponentPathAtPointAndTransformStack(IUIComponent self, final IAffineTransformStack stack, Point2D point, final AtomicInteger popTimes) {

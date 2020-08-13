@@ -20,7 +20,7 @@ import java.util.function.Function;
 
 public interface IUIExtensionCache
 		extends IUIExtension<ResourceLocation, IExtensionContainer<ResourceLocation, ?>> {
-	ResourceLocation KEY = new ResourceLocation(NamespaceUtilities.NAMESPACE_DEFAULT, AREA_UI + ".cache");
+	ResourceLocation KEY = new ResourceLocation(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, AREA_UI + ".cache");
 
 	Cache<ResourceLocation, Object> getDelegated();
 
@@ -41,6 +41,7 @@ public interface IUIExtensionCache
 			protected final BiConsumer<? super IType<V, I>, ? super I> invalidator;
 			protected final Object eventListener;
 
+			@SuppressWarnings("ThisEscapedInObjectConstruction")
 			public Impl(ResourceLocation key,
 			            BiFunction<? super IType<V, I>, ? super I, ? extends Optional<? extends V>> getter,
 			            BiConsumer<? super IType<V, I>, ? super I> invalidator,
