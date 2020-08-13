@@ -48,19 +48,22 @@ public enum DynamicUtilities {
 
 	private static final Logger LOGGER = LogManager.getLogger(DynamicUtilities.class);
 
+	private static final int TRUSTED_LOOKUP_MODES = 15;
 
 	static {
 		{
 			Optional<Lookup> implLookup = Optional.empty();
 			for (Field f : Lookup.class.getDeclaredFields()) {
-				Try.run(() -> f.setAccessible(true), LOGGER);
-				ThrowableCatcher.acceptIfCaught(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("impl lookup field", f, Lookup.class, true), t)));
+				if (Lookup.class.equals(f.getType())) {
+					Try.run(() -> f.setAccessible(true), LOGGER);
+					ThrowableCatcher.acceptIfCaught(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("impl lookup field", f, Lookup.class, true), t)));
 
-				implLookup = Try.call(() -> (Lookup) PUBLIC_LOOKUP.unreflectGetter(f).invokeExact(), LOGGER).filter(l -> l.lookupModes() == 0);
+					implLookup = Try.call(() -> (Lookup) PUBLIC_LOOKUP.unreflectGetter(f).invokeExact(), LOGGER).filter(l -> l.lookupModes() == TRUSTED_LOOKUP_MODES);
 
-				Try.run(() -> f.setAccessible(false), LOGGER);
-				if (implLookup.isPresent())
-					break;
+					Try.run(() -> f.setAccessible(false), LOGGER);
+					if (implLookup.isPresent())
+						break;
+				}
 			}
 			IMPL_LOOKUP = implLookup.orElse(PUBLIC_LOOKUP);
 		}
@@ -68,7 +71,7 @@ public enum DynamicUtilities {
 		{
 			Optional<Unsafe> unsafe = Optional.empty();
 			for (Field f : Unsafe.class.getDeclaredFields()) {
-				if (f.getType() == Unsafe.class) {
+				if (Unsafe.class.equals(f.getType())) {
 					unsafe = Try.call(() -> (Unsafe) IMPL_LOOKUP.unreflectGetter(f).invokeExact(), LOGGER);
 					break;
 				}
@@ -200,8 +203,6 @@ public enum DynamicUtilities {
 
 	private static final class SecurityManagerReflections extends SecurityManager {
 		private static final SecurityManagerReflections INSTANCE = new SecurityManagerReflections();
-
-		private SecurityManagerReflections() {}
 
 		@Override
 		protected Class<?>[] getClassContext() {
