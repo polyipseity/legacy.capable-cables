@@ -19,6 +19,7 @@ import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.specific.ThrowableUtilities.Try;
 import $group__.utilities.structures.NodeListList;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -170,6 +171,7 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 
 		protected Map<String, IUIPropertyMappingValue> getPropertyMapping() { return propertyMapping; }
 
+		@SuppressWarnings("UnstableApiUsage")
 		public IUIComponent createComponent() throws Throwable {
 			MethodHandle constructor = DynamicUtilities.IMPL_LOOKUP.findConstructor(Class.forName(getClassName()), MethodType.methodType(void.class, Map.class));
 			IUIComponent ret = IUIComponent.createComponent(() -> Try.call(() -> (IUIComponent) constructor.invoke(getPropertyMapping()), LOGGER).orElseThrow(ThrowableCatcher::rethrow));
@@ -182,6 +184,10 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 				getChildren().stream().sequential()
 						.map(c -> Try.call(c::createComponent, LOGGER).orElseThrow(ThrowableCatcher::rethrow))
 						.forEachOrdered(c -> container.addChildren(ImmutableSet.of(c)));
+				container.addChildren(getChildren().stream().map(c ->
+						Try.call(c::createComponent, LOGGER)
+								.orElseThrow(ThrowableCatcher::rethrow))
+						.collect(ImmutableList.toImmutableList()));
 			}
 			return ret;
 		}

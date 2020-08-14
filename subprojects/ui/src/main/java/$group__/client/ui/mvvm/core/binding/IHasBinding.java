@@ -4,13 +4,14 @@ import $group__.client.ui.mvvm.binding.BindingField;
 import $group__.client.ui.mvvm.binding.ObservableField;
 import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
 import $group__.client.ui.utilities.BindingUtilities;
-import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.core.Observer;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -36,5 +37,5 @@ public interface IHasBinding {
 
 	default Iterable<IBindingMethod<?>> getBindingMethods() { return BindingUtilities.getBindingMethods(this); }
 
-	ObservableSource<IBinderAction> getBinderNotifier();
+	Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber();
 }

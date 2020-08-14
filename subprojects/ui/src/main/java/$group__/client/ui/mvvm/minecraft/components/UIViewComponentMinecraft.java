@@ -13,7 +13,6 @@ import $group__.utilities.CastUtilities;
 import $group__.utilities.TreeUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventUtilities;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -41,12 +40,13 @@ public class UIViewComponentMinecraft<SD extends IShapeDescriptor<?>, M extends 
 										cc.crop(stack, cropMethod, true, cursorPosition, partialTicks);
 										cc.render(stack, cursorPosition, partialTicks, true);
 									});
+									stack.push();
 									return CastUtilities.castChecked(IUIComponentContainer.class, c)
-											.map(cp -> {
+											.<Iterable<IUIComponent>>map(cp -> {
 												cp.transformChildren(stack);
 												return cp.getChildrenView();
 											})
-											.orElseGet(ImmutableList::of);
+											.orElseGet(ImmutableSet::of);
 								}
 								return ImmutableSet.of();
 							},
@@ -76,12 +76,13 @@ public class UIViewComponentMinecraft<SD extends IShapeDescriptor<?>, M extends 
 				c -> {
 					CastUtilities.castChecked(IUIComponentMinecraft.class, c).ifPresent(cc ->
 							cc.initialize(stack));
+					stack.push();
 					return CastUtilities.castChecked(IUIComponentContainer.class, c)
-							.map(cp -> {
+							.<Iterable<IUIComponent>>map(cp -> {
 								cp.transformChildren(stack);
 								return cp.getChildrenView();
 							})
-							.orElseGet(ImmutableList::of);
+							.orElseGet(ImmutableSet::of);
 				},
 				(p, c) -> {
 					stack.getDelegated().pop();
@@ -99,12 +100,13 @@ public class UIViewComponentMinecraft<SD extends IShapeDescriptor<?>, M extends 
 					if (c.isActive()) {
 						CastUtilities.castChecked(IUIComponentMinecraft.class, c).ifPresent(cc ->
 								cc.tick(stack));
+						stack.push();
 						return CastUtilities.castChecked(IUIComponentContainer.class, c)
-								.map(cp -> {
+								.<Iterable<IUIComponent>>map(cp -> {
 									cp.transformChildren(stack);
 									return cp.getChildrenView();
 								})
-								.orElseGet(ImmutableList::of);
+								.orElseGet(ImmutableSet::of);
 					}
 					return ImmutableSet.of();
 				},
@@ -124,12 +126,13 @@ public class UIViewComponentMinecraft<SD extends IShapeDescriptor<?>, M extends 
 				c -> {
 					CastUtilities.castChecked(IUIComponentMinecraft.class, c).ifPresent(cc ->
 							cc.removed(stack));
+					stack.push();
 					return CastUtilities.castChecked(IUIComponentContainer.class, c)
-							.map(cp -> {
+							.<Iterable<IUIComponent>>map(cp -> {
 								cp.transformChildren(stack);
 								return cp.getChildrenView();
 							})
-							.orElseGet(ImmutableList::of);
+							.orElseGet(ImmutableSet::of);
 				},
 				(p, c) -> {
 					stack.getDelegated().pop();

@@ -9,7 +9,7 @@ import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.specific.MapUtilities;
 import com.google.common.collect.ImmutableMap;
-import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.subjects.Subject;
 import io.reactivex.rxjava3.subjects.UnicastSubject;
 import net.minecraft.util.ResourceLocation;
@@ -20,6 +20,8 @@ import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
@@ -41,7 +43,7 @@ public class UIViewModel<M extends IUIModel>
 	public void setModel(M model) { this.model = model; }
 
 	@Override
-	public ObservableSource<IBinderAction> getBinderNotifier() { return getBinderNotifierSubject(); }
+	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() { return s -> getBinderNotifierSubject().subscribe(s.get()); }
 
 	protected Subject<IBinderAction> getBinderNotifierSubject() { return binderNotifierSubject; }
 

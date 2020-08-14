@@ -22,7 +22,7 @@ import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.specific.MapUtilities;
 import com.google.common.collect.ImmutableMap;
-import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.subjects.Subject;
 import io.reactivex.rxjava3.subjects.UnicastSubject;
 import net.minecraft.util.ResourceLocation;
@@ -35,6 +35,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
@@ -42,8 +44,8 @@ public class UIComponent
 		extends UIEventTarget
 		implements IUIComponent {
 	public static final String
-			PROPERTY_VISIBLE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT + "visible",
-			PROPERTY_ACTIVE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT + "active";
+			PROPERTY_VISIBLE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "component.visible",
+			PROPERTY_ACTIVE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "component.active";
 	private static final Rectangle2D SHAPE_PLACEHOLDER = new Rectangle2D.Double(0, 0, 1, 1);
 	protected final Map<String, IUIPropertyMappingValue> propertyMapping;
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
@@ -118,7 +120,7 @@ public class UIComponent
 	protected ConcurrentMap<ResourceLocation, IUIExtension<? extends ResourceLocation, ? super IUIComponent>> getExtensions() { return extensions; }
 
 	@Override
-	public ObservableSource<IBinderAction> getBinderNotifier() { return getBinderNotifierSubject(); }
+	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() { return s -> getBinderNotifierSubject().subscribe(s.get()); }
 
 	protected Subject<IBinderAction> getBinderNotifierSubject() { return binderNotifierSubject; }
 

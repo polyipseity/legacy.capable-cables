@@ -8,12 +8,14 @@ import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
 import $group__.client.ui.mvvm.core.views.components.IUIViewComponent;
 import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;
 import $group__.client.ui.mvvm.views.UIView;
-import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.core.Observer;
 
 import javax.annotation.Nullable;
 import java.awt.geom.Point2D;
 import java.lang.ref.WeakReference;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class UIViewComponent<SD extends IShapeDescriptor<?>, M extends IUIComponentManager<? extends SD>>
 		extends UIView<SD>
@@ -39,10 +41,10 @@ public class UIViewComponent<SD extends IShapeDescriptor<?>, M extends IUICompon
 	public SD getShapeDescriptor() { return getManager().getShapeDescriptor(); }
 
 	@Override
-	public ObservableSource<IBinderAction> getBinderNotifier() {
-		return o -> {
-			super.getBinderNotifier().subscribe(o);
-			getManager().getBinderNotifier().subscribe(o);
+	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() {
+		return s -> {
+			super.getBinderSubscriber().accept(s);
+			getManager().getBinderSubscriber().accept(s);
 		};
 	}
 

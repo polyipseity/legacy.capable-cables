@@ -11,6 +11,7 @@ import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.specific.MapUtilities;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraft.util.ResourceLocation;
@@ -20,6 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Supplier;
 
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
@@ -88,12 +90,13 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 		getBinder().bindFields(Iterables.concat(getView().getBindingFields(), getViewModel().getBindingFields()));
 		getBinder().bindMethods(Iterables.concat(getView().getBindingMethods(), getViewModel().getBindingMethods()));
 
-		DisposableObserver<IBinderAction> d = IBinder.createBinderActionObserver(getBinder());
-		getBinderDisposables().add(d);
-		getView().getBinderNotifier().subscribe(d);
-		d = IBinder.createBinderActionObserver(getBinder());
-		getBinderDisposables().add(d);
-		getViewModel().getBinderNotifier().subscribe(d);
+		Supplier<? extends Observer<? super IBinderAction>> s = () -> {
+			DisposableObserver<IBinderAction> d = IBinder.createBinderActionObserver(getBinder());
+			getBinderDisposables().add(d);
+			return d;
+		};
+		getView().getBinderSubscriber().accept(s);
+		getViewModel().getBinderSubscriber().accept(s);
 
 		setBound(true);
 	}

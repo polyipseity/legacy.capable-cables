@@ -41,13 +41,13 @@ import java.util.Map;
 public class UIComponentMinecraftButton
 		extends UIComponent
 		implements IUIComponentMinecraft {
-	public static final String PROPERTY_COLOR_BASE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT + "button.colors.base";
-	public static final String PROPERTY_COLOR_BASE_BORDER = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT + "button.colors.base.border";
-	public static final String PROPERTY_COLOR_HOVERING = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT + "button.colors.hovering";
-	public static final String PROPERTY_COLOR_HOVERING_BORDER = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT + "button.colors.hovering.border";
-	public static final String PROPERTY_COLOR_PRESSED = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT + "button.colors.pressed";
-	public static final String PROPERTY_COLOR_PRESSED_BORDER = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT + "button.colors.pressed.border";
-	public static final String METHOD_ON_ACTIVATED = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT + "button.methods.onActivated";
+	public static final String PROPERTY_COLOR_BASE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "button.colors.base";
+	public static final String PROPERTY_COLOR_BASE_BORDER = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "button.colors.base.border";
+	public static final String PROPERTY_COLOR_HOVERING = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "button.colors.hovering";
+	public static final String PROPERTY_COLOR_HOVERING_BORDER = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "button.colors.hovering.border";
+	public static final String PROPERTY_COLOR_PRESSED = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "button.colors.pressed";
+	public static final String PROPERTY_COLOR_PRESSED_BORDER = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "button.colors.pressed.border";
+	public static final String METHOD_ON_ACTIVATED = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "button.methods.activated";
 
 	@UIProperty(PROPERTY_COLOR_BASE)
 	protected final IBindingField<Color> colorBase;

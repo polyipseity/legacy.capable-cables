@@ -13,7 +13,7 @@ import $group__.utilities.events.EventUtilities;
 import $group__.utilities.specific.ThrowableUtilities;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.core.Observer;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class UIComponentContainer
 		extends UIComponent
@@ -56,7 +58,7 @@ public class UIComponentContainer
 						List<IUIComponent> childrenMoved = getChildren().subList(index + 1, getChildren().size());
 						for (int i = 0; i < childrenMoved.size(); i++)
 							childrenMoved.get(i).onIndexMove(index + i, index + i + 1);
-						onParentChange(null, this);
+						component.onParentChange(null, this);
 						return true;
 					},
 					new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.PRE, this, null, this),
@@ -79,7 +81,7 @@ public class UIComponentContainer
 							List<IUIComponent> childrenMoved = getChildren().subList(index, getChildren().size());
 							for (int i = 0; i < childrenMoved.size(); i++)
 								childrenMoved.get(i).onIndexMove(index + i + 1, index + i);
-							onParentChange(this, null);
+							component.onParentChange(this, null);
 							return true;
 						},
 						new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.PRE, this, this, null),
@@ -109,7 +111,7 @@ public class UIComponentContainer
 						for (int i = 0; i < childrenMoved.size(); i++)
 							childrenMoved.get(i).onIndexMove(index + i, index + i + 1);
 					}
-					onIndexMove(previous, index);
+					component.onIndexMove(previous, index);
 					return true;
 				},
 				new EventUIComponentHierarchyChanged.Index(EnumEventHookStage.PRE, this, previous, index),
@@ -137,11 +139,11 @@ public class UIComponentContainer
 	protected List<IUIComponent> getChildren() { return children; }
 
 	@Override
-	public ObservableSource<IBinderAction> getBinderNotifier() {
-		return o -> {
-			super.getBinderNotifier().subscribe(o);
+	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() {
+		return s -> {
+			super.getBinderSubscriber().accept(s);
 			getChildren().forEach(c ->
-					c.getBinderNotifier().subscribe(o));
+					c.getBinderSubscriber().accept(s));
 		};
 	}
 }

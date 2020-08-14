@@ -70,9 +70,9 @@ public class UIComponentMinecraftWindow
 		extends UIComponentContainer implements IUIReshapeExplicitly<ShapeDescriptor.Rectangular<?>>, IUIComponentMinecraft {
 	private static final Logger LOGGER = LogManager.getLogger();
 	public static final String
-			PROPERTY_COLOR_BACKGROUND = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT + "window.colors.background",
-			PROPERTY_COLOR_BORDER = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT + "window.colors.border",
-			PROPERTY_COLOR_DRAGGING = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT + "window.colors.dragging";
+			PROPERTY_COLOR_BACKGROUND = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "window.colors.background",
+			PROPERTY_COLOR_BORDER = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "window.colors.border",
+			PROPERTY_COLOR_DRAGGING = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "window.colors.dragging";
 	// TODO make window scroll bars, maybe create a new component, and embed into this
 	// TODO make value not hardcoded through themes
 	public static final int

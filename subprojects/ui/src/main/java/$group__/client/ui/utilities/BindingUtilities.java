@@ -17,10 +17,10 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 public enum BindingUtilities {
 	;
@@ -39,16 +39,16 @@ public enum BindingUtilities {
 			@Nullable Function<T, Iterable<IBindingField<?>>> ret = CastUtilities.castUncheckedNullable(BINDING_FIELDS_MAP.get(clazz)); // COMMENT should be safe
 			if (ret != null)
 				return ret;
-			Stream<Field> fs = DynamicUtilities.getSuperclasses(clazz).stream().unordered()
-					.flatMap(c -> Sets.newHashSet(c.getDeclaredFields()).stream());
-			ImmutableSet<Function<T, Optional<IBindingField<?>>>> b = fs.distinct()
+			Collection<Field> fs = DynamicUtilities.getSuperclasses(clazz).stream().unordered()
+					.flatMap(c -> Sets.newHashSet(c.getDeclaredFields()).stream()).collect(ImmutableSet.toImmutableSet());
+			ImmutableSet<Function<T, Optional<IBindingField<?>>>> b = fs.stream().unordered()
 					.filter(f -> !Modifier.isStatic(f.getModifiers()) && IBindingField.class.isAssignableFrom(f.getType()))
 					.map(f -> Try.call(() -> DynamicUtilities.IMPL_LOOKUP.unreflectGetter(f), LOGGER))
 					.filter(Optional::isPresent)
 					.map(m -> (Function<T, Optional<IBindingField<?>>>) o ->
 							Try.call(() -> (IBindingField<?>) m.get().invoke(o), LOGGER))
 					.collect(ImmutableSet.toImmutableSet());
-			ImmutableSet<Function<T, Optional<IHasBinding>>> c = fs
+			ImmutableSet<Function<T, Optional<IHasBinding>>> c = fs.stream().unordered()
 					.filter(f -> !Modifier.isStatic(f.getModifiers()) && IHasBinding.class.isAssignableFrom(f.getType()))
 					.map(f -> Try.call(() -> DynamicUtilities.IMPL_LOOKUP.unreflectGetter(f), LOGGER))
 					.filter(Optional::isPresent)
@@ -78,16 +78,16 @@ public enum BindingUtilities {
 			@Nullable Function<T, Iterable<IBindingMethod<?>>> ret = CastUtilities.castUncheckedNullable(BINDING_METHODS_MAP.get(clazz)); // COMMENT should be safe
 			if (ret != null)
 				return ret;
-			Stream<Field> fs = DynamicUtilities.getSuperclasses(clazz).stream().unordered()
-					.flatMap(c -> Sets.newHashSet(c.getDeclaredFields()).stream());
-			ImmutableSet<Function<T, Optional<IBindingMethod<?>>>> b = fs.distinct()
+			Collection<Field> fs = DynamicUtilities.getSuperclasses(clazz).stream().unordered()
+					.flatMap(c -> Sets.newHashSet(c.getDeclaredFields()).stream()).collect(ImmutableSet.toImmutableSet());
+			ImmutableSet<Function<T, Optional<IBindingMethod<?>>>> b = fs.stream().unordered()
 					.filter(f -> !Modifier.isStatic(f.getModifiers()) && IBindingMethod.class.isAssignableFrom(f.getType()))
 					.map(f -> Try.call(() -> DynamicUtilities.IMPL_LOOKUP.unreflectGetter(f), LOGGER))
 					.filter(Optional::isPresent)
 					.map(m -> (Function<T, Optional<IBindingMethod<?>>>) o ->
 							Try.call(() -> (IBindingMethod<?>) m.get().invoke(o), LOGGER))
 					.collect(ImmutableSet.toImmutableSet());
-			ImmutableSet<Function<T, Optional<IHasBinding>>> c = fs
+			ImmutableSet<Function<T, Optional<IHasBinding>>> c = fs.stream().unordered()
 					.filter(f -> !Modifier.isStatic(f.getModifiers()) && IHasBinding.class.isAssignableFrom(f.getType()))
 					.map(f -> Try.call(() -> DynamicUtilities.IMPL_LOOKUP.unreflectGetter(f), LOGGER))
 					.filter(Optional::isPresent)
