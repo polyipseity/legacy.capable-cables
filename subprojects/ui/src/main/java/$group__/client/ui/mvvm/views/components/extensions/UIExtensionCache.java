@@ -60,7 +60,8 @@ public class UIExtensionCache
 								(t, i) ->
 										TYPE.getValue().get(i).flatMap(cache -> Try.call(() -> cache.getDelegated()
 												.get(t.getKey(), () ->
-														IUIComponent.getYoungestParentInstanceOf(i, IUIComponentManager.class)), LOGGER)
+														IUIComponent.getYoungestParentInstanceOf(i, IUIComponentManager.class)
+																.orElseThrow(IllegalStateException::new)), LOGGER)
 												.map(CastUtilities::castUnchecked)),
 								(t, i) -> {
 									IType.invalidate(i, t.getKey());
