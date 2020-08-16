@@ -18,9 +18,13 @@ buildscript {
 
 	dependencies {
 		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
-		classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.4'
 	}
 	// COMMENT Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+}
+
+plugins {
+	id 'com.github.johnrengelman.shadow' version '4.0.4' apply false
+	id 'io.freefair.lombok' version '2.9.5' apply false
 }
 
 configurations {
@@ -31,6 +35,8 @@ configurations {
 }
 
 allprojects {
+	apply plugin: 'io.freefair.lombok'
+
 	ext {
 		utilitiesDir = "$rootDir${separator}gradle${separator}utilities".toString()
 		modulesDir = "$utilitiesDir${separator}modules".toString()

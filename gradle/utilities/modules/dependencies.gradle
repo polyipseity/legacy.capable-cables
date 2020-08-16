@@ -4,10 +4,8 @@
 
 import static java.io.File.separator
 
-
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['stringToStringMap', 'evaluateGString'])
-
 
 // COMMENT append
 afterEvaluate {
@@ -31,8 +29,8 @@ afterEvaluate {
 		// CODE deobfProvided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
 
 		// COMMENT for more info...
-		// COMMENT http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-		// COMMENT http://www.gradle.org/docs/current/userguide/dependency_management.html
+		// COMMENT https://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
+		// COMMENT https://www.gradle.org/docs/current/userguide/dependency_management.html
 
 		/* COMMENT
 		'compile' is superseded by 'implementation'.

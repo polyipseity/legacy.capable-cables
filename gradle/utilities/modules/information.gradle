@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////
 
 archivesBaseName = project.name
-group = group_ // COMMENT http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group = group_ // COMMENT https://maven.apache.org/guides/mini/guide-naming-conventions.html
 description = description_
 
 // COMMENT Need this here so eclipse task generates correctly.
