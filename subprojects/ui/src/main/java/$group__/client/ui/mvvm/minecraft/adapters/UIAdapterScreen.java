@@ -70,6 +70,7 @@ public class UIAdapterScreen
 	protected boolean paused = false;
 	@Nullable
 	protected IUIEventTarget targetBeingHoveredByMouse = null;
+	protected ITextComponent title;
 
 	public UIAdapterScreen(ITextComponent titleIn, I infrastructure) { this(titleIn, infrastructure, ImmutableSet.of(GLFW.GLFW_KEY_ESCAPE), ImmutableSet.of(GLFW.GLFW_KEY_TAB)); }
 
@@ -78,11 +79,17 @@ public class UIAdapterScreen
 
 	public UIAdapterScreen(ITextComponent titleIn, I infrastructure, Set<Integer> closeKeys, Set<Integer> changeFocusKeys) {
 		super(titleIn);
+		this.title = titleIn;
 		this.infrastructure = infrastructure;
 		this.closeKeys = new HashSet<>(closeKeys);
 		this.changeFocusKeys = new HashSet<>(changeFocusKeys);
 		IExtensionContainer.addExtensionSafe(infrastructure, new UIExtensionScreen());
 	}
+
+	@Override
+	public ITextComponent getTitle() { return title; }
+
+	public void setTitle(ITextComponent title) { this.title = title; }
 
 	@Override
 	@Deprecated
@@ -437,10 +444,10 @@ public class UIAdapterScreen
 		public Set<Integer> getChangeFocusKeys() { return UIAdapterScreen.this.getChangeFocusKeys(); }
 
 		@Override
-		public boolean isPaused() { return UIAdapterScreen.this.isPaused(); }
+		public void setPaused(boolean paused) { UIAdapterScreen.this.setPaused(paused); }
 
 		@Override
-		public void setPaused(boolean paused) { UIAdapterScreen.this.setPaused(paused); }
+		public void setTitle(ITextComponent title) { UIAdapterScreen.this.setTitle(title); }
 
 		@Override
 		public IType<? extends ResourceLocation, ?, ? extends IUIInfrastructure<?, ?, ?>> getType() { return IUIExtensionScreenProvider.TYPE.getValue(); }

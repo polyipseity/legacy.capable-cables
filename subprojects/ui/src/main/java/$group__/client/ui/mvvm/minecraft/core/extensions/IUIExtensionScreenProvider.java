@@ -7,6 +7,7 @@ import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.structures.Registry;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -25,7 +26,7 @@ public interface IUIExtensionScreenProvider
 
 	Set<Integer> getChangeFocusKeys();
 
-	boolean isPaused();
-
 	void setPaused(boolean paused);
+
+	void setTitle(ITextComponent title);
 }
