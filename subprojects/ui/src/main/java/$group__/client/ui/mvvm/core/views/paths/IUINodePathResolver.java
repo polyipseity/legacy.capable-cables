@@ -10,4 +10,7 @@ public interface IUINodePathResolver<T extends IUINode> {
 
 	boolean removeVirtualElement(T element,
 	                             T virtualElement);
+
+	boolean moveVirtualElementToTop(T element,
+	                                T virtualElement);
 }

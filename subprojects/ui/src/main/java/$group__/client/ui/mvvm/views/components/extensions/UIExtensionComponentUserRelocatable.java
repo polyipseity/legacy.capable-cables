@@ -6,6 +6,7 @@ import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.views.IUIReshapeExplicitly;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
+import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
 import $group__.client.ui.mvvm.core.views.components.extensions.IUIExtensionComponentUserRelocatable;
 import $group__.client.ui.mvvm.core.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
 import $group__.client.ui.mvvm.core.views.events.IUIEventMouse;
@@ -31,6 +32,7 @@ import java.awt.geom.RectangularShape;
 import java.util.Optional;
 import java.util.function.Function;
 
+// TODO could use some redesign
 public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
 		extends ExtensionContainerAware<ResourceLocation, IUIComponent, E>
 		implements IUIExtensionComponentUserRelocatable<E> {
@@ -127,8 +129,17 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 		@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 		protected VirtualComponent() {
 			addEventListener(UIEventMouse.TYPE_MOUSE_DOWN, new UIEventListener.Functional<IUIEventMouse>(evt -> {
-				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && startRelocateMaybe(evt.getData().getCursorPositionView())) // todo custom
+				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && startRelocateMaybe(evt.getData().getCursorPositionView())) { // todo custom
+					getContainer().ifPresent(c -> {
+						c.getParent().ifPresent(p ->
+								p.moveChildToTop(c));
+						c.getManager()
+								.map(IUIComponentManager::getPathResolver)
+								.ifPresent(pr ->
+										pr.moveVirtualElementToTop(c, this));
+					});
 					evt.stopPropagation();
+				}
 			}), false);
 			addEventListener(UIEventMouse.TYPE_MOUSE_UP, new UIEventListener.Functional<IUIEventMouse>(evt -> {
 				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && finishRelocateMaybe(evt.getData().getCursorPositionView()))

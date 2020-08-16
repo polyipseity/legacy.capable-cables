@@ -26,6 +26,16 @@ public abstract class UINodePathResolver<T extends IUINode>
 		return getVirtualElements(element).remove(virtualElement);
 	}
 
+	@Override
+	public boolean moveVirtualElementToTop(T element, T virtualElement) {
+		List<T> ve = getVirtualElements(element);
+		if (ve.remove(virtualElement)) {
+			ve.add(ve.size(), virtualElement);
+			return true;
+		}
+		return false;
+	}
+
 	protected List<T> getVirtualElements(T element) { return getVirtualElementsMap().computeIfAbsent(element, k -> new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL)); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")

@@ -6,6 +6,7 @@ import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.views.IUIReshapeExplicitly;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
+import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
 import $group__.client.ui.mvvm.core.views.components.extensions.IUIExtensionComponentUserResizable;
 import $group__.client.ui.mvvm.core.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
 import $group__.client.ui.mvvm.core.views.events.IUIEventMouse;
@@ -35,6 +36,7 @@ import java.util.EnumSet;
 import java.util.Optional;
 import java.util.function.Function;
 
+// TODO could use some redesign
 public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
 		extends ExtensionContainerAware<ResourceLocation, IUIComponent, E>
 		implements IUIExtensionComponentUserResizable<E> {
@@ -113,7 +115,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 					new Rectangle2D.Double(x - getResizeBorderThickness(), y - getResizeBorderThickness(),
 							w + (getResizeBorderThickness() << 1), h + (getResizeBorderThickness() << 1))));
 			ret.subtract(new Area(spb));
-			return spb;
+			return ret;
 		});
 	}
 
@@ -179,8 +181,17 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 			addEventListener(UIEventMouse.TYPE_MOUSE_ENTER, new UIEventListener.Functional<IUIEventMouse>(evt -> setBeingHovered(true)), false);
 			addEventListener(UIEventMouse.TYPE_MOUSE_LEAVE, new UIEventListener.Functional<IUIEventMouse>(evt -> setBeingHovered(false)), false);
 			addEventListener(UIEventMouse.TYPE_MOUSE_DOWN, new UIEventListener.Functional<IUIEventMouse>(evt -> {
-				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && startResizeMaybe(evt.getData().getCursorPositionView())) // todo custom
+				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && startResizeMaybe(evt.getData().getCursorPositionView())) { // todo custom
+					getContainer().ifPresent(c -> {
+						c.getParent().ifPresent(p ->
+								p.moveChildToTop(c));
+						c.getManager()
+								.map(IUIComponentManager::getPathResolver)
+								.ifPresent(pr ->
+										pr.moveVirtualElementToTop(c, this));
+					});
 					evt.stopPropagation();
+				}
 			}), false);
 			addEventListener(UIEventMouse.TYPE_MOUSE_UP, new UIEventListener.Functional<IUIEventMouse>(evt -> {
 				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && finishResizeMaybe(evt.getData().getCursorPositionView()))
@@ -248,7 +259,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 							.map(b -> {
 								EnumSet<EnumUISide> sides = EnumUISide.getSidesMouseOver(
 										new Rectangle2D.Double(b.getX(), b.getY(), 0, 0),
-										d.getCursorPositionView());
+										cursorPosition);
 								if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT)
 										|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
 									return EnumCursor.EXTENSION_RESIZE_NW_SE_CURSOR.getHandle();

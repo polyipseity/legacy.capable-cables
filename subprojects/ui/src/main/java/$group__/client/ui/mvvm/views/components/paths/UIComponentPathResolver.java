@@ -8,6 +8,7 @@ import $group__.client.ui.mvvm.core.views.components.paths.IUIComponentPath;
 import $group__.client.ui.mvvm.core.views.components.paths.IUIComponentPathResolver;
 import $group__.client.ui.mvvm.views.paths.UINodePathResolver;
 import $group__.utilities.CapacityUtilities;
+import com.google.common.collect.Lists;
 
 import java.awt.geom.Point2D;
 import java.lang.ref.WeakReference;
@@ -43,16 +44,16 @@ public class UIComponentPathResolver
 
 					// todo algo
 					Optional<IUIComponent> c = Optional.empty();
-					for (IUIComponent rwcC : rwcCV) {
-						for (IUIComponent rwcCVE : getVirtualElements(rwcC)) {
+					rwcCLoop:
+					for (IUIComponent rwcC : Lists.reverse(rwcCV)) {
+						for (IUIComponent rwcCVE : Lists.reverse(getVirtualElements(rwcC))) {
 							if (stack.getDelegated().peek().createTransformedShape(
 									rwcCVE.getShapeDescriptor().getShapeOutput()).contains(point)) {
 								c = Optional.of(virtual ? rwcCVE : rwcC);
-								break;
+								break rwcCLoop;
 							}
 						}
-						if (!c.isPresent()
-								&& stack.getDelegated().peek().createTransformedShape(
+						if (stack.getDelegated().peek().createTransformedShape(
 								rwcC.getShapeDescriptor().getShapeOutput()).contains(point)) {
 							c = Optional.of(rwcC);
 							break;
