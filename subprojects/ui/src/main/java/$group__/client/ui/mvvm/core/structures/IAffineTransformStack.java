@@ -1,5 +1,6 @@
 package $group__.client.ui.mvvm.core.structures;
 
+import $group__.client.ui.ConstantsUI;
 import $group__.utilities.interfaces.ICopyable;
 import $group__.utilities.specific.LoggerUtilities;
 import $group__.utilities.specific.MapUtilities;
@@ -58,7 +59,7 @@ public interface IAffineTransformStack
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 		public LeakNotifier(Stack<AffineTransform> delegated) {
 			this.delegated = delegated;
-			if (true) // todo debug flag
+			if (ConstantsUI.BUILD_TYPE.isDebug())
 				this.throwable = ThrowableUtilities.create();
 			else
 				this.throwable = null;
