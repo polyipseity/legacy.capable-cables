@@ -1,9 +1,5 @@
 package $group__.utilities.compile;
 
-import $group__.utilities.specific.ThrowableUtilities;
-
-import java.util.Arrays;
-
 public enum EnumBuildType {
 	DEBUG("debug"),
 	RELEASE("release"),
@@ -18,9 +14,7 @@ public enum EnumBuildType {
 			if (string.equals(value.getString()))
 				return value;
 		}
-		throw ThrowableUtilities.BecauseOf.illegalArgument("Invalid build type string",
-				"string", string,
-				"values()", Arrays.toString(values()));
+		return DEBUG; // COMMENT default case in case the string did not get replaced
 	}
 
 	public String getString() { return string; }
