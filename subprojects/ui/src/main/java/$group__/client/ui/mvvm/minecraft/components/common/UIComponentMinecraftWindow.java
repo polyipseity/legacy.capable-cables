@@ -28,7 +28,6 @@ import $group__.client.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.events.EnumEventHookStage;
-import $group__.utilities.functions.IFunction4;
 import $group__.utilities.reactive.DisposableObserverAuto;
 import $group__.utilities.specific.ThrowableUtilities.Try;
 import $group__.utilities.structures.Registry;
@@ -48,8 +47,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
-import java.util.List;
-import java.util.*;
+import java.util.ConcurrentModificationException;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -66,7 +66,6 @@ public class UIComponentMinecraftWindow
 	public static final int
 			WINDOW_DRAG_BAR_THICKNESS = 10, // COMMENT internal top
 			WINDOW_VISIBLE_MINIMUM = 10;
-	protected final List<IFunction4<? super IAffineTransformStack, ? super Point2D, ? super Double, ? super Boolean, ? extends Boolean>> scheduledActions = new LinkedList<>();
 
 	@UIProperty(PROPERTY_COLOR_BACKGROUND)
 	protected final IBindingField<Color> colorBackground;
@@ -138,9 +137,6 @@ public class UIComponentMinecraftWindow
 			DrawingUtilities.drawShape(transform, getShapeDescriptor().getShapeOutput(), true, getColorBorder().getValue(), 0);
 		}
 	}
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected List<IFunction4<? super IAffineTransformStack, ? super Point2D, ? super Double, ? super Boolean, ? extends Boolean>> getScheduledActions() { return scheduledActions; }
 
 	public IBindingField<Color> getColorBackground() { return colorBackground; }
 
