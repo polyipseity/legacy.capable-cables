@@ -60,26 +60,26 @@ import java.awt.geom.Rectangle2D;
 import static $group__.utilities.PreconditionUtilities.requireRunOnceOnly;
 import static java.util.Objects.requireNonNull;
 
-public enum UIComponentDebug {
+public enum UIDebug {
 	;
 
 	public static final String PATH = "debug_ui";
 	public static final ITextComponent DISPLAY_NAME = new StringTextComponent("MVVM GUI Debug UI");
 
-	public static Block getBlockEntry() { return BlockDebug.INSTANCE; }
+	public static Block getBlockEntry() { return UIDebugBlock.INSTANCE; }
 
-	public static TileEntityType<TileEntityDebug> getTileEntityEntry() { return TileEntityDebug.Type.INSTANCE; }
+	public static TileEntityType<UIDebugTileEntity> getTileEntityEntry() { return UIDebugTileEntity.Type.INSTANCE; }
 
-	public static ContainerType<ContainerDebug> getContainerEntry() { return ContainerDebug.Type.INSTANCE; }
+	public static ContainerType<UIDebugContainer> getContainerEntry() { return UIDebugContainer.Type.INSTANCE; }
 
 	@OnlyIn(Dist.CLIENT)
-	public static void registerUIFactory() { ScreenManager.registerFactory(ContainerDebug.Type.INSTANCE, UIDebugFactory.INSTANCE); }
+	public static void registerUIFactory() { ScreenManager.registerFactory(UIDebugContainer.Type.INSTANCE, UIDebugFactory.INSTANCE); }
 }
 
 @SuppressWarnings("HardcodedFileSeparator")
 @OnlyIn(Dist.CLIENT)
 enum UIDebugFactory
-		implements ScreenManager.IScreenFactory<ContainerDebug, UIAdapterScreen.WithContainer<UIInfrastructureMinecraft<UIViewComponentMinecraft<IShapeDescriptor<? extends Rectangle2D>, IUIComponentManager<IShapeDescriptor<? extends Rectangle2D>>>, UIDebugFactory.ViewModel, Binder>, ContainerDebug>> {
+		implements ScreenManager.IScreenFactory<UIDebugContainer, UIAdapterScreen.WithContainer<UIInfrastructureMinecraft<UIViewComponentMinecraft<IShapeDescriptor<? extends Rectangle2D>, IUIComponentManager<IShapeDescriptor<? extends Rectangle2D>>>, UIDebugFactory.ViewModel, Binder>, UIDebugContainer>> {
 	INSTANCE,
 	;
 
@@ -99,16 +99,16 @@ enum UIDebugFactory
 	}
 
 	@Override
-	public UIAdapterScreen.WithContainer<UIInfrastructureMinecraft<UIViewComponentMinecraft<IShapeDescriptor<? extends Rectangle2D>, IUIComponentManager<IShapeDescriptor<? extends Rectangle2D>>>, ViewModel, Binder>, ContainerDebug> create(ContainerDebug container, PlayerInventory inv, ITextComponent title) {
+	public UIAdapterScreen.WithContainer<UIInfrastructureMinecraft<UIViewComponentMinecraft<IShapeDescriptor<? extends Rectangle2D>, IUIComponentManager<IShapeDescriptor<? extends Rectangle2D>>>, ViewModel, Binder>, UIDebugContainer> create(UIDebugContainer container, PlayerInventory inv, ITextComponent title) {
 		return createUI(container);
 	}
 
 	@SuppressWarnings("ObjectAllocationInLoop")
-	private static UIAdapterScreen.WithContainer<UIInfrastructureMinecraft<UIViewComponentMinecraft<IShapeDescriptor<? extends Rectangle2D>, IUIComponentManager<IShapeDescriptor<? extends Rectangle2D>>>, ViewModel, Binder>, ContainerDebug>
-	createUI(ContainerDebug container) {
-		UIAdapterScreen.WithContainer<UIInfrastructureMinecraft<UIViewComponentMinecraft<IShapeDescriptor<? extends Rectangle2D>, IUIComponentManager<IShapeDescriptor<? extends Rectangle2D>>>, ViewModel, Binder>, ContainerDebug>
+	private static UIAdapterScreen.WithContainer<UIInfrastructureMinecraft<UIViewComponentMinecraft<IShapeDescriptor<? extends Rectangle2D>, IUIComponentManager<IShapeDescriptor<? extends Rectangle2D>>>, ViewModel, Binder>, UIDebugContainer>
+	createUI(UIDebugContainer container) {
+		UIAdapterScreen.WithContainer<UIInfrastructureMinecraft<UIViewComponentMinecraft<IShapeDescriptor<? extends Rectangle2D>, IUIComponentManager<IShapeDescriptor<? extends Rectangle2D>>>, ViewModel, Binder>, UIDebugContainer>
 				ret =
-				new UIAdapterScreen.WithContainer<>(UIComponentDebug.DISPLAY_NAME, new UIInfrastructureMinecraft<>(
+				new UIAdapterScreen.WithContainer<>(UIDebug.DISPLAY_NAME, new UIInfrastructureMinecraft<>(
 						new UIViewComponentMinecraft<>(PARSER.createUI()),
 						new ViewModel(),
 						new Binder()), container);
@@ -145,11 +145,11 @@ enum UIDebugFactory
 
 /* TODO
 @OnlyIn(Dist.CLIENT)
-final class UIDebug extends GuiManagerWindows<ShapeDescriptor.Rectangular<Rectangle2D>, GuiManagers.Data<GuiManagers.Events, ContainerDebug>, ContainerDebug> {
+final class UIDebug extends GuiManagerWindows<ShapeDescriptor.Rectangular<Rectangle2D>, GuiManagers.Data<GuiManagers.Events, UIDebugContainer>, UIDebugContainer> {
 	private static final Logger LOGGER = LogManager.getLogger();
 
 	@SuppressWarnings("MagicNumber")
-	UIDebug(ITextComponent title, ContainerDebug container) {
+	UIDebug(ITextComponent title, UIDebugContainer container) {
 		super(title, ShapeDescriptor.Rectangular::new,
 				new Data<>(new Events(), UIDebug::getLogger, new GuiBackgroundDefault<>(ShapeDescriptor.Rectangular::new,
 						new UIComponentMinecraft.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger)), container));
@@ -230,34 +230,34 @@ final class UIDebug extends GuiManagerWindows<ShapeDescriptor.Rectangular<Rectan
 	private static Logger getLogger() { return LOGGER; }
 }*/
 
-final class ContainerDebug extends Container {
+final class UIDebugContainer extends Container {
 	private final TileEntity tileEntity;
 
-	ContainerDebug(int id, World world, BlockPos pos) {
+	UIDebugContainer(int id, World world, BlockPos pos) {
 		super(Type.INSTANCE, id);
 		tileEntity = requireNonNull(world.getTileEntity(pos));
 	}
 
 	@Override
 	public boolean canInteractWith(PlayerEntity playerIn) {
-		return isWithinUsableDistance(IWorldPosCallable.of(requireNonNull(tileEntity.getWorld()), tileEntity.getPos()), playerIn, BlockDebug.INSTANCE);
+		return isWithinUsableDistance(IWorldPosCallable.of(requireNonNull(tileEntity.getWorld()), tileEntity.getPos()), playerIn, UIDebugBlock.INSTANCE);
 	}
 
 	enum Type {
 		;
 
-		static final ContainerType<ContainerDebug> INSTANCE = IForgeContainerType.create((windowId, inv, data) -> {
+		static final ContainerType<UIDebugContainer> INSTANCE = IForgeContainerType.create((windowId, inv, data) -> {
 			assert Minecraft.getInstance().world != null;
-			return new ContainerDebug(windowId, Minecraft.getInstance().world, data.readBlockPos());
+			return new UIDebugContainer(windowId, Minecraft.getInstance().world, data.readBlockPos());
 		});
 	}
 }
 
-final class BlockDebug extends Block {
-	static final BlockDebug INSTANCE = new BlockDebug();
+final class UIDebugBlock extends Block {
+	static final UIDebugBlock INSTANCE = new UIDebugBlock();
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	private BlockDebug() {
+	private UIDebugBlock() {
 		super(Properties.from(Blocks.STONE));
 		requireRunOnceOnly(LOGGER);
 	}
@@ -266,7 +266,7 @@ final class BlockDebug extends Block {
 	public boolean hasTileEntity(BlockState state) { return true; }
 
 	@Override
-	public TileEntity createTileEntity(BlockState state, IBlockReader world) { return new TileEntityDebug(); }
+	public TileEntity createTileEntity(BlockState state, IBlockReader world) { return new UIDebugTileEntity(); }
 
 	@SuppressWarnings("deprecation")
 	@Override
@@ -282,18 +282,18 @@ final class BlockDebug extends Block {
 	}
 }
 
-final class TileEntityDebug extends TileEntity implements INamedContainerProvider {
-	TileEntityDebug() { super(requireNonNull(Type.INSTANCE)); }
+final class UIDebugTileEntity extends TileEntity implements INamedContainerProvider {
+	UIDebugTileEntity() { super(requireNonNull(Type.INSTANCE)); }
 
 	@Override
-	public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) { return new ContainerDebug(id, requireNonNull(getWorld()), getPos()); }
+	public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) { return new UIDebugContainer(id, requireNonNull(getWorld()), getPos()); }
 
 	@Override
-	public ITextComponent getDisplayName() { return UIComponentDebug.DISPLAY_NAME; }
+	public ITextComponent getDisplayName() { return UIDebug.DISPLAY_NAME; }
 
 	enum Type {
 		;
 
-		static final TileEntityType<TileEntityDebug> INSTANCE = TileEntityType.Builder.create(TileEntityDebug::new, BlockDebug.INSTANCE).build(null);
+		static final TileEntityType<UIDebugTileEntity> INSTANCE = TileEntityType.Builder.create(UIDebugTileEntity::new, UIDebugBlock.INSTANCE).build(null);
 	}
 }
