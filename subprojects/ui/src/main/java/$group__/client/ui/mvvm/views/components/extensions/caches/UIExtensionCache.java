@@ -12,11 +12,13 @@ import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.IHasGenericClass;
+import $group__.utilities.reactive.DisposableObserverAuto;
 import $group__.utilities.specific.MapUtilities;
 import $group__.utilities.specific.ThrowableUtilities.Try;
 import $group__.utilities.structures.Registry;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -64,13 +66,14 @@ public class UIExtensionCache
 									if (i instanceof IUIComponentContainer)
 										((IUIComponentContainer) i).getChildrenView().forEach(t::invalidate);
 								},
-								t -> new Object() {
+								t -> ImmutableList.of(new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
+									@Override
 									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-									protected void onParentChanged(EventUIComponentHierarchyChanged.Parent event) {
+									public void onNext(EventUIComponentHierarchyChanged.Parent event) {
 										if (event.getStage() == EnumEventHookStage.POST)
 											t.invalidate(event.getComponent());
 									}
-								}));
+								})));
 		public static final Registry.RegistryObject<IType<Integer, IUIComponent>> Z =
 				RegUICache.INSTANCE.registerApply(generateKey("z"),
 						k -> new IType.Impl<>(k,
@@ -88,13 +91,14 @@ public class UIExtensionCache
 									if (i instanceof IUIComponentContainer)
 										((IUIComponentContainer) i).getChildrenView().forEach(t::invalidate);
 								},
-								t -> new Object() {
+								t -> ImmutableList.of(new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
+									@Override
 									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-									protected void onParentChanged(EventUIComponentHierarchyChanged.Parent event) {
+									public void onNext(EventUIComponentHierarchyChanged.Parent event) {
 										if (event.getStage() == EnumEventHookStage.POST)
 											t.invalidate(event.getComponent());
 									}
-								}));
+								})));
 
 		private static ResourceLocation generateKey(String name) { return new ResourceLocation(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, "universal." + name); }
 	}

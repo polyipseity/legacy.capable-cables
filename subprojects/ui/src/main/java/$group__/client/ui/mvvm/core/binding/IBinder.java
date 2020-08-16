@@ -3,15 +3,12 @@ package $group__.client.ui.mvvm.core.binding;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.interfaces.IHasGenericClass;
+import $group__.utilities.reactive.DisposableObserverAuto;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
-import $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
-import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraft.util.ResourceLocation;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -20,8 +17,6 @@ import java.util.function.Function;
 // TODO mark as only UI thread
 // TODO add binding transformers
 public interface IBinder {
-	Logger LOGGER = LogManager.getLogger();
-
 	static <B extends IHasBindingKey> Multimap<ResourceLocation, B> sortAndTrimBindings(Iterable<B> bindings) {
 		@SuppressWarnings("UnstableApiUsage") Multimap<ResourceLocation, B> ret = MultimapBuilder
 				.hashKeys(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)
@@ -53,7 +48,7 @@ public interface IBinder {
 	}
 
 	static DisposableObserver<IBinderAction> createBinderActionObserver(IBinder binder) {
-		return new DisposableObserver<IBinderAction>() {
+		return new DisposableObserverAuto<IBinderAction>() {
 			@Override
 			public void onNext(@Nonnull IBinderAction o) {
 				switch (o.getType()) {
@@ -70,15 +65,6 @@ public interface IBinder {
 						break;
 				}
 			}
-
-			@Override
-			public void onError(@NonNull Throwable e) {
-				ThrowableCatcher.catch_(e, LOGGER);
-				dispose();
-			}
-
-			@Override
-			public void onComplete() { dispose(); }
 		};
 	}
 

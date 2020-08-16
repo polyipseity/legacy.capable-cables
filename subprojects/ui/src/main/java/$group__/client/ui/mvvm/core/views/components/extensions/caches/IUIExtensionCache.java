@@ -8,11 +8,15 @@ import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.structures.Registry;
 import $group__.utilities.structures.Singleton;
 import com.google.common.cache.Cache;
+import com.google.common.collect.ImmutableList;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import sun.misc.Cleaner;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -41,23 +45,27 @@ public interface IUIExtensionCache
 			protected final ResourceLocation key;
 			protected final BiFunction<? super IType<V, I>, ? super I, ? extends Optional<? extends V>> getter;
 			protected final BiConsumer<? super IType<V, I>, ? super I> invalidator;
-			protected final Object eventListener;
+			protected final List<? extends DisposableObserver<?>> eventListeners;
 			protected final Object cleanerRef = new Object();
 
 			@SuppressWarnings("ThisEscapedInObjectConstruction")
 			public Impl(ResourceLocation key,
 			            BiFunction<? super IType<V, I>, ? super I, ? extends Optional<? extends V>> getter,
 			            BiConsumer<? super IType<V, I>, ? super I> invalidator,
-			            Function<? super IType<V, I>, ?> eventListenerFunction) {
+			            Function<? super IType<V, I>, ? extends List<? extends DisposableObserver<?>>> eventListenersFunction) {
 				this.key = key;
 				this.getter = getter;
 				this.invalidator = invalidator;
-				this.eventListener = eventListenerFunction.apply(this);
-				EventBusEntryPoint.INSTANCE.register(eventListener);
-				Cleaner.create(cleanerRef, () -> EventBusEntryPoint.INSTANCE.unregister(eventListener));
+				this.eventListeners = ImmutableList.copyOf(eventListenersFunction.apply(this));
+
+				eventListeners.forEach(el ->
+						EventBusEntryPoint.getEventBus()
+								.subscribe(CastUtilities.<Observer<? super Object>>castUnchecked(el)) // COMMENT we do not care about the event type
+				);
+				Cleaner.create(cleanerRef, () -> eventListeners.forEach(DisposableObserver::dispose));
 			}
 
-			protected Object getEventListener() { return eventListener; }
+			protected List<? extends DisposableObserver<?>> getEventListeners() { return eventListeners; }
 
 			@Override
 			public Optional<V> get(I instance) { return getGetter().apply(this, instance).map(Function.identity()); }

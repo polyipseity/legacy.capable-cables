@@ -29,8 +29,11 @@ import $group__.utilities.CastUtilities;
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.functions.IFunction4;
+import $group__.utilities.reactive.DisposableObserverAuto;
 import $group__.utilities.specific.ThrowableUtilities.Try;
 import $group__.utilities.structures.Registry;
+import com.google.common.collect.ImmutableList;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -47,6 +50,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -113,11 +117,18 @@ public class UIComponentMinecraftWindow
 	@Override
 	public ShapeDescriptor.Rectangular<?> getShapeDescriptor() { return (Rectangular<?>) super.getShapeDescriptor(); }
 
-	@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-	protected void onParentShapeDescriptorModified(EventUIShapeDescriptor.Modify event) {
-		if (event.getStage() == EnumEventHookStage.POST && getParent().filter(p -> p.getShapeDescriptor().equals(event.getShapeDescriptor())).isPresent())
-			IUIReshapeExplicitly.refresh(this);
+	protected final AtomicReference<ObserverEventUIShapeDescriptorModify> observerEventUIShapeDescriptorModify = new AtomicReference<>();
+
+	@Override
+	public void initialize(IAffineTransformStack stack) {
+		EventBusEntryPoint.<EventUIShapeDescriptor.Modify>getEventBus()
+				.subscribe(getObserverEventUIShapeDescriptorModify().accumulateAndGet(new ObserverEventUIShapeDescriptorModify(), (p, n) -> {
+					Optional.ofNullable(p).ifPresent(DisposableObserver::dispose);
+					return n;
+				}));
 	}
+
+	protected AtomicReference<ObserverEventUIShapeDescriptorModify> getObserverEventUIShapeDescriptorModify() { return observerEventUIShapeDescriptorModify; }
 
 	@Override
 	public void render(IAffineTransformStack stack, Point2D cursorPosition, double partialTicks, boolean pre) {
@@ -139,13 +150,9 @@ public class UIComponentMinecraftWindow
 	public void crop(IAffineTransformStack stack, EnumCropMethod method, boolean push, Point2D mouse, double partialTicks) { IUIComponentMinecraft.crop(this, stack, method, push, mouse, partialTicks); }
 
 	@Override
-	public void initialize(IAffineTransformStack stack) {
-		EventBusEntryPoint.INSTANCE.register(this);
-		getShapeDescriptor().modify(() -> false);
+	public void removed(IAffineTransformStack stack) {
+		Optional.ofNullable(getObserverEventUIShapeDescriptorModify().getAndSet(null)).ifPresent(DisposableObserver::dispose);
 	}
-
-	@Override
-	public void removed(IAffineTransformStack stack) { EventBusEntryPoint.INSTANCE.unregister(this); }
 
 	@Override
 	public void transformChildren(IAffineTransformStack stack) {
@@ -231,17 +238,28 @@ public class UIComponentMinecraftWindow
 								(t, i) -> IUIExtensionCache.IType.invalidate(i, t.getKey()),
 								t -> {
 									UICacheShapeDescriptor<IUIConstraint, IUIComponent> tc = (UICacheShapeDescriptor<IUIConstraint, IUIComponent>) t;
-									return new Object() {
+									return ImmutableList.of(new DisposableObserverAuto<EventUIShapeDescriptor.Modify>() {
+										@Override
 										@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-										protected void onShapeDescriptorReshape(EventUIShapeDescriptor.Modify event) {
+										public void onNext(EventUIShapeDescriptor.Modify event) {
 											if (event.getStage() == EnumEventHookStage.POST) {
 												UICacheShapeDescriptor.getInstanceFromShapeDescriptor(tc.getInstancesView(), event.getShapeDescriptor())
 														.ifPresent(tc::invalidate);
 											}
 										}
-									};
+									});
 								}));
 
 		private static ResourceLocation generateKey(@SuppressWarnings("SameParameterValue") String name) { return new ResourceLocation(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, "window." + name); }
+	}
+
+	protected class ObserverEventUIShapeDescriptorModify
+			extends DisposableObserverAuto<EventUIShapeDescriptor.Modify> {
+		@Override
+		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+		public void onNext(EventUIShapeDescriptor.Modify event) {
+			if (event.getStage() == EnumEventHookStage.POST && getParent().filter(p -> p.getShapeDescriptor().equals(event.getShapeDescriptor())).isPresent())
+				IUIReshapeExplicitly.refresh(UIComponentMinecraftWindow.this);
+		}
 	}
 }

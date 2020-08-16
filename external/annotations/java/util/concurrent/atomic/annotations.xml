@@ -1,0 +1,5 @@
+<root>
+	<item name='java.util.concurrent.atomic.AtomicReference V getAndSet(V)'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
+</root>

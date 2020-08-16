@@ -7,8 +7,10 @@ import $group__.client.ui.mvvm.core.structures.IUIAnchorSet;
 import $group__.client.ui.mvvm.views.events.bus.EventUIShapeDescriptor;
 import $group__.utilities.ObjectUtilities;
 import $group__.utilities.events.EnumEventHookStage;
+import $group__.utilities.reactive.DisposableObserverAuto;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import sun.misc.Cleaner;
@@ -19,6 +21,7 @@ import java.awt.geom.Rectangle2D;
 import java.lang.ref.WeakReference;
 import java.util.ConcurrentModificationException;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 @Immutable
@@ -39,12 +42,6 @@ public final class UIAnchor implements IUIAnchor {
 		this.fromSide = fromSide;
 		this.toSide = toSide;
 		this.borderThickness = borderThickness;
-	}
-
-	@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-	protected void onShapeDescriptorModify(EventUIShapeDescriptor.Modify event) {
-		if (event.getStage() == EnumEventHookStage.POST && event.getShapeDescriptor().equals(getTo()))
-			getContainer().flatMap(IUIAnchorSet::getFrom).ifPresent(this::anchor);
 	}
 
 	@Override
@@ -80,10 +77,17 @@ public final class UIAnchor implements IUIAnchor {
 	@Override
 	public EnumUISide getFromSide() { return fromSide; }
 
+	protected final AtomicReference<ObserverEventUIShapeDescriptorModify> observerEventUIShapeDescriptorModify = new AtomicReference<>();
+
 	@Override
 	public void onContainerAdded(IUIAnchorSet<?> container) {
 		setContainer(container);
-		EventBusEntryPoint.INSTANCE.register(this);
+		EventBusEntryPoint.<EventUIShapeDescriptor.Modify>getEventBus()
+				.subscribe(getObserverEventUIShapeDescriptorModify().accumulateAndGet(new ObserverEventUIShapeDescriptorModify(), (p, n) -> {
+					Optional.ofNullable(p).ifPresent(DisposableObserver::dispose);
+					return n;
+				}));
+
 		Cleaner.create(container, this::onContainerRemoved);
 		container.getFrom()
 				.ifPresent(this::anchor);
@@ -91,10 +95,22 @@ public final class UIAnchor implements IUIAnchor {
 
 	@Override
 	public void onContainerRemoved() {
-		EventBusEntryPoint.INSTANCE.unregister(this);
 		setContainer(null);
+		Optional.ofNullable(getObserverEventUIShapeDescriptorModify().getAndSet(null)).ifPresent(DisposableObserver::dispose);
 	}
+
+	protected AtomicReference<ObserverEventUIShapeDescriptorModify> getObserverEventUIShapeDescriptorModify() { return observerEventUIShapeDescriptorModify; }
 
 	@Override
 	public String toString() { return ObjectUtilities.toString(this, super::toString, OBJECT_VARIABLES_MAP); }
+
+	protected class ObserverEventUIShapeDescriptorModify
+			extends DisposableObserverAuto<EventUIShapeDescriptor.Modify> {
+		@Override
+		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+		public void onNext(EventUIShapeDescriptor.Modify event) {
+			if (event.getStage() == EnumEventHookStage.POST && event.getShapeDescriptor().equals(getTo()))
+				getContainer().flatMap(IUIAnchorSet::getFrom).ifPresent(UIAnchor.this::anchor);
+		}
+	}
 }

@@ -1,6 +1,5 @@
-package $group__.utilities.specific;
+package $group__.utilities.reactive;
 
-import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 
@@ -20,7 +19,7 @@ public class DisposableObserverDelegated<T> extends DisposableObserver<T> {
 	public void onNext(@Nonnull T o) { getDownstream().onNext(o); }
 
 	@Override
-	public void onError(@NonNull Throwable e) { getDownstream().onError(e); }
+	public void onError(@Nonnull Throwable e) { getDownstream().onError(e); }
 
 	@Override
 	public void onComplete() { getDownstream().onComplete(); }

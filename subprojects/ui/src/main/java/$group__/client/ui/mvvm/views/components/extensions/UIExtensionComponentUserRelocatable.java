@@ -16,6 +16,8 @@ import $group__.client.ui.mvvm.views.events.ui.UIEventMouse;
 import $group__.client.ui.utilities.UIObjectUtilities;
 import $group__.client.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;
+import $group__.utilities.reactive.DisposableObserverAuto;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -30,6 +32,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 // TODO could use some redesign
@@ -50,6 +53,8 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 	@Override
 	public IType<? extends ResourceLocation, ?, ? extends IUIComponent> getType() { return TYPE.getValue(); }
 
+	protected final AtomicReference<ObserverDrawScreenEventPost> observerDrawScreenEventPost = new AtomicReference<>();
+
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void onExtensionAdded(IUIComponent container) {
@@ -59,33 +64,14 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 			c.getManager().ifPresent(m ->
 					m.getPathResolver().addVirtualElement(c, getVirtualComponent()));
 		});
-		EventBusEntryPoint.INSTANCE.register(this);
+		EventBusEntryPoint.<GuiScreenEvent.DrawScreenEvent.Post>getEventBus()
+				.subscribe(getObserverDrawScreenEventPost().accumulateAndGet(new ObserverDrawScreenEventPost(), (p, n) -> {
+					Optional.ofNullable(p).ifPresent(DisposableObserver::dispose);
+					return n;
+				}));
 	}
 
 	protected VirtualComponent getVirtualComponent() { return virtualComponent; }
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void onExtensionRemoved() {
-		super.onExtensionRemoved();
-		getContainer().ifPresent(c -> {
-			getVirtualComponent().setRelatedComponent(null);
-			c.getManager().ifPresent(m ->
-					m.getPathResolver().removeVirtualElement(c, getVirtualComponent()));
-		});
-		EventBusEntryPoint.INSTANCE.unregister(this);
-	}
-
-	@SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-	protected void onDrawScreenPost(GuiScreenEvent.DrawScreenEvent.Post event) {
-		getRelocateData().ifPresent(d -> getContainer().ifPresent(c -> c.getManager().ifPresent(m -> {
-			Point2D cp = new Point2D.Double(event.getMouseX(), event.getMouseY());
-			Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
-			d.handle(r, cp);
-			DrawingUtilities.drawRectangle(m.getPathResolver().resolvePath(cp, true).getTransformCurrentView(),
-					r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
-		})));
-	}
 
 	@Override
 	public Optional<? extends Shape> getRelocateShape() {
@@ -192,6 +178,35 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 				return new ShapeDescriptor.Generic(getRelocateShape()
 						.<Shape>map(Function.identity())
 						.orElseGet(Rectangle2D.Double::new));
+		}
+	}
+
+	protected AtomicReference<ObserverDrawScreenEventPost> getObserverDrawScreenEventPost() { return observerDrawScreenEventPost; }
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void onExtensionRemoved() {
+		super.onExtensionRemoved();
+		getContainer().ifPresent(c -> {
+			getVirtualComponent().setRelatedComponent(null);
+			c.getManager().ifPresent(m ->
+					m.getPathResolver().removeVirtualElement(c, getVirtualComponent()));
+		});
+		Optional.ofNullable(getObserverDrawScreenEventPost().getAndSet(null)).ifPresent(DisposableObserver::dispose);
+	}
+
+	protected class ObserverDrawScreenEventPost
+			extends DisposableObserverAuto<GuiScreenEvent.DrawScreenEvent.Post> {
+		@Override
+		@SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
+		public void onNext(GuiScreenEvent.DrawScreenEvent.Post event) {
+			getRelocateData().ifPresent(d -> getContainer().ifPresent(c -> c.getManager().ifPresent(m -> {
+				Point2D cp = new Point2D.Double(event.getMouseX(), event.getMouseY());
+				Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
+				d.handle(r, cp);
+				DrawingUtilities.drawRectangle(m.getPathResolver().resolvePath(cp, true).getTransformCurrentView(),
+						r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
+			})));
 		}
 	}
 }

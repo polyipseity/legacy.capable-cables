@@ -7,9 +7,11 @@ import $group__.utilities.CapacityUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.specific.MapUtilities;
 import com.google.common.collect.ImmutableSet;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -21,8 +23,8 @@ public class UICacheShapeDescriptor<V, I extends IExtensionContainer<ResourceLoc
 	protected final Set<I> instances = Collections.newSetFromMap(
 			MapUtilities.getMapMakerSingleThreadedWithWeakKeys().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap());
 
-	public UICacheShapeDescriptor(ResourceLocation key, BiFunction<? super IUIExtensionCache.IType<V, I>, ? super I, ? extends Optional<? extends V>> getter, BiConsumer<? super IUIExtensionCache.IType<V, I>, ? super I> invalidator, Function<? super IUIExtensionCache.IType<V, I>, ?> eventListenerFunction) {
-		super(key, getter, invalidator, eventListenerFunction);
+	public UICacheShapeDescriptor(ResourceLocation key, BiFunction<? super IUIExtensionCache.IType<V, I>, ? super I, ? extends Optional<? extends V>> getter, BiConsumer<? super IUIExtensionCache.IType<V, I>, ? super I> invalidator, Function<? super IUIExtensionCache.IType<V, I>, ? extends List<? extends DisposableObserver<?>>> eventListenersFunction) {
+		super(key, getter, invalidator, eventListenersFunction);
 	}
 
 	public static Optional<IUIComponent> getInstanceFromShapeDescriptor(Set<? extends IUIComponent> instances, IShapeDescriptor<?> shapeDescriptor) {

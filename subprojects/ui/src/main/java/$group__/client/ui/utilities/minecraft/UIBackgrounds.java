@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 public enum UIBackgrounds {
 	;
 
-	public static void notifyBackgroundDrawn(Screen screen) { EventBusEntryPoint.INSTANCE.post(new GuiScreenEvent.BackgroundDrawnEvent(screen)); }
+	public static void notifyBackgroundDrawn(Screen screen) { EventBusEntryPoint.getEventBus().onNext(new GuiScreenEvent.BackgroundDrawnEvent(screen)); }
 
 	/**
 	 * @see Screen#renderBackground()

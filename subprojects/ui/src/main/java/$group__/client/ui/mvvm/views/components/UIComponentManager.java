@@ -17,6 +17,7 @@ import $group__.utilities.CastUtilities;
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.TreeUtilities;
 import $group__.utilities.events.EnumEventHookStage;
+import $group__.utilities.reactive.DisposableObserverAuto;
 import $group__.utilities.specific.ThrowableUtilities;
 import $group__.utilities.structures.Registry;
 import com.google.common.collect.ImmutableList;
@@ -91,13 +92,14 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?>>
 									if (i instanceof IUIComponentContainer)
 										((IUIComponentContainer) i).getChildrenView().forEach(t::invalidate);
 								},
-								t -> new Object() {
+								t -> ImmutableList.of(new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
+									@Override
 									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-									protected void onParentChanged(EventUIComponentHierarchyChanged.Parent event) {
+									public void onNext(EventUIComponentHierarchyChanged.Parent event) {
 										if (event.getStage() == EnumEventHookStage.POST)
 											t.invalidate(event.getComponent());
 									}
-								}));
+								})));
 
 		private static ResourceLocation generateKey(@SuppressWarnings("SameParameterValue") String name) { return new ResourceLocation(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, "manager." + name); }
 	}
