@@ -9,7 +9,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-// TODO create tests
 public enum TreeUtilities {
 	/* MARK empty */;
 
