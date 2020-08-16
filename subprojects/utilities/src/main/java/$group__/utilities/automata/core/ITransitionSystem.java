@@ -11,7 +11,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 // TODO based on https://stackoverflow.com/q/1647631/9341868
-public interface ITransitionSystem<S, E, D> {
+public interface ITransitionSystem<S extends IState<D>, E, D> {
 	ImmutableList<Function<ITransitionSystem<?, ?, ?>, Object>> OBJECT_VARIABLES = ImmutableList.of(
 			ITransitionSystem::getState, ITransitionSystem::getInput, ITransitionSystem::getTransitionsView);
 	ImmutableMap<String, Function<ITransitionSystem<?, ?, ?>, Object>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),

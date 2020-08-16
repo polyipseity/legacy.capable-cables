@@ -7,9 +7,10 @@ import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
 import $group__.client.ui.mvvm.core.views.components.extensions.caches.IUIExtensionCache;
+import $group__.client.ui.mvvm.core.views.components.paths.IUIComponentPathResolver;
 import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;
 import $group__.client.ui.mvvm.structures.AffineTransformStack;
-import $group__.client.ui.mvvm.views.components.extensions.UIExtensionCache;
+import $group__.client.ui.mvvm.views.components.paths.UIComponentPathResolver;
 import $group__.client.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
@@ -27,19 +28,21 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.awt.geom.Point2D;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public abstract class UIComponentManager<SD extends IShapeDescriptor<?>>
 		extends UIComponentContainer
 		implements IUIComponentManager<SD> {
+	protected final IUIComponentPathResolver<IUIComponent> pathResolver = new PathResolver();
+
 	public UIComponentManager(Map<String, IUIPropertyMappingValue> propertyMapping) { super(propertyMapping); }
 
 	@Override
 	protected abstract SD createShapeDescriptor();
+
+	@Override
+	public IUIComponentPathResolver<IUIComponent> getPathResolver() { return pathResolver; }
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -48,7 +51,7 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?>>
 	}
 
 	@Override
-	public boolean reshape(Function<? super SD, ? extends Boolean> action) throws ConcurrentModificationException { return getShapeDescriptor().modify(getShapeDescriptor(), action); }
+	public boolean reshape(Function<? super SD, ? extends Boolean> action) throws ConcurrentModificationException { return getShapeDescriptor().modify(() -> action.apply(getShapeDescriptor())); }
 
 	@Override
 	public Optional<IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) {
@@ -63,24 +66,6 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?>>
 	@Override
 	public IAffineTransformStack getCleanTransformStack() { return new AffineTransformStack(); }
 
-
-	@Override
-	public <CL extends IUIComponent, R> Optional<R> callAsComponent(CL component, BiFunction<? super CL, ? super IAffineTransformStack, ? extends R> action) {
-		IAffineTransformStack stack = getCleanTransformStack();
-		ImmutableList<IUIComponent> path = IUIComponent.computeComponentPath(component);
-		if (!path.contains(this))
-			return Optional.empty();
-		int popTimes = 0;
-		for (IUIComponent element : path) {
-			if (element instanceof IUIComponentContainer) {
-				((IUIComponentContainer) element).transformChildren(stack);
-				++popTimes;
-			}
-		}
-		IAffineTransformStack.popMultiple(stack, popTimes);
-		return Optional.ofNullable(action.apply(component, stack));
-	}
-
 	@Override
 	public List<IUIComponent> getChildrenFlat() { return CacheManager.CHILDREN_FLAT.getValue().get(this).orElseThrow(InternalError::new); }
 
@@ -92,7 +77,7 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?>>
 		public static final Registry.RegistryObject<IUIExtensionCache.IType<List<IUIComponent>, IUIComponent>> CHILDREN_FLAT =
 				IUIExtensionCache.RegUICache.INSTANCE.registerApply(generateKey("children_flat"),
 						k -> new IUIExtensionCache.IType.Impl<>(k,
-								(t, i) -> UIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> ThrowableUtilities.Try.call(() ->
+								(t, i) -> IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> ThrowableUtilities.Try.call(() ->
 										cache.getDelegated().get(t.getKey(), () -> {
 											List<IUIComponent> ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
 											TreeUtilities.<IUIComponent, Object>visitNodesDepthFirst(i,
@@ -117,13 +102,7 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?>>
 		private static ResourceLocation generateKey(@SuppressWarnings("SameParameterValue") String name) { return new ResourceLocation(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, "manager." + name); }
 	}
 
-	@Override
-	public IUIComponent getComponentAtPoint(Point2D point) {
-		IAffineTransformStack stack = getCleanTransformStack();
-		AtomicInteger popTimes = new AtomicInteger();
-		List<IUIComponent> path = IUIComponentManager.getComponentPathAtPointAndTransformStack(this, stack, point, popTimes);
-		assert !path.isEmpty();
-		IAffineTransformStack.popMultiple(stack, popTimes.get());
-		return path.get(path.size() - 1);
+	protected class PathResolver extends UIComponentPathResolver {
+		protected PathResolver() { super(UIComponentManager.this); }
 	}
 }

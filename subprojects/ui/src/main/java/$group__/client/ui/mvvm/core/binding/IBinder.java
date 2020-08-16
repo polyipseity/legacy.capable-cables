@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.function.Function;
 
 // TODO mark as only UI thread
 // TODO add binding transformers
@@ -30,8 +31,9 @@ public interface IBinder {
 	}
 
 	static <T, B extends IHasBindingKey & IHasGenericClass<T>, BF extends IHasBindingKey & IHasGenericClass<?>> Iterable<B> checkAndCastBindings(ResourceLocation bindingKey, @Nullable Class<T> clazz, Iterable<BF> bindings) {
+		Function<ResourceLocation, Boolean> bindingKeyEquals = bindingKey::equals;
 		for (BF b : bindings) {
-			if (!b.getBindingKey().map(bindingKey::equals).orElse(true))
+			if (!b.getBindingKey().map(bindingKeyEquals).orElse(true))
 				throw BecauseOf.illegalArgument("The strings of all bindings are not the same",
 						"b.getBindingKey()", b.getBindingKey(),
 						"bindingKey", bindingKey,

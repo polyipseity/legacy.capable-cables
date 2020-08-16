@@ -165,7 +165,8 @@ public enum DrawingUtilities {
 
 	public static void drawShape(@Nullable AffineTransform transform, Shape shape, boolean filled, Color color, float z) {
 		PathIterator path = shape.getPathIterator(transform, 1);
-		@Nullable Point2D start = null, current = null;
+		Point2D start = new Point2D.Double(), current = new Point2D.Double();
+		boolean started = false;
 		int r = color.getRed(), g = color.getGreen(), b = color.getBlue(), a = color.getAlpha();
 
 		// TODO: Wait for a better system for such
@@ -178,24 +179,27 @@ public enum DrawingUtilities {
 		BufferBuilder buffer = tessellator.getBuffer();
 		// TODO: concave and self-intersecting polygons
 		buffer.begin(filled ? GL11.GL_POLYGON : GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+		double[] segment = new double[6];
 		while (!path.isDone()) {
-			double[] segment = new double[6];
 			switch (path.currentSegment(segment)) {
 				case PathIterator.SEG_MOVETO:
-					start = new Point2D.Double(segment[0], segment[1]);
-					current = start;
+					start.setLocation(segment[0], segment[1]);
+					current.setLocation(start);
+					started = true;
 					break;
 				case PathIterator.SEG_LINETO:
-					if (current == null) throw new InternalError();
+					if (!started)
+						throw new InternalError();
 					buffer.pos(current.getX(), current.getY(), z).color(r, g, b, a).endVertex();
 					buffer.pos(segment[0], segment[1], z).color(r, g, b, a).endVertex();
-					current = new Point2D.Double(segment[0], segment[1]);
+					current.setLocation(segment[0], segment[1]);
 					break;
 				case PathIterator.SEG_CLOSE:
-					if (current == null) throw new InternalError();
+					if (!started)
+						throw new InternalError();
 					buffer.pos(current.getX(), current.getY(), z).color(r, g, b, a).endVertex();
 					buffer.pos(start.getX(), start.getY(), z).color(r, g, b, a).endVertex();
-					current = start;
+					current.setLocation(start);
 					break;
 				default:
 					throw new InternalError();

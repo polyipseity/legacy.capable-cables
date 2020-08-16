@@ -53,9 +53,9 @@ public class UIViewComponentMinecraft<SD extends IShapeDescriptor<?>, M extends 
 							(p, c) -> {
 								if (p.isVisible()) {
 									stack.getDelegated().pop();
-									CastUtilities.castChecked(IUIComponentMinecraft.class, c).ifPresent(cc -> {
-										cc.render(stack, cursorPosition, partialTicks, false);
-										cc.crop(stack, cropMethod, false, cursorPosition, partialTicks);
+									CastUtilities.castChecked(IUIComponentMinecraft.class, p).ifPresent(pc -> {
+										pc.render(stack, cursorPosition, partialTicks, false);
+										pc.crop(stack, cropMethod, false, cursorPosition, partialTicks);
 									});
 								}
 								return p;

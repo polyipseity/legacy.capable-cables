@@ -21,7 +21,6 @@ import $group__.utilities.specific.ThrowableUtilities.Try;
 import $group__.utilities.structures.NodeListList;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
@@ -174,16 +173,13 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 		@SuppressWarnings("UnstableApiUsage")
 		public IUIComponent createComponent() throws Throwable {
 			MethodHandle constructor = DynamicUtilities.IMPL_LOOKUP.findConstructor(Class.forName(getClassName()), MethodType.methodType(void.class, Map.class));
-			IUIComponent ret = IUIComponent.createComponent(() -> Try.call(() -> (IUIComponent) constructor.invoke(getPropertyMapping()), LOGGER).orElseThrow(ThrowableCatcher::rethrow));
+			IUIComponent ret = Try.call(() -> (IUIComponent) constructor.invoke(getPropertyMapping()), LOGGER).orElseThrow(ThrowableCatcher::rethrow);
 			if (!getChildren().isEmpty()) {
 				if (!(ret instanceof IUIComponentContainer))
 					throw BecauseOf.illegalArgument("Component type is not a container",
 							"ret.getClass()", ret.getClass(),
 							"ret", ret);
 				IUIComponentContainer container = (IUIComponentContainer) ret;
-				getChildren().stream().sequential()
-						.map(c -> Try.call(c::createComponent, LOGGER).orElseThrow(ThrowableCatcher::rethrow))
-						.forEachOrdered(c -> container.addChildren(ImmutableSet.of(c)));
 				container.addChildren(getChildren().stream().map(c ->
 						Try.call(c::createComponent, LOGGER)
 								.orElseThrow(ThrowableCatcher::rethrow))

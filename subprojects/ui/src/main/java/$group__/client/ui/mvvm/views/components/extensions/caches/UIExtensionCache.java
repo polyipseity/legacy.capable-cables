@@ -1,6 +1,5 @@
-package $group__.client.ui.mvvm.views.components.extensions;
+package $group__.client.ui.mvvm.views.components.extensions.caches;
 
-import $group__.client.ui.mvvm.core.extensions.IUIExtension;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
@@ -31,9 +30,6 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 public class UIExtensionCache
 		extends IHasGenericClass.Impl<IExtensionContainer<ResourceLocation, ?>>
 		implements IUIExtensionCache {
-	public static final Registry.RegistryObject<IUIExtension.IType<ResourceLocation, IUIExtensionCache, IExtensionContainer<ResourceLocation, ?>>> TYPE =
-			RegExtension.INSTANCE.registerApply(KEY, k -> new IUIExtension.IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
-
 	protected final Cache<ResourceLocation, Object> cache =
 			CacheBuilder.newBuilder()
 					.initialCapacity(INITIAL_CAPACITY_SMALL)
@@ -48,7 +44,7 @@ public class UIExtensionCache
 	public Cache<ResourceLocation, Object> getDelegated() { return cache; }
 
 	@Override
-	public IExtension.IType<? extends ResourceLocation, ?, ? extends IExtensionContainer<ResourceLocation, ?>> getType() { return TYPE.getValue(); }
+	public IExtension.IType<? extends ResourceLocation, ?, ? extends IExtensionContainer<ResourceLocation, ?>> getType() { return IUIExtensionCache.TYPE.getValue(); }
 
 	public enum CacheUniversal {
 		;
@@ -58,7 +54,7 @@ public class UIExtensionCache
 				RegUICache.INSTANCE.registerApply(generateKey("manager"),
 						k -> new IType.Impl<>(k,
 								(t, i) ->
-										TYPE.getValue().get(i).flatMap(cache -> Try.call(() -> cache.getDelegated()
+										IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> Try.call(() -> cache.getDelegated()
 												.get(t.getKey(), () ->
 														IUIComponent.getYoungestParentInstanceOf(i, IUIComponentManager.class)
 																.orElseThrow(IllegalStateException::new)), LOGGER)
@@ -78,7 +74,7 @@ public class UIExtensionCache
 		public static final Registry.RegistryObject<IType<Integer, IUIComponent>> Z =
 				RegUICache.INSTANCE.registerApply(generateKey("z"),
 						k -> new IType.Impl<>(k,
-								(t, i) -> TYPE.getValue().get(i).flatMap(cache -> Try.call(() -> cache.getDelegated().get(t.getKey(),
+								(t, i) -> IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> Try.call(() -> cache.getDelegated().get(t.getKey(),
 										() -> {
 											int ret = -1;
 											for (Optional<? extends IUIComponent> parent = Optional.of(i);

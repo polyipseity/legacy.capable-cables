@@ -10,7 +10,6 @@ import $group__.utilities.CapacityUtilities;
 import $group__.utilities.client.minecraft.TransformUtilities.AffineTransformUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventUtilities;
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
@@ -21,23 +20,15 @@ import java.awt.geom.RectangularShape;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static $group__.client.ui.mvvm.core.structures.IShapeDescriptor.checkIsBeingModified;
 
 public abstract class ShapeDescriptor<S extends Shape> implements IShapeDescriptor<S> {
-	protected final IUIAnchorSet<IUIAnchor> anchorSet;
-	protected S shape;
 	protected final List<IUIConstraint> constraints = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
+	protected final IUIAnchorSet<IUIAnchor> anchorSet = new UIAnchorSet<>(this);
 	protected boolean beingModified = false;
-
-	public ShapeDescriptor(S shape, IUIAnchorSet<IUIAnchor> anchorSet) {
-		this.shape = shape;
-		this.anchorSet = anchorSet;
-	}
-
-	@Override
-	public Shape getShapeProcessed() { return UIObjectUtilities.copyShape(getShape()); }
 
 	@Override
 	public List<IUIConstraint> getConstraintsView() { return ImmutableList.copyOf(getConstraints()); }
@@ -52,38 +43,48 @@ public abstract class ShapeDescriptor<S extends Shape> implements IShapeDescript
 	@Override
 	public IUIAnchorSet<IUIAnchor> getAnchorSet() { return anchorSet; }
 
+	// TODO remove argument self
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public <T extends IShapeDescriptor<?>> boolean modify(T self, Function<? super T, ? extends Boolean> action)
+	public boolean modify(Supplier<? extends Boolean> action)
 			throws ConcurrentModificationException {
-		if (!self.equals(this))
-			throw BecauseOf.illegalArgument("'self' does not equal to 'this'", "this", this, "self", self);
 		if (isBeingModified())
 			throw new ConcurrentModificationException('\'' + getClass().getName() + "' is already being modified");
 		setBeingModified(true);
-		boolean ret = EventUtilities.callWithPrePostHooks(() -> modify0(self, action),
+		boolean ret = EventUtilities.callWithPrePostHooks(() -> modify0(action),
 				new EventUIShapeDescriptor.Modify(EnumEventHookStage.PRE, this),
 				new EventUIShapeDescriptor.Modify(EnumEventHookStage.POST, this));
 		setBeingModified(false);
 		return ret;
 	}
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected List<IUIConstraint> getConstraints() { return constraints; }
-
 	protected void setBeingModified(boolean beingModified) { this.beingModified = beingModified; }
 
-	protected <T extends IShapeDescriptor<?>> boolean modify0(T self, Function<? super T, ? extends Boolean> action) {
-		boolean ret = action.apply(self);
-		Rectangle2D current = getShape().getBounds2D(), bounds = (Rectangle2D) current.clone();
+	protected boolean modify0(Supplier<? extends Boolean> action) {
+		boolean ret = action.get();
+		Rectangle2D current = getShapeOutput().getBounds2D(), bounds = (Rectangle2D) current.clone();
 		getConstraints().forEach(c -> c.accept(bounds));
 		Constants.getConstraintMinimumView().accept(bounds);
 		bound(bounds);
 		return ret;
 	}
 
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected List<IUIConstraint> getConstraints() { return constraints; }
+
 	public static class Generic extends ShapeDescriptor<Shape> {
-		public Generic(Shape shape, IUIAnchorSet<IUIAnchor> anchorSet) { super(shape, anchorSet); }
+		protected Shape shape;
+
+		public Generic(Shape shape) {
+			this.shape = shape;
+		}
+
+		@Override
+		public Shape getShapeOutput() { return getShape(); }
+
+		protected Shape getShape() { return shape; }
+
+		protected void setShape(Shape shape) { this.shape = shape; }
 
 		@Override
 		@OverridingMethodsMustInvokeSuper
@@ -108,24 +109,6 @@ public abstract class ShapeDescriptor<S extends Shape> implements IShapeDescript
 	public boolean isBeingModified() { return beingModified; }
 
 	@Override
-	public S getShapeRef()
-			throws IllegalStateException {
-		checkIsBeingModified(this);
-		return getShape();
-	}
-
-	protected S getShape() { return shape; }
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public boolean setShape(S shape)
-			throws IllegalStateException {
-		checkIsBeingModified(this);
-		this.shape = shape;
-		return true;
-	}
-
-	@Override
 	@OverridingMethodsMustInvokeSuper
 	public boolean bound(Rectangle2D bounds)
 			throws IllegalStateException {
@@ -142,10 +125,21 @@ public abstract class ShapeDescriptor<S extends Shape> implements IShapeDescript
 	}
 
 	public static class Rectangular<S extends RectangularShape> extends ShapeDescriptor<S> {
-		public Rectangular(S shape, IUIAnchorSet<IUIAnchor> anchorSet) { super(shape, anchorSet); }
+		protected S shape;
 
+		public Rectangular(S shape) {
+			this.shape = shape;
+		}
+
+		@SuppressWarnings("unchecked")
 		@Override
-		public Shape getShapeProcessed() { return (Shape) getShape().clone(); }
+		public S getShapeOutput() {
+			return (S) getShape().clone(); // COMMENT cloning should return itself
+		}
+
+		protected S getShape() { return shape; }
+
+		protected void setShape(S shape) { this.shape = shape; }
 
 		@Override
 		@OverridingMethodsMustInvokeSuper
@@ -161,7 +155,7 @@ public abstract class ShapeDescriptor<S extends Shape> implements IShapeDescript
 		public boolean transform(AffineTransform transform)
 				throws IllegalStateException {
 			super.transform(transform);
-			UIObjectUtilities.acceptRectangular(getShape(), (x, y) -> (h, w) ->
+			UIObjectUtilities.acceptRectangular(getShape(), (x, y, h, w) ->
 					getShape().setFrame(x + transform.getTranslateX(), y + transform.getTranslateY(),
 							w * transform.getScaleX(), h * transform.getScaleY()));
 			// COMMENT shear not supported

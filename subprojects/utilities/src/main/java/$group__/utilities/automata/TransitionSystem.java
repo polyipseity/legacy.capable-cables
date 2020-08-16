@@ -1,6 +1,7 @@
 package $group__.utilities.automata;
 
 import $group__.utilities.ObjectUtilities;
+import $group__.utilities.automata.core.IState;
 import $group__.utilities.automata.core.ITransitionSystem;
 import com.google.common.collect.ImmutableMap;
 
@@ -10,10 +11,16 @@ import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-public class TransitionSystem<S, E, D>
+public class TransitionSystem<S extends IState<D>, E, D>
 		implements ITransitionSystem<S, E, D> {
-	protected static final ITransitionSystem<Object, Object, Object> UNINITIALIZED = new TransitionSystem<>(new Object(), null, ImmutableMap
-			.of((ts, d) -> true, d -> { throw new IllegalStateException(); }));
+	protected static final ITransitionSystem<IState<Object>, Object, Object> UNINITIALIZED = new TransitionSystem<>(new IState<Object>() {
+		@Override
+		public void transitFromThis(Object argument) { throw new UnsupportedOperationException(); }
+
+		@Override
+		public void transitToThis(Object argument) { throw new UnsupportedOperationException(); }
+	}, null, ImmutableMap
+			.of((ts, d) -> true, d -> { throw new UnsupportedOperationException(); }));
 	protected final Map<? extends BiPredicate<? super ITransitionSystem<? extends S, ? extends E, ? extends D>, ? super D>, ? extends Function<? super D, ? extends S>> transitionsView;
 	protected S state;
 	@Nullable
@@ -26,7 +33,7 @@ public class TransitionSystem<S, E, D>
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <S, E, D> ITransitionSystem<S, E, D> getUninitialized() {
+	public static <S extends IState<D>, E, D> ITransitionSystem<S, E, D> getUninitialized() {
 		return (ITransitionSystem<S, E, D>) UNINITIALIZED; // COMMENT step always throw
 	}
 
@@ -36,7 +43,9 @@ public class TransitionSystem<S, E, D>
 		for (Map.Entry<? extends BiPredicate<? super ITransitionSystem<? extends S, ? extends E, ? extends D>, ? super D>, ? extends Function<? super D, ? extends S>> t
 				: getTransitionsView().entrySet()) {
 			if (t.getKey().test(this, data)) {
+				getState().transitFromThis(data);
 				setState(t.getValue().apply(data));
+				getState().transitToThis(data);
 				break;
 			}
 		}

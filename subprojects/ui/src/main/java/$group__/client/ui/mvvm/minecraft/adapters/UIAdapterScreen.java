@@ -1,13 +1,14 @@
-package $group__.client.ui.mvvm.minecraft.components.adapters;
+package $group__.client.ui.mvvm.minecraft.adapters;
 
 import $group__.client.ui.events.ui.UIEventUtilities;
 import $group__.client.ui.mvvm.core.IUIInfrastructure;
 import $group__.client.ui.mvvm.core.adapters.IUIAdapter;
+import $group__.client.ui.mvvm.core.extensions.cursors.IUIExtensionCursorHandleProvider;
 import $group__.client.ui.mvvm.core.structures.IUIDataMouseButtonClick;
 import $group__.client.ui.mvvm.core.views.events.IUIEventKeyboard;
 import $group__.client.ui.mvvm.core.views.events.IUIEventMouse;
 import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;
-import $group__.client.ui.mvvm.core.views.nodes.IUINode;
+import $group__.client.ui.mvvm.core.views.paths.IUINode;
 import $group__.client.ui.mvvm.minecraft.core.IUIInfrastructureMinecraft;
 import $group__.client.ui.mvvm.minecraft.core.extensions.IUIExtensionContainerProvider;
 import $group__.client.ui.mvvm.minecraft.core.extensions.IUIExtensionScreenProvider;
@@ -26,7 +27,6 @@ import $group__.utilities.client.minecraft.TransformUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.specific.MapUtilities;
-import $group__.utilities.structures.Registry;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -43,6 +43,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.system.MemoryUtil;
 
 import javax.annotation.Nullable;
 import java.awt.geom.Point2D;
@@ -75,17 +76,22 @@ public class UIAdapterScreen
 	@Nullable
 	protected IUIEventTarget focus;
 
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public UIAdapterScreen(ITextComponent titleIn, I infrastructure, Set<Integer> closeKeys, Set<Integer> changeFocusKeys) {
 		super(titleIn);
 		this.infrastructure = infrastructure;
 		this.closeKeys = new HashSet<>(closeKeys);
 		this.changeFocusKeys = new HashSet<>(changeFocusKeys);
-		IExtensionContainer.addExtensionSafe(getInfrastructure(), new UIExtensionScreen(this));
+		IExtensionContainer.addExtensionSafe(infrastructure, new UIExtensionScreen());
 	}
 
 	@Override
-	public final I getInfrastructure() { return infrastructure; }
+	@Deprecated
+	public void render(int mouseX, int mouseY, float partialTicks) {
+		Point2D.Double cp = new Point2D.Double(mouseX, mouseY); // TODO make an immutable variant
+		getInfrastructure().getView().render(cp, partialTicks);
+		IUIExtensionCursorHandleProvider.TYPE.getValue().get(getInfrastructure().getView()).ifPresent(ext ->
+				GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), ext.getCursorHandle(cp).orElse(MemoryUtil.NULL)));
+	}
 
 	public Set<Integer> getCloseKeysView() { return ImmutableSet.copyOf(getCloseKeys()); }
 
@@ -126,8 +132,7 @@ public class UIAdapterScreen
 	}
 
 	@Override
-	@Deprecated
-	public void render(int mouseX, int mouseY, float partialTicks) { getInfrastructure().getView().render(new Point2D.Double(mouseX, mouseY), partialTicks); }
+	public I getInfrastructure() { return infrastructure; }
 
 	@Nullable
 	protected UIDataMouseButtonClick lastMouseClickData = null;
@@ -253,6 +258,7 @@ public class UIAdapterScreen
 	@Override
 	@Deprecated
 	public void removed() {
+		GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), MemoryUtil.NULL);
 		{
 			// COMMENT generate opposite synthetic events
 			ImmutableMap.copyOf(getKeyboardKeysBeingPressed()).forEach((k, e) ->
@@ -383,19 +389,16 @@ public class UIAdapterScreen
 		public WithContainer(ITextComponent titleIn, I manager, C container) {
 			super(titleIn, manager);
 			this.container = container;
-			IExtensionContainer.addExtensionSafe(getInfrastructure(), new UIExtensionContainer(getContainer()));
+			IExtensionContainer.addExtensionSafe(infrastructure, new UIExtensionContainer(container));
 		}
 
 		@Override
-		public final C getContainer() { return container; }
+		public C getContainer() { return container; }
 
 		@OnlyIn(Dist.CLIENT)
 		public static class UIExtensionContainer
 				extends IHasGenericClass.Impl<IUIInfrastructure<?, ?, ?>>
 				implements IUIExtensionContainerProvider {
-			public static final Registry.RegistryObject<IType<ResourceLocation, IUIExtensionContainerProvider, IUIInfrastructure<?, ?, ?>>> TYPE =
-					RegExtension.INSTANCE.registerApply(KEY, k -> new IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
-
 			protected final Container container;
 
 			public UIExtensionContainer(Container container) {
@@ -407,7 +410,7 @@ public class UIAdapterScreen
 			public Container getContainer() { return container; }
 
 			@Override
-			public IType<? extends ResourceLocation, ?, ? extends IUIInfrastructure<?, ?, ?>> getType() { return TYPE.getValue(); }
+			public IType<? extends ResourceLocation, ?, ? extends IUIInfrastructure<?, ?, ?>> getType() { return IUIExtensionContainerProvider.TYPE.getValue(); }
 		}
 	}
 
@@ -417,37 +420,30 @@ public class UIAdapterScreen
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public static class UIExtensionScreen
+	protected class UIExtensionScreen
 			extends IHasGenericClass.Impl<IUIInfrastructure<?, ?, ?>>
 			implements IUIExtensionScreenProvider {
-		public static final Registry.RegistryObject<IType<ResourceLocation, IUIExtensionScreenProvider, IUIInfrastructure<?, ?, ?>>> TYPE =
-				RegExtension.INSTANCE.registerApply(KEY, k -> new IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
-		protected final UIAdapterScreen<?> adapter;
-
-		public UIExtensionScreen(UIAdapterScreen<?> adapter) {
+		protected UIExtensionScreen() {
 			super(CastUtilities.castUnchecked(IUIInfrastructure.class)); // COMMENT class should not care about it
-			this.adapter = adapter;
 		}
 
 		@Override
-		public Screen getScreen() { return getAdapter(); }
+		public Screen getScreen() { return UIAdapterScreen.this; }
 
 		@Override
-		public Set<Integer> getCloseKeys() { return getAdapter().getCloseKeys(); }
+		public Set<Integer> getCloseKeys() { return UIAdapterScreen.this.getCloseKeys(); }
 
 		@Override
-		public Set<Integer> getChangeFocusKeys() { return getAdapter().getChangeFocusKeys(); }
+		public Set<Integer> getChangeFocusKeys() { return UIAdapterScreen.this.getChangeFocusKeys(); }
 
 		@Override
-		public boolean isPaused() { return getAdapter().isPaused(); }
+		public boolean isPaused() { return UIAdapterScreen.this.isPaused(); }
 
 		@Override
-		public void setPaused(boolean paused) { getAdapter().setPaused(paused); }
-
-		protected UIAdapterScreen<?> getAdapter() { return adapter; }
+		public void setPaused(boolean paused) { UIAdapterScreen.this.setPaused(paused); }
 
 		@Override
-		public IType<? extends ResourceLocation, ?, ? extends IUIInfrastructure<?, ?, ?>> getType() { return TYPE.getValue(); }
+		public IType<? extends ResourceLocation, ?, ? extends IUIInfrastructure<?, ?, ?>> getType() { return IUIExtensionScreenProvider.TYPE.getValue(); }
 	}
 
 	@Override

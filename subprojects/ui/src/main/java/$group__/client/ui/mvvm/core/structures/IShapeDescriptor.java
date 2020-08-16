@@ -7,11 +7,13 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.ConcurrentModificationException;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static $group__.client.ui.mvvm.core.structures.IUIConstraint.CONSTRAINT_NULL_VALUE;
 import static $group__.client.ui.mvvm.core.structures.IUIConstraint.Constants.getConstraintNullRectangleView;
 
+// TODO some sort of builder
+// TODO needs better design, but I cannot think of one
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public interface IShapeDescriptor<S extends Shape> {
 	static void checkIsBeingModified(IShapeDescriptor<?> shapeDescriptor) throws IllegalStateException {
@@ -21,7 +23,7 @@ public interface IShapeDescriptor<S extends Shape> {
 
 	boolean isBeingModified();
 
-	Shape getShapeProcessed();
+	S getShapeOutput();
 
 	List<IUIConstraint> getConstraintsView();
 
@@ -30,14 +32,8 @@ public interface IShapeDescriptor<S extends Shape> {
 
 	IUIAnchorSet<IUIAnchor> getAnchorSet();
 
-	<T extends IShapeDescriptor<?>> boolean modify(T self, Function<? super T, ? extends Boolean> action)
+	boolean modify(Supplier<? extends Boolean> action)
 			throws ConcurrentModificationException;
-
-	boolean setShape(S shape)
-			throws IllegalStateException;
-
-	S getShapeRef()
-			throws IllegalStateException;
 
 	boolean bound(Rectangle2D bounds)
 			throws IllegalStateException;

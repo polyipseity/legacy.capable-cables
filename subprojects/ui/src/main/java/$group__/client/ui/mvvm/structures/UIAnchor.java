@@ -44,7 +44,7 @@ public final class UIAnchor implements IUIAnchor {
 	@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 	protected void onShapeDescriptorModify(EventUIShapeDescriptor.Modify event) {
 		if (event.getStage() == EnumEventHookStage.POST && event.getShapeDescriptor().equals(getTo()))
-			getContainer().ifPresent(c -> anchor(c.getFrom()));
+			getContainer().flatMap(IUIAnchorSet::getFrom).ifPresent(this::anchor);
 	}
 
 	@Override
@@ -59,14 +59,14 @@ public final class UIAnchor implements IUIAnchor {
 
 	@Override
 	public void anchor(IShapeDescriptor<?> from) {
-		Rectangle2D bounds = from.getShapeProcessed().getBounds2D();
+		Rectangle2D bounds = from.getShapeOutput().getBounds2D();
 		getFromSide().getSetter().accept(bounds,
 				getFromSide().getApplyBorder().apply(
-						getToSide().getGetter().apply(getTo().getShapeProcessed().getBounds2D()),
+						getToSide().getGetter().apply(getTo().getShapeOutput().getBounds2D()),
 						getBorderThickness()));
 		try {
-			from.modify(from, cl -> {
-				cl.bound(bounds);
+			from.modify(() -> {
+				from.bound(bounds);
 				return true;
 			});
 		} catch (ConcurrentModificationException ex) {
@@ -85,7 +85,8 @@ public final class UIAnchor implements IUIAnchor {
 		setContainer(container);
 		EventBusEntryPoint.INSTANCE.register(this);
 		Cleaner.create(container, this::onContainerRemoved);
-		anchor(container.getFrom());
+		container.getFrom()
+				.ifPresent(this::anchor);
 	}
 
 	@Override

@@ -2,19 +2,17 @@ package $group__.client.ui.mvvm.core.views.components;
 
 import $group__.client.ui.mvvm.core.binding.IHasBinding;
 import $group__.client.ui.mvvm.core.extensions.IUIExtension;
-import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
 import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;
-import $group__.client.ui.mvvm.core.views.nodes.IUINode;
-import $group__.client.ui.mvvm.views.components.extensions.UIExtensionCache;
+import $group__.client.ui.mvvm.core.views.paths.IUINode;
+import $group__.client.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
 import $group__.utilities.extensions.IExtensionContainer;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
-import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,7 +31,7 @@ public interface IUIComponent
 	}
 
 	@OverridingMethodsMustInvokeSuper
-	default void onCreated() {}
+	default void onCreated() {} // TODO consider removing, extensions should be added manually
 
 	static <T> Optional<T> getYoungestParentInstanceOf(IUIComponent self, Class<T> clazz) {
 		Optional<? extends IUIComponentContainer> parent = self.getParent();
@@ -53,24 +51,11 @@ public interface IUIComponent
 
 	default Optional<IUIComponentManager<?>> getManager() { return UIExtensionCache.CacheUniversal.MANAGER.getValue().get(this); }
 
-	static ImmutableList<IUIComponent> computeComponentPath(IUIComponent component) {
-		ImmutableList.Builder<IUIComponent> builder = ImmutableList.builder();
-		builder.add(component);
-		Optional<? extends IUIComponentContainer> parent = component.getParent();
-		while (parent.isPresent()) {
-			builder.add(parent.get());
-			parent = parent.get().getParent();
-		}
-		return builder.build().reverse();
-	}
-
 	IShapeDescriptor<?> getShapeDescriptor();
 
 	boolean isVisible();
 
 	void setVisible(boolean visible);
-
-	boolean contains(final IAffineTransformStack stack, Point2D point);
 
 	void onIndexMove(int previous, int next);
 

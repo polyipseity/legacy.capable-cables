@@ -26,7 +26,7 @@ public class UIViewComponent<SD extends IShapeDescriptor<?>, M extends IUICompon
 	public UIViewComponent(M manager) { this.manager = manager; }
 
 	@Override
-	public IUIEventTarget getTargetAtPoint(Point2D point) { return getManager().getComponentAtPoint(point); }
+	public IUIEventTarget getTargetAtPoint(Point2D point) { return getManager().getPathResolver().resolvePath(point, true).getPathEnd(); }
 
 	@Override
 	public M getManager() { return manager; }

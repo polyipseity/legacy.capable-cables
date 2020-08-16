@@ -12,15 +12,12 @@ import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventUtilities;
 import $group__.utilities.specific.ThrowableUtilities;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import io.reactivex.rxjava3.core.Observer;
 
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -32,8 +29,8 @@ public class UIComponentContainer
 	public UIComponentContainer(Map<String, IUIPropertyMappingValue> propertyMapping) { super(propertyMapping); }
 
 	@Override
-	public void transformChildren(final IAffineTransformStack stack) {
-		Rectangle2D bounds = getShapeDescriptor().getShapeProcessed().getBounds2D();
+	public void transformChildren(IAffineTransformStack stack) {
+		Rectangle2D bounds = getShapeDescriptor().getShapeOutput().getBounds2D();
 		stack.getDelegated().peek().translate(bounds.getX(), bounds.getY());
 	}
 
@@ -123,17 +120,6 @@ public class UIComponentContainer
 
 	@Override
 	public List<IUIComponent> getChildrenView() { return ImmutableList.copyOf(getChildren()); }
-
-	@Override
-	public Optional<IUIComponent> getChildAtPoint(final IAffineTransformStack stack, Point2D point) {
-		return IUIComponentContainer.getWithStackTransformed(this, stack, () -> {
-			for (IUIComponent child : Lists.reverse(getChildren())) {
-				if (child.contains(stack, point))
-					return Optional.of(child);
-			}
-			return Optional.empty();
-		});
-	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected List<IUIComponent> getChildren() { return children; }

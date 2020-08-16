@@ -7,7 +7,6 @@ import $group__.client.ui.mvvm.core.binding.IBindingField;
 import $group__.client.ui.mvvm.core.binding.IBindingMethod;
 import $group__.client.ui.mvvm.core.binding.IHasBinding;
 import $group__.client.ui.mvvm.core.extensions.IUIExtension;
-import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
@@ -15,8 +14,7 @@ import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
 import $group__.client.ui.mvvm.core.views.components.parsers.UIProperty;
 import $group__.client.ui.mvvm.core.views.events.IUIEvent;
 import $group__.client.ui.mvvm.structures.ShapeDescriptor;
-import $group__.client.ui.mvvm.structures.UIAnchorSet;
-import $group__.client.ui.mvvm.views.components.extensions.UIExtensionCache;
+import $group__.client.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
@@ -28,7 +26,6 @@ import io.reactivex.rxjava3.subjects.UnicastSubject;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -43,9 +40,9 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 public class UIComponent
 		extends UIEventTarget
 		implements IUIComponent {
-	public static final String
-			PROPERTY_VISIBLE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "component.visible",
-			PROPERTY_ACTIVE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "component.active";
+	public static final String PROPERTY_VISIBLE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "component.visible";
+	public static final String PROPERTY_ACTIVE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "component.active";
+
 	private static final Rectangle2D SHAPE_PLACEHOLDER = new Rectangle2D.Double(0, 0, 1, 1);
 	protected final Map<String, IUIPropertyMappingValue> propertyMapping;
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
@@ -61,21 +58,22 @@ public class UIComponent
 	protected final IBindingField<Boolean> active;
 	protected WeakReference<IUIComponentContainer> parent = new WeakReference<>(null);
 
-	@SuppressWarnings({"OverridableMethodCallDuringObjectConstruction", "ThisEscapedInObjectConstruction"})
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public UIComponent(Map<String, IUIPropertyMappingValue> propertyMapping) {
+		IExtensionContainer.addExtensionSafe(this, new UIExtensionCache());
+
 		this.propertyMapping = new HashMap<>(propertyMapping);
 
 		this.visible = IHasBinding.createBindingField(Boolean.class, getPropertyMapping().get(PROPERTY_VISIBLE), Boolean::valueOf, true);
 		this.active = IHasBinding.createBindingField(Boolean.class, getPropertyMapping().get(PROPERTY_ACTIVE), Boolean::valueOf, true);
 
-		this.shapeDescriptor = createShapeDescriptor();
-		IExtensionContainer.addExtensionSafe(this, new UIExtensionCache());
+		this.shapeDescriptor = createShapeDescriptor(); // todo UGLY, probably should make it as an argument
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected final Map<String, IUIPropertyMappingValue> getPropertyMapping() { return propertyMapping; }
 
-	protected IShapeDescriptor<?> createShapeDescriptor() { return new ShapeDescriptor.Generic(getShapePlaceholderView(), new UIAnchorSet<>(this::getShapeDescriptor)); }
+	protected IShapeDescriptor<?> createShapeDescriptor() { return new ShapeDescriptor.Generic(getShapePlaceholderView()); } // todo ugly
 
 	public static Rectangle2D getShapePlaceholderView() { return (Rectangle2D) SHAPE_PLACEHOLDER.clone(); }
 
@@ -92,9 +90,6 @@ public class UIComponent
 
 	@Override
 	public void setVisible(boolean visible) { getVisible().setValue(visible); }
-
-	@Override
-	public boolean contains(final IAffineTransformStack stack, Point2D point) { return stack.getDelegated().peek().createTransformedShape(getShapeDescriptor().getShapeProcessed()).contains(point); }
 
 	@Override
 	public void onIndexMove(int previous, int next) {}

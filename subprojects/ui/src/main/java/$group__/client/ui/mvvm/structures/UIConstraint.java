@@ -15,7 +15,7 @@ public final class UIConstraint implements IUIConstraint, ICopyable {
 	public UIConstraint(Rectangle2D rectangleMin, Rectangle2D rectangleMax) {
 		this.rectangleMin = (Rectangle2D) rectangleMin.clone();
 		this.rectangleMax = (Rectangle2D) rectangleMax.clone();
-		correct(getRectangleMax(), getRectangleMin());
+		correct(getRectangleMin(), getRectangleMax());
 	}
 
 	protected static void correct(Rectangle2D min, Rectangle2D max) {
@@ -25,10 +25,10 @@ public final class UIConstraint implements IUIConstraint, ICopyable {
 		correct(min.getY(), max.getY(),
 				d -> min.setRect(min.getX(), d, min.getWidth(), min.getHeight()),
 				d -> max.setRect(max.getX(), d, max.getWidth(), max.getHeight()));
-		correct(min.getY(), max.getY(),
+		correct(min.getWidth(), max.getWidth(),
 				d -> min.setRect(min.getX(), min.getY(), d, min.getHeight()),
 				d -> max.setRect(max.getX(), max.getY(), d, max.getHeight()));
-		correct(min.getY(), max.getY(),
+		correct(min.getHeight(), max.getHeight(),
 				d -> min.setRect(min.getX(), min.getY(), min.getWidth(), d),
 				d -> max.setRect(max.getX(), max.getY(), max.getWidth(), d));
 	}

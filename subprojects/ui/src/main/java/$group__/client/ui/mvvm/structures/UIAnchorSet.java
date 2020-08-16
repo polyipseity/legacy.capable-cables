@@ -7,18 +7,21 @@ import $group__.utilities.specific.MapUtilities;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 
+import java.lang.ref.WeakReference;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Supplier;
 
-public class UIAnchorSet<A extends IUIAnchor> implements IUIAnchorSet<A> {
+public class UIAnchorSet<A extends IUIAnchor>
+		implements IUIAnchorSet<A> {
 	protected final ConcurrentMap<EnumUISide, A> anchors = MapUtilities.getMapMakerSingleThreaded().initialCapacity(EnumUISide.values().length).makeMap();
-	protected final Supplier<? extends IShapeDescriptor<?>> from;
+	protected final WeakReference<IShapeDescriptor<?>> from;
 
-	public UIAnchorSet(Supplier<? extends IShapeDescriptor<?>> from) { this.from = from; }
+	public UIAnchorSet(IShapeDescriptor<?> from) {
+		this.from = new WeakReference<>(from);
+	}
 
 	public static Set<UIAnchor> getAnchorsToMatch(IShapeDescriptor<?> to, double borderThickness) {
 		return Sets.newHashSet(
@@ -74,7 +77,7 @@ public class UIAnchorSet<A extends IUIAnchor> implements IUIAnchorSet<A> {
 	public Map<EnumUISide, A> getAnchorsView() { return ImmutableMap.copyOf(getAnchors()); }
 
 	@Override
-	public IShapeDescriptor<?> getFrom() { return from.get(); }
+	public Optional<IShapeDescriptor<?>> getFrom() { return Optional.ofNullable(from.get()); }
 
 	@Override
 	public boolean clear() { return removeSides(EnumSet.allOf(EnumUISide.class)); }

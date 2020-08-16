@@ -2,6 +2,8 @@ package $group__.client.ui.utilities;
 
 import $group__.client.ui.mvvm.structures.Dimension2DDouble;
 import $group__.utilities.client.minecraft.TransformUtilities.AffineTransformUtilities;
+import $group__.utilities.functions.IConsumer4;
+import $group__.utilities.functions.IFunction4;
 
 import java.awt.*;
 import java.awt.geom.Dimension2D;
@@ -37,27 +39,27 @@ public enum UIObjectUtilities {
 
 	public static Point getPointCeil(Point2D point) { return new Point((int) Math.ceil(point.getX()), (int) Math.ceil(point.getY())); }
 
-	public static <T> void acceptPoint(Point2D point, BiConsumer<Double, Double> user) { user.accept(point.getX(), point.getY()); }
+	public static <T> void acceptPoint(Point2D point, BiConsumer<Double, Double> action) { action.accept(point.getX(), point.getY()); }
 
-	public static <T> void acceptDimension(Dimension2D dimension, BiConsumer<Double, Double> user) { user.accept(dimension.getWidth(), dimension.getHeight()); }
+	public static <T> void acceptDimension(Dimension2D dimension, BiConsumer<Double, Double> action) { action.accept(dimension.getWidth(), dimension.getHeight()); }
 
-	public static void acceptRectangular(RectangularShape rectangular, BiFunction<Double, Double, BiConsumer<Double, Double>> user) { user.apply(rectangular.getX(), rectangular.getY()).accept(rectangular.getWidth(), rectangular.getHeight()); }
+	public static void acceptRectangular(RectangularShape rectangular, IConsumer4<Double, Double, Double, Double> action) { action.accept(rectangular.getX(), rectangular.getY(), rectangular.getWidth(), rectangular.getHeight()); }
 
 	public static Point2D minPoint(Point2D a, Point2D b) { return applyPoint(a, (ax, ay) -> applyPoint(b, (bx, by) -> new Point2D.Double(min(ax, bx), min(ay, by)))); }
 
-	public static <T> T applyPoint(Point2D point, BiFunction<Double, Double, T> user) { return user.apply(point.getX(), point.getY()); }
+	public static <T> T applyPoint(Point2D point, BiFunction<Double, Double, T> action) { return action.apply(point.getX(), point.getY()); }
 
 	public static Point2D maxPoint(Point2D a, Point2D b) { return applyPoint(a, (ax, ay) -> applyPoint(b, (bx, by) -> new Point2D.Double(max(ax, bx), max(ay, by)))); }
 
 	public static Dimension2D minDimension(Dimension2D a, Dimension2D b) { return applyDimension(a, (ax, ay) -> applyDimension(b, (bx, by) -> new Dimension2DDouble(min(ax, bx), min(ay, by)))); }
 
-	public static <T> T applyDimension(Dimension2D dimension, BiFunction<Double, Double, T> user) { return user.apply(dimension.getWidth(), dimension.getHeight()); }
+	public static <T> T applyDimension(Dimension2D dimension, BiFunction<Double, Double, T> action) { return action.apply(dimension.getWidth(), dimension.getHeight()); }
 
 	public static Dimension2D maxDimension(Dimension2D a, Dimension2D b) { return applyDimension(a, (ax, ay) -> applyDimension(b, (bx, by) -> new Dimension2DDouble(max(ax, bx), max(ay, by)))); }
 
-	public static Rectangle2D minRectangle(Rectangle2D a, Rectangle2D b) { return applyRectangular(a, (ax, ay) -> (aw, ah) -> applyRectangular(b, (bx, by) -> (bw, bh) -> new Rectangle2D.Double(min(ax, bx), min(ay, by), min(aw, bw), min(ah, bh)))); }
+	public static Rectangle2D minRectangle(Rectangle2D a, Rectangle2D b) { return applyRectangular(a, (ax, ay, aw, ah) -> applyRectangular(b, (bx, by, bw, bh) -> new Rectangle2D.Double(min(ax, bx), min(ay, by), min(aw, bw), min(ah, bh)))); }
 
-	public static <T> T applyRectangular(RectangularShape rectangular, BiFunction<Double, Double, BiFunction<Double, Double, T>> user) { return user.apply(rectangular.getX(), rectangular.getY()).apply(rectangular.getWidth(), rectangular.getHeight()); }
+	public static <T> T applyRectangular(RectangularShape rectangular, IFunction4<Double, Double, Double, Double, T> action) { return action.apply(rectangular.getX(), rectangular.getY(), rectangular.getWidth(), rectangular.getHeight()); }
 
-	public static Rectangle2D maxRectangle(Rectangle2D a, Rectangle2D b) { return applyRectangular(a, (ax, ay) -> (aw, ah) -> applyRectangular(b, (bx, by) -> (bw, bh) -> new Rectangle2D.Double(max(ax, bx), max(ay, by), max(aw, bw), max(ah, bh)))); }
+	public static Rectangle2D maxRectangle(Rectangle2D a, Rectangle2D b) { return applyRectangular(a, (ax, ay, aw, ah) -> applyRectangular(b, (bx, by, bw, bh) -> new Rectangle2D.Double(max(ax, bx), max(ay, by), max(aw, bw), max(ah, bh)))); }
 }

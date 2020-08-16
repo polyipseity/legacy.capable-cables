@@ -3,16 +3,24 @@ package $group__.client.ui.mvvm.minecraft.debug;
 import $group__.client.ui.ConfigurationUI;
 import $group__.client.ui.mvvm.binding.Binder;
 import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
+import $group__.client.ui.mvvm.core.views.components.IUIComponent;
+import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
+import $group__.client.ui.mvvm.core.views.components.IUIViewComponent;
 import $group__.client.ui.mvvm.core.views.components.parsers.IUIResourceParser;
 import $group__.client.ui.mvvm.minecraft.UIInfrastructureMinecraft;
+import $group__.client.ui.mvvm.minecraft.adapters.UIAdapterScreen;
 import $group__.client.ui.mvvm.minecraft.components.UIComponentManagerMinecraft;
 import $group__.client.ui.mvvm.minecraft.components.UIViewComponentMinecraft;
-import $group__.client.ui.mvvm.minecraft.components.adapters.UIAdapterScreen;
+import $group__.client.ui.mvvm.minecraft.components.common.UIComponentMinecraftWindow;
 import $group__.client.ui.mvvm.minecraft.viewmodels.UIViewModelMinecraft;
 import $group__.client.ui.mvvm.models.UIModel;
+import $group__.client.ui.mvvm.views.components.extensions.UIExtensionComponentUserRelocatable;
+import $group__.client.ui.mvvm.views.components.extensions.UIExtensionComponentUserResizable;
+import $group__.client.ui.mvvm.views.components.extensions.UIExtensionCursorHandleProviderComponent;
 import $group__.client.ui.mvvm.views.components.parsers.UIXMLDOMComponentParser;
 import $group__.utilities.client.minecraft.ResourceUtilities;
+import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.specific.ThrowableUtilities.Try;
 import net.minecraft.block.Block;
@@ -92,13 +100,36 @@ enum UIDebugFactory
 
 	@Override
 	public UIAdapterScreen.WithContainer<UIInfrastructureMinecraft<UIViewComponentMinecraft<IShapeDescriptor<? extends Rectangle2D>, IUIComponentManager<IShapeDescriptor<? extends Rectangle2D>>>, ViewModel, Binder>, ContainerDebug> create(ContainerDebug container, PlayerInventory inv, ITextComponent title) {
-		return new UIAdapterScreen.WithContainer<>(UIComponentDebug.DISPLAY_NAME, new UIInfrastructureMinecraft<>(
-				new UIViewComponentMinecraft<>(UIDebugFactory.getUI()),
-				new ViewModel(),
-				new Binder()), container);
+		return createUI(container);
 	}
 
-	private static IUIComponentManager<IShapeDescriptor<? extends Rectangle2D>> getUI() { return PARSER.createUI(); }
+	@SuppressWarnings("ObjectAllocationInLoop")
+	private static UIAdapterScreen.WithContainer<UIInfrastructureMinecraft<UIViewComponentMinecraft<IShapeDescriptor<? extends Rectangle2D>, IUIComponentManager<IShapeDescriptor<? extends Rectangle2D>>>, ViewModel, Binder>, ContainerDebug>
+	createUI(ContainerDebug container) {
+		UIAdapterScreen.WithContainer<UIInfrastructureMinecraft<UIViewComponentMinecraft<IShapeDescriptor<? extends Rectangle2D>, IUIComponentManager<IShapeDescriptor<? extends Rectangle2D>>>, ViewModel, Binder>, ContainerDebug>
+				ret =
+				new UIAdapterScreen.WithContainer<>(UIComponentDebug.DISPLAY_NAME, new UIInfrastructureMinecraft<>(
+						new UIViewComponentMinecraft<>(PARSER.createUI()),
+						new ViewModel(),
+						new Binder()), container);
+
+		// TODO add extensions with XML
+		IUIViewComponent<?, ?> v =
+				ret.getInfrastructure().getView();
+		IExtensionContainer.addExtensionSafeExtended(v, new UIExtensionCursorHandleProviderComponent<>(IUIViewComponent.class));
+		IUIComponentManager<?> m = v.getManager();
+		if (m instanceof IUIComponentContainer) {
+			IUIComponentContainer mc = (IUIComponentContainer) m;
+			for (IUIComponent mcC : mc.getChildrenView()) {
+				if (mcC instanceof UIComponentMinecraftWindow) {
+					UIComponentMinecraftWindow mcCc = (UIComponentMinecraftWindow) mcC;
+					IExtensionContainer.addExtensionSafeExtended(mcCc, new UIExtensionComponentUserRelocatable<>(UIComponentMinecraftWindow.class));
+					IExtensionContainer.addExtensionSafeExtended(mcCc, new UIExtensionComponentUserResizable<>(UIComponentMinecraftWindow.class));
+				}
+			}
+		}
+		return ret;
+	}
 
 	@OnlyIn(Dist.CLIENT)
 	protected static final class ViewModel
@@ -139,7 +170,7 @@ final class UIDebug extends GuiManagerWindows<ShapeDescriptor.Rectangular<Rectan
 				protected double tick = 0;
 
 				@Override
-				public void renderTick(final IAffineTransformStack stack, Point2D mouse, float partialTicks) {
+				public void renderTick(IAffineTransformStack stack, Point2D mouse, float partialTicks) {
 					tick = (tick + partialTicks) % 360;
 					if (tick % 120 == 0) {
 						UIObjectUtilities.acceptRectangular(getShapeDescriptor().getShape(), (x, y) -> (w, h) -> current.setFrame(x * random.nextDouble() * 2, y * random.nextDouble() * 2, w * random.nextDouble() * 2, y * random.nextDouble() * 2));

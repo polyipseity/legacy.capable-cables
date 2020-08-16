@@ -40,15 +40,15 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 		this.viewModel = viewModel;
 		this.binder = binder;
 
-		getView().setInfrastructure(this);
-		getViewModel().setInfrastructure(this);
+		view.setInfrastructure(this);
+		viewModel.setInfrastructure(this);
 	}
 
 	@Override
-	public final V getView() { return view; }
+	public V getView() { return view; }
 
 	@Override
-	public final VM getViewModel() { return viewModel; }
+	public VM getViewModel() { return viewModel; }
 
 	@Override
 	public B getBinder() { return binder; }

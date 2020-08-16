@@ -6,12 +6,11 @@ import com.google.common.collect.Streams;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.awt.geom.Rectangle2D;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.Optional;
 
 @OnlyIn(Dist.CLIENT)
-public interface IUIAnchorSet<A extends IUIAnchor> extends Consumer<Rectangle2D> {
+public interface IUIAnchorSet<A extends IUIAnchor> {
 	boolean addAnchors(Iterable<A> anchors);
 
 	@SuppressWarnings("UnstableApiUsage")
@@ -19,14 +18,11 @@ public interface IUIAnchorSet<A extends IUIAnchor> extends Consumer<Rectangle2D>
 
 	boolean removeSides(Iterable<EnumUISide> sides);
 
-	@Override
-	default void accept(Rectangle2D rectangle) { anchor(); }
-
-	default void anchor() { getAnchorsView().forEach((s, a) -> a.anchor(getFrom())); }
+	default void anchor() { getFrom().ifPresent(f -> getAnchorsView().forEach((s, a) -> a.anchor(f))); }
 
 	Map<EnumUISide, A> getAnchorsView();
 
-	IShapeDescriptor<?> getFrom();
+	Optional<IShapeDescriptor<?>> getFrom();
 
 	default boolean isEmpty() { return getAnchorsView().isEmpty(); }
 

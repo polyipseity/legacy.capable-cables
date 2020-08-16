@@ -1,6 +1,7 @@
 package $group__.utilities.extensions;
 
 import $group__.utilities.CastUtilities;
+import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
@@ -8,21 +9,17 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public interface IExtensionContainer<K, V extends IExtension<? extends K, ?>> {
 	Logger LOGGER = LogManager.getLogger();
 
 	@SuppressWarnings("UnusedReturnValue")
-	static <K, V extends IExtension<? extends K, ? super C>, C extends IExtensionContainer<K, V>> Optional<V> addExtensionSafe(C container, V extension) { return container.addExtension(extension); }
+	static <K, V extends IExtension<? extends K, ? super C>, C extends IExtensionContainer<K, ? super V>> Optional<? super V> addExtensionSafe(C container, V extension) { return container.addExtension(extension); }
+
+	@SuppressWarnings("UnusedReturnValue")
+	static <K, V extends IExtension<? extends K, C> & IHasGenericClass.Extended<C, ? super E>, C extends IExtensionContainer<K, ? super V>, E extends C> Optional<? super V> addExtensionSafeExtended(E container, V extension) { return container.addExtension(extension); }
 
 	Optional<V> addExtension(V extension);
-
-	static <K, V extends IExtension<? extends K, ? super C>, C extends IExtensionContainer<K, V>> Optional<V> addExtensionDecorated(C container, K key, BiFunction<? super C, ? super V, ? extends Optional<? extends V>> function, Function<? super V, ? extends V> extension) {
-		Optional<V> o = container.getExtension(key);
-		return function.apply(container, extension.apply(o.orElse(null))).map(Function.identity());
-	}
 
 	static <K, V extends IExtension<? super K, ?>> Optional<V> getExtension(Map<K, V> extensions, K key) { return Optional.ofNullable(extensions.get(key)); }
 

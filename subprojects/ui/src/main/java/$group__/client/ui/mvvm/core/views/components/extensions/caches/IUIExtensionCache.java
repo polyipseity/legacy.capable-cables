@@ -2,7 +2,7 @@ package $group__.client.ui.mvvm.core.views.components.extensions.caches;
 
 import $group__.client.ui.events.bus.EventBusEntryPoint;
 import $group__.client.ui.mvvm.core.extensions.IUIExtension;
-import $group__.client.ui.mvvm.views.components.extensions.UIExtensionCache;
+import $group__.utilities.CastUtilities;
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.structures.Registry;
@@ -21,6 +21,8 @@ import java.util.function.Function;
 public interface IUIExtensionCache
 		extends IUIExtension<ResourceLocation, IExtensionContainer<ResourceLocation, ?>> {
 	ResourceLocation KEY = new ResourceLocation(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, AREA_UI + ".cache");
+	Registry.RegistryObject<IUIExtension.IType<ResourceLocation, IUIExtensionCache, IExtensionContainer<ResourceLocation, ?>>> TYPE =
+			RegExtension.INSTANCE.registerApply(KEY, k -> new IUIExtension.IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
 
 	Cache<ResourceLocation, Object> getDelegated();
 
@@ -30,7 +32,7 @@ public interface IUIExtensionCache
 		default void invalidate(I instance) { invalidate(instance, getKey()); }
 
 		static void invalidate(IExtensionContainer<ResourceLocation, ?> instance, ResourceLocation key) {
-			UIExtensionCache.TYPE.getValue().get(instance).ifPresent(c -> c.getDelegated().invalidate(key));
+			IUIExtensionCache.TYPE.getValue().get(instance).ifPresent(c -> c.getDelegated().invalidate(key));
 		}
 
 		ResourceLocation getKey();
@@ -40,6 +42,7 @@ public interface IUIExtensionCache
 			protected final BiFunction<? super IType<V, I>, ? super I, ? extends Optional<? extends V>> getter;
 			protected final BiConsumer<? super IType<V, I>, ? super I> invalidator;
 			protected final Object eventListener;
+			protected final Object cleanerRef = new Object();
 
 			@SuppressWarnings("ThisEscapedInObjectConstruction")
 			public Impl(ResourceLocation key,
@@ -50,14 +53,11 @@ public interface IUIExtensionCache
 				this.getter = getter;
 				this.invalidator = invalidator;
 				this.eventListener = eventListenerFunction.apply(this);
-				EventBusEntryPoint.INSTANCE.register(getEventListener());
-				{
-					Object eventListenerRef = getEventListener();
-					Cleaner.create(this, () -> EventBusEntryPoint.INSTANCE.unregister(eventListenerRef));
-				}
+				EventBusEntryPoint.INSTANCE.register(eventListener);
+				Cleaner.create(cleanerRef, () -> EventBusEntryPoint.INSTANCE.unregister(eventListener));
 			}
 
-			protected final Object getEventListener() { return eventListener; }
+			protected Object getEventListener() { return eventListener; }
 
 			@Override
 			public Optional<V> get(I instance) { return getGetter().apply(this, instance).map(Function.identity()); }

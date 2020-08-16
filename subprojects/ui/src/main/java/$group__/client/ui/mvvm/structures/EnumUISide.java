@@ -1,7 +1,6 @@
 package $group__.client.ui.mvvm.structures;
 
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.util.EnumSet;
 import java.util.function.BiConsumer;
@@ -17,13 +16,13 @@ public enum EnumUISide {
 		public EnumUISide getOpposite() { return DOWN; }
 
 		@Override
-		public boolean isMouseOver(Rectangle2D rectangle, Point2D mouse) { return mouse.getY() < rectangle.getY(); }
+		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return mouse.getY() < rectangular.getY(); }
 
 		@Override
-		public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getY; }
+		public Function<RectangularShape, Double> getGetter() { return RectangularShape::getY; }
 
 		@Override
-		public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), i, r.getMaxX(), r.getMaxY()); }
+		public BiConsumer<RectangularShape, Double> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), i, r.getMaxX(), r.getMaxY()); }
 
 		@Override
 		public BiFunction<Double, Double, Double> getApplyBorder() { return Double::sum; }
@@ -36,13 +35,13 @@ public enum EnumUISide {
 		public EnumUISide getOpposite() { return UP; }
 
 		@Override
-		public boolean isMouseOver(Rectangle2D rectangle, Point2D mouse) { return mouse.getY() >= rectangle.getMaxY(); }
+		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return mouse.getY() >= rectangular.getMaxY(); }
 
 		@Override
-		public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getMaxY; }
+		public Function<RectangularShape, Double> getGetter() { return RectangularShape::getMaxY; }
 
 		@Override
-		public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), r.getY(), r.getMaxX(), i); }
+		public BiConsumer<RectangularShape, Double> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), r.getY(), r.getMaxX(), i); }
 
 		@Override
 		public BiFunction<Double, Double, Double> getApplyBorder() { return (i, b) -> i - b; }
@@ -55,13 +54,13 @@ public enum EnumUISide {
 		public EnumUISide getOpposite() { return RIGHT; }
 
 		@Override
-		public boolean isMouseOver(Rectangle2D rectangle, Point2D mouse) { return mouse.getX() < rectangle.getX(); }
+		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return mouse.getX() < rectangular.getX(); }
 
 		@Override
-		public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getX; }
+		public Function<RectangularShape, Double> getGetter() { return RectangularShape::getX; }
 
 		@Override
-		public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromDiagonal(i, r.getY(), r.getMaxX(), r.getMaxY()); }
+		public BiConsumer<RectangularShape, Double> getSetter() { return (r, i) -> r.setFrameFromDiagonal(i, r.getY(), r.getMaxX(), r.getMaxY()); }
 
 		@Override
 		public BiFunction<Double, Double, Double> getApplyBorder() { return Double::sum; }
@@ -74,13 +73,13 @@ public enum EnumUISide {
 		public EnumUISide getOpposite() { return LEFT; }
 
 		@Override
-		public boolean isMouseOver(Rectangle2D rectangle, Point2D mouse) { return mouse.getX() >= rectangle.getMaxX(); }
+		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return mouse.getX() >= rectangular.getMaxX(); }
 
 		@Override
-		public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getMaxX; }
+		public Function<RectangularShape, Double> getGetter() { return RectangularShape::getMaxX; }
 
 		@Override
-		public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), r.getY(), i, r.getMaxY()); }
+		public BiConsumer<RectangularShape, Double> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), r.getY(), i, r.getMaxY()); }
 
 		@Override
 		public BiFunction<Double, Double, Double> getApplyBorder() { return (i, b) -> i - b; }
@@ -93,10 +92,10 @@ public enum EnumUISide {
 		public EnumUISide getOpposite() { return VERTICAL; }
 
 		@Override
-		public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getCenterX; }
+		public Function<RectangularShape, Double> getGetter() { return RectangularShape::getCenterX; }
 
 		@Override
-		public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromCenter(i, r.getCenterY(), r.getX() + i - r.getCenterX(), r.getY()); }
+		public BiConsumer<RectangularShape, Double> getSetter() { return (r, i) -> r.setFrameFromCenter(i, r.getCenterY(), r.getX() + i - r.getCenterX(), r.getY()); }
 
 		@Override
 		public BiFunction<Double, Double, Double> getApplyBorder() { return (i, b) -> i; }
@@ -109,30 +108,30 @@ public enum EnumUISide {
 		public EnumUISide getOpposite() { return HORIZONTAL; }
 
 		@Override
-		public Function<Rectangle2D, Double> getGetter() { return RectangularShape::getCenterY; }
+		public Function<RectangularShape, Double> getGetter() { return RectangularShape::getCenterY; }
 
 		@Override
-		public BiConsumer<Rectangle2D, Double> getSetter() { return (r, i) -> r.setFrameFromCenter(i, r.getCenterY(), r.getX() + i - r.getCenterX(), r.getY()); }
+		public BiConsumer<RectangularShape, Double> getSetter() { return (r, i) -> r.setFrameFromCenter(i, r.getCenterY(), r.getX() + i - r.getCenterX(), r.getY()); }
 
 		@Override
 		public BiFunction<Double, Double, Double> getApplyBorder() { return (i, b) -> i; }
 	};
 
-	public static EnumSet<EnumUISide> getSidesMouseOver(Rectangle2D rectangle, Point2D mouse) {
+	public static EnumSet<EnumUISide> getSidesMouseOver(RectangularShape rectangular, Point2D mouse) {
 		EnumSet<EnumUISide> sides = EnumSet.noneOf(EnumUISide.class);
-		for (EnumUISide side : EnumUISide.values()) if (side.isMouseOver(rectangle, mouse)) sides.add(side);
+		for (EnumUISide side : EnumUISide.values()) if (side.isMouseOver(rectangular, mouse)) sides.add(side);
 		return sides;
 	}
 
-	public boolean isMouseOver(Rectangle2D rectangle, Point2D mouse) { return false; }
+	public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return false; }
 
 	public abstract EnumUIAxis getAxis();
 
 	public abstract EnumUISide getOpposite();
 
-	public abstract Function<Rectangle2D, Double> getGetter();
+	public abstract Function<RectangularShape, Double> getGetter();
 
-	public abstract BiConsumer<Rectangle2D, Double> getSetter();
+	public abstract BiConsumer<RectangularShape, Double> getSetter();
 
 	public abstract BiFunction<Double, Double, Double> getApplyBorder();
 }

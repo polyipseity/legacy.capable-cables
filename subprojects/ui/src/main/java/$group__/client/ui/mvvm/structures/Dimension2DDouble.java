@@ -21,7 +21,10 @@ public class Dimension2DDouble extends Dimension2D implements Serializable {
 
 	public Dimension2DDouble() { this(0, 0); }
 
-	public Dimension2DDouble(double width, double height) { setSize(width, height); }
+	public Dimension2DDouble(double width, double height) {
+		this.width = width;
+		this.height = height;
+	}
 
 	@Override
 	public double getWidth() { return width; }

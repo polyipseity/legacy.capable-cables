@@ -52,5 +52,5 @@ public abstract class UIView<SD extends IShapeDescriptor<?>>
 	protected ConcurrentMap<ResourceLocation, IUIExtension<ResourceLocation, ? extends IUIView<?>>> getExtensions() { return extensions; }
 
 	@Override
-	public boolean reshape(Function<? super SD, ? extends Boolean> action) throws ConcurrentModificationException { return getShapeDescriptor().modify(getShapeDescriptor(), action); }
+	public boolean reshape(Function<? super SD, ? extends Boolean> action) throws ConcurrentModificationException { return getShapeDescriptor().modify(() -> action.apply(getShapeDescriptor())); }
 }

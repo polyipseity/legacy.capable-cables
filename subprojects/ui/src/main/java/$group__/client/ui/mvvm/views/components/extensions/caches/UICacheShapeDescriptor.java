@@ -1,7 +1,8 @@
-package $group__.client.ui.mvvm.core.views.components.extensions.caches;
+package $group__.client.ui.mvvm.views.components.extensions.caches;
 
 import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
+import $group__.client.ui.mvvm.core.views.components.extensions.caches.IUIExtensionCache;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.specific.MapUtilities;

@@ -6,7 +6,6 @@ import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
 import $group__.client.ui.mvvm.core.views.components.parsers.UIConstructor;
 import $group__.client.ui.mvvm.minecraft.core.views.IUIComponentMinecraft;
 import $group__.client.ui.mvvm.structures.ShapeDescriptor;
-import $group__.client.ui.mvvm.structures.UIAnchorSet;
 import $group__.client.ui.mvvm.views.components.UIComponentManager;
 import $group__.utilities.functions.IFunction4;
 import net.minecraftforge.api.distmarker.Dist;
@@ -28,17 +27,8 @@ public class UIComponentManagerMinecraft
 	public UIComponentManagerMinecraft(Map<String, IUIPropertyMappingValue> propertyMapping) { super(propertyMapping); }
 
 	@Override
-	protected IShapeDescriptor<? extends Rectangle2D> createShapeDescriptor() { return new ShapeDescriptor.Rectangular<>(getShapePlaceholderView(), new UIAnchorSet<>(this::getShapeDescriptor)); }
+	protected IShapeDescriptor<? extends Rectangle2D> createShapeDescriptor() { return new ShapeDescriptor.Rectangular<>(getShapePlaceholderView()); }
 
 	@Override
-	public void render(final IAffineTransformStack stack, Point2D cursorPosition, double partialTicks, boolean pre) { getScheduledActions().removeIf(a -> a.apply(stack, cursorPosition, partialTicks, pre)); }
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected List<IFunction4<? super IAffineTransformStack, ? super Point2D, ? super Double, ? super Boolean, ? extends Boolean>> getScheduledActions() { return scheduledActions; }
-
-	@Override
-	public void schedule(IFunction4<? super IAffineTransformStack, ? super Point2D, ? super Double, ? super Boolean, ? extends Boolean> action) { getScheduledActions().add(action); }
-
-	@Override
-	public void crop(final IAffineTransformStack stack, EnumCropMethod method, boolean push, Point2D mouse, double partialTicks) {}
+	public void crop(IAffineTransformStack stack, EnumCropMethod method, boolean push, Point2D mouse, double partialTicks) {}
 }

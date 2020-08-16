@@ -3,7 +3,7 @@ package $group__.client.ui.events.ui;
 import $group__.client.ui.mvvm.core.structures.IUIDataKeyboardKeyPress;
 import $group__.client.ui.mvvm.core.structures.IUIDataMouseButtonClick;
 import $group__.client.ui.mvvm.core.views.events.*;
-import $group__.client.ui.mvvm.core.views.nodes.IUINode;
+import $group__.client.ui.mvvm.core.views.paths.IUINode;
 import $group__.client.ui.mvvm.structures.UIDataMouseButtonClick;
 import $group__.client.ui.mvvm.views.events.ui.*;
 import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
@@ -31,20 +31,27 @@ public enum UIEventUtilities {
 			event.advancePhase();
 			for (int i = 0, maxI = path.size() - 1; i < maxI; i++) {
 				IUINode n = path.get(i);
-				if (n instanceof IUIEventTarget)
-					ret |= ((IUIEventTarget) n).dispatchEvent(event);
+				if (n instanceof IUIEventTarget) {
+					IUIEventTarget nc = (IUIEventTarget) n;
+					if (nc.isActive())
+						ret |= nc.dispatchEvent(event);
+				}
 			}
 
 			event.advancePhase();
-			ret |= event.getTarget().dispatchEvent(event);
+			if (event.getTarget().isActive())
+				ret |= event.getTarget().dispatchEvent(event);
 
 			if (!event.isPropagationStopped() && event.canBubble()) {
 				event.advancePhase();
 				ImmutableList<IUINode> pathReversed = path.reverse();
 				for (int i = 1, maxI = pathReversed.size(); i < maxI; i++) {
 					IUINode n = pathReversed.get(i);
-					if (n instanceof IUIEventTarget)
-						ret |= ((IUIEventTarget) n).dispatchEvent(event);
+					if (n instanceof IUIEventTarget) {
+						IUIEventTarget nc = (IUIEventTarget) n;
+						if (nc.isActive())
+							ret |= nc.dispatchEvent(event);
+					}
 				}
 			}
 		} else {

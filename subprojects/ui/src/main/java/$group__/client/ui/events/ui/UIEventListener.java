@@ -24,10 +24,6 @@ public abstract class UIEventListener<E extends IUIEvent>
 
 	protected abstract void accept0(E event);
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public UIEventListener<E> clone() throws CloneNotSupportedException { return (UIEventListener<E>) super.clone(); }
-
 	public static class Functional<E extends IUIEvent>
 			extends UIEventListener<E> {
 		protected final Consumer<E> action;
@@ -38,8 +34,5 @@ public abstract class UIEventListener<E extends IUIEvent>
 		protected void accept0(E event) { getAction().accept(event); }
 
 		protected Consumer<E> getAction() { return action; }
-
-		@Override
-		public Functional<E> clone() throws CloneNotSupportedException { return (Functional<E>) super.clone(); }
 	}
 }

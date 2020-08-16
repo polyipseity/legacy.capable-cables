@@ -21,7 +21,6 @@ import $group__.client.ui.mvvm.views.events.ui.UIEventMouse;
 import $group__.client.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.client.minecraft.GLUtilities;
-import $group__.utilities.functions.IFunction4;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -32,8 +31,6 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.EnumSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 // TODO responsibility of this classes may need to be delegated to the view model via some means
@@ -63,7 +60,6 @@ public class UIComponentMinecraftButton
 	protected final IBindingField<Color> colorPressedBorder;
 	@UIMethod(METHOD_ON_ACTIVATED)
 	protected final IBindingMethod.ISource<IUIEvent> methodOnActivated;
-	protected final List<IFunction4<? super IAffineTransformStack, ? super Point2D, ? super Double, ? super Boolean, ? extends Boolean>> scheduledActions = new LinkedList<>();
 	protected final EnumSet<IButtonState> buttonStates = EnumSet.noneOf(IButtonState.class);
 
 	@UIConstructor
@@ -138,11 +134,10 @@ public class UIComponentMinecraftButton
 	}
 
 	@Override
-	public void render(final IAffineTransformStack stack, Point2D cursorPosition, double partialTicks, boolean pre) {
-		getScheduledActions().removeIf(a -> a.apply(stack, cursorPosition, partialTicks, pre));
+	public void render(IAffineTransformStack stack, Point2D cursorPosition, double partialTicks, boolean pre) {
 		if (pre) {
 			AffineTransform transform = stack.getDelegated().peek();
-			Shape transformed = transform.createTransformedShape(getShapeDescriptor().getShapeProcessed());
+			Shape transformed = transform.createTransformedShape(getShapeDescriptor().getShapeOutput());
 			if (getButtonStates().contains(IButtonState.PRESSING)) {
 				DrawingUtilities.drawShape(transformed, true, getColorPressed().getValue(), 0);
 				DrawingUtilities.drawShape(transformed, false, getColorPressedBorder().getValue(), 0);
@@ -156,18 +151,11 @@ public class UIComponentMinecraftButton
 		}
 	}
 
-	@Override
-	public void schedule(IFunction4<? super IAffineTransformStack, ? super Point2D, ? super Double, ? super Boolean, ? extends Boolean> action) { getScheduledActions().add(action); }
 
 	@Override
 	public void crop(IAffineTransformStack stack, EnumCropMethod method, boolean push, Point2D mouse, double partialTicks) { IUIComponentMinecraft.crop(this, stack, method, push, mouse, partialTicks); }
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected List<IFunction4<? super IAffineTransformStack, ? super Point2D, ? super Double, ? super Boolean, ? extends Boolean>> getScheduledActions() { return scheduledActions; }
-
-	protected IBindingField<Color> getColorPressed() {
-		return colorPressed;
-	}
+	protected IBindingField<Color> getColorPressed() { return colorPressed; }
 
 	protected IBindingField<Color> getColorPressedBorder() {
 		return colorPressedBorder;

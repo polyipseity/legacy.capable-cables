@@ -2,33 +2,23 @@ package $group__.client.ui.mvvm.structures;
 
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.utilities.ObjectUtilities;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import sun.misc.Cleaner;
 
 import java.awt.geom.AffineTransform;
 import java.util.Stack;
 
 public class AffineTransformStack implements IAffineTransformStack {
-	private static final Logger LOGGER = LogManager.getLogger();
 	protected final Stack<AffineTransform> delegated = new Stack<>();
+	protected final Object cleanerRef = new Object();
 
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public AffineTransformStack() {
-		getDelegated().push(new AffineTransform());
-		{
-			Stack<AffineTransform> delegatedRef = getDelegated();
-			// TODO see if the lambda will have an implicit ref to this
-			Cleaner.create(this, () -> {
-				if (!IAffineTransformStack.isClean(delegatedRef))
-					LOGGER.warn("Stack not clean, content:{}{}", System.lineSeparator(), delegatedRef);
-			});
-		}
+		delegated.push(new AffineTransform());
+		Cleaner.create(cleanerRef, new LeakNotifier(delegated));
 	}
 
 	@Override
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	public final Stack<AffineTransform> getDelegated() { return delegated; }
+	public Stack<AffineTransform> getDelegated() { return delegated; }
 
 	@Override
 	@SuppressWarnings("UnusedReturnValue")

@@ -1,4 +1,4 @@
-package $group__.client.ui.mvvm.core.views.nodes;
+package $group__.client.ui.mvvm.core.views.paths;
 
 import java.util.List;
 import java.util.Optional;

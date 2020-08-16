@@ -87,14 +87,12 @@ public class Binder implements IBinder {
 		protected final ResourceLocation bindingKey;
 		protected final Map<IBindingField<T>, Disposable> fields = new HashMap<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
 		protected final AtomicBoolean isSource = new AtomicBoolean();
+		protected final Object cleanerRef = new Object();
 
 		public FieldBinding(ResourceLocation bindingKey) {
 			this.bindingKey = bindingKey;
-			{
-				final Map<IBindingField<T>, Disposable> fieldsCopy = getFields();
-				// TODO see if the lambda will have an implicit ref to this
-				Cleaner.create(this, () -> fieldsCopy.values().forEach(Disposable::dispose));
-			}
+			Cleaner.create(cleanerRef, () ->
+					fields.values().forEach(Disposable::dispose)); // todo any implicit this
 		}
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
@@ -151,14 +149,12 @@ public class Binder implements IBinder {
 		protected final ResourceLocation bindingKey;
 		protected final Map<IBindingMethod.ISource<T>, Disposable> sources = new HashMap<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
 		protected final Set<IBindingMethod.IDestination<T>> destinations = new HashSet<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
+		protected final Object cleanerRef = new Object();
 
 		public MethodBinding(ResourceLocation bindingKey) {
 			this.bindingKey = bindingKey;
-			{
-				Map<IBindingMethod.ISource<T>, Disposable> sourcesCopy = getSources();
-				// TODO see if the lambda will have an implicit ref to this
-				Cleaner.create(this, () -> sourcesCopy.values().forEach(Disposable::dispose));
-			}
+			Cleaner.create(cleanerRef, ()
+					-> sources.values().forEach(Disposable::dispose)); // TODO any implicit this
 		}
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
