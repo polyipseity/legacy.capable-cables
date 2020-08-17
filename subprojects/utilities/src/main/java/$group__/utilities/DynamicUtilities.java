@@ -7,6 +7,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
+import net.jodah.typetools.TypeResolver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
@@ -208,6 +209,21 @@ public enum DynamicUtilities {
 		protected Class<?>[] getClassContext() {
 			Class<?>[] r = super.getClassContext();
 			return Arrays.copyOfRange(r, 1, r.length);
+		}
+	}
+
+	public enum Extensions {
+		;
+
+		public static Optional<Class<?>>[] wrapTypeResolverResults(Class<?>... results) {
+			@SuppressWarnings("unchecked") Optional<Class<?>>[] ret = new Optional[results.length];
+			for (int i = 0; i < results.length; i++)
+				ret[i] = wrapTypeResolverResult(results[i]);
+			return ret;
+		}
+
+		public static Optional<Class<?>> wrapTypeResolverResult(Class<?> result) {
+			return TypeResolver.Unknown.class.equals(result) ? Optional.empty() : Optional.of(result);
 		}
 	}
 }
