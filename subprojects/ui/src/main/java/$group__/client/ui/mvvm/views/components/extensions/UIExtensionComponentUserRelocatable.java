@@ -12,6 +12,7 @@ import $group__.client.ui.mvvm.core.views.components.extensions.cursors.IUICompo
 import $group__.client.ui.mvvm.core.views.events.IUIEventMouse;
 import $group__.client.ui.mvvm.views.components.UIComponentVirtual;
 import $group__.client.ui.mvvm.views.events.ui.UIEventMouse;
+import $group__.client.ui.structures.Point2DImmutable;
 import $group__.client.ui.structures.ShapeDescriptor;
 import $group__.client.ui.utilities.UIObjectUtilities;
 import $group__.client.ui.utilities.minecraft.DrawingUtilities;
@@ -201,7 +202,7 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 		@SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
 		public void onNext(GuiScreenEvent.DrawScreenEvent.Post event) {
 			getRelocateData().ifPresent(d -> getContainer().ifPresent(c -> c.getManager().ifPresent(m -> {
-				Point2D cp = new Point2D.Double(event.getMouseX(), event.getMouseY());
+				Point2D cp = new Point2DImmutable(event.getMouseX(), event.getMouseY());
 				Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
 				d.handle(r, cp);
 				DrawingUtilities.drawRectangle(m.getPathResolver().resolvePath(cp, true).getTransformCurrentView(),

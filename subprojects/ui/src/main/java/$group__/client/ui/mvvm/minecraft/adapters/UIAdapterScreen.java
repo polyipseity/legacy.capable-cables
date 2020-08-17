@@ -13,6 +13,7 @@ import $group__.client.ui.mvvm.minecraft.core.IUIInfrastructureMinecraft;
 import $group__.client.ui.mvvm.minecraft.core.extensions.IUIExtensionContainerProvider;
 import $group__.client.ui.mvvm.minecraft.core.extensions.IUIExtensionScreenProvider;
 import $group__.client.ui.structures.Dimension2DDouble;
+import $group__.client.ui.structures.Point2DImmutable;
 import $group__.client.ui.utilities.InputUtilities;
 import $group__.client.ui.utilities.UIDataKeyboardKeyPress;
 import $group__.client.ui.utilities.UIDataMouseButtonClick;
@@ -93,7 +94,7 @@ public class UIAdapterScreen
 	@Override
 	@Deprecated
 	public void render(int mouseX, int mouseY, float partialTicks) {
-		Point2D.Double cp = new Point2D.Double(mouseX, mouseY); // TODO make an immutable variant
+		Point2D cp = new Point2DImmutable(mouseX, mouseY);
 		getInfrastructure().getView().render(cp, partialTicks);
 		IUIExtensionCursorHandleProvider.TYPE.getValue().get(getInfrastructure().getView()).ifPresent(ext ->
 				GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), ext.getCursorHandle(cp).orElse(MemoryUtil.NULL)));
@@ -208,7 +209,7 @@ public class UIAdapterScreen
 	@Override
 	@Deprecated
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		Point2D cp = new Point2D.Double(mouseX, mouseY);
+		Point2D cp = new Point2DImmutable(mouseX, mouseY);
 		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
 		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(cp);
 		if (UIEventUtilities.dispatchEvent(addEventMouse(this, UIEventUtilities.Factory.createEventMouseDown(t, d)))) {
@@ -225,7 +226,7 @@ public class UIAdapterScreen
 	@Deprecated
 	public boolean mouseReleased(double mouseX, double mouseY, int button) {
 		// TODO test if release works when multiple buttons are clicked
-		Point2D cp = new Point2D.Double(mouseX, mouseY);
+		Point2D cp = new Point2DImmutable(mouseX, mouseY);
 		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
 		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(cp);
 		removeEventMouse(this, button).ifPresent(e -> {
@@ -273,7 +274,7 @@ public class UIAdapterScreen
 	@Override
 	@Deprecated
 	public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-		Point2D cp = new Point2D.Double(mouseX, mouseY);
+		Point2D cp = new Point2DImmutable(mouseX, mouseY);
 		IUIEventTarget target = getInfrastructure().getView().getTargetAtPoint(cp);
 		UIEventUtilities.dispatchEvent(
 				UIEventUtilities.Factory.createEventWheel(false, target, new UIDataMouseButtonClick(cp), target, delta)); // COMMENT nothing to be scrolled
@@ -501,7 +502,7 @@ public class UIAdapterScreen
 	@Override
 	@Deprecated
 	public void mouseMoved(double mouseX, double mouseY) {
-		Point2D cp = new Point2D.Double(mouseX, mouseY);
+		Point2D cp = new Point2DImmutable(mouseX, mouseY);
 		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp);
 		UIEventUtilities.dispatchEvent(
 				UIEventUtilities.Factory.createEventMouseMove(getInfrastructure().getView().getTargetAtPoint(cp), d));
@@ -518,24 +519,22 @@ public class UIAdapterScreen
 
 	@Override
 	@Deprecated
-	protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) { DrawingUtilities.fillGradient(TransformUtilities.AffineTransformUtilities.getIdentity(), UIObjectUtilities.getRectangleFromDiagonal(new Point2D.Double(x1, y1), new Point2D.Double(x2, y2)), colorTop, colorBottom, getBlitOffset()); }
+	protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) { DrawingUtilities.fillGradient(TransformUtilities.AffineTransformUtilities.getIdentity(), UIObjectUtilities.getRectangleFromDiagonal(new Point2DImmutable(x1, y1), new Point2DImmutable(x2, y2)), colorTop, colorBottom, getBlitOffset()); }
 
 	@Override
 	@Deprecated
-	public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawCenteredString(TransformUtilities.AffineTransformUtilities.getIdentity(), font, string, new Point2D.Double(x, y), color); }
+	public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawCenteredString(TransformUtilities.AffineTransformUtilities.getIdentity(), font, string, new Point2DImmutable(x, y), color); }
 
 	@Override
 	@Deprecated
-	public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawRightAlignedString(TransformUtilities.AffineTransformUtilities.getIdentity(), font, string, new Point2D.Double(x, y), color); }
+	public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawRightAlignedString(TransformUtilities.AffineTransformUtilities.getIdentity(), font, string, new Point2DImmutable(x, y), color); }
 
 	@Override
 	@Deprecated
-	public void drawString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawString(TransformUtilities.AffineTransformUtilities.getIdentity(), font, string, new Point2D.Double(x, y), color); }
+	public void drawString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawString(TransformUtilities.AffineTransformUtilities.getIdentity(), font, string, new Point2DImmutable(x, y), color); }
 
 	@SuppressWarnings("MagicNumber")
 	@Override
 	@Deprecated
-	public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(TransformUtilities.AffineTransformUtilities.getIdentity(), new Rectangle2D.Double(x, y, w, h), new Point2D.Double(u, v), new Dimension2DDouble(256, 256), getBlitOffset()); }
-
-
+	public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(TransformUtilities.AffineTransformUtilities.getIdentity(), new Rectangle2D.Double(x, y, w, h), new Point2DImmutable(u, v), new Dimension2DDouble(256, 256), getBlitOffset()); }
 }

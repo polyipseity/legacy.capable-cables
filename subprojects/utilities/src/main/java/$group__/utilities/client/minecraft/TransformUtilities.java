@@ -20,6 +20,7 @@ public enum TransformUtilities {
 
 	public static final int MATRIX_ARRAY_LENGTH = 16;
 
+	// TODO remove these, GC counts live objects
 	private static final Vector4f VECTOR = new Vector4f();
 	private static final Point2D
 			POINT = new Point2D.Double(),

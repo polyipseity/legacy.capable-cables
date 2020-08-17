@@ -12,10 +12,7 @@ import $group__.client.ui.mvvm.core.views.components.extensions.cursors.IUICompo
 import $group__.client.ui.mvvm.core.views.events.IUIEventMouse;
 import $group__.client.ui.mvvm.views.components.UIComponentVirtual;
 import $group__.client.ui.mvvm.views.events.ui.UIEventMouse;
-import $group__.client.ui.structures.EnumCursor;
-import $group__.client.ui.structures.EnumUIAxis;
-import $group__.client.ui.structures.EnumUISide;
-import $group__.client.ui.structures.ShapeDescriptor;
+import $group__.client.ui.structures.*;
 import $group__.client.ui.utilities.UIObjectUtilities;
 import $group__.client.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;
@@ -190,13 +187,13 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 
 				@Nullable Point2D base = null;
 				if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT))
-					base = new Point2D.Double(spb.getMaxX(), spb.getMaxY());
+					base = new Point2DImmutable(spb.getMaxX(), spb.getMaxY());
 				else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
-					base = new Point2D.Double(spb.getX(), spb.getY());
+					base = new Point2DImmutable(spb.getX(), spb.getY());
 				else if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.RIGHT))
-					base = new Point2D.Double(spb.getX(), spb.getMaxY());
+					base = new Point2DImmutable(spb.getX(), spb.getMaxY());
 				else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
-					base = new Point2D.Double(spb.getMaxX(), spb.getY());
+					base = new Point2DImmutable(spb.getMaxX(), spb.getY());
 
 				IResizeData d = new ResizeData(cursorPosition, sides, base, getCursor(sides).orElseThrow(InternalError::new).getHandle());
 				synchronized (getLockObject()) {
@@ -280,7 +277,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 		@SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
 		public void onNext(GuiScreenEvent.DrawScreenEvent.Post event) {
 			getResizeData().ifPresent(d -> getContainer().filter(c -> {
-				Point2D cp = new Point2D.Double(event.getMouseX(), event.getMouseY());
+				Point2D cp = new Point2DImmutable(event.getMouseX(), event.getMouseY());
 				c.getManager().ifPresent(m -> {
 					Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
 					d.handle(r, cp);
