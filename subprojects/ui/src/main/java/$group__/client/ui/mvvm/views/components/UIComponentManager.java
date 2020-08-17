@@ -56,12 +56,16 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?>>
 
 	@Override
 	public Optional<IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) {
+		Optional<IUIEventTarget> ret = Optional.of(this);
 		if (currentFocus instanceof IUIComponent) {
-			@SuppressWarnings("UnstableApiUsage") ImmutableList<IUIComponent> focs = getChildrenFlat().stream().sequential().filter(IUIComponent::isFocusable).collect(ImmutableList.toImmutableList()); // TODO cache this maybe
-			assert !focs.isEmpty();
-			return Optional.ofNullable(focs.get(Math.max(focs.indexOf(currentFocus), 0) + (next ? 1 : -1) % focs.size()));
+			ret = CacheManager.CHILDREN_FLAT_FOCUSABLE.getValue().get(this)
+					.filter(f -> !f.isEmpty())
+					.map(f -> f.get(Math.floorMod(
+							Math.max(f.indexOf(currentFocus), 0)
+									+ (next ? 1 : -1),
+							f.size())));
 		}
-		return Optional.of(this);
+		return ret;
 	}
 
 	@Override
@@ -75,7 +79,7 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?>>
 
 		private static final Logger LOGGER = LogManager.getLogger();
 
-		public static final Registry.RegistryObject<IUIExtensionCache.IType<List<IUIComponent>, IUIComponent>> CHILDREN_FLAT =
+		public static final Registry.RegistryObject<IUIExtensionCache.IType<List<IUIComponent>, IUIComponentManager<?>>> CHILDREN_FLAT =
 				IUIExtensionCache.RegUICache.INSTANCE.registerApply(generateKey("children_flat"),
 						k -> new IUIExtensionCache.IType.Impl<>(k,
 								(t, i) -> IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> ThrowableUtilities.Try.call(() ->
@@ -87,17 +91,38 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?>>
 															((IUIComponentContainer) p).getChildrenView() : ImmutableSet.of(), null, null);
 											return ret;
 										}), LOGGER).map(CastUtilities::castUnchecked)),
-								(t, i) -> {
-									IUIExtensionCache.IType.invalidate(i, t.getKey());
-									if (i instanceof IUIComponentContainer)
-										((IUIComponentContainer) i).getChildrenView().forEach(t::invalidate);
-								},
+								(t, i) -> IUIExtensionCache.IType.invalidate(i, t.getKey()),
 								t -> ImmutableList.of(new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
 									@Override
 									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 									public void onNext(EventUIComponentHierarchyChanged.Parent event) {
-										if (event.getStage() == EnumEventHookStage.POST)
-											t.invalidate(event.getComponent());
+										if (event.getStage() == EnumEventHookStage.POST) {
+											IUIComponent ec = event.getComponent();
+											if (ec instanceof IUIComponentManager)
+												t.invalidate((IUIComponentManager<?>) ec);
+										}
+									}
+								})));
+		@SuppressWarnings("UnstableApiUsage")
+		public static final Registry.RegistryObject<IUIExtensionCache.IType<List<IUIComponent>, IUIComponentManager<?>>> CHILDREN_FLAT_FOCUSABLE =
+				IUIExtensionCache.RegUICache.INSTANCE.registerApply(generateKey("children_flat.focusable"),
+						k -> new IUIExtensionCache.IType.Impl<>(k,
+								(t, i) -> IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> ThrowableUtilities.Try.call(() ->
+										cache.getDelegated().get(t.getKey(), () ->
+												i.getChildrenFlat().stream().sequential()
+														.filter(IUIComponent::isFocusable)
+														.collect(ImmutableList.toImmutableList())
+										), LOGGER).map(CastUtilities::castUnchecked)),
+								(t, i) -> IUIExtensionCache.IType.invalidate(i, t.getKey()),
+								t -> ImmutableList.of(new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
+									@Override
+									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+									public void onNext(EventUIComponentHierarchyChanged.Parent event) {
+										if (event.getStage() == EnumEventHookStage.POST) {
+											IUIComponent ec = event.getComponent();
+											if (ec instanceof IUIComponentManager)
+												t.invalidate((IUIComponentManager<?>) ec);
+										}
 									}
 								})));
 

@@ -26,8 +26,7 @@ import static $group__.client.ui.mvvm.core.structures.IShapeDescriptor.checkIsBe
 
 public abstract class ShapeDescriptor<S extends Shape> implements IShapeDescriptor<S> {
 	protected final List<IUIConstraint> constraints = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	protected final IUIAnchorSet<IUIAnchor> anchorSet = new UIAnchorSet<>(this);
+	protected final IUIAnchorSet<IUIAnchor> anchorSet = new AnchorSet();
 	protected boolean beingModified = false;
 
 	@Override
@@ -43,7 +42,6 @@ public abstract class ShapeDescriptor<S extends Shape> implements IShapeDescript
 	@Override
 	public IUIAnchorSet<IUIAnchor> getAnchorSet() { return anchorSet; }
 
-	// TODO remove argument self
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public boolean modify(Supplier<? extends Boolean> action)
@@ -161,5 +159,10 @@ public abstract class ShapeDescriptor<S extends Shape> implements IShapeDescript
 			// COMMENT shear not supported
 			return true;
 		}
+	}
+
+	protected class AnchorSet
+			extends UIAnchorSet<IUIAnchor> {
+		protected AnchorSet() { super(ShapeDescriptor.this); }
 	}
 }
