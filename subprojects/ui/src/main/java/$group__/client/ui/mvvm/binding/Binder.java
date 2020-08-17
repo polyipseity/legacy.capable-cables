@@ -91,8 +91,9 @@ public class Binder implements IBinder {
 
 		public FieldBinding(ResourceLocation bindingKey) {
 			this.bindingKey = bindingKey;
+			@SuppressWarnings("UnnecessaryLocalVariable") Map<IBindingField<T>, Disposable> fieldsRef = fields;
 			Cleaner.create(cleanerRef, () ->
-					fields.values().forEach(Disposable::dispose)); // todo any implicit this
+					fieldsRef.values().forEach(Disposable::dispose));
 		}
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
@@ -153,8 +154,9 @@ public class Binder implements IBinder {
 
 		public MethodBinding(ResourceLocation bindingKey) {
 			this.bindingKey = bindingKey;
+			@SuppressWarnings("UnnecessaryLocalVariable") Map<IBindingMethod.ISource<T>, Disposable> sourcesRef = sources;
 			Cleaner.create(cleanerRef, ()
-					-> sources.values().forEach(Disposable::dispose)); // TODO any implicit this
+					-> sourcesRef.values().forEach(Disposable::dispose));
 		}
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")

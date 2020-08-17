@@ -62,7 +62,9 @@ public interface IUIExtensionCache
 						EventBusEntryPoint.getEventBus()
 								.subscribe(CastUtilities.<Observer<? super Object>>castUnchecked(el)) // COMMENT we do not care about the event type
 				);
-				Cleaner.create(cleanerRef, () -> eventListeners.forEach(DisposableObserver::dispose));
+				@SuppressWarnings("UnnecessaryLocalVariable") List<? extends DisposableObserver<?>> eventListenersRef = eventListeners;
+				Cleaner.create(cleanerRef, () ->
+						eventListenersRef.forEach(DisposableObserver::dispose));
 			}
 
 			protected List<? extends DisposableObserver<?>> getEventListeners() { return eventListeners; }
