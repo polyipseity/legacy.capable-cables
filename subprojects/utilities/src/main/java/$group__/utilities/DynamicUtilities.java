@@ -9,6 +9,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.reflections.Reflections;
 import sun.misc.Unsafe;
 
 import javax.annotation.Nullable;
@@ -38,9 +39,9 @@ public enum DynamicUtilities {
 	public static final Unsafe UNSAFE;
 
 
-	public static final LoadingCache<String, org.reflections.Reflections> REFLECTIONS_CACHE =
+	public static final LoadingCache<String, Reflections> REFLECTIONS_CACHE =
 			CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_SMALL).expireAfterAccess(MapUtilities.CACHE_EXPIRATION_ACCESS_DURATION, MapUtilities.CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(ConcurrencyUtilities.MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(t -> {
-				org.reflections.Reflections r = new org.reflections.Reflections(t);
+				Reflections r = new Reflections(t);
 				r.expandSuperTypes();
 				return r;
 			}));

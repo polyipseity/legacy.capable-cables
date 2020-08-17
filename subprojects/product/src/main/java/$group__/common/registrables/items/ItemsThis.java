@@ -1,7 +1,7 @@
 package $group__.common.registrables.items;
 
 import $group__.client.ui.ConstantsUI;
-import $group__.client.ui.mvvm.minecraft.debug.UIDebug;
+import $group__.client.ui.debug.UIDebugMinecraft;
 import $group__.common.registrables.blocks.BlocksThis;
 import $group__.common.registrables.items.groups.ItemGroupsThis;
 import net.minecraft.item.BlockItem;
@@ -28,6 +28,6 @@ public enum ItemsThis {
 	private static final RegistryObject<Item> DEBUG_UI;
 
 	static {
-		DEBUG_UI = ConstantsUI.BUILD_TYPE.isDebug() ? ITEMS.register(UIDebug.PATH, () -> new BlockItem(UIDebug.getBlockEntry(), new Item.Properties().group(ItemGroupsThis.DEFAULT))) : null;
+		DEBUG_UI = ConstantsUI.BUILD_TYPE.isDebug() ? ITEMS.register(UIDebugMinecraft.PATH, () -> new BlockItem(UIDebugMinecraft.getBlockEntry(), new Item.Properties().group(ItemGroupsThis.DEFAULT))) : null;
 	}
 }

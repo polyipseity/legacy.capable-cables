@@ -37,7 +37,6 @@ import java.lang.invoke.MethodType;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 
-// TODO make facade
 public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 		extends IHasGenericClass.Impl<T>
 		implements IUIResourceParser<T, Document> {

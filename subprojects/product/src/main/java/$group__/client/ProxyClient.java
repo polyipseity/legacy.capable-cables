@@ -3,7 +3,7 @@ package $group__.client;
 import $group__.Constants;
 import $group__.client.ui.ConfigurationUI;
 import $group__.client.ui.ConstantsUI;
-import $group__.client.ui.mvvm.minecraft.debug.UIDebug;
+import $group__.client.ui.debug.UIDebugMinecraft;
 import $group__.proxies.Proxy;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -29,7 +29,7 @@ public final class ProxyClient extends Proxy implements IProxyClient {
 		ConfigurationUI.setup(Constants.MOD_ID);
 
 		if (ConstantsUI.BUILD_TYPE.isDebug())
-			UIDebug.registerUIFactory();
+			UIDebugMinecraft.registerUIFactory();
 	}
 
 	@Override
