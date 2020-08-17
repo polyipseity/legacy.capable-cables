@@ -1,10 +1,10 @@
 package $group__.client.ui.mvvm.minecraft.adapters;
 
+import $group__.client.ui.core.IUIDataMouseButtonClick;
 import $group__.client.ui.events.ui.UIEventUtilities;
 import $group__.client.ui.mvvm.core.IUIInfrastructure;
 import $group__.client.ui.mvvm.core.adapters.IUIAdapter;
 import $group__.client.ui.mvvm.core.extensions.cursors.IUIExtensionCursorHandleProvider;
-import $group__.client.ui.mvvm.core.structures.IUIDataMouseButtonClick;
 import $group__.client.ui.mvvm.core.views.events.IUIEventKeyboard;
 import $group__.client.ui.mvvm.core.views.events.IUIEventMouse;
 import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;
@@ -12,10 +12,10 @@ import $group__.client.ui.mvvm.core.views.paths.IUINode;
 import $group__.client.ui.mvvm.minecraft.core.IUIInfrastructureMinecraft;
 import $group__.client.ui.mvvm.minecraft.core.extensions.IUIExtensionContainerProvider;
 import $group__.client.ui.mvvm.minecraft.core.extensions.IUIExtensionScreenProvider;
-import $group__.client.ui.mvvm.structures.Dimension2DDouble;
-import $group__.client.ui.mvvm.structures.UIDataKeyboardKeyPress;
-import $group__.client.ui.mvvm.structures.UIDataMouseButtonClick;
+import $group__.client.ui.structures.Dimension2DDouble;
 import $group__.client.ui.utilities.InputUtilities;
+import $group__.client.ui.utilities.UIDataKeyboardKeyPress;
+import $group__.client.ui.utilities.UIDataMouseButtonClick;
 import $group__.client.ui.utilities.UIObjectUtilities;
 import $group__.client.ui.utilities.minecraft.DrawingUtilities;
 import $group__.client.ui.utilities.minecraft.TextComponentUtilities;

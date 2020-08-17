@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.core.views;
 
-import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
+import $group__.client.ui.core.IShapeDescriptor;
 
 import java.util.ConcurrentModificationException;
 import java.util.function.Function;

@@ -2,7 +2,7 @@ package $group__.client.ui;
 
 import $group__.client.ui.events.bus.EventBusEntryPoint;
 import $group__.client.ui.events.bus.EventBusForge;
-import $group__.client.ui.mvvm.structures.EnumCursor;
+import $group__.client.ui.structures.EnumCursor;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;

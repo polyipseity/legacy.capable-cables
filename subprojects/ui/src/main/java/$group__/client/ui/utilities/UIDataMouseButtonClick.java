@@ -1,6 +1,6 @@
-package $group__.client.ui.mvvm.structures;
+package $group__.client.ui.utilities;
 
-import $group__.client.ui.mvvm.core.structures.IUIDataMouseButtonClick;
+import $group__.client.ui.core.IUIDataMouseButtonClick;
 import $group__.utilities.ObjectUtilities;
 import jdk.nashorn.internal.ir.annotations.Immutable;
 

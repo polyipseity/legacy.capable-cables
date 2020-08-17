@@ -1,10 +1,10 @@
 package $group__.client.ui.mvvm.core.views.components.extensions;
 
+import $group__.client.ui.core.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.extensions.IUIExtension;
-import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.views.IUIReshapeExplicitly;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
-import $group__.client.ui.mvvm.structures.EnumUISide;
+import $group__.client.ui.structures.EnumUISide;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.interfaces.IHasGenericClass;

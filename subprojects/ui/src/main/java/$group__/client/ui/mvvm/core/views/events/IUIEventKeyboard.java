@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.core.views.events;
 
-import $group__.client.ui.mvvm.core.structures.IUIDataKeyboardKeyPress;
+import $group__.client.ui.core.IUIDataKeyboardKeyPress;
 import $group__.utilities.NamespaceUtilities;
 import net.minecraft.util.ResourceLocation;
 

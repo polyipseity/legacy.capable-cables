@@ -1,6 +1,8 @@
-package $group__.client.ui.mvvm.core.structures;
+package $group__.client.ui.core;
 
-import $group__.client.ui.mvvm.structures.UIConstraint;
+import $group__.client.ui.mvvm.core.structures.IUIAnchor;
+import $group__.client.ui.mvvm.core.structures.IUIAnchorSet;
+import $group__.client.ui.structures.UIConstraint;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -9,8 +11,8 @@ import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static $group__.client.ui.mvvm.core.structures.IUIConstraint.CONSTRAINT_NULL_VALUE;
-import static $group__.client.ui.mvvm.core.structures.IUIConstraint.Constants.getConstraintNullRectangleView;
+import static $group__.client.ui.core.IUIConstraint.CONSTRAINT_NULL_VALUE;
+import static $group__.client.ui.core.IUIConstraint.Constants.getConstraintNullRectangleView;
 
 // TODO some sort of builder
 // TODO needs better design, but I cannot think of one

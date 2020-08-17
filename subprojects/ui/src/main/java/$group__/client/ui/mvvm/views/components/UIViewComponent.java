@@ -1,9 +1,9 @@
 package $group__.client.ui.mvvm.views.components;
 
+import $group__.client.ui.core.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.IUIInfrastructure;
 import $group__.client.ui.mvvm.core.binding.IBinderAction;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
-import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
 import $group__.client.ui.mvvm.core.views.components.IUIViewComponent;
 import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;

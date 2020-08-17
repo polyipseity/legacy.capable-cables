@@ -1,18 +1,18 @@
 package $group__.client.ui.mvvm.views.components.extensions;
 
+import $group__.client.ui.core.IShapeDescriptor;
 import $group__.client.ui.events.bus.EventBusEntryPoint;
 import $group__.client.ui.events.ui.UIEventListener;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
-import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.views.IUIReshapeExplicitly;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
 import $group__.client.ui.mvvm.core.views.components.extensions.IUIExtensionComponentUserRelocatable;
 import $group__.client.ui.mvvm.core.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
 import $group__.client.ui.mvvm.core.views.events.IUIEventMouse;
-import $group__.client.ui.mvvm.structures.ShapeDescriptor;
 import $group__.client.ui.mvvm.views.components.UIComponentVirtual;
 import $group__.client.ui.mvvm.views.events.ui.UIEventMouse;
+import $group__.client.ui.structures.ShapeDescriptor;
 import $group__.client.ui.utilities.UIObjectUtilities;
 import $group__.client.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;

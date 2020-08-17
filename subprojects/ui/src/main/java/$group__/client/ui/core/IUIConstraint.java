@@ -1,4 +1,4 @@
-package $group__.client.ui.mvvm.core.structures;
+package $group__.client.ui.core;
 
 import java.awt.geom.Rectangle2D;
 import java.util.function.Consumer;

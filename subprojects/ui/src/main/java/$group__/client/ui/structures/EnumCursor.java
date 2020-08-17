@@ -1,4 +1,4 @@
-package $group__.client.ui.mvvm.structures;
+package $group__.client.ui.structures;
 
 import $group__.client.ui.ConfigurationUI;
 import $group__.client.ui.utilities.UIObjectUtilities;

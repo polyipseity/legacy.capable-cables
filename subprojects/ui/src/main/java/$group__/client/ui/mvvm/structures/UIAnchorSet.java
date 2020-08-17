@@ -1,8 +1,9 @@
 package $group__.client.ui.mvvm.structures;
 
-import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
+import $group__.client.ui.core.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.structures.IUIAnchor;
 import $group__.client.ui.mvvm.core.structures.IUIAnchorSet;
+import $group__.client.ui.structures.EnumUISide;
 import $group__.utilities.specific.MapUtilities;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;

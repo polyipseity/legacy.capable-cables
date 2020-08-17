@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.minecraft.core.views;
 
-import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
+import $group__.client.ui.core.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.views.IUIView;
 import $group__.client.ui.mvvm.minecraft.core.IUICommonMinecraft;
 import net.minecraftforge.api.distmarker.Dist;

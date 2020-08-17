@@ -1,10 +1,11 @@
 package $group__.client.ui.mvvm.structures;
 
+import $group__.client.ui.core.IShapeDescriptor;
 import $group__.client.ui.events.bus.EventBusEntryPoint;
-import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.structures.IUIAnchor;
 import $group__.client.ui.mvvm.core.structures.IUIAnchorSet;
 import $group__.client.ui.mvvm.views.events.bus.EventUIShapeDescriptor;
+import $group__.client.ui.structures.EnumUISide;
 import $group__.utilities.ObjectUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.reactive.DisposableObserverAuto;

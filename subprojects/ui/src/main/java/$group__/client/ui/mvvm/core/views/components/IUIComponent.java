@@ -1,8 +1,8 @@
 package $group__.client.ui.mvvm.core.views.components;
 
+import $group__.client.ui.core.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.binding.IHasBinding;
 import $group__.client.ui.mvvm.core.extensions.IUIExtension;
-import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
 import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;
 import $group__.client.ui.mvvm.core.views.paths.IUINode;

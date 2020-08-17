@@ -1,6 +1,7 @@
 package $group__.client.ui.mvvm.core.structures;
 
-import $group__.client.ui.mvvm.structures.EnumUISide;
+import $group__.client.ui.core.IShapeDescriptor;
+import $group__.client.ui.structures.EnumUISide;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import net.minecraftforge.api.distmarker.Dist;

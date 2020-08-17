@@ -1,9 +1,9 @@
 package $group__.client.ui.mvvm.core.views;
 
+import $group__.client.ui.core.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.IUICommon;
 import $group__.client.ui.mvvm.core.binding.IHasBinding;
 import $group__.client.ui.mvvm.core.extensions.IUIExtension;
-import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;
 import $group__.utilities.extensions.IExtensionContainer;
 import net.minecraft.util.ResourceLocation;

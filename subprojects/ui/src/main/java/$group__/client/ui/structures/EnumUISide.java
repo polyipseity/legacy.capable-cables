@@ -1,4 +1,4 @@
-package $group__.client.ui.mvvm.structures;
+package $group__.client.ui.structures;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.RectangularShape;

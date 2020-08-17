@@ -1,9 +1,10 @@
-package $group__.client.ui.mvvm.structures;
+package $group__.client.ui.structures;
 
-import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
+import $group__.client.ui.core.IShapeDescriptor;
+import $group__.client.ui.core.IUIConstraint;
 import $group__.client.ui.mvvm.core.structures.IUIAnchor;
 import $group__.client.ui.mvvm.core.structures.IUIAnchorSet;
-import $group__.client.ui.mvvm.core.structures.IUIConstraint;
+import $group__.client.ui.mvvm.structures.UIAnchorSet;
 import $group__.client.ui.mvvm.views.events.bus.EventUIShapeDescriptor;
 import $group__.client.ui.utilities.UIObjectUtilities;
 import $group__.utilities.CapacityUtilities;
@@ -22,7 +23,7 @@ import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static $group__.client.ui.mvvm.core.structures.IShapeDescriptor.checkIsBeingModified;
+import static $group__.client.ui.core.IShapeDescriptor.checkIsBeingModified;
 
 public abstract class ShapeDescriptor<S extends Shape> implements IShapeDescriptor<S> {
 	protected final List<IUIConstraint> constraints = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);

@@ -1,12 +1,12 @@
 package $group__.client.ui.mvvm.minecraft.components;
 
+import $group__.client.ui.core.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
-import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
 import $group__.client.ui.mvvm.core.views.components.parsers.UIConstructor;
 import $group__.client.ui.mvvm.minecraft.core.views.IUIComponentMinecraft;
-import $group__.client.ui.mvvm.structures.ShapeDescriptor;
 import $group__.client.ui.mvvm.views.components.UIComponentManager;
+import $group__.client.ui.structures.ShapeDescriptor;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 

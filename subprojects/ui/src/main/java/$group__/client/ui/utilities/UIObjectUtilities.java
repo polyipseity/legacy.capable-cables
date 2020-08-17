@@ -1,6 +1,6 @@
 package $group__.client.ui.utilities;
 
-import $group__.client.ui.mvvm.structures.Dimension2DDouble;
+import $group__.client.ui.structures.Dimension2DDouble;
 import $group__.utilities.client.minecraft.TransformUtilities.AffineTransformUtilities;
 import $group__.utilities.functions.IConsumer4;
 import $group__.utilities.functions.IFunction4;

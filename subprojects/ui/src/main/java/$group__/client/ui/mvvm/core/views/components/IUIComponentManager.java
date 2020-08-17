@@ -1,7 +1,7 @@
 package $group__.client.ui.mvvm.core.views.components;
 
+import $group__.client.ui.core.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
-import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.views.IUIReshapeExplicitly;
 import $group__.client.ui.mvvm.core.views.components.paths.IUIComponentPathResolver;
 import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;

@@ -1,4 +1,4 @@
-package $group__.client.ui.mvvm.structures;
+package $group__.client.ui.structures;
 
 import $group__.utilities.ObjectUtilities;
 import $group__.utilities.specific.MapUtilities;

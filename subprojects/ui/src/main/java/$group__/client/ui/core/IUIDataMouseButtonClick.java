@@ -1,4 +1,4 @@
-package $group__.client.ui.mvvm.core.structures;
+package $group__.client.ui.core;
 
 import $group__.utilities.interfaces.ICopyable;
 import $group__.utilities.specific.MapUtilities;

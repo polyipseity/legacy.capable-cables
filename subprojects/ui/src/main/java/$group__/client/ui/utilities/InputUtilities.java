@@ -1,6 +1,6 @@
 package $group__.client.ui.utilities;
 
-import $group__.client.ui.mvvm.core.structures.IUIDataMouseButtonClick;
+import $group__.client.ui.core.IUIDataMouseButtonClick;
 
 public enum InputUtilities {
 	;

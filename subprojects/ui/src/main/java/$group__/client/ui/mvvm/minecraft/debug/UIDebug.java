@@ -1,8 +1,8 @@
 package $group__.client.ui.mvvm.minecraft.debug;
 
 import $group__.client.ui.ConfigurationUI;
+import $group__.client.ui.core.IShapeDescriptor;
 import $group__.client.ui.mvvm.binding.Binder;
-import $group__.client.ui.mvvm.core.structures.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;

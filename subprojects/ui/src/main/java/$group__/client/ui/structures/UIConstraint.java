@@ -1,6 +1,6 @@
-package $group__.client.ui.mvvm.structures;
+package $group__.client.ui.structures;
 
-import $group__.client.ui.mvvm.core.structures.IUIConstraint;
+import $group__.client.ui.core.IUIConstraint;
 import $group__.utilities.interfaces.ICopyable;
 import jdk.nashorn.internal.ir.annotations.Immutable;
 
