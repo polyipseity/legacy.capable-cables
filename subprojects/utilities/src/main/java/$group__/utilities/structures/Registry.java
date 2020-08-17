@@ -1,10 +1,10 @@
 package $group__.utilities.structures;
 
 import $group__.utilities.CastUtilities;
-import $group__.utilities.specific.LoggerUtilities;
-import $group__.utilities.specific.MapUtilities;
-import $group__.utilities.specific.StreamUtilities;
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.LoggerUtilities;
+import $group__.utilities.MapUtilities;
+import $group__.utilities.StreamUtilities;
+import $group__.utilities.ThrowableUtilities.BecauseOf;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;

@@ -1,7 +1,7 @@
 package $group__.client.ui.core;
 
+import $group__.utilities.MapUtilities;
 import $group__.utilities.interfaces.ICopyable;
-import $group__.utilities.specific.MapUtilities;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import jdk.nashorn.internal.ir.annotations.Immutable;

@@ -7,14 +7,14 @@ import $group__.client.ui.mvvm.core.views.components.extensions.caches.IUIExtens
 import $group__.client.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.ConcurrencyUtilities;
+import $group__.utilities.MapUtilities;
 import $group__.utilities.NamespaceUtilities;
+import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.reactive.DisposableObserverAuto;
-import $group__.utilities.specific.MapUtilities;
-import $group__.utilities.specific.ThrowableUtilities.Try;
 import $group__.utilities.structures.Registry;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

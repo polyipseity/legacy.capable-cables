@@ -1,6 +1,6 @@
 package $group__.utilities.client;
 
-import $group__.utilities.specific.ThrowableUtilities;
+import $group__.utilities.ThrowableUtilities;
 import net.minecraft.client.renderer.Matrix4f;
 
 import java.awt.geom.AffineTransform;

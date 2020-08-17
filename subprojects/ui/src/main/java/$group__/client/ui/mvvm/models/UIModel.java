@@ -2,9 +2,9 @@ package $group__.client.ui.mvvm.models;
 
 import $group__.client.ui.mvvm.core.extensions.IUIExtension;
 import $group__.client.ui.mvvm.core.models.IUIModel;
+import $group__.utilities.MapUtilities;
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
-import $group__.utilities.specific.MapUtilities;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.util.ResourceLocation;
 

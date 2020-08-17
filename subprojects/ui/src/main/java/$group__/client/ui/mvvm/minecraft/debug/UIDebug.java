@@ -19,10 +19,10 @@ import $group__.client.ui.mvvm.views.components.extensions.UIExtensionComponentU
 import $group__.client.ui.mvvm.views.components.extensions.UIExtensionComponentUserResizable;
 import $group__.client.ui.mvvm.views.components.extensions.UIExtensionCursorHandleProviderComponent;
 import $group__.client.ui.mvvm.views.components.parsers.UIXMLDOMComponentParser;
+import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
+import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.client.minecraft.ResourceUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
-import $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher;
-import $group__.utilities.specific.ThrowableUtilities.Try;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;

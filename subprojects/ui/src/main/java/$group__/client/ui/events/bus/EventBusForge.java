@@ -1,6 +1,6 @@
 package $group__.client.ui.events.bus;
 
-import $group__.utilities.specific.ThrowableUtilities;
+import $group__.utilities.ThrowableUtilities;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.subjects.Subject;

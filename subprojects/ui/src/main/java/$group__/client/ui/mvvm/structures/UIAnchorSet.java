@@ -4,7 +4,7 @@ import $group__.client.ui.core.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.structures.IUIAnchor;
 import $group__.client.ui.mvvm.core.structures.IUIAnchorSet;
 import $group__.client.ui.structures.EnumUISide;
-import $group__.utilities.specific.MapUtilities;
+import $group__.utilities.MapUtilities;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 

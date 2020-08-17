@@ -1,4 +1,4 @@
-package $group__.utilities.client.minecraft.specific;
+package $group__.utilities.client.minecraft;
 
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraftforge.api.distmarker.Dist;

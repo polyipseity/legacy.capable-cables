@@ -1,4 +1,4 @@
-package $group__.utilities.specific;
+package $group__.utilities;
 
 import $group__.utilities.structures.NodeListList;
 import com.google.common.collect.ImmutableList;

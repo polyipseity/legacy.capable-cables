@@ -6,7 +6,7 @@ import $group__.client.ui.mvvm.core.views.events.*;
 import $group__.client.ui.mvvm.core.views.paths.IUINode;
 import $group__.client.ui.mvvm.views.events.ui.*;
 import $group__.client.ui.utilities.UIDataMouseButtonClick;
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.structures.Registry;
 import $group__.utilities.structures.Singleton;
 import com.google.common.collect.ImmutableList;

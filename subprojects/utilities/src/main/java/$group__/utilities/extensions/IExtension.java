@@ -1,7 +1,7 @@
 package $group__.utilities.extensions;
 
+import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.interfaces.IHasGenericClass;
-import $group__.utilities.specific.ThrowableUtilities;
 import $group__.utilities.structures.Registry;
 import $group__.utilities.structures.Singleton;
 import net.minecraft.util.ResourceLocation;

@@ -1,7 +1,5 @@
 package $group__.utilities;
 
-import $group__.utilities.specific.MapUtilities;
-import $group__.utilities.specific.ThrowableUtilities;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
@@ -9,7 +7,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import static $group__.utilities.DynamicUtilities.getCallerClass;
-import static $group__.utilities.specific.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
+import static $group__.utilities.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkElementIndex;
 import static java.lang.System.lineSeparator;

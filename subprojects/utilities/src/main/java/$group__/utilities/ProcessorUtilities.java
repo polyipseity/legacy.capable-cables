@@ -1,7 +1,6 @@
 package $group__.utilities;
 
-import $group__.utilities.specific.StreamUtilities;
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 

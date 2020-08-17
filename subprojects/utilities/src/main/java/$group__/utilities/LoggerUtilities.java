@@ -1,4 +1,4 @@
-package $group__.utilities.specific;
+package $group__.utilities;
 
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.ParameterizedMessage;

@@ -1,7 +1,7 @@
 package $group__.utilities.extensions;
 
+import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.interfaces.IHasGenericClass;
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import sun.misc.Cleaner;
 
 import javax.annotation.Nullable;

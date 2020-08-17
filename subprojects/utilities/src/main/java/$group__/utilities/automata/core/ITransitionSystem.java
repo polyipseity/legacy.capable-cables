@@ -1,6 +1,6 @@
 package $group__.utilities.automata.core;
 
-import $group__.utilities.specific.MapUtilities;
+import $group__.utilities.MapUtilities;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 

@@ -1,6 +1,6 @@
 package $group__.utilities.reactive;
 
-import $group__.utilities.specific.ThrowableUtilities;
+import $group__.utilities.ThrowableUtilities;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

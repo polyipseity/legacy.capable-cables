@@ -3,7 +3,7 @@ package $group__.annotations.processors;
 import $group__.annotations.OverridingStatus;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.ProcessorUtilities;
-import $group__.utilities.specific.StreamUtilities;
+import $group__.utilities.StreamUtilities;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;

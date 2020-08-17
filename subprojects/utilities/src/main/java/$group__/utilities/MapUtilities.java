@@ -1,4 +1,4 @@
-package $group__.utilities.specific;
+package $group__.utilities;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.MapMaker;

@@ -1,7 +1,7 @@
 package $group__.client.ui.structures;
 
+import $group__.utilities.MapUtilities;
 import $group__.utilities.ObjectUtilities;
-import $group__.utilities.specific.MapUtilities;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 

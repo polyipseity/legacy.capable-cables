@@ -9,8 +9,8 @@ import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.function.Consumer;
 
 import static $group__.Globals.LOGGER;
-import static $group__.utilities.specific.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
-import static $group__.utilities.specific.LoggerUtilities.EnumMessages.PREFIX_MOD_LIFECYCLE_MESSAGE;
+import static $group__.utilities.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
+import static $group__.utilities.LoggerUtilities.EnumMessages.PREFIX_MOD_LIFECYCLE_MESSAGE;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 public abstract class Proxy extends Singleton implements IProxy {

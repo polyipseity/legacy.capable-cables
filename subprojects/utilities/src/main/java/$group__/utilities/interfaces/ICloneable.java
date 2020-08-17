@@ -1,7 +1,7 @@
 package $group__.utilities.interfaces;
 
 import $group__.utilities.DynamicUtilities;
-import $group__.utilities.specific.ThrowableUtilities;
+import $group__.utilities.ThrowableUtilities;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

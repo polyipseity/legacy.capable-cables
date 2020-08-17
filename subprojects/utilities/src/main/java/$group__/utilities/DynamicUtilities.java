@@ -1,9 +1,8 @@
 package $group__.utilities;
 
-import $group__.utilities.specific.MapUtilities;
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
-import $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher;
-import $group__.utilities.specific.ThrowableUtilities.Try;
+import $group__.utilities.ThrowableUtilities.BecauseOf;
+import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
+import $group__.utilities.ThrowableUtilities.Try;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -27,7 +26,7 @@ import java.util.stream.IntStream;
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 import static $group__.utilities.CastUtilities.castUnchecked;
 import static $group__.utilities.CastUtilities.castUncheckedNullable;
-import static $group__.utilities.specific.LoggerUtilities.EnumMessages.*;
+import static $group__.utilities.LoggerUtilities.EnumMessages.*;
 import static java.lang.invoke.LambdaMetafactory.metafactory;
 import static java.lang.invoke.MethodType.methodType;
 

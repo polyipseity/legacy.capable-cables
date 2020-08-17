@@ -2,7 +2,7 @@ package $group__.utilities.structures;
 
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.specific.MapUtilities;
+import $group__.utilities.MapUtilities;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
@@ -12,8 +12,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static $group__.utilities.DynamicUtilities.IMPL_LOOKUP;
-import static $group__.utilities.specific.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
-import static $group__.utilities.specific.ThrowableUtilities.*;
+import static $group__.utilities.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
+import static $group__.utilities.ThrowableUtilities.*;
 import static com.google.common.collect.Maps.immutableEntry;
 import static java.lang.System.lineSeparator;
 import static java.lang.invoke.MethodType.methodType;

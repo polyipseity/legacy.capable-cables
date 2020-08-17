@@ -8,9 +8,9 @@ import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
 import $group__.client.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
 import $group__.utilities.CapacityUtilities;
+import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventUtilities;
-import $group__.utilities.specific.ThrowableUtilities;
 import com.google.common.collect.ImmutableList;
 import io.reactivex.rxjava3.core.Observer;
 

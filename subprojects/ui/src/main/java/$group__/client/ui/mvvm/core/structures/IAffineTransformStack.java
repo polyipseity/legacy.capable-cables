@@ -1,10 +1,10 @@
 package $group__.client.ui.mvvm.core.structures;
 
 import $group__.client.ui.ConstantsUI;
+import $group__.utilities.LoggerUtilities;
+import $group__.utilities.MapUtilities;
+import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.interfaces.ICopyable;
-import $group__.utilities.specific.LoggerUtilities;
-import $group__.utilities.specific.MapUtilities;
-import $group__.utilities.specific.ThrowableUtilities;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.logging.log4j.LogManager;

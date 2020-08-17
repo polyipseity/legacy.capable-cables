@@ -1,7 +1,7 @@
-package $group__.utilities.client.minecraft.specific;
+package $group__.utilities.client.minecraft;
 
+import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.client.AffineTransformUtilities;
-import $group__.utilities.specific.ThrowableUtilities;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Vector4f;

@@ -2,9 +2,9 @@ package $group__.client.ui.mvvm.core.binding;
 
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
+import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.reactive.DisposableObserverAuto;
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import io.reactivex.rxjava3.observers.DisposableObserver;

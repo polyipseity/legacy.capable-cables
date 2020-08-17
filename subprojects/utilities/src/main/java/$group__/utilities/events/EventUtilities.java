@@ -1,6 +1,6 @@
 package $group__.utilities.events;
 
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
+import $group__.utilities.ThrowableUtilities.BecauseOf;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 

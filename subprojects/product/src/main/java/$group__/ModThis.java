@@ -20,8 +20,8 @@ import static $group__.common.registrables.blocks.BlocksThis.BLOCKS;
 import static $group__.common.registrables.inventory.ContainersThis.CONTAINERS;
 import static $group__.common.registrables.items.ItemsThis.ITEMS;
 import static $group__.common.registrables.tileentities.TileEntityTypesThis.TILE_ENTITIES;
-import static $group__.utilities.specific.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
-import static $group__.utilities.specific.LoggerUtilities.EnumMessages.PREFIX_MOD_LIFECYCLE_MESSAGE;
+import static $group__.utilities.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
+import static $group__.utilities.LoggerUtilities.EnumMessages.PREFIX_MOD_LIFECYCLE_MESSAGE;
 
 @Mod(MOD_ID)
 @EventBusSubscriber(bus = Bus.MOD)

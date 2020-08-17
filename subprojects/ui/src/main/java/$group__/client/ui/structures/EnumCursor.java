@@ -2,10 +2,10 @@ package $group__.client.ui.structures;
 
 import $group__.client.ui.ConfigurationUI;
 import $group__.client.ui.utilities.UIObjectUtilities;
+import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
+import $group__.utilities.ThrowableUtilities.Try;
+import $group__.utilities.client.minecraft.ImageUtilities;
 import $group__.utilities.client.minecraft.ResourceUtilities;
-import $group__.utilities.client.minecraft.specific.ImageUtilities;
-import $group__.utilities.specific.ThrowableUtilities.ThrowableCatcher;
-import $group__.utilities.specific.ThrowableUtilities.Try;
 import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;

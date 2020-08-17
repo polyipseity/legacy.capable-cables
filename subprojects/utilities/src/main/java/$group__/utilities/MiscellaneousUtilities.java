@@ -1,7 +1,5 @@
 package $group__.utilities;
 
-import $group__.utilities.specific.StreamUtilities;
-
 import javax.annotation.Nullable;
 import java.util.Optional;
 

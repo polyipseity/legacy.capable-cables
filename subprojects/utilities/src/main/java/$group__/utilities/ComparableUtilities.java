@@ -1,4 +1,4 @@
-package $group__.utilities.specific;
+package $group__.utilities;
 
 public enum ComparableUtilities {
 	;

@@ -1,4 +1,4 @@
-package $group__.utilities.specific;
+package $group__.utilities;
 
 import static java.lang.Double.doubleToLongBits;
 
