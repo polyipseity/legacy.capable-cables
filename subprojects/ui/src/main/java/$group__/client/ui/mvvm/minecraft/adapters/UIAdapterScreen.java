@@ -23,8 +23,8 @@ import $group__.client.ui.utilities.minecraft.TextComponentUtilities;
 import $group__.client.ui.utilities.minecraft.TooltipUtilities;
 import $group__.client.ui.utilities.minecraft.UIBackgrounds;
 import $group__.utilities.CastUtilities;
+import $group__.utilities.client.AffineTransformUtilities;
 import $group__.utilities.client.minecraft.GLUtilities;
-import $group__.utilities.client.minecraft.TransformUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.specific.MapUtilities;
@@ -511,30 +511,30 @@ public class UIAdapterScreen
 
 	@Override
 	@Deprecated
-	protected void hLine(int x1, int x2, int y, int color) { DrawingUtilities.hLine(TransformUtilities.AffineTransformUtilities.getIdentity(), x1, x2, y, color, getBlitOffset()); }
+	protected void hLine(int x1, int x2, int y, int color) { DrawingUtilities.hLine(AffineTransformUtilities.getIdentity(), x1, x2, y, color, getBlitOffset()); }
 
 	@Override
 	@Deprecated
-	protected void vLine(int x, int y1, int y2, int color) { DrawingUtilities.vLine(TransformUtilities.AffineTransformUtilities.getIdentity(), x, y1, y2, color, getBlitOffset()); }
+	protected void vLine(int x, int y1, int y2, int color) { DrawingUtilities.vLine(AffineTransformUtilities.getIdentity(), x, y1, y2, color, getBlitOffset()); }
 
 	@Override
 	@Deprecated
-	protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) { DrawingUtilities.fillGradient(TransformUtilities.AffineTransformUtilities.getIdentity(), UIObjectUtilities.getRectangleFromDiagonal(new Point2DImmutable(x1, y1), new Point2DImmutable(x2, y2)), colorTop, colorBottom, getBlitOffset()); }
+	protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) { DrawingUtilities.fillGradient(AffineTransformUtilities.getIdentity(), UIObjectUtilities.getRectangleFromDiagonal(new Point2DImmutable(x1, y1), new Point2DImmutable(x2, y2)), colorTop, colorBottom, getBlitOffset()); }
 
 	@Override
 	@Deprecated
-	public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawCenteredString(TransformUtilities.AffineTransformUtilities.getIdentity(), font, string, new Point2DImmutable(x, y), color); }
+	public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawCenteredString(AffineTransformUtilities.getIdentity(), font, string, new Point2DImmutable(x, y), color); }
 
 	@Override
 	@Deprecated
-	public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawRightAlignedString(TransformUtilities.AffineTransformUtilities.getIdentity(), font, string, new Point2DImmutable(x, y), color); }
+	public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawRightAlignedString(AffineTransformUtilities.getIdentity(), font, string, new Point2DImmutable(x, y), color); }
 
 	@Override
 	@Deprecated
-	public void drawString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawString(TransformUtilities.AffineTransformUtilities.getIdentity(), font, string, new Point2DImmutable(x, y), color); }
+	public void drawString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawString(AffineTransformUtilities.getIdentity(), font, string, new Point2DImmutable(x, y), color); }
 
 	@SuppressWarnings("MagicNumber")
 	@Override
 	@Deprecated
-	public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(TransformUtilities.AffineTransformUtilities.getIdentity(), new Rectangle2D.Double(x, y, w, h), new Point2DImmutable(u, v), new Dimension2DDouble(256, 256), getBlitOffset()); }
+	public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(AffineTransformUtilities.getIdentity(), new Rectangle2D.Double(x, y, w, h), new Point2DImmutable(u, v), new Dimension2DDouble(256, 256), getBlitOffset()); }
 }

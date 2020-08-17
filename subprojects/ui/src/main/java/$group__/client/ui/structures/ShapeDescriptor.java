@@ -8,7 +8,7 @@ import $group__.client.ui.mvvm.structures.UIAnchorSet;
 import $group__.client.ui.mvvm.views.events.bus.EventUIShapeDescriptor;
 import $group__.client.ui.utilities.UIObjectUtilities;
 import $group__.utilities.CapacityUtilities;
-import $group__.utilities.client.minecraft.TransformUtilities.AffineTransformUtilities;
+import $group__.utilities.client.AffineTransformUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventUtilities;
 import com.google.common.collect.ImmutableList;

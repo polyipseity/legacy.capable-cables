@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.geom.*;
 
-import static $group__.utilities.client.minecraft.TransformUtilities.AffineTransformUtilities.*;
+import static $group__.utilities.client.AffineTransformUtilities.*;
 
 @OnlyIn(Dist.CLIENT)
 public enum DrawingUtilities {
