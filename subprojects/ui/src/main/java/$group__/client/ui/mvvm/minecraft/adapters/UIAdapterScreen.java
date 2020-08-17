@@ -54,7 +54,6 @@ import java.util.concurrent.ConcurrentMap;
 
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
-// TODO maybe make some utilities from here
 @OnlyIn(Dist.CLIENT)
 public class UIAdapterScreen
 		<I extends IUIInfrastructureMinecraft<?, ?, ?>>
@@ -215,7 +214,7 @@ public class UIAdapterScreen
 		if (UIEventUtilities.dispatchEvent(addEventMouse(this, UIEventUtilities.Factory.createEventMouseDown(t, d)))) {
 			if (t.isFocusable())
 				setFocus(t);
-			// TODO selection
+			// TODO select
 			// TODO drag or drop perhaps
 			// TODO scroll/pan
 		}
@@ -236,7 +235,6 @@ public class UIAdapterScreen
 				if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClick(t, d))) {
 					if (t.isFocusable())
 						setFocus(t);
-					// TODO activation
 				}
 				setLastMouseClickData(d, t);
 			}
@@ -268,7 +266,6 @@ public class UIAdapterScreen
 		if (ret)
 			setFocus(target);
 		// TODO select
-		// TODO activation
 	}
 
 	@Override
@@ -433,7 +430,6 @@ public class UIAdapterScreen
 				onClose();
 			if (getChangeFocusKeys().contains(key))
 				changeFocus((modifiers & GLFW.GLFW_MOD_SHIFT) == 0);
-			// TODO activation
 		}
 		return true;
 	}

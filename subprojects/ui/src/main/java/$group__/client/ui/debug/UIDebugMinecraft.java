@@ -167,7 +167,6 @@ final class UIDebug extends GuiManagerWindows<ShapeDescriptor.Rectangular<Rectan
 				UIButtonComponentMinecraft button;
 				{
 					Random random = new Random();
-					// FIXME ellipse
 					button = new UIButtonComponentMinecraft(new ShapeDescriptor.Rectangular<>(new Ellipse2D.Double(0, 0, 100, 100)),
 							new UIButtonComponentMinecraft.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new UIButtonComponentMinecraft.Data.ColorData())) {
 						@Override

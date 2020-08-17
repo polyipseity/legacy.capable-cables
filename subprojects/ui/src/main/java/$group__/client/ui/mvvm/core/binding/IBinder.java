@@ -14,7 +14,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.function.Function;
 
-// TODO mark as only UI thread
+/**
+ * Not thread-safe.
+ */
 // TODO add binding transformers
 public interface IBinder {
 	static <B extends IHasBindingKey> Multimap<ResourceLocation, B> sortAndTrimBindings(Iterable<B> bindings) {

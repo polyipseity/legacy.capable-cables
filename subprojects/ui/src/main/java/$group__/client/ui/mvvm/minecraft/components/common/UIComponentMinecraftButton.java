@@ -92,7 +92,6 @@ public class UIComponentMinecraftButton
 	public void onCreated() {
 		super.onCreated();
 
-		// TODO activation events
 		addEventListener(UIEventMouse.TYPE_MOUSE_ENTER_SELF, new UIEventListener.Functional<IUIEventMouse>(e -> {
 			if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET) {
 				getButtonStates().add(IButtonState.HOVERING);

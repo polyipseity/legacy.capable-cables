@@ -12,7 +12,9 @@ import javax.annotation.Nullable;
 import java.awt.geom.Point2D;
 import java.util.Optional;
 
-// TODO mark as only UI thread
+/**
+ * Operations not thread-safe.
+ */
 public interface IUIView<SD extends IShapeDescriptor<?>>
 		extends IUICommon, IUIReshapeExplicitly<SD>, IHasBinding, IExtensionContainer<ResourceLocation, IUIExtension<ResourceLocation, ? extends IUIView<?>>> {
 	IUIEventTarget getTargetAtPoint(Point2D point);

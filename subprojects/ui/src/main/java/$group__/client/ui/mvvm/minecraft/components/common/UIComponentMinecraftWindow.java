@@ -11,7 +11,6 @@ import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
 import $group__.client.ui.mvvm.core.views.IUIReshapeExplicitly;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.extensions.caches.IUIExtensionCache;
-import $group__.client.ui.mvvm.core.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
 import $group__.client.ui.mvvm.core.views.components.parsers.UIConstructor;
 import $group__.client.ui.mvvm.core.views.components.parsers.UIProperty;
 import $group__.client.ui.mvvm.core.views.events.IUIEventFocus;
@@ -58,7 +57,7 @@ import java.util.function.Supplier;
 @OnlyIn(Dist.CLIENT)
 public class UIComponentMinecraftWindow
 		extends UIComponentContainer
-		implements IUIReshapeExplicitly<IShapeDescriptor<? extends RectangularShape>>, IUIComponentMinecraft, IUIComponentCursorHandleProvider {
+		implements IUIReshapeExplicitly<IShapeDescriptor<? extends RectangularShape>>, IUIComponentMinecraft {
 	public static final String PROPERTY_COLOR_BACKGROUND = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "window.colors.background";
 	public static final String PROPERTY_COLOR_BORDER = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "window.colors.border";
 	// TODO make window scroll bars, maybe create a new component, and embed into this
@@ -154,14 +153,6 @@ public class UIComponentMinecraftWindow
 	public void transformChildren(IAffineTransformStack stack) {
 		super.transformChildren(stack);
 		stack.getDelegated().peek().translate(0, WINDOW_DRAG_BAR_THICKNESS); // TODO move
-	}
-
-	@Override
-	public Optional<Long> getCursorHandle(IAffineTransformStack stack, Point2D cursorPosition) {
-		return getExtensions().values().stream().sequential() // TODO there should be a better way
-				.filter(IUIComponentCursorHandleProvider.class::isInstance)
-				.findFirst()
-				.flatMap(ext -> ((IUIComponentCursorHandleProvider) ext).getCursorHandle(stack, cursorPosition));
 	}
 
 	@OnlyIn(Dist.CLIENT)
