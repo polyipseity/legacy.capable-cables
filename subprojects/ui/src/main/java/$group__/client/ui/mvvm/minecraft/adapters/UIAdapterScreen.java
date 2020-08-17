@@ -54,7 +54,6 @@ import java.util.concurrent.ConcurrentMap;
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
 // TODO maybe make some utilities from here
-// TODO activation events
 @OnlyIn(Dist.CLIENT)
 public class UIAdapterScreen
 		<I extends IUIInfrastructureMinecraft<?, ?, ?>>
@@ -209,15 +208,17 @@ public class UIAdapterScreen
 	@Override
 	@Deprecated
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		// TODO double click
-		// TODO should implement prevent default?
 		Point2D cp = new Point2D.Double(mouseX, mouseY);
 		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
 		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(cp);
-		boolean ret = UIEventUtilities.dispatchEvent(addEventMouse(this, UIEventUtilities.Factory.createEventMouseDown(t, d)));
-		if (t.isFocusable())
-			setFocus(t);
-		return ret;
+		if (UIEventUtilities.dispatchEvent(addEventMouse(this, UIEventUtilities.Factory.createEventMouseDown(t, d)))) {
+			if (t.isFocusable())
+				setFocus(t);
+			// TODO selection
+			// TODO drag or drop perhaps
+			// TODO scroll/pan
+		}
+		return true;
 	}
 
 	@Override
@@ -227,11 +228,19 @@ public class UIAdapterScreen
 		Point2D cp = new Point2D.Double(mouseX, mouseY);
 		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
 		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(cp);
-		return removeEventMouse(this, button).map(e ->
-				UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e, new Point2D.Double(mouseX, mouseY)))
-						| (t.equals(e.getTarget())
-						&& UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClick(e.getTarget(), d)) | setLastMouseClickData(d, e.getTarget())))
-				.orElse(false);
+		removeEventMouse(this, button).ifPresent(e -> {
+			if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e, cp)))
+				; // TODO context menu
+			if (t.equals(e.getTarget())) {
+				if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClick(t, d))) {
+					if (t.isFocusable())
+						setFocus(t);
+					// TODO activation
+				}
+				setLastMouseClickData(d, t);
+			}
+		});
+		return true;
 	}
 
 	@Override
@@ -246,82 +255,7 @@ public class UIAdapterScreen
 
 	protected static Optional<IUIEventMouse> removeEventMouse(UIAdapterScreen<?> self, int key) { return Optional.ofNullable(self.getMouseButtonsBeingPressed().remove(key)); }
 
-	@Override
-	@Deprecated
-	public boolean keyPressed(int key, int scanCode, int modifiers) {
-		if (getCloseKeys().contains(key)) {
-			onClose();
-			return true;
-		}
-		if (getChangeFocusKeys().contains(key)) {
-			changeFocus((modifiers & GLFW.GLFW_MOD_SHIFT) == 0);
-			return true;
-		}
-		return getFocus().filter(f -> UIEventUtilities.dispatchEvent(
-				addEventKeyboard(this, UIEventUtilities.Factory.createEventKeyDown(f,
-						new UIDataKeyboardKeyPress(key, scanCode, modifiers))))).isPresent();
-	}
-
-	@Override
-	@Deprecated
-	public void removed() {
-		GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), MemoryUtil.NULL);
-		{
-			// COMMENT generate opposite synthetic events
-			ImmutableMap.copyOf(getKeyboardKeysBeingPressed()).forEach((k, e) ->
-					removeEventKeyboard(this, k).ifPresent(e2 ->
-							UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventKeyboardOpposite(e2))));
-			Point2D cp = GLUtilities.getCursorPos();
-			ImmutableMap.copyOf(getMouseButtonsBeingPressed()).forEach((k, e) ->
-					removeEventMouse(this, k).ifPresent(e2 ->
-							UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e2, cp))));
-			setTargetBeingHoveredByMouse(null, new UIDataMouseButtonClick(cp));
-			setLastMouseClickData(null, null);
-			setFocus(null);
-		}
-		getInfrastructure().removed();
-		IUIInfrastructure.unbindSafe(getInfrastructure());
-	}
-
-	@SuppressWarnings("UnusedReturnValue")
-	protected boolean setTargetBeingHoveredByMouse(@Nullable IUIEventTarget targetBeingHoveredByMouse, IUIDataMouseButtonClick data) {
-		Optional<IUIEventTarget> o = getTargetBeingHoveredByMouse();
-		Optional<IUIEventTarget> n = Optional.ofNullable(targetBeingHoveredByMouse);
-		if (!n.equals(o)) {
-			ImmutableList<?>
-					op = o.map(t -> t instanceof IUINode ? UIEventUtilities.computeNodePath((IUINode) t) : ImmutableList.of(t)).orElseGet(ImmutableList::of),
-					np = n.map(t -> t instanceof IUINode ? UIEventUtilities.computeNodePath((IUINode) t) : ImmutableList.of(t)).orElseGet(ImmutableList::of);
-			int i = 0;
-			for (int maxI = Math.min(op.size(), np.size()); i < maxI; ++i) {
-				if (!op.get(i).equals(np.get(i)))
-					break;
-			}
-			int iFinal = i; // COMMENT paths equal for [0,i)
-			o.ifPresent(t -> {
-				UIEventUtilities.dispatchEvent(
-						UIEventUtilities.Factory.createEventMouseLeaveSelf(t, data, n.orElse(null))); // COMMENT consider bubbling
-				Lists.reverse(op.subList(iFinal, op.size())).forEach(t2 -> {
-					if (t2 instanceof IUIEventTarget)
-						UIEventUtilities.dispatchEvent(
-								UIEventUtilities.Factory.createEventMouseLeave((IUIEventTarget) t2, data, n.orElse(null)));
-				});
-			});
-			this.targetBeingHoveredByMouse = targetBeingHoveredByMouse;
-			n.ifPresent(t -> {
-				UIEventUtilities.dispatchEvent(
-						UIEventUtilities.Factory.createEventMouseEnterSelf(t, data, o.orElse(null))); // COMMENT consider bubbling
-				np.subList(iFinal, np.size()).forEach(t2 -> {
-					if (t2 instanceof IUIEventTarget)
-						UIEventUtilities.dispatchEvent(
-								UIEventUtilities.Factory.createEventMouseEnter((IUIEventTarget) t2, data, o.orElse(null)));
-				});
-			});
-			return true;
-		}
-		return false;
-	}
-
-	protected boolean setLastMouseClickData(@Nullable UIDataMouseButtonClick newMouseClickData, @Nullable IUIEventTarget target) {
+	protected void setLastMouseClickData(@Nullable UIDataMouseButtonClick newMouseClickData, @Nullable IUIEventTarget target) {
 		boolean ret = getLastMouseClickData()
 				.flatMap(dl -> Optional.ofNullable(newMouseClickData)
 						.filter(d -> {
@@ -330,7 +264,38 @@ public class UIAdapterScreen
 									&& UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClickDouble(target, d));
 						})).isPresent();
 		this.lastMouseClickData = newMouseClickData;
-		return ret;
+		if (ret)
+			setFocus(target);
+		// TODO select
+		// TODO activation
+	}
+
+	@Override
+	@Deprecated
+	public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+		Point2D cp = new Point2D.Double(mouseX, mouseY);
+		IUIEventTarget target = getInfrastructure().getView().getTargetAtPoint(cp);
+		UIEventUtilities.dispatchEvent(
+				UIEventUtilities.Factory.createEventWheel(false, target, new UIDataMouseButtonClick(cp), target, delta)); // COMMENT nothing to be scrolled
+		return true;
+	}
+
+	@Override
+	@Deprecated
+	public boolean keyReleased(int key, int scanCode, int modifiers) {
+		return removeEventKeyboard(this, key).filter(e -> {
+			UIEventUtilities.dispatchEvent(
+					UIEventUtilities.Factory.generateSyntheticEventKeyboardOpposite(e));
+			return true;
+		}).isPresent(); // COMMENT NO default action
+	}
+
+	@Override
+	@Deprecated
+	public boolean charTyped(char codePoint, int modifiers) {
+		getFocus().filter(f -> UIEventUtilities.dispatchEvent(
+				UIEventUtilities.Factory.createEventChar(f, codePoint, modifiers)));
+		return true;
 	}
 
 	protected Optional<IUIEventTarget> getTargetBeingHoveredByMouse() { return Optional.ofNullable(targetBeingHoveredByMouse); }
@@ -459,26 +424,74 @@ public class UIAdapterScreen
 
 	@Override
 	@Deprecated
-	public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-		Point2D cp = new Point2D.Double(mouseX, mouseY);
-		IUIEventTarget target = getInfrastructure().getView().getTargetAtPoint(cp);
-		return UIEventUtilities.dispatchEvent(
-				UIEventUtilities.Factory.createEventWheel(target, new UIDataMouseButtonClick(cp), target, delta));
+	public boolean keyPressed(int key, int scanCode, int modifiers) {
+		if (getFocus().filter(f -> UIEventUtilities.dispatchEvent(
+				addEventKeyboard(this, UIEventUtilities.Factory.createEventKeyDown(f,
+						new UIDataKeyboardKeyPress(key, scanCode, modifiers))))).isPresent()) {
+			if (getCloseKeys().contains(key))
+				onClose();
+			if (getChangeFocusKeys().contains(key))
+				changeFocus((modifiers & GLFW.GLFW_MOD_SHIFT) == 0);
+			// TODO activation
+		}
+		return true;
 	}
 
 	@Override
 	@Deprecated
-	public boolean keyReleased(int key, int scanCode, int modifiers) {
-		return removeEventKeyboard(this, key).map(e ->
+	public void removed() {
+		GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), MemoryUtil.NULL);
+		{
+			// COMMENT generate opposite synthetic events
+			// COMMENT NO default actions
+			ImmutableMap.copyOf(getKeyboardKeysBeingPressed()).forEach((k, e) ->
+					removeEventKeyboard(this, k).ifPresent(e2 ->
+							UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventKeyboardOpposite(e2))));
+			Point2D cp = GLUtilities.getCursorPos();
+			ImmutableMap.copyOf(getMouseButtonsBeingPressed()).forEach((k, e) ->
+					removeEventMouse(this, k).ifPresent(e2 ->
+							UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e2, cp))));
+			setTargetBeingHoveredByMouse(null, new UIDataMouseButtonClick(cp));
+			setLastMouseClickData(null, null);
+			setFocus(null);
+		}
+		getInfrastructure().removed();
+		IUIInfrastructure.unbindSafe(getInfrastructure());
+	}
+
+	protected void setTargetBeingHoveredByMouse(@Nullable IUIEventTarget targetBeingHoveredByMouse, IUIDataMouseButtonClick data) {
+		Optional<IUIEventTarget> o = getTargetBeingHoveredByMouse();
+		Optional<IUIEventTarget> n = Optional.ofNullable(targetBeingHoveredByMouse);
+		if (!n.equals(o)) {
+			ImmutableList<?>
+					op = o.map(t -> t instanceof IUINode ? UIEventUtilities.computeNodePath((IUINode) t) : ImmutableList.of(t)).orElseGet(ImmutableList::of),
+					np = n.map(t -> t instanceof IUINode ? UIEventUtilities.computeNodePath((IUINode) t) : ImmutableList.of(t)).orElseGet(ImmutableList::of);
+			int i = 0;
+			for (int maxI = Math.min(op.size(), np.size()); i < maxI; ++i) {
+				if (!op.get(i).equals(np.get(i)))
+					break;
+			}
+			int iFinal = i; // COMMENT paths equal for [0,i)
+			o.ifPresent(t -> {
 				UIEventUtilities.dispatchEvent(
-						UIEventUtilities.Factory.generateSyntheticEventKeyboardOpposite(e))).orElse(false);
-	}
-
-	@Override
-	@Deprecated
-	public boolean charTyped(char codePoint, int modifiers) {
-		return getFocus().filter(f -> UIEventUtilities.dispatchEvent(
-				UIEventUtilities.Factory.createEventChar(f, codePoint, modifiers))).isPresent();
+						UIEventUtilities.Factory.createEventMouseLeaveSelf(t, data, n.orElse(null))); // COMMENT consider bubbling
+				Lists.reverse(op.subList(iFinal, op.size())).forEach(t2 -> {
+					if (t2 instanceof IUIEventTarget)
+						UIEventUtilities.dispatchEvent(
+								UIEventUtilities.Factory.createEventMouseLeave((IUIEventTarget) t2, data, n.orElse(null)));
+				});
+			});
+			this.targetBeingHoveredByMouse = targetBeingHoveredByMouse;
+			n.ifPresent(t -> {
+				UIEventUtilities.dispatchEvent(
+						UIEventUtilities.Factory.createEventMouseEnterSelf(t, data, o.orElse(null))); // COMMENT consider bubbling
+				np.subList(iFinal, np.size()).forEach(t2 -> {
+					if (t2 instanceof IUIEventTarget)
+						UIEventUtilities.dispatchEvent(
+								UIEventUtilities.Factory.createEventMouseEnter((IUIEventTarget) t2, data, o.orElse(null)));
+				});
+			});
+		}
 	}
 
 	@Override

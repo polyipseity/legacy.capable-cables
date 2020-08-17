@@ -25,6 +25,12 @@ public interface IUIEvent {
 
 	void stopPropagation();
 
+	boolean isCancelable();
+
+	boolean isDefaultPrevented();
+
+	boolean preventDefault();
+
 	enum EnumPhase {
 		NONE,
 		CAPTURING_PHASE,

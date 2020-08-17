@@ -24,7 +24,6 @@ public enum UIEventUtilities {
 	public static boolean dispatchEvent(IUIEvent event) {
 		RegUIEvent.checkEvent(event);
 
-		boolean ret = false;
 		if (event.getTarget() instanceof IUINode) {
 			ImmutableList<IUINode> path = computeNodePath((IUINode) event.getTarget());
 
@@ -34,13 +33,13 @@ public enum UIEventUtilities {
 				if (n instanceof IUIEventTarget) {
 					IUIEventTarget nc = (IUIEventTarget) n;
 					if (nc.isActive())
-						ret |= nc.dispatchEvent(event);
+						nc.dispatchEvent(event);
 				}
 			}
 
 			event.advancePhase();
 			if (event.getTarget().isActive())
-				ret |= event.getTarget().dispatchEvent(event);
+				event.getTarget().dispatchEvent(event);
 
 			if (!event.isPropagationStopped() && event.canBubble()) {
 				event.advancePhase();
@@ -50,7 +49,7 @@ public enum UIEventUtilities {
 					if (n instanceof IUIEventTarget) {
 						IUIEventTarget nc = (IUIEventTarget) n;
 						if (nc.isActive())
-							ret |= nc.dispatchEvent(event);
+							nc.dispatchEvent(event);
 					}
 				}
 			}
@@ -65,7 +64,7 @@ public enum UIEventUtilities {
 		}
 
 		event.reset();
-		return ret;
+		return !event.isDefaultPrevented();
 	}
 
 	public static ImmutableList<IUINode> computeNodePath(IUINode node) {
@@ -84,73 +83,74 @@ public enum UIEventUtilities {
 		;
 
 		static {
-			// TODO is defaulta action needed
 			/* SECTION DOM */
 			// COMMENT load
 			// COMMENT unload
 			// COMMENT abort
 			// COMMENT error
-			RegUIEvent.INSTANCE.register(IUIEvent.TYPE_SELECT, IUIEvent.class); // TODO implement
-			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_OUT_POST, IUIEventFocus.class);
-			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_IN_POST, IUIEventFocus.class);
-			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_IN_PRE, IUIEventFocus.class);
-			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_OUT_PRE, IUIEventFocus.class);
+			RegUIEvent.INSTANCE.register(IUIEvent.TYPE_SELECT, IUIEvent.class); // COMMENT NO default // TODO implement
+			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_OUT_POST, IUIEventFocus.class); // COMMENT NO default
+			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_IN_POST, IUIEventFocus.class); // COMMENT NO default
+			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_IN_PRE, IUIEventFocus.class); // COMMENT NO default
+			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_OUT_PRE, IUIEventFocus.class); // COMMENT NO default
 			// COMMENT auxclick
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_CLICK, IUIEventMouse.class);
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_CLICK_DOUBLE, IUIEventMouse.class);
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_DOWN, IUIEventMouse.class);
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_ENTER, IUIEventMouse.class);
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_LEAVE, IUIEventMouse.class);
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_MOVE, IUIEventMouse.class);
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_LEAVE_SELF, IUIEventMouse.class);
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_ENTER_SELF, IUIEventMouse.class);
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_UP, IUIEventMouse.class);
-			RegUIEvent.INSTANCE.register(IUIEventMouseWheel.TYPE_WHEEL, IUIEventMouseWheel.class);
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_CLICK, IUIEventMouse.class); // COMMENT activate, and/or focus
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_CLICK_DOUBLE, IUIEventMouse.class); // COMMENT activate, focus, and/or select
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_DOWN, IUIEventMouse.class); // COMMENT drag, start select, scroll, and/or pan
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_ENTER, IUIEventMouse.class); // COMMENT NO default
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_LEAVE, IUIEventMouse.class); // COMMENT NO default
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_MOVE, IUIEventMouse.class); // COMMENT may have default
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_LEAVE_SELF, IUIEventMouse.class); // COMMENT may have default
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_ENTER_SELF, IUIEventMouse.class); // COMMENT may have default
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_UP, IUIEventMouse.class);// COMMENT context menu
+			RegUIEvent.INSTANCE.register(IUIEventMouseWheel.TYPE_WHEEL, IUIEventMouseWheel.class); // COMMENT scroll or zoom, cancelability varies
 			// COMMENT beforeinput
 			// COMMENT input
-			RegUIEvent.INSTANCE.register(IUIEventKeyboard.TYPE_KEY_DOWN, IUIEventKeyboard.class);
-			RegUIEvent.INSTANCE.register(IUIEventKeyboard.TYPE_KEY_UP, IUIEventKeyboard.class);
+			RegUIEvent.INSTANCE.register(IUIEventKeyboard.TYPE_KEY_DOWN, IUIEventKeyboard.class); // COMMENT focus, keypress, and/or activate
+			RegUIEvent.INSTANCE.register(IUIEventKeyboard.TYPE_KEY_UP, IUIEventKeyboard.class); // COMMENT may have default
 			// COMMENT compositionstart
 			// COMMENT compositionupdate
 			// COMMENT compositionend
 
 			/* SECTION Standard */
-			RegUIEvent.INSTANCE.register(IUIEventChar.TYPE_CHAR_TYPED, IUIEventChar.class);
+			RegUIEvent.INSTANCE.register(IUIEventChar.TYPE_CHAR_TYPED, IUIEventChar.class); // COMMENT NO default
 		}
 
-		public static IUIEvent createEventSelect(IUIEventTarget target) { return new UIEvent(IUIEvent.TYPE_SELECT, true, target); }
+		public static IUIEvent createEventSelect(IUIEventTarget target) { return new UIEvent(IUIEvent.TYPE_SELECT, true, false, target); }
 
-		public static IUIEventFocus createEventFocusOutPost(IUIEventTarget target, @Nullable IUIEventTarget targetBeingFocused) { return new UIEventFocus(IUIEventFocus.TYPE_FOCUS_OUT_POST, false, target, targetBeingFocused); }
+		public static IUIEventFocus createEventFocusOutPost(IUIEventTarget target, @Nullable IUIEventTarget targetBeingFocused) { return new UIEventFocus(IUIEventFocus.TYPE_FOCUS_OUT_POST, false, false, target, targetBeingFocused); }
 
-		public static IUIEventFocus createEventFocusInPost(IUIEventTarget target, @Nullable IUIEventTarget targetBeingUnfocused) { return new UIEventFocus(IUIEventFocus.TYPE_FOCUS_IN_POST, false, target, targetBeingUnfocused); }
+		public static IUIEventFocus createEventFocusInPost(IUIEventTarget target, @Nullable IUIEventTarget targetBeingUnfocused) { return new UIEventFocus(IUIEventFocus.TYPE_FOCUS_IN_POST, false, false, target, targetBeingUnfocused); }
 
-		public static IUIEventFocus createEventFocusInPre(IUIEventTarget target, @Nullable IUIEventTarget targetBeingUnfocused) { return new UIEventFocus(IUIEventFocus.TYPE_FOCUS_IN_PRE, true, target, targetBeingUnfocused); }
+		public static IUIEventFocus createEventFocusInPre(IUIEventTarget target, @Nullable IUIEventTarget targetBeingUnfocused) { return new UIEventFocus(IUIEventFocus.TYPE_FOCUS_IN_PRE, true, false, target, targetBeingUnfocused); }
 
-		public static IUIEventFocus createEventFocusOutPre(IUIEventTarget target, @Nullable IUIEventTarget targetBeingFocused) { return new UIEventFocus(IUIEventFocus.TYPE_FOCUS_OUT_PRE, true, target, targetBeingFocused); }
+		public static IUIEventFocus createEventFocusOutPre(IUIEventTarget target, @Nullable IUIEventTarget targetBeingFocused) { return new UIEventFocus(IUIEventFocus.TYPE_FOCUS_OUT_PRE, true, false, target, targetBeingFocused); }
 
-		public static IUIEventMouse createEventClick(IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(IUIEventMouse.TYPE_CLICK, true, target, data, null); }
+		public static IUIEventMouse createEventClick(IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(IUIEventMouse.TYPE_CLICK, true, true, target, data, null); }
 
-		public static IUIEventMouse createEventClickDouble(IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(IUIEventMouse.TYPE_CLICK_DOUBLE, true, target, data, null); }
+		public static IUIEventMouse createEventClickDouble(IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(IUIEventMouse.TYPE_CLICK_DOUBLE, true, true, target, data, null); }
 
-		public static IUIEventMouse createEventMouseDown(IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(IUIEventMouse.TYPE_MOUSE_DOWN, true, target, data, null); }
+		public static IUIEventMouse createEventMouseDown(IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(IUIEventMouse.TYPE_MOUSE_DOWN, true, true, target, data, null); }
 
-		public static IUIEventMouse createEventMouseEnter(IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingLeft) { return new UIEventMouse(IUIEventMouse.TYPE_MOUSE_ENTER, false, target, data, targetBeingLeft); }
+		public static IUIEventMouse createEventMouseEnter(IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingLeft) { return new UIEventMouse(IUIEventMouse.TYPE_MOUSE_ENTER, false, false, target, data, targetBeingLeft); }
 
-		public static IUIEventMouse createEventMouseLeave(IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingEntered) { return new UIEventMouse(IUIEventMouse.TYPE_MOUSE_LEAVE, false, target, data, targetBeingEntered); }
+		public static IUIEventMouse createEventMouseLeave(IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingEntered) { return new UIEventMouse(IUIEventMouse.TYPE_MOUSE_LEAVE, false, false, target, data, targetBeingEntered); }
 
-		public static IUIEventMouse createEventMouseMove(IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(IUIEventMouse.TYPE_MOUSE_MOVE, true, target, data, null); }
+		public static IUIEventMouse createEventMouseMove(IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(IUIEventMouse.TYPE_MOUSE_MOVE, true, true, target, data, null); }
 
-		public static IUIEventMouse createEventMouseEnterSelf(IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingLeft) { return new UIEventMouse(IUIEventMouse.TYPE_MOUSE_ENTER_SELF, true, target, data, targetBeingLeft); }
+		public static IUIEventMouse createEventMouseEnterSelf(IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingLeft) { return new UIEventMouse(IUIEventMouse.TYPE_MOUSE_ENTER_SELF, true, true, target, data, targetBeingLeft); }
 
-		public static IUIEventChar createEventChar(IUIEventTarget target, char codePoint, int modifiers) { return new UIEventChar(IUIEventChar.TYPE_CHAR_TYPED, true, target, codePoint, modifiers); }
+		public static IUIEventMouse createEventMouseLeaveSelf(IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingEntered) { return new UIEventMouse(IUIEventMouse.TYPE_MOUSE_LEAVE_SELF, true, true, target, data, targetBeingEntered); }
 
-		public static IUIEventMouse createEventMouseUp(IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(IUIEventMouse.TYPE_MOUSE_UP, true, target, data, null); }
+		public static IUIEventChar createEventChar(IUIEventTarget target, char codePoint, int modifiers) { return new UIEventChar(IUIEventChar.TYPE_CHAR_TYPED, true, false, target, codePoint, modifiers); }
 
-		public static IUIEventMouseWheel createEventWheel(IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingPointed, double delta) { return new UIEventMouseWheel(IUIEventMouseWheel.TYPE_WHEEL, true, target, data, targetBeingPointed, delta); }
+		public static IUIEventMouse createEventMouseUp(IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(IUIEventMouse.TYPE_MOUSE_UP, true, true, target, data, null); }
 
-		public static IUIEventKeyboard createEventKeyDown(IUIEventTarget target, IUIDataKeyboardKeyPress data) { return new UIEventKeyboard(IUIEventKeyboard.TYPE_KEY_DOWN, true, target, data); }
+		public static IUIEventMouseWheel createEventWheel(boolean cancelable, IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingPointed, double delta) { return new UIEventMouseWheel(IUIEventMouseWheel.TYPE_WHEEL, true, cancelable, target, data, targetBeingPointed, delta); }
 
-		public static IUIEventKeyboard createEventKeyUp(IUIEventTarget target, IUIDataKeyboardKeyPress data) { return new UIEventKeyboard(IUIEventKeyboard.TYPE_KEY_UP, true, target, data); }
+		public static IUIEventKeyboard createEventKeyDown(IUIEventTarget target, IUIDataKeyboardKeyPress data) { return new UIEventKeyboard(IUIEventKeyboard.TYPE_KEY_DOWN, true, true, target, data); }
+
+		public static IUIEventKeyboard createEventKeyUp(IUIEventTarget target, IUIDataKeyboardKeyPress data) { return new UIEventKeyboard(IUIEventKeyboard.TYPE_KEY_UP, true, true, target, data); }
 
 		public static IUIEventKeyboard generateSyntheticEventKeyboardOpposite(IUIEventKeyboard event) {
 			if (IUIEventKeyboard.TYPE_KEY_DOWN.equals(event.getType()))
@@ -172,8 +172,6 @@ public enum UIEventUtilities {
 					"event.getType()", event.getType(),
 					"event", event);
 		}
-
-		public static IUIEventMouse createEventMouseLeaveSelf(IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingEntered) { return new UIEventMouse(IUIEventMouse.TYPE_MOUSE_LEAVE_SELF, true, target, data, targetBeingEntered); }
 	}
 
 	public static final class RegUIEvent extends Registry<ResourceLocation, Class<? extends IUIEvent>> {

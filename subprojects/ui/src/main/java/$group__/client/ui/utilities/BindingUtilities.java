@@ -24,7 +24,6 @@ import java.util.function.Function;
 
 public enum BindingUtilities {
 	;
-	// TODO Should these be a cache instead?
 	protected static final ConcurrentMap<Class<?>, Function<?, Iterable<IBindingField<?>>>> BINDING_FIELDS_MAP
 			= MapUtilities.getMapMakerMultiThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 	protected static final ConcurrentMap<Class<?>, Function<?, Iterable<IBindingMethod<?>>>> BINDING_METHODS_MAP

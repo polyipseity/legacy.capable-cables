@@ -10,8 +10,8 @@ import javax.annotation.Nullable;
 public class UIEventMouseWheel extends UIEventMouse implements IUIEventMouseWheel {
 	protected final double delta;
 
-	public UIEventMouseWheel(ResourceLocation type, boolean canBubble, IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget relatedTarget, double delta) {
-		super(type, canBubble, target, data, relatedTarget);
+	public UIEventMouseWheel(ResourceLocation type, boolean canBubble, boolean cancelable, IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget relatedTarget, double delta) {
+		super(type, canBubble, cancelable, target, data, relatedTarget);
 		this.delta = delta;
 	}
 

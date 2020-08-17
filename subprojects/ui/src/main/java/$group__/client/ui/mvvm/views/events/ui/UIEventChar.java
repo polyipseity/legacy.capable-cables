@@ -9,8 +9,8 @@ public class UIEventChar extends UIEvent implements IUIEventChar {
 	protected final char codePoint;
 	protected final int modifiers;
 
-	public UIEventChar(ResourceLocation type, boolean canBubble, IUIEventTarget target, char codePoint, int modifiers) {
-		super(type, canBubble, target);
+	public UIEventChar(ResourceLocation type, boolean canBubble, boolean cancelable, IUIEventTarget target, char codePoint, int modifiers) {
+		super(type, canBubble, cancelable, target);
 		this.codePoint = codePoint;
 		this.modifiers = modifiers;
 	}

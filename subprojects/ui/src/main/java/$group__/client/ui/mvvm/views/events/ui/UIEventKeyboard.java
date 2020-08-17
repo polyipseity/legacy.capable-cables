@@ -9,8 +9,8 @@ import net.minecraft.util.ResourceLocation;
 public class UIEventKeyboard extends UIEvent implements IUIEventKeyboard {
 	protected final IUIDataKeyboardKeyPress data;
 
-	public UIEventKeyboard(ResourceLocation type, boolean canBubble, IUIEventTarget target, IUIDataKeyboardKeyPress data) {
-		super(type, canBubble, target);
+	public UIEventKeyboard(ResourceLocation type, boolean canBubble, boolean cancelable, IUIEventTarget target, IUIDataKeyboardKeyPress data) {
+		super(type, canBubble, cancelable, target);
 		this.data = data;
 	}
 

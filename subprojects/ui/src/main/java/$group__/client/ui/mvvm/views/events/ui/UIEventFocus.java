@@ -12,8 +12,8 @@ public class UIEventFocus extends UIEvent implements IUIEventFocus {
 	@Nullable
 	protected final IUIEventTarget relatedTarget;
 
-	public UIEventFocus(ResourceLocation type, boolean canBubble, IUIEventTarget target, @Nullable IUIEventTarget relatedTarget) {
-		super(type, canBubble, target);
+	public UIEventFocus(ResourceLocation type, boolean canBubble, boolean cancelable, IUIEventTarget target, @Nullable IUIEventTarget relatedTarget) {
+		super(type, canBubble, cancelable, target);
 		this.relatedTarget = relatedTarget;
 	}
 

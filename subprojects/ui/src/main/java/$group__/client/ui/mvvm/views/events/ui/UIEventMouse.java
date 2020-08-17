@@ -14,8 +14,8 @@ public class UIEventMouse extends UIEvent implements IUIEventMouse {
 	@Nullable
 	protected final IUIEventTarget relatedTarget;
 
-	public UIEventMouse(ResourceLocation type, boolean canBubble, IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget relatedTarget) {
-		super(type, canBubble, target);
+	public UIEventMouse(ResourceLocation type, boolean canBubble, boolean cancelable, IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget relatedTarget) {
+		super(type, canBubble, cancelable, target);
 		this.data = data;
 		this.relatedTarget = relatedTarget;
 	}
