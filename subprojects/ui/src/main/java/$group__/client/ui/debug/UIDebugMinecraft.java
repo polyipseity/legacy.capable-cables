@@ -13,7 +13,6 @@ import $group__.client.ui.mvvm.models.UIModel;
 import $group__.client.ui.mvvm.views.components.parsers.UIXMLDOMComponentParser;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
-import $group__.utilities.client.minecraft.ResourceUtilities;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -45,8 +44,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import static $group__.utilities.PreconditionUtilities.requireRunOnceOnly;
 import static java.util.Objects.requireNonNull;
 
@@ -77,13 +74,8 @@ public enum UIDebugMinecraft {
 				new UIXMLDOMComponentParser<>(UIComponentManagerMinecraft.class);
 
 		static {
-			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			dbf.setNamespaceAware(true); // TODO somehow make sure that this is called
-			Try.run(() -> PARSER.parseResource(dbf
-					.newDocumentBuilder()
-					.parse(ResourceUtilities.getResource(
-							new ResourceLocation(ConfigurationUI.getModId(), "ui/schemas/components_test.xml"))
-							.getInputStream())), LOGGER);
+			Try.run(() ->
+					PARSER.parseResource(UIFacade.UFMinecraft.parseResourceDocument(new ResourceLocation(ConfigurationUI.getModId(), "ui/schemas/components_test.xml"))), LOGGER);
 			ThrowableCatcher.rethrow(true);
 		}
 

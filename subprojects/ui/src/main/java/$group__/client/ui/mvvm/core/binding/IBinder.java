@@ -1,11 +1,8 @@
 package $group__.client.ui.mvvm.core.binding;
 
 import $group__.utilities.CapacityUtilities;
-import $group__.utilities.CastUtilities;
 import $group__.utilities.DynamicUtilities;
 import $group__.utilities.MapUtilities;
-import $group__.utilities.ThrowableUtilities.BecauseOf;
-import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.reactive.DisposableObserverAuto;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
@@ -14,7 +11,6 @@ import net.jodah.typetools.TypeResolver;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -29,28 +25,6 @@ public interface IBinder {
 				.hashSetValues(CapacityUtilities.INITIAL_CAPACITY_TINY).build();
 		bindings.forEach(f -> f.getBindingKey().ifPresent(rl -> ret.put(rl, f)));
 		return ret;
-	}
-
-	static <T, B extends IHasBindingKey & IHasGenericClass<T>, BF extends IHasBindingKey & IHasGenericClass<?>> Iterable<B> checkAndCastBindings(ResourceLocation bindingKey, @Nullable Class<T> clazz, Iterable<BF> bindings) {
-		Function<ResourceLocation, Boolean> bindingKeyEquals = bindingKey::equals;
-		for (BF b : bindings) {
-			if (!b.getBindingKey().map(bindingKeyEquals).orElse(true))
-				throw BecauseOf.illegalArgument("The strings of all bindings are not the same",
-						"b.getBindingKey()", b.getBindingKey(),
-						"bindingKey", bindingKey,
-						"b", b,
-						"bindings", bindings);
-
-			if (clazz == null)
-				clazz = CastUtilities.castUnchecked(b.getGenericClass()); // COMMENT the first binding determines the type
-			else if (!b.getGenericClass().equals(clazz))
-				throw BecauseOf.illegalArgument("The types of all bindings are not the same",
-						"b.getGenericClass()", b.getGenericClass(),
-						"clazzFinal", clazz,
-						"b", b,
-						"bindings", bindings);
-		}
-		return CastUtilities.castUnchecked(bindings); // COMMENT safe, type checked
 	}
 
 	static DisposableObserver<IBinderAction> createBinderActionObserver(IBinder binder) {

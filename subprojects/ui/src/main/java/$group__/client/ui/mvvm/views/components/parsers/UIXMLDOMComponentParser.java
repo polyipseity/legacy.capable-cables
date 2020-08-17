@@ -32,6 +32,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.util.*;
@@ -43,9 +44,15 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 	@SuppressWarnings("HardcodedFileSeparator")
 	public static final ResourceLocation SCHEMA_LOCATION = new ResourceLocation(ConfigurationUI.getModId(), "ui/schemas/components.xsd");
 	private static final Logger LOGGER = LogManager.getLogger();
-	public static final Schema SCHEMA = Try.call(() ->
-			SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
-					.newSchema(new StreamSource(ResourceUtilities.getResource(SCHEMA_LOCATION).getInputStream())), LOGGER).orElseThrow(ThrowableCatcher::rethrow);
+	public static final Schema SCHEMA;
+
+	static {
+		SCHEMA = Try.call(() -> {
+			try (InputStream res = ResourceUtilities.getResource(SCHEMA_LOCATION).getInputStream()) {
+				return SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new StreamSource(res));
+			}
+		}, LOGGER).orElseThrow(ThrowableCatcher::rethrow);
+	}
 
 	protected ConcurrentMap<String, String> aliases = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 	@Nullable
