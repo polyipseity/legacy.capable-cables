@@ -25,10 +25,16 @@ import java.util.function.Supplier;
 
 import static $group__.client.ui.core.IShapeDescriptor.checkIsBeingModified;
 
+// TODO needs better design, but I cannot think of one
 public abstract class ShapeDescriptor<S extends Shape> implements IShapeDescriptor<S> {
 	protected final List<IUIConstraint> constraints = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 	protected final IUIAnchorSet<IUIAnchor> anchorSet = new AnchorSet();
 	protected boolean beingModified = false;
+
+	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
+	protected ShapeDescriptor() {
+		modify(() -> false); // COMMENT check for constraints
+	}
 
 	@Override
 	public List<IUIConstraint> getConstraintsView() { return ImmutableList.copyOf(getConstraints()); }
