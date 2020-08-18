@@ -36,6 +36,46 @@
 				<xs:element ref="ui:componentContainer"/>
 			</xs:sequence>
 			<xs:attribute name="class" type="xs:string" use="required"/>
+			<!-- SECTION DOM -->
+			<!-- COMMENT unused, reserved -->
+			<xs:attribute name="load" type="xs:string"/>
+			<!-- COMMENT unused, reserved -->
+			<xs:attribute name="unload" type="xs:string"/>
+			<!-- COMMENT unused, reserved -->
+			<xs:attribute name="abort" type="xs:string"/>
+			<!-- COMMENT unused, reserved -->
+			<xs:attribute name="error" type="xs:string"/>
+			<xs:attribute name="select" type="xs:string"/>
+			<xs:attribute name="blur" type="xs:string"/>
+			<xs:attribute name="focus" type="xs:string"/>
+			<xs:attribute name="focusin" type="xs:string"/>
+			<xs:attribute name="focusout" type="xs:string"/>
+			<!-- COMMENT unused, reserved -->
+			<xs:attribute name="auxclick" type="xs:string"/>
+			<xs:attribute name="click" type="xs:string"/>
+			<xs:attribute name="dblclick" type="xs:string"/>
+			<xs:attribute name="mousedown" type="xs:string"/>
+			<xs:attribute name="mouseenter" type="xs:string"/>
+			<xs:attribute name="mouseleave" type="xs:string"/>
+			<xs:attribute name="mousemove" type="xs:string"/>
+			<xs:attribute name="mouseout" type="xs:string"/>
+			<xs:attribute name="mouseover" type="xs:string"/>
+			<xs:attribute name="mouseup" type="xs:string"/>
+			<xs:attribute name="wheel" type="xs:string"/>
+			<!-- COMMENT unused, reserved -->
+			<xs:attribute name="beforeinput" type="xs:string"/>
+			<!-- COMMENT unused, reserved -->
+			<xs:attribute name="input" type="xs:string"/>
+			<xs:attribute name="keydown" type="xs:string"/>
+			<xs:attribute name="keyup" type="xs:string"/>
+			<!-- COMMENT unused, reserved -->
+			<xs:attribute name="compositionstart" type="xs:string"/>
+			<!-- COMMENT unused, reserved -->
+			<xs:attribute name="compositionupdate" type="xs:string"/>
+			<!-- COMMENT unused, reserved -->
+			<xs:attribute name="compositionend" type="xs:string"/>
+			<!-- SECTION Standard -->
+			<xs:attribute name="char_typed" type="xs:string"/>
 		</xs:complexType>
 	</xs:element>
 
@@ -82,7 +122,7 @@
 
 	<xs:complexType name="valueType" id="valueType">
 		<xs:choice minOccurs="0" maxOccurs="unbounded">
-			<!-- unique particle attribution -->
+			<!-- unique particle attribution :( -->
 			<xs:any/>
 		</xs:choice>
 		<xs:attribute name="boolean" type="xs:boolean"/>

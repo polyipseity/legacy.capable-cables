@@ -13,7 +13,7 @@ import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.client.minecraft.ResourceUtilities;
 import $group__.utilities.interfaces.IHasGenericClass;
-import $group__.utilities.structures.NodeListList;
+import $group__.utilities.structures.NamedNodeMapMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -22,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -86,8 +87,9 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 
 		setPrototype(TreeUtilities.visitNodesDepthFirst(managerNode,
 				n -> {
-					NodeListList i = NodeListList.wrap(n.getChildNodes());
-					Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping = new HashMap<>(i.size());
+					@Nullable NamedNodeMap as = n.getAttributes();
+					assert as != null;
+					Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping = new HashMap<>(as.getLength() + n.getChildNodes().getLength());
 
 					DOMUtilities.getChildrenByTagNameNS(n, namespaceURI, "property").forEach(p ->
 							propertyMapping.put(
@@ -99,6 +101,10 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 									new UIPropertyMappingValue(
 											p.getFirstChild(),
 											DOMUtilities.getAttributeValue(p, "binding").map(ResourceLocation::new).orElse(null))));
+
+					// COMMENT adds the default UI event, they are specified as attributes instead of elements
+					NamedNodeMapMap.wrap(as).forEach((k, v) -> propertyMapping.put(new ResourceLocation(k),
+							new UIPropertyMappingValue(null, Optional.ofNullable(v.getNodeValue()).map(ResourceLocation::new).orElse(null))));
 
 					return new UIComponentPrototype(
 							getClassFromMaybeAlias(getAliases(), DOMUtilities.getAttributeValue(n, "class")

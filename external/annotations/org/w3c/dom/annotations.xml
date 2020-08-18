@@ -2,7 +2,16 @@
 	<item name='org.w3c.dom.NamedNodeMap org.w3c.dom.Node getNamedItem(java.lang.String)'>
 		<annotation name='javax.annotation.Nullable'/>
 	</item>
+	<item name='org.w3c.dom.NamedNodeMap org.w3c.dom.Node getNamedItemNS(java.lang.String, java.lang.String)'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
 	<item name='org.w3c.dom.NamedNodeMap org.w3c.dom.Node getNamedItemNS(java.lang.String, java.lang.String) 0'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
+	<item name='org.w3c.dom.NamedNodeMap org.w3c.dom.Node removeNamedItemNS(java.lang.String, java.lang.String)'>
+		<annotation name='javax.annotation.Nonnull'/>
+	</item>
+	<item name='org.w3c.dom.Node java.lang.String getLocalName()'>
 		<annotation name='javax.annotation.Nullable'/>
 	</item>
 	<item name='org.w3c.dom.Node java.lang.String getNamespaceURI()'>

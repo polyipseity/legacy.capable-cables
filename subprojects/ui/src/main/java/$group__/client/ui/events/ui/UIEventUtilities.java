@@ -30,7 +30,7 @@ public enum UIEventUtilities {
 
 			event.advancePhase();
 			for (int i = 0, maxI = path.size() - 1; i < maxI; i++) {
-				IUINode n = path.get(i);
+				@Nullable IUINode n = path.get(i);
 				if (n instanceof IUIEventTarget) {
 					IUIEventTarget nc = (IUIEventTarget) n;
 					if (nc.isActive())
@@ -46,7 +46,7 @@ public enum UIEventUtilities {
 				event.advancePhase();
 				ImmutableList<IUINode> pathReversed = path.reverse();
 				for (int i = 1, maxI = pathReversed.size(); i < maxI; i++) {
-					IUINode n = pathReversed.get(i);
+					@Nullable IUINode n = pathReversed.get(i);
 					if (n instanceof IUIEventTarget) {
 						IUIEventTarget nc = (IUIEventTarget) n;
 						if (nc.isActive())
@@ -88,32 +88,33 @@ public enum UIEventUtilities {
 			// COMMENT unload
 			// COMMENT abort
 			// COMMENT error
-			RegUIEvent.INSTANCE.register(IUIEvent.TYPE_SELECT, IUIEvent.class); // COMMENT NO default // TODO implement
-			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_OUT_POST, IUIEventFocus.class); // COMMENT NO default
-			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_IN_POST, IUIEventFocus.class); // COMMENT NO default
-			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_IN_PRE, IUIEventFocus.class); // COMMENT NO default
-			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_OUT_PRE, IUIEventFocus.class); // COMMENT NO default
+			// TODO implement select
+			RegUIEvent.INSTANCE.register(IUIEvent.TYPE_SELECT, IUIEvent.class); // COMMENT select: NO default
+			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_OUT_POST, IUIEventFocus.class); // COMMENT blur: NO default
+			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_IN_POST, IUIEventFocus.class); // COMMENT focus: NO default
+			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_IN_PRE, IUIEventFocus.class); // COMMENT focusin: NO default
+			RegUIEvent.INSTANCE.register(IUIEventFocus.TYPE_FOCUS_OUT_PRE, IUIEventFocus.class); // COMMENT focusout: NO default
 			// COMMENT auxclick
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_CLICK, IUIEventMouse.class); // COMMENT activate, and/or focus
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_CLICK_DOUBLE, IUIEventMouse.class); // COMMENT activate, focus, and/or select
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_DOWN, IUIEventMouse.class); // COMMENT drag, start select, scroll, and/or pan
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_ENTER, IUIEventMouse.class); // COMMENT NO default
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_LEAVE, IUIEventMouse.class); // COMMENT NO default
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_MOVE, IUIEventMouse.class); // COMMENT may have default
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_LEAVE_SELF, IUIEventMouse.class); // COMMENT may have default
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_ENTER_SELF, IUIEventMouse.class); // COMMENT may have default
-			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_UP, IUIEventMouse.class);// COMMENT context menu
-			RegUIEvent.INSTANCE.register(IUIEventMouseWheel.TYPE_WHEEL, IUIEventMouseWheel.class); // COMMENT scroll or zoom, cancelability varies
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_CLICK, IUIEventMouse.class); // COMMENT click: activate, and/or focus
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_CLICK_DOUBLE, IUIEventMouse.class); // COMMENT dblclick: activate, focus, and/or select
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_DOWN, IUIEventMouse.class); // COMMENT mousedown: drag, start select, scroll, and/or pan
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_ENTER, IUIEventMouse.class); // COMMENT mousenter: NO default
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_LEAVE, IUIEventMouse.class); // COMMENT mouseleave: NO default
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_MOVE, IUIEventMouse.class); // COMMENT mousemove: may have default
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_LEAVE_SELF, IUIEventMouse.class); // COMMENT mouseout: may have default
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_ENTER_SELF, IUIEventMouse.class); // COMMENT mouseover: may have default
+			RegUIEvent.INSTANCE.register(IUIEventMouse.TYPE_MOUSE_UP, IUIEventMouse.class);// COMMENT mouseup: context menu
+			RegUIEvent.INSTANCE.register(IUIEventMouseWheel.TYPE_WHEEL, IUIEventMouseWheel.class); // COMMENT wheel: scroll or zoom, cancelability varies
 			// COMMENT beforeinput
 			// COMMENT input
-			RegUIEvent.INSTANCE.register(IUIEventKeyboard.TYPE_KEY_DOWN, IUIEventKeyboard.class); // COMMENT focus, keypress, and/or activate
-			RegUIEvent.INSTANCE.register(IUIEventKeyboard.TYPE_KEY_UP, IUIEventKeyboard.class); // COMMENT may have default
+			RegUIEvent.INSTANCE.register(IUIEventKeyboard.TYPE_KEY_DOWN, IUIEventKeyboard.class); // COMMENT keydown: focus, keypress, and/or activate
+			RegUIEvent.INSTANCE.register(IUIEventKeyboard.TYPE_KEY_UP, IUIEventKeyboard.class); // COMMENT keyup: may have default
 			// COMMENT compositionstart
 			// COMMENT compositionupdate
 			// COMMENT compositionend
 
 			/* SECTION Standard */
-			RegUIEvent.INSTANCE.register(IUIEventChar.TYPE_CHAR_TYPED, IUIEventChar.class); // COMMENT NO default
+			RegUIEvent.INSTANCE.register(IUIEventChar.TYPE_CHAR_TYPED, IUIEventChar.class); // COMMENT char_typed: NO default
 		}
 
 		public static IUIEvent createEventSelect(IUIEventTarget target) { return new UIEvent(IUIEvent.TYPE_SELECT, true, false, target); }

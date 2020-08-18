@@ -130,7 +130,8 @@ public class UIComponent
 		CastUtilities.<IBindingMethod.ISource<? extends IUIEvent>>castUnchecked( // COMMENT should match
 				Optional.<IBindingMethod.ISource<?>>ofNullable(getEventTargetBindingMethods().get(type))
 						.orElseGet(() -> {
-							IBindingMethod.ISource<? extends IUIEvent> r = new BindingMethodSource<>(event.getClass(), type);
+							IBindingMethod.ISource<? extends IUIEvent> r = new BindingMethodSource<>(event.getClass(),
+									Optional.ofNullable(getPropertyMapping().get(type)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 							getEventTargetBindingMethods().put(type, r);
 							return r;
 						})).invoke(CastUtilities.castUnchecked(event)); // COMMENT should match
