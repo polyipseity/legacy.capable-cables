@@ -62,6 +62,7 @@ public class UIComponentMinecraftButton
 	protected final IBindingMethod.ISource<IUIEvent> methodOnActivated;
 	protected final EnumSet<IButtonState> buttonStates = EnumSet.noneOf(IButtonState.class);
 
+	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	@UIConstructor
 	public UIComponentMinecraftButton(Map<String, IUIPropertyMappingValue> propertyMapping) {
 		super(propertyMapping);
@@ -86,11 +87,6 @@ public class UIComponentMinecraftButton
 				s -> new Color(Integer.decode(s), true), Color.LIGHT_GRAY);
 
 		this.methodOnActivated = new BindingMethodSource<>(IUIEvent.class, new ResourceLocation(METHOD_ON_ACTIVATED));
-	}
-
-	@Override
-	public void onCreated() {
-		super.onCreated();
 
 		addEventListener(UIEventMouse.TYPE_MOUSE_ENTER_SELF, new UIEventListener.Functional<IUIEventMouse>(e -> {
 			if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET) {

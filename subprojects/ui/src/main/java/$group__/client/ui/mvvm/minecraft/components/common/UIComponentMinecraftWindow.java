@@ -40,7 +40,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -71,6 +70,7 @@ public class UIComponentMinecraftWindow
 	@UIProperty(PROPERTY_COLOR_BORDER)
 	protected final IBindingField<Color> colorBorder;
 
+	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	@UIConstructor
 	public UIComponentMinecraftWindow(Map<String, IUIPropertyMappingValue> propertyMapping) {
 		super(propertyMapping);
@@ -81,12 +81,7 @@ public class UIComponentMinecraftWindow
 		this.colorBorder = IHasBinding.createBindingField(Color.class,
 				getPropertyMapping().get(PROPERTY_COLOR_BORDER),
 				s -> new Color(Integer.decode(s), true), Color.WHITE);
-	}
 
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void onCreated() {
-		super.onCreated();
 		addEventListener(UIEventFocus.TYPE_FOCUS_IN_POST, new UIEventListener.Functional<IUIEventFocus>(e ->
 				getParent().orElseThrow(InternalError::new).moveChildToTop(this)), true);
 	}

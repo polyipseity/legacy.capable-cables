@@ -12,27 +12,16 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
-import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /*
 TODO auto resizing based on min size and preferred size
  */
 public interface IUIComponent
 		extends IUINode, IHasBinding, IUIEventTarget, IExtensionContainer<ResourceLocation, IUIExtension<? extends ResourceLocation, ? super IUIComponent>> {
-	static <C extends IUIComponent> C createComponent(Supplier<? extends C> constructor) {
-		C ret = constructor.get();
-		ret.onCreated();
-		return ret;
-	}
-
-	@OverridingMethodsMustInvokeSuper
-	default void onCreated() {} // TODO consider removing, extensions should be added manually
-
 	static <T> Optional<T> getYoungestParentInstanceOf(IUIComponent self, Class<T> clazz) {
 		Optional<? extends IUIComponentContainer> parent = self.getParent();
 		Optional<T> ret = Optional.empty();
