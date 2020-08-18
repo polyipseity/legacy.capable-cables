@@ -212,8 +212,6 @@ public class UIAdapterScreen
 		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
 		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(cp);
 		if (UIEventUtilities.dispatchEvent(addEventMouse(this, UIEventUtilities.Factory.createEventMouseDown(t, d)))) {
-			if (t.isFocusable())
-				setFocus(t);
 			// TODO select
 			// TODO drag or drop perhaps
 			// TODO scroll/pan
@@ -232,10 +230,8 @@ public class UIAdapterScreen
 			if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e, cp)))
 				; // TODO context menu
 			if (t.equals(e.getTarget())) {
-				if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClick(t, d))) {
-					if (t.isFocusable())
-						setFocus(t);
-				}
+				if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClick(t, d)))
+					setFocus(t);
 				setLastMouseClickData(d, t);
 			}
 		});
@@ -291,7 +287,7 @@ public class UIAdapterScreen
 	@Override
 	@Deprecated
 	public boolean charTyped(char codePoint, int modifiers) {
-		getFocus().filter(f -> UIEventUtilities.dispatchEvent(
+		getFocus().ifPresent(f -> UIEventUtilities.dispatchEvent(
 				UIEventUtilities.Factory.createEventChar(f, codePoint, modifiers)));
 		return true;
 	}
@@ -331,7 +327,7 @@ public class UIAdapterScreen
 
 	protected boolean setFocus(@Nullable IUIEventTarget focus) {
 		Optional<IUIEventTarget> p = getFocus(), n = Optional.ofNullable(focus);
-		if (!p.equals(n)) {
+		if (p.map(IUIEventTarget::isFocusable).orElse(true) && !p.equals(n)) {
 			@Nullable IUIEventTarget pv = p.orElse(null);
 			p.ifPresent(f -> UIEventUtilities.dispatchEvent(
 					UIEventUtilities.Factory.createEventFocusOutPre(f, focus)));
@@ -423,9 +419,9 @@ public class UIAdapterScreen
 	@Override
 	@Deprecated
 	public boolean keyPressed(int key, int scanCode, int modifiers) {
-		if (getFocus().filter(f -> UIEventUtilities.dispatchEvent(
+		if (getFocus().map(f -> UIEventUtilities.dispatchEvent(
 				addEventKeyboard(this, UIEventUtilities.Factory.createEventKeyDown(f,
-						new UIDataKeyboardKeyPress(key, scanCode, modifiers))))).isPresent()) {
+						new UIDataKeyboardKeyPress(key, scanCode, modifiers))))).orElse(true)) {
 			if (getCloseKeys().contains(key))
 				onClose();
 			if (getChangeFocusKeys().contains(key))

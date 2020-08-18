@@ -23,6 +23,7 @@ public enum UIEventUtilities {
 
 	public static boolean dispatchEvent(IUIEvent event) {
 		RegUIEvent.checkEvent(event);
+		event.reset();
 
 		if (event.getTarget() instanceof IUINode) {
 			ImmutableList<IUINode> path = computeNodePath((IUINode) event.getTarget());
@@ -63,7 +64,6 @@ public enum UIEventUtilities {
 			// COMMENT NOOP
 		}
 
-		event.reset();
 		return !event.isDefaultPrevented();
 	}
 
