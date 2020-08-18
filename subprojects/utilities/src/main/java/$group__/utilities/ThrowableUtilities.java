@@ -30,6 +30,8 @@ public enum ThrowableUtilities {
 
 	public static Throwable create() { return new Throwable("Instantiated throwable"); }
 
+	public static Optional<Throwable> createIfDebug() { return ConstantsUtilities.BUILD_TYPE.isDebug() ? Optional.of(ThrowableUtilities.create()) : Optional.empty(); }
+
 	public enum ThrowableCatcher {
 		;
 
