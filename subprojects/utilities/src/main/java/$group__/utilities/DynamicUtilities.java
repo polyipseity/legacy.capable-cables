@@ -222,8 +222,8 @@ public enum DynamicUtilities {
 			return ret;
 		}
 
-		public static Optional<Class<?>> wrapTypeResolverResult(Class<?> result) {
-			return TypeResolver.Unknown.class.equals(result) ? Optional.empty() : Optional.of(result);
+		public static Optional<Class<?>> wrapTypeResolverResult(@Nullable Class<?> result) {
+			return TypeResolver.Unknown.class.equals(result) ? Optional.empty() : Optional.ofNullable(result);
 		}
 	}
 }

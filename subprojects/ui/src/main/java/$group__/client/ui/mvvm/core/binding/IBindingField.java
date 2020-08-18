@@ -47,4 +47,3 @@ public interface IBindingField<T> extends IField<T>, IHasGenericClass<T>, IHasBi
 	@Override
 	default void setValue(T value) { getField().setValue(value); }
 }
-
