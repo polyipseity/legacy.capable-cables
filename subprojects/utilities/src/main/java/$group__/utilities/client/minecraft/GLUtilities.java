@@ -58,10 +58,13 @@ public enum GLUtilities {
 			action.run();
 		}
 
-		public static void pop(String name) {
+		public static void clear(String name) {
 			Deque<GLCall> stack = getStack(name);
-			Runnable fallback = stack.pop().fallback;
-			(stack.isEmpty() ? fallback : stack.peek()).run();
+			if (!stack.isEmpty()) {
+				LOGGER.warn(() -> LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} leak: {}: {} not popped", GLStacksUtilities.class.getSimpleName(), name, stack.size()));
+				while (!stack.isEmpty())
+					pop(name);
+			}
 		}
 
 		public static void clearAll() {
@@ -69,13 +72,10 @@ public enum GLUtilities {
 			STACKS.clear();
 		}
 
-		public static void clear(String name) {
+		public static void pop(String name) {
 			Deque<GLCall> stack = getStack(name);
-			if (!stack.isEmpty()) {
-				LOGGER.warn(LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} leak: {}: {} not popped", GLStacksUtilities.class.getSimpleName(), name, stack.size()));
-				while (!stack.isEmpty())
-					pop(name);
-			}
+			Runnable fallback = stack.pop().getFallback();
+			(stack.isEmpty() ? fallback : stack.peek()).run();
 		}
 
 		private static Deque<GLCall> getStack(String name) { return STACKS.computeIfAbsent(name, s -> new ArrayDeque<>(INITIAL_CAPACITY_MEDIUM)); }
@@ -91,6 +91,10 @@ public enum GLUtilities {
 
 			@Override
 			public void run() { action.run(); }
+
+			private Runnable getAction() { return action; }
+
+			private Runnable getFallback() { return fallback; }
 		}
 	}
 

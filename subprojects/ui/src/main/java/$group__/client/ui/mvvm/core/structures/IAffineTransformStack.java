@@ -1,6 +1,5 @@
 package $group__.client.ui.mvvm.core.structures;
 
-import $group__.client.ui.ConstantsUI;
 import $group__.utilities.LoggerUtilities;
 import $group__.utilities.MapUtilities;
 import $group__.utilities.ThrowableUtilities;
@@ -59,16 +58,13 @@ public interface IAffineTransformStack
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 		public LeakNotifier(Stack<AffineTransform> delegated) {
 			this.delegated = delegated;
-			if (ConstantsUI.BUILD_TYPE.isDebug())
-				this.throwable = ThrowableUtilities.create();
-			else
-				this.throwable = null;
+			this.throwable = ThrowableUtilities.createIfDebug().orElse(null);
 		}
 
 		@Override
 		public void run() {
 			if (!isClean(getDelegated()))
-				LOGGER.warn(LoggerUtilities.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(
+				LOGGER.warn(() -> LoggerUtilities.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(
 						LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Stack not clean, content:{}{}", System.lineSeparator(), getDelegated()),
 						getThrowable().orElse(null)
 				));
