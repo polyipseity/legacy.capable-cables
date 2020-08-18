@@ -159,55 +159,6 @@ public class UIComponentMinecraftWindow
 
 		private static final Logger LOGGER = LogManager.getLogger();
 
-		/*
-		TODO move cache
-		public static final Registry.RegistryObject<UIExtensionCache.IType<Rectangle2D, IUIComponent>> RECTANGLE_DRAGGABLE =
-				IUIExtensionCache.RegUICache.INSTANCE.registerApply(generateKey("rectangle_draggable"),
-						k -> new UICacheShapeDescriptor<>(k,
-								(t, i) -> IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache ->
-										Try.call(() -> cache.getDelegated().get(t.getKey(),
-												() -> {
-													Rectangle2D bounds = i.getShapeDescriptor().getShapeOutput().getBounds2D();
-													return new Rectangle2D.Double(
-															bounds.getX(),
-															bounds.getY(),
-															bounds.getWidth(),
-															WINDOW_DRAG_BAR_THICKNESS);
-												}), LOGGER).map(CastUtilities::castUnchecked)),
-								(t, i) -> IUIExtensionCache.IType.invalidate(i, t.getKey()),
-								t -> {
-									UICacheShapeDescriptor<Rectangle2D, IUIComponent> tc = (UICacheShapeDescriptor<Rectangle2D, IUIComponent>) t;
-									return new Object() {
-										@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-										protected void onShapeDescriptorReshape(EventUIShapeDescriptor.Modify event) {
-											if (event.getStage() == EnumEventHookStage.POST) {
-												UICacheShapeDescriptor.getInstanceFromShapeDescriptor(tc.getInstancesView(), event.getShapeDescriptor())
-														.ifPresent(tc::invalidate);
-											}
-										}
-									};
-								}));
-		public static final Registry.RegistryObject<UIExtensionCache.IType<Rectangle2D, IUIComponent>> RECTANGLE_CLICKABLE =
-				IUIExtensionCache.RegUICache.INSTANCE.registerApply(generateKey("rectangle_clickable"),
-						k -> new UICacheShapeDescriptor<>(k,
-								(t, i) -> IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> Try.call(() -> cache.getDelegated().get(t.getKey(),
-										() -> UIObjectUtilities.applyRectangular(i.getShapeDescriptor().getShapeOutput().getBounds2D(), (x, y, w, h) ->
-												new Rectangle2D.Double(x - WINDOW_RESHAPE_THICKNESS, y - WINDOW_RESHAPE_THICKNESS, w + (WINDOW_RESHAPE_THICKNESS << 1), h + (WINDOW_RESHAPE_THICKNESS << 1)))), LOGGER).map(CastUtilities::castUnchecked)),
-								(t, i) -> IUIExtensionCache.IType.invalidate(i, t.getKey()),
-								t -> {
-									UICacheShapeDescriptor<Rectangle2D, IUIComponent> tc = (UICacheShapeDescriptor<Rectangle2D, IUIComponent>) t;
-									return new Object() {
-										@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-										protected void onShapeDescriptorReshape(EventUIShapeDescriptor.Modify event) {
-											if (event.getStage() == EnumEventHookStage.POST) {
-												UICacheShapeDescriptor.getInstanceFromShapeDescriptor(tc.getInstancesView(), event.getShapeDescriptor())
-														.ifPresent(tc::invalidate);
-											}
-										}
-									};
-								}));
-
-		 */
 		public static final Registry.RegistryObject<UIExtensionCache.IType<IUIConstraint, IUIComponent>> CONSTRAINT =
 				IUIExtensionCache.RegUICache.INSTANCE.registerApply(generateKey("constraint"),
 						k -> new UICacheShapeDescriptor<>(k,
