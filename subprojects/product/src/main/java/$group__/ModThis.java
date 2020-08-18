@@ -25,7 +25,7 @@ import static $group__.utilities.specific.LoggerUtilities.EnumMessages.PREFIX_MO
 @Mod(MOD_ID)
 @EventBusSubscriber(bus = Bus.MOD)
 public final class ModThis extends Singleton {
-	public final IProxy proxy = DistExecutor.unsafeRunForDist(() -> ModThis::getProxyClientSupplier, () -> ModThis::getProxyServerSupplier);
+	public final IProxy proxy = DistExecutor.unsafeRunForDist(() -> ModThis::getProxyClientSupplier, () -> ModThis::getProxyServerSupplier); // COMMENT IMPORTANT note: ONLY reference 'ProxyClient' or 'ProxyServer' in the method body part.
 
 	public ModThis() {
 		super(LOGGER);
