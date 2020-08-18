@@ -13,6 +13,7 @@ import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventUtilities;
 import com.google.common.collect.ImmutableList;
 import io.reactivex.rxjava3.core.Observer;
+import net.minecraft.util.ResourceLocation;
 
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class UIComponentContainer
 		implements IUIComponentContainer {
 	protected final List<IUIComponent> children = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 
-	public UIComponentContainer(Map<String, IUIPropertyMappingValue> propertyMapping) { super(propertyMapping); }
+	public UIComponentContainer(Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) { super(propertyMapping); }
 
 	@Override
 	public void transformChildren(IAffineTransformStack stack) {

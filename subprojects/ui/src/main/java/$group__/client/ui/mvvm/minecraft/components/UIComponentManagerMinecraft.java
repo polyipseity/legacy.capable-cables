@@ -7,6 +7,7 @@ import $group__.client.ui.mvvm.core.views.components.parsers.UIConstructor;
 import $group__.client.ui.mvvm.minecraft.core.views.IUIComponentMinecraft;
 import $group__.client.ui.mvvm.views.components.UIComponentManager;
 import $group__.client.ui.structures.ShapeDescriptor;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -19,7 +20,7 @@ public class UIComponentManagerMinecraft
 		extends UIComponentManager<IShapeDescriptor<? extends Rectangle2D>>
 		implements IUIComponentMinecraft {
 	@UIConstructor
-	public UIComponentManagerMinecraft(Map<String, IUIPropertyMappingValue> propertyMapping) { super(propertyMapping); }
+	public UIComponentManagerMinecraft(Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) { super(propertyMapping); }
 
 	@Override
 	protected IShapeDescriptor<? extends Rectangle2D> createShapeDescriptor() { return new ShapeDescriptor.Rectangular<>(getShapePlaceholderView()); }

@@ -33,7 +33,7 @@ public abstract class UIComponentManager<SD extends IShapeDescriptor<?>>
 		implements IUIComponentManager<SD> {
 	protected final IUIComponentPathResolver<IUIComponent> pathResolver = new PathResolver();
 
-	public UIComponentManager(Map<String, IUIPropertyMappingValue> propertyMapping) { super(propertyMapping); }
+	public UIComponentManager(Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) { super(propertyMapping); }
 
 	@Override
 	protected abstract SD createShapeDescriptor();

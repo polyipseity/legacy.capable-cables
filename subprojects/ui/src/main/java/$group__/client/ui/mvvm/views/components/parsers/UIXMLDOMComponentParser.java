@@ -68,17 +68,14 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 		@Nullable String namespaceURI = root.getNamespaceURI();
 
 		DOMUtilities.getChildrenByTagNameNS(root, namespaceURI, "alias").forEach(al ->
-				getAliases().put(Optional.ofNullable(al.getAttributes()).map(a -> a.getNamedItem("name"))
-								.orElseThrow(InternalError::new).getNodeValue(),
-						Optional.ofNullable(al.getAttributes()).map(a -> a.getNamedItem("class"))
-								.orElseThrow(InternalError::new).getNodeValue()));
+				getAliases().put(DOMUtilities.getAttributeValue(al, "name").orElseThrow(InternalError::new),
+						DOMUtilities.getAttributeValue(al, "class").orElseThrow(InternalError::new)));
 		Node managerNode = DOMUtilities.getChildrenByTagNameNS(root, namespaceURI, "component").stream().unordered().findAny().orElseThrow(() ->
 				BecauseOf.illegalArgument("Component manager not found",
 						"resource", resource));
 
 		{
-			String managerClassName = getClassFromMaybeAlias(getAliases(), Optional.ofNullable(managerNode.getAttributes()).map(a -> a.getNamedItem("class"))
-					.orElseThrow(InternalError::new).getNodeValue());
+			String managerClassName = getClassFromMaybeAlias(getAliases(), DOMUtilities.getAttributeValue(managerNode, "class").orElseThrow(InternalError::new));
 			Class<?> managerClass = Class.forName(managerClassName);
 			if (!getGenericClass().equals(managerClass))
 				throw BecauseOf.illegalArgument("Component manager type does not match",
@@ -90,22 +87,22 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 		setPrototype(TreeUtilities.visitNodesDepthFirst(managerNode,
 				n -> {
 					NodeListList i = NodeListList.wrap(n.getChildNodes());
-					Map<String, IUIPropertyMappingValue> propertyMapping = new HashMap<>(i.size());
+					Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping = new HashMap<>(i.size());
+
 					DOMUtilities.getChildrenByTagNameNS(n, namespaceURI, "property").forEach(p ->
-							propertyMapping.put(Optional.ofNullable(p.getAttributes()).map(a -> a.getNamedItem("key"))
-											.orElseThrow(InternalError::new).getNodeValue(),
-									new UIPropertyMappingValue(Optional.ofNullable(p.getAttributes()).map(a -> a.getNamedItem("value"))
-											.orElseThrow(InternalError::new).getNodeValue(), null)));
+							propertyMapping.put(
+									DOMUtilities.getAttributeValue(p, "key").map(ResourceLocation::new).orElseThrow(InternalError::new),
+									new UIPropertyMappingValue(p.getFirstChild(), null)));
 					DOMUtilities.getChildrenByTagNameNS(n, namespaceURI, "binding").forEach(p ->
-							propertyMapping.put(Optional.ofNullable(p.getAttributes()).map(a -> a.getNamedItem("key"))
-											.orElseThrow(InternalError::new).getNodeValue(),
-									new UIPropertyMappingValue(Optional.ofNullable(p.getAttributes()).map(a -> a.getNamedItem("value"))
-											.map(Node::getNodeValue).orElse(null),
-											Optional.ofNullable(p.getAttributes()).map(a -> a.getNamedItem("binding"))
-													.orElseThrow(InternalError::new).getNodeValue())));
+							propertyMapping.put(
+									DOMUtilities.getAttributeValue(p, "key").map(ResourceLocation::new).orElseThrow(InternalError::new),
+									new UIPropertyMappingValue(
+											p.getFirstChild(),
+											DOMUtilities.getAttributeValue(p, "binding").map(ResourceLocation::new).orElse(null))));
+
 					return new UIComponentPrototype(
-							getClassFromMaybeAlias(getAliases(), Optional.ofNullable(n.getAttributes()).map(a -> a.getNamedItem("class"))
-									.orElseThrow(InternalError::new).getNodeValue()),
+							getClassFromMaybeAlias(getAliases(), DOMUtilities.getAttributeValue(n, "class")
+									.orElseThrow(InternalError::new)),
 							propertyMapping);
 				},
 				n -> DOMUtilities.getChildrenByTagNameNS(
@@ -153,10 +150,10 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 	protected static class UIComponentPrototype {
 		private static final Logger LOGGER = LogManager.getLogger();
 		protected final String className;
-		protected final Map<String, IUIPropertyMappingValue> propertyMapping;
+		protected final Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping;
 		protected final List<UIComponentPrototype> children = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 
-		public UIComponentPrototype(String className, Map<String, IUIPropertyMappingValue> propertyMapping) {
+		public UIComponentPrototype(String className, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) {
 			this.className = className;
 			this.propertyMapping = ImmutableMap.copyOf(propertyMapping);
 		}
@@ -169,7 +166,7 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 		protected List<UIComponentPrototype> getChildren() { return children; }
 
-		protected Map<String, IUIPropertyMappingValue> getPropertyMapping() { return propertyMapping; }
+		protected Map<ResourceLocation, IUIPropertyMappingValue> getPropertyMapping() { return propertyMapping; }
 
 		@SuppressWarnings("UnstableApiUsage")
 		public IUIComponent createComponent() throws Throwable {

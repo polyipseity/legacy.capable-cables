@@ -3,18 +3,17 @@ package $group__.client.ui.utilities;
 import $group__.client.ui.mvvm.core.binding.IBindingField;
 import $group__.client.ui.mvvm.core.binding.IBindingMethod;
 import $group__.client.ui.mvvm.core.binding.IHasBinding;
-import $group__.utilities.CapacityUtilities;
-import $group__.utilities.CastUtilities;
-import $group__.utilities.DynamicUtilities;
-import $group__.utilities.MapUtilities;
+import $group__.utilities.*;
 import $group__.utilities.ThrowableUtilities.Try;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Node;
 
 import javax.annotation.Nullable;
+import java.awt.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -105,6 +104,58 @@ public enum BindingUtilities {
 					.collect(ImmutableSet.toImmutableSet());
 			BINDING_METHODS_MAP.put(clazz, ret);
 			return ret;
+		}
+	}
+
+	public enum Deserializers {
+		;
+
+		private static final Logger LOGGER = LogManager.getLogger();
+
+		public static Optional<Boolean> deserializeBoolean(Node n) {
+			return warnIfNotPresent(DOMUtilities.getAttributeValue(n, "boolean")
+					.map(Boolean::valueOf), n);
+		}
+
+		public static <T> Optional<T> warnIfNotPresent(@SuppressWarnings("OptionalUsedAsFieldOrParameterType") Optional<T> optional, Node node) {
+			if (!optional.isPresent())
+				LOGGER.warn(() -> LoggerUtilities.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(
+						LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot deserialize node:{}{}",
+								System.lineSeparator(), node),
+						ThrowableUtilities.createIfDebug().orElse(null)
+				));
+			return optional;
+		}
+
+		public static Optional<Byte> deserializeByte(Node n) {
+			return warnIfNotPresent(DOMUtilities.getAttributeValue(n, "byte")
+					.map(Byte::valueOf), n);
+		}
+
+		public static Optional<Short> deserializeShort(Node n) {
+			return warnIfNotPresent(DOMUtilities.getAttributeValue(n, "short")
+					.map(Short::valueOf), n);
+		}
+
+		public static Optional<Integer> deserializeInt(Node n) {
+			return warnIfNotPresent(DOMUtilities.getAttributeValue(n, "int")
+					.map(Integer::valueOf), n);
+		}
+
+		public static Optional<Long> deserializeLong(Node n) {
+			return warnIfNotPresent(DOMUtilities.getAttributeValue(n, "long")
+					.map(Long::valueOf), n);
+		}
+
+		public static Optional<Color> deserializeColor(Node n) {
+			return warnIfNotPresent(DOMUtilities.getChildrenByTagName(n, "color")
+					.stream()
+					.findFirst()
+					.map(nc -> new Color(
+							Integer.valueOf(DOMUtilities.getAttributeValue(nc, "red").orElseThrow(InternalError::new), RadixUtilities.RADIX_HEX),
+							Integer.valueOf(DOMUtilities.getAttributeValue(nc, "green").orElseThrow(InternalError::new), RadixUtilities.RADIX_HEX),
+							Integer.valueOf(DOMUtilities.getAttributeValue(nc, "blue").orElseThrow(InternalError::new), RadixUtilities.RADIX_HEX),
+							Integer.valueOf(DOMUtilities.getAttributeValue(nc, "alpha").orElseThrow(InternalError::new), RadixUtilities.RADIX_HEX))), n);
 		}
 	}
 }

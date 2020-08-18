@@ -61,5 +61,5 @@ public interface IUIComponent
 	@Override
 	default Optional<IUINode> getParentNode() { return getParent().map(Function.identity()); }
 
-	Map<String, IUIPropertyMappingValue> getPropertyMappingView();
+	Map<ResourceLocation, IUIPropertyMappingValue> getPropertyMappingView();
 }

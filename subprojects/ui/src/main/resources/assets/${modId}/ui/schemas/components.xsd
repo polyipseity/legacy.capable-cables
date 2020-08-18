@@ -15,12 +15,16 @@
 		</xs:complexType>
 	</xs:element>
 
+	<!-- SECTION top -->
+
 	<xs:element name="alias" id="alias">
 		<xs:complexType>
 			<xs:attribute name="name" type="xs:string" use="required"/>
 			<xs:attribute name="class" type="xs:string" use="required"/>
 		</xs:complexType>
 	</xs:element>
+
+	<!-- SECTION components -->
 
 	<xs:element name="component" id="component">
 		<xs:complexType>
@@ -35,17 +39,6 @@
 		</xs:complexType>
 	</xs:element>
 
-	<xs:element name="property" id="property">
-		<xs:complexType>
-			<xs:complexContent>
-				<xs:restriction base="ui:propertyType">
-					<xs:attribute name="value" type="xs:string" use="required"/>
-				</xs:restriction>
-			</xs:complexContent>
-		</xs:complexType>
-	</xs:element>
-	<xs:element name="binding" id="binding" type="ui:bindingType"/>
-
 	<xs:element name="componentContainer" id="componentContainer">
 		<xs:complexType>
 			<xs:sequence>
@@ -54,9 +47,13 @@
 		</xs:complexType>
 	</xs:element>
 
+	<!-- SECTION property-value pairs -->
+
 	<xs:complexType name="propertyType" id="propertyType">
+		<xs:sequence>
+			<xs:element ref="ui:value" minOccurs="0"/>
+		</xs:sequence>
 		<xs:attribute name="key" type="xs:string" use="required"/>
-		<xs:attribute name="value" type="xs:string"/>
 	</xs:complexType>
 
 	<xs:complexType name="bindingType" id="bindingType">
@@ -66,4 +63,41 @@
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
+
+	<xs:element name="value" id="value" type="ui:valueType"/>
+	<xs:element name="property" id="property">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:restriction base="ui:propertyType">
+					<xs:sequence>
+						<xs:element ref="ui:value"/>
+					</xs:sequence>
+				</xs:restriction>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="binding" id="binding" type="ui:bindingType"/>
+
+	<!-- SECTION values -->
+
+	<xs:complexType name="valueType" id="valueType">
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
+			<!-- unique particle attribution -->
+			<xs:any/>
+		</xs:choice>
+		<xs:attribute name="boolean" type="xs:boolean"/>
+		<xs:attribute name="byte" type="xs:byte"/>
+		<xs:attribute name="short" type="xs:short"/>
+		<xs:attribute name="int" type="xs:int"/>
+		<xs:attribute name="long" type="xs:long"/>
+		<xs:anyAttribute processContents="lax"/>
+	</xs:complexType>
+
+	<xs:complexType name="colorType" id="colorType">
+		<xs:attribute name="red" type="xs:hexBinary" default="00"/>
+		<xs:attribute name="green" type="xs:hexBinary" default="00"/>
+		<xs:attribute name="blue" type="xs:hexBinary" default="00"/>
+		<xs:attribute name="alpha" type="xs:hexBinary" default="FF"/>
+	</xs:complexType>
+	<xs:element name="color" type="ui:colorType"/>
 </xs:schema>

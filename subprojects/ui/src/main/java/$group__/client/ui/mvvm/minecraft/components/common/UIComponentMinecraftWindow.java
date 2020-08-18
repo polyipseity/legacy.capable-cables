@@ -23,6 +23,7 @@ import $group__.client.ui.mvvm.views.events.ui.UIEventFocus;
 import $group__.client.ui.structures.ShapeDescriptor;
 import $group__.client.ui.structures.ShapeDescriptor.Rectangular;
 import $group__.client.ui.structures.UIConstraint;
+import $group__.client.ui.utilities.BindingUtilities;
 import $group__.client.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.NamespaceUtilities;
@@ -59,6 +60,10 @@ public class UIComponentMinecraftWindow
 		implements IUIReshapeExplicitly<IShapeDescriptor<? extends RectangularShape>>, IUIComponentMinecraft {
 	public static final String PROPERTY_COLOR_BACKGROUND = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "window.colors.background";
 	public static final String PROPERTY_COLOR_BORDER = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "window.colors.border";
+
+	public static final ResourceLocation PROPERTY_COLOR_BACKGROUND_LOCATION = new ResourceLocation(PROPERTY_COLOR_BACKGROUND);
+	public static final ResourceLocation PROPERTY_COLOR_BORDER_LOCATION = new ResourceLocation(PROPERTY_COLOR_BORDER);
+
 	// TODO make window scroll bars, maybe create a new component, and embed into this
 	// TODO make value not hardcoded through themes
 	public static final int
@@ -72,15 +77,13 @@ public class UIComponentMinecraftWindow
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	@UIConstructor
-	public UIComponentMinecraftWindow(Map<String, IUIPropertyMappingValue> propertyMapping) {
+	public UIComponentMinecraftWindow(Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) {
 		super(propertyMapping);
 
 		this.colorBackground = IHasBinding.createBindingField(Color.class,
-				getPropertyMapping().get(PROPERTY_COLOR_BACKGROUND),
-				s -> new Color(Integer.decode(s), true), Color.BLACK);
+				this.propertyMapping.get(PROPERTY_COLOR_BACKGROUND_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.BLACK);
 		this.colorBorder = IHasBinding.createBindingField(Color.class,
-				getPropertyMapping().get(PROPERTY_COLOR_BORDER),
-				s -> new Color(Integer.decode(s), true), Color.WHITE);
+				this.propertyMapping.get(PROPERTY_COLOR_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.WHITE);
 
 		addEventListener(UIEventFocus.TYPE_FOCUS_IN_POST, new UIEventListener.Functional<IUIEventFocus>(e ->
 				getParent().orElseThrow(InternalError::new).moveChildToTop(this)), true);

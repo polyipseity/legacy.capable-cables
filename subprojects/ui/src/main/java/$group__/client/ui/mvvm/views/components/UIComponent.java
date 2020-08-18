@@ -15,6 +15,7 @@ import $group__.client.ui.mvvm.core.views.components.parsers.UIProperty;
 import $group__.client.ui.mvvm.core.views.events.IUIEvent;
 import $group__.client.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
 import $group__.client.ui.structures.ShapeDescriptor;
+import $group__.client.ui.utilities.BindingUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.MapUtilities;
 import $group__.utilities.NamespaceUtilities;
@@ -43,8 +44,11 @@ public class UIComponent
 	public static final String PROPERTY_VISIBLE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "component.visible";
 	public static final String PROPERTY_ACTIVE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "component.active";
 
+	public static final ResourceLocation PROPERTY_VISIBLE_LOCATION = new ResourceLocation(PROPERTY_VISIBLE);
+	public static final ResourceLocation PROPERTY_ACTIVE_LOCATION = new ResourceLocation(PROPERTY_ACTIVE);
+
 	private static final Rectangle2D SHAPE_PLACEHOLDER = new Rectangle2D.Double(0, 0, 1, 1);
-	protected final Map<String, IUIPropertyMappingValue> propertyMapping;
+	protected final Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping;
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 	protected final ConcurrentMap<ResourceLocation, IUIExtension<? extends ResourceLocation, ? super IUIComponent>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected final ConcurrentMap<ResourceLocation, IBindingMethod.ISource<?>> eventTargetBindingMethods = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
@@ -59,19 +63,19 @@ public class UIComponent
 	protected WeakReference<IUIComponentContainer> parent = new WeakReference<>(null);
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	public UIComponent(Map<String, IUIPropertyMappingValue> propertyMapping) {
+	public UIComponent(Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) {
 		IExtensionContainer.addExtensionSafe(this, new UIExtensionCache());
 
 		this.propertyMapping = new HashMap<>(propertyMapping);
 
-		this.visible = IHasBinding.createBindingField(Boolean.class, getPropertyMapping().get(PROPERTY_VISIBLE), Boolean::valueOf, true);
-		this.active = IHasBinding.createBindingField(Boolean.class, getPropertyMapping().get(PROPERTY_ACTIVE), Boolean::valueOf, true);
+		this.visible = IHasBinding.createBindingField(Boolean.class, this.propertyMapping.get(PROPERTY_VISIBLE_LOCATION), BindingUtilities.Deserializers::deserializeBoolean, true);
+		this.active = IHasBinding.createBindingField(Boolean.class, this.propertyMapping.get(PROPERTY_ACTIVE_LOCATION), BindingUtilities.Deserializers::deserializeBoolean, true);
 
 		this.shapeDescriptor = createShapeDescriptor(); // todo UGLY, probably should make it as an argument
 	}
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected final Map<String, IUIPropertyMappingValue> getPropertyMapping() { return propertyMapping; }
+	@Override
+	public Map<ResourceLocation, IUIPropertyMappingValue> getPropertyMappingView() { return ImmutableMap.copyOf(getPropertyMapping()); }
 
 	protected IShapeDescriptor<?> createShapeDescriptor() { return new ShapeDescriptor.Generic(getShapePlaceholderView()); } // todo ugly
 
@@ -141,8 +145,8 @@ public class UIComponent
 	@Override
 	public void setActive(boolean active) { getActive().setValue(active); }
 
-	@Override
-	public Map<String, IUIPropertyMappingValue> getPropertyMappingView() { return ImmutableMap.copyOf(getPropertyMapping()); }
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected Map<ResourceLocation, IUIPropertyMappingValue> getPropertyMapping() { return propertyMapping; }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<ResourceLocation, IBindingMethod.ISource<?>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }
