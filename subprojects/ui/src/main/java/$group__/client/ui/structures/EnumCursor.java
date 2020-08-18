@@ -16,6 +16,7 @@ import org.lwjgl.glfw.GLFWImage;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.function.Supplier;
 
 public enum EnumCursor {
@@ -47,8 +48,9 @@ public enum EnumCursor {
 	public static void preload() {}
 
 	public static long createCursor(ResourceLocation location, Point2D hotspot) throws IOException {
-		try (GLFWImage i = ImageUtilities.toGLFWImageCursor(NativeImage.read(NativeImage.PixelFormat.RGBA,
-				ResourceUtilities.getResource(location).getInputStream()))) {
+		try (InputStream is = ResourceUtilities.getResource(location).getInputStream();
+		     NativeImage ni = NativeImage.read(NativeImage.PixelFormat.RGBA, is);
+		     GLFWImage i = ImageUtilities.toGLFWImageCursor(ni)) {
 			Point hotspotF = UIObjectUtilities.getPointFloor(hotspot);
 			return GLFW.glfwCreateCursor(i, hotspotF.x, hotspotF.y);
 		}

@@ -13,14 +13,12 @@ public enum ImageUtilities {
 	;
 
 	public static GLFWImage toGLFWImageCursor(NativeImage image) {
-		try (NativeImage i = image) {
-			ByteBuffer buf = ByteBuffer.allocateDirect(4 * i.getWidth() * i.getHeight()).order(ByteOrder.LITTLE_ENDIAN);
-			for (int y = 0; y < i.getHeight(); ++y) {
-				for (int x = 0; x < i.getWidth(); ++x)
-					buf.putInt(i.getPixelRGBA(x, y));
-			}
-			buf.rewind();
-			return GLFWImage.malloc().set(i.getWidth(), i.getHeight(), buf);
+		ByteBuffer buf = ByteBuffer.allocateDirect(4 * image.getWidth() * image.getHeight()).order(ByteOrder.LITTLE_ENDIAN);
+		for (int y = 0; y < image.getHeight(); ++y) {
+			for (int x = 0; x < image.getWidth(); ++x)
+				buf.putInt(image.getPixelRGBA(x, y));
 		}
+		buf.rewind();
+		return GLFWImage.malloc().set(image.getWidth(), image.getHeight(), buf);
 	}
 }
