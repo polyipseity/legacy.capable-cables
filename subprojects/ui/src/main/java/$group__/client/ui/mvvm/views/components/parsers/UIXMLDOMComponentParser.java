@@ -111,14 +111,7 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 									.orElseThrow(InternalError::new)),
 							propertyMapping);
 				},
-				n -> DOMUtilities.getChildrenByTagNameNS(
-						DOMUtilities.getChildrenByTagNameNS(n, namespaceURI, "componentContainer").stream().unordered()
-								.findAny()
-								.orElseThrow(() ->
-										BecauseOf.illegalArgument("Component container not found",
-												"n", n,
-												"resource", resource)), namespaceURI, "component")
-				,
+				n -> DOMUtilities.getChildrenByTagNameNS(n, namespaceURI, "component"),
 				(p, c) -> {
 					p.addChildren(c);
 					return p;

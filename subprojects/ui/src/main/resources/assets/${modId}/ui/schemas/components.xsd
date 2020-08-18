@@ -33,7 +33,7 @@
 					<xs:element ref="ui:property"/>
 					<xs:element ref="ui:binding"/>
 				</xs:choice>
-				<xs:element ref="ui:componentContainer"/>
+				<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
 			</xs:sequence>
 			<xs:attribute name="class" type="xs:string" use="required"/>
 			<!-- SECTION DOM -->
@@ -76,14 +76,6 @@
 			<xs:attribute name="compositionend" type="xs:string"/>
 			<!-- SECTION Standard -->
 			<xs:attribute name="char_typed" type="xs:string"/>
-		</xs:complexType>
-	</xs:element>
-
-	<xs:element name="componentContainer" id="componentContainer">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
-			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
 

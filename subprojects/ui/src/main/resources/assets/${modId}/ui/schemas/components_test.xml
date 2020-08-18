@@ -5,22 +5,14 @@
 	<alias name="window" class="$group__.client.ui.mvvm.minecraft.components.common.UIComponentMinecraftWindow"/>
 	<alias name="button" class="$group__.client.ui.mvvm.minecraft.components.common.UIComponentMinecraftButton"/>
 	<component class="manager">
-		<componentContainer>
-			<component class="window">
-				<!-- 10 10 100 100 -->
-				<componentContainer>
-				</componentContainer>
+		<component class="window">
+			<!-- 10 10 100 100 -->
+		</component>
+		<component class="window">
+			<!-- 50 50 200 200 -->
+			<component class="button">
+				<!-- 0 0 100 100 -->
 			</component>
-			<component class="window">
-				<!-- 50 50 200 200 -->
-				<componentContainer>
-					<component class="button">
-						<!-- 0 0 100 100 -->
-						<componentContainer>
-						</componentContainer>
-					</component>
-				</componentContainer>
-			</component>
-		</componentContainer>
+		</component>
 	</component>
 </ui>
