@@ -106,8 +106,6 @@ public interface IUIComponentMinecraft {
 		STENCIL_BUFFER {
 			@Override
 			public void enable() {
-				if (true) // TODO
-					return;
 				GLUtilities.GLStacksUtilities.push("GL_STENCIL_TEST",
 						() -> GL11.glEnable(GL11.GL_STENCIL_TEST), () -> GL11.glDisable(GL11.GL_STENCIL_TEST));
 				GLUtilities.GLStacksUtilities.push("stencilMask",
@@ -116,8 +114,6 @@ public interface IUIComponentMinecraft {
 
 			@Override
 			public void disable() {
-				if (true) // TODO
-					return;
 				GLUtilities.GLStacksUtilities.pop("stencilMask");
 				GLUtilities.GLStacksUtilities.pop("GL_STENCIL_TEST");
 			}
