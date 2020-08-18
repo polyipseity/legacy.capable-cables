@@ -148,8 +148,7 @@ public enum BindingUtilities {
 		}
 
 		public static Optional<Color> deserializeColor(Node n) {
-			return warnIfNotPresent(DOMUtilities.getChildrenByTagName(n, "color")
-					.stream()
+			return warnIfNotPresent(DOMUtilities.getChildrenByTagName(n, "color").stream().sequential()
 					.findFirst()
 					.map(nc -> new Color(
 							Integer.valueOf(DOMUtilities.getAttributeValue(nc, "red").orElseThrow(InternalError::new), RadixUtilities.RADIX_HEX),

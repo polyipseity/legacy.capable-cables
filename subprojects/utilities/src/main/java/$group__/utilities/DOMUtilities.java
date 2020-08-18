@@ -13,14 +13,14 @@ public enum DOMUtilities {
 
 	@SuppressWarnings("UnstableApiUsage")
 	public static ImmutableList<Node> getChildrenByTagName(Node node, String name) {
-		return NodeListList.wrap(node.getChildNodes()).stream()
+		return NodeListList.wrap(node.getChildNodes()).stream().sequential()
 				.filter(n -> name.equals(n.getLocalName()))
 				.collect(ImmutableList.toImmutableList());
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
 	public static ImmutableList<Node> getChildrenByTagNameNS(Node node, @Nullable String namespaceURI, String name) {
-		return NodeListList.wrap(node.getChildNodes()).stream()
+		return NodeListList.wrap(node.getChildNodes()).stream().sequential()
 				.filter(n -> Objects.equals(n.getNamespaceURI(), namespaceURI)
 						&& name.equals(n.getLocalName()))
 				.collect(ImmutableList.toImmutableList());

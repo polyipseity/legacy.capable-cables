@@ -134,14 +134,14 @@ public class NamedNodeMapMap
 
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public Set<String> keySet() { return getDelegatedList().stream().map(NamedNodeMapMap::constructKey).collect(ImmutableSet.toImmutableSet()); }
+	public Set<String> keySet() { return getDelegatedList().stream().unordered().map(NamedNodeMapMap::constructKey).collect(ImmutableSet.toImmutableSet()); }
 
 	@Override
 	public Collection<Node> values() { return getDelegatedList(); }
 
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public Set<Entry<String, Node>> entrySet() { return keySet().stream().map(k -> new EntryThis(this, k)).collect(ImmutableSet.toImmutableSet()); }
+	public Set<Entry<String, Node>> entrySet() { return keySet().stream().unordered().map(k -> new EntryThis(this, k)).collect(ImmutableSet.toImmutableSet()); }
 
 	protected static String[] splitString(String string) { return string.split(Pattern.quote(":")); }
 
