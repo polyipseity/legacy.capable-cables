@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
 
-import static $group__.Constants.MOD_ID;
+import static $group__.ConstantsProduct.MOD_ID;
 import static $group__.Globals.LOGGER;
 import static $group__.common.registrables.blocks.BlocksThis.BLOCKS;
 import static $group__.common.registrables.inventory.ContainersThis.CONTAINERS;

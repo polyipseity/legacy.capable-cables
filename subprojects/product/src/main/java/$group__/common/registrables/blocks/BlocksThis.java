@@ -9,7 +9,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 
-import static $group__.Constants.MOD_ID;
+import static $group__.ConstantsProduct.MOD_ID;
 
 public enum BlocksThis {
 	;

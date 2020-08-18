@@ -1,6 +1,6 @@
 package $group__.client;
 
-import $group__.Constants;
+import $group__.ConstantsProduct;
 import $group__.client.ui.ConfigurationUI;
 import $group__.client.ui.ConstantsUI;
 import $group__.client.ui.debug.UIDebugMinecraft;
@@ -26,7 +26,7 @@ public final class ProxyClient extends Proxy implements IProxyClient {
 
 	@Override
 	public void onSetupClient(FMLClientSetupEvent event) {
-		ConfigurationUI.setup(Constants.MOD_ID);
+		ConfigurationUI.setup(ConstantsProduct.MOD_ID);
 
 		if (ConstantsUI.BUILD_TYPE.isDebug())
 			UIDebugMinecraft.registerUIFactory();
