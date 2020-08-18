@@ -6,6 +6,7 @@ import $group__.client.ui.mvvm.core.views.IUIView;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.IUIViewComponent;
 import $group__.client.ui.mvvm.core.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
+import $group__.client.ui.mvvm.core.views.components.parsers.UIConstructor;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;
 import net.minecraft.util.ResourceLocation;
@@ -17,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent<?, ?>>
 		extends ExtensionContainerAware<ResourceLocation, IUIView<?>, E>
 		implements IUIExtensionCursorHandleProvider {
+	@UIConstructor
 	public UIExtensionCursorHandleProviderComponent(Class<E> extendedClass) {
 		super(CastUtilities.castUnchecked(IUIView.class), // COMMENT generics should not matter in this case
 				extendedClass);

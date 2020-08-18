@@ -6,5 +6,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.CONSTRUCTOR)
 public @interface UIConstructor {
-	// TODO make this annotation do something?
+	// TODO make this annotation do something? choose constructor with this annotation?
 }

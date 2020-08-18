@@ -1,8 +1,17 @@
 package $group__.utilities.interfaces;
 
+import $group__.utilities.ThrowableUtilities.BecauseOf;
+
 @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface IHasGenericClass<T> {
 	Class<T> getGenericClass();
+
+	@SuppressWarnings("unchecked")
+	static <T> Class<? extends T> getActualClass(IHasGenericClass<T> obj) {
+		return obj instanceof Extended
+				? (Class<? extends T>) ((Extended<?, ?>) obj).getExtendedClass() // COMMENT should always extends T
+				: obj.getGenericClass();
+	}
 
 	class Impl<T>
 			implements IHasGenericClass<T> {
@@ -25,6 +34,11 @@ public interface IHasGenericClass<T> {
 			public Impl(Class<T> genericClass, Class<E> extendedClass) {
 				super(genericClass);
 				this.extendedClass = extendedClass;
+
+				if (!genericClass.isAssignableFrom(extendedClass))
+					throw BecauseOf.illegalArgument("Generic class is not assignable from extended class",
+							"extendedClass", extendedClass,
+							"genericClass", genericClass);
 			}
 
 			@Override

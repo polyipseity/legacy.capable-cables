@@ -4,6 +4,7 @@ import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
 import $group__.client.ui.mvvm.core.views.components.extensions.caches.IUIExtensionCache;
+import $group__.client.ui.mvvm.core.views.components.parsers.UIConstructor;
 import $group__.client.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.ConcurrencyUtilities;
@@ -38,6 +39,7 @@ public class UIExtensionCache
 					.expireAfterAccess(MapUtilities.CACHE_EXPIRATION_ACCESS_DURATION, MapUtilities.CACHE_EXPIRATION_ACCESS_TIME_UNIT)
 					.concurrencyLevel(ConcurrencyUtilities.SINGLE_THREAD_THREAD_COUNT).build();
 
+	@UIConstructor
 	public UIExtensionCache() {
 		super(CastUtilities.castUnchecked(IExtensionContainer.class)); // COMMENT should not matter in this case
 	}
