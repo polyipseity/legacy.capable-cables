@@ -107,7 +107,7 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 										Map<ResourceLocation, IUIPropertyMappingValue> mappingE = new HashMap<>(e.getChildNodes().getLength());
 										ComponentBasedPrototype.constructMapping(mappingE, e, namespaceURI);
 										return new UIExtensionPrototype(
-												getClassFromMaybeAlias(getAliases(), DOMUtilities.getAttributeValue(n, "class").orElseThrow(InternalError::new)),
+												getClassFromMaybeAlias(getAliases(), DOMUtilities.getAttributeValue(e, "class").orElseThrow(InternalError::new)),
 												mappingE);
 									})
 									.collect(ImmutableList.toImmutableList()));
@@ -133,8 +133,13 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 
 	@Override
 	public T createUI() {
+		List<Runnable> queue = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM);
 		return getPrototype()
-				.map(c -> Try.call(c::createComponent, LOGGER).orElseThrow(ThrowableCatcher::rethrow))
+				.map(cp -> Try.call(() -> {
+					IUIComponent c = cp.createComponent(queue);
+					queue.forEach(Runnable::run);
+					return c;
+				}, LOGGER).orElseThrow(ThrowableCatcher::rethrow))
 				.map(CastUtilities::<T>castUnchecked)
 				.orElseThrow(() -> new IllegalStateException("Prototype has not been created"));
 	}
@@ -227,9 +232,14 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 		protected List<UIExtensionPrototype> getExtensions() { return extensions; }
 
 		@SuppressWarnings({"UnstableApiUsage"})
-		protected IUIComponent createComponent() throws Throwable {
+		protected IUIComponent createComponent(final List<Runnable> queue) throws Throwable {
 			MethodHandle constructor = DynamicUtilities.IMPL_LOOKUP.findConstructor(Class.forName(getClassName()), MethodType.methodType(void.class, Map.class));
 			IUIComponent ret = (IUIComponent) constructor.invoke(getPropertyMapping());
+			queue.add(() -> {
+				for (UIExtensionPrototype e : getExtensions())
+					ret.addExtension(CastUtilities.castUnchecked(Try.call(() -> e.createComponent(ret), LOGGER)
+							.orElseThrow(ThrowableCatcher::rethrow))); // COMMENT addExtension should check
+			});
 			if (!getChildren().isEmpty()) {
 				if (!(ret instanceof IUIComponentContainer))
 					throw BecauseOf.illegalArgument("UI component type is not a container",
@@ -238,12 +248,10 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 				IUIComponentContainer container = (IUIComponentContainer) ret;
 				container.addChildren(getChildren().stream().sequential()
 						.map(c ->
-								Try.call(c::createComponent, LOGGER)
+								Try.call(() -> c.createComponent(queue), LOGGER)
 										.orElseThrow(ThrowableCatcher::rethrow))
 						.collect(ImmutableList.toImmutableList()));
 			}
-			for (UIExtensionPrototype e : getExtensions())
-				ret.addExtension(CastUtilities.castUnchecked(e.createComponent(ret))); // COMMENT addExtension should check
 			return ret;
 		}
 

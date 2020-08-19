@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ui xmlns="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
+    xml:lang="EN">
+	<alias name="component.manager" class="${group}.client.ui.mvvm.minecraft.components.UIComponentManagerMinecraft"/>
+	<alias name="component.window" class="${group}.client.ui.mvvm.minecraft.components.common.UIComponentMinecraftWindow"/>
+	<alias name="component.button" class="${group}.client.ui.mvvm.minecraft.components.common.UIComponentMinecraftButton"/>
+	<alias name="extension.user_relocatable" class="${group}.client.ui.mvvm.views.components.extensions.UIExtensionComponentUserRelocatable"/>
+	<alias name="extension.user_resizable" class="${group}.client.ui.mvvm.views.components.extensions.UIExtensionComponentUserResizable"/>
+	<component class="component.manager">
+		<component class="component.window">
+			<!-- 10 10 100 100 -->
+			<extension class="extension.user_relocatable"/>
+			<extension class="extension.user_resizable"/>
+		</component>
+		<component class="component.window">
+			<!-- 50 50 200 200 -->
+			<extension class="extension.user_relocatable"/>
+			<extension class="extension.user_resizable"/>
+			<component class="component.button">
+				<!-- 0 0 100 100 -->
+			</component>
+		</component>
+	</component>
+</ui>

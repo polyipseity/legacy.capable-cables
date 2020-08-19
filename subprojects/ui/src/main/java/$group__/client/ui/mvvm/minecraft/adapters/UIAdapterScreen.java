@@ -461,7 +461,7 @@ public class UIAdapterScreen
 					np = n.map(t -> t instanceof IUINode ? UIEventUtilities.computeNodePath((IUINode) t) : ImmutableList.of(t)).orElseGet(ImmutableList::of);
 			int i = 0;
 			for (int maxI = Math.min(op.size(), np.size()); i < maxI; ++i) {
-				if (!op.get(i).equals(np.get(i)))
+				if (!Objects.equals(op.get(i), np.get(i)))
 					break;
 			}
 			int iFinal = i; // COMMENT paths equal for [0,i)

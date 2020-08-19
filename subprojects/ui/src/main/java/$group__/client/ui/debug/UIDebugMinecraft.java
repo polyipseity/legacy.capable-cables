@@ -3,6 +3,7 @@ package $group__.client.ui.debug;
 import $group__.client.ui.ConfigurationUI;
 import $group__.client.ui.UIFacade;
 import $group__.client.ui.mvvm.binding.Binder;
+import $group__.client.ui.mvvm.core.views.components.IUIViewComponent;
 import $group__.client.ui.mvvm.core.views.components.parsers.IUIResourceParser;
 import $group__.client.ui.mvvm.minecraft.adapters.UIAdapterScreen;
 import $group__.client.ui.mvvm.minecraft.components.UIComponentManagerMinecraft;
@@ -10,9 +11,11 @@ import $group__.client.ui.mvvm.minecraft.components.UIViewComponentMinecraft;
 import $group__.client.ui.mvvm.minecraft.core.IUIInfrastructureMinecraft;
 import $group__.client.ui.mvvm.minecraft.viewmodels.UIViewModelMinecraft;
 import $group__.client.ui.mvvm.models.UIModel;
+import $group__.client.ui.mvvm.views.components.extensions.UIExtensionCursorHandleProviderComponent;
 import $group__.client.ui.mvvm.views.components.parsers.UIXMLDOMComponentParser;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
+import $group__.utilities.extensions.IExtensionContainer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -85,17 +88,18 @@ public enum UIDebugMinecraft {
 		}
 
 		private static UIAdapterScreen.WithContainer<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> createUI(DebugContainer container) {
-			// TODO add extensions with XML
-			// IExtensionContainer.addExtensionSafeExtended(mcCc, new UIExtensionComponentUserRelocatable<>(UIComponentMinecraftWindow.class));
-			// IExtensionContainer.addExtensionSafeExtended(mcCc, new UIExtensionComponentUserResizable<>(UIComponentMinecraftWindow.class));
-			return UIFacade.UFMinecraft.createScreen(
-					DISPLAY_NAME,
-					UIFacade.UFMinecraft.createInfrastructure(
-							new UIViewComponentMinecraft<>(PARSER.createUI()),
-							new ViewModel(),
-							new Binder()
-					),
-					container);
+			UIAdapterScreen.WithContainer<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> ret =
+					UIFacade.UFMinecraft.createScreen(
+							DISPLAY_NAME,
+							UIFacade.UFMinecraft.createInfrastructure(
+									new UIViewComponentMinecraft<>(PARSER.createUI()),
+									new ViewModel(),
+									new Binder()
+							),
+							container);
+			IExtensionContainer.addExtensionSafe(ret.getInfrastructure().getView(),
+					new UIExtensionCursorHandleProviderComponent<>(IUIViewComponent.class));
+			return ret;
 		}
 
 		@OnlyIn(Dist.CLIENT)

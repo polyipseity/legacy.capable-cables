@@ -31,10 +31,7 @@ public abstract class ShapeDescriptor<S extends Shape> implements IShapeDescript
 	protected final IUIAnchorSet<IUIAnchor> anchorSet = new AnchorSet();
 	protected boolean beingModified = false;
 
-	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
-	protected ShapeDescriptor() {
-		modify(() -> false); // COMMENT check for constraints
-	}
+	protected ShapeDescriptor() {}
 
 	@Override
 	public List<IUIConstraint> getConstraintsView() { return ImmutableList.copyOf(getConstraints()); }
@@ -67,11 +64,15 @@ public abstract class ShapeDescriptor<S extends Shape> implements IShapeDescript
 
 	protected boolean modify0(Supplier<? extends Boolean> action) {
 		boolean ret = action.get();
-		Rectangle2D current = getShapeOutput().getBounds2D(), bounds = (Rectangle2D) current.clone();
-		getConstraints().forEach(c -> c.accept(bounds));
-		Constants.getConstraintMinimumView().accept(bounds);
-		bound(bounds);
+		constrain(this);
 		return ret;
+	}
+
+	protected static void constrain(IShapeDescriptor<?> self) {
+		Rectangle2D current = self.getShapeOutput().getBounds2D(), bounds = (Rectangle2D) current.clone();
+		self.getConstraintsRef().forEach(c -> c.accept(bounds));
+		Constants.getConstraintMinimumView().accept(bounds);
+		self.bound(bounds);
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
@@ -132,9 +133,7 @@ public abstract class ShapeDescriptor<S extends Shape> implements IShapeDescript
 	public static class Rectangular<S extends RectangularShape> extends ShapeDescriptor<S> {
 		protected S shape;
 
-		public Rectangular(S shape) {
-			this.shape = shape;
-		}
+		public Rectangular(S shape) { this.shape = shape; }
 
 		@SuppressWarnings("unchecked")
 		@Override

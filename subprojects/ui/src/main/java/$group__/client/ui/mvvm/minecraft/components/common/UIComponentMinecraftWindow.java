@@ -96,7 +96,7 @@ public class UIComponentMinecraftWindow
 	}
 
 	@Override
-	protected ShapeDescriptor.Rectangular<?> createShapeDescriptor() {
+	protected IShapeDescriptor<? extends RectangularShape> createShapeDescriptor() {
 		return new Rectangular<Rectangle2D>(getShapePlaceholderView()) {
 			@Override
 			protected boolean modify0(Supplier<? extends Boolean> action)
