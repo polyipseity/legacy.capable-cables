@@ -21,7 +21,9 @@ project.ext.makeResourcesTasks = { Closure c ->
 			configure c
 
 			if (buildType == 'DEBUG') inputs.property 'expand_group', '$group__'
-			Map<String, Object> e = inputs.properties.findAll { it.key.startsWith 'expand_' }.collectEntries { [it.key.replace('expand_', ''), it.value] } as Map<String, Object>
+			Map<String, Object> e = inputs.properties
+					.findAll { it.key.startsWith 'expand_' }
+					.collectEntries { [(it.key.replace('expand_', '')): it.value] } as Map<String, Object>
 
 			// COMMENT replace stuff in the to-be-processed files, nothing else
 			rename ~/(.*)\.in/, '$1'

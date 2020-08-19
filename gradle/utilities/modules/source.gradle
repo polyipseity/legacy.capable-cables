@@ -40,15 +40,13 @@ project.ext.makeSourceTasks = { Closure c ->
 
 			into temporaryDir
 			from(pre.temporaryDir) {
-				Map<String, Object> e = [:]
 				if (buildType == 'DEBUG') inputs.property 'expand_group', '$group__'
-				inputs.properties.each {
-					if (it.key.startsWith('expand_')) {
-						String k = it.key.replace('expand_', '')
-						e.put k, it.value
-						e.put "${k}__".toString(), it.value
-					}
-				}
+				Map<String, Object> e = inputs.properties
+						.findAll { it.key.startsWith 'expand_' }
+						.collectEntries {
+							String k = it.key.replace('expand_', '')
+							[(k): it.value, ("${k}__".toString()): it.value]
+						} as Map<String, Object>
 
 				expand e
 

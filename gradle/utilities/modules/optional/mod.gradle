@@ -44,12 +44,6 @@ minecraft {
 	}
 
 	afterEvaluate {
-		configurations.runtimeClasspath.allDependencies.each { dependency ->
-			// COMMENT Add resources of non-mod modules
-			if (dependency instanceof ProjectDependency)
-				sourceSets.main.resources.srcDirs dependency.dependencyProject.sourceSets.main.resources.srcDirs
-		}
-
 		runs.configureEach {
 			workingDirectory file(minecraftRunDir)
 			if (project != rootProject) ideaModule "${rootProject.name}${project.path.replace ':', '.'}.main"
