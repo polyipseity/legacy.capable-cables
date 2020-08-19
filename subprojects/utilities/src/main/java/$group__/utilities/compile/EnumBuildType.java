@@ -1,23 +1,21 @@
 package $group__.utilities.compile;
 
+import $group__.utilities.ThrowableUtilities;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public enum EnumBuildType {
-	DEBUG("debug"),
-	RELEASE("release"),
+	DEBUG,
+	RELEASE,
 	;
 
-	protected final String string;
+	private static final Logger LOGGER = LogManager.getLogger();
 
-	EnumBuildType(String string) { this.string = string; }
-
-	public static EnumBuildType fromString(String string) {
-		for (EnumBuildType value : values()) {
-			if (string.equals(value.getString()))
-				return value;
-		}
-		return DEBUG; // COMMENT default case in case the string did not get replaced
+	public static EnumBuildType valueOfSafe(String name) {
+		return ThrowableUtilities.Try.call(() ->
+				valueOf(name), LOGGER)
+				.orElse(DEBUG); // COMMENT default value in case the string did not get replaced
 	}
-
-	public String getString() { return string; }
 
 	public boolean isDebug() { return this == DEBUG; }
 

@@ -6,5 +6,5 @@ public enum ConstantsUI {
 	;
 
 	public static final String BUILD_TYPE_STRING = "${buildType}";
-	public static final EnumBuildType BUILD_TYPE = EnumBuildType.fromString(BUILD_TYPE_STRING);
+	public static final EnumBuildType BUILD_TYPE = EnumBuildType.valueOfSafe(BUILD_TYPE_STRING);
 }
