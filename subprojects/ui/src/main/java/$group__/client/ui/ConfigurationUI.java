@@ -47,9 +47,10 @@ public enum ConfigurationUI {
 		Minecraft.getInstance().getFramebuffer().enableStencil();
 		EnumCursor.preload();
 	}
-}
 
-final class EventSanityCheck<T>
-		extends GenericEvent<T> {
-	EventSanityCheck(Class<T> clazz) { super(clazz); }
+	@OnlyIn(Dist.CLIENT)
+	private static final class EventSanityCheck<T>
+			extends GenericEvent<T> {
+		private EventSanityCheck(Class<T> clazz) { super(clazz); }
+	}
 }

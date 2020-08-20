@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:ui="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
            targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
            elementFormDefault="qualified"
            version="1.0"
-           xmlns:ui="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
            xml:lang="EN">
 	<xs:element name="ui" id="ui">
 		<xs:complexType>
@@ -43,21 +43,16 @@
 						<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
 					<!-- SECTION DOM -->
-					<!-- COMMENT unused, reserved -->
-					<xs:attribute name="load" type="xs:string"/>
-					<!-- COMMENT unused, reserved -->
-					<xs:attribute name="unload" type="xs:string"/>
-					<!-- COMMENT unused, reserved -->
-					<xs:attribute name="abort" type="xs:string"/>
-					<!-- COMMENT unused, reserved -->
-					<xs:attribute name="error" type="xs:string"/>
+					<xs:attribute name="load" type="xs:string"/><!-- COMMENT unused, reserved -->
+					<xs:attribute name="unload" type="xs:string"/><!-- COMMENT unused, reserved -->
+					<xs:attribute name="abort" type="xs:string"/><!-- COMMENT unused, reserved -->
+					<xs:attribute name="error" type="xs:string"/><!-- COMMENT unused, reserved -->
 					<xs:attribute name="select" type="xs:string"/>
 					<xs:attribute name="blur" type="xs:string"/>
 					<xs:attribute name="focus" type="xs:string"/>
 					<xs:attribute name="focusin" type="xs:string"/>
 					<xs:attribute name="focusout" type="xs:string"/>
-					<!-- COMMENT unused, reserved -->
-					<xs:attribute name="auxclick" type="xs:string"/>
+					<xs:attribute name="auxclick" type="xs:string"/><!-- COMMENT unused, reserved -->
 					<xs:attribute name="click" type="xs:string"/>
 					<xs:attribute name="dblclick" type="xs:string"/>
 					<xs:attribute name="mousedown" type="xs:string"/>
@@ -68,18 +63,13 @@
 					<xs:attribute name="mouseover" type="xs:string"/>
 					<xs:attribute name="mouseup" type="xs:string"/>
 					<xs:attribute name="wheel" type="xs:string"/>
-					<!-- COMMENT unused, reserved -->
-					<xs:attribute name="beforeinput" type="xs:string"/>
-					<!-- COMMENT unused, reserved -->
-					<xs:attribute name="input" type="xs:string"/>
+					<xs:attribute name="beforeinput" type="xs:string"/><!-- COMMENT unused, reserved -->
+					<xs:attribute name="input" type="xs:string"/><!-- COMMENT unused, reserved -->
 					<xs:attribute name="keydown" type="xs:string"/>
 					<xs:attribute name="keyup" type="xs:string"/>
-					<!-- COMMENT unused, reserved -->
-					<xs:attribute name="compositionstart" type="xs:string"/>
-					<!-- COMMENT unused, reserved -->
-					<xs:attribute name="compositionupdate" type="xs:string"/>
-					<!-- COMMENT unused, reserved -->
-					<xs:attribute name="compositionend" type="xs:string"/>
+					<xs:attribute name="compositionstart" type="xs:string"/><!-- COMMENT unused, reserved -->
+					<xs:attribute name="compositionupdate" type="xs:string"/><!-- COMMENT unused, reserved -->
+					<xs:attribute name="compositionend" type="xs:string"/><!-- COMMENT unused, reserved -->
 					<!-- SECTION Standard -->
 					<xs:attribute name="char_typed" type="xs:string"/>
 				</xs:extension>

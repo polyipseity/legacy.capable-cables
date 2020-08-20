@@ -143,9 +143,7 @@ public class UIComponentMinecraftWindow
 	public void crop(IAffineTransformStack stack, EnumCropMethod method, boolean push, Point2D mouse, double partialTicks) { IUIComponentMinecraft.crop(this, stack, method, push, mouse, partialTicks); }
 
 	@Override
-	public void removed(IAffineTransformStack stack) {
-		Optional.ofNullable(getObserverEventUIShapeDescriptorModify().getAndSet(null)).ifPresent(DisposableObserver::dispose);
-	}
+	public void removed(IAffineTransformStack stack) { Optional.ofNullable(getObserverEventUIShapeDescriptorModify().getAndSet(null)).ifPresent(DisposableObserver::dispose); }
 
 	@Override
 	public void transformChildren(IAffineTransformStack stack) {
