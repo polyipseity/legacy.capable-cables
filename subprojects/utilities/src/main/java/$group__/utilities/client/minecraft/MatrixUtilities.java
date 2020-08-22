@@ -65,9 +65,9 @@ public enum MatrixUtilities {
 		FloatBuffer buf = FloatBuffer.allocate(MATRIX_ARRAY_LENGTH);
 		matrix.write(buf);
 		return new AffineTransform(
-				buf.get(AffineTransformUtilities.toArrayIndex(0, 0)), buf.get(AffineTransformUtilities.toArrayIndex(1, 0)),
-				buf.get(AffineTransformUtilities.toArrayIndex(0, 1)), buf.get(AffineTransformUtilities.toArrayIndex(1, 1)),
-				buf.get(AffineTransformUtilities.toArrayIndex(0, 3)), buf.get(AffineTransformUtilities.toArrayIndex(1, 3))
+				buf.get(AffineTransformUtilities.toMatrix4x4ArrayIndex(0, 0)), buf.get(AffineTransformUtilities.toMatrix4x4ArrayIndex(1, 0)),
+				buf.get(AffineTransformUtilities.toMatrix4x4ArrayIndex(0, 1)), buf.get(AffineTransformUtilities.toMatrix4x4ArrayIndex(1, 1)),
+				buf.get(AffineTransformUtilities.toMatrix4x4ArrayIndex(0, 3)), buf.get(AffineTransformUtilities.toMatrix4x4ArrayIndex(1, 3))
 		);
 	}
 

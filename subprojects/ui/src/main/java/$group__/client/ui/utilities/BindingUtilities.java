@@ -147,6 +147,20 @@ public enum BindingUtilities {
 					.map(Long::valueOf), n);
 		}
 
+		public static Optional<Float> deserializeFloat(Node n) {
+			return warnIfNotPresent(DOMUtilities.getAttributeValue(n, "float")
+					.map(Float::valueOf), n);
+		}
+
+		public static Optional<Double> deserializeDouble(Node n) {
+			return warnIfNotPresent(DOMUtilities.getAttributeValue(n, "double")
+					.map(Double::valueOf), n);
+		}
+
+		public static Optional<String> deserializeString(Node n) {
+			return warnIfNotPresent(DOMUtilities.getAttributeValue(n, "string"), n);
+		}
+
 		public static Optional<Color> deserializeColor(Node n) {
 			return warnIfNotPresent(DOMUtilities.getChildrenByTagName(n, "color").stream().sequential()
 					.findFirst()

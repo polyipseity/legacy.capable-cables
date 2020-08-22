@@ -1,6 +1,6 @@
 package $group__.client.ui.utilities;
 
-import $group__.client.ui.core.IUIDataKeyboardKeyPress;
+import $group__.client.ui.core.structures.IUIDataKeyboardKeyPress;
 import $group__.utilities.ObjectUtilities;
 import jdk.nashorn.internal.ir.annotations.Immutable;
 

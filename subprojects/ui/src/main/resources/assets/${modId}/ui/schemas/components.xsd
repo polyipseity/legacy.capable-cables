@@ -27,21 +27,51 @@
 	<!-- SECTION components -->
 
 	<xs:complexType name="componentBasedType" id="componentBasedType">
-		<xs:choice minOccurs="0" maxOccurs="unbounded">
-			<xs:element ref="ui:property"/>
-			<xs:element ref="ui:binding"/>
-		</xs:choice>
+		<xs:sequence>
+			<xs:element ref="ui:property" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required"/>
 	</xs:complexType>
 
-	<xs:element name="component" id="component">
+	<xs:complexType name="componentBasedWithBindingsType" id="componentBasedWithBindingsType">
+		<xs:complexContent>
+			<xs:extension base="ui:componentBasedType">
+				<xs:sequence>
+					<xs:element ref="ui:binding" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:element name="shape" id="shape">
 		<xs:complexType>
 			<xs:complexContent>
 				<xs:extension base="ui:componentBasedType">
 					<xs:sequence>
+						<xs:element name="transform" type="ui:affineTransformDefinerType" minOccurs="0"/>
+						<xs:element ref="ui:constraint" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="ui:anchor" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+					<xs:attribute name="x" type="xs:double"/>
+					<xs:attribute name="y" type="xs:double"/>
+					<xs:attribute name="width" type="xs:double"/>
+					<xs:attribute name="height" type="xs:double"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="component" id="component">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ui:componentBasedWithBindingsType">
+					<xs:sequence>
+						<xs:element ref="ui:shape"/>
 						<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
 						<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
+					<!-- SECTION Special -->
+					<xs:attribute name="id" type="xs:ID"/>
 					<!-- SECTION DOM -->
 					<xs:attribute name="load" type="xs:string"/><!-- COMMENT unused, reserved -->
 					<xs:attribute name="unload" type="xs:string"/><!-- COMMENT unused, reserved -->
@@ -77,7 +107,7 @@
 		</xs:complexType>
 	</xs:element>
 
-	<xs:element name="extension" id="extension" type="ui:componentBasedType"/>
+	<xs:element name="extension" id="extension" type="ui:componentBasedWithBindingsType"/>
 
 	<!-- SECTION property-value pairs -->
 
@@ -87,16 +117,6 @@
 		</xs:sequence>
 		<xs:attribute name="key" type="xs:string" use="required"/>
 	</xs:complexType>
-
-	<xs:complexType name="bindingType" id="bindingType">
-		<xs:complexContent>
-			<xs:extension base="ui:propertyType">
-				<xs:attribute name="binding" type="xs:string" use="required"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
-
-	<xs:element name="value" id="value" type="ui:valueType"/>
 	<xs:element name="property" id="property">
 		<xs:complexType>
 			<xs:complexContent>
@@ -108,10 +128,39 @@
 			</xs:complexContent>
 		</xs:complexType>
 	</xs:element>
+
+	<xs:complexType name="bindingType" id="bindingType">
+		<xs:complexContent>
+			<xs:extension base="ui:propertyType">
+				<xs:attribute name="binding" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 	<xs:element name="binding" id="binding" type="ui:bindingType"/>
+
+	<!-- SECTION types -->
+
+	<!-- COMMENT argument -->
+	<xs:complexType name="argumentsType" id="argumentsType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="delimiter" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+	<!-- COMMENT method -->
+	<xs:complexType name="methodType" id="methodType">
+		<xs:simpleContent>
+			<xs:extension base="ui:argumentsType">
+				<xs:attribute name="method" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
 
 	<!-- SECTION values -->
 
+	<!-- COMMENT IUIPropertyMappingValue -->
 	<xs:complexType name="valueType" id="valueType">
 		<xs:choice minOccurs="0" maxOccurs="unbounded">
 			<!-- unique particle attribution :( -->
@@ -122,14 +171,70 @@
 		<xs:attribute name="short" type="xs:short"/>
 		<xs:attribute name="int" type="xs:int"/>
 		<xs:attribute name="long" type="xs:long"/>
+		<xs:attribute name="float" type="xs:float"/>
+		<xs:attribute name="double" type="xs:double"/>
+		<xs:attribute name="string" type="xs:string"/>
 		<xs:anyAttribute processContents="lax"/>
 	</xs:complexType>
+	<xs:element name="value" id="value" type="ui:valueType"/>
 
+	<!-- COMMENT Color -->
 	<xs:complexType name="colorType" id="colorType">
 		<xs:attribute name="red" type="xs:hexBinary" default="00"/>
 		<xs:attribute name="green" type="xs:hexBinary" default="00"/>
 		<xs:attribute name="blue" type="xs:hexBinary" default="00"/>
 		<xs:attribute name="alpha" type="xs:hexBinary" default="FF"/>
 	</xs:complexType>
-	<xs:element name="color" type="ui:colorType"/>
+	<xs:element name="color" id="color" type="ui:colorType"/>
+
+	<!-- COMMENT IUIConstraint -->
+	<xs:complexType name="constraintType" id="constraintType">
+		<xs:attribute name="minX" type="xs:double"/>
+		<xs:attribute name="minY" type="xs:double"/>
+		<xs:attribute name="maxX" type="xs:double"/>
+		<xs:attribute name="maxY" type="xs:double"/>
+		<xs:attribute name="minWidth" type="xs:double"/>
+		<xs:attribute name="minHeight" type="xs:double"/>
+		<xs:attribute name="maxWidth" type="xs:double"/>
+		<xs:attribute name="maxHeight" type="xs:double"/>
+	</xs:complexType>
+	<xs:element name="constraint" id="constraint" type="ui:constraintType"/>
+
+	<!-- COMMENT IUIAnchor -->
+	<xs:complexType name="anchorType" id="anchorType">
+		<xs:attribute name="target" type="xs:IDREF" use="required"/>
+		<xs:attribute name="originSide" type="ui:sideType" use="required"/>
+		<xs:attribute name="targetSide" type="ui:sideType" use="required"/>
+		<xs:attribute name="borderThickness" type="xs:double" default="0"/>
+	</xs:complexType>
+	<xs:element name="anchor" id="anchor" type="ui:anchorType"/>
+
+	<!-- COMMENT EnumUISide -->
+	<xs:simpleType name="sideType" id="sideType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="UP"/>
+			<xs:enumeration value="DOWN"/>
+			<xs:enumeration value="LEFT"/>
+			<xs:enumeration value="RIGHT"/>
+			<xs:enumeration value="HORIZONTAL"/>
+			<xs:enumeration value="VERTICAL"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- COMMENT AffineTransform -->
+	<xs:complexType name="affineTransformType" id="affineTransformType">
+		<xs:attribute name="translateX" type="xs:double" default="0"/>
+		<xs:attribute name="translateY" type="xs:double" default="0"/>
+		<xs:attribute name="scaleX" type="xs:double" default="1"/>
+		<xs:attribute name="scaleY" type="xs:double" default="1"/>
+		<xs:attribute name="shearX" type="xs:double" default="0"/>
+		<xs:attribute name="shearY" type="xs:double" default="0"/>
+	</xs:complexType>
+
+	<xs:complexType name="affineTransformDefinerType" id="affineTransformDefinerType">
+		<xs:sequence>
+			<xs:element name="values" type="ui:affineTransformType"/>
+			<xs:element name="operation" type="ui:methodType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
 </xs:schema>

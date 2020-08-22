@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.views.components;
 
-import $group__.client.ui.core.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.IUIInfrastructure;
 import $group__.client.ui.mvvm.core.binding.IBinderAction;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
@@ -11,15 +11,18 @@ import $group__.client.ui.mvvm.views.UIView;
 import io.reactivex.rxjava3.core.Observer;
 
 import javax.annotation.Nullable;
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.lang.ref.WeakReference;
+import java.util.ConcurrentModificationException;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class UIViewComponent<SD extends IShapeDescriptor<?>, M extends IUIComponentManager<? extends SD>>
-		extends UIView<SD>
-		implements IUIViewComponent<SD, M> {
+public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
+		extends UIView<S>
+		implements IUIViewComponent<S, M> {
 	protected final M manager;
 	protected WeakReference<IUIInfrastructure<?, ?, ?>> infrastructure = new WeakReference<>(null);
 
@@ -38,9 +41,6 @@ public class UIViewComponent<SD extends IShapeDescriptor<?>, M extends IUICompon
 	public Optional<IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) { return getManager().changeFocus(currentFocus, next); }
 
 	@Override
-	public SD getShapeDescriptor() { return getManager().getShapeDescriptor(); }
-
-	@Override
 	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() {
 		return s -> {
 			super.getBinderSubscriber().accept(s);
@@ -53,4 +53,7 @@ public class UIViewComponent<SD extends IShapeDescriptor<?>, M extends IUICompon
 
 	@Override
 	public void setInfrastructure(@Nullable IUIInfrastructure<?, ?, ?> infrastructure) { this.infrastructure = new WeakReference<>(infrastructure); }
+
+	@Override
+	public boolean reshape(Function<? super IShapeDescriptor<? super S>, ? extends Boolean> action) throws ConcurrentModificationException { return getManager().reshape(action); }
 }

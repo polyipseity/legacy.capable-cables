@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.core.views.events;
 
-import $group__.client.ui.core.IUIDataMouseButtonClick;
+import $group__.client.ui.core.structures.IUIDataMouseButtonClick;
 import $group__.utilities.NamespaceUtilities;
 import net.minecraft.util.ResourceLocation;
 

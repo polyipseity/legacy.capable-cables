@@ -1,5 +1,6 @@
 package $group__.client.ui.mvvm.minecraft.components.common;
 
+import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
 import $group__.client.ui.events.ui.UIEventListener;
 import $group__.client.ui.mvvm.binding.BindingMethodSource;
 import $group__.client.ui.mvvm.core.binding.IBindingField;
@@ -75,8 +76,8 @@ public class UIComponentMinecraftButton
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	@UIConstructor
-	public UIComponentMinecraftButton(Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) {
-		super(propertyMapping);
+	public UIComponentMinecraftButton(IShapeDescriptor<?> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) {
+		super(shapeDescriptor, propertyMapping);
 
 		this.colorBase = IHasBinding.createBindingField(Color.class,
 				this.propertyMapping.get(PROPERTY_COLOR_BASE_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.DARK_GRAY);

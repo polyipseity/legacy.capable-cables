@@ -1,4 +1,4 @@
-package $group__.client.ui.core;
+package $group__.client.ui.core.structures;
 
 import $group__.utilities.MapUtilities;
 import $group__.utilities.interfaces.ICopyable;

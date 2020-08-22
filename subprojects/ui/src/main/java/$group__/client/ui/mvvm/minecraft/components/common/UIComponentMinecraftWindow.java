@@ -1,7 +1,6 @@
 package $group__.client.ui.mvvm.minecraft.components.common;
 
-import $group__.client.ui.core.IShapeDescriptor;
-import $group__.client.ui.core.IUIConstraint;
+import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
 import $group__.client.ui.events.bus.EventBusEntryPoint;
 import $group__.client.ui.events.ui.UIEventListener;
 import $group__.client.ui.mvvm.core.binding.IBindingField;
@@ -10,54 +9,44 @@ import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
 import $group__.client.ui.mvvm.core.views.IUIReshapeExplicitly;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
-import $group__.client.ui.mvvm.core.views.components.extensions.caches.IUIExtensionCache;
+import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
 import $group__.client.ui.mvvm.core.views.components.parsers.UIConstructor;
 import $group__.client.ui.mvvm.core.views.components.parsers.UIProperty;
 import $group__.client.ui.mvvm.core.views.events.IUIEventFocus;
 import $group__.client.ui.mvvm.minecraft.core.views.IUIComponentMinecraft;
 import $group__.client.ui.mvvm.views.components.UIComponentContainer;
-import $group__.client.ui.mvvm.views.components.extensions.caches.UICacheShapeDescriptor;
-import $group__.client.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
-import $group__.client.ui.mvvm.views.events.bus.EventUIShapeDescriptor;
+import $group__.client.ui.mvvm.views.events.bus.EventUIComponent;
 import $group__.client.ui.mvvm.views.events.ui.UIEventFocus;
-import $group__.client.ui.structures.ShapeDescriptor;
-import $group__.client.ui.structures.ShapeDescriptor.Rectangular;
-import $group__.client.ui.structures.UIConstraint;
+import $group__.client.ui.structures.shapes.interactions.UIConstraintSupplier;
 import $group__.client.ui.utilities.BindingUtilities;
 import $group__.client.ui.utilities.minecraft.DrawingUtilities;
-import $group__.utilities.CastUtilities;
 import $group__.utilities.NamespaceUtilities;
-import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.events.EnumEventHookStage;
+import $group__.utilities.functions.ConstantSupplier;
 import $group__.utilities.reactive.DisposableObserverAuto;
-import $group__.utilities.structures.Registry;
-import com.google.common.collect.ImmutableList;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
+import java.lang.ref.WeakReference;
 import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 // TODO responsibility of this classes may need to be delegated to the view model via some means
 @OnlyIn(Dist.CLIENT)
 public class UIComponentMinecraftWindow
 		extends UIComponentContainer
-		implements IUIReshapeExplicitly<IShapeDescriptor<? extends RectangularShape>>, IUIComponentMinecraft {
+		implements IUIReshapeExplicitly<RectangularShape>, IUIComponentMinecraft {
 	public static final String PROPERTY_COLOR_BACKGROUND = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "window.colors.background";
 	public static final String PROPERTY_COLOR_BORDER = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "window.colors.border";
 
@@ -77,51 +66,66 @@ public class UIComponentMinecraftWindow
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	@UIConstructor
-	public UIComponentMinecraftWindow(Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) {
-		super(propertyMapping);
+	public UIComponentMinecraftWindow(IShapeDescriptor<RectangularShape> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) {
+		super(shapeDescriptor, propertyMapping);
 
 		this.colorBackground = IHasBinding.createBindingField(Color.class,
 				this.propertyMapping.get(PROPERTY_COLOR_BACKGROUND_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.BLACK);
 		this.colorBorder = IHasBinding.createBindingField(Color.class,
 				this.propertyMapping.get(PROPERTY_COLOR_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.WHITE);
 
+		IShapeDescriptor<?> sd = getShapeDescriptor();
+		sd.modify(() -> {
+			WeakReference<IUIComponent> selfRef = new WeakReference<>(this);
+			sd.getConstraintsRef().add(new UIConstraintSupplier(
+					ConstantSupplier.of(0d), ConstantSupplier.of(0d),
+					() -> Optional.ofNullable(selfRef.get())
+							.flatMap(IUIComponent::getManager)
+							.map(IUIComponentManager::getShapeDescriptor)
+							.map(IShapeDescriptor::getShapeOutput)
+							.map(Shape::getBounds2D)
+							.map(RectangularShape::getMaxX)
+							.map(n -> n - WINDOW_VISIBLE_MINIMUM)
+							.orElse(null),
+					() -> Optional.ofNullable(selfRef.get())
+							.flatMap(IUIComponent::getManager)
+							.map(IUIComponentManager::getShapeDescriptor)
+							.map(IShapeDescriptor::getShapeOutput)
+							.map(Shape::getBounds2D)
+							.map(RectangularShape::getMaxY)
+							.map(n -> n - WINDOW_VISIBLE_MINIMUM)
+							.orElse(null),
+					ConstantSupplier.of((double) WINDOW_VISIBLE_MINIMUM), ConstantSupplier.of((double) WINDOW_VISIBLE_MINIMUM),
+					ConstantSupplier.getNullSupplier(), ConstantSupplier.getNullSupplier()));
+			return false;
+		});
+
 		addEventListener(UIEventFocus.TYPE_FOCUS_IN_POST, new UIEventListener.Functional<IUIEventFocus>(e ->
 				getParent().orElseThrow(InternalError::new).moveChildToTop(this)), true);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public boolean reshape(Function<? super IShapeDescriptor<? extends RectangularShape>, ? extends Boolean> action) throws ConcurrentModificationException {
-		return getShapeDescriptor().modify(() -> action.apply(getShapeDescriptor()));
+	public IShapeDescriptor<RectangularShape> getShapeDescriptor() {
+		return (IShapeDescriptor<RectangularShape>) super.getShapeDescriptor(); // COMMENT should be safe, see constructor
+	}
+
+	@Override
+	public boolean reshape(Function<? super IShapeDescriptor<? super RectangularShape>, ? extends Boolean> action) throws ConcurrentModificationException {
+		return IUIComponent.reshapeComponent(this, getShapeDescriptor(), action);
 		// TODO resizing logic
 	}
-
-	@Override
-	protected IShapeDescriptor<? extends RectangularShape> createShapeDescriptor() {
-		return new Rectangular<Rectangle2D>(getShapePlaceholderView()) {
-			@Override
-			protected boolean modify0(Supplier<? extends Boolean> action)
-					throws ConcurrentModificationException {
-				Optional<IUIConstraint> cs = CacheGuiWindow.CONSTRAINT.getValue().get(UIComponentMinecraftWindow.this);
-				cs.ifPresent(c -> getConstraints().add(c));
-				boolean ret = super.modify0(action);
-				cs.ifPresent(c -> getConstraints().remove(c));
-				return ret;
-			}
-		};
-	}
-
-	@Override
-	public ShapeDescriptor.Rectangular<?> getShapeDescriptor() { return (Rectangular<?>) super.getShapeDescriptor(); }
 
 	protected final AtomicReference<ObserverEventUIShapeDescriptorModify> observerEventUIShapeDescriptorModify = new AtomicReference<>();
 
 	@Override
 	public void initialize(IAffineTransformStack stack) {
-		EventBusEntryPoint.<EventUIShapeDescriptor.Modify>getEventBus()
+		EventBusEntryPoint.<EventUIComponent.ShapeDescriptorModify>getEventBus()
 				.subscribe(getObserverEventUIShapeDescriptorModify().accumulateAndGet(new ObserverEventUIShapeDescriptorModify(), (p, n) -> {
 					Optional.ofNullable(p).ifPresent(DisposableObserver::dispose);
 					return n;
 				}));
+		IUIReshapeExplicitly.refresh(this);
 	}
 
 	protected AtomicReference<ObserverEventUIShapeDescriptorModify> getObserverEventUIShapeDescriptorModify() { return observerEventUIShapeDescriptorModify; }
@@ -151,48 +155,12 @@ public class UIComponentMinecraftWindow
 		stack.getDelegated().peek().translate(0, WINDOW_DRAG_BAR_THICKNESS); // TODO move
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	public enum CacheGuiWindow {
-		;
-
-		private static final Logger LOGGER = LogManager.getLogger();
-
-		public static final Registry.RegistryObject<UIExtensionCache.IType<IUIConstraint, IUIComponent>> CONSTRAINT =
-				IUIExtensionCache.RegUICache.INSTANCE.registerApply(generateKey("constraint"),
-						k -> new UICacheShapeDescriptor<>(k,
-								(t, i) -> IUIExtensionCache.TYPE.getValue().get(i)
-										.flatMap(cache -> i.getManager()
-												.map(m -> m.getShapeDescriptor().getShapeOutput().getBounds2D())
-												.flatMap(mb -> Try.call(() -> cache.getDelegated().get(t.getKey(), () ->
-														new UIConstraint(
-																new Rectangle2D.Double(0, 0, WINDOW_VISIBLE_MINIMUM, WINDOW_VISIBLE_MINIMUM),
-																new Rectangle2D.Double(mb.getMaxX() - WINDOW_VISIBLE_MINIMUM, mb.getMaxY() - WINDOW_VISIBLE_MINIMUM,
-																		IUIConstraint.CONSTRAINT_NULL_VALUE, IUIConstraint.CONSTRAINT_NULL_VALUE))), LOGGER)
-														.map(CastUtilities::castUnchecked))),
-								(t, i) -> IUIExtensionCache.IType.invalidate(i, t.getKey()),
-								t -> {
-									UICacheShapeDescriptor<IUIConstraint, IUIComponent> tc = (UICacheShapeDescriptor<IUIConstraint, IUIComponent>) t;
-									return ImmutableList.of(new DisposableObserverAuto<EventUIShapeDescriptor.Modify>() {
-										@Override
-										@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-										public void onNext(EventUIShapeDescriptor.Modify event) {
-											if (event.getStage() == EnumEventHookStage.POST) {
-												UICacheShapeDescriptor.getInstanceFromShapeDescriptor(tc.getInstancesView(), event.getShapeDescriptor())
-														.ifPresent(tc::invalidate);
-											}
-										}
-									});
-								}));
-
-		private static ResourceLocation generateKey(@SuppressWarnings("SameParameterValue") String name) { return new ResourceLocation(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, "window." + name); }
-	}
-
 	protected class ObserverEventUIShapeDescriptorModify
-			extends DisposableObserverAuto<EventUIShapeDescriptor.Modify> {
+			extends DisposableObserverAuto<EventUIComponent.ShapeDescriptorModify> {
 		@Override
 		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-		public void onNext(EventUIShapeDescriptor.Modify event) {
-			if (event.getStage() == EnumEventHookStage.POST && getParent().filter(p -> p.getShapeDescriptor().equals(event.getShapeDescriptor())).isPresent())
+		public void onNext(EventUIComponent.ShapeDescriptorModify event) {
+			if (event.getStage() == EnumEventHookStage.POST && getParent().filter(p -> p.equals(event.getComponent())).isPresent())
 				IUIReshapeExplicitly.refresh(UIComponentMinecraftWindow.this);
 		}
 	}

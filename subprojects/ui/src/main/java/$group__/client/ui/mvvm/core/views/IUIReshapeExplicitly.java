@@ -1,14 +1,15 @@
 package $group__.client.ui.mvvm.core.views;
 
-import $group__.client.ui.core.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
 
+import java.awt.*;
 import java.util.ConcurrentModificationException;
 import java.util.function.Function;
 
 @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
-public interface IUIReshapeExplicitly<SD extends IShapeDescriptor<?>> {
-	static boolean refresh(IUIReshapeExplicitly<?> trait) { return trait.reshape(s -> false); }
+public interface IUIReshapeExplicitly<S extends Shape> {
+	static boolean refresh(IUIReshapeExplicitly<?> trait) { return trait.reshape(s -> true); }
 
-	boolean reshape(Function<? super SD, ? extends Boolean> action)
+	boolean reshape(Function<? super IShapeDescriptor<? super S>, ? extends Boolean> action)
 			throws ConcurrentModificationException;
 }

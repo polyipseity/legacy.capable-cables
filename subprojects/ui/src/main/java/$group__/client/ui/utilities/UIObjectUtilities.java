@@ -6,10 +6,7 @@ import $group__.utilities.functions.IConsumer4;
 import $group__.utilities.functions.IFunction4;
 
 import java.awt.*;
-import java.awt.geom.Dimension2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RectangularShape;
+import java.awt.geom.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
@@ -19,7 +16,7 @@ import static java.lang.Math.min;
 public enum UIObjectUtilities {
 	;
 
-	public static Shape copyShape(Shape shape) { return AffineTransformUtilities.getIdentity().createTransformedShape(shape); }
+	public static Shape copyShape(Shape shape) { return AffineTransformUtilities.getIdentityView().createTransformedShape(shape); }
 
 	public static Rectangle2D getRectangleFromDiagonal(Point2D p1, Point2D p2) {
 		Rectangle2D ret = new Rectangle2D.Double();
@@ -62,4 +59,10 @@ public enum UIObjectUtilities {
 	public static <T> T applyRectangular(RectangularShape rectangular, IFunction4<Double, Double, Double, Double, T> action) { return action.apply(rectangular.getX(), rectangular.getY(), rectangular.getWidth(), rectangular.getHeight()); }
 
 	public static Rectangle2D maxRectangle(Rectangle2D a, Rectangle2D b) { return applyRectangular(a, (ax, ay, aw, ah) -> applyRectangular(b, (bx, by, bw, bh) -> new Rectangle2D.Double(max(ax, bx), max(ay, by), max(aw, bw), max(ah, bh)))); }
+
+	public static void transformRectangular(AffineTransform transform, RectangularShape rectangular) {
+		UIObjectUtilities.acceptRectangular(rectangular, (x, y, h, w) ->
+				rectangular.setFrame(x + transform.getTranslateX(), y + transform.getTranslateY(),
+						w * transform.getScaleX(), h * transform.getScaleY()));
+	}
 }

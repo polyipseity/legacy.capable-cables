@@ -13,7 +13,7 @@ public abstract class DisposableObserverAuto<T>
 
 	@Override
 	public void onError(@Nonnull Throwable e) {
-		ThrowableUtilities.ThrowableCatcher.catch_(e, LOGGER);
+		ThrowableUtilities.ThrowableCatcher.log(e, LOGGER);
 		dispose();
 	}
 

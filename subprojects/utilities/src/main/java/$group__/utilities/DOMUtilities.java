@@ -5,21 +5,26 @@ import com.google.common.collect.ImmutableList;
 import org.w3c.dom.Node;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 public enum DOMUtilities {
 	;
 
+	public static Optional<Node> getChildByTagName(Node node, String name) { return getChildrenByTagName(node, name).stream().unordered().findAny(); }
+
 	@SuppressWarnings("UnstableApiUsage")
-	public static ImmutableList<Node> getChildrenByTagName(Node node, String name) {
+	public static List<Node> getChildrenByTagName(Node node, String name) {
 		return NodeListList.wrap(node.getChildNodes()).stream().sequential()
 				.filter(n -> name.equals(n.getLocalName()))
 				.collect(ImmutableList.toImmutableList());
 	}
 
+	public static Optional<Node> getChildByTagNameNS(Node node, @Nullable String namespaceURI, String name) { return getChildrenByTagNameNS(node, namespaceURI, name).stream().unordered().findAny(); }
+
 	@SuppressWarnings("UnstableApiUsage")
-	public static ImmutableList<Node> getChildrenByTagNameNS(Node node, @Nullable String namespaceURI, String name) {
+	public static List<Node> getChildrenByTagNameNS(Node node, @Nullable String namespaceURI, String name) {
 		return NodeListList.wrap(node.getChildNodes()).stream().sequential()
 				.filter(n -> Objects.equals(n.getNamespaceURI(), namespaceURI)
 						&& name.equals(n.getLocalName()))

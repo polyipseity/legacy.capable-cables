@@ -1,6 +1,5 @@
 package $group__.client.ui.mvvm.views;
 
-import $group__.client.ui.core.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.binding.IBinderAction;
 import $group__.client.ui.mvvm.core.extensions.IUIExtension;
 import $group__.client.ui.mvvm.core.views.IUIView;
@@ -13,18 +12,17 @@ import io.reactivex.rxjava3.subjects.Subject;
 import io.reactivex.rxjava3.subjects.UnicastSubject;
 import net.minecraft.util.ResourceLocation;
 
-import java.util.ConcurrentModificationException;
+import java.awt.*;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
-public abstract class UIView<SD extends IShapeDescriptor<?>>
-		implements IUIView<SD> {
+public abstract class UIView<S extends Shape>
+		implements IUIView<S> {
 	protected final ConcurrentMap<ResourceLocation, IUIExtension<ResourceLocation, ? extends IUIView<?>>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 
@@ -50,7 +48,4 @@ public abstract class UIView<SD extends IShapeDescriptor<?>>
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<ResourceLocation, IUIExtension<ResourceLocation, ? extends IUIView<?>>> getExtensions() { return extensions; }
-
-	@Override
-	public boolean reshape(Function<? super SD, ? extends Boolean> action) throws ConcurrentModificationException { return getShapeDescriptor().modify(() -> action.apply(getShapeDescriptor())); }
 }

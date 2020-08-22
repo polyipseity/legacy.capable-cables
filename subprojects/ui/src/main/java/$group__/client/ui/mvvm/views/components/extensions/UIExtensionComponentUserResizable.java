@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.views.components.extensions;
 
-import $group__.client.ui.core.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
 import $group__.client.ui.events.bus.EventBusEntryPoint;
 import $group__.client.ui.events.ui.UIEventListener;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
@@ -13,7 +13,11 @@ import $group__.client.ui.mvvm.core.views.components.parsers.UIConstructor;
 import $group__.client.ui.mvvm.core.views.events.IUIEventMouse;
 import $group__.client.ui.mvvm.views.components.UIComponentVirtual;
 import $group__.client.ui.mvvm.views.events.ui.UIEventMouse;
-import $group__.client.ui.structures.*;
+import $group__.client.ui.structures.EnumCursor;
+import $group__.client.ui.structures.EnumUIAxis;
+import $group__.client.ui.structures.EnumUISide;
+import $group__.client.ui.structures.Point2DImmutable;
+import $group__.client.ui.structures.shapes.descriptors.GenericShapeDescriptor;
 import $group__.client.ui.utilities.UIObjectUtilities;
 import $group__.client.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;
@@ -161,6 +165,8 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 
 		@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 		protected VirtualComponent() {
+			super(IShapeDescriptor.getShapeDescriptorPlaceholderView());
+
 			addEventListener(UIEventMouse.TYPE_MOUSE_ENTER, new UIEventListener.Functional<IUIEventMouse>(evt -> setBeingHovered(true)), false);
 			addEventListener(UIEventMouse.TYPE_MOUSE_LEAVE, new UIEventListener.Functional<IUIEventMouse>(evt -> setBeingHovered(false)), false);
 			addEventListener(UIEventMouse.TYPE_MOUSE_DOWN, new UIEventListener.Functional<IUIEventMouse>(evt -> {
@@ -226,10 +232,10 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 			if (isResizing())
 				return getManager()
 						.map(m ->
-								new ShapeDescriptor.Generic(m.getShapeDescriptor().getShapeOutput()))
-						.orElseGet(() -> new ShapeDescriptor.Generic(new Rectangle2D.Double()));
+								new GenericShapeDescriptor(m.getShapeDescriptor().getShapeOutput()))
+						.orElseGet(() -> new GenericShapeDescriptor(new Rectangle2D.Double()));
 			else
-				return new ShapeDescriptor.Generic(getResizeShape()
+				return new GenericShapeDescriptor(getResizeShape()
 						.<Shape>map(Function.identity())
 						.orElseGet(Rectangle2D.Double::new));
 		}

@@ -14,4 +14,7 @@ public abstract class EventUIComponent extends EventUI {
 
 	public IUIComponent getComponent() { return component; }
 
+	public static class ShapeDescriptorModify extends EventUIComponent {
+		public ShapeDescriptorModify(EnumEventHookStage stage, IUIComponent component) { super(stage, component); }
+	}
 }

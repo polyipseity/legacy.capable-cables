@@ -1,8 +1,9 @@
-package $group__.client.ui.mvvm.structures;
+package $group__.client.ui.structures.shapes.interactions;
 
-import $group__.client.ui.core.IShapeDescriptor;
-import $group__.client.ui.mvvm.core.structures.IUIAnchor;
-import $group__.client.ui.mvvm.core.structures.IUIAnchorSet;
+import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.IUIAnchor;
+import $group__.client.ui.core.structures.shapes.IUIAnchorSet;
+import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.structures.EnumUISide;
 import $group__.utilities.MapUtilities;
 import com.google.common.collect.ImmutableMap;
@@ -24,20 +25,20 @@ public class UIAnchorSet<A extends IUIAnchor>
 		this.from = new WeakReference<>(from);
 	}
 
-	public static Set<UIAnchor> getAnchorsToMatch(IShapeDescriptor<?> to, double borderThickness) {
+	public static Set<UIAnchor> getAnchorsToMatch(IUIComponent target, double borderThickness) {
 		return Sets.newHashSet(
-				new UIAnchor(to, EnumUISide.UP, EnumUISide.DOWN, borderThickness),
-				new UIAnchor(to, EnumUISide.DOWN, EnumUISide.UP, borderThickness),
-				new UIAnchor(to, EnumUISide.LEFT, EnumUISide.RIGHT, borderThickness),
-				new UIAnchor(to, EnumUISide.RIGHT, EnumUISide.LEFT, borderThickness));
+				new UIAnchor(target, EnumUISide.UP, EnumUISide.DOWN, borderThickness),
+				new UIAnchor(target, EnumUISide.DOWN, EnumUISide.UP, borderThickness),
+				new UIAnchor(target, EnumUISide.LEFT, EnumUISide.RIGHT, borderThickness),
+				new UIAnchor(target, EnumUISide.RIGHT, EnumUISide.LEFT, borderThickness));
 	}
 
 	@SuppressWarnings("ObjectAllocationInLoop")
 	@Override
-	public boolean addAnchors(Iterable<A> anchors) {
+	public boolean addAnchors(Iterable<? extends A> anchors) {
 		boolean ret = false;
 		for (A anchor : anchors) {
-			switch (anchor.getFromSide()) {
+			switch (anchor.getOriginSide()) {
 				case UP:
 				case DOWN:
 					removeSides(EnumSet.of(EnumUISide.VERTICAL));
@@ -57,7 +58,7 @@ public class UIAnchorSet<A extends IUIAnchor>
 				default:
 					throw new InternalError();
 			}
-			getAnchors().put(anchor.getFromSide(), anchor);
+			getAnchors().put(anchor.getOriginSide(), anchor);
 			anchor.onContainerAdded(this);
 			ret = true;
 		}

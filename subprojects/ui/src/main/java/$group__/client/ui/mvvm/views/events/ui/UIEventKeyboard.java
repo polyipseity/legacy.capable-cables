@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.views.events.ui;
 
-import $group__.client.ui.core.IUIDataKeyboardKeyPress;
+import $group__.client.ui.core.structures.IUIDataKeyboardKeyPress;
 import $group__.client.ui.events.ui.UIEvent;
 import $group__.client.ui.mvvm.core.views.events.IUIEventKeyboard;
 import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;

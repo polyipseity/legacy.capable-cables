@@ -6,11 +6,11 @@ import $group__.utilities.MapUtilities;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.MouseHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.geom.Point2D;
@@ -29,9 +29,8 @@ public enum GLUtilities {
 			GL_MASK_ALL_BITS = 0xFFFFFFFF;
 
 	public static Point2D getCursorPos() {
-		double[] xPos = new double[1], yPos = new double[1];
-		GLFW.glfwGetCursorPos(getWindowHandle(), xPos, yPos);
-		return new Point2D.Double(xPos[0], yPos[0]);
+		MouseHelper mh = Minecraft.getInstance().mouseHelper;
+		return new Point2D.Double(mh.getMouseX(), mh.getMouseY());
 	}
 
 	public static long getWindowHandle() { return Minecraft.getInstance().getMainWindow().getHandle(); }

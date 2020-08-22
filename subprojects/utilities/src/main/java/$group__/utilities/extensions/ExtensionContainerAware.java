@@ -26,7 +26,8 @@ public abstract class ExtensionContainerAware<K, C extends IExtensionContainer<?
 					"getGenericClass()", getGenericClass(),
 					"container", container);
 		setContainer((E) container); // COMMENT checked
-		Cleaner.create(container, this::onExtensionRemoved);
+		Cleaner.create(container,
+				this::onExtensionRemoved); // TODO CLEANER not working
 	}
 
 	@Override

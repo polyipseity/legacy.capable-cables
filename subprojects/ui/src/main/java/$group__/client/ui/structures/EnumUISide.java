@@ -3,6 +3,7 @@ package $group__.client.ui.structures;
 import java.awt.geom.Point2D;
 import java.awt.geom.RectangularShape;
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -13,7 +14,7 @@ public enum EnumUISide {
 		public EnumUIAxis getAxis() { return EnumUIAxis.Y; }
 
 		@Override
-		public EnumUISide getOpposite() { return DOWN; }
+		public Optional<EnumUISide> getOpposite() { return Optional.of(DOWN); }
 
 		@Override
 		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return mouse.getY() < rectangular.getY(); }
@@ -32,7 +33,7 @@ public enum EnumUISide {
 		public EnumUIAxis getAxis() { return EnumUIAxis.Y; }
 
 		@Override
-		public EnumUISide getOpposite() { return UP; }
+		public Optional<EnumUISide> getOpposite() { return Optional.of(UP); }
 
 		@Override
 		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return mouse.getY() >= rectangular.getMaxY(); }
@@ -51,7 +52,7 @@ public enum EnumUISide {
 		public EnumUIAxis getAxis() { return EnumUIAxis.X; }
 
 		@Override
-		public EnumUISide getOpposite() { return RIGHT; }
+		public Optional<EnumUISide> getOpposite() { return Optional.of(RIGHT); }
 
 		@Override
 		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return mouse.getX() < rectangular.getX(); }
@@ -70,7 +71,7 @@ public enum EnumUISide {
 		public EnumUIAxis getAxis() { return EnumUIAxis.X; }
 
 		@Override
-		public EnumUISide getOpposite() { return LEFT; }
+		public Optional<EnumUISide> getOpposite() { return Optional.of(LEFT); }
 
 		@Override
 		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return mouse.getX() >= rectangular.getMaxX(); }
@@ -89,7 +90,7 @@ public enum EnumUISide {
 		public EnumUIAxis getAxis() { return EnumUIAxis.X; }
 
 		@Override
-		public EnumUISide getOpposite() { return VERTICAL; }
+		public Optional<EnumUISide> getOpposite() { return Optional.empty(); }
 
 		@Override
 		public Function<RectangularShape, Double> getGetter() { return RectangularShape::getCenterX; }
@@ -105,7 +106,7 @@ public enum EnumUISide {
 		public EnumUIAxis getAxis() { return EnumUIAxis.Y; }
 
 		@Override
-		public EnumUISide getOpposite() { return HORIZONTAL; }
+		public Optional<EnumUISide> getOpposite() { return Optional.empty(); }
 
 		@Override
 		public Function<RectangularShape, Double> getGetter() { return RectangularShape::getCenterY; }
@@ -127,7 +128,7 @@ public enum EnumUISide {
 
 	public abstract EnumUIAxis getAxis();
 
-	public abstract EnumUISide getOpposite();
+	public abstract Optional<EnumUISide> getOpposite();
 
 	public abstract Function<RectangularShape, Double> getGetter();
 

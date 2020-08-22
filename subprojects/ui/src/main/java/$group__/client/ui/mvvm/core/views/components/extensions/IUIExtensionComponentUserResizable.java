@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.core.views.components.extensions;
 
-import $group__.client.ui.core.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.extensions.IUIExtension;
 import $group__.client.ui.mvvm.core.views.IUIReshapeExplicitly;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;

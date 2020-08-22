@@ -116,25 +116,25 @@ public enum UIDebugMinecraft {
 
 /* TODO
 @OnlyIn(Dist.CLIENT)
-final class UIDebug extends GuiManagerWindows<ShapeDescriptor.Rectangular<Rectangle2D>, GuiManagers.Data<GuiManagers.Events, DebugContainer>, DebugContainer> {
+final class UIDebug extends GuiManagerWindows<AbstractShapeDescriptor.Rectangular<Rectangle2D>, GuiManagers.Data<GuiManagers.Events, DebugContainer>, DebugContainer> {
 	private static final Logger LOGGER = LogManager.getLogger();
 
 	@SuppressWarnings("MagicNumber")
 	UIDebug(ITextComponent title, DebugContainer container) {
-		super(title, ShapeDescriptor.Rectangular::new,
-				new Data<>(new Events(), UIDebug::getLogger, new GuiBackgroundDefault<>(ShapeDescriptor.Rectangular::new,
+		super(title, AbstractShapeDescriptor.Rectangular::new,
+				new Data<>(new Events(), UIDebug::getLogger, new GuiBackgroundDefault<>(AbstractShapeDescriptor.Rectangular::new,
 						new UIComponentMinecraft.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger)), container));
 		{
 			UIComponentMinecraftWindow<UIComponentMinecraftWindow.Model, UIComponentMinecraftWindow.View<?, ?>, UIComponentMinecraftWindow.Controller, IUIComponent> window1 = new UIComponentMinecraftWindow<>();
 			window1.setModel(new UIComponentMinecraftWindow.Model<>(window1));
 			window1.setView(new UIComponentMinecraftWindow.View<>(window1));
-			window1.getView().setShapeDescriptor(window1.getView().new ShapeDescriptor<>(
+			window1.getView().setShapeDescriptor(window1.getView().new AbstractShapeDescriptor<>(
 					new Rectangle2D.Double(10, 10, 100, 100),
 					new UIAnchorSet<>(null)));
 			window1.setController(new UIComponentMinecraftWindow.Controller<>(window1));
-			UIComponentMinecraftWindow<?, ?, ?, ?> window1 = new UIComponentMinecraftWindow<>(new ShapeDescriptor.Rectangular<>(
+			UIComponentMinecraftWindow<?, ?, ?, ?> window1 = new UIComponentMinecraftWindow<>(new AbstractShapeDescriptor.Rectangular<>(
 					new UIComponentMinecraftWindow.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new UIComponentMinecraftWindow.Data.ColorData()));
-			UIComponentMinecraftWindow<?, ?> window2 = new UIComponentMinecraftWindow<ShapeDescriptor.Rectangular<Rectangle2D.Double>, UIComponentMinecraftWindow.Data<UIComponentMinecraft.Events, UIComponentMinecraftWindow.Data.ColorData>>(new ShapeDescriptor.Rectangular<>(new Rectangle2D.Double(50, 50, 200, 200)),
+			UIComponentMinecraftWindow<?, ?> window2 = new UIComponentMinecraftWindow<AbstractShapeDescriptor.Rectangular<Rectangle2D.Double>, UIComponentMinecraftWindow.Data<UIComponentMinecraft.Events, UIComponentMinecraftWindow.Data.ColorData>>(new AbstractShapeDescriptor.Rectangular<>(new Rectangle2D.Double(50, 50, 200, 200)),
 					new UIComponentMinecraftWindow.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new UIComponentMinecraftWindow.Data.ColorData())) {
 				protected final Rectangle2D current = new Rectangle2D.Double();
 				protected final Random random = new Random();
@@ -147,7 +147,7 @@ final class UIDebug extends GuiManagerWindows<ShapeDescriptor.Rectangular<Rectan
 						UIObjectUtilities.acceptRectangular(getShapeDescriptor().getShape(), (x, y) -> (w, h) -> current.setFrame(x * random.nextDouble() * 2, y * random.nextDouble() * 2, w * random.nextDouble() * 2, y * random.nextDouble() * 2));
 						data.setActive(!data.isActive());
 					}
-					reshape(this, this, s -> s.adapt(current));
+					reshapeComponent(this, this, s -> s.adapt(current));
 					super.renderTick(stack, mouse, partialTicks);
 				}
 
@@ -163,7 +163,7 @@ final class UIDebug extends GuiManagerWindows<ShapeDescriptor.Rectangular<Rectan
 				UIButtonComponentMinecraft button;
 				{
 					Random random = new Random();
-					button = new UIButtonComponentMinecraft(new ShapeDescriptor.Rectangular<>(new Ellipse2D.Double(0, 0, 100, 100)),
+					button = new UIButtonComponentMinecraft(new AbstractShapeDescriptor.Rectangular<>(new Ellipse2D.Double(0, 0, 100, 100)),
 							new UIButtonComponentMinecraft.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new UIButtonComponentMinecraft.Data.ColorData())) {
 						@Override
 						protected boolean onButtonKeyboardPressed(int key, int scanCode, int modifiers) { return key == GLFW.GLFW_KEY_ENTER; }

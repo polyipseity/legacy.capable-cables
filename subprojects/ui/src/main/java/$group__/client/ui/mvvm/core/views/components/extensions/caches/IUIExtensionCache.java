@@ -36,7 +36,9 @@ public interface IUIExtensionCache
 		default void invalidate(I instance) { invalidate(instance, getKey()); }
 
 		static void invalidate(IExtensionContainer<ResourceLocation, ?> instance, ResourceLocation key) {
-			IUIExtensionCache.TYPE.getValue().get(instance).ifPresent(c -> c.getDelegated().invalidate(key));
+			IUIExtensionCache.TYPE.getValue().get(instance)
+					.ifPresent(c ->
+							c.getDelegated().invalidate(key));
 		}
 
 		ResourceLocation getKey();
@@ -63,9 +65,11 @@ public interface IUIExtensionCache
 								.subscribe(CastUtilities.<Observer<? super Object>>castUnchecked(el)) // COMMENT we do not care about the event type
 				);
 				@SuppressWarnings("UnnecessaryLocalVariable") List<? extends DisposableObserver<?>> eventListenersRef = eventListeners;
-				Cleaner.create(cleanerRef, () ->
+				Cleaner.create(getCleanerRef(), () ->
 						eventListenersRef.forEach(DisposableObserver::dispose));
 			}
+
+			protected final Object getCleanerRef() { return cleanerRef; }
 
 			protected List<? extends DisposableObserver<?>> getEventListeners() { return eventListeners; }
 

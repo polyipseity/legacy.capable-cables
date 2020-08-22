@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.views.components.extensions;
 
-import $group__.client.ui.core.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
 import $group__.client.ui.events.bus.EventBusEntryPoint;
 import $group__.client.ui.events.ui.UIEventListener;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
@@ -14,7 +14,7 @@ import $group__.client.ui.mvvm.core.views.events.IUIEventMouse;
 import $group__.client.ui.mvvm.views.components.UIComponentVirtual;
 import $group__.client.ui.mvvm.views.events.ui.UIEventMouse;
 import $group__.client.ui.structures.Point2DImmutable;
-import $group__.client.ui.structures.ShapeDescriptor;
+import $group__.client.ui.structures.shapes.descriptors.GenericShapeDescriptor;
 import $group__.client.ui.utilities.UIObjectUtilities;
 import $group__.client.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;
@@ -117,6 +117,8 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 			implements IUIComponentCursorHandleProvider {
 		@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 		protected VirtualComponent() {
+			super(IShapeDescriptor.getShapeDescriptorPlaceholderView());
+
 			addEventListener(UIEventMouse.TYPE_MOUSE_DOWN, new UIEventListener.Functional<IUIEventMouse>(evt -> {
 				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && startRelocateMaybe(evt.getData().getCursorPositionView())) { // todo custom
 					getContainer().ifPresent(c -> {
@@ -174,11 +176,10 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 		public IShapeDescriptor<?> getShapeDescriptor() {
 			if (isRelocating())
 				return getManager()
-						.map(m ->
-								new ShapeDescriptor.Generic(m.getShapeDescriptor().getShapeOutput()))
-						.orElseGet(() -> new ShapeDescriptor.Generic(new Rectangle2D.Double()));
+						.map(m -> new GenericShapeDescriptor(m.getShapeDescriptor().getShapeOutput()))
+						.orElseGet(() -> new GenericShapeDescriptor(new Rectangle2D.Double()));
 			else
-				return new ShapeDescriptor.Generic(getRelocateShape()
+				return new GenericShapeDescriptor(getRelocateShape()
 						.<Shape>map(Function.identity())
 						.orElseGet(Rectangle2D.Double::new));
 		}

@@ -13,8 +13,10 @@ public class AffineTransformStack implements IAffineTransformStack {
 
 	public AffineTransformStack() {
 		delegated.push(new AffineTransform());
-		Cleaner.create(cleanerRef, new LeakNotifier(delegated));
+		Cleaner.create(getCleanerRef(), new LeakNotifier(delegated));
 	}
+
+	protected final Object getCleanerRef() { return cleanerRef; }
 
 	@Override
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")

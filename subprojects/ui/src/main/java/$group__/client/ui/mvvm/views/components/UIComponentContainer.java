@@ -1,5 +1,6 @@
 package $group__.client.ui.mvvm.views.components;
 
+import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.binding.IBinderAction;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
@@ -27,7 +28,7 @@ public class UIComponentContainer
 		implements IUIComponentContainer {
 	protected final List<IUIComponent> children = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 
-	public UIComponentContainer(Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) { super(propertyMapping); }
+	public UIComponentContainer(IShapeDescriptor<?> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) { super(shapeDescriptor, propertyMapping); }
 
 	@Override
 	public void transformChildren(IAffineTransformStack stack) {

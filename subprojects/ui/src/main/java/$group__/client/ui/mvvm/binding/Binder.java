@@ -140,9 +140,11 @@ public class Binder implements IBinder {
 			this.bindingKey = bindingKey;
 			this.transformers = transformers; // COMMENT intended to be modified
 			@SuppressWarnings("UnnecessaryLocalVariable") Map<IBindingField<?>, Disposable> fieldsRef = fields;
-			Cleaner.create(cleanerRef, () ->
+			Cleaner.create(getCleanerRef(), () ->
 					fieldsRef.values().forEach(Disposable::dispose));
 		}
+
+		protected final Object getCleanerRef() { return cleanerRef; }
 
 		public boolean add(Iterable<IBindingField<?>> fields) {
 			final boolean[] ret = {false};
@@ -203,9 +205,11 @@ public class Binder implements IBinder {
 			this.bindingKey = bindingKey;
 			this.transformers = transformers; // COMMENT intended to be modified
 			@SuppressWarnings("UnnecessaryLocalVariable") Map<IBindingMethod.ISource<?>, Disposable> sourcesRef = sources;
-			Cleaner.create(cleanerRef, ()
-					-> sourcesRef.values().forEach(Disposable::dispose));
+			Cleaner.create(getCleanerRef(), () ->
+					sourcesRef.values().forEach(Disposable::dispose));
 		}
+
+		protected final Object getCleanerRef() { return cleanerRef; }
 
 		@SuppressWarnings("SuspiciousMethodCalls")
 		public boolean add(Iterable<IBindingMethod<?>> methods) {

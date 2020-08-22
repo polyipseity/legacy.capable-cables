@@ -1,6 +1,5 @@
 package $group__.client.ui.mvvm.minecraft.components;
 
-import $group__.client.ui.core.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
@@ -17,13 +16,14 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.function.Function;
 
 @OnlyIn(Dist.CLIENT)
-public class UIViewComponentMinecraft<SD extends IShapeDescriptor<?>, M extends IUIComponentManager<? extends SD>>
-		extends UIViewComponent<SD, M>
-		implements IUIViewComponentMinecraft<SD, M> {
+public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentManager<S>>
+		extends UIViewComponent<S, M>
+		implements IUIViewComponentMinecraft<S, M> {
 	public UIViewComponentMinecraft(M manager) { super(manager); }
 
 	@Override

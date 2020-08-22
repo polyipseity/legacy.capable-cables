@@ -27,8 +27,10 @@ public class UIComponentPath<T extends IUIComponent>
 		}
 		transformStack.getDelegated().pop();
 
-		Cleaner.create(cleanerRef, transformStack.createCleaner());
+		Cleaner.create(getCleanerRef(), transformStack.createCleaner());
 	}
+
+	protected final Object getCleanerRef() { return cleanerRef; }
 
 	@Override
 	public IAffineTransformStack getTransformStackView() { return getTransformStack().copy(); }

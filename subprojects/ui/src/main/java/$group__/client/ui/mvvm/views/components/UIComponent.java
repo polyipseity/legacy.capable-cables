@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.views.components;
 
-import $group__.client.ui.core.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
 import $group__.client.ui.events.ui.UIEventTarget;
 import $group__.client.ui.mvvm.binding.BindingMethodSource;
 import $group__.client.ui.mvvm.core.binding.IBinderAction;
@@ -14,7 +14,6 @@ import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
 import $group__.client.ui.mvvm.core.views.components.parsers.UIProperty;
 import $group__.client.ui.mvvm.core.views.events.IUIEvent;
 import $group__.client.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
-import $group__.client.ui.structures.ShapeDescriptor;
 import $group__.client.ui.utilities.BindingUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.MapUtilities;
@@ -25,9 +24,9 @@ import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.subjects.Subject;
 import io.reactivex.rxjava3.subjects.UnicastSubject;
 import net.minecraft.util.ResourceLocation;
+import org.w3c.dom.Node;
 
 import javax.annotation.Nullable;
-import java.awt.geom.Rectangle2D;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +46,8 @@ public class UIComponent
 	public static final ResourceLocation PROPERTY_VISIBLE_LOCATION = new ResourceLocation(PROPERTY_VISIBLE);
 	public static final ResourceLocation PROPERTY_ACTIVE_LOCATION = new ResourceLocation(PROPERTY_ACTIVE);
 
-	private static final Rectangle2D SHAPE_PLACEHOLDER = new Rectangle2D.Double(0, 0, 1, 1);
+	@Nullable
+	protected final String id;
 	protected final Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping;
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 	protected final ConcurrentMap<ResourceLocation, IUIExtension<? extends ResourceLocation, ? super IUIComponent>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
@@ -63,23 +63,26 @@ public class UIComponent
 	protected WeakReference<IUIComponentContainer> parent = new WeakReference<>(null);
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	public UIComponent(Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) {
-		IExtensionContainer.addExtensionSafe(this, new UIExtensionCache());
-
+	public UIComponent(IShapeDescriptor<?> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) {
+		this.shapeDescriptor = shapeDescriptor;
 		this.propertyMapping = new HashMap<>(propertyMapping);
+
+		this.id = Optional.ofNullable(this.propertyMapping.get(PROPERTY_ID_LOCATION))
+				.flatMap(IUIPropertyMappingValue::getDefaultValue)
+				.map(Node::getNodeValue)
+				.orElse(null);
 
 		this.visible = IHasBinding.createBindingField(Boolean.class, this.propertyMapping.get(PROPERTY_VISIBLE_LOCATION), BindingUtilities.Deserializers::deserializeBoolean, true);
 		this.active = IHasBinding.createBindingField(Boolean.class, this.propertyMapping.get(PROPERTY_ACTIVE_LOCATION), BindingUtilities.Deserializers::deserializeBoolean, true);
 
-		this.shapeDescriptor = createShapeDescriptor(); // todo UGLY, probably should make it as an argument
+		IExtensionContainer.addExtensionSafe(this, new UIExtensionCache());
 	}
 
 	@Override
+	public Optional<String> getID() { return Optional.ofNullable(id); }
+
+	@Override
 	public Map<ResourceLocation, IUIPropertyMappingValue> getPropertyMappingView() { return ImmutableMap.copyOf(getPropertyMapping()); }
-
-	protected IShapeDescriptor<?> createShapeDescriptor() { return new ShapeDescriptor.Generic(getShapePlaceholderView()); } // todo ugly
-
-	public static Rectangle2D getShapePlaceholderView() { return (Rectangle2D) SHAPE_PLACEHOLDER.clone(); }
 
 	@Override
 	public Optional<IUIComponentContainer> getParent() { return Optional.ofNullable(parent.get()); }

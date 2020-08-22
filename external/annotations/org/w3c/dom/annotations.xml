@@ -20,7 +20,13 @@
 	<item name='org.w3c.dom.Node java.lang.String getNodeValue()'>
 		<annotation name='javax.annotation.Nullable'/>
 	</item>
+	<item name='org.w3c.dom.Node java.lang.String getTextContent()'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
 	<item name='org.w3c.dom.Node org.w3c.dom.NamedNodeMap getAttributes()'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
+	<item name='org.w3c.dom.NodeList org.w3c.dom.Node item(int)'>
 		<annotation name='javax.annotation.Nullable'/>
 	</item>
 </root>
