@@ -4,10 +4,8 @@
 
 import static java.io.File.separator
 
-
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['evaluateGStringString'])
-
 
 project.ext.makeResourcesTasks = { Closure c ->
 	tasks.withType(ProcessResources) { ProcessResources t ->
@@ -26,16 +24,16 @@ project.ext.makeResourcesTasks = { Closure c ->
 					.collectEntries { [(it.key.replace('expand_', '')): it.value] } as Map<String, Object>
 
 			// COMMENT replace stuff in the to-be-processed files, nothing else
-			rename ~/(.*)\.in/, '$1'
+			rename ~/(.*)\.in(.*)/, '$1$2'
 			from(sourceSets."$sourceSetName".resources.srcDirs) {
-				include '**/*.in'
+				include '**/*.in*'
 
 				// COMMENT replace variables
 				expand e
 			}
 
 			// COMMENT copy everything else except the processed files
-			from(sourceSets."$sourceSetName".resources.srcDirs) { exclude '**/*.in' }
+			from(sourceSets."$sourceSetName".resources.srcDirs) { exclude '**/*.in*' }
 
 			Binding eb = new Binding(e)
 			eachFile { it.path = evaluateGStringString.call it.path, eb }
