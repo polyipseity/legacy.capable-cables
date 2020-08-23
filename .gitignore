@@ -229,8 +229,10 @@ gradle-app.setting
 # Custom definitions
 
 # IntelliJ IDEA
-.idea/*.xml
 .idea/.name
+.idea/discord.xml
+.idea/sbt.xml
+.idea/scala_compiler.xml
 
 # Custom files
 ext*.properties
