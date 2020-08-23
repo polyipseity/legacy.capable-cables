@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.minecraft.components;
 
-import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
 import $group__.client.ui.mvvm.core.views.components.parsers.UIConstructor;

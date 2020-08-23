@@ -44,7 +44,6 @@ public enum AffineTransformUtilities {
 	}
 
 	public static void transformPoint(Point2D point, AffineTransform transform) { transformReturns(point, transform); }
-
 	public static final int TRANSLATE_Y_INDEX = toFlatMatrixArrayIndex(1, 2);
 	private static final double[] MATRIX_3X2_IDENTITY = {
 			1, 0, 0,

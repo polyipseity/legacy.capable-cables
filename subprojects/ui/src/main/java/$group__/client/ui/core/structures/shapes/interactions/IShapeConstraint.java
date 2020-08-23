@@ -1,15 +1,15 @@
-package $group__.client.ui.core.structures.shapes;
+package $group__.client.ui.core.structures.shapes.interactions;
 
-import $group__.client.ui.structures.shapes.interactions.UIConstraint;
+import $group__.client.ui.structures.shapes.interactions.ShapeConstraint;
 import $group__.utilities.interfaces.ICloneable;
 import $group__.utilities.interfaces.ICopyable;
 
 import java.awt.geom.Rectangle2D;
 import java.util.Optional;
 
-public interface IUIConstraint
+public interface IShapeConstraint
 		extends ICopyable, ICloneable {
-	IUIConstraint CONSTRAINT_NULL = new UIConstraint(null, null, null, null, null, null, null, null);
+	IShapeConstraint CONSTRAINT_NULL = new ShapeConstraint(null, null, null, null, null, null, null, null);
 
 	default void constrain(Rectangle2D rectangle) {
 		final double[]
@@ -44,11 +44,11 @@ public interface IUIConstraint
 
 	Optional<Double> getMaxHeight();
 
-	IUIConstraint createIntersection(IUIConstraint constraint);
+	IShapeConstraint createIntersection(IShapeConstraint constraint);
 
 	@Override
-	IUIConstraint copy();
+	IShapeConstraint copy();
 
 	@SuppressWarnings("override")
-	IUIConstraint clone() throws CloneNotSupportedException;
+	IShapeConstraint clone() throws CloneNotSupportedException;
 }

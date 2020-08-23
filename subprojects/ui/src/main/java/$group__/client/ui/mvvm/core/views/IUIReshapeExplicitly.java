@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.core.views;
 
-import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 
 import java.awt.*;
 import java.util.ConcurrentModificationException;

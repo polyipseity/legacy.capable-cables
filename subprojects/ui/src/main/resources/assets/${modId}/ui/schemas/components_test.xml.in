@@ -19,9 +19,8 @@
 		<shape class="shape.rectangle"/>
 
 		<component class="component.window">
-			<shape class="shape.rectangle" x="10" y="10" width="100" height="100">
-				<anchor target="manager.window.anchored" originSide="LEFT" targetSide="RIGHT" borderThickness="5"/>
-			</shape>
+			<shape class="shape.rectangle" x="10" y="10" width="100" height="100"/>
+			<anchor target="manager.window.anchored" originSide="LEFT" targetSide="RIGHT" borderThickness="5"/>
 
 			<extension class="extension.user_relocatable"/>
 			<extension class="extension.user_resizable"/>

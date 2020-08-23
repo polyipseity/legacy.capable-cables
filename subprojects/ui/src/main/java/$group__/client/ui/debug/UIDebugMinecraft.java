@@ -130,7 +130,7 @@ final class UIDebug extends GuiManagerWindows<AbstractShapeDescriptor.Rectangula
 			window1.setView(new UIComponentMinecraftWindow.View<>(window1));
 			window1.getView().setShapeDescriptor(window1.getView().new AbstractShapeDescriptor<>(
 					new Rectangle2D.Double(10, 10, 100, 100),
-					new UIAnchorSet<>(null)));
+					new ShapeAnchorSet<>(null)));
 			window1.setController(new UIComponentMinecraftWindow.Controller<>(window1));
 			UIComponentMinecraftWindow<?, ?, ?, ?> window1 = new UIComponentMinecraftWindow<>(new AbstractShapeDescriptor.Rectangular<>(
 					new UIComponentMinecraftWindow.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new UIComponentMinecraftWindow.Data.ColorData()));

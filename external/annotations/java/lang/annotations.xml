@@ -2,4 +2,7 @@
 	<item name='java.lang.Class java.lang.Class&lt;? super T&gt; getSuperclass()'>
 		<annotation name='javax.annotation.Nullable'/>
 	</item>
+	<item name='java.lang.Object boolean equals(java.lang.Object) 0'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
 </root>

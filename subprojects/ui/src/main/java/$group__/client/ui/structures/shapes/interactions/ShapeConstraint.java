@@ -8,9 +8,9 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 @Immutable
-public final class UIConstraint
-		extends UIConstraintSupplier {
-	public UIConstraint(@Nullable Double minX, @Nullable Double minY, @Nullable Double maxX, @Nullable Double maxY, @Nullable Double minWidth, @Nullable Double minHeight, @Nullable Double maxWidth, @Nullable Double maxHeight) {
+public final class ShapeConstraint
+		extends ShapeConstraintSupplier {
+	public ShapeConstraint(@Nullable Double minX, @Nullable Double minY, @Nullable Double maxX, @Nullable Double maxY, @Nullable Double minWidth, @Nullable Double minHeight, @Nullable Double maxWidth, @Nullable Double maxHeight) {
 		super(
 				ConstantSupplier.of(Optional.ofNullable(minX).map(x -> MathUtilities.minNullable(x, maxX)).orElse(null)),
 				ConstantSupplier.of(Optional.ofNullable(minY).map(y -> MathUtilities.minNullable(y, maxY)).orElse(null)),
@@ -23,8 +23,11 @@ public final class UIConstraint
 	}
 
 	@Override
-	public UIConstraint copy() {
-		return new UIConstraint(
+	public ShapeConstraint clone() throws CloneNotSupportedException { return (ShapeConstraint) super.clone(); }
+
+	@Override
+	public ShapeConstraint copy() {
+		return new ShapeConstraint(
 				getMinX().orElse(null),
 				getMinY().orElse(null),
 				getMaxX().orElse(null),
@@ -34,7 +37,4 @@ public final class UIConstraint
 				getMaxWidth().orElse(null),
 				getMaxHeight().orElse(null));
 	}
-
-	@Override
-	public UIConstraint clone() throws CloneNotSupportedException { return (UIConstraint) super.clone(); }
 }

@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.views.components;
 
-import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.IUIInfrastructure;
 import $group__.client.ui.mvvm.core.binding.IBinderAction;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;

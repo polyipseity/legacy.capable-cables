@@ -1,9 +1,8 @@
-package $group__.client.ui.structures.shapes.builders;
+package $group__.client.ui.structures.shapes.descriptors.builders;
 
-import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
-import $group__.client.ui.core.structures.shapes.IShapeDescriptorBuilder;
-import $group__.client.ui.core.structures.shapes.IUIAnchor;
-import $group__.client.ui.core.structures.shapes.IUIConstraint;
+import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilder;
+import $group__.client.ui.core.structures.shapes.interactions.IShapeConstraint;
 import $group__.client.ui.utilities.UIObjectUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.MapUtilities;
@@ -25,8 +24,7 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 		implements IShapeDescriptorBuilder<S> {
 	protected final AffineTransform transform = new AffineTransform();
 	protected final Rectangle2D bounds = IShapeDescriptor.getShapePlaceholderView();
-	protected final List<IUIAnchor> anchors = new LinkedList<>();
-	protected final List<IUIConstraint> constraints = new LinkedList<>();
+	protected final List<IShapeConstraint> constraints = new LinkedList<>();
 	protected final ConcurrentMap<String, Consumer<?>> properties =
 			MapUtilities.getMapMakerSingleThreaded().makeMap();
 
@@ -88,22 +86,13 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 	}
 
 	@Override
-	public AbstractShapeDescriptorBuilder<S> anchor(Iterable<? extends IUIAnchor> anchors) {
-		Iterables.addAll(getAnchors(), anchors);
-		return this;
-	}
-
-	@Override
-	public AbstractShapeDescriptorBuilder<S> constrain(Iterable<? extends IUIConstraint> constraints) {
+	public AbstractShapeDescriptorBuilder<S> constrain(Iterable<? extends IShapeConstraint> constraints) {
 		Iterables.addAll(getConstraints(), constraints);
 		return this;
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected List<IUIConstraint> getConstraints() { return constraints; }
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected List<IUIAnchor> getAnchors() { return anchors; }
+	protected List<IShapeConstraint> getConstraints() { return constraints; }
 
 	protected Rectangle2D getBounds() { return bounds; }
 

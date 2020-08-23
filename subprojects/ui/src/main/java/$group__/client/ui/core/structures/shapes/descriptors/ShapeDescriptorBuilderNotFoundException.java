@@ -1,4 +1,4 @@
-package $group__.client.ui.core.structures.shapes;
+package $group__.client.ui.core.structures.shapes.descriptors;
 
 public class ShapeDescriptorBuilderNotFoundException
 		extends RuntimeException {

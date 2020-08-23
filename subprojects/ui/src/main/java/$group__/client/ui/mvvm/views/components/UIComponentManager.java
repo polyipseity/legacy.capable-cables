@@ -1,11 +1,12 @@
 package $group__.client.ui.mvvm.views.components;
 
-import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
+import $group__.client.ui.mvvm.core.views.components.IUIComponentShapeAnchorController;
 import $group__.client.ui.mvvm.core.views.components.extensions.caches.IUIExtensionCache;
 import $group__.client.ui.mvvm.core.views.components.paths.IUIComponentPathResolver;
 import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;
@@ -34,6 +35,7 @@ public abstract class UIComponentManager<S extends Shape>
 		extends UIComponentContainer
 		implements IUIComponentManager<S> {
 	protected final IUIComponentPathResolver<IUIComponent> pathResolver = new PathResolver();
+	protected final IUIComponentShapeAnchorController shapeAnchorController = new UIComponentShapeAnchorController();
 
 	public UIComponentManager(IShapeDescriptor<S> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) { super(shapeDescriptor, propertyMapping); }
 
@@ -123,6 +125,9 @@ public abstract class UIComponentManager<S extends Shape>
 
 		private static ResourceLocation generateKey(@SuppressWarnings("SameParameterValue") String name) { return new ResourceLocation(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, "manager." + name); }
 	}
+
+	@Override
+	public IUIComponentShapeAnchorController getShapeAnchorController() { return shapeAnchorController; }
 
 	protected class PathResolver extends UIComponentPathResolver {
 		protected PathResolver() { super(UIComponentManager.this); }

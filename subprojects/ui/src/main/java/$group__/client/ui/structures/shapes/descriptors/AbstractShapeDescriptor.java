@@ -1,10 +1,7 @@
 package $group__.client.ui.structures.shapes.descriptors;
 
-import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
-import $group__.client.ui.core.structures.shapes.IUIAnchor;
-import $group__.client.ui.core.structures.shapes.IUIAnchorSet;
-import $group__.client.ui.core.structures.shapes.IUIConstraint;
-import $group__.client.ui.structures.shapes.interactions.UIAnchorSet;
+import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.interactions.IShapeConstraint;
 import $group__.utilities.CapacityUtilities;
 import com.google.common.collect.ImmutableList;
 
@@ -17,34 +14,25 @@ import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static $group__.client.ui.core.structures.shapes.IShapeDescriptor.checkIsBeingModified;
+import static $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor.checkIsBeingModified;
 
 // TODO needs better design, but I cannot think of one
 public abstract class AbstractShapeDescriptor<S extends Shape>
 		implements IShapeDescriptor<S> {
-	protected final List<IUIConstraint> constraints = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
-	protected final IUIAnchorSet<IUIAnchor> anchors = new AnchorSet();
+	protected final List<IShapeConstraint> constraints = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 	protected boolean beingModified = false;
 
 	protected AbstractShapeDescriptor() {}
 
 	@Override
-	public List<IUIConstraint> getConstraintsView() { return ImmutableList.copyOf(getConstraints()); }
+	public List<IShapeConstraint> getConstraintsView() { return ImmutableList.copyOf(getConstraints()); }
 
 	@Override
-	public List<IUIConstraint> getConstraintsRef()
+	public List<IShapeConstraint> getConstraintsRef()
 			throws IllegalStateException {
 		checkIsBeingModified(this);
 		return getConstraints();
 	}
-
-	@Override
-	public IUIAnchorSet<IUIAnchor> getAnchorsRef() {
-		checkIsBeingModified(this);
-		return getAnchors();
-	}
-
-	protected IUIAnchorSet<IUIAnchor> getAnchors() { return anchors; }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -63,7 +51,6 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 	protected boolean modify0(Supplier<? extends Boolean> action) {
 		boolean ret = action.get();
 		if (ret) {
-			getAnchors().anchor(true);
 			Rectangle2D bounds = getShapeOutput().getBounds2D();
 			IShapeDescriptor.constrain(bounds, getConstraints());
 			bound(bounds);
@@ -72,7 +59,7 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected List<IUIConstraint> getConstraints() { return constraints; }
+	protected List<IShapeConstraint> getConstraints() { return constraints; }
 
 	@Override
 	public boolean isBeingModified() { return beingModified; }
@@ -91,10 +78,5 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 			throws IllegalStateException {
 		checkIsBeingModified(this);
 		return false;
-	}
-
-	protected class AnchorSet
-			extends UIAnchorSet<IUIAnchor> {
-		protected AnchorSet() { super(AbstractShapeDescriptor.this); }
 	}
 }

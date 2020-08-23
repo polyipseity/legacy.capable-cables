@@ -1,7 +1,8 @@
-package $group__.client.ui.core.structures.shapes;
+package $group__.client.ui.core.structures.shapes.descriptors;
 
+import $group__.client.ui.core.structures.shapes.interactions.IShapeConstraint;
 import $group__.client.ui.structures.shapes.descriptors.GenericShapeDescriptor;
-import $group__.client.ui.structures.shapes.interactions.UIConstraint;
+import $group__.client.ui.structures.shapes.interactions.ShapeConstraint;
 import com.google.common.collect.Streams;
 
 import java.awt.*;
@@ -13,7 +14,7 @@ import java.util.function.Supplier;
 
 // TODO needs better design, but I cannot think of one
 public interface IShapeDescriptor<S extends Shape> {
-	IUIConstraint CONSTRAINT_MINIMUM = new UIConstraint(null, null, null, null, 1d, 1d, null, null);
+	IShapeConstraint CONSTRAINT_MINIMUM = new ShapeConstraint(null, null, null, null, 1d, 1d, null, null);
 	Rectangle2D SHAPE_PLACEHOLDER = new Rectangle2D.Double(0, 0, 1, 1);
 
 	static void checkIsBeingModified(IShapeDescriptor<?> shapeDescriptor) throws IllegalStateException {
@@ -29,17 +30,17 @@ public interface IShapeDescriptor<S extends Shape> {
 
 	S getShapeOutput();
 
-	List<IUIConstraint> getConstraintsView();
-
-	List<IUIConstraint> getConstraintsRef()
-			throws IllegalStateException;
-
 	@SuppressWarnings({"UnstableApiUsage", "unchecked"})
-	static void constrain(Rectangle2D bounds, Iterable<? extends IUIConstraint> constraints) {
-		Streams.stream((Iterable<IUIConstraint>) constraints).unordered() // COMMENT should be safe
-				.reduce(CONSTRAINT_MINIMUM, IUIConstraint::createIntersection)
+	static void constrain(Rectangle2D bounds, Iterable<? extends IShapeConstraint> constraints) {
+		Streams.stream((Iterable<IShapeConstraint>) constraints).unordered() // COMMENT should be safe
+				.reduce(CONSTRAINT_MINIMUM, IShapeConstraint::createIntersection)
 				.constrain(bounds);
 	}
+
+	List<IShapeConstraint> getConstraintsView();
+
+	List<IShapeConstraint> getConstraintsRef()
+			throws IllegalStateException;
 
 	boolean modify(Supplier<? extends Boolean> action)
 			throws ConcurrentModificationException;
@@ -48,8 +49,5 @@ public interface IShapeDescriptor<S extends Shape> {
 			throws IllegalStateException;
 
 	boolean transform(AffineTransform transform)
-			throws IllegalStateException;
-
-	IUIAnchorSet<IUIAnchor> getAnchorsRef()
 			throws IllegalStateException;
 }

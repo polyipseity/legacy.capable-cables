@@ -1,6 +1,6 @@
-package $group__.client.ui.core.structures.shapes;
+package $group__.client.ui.core.structures.shapes.descriptors;
 
-import $group__.client.ui.structures.shapes.builders.RectangularShapeDescriptorBuilder;
+import $group__.client.ui.structures.shapes.descriptors.builders.RectangularShapeDescriptorBuilder;
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.structures.Registry;

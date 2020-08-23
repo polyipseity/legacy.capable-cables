@@ -1,7 +1,7 @@
-package $group__.client.ui.structures.shapes.builders;
+package $group__.client.ui.structures.shapes.descriptors.builders;
 
-import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
-import $group__.client.ui.core.structures.shapes.IShapeDescriptorBuilder;
+import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilder;
 import $group__.client.ui.structures.shapes.descriptors.RectangularShapeDescriptor;
 import $group__.client.ui.utilities.UIObjectUtilities;
 
@@ -20,7 +20,7 @@ public abstract class RectangularShapeDescriptorBuilder<S extends RectangularSha
 		UIObjectUtilities.acceptRectangular(getBounds(), (x, y, w, h) -> s.setFrame(x, y, w, h)); // COMMENT javac bug, no method ref here
 		UIObjectUtilities.transformRectangular(getTransform(), s);
 		IShapeDescriptor<S> ret = new RectangularShapeDescriptor<>(s);
-		IShapeDescriptorBuilder.addUIObjects(ret, getConstraints(), getAnchors());
+		IShapeDescriptorBuilder.addUIObjects(ret, getConstraints());
 		return ret;
 	}
 

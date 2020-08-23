@@ -1,7 +1,11 @@
 package $group__.client.ui.mvvm.views.components.parsers;
 
 import $group__.client.ui.ConfigurationUI;
-import $group__.client.ui.core.structures.shapes.*;
+import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilder;
+import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilderFactory;
+import $group__.client.ui.core.structures.shapes.interactions.IShapeAnchor;
+import $group__.client.ui.core.structures.shapes.interactions.IShapeConstraint;
 import $group__.client.ui.mvvm.core.extensions.IUIExtension;
 import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
@@ -10,8 +14,8 @@ import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
 import $group__.client.ui.mvvm.core.views.components.parsers.IUIResourceParser;
 import $group__.client.ui.mvvm.structures.UIPropertyMappingValue;
 import $group__.client.ui.structures.EnumUISide;
+import $group__.client.ui.structures.shapes.interactions.ShapeConstraint;
 import $group__.client.ui.structures.shapes.interactions.UIAnchor;
-import $group__.client.ui.structures.shapes.interactions.UIConstraint;
 import $group__.utilities.*;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
@@ -224,13 +228,16 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 			extends ComponentBasedPrototype {
 		private static final Logger LOGGER = LogManager.getLogger();
 		protected final UIShapeDescriptorPrototype shapeDescriptorPrototype;
+		protected final Iterable<Function<? super IUIComponentManager<?>, ? extends Optional<? extends IShapeAnchor>>> anchors;
 		protected final List<UIExtensionPrototype> extensions = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 		protected final List<UIComponentPrototype> children = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 
 		protected UIComponentPrototype(String className,
 		                               UIShapeDescriptorPrototype shapeDescriptorPrototype,
+		                               Iterable<? extends Function<? super IUIComponentManager<?>, ? extends Optional<? extends IShapeAnchor>>> anchors,
 		                               Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) {
 			super(className, propertyMapping);
+			this.anchors = Iterables.unmodifiableIterable(anchors);
 			this.shapeDescriptorPrototype = shapeDescriptorPrototype;
 		}
 
@@ -252,12 +259,31 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 								mapping.put(new ResourceLocation(k), mv);
 							}));
 
+			// COMMENT anchors
+			Iterable<Function<IUIComponentManager<?>, Optional<IShapeAnchor>>> anchors =
+					DOMUtilities.getChildrenByTagNameNS(node, namespaceURI, "anchor").stream().sequential()
+							.map(na ->
+									(Function<IUIComponentManager<?>, Optional<IShapeAnchor>>) mag ->
+											IUIComponentManager.getComponentByID(mag,
+													DOMUtilities.getAttributeValue(na, "target")
+															.orElseThrow(InternalError::new))
+													.map(ct ->
+															new UIAnchor(
+																	ct,
+																	EnumUISide.valueOf(DOMUtilities.getAttributeValue(na, "originSide")
+																			.orElseThrow(InternalError::new)),
+																	EnumUISide.valueOf(DOMUtilities.getAttributeValue(na, "targetSide")
+																			.orElseThrow(InternalError::new)),
+																	Double.parseDouble(DOMUtilities.getAttributeValue(na, "borderThickness")
+																			.orElseThrow(InternalError::new)))))
+							.collect(ImmutableList.toImmutableList());
+
 			UIComponentPrototype ret = new UIComponentPrototype(
 					getClassFromMaybeAlias(aliases, DOMUtilities.getAttributeValue(node, "class").orElseThrow(InternalError::new)),
 					UIShapeDescriptorPrototype.createPrototype(aliases, namespaceURI,
 							DOMUtilities.getChildByTagNameNS(node, namespaceURI, "shape")
 									.orElseThrow(InternalError::new)),
-					mapping);
+					anchors, mapping);
 			ret.addExtensions(
 					DOMUtilities.getChildrenByTagNameNS(node, namespaceURI, "extension").stream().sequential()
 							.map(e -> UIExtensionPrototype.createPrototype(aliases, namespaceURI, e))
@@ -280,11 +306,7 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 			IUIComponent ret = (IUIComponent) DynamicUtilities.IMPL_LOOKUP
 					.findConstructor(Class.forName(getClassName()),
 							MethodType.methodType(void.class, IShapeDescriptor.class, Map.class))
-					.invoke(getShapeDescriptorPrototype().createComponent(queue), getPropertyMapping());
-			queue.add(m ->
-					getExtensions().forEach(e ->
-							ret.addExtension(CastUtilities.castUnchecked(Try.call(() -> e.createComponent(ret), LOGGER) // COMMENT addExtension should check
-									.orElseThrow(ThrowableCatcher::rethrow)))));
+					.invoke(getShapeDescriptorPrototype().createComponent(), getPropertyMapping());
 			if (!getChildren().isEmpty()) {
 				if (!(ret instanceof IUIComponentContainer))
 					throw BecauseOf.illegalArgument("UI component type is not a container",
@@ -297,6 +319,17 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 										.orElseThrow(ThrowableCatcher::rethrow))
 						.collect(ImmutableList.toImmutableList()));
 			}
+			queue.add(m ->
+					getExtensions().forEach(e ->
+							ret.addExtension(CastUtilities.castUnchecked(Try.call(() -> e.createComponent(ret), LOGGER) // COMMENT addExtension should check
+									.orElseThrow(ThrowableCatcher::rethrow)))));
+			queue.add(m ->
+					m.getShapeAnchorController().addAnchors(ret,
+							Streams.stream(getAnchors()).sequential()
+									.map(a -> a.apply(m))
+									.filter(Optional::isPresent)
+									.map(Optional::get)
+									.collect(ImmutableList.toImmutableList())));
 			return ret;
 		}
 
@@ -304,6 +337,8 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 		protected List<UIComponentPrototype> getChildren() { return children; }
 
 		protected UIShapeDescriptorPrototype getShapeDescriptorPrototype() { return shapeDescriptorPrototype; }
+
+		protected Iterable<Function<? super IUIComponentManager<?>, ? extends Optional<? extends IShapeAnchor>>> getAnchors() { return anchors; }
 	}
 
 	protected static class UIShapeDescriptorPrototype
@@ -325,15 +360,13 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 		private static final Logger LOGGER = LogManager.getLogger();
 		protected final AffineTransform transform;
 		protected final Map<String, Number> attributes;
-		protected final Iterable<IUIConstraint> constraints;
-		protected final Iterable<Function<? super IUIComponentManager<?>, ? extends Optional<? extends IUIAnchor>>> anchors;
+		protected final Iterable<IShapeConstraint> constraints;
 
-		protected UIShapeDescriptorPrototype(String className, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping, AffineTransform transform, Map<? extends String, ? extends Number> attributes, Iterable<? extends IUIConstraint> constraints, Iterable<? extends Function<? super IUIComponentManager<?>, ? extends Optional<? extends IUIAnchor>>> anchors) {
+		protected UIShapeDescriptorPrototype(String className, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping, AffineTransform transform, Map<? extends String, ? extends Number> attributes, Iterable<? extends IShapeConstraint> constraints) {
 			super(className, propertyMapping);
 			this.attributes = ImmutableMap.copyOf(attributes);
 			this.transform = (AffineTransform) transform.clone();
 			this.constraints = Iterables.unmodifiableIterable(constraints);
-			this.anchors = Iterables.unmodifiableIterable(anchors);
 		}
 
 		@SuppressWarnings("UnstableApiUsage")
@@ -398,9 +431,9 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 					});
 
 			// COMMENT constraints
-			Iterable<IUIConstraint> constraints = DOMUtilities.getChildrenByTagNameNS(node, namespaceURI, "constraint").stream().sequential()
+			Iterable<IShapeConstraint> constraints = DOMUtilities.getChildrenByTagNameNS(node, namespaceURI, "constraint").stream().sequential()
 					.map(nc ->
-							new UIConstraint(
+							new ShapeConstraint(
 									DOMUtilities.getAttributeValue(nc, "minX")
 											.map(Double::parseDouble)
 											.orElse(null),
@@ -428,33 +461,13 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 					)
 					.collect(ImmutableList.toImmutableList());
 
-			// COMMENT anchors
-			Iterable<Function<IUIComponentManager<?>, Optional<IUIAnchor>>> anchors =
-					DOMUtilities.getChildrenByTagNameNS(node, namespaceURI, "anchor").stream().sequential()
-							.map(na ->
-									(Function<IUIComponentManager<?>, Optional<IUIAnchor>>) mag ->
-											IUIComponentManager.getComponentByID(mag,
-													DOMUtilities.getAttributeValue(na, "target")
-															.orElseThrow(InternalError::new))
-													.map(ct ->
-															new UIAnchor(
-																	ct,
-																	EnumUISide.valueOf(DOMUtilities.getAttributeValue(na, "originSide")
-																			.orElseThrow(InternalError::new)),
-																	EnumUISide.valueOf(DOMUtilities.getAttributeValue(na, "targetSide")
-																			.orElseThrow(InternalError::new)),
-																	Double.parseDouble(DOMUtilities.getAttributeValue(na, "borderThickness")
-																			.orElseThrow(InternalError::new)))))
-							.collect(ImmutableList.toImmutableList());
-
 			return new UIShapeDescriptorPrototype(
 					getClassFromMaybeAlias(aliases, DOMUtilities.getAttributeValue(node, "class").orElseThrow(InternalError::new)),
 					m,
-					transform, attributes, constraints, anchors);
+					transform, attributes, constraints);
 		}
 
-		@SuppressWarnings("UnstableApiUsage")
-		protected IShapeDescriptor<?> createComponent(final List<Consumer<? super IUIComponentManager<?>>> queue)
+		protected IShapeDescriptor<?> createComponent()
 				throws Throwable {
 			@SuppressWarnings("unchecked") IShapeDescriptorBuilder<?> sdb = IShapeDescriptorBuilderFactory.getDefault()
 					.createBuilder((Class<? extends Shape>) Class.forName(getClassName()));
@@ -463,31 +476,16 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 					SHAPE_DESCRIPTOR_ATTRIBUTE_MAP.getOrDefault(s, (sdbD, nD) ->
 							sdbD.setProperty(s, nD))
 							.accept(sdb, n));
-			sdb.transformConcatenate(getTransform());
-			sdb.constrain(getConstraints());
 
-			IShapeDescriptor<? extends Shape> ret = sdb.build();
-
-			queue.add(m ->
-					ret.modify(() -> {
-						ret.getAnchorsRef().addAnchors(
-								Streams.stream(getAnchors()).sequential()
-										.map(a -> a.apply(m))
-										.filter(Optional::isPresent)
-										.map(Optional::get)
-										.collect(ImmutableList.toImmutableList()));
-						return false;
-					}));
-
-			return ret;
+			return sdb.transformConcatenate(getTransform())
+					.constrain(getConstraints())
+					.build();
 		}
 
 		protected Map<String, Number> getAttributes() { return attributes; }
 
 		protected AffineTransform getTransform() { return transform; }
 
-		protected Iterable<IUIConstraint> getConstraints() { return constraints; }
-
-		protected Iterable<Function<? super IUIComponentManager<?>, ? extends Optional<? extends IUIAnchor>>> getAnchors() { return anchors; }
+		protected Iterable<IShapeConstraint> getConstraints() { return constraints; }
 	}
 }

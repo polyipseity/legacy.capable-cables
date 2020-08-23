@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.core.views.components;
 
-import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.client.ui.mvvm.core.views.IUIReshapeExplicitly;
 import $group__.client.ui.mvvm.core.views.components.paths.IUIComponentPathResolver;
@@ -44,4 +44,6 @@ public interface IUIComponentManager<S extends Shape>
 
 	@Override
 	IShapeDescriptor<S> getShapeDescriptor();
+
+	IUIComponentShapeAnchorController getShapeAnchorController();
 }

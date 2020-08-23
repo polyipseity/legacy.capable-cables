@@ -23,14 +23,6 @@ public enum MapUtilities {
 		return new MapMaker().concurrencyLevel(MULTI_THREAD_THREAD_COUNT);
 	}
 
-	public static MapMaker getMapMakerMultiThreadedWithWeakKeys() {
-		return new MapMaker().concurrencyLevel(SINGLE_THREAD_THREAD_COUNT).weakKeys();
-	}
-
-	public static MapMaker getMapMakerSingleThreadedWithWeakKeys() {
-		return new MapMaker().concurrencyLevel(MULTI_THREAD_THREAD_COUNT).weakKeys();
-	}
-
 	@SafeVarargs
 	public static <K, V> Map<K, V> concatMaps(Map<? extends K, ? extends V>... maps) {
 		List<Iterable<? extends K>> keys = new ArrayList<>(maps.length);

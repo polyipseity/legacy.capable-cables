@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.minecraft.components.common;
 
-import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.client.ui.events.ui.UIEventListener;
 import $group__.client.ui.mvvm.binding.BindingMethodSource;
 import $group__.client.ui.mvvm.core.binding.IBindingField;

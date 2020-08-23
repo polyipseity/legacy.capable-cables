@@ -1,17 +1,18 @@
-package $group__.client.ui.core.structures.shapes;
+package $group__.client.ui.core.structures.shapes.descriptors;
 
+import $group__.client.ui.core.structures.shapes.interactions.IShapeConstraint;
 import $group__.utilities.interfaces.IHasGenericClass;
 import com.google.common.collect.Iterables;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 
+@SuppressWarnings("UnusedReturnValue")
 public interface IShapeDescriptorBuilder<S extends Shape>
 		extends IHasGenericClass<S> {
-	static void addUIObjects(IShapeDescriptor<?> shapeDescriptor, Iterable<? extends IUIConstraint> constraints, Iterable<? extends IUIAnchor> anchors) {
+	static void addUIObjects(IShapeDescriptor<?> shapeDescriptor, Iterable<? extends IShapeConstraint> constraints) {
 		shapeDescriptor.modify(() -> {
 			Iterables.addAll(shapeDescriptor.getConstraintsRef(), constraints);
-			shapeDescriptor.getAnchorsRef().addAnchors(anchors);
 			return false;
 		});
 	}
@@ -31,9 +32,7 @@ public interface IShapeDescriptorBuilder<S extends Shape>
 
 	IShapeDescriptorBuilder<S> setY(double y);
 
-	IShapeDescriptorBuilder<S> anchor(Iterable<? extends IUIAnchor> anchors);
-
-	IShapeDescriptorBuilder<S> constrain(Iterable<? extends IUIConstraint> constraints);
+	IShapeDescriptorBuilder<S> constrain(Iterable<? extends IShapeConstraint> constraints);
 
 	IShapeDescriptor<S> build();
 }

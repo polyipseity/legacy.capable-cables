@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.views.components;
 
-import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.client.ui.events.ui.UIEventTarget;
 import $group__.client.ui.mvvm.binding.BindingMethodSource;
 import $group__.client.ui.mvvm.core.binding.IBinderAction;
@@ -14,10 +14,14 @@ import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
 import $group__.client.ui.mvvm.core.views.components.parsers.UIProperty;
 import $group__.client.ui.mvvm.core.views.events.IUIEvent;
 import $group__.client.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
+import $group__.client.ui.mvvm.views.events.bus.EventUIComponent;
+import $group__.client.ui.structures.shapes.descriptors.DelegatingShapeDescriptor;
 import $group__.client.ui.utilities.BindingUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.MapUtilities;
 import $group__.utilities.NamespaceUtilities;
+import $group__.utilities.events.EnumEventHookStage;
+import $group__.utilities.events.EventUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
 import com.google.common.collect.ImmutableMap;
 import io.reactivex.rxjava3.core.Observer;
@@ -27,11 +31,14 @@ import net.minecraft.util.ResourceLocation;
 import org.w3c.dom.Node;
 
 import javax.annotation.Nullable;
+import java.awt.*;
 import java.lang.ref.WeakReference;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -61,10 +68,11 @@ public class UIComponent
 	@UIProperty(PROPERTY_ACTIVE)
 	protected final IBindingField<Boolean> active;
 	protected WeakReference<IUIComponentContainer> parent = new WeakReference<>(null);
+	protected final AtomicBoolean modifyingShape = new AtomicBoolean();
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public UIComponent(IShapeDescriptor<?> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) {
-		this.shapeDescriptor = shapeDescriptor;
+		this.shapeDescriptor = new ComponentShapeDescriptor<>(shapeDescriptor);
 		this.propertyMapping = new HashMap<>(propertyMapping);
 
 		this.id = Optional.ofNullable(this.propertyMapping.get(PROPERTY_ID_LOCATION))
@@ -76,6 +84,35 @@ public class UIComponent
 		this.active = IHasBinding.createBindingField(Boolean.class, this.propertyMapping.get(PROPERTY_ACTIVE_LOCATION), BindingUtilities.Deserializers::deserializeBoolean, true);
 
 		IExtensionContainer.addExtensionSafe(this, new UIExtensionCache());
+	}
+
+	@Override
+	public boolean modifyShape(Supplier<? extends Boolean> action) throws ConcurrentModificationException {
+		getModifyingShape().compareAndSet(false, true);
+		boolean ret = EventUtilities.callWithPrePostHooks(() ->
+						getShapeDescriptor().modify(action),
+				new EventUIComponent.ShapeDescriptorModify(EnumEventHookStage.PRE, this),
+				new EventUIComponent.ShapeDescriptorModify(EnumEventHookStage.POST, this));
+		getModifyingShape().compareAndSet(true, false);
+		return ret;
+	}
+
+	protected AtomicBoolean getModifyingShape() { return modifyingShape; }
+
+	@Override
+	public boolean isModifyingShape() { return getModifyingShape().get(); }
+
+	protected class ComponentShapeDescriptor<S extends Shape>
+			extends DelegatingShapeDescriptor<S> {
+		protected ComponentShapeDescriptor(IShapeDescriptor<S> delegated) { super(delegated); }
+
+		@Override
+		public boolean modify(Supplier<? extends Boolean> action)
+				throws ConcurrentModificationException {
+			if (!getModifyingShape().get())
+				throw new IllegalStateException("Use 'IShapeDescriptorProvider.modifyShape' instead");
+			return super.modify(action);
+		}
 	}
 
 	@Override

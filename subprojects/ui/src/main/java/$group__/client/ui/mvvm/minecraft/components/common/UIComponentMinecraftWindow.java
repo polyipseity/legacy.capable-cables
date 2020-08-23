@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.minecraft.components.common;
 
-import $group__.client.ui.core.structures.shapes.IShapeDescriptor;
+import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.client.ui.events.bus.EventBusEntryPoint;
 import $group__.client.ui.events.ui.UIEventListener;
 import $group__.client.ui.mvvm.core.binding.IBindingField;
@@ -17,7 +17,7 @@ import $group__.client.ui.mvvm.minecraft.core.views.IUIComponentMinecraft;
 import $group__.client.ui.mvvm.views.components.UIComponentContainer;
 import $group__.client.ui.mvvm.views.events.bus.EventUIComponent;
 import $group__.client.ui.mvvm.views.events.ui.UIEventFocus;
-import $group__.client.ui.structures.shapes.interactions.UIConstraintSupplier;
+import $group__.client.ui.structures.shapes.interactions.ShapeConstraintSupplier;
 import $group__.client.ui.utilities.BindingUtilities;
 import $group__.client.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.NamespaceUtilities;
@@ -75,9 +75,9 @@ public class UIComponentMinecraftWindow
 				this.propertyMapping.get(PROPERTY_COLOR_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.WHITE);
 
 		IShapeDescriptor<?> sd = getShapeDescriptor();
-		sd.modify(() -> {
+		modifyShape(() -> {
 			WeakReference<IUIComponent> selfRef = new WeakReference<>(this);
-			sd.getConstraintsRef().add(new UIConstraintSupplier(
+			sd.getConstraintsRef().add(new ShapeConstraintSupplier(
 					ConstantSupplier.of(0d), ConstantSupplier.of(0d),
 					() -> Optional.ofNullable(selfRef.get())
 							.flatMap(IUIComponent::getManager)

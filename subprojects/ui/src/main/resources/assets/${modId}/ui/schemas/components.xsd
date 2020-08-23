@@ -50,7 +50,6 @@
 					<xs:sequence>
 						<xs:element name="transform" type="ui:affineTransformDefinerType" minOccurs="0"/>
 						<xs:element ref="ui:constraint" minOccurs="0" maxOccurs="unbounded"/>
-						<xs:element ref="ui:anchor" minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
 					<xs:attribute name="x" type="xs:double"/>
 					<xs:attribute name="y" type="xs:double"/>
@@ -67,6 +66,7 @@
 				<xs:extension base="ui:componentBasedWithBindingsType">
 					<xs:sequence>
 						<xs:element ref="ui:shape"/>
+						<xs:element ref="ui:anchor" minOccurs="0" maxOccurs="unbounded"/>
 						<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
 						<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
@@ -187,7 +187,7 @@
 	</xs:complexType>
 	<xs:element name="color" id="color" type="ui:colorType"/>
 
-	<!-- COMMENT IUIConstraint -->
+	<!-- COMMENT IShapeConstraint -->
 	<xs:complexType name="constraintType" id="constraintType">
 		<xs:attribute name="minX" type="xs:double"/>
 		<xs:attribute name="minY" type="xs:double"/>
@@ -200,7 +200,7 @@
 	</xs:complexType>
 	<xs:element name="constraint" id="constraint" type="ui:constraintType"/>
 
-	<!-- COMMENT IUIAnchor -->
+	<!-- COMMENT IShapeAnchor -->
 	<xs:complexType name="anchorType" id="anchorType">
 		<xs:attribute name="target" type="xs:IDREF" use="required"/>
 		<xs:attribute name="originSide" type="ui:sideType" use="required"/>

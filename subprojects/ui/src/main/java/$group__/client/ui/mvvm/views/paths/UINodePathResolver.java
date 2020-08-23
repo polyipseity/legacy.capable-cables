@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentMap;
 public abstract class UINodePathResolver<T extends IUINode>
 		implements IUINodePathResolver<T> {
 	protected final ConcurrentMap<T, List<T>> virtualElementsMap =
-			MapUtilities.getMapMakerSingleThreadedWithWeakKeys().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap();
+			MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).weakKeys().makeMap();
 
 	@Override
 	public boolean addVirtualElement(T element,

@@ -1,13 +1,13 @@
 package $group__.client.ui.structures.shapes.interactions;
 
-import $group__.client.ui.core.structures.shapes.IUIConstraint;
+import $group__.client.ui.core.structures.shapes.interactions.IShapeConstraint;
 import $group__.utilities.MathUtilities;
 
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public class UIConstraintSupplier
-		implements IUIConstraint {
+public class ShapeConstraintSupplier
+		implements IShapeConstraint {
 	protected final Supplier<? extends Double> minXSupplier;
 	protected final Supplier<? extends Double> minYSupplier;
 	protected final Supplier<? extends Double> maxXSupplier;
@@ -17,7 +17,7 @@ public class UIConstraintSupplier
 	protected final Supplier<? extends Double> maxWidthSupplier;
 	protected final Supplier<? extends Double> maxHeightSupplier;
 
-	public UIConstraintSupplier(Supplier<? extends Double> minXSupplier, Supplier<? extends Double> minYSupplier, Supplier<? extends Double> maxXSupplier, Supplier<? extends Double> maxYSupplier, Supplier<? extends Double> minWidthSupplier, Supplier<? extends Double> minHeightSupplier, Supplier<? extends Double> maxWidthSupplier, Supplier<? extends Double> maxHeightSupplier) {
+	public ShapeConstraintSupplier(Supplier<? extends Double> minXSupplier, Supplier<? extends Double> minYSupplier, Supplier<? extends Double> maxXSupplier, Supplier<? extends Double> maxYSupplier, Supplier<? extends Double> minWidthSupplier, Supplier<? extends Double> minHeightSupplier, Supplier<? extends Double> maxWidthSupplier, Supplier<? extends Double> maxHeightSupplier) {
 		this.minXSupplier = minXSupplier;
 		this.minYSupplier = minYSupplier;
 		this.maxXSupplier = maxXSupplier;
@@ -29,21 +29,20 @@ public class UIConstraintSupplier
 	}
 
 	@Override
-	public UIConstraintSupplier clone() throws CloneNotSupportedException { return (UIConstraintSupplier) super.clone(); }
+	public ShapeConstraintSupplier clone() throws CloneNotSupportedException { return (ShapeConstraintSupplier) super.clone(); }
 
 	@Override
-	public UIConstraintSupplier copy() {
-		return new UIConstraintSupplier(
-				getMinXSupplier(),
-				getMinYSupplier(),
-				getMaxXSupplier(),
-				getMaxYSupplier(),
-				getMinWidthSupplier(),
-				getMinHeightSupplier(),
-				getMaxWidthSupplier(),
-				getMaxHeightSupplier());
+	public IShapeConstraint createIntersection(IShapeConstraint constraint) {
+		return new ShapeConstraintSupplier(
+				() -> MathUtilities.maxNullable(getMinX().orElse(null), constraint.getMinX().orElse(null)),
+				() -> MathUtilities.minNullable(getMinY().orElse(null), constraint.getMinY().orElse(null)),
+				() -> MathUtilities.maxNullable(getMaxX().orElse(null), constraint.getMaxX().orElse(null)),
+				() -> MathUtilities.minNullable(getMaxY().orElse(null), constraint.getMaxY().orElse(null)),
+				() -> MathUtilities.maxNullable(getMinWidth().orElse(null), constraint.getMinWidth().orElse(null)),
+				() -> MathUtilities.minNullable(getMinHeight().orElse(null), constraint.getMinHeight().orElse(null)),
+				() -> MathUtilities.maxNullable(getMaxWidth().orElse(null), constraint.getMaxWidth().orElse(null)),
+				() -> MathUtilities.minNullable(getMaxHeight().orElse(null), constraint.getMaxHeight().orElse(null)));
 	}
-
 
 	@Override
 	public Optional<Double> getMinX() { return Optional.ofNullable(getMinXSupplier().get()); }
@@ -70,16 +69,16 @@ public class UIConstraintSupplier
 	public Optional<Double> getMaxHeight() { return Optional.ofNullable(getMaxHeightSupplier().get()); }
 
 	@Override
-	public IUIConstraint createIntersection(IUIConstraint constraint) {
-		return new UIConstraintSupplier(
-				() -> MathUtilities.maxNullable(getMinX().orElse(null), constraint.getMinX().orElse(null)),
-				() -> MathUtilities.minNullable(getMinY().orElse(null), constraint.getMinY().orElse(null)),
-				() -> MathUtilities.maxNullable(getMaxX().orElse(null), constraint.getMaxX().orElse(null)),
-				() -> MathUtilities.minNullable(getMaxY().orElse(null), constraint.getMaxY().orElse(null)),
-				() -> MathUtilities.maxNullable(getMinWidth().orElse(null), constraint.getMinWidth().orElse(null)),
-				() -> MathUtilities.minNullable(getMinHeight().orElse(null), constraint.getMinHeight().orElse(null)),
-				() -> MathUtilities.maxNullable(getMaxWidth().orElse(null), constraint.getMaxWidth().orElse(null)),
-				() -> MathUtilities.minNullable(getMaxHeight().orElse(null), constraint.getMaxHeight().orElse(null)));
+	public ShapeConstraintSupplier copy() {
+		return new ShapeConstraintSupplier(
+				getMinXSupplier(),
+				getMinYSupplier(),
+				getMaxXSupplier(),
+				getMaxYSupplier(),
+				getMinWidthSupplier(),
+				getMinHeightSupplier(),
+				getMaxWidthSupplier(),
+				getMaxHeightSupplier());
 	}
 
 	protected Supplier<? extends Double> getMinXSupplier() { return minXSupplier; }
