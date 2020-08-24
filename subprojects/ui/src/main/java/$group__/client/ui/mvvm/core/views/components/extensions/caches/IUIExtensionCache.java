@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.core.views.components.extensions.caches;
 
-import $group__.client.ui.events.bus.EventBusEntryPoint;
+import $group__.client.ui.events.bus.UIEventBusEntryPoint;
 import $group__.client.ui.mvvm.core.extensions.IUIExtension;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.NamespaceUtilities;
@@ -61,7 +61,7 @@ public interface IUIExtensionCache
 				this.eventListeners = ImmutableList.copyOf(eventListenersFunction.apply(this));
 
 				eventListeners.forEach(el ->
-						EventBusEntryPoint.getEventBus()
+						UIEventBusEntryPoint.getEventBus()
 								.subscribe(CastUtilities.<Observer<? super Object>>castUnchecked(el)) // COMMENT we do not care about the event type
 				);
 				@SuppressWarnings("UnnecessaryLocalVariable") List<? extends DisposableObserver<?>> eventListenersRef = eventListeners;

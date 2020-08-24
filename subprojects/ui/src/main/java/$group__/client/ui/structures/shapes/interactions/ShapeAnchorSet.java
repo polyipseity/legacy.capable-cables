@@ -21,10 +21,10 @@ public class ShapeAnchorSet
 
 	public static Set<IShapeAnchor> getAnchorsToMatch(IShapeDescriptorProvider target, double borderThickness) {
 		return Sets.newHashSet(
-				new UIAnchor(target, EnumUISide.UP, EnumUISide.DOWN, borderThickness),
-				new UIAnchor(target, EnumUISide.DOWN, EnumUISide.UP, borderThickness),
-				new UIAnchor(target, EnumUISide.LEFT, EnumUISide.RIGHT, borderThickness),
-				new UIAnchor(target, EnumUISide.RIGHT, EnumUISide.LEFT, borderThickness));
+				new ShapeAnchor(target, EnumUISide.UP, EnumUISide.DOWN, borderThickness),
+				new ShapeAnchor(target, EnumUISide.DOWN, EnumUISide.UP, borderThickness),
+				new ShapeAnchor(target, EnumUISide.LEFT, EnumUISide.RIGHT, borderThickness),
+				new ShapeAnchor(target, EnumUISide.RIGHT, EnumUISide.LEFT, borderThickness));
 	}
 
 	@Override

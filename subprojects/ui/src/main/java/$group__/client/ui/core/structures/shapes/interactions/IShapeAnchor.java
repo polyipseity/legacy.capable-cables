@@ -16,7 +16,7 @@ public interface IShapeAnchor {
 	ImmutableMap<String, Function<? super IShapeAnchor, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
 			ImmutableList.of("target", "originSide", "targetSide", "borderThickness", "container"), OBJECT_VARIABLES));
 
-	IShapeDescriptorProvider getTarget();
+	Optional<? extends IShapeDescriptorProvider> getTarget();
 
 	EnumUISide getOriginSide();
 

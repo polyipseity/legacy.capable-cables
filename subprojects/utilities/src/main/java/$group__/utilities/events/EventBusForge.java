@@ -1,12 +1,12 @@
-package $group__.client.ui.events.bus;
+package $group__.utilities.events;
 
 import $group__.utilities.ThrowableUtilities;
-import $group__.utilities.events.EventBusBridgeMethodFixConsumer;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.subjects.Subject;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -15,6 +15,16 @@ import java.util.function.Consumer;
 
 public class EventBusForge
 		extends Subject<Event> {
+	public static final Subject<Event> FORGE_EVENT_BUS = new EventBusForge(Bus.FORGE.bus().get());
+	private static final ThreadLocal<Subject<Event>> MOD_EVENT_BUS = ThreadLocal.withInitial(() ->
+			new EventBusForge(Bus.MOD.bus().get()));
+
+	public static Subject<Event> getModEventBus() {
+		@Nullable Subject<Event> ret = MOD_EVENT_BUS.get();
+		assert ret != null;
+		return ret;
+	}
+
 	protected final IEventBus delegated;
 
 	public EventBusForge(IEventBus delegated) { this.delegated = delegated; }
@@ -44,7 +54,7 @@ public class EventBusForge
 			onError(t);
 			return;
 		}
-		observer.onSubscribe(new EventBusForgeDisposable(getDelegated(), oc));
+		observer.onSubscribe(new EventBusForgeDisposable(getDelegated(), oc.getEventType(), oc));
 	}
 
 	protected IEventBus getDelegated() { return delegated; }
@@ -64,18 +74,22 @@ public class EventBusForge
 	protected static class EventBusForgeDisposable
 			implements Disposable {
 		protected final AtomicBoolean disposed = new AtomicBoolean();
-		protected final IEventBus delegated;
+		protected final IEventBus owner;
+		protected final Class<? extends Event> eventType;
 		protected final Consumer<? extends Event> downstream;
 
-		public EventBusForgeDisposable(IEventBus delegated, Consumer<? extends Event> downstream) {
-			this.delegated = delegated;
+		public EventBusForgeDisposable(IEventBus owner, Class<? extends Event> eventType, Consumer<? extends Event> downstream) {
+			this.owner = owner;
+			this.eventType = eventType;
 			this.downstream = downstream;
 		}
 
 		@Override
 		public void dispose() {
-			if (!getDisposed().getAndSet(true))
-				getDelegated().unregister(getDownstream());
+			if (!getDisposed().getAndSet(true)) {
+				getOwner().unregister(getDownstream());
+				EventUtilities.cleanListenersCache(getOwner(), getEventType());
+			}
 		}
 
 		@Override
@@ -83,8 +97,10 @@ public class EventBusForge
 
 		protected AtomicBoolean getDisposed() { return disposed; }
 
-		public IEventBus getDelegated() { return delegated; }
+		public IEventBus getOwner() { return owner; }
 
 		protected Consumer<? extends Event> getDownstream() { return downstream; }
+
+		protected Class<? extends Event> getEventType() { return eventType; }
 	}
 }

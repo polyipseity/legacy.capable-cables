@@ -27,9 +27,12 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.awt.*;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public abstract class UIComponentManager<S extends Shape>
 		extends UIComponentContainer
@@ -76,18 +79,34 @@ public abstract class UIComponentManager<S extends Shape>
 
 		private static final Logger LOGGER = LogManager.getLogger();
 
+		@SuppressWarnings("UnstableApiUsage")
 		public static final Registry.RegistryObject<IUIExtensionCache.IType<List<IUIComponent>, IUIComponentManager<?>>> CHILDREN_FLAT =
 				IUIExtensionCache.RegUICache.INSTANCE.registerApply(generateKey("children_flat"),
 						k -> new IUIExtensionCache.IType.Impl<>(k,
-								(t, i) -> IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> ThrowableUtilities.Try.call(() ->
-										cache.getDelegated().get(t.getKey(), () -> {
-											List<IUIComponent> ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
-											TreeUtilities.<IUIComponent, Object>visitNodesDepthFirst(i,
-													ret::add,
-													p -> p instanceof IUIComponentContainer ?
-															((IUIComponentContainer) p).getChildrenView() : ImmutableSet.of(), null, null);
-											return ret;
-										}), LOGGER).map(CastUtilities::castUnchecked)),
+								(t, i) -> IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> ThrowableUtilities.Try.call(() -> {
+									@SuppressWarnings("unchecked") @Nullable List<WeakReference<IUIComponent>> cv =
+											(List<WeakReference<IUIComponent>>) cache.getDelegated().getIfPresent(t.getKey());
+									List<IUIComponent> ret;
+									if (cv == null) {
+										ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
+										TreeUtilities.<IUIComponent, Object>visitNodesDepthFirst(i,
+												ret::add,
+												p -> p instanceof IUIComponentContainer ?
+														((IUIComponentContainer) p).getChildrenView() : ImmutableSet.of(), null, null);
+										cache.getDelegated().put(t.getKey(),
+												ret.stream().sequential()
+														.map(WeakReference::new)
+														.collect(Collectors.toList()));
+									} else {
+										cv.removeIf(wr ->
+												wr.get() == null);
+										ret = cv.stream().sequential()
+												.map(Reference::get)
+												.filter(Objects::nonNull)
+												.collect(ImmutableList.toImmutableList());
+									}
+									return ret;
+								}, LOGGER).map(CastUtilities::castUnchecked)),
 								(t, i) -> IUIExtensionCache.IType.invalidate(i, t.getKey()),
 								t -> ImmutableList.of(new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
 									@Override
@@ -104,12 +123,28 @@ public abstract class UIComponentManager<S extends Shape>
 		public static final Registry.RegistryObject<IUIExtensionCache.IType<List<IUIComponent>, IUIComponentManager<?>>> CHILDREN_FLAT_FOCUSABLE =
 				IUIExtensionCache.RegUICache.INSTANCE.registerApply(generateKey("children_flat.focusable"),
 						k -> new IUIExtensionCache.IType.Impl<>(k,
-								(t, i) -> IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> ThrowableUtilities.Try.call(() ->
-										cache.getDelegated().get(t.getKey(), () ->
-												i.getChildrenFlatView().stream().sequential()
-														.filter(IUIComponent::isFocusable)
-														.collect(ImmutableList.toImmutableList())
-										), LOGGER).map(CastUtilities::castUnchecked)),
+								(t, i) -> IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> ThrowableUtilities.Try.call(() -> {
+									@SuppressWarnings("unchecked") @Nullable List<WeakReference<IUIComponent>> cv =
+											(List<WeakReference<IUIComponent>>) cache.getDelegated().getIfPresent(t.getKey());
+									List<IUIComponent> ret;
+									if (cv == null) {
+										ret = i.getChildrenFlatView().stream().sequential()
+												.filter(IUIComponent::isFocusable)
+												.collect(ImmutableList.toImmutableList());
+										cache.getDelegated().put(t.getKey(),
+												ret.stream().sequential()
+														.map(WeakReference::new)
+														.collect(Collectors.toList()));
+									} else {
+										cv.removeIf(wr ->
+												wr.get() == null);
+										ret = cv.stream().sequential()
+												.map(Reference::get)
+												.filter(Objects::nonNull)
+												.collect(ImmutableList.toImmutableList());
+									}
+									return ret;
+								}, LOGGER).map(CastUtilities::castUnchecked)),
 								(t, i) -> IUIExtensionCache.IType.invalidate(i, t.getKey()),
 								t -> ImmutableList.of(new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
 									@Override

@@ -1,5 +1,6 @@
 package $group__.client.ui.mvvm.minecraft.components;
 
+import $group__.client.ui.events.bus.UIEventBusEntryPoint;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
@@ -28,7 +29,7 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 
 	@Override
 	public void render(Point2D cursorPosition, double partialTicks) {
-		EventUtilities.callWithPrePostHooks(() -> {
+		EventUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 					IAffineTransformStack stack = getCleanTransformStack();
 					IUIComponentMinecraft.EnumCropMethod cropMethod = IUIComponentMinecraft.EnumCropMethod.getBestMethod();
 					cropMethod.enable();

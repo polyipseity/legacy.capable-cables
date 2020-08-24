@@ -1,6 +1,7 @@
 package $group__.client.ui.mvvm.views.components;
 
 import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
+import $group__.client.ui.events.bus.UIEventBusEntryPoint;
 import $group__.client.ui.mvvm.core.binding.IBinderAction;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
@@ -53,7 +54,7 @@ public class UIComponentContainer
 			return moveChildTo(index, component);
 		boolean ret = false;
 		if (getParent().map(p -> p.removeChildren(ImmutableList.of(component))).orElse(true)) {
-			ret = EventUtilities.callWithPrePostHooks(() -> {
+			ret = EventUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 						getChildren().add(index, component);
 						List<IUIComponent> childrenMoved = getChildren().subList(index + 1, getChildren().size());
 						for (int i = 0; i < childrenMoved.size(); i++) {
@@ -79,7 +80,7 @@ public class UIComponentContainer
 		for (IUIComponent component : components) {
 			int index = getChildren().indexOf(component);
 			if (index != -1) {
-				ret |= EventUtilities.callWithPrePostHooks(() -> {
+				ret |= EventUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 							getChildren().remove(component);
 							List<IUIComponent> childrenMoved = getChildren().subList(index, getChildren().size());
 							for (int i = 0; i < childrenMoved.size(); i++) {
@@ -104,7 +105,7 @@ public class UIComponentContainer
 		int previous = getChildren().indexOf(component);
 		if (previous == index)
 			return false;
-		return getChildren().contains(component) && EventUtilities.callWithPrePostHooks(() -> {
+		return getChildren().contains(component) && EventUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 					getChildren().remove(previous);
 					getChildren().add(index, component); // COMMENT cast is always safe
 					List<IUIComponent> childrenMoved;

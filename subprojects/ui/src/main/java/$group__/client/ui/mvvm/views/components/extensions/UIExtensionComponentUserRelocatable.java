@@ -1,7 +1,7 @@
 package $group__.client.ui.mvvm.views.components.extensions;
 
 import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
-import $group__.client.ui.events.bus.EventBusEntryPoint;
+import $group__.client.ui.events.bus.UIEventBusEntryPoint;
 import $group__.client.ui.events.ui.UIEventListener;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.client.ui.mvvm.core.views.IUIReshapeExplicitly;
@@ -67,13 +67,14 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 			c.getManager().ifPresent(m ->
 					m.getPathResolver().addVirtualElement(c, getVirtualComponent()));
 		});
-		EventBusEntryPoint.<GuiScreenEvent.DrawScreenEvent.Post>getEventBus()
+		UIEventBusEntryPoint.<GuiScreenEvent.DrawScreenEvent.Post>getEventBus()
 				.subscribe(getObserverDrawScreenEventPost().accumulateAndGet(new ObserverDrawScreenEventPost(), (p, n) -> {
 					Optional.ofNullable(p).ifPresent(DisposableObserver::dispose);
 					return n;
 				}));
 	}
 
+	@SuppressWarnings("ReturnOfInnerClass")
 	protected VirtualComponent getVirtualComponent() { return virtualComponent; }
 
 	@Override

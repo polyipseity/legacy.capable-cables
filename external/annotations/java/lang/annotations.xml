@@ -5,4 +5,7 @@
 	<item name='java.lang.Object boolean equals(java.lang.Object) 0'>
 		<annotation name='javax.annotation.Nullable'/>
 	</item>
+	<item name='java.lang.ThreadLocal T get()'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
 </root>

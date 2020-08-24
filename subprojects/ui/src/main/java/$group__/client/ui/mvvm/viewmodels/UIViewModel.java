@@ -17,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
@@ -29,8 +30,7 @@ public class UIViewModel<M extends IUIModel>
 		implements IUIViewModel<M> {
 	private static final Logger LOGGER = LogManager.getLogger();
 	protected final ConcurrentMap<ResourceLocation, IUIExtension<ResourceLocation, ? super IUIViewModel<?>>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
-	@Nullable
-	protected IUIInfrastructure<?, ?, ?> infrastructure;
+	protected WeakReference<IUIInfrastructure<?, ?, ?>> infrastructure = new WeakReference<>(null);
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 	protected M model;
 
@@ -66,8 +66,8 @@ public class UIViewModel<M extends IUIModel>
 	protected ConcurrentMap<ResourceLocation, IUIExtension<ResourceLocation, ? super IUIViewModel<?>>> getExtensions() { return extensions; }
 
 	@Override
-	public Optional<IUIInfrastructure<?, ?, ?>> getInfrastructure() { return Optional.ofNullable(infrastructure); }
+	public Optional<? extends IUIInfrastructure<?, ?, ?>> getInfrastructure() { return Optional.ofNullable(infrastructure.get()); }
 
 	@Override
-	public void setInfrastructure(@Nullable IUIInfrastructure<?, ?, ?> infrastructure) { this.infrastructure = infrastructure; }
+	public void setInfrastructure(@Nullable IUIInfrastructure<?, ?, ?> infrastructure) { this.infrastructure = new WeakReference<>(infrastructure); }
 }

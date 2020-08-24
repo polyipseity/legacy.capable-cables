@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.minecraft.extensions;
 
-import $group__.client.ui.events.bus.EventBusEntryPoint;
+import $group__.client.ui.events.bus.UIEventBusEntryPoint;
 import $group__.client.ui.mvvm.core.IUICommon;
 import $group__.client.ui.mvvm.core.views.components.parsers.UIConstructor;
 import $group__.client.ui.mvvm.minecraft.core.extensions.IUIExtensionBackgroundRenderer;
@@ -67,7 +67,7 @@ public abstract class UIExtensionBackgroundMinecraft<E extends IUIViewComponentM
 	@OverridingMethodsMustInvokeSuper
 	public void onExtensionAdded(IUIViewComponentMinecraft<?, ?> container) {
 		super.onExtensionAdded(container);
-		EventBusEntryPoint.<EventUIViewMinecraft.Render>getEventBus()
+		UIEventBusEntryPoint.<EventUIViewMinecraft.Render>getEventBus()
 				.subscribe(getObserverRender().accumulateAndGet(new ObserverRender(), (p, n) -> {
 					Optional.ofNullable(p).ifPresent(DisposableObserver::dispose);
 					return n;

@@ -12,9 +12,9 @@ import $group__.utilities.MapUtilities;
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.events.EnumEventHookStage;
+import $group__.utilities.extensions.ExtensionContainerAware;
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
-import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.reactive.DisposableObserverAuto;
 import $group__.utilities.structures.Registry;
 import com.google.common.cache.Cache;
@@ -26,12 +26,14 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
 import java.util.Optional;
 
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
 public class UIExtensionCache
-		extends IHasGenericClass.Impl<IExtensionContainer<ResourceLocation, ?>>
+		extends ExtensionContainerAware<ResourceLocation, IExtensionContainer<ResourceLocation, ?>, IExtensionContainer<ResourceLocation, ?>>
 		implements IUIExtensionCache {
 	protected final Cache<ResourceLocation, Object> cache =
 			CacheBuilder.newBuilder()
@@ -41,7 +43,13 @@ public class UIExtensionCache
 
 	@UIConstructor
 	public UIExtensionCache() {
-		super(CastUtilities.castUnchecked(IExtensionContainer.class)); // COMMENT should not matter in this case
+		super(CastUtilities.castUnchecked(IExtensionContainer.class), CastUtilities.castUnchecked(IExtensionContainer.class)); // COMMENT should not matter in this case
+	}
+
+	@Override
+	public void onExtensionRemoved() {
+		super.onExtensionRemoved();
+		getDelegated().invalidateAll();
 	}
 
 	@Override
@@ -54,17 +62,26 @@ public class UIExtensionCache
 		;
 		private static final Logger LOGGER = LogManager.getLogger();
 
-		public static final Registry.RegistryObject<IType<IUIComponentManager<?>, IUIComponent>> MANAGER =
+		public static final Registry.RegistryObject<IUIExtensionCache.IType<IUIComponentManager<?>, IUIComponent>> MANAGER =
 				RegUICache.INSTANCE.registerApply(generateKey("manager"),
-						k -> new IType.Impl<>(k,
+						k -> new IUIExtensionCache.IType.Impl<>(k,
 								(t, i) ->
-										IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> Try.call(() -> cache.getDelegated()
-												.get(t.getKey(), () ->
-														IUIComponent.getYoungestParentInstanceOf(i, IUIComponentManager.class)
-																.orElseThrow(IllegalStateException::new)), LOGGER)
-												.map(CastUtilities::castUnchecked)),
+										IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache ->
+												Try.call(() -> {
+													@SuppressWarnings("unchecked") @Nullable WeakReference<IUIComponentManager<?>> cv =
+															(WeakReference<IUIComponentManager<?>>) cache.getDelegated().getIfPresent(t.getKey());
+													@Nullable IUIComponentManager<?> ret;
+													if (cv == null || (ret = cv.get()) == null) {
+														ret = IUIComponent.getYoungestParentInstanceOf(i, IUIComponentManager.class)
+																.orElseThrow(IllegalStateException::new);
+														cache.getDelegated().put(t.getKey(),
+																new WeakReference<>(ret));
+													}
+													return ret;
+												}, LOGGER)
+														.map(CastUtilities::castUnchecked)),
 								(t, i) -> {
-									IType.invalidate(i, t.getKey());
+									IUIExtensionCache.IType.invalidate(i, t.getKey());
 									if (i instanceof IUIComponentContainer)
 										((IUIComponentContainer) i).getChildrenView().forEach(t::invalidate);
 								},
@@ -76,9 +93,9 @@ public class UIExtensionCache
 											t.invalidate(event.getComponent());
 									}
 								})));
-		public static final Registry.RegistryObject<IType<Integer, IUIComponent>> Z =
+		public static final Registry.RegistryObject<IUIExtensionCache.IType<Integer, IUIComponent>> Z =
 				RegUICache.INSTANCE.registerApply(generateKey("z"),
-						k -> new IType.Impl<>(k,
+						k -> new IUIExtensionCache.IType.Impl<>(k,
 								(t, i) -> IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> Try.call(() -> cache.getDelegated().get(t.getKey(),
 										() -> {
 											int ret = -1;
@@ -89,7 +106,7 @@ public class UIExtensionCache
 											return ret;
 										}), LOGGER).map(CastUtilities::castUnchecked)),
 								(t, i) -> {
-									IType.invalidate(i, t.getKey());
+									IUIExtensionCache.IType.invalidate(i, t.getKey());
 									if (i instanceof IUIComponentContainer)
 										((IUIComponentContainer) i).getChildrenView().forEach(t::invalidate);
 								},

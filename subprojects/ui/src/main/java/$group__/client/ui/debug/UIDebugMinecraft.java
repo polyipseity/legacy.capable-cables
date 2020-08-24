@@ -110,8 +110,7 @@ public enum UIDebugMinecraft {
 
 		@OnlyIn(Dist.CLIENT)
 		private static final class Model
-				extends UIModel {
-		}
+				extends UIModel {}
 	}
 
 /* TODO

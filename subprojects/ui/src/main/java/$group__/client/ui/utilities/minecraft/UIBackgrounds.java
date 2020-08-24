@@ -1,6 +1,6 @@
 package $group__.client.ui.utilities.minecraft;
 
-import $group__.client.ui.events.bus.EventBusEntryPoint;
+import $group__.client.ui.events.bus.UIEventBusEntryPoint;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.api.distmarker.Dist;
@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 public enum UIBackgrounds {
 	;
 
-	public static void notifyBackgroundDrawn(Screen screen) { EventBusEntryPoint.getEventBus().onNext(new GuiScreenEvent.BackgroundDrawnEvent(screen)); }
+	public static void notifyBackgroundDrawn(Screen screen) { UIEventBusEntryPoint.getEventBus().onNext(new GuiScreenEvent.BackgroundDrawnEvent(screen)); }
 
 	/**
 	 * @see Screen#renderBackground()

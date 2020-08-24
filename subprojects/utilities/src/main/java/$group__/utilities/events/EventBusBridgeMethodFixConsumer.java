@@ -29,7 +29,7 @@ public class EventBusBridgeMethodFixConsumer<T extends Event, O>
 	protected final Class<?> genericClassFilter;
 	protected final MethodHandle methodHandle;
 
-	@SuppressWarnings({"unchecked", "RedundantThrows"})
+	@SuppressWarnings("unchecked")
 	public EventBusBridgeMethodFixConsumer(Class<? super O> superClass, String methodName, O delegated)
 			throws Throwable {
 		this.delegated = delegated;

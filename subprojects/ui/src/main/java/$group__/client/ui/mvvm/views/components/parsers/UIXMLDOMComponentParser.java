@@ -14,8 +14,8 @@ import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
 import $group__.client.ui.mvvm.core.views.components.parsers.IUIResourceParser;
 import $group__.client.ui.mvvm.structures.UIPropertyMappingValue;
 import $group__.client.ui.structures.EnumUISide;
+import $group__.client.ui.structures.shapes.interactions.ShapeAnchor;
 import $group__.client.ui.structures.shapes.interactions.ShapeConstraint;
-import $group__.client.ui.structures.shapes.interactions.UIAnchor;
 import $group__.utilities.*;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
@@ -268,7 +268,7 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 													DOMUtilities.getAttributeValue(na, "target")
 															.orElseThrow(InternalError::new))
 													.map(ct ->
-															new UIAnchor(
+															new ShapeAnchor(
 																	ct,
 																	EnumUISide.valueOf(DOMUtilities.getAttributeValue(na, "originSide")
 																			.orElseThrow(InternalError::new)),

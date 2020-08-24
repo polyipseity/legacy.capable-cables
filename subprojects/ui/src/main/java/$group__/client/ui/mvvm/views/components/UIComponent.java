@@ -1,6 +1,7 @@
 package $group__.client.ui.mvvm.views.components;
 
 import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
+import $group__.client.ui.events.bus.UIEventBusEntryPoint;
 import $group__.client.ui.events.ui.UIEventTarget;
 import $group__.client.ui.mvvm.binding.BindingMethodSource;
 import $group__.client.ui.mvvm.core.binding.IBinderAction;
@@ -89,7 +90,7 @@ public class UIComponent
 	@Override
 	public boolean modifyShape(Supplier<? extends Boolean> action) throws ConcurrentModificationException {
 		getModifyingShape().compareAndSet(false, true);
-		boolean ret = EventUtilities.callWithPrePostHooks(() ->
+		boolean ret = EventUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () ->
 						getShapeDescriptor().modify(action),
 				new EventUIComponent.ShapeDescriptorModify(EnumEventHookStage.PRE, this),
 				new EventUIComponent.ShapeDescriptorModify(EnumEventHookStage.POST, this));

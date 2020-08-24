@@ -1,7 +1,7 @@
 package $group__.client.ui.mvvm.views.components;
 
 import $group__.client.ui.core.structures.shapes.interactions.IShapeAnchor;
-import $group__.client.ui.events.bus.EventBusEntryPoint;
+import $group__.client.ui.events.bus.UIEventBusEntryPoint;
 import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentShapeAnchorController;
 import $group__.client.ui.mvvm.views.events.bus.EventUIComponent;
@@ -15,7 +15,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import sun.misc.Cleaner;
 
 import javax.annotation.Nullable;
-import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ConcurrentModificationException;
 import java.util.Objects;
@@ -32,7 +31,7 @@ public class UIComponentShapeAnchorController
 		@SuppressWarnings("ThisEscapedInObjectConstruction")
 		DisposableObserver<EventUIComponent.ShapeDescriptorModify> od = new ObserverEventUIShapeDescriptorModify(this);
 		this.disposable = od;
-		EventBusEntryPoint.<EventUIComponent.ShapeDescriptorModify>getEventBus().subscribe(od);
+		UIEventBusEntryPoint.<EventUIComponent.ShapeDescriptorModify>getEventBus().subscribe(od);
 
 		Cleaner.create(getCleanerRef(), od::dispose);
 	}
@@ -77,8 +76,7 @@ public class UIComponentShapeAnchorController
 			Optional.ofNullable(controller.getSubscribersMap().get(event.getComponent()))
 					.ifPresent(as ->
 							as.forEach(a -> a.getContainer()
-									.map(ac -> controller.getAnchorSets().inverse().get(ac))
-									.map(Reference::get)
+									.map(ac -> controller.getAnchorSetsInverse().get(ac))
 									.ifPresent(f -> {
 										if (getAnchoringAnchors().contains(a))
 											throw new ConcurrentModificationException("Anchor cycle:" + System.lineSeparator()

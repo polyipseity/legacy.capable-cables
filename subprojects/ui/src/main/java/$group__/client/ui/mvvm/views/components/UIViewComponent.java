@@ -1,7 +1,6 @@
 package $group__.client.ui.mvvm.views.components;
 
 import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
-import $group__.client.ui.mvvm.core.IUIInfrastructure;
 import $group__.client.ui.mvvm.core.binding.IBinderAction;
 import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
@@ -13,7 +12,6 @@ import io.reactivex.rxjava3.core.Observer;
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.lang.ref.WeakReference;
 import java.util.ConcurrentModificationException;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -24,7 +22,6 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		extends UIView<S>
 		implements IUIViewComponent<S, M> {
 	protected final M manager;
-	protected WeakReference<IUIInfrastructure<?, ?, ?>> infrastructure = new WeakReference<>(null);
 
 	public UIViewComponent(M manager) { this.manager = manager; }
 
@@ -47,12 +44,6 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 			getManager().getBinderSubscriber().accept(s);
 		};
 	}
-
-	@Override
-	public Optional<IUIInfrastructure<?, ?, ?>> getInfrastructure() { return Optional.ofNullable(infrastructure.get()); }
-
-	@Override
-	public void setInfrastructure(@Nullable IUIInfrastructure<?, ?, ?> infrastructure) { this.infrastructure = new WeakReference<>(infrastructure); }
 
 	@Override
 	public boolean reshape(Function<? super IShapeDescriptor<? super S>, ? extends Boolean> action) throws ConcurrentModificationException { return getManager().reshape(action); }

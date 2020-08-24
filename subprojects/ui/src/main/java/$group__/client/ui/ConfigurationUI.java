@@ -1,8 +1,8 @@
 package $group__.client.ui;
 
-import $group__.client.ui.events.bus.EventBusEntryPoint;
-import $group__.client.ui.events.bus.EventBusForge;
+import $group__.client.ui.events.bus.UIEventBusEntryPoint;
 import $group__.client.ui.structures.EnumCursor;
+import $group__.utilities.events.EventBusForge;
 import $group__.utilities.reactive.DisposableObserverAuto;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.observers.DisposableObserver;
@@ -11,7 +11,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.GenericEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -31,14 +30,14 @@ public enum ConfigurationUI {
 		if (MOD_ID.getAndSet(modId) != null)
 			throw new IllegalStateException("Setup already done");
 		{
-			EventBusEntryPoint.setEventBus(new EventBusForge(Bus.FORGE.bus().get()));
+			UIEventBusEntryPoint.setEventBus(EventBusForge.FORGE_EVENT_BUS);
 			DisposableObserver<EventSanityCheck<Event>> d = new DisposableObserverAuto<EventSanityCheck<Event>>() {
 				@Override
 				public void onNext(@NonNull EventSanityCheck<Event> event) { /* TODO write something here */ }
 			};
 			// COMMENT sanity checks
-			EventBusEntryPoint.<EventSanityCheck<Event>>getEventBus().subscribe(d);
-			EventBusEntryPoint.getEventBus().onNext(new EventSanityCheck<>(Event.class));
+			UIEventBusEntryPoint.<EventSanityCheck<Event>>getEventBus().subscribe(d);
+			UIEventBusEntryPoint.getEventBus().onNext(new EventSanityCheck<>(Event.class));
 			d.dispose();
 		}
 	}

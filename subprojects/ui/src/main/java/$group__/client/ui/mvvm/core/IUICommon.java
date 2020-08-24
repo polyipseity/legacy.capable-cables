@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 public interface IUICommon {
-	Optional<IUIInfrastructure<?, ?, ?>> getInfrastructure();
+	Optional<? extends IUIInfrastructure<?, ?, ?>> getInfrastructure();
 
 	void setInfrastructure(@Nullable IUIInfrastructure<?, ?, ?> infrastructure);
 }
