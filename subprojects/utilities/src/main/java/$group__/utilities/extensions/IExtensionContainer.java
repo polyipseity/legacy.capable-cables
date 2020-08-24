@@ -3,7 +3,7 @@ package $group__.utilities.extensions;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.interfaces.IHasGenericClass;
-import net.minecraft.util.ResourceLocation;
+import $group__.utilities.interfaces.INamespacePrefixedString;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,8 +25,8 @@ public interface IExtensionContainer<K, V extends IExtension<? extends K, ?>> {
 
 	@SuppressWarnings("unchecked")
 	static <K, V extends IExtension<? extends K, ?>> Optional<V> addExtension(IExtensionContainer<K, V> self, Map<K, V> extensions, K key, V extension) {
-		if (extension.getType().getKey() instanceof ResourceLocation)
-			IExtension.RegExtension.checkExtensionRegistered((IExtension<? extends ResourceLocation, ?>) extension); // COMMENT checked
+		if (extension.getType().getKey() instanceof INamespacePrefixedString)
+			IExtension.RegExtension.checkExtensionRegistered((IExtension<? extends INamespacePrefixedString, ?>) extension); // COMMENT checked
 		if (!extension.getGenericClass().isInstance(self))
 			throw BecauseOf.illegalArgument("Self is not an instance of extension's container class",
 					"self.getClass()", self.getClass(),

@@ -1,9 +1,9 @@
 package $group__.client.ui.mvvm.views.events.ui;
 
+import $group__.client.ui.core.mvvm.views.events.IUIEventFocus;
+import $group__.client.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.client.ui.events.ui.UIEvent;
-import $group__.client.ui.mvvm.core.views.events.IUIEventFocus;
-import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;
-import net.minecraft.util.ResourceLocation;
+import $group__.utilities.interfaces.INamespacePrefixedString;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -12,7 +12,7 @@ public class UIEventFocus extends UIEvent implements IUIEventFocus {
 	@Nullable
 	protected final IUIEventTarget relatedTarget;
 
-	public UIEventFocus(ResourceLocation type, boolean canBubble, boolean cancelable, IUIEventTarget target, @Nullable IUIEventTarget relatedTarget) {
+	public UIEventFocus(INamespacePrefixedString type, boolean canBubble, boolean cancelable, IUIEventTarget target, @Nullable IUIEventTarget relatedTarget) {
 		super(type, canBubble, cancelable, target);
 		this.relatedTarget = relatedTarget;
 	}

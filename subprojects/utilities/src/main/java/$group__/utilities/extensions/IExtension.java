@@ -2,9 +2,9 @@ package $group__.utilities.extensions;
 
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.interfaces.IHasGenericClass;
+import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.Registry;
 import $group__.utilities.structures.Singleton;
-import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -46,14 +46,14 @@ public interface IExtension<K, C extends IExtensionContainer<? super K, ?>> exte
 		}
 	}
 
-	final class RegExtension extends Registry<ResourceLocation, IType<? extends ResourceLocation, ?, ?>> {
+	final class RegExtension extends Registry<INamespacePrefixedString, IType<? extends INamespacePrefixedString, ?, ?>> {
 		private static final Logger LOGGER = LogManager.getLogger();
 		public static final RegExtension INSTANCE = Singleton.getSingletonInstance(RegExtension.class, LOGGER);
 
 		@SuppressWarnings("unused")
 		protected RegExtension() { super(true, LOGGER); }
 
-		public static void checkExtensionRegistered(IExtension<? extends ResourceLocation, ?> extension) {
+		public static void checkExtensionRegistered(IExtension<? extends INamespacePrefixedString, ?> extension) {
 			if (!INSTANCE.containsValue(extension.getType())) {
 				throw ThrowableUtilities.BecauseOf.illegalArgument("Unregistered UI extension type",
 						"extension.getType()", extension.getType(),

@@ -1,7 +1,7 @@
 package $group__.client.ui.mvvm.structures;
 
-import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
-import net.minecraft.util.ResourceLocation;
+import $group__.client.ui.core.mvvm.structures.IUIPropertyMappingValue;
+import $group__.utilities.interfaces.INamespacePrefixedString;
 import org.w3c.dom.Node;
 
 import javax.annotation.Nullable;
@@ -11,9 +11,9 @@ public class UIPropertyMappingValue implements IUIPropertyMappingValue {
 	@Nullable
 	protected final Node defaultValue;
 	@Nullable
-	protected final ResourceLocation bindingKey;
+	protected final INamespacePrefixedString bindingKey;
 
-	public UIPropertyMappingValue(@Nullable Node defaultValue, @Nullable ResourceLocation bindingKey) {
+	public UIPropertyMappingValue(@Nullable Node defaultValue, @Nullable INamespacePrefixedString bindingKey) {
 		this.defaultValue = defaultValue;
 		this.bindingKey = bindingKey;
 	}
@@ -22,5 +22,5 @@ public class UIPropertyMappingValue implements IUIPropertyMappingValue {
 	public Optional<Node> getDefaultValue() { return Optional.ofNullable(defaultValue); }
 
 	@Override
-	public Optional<ResourceLocation> getBindingKey() { return Optional.ofNullable(bindingKey); }
+	public Optional<INamespacePrefixedString> getBindingKey() { return Optional.ofNullable(bindingKey); }
 }

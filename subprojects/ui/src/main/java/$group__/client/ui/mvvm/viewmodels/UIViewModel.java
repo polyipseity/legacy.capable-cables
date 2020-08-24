@@ -8,11 +8,11 @@ import $group__.client.ui.mvvm.core.viewmodels.IUIViewModel;
 import $group__.utilities.MapUtilities;
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
+import $group__.utilities.interfaces.INamespacePrefixedString;
 import com.google.common.collect.ImmutableMap;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.subjects.Subject;
 import io.reactivex.rxjava3.subjects.UnicastSubject;
-import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,7 +29,7 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 public class UIViewModel<M extends IUIModel>
 		implements IUIViewModel<M> {
 	private static final Logger LOGGER = LogManager.getLogger();
-	protected final ConcurrentMap<ResourceLocation, IUIExtension<ResourceLocation, ? super IUIViewModel<?>>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<INamespacePrefixedString, IUIExtension<INamespacePrefixedString, ? super IUIViewModel<?>>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected WeakReference<IUIInfrastructure<?, ?, ?>> infrastructure = new WeakReference<>(null);
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 	protected M model;
@@ -48,22 +48,22 @@ public class UIViewModel<M extends IUIModel>
 	protected Subject<IBinderAction> getBinderNotifierSubject() { return binderNotifierSubject; }
 
 	@Override
-	public Optional<IUIExtension<ResourceLocation, ? super IUIViewModel<?>>> addExtension(IUIExtension<ResourceLocation, ? super IUIViewModel<?>> extension) {
+	public Optional<IUIExtension<INamespacePrefixedString, ? super IUIViewModel<?>>> addExtension(IUIExtension<INamespacePrefixedString, ? super IUIViewModel<?>> extension) {
 		IExtension.RegExtension.checkExtensionRegistered(extension);
 		return IExtensionContainer.addExtension(this, getExtensions(), extension.getType().getKey(), extension);
 	}
 
 	@Override
-	public Optional<IUIExtension<ResourceLocation, ? super IUIViewModel<?>>> removeExtension(ResourceLocation key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
+	public Optional<IUIExtension<INamespacePrefixedString, ? super IUIViewModel<?>>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
 
 	@Override
-	public Optional<IUIExtension<ResourceLocation, ? super IUIViewModel<?>>> getExtension(ResourceLocation key) { return Optional.ofNullable(getExtensions().get(key)); }
+	public Optional<IUIExtension<INamespacePrefixedString, ? super IUIViewModel<?>>> getExtension(INamespacePrefixedString key) { return Optional.ofNullable(getExtensions().get(key)); }
 
 	@Override
-	public Map<ResourceLocation, IUIExtension<ResourceLocation, ? super IUIViewModel<?>>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
+	public Map<INamespacePrefixedString, IUIExtension<INamespacePrefixedString, ? super IUIViewModel<?>>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<ResourceLocation, IUIExtension<ResourceLocation, ? super IUIViewModel<?>>> getExtensions() { return extensions; }
+	protected ConcurrentMap<INamespacePrefixedString, IUIExtension<INamespacePrefixedString, ? super IUIViewModel<?>>> getExtensions() { return extensions; }
 
 	@Override
 	public Optional<? extends IUIInfrastructure<?, ?, ?>> getInfrastructure() { return Optional.ofNullable(infrastructure.get()); }

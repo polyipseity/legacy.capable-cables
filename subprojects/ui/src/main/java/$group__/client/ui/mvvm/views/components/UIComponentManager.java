@@ -1,25 +1,26 @@
 package $group__.client.ui.mvvm.views.components;
 
+import $group__.client.ui.core.mvvm.structures.IAffineTransformStack;
+import $group__.client.ui.core.mvvm.structures.IUIPropertyMappingValue;
+import $group__.client.ui.core.mvvm.views.components.IUIComponent;
+import $group__.client.ui.core.mvvm.views.components.IUIComponentContainer;
+import $group__.client.ui.core.mvvm.views.components.IUIComponentManager;
+import $group__.client.ui.core.mvvm.views.components.IUIComponentShapeAnchorController;
+import $group__.client.ui.core.mvvm.views.components.extensions.caches.IUIExtensionCache;
+import $group__.client.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
+import $group__.client.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
-import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
-import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
-import $group__.client.ui.mvvm.core.views.components.IUIComponent;
-import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
-import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
-import $group__.client.ui.mvvm.core.views.components.IUIComponentShapeAnchorController;
-import $group__.client.ui.mvvm.core.views.components.extensions.caches.IUIExtensionCache;
-import $group__.client.ui.mvvm.core.views.components.paths.IUIComponentPathResolver;
-import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;
 import $group__.client.ui.mvvm.structures.AffineTransformStack;
 import $group__.client.ui.mvvm.views.components.paths.UIComponentPathResolver;
 import $group__.client.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
 import $group__.utilities.*;
 import $group__.utilities.events.EnumEventHookStage;
+import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.reactive.DisposableObserverAuto;
+import $group__.utilities.structures.NamespacePrefixedString;
 import $group__.utilities.structures.Registry;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
@@ -40,7 +41,7 @@ public abstract class UIComponentManager<S extends Shape>
 	protected final IUIComponentPathResolver<IUIComponent> pathResolver = new PathResolver();
 	protected final IUIComponentShapeAnchorController shapeAnchorController = new UIComponentShapeAnchorController();
 
-	public UIComponentManager(IShapeDescriptor<S> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> mapping) { super(shapeDescriptor, mapping); }
+	public UIComponentManager(IShapeDescriptor<S> shapeDescriptor, Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping) { super(shapeDescriptor, mapping); }
 
 	@Override
 	public IUIComponentPathResolver<IUIComponent> getPathResolver() { return pathResolver; }
@@ -158,7 +159,7 @@ public abstract class UIComponentManager<S extends Shape>
 									}
 								})));
 
-		private static ResourceLocation generateKey(@SuppressWarnings("SameParameterValue") String name) { return new ResourceLocation(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, "manager." + name); }
+		private static INamespacePrefixedString generateKey(@SuppressWarnings("SameParameterValue") String name) { return new NamespacePrefixedString(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, "manager." + name); }
 	}
 
 	@Override

@@ -9,14 +9,14 @@ import $group__.client.ui.mvvm.core.views.components.extensions.cursors.IUICompo
 import $group__.client.ui.mvvm.core.views.components.parsers.UIExtensionConstructor;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;
-import net.minecraft.util.ResourceLocation;
+import $group__.utilities.interfaces.INamespacePrefixedString;
 
 import java.awt.geom.Point2D;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent<?, ?>>
-		extends ExtensionContainerAware<ResourceLocation, IUIView<?>, E>
+		extends ExtensionContainerAware<INamespacePrefixedString, IUIView<?>, E>
 		implements IUIExtensionCursorHandleProvider {
 	@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.EXTENDED_CLASS)
 	public UIExtensionCursorHandleProviderComponent(Class<E> extendedClass) {
@@ -45,5 +45,5 @@ public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent
 	}
 
 	@Override
-	public IType<? extends ResourceLocation, ?, ? extends IUIView<?>> getType() { return TYPE.getValue(); }
+	public IType<? extends INamespacePrefixedString, ?, ? extends IUIView<?>> getType() { return TYPE.getValue(); }
 }

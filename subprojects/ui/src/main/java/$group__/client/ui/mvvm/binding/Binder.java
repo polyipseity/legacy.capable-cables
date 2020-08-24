@@ -6,9 +6,9 @@ import $group__.client.ui.mvvm.core.binding.IBindingMethod;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.MapUtilities;
+import $group__.utilities.interfaces.INamespacePrefixedString;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
-import net.minecraft.util.ResourceLocation;
 import sun.misc.Cleaner;
 
 import java.util.*;
@@ -17,8 +17,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 public class Binder implements IBinder {
-	protected final ConcurrentMap<ResourceLocation, FieldBinding> fieldBindings = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap();
-	protected final ConcurrentMap<ResourceLocation, MethodBinding> methodBindings = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<INamespacePrefixedString, FieldBinding> fieldBindings = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<INamespacePrefixedString, MethodBinding> methodBindings = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap();
 	protected final ConcurrentMap<Class<?>, Map<Class<?>, Function<?, ?>>> fieldTransformers = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap();
 	protected final ConcurrentMap<Class<?>, Map<Class<?>, Function<?, ?>>> methodTransformers = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap();
 
@@ -96,10 +96,10 @@ public class Binder implements IBinder {
 		return IBinder.removeTransformer(getMethodTransformers(), (Class<T>) types[0].get(), (Class<R>) types[1].get()); // COMMENT should be of correct types
 	}
 
-	protected MethodBinding getMethodBinding(ResourceLocation bindingKey) { return getMethodBindings().computeIfAbsent(bindingKey, k -> new MethodBinding(k, getMethodTransformers())); }
+	protected MethodBinding getMethodBinding(INamespacePrefixedString bindingKey) { return getMethodBindings().computeIfAbsent(bindingKey, k -> new MethodBinding(k, getMethodTransformers())); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<ResourceLocation, MethodBinding> getMethodBindings() { return methodBindings; }
+	protected ConcurrentMap<INamespacePrefixedString, MethodBinding> getMethodBindings() { return methodBindings; }
 
 	@Override
 	public boolean unbindAllFields() {
@@ -120,23 +120,23 @@ public class Binder implements IBinder {
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<Class<?>, Map<Class<?>, Function<?, ?>>> getMethodTransformers() { return methodTransformers; }
 
-	protected FieldBinding getFieldBinding(ResourceLocation bindingKey) { return getFieldBindings().computeIfAbsent(bindingKey, k -> new FieldBinding(k, getFieldTransformers())); }
+	protected FieldBinding getFieldBinding(INamespacePrefixedString bindingKey) { return getFieldBindings().computeIfAbsent(bindingKey, k -> new FieldBinding(k, getFieldTransformers())); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<ResourceLocation, FieldBinding> getFieldBindings() { return fieldBindings; }
+	protected ConcurrentMap<INamespacePrefixedString, FieldBinding> getFieldBindings() { return fieldBindings; }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<Class<?>, Map<Class<?>, Function<?, ?>>> getFieldTransformers() { return fieldTransformers; }
 
 	protected static class FieldBinding {
-		protected final ResourceLocation bindingKey;
+		protected final INamespacePrefixedString bindingKey;
 		protected final Map<IBindingField<?>, Disposable> fields = new HashMap<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
 		protected final ConcurrentMap<Class<?>, Map<Class<?>, Function<?, ?>>> transformers;
 		protected final AtomicBoolean isSource = new AtomicBoolean();
 		protected final Object cleanerRef = new Object();
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-		public FieldBinding(ResourceLocation bindingKey, ConcurrentMap<Class<?>, Map<Class<?>, Function<?, ?>>> transformers) {
+		public FieldBinding(INamespacePrefixedString bindingKey, ConcurrentMap<Class<?>, Map<Class<?>, Function<?, ?>>> transformers) {
 			this.bindingKey = bindingKey;
 			this.transformers = transformers; // COMMENT intended to be modified
 			@SuppressWarnings("UnnecessaryLocalVariable") Map<IBindingField<?>, Disposable> fieldsRef = fields;
@@ -162,7 +162,7 @@ public class Binder implements IBinder {
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 		public Map<IBindingField<?>, Disposable> getFields() { return fields; }
 
-		public ResourceLocation getBindingKey() { return bindingKey; }
+		public INamespacePrefixedString getBindingKey() { return bindingKey; }
 
 		public AtomicBoolean getIsSource() { return isSource; }
 
@@ -194,14 +194,14 @@ public class Binder implements IBinder {
 	}
 
 	protected static class MethodBinding {
-		protected final ResourceLocation bindingKey;
+		protected final INamespacePrefixedString bindingKey;
 		protected final Map<IBindingMethod.ISource<?>, Disposable> sources = new HashMap<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
 		protected final Set<IBindingMethod.IDestination<?>> destinations = new HashSet<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
 		protected final ConcurrentMap<Class<?>, Map<Class<?>, Function<?, ?>>> transformers;
 		protected final Object cleanerRef = new Object();
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-		public MethodBinding(ResourceLocation bindingKey, ConcurrentMap<Class<?>, Map<Class<?>, Function<?, ?>>> transformers) {
+		public MethodBinding(INamespacePrefixedString bindingKey, ConcurrentMap<Class<?>, Map<Class<?>, Function<?, ?>>> transformers) {
 			this.bindingKey = bindingKey;
 			this.transformers = transformers; // COMMENT intended to be modified
 			@SuppressWarnings("UnnecessaryLocalVariable") Map<IBindingMethod.ISource<?>, Disposable> sourcesRef = sources;
@@ -239,7 +239,7 @@ public class Binder implements IBinder {
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 		protected Map<IBindingMethod.ISource<?>, Disposable> getSources() { return sources; }
 
-		public ResourceLocation getBindingKey() { return bindingKey; }
+		public INamespacePrefixedString getBindingKey() { return bindingKey; }
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 		protected Set<IBindingMethod.IDestination<?>> getDestinations() { return destinations; }

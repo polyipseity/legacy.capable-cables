@@ -3,9 +3,10 @@ package $group__.client.ui.core.structures.shapes.descriptors;
 import $group__.client.ui.structures.shapes.descriptors.builders.RectangularShapeDescriptorBuilder;
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
+import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.NamespacePrefixedString;
 import $group__.utilities.structures.Registry;
 import $group__.utilities.structures.Singleton;
-import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,7 +24,7 @@ public interface IShapeDescriptorBuilderFactory {
 	<S extends Shape> IShapeDescriptorBuilder<S> createBuilder(Class<S> clazz)
 			throws ShapeDescriptorBuilderNotFoundException;
 
-	class RegSDBFactory extends Registry<ResourceLocation, IShapeDescriptorBuilderFactory> {
+	class RegSDBFactory extends Registry<INamespacePrefixedString, IShapeDescriptorBuilderFactory> {
 		private static final Logger LOGGER = LogManager.getLogger();
 		public static final RegSDBFactory INSTANCE = Singleton.getSingletonInstance(RegSDBFactory.class, LOGGER);
 
@@ -33,7 +34,7 @@ public interface IShapeDescriptorBuilderFactory {
 		}
 
 		@Override
-		public <VL extends IShapeDescriptorBuilderFactory> RegistryObject<VL> register(ResourceLocation key, VL value) {
+		public <VL extends IShapeDescriptorBuilderFactory> RegistryObject<VL> register(INamespacePrefixedString key, VL value) {
 			if (DefaultFactory.KEY.equals(key))
 				throw BecauseOf.illegalArgument("Default is not replaceable",
 						"DefaultFactory.KEY", DefaultFactory.KEY,
@@ -46,7 +47,7 @@ public interface IShapeDescriptorBuilderFactory {
 	class DefaultFactory
 			extends Registry<Class<? extends Shape>, Function<? super Class<? extends Shape>, ? extends IShapeDescriptorBuilder<?>>>
 			implements IShapeDescriptorBuilderFactory {
-		public static final ResourceLocation KEY = new ResourceLocation(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, "default");
+		public static final INamespacePrefixedString KEY = new NamespacePrefixedString(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, "default");
 		private static final Logger LOGGER = LogManager.getLogger();
 
 		protected DefaultFactory() {

@@ -1,21 +1,21 @@
 package $group__.client.ui.mvvm.views.components;
 
+import $group__.client.ui.core.mvvm.binding.IBinderAction;
+import $group__.client.ui.core.mvvm.structures.IAffineTransformStack;
+import $group__.client.ui.core.mvvm.structures.IUIPropertyMappingValue;
+import $group__.client.ui.core.mvvm.views.IUIReshapeExplicitly;
+import $group__.client.ui.core.mvvm.views.components.IUIComponent;
+import $group__.client.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.client.ui.events.bus.UIEventBusEntryPoint;
-import $group__.client.ui.mvvm.core.binding.IBinderAction;
-import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
-import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
-import $group__.client.ui.mvvm.core.views.IUIReshapeExplicitly;
-import $group__.client.ui.mvvm.core.views.components.IUIComponent;
-import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
 import $group__.client.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventUtilities;
+import $group__.utilities.interfaces.INamespacePrefixedString;
 import com.google.common.collect.ImmutableList;
 import io.reactivex.rxjava3.core.Observer;
-import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
 import java.awt.geom.Rectangle2D;
@@ -30,7 +30,7 @@ public class UIComponentContainer
 		implements IUIComponentContainer {
 	protected final List<IUIComponent> children = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 
-	public UIComponentContainer(IShapeDescriptor<?> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> mapping) { super(shapeDescriptor, mapping); }
+	public UIComponentContainer(IShapeDescriptor<?> shapeDescriptor, Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping) { super(shapeDescriptor, mapping); }
 
 	@Override
 	public void transformChildren(IAffineTransformStack stack) {

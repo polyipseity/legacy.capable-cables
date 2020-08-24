@@ -2,12 +2,14 @@ package $group__.client.ui.structures;
 
 import $group__.client.ui.ConfigurationUI;
 import $group__.client.ui.utilities.UIObjectUtilities;
+import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.client.minecraft.ImageUtilities;
 import $group__.utilities.client.minecraft.ResourceUtilities;
+import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.NamespacePrefixedString;
 import net.minecraft.client.renderer.texture.NativeImage;
-import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
@@ -29,13 +31,13 @@ public enum EnumCursor {
 	@SuppressWarnings({"SpellCheckingInspection", "HardcodedFileSeparator"})
 	EXTENSION_RESIZE_NW_SE_CURSOR(() -> {
 		return Try.call(() -> createCursor(
-				new ResourceLocation(ConfigurationUI.getModId(), "textures/cursors/aero_nwse/32x32.png"),
+				new NamespacePrefixedString(ConfigurationUI.getModId(), "textures/cursors/aero_nwse/32x32.png"),
 				new Point(8, 8)), LoggerHolder.LOGGER).orElseThrow(ThrowableCatcher::rethrow);
 	}),
 	@SuppressWarnings({"SpellCheckingInspection", "HardcodedFileSeparator"})
 	EXTENSION_RESIZE_NE_SW_CURSOR(() -> {
 		return Try.call(() -> createCursor(
-				new ResourceLocation(ConfigurationUI.getModId(), "textures/cursors/aero_nesw/32x32.png"),
+				new NamespacePrefixedString(ConfigurationUI.getModId(), "textures/cursors/aero_nesw/32x32.png"),
 				new Point(8, 8)), LoggerHolder.LOGGER).orElseThrow(ThrowableCatcher::rethrow);
 	}),
 	;
@@ -47,8 +49,8 @@ public enum EnumCursor {
 	@SuppressWarnings("EmptyMethod")
 	public static void preload() {}
 
-	public static long createCursor(ResourceLocation location, Point2D hotspot) throws IOException {
-		try (InputStream is = ResourceUtilities.getResource(location).getInputStream();
+	public static long createCursor(INamespacePrefixedString location, Point2D hotspot) throws IOException {
+		try (InputStream is = ResourceUtilities.getResource(NamespaceUtilities.toResourceLocation(location)).getInputStream();
 		     NativeImage ni = NativeImage.read(NativeImage.PixelFormat.RGBA, is);
 		     GLFWImage i = ImageUtilities.toGLFWImageCursor(ni)) {
 			Point hotspotF = UIObjectUtilities.getPointFloor(hotspot);

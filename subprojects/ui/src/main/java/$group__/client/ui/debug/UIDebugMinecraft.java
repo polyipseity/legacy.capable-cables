@@ -2,20 +2,22 @@ package $group__.client.ui.debug;
 
 import $group__.client.ui.ConfigurationUI;
 import $group__.client.ui.UIFacade;
+import $group__.client.ui.core.mvvm.views.components.IUIViewComponent;
+import $group__.client.ui.core.mvvm.views.components.parsers.IUIResourceParser;
+import $group__.client.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
+import $group__.client.ui.minecraft.mvvm.adapters.UIAdapterScreen;
+import $group__.client.ui.minecraft.mvvm.components.UIComponentManagerMinecraft;
+import $group__.client.ui.minecraft.mvvm.components.UIViewComponentMinecraft;
+import $group__.client.ui.minecraft.mvvm.components.parsers.dom.UIDOMPrototypeMinecraftParser;
+import $group__.client.ui.minecraft.mvvm.viewmodels.UIViewModelMinecraft;
 import $group__.client.ui.mvvm.binding.Binder;
-import $group__.client.ui.mvvm.core.views.components.IUIViewComponent;
-import $group__.client.ui.mvvm.core.views.components.parsers.IUIResourceParser;
-import $group__.client.ui.mvvm.minecraft.adapters.UIAdapterScreen;
-import $group__.client.ui.mvvm.minecraft.components.UIComponentManagerMinecraft;
-import $group__.client.ui.mvvm.minecraft.components.UIViewComponentMinecraft;
-import $group__.client.ui.mvvm.minecraft.core.IUIInfrastructureMinecraft;
-import $group__.client.ui.mvvm.minecraft.viewmodels.UIViewModelMinecraft;
 import $group__.client.ui.mvvm.models.UIModel;
 import $group__.client.ui.mvvm.views.components.extensions.UIExtensionCursorHandleProviderComponent;
-import $group__.client.ui.mvvm.views.components.parsers.UIXMLDOMComponentParser;
+import $group__.client.ui.mvvm.views.components.parsers.dom.UIDOMPrototypeParser;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.extensions.IExtensionContainer;
+import $group__.utilities.structures.NamespacePrefixedString;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -32,7 +34,6 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.IWorldPosCallable;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
@@ -78,7 +79,7 @@ public enum UIDebugMinecraft {
 
 		static {
 			Try.run(() ->
-					PARSER.parseResource(UIFacade.UFMinecraft.parseResourceDocument(new ResourceLocation(ConfigurationUI.getModId(), "ui/schemas/components_test.xml"))), LOGGER);
+					PARSER.parse(UIFacade.UFMinecraft.parseResourceDocument(new NamespacePrefixedString(ConfigurationUI.getModId(), "ui/schemas/components_test.xml"))), LOGGER);
 			ThrowableCatcher.rethrow(true);
 		}
 

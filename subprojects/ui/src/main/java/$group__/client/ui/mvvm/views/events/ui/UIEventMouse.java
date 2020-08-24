@@ -1,10 +1,10 @@
 package $group__.client.ui.mvvm.views.events.ui;
 
+import $group__.client.ui.core.mvvm.views.events.IUIEventMouse;
+import $group__.client.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.client.ui.core.structures.IUIDataMouseButtonClick;
 import $group__.client.ui.events.ui.UIEvent;
-import $group__.client.ui.mvvm.core.views.events.IUIEventMouse;
-import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;
-import net.minecraft.util.ResourceLocation;
+import $group__.utilities.interfaces.INamespacePrefixedString;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -14,7 +14,7 @@ public class UIEventMouse extends UIEvent implements IUIEventMouse {
 	@Nullable
 	protected final IUIEventTarget relatedTarget;
 
-	public UIEventMouse(ResourceLocation type, boolean canBubble, boolean cancelable, IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget relatedTarget) {
+	public UIEventMouse(INamespacePrefixedString type, boolean canBubble, boolean cancelable, IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget relatedTarget) {
 		super(type, canBubble, cancelable, target);
 		this.data = data;
 		this.relatedTarget = relatedTarget;

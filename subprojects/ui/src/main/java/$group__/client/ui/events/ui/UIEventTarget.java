@@ -8,11 +8,11 @@ import $group__.utilities.CastUtilities;
 import $group__.utilities.MapUtilities;
 import $group__.utilities.ObjectUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
+import $group__.utilities.interfaces.INamespacePrefixedString;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
-import net.minecraft.util.ResourceLocation;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -20,19 +20,19 @@ import java.util.function.Predicate;
 public class UIEventTarget
 		implements IUIEventTarget {
 	@SuppressWarnings("UnstableApiUsage")
-	protected final SetMultimap<ResourceLocation, IUIEventListenerWithParameters> eventTargetListeners = MultimapBuilder
+	protected final SetMultimap<INamespacePrefixedString, IUIEventListenerWithParameters> eventTargetListeners = MultimapBuilder
 			.hashKeys(CapacityUtilities.INITIAL_CAPACITY_SMALL)
 			.linkedHashSetValues(CapacityUtilities.INITIAL_CAPACITY_SMALL)
 			.build();
 
 	@Override
-	public boolean addEventListener(ResourceLocation type, IUIEventListener<?> listener, boolean useCapture) { return getEventTargetListeners().put(type, new IUIEventListenerWithParameters(listener, useCapture)); }
+	public boolean addEventListener(INamespacePrefixedString type, IUIEventListener<?> listener, boolean useCapture) { return getEventTargetListeners().put(type, new IUIEventListenerWithParameters(listener, useCapture)); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected SetMultimap<ResourceLocation, IUIEventListenerWithParameters> getEventTargetListeners() { return eventTargetListeners; }
+	protected SetMultimap<INamespacePrefixedString, IUIEventListenerWithParameters> getEventTargetListeners() { return eventTargetListeners; }
 
 	@Override
-	public boolean removeEventListener(ResourceLocation type, IUIEventListener<?> listener, boolean useCapture) {
+	public boolean removeEventListener(INamespacePrefixedString type, IUIEventListener<?> listener, boolean useCapture) {
 		if (getEventTargetListeners().remove(type, new IUIEventListenerWithParameters(listener, useCapture))) {
 			listener.markAsRemoved();
 			return true;

@@ -1,16 +1,16 @@
 package $group__.client.ui.events.ui;
 
+import $group__.client.ui.core.mvvm.views.events.*;
+import $group__.client.ui.core.mvvm.views.paths.IUINode;
 import $group__.client.ui.core.structures.IUIDataKeyboardKeyPress;
 import $group__.client.ui.core.structures.IUIDataMouseButtonClick;
-import $group__.client.ui.mvvm.core.views.events.*;
-import $group__.client.ui.mvvm.core.views.paths.IUINode;
 import $group__.client.ui.mvvm.views.events.ui.*;
 import $group__.client.ui.utilities.UIDataMouseButtonClick;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
+import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.Registry;
 import $group__.utilities.structures.Singleton;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -175,7 +175,7 @@ public enum UIEventUtilities {
 		}
 	}
 
-	public static final class RegUIEvent extends Registry<ResourceLocation, Class<? extends IUIEvent>> {
+	public static final class RegUIEvent extends Registry<INamespacePrefixedString, Class<? extends IUIEvent>> {
 		private static final Logger LOGGER = LogManager.getLogger();
 		public static final RegUIEvent INSTANCE = Singleton.getSingletonInstance(RegUIEvent.class, LOGGER);
 

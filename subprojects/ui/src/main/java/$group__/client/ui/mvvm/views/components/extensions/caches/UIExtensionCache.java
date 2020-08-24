@@ -15,12 +15,13 @@ import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.extensions.ExtensionContainerAware;
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
+import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.reactive.DisposableObserverAuto;
+import $group__.utilities.structures.NamespacePrefixedString;
 import $group__.utilities.structures.Registry;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
@@ -33,9 +34,9 @@ import java.util.Optional;
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
 public class UIExtensionCache
-		extends ExtensionContainerAware<ResourceLocation, IExtensionContainer<ResourceLocation, ?>, IExtensionContainer<ResourceLocation, ?>>
+		extends ExtensionContainerAware<INamespacePrefixedString, IExtensionContainer<INamespacePrefixedString, ?>, IExtensionContainer<INamespacePrefixedString, ?>>
 		implements IUIExtensionCache {
-	protected final Cache<ResourceLocation, Object> cache =
+	protected final Cache<INamespacePrefixedString, Object> cache =
 			CacheBuilder.newBuilder()
 					.initialCapacity(INITIAL_CAPACITY_SMALL)
 					.expireAfterAccess(MapUtilities.CACHE_EXPIRATION_ACCESS_DURATION, MapUtilities.CACHE_EXPIRATION_ACCESS_TIME_UNIT)
@@ -53,10 +54,10 @@ public class UIExtensionCache
 	}
 
 	@Override
-	public Cache<ResourceLocation, Object> getDelegated() { return cache; }
+	public Cache<INamespacePrefixedString, Object> getDelegated() { return cache; }
 
 	@Override
-	public IExtension.IType<? extends ResourceLocation, ?, ? extends IExtensionContainer<ResourceLocation, ?>> getType() { return IUIExtensionCache.TYPE.getValue(); }
+	public IExtension.IType<? extends INamespacePrefixedString, ?, ? extends IExtensionContainer<INamespacePrefixedString, ?>> getType() { return IUIExtensionCache.TYPE.getValue(); }
 
 	public enum CacheUniversal {
 		;
@@ -119,6 +120,6 @@ public class UIExtensionCache
 									}
 								})));
 
-		private static ResourceLocation generateKey(String name) { return new ResourceLocation(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, "universal." + name); }
+		private static INamespacePrefixedString generateKey(String name) { return new NamespacePrefixedString(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, "universal." + name); }
 	}
 }

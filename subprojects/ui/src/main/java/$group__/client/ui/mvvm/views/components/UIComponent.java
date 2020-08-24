@@ -1,19 +1,19 @@
 package $group__.client.ui.mvvm.views.components;
 
+import $group__.client.ui.core.mvvm.binding.IBinderAction;
+import $group__.client.ui.core.mvvm.binding.IBindingField;
+import $group__.client.ui.core.mvvm.binding.IBindingMethod;
+import $group__.client.ui.core.mvvm.binding.IHasBinding;
+import $group__.client.ui.core.mvvm.extensions.IUIExtension;
+import $group__.client.ui.core.mvvm.structures.IUIPropertyMappingValue;
+import $group__.client.ui.core.mvvm.views.components.IUIComponent;
+import $group__.client.ui.core.mvvm.views.components.IUIComponentContainer;
+import $group__.client.ui.core.mvvm.views.components.parsers.UIProperty;
+import $group__.client.ui.core.mvvm.views.events.IUIEvent;
 import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.client.ui.events.bus.UIEventBusEntryPoint;
 import $group__.client.ui.events.ui.UIEventTarget;
 import $group__.client.ui.mvvm.binding.BindingMethodSource;
-import $group__.client.ui.mvvm.core.binding.IBinderAction;
-import $group__.client.ui.mvvm.core.binding.IBindingField;
-import $group__.client.ui.mvvm.core.binding.IBindingMethod;
-import $group__.client.ui.mvvm.core.binding.IHasBinding;
-import $group__.client.ui.mvvm.core.extensions.IUIExtension;
-import $group__.client.ui.mvvm.core.structures.IUIPropertyMappingValue;
-import $group__.client.ui.mvvm.core.views.components.IUIComponent;
-import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
-import $group__.client.ui.mvvm.core.views.components.parsers.UIProperty;
-import $group__.client.ui.mvvm.core.views.events.IUIEvent;
 import $group__.client.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
 import $group__.client.ui.mvvm.views.events.bus.EventUIComponent;
 import $group__.client.ui.structures.shapes.descriptors.DelegatingShapeDescriptor;
@@ -24,11 +24,12 @@ import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
+import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.NamespacePrefixedString;
 import com.google.common.collect.ImmutableMap;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.subjects.Subject;
 import io.reactivex.rxjava3.subjects.UnicastSubject;
-import net.minecraft.util.ResourceLocation;
 import org.w3c.dom.Node;
 
 import javax.annotation.Nullable;
@@ -51,15 +52,15 @@ public class UIComponent
 	public static final String PROPERTY_VISIBLE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "component.visible";
 	public static final String PROPERTY_ACTIVE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "component.active";
 
-	public static final ResourceLocation PROPERTY_VISIBLE_LOCATION = new ResourceLocation(PROPERTY_VISIBLE);
-	public static final ResourceLocation PROPERTY_ACTIVE_LOCATION = new ResourceLocation(PROPERTY_ACTIVE);
+	public static final INamespacePrefixedString PROPERTY_VISIBLE_LOCATION = new NamespacePrefixedString(PROPERTY_VISIBLE);
+	public static final INamespacePrefixedString PROPERTY_ACTIVE_LOCATION = new NamespacePrefixedString(PROPERTY_ACTIVE);
 
 	@Nullable
 	protected final String id;
-	protected final Map<ResourceLocation, IUIPropertyMappingValue> mapping;
+	protected final Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping;
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
-	protected final ConcurrentMap<ResourceLocation, IUIExtension<? extends ResourceLocation, ? super IUIComponent>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
-	protected final ConcurrentMap<ResourceLocation, IBindingMethod.ISource<?>> eventTargetBindingMethods = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<INamespacePrefixedString, IUIExtension<? extends INamespacePrefixedString, ? super IUIComponent>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<INamespacePrefixedString, IBindingMethod.ISource<?>> eventTargetBindingMethods = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	// todo add animation system
 	// todo add name
 	// todo cache transform
@@ -72,7 +73,7 @@ public class UIComponent
 	protected final AtomicBoolean modifyingShape = new AtomicBoolean();
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	public UIComponent(IShapeDescriptor<?> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> mapping) {
+	public UIComponent(IShapeDescriptor<?> shapeDescriptor, Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping) {
 		this.shapeDescriptor = new ComponentShapeDescriptor<>(shapeDescriptor);
 		this.mapping = new HashMap<>(mapping);
 
@@ -122,7 +123,7 @@ public class UIComponent
 	@Override
 	public boolean dispatchEvent(IUIEvent event) {
 		boolean ret = super.dispatchEvent(event);
-		ResourceLocation type = event.getType();
+		INamespacePrefixedString type = event.getType();
 		CastUtilities.<IBindingMethod.ISource<? extends IUIEvent>>castUnchecked( // COMMENT should match
 				Optional.<IBindingMethod.ISource<?>>ofNullable(getEventTargetBindingMethods().get(type))
 						.orElseGet(() -> {
@@ -156,20 +157,20 @@ public class UIComponent
 
 	protected void setParent(@Nullable IUIComponentContainer parent) { this.parent = new WeakReference<>(parent); }
 
-	@Override
-	public Optional<IUIExtension<? extends ResourceLocation, ? super IUIComponent>> addExtension(IUIExtension<? extends ResourceLocation, ? super IUIComponent> extension) { return IExtensionContainer.addExtension(this, getExtensions(), extension.getType().getKey(), extension); }
-
-	@Override
-	public Optional<IUIExtension<? extends ResourceLocation, ? super IUIComponent>> removeExtension(ResourceLocation key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
-
-	@Override
-	public Optional<IUIExtension<? extends ResourceLocation, ? super IUIComponent>> getExtension(ResourceLocation key) { return Optional.ofNullable(getExtensions().get(key)); }
-
-	@Override
-	public Map<ResourceLocation, IUIExtension<? extends ResourceLocation, ? super IUIComponent>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected ConcurrentMap<INamespacePrefixedString, IBindingMethod.ISource<?>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<ResourceLocation, IUIExtension<? extends ResourceLocation, ? super IUIComponent>> getExtensions() { return extensions; }
+	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMapping() { return mapping; }
+
+	@Override
+	public Optional<IUIExtension<? extends INamespacePrefixedString, ? super IUIComponent>> addExtension(IUIExtension<? extends INamespacePrefixedString, ? super IUIComponent> extension) { return IExtensionContainer.addExtension(this, getExtensions(), extension.getType().getKey(), extension); }
+
+	@Override
+	public Optional<IUIExtension<? extends INamespacePrefixedString, ? super IUIComponent>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
+
+	@Override
+	public Optional<IUIExtension<? extends INamespacePrefixedString, ? super IUIComponent>> getExtension(INamespacePrefixedString key) { return Optional.ofNullable(getExtensions().get(key)); }
 
 	@Override
 	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() { return s -> getBinderNotifierSubject().subscribe(s.get()); }
@@ -185,11 +186,11 @@ public class UIComponent
 	public void setActive(boolean active) { getActive().setValue(active); }
 
 	@Override
-	public Map<ResourceLocation, IUIPropertyMappingValue> getMappingView() { return ImmutableMap.copyOf(getMapping()); }
+	public Map<INamespacePrefixedString, IUIExtension<? extends INamespacePrefixedString, ? super IUIComponent>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Map<ResourceLocation, IUIPropertyMappingValue> getMapping() { return mapping; }
+	protected ConcurrentMap<INamespacePrefixedString, IUIExtension<? extends INamespacePrefixedString, ? super IUIComponent>> getExtensions() { return extensions; }
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<ResourceLocation, IBindingMethod.ISource<?>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }
+	@Override
+	public Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingView() { return ImmutableMap.copyOf(getMapping()); }
 }

@@ -1,16 +1,16 @@
 package $group__.client.ui.mvvm.views.components.extensions;
 
+import $group__.client.ui.core.mvvm.structures.IAffineTransformStack;
+import $group__.client.ui.core.mvvm.views.IUIReshapeExplicitly;
+import $group__.client.ui.core.mvvm.views.components.IUIComponent;
+import $group__.client.ui.core.mvvm.views.components.IUIComponentManager;
+import $group__.client.ui.core.mvvm.views.components.extensions.IUIExtensionComponentUserResizable;
+import $group__.client.ui.core.mvvm.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
+import $group__.client.ui.core.mvvm.views.components.parsers.UIExtensionConstructor;
+import $group__.client.ui.core.mvvm.views.events.IUIEventMouse;
 import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.client.ui.events.bus.UIEventBusEntryPoint;
 import $group__.client.ui.events.ui.UIEventListener;
-import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
-import $group__.client.ui.mvvm.core.views.IUIReshapeExplicitly;
-import $group__.client.ui.mvvm.core.views.components.IUIComponent;
-import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
-import $group__.client.ui.mvvm.core.views.components.extensions.IUIExtensionComponentUserResizable;
-import $group__.client.ui.mvvm.core.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
-import $group__.client.ui.mvvm.core.views.components.parsers.UIExtensionConstructor;
-import $group__.client.ui.mvvm.core.views.events.IUIEventMouse;
 import $group__.client.ui.mvvm.views.components.UIComponentVirtual;
 import $group__.client.ui.mvvm.views.events.ui.UIEventMouse;
 import $group__.client.ui.structures.EnumCursor;
@@ -21,9 +21,9 @@ import $group__.client.ui.structures.shapes.descriptors.GenericShapeDescriptor;
 import $group__.client.ui.utilities.UIObjectUtilities;
 import $group__.client.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;
+import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.reactive.DisposableObserverAuto;
 import io.reactivex.rxjava3.observers.DisposableObserver;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -43,7 +43,7 @@ import java.util.function.Function;
 
 // TODO could use some redesign
 public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
-		extends ExtensionContainerAware<ResourceLocation, IUIComponent, E>
+		extends ExtensionContainerAware<INamespacePrefixedString, IUIComponent, E>
 		implements IUIExtensionComponentUserResizable<E> {
 	public static final int RESIZE_BORDER_THICKNESS_DEFAULT = 10;
 	protected final int resizeBorderThickness = RESIZE_BORDER_THICKNESS_DEFAULT; // TODO make this a property and strategy or something like that
@@ -73,7 +73,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 	}
 
 	@Override
-	public IType<? extends ResourceLocation, ?, ? extends IUIComponent> getType() { return TYPE.getValue(); }
+	public IType<? extends INamespacePrefixedString, ?, ? extends IUIComponent> getType() { return TYPE.getValue(); }
 
 	protected final AtomicReference<ObserverDrawScreenEventPost> observerDrawScreenEventPost = new AtomicReference<>();
 

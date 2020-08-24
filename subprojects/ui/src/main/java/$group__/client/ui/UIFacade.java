@@ -1,17 +1,18 @@
 package $group__.client.ui;
 
-import $group__.client.ui.mvvm.core.binding.IBinder;
-import $group__.client.ui.mvvm.minecraft.UIInfrastructureMinecraft;
-import $group__.client.ui.mvvm.minecraft.adapters.UIAdapterScreen;
-import $group__.client.ui.mvvm.minecraft.core.IUIInfrastructureMinecraft;
-import $group__.client.ui.mvvm.minecraft.core.IUIViewModelMinecraft;
-import $group__.client.ui.mvvm.minecraft.core.views.IUIViewMinecraft;
+import $group__.client.ui.core.mvvm.binding.IBinder;
+import $group__.client.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
+import $group__.client.ui.minecraft.core.mvvm.IUIViewModelMinecraft;
+import $group__.client.ui.minecraft.core.mvvm.views.IUIViewMinecraft;
+import $group__.client.ui.minecraft.mvvm.UIInfrastructureMinecraft;
+import $group__.client.ui.minecraft.mvvm.adapters.UIAdapterScreen;
+import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.client.minecraft.ResourceUtilities;
+import $group__.utilities.interfaces.INamespacePrefixedString;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.inventory.container.Container;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -46,8 +47,8 @@ public enum UIFacade {
 			return new UIInfrastructureMinecraft<>(view, viewModel, binder);
 		}
 
-		public static Document parseResourceDocument(ResourceLocation location) throws IOException, SAXException {
-			try (InputStream res = ResourceUtilities.getResource(location).getInputStream()) {
+		public static Document parseResourceDocument(INamespacePrefixedString location) throws IOException, SAXException {
+			try (InputStream res = ResourceUtilities.getResource(NamespaceUtilities.toResourceLocation(location)).getInputStream()) {
 				return UFResources.parseDocumentInput(new InputSource(res));
 			}
 		}

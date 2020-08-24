@@ -1,13 +1,13 @@
 package $group__.client.ui.events.ui;
 
-import $group__.client.ui.mvvm.core.views.events.IUIEvent;
-import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;
-import net.minecraft.util.ResourceLocation;
+import $group__.client.ui.core.mvvm.views.events.IUIEvent;
+import $group__.client.ui.core.mvvm.views.events.IUIEventTarget;
+import $group__.utilities.interfaces.INamespacePrefixedString;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UIEvent implements IUIEvent {
-	protected final ResourceLocation type;
+	protected final INamespacePrefixedString type;
 	protected final boolean
 			canBubble,
 			cancelable;
@@ -16,7 +16,7 @@ public class UIEvent implements IUIEvent {
 	protected boolean propagationStopped = false;
 	protected AtomicBoolean defaultPrevented = new AtomicBoolean();
 
-	public UIEvent(ResourceLocation type, boolean canBubble, boolean cancelable, IUIEventTarget target) {
+	public UIEvent(INamespacePrefixedString type, boolean canBubble, boolean cancelable, IUIEventTarget target) {
 		this.type = type;
 		this.canBubble = canBubble;
 		this.cancelable = cancelable;
@@ -24,7 +24,7 @@ public class UIEvent implements IUIEvent {
 	}
 
 	@Override
-	public ResourceLocation getType() { return type; }
+	public INamespacePrefixedString getType() { return type; }
 
 	@Override
 	public IUIEventTarget getTarget() { return target; }
