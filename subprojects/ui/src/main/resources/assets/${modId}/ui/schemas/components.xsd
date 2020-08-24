@@ -67,8 +67,8 @@
 					<xs:sequence>
 						<xs:element ref="ui:shape"/>
 						<xs:element ref="ui:anchor" minOccurs="0" maxOccurs="unbounded"/>
-						<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
 						<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
 					<!-- SECTION Special -->
 					<xs:attribute name="id" type="xs:ID"/>

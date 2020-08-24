@@ -1,4 +1,4 @@
-package $group__.client.ui.mvvm.core.extensions;
+package $group__.client.ui.core.mvvm.extensions;
 
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;

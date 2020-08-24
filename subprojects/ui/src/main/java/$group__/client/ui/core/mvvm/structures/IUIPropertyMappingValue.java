@@ -1,4 +1,4 @@
-package $group__.client.ui.mvvm.core.structures;
+package $group__.client.ui.core.mvvm.structures;
 
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import org.w3c.dom.Node;

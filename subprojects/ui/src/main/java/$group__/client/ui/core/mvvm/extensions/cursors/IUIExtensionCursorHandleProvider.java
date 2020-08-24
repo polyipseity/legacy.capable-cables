@@ -1,7 +1,7 @@
-package $group__.client.ui.mvvm.core.extensions.cursors;
+package $group__.client.ui.core.mvvm.extensions.cursors;
 
-import $group__.client.ui.mvvm.core.extensions.IUIExtension;
-import $group__.client.ui.mvvm.core.views.IUIView;
+import $group__.client.ui.core.mvvm.extensions.IUIExtension;
+import $group__.client.ui.core.mvvm.views.IUIView;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;

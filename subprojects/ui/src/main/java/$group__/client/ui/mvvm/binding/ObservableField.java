@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.binding;
 
-import $group__.client.ui.mvvm.core.binding.IObservableField;
+import $group__.client.ui.core.mvvm.binding.IObservableField;
 import $group__.utilities.interfaces.IHasGenericClass;
 import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;

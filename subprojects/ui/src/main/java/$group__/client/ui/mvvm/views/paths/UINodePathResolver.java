@@ -1,7 +1,7 @@
 package $group__.client.ui.mvvm.views.paths;
 
-import $group__.client.ui.mvvm.core.views.paths.IUINode;
-import $group__.client.ui.mvvm.core.views.paths.IUINodePathResolver;
+import $group__.client.ui.core.mvvm.views.paths.IUINode;
+import $group__.client.ui.core.mvvm.views.paths.IUINodePathResolver;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.MapUtilities;
 

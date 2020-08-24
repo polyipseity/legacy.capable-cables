@@ -1,10 +1,10 @@
 package $group__.client.ui.mvvm.viewmodels;
 
-import $group__.client.ui.mvvm.core.IUIInfrastructure;
-import $group__.client.ui.mvvm.core.binding.IBinderAction;
-import $group__.client.ui.mvvm.core.extensions.IUIExtension;
-import $group__.client.ui.mvvm.core.models.IUIModel;
-import $group__.client.ui.mvvm.core.viewmodels.IUIViewModel;
+import $group__.client.ui.core.mvvm.IUIInfrastructure;
+import $group__.client.ui.core.mvvm.binding.IBinderAction;
+import $group__.client.ui.core.mvvm.extensions.IUIExtension;
+import $group__.client.ui.core.mvvm.models.IUIModel;
+import $group__.client.ui.core.mvvm.viewmodels.IUIViewModel;
 import $group__.utilities.MapUtilities;
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;

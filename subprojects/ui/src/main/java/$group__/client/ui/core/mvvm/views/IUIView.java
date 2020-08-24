@@ -1,9 +1,9 @@
-package $group__.client.ui.mvvm.core.views;
+package $group__.client.ui.core.mvvm.views;
 
-import $group__.client.ui.mvvm.core.IUICommon;
-import $group__.client.ui.mvvm.core.binding.IHasBinding;
-import $group__.client.ui.mvvm.core.extensions.IUIExtension;
-import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;
+import $group__.client.ui.core.mvvm.IUICommon;
+import $group__.client.ui.core.mvvm.binding.IHasBinding;
+import $group__.client.ui.core.mvvm.extensions.IUIExtension;
+import $group__.client.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 

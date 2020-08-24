@@ -1,4 +1,4 @@
-package $group__.client.ui.mvvm.core.views.events;
+package $group__.client.ui.core.mvvm.views.events;
 
 import $group__.client.ui.core.structures.IUIDataKeyboardKeyPress;
 import $group__.utilities.NamespaceUtilities;

@@ -1,9 +1,9 @@
 package $group__.client.ui.mvvm.views;
 
-import $group__.client.ui.mvvm.core.IUIInfrastructure;
-import $group__.client.ui.mvvm.core.binding.IBinderAction;
-import $group__.client.ui.mvvm.core.extensions.IUIExtension;
-import $group__.client.ui.mvvm.core.views.IUIView;
+import $group__.client.ui.core.mvvm.IUIInfrastructure;
+import $group__.client.ui.core.mvvm.binding.IBinderAction;
+import $group__.client.ui.core.mvvm.extensions.IUIExtension;
+import $group__.client.ui.core.mvvm.views.IUIView;
 import $group__.utilities.MapUtilities;
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;

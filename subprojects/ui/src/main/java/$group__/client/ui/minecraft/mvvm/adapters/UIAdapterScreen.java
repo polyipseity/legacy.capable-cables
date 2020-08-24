@@ -1,4 +1,4 @@
-package $group__.client.ui.mvvm.minecraft.adapters;
+package $group__.client.ui.minecraft.mvvm.adapters;
 
 import $group__.client.ui.core.mvvm.IUIInfrastructure;
 import $group__.client.ui.core.mvvm.adapters.IUIAdapter;

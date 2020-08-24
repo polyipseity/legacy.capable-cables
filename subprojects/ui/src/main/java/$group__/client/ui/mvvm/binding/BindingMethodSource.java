@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.binding;
 
-import $group__.client.ui.mvvm.core.binding.IBindingMethod;
+import $group__.client.ui.core.mvvm.binding.IBindingMethod;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import io.reactivex.rxjava3.core.ObservableSource;

@@ -1,7 +1,7 @@
-package $group__.client.ui.mvvm.minecraft.core.extensions;
+package $group__.client.ui.minecraft.core.mvvm.extensions;
 
-import $group__.client.ui.mvvm.core.extensions.IUIExtension;
-import $group__.client.ui.mvvm.minecraft.core.views.IUIViewComponentMinecraft;
+import $group__.client.ui.core.mvvm.extensions.IUIExtension;
+import $group__.client.ui.minecraft.core.mvvm.views.IUIViewComponentMinecraft;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;

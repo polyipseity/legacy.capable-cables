@@ -1,8 +1,8 @@
 package $group__.client.ui.mvvm.binding;
 
-import $group__.client.ui.mvvm.core.binding.IBinderAction;
-import $group__.client.ui.mvvm.core.binding.IBindingField;
-import $group__.client.ui.mvvm.core.binding.IBindingMethod;
+import $group__.client.ui.core.mvvm.binding.IBinderAction;
+import $group__.client.ui.core.mvvm.binding.IBindingField;
+import $group__.client.ui.core.mvvm.binding.IBindingMethod;
 import com.google.common.collect.ImmutableSet;
 
 public class BinderAction implements IBinderAction {

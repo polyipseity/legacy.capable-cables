@@ -1,4 +1,4 @@
-package $group__.client.ui.mvvm.minecraft.components;
+package $group__.client.ui.minecraft.mvvm.components;
 
 import $group__.client.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.client.ui.core.mvvm.structures.IUIPropertyMappingValue;

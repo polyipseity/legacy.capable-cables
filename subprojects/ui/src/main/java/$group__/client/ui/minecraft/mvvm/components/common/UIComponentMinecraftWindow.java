@@ -1,4 +1,4 @@
-package $group__.client.ui.mvvm.minecraft.components.common;
+package $group__.client.ui.minecraft.mvvm.components.common;
 
 import $group__.client.ui.core.mvvm.binding.IBindingField;
 import $group__.client.ui.core.mvvm.binding.IHasBinding;

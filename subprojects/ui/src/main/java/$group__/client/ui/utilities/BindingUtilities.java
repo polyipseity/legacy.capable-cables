@@ -1,8 +1,8 @@
 package $group__.client.ui.utilities;
 
-import $group__.client.ui.mvvm.core.binding.IBindingField;
-import $group__.client.ui.mvvm.core.binding.IBindingMethod;
-import $group__.client.ui.mvvm.core.binding.IHasBinding;
+import $group__.client.ui.core.mvvm.binding.IBindingField;
+import $group__.client.ui.core.mvvm.binding.IBindingMethod;
+import $group__.client.ui.core.mvvm.binding.IHasBinding;
 import $group__.utilities.*;
 import $group__.utilities.ThrowableUtilities.Try;
 import com.google.common.collect.ImmutableSet;

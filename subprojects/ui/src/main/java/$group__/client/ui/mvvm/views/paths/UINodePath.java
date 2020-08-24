@@ -1,9 +1,10 @@
 package $group__.client.ui.mvvm.views.paths;
 
-import $group__.client.ui.mvvm.core.views.paths.IUINode;
-import $group__.client.ui.mvvm.core.views.paths.IUINodePath;
+import $group__.client.ui.core.mvvm.views.paths.IUINode;
+import $group__.client.ui.core.mvvm.views.paths.IUINodePath;
 import com.google.common.collect.ImmutableList;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class UINodePath<T extends IUINode>
@@ -18,7 +19,11 @@ public class UINodePath<T extends IUINode>
 	public int size() { return getDelegated().size(); }
 
 	@Override
-	public T getAt(int depth) { return getDelegated().get(Math.floorMod(depth, size())); }
+	public T getAt(int depth) {
+		@Nullable T ret = getDelegated().get(Math.floorMod(depth, size()));
+		assert ret != null;
+		return ret;
+	}
 
 	@Override
 	public List<T> asList() { return ImmutableList.copyOf(getDelegated()); }

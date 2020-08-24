@@ -1,6 +1,6 @@
 package $group__.client.ui.mvvm.structures;
 
-import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
+import $group__.client.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.utilities.ObjectUtilities;
 import sun.misc.Cleaner;
 

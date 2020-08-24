@@ -7,12 +7,16 @@
 	<alias name="shape.rectangle" class="java.awt.geom.Rectangle2D"/>
 	<alias name="shape.ellipse" class="java.awt.geom.Ellipse2D"/>
 	<!-- COMMENT components -->
-	<alias name="component.manager" class="${group}.client.ui.mvvm.minecraft.components.UIComponentManagerMinecraft"/>
-	<alias name="component.window" class="${group}.client.ui.mvvm.minecraft.components.common.UIComponentMinecraftWindow"/>
-	<alias name="component.button" class="${group}.client.ui.mvvm.minecraft.components.common.UIComponentMinecraftButton"/>
+	<alias name="component.manager" class="${group}.client.ui.minecraft.mvvm.components.UIComponentManagerMinecraft"/>
+	<alias name="component.window"
+	       class="${group}.client.ui.minecraft.mvvm.components.common.UIComponentMinecraftWindow"/>
+	<alias name="component.button"
+	       class="${group}.client.ui.minecraft.mvvm.components.common.UIComponentMinecraftButton"/>
 	<!-- COMMENT extensions -->
-	<alias name="extension.user_relocatable" class="${group}.client.ui.mvvm.views.components.extensions.UIExtensionComponentUserRelocatable"/>
-	<alias name="extension.user_resizable" class="${group}.client.ui.mvvm.views.components.extensions.UIExtensionComponentUserResizable"/>
+	<alias name="extension.user_relocatable"
+	       class="${group}.client.ui.mvvm.views.components.extensions.UIExtensionComponentUserRelocatable"/>
+	<alias name="extension.user_resizable"
+	       class="${group}.client.ui.mvvm.views.components.extensions.UIExtensionComponentUserResizable"/>
 
 	<!-- SECTION content -->
 	<component class="component.manager">
@@ -31,9 +35,6 @@
 				<constraint minX="20"/>
 			</shape>
 
-			<extension class="extension.user_relocatable"/>
-			<extension class="extension.user_resizable"/>
-
 			<component class="component.button">
 				<shape class="shape.ellipse" x="0" y="0" width="100" height="100">
 					<transform>
@@ -43,6 +44,9 @@
 					</transform>
 				</shape>
 			</component>
+
+			<extension class="extension.user_relocatable"/>
+			<extension class="extension.user_resizable"/>
 		</component>
 	</component>
 </ui>

@@ -1,8 +1,8 @@
 package $group__.client.ui.events.ui;
 
-import $group__.client.ui.mvvm.core.views.events.IUIEvent;
-import $group__.client.ui.mvvm.core.views.events.IUIEventListener;
-import $group__.client.ui.mvvm.core.views.events.IUIEventTarget;
+import $group__.client.ui.core.mvvm.views.events.IUIEvent;
+import $group__.client.ui.core.mvvm.views.events.IUIEventListener;
+import $group__.client.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.MapUtilities;

@@ -1,4 +1,4 @@
-package $group__.client.ui.mvvm.minecraft.extensions;
+package $group__.client.ui.minecraft.mvvm.extensions;
 
 import $group__.client.ui.core.mvvm.IUICommon;
 import $group__.client.ui.core.mvvm.views.components.parsers.UIExtensionConstructor;

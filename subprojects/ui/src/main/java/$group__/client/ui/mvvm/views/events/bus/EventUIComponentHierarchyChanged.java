@@ -1,7 +1,7 @@
 package $group__.client.ui.mvvm.views.events.bus;
 
-import $group__.client.ui.mvvm.core.views.components.IUIComponent;
-import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
+import $group__.client.ui.core.mvvm.views.components.IUIComponent;
+import $group__.client.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.utilities.events.EnumEventHookStage;
 
 import javax.annotation.Nullable;

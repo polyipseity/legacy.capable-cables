@@ -1,4 +1,4 @@
-package $group__.client.ui.mvvm.core.views.components.extensions;
+package $group__.client.ui.core.mvvm.views.components.extensions;
 
 import $group__.client.ui.core.mvvm.extensions.IUIExtension;
 import $group__.client.ui.core.mvvm.views.IUIReshapeExplicitly;

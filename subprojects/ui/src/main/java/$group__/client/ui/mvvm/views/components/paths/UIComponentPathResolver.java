@@ -1,11 +1,11 @@
 package $group__.client.ui.mvvm.views.components.paths;
 
-import $group__.client.ui.mvvm.core.structures.IAffineTransformStack;
-import $group__.client.ui.mvvm.core.views.components.IUIComponent;
-import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
-import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
-import $group__.client.ui.mvvm.core.views.components.paths.IUIComponentPath;
-import $group__.client.ui.mvvm.core.views.components.paths.IUIComponentPathResolver;
+import $group__.client.ui.core.mvvm.structures.IAffineTransformStack;
+import $group__.client.ui.core.mvvm.views.components.IUIComponent;
+import $group__.client.ui.core.mvvm.views.components.IUIComponentContainer;
+import $group__.client.ui.core.mvvm.views.components.IUIComponentManager;
+import $group__.client.ui.core.mvvm.views.components.paths.IUIComponentPath;
+import $group__.client.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
 import $group__.client.ui.mvvm.views.paths.UINodePathResolver;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.MapUtilities;

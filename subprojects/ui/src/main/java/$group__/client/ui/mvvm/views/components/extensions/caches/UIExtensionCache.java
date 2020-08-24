@@ -1,10 +1,10 @@
 package $group__.client.ui.mvvm.views.components.extensions.caches;
 
-import $group__.client.ui.mvvm.core.views.components.IUIComponent;
-import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
-import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
-import $group__.client.ui.mvvm.core.views.components.extensions.caches.IUIExtensionCache;
-import $group__.client.ui.mvvm.core.views.components.parsers.UIExtensionConstructor;
+import $group__.client.ui.core.mvvm.views.components.IUIComponent;
+import $group__.client.ui.core.mvvm.views.components.IUIComponentContainer;
+import $group__.client.ui.core.mvvm.views.components.IUIComponentManager;
+import $group__.client.ui.core.mvvm.views.components.extensions.caches.IUIExtensionCache;
+import $group__.client.ui.core.mvvm.views.components.parsers.UIExtensionConstructor;
 import $group__.client.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.ConcurrencyUtilities;

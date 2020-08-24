@@ -17,8 +17,9 @@ public enum ObjectUtilities {
 
 	public static final IntSupplier HASH_CODE_SUPER_METHOD_DEFAULT = () -> 1;
 
+	@SuppressWarnings("ObjectEquality")
 	public static <T> boolean equals(T self, @Nullable Object other, boolean acceptSubclasses, @Nullable Function<? super Object, ? extends Boolean> superMethod, Iterable<? extends Function<? super T, ?>> variables) {
-		if (self.equals(other))
+		if (self == other)
 			return true;
 		if (acceptSubclasses) {
 			if (!self.getClass().isInstance(other))

@@ -1,4 +1,4 @@
-package $group__.client.ui.mvvm.core.binding;
+package $group__.client.ui.core.mvvm.binding;
 
 import $group__.utilities.interfaces.INamespacePrefixedString;
 

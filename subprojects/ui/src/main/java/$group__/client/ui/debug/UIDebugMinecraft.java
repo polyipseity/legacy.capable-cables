@@ -75,7 +75,9 @@ public enum UIDebugMinecraft {
 
 		private static final Logger LOGGER = LogManager.getLogger();
 		private static final IUIResourceParser<UIComponentManagerMinecraft, Document> PARSER =
-				new UIXMLDOMComponentParser<>(UIComponentManagerMinecraft.class);
+				UIDOMPrototypeMinecraftParser.makeParserMinecraft(
+						UIDOMPrototypeParser.makeParserStandard(
+								new UIDOMPrototypeMinecraftParser<>(UIComponentManagerMinecraft.class)));
 
 		static {
 			Try.run(() ->
@@ -93,7 +95,7 @@ public enum UIDebugMinecraft {
 					UIFacade.UFMinecraft.createScreen(
 							DISPLAY_NAME,
 							UIFacade.UFMinecraft.createInfrastructure(
-									new UIViewComponentMinecraft<>(PARSER.createUI()),
+									new UIViewComponentMinecraft<>(PARSER.construct()),
 									new ViewModel(),
 									new Binder()
 							),

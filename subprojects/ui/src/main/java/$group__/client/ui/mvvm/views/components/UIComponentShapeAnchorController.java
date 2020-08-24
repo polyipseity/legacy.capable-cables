@@ -1,9 +1,9 @@
 package $group__.client.ui.mvvm.views.components;
 
+import $group__.client.ui.core.mvvm.views.components.IUIComponent;
+import $group__.client.ui.core.mvvm.views.components.IUIComponentShapeAnchorController;
 import $group__.client.ui.core.structures.shapes.interactions.IShapeAnchor;
 import $group__.client.ui.events.bus.UIEventBusEntryPoint;
-import $group__.client.ui.mvvm.core.views.components.IUIComponent;
-import $group__.client.ui.mvvm.core.views.components.IUIComponentShapeAnchorController;
 import $group__.client.ui.mvvm.views.events.bus.EventUIComponent;
 import $group__.client.ui.structures.shapes.interactions.ShapeAnchorController;
 import $group__.utilities.events.EnumEventHookStage;

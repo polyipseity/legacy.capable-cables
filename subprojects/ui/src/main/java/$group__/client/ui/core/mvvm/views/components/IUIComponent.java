@@ -1,4 +1,4 @@
-package $group__.client.ui.mvvm.core.views.components;
+package $group__.client.ui.core.mvvm.views.components;
 
 import $group__.client.ui.core.mvvm.binding.IHasBinding;
 import $group__.client.ui.core.mvvm.extensions.IUIExtension;
