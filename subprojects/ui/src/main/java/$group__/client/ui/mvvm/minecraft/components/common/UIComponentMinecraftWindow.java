@@ -65,14 +65,14 @@ public class UIComponentMinecraftWindow
 	protected final IBindingField<Color> colorBorder;
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
-	@UIConstructor
-	public UIComponentMinecraftWindow(IShapeDescriptor<RectangularShape> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) {
-		super(shapeDescriptor, propertyMapping);
+	@UIConstructor(type = UIConstructor.ConstructorType.SHAPE_DESCRIPTOR__MAPPING)
+	public UIComponentMinecraftWindow(IShapeDescriptor<RectangularShape> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> mapping) {
+		super(shapeDescriptor, mapping);
 
 		this.colorBackground = IHasBinding.createBindingField(Color.class,
-				this.propertyMapping.get(PROPERTY_COLOR_BACKGROUND_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.BLACK);
+				this.mapping.get(PROPERTY_COLOR_BACKGROUND_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.BLACK);
 		this.colorBorder = IHasBinding.createBindingField(Color.class,
-				this.propertyMapping.get(PROPERTY_COLOR_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.WHITE);
+				this.mapping.get(PROPERTY_COLOR_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.WHITE);
 
 		IShapeDescriptor<?> sd = getShapeDescriptor();
 		modifyShape(() -> {

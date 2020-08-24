@@ -74,5 +74,5 @@ public interface IUIComponent
 	@Override
 	default Optional<IUINode> getParentNode() { return getParent().map(Function.identity()); }
 
-	Map<ResourceLocation, IUIPropertyMappingValue> getPropertyMappingView();
+	Map<ResourceLocation, IUIPropertyMappingValue> getMappingView();
 }

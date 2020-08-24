@@ -56,7 +56,7 @@ public class UIComponent
 
 	@Nullable
 	protected final String id;
-	protected final Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping;
+	protected final Map<ResourceLocation, IUIPropertyMappingValue> mapping;
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 	protected final ConcurrentMap<ResourceLocation, IUIExtension<? extends ResourceLocation, ? super IUIComponent>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected final ConcurrentMap<ResourceLocation, IBindingMethod.ISource<?>> eventTargetBindingMethods = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
@@ -72,17 +72,17 @@ public class UIComponent
 	protected final AtomicBoolean modifyingShape = new AtomicBoolean();
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	public UIComponent(IShapeDescriptor<?> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) {
+	public UIComponent(IShapeDescriptor<?> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> mapping) {
 		this.shapeDescriptor = new ComponentShapeDescriptor<>(shapeDescriptor);
-		this.propertyMapping = new HashMap<>(propertyMapping);
+		this.mapping = new HashMap<>(mapping);
 
-		this.id = Optional.ofNullable(this.propertyMapping.get(PROPERTY_ID_LOCATION))
+		this.id = Optional.ofNullable(this.mapping.get(PROPERTY_ID_LOCATION))
 				.flatMap(IUIPropertyMappingValue::getDefaultValue)
 				.map(Node::getNodeValue)
 				.orElse(null);
 
-		this.visible = IHasBinding.createBindingField(Boolean.class, this.propertyMapping.get(PROPERTY_VISIBLE_LOCATION), BindingUtilities.Deserializers::deserializeBoolean, true);
-		this.active = IHasBinding.createBindingField(Boolean.class, this.propertyMapping.get(PROPERTY_ACTIVE_LOCATION), BindingUtilities.Deserializers::deserializeBoolean, true);
+		this.visible = IHasBinding.createBindingField(Boolean.class, this.mapping.get(PROPERTY_VISIBLE_LOCATION), BindingUtilities.Deserializers::deserializeBoolean, true);
+		this.active = IHasBinding.createBindingField(Boolean.class, this.mapping.get(PROPERTY_ACTIVE_LOCATION), BindingUtilities.Deserializers::deserializeBoolean, true);
 
 		IExtensionContainer.addExtensionSafe(this, new UIExtensionCache());
 	}
@@ -120,7 +120,19 @@ public class UIComponent
 	public Optional<String> getID() { return Optional.ofNullable(id); }
 
 	@Override
-	public Map<ResourceLocation, IUIPropertyMappingValue> getPropertyMappingView() { return ImmutableMap.copyOf(getPropertyMapping()); }
+	public boolean dispatchEvent(IUIEvent event) {
+		boolean ret = super.dispatchEvent(event);
+		ResourceLocation type = event.getType();
+		CastUtilities.<IBindingMethod.ISource<? extends IUIEvent>>castUnchecked( // COMMENT should match
+				Optional.<IBindingMethod.ISource<?>>ofNullable(getEventTargetBindingMethods().get(type))
+						.orElseGet(() -> {
+							IBindingMethod.ISource<? extends IUIEvent> r = new BindingMethodSource<>(event.getClass(),
+									Optional.ofNullable(getMapping().get(type)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
+							getEventTargetBindingMethods().put(type, r);
+							return r;
+						})).invoke(CastUtilities.castUnchecked(event)); // COMMENT should match
+		return ret;
+	}
 
 	@Override
 	public Optional<IUIComponentContainer> getParent() { return Optional.ofNullable(parent.get()); }
@@ -165,21 +177,6 @@ public class UIComponent
 	protected Subject<IBinderAction> getBinderNotifierSubject() { return binderNotifierSubject; }
 
 	@Override
-	public boolean dispatchEvent(IUIEvent event) {
-		boolean ret = super.dispatchEvent(event);
-		ResourceLocation type = event.getType();
-		CastUtilities.<IBindingMethod.ISource<? extends IUIEvent>>castUnchecked( // COMMENT should match
-				Optional.<IBindingMethod.ISource<?>>ofNullable(getEventTargetBindingMethods().get(type))
-						.orElseGet(() -> {
-							IBindingMethod.ISource<? extends IUIEvent> r = new BindingMethodSource<>(event.getClass(),
-									Optional.ofNullable(getPropertyMapping().get(type)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
-							getEventTargetBindingMethods().put(type, r);
-							return r;
-						})).invoke(CastUtilities.castUnchecked(event)); // COMMENT should match
-		return ret;
-	}
-
-	@Override
 	public boolean isActive() { return getActive().getValue(); }
 
 	public IBindingField<Boolean> getActive() { return active; }
@@ -187,8 +184,11 @@ public class UIComponent
 	@Override
 	public void setActive(boolean active) { getActive().setValue(active); }
 
+	@Override
+	public Map<ResourceLocation, IUIPropertyMappingValue> getMappingView() { return ImmutableMap.copyOf(getMapping()); }
+
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Map<ResourceLocation, IUIPropertyMappingValue> getPropertyMapping() { return propertyMapping; }
+	protected Map<ResourceLocation, IUIPropertyMappingValue> getMapping() { return mapping; }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<ResourceLocation, IBindingMethod.ISource<?>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }

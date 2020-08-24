@@ -7,5 +7,4 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 public @interface UIMethod {
 	String value();
-	// TODO make this annotation do something?
 }

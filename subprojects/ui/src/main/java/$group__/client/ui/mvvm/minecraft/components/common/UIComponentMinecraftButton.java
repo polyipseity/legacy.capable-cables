@@ -75,25 +75,25 @@ public class UIComponentMinecraftButton
 	protected final EnumSet<IButtonState> buttonStates = EnumSet.noneOf(IButtonState.class);
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
-	@UIConstructor
-	public UIComponentMinecraftButton(IShapeDescriptor<?> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) {
-		super(shapeDescriptor, propertyMapping);
+	@UIConstructor(type = UIConstructor.ConstructorType.SHAPE_DESCRIPTOR__MAPPING)
+	public UIComponentMinecraftButton(IShapeDescriptor<?> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> mapping) {
+		super(shapeDescriptor, mapping);
 
 		this.colorBase = IHasBinding.createBindingField(Color.class,
-				this.propertyMapping.get(PROPERTY_COLOR_BASE_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.DARK_GRAY);
+				this.mapping.get(PROPERTY_COLOR_BASE_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.DARK_GRAY);
 		this.colorBaseBorder = IHasBinding.createBindingField(Color.class,
-				this.propertyMapping.get(PROPERTY_COLOR_BASE_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.DARK_GRAY);
+				this.mapping.get(PROPERTY_COLOR_BASE_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.DARK_GRAY);
 		this.colorHovering = IHasBinding.createBindingField(Color.class,
-				this.propertyMapping.get(PROPERTY_COLOR_HOVERING_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.GRAY);
+				this.mapping.get(PROPERTY_COLOR_HOVERING_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.GRAY);
 		this.colorHoveringBorder = IHasBinding.createBindingField(Color.class,
-				this.propertyMapping.get(PROPERTY_COLOR_HOVERING_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.GRAY);
+				this.mapping.get(PROPERTY_COLOR_HOVERING_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.GRAY);
 		this.colorPressed = IHasBinding.createBindingField(Color.class,
-				this.propertyMapping.get(PROPERTY_COLOR_PRESSED_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.LIGHT_GRAY);
+				this.mapping.get(PROPERTY_COLOR_PRESSED_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.LIGHT_GRAY);
 		this.colorPressedBorder = IHasBinding.createBindingField(Color.class,
-				this.propertyMapping.get(PROPERTY_COLOR_PRESSED_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.LIGHT_GRAY);
+				this.mapping.get(PROPERTY_COLOR_PRESSED_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.LIGHT_GRAY);
 
 		this.methodOnActivated = new BindingMethodSource<>(IUIEvent.class,
-				Optional.ofNullable(this.propertyMapping.get(METHOD_ON_ACTIVATED_LOCATION)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
+				Optional.ofNullable(this.mapping.get(METHOD_ON_ACTIVATED_LOCATION)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 
 		addEventListener(UIEventMouse.TYPE_MOUSE_ENTER_SELF, new UIEventListener.Functional<IUIEventMouse>(e -> {
 			if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET) {

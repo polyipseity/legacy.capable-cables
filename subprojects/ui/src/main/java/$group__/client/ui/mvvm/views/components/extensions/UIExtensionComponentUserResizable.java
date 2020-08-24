@@ -9,7 +9,7 @@ import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
 import $group__.client.ui.mvvm.core.views.components.extensions.IUIExtensionComponentUserResizable;
 import $group__.client.ui.mvvm.core.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
-import $group__.client.ui.mvvm.core.views.components.parsers.UIConstructor;
+import $group__.client.ui.mvvm.core.views.components.parsers.UIExtensionConstructor;
 import $group__.client.ui.mvvm.core.views.events.IUIEventMouse;
 import $group__.client.ui.mvvm.views.components.UIComponentVirtual;
 import $group__.client.ui.mvvm.views.events.ui.UIEventMouse;
@@ -52,7 +52,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 	@Nullable
 	protected IResizeData resizeData;
 
-	@UIConstructor
+	@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.EXTENDED_CLASS)
 	public UIExtensionComponentUserResizable(Class<E> extendedClass) {
 		super(IUIComponent.class, extendedClass);
 	}

@@ -12,6 +12,8 @@ import $group__.client.ui.mvvm.core.views.components.IUIComponent;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentContainer;
 import $group__.client.ui.mvvm.core.views.components.IUIComponentManager;
 import $group__.client.ui.mvvm.core.views.components.parsers.IUIResourceParser;
+import $group__.client.ui.mvvm.core.views.components.parsers.UIConstructor;
+import $group__.client.ui.mvvm.core.views.components.parsers.UIExtensionConstructor;
 import $group__.client.ui.mvvm.structures.UIPropertyMappingValue;
 import $group__.client.ui.structures.EnumUISide;
 import $group__.client.ui.structures.shapes.interactions.ShapeAnchor;
@@ -102,7 +104,9 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 		}
 
 		setPrototype(TreeUtilities.visitNodesDepthFirst(managerNode,
-				n -> UIComponentPrototype.createPrototype(getAliases(), namespaceURI, n),
+				n -> Try.call(() ->
+						UIComponentPrototype.createPrototype(getAliases(), namespaceURI, n), LOGGER)
+						.orElseThrow(ThrowableCatcher::rethrow),
 				n -> DOMUtilities.getChildrenByTagNameNS(n, namespaceURI, "component"),
 				(p, c) -> {
 					p.addChildren(c);
@@ -144,13 +148,15 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 
 	protected static String getClassFromMaybeAlias(Map<String, String> aliases, String maybeAlias) { return aliases.getOrDefault(maybeAlias, maybeAlias); }
 
-	protected static abstract class ComponentBasedPrototype {
-		protected final String className;
-		protected final Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping;
+	protected static abstract class ComponentBasedPrototype<T> {
+		protected final Class<? extends T> componentClass;
+		protected final Map<ResourceLocation, IUIPropertyMappingValue> mapping;
 
-		protected ComponentBasedPrototype(String className, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) {
-			this.className = className;
-			this.propertyMapping = ImmutableMap.copyOf(propertyMapping);
+		@SuppressWarnings("unchecked")
+		protected ComponentBasedPrototype(String className, Map<ResourceLocation, IUIPropertyMappingValue> mapping)
+				throws ClassNotFoundException {
+			this.componentClass = (Class<? extends T>) Class.forName(className); // COMMENT we will know later...
+			this.mapping = ImmutableMap.copyOf(mapping);
 		}
 
 		protected static void constructMapping(Map<ResourceLocation, IUIPropertyMappingValue> mapping, Node node, @Nullable String namespaceURI) {
@@ -166,18 +172,34 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 									DOMUtilities.getAttributeValue(p, "binding").map(ResourceLocation::new).orElse(null))));
 		}
 
-		protected String getClassName() { return className; }
+		protected Class<? extends T> getComponentClass() { return componentClass; }
 
-		protected Map<ResourceLocation, IUIPropertyMappingValue> getPropertyMapping() { return propertyMapping; }
+		protected Map<ResourceLocation, IUIPropertyMappingValue> getMapping() { return mapping; }
 	}
 
 	protected static class UIExtensionPrototype
-			extends ComponentBasedPrototype {
-		private static final Logger LOGGER = LogManager.getLogger();
+			extends ComponentBasedPrototype<IUIExtension<?, ?>> {
+		protected final UIExtensionConstructor.ConstructorType constructorType;
+		protected final MethodHandle constructor;
 
-		protected UIExtensionPrototype(String className, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) { super(className, propertyMapping); }
+		protected UIExtensionPrototype(String className, Map<ResourceLocation, IUIPropertyMappingValue> mapping)
+				throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException {
+			super(className, mapping);
 
-		protected static UIExtensionPrototype createPrototype(Map<String, String> aliases, @Nullable String namespaceURI, Node node) {
+			this.constructorType = Arrays.stream(componentClass.getDeclaredConstructors()).unordered()
+					.map(c -> c.getAnnotation(UIExtensionConstructor.class))
+					.filter(Objects::nonNull)
+					.findAny()
+					.orElseThrow(() ->
+							BecauseOf.illegalArgument("Cannot find any constructor annotated with 'UIExtensionConstructor'",
+									"componentClass.getDeclaredConstructors()", componentClass.getDeclaredConstructors(),
+									"componentClass", componentClass)).type();
+			this.constructor = DynamicUtilities.IMPL_LOOKUP.findConstructor(componentClass,
+					constructorType.getMethodType());
+		}
+
+		protected static UIExtensionPrototype createPrototype(Map<String, String> aliases, @Nullable String namespaceURI, Node node)
+				throws NoSuchMethodException, IllegalAccessException, ClassNotFoundException {
 			Map<ResourceLocation, IUIPropertyMappingValue> m = new HashMap<>(node.getChildNodes().getLength());
 			ComponentBasedPrototype.constructMapping(m, node, namespaceURI);
 			return new UIExtensionPrototype(
@@ -187,62 +209,59 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 
 		protected IUIExtension<?, ?> createComponent(IUIComponent container)
 				throws Throwable {
-			final EnumConstructorType[] type = new EnumConstructorType[1];
-			MethodHandle constructor = // COMMENT it's almost like if-else if-else ;/
-					Try.call(() -> {
-						type[0] = EnumConstructorType.MAP__EXTENDED_CLASS;
-						return DynamicUtilities.IMPL_LOOKUP.findConstructor(Class.forName(getClassName()), MethodType.methodType(void.class, Map.class, Class.class));
-					}, LOGGER).orElseGet(() -> Try.call(() -> {
-						type[0] = EnumConstructorType.MAP;
-						return DynamicUtilities.IMPL_LOOKUP.findConstructor(Class.forName(getClassName()), MethodType.methodType(void.class, Map.class));
-					}, LOGGER).orElseGet(() -> Try.call(() -> {
-						type[0] = EnumConstructorType.EXTENDED_CLASS;
-						return DynamicUtilities.IMPL_LOOKUP.findConstructor(Class.forName(getClassName()), MethodType.methodType(void.class, Class.class));
-					}, LOGGER).orElseGet(() -> Try.call(() -> {
-						type[0] = EnumConstructorType.NO_ARGS;
-						return DynamicUtilities.IMPL_LOOKUP.findConstructor(Class.forName(getClassName()), MethodType.methodType(void.class));
-					}, LOGGER).orElseThrow(ThrowableCatcher::rethrow))));
-			switch (type[0]) {
-				case MAP__EXTENDED_CLASS:
-					return (IUIExtension<?, ?>) constructor.invoke(getPropertyMapping(), container.getClass());
-				case MAP:
-					return (IUIExtension<?, ?>) constructor.invoke(getPropertyMapping());
+			switch (getConstructorType()) {
+				case MAPPING__EXTENDED_CLASS:
+					return (IUIExtension<?, ?>) getConstructor().invoke(getMapping(), container.getClass());
+				case MAPPING:
+					return (IUIExtension<?, ?>) getConstructor().invoke(getMapping());
 				case EXTENDED_CLASS:
-					return (IUIExtension<?, ?>) constructor.invoke(container.getClass());
+					return (IUIExtension<?, ?>) getConstructor().invoke(container.getClass());
 				case NO_ARGS:
-					return (IUIExtension<?, ?>) constructor.invoke();
+					return (IUIExtension<?, ?>) getConstructor().invoke();
 				default:
 					throw new InternalError();
 			}
 		}
 
-		protected enum EnumConstructorType {
-			MAP__EXTENDED_CLASS,
-			MAP,
-			EXTENDED_CLASS,
-			NO_ARGS,
-		}
+		protected UIExtensionConstructor.ConstructorType getConstructorType() { return constructorType; }
+
+		protected MethodHandle getConstructor() { return constructor; }
 	}
 
 	protected static class UIComponentPrototype
-			extends ComponentBasedPrototype {
+			extends ComponentBasedPrototype<IUIComponent> {
 		private static final Logger LOGGER = LogManager.getLogger();
 		protected final UIShapeDescriptorPrototype shapeDescriptorPrototype;
 		protected final Iterable<Function<? super IUIComponentManager<?>, ? extends Optional<? extends IShapeAnchor>>> anchors;
 		protected final List<UIExtensionPrototype> extensions = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 		protected final List<UIComponentPrototype> children = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+		protected final UIConstructor.ConstructorType constructorType;
+		protected final MethodHandle constructor;
 
 		protected UIComponentPrototype(String className,
 		                               UIShapeDescriptorPrototype shapeDescriptorPrototype,
 		                               Iterable<? extends Function<? super IUIComponentManager<?>, ? extends Optional<? extends IShapeAnchor>>> anchors,
-		                               Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) {
-			super(className, propertyMapping);
+		                               Map<ResourceLocation, IUIPropertyMappingValue> mapping)
+				throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException {
+			super(className, mapping);
 			this.anchors = Iterables.unmodifiableIterable(anchors);
 			this.shapeDescriptorPrototype = shapeDescriptorPrototype;
+
+			this.constructorType = Arrays.stream(componentClass.getDeclaredConstructors()).unordered()
+					.map(c -> c.getAnnotation(UIConstructor.class))
+					.filter(Objects::nonNull)
+					.findAny()
+					.orElseThrow(() ->
+							BecauseOf.illegalArgument("Cannot find any constructor annotated with 'UIConstructor'",
+									"componentClass.getDeclaredConstructors()", componentClass.getDeclaredConstructors(),
+									"componentClass", componentClass)).type();
+			this.constructor = DynamicUtilities.IMPL_LOOKUP.findConstructor(componentClass,
+					constructorType.getMethodType());
 		}
 
 		@SuppressWarnings("UnstableApiUsage")
-		protected static UIComponentPrototype createPrototype(Map<String, String> aliases, @Nullable String namespaceURI, Node node) {
+		protected static UIComponentPrototype createPrototype(Map<String, String> aliases, @Nullable String namespaceURI, Node node)
+				throws NoSuchMethodException, IllegalAccessException, ClassNotFoundException {
 			@Nullable NamedNodeMap as = node.getAttributes();
 			assert as != null;
 			Map<ResourceLocation, IUIPropertyMappingValue> mapping = new HashMap<>(as.getLength() + node.getChildNodes().getLength());
@@ -286,10 +305,16 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 					anchors, mapping);
 			ret.addExtensions(
 					DOMUtilities.getChildrenByTagNameNS(node, namespaceURI, "extension").stream().sequential()
-							.map(e -> UIExtensionPrototype.createPrototype(aliases, namespaceURI, e))
+							.map(e -> Try.call(() ->
+									UIExtensionPrototype.createPrototype(aliases, namespaceURI, e), LOGGER)
+									.orElseThrow(ThrowableCatcher::rethrow))
 							.collect(ImmutableList.toImmutableList()));
 			return ret;
 		}
+
+		protected MethodHandle getConstructor() { return constructor; }
+
+		protected UIConstructor.ConstructorType getConstructorType() { return constructorType; }
 
 		@SuppressWarnings("UnusedReturnValue")
 		public boolean addChildren(Iterable<? extends UIComponentPrototype> children) { return Iterables.addAll(getChildren(), children); }
@@ -300,13 +325,17 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 		protected List<UIExtensionPrototype> getExtensions() { return extensions; }
 
-		@SuppressWarnings({"UnstableApiUsage"})
+		@SuppressWarnings({"UnstableApiUsage", "SwitchStatementWithTooFewBranches"})
 		protected IUIComponent createComponent(final List<Consumer<? super IUIComponentManager<?>>> queue)
 				throws Throwable {
-			IUIComponent ret = (IUIComponent) DynamicUtilities.IMPL_LOOKUP
-					.findConstructor(Class.forName(getClassName()),
-							MethodType.methodType(void.class, IShapeDescriptor.class, Map.class))
-					.invoke(getShapeDescriptorPrototype().createComponent(), getPropertyMapping());
+			IUIComponent ret;
+			switch (getConstructorType()) {
+				case SHAPE_DESCRIPTOR__MAPPING:
+					ret = (IUIComponent) getConstructor().invoke(getShapeDescriptorPrototype().createComponent(), getMapping());
+					break;
+				default:
+					throw new InternalError();
+			}
 			if (!getChildren().isEmpty()) {
 				if (!(ret instanceof IUIComponentContainer))
 					throw BecauseOf.illegalArgument("UI component type is not a container",
@@ -342,7 +371,7 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 	}
 
 	protected static class UIShapeDescriptorPrototype
-			extends ComponentBasedPrototype {
+			extends ComponentBasedPrototype<Shape> {
 		protected static final ImmutableMap<String, BiConsumer<? super IShapeDescriptorBuilder<?>, ? super Number>> SHAPE_DESCRIPTOR_ATTRIBUTE_MAP = ImmutableMap.<String, BiConsumer<? super IShapeDescriptorBuilder<?>, ? super Number>>builder()
 				.put("x", (sdb, n) -> sdb.setX(n.doubleValue()))
 				.put("y", (sdb, n) -> sdb.setY(n.doubleValue()))
@@ -362,15 +391,17 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 		protected final Map<String, Number> attributes;
 		protected final Iterable<IShapeConstraint> constraints;
 
-		protected UIShapeDescriptorPrototype(String className, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping, AffineTransform transform, Map<? extends String, ? extends Number> attributes, Iterable<? extends IShapeConstraint> constraints) {
-			super(className, propertyMapping);
+		protected UIShapeDescriptorPrototype(String className, Map<ResourceLocation, IUIPropertyMappingValue> mapping, AffineTransform transform, Map<? extends String, ? extends Number> attributes, Iterable<? extends IShapeConstraint> constraints)
+				throws ClassNotFoundException {
+			super(className, mapping);
 			this.attributes = ImmutableMap.copyOf(attributes);
 			this.transform = (AffineTransform) transform.clone();
 			this.constraints = Iterables.unmodifiableIterable(constraints);
 		}
 
 		@SuppressWarnings("UnstableApiUsage")
-		protected static UIShapeDescriptorPrototype createPrototype(Map<String, String> aliases, @Nullable String namespaceURI, Node node) {
+		protected static UIShapeDescriptorPrototype createPrototype(Map<String, String> aliases, @Nullable String namespaceURI, Node node)
+				throws ClassNotFoundException {
 			Map<ResourceLocation, IUIPropertyMappingValue> m = new HashMap<>(node.getChildNodes().getLength());
 			ComponentBasedPrototype.constructMapping(m, node, namespaceURI);
 
@@ -467,10 +498,9 @@ public class UIXMLDOMComponentParser<T extends IUIComponentManager<?>>
 					transform, attributes, constraints);
 		}
 
-		protected IShapeDescriptor<?> createComponent()
-				throws Throwable {
-			@SuppressWarnings("unchecked") IShapeDescriptorBuilder<?> sdb = IShapeDescriptorBuilderFactory.getDefault()
-					.createBuilder((Class<? extends Shape>) Class.forName(getClassName()));
+		protected IShapeDescriptor<?> createComponent() {
+			IShapeDescriptorBuilder<?> sdb = IShapeDescriptorBuilderFactory.getDefault()
+					.createBuilder(getComponentClass());
 
 			getAttributes().forEach((s, n) ->
 					SHAPE_DESCRIPTOR_ATTRIBUTE_MAP.getOrDefault(s, (sdbD, nD) ->

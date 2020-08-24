@@ -1,7 +1,5 @@
 package $group__.client.ui.mvvm.core.views.components.parsers;
 
-import $group__.client.ui.core.structures.shapes.descriptors.IShapeDescriptor;
-
 import java.lang.annotation.*;
 import java.lang.invoke.MethodType;
 import java.util.Map;
@@ -9,11 +7,14 @@ import java.util.Map;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.CONSTRUCTOR)
-public @interface UIConstructor {
+public @interface UIExtensionConstructor {
 	ConstructorType type();
 
 	enum ConstructorType {
-		SHAPE_DESCRIPTOR__MAPPING(MethodType.methodType(void.class, IShapeDescriptor.class, Map.class)),
+		MAPPING__EXTENDED_CLASS(MethodType.methodType(void.class, Map.class, Class.class)),
+		MAPPING(MethodType.methodType(void.class, Map.class)),
+		EXTENDED_CLASS(MethodType.methodType(void.class, Class.class)),
+		NO_ARGS(MethodType.methodType(void.class)),
 		;
 
 		protected final MethodType methodType;

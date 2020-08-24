@@ -18,8 +18,8 @@ import java.util.Map;
 public class UIComponentManagerMinecraft
 		extends UIComponentManager<Rectangle2D>
 		implements IUIComponentMinecraft {
-	@UIConstructor
-	public UIComponentManagerMinecraft(IShapeDescriptor<Rectangle2D> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) { super(shapeDescriptor, propertyMapping); }
+	@UIConstructor(type = UIConstructor.ConstructorType.SHAPE_DESCRIPTOR__MAPPING)
+	public UIComponentManagerMinecraft(IShapeDescriptor<Rectangle2D> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> mapping) { super(shapeDescriptor, mapping); }
 
 	@Override
 	public void crop(IAffineTransformStack stack, EnumCropMethod method, boolean push, Point2D mouse, double partialTicks) { IUIComponentMinecraft.crop(this, stack, method, push, mouse, partialTicks); }

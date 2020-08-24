@@ -40,7 +40,7 @@ public abstract class UIComponentManager<S extends Shape>
 	protected final IUIComponentPathResolver<IUIComponent> pathResolver = new PathResolver();
 	protected final IUIComponentShapeAnchorController shapeAnchorController = new UIComponentShapeAnchorController();
 
-	public UIComponentManager(IShapeDescriptor<S> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) { super(shapeDescriptor, propertyMapping); }
+	public UIComponentManager(IShapeDescriptor<S> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> mapping) { super(shapeDescriptor, mapping); }
 
 	@Override
 	public IUIComponentPathResolver<IUIComponent> getPathResolver() { return pathResolver; }

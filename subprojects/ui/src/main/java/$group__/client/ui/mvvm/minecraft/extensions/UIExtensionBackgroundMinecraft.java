@@ -2,7 +2,7 @@ package $group__.client.ui.mvvm.minecraft.extensions;
 
 import $group__.client.ui.events.bus.UIEventBusEntryPoint;
 import $group__.client.ui.mvvm.core.IUICommon;
-import $group__.client.ui.mvvm.core.views.components.parsers.UIConstructor;
+import $group__.client.ui.mvvm.core.views.components.parsers.UIExtensionConstructor;
 import $group__.client.ui.mvvm.minecraft.core.extensions.IUIExtensionBackgroundRenderer;
 import $group__.client.ui.mvvm.minecraft.core.extensions.IUIExtensionScreenProvider;
 import $group__.client.ui.mvvm.minecraft.core.views.IUIViewComponentMinecraft;
@@ -30,7 +30,7 @@ import java.util.function.Predicate;
 public abstract class UIExtensionBackgroundMinecraft<E extends IUIViewComponentMinecraft<?, ?>>
 		extends ExtensionContainerAware<ResourceLocation, IUIViewComponentMinecraft<?, ?>, E>
 		implements IUIExtensionBackgroundRenderer {
-	@UIConstructor
+	@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.EXTENDED_CLASS)
 	public UIExtensionBackgroundMinecraft(Class<E> extendedClass) {
 		super(CastUtilities.castUnchecked(IUIViewComponentMinecraft.class), // COMMENT the generics should not matter here
 				extendedClass);
@@ -44,7 +44,7 @@ public abstract class UIExtensionBackgroundMinecraft<E extends IUIViewComponentM
 	@OnlyIn(Dist.CLIENT)
 	public static class Default<E extends IUIViewComponentMinecraft<?, ?>>
 			extends UIExtensionBackgroundMinecraft<E> {
-		@UIConstructor
+		@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.EXTENDED_CLASS)
 		public Default(Class<E> extendedClass) { super(extendedClass); }
 
 		@Override
@@ -54,7 +54,7 @@ public abstract class UIExtensionBackgroundMinecraft<E extends IUIViewComponentM
 	@OnlyIn(Dist.CLIENT)
 	public static class Dirt<E extends IUIViewComponentMinecraft<?, ?>>
 			extends UIExtensionBackgroundMinecraft<E> {
-		@UIConstructor
+		@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.EXTENDED_CLASS)
 		public Dirt(Class<E> extendedClass) { super(extendedClass); }
 
 		@Override

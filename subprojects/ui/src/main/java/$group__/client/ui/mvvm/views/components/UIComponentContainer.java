@@ -30,7 +30,7 @@ public class UIComponentContainer
 		implements IUIComponentContainer {
 	protected final List<IUIComponent> children = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 
-	public UIComponentContainer(IShapeDescriptor<?> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> propertyMapping) { super(shapeDescriptor, propertyMapping); }
+	public UIComponentContainer(IShapeDescriptor<?> shapeDescriptor, Map<ResourceLocation, IUIPropertyMappingValue> mapping) { super(shapeDescriptor, mapping); }
 
 	@Override
 	public void transformChildren(IAffineTransformStack stack) {
