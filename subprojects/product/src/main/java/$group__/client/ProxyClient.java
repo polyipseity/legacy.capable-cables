@@ -1,10 +1,10 @@
 package $group__.client;
 
 import $group__.ConstantsProduct;
-import $group__.client.ui.ConfigurationUI;
-import $group__.client.ui.ConstantsUI;
-import $group__.client.ui.debug.UIDebugMinecraft;
 import $group__.proxies.Proxy;
+import $group__.ui.ConfigurationUI;
+import $group__.ui.ConstantsUI;
+import $group__.ui.debug.UIDebugMinecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;

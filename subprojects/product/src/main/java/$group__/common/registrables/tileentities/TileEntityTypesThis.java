@@ -1,7 +1,7 @@
 package $group__.common.registrables.tileentities;
 
-import $group__.client.ui.ConstantsUI;
-import $group__.client.ui.debug.UIDebugMinecraft;
+import $group__.ui.ConstantsUI;
+import $group__.ui.debug.UIDebugMinecraft;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;

@@ -1,9 +1,9 @@
 package $group__.common.registrables.items;
 
-import $group__.client.ui.ConstantsUI;
-import $group__.client.ui.debug.UIDebugMinecraft;
 import $group__.common.registrables.blocks.BlocksThis;
 import $group__.common.registrables.items.groups.ItemGroupsThis;
+import $group__.ui.ConstantsUI;
+import $group__.ui.debug.UIDebugMinecraft;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.RegistryObject;
