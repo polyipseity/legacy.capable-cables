@@ -23,19 +23,19 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public interface IUIExtensionCache
-		extends IUIExtension<INamespacePrefixedString, IExtensionContainer<INamespacePrefixedString, ?>> {
+		extends IUIExtension<INamespacePrefixedString, IExtensionContainer<INamespacePrefixedString>> {
 	INamespacePrefixedString KEY = new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, AREA_UI + ".cache");
-	Registry.RegistryObject<IUIExtension.IType<INamespacePrefixedString, IUIExtensionCache, IExtensionContainer<INamespacePrefixedString, ?>>> TYPE =
+	Registry.RegistryObject<IUIExtension.IType<INamespacePrefixedString, IUIExtensionCache, IExtensionContainer<INamespacePrefixedString>>> TYPE =
 			RegExtension.INSTANCE.registerApply(KEY, k -> new IUIExtension.IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
 
 	Cache<INamespacePrefixedString, Object> getDelegated();
 
-	interface IType<V, I extends IExtensionContainer<INamespacePrefixedString, ?>> {
+	interface IType<V, I extends IExtensionContainer<INamespacePrefixedString>> {
 		Optional<V> get(I instance);
 
 		default void invalidate(I instance) { invalidate(instance, getKey()); }
 
-		static void invalidate(IExtensionContainer<INamespacePrefixedString, ?> instance, INamespacePrefixedString key) {
+		static void invalidate(IExtensionContainer<INamespacePrefixedString> instance, INamespacePrefixedString key) {
 			IUIExtensionCache.TYPE.getValue().get(instance)
 					.ifPresent(c ->
 							c.getDelegated().invalidate(key));
@@ -43,7 +43,7 @@ public interface IUIExtensionCache
 
 		INamespacePrefixedString getKey();
 
-		class Impl<V, I extends IExtensionContainer<INamespacePrefixedString, ?>> implements IType<V, I> {
+		class Impl<V, I extends IExtensionContainer<INamespacePrefixedString>> implements IType<V, I> {
 			protected final INamespacePrefixedString key;
 			protected final BiFunction<? super IType<V, I>, ? super I, ? extends Optional<? extends V>> getter;
 			protected final BiConsumer<? super IType<V, I>, ? super I> invalidator;

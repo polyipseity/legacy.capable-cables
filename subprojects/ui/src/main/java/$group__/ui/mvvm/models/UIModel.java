@@ -1,6 +1,5 @@
 package $group__.ui.mvvm.models;
 
-import $group__.ui.core.mvvm.extensions.IUIExtension;
 import $group__.ui.core.mvvm.models.IUIModel;
 import $group__.utilities.MapUtilities;
 import $group__.utilities.extensions.IExtension;
@@ -16,23 +15,20 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
 public class UIModel
 		implements IUIModel {
-	protected final ConcurrentMap<INamespacePrefixedString, IUIExtension<INamespacePrefixedString, ? super IUIModel>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 
 	@Override
-	public Optional<IUIExtension<INamespacePrefixedString, ? super IUIModel>> addExtension(IUIExtension<INamespacePrefixedString, ? super IUIModel> extension) {
-		IExtension.RegExtension.checkExtensionRegistered(extension);
-		return IExtensionContainer.addExtension(this, getExtensions(), extension.getType().getKey(), extension);
-	}
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) { return IExtensionContainer.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension); }
 
 	@Override
-	public Optional<IUIExtension<INamespacePrefixedString, ? super IUIModel>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
 
 	@Override
-	public Optional<IUIExtension<INamespacePrefixedString, ? super IUIModel>> getExtension(INamespacePrefixedString key) { return Optional.ofNullable(getExtensions().get(key)); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return Optional.ofNullable(getExtensions().get(key)); }
 
 	@Override
-	public Map<INamespacePrefixedString, IUIExtension<INamespacePrefixedString, ? super IUIModel>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
+	public Map<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<INamespacePrefixedString, IUIExtension<INamespacePrefixedString, ? super IUIModel>> getExtensions() { return extensions; }
+	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() { return extensions; }
 }

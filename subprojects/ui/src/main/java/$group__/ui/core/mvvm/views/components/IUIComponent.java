@@ -1,7 +1,6 @@
 package $group__.ui.core.mvvm.views.components;
 
 import $group__.ui.core.mvvm.binding.IHasBinding;
-import $group__.ui.core.mvvm.extensions.IUIExtension;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
@@ -26,7 +25,7 @@ import java.util.function.Function;
 TODO auto resizing based on min size and preferred size
  */
 public interface IUIComponent
-		extends IUINode, IShapeDescriptorProvider, IHasBinding, IUIEventTarget, IExtensionContainer<INamespacePrefixedString, IUIExtension<? extends INamespacePrefixedString, ? super IUIComponent>> {
+		extends IUINode, IShapeDescriptorProvider, IHasBinding, IUIEventTarget, IExtensionContainer<INamespacePrefixedString> {
 	String PROPERTY_ID = INamespacePrefixedString.DEFAULT_PREFIX + "id";
 	INamespacePrefixedString PROPERTY_ID_LOCATION = new NamespacePrefixedString(PROPERTY_ID);
 

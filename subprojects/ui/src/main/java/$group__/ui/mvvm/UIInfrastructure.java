@@ -3,7 +3,6 @@ package $group__.ui.mvvm;
 import $group__.ui.core.mvvm.IUIInfrastructure;
 import $group__.ui.core.mvvm.binding.IBinder;
 import $group__.ui.core.mvvm.binding.IBinderAction;
-import $group__.ui.core.mvvm.extensions.IUIExtension;
 import $group__.ui.core.mvvm.viewmodels.IUIViewModel;
 import $group__.ui.core.mvvm.views.IUIView;
 import $group__.utilities.MapUtilities;
@@ -27,7 +26,7 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
 public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, B extends IBinder>
 		implements IUIInfrastructure<V, VM, B> {
-	protected final ConcurrentMap<INamespacePrefixedString, IUIExtension<INamespacePrefixedString, ? super IUIInfrastructure<?, ?, ?>>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected final Set<Disposable> binderDisposables = new HashSet<>(2);
 	protected V view;
 	protected VM viewModel;
@@ -114,20 +113,17 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 	}
 
 	@Override
-	public Optional<IUIExtension<INamespacePrefixedString, ? super IUIInfrastructure<?, ?, ?>>> addExtension(IUIExtension<INamespacePrefixedString, ? super IUIInfrastructure<?, ?, ?>> extension) {
-		IExtension.RegExtension.checkExtensionRegistered(extension);
-		return IExtensionContainer.addExtension(this, getExtensions(), extension.getType().getKey(), extension);
-	}
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) { return IExtensionContainer.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension); }
 
 	@Override
-	public Optional<IUIExtension<INamespacePrefixedString, ? super IUIInfrastructure<?, ?, ?>>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
 
 	@Override
-	public Optional<IUIExtension<INamespacePrefixedString, ? super IUIInfrastructure<?, ?, ?>>> getExtension(INamespacePrefixedString key) { return Optional.ofNullable(getExtensions().get(key)); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return Optional.ofNullable(getExtensions().get(key)); }
 
 	@Override
-	public Map<INamespacePrefixedString, IUIExtension<INamespacePrefixedString, ? super IUIInfrastructure<?, ?, ?>>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
+	public Map<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<INamespacePrefixedString, IUIExtension<INamespacePrefixedString, ? super IUIInfrastructure<?, ?, ?>>> getExtensions() { return extensions; }
+	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() { return extensions; }
 }

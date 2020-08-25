@@ -4,7 +4,6 @@ import $group__.ui.core.mvvm.binding.IBinderAction;
 import $group__.ui.core.mvvm.binding.IBindingField;
 import $group__.ui.core.mvvm.binding.IBindingMethod;
 import $group__.ui.core.mvvm.binding.IHasBinding;
-import $group__.ui.core.mvvm.extensions.IUIExtension;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
@@ -22,6 +21,7 @@ import $group__.utilities.CastUtilities;
 import $group__.utilities.MapUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventUtilities;
+import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
@@ -58,7 +58,7 @@ public class UIComponent
 	protected final String id;
 	protected final Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping;
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
-	protected final ConcurrentMap<INamespacePrefixedString, IUIExtension<? extends INamespacePrefixedString, ? super IUIComponent>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected final ConcurrentMap<INamespacePrefixedString, IBindingMethod.ISource<?>> eventTargetBindingMethods = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	// todo add animation system
 	// todo add name
@@ -163,13 +163,15 @@ public class UIComponent
 	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMapping() { return mapping; }
 
 	@Override
-	public Optional<IUIExtension<? extends INamespacePrefixedString, ? super IUIComponent>> addExtension(IUIExtension<? extends INamespacePrefixedString, ? super IUIComponent> extension) { return IExtensionContainer.addExtension(this, getExtensions(), extension.getType().getKey(), extension); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
+		return IExtensionContainer.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension);
+	}
 
 	@Override
-	public Optional<IUIExtension<? extends INamespacePrefixedString, ? super IUIComponent>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
 
 	@Override
-	public Optional<IUIExtension<? extends INamespacePrefixedString, ? super IUIComponent>> getExtension(INamespacePrefixedString key) { return Optional.ofNullable(getExtensions().get(key)); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return Optional.ofNullable(getExtensions().get(key)); }
 
 	@Override
 	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() { return s -> getBinderNotifierSubject().subscribe(s.get()); }
@@ -185,10 +187,10 @@ public class UIComponent
 	public void setActive(boolean active) { getActive().setValue(active); }
 
 	@Override
-	public Map<INamespacePrefixedString, IUIExtension<? extends INamespacePrefixedString, ? super IUIComponent>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
+	public Map<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<INamespacePrefixedString, IUIExtension<? extends INamespacePrefixedString, ? super IUIComponent>> getExtensions() { return extensions; }
+	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() { return extensions; }
 
 	@Override
 	public Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingView() { return ImmutableMap.copyOf(getMapping()); }

@@ -2,7 +2,6 @@ package $group__.ui.mvvm.viewmodels;
 
 import $group__.ui.core.mvvm.IUIInfrastructure;
 import $group__.ui.core.mvvm.binding.IBinderAction;
-import $group__.ui.core.mvvm.extensions.IUIExtension;
 import $group__.ui.core.mvvm.models.IUIModel;
 import $group__.ui.core.mvvm.viewmodels.IUIViewModel;
 import $group__.utilities.MapUtilities;
@@ -29,7 +28,7 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 public class UIViewModel<M extends IUIModel>
 		implements IUIViewModel<M> {
 	private static final Logger LOGGER = LogManager.getLogger();
-	protected final ConcurrentMap<INamespacePrefixedString, IUIExtension<INamespacePrefixedString, ? super IUIViewModel<?>>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected WeakReference<IUIInfrastructure<?, ?, ?>> infrastructure = new WeakReference<>(null);
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 	protected M model;
@@ -48,22 +47,19 @@ public class UIViewModel<M extends IUIModel>
 	protected Subject<IBinderAction> getBinderNotifierSubject() { return binderNotifierSubject; }
 
 	@Override
-	public Optional<IUIExtension<INamespacePrefixedString, ? super IUIViewModel<?>>> addExtension(IUIExtension<INamespacePrefixedString, ? super IUIViewModel<?>> extension) {
-		IExtension.RegExtension.checkExtensionRegistered(extension);
-		return IExtensionContainer.addExtension(this, getExtensions(), extension.getType().getKey(), extension);
-	}
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) { return IExtensionContainer.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension); }
 
 	@Override
-	public Optional<IUIExtension<INamespacePrefixedString, ? super IUIViewModel<?>>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
 
 	@Override
-	public Optional<IUIExtension<INamespacePrefixedString, ? super IUIViewModel<?>>> getExtension(INamespacePrefixedString key) { return Optional.ofNullable(getExtensions().get(key)); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return Optional.ofNullable(getExtensions().get(key)); }
 
 	@Override
-	public Map<INamespacePrefixedString, IUIExtension<INamespacePrefixedString, ? super IUIViewModel<?>>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
+	public Map<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<INamespacePrefixedString, IUIExtension<INamespacePrefixedString, ? super IUIViewModel<?>>> getExtensions() { return extensions; }
+	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() { return extensions; }
 
 	@Override
 	public Optional<? extends IUIInfrastructure<?, ?, ?>> getInfrastructure() { return Optional.ofNullable(infrastructure.get()); }

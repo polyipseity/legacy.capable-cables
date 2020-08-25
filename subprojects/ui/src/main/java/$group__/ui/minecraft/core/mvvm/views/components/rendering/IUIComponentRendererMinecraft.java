@@ -26,10 +26,10 @@ public interface IUIComponentRendererMinecraft
 	void render(IUIComponent container, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks, boolean pre);
 
 	default void crop(IUIComponent container, IAffineTransformStack stack, EnumCropMethod method, boolean push, Point2D mouse, double partialTicks) {
-		IUIComponentRendererMinecraft.cropDefault(container, stack, method, push, mouse, partialTicks);
+		IUIComponentRendererMinecraft.cropImpl(container, stack, method, push, mouse, partialTicks);
 	}
 
-	static void cropDefault(final IUIComponent container, IAffineTransformStack stack, EnumCropMethod method, boolean push, @SuppressWarnings("unused") Point2D mouse, @SuppressWarnings("unused") double partialTicks) {
+	static void cropImpl(final IUIComponent container, IAffineTransformStack stack, EnumCropMethod method, boolean push, @SuppressWarnings("unused") Point2D mouse, @SuppressWarnings("unused") double partialTicks) {
 		switch (method) {
 			case STENCIL_BUFFER:
 				if (push) {

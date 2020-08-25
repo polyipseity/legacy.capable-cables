@@ -33,7 +33,7 @@ import java.util.Optional;
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
 public class UIExtensionCache
-		extends ExtensionContainerAware<INamespacePrefixedString, IExtensionContainer<INamespacePrefixedString, ?>, IExtensionContainer<INamespacePrefixedString, ?>>
+		extends ExtensionContainerAware<INamespacePrefixedString, IExtensionContainer<INamespacePrefixedString>, IExtensionContainer<INamespacePrefixedString>>
 		implements IUIExtensionCache {
 	protected final Cache<INamespacePrefixedString, Object> cache =
 			CacheBuilder.newBuilder()
@@ -56,7 +56,7 @@ public class UIExtensionCache
 	public Cache<INamespacePrefixedString, Object> getDelegated() { return cache; }
 
 	@Override
-	public IExtension.IType<? extends INamespacePrefixedString, ?, ? extends IExtensionContainer<INamespacePrefixedString, ?>> getType() { return IUIExtensionCache.TYPE.getValue(); }
+	public IExtension.IType<? extends INamespacePrefixedString, ?, ? extends IExtensionContainer<INamespacePrefixedString>> getType() { return IUIExtensionCache.TYPE.getValue(); }
 
 	public enum CacheUniversal {
 		;
