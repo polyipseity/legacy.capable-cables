@@ -5,7 +5,6 @@ import $group__.ui.core.mvvm.views.IUIReshapeExplicitly;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
@@ -18,7 +17,7 @@ import java.util.Optional;
 
 public interface IUIExtensionComponentUserRelocatable<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
 		extends IUIExtension<INamespacePrefixedString, IUIComponent>, IHasGenericClass.Extended<IUIComponent, E> {
-	INamespacePrefixedString KEY = new NamespacePrefixedString(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, AREA_UI + ".component.user_relocatable");
+	INamespacePrefixedString KEY = new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, AREA_UI + ".component.user_relocatable");
 	Registry.RegistryObject<IUIExtension.IType<INamespacePrefixedString, IUIExtensionComponentUserRelocatable<?>, IUIComponent>> TYPE =
 			RegExtension.INSTANCE.registerApply(KEY, k -> new IUIExtension.IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
 

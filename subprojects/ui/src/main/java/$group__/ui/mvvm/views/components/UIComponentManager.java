@@ -13,7 +13,10 @@ import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.mvvm.structures.AffineTransformStack;
 import $group__.ui.mvvm.views.components.paths.UIComponentPathResolver;
 import $group__.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
-import $group__.utilities.*;
+import $group__.utilities.CapacityUtilities;
+import $group__.utilities.CastUtilities;
+import $group__.utilities.ThrowableUtilities;
+import $group__.utilities.TreeUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.reactive.DisposableObserverAuto;
@@ -35,7 +38,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public abstract class UIComponentManager<S extends Shape>
+public class UIComponentManager<S extends Shape>
 		extends UIComponentContainer
 		implements IUIComponentManager<S> {
 	protected final IUIComponentPathResolver<IUIComponent> pathResolver = new PathResolver();
@@ -159,13 +162,13 @@ public abstract class UIComponentManager<S extends Shape>
 									}
 								})));
 
-		private static INamespacePrefixedString generateKey(@SuppressWarnings("SameParameterValue") String name) { return new NamespacePrefixedString(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, "manager." + name); }
+		private static INamespacePrefixedString generateKey(@SuppressWarnings("SameParameterValue") String name) { return new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, "manager." + name); }
 	}
 
 	@Override
 	public IUIComponentShapeAnchorController getShapeAnchorController() { return shapeAnchorController; }
 
-	protected class PathResolver extends UIComponentPathResolver {
+	public class PathResolver extends UIComponentPathResolver {
 		protected PathResolver() { super(UIComponentManager.this); }
 	}
 }

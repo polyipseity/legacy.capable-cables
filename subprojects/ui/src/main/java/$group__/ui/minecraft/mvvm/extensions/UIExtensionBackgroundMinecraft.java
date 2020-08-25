@@ -83,7 +83,8 @@ public abstract class UIExtensionBackgroundMinecraft<E extends IUIViewComponentM
 
 	protected AtomicReference<ObserverRender> getObserverRender() { return observerRender; }
 
-	protected class ObserverRender
+	@OnlyIn(Dist.CLIENT)
+	public class ObserverRender
 			extends DisposableObserverAuto<EventUIViewMinecraft.Render> {
 		@Override
 		@SubscribeEvent

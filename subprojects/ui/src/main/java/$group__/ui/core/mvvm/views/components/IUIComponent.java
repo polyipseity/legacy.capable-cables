@@ -2,13 +2,13 @@ package $group__.ui.core.mvvm.views.components;
 
 import $group__.ui.core.mvvm.binding.IHasBinding;
 import $group__.ui.core.mvvm.extensions.IUIExtension;
+import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.ui.core.mvvm.views.paths.IUINode;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
 import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
-import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
@@ -27,7 +27,7 @@ TODO auto resizing based on min size and preferred size
  */
 public interface IUIComponent
 		extends IUINode, IShapeDescriptorProvider, IHasBinding, IUIEventTarget, IExtensionContainer<INamespacePrefixedString, IUIExtension<? extends INamespacePrefixedString, ? super IUIComponent>> {
-	String PROPERTY_ID = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "id";
+	String PROPERTY_ID = INamespacePrefixedString.DEFAULT_PREFIX + "id";
 	INamespacePrefixedString PROPERTY_ID_LOCATION = new NamespacePrefixedString(PROPERTY_ID);
 
 	static <T> Optional<T> getYoungestParentInstanceOf(IUIComponent self, Class<T> clazz) {
@@ -76,4 +76,8 @@ public interface IUIComponent
 	default Optional<IUINode> getParentNode() { return getParent().map(Function.identity()); }
 
 	Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingView();
+
+	default void initialize(IAffineTransformStack stack) {}
+
+	default void removed(IAffineTransformStack stack) {}
 }

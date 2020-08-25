@@ -3,7 +3,6 @@ package $group__.ui.core.mvvm.views.components.extensions.caches;
 import $group__.ui.core.mvvm.extensions.IUIExtension;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
@@ -25,7 +24,7 @@ import java.util.function.Function;
 
 public interface IUIExtensionCache
 		extends IUIExtension<INamespacePrefixedString, IExtensionContainer<INamespacePrefixedString, ?>> {
-	INamespacePrefixedString KEY = new NamespacePrefixedString(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, AREA_UI + ".cache");
+	INamespacePrefixedString KEY = new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, AREA_UI + ".cache");
 	Registry.RegistryObject<IUIExtension.IType<INamespacePrefixedString, IUIExtensionCache, IExtensionContainer<INamespacePrefixedString, ?>>> TYPE =
 			RegExtension.INSTANCE.registerApply(KEY, k -> new IUIExtension.IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
 

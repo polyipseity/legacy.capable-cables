@@ -1,4 +1,4 @@
-package $group__.ui.minecraft.mvvm.components.common;
+package $group__.ui.mvvm.views.components.common;
 
 import $group__.ui.core.mvvm.binding.IBindingField;
 import $group__.ui.core.mvvm.binding.IHasBinding;
@@ -13,28 +13,21 @@ import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.events.ui.UIEventListener;
-import $group__.ui.minecraft.core.mvvm.views.IUIComponentMinecraft;
 import $group__.ui.mvvm.views.components.UIComponentContainer;
 import $group__.ui.mvvm.views.events.bus.EventUIComponent;
 import $group__.ui.mvvm.views.events.ui.UIEventFocus;
 import $group__.ui.structures.shapes.interactions.ShapeConstraintSupplier;
 import $group__.ui.utilities.BindingUtilities;
-import $group__.ui.utilities.minecraft.DrawingUtilities;
-import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.functions.ConstantSupplier;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.reactive.DisposableObserverAuto;
 import $group__.utilities.structures.NamespacePrefixedString;
 import io.reactivex.rxjava3.observers.DisposableObserver;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.awt.geom.RectangularShape;
 import java.lang.ref.WeakReference;
 import java.util.ConcurrentModificationException;
@@ -43,13 +36,11 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-// TODO responsibility of this classes may need to be delegated to the view model via some means
-@OnlyIn(Dist.CLIENT)
-public class UIComponentMinecraftWindow
+public class UIComponentWindow
 		extends UIComponentContainer
-		implements IUIReshapeExplicitly<RectangularShape>, IUIComponentMinecraft {
-	public static final String PROPERTY_COLOR_BACKGROUND = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "window.colors.background";
-	public static final String PROPERTY_COLOR_BORDER = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "window.colors.border";
+		implements IUIReshapeExplicitly<RectangularShape> {
+	public static final String PROPERTY_COLOR_BACKGROUND = INamespacePrefixedString.DEFAULT_PREFIX + "window.colors.background";
+	public static final String PROPERTY_COLOR_BORDER = INamespacePrefixedString.DEFAULT_PREFIX + "window.colors.border";
 
 	public static final INamespacePrefixedString PROPERTY_COLOR_BACKGROUND_LOCATION = new NamespacePrefixedString(PROPERTY_COLOR_BACKGROUND);
 	public static final INamespacePrefixedString PROPERTY_COLOR_BORDER_LOCATION = new NamespacePrefixedString(PROPERTY_COLOR_BORDER);
@@ -67,7 +58,7 @@ public class UIComponentMinecraftWindow
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.SHAPE_DESCRIPTOR__MAPPING)
-	public UIComponentMinecraftWindow(IShapeDescriptor<RectangularShape> shapeDescriptor, Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping) {
+	public UIComponentWindow(IShapeDescriptor<RectangularShape> shapeDescriptor, Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping) {
 		super(shapeDescriptor, mapping);
 
 		this.colorBackground = IHasBinding.createBindingField(Color.class,
@@ -119,6 +110,18 @@ public class UIComponentMinecraftWindow
 
 	protected final AtomicReference<ObserverEventUIShapeDescriptorModify> observerEventUIShapeDescriptorModify = new AtomicReference<>();
 
+	protected AtomicReference<ObserverEventUIShapeDescriptorModify> getObserverEventUIShapeDescriptorModify() { return observerEventUIShapeDescriptorModify; }
+
+	public IBindingField<Color> getColorBackground() { return colorBackground; }
+
+	public IBindingField<Color> getColorBorder() { return colorBorder; }
+
+	@Override
+	public void transformChildren(IAffineTransformStack stack) {
+		super.transformChildren(stack);
+		stack.getDelegated().peek().translate(0, WINDOW_DRAG_BAR_THICKNESS); // TODO move
+	}
+
 	@Override
 	public void initialize(IAffineTransformStack stack) {
 		UIEventBusEntryPoint.<EventUIComponent.ShapeDescriptorModify>getEventBus()
@@ -129,40 +132,16 @@ public class UIComponentMinecraftWindow
 		IUIReshapeExplicitly.refresh(this);
 	}
 
-	protected AtomicReference<ObserverEventUIShapeDescriptorModify> getObserverEventUIShapeDescriptorModify() { return observerEventUIShapeDescriptorModify; }
-
-	@Override
-	public void render(IAffineTransformStack stack, Point2D cursorPosition, double partialTicks, boolean pre) {
-		AffineTransform transform = stack.getDelegated().peek();
-		if (pre) {
-			DrawingUtilities.drawShape(transform, getShapeDescriptor().getShapeOutput(), true, getColorBackground().getValue(), 0);
-			DrawingUtilities.drawShape(transform, getShapeDescriptor().getShapeOutput(), true, getColorBorder().getValue(), 0);
-		}
-	}
-
-	public IBindingField<Color> getColorBackground() { return colorBackground; }
-
-	public IBindingField<Color> getColorBorder() { return colorBorder; }
-
-	@Override
-	public void crop(IAffineTransformStack stack, EnumCropMethod method, boolean push, Point2D mouse, double partialTicks) { IUIComponentMinecraft.crop(this, stack, method, push, mouse, partialTicks); }
-
 	@Override
 	public void removed(IAffineTransformStack stack) { Optional.ofNullable(getObserverEventUIShapeDescriptorModify().getAndSet(null)).ifPresent(DisposableObserver::dispose); }
 
-	@Override
-	public void transformChildren(IAffineTransformStack stack) {
-		super.transformChildren(stack);
-		stack.getDelegated().peek().translate(0, WINDOW_DRAG_BAR_THICKNESS); // TODO move
-	}
-
-	protected class ObserverEventUIShapeDescriptorModify
+	public class ObserverEventUIShapeDescriptorModify
 			extends DisposableObserverAuto<EventUIComponent.ShapeDescriptorModify> {
 		@Override
 		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 		public void onNext(EventUIComponent.ShapeDescriptorModify event) {
 			if (event.getStage() == EnumEventHookStage.POST && getParent().filter(p -> p.equals(event.getComponent())).isPresent())
-				IUIReshapeExplicitly.refresh(UIComponentMinecraftWindow.this);
+				IUIReshapeExplicitly.refresh(UIComponentWindow.this);
 		}
 	}
 }

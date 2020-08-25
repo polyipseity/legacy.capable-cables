@@ -1,7 +1,6 @@
 package $group__.utilities.interfaces;
 
 import $group__.utilities.MapUtilities;
-import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.ThrowableUtilities;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -12,7 +11,9 @@ import java.util.regex.Pattern;
 
 public interface INamespacePrefixedString {
 	String SEPARATOR = ":";
-	String DEFAULT_NAMESPACE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT;
+	String DEFAULT_NAMESPACE = "minecraft";
+	String DEFAULT_PREFIX = DEFAULT_NAMESPACE + SEPARATOR;
+
 	ImmutableList<Function<INamespacePrefixedString, Object>> OBJECT_VARIABLES = ImmutableList.of(
 			INamespacePrefixedString::getNamespace, INamespacePrefixedString::getPath);
 	ImmutableMap<String, Function<INamespacePrefixedString, Object>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),

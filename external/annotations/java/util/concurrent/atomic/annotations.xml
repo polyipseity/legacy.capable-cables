@@ -1,5 +1,11 @@
 <root>
+	<item name='java.util.concurrent.atomic.AtomicReference V get()'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
 	<item name='java.util.concurrent.atomic.AtomicReference V getAndSet(V)'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
+	<item name='java.util.concurrent.atomic.AtomicReference void set(V) 0'>
 		<annotation name='javax.annotation.Nullable'/>
 	</item>
 </root>

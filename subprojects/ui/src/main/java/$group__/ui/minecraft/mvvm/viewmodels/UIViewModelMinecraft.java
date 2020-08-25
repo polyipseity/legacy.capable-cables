@@ -13,11 +13,5 @@ public class UIViewModelMinecraft<M extends IUIModel>
 	public UIViewModelMinecraft(M model) { super(model); }
 
 	@Override
-	public void initialize() {}
-
-	@Override
 	public void tick() {}
-
-	@Override
-	public void removed() {}
 }

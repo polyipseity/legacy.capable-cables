@@ -159,7 +159,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 		protected Point2D getCursorPosition() { return cursorPosition; }
 	}
 
-	protected class VirtualComponent
+	public class VirtualComponent
 			extends UIComponentVirtual
 			implements IUIComponentCursorHandleProvider {
 		protected boolean beingHovered = false;
@@ -280,7 +280,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 		Optional.ofNullable(getObserverDrawScreenEventPost().getAndSet(null)).ifPresent(DisposableObserver::dispose);
 	}
 
-	protected class ObserverDrawScreenEventPost
+	public class ObserverDrawScreenEventPost
 			extends DisposableObserverAuto<GuiScreenEvent.DrawScreenEvent.Post> {
 		@Override
 		@SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)

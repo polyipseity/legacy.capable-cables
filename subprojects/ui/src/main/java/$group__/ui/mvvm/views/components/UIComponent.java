@@ -20,7 +20,6 @@ import $group__.ui.structures.shapes.descriptors.DelegatingShapeDescriptor;
 import $group__.ui.utilities.BindingUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.MapUtilities;
-import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
@@ -49,8 +48,8 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 public class UIComponent
 		extends UIEventTarget
 		implements IUIComponent {
-	public static final String PROPERTY_VISIBLE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "component.visible";
-	public static final String PROPERTY_ACTIVE = NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT_PREFIX + "component.active";
+	public static final String PROPERTY_VISIBLE = INamespacePrefixedString.DEFAULT_PREFIX + "component.visible";
+	public static final String PROPERTY_ACTIVE = INamespacePrefixedString.DEFAULT_PREFIX + "component.active";
 
 	public static final INamespacePrefixedString PROPERTY_VISIBLE_LOCATION = new NamespacePrefixedString(PROPERTY_VISIBLE);
 	public static final INamespacePrefixedString PROPERTY_ACTIVE_LOCATION = new NamespacePrefixedString(PROPERTY_ACTIVE);
@@ -104,7 +103,7 @@ public class UIComponent
 	@Override
 	public boolean isModifyingShape() { return getModifyingShape().get(); }
 
-	protected class ComponentShapeDescriptor<S extends Shape>
+	public class ComponentShapeDescriptor<S extends Shape>
 			extends DelegatingShapeDescriptor<S> {
 		protected ComponentShapeDescriptor(IShapeDescriptor<S> delegated) { super(delegated); }
 

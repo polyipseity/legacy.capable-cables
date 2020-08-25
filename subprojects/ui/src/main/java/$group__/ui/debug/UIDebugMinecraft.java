@@ -127,17 +127,17 @@ final class UIDebug extends GuiManagerWindows<AbstractShapeDescriptor.Rectangula
 				new Data<>(new Events(), UIDebug::getLogger, new GuiBackgroundDefault<>(AbstractShapeDescriptor.Rectangular::new,
 						new UIComponentMinecraft.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger)), container));
 		{
-			UIComponentMinecraftWindow<UIComponentMinecraftWindow.Model, UIComponentMinecraftWindow.View<?, ?>, UIComponentMinecraftWindow.Controller, IUIComponent> window1 = new UIComponentMinecraftWindow<>();
-			window1.setModel(new UIComponentMinecraftWindow.Model<>(window1));
-			window1.setView(new UIComponentMinecraftWindow.View<>(window1));
+			UIComponentWindow<UIComponentWindow.Model, UIComponentWindow.View<?, ?>, UIComponentWindow.Controller, IUIComponent> window1 = new UIComponentWindow<>();
+			window1.setModel(new UIComponentWindow.Model<>(window1));
+			window1.setView(new UIComponentWindow.View<>(window1));
 			window1.getView().setShapeDescriptor(window1.getView().new AbstractShapeDescriptor<>(
 					new Rectangle2D.Double(10, 10, 100, 100),
 					new ShapeAnchorSet<>(null)));
-			window1.setController(new UIComponentMinecraftWindow.Controller<>(window1));
-			UIComponentMinecraftWindow<?, ?, ?, ?> window1 = new UIComponentMinecraftWindow<>(new AbstractShapeDescriptor.Rectangular<>(
-					new UIComponentMinecraftWindow.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new UIComponentMinecraftWindow.Data.ColorData()));
-			UIComponentMinecraftWindow<?, ?> window2 = new UIComponentMinecraftWindow<AbstractShapeDescriptor.Rectangular<Rectangle2D.Double>, UIComponentMinecraftWindow.Data<UIComponentMinecraft.Events, UIComponentMinecraftWindow.Data.ColorData>>(new AbstractShapeDescriptor.Rectangular<>(new Rectangle2D.Double(50, 50, 200, 200)),
-					new UIComponentMinecraftWindow.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new UIComponentMinecraftWindow.Data.ColorData())) {
+			window1.setController(new UIComponentWindow.Controller<>(window1));
+			UIComponentWindow<?, ?, ?, ?> window1 = new UIComponentWindow<>(new AbstractShapeDescriptor.Rectangular<>(
+					new UIComponentWindow.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new UIComponentWindow.Data.ColorData()));
+			UIComponentWindow<?, ?> window2 = new UIComponentWindow<AbstractShapeDescriptor.Rectangular<Rectangle2D.Double>, UIComponentWindow.Data<UIComponentMinecraft.Events, UIComponentWindow.Data.ColorData>>(new AbstractShapeDescriptor.Rectangular<>(new Rectangle2D.Double(50, 50, 200, 200)),
+					new UIComponentWindow.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new UIComponentWindow.Data.ColorData())) {
 				protected final Rectangle2D current = new Rectangle2D.Double();
 				protected final Random random = new Random();
 				protected double tick = 0;

@@ -9,7 +9,6 @@ import $group__.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.ConcurrencyUtilities;
 import $group__.utilities.MapUtilities;
-import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.extensions.ExtensionContainerAware;
@@ -120,6 +119,6 @@ public class UIExtensionCache
 									}
 								})));
 
-		private static INamespacePrefixedString generateKey(String name) { return new NamespacePrefixedString(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, "universal." + name); }
+		private static INamespacePrefixedString generateKey(String name) { return new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, "universal." + name); }
 	}
 }

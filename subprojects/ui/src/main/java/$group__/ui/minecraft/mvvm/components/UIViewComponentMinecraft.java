@@ -4,9 +4,11 @@ import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
+import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRendererContainer;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
-import $group__.ui.minecraft.core.mvvm.views.IUIComponentMinecraft;
+import $group__.ui.minecraft.core.mvvm.views.EnumCropMethod;
 import $group__.ui.minecraft.core.mvvm.views.IUIViewComponentMinecraft;
+import $group__.ui.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import $group__.ui.minecraft.mvvm.events.bus.EventUIViewMinecraft;
 import $group__.ui.mvvm.views.components.UIViewComponent;
 import $group__.utilities.CastUtilities;
@@ -31,21 +33,24 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 	public void render(Point2D cursorPosition, double partialTicks) {
 		EventUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 					IAffineTransformStack stack = getCleanTransformStack();
-					IUIComponentMinecraft.EnumCropMethod cropMethod = IUIComponentMinecraft.EnumCropMethod.getBestMethod();
+					EnumCropMethod cropMethod = EnumCropMethod.getBestMethod();
 					cropMethod.enable();
 					TreeUtilities.<IUIComponent, IUIComponent>visitNodesDepthFirst(getManager(),
 							Function.identity(),
 							c -> {
 								if (c.isVisible()) {
-									CastUtilities.castChecked(IUIComponentMinecraft.class, c).ifPresent(cc -> {
-										cc.crop(stack, cropMethod, true, cursorPosition, partialTicks);
-										cc.render(stack, cursorPosition, partialTicks, true);
-									});
-									stack.push();
-									return CastUtilities.castChecked(IUIComponentContainer.class, c)
-											.<Iterable<IUIComponent>>map(cp -> {
-												cp.transformChildren(stack);
-												return cp.getChildrenView();
+									return CastUtilities.castChecked(IUIComponentMinecraft.class, c)
+											.flatMap(IUIComponentRendererContainer::getRenderer)
+											.map(ccr -> {
+												ccr.crop(c, stack, cropMethod, true, cursorPosition, partialTicks);
+												ccr.render(c, stack, cursorPosition, partialTicks, true);
+												stack.push();
+												return CastUtilities.castChecked(IUIComponentContainer.class, c)
+														.<Iterable<IUIComponent>>map(cp -> {
+															cp.transformChildren(stack);
+															return cp.getChildrenView();
+														})
+														.orElseGet(ImmutableSet::of);
 											})
 											.orElseGet(ImmutableSet::of);
 								}
@@ -53,11 +58,13 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 							},
 							(p, c) -> {
 								if (p.isVisible()) {
-									stack.getDelegated().pop();
-									CastUtilities.castChecked(IUIComponentMinecraft.class, p).ifPresent(pc -> {
-										pc.render(stack, cursorPosition, partialTicks, false);
-										pc.crop(stack, cropMethod, false, cursorPosition, partialTicks);
-									});
+									CastUtilities.castChecked(IUIComponentMinecraft.class, p)
+											.flatMap(IUIComponentRendererContainer::getRenderer)
+											.ifPresent(pc -> {
+												stack.getDelegated().pop();
+												pc.render(p, stack, cursorPosition, partialTicks, false);
+												pc.crop(p, stack, cropMethod, false, cursorPosition, partialTicks);
+											});
 								}
 								return p;
 							},
@@ -67,29 +74,6 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 				},
 				new EventUIViewMinecraft.Render(EnumEventHookStage.PRE, this, cursorPosition, partialTicks),
 				new EventUIViewMinecraft.Render(EnumEventHookStage.POST, this, cursorPosition, partialTicks));
-	}
-
-	@Override
-	public void initialize() {
-		IAffineTransformStack stack = getCleanTransformStack();
-		TreeUtilities.<IUIComponent, IUIComponent>visitNodesDepthFirst(getManager(),
-				Function.identity(),
-				c -> {
-					CastUtilities.castChecked(IUIComponentMinecraft.class, c).ifPresent(cc ->
-							cc.initialize(stack));
-					stack.push();
-					return CastUtilities.castChecked(IUIComponentContainer.class, c)
-							.<Iterable<IUIComponent>>map(cp -> {
-								cp.transformChildren(stack);
-								return cp.getChildrenView();
-							})
-							.orElseGet(ImmutableSet::of);
-				},
-				(p, c) -> {
-					stack.getDelegated().pop();
-					return p;
-				},
-				r -> { throw new InternalError(); });
 	}
 
 	@Override
@@ -114,29 +98,6 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 				(p, c) -> {
 					if (p.isActive())
 						stack.getDelegated().pop();
-					return p;
-				},
-				r -> { throw new InternalError(); });
-	}
-
-	@Override
-	public void removed() {
-		IAffineTransformStack stack = getCleanTransformStack();
-		TreeUtilities.<IUIComponent, IUIComponent>visitNodesDepthFirst(getManager(),
-				Function.identity(),
-				c -> {
-					CastUtilities.castChecked(IUIComponentMinecraft.class, c).ifPresent(cc ->
-							cc.removed(stack));
-					stack.push();
-					return CastUtilities.castChecked(IUIComponentContainer.class, c)
-							.<Iterable<IUIComponent>>map(cp -> {
-								cp.transformChildren(stack);
-								return cp.getChildrenView();
-							})
-							.orElseGet(ImmutableSet::of);
-				},
-				(p, c) -> {
-					stack.getDelegated().pop();
 					return p;
 				},
 				r -> { throw new InternalError(); });

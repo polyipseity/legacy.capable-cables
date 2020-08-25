@@ -70,4 +70,10 @@ public class UIViewModel<M extends IUIModel>
 
 	@Override
 	public void setInfrastructure(@Nullable IUIInfrastructure<?, ?, ?> infrastructure) { this.infrastructure = new WeakReference<>(infrastructure); }
+
+	@Override
+	public void initialize() {}
+
+	@Override
+	public void removed() {}
 }

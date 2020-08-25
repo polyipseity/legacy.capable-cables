@@ -2,11 +2,16 @@ package $group__.ui.mvvm.views.components;
 
 import $group__.ui.core.mvvm.binding.IBinderAction;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
+import $group__.ui.core.mvvm.views.components.IUIComponent;
+import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.components.IUIViewComponent;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.mvvm.views.UIView;
+import $group__.utilities.CastUtilities;
+import $group__.utilities.TreeUtilities;
+import com.google.common.collect.ImmutableSet;
 import io.reactivex.rxjava3.core.Observer;
 
 import javax.annotation.Nullable;
@@ -47,4 +52,48 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 
 	@Override
 	public boolean reshape(Function<? super IShapeDescriptor<? super S>, ? extends Boolean> action) throws ConcurrentModificationException { return getManager().reshape(action); }
+
+	@Override
+	public void initialize() {
+		IAffineTransformStack stack = getCleanTransformStack();
+		TreeUtilities.<IUIComponent, IUIComponent>visitNodesDepthFirst(getManager(),
+				Function.identity(),
+				c -> {
+					c.initialize(stack);
+					stack.push();
+					return CastUtilities.castChecked(IUIComponentContainer.class, c)
+							.<Iterable<IUIComponent>>map(cp -> {
+								cp.transformChildren(stack);
+								return cp.getChildrenView();
+							})
+							.orElseGet(ImmutableSet::of);
+				},
+				(p, c) -> {
+					stack.getDelegated().pop();
+					return p;
+				},
+				r -> { throw new InternalError(); });
+	}
+
+	@Override
+	public void removed() {
+		IAffineTransformStack stack = getCleanTransformStack();
+		TreeUtilities.<IUIComponent, IUIComponent>visitNodesDepthFirst(getManager(),
+				Function.identity(),
+				c -> {
+					c.removed(stack);
+					stack.push();
+					return CastUtilities.castChecked(IUIComponentContainer.class, c)
+							.<Iterable<IUIComponent>>map(cp -> {
+								cp.transformChildren(stack);
+								return cp.getChildrenView();
+							})
+							.orElseGet(ImmutableSet::of);
+				},
+				(p, c) -> {
+					stack.getDelegated().pop();
+					return p;
+				},
+				r -> { throw new InternalError(); });
+	}
 }

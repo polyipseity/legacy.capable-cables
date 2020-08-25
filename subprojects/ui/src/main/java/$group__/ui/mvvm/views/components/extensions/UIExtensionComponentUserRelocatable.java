@@ -113,7 +113,7 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 		}
 	}
 
-	protected class VirtualComponent
+	public class VirtualComponent
 			extends UIComponentVirtual
 			implements IUIComponentCursorHandleProvider {
 		@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
@@ -200,7 +200,7 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 		Optional.ofNullable(getObserverDrawScreenEventPost().getAndSet(null)).ifPresent(DisposableObserver::dispose);
 	}
 
-	protected class ObserverDrawScreenEventPost
+	public class ObserverDrawScreenEventPost
 			extends DisposableObserverAuto<GuiScreenEvent.DrawScreenEvent.Post> {
 		@Override
 		@SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)

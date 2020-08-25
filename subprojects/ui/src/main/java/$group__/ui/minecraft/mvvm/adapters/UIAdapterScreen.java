@@ -386,7 +386,7 @@ public class UIAdapterScreen
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	protected class UIExtensionScreen
+	public class UIExtensionScreen
 			extends IHasGenericClass.Impl<IUIInfrastructure<?, ?, ?>>
 			implements IUIExtensionScreenProvider {
 		protected UIExtensionScreen() {

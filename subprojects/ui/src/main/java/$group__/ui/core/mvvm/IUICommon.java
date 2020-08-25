@@ -7,4 +7,8 @@ public interface IUICommon {
 	Optional<? extends IUIInfrastructure<?, ?, ?>> getInfrastructure();
 
 	void setInfrastructure(@Nullable IUIInfrastructure<?, ?, ?> infrastructure);
+
+	void initialize();
+
+	void removed();
 }

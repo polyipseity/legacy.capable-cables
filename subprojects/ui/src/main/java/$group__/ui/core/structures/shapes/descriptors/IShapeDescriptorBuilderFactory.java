@@ -1,7 +1,6 @@
 package $group__.ui.core.structures.shapes.descriptors;
 
 import $group__.ui.structures.shapes.descriptors.builders.RectangularShapeDescriptorBuilder;
-import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
@@ -47,7 +46,7 @@ public interface IShapeDescriptorBuilderFactory {
 	class DefaultFactory
 			extends Registry<Class<? extends Shape>, Function<? super Class<? extends Shape>, ? extends IShapeDescriptorBuilder<?>>>
 			implements IShapeDescriptorBuilderFactory {
-		public static final INamespacePrefixedString KEY = new NamespacePrefixedString(NamespaceUtilities.NAMESPACE_MINECRAFT_DEFAULT, "default");
+		public static final INamespacePrefixedString KEY = new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, "default");
 		private static final Logger LOGGER = LogManager.getLogger();
 
 		protected DefaultFactory() {

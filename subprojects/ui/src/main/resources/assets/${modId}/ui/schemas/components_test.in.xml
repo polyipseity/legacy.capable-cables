@@ -7,18 +7,21 @@
 	<alias name="shape.rectangle" class="java.awt.geom.Rectangle2D"/>
 	<alias name="shape.ellipse" class="java.awt.geom.Ellipse2D"/>
 	<!-- COMMENT components -->
-	<alias name="component.manager" class="${group}.client.ui.minecraft.mvvm.components.UIComponentManagerMinecraft"/>
+	<alias name="component.manager" class="${group}.ui.minecraft.mvvm.components.UIComponentManagerMinecraft"/>
 	<alias name="component.window"
-	       class="${group}.client.ui.minecraft.mvvm.components.common.UIComponentMinecraftWindow"/>
+	       class="${group}.ui.minecraft.mvvm.components.common.UIComponentWindowMinecraft"/>
 	<alias name="component.button"
-	       class="${group}.client.ui.minecraft.mvvm.components.common.UIComponentMinecraftButton"/>
+	       class="${group}.ui.minecraft.mvvm.components.common.UIComponentButtonMinecraft"/>
 	<!-- COMMENT extensions -->
+	<alias name="extension.minecraft.background.default"
+	       class="${group}.ui.minecraft.mvvm.extensions.UIExtensionBackgroundMinecraft\$Default"/>
 	<alias name="extension.user_relocatable"
-	       class="${group}.client.ui.mvvm.views.components.extensions.UIExtensionComponentUserRelocatable"/>
+	       class="${group}.ui.mvvm.views.components.extensions.UIExtensionComponentUserRelocatable"/>
 	<alias name="extension.user_resizable"
-	       class="${group}.client.ui.mvvm.views.components.extensions.UIExtensionComponentUserResizable"/>
+	       class="${group}.ui.mvvm.views.components.extensions.UIExtensionComponentUserResizable"/>
 
 	<!-- SECTION content -->
+	<!-- TODO extension class="extension.minecraft.background.default" need method of adding extensions to the view /-->
 	<component class="component.manager">
 		<shape class="shape.rectangle"/>
 
