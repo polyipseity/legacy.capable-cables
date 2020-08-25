@@ -1,9 +1,9 @@
-package $group__.ui.mvvm.views.components.parsers.dom;
+package $group__.ui.parsers.components;
 
 import $group__.ui.ConfigurationUI;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
-import $group__.ui.core.mvvm.views.components.parsers.IGeneralPrototype;
-import $group__.ui.core.mvvm.views.components.parsers.xml.IUIDOMPrototypeParser;
+import $group__.ui.core.parsers.components.IGeneralPrototype;
+import $group__.ui.core.parsers.components.IUIDOMPrototypeParser;
 import $group__.utilities.*;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;

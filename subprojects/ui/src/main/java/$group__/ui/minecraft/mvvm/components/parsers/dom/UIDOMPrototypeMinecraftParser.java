@@ -1,7 +1,7 @@
 package $group__.ui.minecraft.mvvm.components.parsers.dom;
 
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
-import $group__.ui.mvvm.views.components.parsers.dom.UIDOMPrototypeParser;
+import $group__.ui.parsers.components.UIDOMPrototypeParser;
 
 public class UIDOMPrototypeMinecraftParser<T extends IUIComponentManager<?>>
 		extends UIDOMPrototypeParser<T> {

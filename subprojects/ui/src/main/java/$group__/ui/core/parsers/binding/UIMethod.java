@@ -1,10 +1,10 @@
-package $group__.ui.core.mvvm.views.components.parsers;
+package $group__.ui.core.parsers.binding;
 
 import java.lang.annotation.*;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface UIProperty {
+public @interface UIMethod {
 	String value();
 }

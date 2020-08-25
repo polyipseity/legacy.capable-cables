@@ -1,12 +1,12 @@
-package $group__.ui.mvvm.views.components.parsers.dom;
+package $group__.ui.parsers.components;
 
 import $group__.ui.core.mvvm.extensions.IUIExtension;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
-import $group__.ui.core.mvvm.views.components.parsers.IGeneralPrototype;
-import $group__.ui.core.mvvm.views.components.parsers.UIExtensionConstructor;
-import $group__.ui.core.mvvm.views.components.parsers.xml.IUIDOMPrototypeParser;
+import $group__.ui.core.parsers.components.IGeneralPrototype;
+import $group__.ui.core.parsers.components.IUIDOMPrototypeParser;
+import $group__.ui.core.parsers.components.UIExtensionConstructor;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.DOMUtilities;
 import $group__.utilities.ThrowableUtilities;

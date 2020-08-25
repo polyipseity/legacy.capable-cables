@@ -1,7 +1,7 @@
-package $group__.ui.mvvm.views.components.parsers.dom;
+package $group__.ui.parsers.components;
 
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
-import $group__.ui.core.mvvm.views.components.parsers.xml.IUIDOMPrototypeParser;
+import $group__.ui.core.parsers.components.IUIDOMPrototypeParser;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilder;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilderFactory;

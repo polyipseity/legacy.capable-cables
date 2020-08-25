@@ -1,7 +1,7 @@
 package $group__.ui.minecraft.mvvm.extensions;
 
 import $group__.ui.core.mvvm.IUICommon;
-import $group__.ui.core.mvvm.views.components.parsers.UIExtensionConstructor;
+import $group__.ui.core.parsers.components.UIExtensionConstructor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.minecraft.core.mvvm.extensions.IUIExtensionBackgroundRenderer;
 import $group__.ui.minecraft.core.mvvm.extensions.IUIExtensionScreenProvider;

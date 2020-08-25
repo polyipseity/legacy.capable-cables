@@ -1,4 +1,4 @@
-package $group__.ui.core.mvvm.views.components.parsers;
+package $group__.ui.core.parsers;
 
 import $group__.utilities.interfaces.IHasGenericClass;
 

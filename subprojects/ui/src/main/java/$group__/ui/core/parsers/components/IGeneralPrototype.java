@@ -1,4 +1,4 @@
-package $group__.ui.core.mvvm.views.components.parsers;
+package $group__.ui.core.parsers.components;
 
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;

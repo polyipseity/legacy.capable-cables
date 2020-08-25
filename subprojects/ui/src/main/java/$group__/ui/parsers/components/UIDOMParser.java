@@ -1,6 +1,6 @@
-package $group__.ui.mvvm.views.components.parsers.dom;
+package $group__.ui.parsers.components;
 
-import $group__.ui.core.mvvm.views.components.parsers.xml.IUIDOMParser;
+import $group__.ui.core.parsers.components.IUIDOMParser;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.MapUtilities;
 import $group__.utilities.interfaces.IHasGenericClass;

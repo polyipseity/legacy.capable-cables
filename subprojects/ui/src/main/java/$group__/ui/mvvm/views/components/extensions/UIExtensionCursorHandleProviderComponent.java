@@ -6,7 +6,7 @@ import $group__.ui.core.mvvm.views.IUIView;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIViewComponent;
 import $group__.ui.core.mvvm.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
-import $group__.ui.core.mvvm.views.components.parsers.UIExtensionConstructor;
+import $group__.ui.core.parsers.components.UIExtensionConstructor;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;
 import $group__.utilities.interfaces.INamespacePrefixedString;

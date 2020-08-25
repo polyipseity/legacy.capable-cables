@@ -4,7 +4,7 @@ import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.components.extensions.caches.IUIExtensionCache;
-import $group__.ui.core.mvvm.views.components.parsers.UIExtensionConstructor;
+import $group__.ui.core.parsers.components.UIExtensionConstructor;
 import $group__.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.ConcurrencyUtilities;

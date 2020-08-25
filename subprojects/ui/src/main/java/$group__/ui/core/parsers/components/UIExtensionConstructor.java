@@ -1,4 +1,4 @@
-package $group__.ui.core.mvvm.views.components.parsers;
+package $group__.ui.core.parsers.components;
 
 import java.lang.annotation.*;
 import java.lang.invoke.MethodType;

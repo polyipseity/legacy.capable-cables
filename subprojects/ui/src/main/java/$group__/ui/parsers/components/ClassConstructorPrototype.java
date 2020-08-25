@@ -1,6 +1,6 @@
-package $group__.ui.mvvm.views.components.parsers.dom;
+package $group__.ui.parsers.components;
 
-import $group__.ui.core.mvvm.views.components.parsers.IConstructorType;
+import $group__.ui.core.parsers.components.IConstructorType;
 import $group__.utilities.DynamicUtilities;
 
 import java.lang.invoke.MethodHandle;

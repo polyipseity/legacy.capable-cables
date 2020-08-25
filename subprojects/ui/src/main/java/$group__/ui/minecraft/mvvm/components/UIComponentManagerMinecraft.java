@@ -2,7 +2,7 @@ package $group__.ui.minecraft.mvvm.components;
 
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
-import $group__.ui.core.mvvm.views.components.parsers.UIComponentConstructor;
+import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.minecraft.core.mvvm.views.IUIComponentMinecraft;
 import $group__.ui.mvvm.views.components.UIComponentManager;

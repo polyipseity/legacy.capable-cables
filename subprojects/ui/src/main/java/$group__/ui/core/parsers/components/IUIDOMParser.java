@@ -1,6 +1,6 @@
-package $group__.ui.core.mvvm.views.components.parsers.xml;
+package $group__.ui.core.parsers.components;
 
-import $group__.ui.core.mvvm.views.components.parsers.IUIResourceParser;
+import $group__.ui.core.parsers.IUIResourceParser;
 import org.w3c.dom.Document;
 
 import javax.annotation.Nullable;

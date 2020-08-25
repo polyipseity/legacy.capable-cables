@@ -1,9 +1,9 @@
-package $group__.ui.mvvm.views.components.parsers.dom;
+package $group__.ui.parsers.components;
 
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
-import $group__.ui.core.mvvm.views.components.parsers.IGeneralPrototype;
-import $group__.ui.core.mvvm.views.components.parsers.xml.IUIDOMPrototypeParser;
+import $group__.ui.core.parsers.components.IGeneralPrototype;
+import $group__.ui.core.parsers.components.IUIDOMPrototypeParser;
 import $group__.ui.core.structures.shapes.interactions.IShapeAnchor;
 import $group__.ui.structures.EnumUISide;
 import $group__.ui.structures.shapes.interactions.ShapeAnchor;

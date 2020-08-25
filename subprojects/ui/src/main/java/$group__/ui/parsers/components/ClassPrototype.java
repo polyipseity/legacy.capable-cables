@@ -1,4 +1,4 @@
-package $group__.ui.mvvm.views.components.parsers.dom;
+package $group__.ui.parsers.components;
 
 public abstract class ClassPrototype<T> {
 	public static final String CLASS_ATTRIBUTE_NAME = "class";
