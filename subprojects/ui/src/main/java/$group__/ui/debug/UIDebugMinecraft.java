@@ -83,6 +83,7 @@ public enum UIDebugMinecraft {
 			Try.run(() ->
 					PARSER.parse(UIFacade.UFMinecraft.parseResourceDocument(new NamespacePrefixedString(ConfigurationUI.getModId(), "ui/schemas/components_test.xml"))), LOGGER);
 			ThrowableCatcher.rethrow(true);
+			PARSER.construct(); // COMMENT early check
 		}
 
 		@Override

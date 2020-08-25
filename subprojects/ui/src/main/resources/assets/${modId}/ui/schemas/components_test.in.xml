@@ -21,9 +21,10 @@
 	       class="${group}.ui.mvvm.views.components.extensions.UIExtensionComponentUserResizable"/>
 
 	<!-- SECTION content -->
-	<!-- TODO extension class="extension.minecraft.background.default" need method of adding extensions to the view /-->
 	<component class="component.manager">
 		<shape class="shape.rectangle"/>
+
+		<extension class="extension.minecraft.background.default"/>
 
 		<component class="component.window">
 			<shape class="shape.rectangle" x="10" y="10" width="100" height="100"/>
@@ -38,6 +39,9 @@
 				<constraint minX="20"/>
 			</shape>
 
+			<extension class="extension.user_relocatable"/>
+			<extension class="extension.user_resizable"/>
+
 			<component class="component.button">
 				<shape class="shape.ellipse" x="0" y="0" width="100" height="100">
 					<transform>
@@ -47,9 +51,6 @@
 					</transform>
 				</shape>
 			</component>
-
-			<extension class="extension.user_relocatable"/>
-			<extension class="extension.user_resizable"/>
 		</component>
 	</component>
 </ui>
