@@ -6,14 +6,15 @@ import $group__.ui.core.mvvm.views.IUIView;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIViewComponent;
 import $group__.ui.core.mvvm.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
+import $group__.ui.core.mvvm.views.components.paths.IUIComponentPath;
 import $group__.ui.core.parsers.components.UIExtensionConstructor;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;
 import $group__.utilities.interfaces.INamespacePrefixedString;
+import com.google.common.collect.Lists;
 
 import java.awt.geom.Point2D;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent<?, ?>>
 		extends ExtensionContainerAware<INamespacePrefixedString, IUIView<?>, E>
@@ -28,18 +29,18 @@ public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent
 	public Optional<Long> getCursorHandle(Point2D cursorPosition) {
 		return getContainer().map(c -> {
 			Optional<Long> ret = Optional.empty();
-			IAffineTransformStack stack = c.getManager().getCleanTransformStack();
-			AtomicInteger popTimes = new AtomicInteger();
-			for (IUIComponent e : c.getManager().getPathResolver().resolvePath(cursorPosition, true).asList()) {
-				if (e instanceof IUIComponentCursorHandleProvider) {
-					if ((ret = ((IUIComponentCursorHandleProvider) e).getCursorHandle(stack, cursorPosition))
-							.isPresent())
-						break;
+			IUIComponentPath cp = c.getManager().getPathResolver().resolvePath(cursorPosition, true);
+			try (IAffineTransformStack stack = cp.getTransformStackView()) {
+				for (IUIComponent e : Lists.reverse(cp.asList())) {
+					if (e instanceof IUIComponentCursorHandleProvider) {
+						if ((ret = ((IUIComponentCursorHandleProvider) e).getCursorHandle(stack, cursorPosition))
+								.isPresent())
+							break;
+					}
+					if (!stack.isClean())
+						stack.getDelegated().pop();
 				}
-				if (popTimes.getAndDecrement() > 0)
-					stack.getDelegated().pop();
 			}
-			IAffineTransformStack.popMultiple(stack, popTimes.get());
 			return ret;
 		}).orElseGet(Optional::empty);
 	}

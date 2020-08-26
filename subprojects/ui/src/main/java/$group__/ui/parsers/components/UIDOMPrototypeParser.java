@@ -93,8 +93,8 @@ public class UIDOMPrototypeParser<T extends IUIComponentManager<?>>
 		reset();
 		Element root = resource.getDocumentElement();
 
-		DOMUtilities.getChildrenByTagNameNS(root, getMainNamespaceURI(), "alias").forEach(al ->
-				getAliases().put(DOMUtilities.getAttributeValue(al, "name").orElseThrow(InternalError::new),
+		DOMUtilities.getChildrenByTagNameNS(root, getMainNamespaceURI(), "using").forEach(al ->
+				getAliases().put(DOMUtilities.getAttributeValue(al, "alias").orElseThrow(InternalError::new),
 						DOMUtilities.getAttributeValue(al, ClassPrototype.CLASS_ATTRIBUTE_NAME).orElseThrow(InternalError::new)));
 		Node managerNode = DOMUtilities.getChildByTagNameNS(root, getMainNamespaceURI(), UIComponentPrototype.LOCAL_NAME).orElseThrow(() ->
 				BecauseOf.illegalArgument("Component manager not found",

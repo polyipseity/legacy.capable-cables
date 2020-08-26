@@ -46,8 +46,7 @@ public interface IAffineTransformStack
 	}
 
 	default Runnable createCleaner() {
-		return () ->
-				IAffineTransformStack.popMultiple(this, getDelegated().size() - 1);
+		return () -> IAffineTransformStack.popMultiple(this, getDelegated().size() - 1);
 	}
 
 	static void popMultiple(IAffineTransformStack stack, int times) {

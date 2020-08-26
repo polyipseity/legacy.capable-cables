@@ -1,7 +1,9 @@
 package $group__.ui.mvvm.views.components.common;
 
 import $group__.ui.core.mvvm.binding.IBindingMethod;
+import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
+import $group__.ui.core.mvvm.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
 import $group__.ui.core.mvvm.views.events.IUIEvent;
 import $group__.ui.core.mvvm.views.events.IUIEventKeyboard;
 import $group__.ui.core.mvvm.views.events.IUIEventMouse;
@@ -14,20 +16,19 @@ import $group__.ui.mvvm.views.components.UIComponent;
 import $group__.ui.mvvm.views.events.ui.UIEventKeyboard;
 import $group__.ui.mvvm.views.events.ui.UIEventMouse;
 import $group__.ui.structures.EnumCursor;
-import $group__.utilities.client.minecraft.GLUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.lwjgl.glfw.GLFW;
-import org.lwjgl.system.MemoryUtil;
 
+import java.awt.geom.Point2D;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Optional;
 
 public class UIComponentButton
-		extends UIComponent {
+		extends UIComponent
+		implements IUIComponentCursorHandleProvider {
 	public static final String METHOD_ON_ACTIVATED = INamespacePrefixedString.DEFAULT_PREFIX + "button.methods.activated";
 
 	public static final INamespacePrefixedString METHOD_ON_ACTIVATED_LOCATION = new NamespacePrefixedString(METHOD_ON_ACTIVATED);
@@ -46,16 +47,12 @@ public class UIComponentButton
 				Optional.ofNullable(this.mapping.get(METHOD_ON_ACTIVATED_LOCATION)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 
 		addEventListener(UIEventMouse.TYPE_MOUSE_ENTER_SELF, new UIEventListener.Functional<IUIEventMouse>(e -> {
-			if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET) {
+			if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET)
 				getButtonStates().add(IButtonState.HOVERING);
-				GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), EnumCursor.STANDARD_HAND_CURSOR.getHandle());
-			}
 		}), false);
 		addEventListener(UIEventMouse.TYPE_MOUSE_LEAVE_SELF, new UIEventListener.Functional<IUIEventMouse>(e -> {
-			if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET) {
+			if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET)
 				getButtonStates().remove(IButtonState.HOVERING);
-				GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), MemoryUtil.NULL);
-			}
 		}), false);
 
 		addEventListener(UIEventMouse.TYPE_MOUSE_DOWN, new UIEventListener.Functional<IUIEventMouse>(e -> {
@@ -88,8 +85,15 @@ public class UIComponentButton
 	@Override
 	public boolean isFocusable() { return true; }
 
+	@Override
+	public Optional<Long> getCursorHandle(IAffineTransformStack stack, Point2D cursorPosition) {
+		if (getButtonStates().contains(IButtonState.HOVERING))
+			return Optional.of(EnumCursor.STANDARD_HAND_CURSOR.getHandle());
+		return Optional.empty();
+	}
+
 	@OnlyIn(Dist.CLIENT)
-	protected enum IButtonState {
+	public enum IButtonState {
 		HOVERING,
 		PRESSING,
 	}

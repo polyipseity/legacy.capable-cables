@@ -8,7 +8,7 @@
 	<xs:element name="ui" id="ui">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="ui:alias" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:using" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="ui:component"/>
 			</xs:sequence>
 			<xs:anyAttribute namespace="##other" processContents="lax"/>
@@ -17,9 +17,9 @@
 
 	<!-- SECTION top -->
 
-	<xs:element name="alias" id="alias">
+	<xs:element name="using" id="using">
 		<xs:complexType>
-			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="alias" type="xs:ID" use="required"/>
 			<xs:attribute name="class" type="xs:string" use="required"/>
 		</xs:complexType>
 	</xs:element>
@@ -30,7 +30,7 @@
 		<xs:sequence>
 			<xs:element ref="ui:property" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
-		<xs:attribute name="class" type="xs:string" use="required"/>
+		<xs:attribute name="class" type="xs:IDREF" use="required"/>
 	</xs:complexType>
 
 	<xs:complexType name="componentBasedWithBindingsType" id="componentBasedWithBindingsType">

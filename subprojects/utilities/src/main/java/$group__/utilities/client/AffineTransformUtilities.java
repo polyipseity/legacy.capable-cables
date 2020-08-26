@@ -46,9 +46,11 @@ public enum AffineTransformUtilities {
 	public static void transformPoint(Point2D point, AffineTransform transform) { transformReturns(point, transform); }
 
 	public static final int TRANSLATE_Y_INDEX = toFlatMatrixArrayIndex(1, 2);
-	private static final double[] MATRIX_3X2_IDENTITY = {
-			1, 0, 0,
-			0, 1, 0,
+	private static final double[] FLAT_MATRIX_IDENTITY = {
+			// COMMENT column-major
+			1, 0,
+			0, 1,
+			0, 0,
 	};
 	private static final float[] MATRIX_4X4_IDENTITY = {
 			1, 0, 0, 0,
@@ -57,9 +59,9 @@ public enum AffineTransformUtilities {
 			0, 0, 0, 1,
 	};
 
-	public static double[] getMatrix3x2IdentityView() { return MATRIX_3X2_IDENTITY.clone(); }
+	public static double[] getFlatMatrixIdentityCopy() { return FLAT_MATRIX_IDENTITY.clone(); }
 
-	public static AffineTransform getIdentityView() { return (AffineTransform) IDENTITY.clone(); }
+	public static AffineTransform getIdentityCopy() { return (AffineTransform) IDENTITY.clone(); }
 
 	public static Matrix4f toMatrix(AffineTransform transform) {
 		final double[] fm = new double[6];

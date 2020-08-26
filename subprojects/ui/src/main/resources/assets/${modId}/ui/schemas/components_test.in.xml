@@ -4,20 +4,20 @@
 	<!-- SECTION aliases -->
 
 	<!-- COMMENT shapes -->
-	<alias name="shape.rectangle" class="java.awt.geom.Rectangle2D"/>
-	<alias name="shape.ellipse" class="java.awt.geom.Ellipse2D"/>
+	<using alias="shape.rectangle" class="java.awt.geom.Rectangle2D"/>
+	<using alias="shape.ellipse" class="java.awt.geom.Ellipse2D"/>
 	<!-- COMMENT components -->
-	<alias name="component.manager" class="${group}.ui.minecraft.mvvm.components.UIComponentManagerMinecraft"/>
-	<alias name="component.window"
+	<using alias="component.manager" class="${group}.ui.minecraft.mvvm.components.UIComponentManagerMinecraft"/>
+	<using alias="component.window"
 	       class="${group}.ui.minecraft.mvvm.components.common.UIComponentWindowMinecraft"/>
-	<alias name="component.button"
+	<using alias="component.button"
 	       class="${group}.ui.minecraft.mvvm.components.common.UIComponentButtonMinecraft"/>
 	<!-- COMMENT extensions -->
-	<alias name="extension.minecraft.background.default"
+	<using alias="extension.minecraft.background.default"
 	       class="${group}.ui.minecraft.mvvm.extensions.UIExtensionBackgroundMinecraft\$Default"/>
-	<alias name="extension.user_relocatable"
+	<using alias="extension.user_relocatable"
 	       class="${group}.ui.mvvm.views.components.extensions.UIExtensionComponentUserRelocatable"/>
-	<alias name="extension.user_resizable"
+	<using alias="extension.user_resizable"
 	       class="${group}.ui.mvvm.views.components.extensions.UIExtensionComponentUserResizable"/>
 
 	<!-- SECTION content -->
@@ -46,7 +46,7 @@
 				<shape class="shape.ellipse" x="0" y="0" width="100" height="100">
 					<transform>
 						<values/>
-						<operation method="rotate" delimiter=",">1,0</operation>
+						<operation method="rotate" delimiter=",">1,1</operation>
 						<operation method="translate" delimiter=" ">10 10</operation>
 					</transform>
 				</shape>

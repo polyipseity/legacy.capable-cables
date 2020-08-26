@@ -88,7 +88,7 @@ public class ShapeDescriptorPrototype
 		AffineTransform transform = new AffineTransform();
 		DOMUtilities.getChildByTagNameNS(node, namespaceURI, "transform")
 				.ifPresent(nt -> {
-					final double[] fm = AffineTransformUtilities.getMatrix3x2IdentityView();
+					final double[] fm = AffineTransformUtilities.getFlatMatrixIdentityCopy();
 					@Nullable NamedNodeMap vAs = DOMUtilities.getChildByTagNameNS(nt, namespaceURI, "values")
 							.orElseThrow(InternalError::new).getAttributes();
 					assert vAs != null;

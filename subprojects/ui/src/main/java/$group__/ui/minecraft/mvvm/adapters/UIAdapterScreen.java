@@ -503,30 +503,30 @@ public class UIAdapterScreen
 
 	@Override
 	@Deprecated
-	protected void hLine(int x1, int x2, int y, int color) { DrawingUtilities.hLine(AffineTransformUtilities.getIdentityView(), x1, x2, y, color, getBlitOffset()); }
+	protected void hLine(int x1, int x2, int y, int color) { DrawingUtilities.hLine(AffineTransformUtilities.getIdentityCopy(), x1, x2, y, color, getBlitOffset()); }
 
 	@Override
 	@Deprecated
-	protected void vLine(int x, int y1, int y2, int color) { DrawingUtilities.vLine(AffineTransformUtilities.getIdentityView(), x, y1, y2, color, getBlitOffset()); }
+	protected void vLine(int x, int y1, int y2, int color) { DrawingUtilities.vLine(AffineTransformUtilities.getIdentityCopy(), x, y1, y2, color, getBlitOffset()); }
 
 	@Override
 	@Deprecated
-	protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) { DrawingUtilities.fillGradient(AffineTransformUtilities.getIdentityView(), UIObjectUtilities.getRectangleFromDiagonal(new Point2DImmutable(x1, y1), new Point2DImmutable(x2, y2)), colorTop, colorBottom, getBlitOffset()); }
+	protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) { DrawingUtilities.fillGradient(AffineTransformUtilities.getIdentityCopy(), UIObjectUtilities.getRectangleFromDiagonal(new Point2DImmutable(x1, y1), new Point2DImmutable(x2, y2)), colorTop, colorBottom, getBlitOffset()); }
 
 	@Override
 	@Deprecated
-	public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawCenteredString(AffineTransformUtilities.getIdentityView(), font, string, new Point2DImmutable(x, y), color); }
+	public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawCenteredString(AffineTransformUtilities.getIdentityCopy(), font, string, new Point2DImmutable(x, y), color); }
 
 	@Override
 	@Deprecated
-	public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawRightAlignedString(AffineTransformUtilities.getIdentityView(), font, string, new Point2DImmutable(x, y), color); }
+	public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawRightAlignedString(AffineTransformUtilities.getIdentityCopy(), font, string, new Point2DImmutable(x, y), color); }
 
 	@Override
 	@Deprecated
-	public void drawString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawString(AffineTransformUtilities.getIdentityView(), font, string, new Point2DImmutable(x, y), color); }
+	public void drawString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawString(AffineTransformUtilities.getIdentityCopy(), font, string, new Point2DImmutable(x, y), color); }
 
 	@SuppressWarnings("MagicNumber")
 	@Override
 	@Deprecated
-	public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(AffineTransformUtilities.getIdentityView(), new Rectangle2D.Double(x, y, w, h), new Point2DImmutable(u, v), new Dimension2DDouble(256, 256), getBlitOffset()); }
+	public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(AffineTransformUtilities.getIdentityCopy(), new Rectangle2D.Double(x, y, w, h), new Point2DImmutable(u, v), new Dimension2DDouble(256, 256), getBlitOffset()); }
 }

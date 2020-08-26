@@ -16,7 +16,7 @@ import static java.lang.Math.min;
 public enum UIObjectUtilities {
 	;
 
-	public static Shape copyShape(Shape shape) { return AffineTransformUtilities.getIdentityView().createTransformedShape(shape); }
+	public static Shape copyShape(Shape shape) { return AffineTransformUtilities.getIdentityCopy().createTransformedShape(shape); }
 
 	public static Rectangle2D getRectangleFromDiagonal(Point2D p1, Point2D p2) {
 		Rectangle2D ret = new Rectangle2D.Double();
