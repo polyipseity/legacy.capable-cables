@@ -23,7 +23,7 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 		extends IHasGenericClass.Impl<S>
 		implements IShapeDescriptorBuilder<S> {
 	protected final AffineTransform transform = new AffineTransform();
-	protected final Rectangle2D bounds = IShapeDescriptor.getShapePlaceholderView();
+	protected final Rectangle2D bounds = IShapeDescriptor.getShapePlaceholderCopy();
 	protected final List<IShapeConstraint> constraints = new LinkedList<>();
 	protected final ConcurrentMap<String, Consumer<?>> properties =
 			MapUtilities.getMapMakerSingleThreaded().makeMap();

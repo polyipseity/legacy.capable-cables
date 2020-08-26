@@ -118,7 +118,7 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 			implements IUIComponentCursorHandleProvider {
 		@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 		protected VirtualComponent() {
-			super(IShapeDescriptor.getShapeDescriptorPlaceholderView());
+			super(IShapeDescriptor.getShapeDescriptorPlaceholderCopy());
 
 			addEventListener(UIEventMouse.TYPE_MOUSE_DOWN, new UIEventListener.Functional<IUIEventMouse>(evt -> {
 				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && startRelocateMaybe(evt.getData().getCursorPositionView())) { // todo custom
