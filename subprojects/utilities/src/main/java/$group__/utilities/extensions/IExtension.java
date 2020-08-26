@@ -1,10 +1,10 @@
 package $group__.utilities.extensions;
 
+import $group__.utilities.PreconditionUtilities;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.Registry;
-import $group__.utilities.structures.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -48,10 +48,12 @@ public interface IExtension<K, C extends IExtensionContainer<? super K>> extends
 
 	final class RegExtension extends Registry<INamespacePrefixedString, IType<? extends INamespacePrefixedString, ?, ?>> {
 		private static final Logger LOGGER = LogManager.getLogger();
-		public static final RegExtension INSTANCE = Singleton.getSingletonInstance(RegExtension.class, LOGGER);
+		public static final RegExtension INSTANCE = new RegExtension();
 
-		@SuppressWarnings("unused")
-		protected RegExtension() { super(true, LOGGER); }
+		protected RegExtension() {
+			super(true, LOGGER);
+			PreconditionUtilities.requireRunOnceOnly(LOGGER);
+		}
 
 		public static void checkExtensionRegistered(IExtension<? extends INamespacePrefixedString, ?> extension) {
 			if (!INSTANCE.containsValue(extension.getType())) {

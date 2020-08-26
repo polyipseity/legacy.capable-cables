@@ -27,7 +27,7 @@ public abstract class Singleton {
 		String classGS = clazz.toGenericString(),
 				sts = getCurrentStackTraceString();
 
-		Map.Entry<? extends Singleton, String> v = immutableEntry(this, sts);
+		@SuppressWarnings("ThisEscapedInObjectConstruction") Map.Entry<? extends Singleton, String> v = immutableEntry(this, sts);
 		@Nullable Map.Entry<? extends Singleton, String> vo = INSTANCES.put(clazz, v);
 		if (vo != null) {
 			logger.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("The singleton instance of '{}' already created, previous stacktrace:{}{}", classGS, lineSeparator(), vo.getValue()));

@@ -3,11 +3,11 @@ package $group__.ui.core.mvvm.views.components.extensions.caches;
 import $group__.ui.core.mvvm.extensions.IUIExtension;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.utilities.CastUtilities;
+import $group__.utilities.PreconditionUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
 import $group__.utilities.structures.Registry;
-import $group__.utilities.structures.Singleton;
 import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableList;
 import io.reactivex.rxjava3.core.Observer;
@@ -90,9 +90,11 @@ public interface IUIExtensionCache
 
 	final class RegUICache extends Registry<INamespacePrefixedString, IType<?, ?>> {
 		private static final Logger LOGGER = LogManager.getLogger();
-		public static final RegUICache INSTANCE = Singleton.getSingletonInstance(RegUICache.class, LOGGER);
+		public static final RegUICache INSTANCE = new RegUICache();
 
-		@SuppressWarnings("unused")
-		protected RegUICache() { super(true, LOGGER); }
+		protected RegUICache() {
+			super(true, LOGGER);
+			PreconditionUtilities.requireRunOnceOnly(LOGGER);
+		}
 	}
 }

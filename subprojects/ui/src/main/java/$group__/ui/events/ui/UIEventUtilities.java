@@ -6,10 +6,10 @@ import $group__.ui.core.structures.IUIDataKeyboardKeyPress;
 import $group__.ui.core.structures.IUIDataMouseButtonClick;
 import $group__.ui.mvvm.views.events.ui.*;
 import $group__.ui.utilities.UIDataMouseButtonClick;
+import $group__.utilities.PreconditionUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.Registry;
-import $group__.utilities.structures.Singleton;
 import com.google.common.collect.ImmutableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -177,9 +177,12 @@ public enum UIEventUtilities {
 
 	public static final class RegUIEvent extends Registry<INamespacePrefixedString, Class<? extends IUIEvent>> {
 		private static final Logger LOGGER = LogManager.getLogger();
-		public static final RegUIEvent INSTANCE = Singleton.getSingletonInstance(RegUIEvent.class, LOGGER);
+		public static final RegUIEvent INSTANCE = new RegUIEvent();
 
-		protected RegUIEvent() { super(false, LOGGER); }
+		protected RegUIEvent() {
+			super(false, LOGGER);
+			PreconditionUtilities.requireRunOnceOnly(LOGGER);
+		}
 
 		public static void checkEvent(IUIEvent event)
 				throws IllegalArgumentException {

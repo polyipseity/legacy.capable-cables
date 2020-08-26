@@ -1,11 +1,11 @@
 package $group__.ui.core.structures.shapes.descriptors;
 
 import $group__.ui.structures.shapes.descriptors.builders.RectangularShapeDescriptorBuilder;
+import $group__.utilities.PreconditionUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
 import $group__.utilities.structures.Registry;
-import $group__.utilities.structures.Singleton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,10 +25,12 @@ public interface IShapeDescriptorBuilderFactory {
 
 	class RegSDBFactory extends Registry<INamespacePrefixedString, IShapeDescriptorBuilderFactory> {
 		private static final Logger LOGGER = LogManager.getLogger();
-		public static final RegSDBFactory INSTANCE = Singleton.getSingletonInstance(RegSDBFactory.class, LOGGER);
+		public static final RegSDBFactory INSTANCE = new RegSDBFactory();
 
 		protected RegSDBFactory() {
 			super(true, LOGGER);
+			PreconditionUtilities.requireRunOnceOnly(LOGGER);
+
 			delegated.put(DefaultFactory.KEY, new Registry.RegistryObject<>(new DefaultFactory()));
 		}
 
