@@ -53,6 +53,7 @@ public interface IShapeDescriptorBuilderFactory {
 
 		protected DefaultFactory() {
 			super(true, LOGGER);
+
 			delegated.put(Rectangle2D.class, new RegistryObject<>(c ->
 					new RectangularShapeDescriptorBuilder.Rectangle2DSD()));
 			delegated.put(Ellipse2D.class, new RegistryObject<>(c ->

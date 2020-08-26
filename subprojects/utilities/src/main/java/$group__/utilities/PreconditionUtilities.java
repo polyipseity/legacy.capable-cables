@@ -3,7 +3,6 @@ package $group__.utilities;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.Map;
 
 import static $group__.utilities.DynamicUtilities.getCallerClass;
@@ -16,7 +15,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 public enum PreconditionUtilities {
 	;
 
-	private static final Map<Class<?>, Throwable> RAN_ONCE = Collections.synchronizedMap(MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_LARGE).makeMap());
+	private static final Map<Class<?>, Throwable> RAN_ONCE = MapUtilities.getMapMakerMultiThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_LARGE).makeMap();
 
 
 	public static void checkArgumentTypes(Class<?>[] types, Object... args) {
@@ -34,10 +33,15 @@ public enum PreconditionUtilities {
 	}
 
 
+	@SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
 	public static void requireRunOnceOnly(@Nullable Logger logger) throws IllegalStateException {
 		Throwable t = ThrowableUtilities.create();
 
-		@Nullable Throwable t1 = RAN_ONCE.put(getCallerClass(), t);
+		Class<?> cc = getCallerClass();
+		@Nullable Throwable t1;
+		synchronized (cc) {
+			t1 = RAN_ONCE.put(cc, t);
+		}
 		if (t1 != null) {
 			if (logger != null)
 				logger.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Illegal second invocation, previous stacktrace:{}{}", lineSeparator(), getStackTrace(t1)));
