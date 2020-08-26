@@ -101,7 +101,7 @@ public enum UIDebugMinecraft {
 									new Binder()
 							),
 							container);
-			IExtensionContainer.addExtensionSafe(ret.getInfrastructure().getView(),
+			IExtensionContainer.addExtensionChecked(ret.getInfrastructure().getView(),
 					new UIExtensionCursorHandleProviderComponent<>(IUIViewComponent.class));
 			return ret;
 		}

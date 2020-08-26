@@ -49,6 +49,6 @@ public enum PreconditionUtilities {
 		}
 
 		if (logger != null)
-			logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("First ONLY invocation, stacktrace:{}{}", lineSeparator(), t));
+			logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("First ONLY invocation, stacktrace:{}{}", lineSeparator(), getStackTrace(t)));
 	}
 }

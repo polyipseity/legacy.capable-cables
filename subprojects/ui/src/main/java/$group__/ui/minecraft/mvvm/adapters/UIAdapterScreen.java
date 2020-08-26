@@ -82,7 +82,7 @@ public class UIAdapterScreen
 		this.infrastructure = infrastructure;
 		this.closeKeys = new HashSet<>(closeKeys);
 		this.changeFocusKeys = new HashSet<>(changeFocusKeys);
-		IExtensionContainer.addExtensionSafe(infrastructure, new UIExtensionScreen());
+		IExtensionContainer.addExtensionChecked(infrastructure, new UIExtensionScreen());
 	}
 
 	@Override
@@ -355,7 +355,7 @@ public class UIAdapterScreen
 		public WithContainer(ITextComponent titleIn, I manager, C container) {
 			super(titleIn, manager);
 			this.container = container;
-			IExtensionContainer.addExtensionSafe(infrastructure, new UIExtensionContainer(container));
+			IExtensionContainer.addExtensionChecked(infrastructure, new UIExtensionContainer(container));
 		}
 
 		@Override

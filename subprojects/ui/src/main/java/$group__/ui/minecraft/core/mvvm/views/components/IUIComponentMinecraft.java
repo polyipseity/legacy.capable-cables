@@ -8,6 +8,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public interface IUIComponentMinecraft
-		extends IUIComponentRendererContainer<IUIComponentRendererMinecraft> {
+		extends IUIComponentRendererContainer<IUIComponentRendererMinecraft<?>> {
 	default void tick(IAffineTransformStack stack) {}
 }

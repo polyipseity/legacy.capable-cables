@@ -1,14 +1,11 @@
 package $group__.ui.mvvm.views.components.common;
 
-import $group__.ui.core.mvvm.binding.IBindingField;
-import $group__.ui.core.mvvm.binding.IHasBinding;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.IUIReshapeExplicitly;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.events.IUIEventFocus;
-import $group__.ui.core.parsers.binding.UIProperty;
 import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
@@ -17,12 +14,10 @@ import $group__.ui.mvvm.views.components.UIComponentContainer;
 import $group__.ui.mvvm.views.events.bus.EventUIComponent;
 import $group__.ui.mvvm.views.events.ui.UIEventFocus;
 import $group__.ui.structures.shapes.interactions.ShapeConstraintSupplier;
-import $group__.ui.utilities.BindingUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.functions.ConstantSupplier;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.reactive.DisposableObserverAuto;
-import $group__.utilities.structures.NamespacePrefixedString;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -39,32 +34,16 @@ import java.util.function.Function;
 public class UIComponentWindow
 		extends UIComponentContainer
 		implements IUIReshapeExplicitly<RectangularShape> {
-	public static final String PROPERTY_COLOR_BACKGROUND = INamespacePrefixedString.DEFAULT_PREFIX + "window.colors.background";
-	public static final String PROPERTY_COLOR_BORDER = INamespacePrefixedString.DEFAULT_PREFIX + "window.colors.border";
-
-	public static final INamespacePrefixedString PROPERTY_COLOR_BACKGROUND_LOCATION = new NamespacePrefixedString(PROPERTY_COLOR_BACKGROUND);
-	public static final INamespacePrefixedString PROPERTY_COLOR_BORDER_LOCATION = new NamespacePrefixedString(PROPERTY_COLOR_BORDER);
-
 	// TODO make window scroll bars, maybe create a new component, and embed into this
 	// TODO make value not hardcoded through themes
 	public static final int
 			WINDOW_DRAG_BAR_THICKNESS = 10, // COMMENT internal top
 			WINDOW_VISIBLE_MINIMUM = 10;
 
-	@UIProperty(PROPERTY_COLOR_BACKGROUND)
-	protected final IBindingField<Color> colorBackground;
-	@UIProperty(PROPERTY_COLOR_BORDER)
-	protected final IBindingField<Color> colorBorder;
-
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.SHAPE_DESCRIPTOR__MAPPING)
 	public UIComponentWindow(IShapeDescriptor<RectangularShape> shapeDescriptor, Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping) {
 		super(shapeDescriptor, mapping);
-
-		this.colorBackground = IHasBinding.createBindingField(Color.class,
-				this.mapping.get(PROPERTY_COLOR_BACKGROUND_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.BLACK);
-		this.colorBorder = IHasBinding.createBindingField(Color.class,
-				this.mapping.get(PROPERTY_COLOR_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.WHITE);
 
 		IShapeDescriptor<?> sd = getShapeDescriptor();
 		modifyShape(() -> {
@@ -111,10 +90,6 @@ public class UIComponentWindow
 	protected final AtomicReference<ObserverEventUIShapeDescriptorModify> observerEventUIShapeDescriptorModify = new AtomicReference<>();
 
 	protected AtomicReference<ObserverEventUIShapeDescriptorModify> getObserverEventUIShapeDescriptorModify() { return observerEventUIShapeDescriptorModify; }
-
-	public IBindingField<Color> getColorBackground() { return colorBackground; }
-
-	public IBindingField<Color> getColorBorder() { return colorBorder; }
 
 	@Override
 	public void transformChildren(IAffineTransformStack stack) {

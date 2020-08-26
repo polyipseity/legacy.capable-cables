@@ -37,7 +37,7 @@ public interface IShapeDescriptorBuilderFactory {
 		@Override
 		public <VL extends IShapeDescriptorBuilderFactory> RegistryObject<VL> register(INamespacePrefixedString key, VL value) {
 			if (DefaultFactory.KEY.equals(key))
-				throw BecauseOf.illegalArgument("Default is not replaceable",
+				throw BecauseOf.illegalArgument("Default factory is not replaceable",
 						"DefaultFactory.KEY", DefaultFactory.KEY,
 						"key", key,
 						"value", value);

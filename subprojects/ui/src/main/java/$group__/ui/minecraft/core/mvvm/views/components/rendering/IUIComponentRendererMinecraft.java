@@ -19,13 +19,12 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-@FunctionalInterface
 @OnlyIn(Dist.CLIENT)
-public interface IUIComponentRendererMinecraft
-		extends IUIComponentRenderer {
-	void render(IUIComponent container, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks, boolean pre);
+public interface IUIComponentRendererMinecraft<C extends IUIComponent>
+		extends IUIComponentRenderer<C> {
+	void render(C container, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks, boolean pre);
 
-	default void crop(IUIComponent container, IAffineTransformStack stack, EnumCropMethod method, boolean push, Point2D mouse, double partialTicks) {
+	default void crop(C container, IAffineTransformStack stack, EnumCropMethod method, boolean push, Point2D mouse, double partialTicks) {
 		IUIComponentRendererMinecraft.cropImpl(container, stack, method, push, mouse, partialTicks);
 	}
 

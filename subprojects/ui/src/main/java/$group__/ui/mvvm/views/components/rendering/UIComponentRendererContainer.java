@@ -6,7 +6,7 @@ import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRendererCont
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class UIComponentRendererContainer<R extends IUIComponentRenderer>
+public class UIComponentRendererContainer<R extends IUIComponentRenderer<?>>
 		implements IUIComponentRendererContainer<R> {
 	@Nullable
 	protected R renderer;

@@ -31,7 +31,8 @@ public abstract class Registry<K, V> {
 		AtomicReference<RegistryObject<VL>> retRef = new AtomicReference<>();
 		if (getDelegated().computeIfPresent(key, (k, v) -> {
 			if (isOverridable())
-				getLogger().info(() -> LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{}: Overriding key '{}': Replacing value '{}' with '{}'", getClass().getName(), key, v, value));
+				getLogger().info(() ->
+						LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{}: Overriding key '{}': Replacing value '{}' with '{}'", getClass().getName(), key, v, value));
 			else
 				throw BecauseOf.illegalArgument(getClass().getName() + ": Cannot override entry", "key", key);
 			RegistryObject<VL> vc = CastUtilities.castUnchecked(v); // COMMENT responsibility goes to the caller

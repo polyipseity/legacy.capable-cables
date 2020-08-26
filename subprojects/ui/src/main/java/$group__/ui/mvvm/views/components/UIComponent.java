@@ -7,6 +7,7 @@ import $group__.ui.core.mvvm.binding.IHasBinding;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
+import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRendererContainer;
 import $group__.ui.core.mvvm.views.events.IUIEvent;
 import $group__.ui.core.parsers.binding.UIProperty;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
@@ -84,7 +85,7 @@ public class UIComponent
 		this.visible = IHasBinding.createBindingField(Boolean.class, this.mapping.get(PROPERTY_VISIBLE_LOCATION), BindingUtilities.Deserializers::deserializeBoolean, true);
 		this.active = IHasBinding.createBindingField(Boolean.class, this.mapping.get(PROPERTY_ACTIVE_LOCATION), BindingUtilities.Deserializers::deserializeBoolean, true);
 
-		IExtensionContainer.addExtensionSafe(this, new UIExtensionCache());
+		IExtensionContainer.addExtensionChecked(this, new UIExtensionCache());
 	}
 
 	@Override
@@ -174,7 +175,14 @@ public class UIComponent
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return Optional.ofNullable(getExtensions().get(key)); }
 
 	@Override
-	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() { return s -> getBinderNotifierSubject().subscribe(s.get()); }
+	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() {
+		return s -> {
+			getBinderNotifierSubject().subscribe(s.get());
+			if (this instanceof IUIComponentRendererContainer)
+				((IUIComponentRendererContainer<?>) this).getRenderer()
+						.ifPresent(r -> r.getBinderSubscriber().accept(s));
+		};
+	}
 
 	protected Subject<IBinderAction> getBinderNotifierSubject() { return binderNotifierSubject; }
 

@@ -14,12 +14,12 @@ public interface IExtensionContainer<K> {
 	Logger LOGGER = LogManager.getLogger();
 
 	@SuppressWarnings("UnusedReturnValue")
-	static <K, V extends IExtension<? extends K, ? super C>, C extends IExtensionContainer<K>> Optional<? extends IExtension<? extends K, ?>> addExtensionSafe(C container, V extension) { return container.addExtension(extension); }
+	static <K, V extends IExtension<? extends K, ? super C>, C extends IExtensionContainer<K>> Optional<? extends IExtension<? extends K, ?>> addExtensionChecked(C container, V extension) { return container.addExtension(extension); }
 
 	Optional<? extends IExtension<? extends K, ?>> addExtension(IExtension<? extends K, ?> extension);
 
 	@SuppressWarnings("UnusedReturnValue")
-	static <K, V extends IExtension<? extends K, C> & IHasGenericClass.Extended<C, ? super E>, C extends IExtensionContainer<K>, E extends C> Optional<? extends IExtension<? extends K, ?>> addExtensionSafeExtended(E container, V extension) { return container.addExtension(extension); }
+	static <K, V extends IExtension<? extends K, C> & IHasGenericClass.Extended<C, ? super E>, C extends IExtensionContainer<K>, E extends C> Optional<? extends IExtension<? extends K, ?>> addExtensionExtendedChecked(E container, V extension) { return container.addExtension(extension); }
 
 	static <K> Optional<? extends IExtension<? extends K, ?>> getExtension(Map<K, ? extends IExtension<? extends K, ?>> extensions, K key) { return Optional.ofNullable(extensions.get(key)); }
 

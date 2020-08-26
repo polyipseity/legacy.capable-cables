@@ -42,8 +42,10 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 									return CastUtilities.castChecked(IUIComponentMinecraft.class, c)
 											.flatMap(IUIComponentRendererContainer::getRenderer)
 											.map(ccr -> {
-												ccr.crop(c, stack, cropMethod, true, cursorPosition, partialTicks);
-												ccr.render(c, stack, cursorPosition, partialTicks, true);
+												ccr.crop(CastUtilities.castUnchecked(c), // COMMENT component should contain a renderer that accepts itself
+														stack, cropMethod, true, cursorPosition, partialTicks);
+												ccr.render(CastUtilities.castUnchecked(c), // COMMENT component should contain a renderer that accepts itself
+														stack, cursorPosition, partialTicks, true);
 												stack.push();
 												return CastUtilities.castChecked(IUIComponentContainer.class, c)
 														.<Iterable<IUIComponent>>map(cp -> {
@@ -62,8 +64,10 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 											.flatMap(IUIComponentRendererContainer::getRenderer)
 											.ifPresent(pc -> {
 												stack.getDelegated().pop();
-												pc.render(p, stack, cursorPosition, partialTicks, false);
-												pc.crop(p, stack, cropMethod, false, cursorPosition, partialTicks);
+												pc.render(CastUtilities.castUnchecked(p), // COMMENT component should contain a renderer that accepts itself
+														stack, cursorPosition, partialTicks, false);
+												pc.crop(CastUtilities.castUnchecked(p), // COMMENT component should contain a renderer that accepts itself
+														stack, cropMethod, false, cursorPosition, partialTicks);
 											});
 								}
 								return p;

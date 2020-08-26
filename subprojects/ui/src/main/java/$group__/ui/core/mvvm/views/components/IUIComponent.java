@@ -1,8 +1,8 @@
 package $group__.ui.core.mvvm.views.components;
 
 import $group__.ui.core.mvvm.binding.IHasBinding;
+import $group__.ui.core.mvvm.binding.IHasBindingMap;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
-import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.ui.core.mvvm.views.paths.IUINode;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
@@ -17,7 +17,6 @@ import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.ConcurrentModificationException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -25,7 +24,7 @@ import java.util.function.Function;
 TODO auto resizing based on min size and preferred size
  */
 public interface IUIComponent
-		extends IUINode, IShapeDescriptorProvider, IHasBinding, IUIEventTarget, IExtensionContainer<INamespacePrefixedString> {
+		extends IUINode, IShapeDescriptorProvider, IHasBinding, IHasBindingMap, IUIEventTarget, IExtensionContainer<INamespacePrefixedString> {
 	String PROPERTY_ID = INamespacePrefixedString.DEFAULT_PREFIX + "id";
 	INamespacePrefixedString PROPERTY_ID_LOCATION = new NamespacePrefixedString(PROPERTY_ID);
 
@@ -73,8 +72,6 @@ public interface IUIComponent
 
 	@Override
 	default Optional<IUINode> getParentNode() { return getParent().map(Function.identity()); }
-
-	Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingView();
 
 	default void initialize(IAffineTransformStack stack) {}
 
