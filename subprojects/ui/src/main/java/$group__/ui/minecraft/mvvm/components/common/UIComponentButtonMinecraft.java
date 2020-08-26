@@ -8,6 +8,7 @@ import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRenderer;
 import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRendererContainer;
 import $group__.ui.core.parsers.binding.UIProperty;
 import $group__.ui.core.parsers.components.UIComponentConstructor;
+import $group__.ui.core.parsers.components.UIRendererConstructor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import $group__.ui.minecraft.core.mvvm.views.components.rendering.IUIComponentRendererMinecraft;
@@ -40,12 +41,12 @@ public class UIComponentButtonMinecraft
 	public static final IUIComponentRenderer.RegRenderer<IUIComponentRendererMinecraft<? super UIComponentButtonMinecraft>> RENDERER_REG =
 			IUIComponentRenderer.RegRenderer.createInstance(UIComponentButtonMinecraft.class,
 					CastUtilities.castUnchecked(IUIComponentRendererMinecraft.class), // COMMENT should not matter
-					() -> new DefaultRenderer<>(UIComponentButtonMinecraft.class, ImmutableMap.of()), LOGGER);
+					() -> new DefaultRenderer<>(ImmutableMap.of(), UIComponentButtonMinecraft.class), LOGGER);
 	protected final IUIComponentRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
 			new UIComponentRendererContainer<>(IUIComponentRenderer.RegRenderer.getDefault(RENDERER_REG).getValue().get());
 
-	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.SHAPE_DESCRIPTOR__MAPPING)
-	public UIComponentButtonMinecraft(IShapeDescriptor<?> shapeDescriptor, Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping) { super(shapeDescriptor, mapping); }
+	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPING__SHAPE_DESCRIPTOR)
+	public UIComponentButtonMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, IShapeDescriptor<?> shapeDescriptor) { super(mapping, shapeDescriptor); }
 
 	@Override
 	public Optional<? extends IUIComponentRendererMinecraft<?>> getRenderer() { return getRendererContainer().getRenderer(); }
@@ -71,7 +72,6 @@ public class UIComponentButtonMinecraft
 		public static final INamespacePrefixedString PROPERTY_COLOR_PRESSED_LOCATION = new NamespacePrefixedString(PROPERTY_COLOR_PRESSED);
 		public static final INamespacePrefixedString PROPERTY_COLOR_PRESSED_BORDER_LOCATION = new NamespacePrefixedString(PROPERTY_COLOR_PRESSED_BORDER);
 
-
 		@UIProperty(PROPERTY_COLOR_BASE)
 		protected final IBindingField<Color> colorBase;
 		@UIProperty(PROPERTY_COLOR_BASE_BORDER)
@@ -85,9 +85,9 @@ public class UIComponentButtonMinecraft
 		@UIProperty(PROPERTY_COLOR_PRESSED_BORDER)
 		protected final IBindingField<Color> colorPressedBorder;
 
-		// todo PARSER constructor
-		public DefaultRenderer(Class<C> containerClass, Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping) {
-			super(containerClass, mapping);
+		@UIRendererConstructor(type = UIRendererConstructor.ConstructorType.MAPPING__CONTAINER_CLASS)
+		public DefaultRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, Class<C> containerClass) {
+			super(mapping, containerClass);
 
 			this.colorBase = IHasBinding.createBindingField(Color.class,
 					this.mapping.get(PROPERTY_COLOR_BASE_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.DARK_GRAY);

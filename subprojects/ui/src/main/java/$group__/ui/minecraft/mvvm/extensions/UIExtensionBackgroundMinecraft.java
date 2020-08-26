@@ -31,10 +31,10 @@ import java.util.function.Predicate;
 public class UIExtensionBackgroundMinecraft<E extends IUIComponentManager<?>>
 		extends ExtensionContainerAware<INamespacePrefixedString, IUIComponentManager<?>, E>
 		implements IUIExtensionBackgroundRenderer {
-	@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.EXTENDED_CLASS)
-	public UIExtensionBackgroundMinecraft(Class<E> extendedClass) {
+	@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.CONTAINER_CLASS)
+	public UIExtensionBackgroundMinecraft(Class<E> containerClass) {
 		super(CastUtilities.castUnchecked(IUIComponentManager.class), // COMMENT the generics should not matter here
-				extendedClass);
+				containerClass);
 	}
 
 	protected void renderBackground(Screen screen, Point2D mouse, double partialTicks) { UIBackgrounds.notifyBackgroundDrawn(screen); }
@@ -56,8 +56,8 @@ public class UIExtensionBackgroundMinecraft<E extends IUIComponentManager<?>>
 	@OnlyIn(Dist.CLIENT)
 	public static class Default<E extends IUIComponentManager<?>>
 			extends UIExtensionBackgroundMinecraft<E> {
-		@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.EXTENDED_CLASS)
-		public Default(Class<E> extendedClass) { super(extendedClass); }
+		@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.CONTAINER_CLASS)
+		public Default(Class<E> containerClass) { super(containerClass); }
 
 		@Override
 		protected void renderBackground(Screen screen, Point2D mouse, double partialTicks) { UIBackgrounds.renderBackgroundAndNotify(screen.getMinecraft(), screen.width, screen.height, 0); }
@@ -68,8 +68,8 @@ public class UIExtensionBackgroundMinecraft<E extends IUIComponentManager<?>>
 	@OnlyIn(Dist.CLIENT)
 	public static class Dirt<E extends IUIComponentManager<?>>
 			extends UIExtensionBackgroundMinecraft<E> {
-		@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.EXTENDED_CLASS)
-		public Dirt(Class<E> extendedClass) { super(extendedClass); }
+		@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.CONTAINER_CLASS)
+		public Dirt(Class<E> containerClass) { super(containerClass); }
 
 		@Override
 		protected void renderBackground(Screen screen, Point2D mouse, double partialTicks) { UIBackgrounds.renderDirtBackgroundAndNotify(screen.getMinecraft(), screen.width, screen.height, 0); }

@@ -14,7 +14,7 @@ public abstract class ExtensionContainerAware<K, C extends IExtensionContainer<?
 		implements IExtension<K, C> {
 	protected WeakReference<E> container = new WeakReference<>(null);
 
-	public ExtensionContainerAware(Class<C> genericClass, Class<E> extendedClass) { super(genericClass, extendedClass); }
+	public ExtensionContainerAware(Class<C> genericClass, Class<E> containerClass) { super(genericClass, containerClass); }
 
 	@SuppressWarnings("unchecked")
 	@Override

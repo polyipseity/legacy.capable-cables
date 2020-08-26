@@ -12,9 +12,9 @@ public @interface UIExtensionConstructor {
 
 	enum ConstructorType
 			implements IConstructorType {
-		MAPPING__EXTENDED_CLASS(MethodType.methodType(void.class, Map.class, Class.class)),
+		MAPPING__CONTAINER_CLASS(MethodType.methodType(void.class, Map.class, Class.class)),
 		MAPPING(MethodType.methodType(void.class, Map.class)),
-		EXTENDED_CLASS(MethodType.methodType(void.class, Class.class)),
+		CONTAINER_CLASS(MethodType.methodType(void.class, Class.class)),
 		NO_ARGS(MethodType.methodType(void.class)),
 		;
 

@@ -110,7 +110,7 @@ public class UIComponentPrototype
 			throws Throwable {
 		IUIComponent ret;
 		switch (getConstructorType()) {
-			case SHAPE_DESCRIPTOR__MAPPING:
+			case MAPPING__SHAPE_DESCRIPTOR:
 				ret = (IUIComponent) getConstructor().invoke(getShapeDescriptorPrototype().construct(), getMapping());
 				break;
 			default:

@@ -33,14 +33,14 @@ public class UIComponentManagerMinecraft
 	public static final Logger LOGGER = LogManager.getLogger();
 	public static final RegRenderer<IUIComponentRendererMinecraft<? super UIComponentManagerMinecraft>> RENDERER_REG =
 			RegRenderer.createInstance(UIComponentManagerMinecraft.class, CastUtilities.castUnchecked(IUIComponentRendererMinecraft.class),
-					() -> new UIComponentRendererMinecraft<>(UIComponentManagerMinecraft.class, ImmutableMap.of()), LOGGER);
+					() -> new UIComponentRendererMinecraft<>(ImmutableMap.of(), UIComponentManagerMinecraft.class), LOGGER);
 	protected final IUIComponentRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
 			new UIComponentRendererContainer<>(RegRenderer.getDefault(RENDERER_REG).getValue().get());
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.SHAPE_DESCRIPTOR__MAPPING)
+	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPING__SHAPE_DESCRIPTOR)
 	public UIComponentManagerMinecraft(IShapeDescriptor<Rectangle2D> shapeDescriptor, Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping) {
-		super(shapeDescriptor, mapping);
+		super(mapping, shapeDescriptor);
 
 		IExtensionContainer.addExtensionExtendedChecked(this, new UIExtensionBackgroundMinecraft<>(IUIComponentManager.class)); // COMMENT to ensure that 'GuiScreenEvent.BackgroundDrawnEvent' is fired
 	}

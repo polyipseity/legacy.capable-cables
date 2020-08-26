@@ -54,13 +54,13 @@ public class UIExtensionPrototype
 			throws Throwable {
 		IUIExtension<?, ?> ret;
 		switch (getConstructorType()) {
-			case MAPPING__EXTENDED_CLASS:
+			case MAPPING__CONTAINER_CLASS:
 				ret = (IUIExtension<?, ?>) getConstructor().invoke(getMapping(), container.getClass());
 				break;
 			case MAPPING:
 				ret = (IUIExtension<?, ?>) getConstructor().invoke(getMapping());
 				break;
-			case EXTENDED_CLASS:
+			case CONTAINER_CLASS:
 				ret = (IUIExtension<?, ?>) getConstructor().invoke(container.getClass());
 				break;
 			case NO_ARGS:

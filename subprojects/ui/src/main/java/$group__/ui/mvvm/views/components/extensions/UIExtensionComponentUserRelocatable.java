@@ -48,9 +48,9 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 	@Nullable
 	protected IRelocateData relocateData;
 
-	@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.EXTENDED_CLASS)
-	public UIExtensionComponentUserRelocatable(Class<E> extendedClass) {
-		super(IUIComponent.class, extendedClass);
+	@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.CONTAINER_CLASS)
+	public UIExtensionComponentUserRelocatable(Class<E> containerClass) {
+		super(IUIComponent.class, containerClass);
 	}
 
 	@Override

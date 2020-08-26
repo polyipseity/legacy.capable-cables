@@ -52,9 +52,9 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 	@Nullable
 	protected IResizeData resizeData;
 
-	@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.EXTENDED_CLASS)
-	public UIExtensionComponentUserResizable(Class<E> extendedClass) {
-		super(IUIComponent.class, extendedClass);
+	@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.CONTAINER_CLASS)
+	public UIExtensionComponentUserResizable(Class<E> containerClass) {
+		super(IUIComponent.class, containerClass);
 	}
 
 	protected static Optional<EnumCursor> getCursor(EnumSet<EnumUISide> sides) {

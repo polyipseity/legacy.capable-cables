@@ -14,7 +14,7 @@ public class UIComponentVirtual
 	protected WeakReference<IUIComponent> relatedComponent = new WeakReference<>(null);
 
 	public UIComponentVirtual(IShapeDescriptor<?> shapeDescriptor) {
-		super(shapeDescriptor, ImmutableMap.of());
+		super(ImmutableMap.of(), shapeDescriptor);
 	}
 
 	@Override

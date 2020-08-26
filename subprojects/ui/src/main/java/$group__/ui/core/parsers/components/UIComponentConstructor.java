@@ -14,7 +14,7 @@ public @interface UIComponentConstructor {
 
 	enum ConstructorType
 			implements IConstructorType {
-		SHAPE_DESCRIPTOR__MAPPING(MethodType.methodType(void.class, IShapeDescriptor.class, Map.class)),
+		MAPPING__SHAPE_DESCRIPTOR(MethodType.methodType(void.class, Map.class, IShapeDescriptor.class)),
 		;
 
 		protected final MethodType methodType;

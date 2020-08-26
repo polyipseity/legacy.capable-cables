@@ -19,10 +19,10 @@ import java.util.Optional;
 public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent<?, ?>>
 		extends ExtensionContainerAware<INamespacePrefixedString, IUIView<?>, E>
 		implements IUIExtensionCursorHandleProvider {
-	@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.EXTENDED_CLASS)
-	public UIExtensionCursorHandleProviderComponent(Class<E> extendedClass) {
+	@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.CONTAINER_CLASS)
+	public UIExtensionCursorHandleProviderComponent(Class<E> containerClass) {
 		super(CastUtilities.castUnchecked(IUIView.class), // COMMENT generics should not matter in this case
-				extendedClass);
+				containerClass);
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRenderer;
 import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRendererContainer;
 import $group__.ui.core.parsers.binding.UIProperty;
 import $group__.ui.core.parsers.components.UIComponentConstructor;
+import $group__.ui.core.parsers.components.UIRendererConstructor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import $group__.ui.minecraft.core.mvvm.views.components.rendering.IUIComponentRendererMinecraft;
@@ -41,12 +42,12 @@ public class UIComponentWindowMinecraft
 	public static final IUIComponentRenderer.RegRenderer<IUIComponentRendererMinecraft<? super UIComponentWindowMinecraft>> RENDERER_REG =
 			IUIComponentRenderer.RegRenderer.createInstance(UIComponentWindowMinecraft.class,
 					CastUtilities.castUnchecked(IUIComponentRendererMinecraft.class), // COMMENT should not matter
-					() -> new DefaultRenderer<>(UIComponentWindowMinecraft.class, ImmutableMap.of()), LOGGER);
+					() -> new DefaultRenderer<>(ImmutableMap.of(), UIComponentWindowMinecraft.class), LOGGER);
 	protected final IUIComponentRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
 			new UIComponentRendererContainer<>(IUIComponentRenderer.RegRenderer.getDefault(RENDERER_REG).getValue().get());
 
-	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.SHAPE_DESCRIPTOR__MAPPING)
-	public UIComponentWindowMinecraft(IShapeDescriptor<RectangularShape> shapeDescriptor, Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping) { super(shapeDescriptor, mapping); }
+	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPING__SHAPE_DESCRIPTOR)
+	public UIComponentWindowMinecraft(IShapeDescriptor<RectangularShape> shapeDescriptor, Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping) { super(mapping, shapeDescriptor); }
 
 	@Override
 	public Optional<? extends IUIComponentRendererMinecraft<?>> getRenderer() { return getRendererContainer().getRenderer(); }
@@ -69,9 +70,9 @@ public class UIComponentWindowMinecraft
 		@UIProperty(PROPERTY_COLOR_BORDER)
 		protected final IBindingField<Color> colorBorder;
 
-		// todo PARSER constructor
-		public DefaultRenderer(Class<C> containerClass, Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping) {
-			super(containerClass, mapping);
+		@UIRendererConstructor(type = UIRendererConstructor.ConstructorType.MAPPING__CONTAINER_CLASS)
+		public DefaultRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, Class<C> containerClass) {
+			super(mapping, containerClass);
 
 			this.colorBackground = IHasBinding.createBindingField(Color.class,
 					this.mapping.get(PROPERTY_COLOR_BACKGROUND_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.BLACK);

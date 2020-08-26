@@ -10,6 +10,7 @@ import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRendererContainer;
 import $group__.ui.core.mvvm.views.events.IUIEvent;
 import $group__.ui.core.parsers.binding.UIProperty;
+import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.events.ui.UIEventTarget;
@@ -73,9 +74,10 @@ public class UIComponent
 	protected final AtomicBoolean modifyingShape = new AtomicBoolean();
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	public UIComponent(IShapeDescriptor<?> shapeDescriptor, Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping) {
-		this.shapeDescriptor = new ComponentShapeDescriptor<>(shapeDescriptor);
+	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPING__SHAPE_DESCRIPTOR)
+	public UIComponent(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, IShapeDescriptor<?> shapeDescriptor) {
 		this.mapping = new HashMap<>(mapping);
+		this.shapeDescriptor = new ComponentShapeDescriptor<>(shapeDescriptor);
 
 		this.id = Optional.ofNullable(this.mapping.get(PROPERTY_ID_LOCATION))
 				.flatMap(IUIPropertyMappingValue::getDefaultValue)

@@ -9,6 +9,7 @@ import $group__.ui.core.mvvm.views.components.IUIComponentShapeAnchorController;
 import $group__.ui.core.mvvm.views.components.extensions.caches.IUIExtensionCache;
 import $group__.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
+import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.mvvm.structures.AffineTransformStack;
 import $group__.ui.mvvm.views.components.paths.UIComponentPathResolver;
@@ -44,7 +45,8 @@ public class UIComponentManager<S extends Shape>
 	protected final IUIComponentPathResolver<IUIComponent> pathResolver = new PathResolver();
 	protected final IUIComponentShapeAnchorController shapeAnchorController = new UIComponentShapeAnchorController();
 
-	public UIComponentManager(IShapeDescriptor<S> shapeDescriptor, Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping) { super(shapeDescriptor, mapping); }
+	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPING__SHAPE_DESCRIPTOR)
+	public UIComponentManager(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, IShapeDescriptor<S> shapeDescriptor) { super(mapping, shapeDescriptor); }
 
 	@Override
 	public IUIComponentPathResolver<IUIComponent> getPathResolver() { return pathResolver; }
