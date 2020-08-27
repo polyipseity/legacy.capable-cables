@@ -4,6 +4,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.RectangularShape;
 import java.util.EnumSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -118,9 +119,11 @@ public enum EnumUISide {
 		public BiFunction<Double, Double, Double> getApplyBorder() { return (i, b) -> i; }
 	};
 
-	public static EnumSet<EnumUISide> getSidesMouseOver(RectangularShape rectangular, Point2D mouse) {
-		EnumSet<EnumUISide> sides = EnumSet.noneOf(EnumUISide.class);
-		for (EnumUISide side : EnumUISide.values()) if (side.isMouseOver(rectangular, mouse)) sides.add(side);
+	public static Set<EnumUISide> getSidesMouseOver(RectangularShape rectangular, Point2D mouse) {
+		Set<EnumUISide> sides = EnumSet.noneOf(EnumUISide.class);
+		for (EnumUISide side : EnumUISide.values())
+			if (side.isMouseOver(rectangular, mouse))
+				sides.add(side);
 		return sides;
 	}
 

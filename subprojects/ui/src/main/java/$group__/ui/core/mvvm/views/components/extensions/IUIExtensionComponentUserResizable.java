@@ -14,8 +14,8 @@ import $group__.utilities.structures.Registry;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.RectangularShape;
-import java.util.EnumSet;
 import java.util.Optional;
+import java.util.Set;
 
 public interface IUIExtensionComponentUserResizable<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
 		extends IUIExtension<INamespacePrefixedString, IUIComponent>, IHasGenericClass.Extended<IUIComponent, E> {
@@ -32,9 +32,9 @@ public interface IUIExtensionComponentUserResizable<E extends IUIComponent & IUI
 	interface IResizeData {
 		Point2D getCursorPositionView();
 
-		EnumSet<EnumUISide> getSidesView();
+		Set<? extends EnumUISide> getSidesView();
 
-		Optional<Point2D> getBaseView();
+		Optional<? extends Point2D> getBaseView();
 
 		long getInitialCursorHandle();
 

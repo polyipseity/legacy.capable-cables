@@ -38,6 +38,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.util.EnumSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
@@ -57,7 +58,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 		super(IUIComponent.class, containerClass);
 	}
 
-	protected static Optional<EnumCursor> getCursor(EnumSet<EnumUISide> sides) {
+	protected static Optional<EnumCursor> getCursor(Set<? extends EnumUISide> sides) {
 		@Nullable EnumCursor cursor = null;
 		if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT)
 				|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
@@ -118,14 +119,14 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 
 	public static class ResizeData implements IResizeData {
 		protected final Point2D cursorPosition;
-		protected final EnumSet<EnumUISide> sides;
+		protected final Set<EnumUISide> sides;
 		@Nullable
 		protected final Point2D base;
 		protected final long initialCursorHandle;
 
-		public ResizeData(Point2D cursorPosition, EnumSet<EnumUISide> sides, @Nullable Point2D base, long initialCursorHandle) {
+		public ResizeData(Point2D cursorPosition, Set<EnumUISide> sides, @Nullable Point2D base, long initialCursorHandle) {
 			this.cursorPosition = (Point2D) cursorPosition.clone();
-			this.sides = sides.clone();
+			this.sides = EnumSet.copyOf(sides);
 			this.base = (Point2D) Optional.ofNullable(base).map(Point2D::clone).orElse(null);
 			this.initialCursorHandle = initialCursorHandle;
 		}
@@ -134,10 +135,10 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 		public Point2D getCursorPositionView() { return (Point2D) getCursorPosition().clone(); }
 
 		@Override
-		public EnumSet<EnumUISide> getSidesView() { return getSides().clone(); }
+		public Set<? extends EnumUISide> getSidesView() { return EnumSet.copyOf(getSides()); }
 
 		@Override
-		public Optional<Point2D> getBaseView() { return getBase().map(p -> (Point2D) p.clone()); }
+		public Optional<? extends Point2D> getBaseView() { return getBase().map(p -> (Point2D) p.clone()); }
 
 		@Override
 		public long getInitialCursorHandle() { return initialCursorHandle; }
@@ -154,7 +155,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 		protected Optional<Point2D> getBase() { return Optional.ofNullable(base); }
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-		protected EnumSet<EnumUISide> getSides() { return sides; }
+		protected Set<EnumUISide> getSides() { return sides; }
 
 		protected Point2D getCursorPosition() { return cursorPosition; }
 	}
@@ -192,7 +193,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 		protected boolean startResizeMaybe(Point2D cursorPosition) {
 			return getContainer().flatMap(c -> c.getManager().filter(m -> {
 				Rectangle2D spb = m.getPathResolver().resolvePath(cursorPosition, true).getTransformCurrentView().createTransformedShape(c.getShapeDescriptor().getShapeOutput()).getBounds2D();
-				EnumSet<EnumUISide> sides = EnumUISide.getSidesMouseOver(spb, cursorPosition);
+				Set<EnumUISide> sides = EnumUISide.getSidesMouseOver(spb, cursorPosition);
 
 				@Nullable Point2D base = null;
 				if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT))
@@ -247,7 +248,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 			return Optional.ofNullable(getResizeData()
 					.map(d -> d.getBaseView()
 							.map(b -> {
-								EnumSet<EnumUISide> sides = EnumUISide.getSidesMouseOver(
+								Set<EnumUISide> sides = EnumUISide.getSidesMouseOver(
 										new Rectangle2D.Double(b.getX(), b.getY(), 0, 0),
 										cursorPosition);
 								if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT)

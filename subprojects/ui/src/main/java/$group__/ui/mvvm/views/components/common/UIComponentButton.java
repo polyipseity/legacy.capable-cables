@@ -25,6 +25,7 @@ import java.awt.geom.Point2D;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public class UIComponentButton
 		extends UIComponent
@@ -36,7 +37,7 @@ public class UIComponentButton
 	@UIMethod(METHOD_ON_ACTIVATED)
 	protected final IBindingMethod.ISource<IUIEvent> methodOnActivated;
 
-	protected final EnumSet<IButtonState> buttonStates = EnumSet.noneOf(IButtonState.class);
+	protected final Set<IButtonState> buttonStates = EnumSet.noneOf(IButtonState.class);
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPING__SHAPE_DESCRIPTOR)
@@ -76,7 +77,7 @@ public class UIComponentButton
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected EnumSet<IButtonState> getButtonStates() { return buttonStates; }
+	protected Set<IButtonState> getButtonStates() { return buttonStates; }
 
 	protected IBindingMethod.ISource<IUIEvent> getMethodOnActivated() {
 		return methodOnActivated;
