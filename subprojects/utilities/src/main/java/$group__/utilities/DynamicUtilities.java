@@ -29,7 +29,6 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
-import static $group__.utilities.CastUtilities.castUnchecked;
 import static $group__.utilities.CastUtilities.castUncheckedNullable;
 import static $group__.utilities.LoggerUtilities.EnumMessages.*;
 import static java.lang.invoke.LambdaMetafactory.metafactory;
@@ -185,25 +184,26 @@ public enum DynamicUtilities {
 	}
 
 	public enum InvocationUtilities {
-		/* MARK empty */;
+		;
 
-
+		@SuppressWarnings("SpellCheckingInspection")
 		public enum LambdaMetafactoryUtilities {
-			/* MARK empty */;
+			;
 
-
+			@SuppressWarnings("unchecked")
 			public static <T, R> Function<T, R> makeFunction(Lookup lookup, MethodHandle method, Class<R> returnType,
 			                                                 Class<T> inputType) throws Throwable {
-				return castUnchecked(metafactory(lookup, "apply", methodType(Function.class),
-						methodType(Object.class, Object.class), method, methodType(returnType, inputType)).getTarget().invokeExact());
+				return (Function<T, R>) metafactory(lookup, "apply", methodType(Function.class),
+						methodType(Object.class, Object.class), method, methodType(returnType, inputType)).getTarget().invokeExact();
 			}
 
+			@SuppressWarnings("unchecked")
 			public static <T, U, R> BiFunction<T, U, R> makeBiFunction(Lookup lookup, MethodHandle method,
 			                                                           Class<R> returnType, Class<T> inputType1,
 			                                                           Class<U> inputType2) throws Throwable {
-				return castUnchecked(metafactory(lookup, "apply", methodType(BiFunction.class),
+				return (BiFunction<T, U, R>) metafactory(lookup, "apply", methodType(BiFunction.class),
 						methodType(Object.class, Object.class, Object.class), method, methodType(returnType,
-								inputType1, inputType2)).getTarget().invokeExact());
+								inputType1, inputType2)).getTarget().invokeExact();
 			}
 		}
 	}

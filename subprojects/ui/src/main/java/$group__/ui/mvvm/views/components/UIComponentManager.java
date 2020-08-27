@@ -110,7 +110,7 @@ public class UIComponentManager<S extends Shape>
 												.collect(ImmutableList.toImmutableList());
 									}
 									return ret;
-								}, LOGGER).map(CastUtilities::castUnchecked)),
+								}, LOGGER)),
 								(t, i) -> IUIExtensionCache.IType.invalidate(i, t.getKey()),
 								t -> ImmutableList.of(new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
 									@Override
@@ -146,7 +146,7 @@ public class UIComponentManager<S extends Shape>
 												.collect(ImmutableList.toImmutableList());
 									}
 									return ret;
-								}, LOGGER).map(CastUtilities::castUnchecked)),
+								}, LOGGER)),
 								(t, i) -> IUIExtensionCache.IType.invalidate(i, t.getKey()),
 								t -> ImmutableList.of(new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
 									@Override

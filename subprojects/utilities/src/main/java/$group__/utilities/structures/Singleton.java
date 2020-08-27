@@ -1,7 +1,6 @@
 package $group__.utilities.structures;
 
 import $group__.utilities.CapacityUtilities;
-import $group__.utilities.CastUtilities;
 import $group__.utilities.MapUtilities;
 import org.apache.logging.log4j.Logger;
 
@@ -38,12 +37,21 @@ public abstract class Singleton {
 	}
 
 
-	public static <T extends Singleton> T getSingletonInstance(Class<T> clazz, @Nullable Logger logger) { return tryGetSingletonInstance(clazz, true, t -> Try.withLogging(() -> Try.call(() -> IMPL_LOOKUP.findConstructor(t, methodType(void.class)).invoke(), logger), logger).map(CastUtilities::castUnchecked)).orElseThrow(ThrowableCatcher::rethrow); }
+	@SuppressWarnings("unchecked")
+	public static <T extends Singleton> T getSingletonInstance(Class<T> clazz, @Nullable Logger logger) {
+		return tryGetSingletonInstance(clazz, true, t ->
+				Try.withLogging(() ->
+								Try.call(() -> (T) IMPL_LOOKUP.findConstructor(t, methodType(void.class)).invoke(), logger),
+						logger))
+				.orElseThrow(ThrowableCatcher::rethrow);
+	}
 
 	public static <T extends Singleton> Optional<T> tryGetSingletonInstance(Class<T> clazz, boolean instantiate,
 	                                                                        Function<Class<T>, ? extends Optional<T>> instantiation) {
-		Optional<T> r = Optional.ofNullable(INSTANCES.get(clazz)).map(Map.Entry::getKey).map(CastUtilities::castUnchecked);
-		if (!r.isPresent() && instantiate) r = instantiation.apply(clazz);
+		@SuppressWarnings("unchecked") Optional<T> r = (Optional<T>) Optional.ofNullable(INSTANCES.get(clazz))
+				.map(Map.Entry::getKey);
+		if (!r.isPresent() && instantiate)
+			r = instantiation.apply(clazz);
 		return r;
 	}
 }

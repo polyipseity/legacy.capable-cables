@@ -3,7 +3,6 @@ package $group__.utilities;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-import static $group__.utilities.CastUtilities.castUnchecked;
 import static $group__.utilities.PrimitiveUtilities.PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP;
 
 /**
@@ -16,10 +15,17 @@ import static $group__.utilities.PrimitiveUtilities.PRIMITIVE_DATA_TYPE_TO_DEFAU
 public enum MiscellaneousUtilities {
 	/* MARK empty */;
 
+	@SuppressWarnings("unchecked")
 	public static <T> Optional<T> getDefaultValue(@Nullable Class<T> type) {
 		return Optional.ofNullable(type)
-				.flatMap(tClass -> StreamUtilities.streamSmart(PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet(), 3).unordered().filter(e -> e.getKey().isAssignableFrom(tClass)).findFirst())
-				.map(e -> castUnchecked(e.getValue()));
+				.flatMap(tClass -> StreamUtilities.streamSmart(PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet(), 3).unordered()
+						.filter(e -> {
+							@Nullable Class<?> ek = e.getKey();
+							assert ek != null;
+							return ek.isAssignableFrom(tClass);
+						})
+						.findAny())
+				.map(e -> (T) e.getValue());
 	}
 
 	/**

@@ -1,7 +1,6 @@
 package $group__.annotations.processors;
 
 import $group__.annotations.OverridingStatus;
-import $group__.utilities.CastUtilities;
 import $group__.utilities.ProcessorUtilities;
 import $group__.utilities.StreamUtilities;
 import com.google.common.collect.ImmutableSet;
@@ -43,7 +42,7 @@ public final class OverridingStatusProcessor extends AbstractProcessor {
 		@SuppressWarnings("UnstableApiUsage") SetMultimap<TypeElement, ExecutableElement> typeToExesMMap = MultimapBuilder.hashKeys(INITIAL_CAPACITY_ENORMOUS).hashSetValues(INITIAL_CAPACITY_SMALL).build();
 		roundEnv.getElementsAnnotatedWith(OverridingStatus.class).forEach(e -> typeToExesMMap.put((TypeElement) e.getEnclosingElement(), (ExecutableElement) e));
 
-		@SuppressWarnings("UnstableApiUsage") Set<TypeElement> pkgFlat = StreamUtilities.streamSmart(roundEnv.getRootElements(), 5).unordered().filter(e -> e.asType().getKind() == TypeKind.DECLARED).map(CastUtilities::<TypeElement>castUnchecked).collect(ImmutableSet.toImmutableSet());
+		@SuppressWarnings("UnstableApiUsage") Set<TypeElement> pkgFlat = StreamUtilities.streamSmart(roundEnv.getRootElements(), 5).unordered().filter(e -> e.asType().getKind() == TypeKind.DECLARED).map(TypeElement.class::cast).collect(ImmutableSet.toImmutableSet());
 
 		Elements elements = processingEnv.getElementUtils();
 		Types types = processingEnv.getTypeUtils();

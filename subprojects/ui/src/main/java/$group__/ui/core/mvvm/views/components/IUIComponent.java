@@ -68,10 +68,10 @@ public interface IUIComponent
 	default boolean isFocusable() { return false; }
 
 	@Override
-	default List<IUINode> getChildNodes() { return ImmutableList.of(); }
+	default List<? extends IUIComponent> getChildNodes() { return ImmutableList.of(); }
 
 	@Override
-	default Optional<IUINode> getParentNode() { return getParent().map(Function.identity()); }
+	default Optional<? extends IUIComponentContainer> getParentNode() { return getParent(); }
 
 	default void initialize(IAffineTransformStack stack) {}
 

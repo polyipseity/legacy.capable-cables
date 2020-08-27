@@ -78,8 +78,7 @@ public class UIExtensionCache
 																new WeakReference<>(ret));
 													}
 													return ret;
-												}, LOGGER)
-														.map(CastUtilities::castUnchecked)),
+												}, LOGGER)),
 								(t, i) -> {
 									IUIExtensionCache.IType.invalidate(i, t.getKey());
 									CastUtilities.castChecked(IUIComponentContainer.class, i)

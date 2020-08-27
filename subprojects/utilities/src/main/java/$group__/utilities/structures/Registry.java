@@ -1,6 +1,5 @@
 package $group__.utilities.structures;
 
-import $group__.utilities.CastUtilities;
 import $group__.utilities.LoggerUtilities;
 import $group__.utilities.MapUtilities;
 import $group__.utilities.StreamUtilities;
@@ -35,7 +34,7 @@ public abstract class Registry<K, V> {
 						LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{}: Overriding key '{}': Replacing value '{}' with '{}'", getClass().getName(), key, v, value));
 			else
 				throw BecauseOf.illegalArgument(getClass().getName() + ": Cannot override entry", "key", key);
-			RegistryObject<VL> vc = CastUtilities.castUnchecked(v); // COMMENT responsibility goes to the caller
+			@SuppressWarnings("unchecked") RegistryObject<VL> vc = (RegistryObject<VL>) v; // COMMENT responsibility goes to the caller
 			vc.setValue(value);
 			retRef.set(vc);
 			return v;

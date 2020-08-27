@@ -137,18 +137,18 @@ public class UIDOMPrototypeParser<T extends IUIComponentManager<?>>
 		getAliases().clear();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public T construct() {
 		List<Consumer<? super IUIComponentManager<?>>> queue = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM);
 		return getPrototype()
-				.map(cp -> Try.call(() -> {
-					IUIComponentManager<?> c = (IUIComponentManager<?>) cp.construct(queue); // COMMENT expect manager
-					queue.forEach(q ->
-							q.accept(c));
-					return c;
-				}, LOGGER)
-						.orElseThrow(ThrowableCatcher::rethrow))
-				.map(CastUtilities::<T>castUnchecked)
+				.map(cp ->
+						(T) Try.call(() -> {
+							IUIComponentManager<?> c = (IUIComponentManager<?>) cp.construct(queue); // COMMENT expect manager
+							queue.forEach(q ->
+									q.accept(c));
+							return c;
+						}, LOGGER).orElseThrow(ThrowableCatcher::rethrow))
 				.orElseThrow(() -> new IllegalStateException("Prototype has not been created"));
 	}
 

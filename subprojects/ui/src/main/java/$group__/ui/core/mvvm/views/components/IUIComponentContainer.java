@@ -1,8 +1,6 @@
 package $group__.ui.core.mvvm.views.components;
 
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
-import $group__.ui.core.mvvm.views.paths.IUINode;
-import $group__.utilities.CastUtilities;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -37,7 +35,7 @@ public interface IUIComponentContainer
 	boolean moveChildToTop(IUIComponent component);
 
 	@Override
-	default List<IUINode> getChildNodes() { return CastUtilities.castUnchecked(getChildrenView()); }
+	default List<? extends IUIComponent> getChildNodes() { return getChildrenView(); }
 
 	List<IUIComponent> getChildrenView();
 }

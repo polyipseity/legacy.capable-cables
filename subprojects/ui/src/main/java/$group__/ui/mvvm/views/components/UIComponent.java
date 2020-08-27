@@ -122,14 +122,13 @@ public class UIComponent
 	public boolean dispatchEvent(IUIEvent event) {
 		boolean ret = super.dispatchEvent(event);
 		INamespacePrefixedString type = event.getType();
-		CastUtilities.<IBindingMethod.ISource<? extends IUIEvent>>castUnchecked( // COMMENT should match
-				Optional.<IBindingMethod.ISource<?>>ofNullable(getEventTargetBindingMethods().get(type))
-						.orElseGet(() -> {
-							IBindingMethod.ISource<? extends IUIEvent> r = new BindingMethodSource<>(event.getClass(),
-									Optional.ofNullable(getMapping().get(type)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
-							getEventTargetBindingMethods().put(type, r);
-							return r;
-						})).invoke(CastUtilities.castUnchecked(event)); // COMMENT should match
+		Optional.<IBindingMethod.ISource<?>>ofNullable(getEventTargetBindingMethods().get(type))
+				.orElseGet(() -> {
+					IBindingMethod.ISource<? extends IUIEvent> r = new BindingMethodSource<>(event.getClass(),
+							Optional.ofNullable(getMapping().get(type)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
+					getEventTargetBindingMethods().put(type, r);
+					return r;
+				}).invoke(CastUtilities.castUnchecked(event)); // COMMENT should match
 		return ret;
 	}
 

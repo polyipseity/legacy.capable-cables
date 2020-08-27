@@ -79,7 +79,7 @@ public class EventBusBridgeMethodFixConsumer<T extends Event, O>
 			return true;
 		}).isPresent()) {
 			bus.addListener(getPriority(), shouldReceiveCancelled(),
-					CastUtilities.castUnchecked(getEventType()),
+					getEventType(),
 					this);
 		}
 	}

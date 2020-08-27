@@ -25,8 +25,9 @@ import java.util.function.Function;
 public interface IUIExtensionCache
 		extends IUIExtension<INamespacePrefixedString, IExtensionContainer<INamespacePrefixedString>> {
 	INamespacePrefixedString KEY = new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, AREA_UI + ".cache");
+	@SuppressWarnings("unchecked")
 	Registry.RegistryObject<IUIExtension.IType<INamespacePrefixedString, IUIExtensionCache, IExtensionContainer<INamespacePrefixedString>>> TYPE =
-			RegExtension.INSTANCE.registerApply(KEY, k -> new IUIExtension.IType.Impl<>(k, (t, i) -> i.getExtension(t.getKey()).map(CastUtilities::castUnchecked)));
+			RegExtension.INSTANCE.registerApply(KEY, k -> new IUIExtension.IType.Impl<>(k, (t, i) -> (Optional<? extends IUIExtensionCache>) i.getExtension(t.getKey())));
 
 	Cache<INamespacePrefixedString, Object> getDelegated();
 

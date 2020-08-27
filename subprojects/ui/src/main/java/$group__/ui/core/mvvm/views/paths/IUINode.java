@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IUINode {
-	List<IUINode> getChildNodes();
+	List<? extends IUINode> getChildNodes();
 
-	Optional<IUINode> getParentNode();
+	Optional<? extends IUINode> getParentNode();
 }

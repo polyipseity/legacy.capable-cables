@@ -6,5 +6,4 @@ import io.reactivex.rxjava3.core.ObservableSource;
 
 public interface IObservableField<T> extends IField<T>, IHasGenericClass<T> {
 	ObservableSource<? extends IValue<T>> getNotifier();
-
 }
