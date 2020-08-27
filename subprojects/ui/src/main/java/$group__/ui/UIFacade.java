@@ -36,7 +36,7 @@ public enum UIFacade {
 		;
 
 		public static <C extends Container> AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, C> createScreen(ITextComponent title, IUIInfrastructureMinecraft<?, ?, ?> infrastructure, C container) {
-			return new UIScreenAdapter.Builder.WithChildren<IUIInfrastructureMinecraft<?, ?, ?>, C>(title, infrastructure, container).build();
+			return new UIScreenAdapter.Builder.WithChildren<>(title, infrastructure, container).build();
 		}
 
 		public static AbstractScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>> createScreen(ITextComponent title, IUIInfrastructureMinecraft<?, ?, ?> infrastructure) {

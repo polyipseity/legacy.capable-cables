@@ -29,14 +29,14 @@ public abstract class Proxy extends Singleton implements IProxy {
 			return processEvent("IMC processing", (InterModProcessEvent) event, this::onInterModProcess);
 		else if (event instanceof FMLLoadCompleteEvent)
 			return processEvent("Loading completion", (FMLLoadCompleteEvent) event, this::onLoadComplete);
-		else if (event instanceof GatherDataEvent)
-			return processEvent("Data gathering", (GatherDataEvent) event, this::onGatherData);
 		else if (event instanceof FMLModIdMappingEvent)
 			return processEvent("Mod ID mapping", (FMLModIdMappingEvent) event, this::onModIdMapping);
+		else if (event instanceof GatherDataEvent)
+			return processEvent("Data gathering", (GatherDataEvent) event, this::onGatherData);
 		return false;
 	}
 
-	protected static <M, E extends ModLifecycleEvent> boolean processEvent(String name, E event, Consumer<? super E> processor) {
+	protected static <E extends ModLifecycleEvent> boolean processEvent(String name, E event, Consumer<? super E> processor) {
 		LOGGER.info(() -> PREFIX_MOD_LIFECYCLE_MESSAGE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} started", name)).getFormattedMessage());
 		Stopwatch stopwatch = Stopwatch.createStarted();
 		processor.accept(event);

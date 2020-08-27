@@ -380,12 +380,11 @@ public class UIScreenAdapter
 		public IType<? extends INamespacePrefixedString, ?, ? extends IUIInfrastructure<?, ?, ?>> getType() { return IUIExtensionContainerProvider.TYPE.getValue(); }
 	}
 
+	@SuppressWarnings("unused")
 	@OnlyIn(Dist.CLIENT)
 	public static class Builder<I extends IUIInfrastructureMinecraft<?, ?, ?>, C extends Container> {
-		protected ITextComponent title;
-		protected I infrastructure;
-		@Nullable
-		protected C containerObject;
+		protected final ITextComponent title;
+		protected final I infrastructure;
 		protected Set<Integer> closeKeys = ImmutableSet.of(GLFW.GLFW_KEY_ESCAPE);
 		protected Set<Integer> changeFocusKeys = ImmutableSet.of(GLFW.GLFW_KEY_TAB);
 
@@ -395,30 +394,17 @@ public class UIScreenAdapter
 		}
 
 		public AbstractScreenAdapter<I> build() {
-			return new UIScreenAdapter<>(getTitle(), getInfrastructure(), getContainerObject()
-					.orElse(null), getCloseKeys(), getChangeFocusKeys());
+			return new UIScreenAdapter<>(
+					getTitle(),
+					getInfrastructure(),
+					null,
+					getCloseKeys(),
+					getChangeFocusKeys());
 		}
 
 		protected ITextComponent getTitle() { return title; }
 
-		public Builder<I, C> setTitle(ITextComponent title) {
-			this.title = title;
-			return this;
-		}
-
 		protected I getInfrastructure() { return infrastructure; }
-
-		public Builder<I, C> setInfrastructure(I infrastructure) {
-			this.infrastructure = infrastructure;
-			return this;
-		}
-
-		protected Optional<? extends C> getContainerObject() { return Optional.ofNullable(containerObject); }
-
-		public Builder<I, C> setContainerObject(C containerObject) {
-			this.containerObject = containerObject;
-			return this;
-		}
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 		protected Set<Integer> getCloseKeys() { return closeKeys; }
@@ -436,9 +422,11 @@ public class UIScreenAdapter
 			return this;
 		}
 
+		@SuppressWarnings("unused")
 		@OnlyIn(Dist.CLIENT)
 		public static class WithChildren<I extends IUIInfrastructureMinecraft<?, ?, ?>, C extends Container>
 				extends Builder<I, C> {
+			protected final C containerObject;
 
 			public WithChildren(ITextComponent titleIn, I infrastructure, C containerObject) {
 				super(titleIn, infrastructure);
@@ -447,9 +435,15 @@ public class UIScreenAdapter
 
 			@Override
 			public AbstractContainerScreenAdapter<I, C> build() {
-				return new UIScreenAdapter<>(getTitle(), getInfrastructure(), getContainerObject()
-						.orElseThrow(NullPointerException::new), getCloseKeys(), getChangeFocusKeys());
+				return new UIScreenAdapter<>(
+						getTitle(),
+						getInfrastructure(),
+						getContainerObject(),
+						getCloseKeys(),
+						getChangeFocusKeys());
 			}
+
+			protected C getContainerObject() { return containerObject; }
 		}
 	}
 
