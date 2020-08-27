@@ -21,5 +21,5 @@ public class UIComponentRendererMinecraft<C extends IUIComponent>
 	public UIComponentRendererMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, Class<C> containerClass) { super(mapping, containerClass); }
 
 	@Override
-	public void render(C container, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks, boolean pre) {}
+	public void render(C container, EnumRenderStage stage, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks) {}
 }

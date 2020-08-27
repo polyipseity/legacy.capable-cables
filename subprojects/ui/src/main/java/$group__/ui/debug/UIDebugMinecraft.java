@@ -141,10 +141,10 @@ public enum UIDebugMinecraft {
 			public CustomWindowRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, Class<C> containerClass) { super(mapping, containerClass); }
 
 			@Override
-			public void render(C container, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks, boolean pre) {
-				super.render(container, stack, cursorPosition, partialTicks, pre);
-				AffineTransform transform = stack.getDelegated().peek();
-				if (pre) {
+			public void render(C container, EnumRenderStage stage, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks) {
+				super.render(container, stage, stack, cursorPosition, partialTicks);
+				if (stage == EnumRenderStage.PRE_CHILDREN) {
+					AffineTransform transform = stack.getDelegated().peek();
 					Shape transformed = transform.createTransformedShape(new Ellipse2D.Double(
 							cursorPosition.getX() - CURSOR_SHAPE_RADIUS, cursorPosition.getY() - CURSOR_SHAPE_RADIUS,
 							CURSOR_SHAPE_RADIUS << 1, CURSOR_SHAPE_RADIUS << 1));

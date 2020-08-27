@@ -9,6 +9,8 @@ import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.minecraft.core.mvvm.views.EnumCropMethod;
 import $group__.ui.minecraft.core.mvvm.views.IUIViewComponentMinecraft;
 import $group__.ui.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
+import $group__.ui.minecraft.core.mvvm.views.components.rendering.IUIComponentRendererMinecraft.EnumCropStage;
+import $group__.ui.minecraft.core.mvvm.views.components.rendering.IUIComponentRendererMinecraft.EnumRenderStage;
 import $group__.ui.minecraft.mvvm.events.bus.EventUIViewMinecraft;
 import $group__.ui.mvvm.views.components.UIViewComponent;
 import $group__.utilities.CastUtilities;
@@ -43,9 +45,9 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 											.flatMap(IUIComponentRendererContainer::getRenderer)
 											.map(ccr -> {
 												ccr.crop(CastUtilities.castUnchecked(c), // COMMENT component should contain a renderer that accepts itself
-														stack, cropMethod, true, cursorPosition, partialTicks);
+														EnumCropStage.CROP, stack, cropMethod, cursorPosition, partialTicks);
 												ccr.render(CastUtilities.castUnchecked(c), // COMMENT component should contain a renderer that accepts itself
-														stack, cursorPosition, partialTicks, true);
+														EnumRenderStage.PRE_CHILDREN, stack, cursorPosition, partialTicks);
 												stack.push();
 												return CastUtilities.castChecked(IUIComponentContainer.class, c)
 														.<Iterable<IUIComponent>>map(cp -> {
@@ -65,9 +67,9 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 											.ifPresent(pc -> {
 												stack.getDelegated().pop();
 												pc.render(CastUtilities.castUnchecked(p), // COMMENT component should contain a renderer that accepts itself
-														stack, cursorPosition, partialTicks, false);
+														EnumRenderStage.POST_CHILDREN, stack, cursorPosition, partialTicks);
 												pc.crop(CastUtilities.castUnchecked(p), // COMMENT component should contain a renderer that accepts itself
-														stack, cropMethod, false, cursorPosition, partialTicks);
+														EnumCropStage.UN_CROP, stack, cropMethod, cursorPosition, partialTicks);
 											});
 								}
 								return p;

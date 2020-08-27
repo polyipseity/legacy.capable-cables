@@ -98,8 +98,8 @@ public class UIComponentButtonMinecraft
 		}
 
 		@Override
-		public void render(C container, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks, boolean pre) {
-			if (pre) {
+		public void render(C container, EnumRenderStage stage, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks) {
+			if (stage == EnumRenderStage.PRE_CHILDREN) {
 				AffineTransform transform = stack.getDelegated().peek();
 				Shape transformed = transform.createTransformedShape(container.getShapeDescriptor().getShapeOutput());
 				if (container.getButtonStates().contains(IButtonState.PRESSING)) {

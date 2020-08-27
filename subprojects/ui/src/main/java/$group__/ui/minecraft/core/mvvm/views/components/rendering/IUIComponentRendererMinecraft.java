@@ -22,66 +22,89 @@ import java.awt.geom.Rectangle2D;
 @OnlyIn(Dist.CLIENT)
 public interface IUIComponentRendererMinecraft<C extends IUIComponent>
 		extends IUIComponentRenderer<C> {
-	void render(C container, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks, boolean pre); // TODO use enum instead of boolean
+	void render(C container, EnumRenderStage stage, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks);
 
-	default void crop(C container, IAffineTransformStack stack, EnumCropMethod method, boolean push, Point2D mouse, double partialTicks) { // TODO use enum instead of boolean
-		IUIComponentRendererMinecraft.cropImpl(container, stack, method, push, mouse, partialTicks);
+	default void crop(C container, EnumCropStage stage, IAffineTransformStack stack, EnumCropMethod method, Point2D mouse, double partialTicks) {
+		IUIComponentRendererMinecraft.cropImpl(container, stage, stack, method, mouse, partialTicks);
 	}
 
-	static void cropImpl(final IUIComponent container, IAffineTransformStack stack, EnumCropMethod method, boolean push, @SuppressWarnings("unused") Point2D mouse, @SuppressWarnings("unused") double partialTicks) {
+	static void cropImpl(final IUIComponent container, EnumCropStage stage, IAffineTransformStack stack, EnumCropMethod method, @SuppressWarnings("unused") Point2D mouse, @SuppressWarnings("unused") double partialTicks) {
 		switch (method) {
 			case STENCIL_BUFFER:
-				if (push) {
-					int stencilRef = Math.floorMod(UIExtensionCache.CacheUniversal.Z.getValue().get(container).orElseThrow(InternalError::new), (int) Math.pow(2, GLUtilities.GLStateUtilities.getInteger(GL11.GL_STENCIL_BITS)));
+				switch (stage) {
+					case CROP:
+						int stencilRef = Math.floorMod(UIExtensionCache.CacheUniversal.Z.getValue().get(container).orElseThrow(InternalError::new), (int) Math.pow(2, GLUtilities.GLStateUtilities.getInteger(GL11.GL_STENCIL_BITS)));
 
-					GLUtilities.GLStacksUtilities.push("stencilFunc",
-							() -> RenderSystem.stencilFunc(GL11.GL_EQUAL, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLUtilities.GLStacksUtilities.STENCIL_FUNC_FALLBACK);
-					GLUtilities.GLStacksUtilities.push("stencilOp",
-							() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL14.GL_INCR_WRAP, GL14.GL_INCR_WRAP), GLUtilities.GLStacksUtilities.STENCIL_OP_FALLBACK);
-					GLUtilities.GLStacksUtilities.push("colorMask",
-							() -> RenderSystem.colorMask(false, false, false, false), GLUtilities.GLStacksUtilities.COLOR_MASK_FALLBACK);
+						GLUtilities.GLStacksUtilities.push("stencilFunc",
+								() -> RenderSystem.stencilFunc(GL11.GL_EQUAL, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLUtilities.GLStacksUtilities.STENCIL_FUNC_FALLBACK);
+						GLUtilities.GLStacksUtilities.push("stencilOp",
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL14.GL_INCR_WRAP, GL14.GL_INCR_WRAP), GLUtilities.GLStacksUtilities.STENCIL_OP_FALLBACK);
+						GLUtilities.GLStacksUtilities.push("colorMask",
+								() -> RenderSystem.colorMask(false, false, false, false), GLUtilities.GLStacksUtilities.COLOR_MASK_FALLBACK);
 
-					DrawingUtilities.drawShape(stack.getDelegated().peek(), container.getShapeDescriptor().getShapeOutput(), true, Color.WHITE, 0);
+						DrawingUtilities.drawShape(stack.getDelegated().peek(), container.getShapeDescriptor().getShapeOutput(), true, Color.WHITE, 0);
 
-					GLUtilities.GLStacksUtilities.pop("colorMask");
-					GLUtilities.GLStacksUtilities.pop("stencilOp");
-					GLUtilities.GLStacksUtilities.pop("stencilFunc");
+						GLUtilities.GLStacksUtilities.pop("colorMask");
+						GLUtilities.GLStacksUtilities.pop("stencilOp");
+						GLUtilities.GLStacksUtilities.pop("stencilFunc");
 
-					GLUtilities.GLStacksUtilities.push("stencilFunc",
-							() -> RenderSystem.stencilFunc(GL11.GL_LESS, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLUtilities.GLStacksUtilities.STENCIL_FUNC_FALLBACK);
+						GLUtilities.GLStacksUtilities.push("stencilFunc",
+								() -> RenderSystem.stencilFunc(GL11.GL_LESS, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLUtilities.GLStacksUtilities.STENCIL_FUNC_FALLBACK);
 
-					GLUtilities.GLStacksUtilities.push("stencilOp",
-							() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP), GLUtilities.GLStacksUtilities.STENCIL_OP_FALLBACK);
-				} else {
-					GLUtilities.GLStacksUtilities.pop("stencilOp");
+						GLUtilities.GLStacksUtilities.push("stencilOp",
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP), GLUtilities.GLStacksUtilities.STENCIL_OP_FALLBACK);
+						break;
+					case UN_CROP:
+						GLUtilities.GLStacksUtilities.pop("stencilOp");
 
-					GLUtilities.GLStacksUtilities.push("stencilOp",
-							() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_REPLACE, GL11.GL_REPLACE), GLUtilities.GLStacksUtilities.STENCIL_OP_FALLBACK);
-					GLUtilities.GLStacksUtilities.push("colorMask",
-							() -> RenderSystem.colorMask(false, false, false, false), GLUtilities.GLStacksUtilities.COLOR_MASK_FALLBACK);
+						GLUtilities.GLStacksUtilities.push("stencilOp",
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_REPLACE, GL11.GL_REPLACE), GLUtilities.GLStacksUtilities.STENCIL_OP_FALLBACK);
+						GLUtilities.GLStacksUtilities.push("colorMask",
+								() -> RenderSystem.colorMask(false, false, false, false), GLUtilities.GLStacksUtilities.COLOR_MASK_FALLBACK);
 
-					DrawingUtilities.drawShape(stack.getDelegated().peek(), container.getShapeDescriptor().getShapeOutput().getBounds2D(), true, Color.BLACK, 0);
+						DrawingUtilities.drawShape(stack.getDelegated().peek(), container.getShapeDescriptor().getShapeOutput().getBounds2D(), true, Color.BLACK, 0);
 
-					GLUtilities.GLStacksUtilities.pop("colorMask");
-					GLUtilities.GLStacksUtilities.pop("stencilOp");
+						GLUtilities.GLStacksUtilities.pop("colorMask");
+						GLUtilities.GLStacksUtilities.pop("stencilOp");
 
-					GLUtilities.GLStacksUtilities.pop("stencilFunc");
+						GLUtilities.GLStacksUtilities.pop("stencilFunc");
+						break;
+					default:
+						throw new InternalError();
 				}
 				break;
 			case GL_SCISSOR:
-				if (push) {
-					int[] boundsBox = new int[4];
-					GLUtilities.GLStateUtilities.getIntegerValue(GL11.GL_SCISSOR_BOX, boundsBox);
-					UIObjectUtilities.acceptRectangular(
-							CoordinateUtilities.toNativeRectangle(
-									UIObjectUtilities.getRectangleExpanded(stack.getDelegated().peek().createTransformedShape(container.getShapeDescriptor().getShapeOutput().getBounds2D()).getBounds2D()))
-									.createIntersection(new Rectangle2D.Double(boundsBox[0], boundsBox[1], boundsBox[2], boundsBox[3])),
-							(x, y, w, h) -> GLUtilities.GLStacksUtilities.push("glScissor",
-									() -> GLUtilities.GLStateUtilities.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{x.intValue(), y.intValue(), w.intValue(), h.intValue()},
-											(i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3])), GLUtilities.GLStacksUtilities.GL_SCISSOR_FALLBACK));
-				} else
-					GLUtilities.GLStacksUtilities.pop("glScissor");
+				switch (stage) {
+					case CROP:
+						int[] boundsBox = new int[4];
+						GLUtilities.GLStateUtilities.getIntegerValue(GL11.GL_SCISSOR_BOX, boundsBox);
+						UIObjectUtilities.acceptRectangular(
+								CoordinateUtilities.toNativeRectangle(
+										UIObjectUtilities.getRectangleExpanded(stack.getDelegated().peek().createTransformedShape(container.getShapeDescriptor().getShapeOutput().getBounds2D()).getBounds2D()))
+										.createIntersection(new Rectangle2D.Double(boundsBox[0], boundsBox[1], boundsBox[2], boundsBox[3])),
+								(x, y, w, h) -> GLUtilities.GLStacksUtilities.push("glScissor",
+										() -> GLUtilities.GLStateUtilities.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{x.intValue(), y.intValue(), w.intValue(), h.intValue()},
+												(i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3])), GLUtilities.GLStacksUtilities.GL_SCISSOR_FALLBACK));
+						break;
+					case UN_CROP:
+						GLUtilities.GLStacksUtilities.pop("glScissor");
+						break;
+					default:
+						throw new InternalError();
+				}
 				break;
 		}
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	enum EnumRenderStage {
+		PRE_CHILDREN,
+		POST_CHILDREN,
+	}
+
+	@OnlyIn(Dist.CLIENT)
+	enum EnumCropStage {
+		CROP,
+		UN_CROP,
 	}
 }
