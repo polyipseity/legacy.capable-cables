@@ -2,35 +2,40 @@ package $group__.ui.mvvm.binding;
 
 import $group__.ui.core.mvvm.binding.IObservableField;
 import $group__.utilities.interfaces.IHasGenericClass;
+import $group__.utilities.interfaces.IValue;
 import io.reactivex.rxjava3.core.ObservableSource;
-import io.reactivex.rxjava3.subjects.BehaviorSubject;
+import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
+
+import javax.annotation.Nullable;
+import java.util.Objects;
+import java.util.Optional;
 
 public class ObservableField<T>
 		extends IHasGenericClass.Impl<T>
 		implements IObservableField<T> {
-	protected final Subject<T> notifierSubject;
+	protected final Subject<IValue<T>> notifierSubject = PublishSubject.create();
+	@Nullable
 	protected T value;
 
-	public ObservableField(Class<T> genericClass, T value) {
+	public ObservableField(Class<T> genericClass, @Nullable T value) {
 		super(genericClass);
 		this.value = value;
-		this.notifierSubject = BehaviorSubject.createDefault(value);
 	}
 
 	@Override
-	public ObservableSource<T> getNotifier() { return getNotifierSubject(); }
+	public ObservableSource<? extends IValue<T>> getNotifier() { return getNotifierSubject(); }
 
-	protected Subject<T> getNotifierSubject() { return notifierSubject; }
+	protected Subject<IValue<T>> getNotifierSubject() { return notifierSubject; }
 
 	@Override
-	public void setValue(T value) {
-		if (!getValue().equals(value)) {
+	public void setValue(@Nullable T value) {
+		if (!Objects.equals(getValue().orElse(null), value)) {
 			this.value = value;
-			getNotifierSubject().onNext(value);
+			getNotifierSubject().onNext(IValue.of(value));
 		}
 	}
 
 	@Override
-	public T getValue() { return value; }
+	public Optional<? extends T> getValue() { return Optional.ofNullable(value); }
 }

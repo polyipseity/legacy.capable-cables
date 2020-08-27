@@ -4,7 +4,6 @@ import $group__.ui.core.mvvm.binding.IBindingField;
 import $group__.ui.core.mvvm.binding.IHasBinding;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
-import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRenderer;
 import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRendererContainer;
 import $group__.ui.core.parsers.binding.UIProperty;
 import $group__.ui.core.parsers.components.UIComponentConstructor;
@@ -17,14 +16,11 @@ import $group__.ui.mvvm.views.components.common.UIComponentButton;
 import $group__.ui.mvvm.views.components.rendering.UIComponentRendererContainer;
 import $group__.ui.utilities.BindingUtilities;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
-import $group__.utilities.CastUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
 import com.google.common.collect.ImmutableMap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -37,13 +33,8 @@ import java.util.Optional;
 public class UIComponentButtonMinecraft
 		extends UIComponentButton
 		implements IUIComponentMinecraft {
-	public static final Logger LOGGER = LogManager.getLogger();
-	public static final IUIComponentRenderer.RegRenderer<IUIComponentRendererMinecraft<? super UIComponentButtonMinecraft>> RENDERER_REG =
-			IUIComponentRenderer.RegRenderer.createInstance(UIComponentButtonMinecraft.class,
-					CastUtilities.castUnchecked(IUIComponentRendererMinecraft.class), // COMMENT should not matter
-					() -> new DefaultRenderer<>(ImmutableMap.of(), UIComponentButtonMinecraft.class), LOGGER);
 	protected final IUIComponentRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
-			new UIComponentRendererContainer<>(IUIComponentRenderer.RegRenderer.getDefault(RENDERER_REG).getValue().get());
+			new UIComponentRendererContainer<>(new DefaultRenderer<>(ImmutableMap.of(), UIComponentButtonMinecraft.class));
 
 	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPING__SHAPE_DESCRIPTOR)
 	public UIComponentButtonMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, IShapeDescriptor<?> shapeDescriptor) { super(mapping, shapeDescriptor); }
@@ -52,7 +43,10 @@ public class UIComponentButtonMinecraft
 	public Optional<? extends IUIComponentRendererMinecraft<?>> getRenderer() { return getRendererContainer().getRenderer(); }
 
 	@Override
-	public void setRenderer(@Nullable IUIComponentRendererMinecraft<?> renderer) { getRendererContainer().setRenderer(renderer); }
+	public void setRenderer(@Nullable IUIComponentRendererMinecraft<?> renderer) {
+		IUIComponentRendererContainer.setRendererImpl(this, renderer,
+				(s, r) -> s.getRendererContainer().setRenderer(r));
+	}
 
 	protected IUIComponentRendererContainer<IUIComponentRendererMinecraft<?>> getRendererContainer() { return rendererContainer; }
 
@@ -109,14 +103,20 @@ public class UIComponentButtonMinecraft
 				AffineTransform transform = stack.getDelegated().peek();
 				Shape transformed = transform.createTransformedShape(container.getShapeDescriptor().getShapeOutput());
 				if (container.getButtonStates().contains(IButtonState.PRESSING)) {
-					DrawingUtilities.drawShape(transformed, true, getColorPressed().getValue(), 0);
-					DrawingUtilities.drawShape(transformed, false, getColorPressedBorder().getValue(), 0);
+					getColorPressed().getValue().ifPresent(c ->
+							DrawingUtilities.drawShape(transformed, true, c, 0));
+					getColorPressedBorder().getValue().ifPresent(c ->
+							DrawingUtilities.drawShape(transformed, false, c, 0));
 				} else if (container.getButtonStates().contains(IButtonState.HOVERING)) {
-					DrawingUtilities.drawShape(transformed, true, getColorHovering().getValue(), 0);
-					DrawingUtilities.drawShape(transformed, false, getColorHoveringBorder().getValue(), 0);
+					getColorHovering().getValue().ifPresent(c ->
+							DrawingUtilities.drawShape(transformed, true, c, 0));
+					getColorHoveringBorder().getValue().ifPresent(c ->
+							DrawingUtilities.drawShape(transformed, false, c, 0));
 				} else {
-					DrawingUtilities.drawShape(transformed, true, getColorBase().getValue(), 0);
-					DrawingUtilities.drawShape(transformed, false, getColorBaseBorder().getValue(), 0);
+					getColorBase().getValue().ifPresent(c ->
+							DrawingUtilities.drawShape(transformed, true, c, 0));
+					getColorBaseBorder().getValue().ifPresent(c ->
+							DrawingUtilities.drawShape(transformed, false, c, 0));
 				}
 			}
 		}

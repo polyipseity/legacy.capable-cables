@@ -2,32 +2,34 @@ package $group__.ui.core.mvvm.binding;
 
 import $group__.utilities.CastUtilities;
 import $group__.utilities.interfaces.IHasGenericClass;
+import $group__.utilities.interfaces.IValue;
 import $group__.utilities.reactive.DisposableObserverAuto;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
-public interface IBindingField<T> extends IField<T>, IHasGenericClass<T>, IHasBindingKey {
-	static <T> DisposableObserver<T> createSynchronizationObserver(IBindingField<T> from, Iterable<? extends IBindingField<?>> to, Map<Class<?>, Map<Class<?>, Function<?, ?>>> transformers, AtomicBoolean isSource) {
-		return new DisposableObserverAuto<T>() {
+public interface IBindingField<T>
+		extends IField<T>, IHasGenericClass<T>, IHasBindingKey {
+	static <T> DisposableObserver<IValue<T>> createSynchronizationObserver(IBindingField<T> from, Iterable<? extends IBindingField<?>> to, Map<Class<?>, Map<Class<?>, Function<?, ?>>> transformers, AtomicBoolean isSource) {
+		return new DisposableObserverAuto<IValue<T>>() {
 			@Override
-			public void onNext(@Nonnull T t) {
+			public void onNext(@Nonnull IValue<T> t) {
 				if (isSource.getAndSet(false)) {
 					for (IBindingField<?> k : to) {
 						if (!k.equals(from)) {
-							Optional<? extends Function<T, ?>> ts = IBinder.getTransformer(transformers, from.getGenericClass(), k.getGenericClass());
-							if (!ts.isPresent()) {
-								onError(new BindingTransformerNotFoundException(
-										"Cannot find transformer for '" + from.getGenericClass() + "' -> '" + k.getGenericClass() + "' in transformers:" + System.lineSeparator()
-												+ transformers));
+							try {
+								k.setValue(CastUtilities.castUncheckedNullable(
+										IBinder.transform(transformers, t.getValue().orElse(null), from.getGenericClass(), k.getGenericClass()))); // COMMENT should be of the correct type
+							} catch (BindingTransformerNotFoundException ex) {
+								onError(ex);
 								isSource.set(true);
 								break;
 							}
-							k.setValue(CastUtilities.castUnchecked(ts.get().apply(t))); // COMMENT should be of the correct type
 						}
 					}
 					isSource.set(true);
@@ -42,8 +44,8 @@ public interface IBindingField<T> extends IField<T>, IHasGenericClass<T>, IHasBi
 	IObservableField<T> getField();
 
 	@Override
-	default T getValue() { return getField().getValue(); }
+	default Optional<? extends T> getValue() { return getField().getValue(); }
 
 	@Override
-	default void setValue(T value) { getField().setValue(value); }
+	default void setValue(@Nullable T value) { getField().setValue(value); }
 }

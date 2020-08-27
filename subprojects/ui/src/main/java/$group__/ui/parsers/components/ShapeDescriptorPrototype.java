@@ -89,17 +89,18 @@ public class ShapeDescriptorPrototype
 		DOMUtilities.getChildByTagNameNS(node, namespaceURI, "transform")
 				.ifPresent(nt -> {
 					final double[] fm = AffineTransformUtilities.getFlatMatrixIdentityCopy();
-					@Nullable NamedNodeMap vAs = DOMUtilities.getChildByTagNameNS(nt, namespaceURI, "values")
-							.orElseThrow(InternalError::new).getAttributes();
-					assert vAs != null;
-					NamedNodeMapMap.wrap(vAs)
-							.forEach((s, a) -> Optional.ofNullable(TRANSFORM_INDEX_MAP.get(s))
-									.ifPresent(i -> {
-										@Nullable String av = a.getNodeValue();
-										assert av != null;
-										fm[i] = Double.parseDouble(av);
-									}));
-					transform.setTransform(new AffineTransform(fm));
+					DOMUtilities.getChildByTagNameNS(nt, namespaceURI, "values")
+							.map(Node::getAttributes)
+							.ifPresent(vAs -> {
+								NamedNodeMapMap.wrap(vAs)
+										.forEach((s, a) -> Optional.ofNullable(TRANSFORM_INDEX_MAP.get(s))
+												.ifPresent(i -> {
+													@Nullable String av = a.getNodeValue();
+													assert av != null;
+													fm[i] = Double.parseDouble(av);
+												}));
+								transform.setTransform(new AffineTransform(fm));
+							});
 					DOMUtilities.getChildrenByTagNameNS(nt, namespaceURI, "operation")
 							.forEach(op -> {
 								@Nullable String opv = op.getTextContent();

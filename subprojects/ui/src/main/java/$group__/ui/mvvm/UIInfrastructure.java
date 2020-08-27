@@ -86,6 +86,7 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 	public void bind() {
 		IUIInfrastructure.checkBoundState(isBound(), false);
 
+		// COMMENT must bind the bindings of view first
 		getBinder().bindFields(Iterables.concat(getView().getBindingFields(), getViewModel().getBindingFields()));
 		getBinder().bindMethods(Iterables.concat(getView().getBindingMethods(), getViewModel().getBindingMethods()));
 

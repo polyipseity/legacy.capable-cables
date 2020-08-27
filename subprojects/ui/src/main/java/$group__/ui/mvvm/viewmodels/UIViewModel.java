@@ -42,7 +42,12 @@ public class UIViewModel<M extends IUIModel>
 	public void setModel(M model) { this.model = model; }
 
 	@Override
-	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() { return s -> getBinderNotifierSubject().subscribe(s.get()); }
+	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() {
+		return s -> {
+			getBinderNotifierSubject().subscribe(s.get());
+			IUIViewModel.super.getBinderSubscriber().accept(s);
+		};
+	}
 
 	protected Subject<IBinderAction> getBinderNotifierSubject() { return binderNotifierSubject; }
 

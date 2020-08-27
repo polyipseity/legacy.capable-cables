@@ -1,6 +1,9 @@
 package $group__.ui.mvvm.views.components;
 
 import $group__.ui.core.mvvm.binding.IBinderAction;
+import $group__.ui.core.mvvm.binding.IBindingField;
+import $group__.ui.core.mvvm.binding.IBindingMethod;
+import $group__.ui.core.mvvm.binding.IHasBinding;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
@@ -12,6 +15,8 @@ import $group__.ui.mvvm.views.UIView;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.TreeUtilities;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import io.reactivex.rxjava3.core.Observer;
 
 import javax.annotation.Nullable;
@@ -46,8 +51,30 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() {
 		return s -> {
 			super.getBinderSubscriber().accept(s);
-			getManager().getBinderSubscriber().accept(s);
+			getManager().getChildrenFlatView().forEach(c -> c.getBinderSubscriber().accept(s));
 		};
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Iterable<IBindingField<?>> getBindingFields() {
+		return Iterables.concat(Lists.asList(
+				super.getBindingFields(),
+				(Iterable<IBindingField<?>>[]) // COMMENT should be safe
+						getManager().getChildrenFlatView().stream().unordered()
+								.map(IHasBinding::getBindingFields)
+								.toArray(Iterable[]::new)));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Iterable<IBindingMethod<?>> getBindingMethods() {
+		return Iterables.concat(Lists.asList(
+				super.getBindingMethods(),
+				(Iterable<IBindingMethod<?>>[]) // COMMENT should be safe
+						getManager().getChildrenFlatView().stream().unordered()
+								.map(IHasBinding::getBindingMethods)
+								.toArray(Iterable[]::new)));
 	}
 
 	@Override

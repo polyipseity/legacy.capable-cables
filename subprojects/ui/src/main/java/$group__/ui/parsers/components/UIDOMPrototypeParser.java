@@ -62,6 +62,9 @@ public class UIDOMPrototypeParser<T extends IUIComponentManager<?>>
 
 	public static <T extends IUIDOMPrototypeParser<?>> T makeParserStandard(T parser) {
 		parser.putVisitor(ShapeAnchorPrototype.LOCAL_NAME_LOCATION, ShapeAnchorPrototype::create);
+		parser.putVisitor(UIRendererPrototype.LOCAL_NAME_LOCATION, (p, n) ->
+				Try.call(() -> UIRendererPrototype.create(p, n), LOGGER)
+						.orElseThrow(ThrowableCatcher::rethrow));
 		parser.putVisitor(UIExtensionPrototype.LOCAL_NAME_LOCATION, (p, n) ->
 				Try.call(() -> UIExtensionPrototype.create(p, n), LOGGER)
 						.orElseThrow(ThrowableCatcher::rethrow));

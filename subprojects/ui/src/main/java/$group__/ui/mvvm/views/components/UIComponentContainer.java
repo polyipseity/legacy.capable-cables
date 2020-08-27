@@ -1,6 +1,5 @@
 package $group__.ui.mvvm.views.components;
 
-import $group__.ui.core.mvvm.binding.IBinderAction;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.IUIReshapeExplicitly;
@@ -16,15 +15,12 @@ import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import com.google.common.collect.ImmutableList;
-import io.reactivex.rxjava3.core.Observer;
 
 import javax.annotation.Nullable;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class UIComponentContainer
 		extends UIComponent
@@ -141,13 +137,4 @@ public class UIComponentContainer
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected List<IUIComponent> getChildren() { return children; }
-
-	@Override
-	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() {
-		return s -> {
-			super.getBinderSubscriber().accept(s);
-			getChildren().forEach(c ->
-					c.getBinderSubscriber().accept(s));
-		};
-	}
 }

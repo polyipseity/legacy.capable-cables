@@ -11,6 +11,7 @@ import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.jodah.typetools.TypeResolver;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -31,18 +32,22 @@ public interface IBinder {
 		return new DisposableObserverAuto<IBinderAction>() {
 			@Override
 			public void onNext(@Nonnull IBinderAction o) {
-				switch (o.getType()) {
-					case BIND:
-						binder.bindFields(o.getFields());
-						binder.bindMethods(o.getMethods());
-						break;
-					case UNBIND:
-						binder.unbindFields(o.getFields());
-						binder.unbindMethods(o.getMethods());
-						break;
-					default:
-						onError(new InternalError());
-						break;
+				try {
+					switch (o.getType()) {
+						case BIND:
+							binder.bindFields(o.getFields());
+							binder.bindMethods(o.getMethods());
+							break;
+						case UNBIND:
+							binder.unbindFields(o.getFields());
+							binder.unbindMethods(o.getMethods());
+							break;
+						default:
+							onError(new InternalError());
+							break;
+					}
+				} catch (BindingTransformerNotFoundException ex) {
+					onError(ex);
 				}
 			}
 		};
@@ -55,6 +60,9 @@ public interface IBinder {
 				Optional.ofNullable(transformers.get(from))
 						.map(m -> (Function<T, R>) m.get(to));
 	}
+
+	boolean bindFields(Iterable<IBindingField<?>> fields)
+			throws BindingTransformerNotFoundException;
 
 	@SuppressWarnings("unchecked")
 	static <T, R> Optional<Function<T, R>> putTransformer(Map<Class<?>, Map<Class<?>, Function<?, ?>>> transformers, Class<T> from, Class<R> to, Function<T, R> transformer) {
@@ -73,7 +81,16 @@ public interface IBinder {
 
 	static Optional<Class<?>>[] resolveFunctionTypes(Function<?, ?> transformer) { return DynamicUtilities.Extensions.wrapTypeResolverResults(TypeResolver.resolveRawArguments(Function.class, transformer.getClass())); }
 
-	boolean bindFields(Iterable<IBindingField<?>> fields);
+	@Nullable
+	static <T, R> R transform(Map<Class<?>, Map<Class<?>, Function<?, ?>>> transformers, @Nullable T value, Class<T> from, Class<R> to)
+			throws BindingTransformerNotFoundException {
+		Optional<? extends Function<T, R>> ts = IBinder.getTransformer(transformers, from, to);
+		if (!ts.isPresent())
+			throw new BindingTransformerNotFoundException(
+					"Cannot find transformer for '" + from + "' -> '" + to + "' in transformers:" + System.lineSeparator()
+							+ transformers);
+		return ts.get().apply(value);
+	}
 
 	boolean bindMethods(Iterable<IBindingMethod<?>> methods);
 

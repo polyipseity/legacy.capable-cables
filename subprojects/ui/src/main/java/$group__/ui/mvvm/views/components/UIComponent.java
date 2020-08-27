@@ -1,13 +1,9 @@
 package $group__.ui.mvvm.views.components;
 
-import $group__.ui.core.mvvm.binding.IBinderAction;
-import $group__.ui.core.mvvm.binding.IBindingField;
-import $group__.ui.core.mvvm.binding.IBindingMethod;
-import $group__.ui.core.mvvm.binding.IHasBinding;
+import $group__.ui.core.mvvm.binding.*;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
-import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRendererContainer;
 import $group__.ui.core.mvvm.views.events.IUIEvent;
 import $group__.ui.core.parsers.binding.UIProperty;
 import $group__.ui.core.parsers.components.UIComponentConstructor;
@@ -63,7 +59,6 @@ public class UIComponent
 	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected final ConcurrentMap<INamespacePrefixedString, IBindingMethod.ISource<?>> eventTargetBindingMethods = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	// todo add animation system
-	// todo add name
 	// todo cache transform
 	protected final IShapeDescriptor<?> shapeDescriptor;
 	@UIProperty(PROPERTY_VISIBLE)
@@ -144,7 +139,7 @@ public class UIComponent
 	public IShapeDescriptor<?> getShapeDescriptor() { return shapeDescriptor; }
 
 	@Override
-	public boolean isVisible() { return getVisible().getValue(); }
+	public boolean isVisible() { return IField.getValueNonnull(getVisible()); }
 
 	public IBindingField<Boolean> getVisible() { return visible; }
 
@@ -180,16 +175,14 @@ public class UIComponent
 	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() {
 		return s -> {
 			getBinderNotifierSubject().subscribe(s.get());
-			if (this instanceof IUIComponentRendererContainer)
-				((IUIComponentRendererContainer<?>) this).getRenderer()
-						.ifPresent(r -> r.getBinderSubscriber().accept(s));
+			IUIComponent.super.getBinderSubscriber().accept(s);
 		};
 	}
 
 	protected Subject<IBinderAction> getBinderNotifierSubject() { return binderNotifierSubject; }
 
 	@Override
-	public boolean isActive() { return getActive().getValue(); }
+	public boolean isActive() { return IField.getValueNonnull(getActive()); }
 
 	public IBindingField<Boolean> getActive() { return active; }
 

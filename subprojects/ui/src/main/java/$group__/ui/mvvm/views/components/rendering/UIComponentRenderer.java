@@ -23,15 +23,20 @@ public class UIComponentRenderer<C extends IUIComponent>
 	protected final Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping;
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 
-	// TODO PARSER constructor
-	public UIComponentRenderer(Class<C> containerClass, Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping) {
+	@UIRendererConstructor(type = UIRendererConstructor.ConstructorType.MAPPING__CONTAINER_CLASS)
+	public UIComponentRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, Class<C> containerClass) {
 		super(containerClass);
 
 		this.mapping = new HashMap<>(mapping);
 	}
 
 	@Override
-	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() { return s -> getBinderNotifierSubject().subscribe(s.get()); }
+	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() {
+		return s -> {
+			getBinderNotifierSubject().subscribe(s.get());
+			IUIComponentRenderer.super.getBinderSubscriber().accept(s);
+		};
+	}
 
 	protected Subject<IBinderAction> getBinderNotifierSubject() { return binderNotifierSubject; }
 

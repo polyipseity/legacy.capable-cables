@@ -13,6 +13,7 @@ import static $group__.utilities.LoggerUtilities.EnumMessages.FACTORY_PARAMETERI
 import static $group__.utilities.LoggerUtilities.EnumMessages.PREFIX_MOD_LIFECYCLE_MESSAGE;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
+// TODO thread safety issues
 public abstract class Proxy extends Singleton implements IProxy {
 	protected Proxy(Logger logger) { super(logger); }
 

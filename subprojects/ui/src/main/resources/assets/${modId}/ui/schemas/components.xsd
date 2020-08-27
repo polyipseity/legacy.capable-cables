@@ -5,6 +5,7 @@
            elementFormDefault="qualified"
            version="1.0"
            xml:lang="EN">
+	<!-- COMMENT ui -->
 	<xs:element name="ui" id="ui">
 		<xs:complexType>
 			<xs:sequence>
@@ -17,6 +18,7 @@
 
 	<!-- SECTION top -->
 
+	<!-- COMMENT using -->
 	<xs:element name="using" id="using">
 		<xs:complexType>
 			<xs:attribute name="alias" type="xs:ID" use="required"/>
@@ -26,27 +28,11 @@
 
 	<!-- SECTION components -->
 
-	<xs:complexType name="componentBasedType" id="componentBasedType">
-		<xs:sequence>
-			<xs:element ref="ui:property" minOccurs="0" maxOccurs="unbounded"/>
-		</xs:sequence>
-		<xs:attribute name="class" type="xs:IDREF" use="required"/>
-	</xs:complexType>
-
-	<xs:complexType name="componentBasedWithBindingsType" id="componentBasedWithBindingsType">
-		<xs:complexContent>
-			<xs:extension base="ui:componentBasedType">
-				<xs:sequence>
-					<xs:element ref="ui:binding" minOccurs="0" maxOccurs="unbounded"/>
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
-
+	<!-- COMMENT shape -->
 	<xs:element name="shape" id="shape">
 		<xs:complexType>
 			<xs:complexContent>
-				<xs:extension base="ui:componentBasedType">
+				<xs:extension base="ui:propertyContainerType">
 					<xs:sequence>
 						<xs:element name="transform" type="ui:affineTransformDefinerType" minOccurs="0"/>
 						<xs:element ref="ui:constraint" minOccurs="0" maxOccurs="unbounded"/>
@@ -55,22 +41,48 @@
 					<xs:attribute name="y" type="xs:double"/>
 					<xs:attribute name="width" type="xs:double"/>
 					<xs:attribute name="height" type="xs:double"/>
+					<xs:attribute name="class" type="xs:IDREF" use="required"/>
 				</xs:extension>
 			</xs:complexContent>
 		</xs:complexType>
 	</xs:element>
 
+	<!-- COMMENT renderer -->
+	<xs:element name="renderer" id="renderer">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ui:propertyAndBindingContainerType">
+					<xs:attribute name="class" type="xs:IDREF" use="required"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- COMMENT extension -->
+	<xs:element name="extension" id="extension">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ui:propertyAndBindingContainerType">
+					<xs:attribute name="class" type="xs:IDREF" use="required"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- COMMENT component -->
 	<xs:element name="component" id="component">
 		<xs:complexType>
 			<xs:complexContent>
-				<xs:extension base="ui:componentBasedWithBindingsType">
+				<xs:extension base="ui:propertyAndBindingContainerType">
 					<xs:sequence>
 						<xs:element ref="ui:shape"/>
 						<xs:element ref="ui:anchor" minOccurs="0" maxOccurs="unbounded"/>
+						<xs:element ref="ui:renderer" minOccurs="0"/>
 						<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
 						<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
 					<!-- SECTION Special -->
+					<xs:attribute name="class" type="xs:IDREF" use="required"/>
 					<xs:attribute name="id" type="xs:ID"/>
 					<!-- SECTION DOM -->
 					<xs:attribute name="load" type="xs:string"/><!-- COMMENT unused, reserved -->
@@ -107,10 +119,9 @@
 		</xs:complexType>
 	</xs:element>
 
-	<xs:element name="extension" id="extension" type="ui:componentBasedWithBindingsType"/>
-
 	<!-- SECTION property-value pairs -->
 
+	<!-- COMMENT property -->
 	<xs:complexType name="propertyType" id="propertyType">
 		<xs:sequence>
 			<xs:element ref="ui:value" minOccurs="0"/>
@@ -129,6 +140,7 @@
 		</xs:complexType>
 	</xs:element>
 
+	<!-- COMMENT binding -->
 	<xs:complexType name="bindingType" id="bindingType">
 		<xs:complexContent>
 			<xs:extension base="ui:propertyType">
@@ -139,6 +151,24 @@
 	<xs:element name="binding" id="binding" type="ui:bindingType"/>
 
 	<!-- SECTION types -->
+
+	<!-- COMMENT property container -->
+	<xs:complexType name="propertyContainerType" id="componentBasedType">
+		<xs:sequence>
+			<xs:element ref="ui:property" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<!-- COMMENT property & binding container -->
+	<xs:complexType name="propertyAndBindingContainerType" id="componentBasedWithBindingsType">
+		<xs:complexContent>
+			<xs:extension base="ui:propertyContainerType">
+				<xs:sequence>
+					<xs:element ref="ui:binding" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 
 	<!-- COMMENT argument -->
 	<xs:complexType name="argumentsType" id="argumentsType">
@@ -163,7 +193,7 @@
 	<!-- COMMENT IUIPropertyMappingValue -->
 	<xs:complexType name="valueType" id="valueType">
 		<xs:choice minOccurs="0" maxOccurs="unbounded">
-			<!-- unique particle attribution :( -->
+			<!-- COMMENT unique particle attribution :( -->
 			<xs:any/>
 		</xs:choice>
 		<xs:attribute name="boolean" type="xs:boolean"/>
@@ -233,7 +263,7 @@
 
 	<xs:complexType name="affineTransformDefinerType" id="affineTransformDefinerType">
 		<xs:sequence>
-			<xs:element name="values" type="ui:affineTransformType"/>
+			<xs:element name="values" type="ui:affineTransformType" minOccurs="0"/>
 			<xs:element name="operation" type="ui:methodType" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>

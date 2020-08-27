@@ -7,6 +7,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import net.jodah.typetools.TypeResolver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,7 +19,9 @@ import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
@@ -124,7 +127,9 @@ public enum DynamicUtilities {
 			c.forEach(t -> Collections.addAll(next, t.getInterfaces()));
 			return next;
 		}))));
-		while (!cur.get().isEmpty()) r.add(ImmutableSet.copyOf(cur.getAndUpdate(s -> {
+		@Nullable List<Class<?>> curG = cur.get();
+		assert curG != null;
+		while (!curG.isEmpty()) r.add(ImmutableSet.copyOf(cur.getAndUpdate(s -> {
 			List<Class<?>> next = new ArrayList<>(INITIAL_CAPACITY_SMALL);
 			s.forEach(t -> Collections.addAll(next, t.getInterfaces()));
 			return next;
@@ -173,9 +178,11 @@ public enum DynamicUtilities {
 		return r;
 	}
 
-	public static Type getGenericSuperclassActualTypeArgument(Class<?> c, int i) throws ClassCastException { return getGenericSuperclassActualTypeArguments(c)[i]; }
-
-	public static Type[] getGenericSuperclassActualTypeArguments(Class<?> c) { return ((ParameterizedType) c.getGenericSuperclass()).getActualTypeArguments(); }
+	@SuppressWarnings("UnstableApiUsage")
+	public static Set<Field> getAllFields(Class<?> clazz) {
+		return getThisAndSuperclasses(clazz).stream().unordered()
+				.flatMap(c -> Sets.newHashSet(c.getDeclaredFields()).stream()).collect(ImmutableSet.toImmutableSet());
+	}
 
 	public enum InvocationUtilities {
 		/* MARK empty */;

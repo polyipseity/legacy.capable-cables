@@ -4,7 +4,6 @@ import $group__.ui.core.mvvm.binding.IBindingField;
 import $group__.ui.core.mvvm.binding.IHasBinding;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
-import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRenderer;
 import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRendererContainer;
 import $group__.ui.core.parsers.binding.UIProperty;
 import $group__.ui.core.parsers.components.UIComponentConstructor;
@@ -17,14 +16,11 @@ import $group__.ui.mvvm.views.components.common.UIComponentWindow;
 import $group__.ui.mvvm.views.components.rendering.UIComponentRendererContainer;
 import $group__.ui.utilities.BindingUtilities;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
-import $group__.utilities.CastUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
 import com.google.common.collect.ImmutableMap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -38,22 +34,20 @@ import java.util.Optional;
 public class UIComponentWindowMinecraft
 		extends UIComponentWindow
 		implements IUIComponentMinecraft {
-	public static final Logger LOGGER = LogManager.getLogger();
-	public static final IUIComponentRenderer.RegRenderer<IUIComponentRendererMinecraft<? super UIComponentWindowMinecraft>> RENDERER_REG =
-			IUIComponentRenderer.RegRenderer.createInstance(UIComponentWindowMinecraft.class,
-					CastUtilities.castUnchecked(IUIComponentRendererMinecraft.class), // COMMENT should not matter
-					() -> new DefaultRenderer<>(ImmutableMap.of(), UIComponentWindowMinecraft.class), LOGGER);
 	protected final IUIComponentRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
-			new UIComponentRendererContainer<>(IUIComponentRenderer.RegRenderer.getDefault(RENDERER_REG).getValue().get());
+			new UIComponentRendererContainer<>(new DefaultRenderer<>(ImmutableMap.of(), UIComponentWindowMinecraft.class));
 
 	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPING__SHAPE_DESCRIPTOR)
-	public UIComponentWindowMinecraft(IShapeDescriptor<RectangularShape> shapeDescriptor, Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping) { super(mapping, shapeDescriptor); }
+	public UIComponentWindowMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, IShapeDescriptor<RectangularShape> shapeDescriptor) { super(mapping, shapeDescriptor); }
 
 	@Override
 	public Optional<? extends IUIComponentRendererMinecraft<?>> getRenderer() { return getRendererContainer().getRenderer(); }
 
 	@Override
-	public void setRenderer(@Nullable IUIComponentRendererMinecraft<?> renderer) { getRendererContainer().setRenderer(renderer); }
+	public void setRenderer(@Nullable IUIComponentRendererMinecraft<?> renderer) {
+		IUIComponentRendererContainer.setRendererImpl(this, renderer,
+				(s, r) -> s.getRendererContainer().setRenderer(r));
+	}
 
 	protected IUIComponentRendererContainer<IUIComponentRendererMinecraft<?>> getRendererContainer() { return rendererContainer; }
 
@@ -84,9 +78,11 @@ public class UIComponentWindowMinecraft
 		public void render(C container, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks, boolean pre) {
 			AffineTransform transform = stack.getDelegated().peek();
 			if (pre) {
-				Shape cSdO = container.getShapeDescriptor().getShapeOutput();
-				DrawingUtilities.drawShape(transform, cSdO, true, getColorBackground().getValue(), 0);
-				DrawingUtilities.drawShape(transform, cSdO, true, getColorBorder().getValue(), 0);
+				Shape transformed = transform.createTransformedShape(container.getShapeDescriptor().getShapeOutput());
+				getColorBackground().getValue().ifPresent(c ->
+						DrawingUtilities.drawShape(transformed, true, c, 0));
+				getColorBorder().getValue().ifPresent(c ->
+						DrawingUtilities.drawShape(transformed, true, c, 0));
 			}
 		}
 

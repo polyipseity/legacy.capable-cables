@@ -22,9 +22,9 @@ import java.awt.geom.Rectangle2D;
 @OnlyIn(Dist.CLIENT)
 public interface IUIComponentRendererMinecraft<C extends IUIComponent>
 		extends IUIComponentRenderer<C> {
-	void render(C container, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks, boolean pre);
+	void render(C container, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks, boolean pre); // TODO use enum instead of boolean
 
-	default void crop(C container, IAffineTransformStack stack, EnumCropMethod method, boolean push, Point2D mouse, double partialTicks) {
+	default void crop(C container, IAffineTransformStack stack, EnumCropMethod method, boolean push, Point2D mouse, double partialTicks) { // TODO use enum instead of boolean
 		IUIComponentRendererMinecraft.cropImpl(container, stack, method, push, mouse, partialTicks);
 	}
 

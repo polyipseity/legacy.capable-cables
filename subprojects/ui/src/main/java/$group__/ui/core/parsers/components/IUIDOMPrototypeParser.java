@@ -21,12 +21,14 @@ public interface IUIDOMPrototypeParser<T>
 		DOMUtilities.getChildrenByTagNameNS(node, namespaceURI, "property").forEach(p ->
 				mapping.put(
 						DOMUtilities.getAttributeValue(p, "key").map(NamespacePrefixedString::new).orElseThrow(InternalError::new),
-						new UIPropertyMappingValue(p.getFirstChild(), null)));
+						new UIPropertyMappingValue(
+								DOMUtilities.getChildByTagNameNS(p, namespaceURI, "value").orElseThrow(InternalError::new),
+								null)));
 		DOMUtilities.getChildrenByTagNameNS(node, namespaceURI, "binding").forEach(p ->
 				mapping.put(
 						DOMUtilities.getAttributeValue(p, "key").map(NamespacePrefixedString::new).orElseThrow(InternalError::new),
 						new UIPropertyMappingValue(
-								p.getFirstChild(),
+								DOMUtilities.getChildByTagNameNS(p, namespaceURI, "value").orElse(null),
 								DOMUtilities.getAttributeValue(p, "binding").map(NamespacePrefixedString::new).orElse(null))));
 	}
 

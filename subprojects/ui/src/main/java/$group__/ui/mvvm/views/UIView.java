@@ -30,7 +30,12 @@ public abstract class UIView<S extends Shape>
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 
 	@Override
-	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() { return s -> getBinderNotifierSubject().subscribe(s.get()); }
+	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() {
+		return s -> {
+			getBinderNotifierSubject().subscribe(s.get());
+			IUIView.super.getBinderSubscriber().accept(s);
+		};
+	}
 
 	protected Subject<IBinderAction> getBinderNotifierSubject() { return binderNotifierSubject; }
 

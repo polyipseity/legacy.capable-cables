@@ -1,5 +1,6 @@
 package $group__.ui.mvvm.binding;
 
+import $group__.ui.core.mvvm.binding.BindingTransformerNotFoundException;
 import $group__.ui.core.mvvm.binding.IBinder;
 import $group__.ui.core.mvvm.binding.IBindingField;
 import $group__.ui.core.mvvm.binding.IBindingMethod;
@@ -7,6 +8,7 @@ import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.MapUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.interfaces.IValue;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import sun.misc.Cleaner;
@@ -47,7 +49,8 @@ public class Binder implements IBinder {
 	}
 
 	@Override
-	public boolean bindFields(Iterable<IBindingField<?>> fields) {
+	public boolean bindFields(Iterable<IBindingField<?>> fields)
+			throws BindingTransformerNotFoundException {
 		final boolean[] ret = {false};
 		IBinder.sortAndTrimBindings(fields).asMap().forEach((s, fs) -> ret[0] |= getFieldBinding(s).add(fs));
 		return ret[0];
@@ -132,7 +135,7 @@ public class Binder implements IBinder {
 		protected final INamespacePrefixedString bindingKey;
 		protected final Map<IBindingField<?>, Disposable> fields = new HashMap<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
 		protected final ConcurrentMap<Class<?>, Map<Class<?>, Function<?, ?>>> transformers;
-		protected final AtomicBoolean isSource = new AtomicBoolean();
+		protected final AtomicBoolean isSource = new AtomicBoolean(true);
 		protected final Object cleanerRef = new Object();
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
@@ -146,11 +149,20 @@ public class Binder implements IBinder {
 
 		protected final Object getCleanerRef() { return cleanerRef; }
 
-		public boolean add(Iterable<IBindingField<?>> fields) {
+		public boolean add(Iterable<IBindingField<?>> fields)
+				throws BindingTransformerNotFoundException {
 			final boolean[] ret = {false};
 			fields.forEach(f -> {
 				if (!getFields().containsKey(f)) {
-					DisposableObserver<?> d = IBindingField.createSynchronizationObserver(f, getFields().keySet(), getTransformers(), getIsSource());
+					getFields().keySet().stream().unordered()
+							.findAny()
+							.ifPresent(fc ->
+									f.setValue(CastUtilities.castUncheckedNullable( // COMMENT should be of the right type
+											IBinder.transform(getTransformers(),
+													CastUtilities.castUncheckedNullable(fc.getValue().orElse(null)), // COMMENT should be always safe
+													fc.getGenericClass(),
+													f.getGenericClass()))));
+					DisposableObserver<? extends IValue<?>> d = IBindingField.createSynchronizationObserver(f, getFields().keySet(), getTransformers(), getIsSource());
 					getFields().put(f, d);
 					f.getField().getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
 					ret[0] = true;

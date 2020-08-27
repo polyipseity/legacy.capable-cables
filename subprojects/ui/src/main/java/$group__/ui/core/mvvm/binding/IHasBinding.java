@@ -15,7 +15,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-@SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface IHasBinding {
 	Logger LOGGER = LogManager.getLogger();
 
@@ -39,9 +38,12 @@ public interface IHasBinding {
 								.orElseGet(defaultValue)));
 	}
 
+	// TODO need some changes
 	default Iterable<IBindingField<?>> getBindingFields() { return BindingUtilities.getBindingFields(this); }
 
 	default Iterable<IBindingMethod<?>> getBindingMethods() { return BindingUtilities.getBindingMethods(this); }
 
-	Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber();
+	default Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() {
+		return s -> BindingUtilities.getHasBindingsVariables(this).forEach(v -> v.getBinderSubscriber().accept(s));
+	}
 }

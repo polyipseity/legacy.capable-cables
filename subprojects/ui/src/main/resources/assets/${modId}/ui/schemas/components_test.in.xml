@@ -12,6 +12,11 @@
 	       class="${group}.ui.minecraft.mvvm.components.common.UIComponentWindowMinecraft"/>
 	<using alias="component.button"
 	       class="${group}.ui.minecraft.mvvm.components.common.UIComponentButtonMinecraft"/>
+	<!-- COMMENT renderer -->
+	<using alias="renderer.component.window.default"
+	       class="${group}.ui.minecraft.mvvm.components.common.UIComponentWindowMinecraft\$DefaultRenderer"/>
+	<using alias="renderer.component.window.debug.custom"
+	       class="${group}.ui.debug.UIDebugMinecraft\$DebugUI\$CustomWindowRenderer"/>
 	<!-- COMMENT extensions -->
 	<using alias="extension.minecraft.background.default"
 	       class="${group}.ui.minecraft.mvvm.extensions.UIExtensionBackgroundMinecraft\$Default"/>
@@ -30,6 +35,14 @@
 			<shape class="shape.rectangle" x="10" y="10" width="100" height="100"/>
 			<anchor target="manager.window.anchored" originSide="LEFT" targetSide="RIGHT" borderThickness="5"/>
 
+			<renderer class="renderer.component.window.debug.custom">
+				<property key="window.colors.border">
+					<value>
+						<color green="80"/>
+					</value>
+				</property>
+			</renderer>
+
 			<extension class="extension.user_relocatable"/>
 			<extension class="extension.user_resizable"/>
 		</component>
@@ -39,13 +52,16 @@
 				<constraint minX="20"/>
 			</shape>
 
+			<renderer class="renderer.component.window.default">
+				<binding key="window.colors.border" binding="manager.window.anchored.window.colors.border"/>
+			</renderer>
+
 			<extension class="extension.user_relocatable"/>
 			<extension class="extension.user_resizable"/>
 
 			<component class="component.button">
 				<shape class="shape.ellipse" x="0" y="0" width="100" height="100">
 					<transform>
-						<values/>
 						<operation method="rotate" delimiter=",">1,1</operation>
 						<operation method="translate" delimiter=" ">10 10</operation>
 					</transform>

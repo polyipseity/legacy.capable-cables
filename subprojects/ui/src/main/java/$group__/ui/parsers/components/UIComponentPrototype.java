@@ -111,7 +111,7 @@ public class UIComponentPrototype
 		IUIComponent ret;
 		switch (getConstructorType()) {
 			case MAPPING__SHAPE_DESCRIPTOR:
-				ret = (IUIComponent) getConstructor().invoke(getShapeDescriptorPrototype().construct(), getMapping());
+				ret = (IUIComponent) getConstructor().invoke(getMapping(), getShapeDescriptorPrototype().construct());
 				break;
 			default:
 				throw new InternalError();

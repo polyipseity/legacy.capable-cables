@@ -2,21 +2,31 @@ package $group__.ui.debug;
 
 import $group__.ui.ConfigurationUI;
 import $group__.ui.UIFacade;
+import $group__.ui.core.mvvm.binding.IBinder;
+import $group__.ui.core.mvvm.binding.IBindingField;
+import $group__.ui.core.mvvm.structures.IAffineTransformStack;
+import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIViewComponent;
 import $group__.ui.core.parsers.IUIResourceParser;
+import $group__.ui.core.parsers.components.UIRendererConstructor;
 import $group__.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
 import $group__.ui.minecraft.mvvm.adapters.UIAdapterScreen;
 import $group__.ui.minecraft.mvvm.components.UIComponentManagerMinecraft;
 import $group__.ui.minecraft.mvvm.components.UIViewComponentMinecraft;
+import $group__.ui.minecraft.mvvm.components.common.UIComponentWindowMinecraft;
 import $group__.ui.minecraft.mvvm.components.parsers.dom.UIDOMPrototypeMinecraftParser;
 import $group__.ui.minecraft.mvvm.viewmodels.UIViewModelMinecraft;
 import $group__.ui.mvvm.binding.Binder;
+import $group__.ui.mvvm.binding.BindingField;
+import $group__.ui.mvvm.binding.ObservableField;
 import $group__.ui.mvvm.models.UIModel;
 import $group__.ui.mvvm.views.components.extensions.UIExtensionCursorHandleProviderComponent;
 import $group__.ui.parsers.components.UIDOMPrototypeParser;
+import $group__.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.extensions.IExtensionContainer;
+import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -47,6 +57,14 @@ import net.minecraftforge.fml.network.NetworkHooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
+
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 
 import static $group__.utilities.PreconditionUtilities.requireRunOnceOnly;
 import static java.util.Objects.requireNonNull;
@@ -92,24 +110,67 @@ public enum UIDebugMinecraft {
 		}
 
 		private static UIAdapterScreen.WithContainer<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> createUI(DebugContainer container) {
+			IBinder binder = new Binder();
+			// COMMENT Color <-> Integer
+			binder.addFieldTransformer((Color color) -> Optional.ofNullable(color).map(Color::getRGB).orElse(null));
+			binder.addFieldTransformer((Integer t) -> Optional.ofNullable(t).map(i -> new Color(i, true)).orElse(null));
+
 			UIAdapterScreen.WithContainer<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> ret =
 					UIFacade.UFMinecraft.createScreen(
 							DISPLAY_NAME,
 							UIFacade.UFMinecraft.createInfrastructure(
 									new UIViewComponentMinecraft<>(PARSER.construct()),
 									new ViewModel(),
-									new Binder()
+									binder
 							),
 							container);
 			IExtensionContainer.addExtensionChecked(ret.getInfrastructure().getView(),
 					new UIExtensionCursorHandleProviderComponent<>(IUIViewComponent.class));
+
 			return ret;
+		}
+
+		@SuppressWarnings("unused")
+		private static final class CustomWindowRenderer<C extends UIComponentWindowMinecraft>
+				extends UIComponentWindowMinecraft.DefaultRenderer<C> {
+			public static final int CURSOR_SHAPE_RADIUS = 10;
+
+			protected final Random random = new Random();
+
+			@UIRendererConstructor(type = UIRendererConstructor.ConstructorType.MAPPING__CONTAINER_CLASS)
+			public CustomWindowRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, Class<C> containerClass) { super(mapping, containerClass); }
+
+			@Override
+			public void render(C container, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks, boolean pre) {
+				super.render(container, stack, cursorPosition, partialTicks, pre);
+				AffineTransform transform = stack.getDelegated().peek();
+				if (pre) {
+					Shape transformed = transform.createTransformedShape(new Ellipse2D.Double(
+							cursorPosition.getX() - CURSOR_SHAPE_RADIUS, cursorPosition.getY() - CURSOR_SHAPE_RADIUS,
+							CURSOR_SHAPE_RADIUS << 1, CURSOR_SHAPE_RADIUS << 1));
+					DrawingUtilities.drawShape(transformed, true, new Color(getRandom().nextInt(), true), 0);
+				}
+			}
+
+			protected Random getRandom() { return random; }
 		}
 
 		@OnlyIn(Dist.CLIENT)
 		private static final class ViewModel
 				extends UIViewModelMinecraft<Model> {
+			protected final IBindingField<Integer> anchoredWindowBorderColor = new BindingField<>(
+					new NamespacePrefixedString("manager.window.anchored.window.colors.border"),
+					new ObservableField<>(Integer.class, null));
+			protected final Random random = new Random();
+
 			private ViewModel() { super(new Model()); }
+
+			@Override
+			public void tick() { getAnchoredWindowBorderColor().setValue(getRandom().nextInt()); }
+
+			protected IBindingField<Integer> getAnchoredWindowBorderColor() { return anchoredWindowBorderColor; }
+
+			protected Random getRandom() { return random; }
 		}
 
 		@OnlyIn(Dist.CLIENT)
