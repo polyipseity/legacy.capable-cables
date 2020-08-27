@@ -10,7 +10,9 @@ import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 
-// TODO based on https://stackoverflow.com/q/1647631/9341868
+/**
+ * Based on <a href="https://stackoverflow.com/q/1647631/9341868">https://stackoverflow.com/q/1647631/9341868</a>.
+ */
 public interface ITransitionSystem<S extends IState<D>, E, D> {
 	ImmutableList<Function<ITransitionSystem<?, ?, ?>, Object>> OBJECT_VARIABLES = ImmutableList.of(
 			ITransitionSystem::getState, ITransitionSystem::getInput, ITransitionSystem::getTransitionsView);

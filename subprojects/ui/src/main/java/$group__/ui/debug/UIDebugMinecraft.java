@@ -10,7 +10,7 @@ import $group__.ui.core.mvvm.views.components.IUIViewComponent;
 import $group__.ui.core.parsers.IUIResourceParser;
 import $group__.ui.core.parsers.components.UIRendererConstructor;
 import $group__.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
-import $group__.ui.minecraft.mvvm.adapters.UIAdapterScreen;
+import $group__.ui.minecraft.mvvm.adapters.AbstractContainerScreenAdapter;
 import $group__.ui.minecraft.mvvm.components.UIComponentManagerMinecraft;
 import $group__.ui.minecraft.mvvm.components.UIViewComponentMinecraft;
 import $group__.ui.minecraft.mvvm.components.common.UIComponentWindowMinecraft;
@@ -31,7 +31,6 @@ import $group__.utilities.structures.NamespacePrefixedString;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -97,7 +96,7 @@ public enum UIDebugMinecraft {
 	@SuppressWarnings("HardcodedFileSeparator")
 	@OnlyIn(Dist.CLIENT)
 	private enum DebugUI
-			implements ScreenManager.IScreenFactory<DebugContainer, UIAdapterScreen.WithContainer<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer>> {
+			implements ScreenManager.IScreenFactory<DebugContainer, AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer>> {
 		INSTANCE,
 		;
 
@@ -109,26 +108,26 @@ public enum UIDebugMinecraft {
 
 		static {
 			Try.run(() ->
-					PARSER.parse(UIFacade.UFMinecraft.parseResourceDocument(new NamespacePrefixedString(ConfigurationUI.getModId(), "ui/schemas/components_test.xml"))), LOGGER);
+					PARSER.parse(UIFacade.Minecraft.parseResourceDocument(new NamespacePrefixedString(ConfigurationUI.getModId(), "ui/schemas/components_test.xml"))), LOGGER);
 			ThrowableCatcher.rethrow(true);
 			PARSER.construct(); // COMMENT early check
 		}
 
 		@Override
-		public UIAdapterScreen.WithContainer<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> create(DebugContainer container, PlayerInventory inv, ITextComponent title) {
+		public AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> create(DebugContainer container, PlayerInventory inv, ITextComponent title) {
 			return createUI(container);
 		}
 
-		private static UIAdapterScreen.WithContainer<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> createUI(DebugContainer container) {
+		private static AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> createUI(DebugContainer container) {
 			IBinder binder = new Binder();
 			// COMMENT Color <-> Integer
 			binder.addFieldTransformer((Color color) -> Optional.ofNullable(color).map(Color::getRGB).orElse(null));
 			binder.addFieldTransformer((Integer t) -> Optional.ofNullable(t).map(i -> new Color(i, true)).orElse(null));
 
-			UIAdapterScreen.WithContainer<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> ret =
-					UIFacade.UFMinecraft.createScreen(
+			AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> ret =
+					UIFacade.Minecraft.createScreen(
 							DISPLAY_NAME,
-							UIFacade.UFMinecraft.createInfrastructure(
+							UIFacade.Minecraft.createInfrastructure(
 									new UIViewComponentMinecraft<>(PARSER.construct()),
 									new ViewModel(),
 									binder
@@ -291,8 +290,8 @@ final class UIDebug extends GuiManagerWindows<AbstractShapeDescriptor.Rectangula
 			;
 
 			private static final ContainerType<DebugContainer> INSTANCE = IForgeContainerType.create((windowId, inv, data) -> {
-				assert Minecraft.getInstance().world != null;
-				return new DebugContainer(windowId, Minecraft.getInstance().world, data.readBlockPos());
+				assert net.minecraft.client.Minecraft.getInstance().world != null;
+				return new DebugContainer(windowId, net.minecraft.client.Minecraft.getInstance().world, data.readBlockPos());
 			});
 		}
 	}

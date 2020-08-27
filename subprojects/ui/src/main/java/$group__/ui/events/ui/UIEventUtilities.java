@@ -69,7 +69,7 @@ public enum UIEventUtilities {
 	public static ImmutableList<IUINode> computeNodePath(IUINode node) {
 		ImmutableList.Builder<IUINode> builder = ImmutableList.builder();
 		builder.add(node);
-		Optional<IUINode> parent = node.getParentNode();
+		Optional<? extends IUINode> parent = node.getParentNode();
 		while (parent.isPresent()) {
 			builder.add(parent.get());
 			parent = parent.get().getParentNode();

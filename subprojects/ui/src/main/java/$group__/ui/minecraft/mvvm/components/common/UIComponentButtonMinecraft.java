@@ -50,6 +50,7 @@ public class UIComponentButtonMinecraft
 
 	protected IUIComponentRendererContainer<IUIComponentRendererMinecraft<?>> getRendererContainer() { return rendererContainer; }
 
+	@OnlyIn(Dist.CLIENT)
 	public static class DefaultRenderer<C extends UIComponentButtonMinecraft>
 			extends UIComponentRendererMinecraft<C> {
 		public static final String PROPERTY_COLOR_BASE = INamespacePrefixedString.DEFAULT_PREFIX + "button.colors.base";

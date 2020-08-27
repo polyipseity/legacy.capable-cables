@@ -51,6 +51,7 @@ public class UIComponentWindowMinecraft
 
 	protected IUIComponentRendererContainer<IUIComponentRendererMinecraft<?>> getRendererContainer() { return rendererContainer; }
 
+	@OnlyIn(Dist.CLIENT)
 	public static class DefaultRenderer<C extends UIComponentWindowMinecraft>
 			extends UIComponentRendererMinecraft<C> {
 		public static final String PROPERTY_COLOR_BACKGROUND = INamespacePrefixedString.DEFAULT_PREFIX + "window.colors.background";
