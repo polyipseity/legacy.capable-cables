@@ -4,14 +4,17 @@ import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.mvvm.binding.BindingField;
 import $group__.ui.mvvm.binding.ObservableField;
 import $group__.ui.utilities.BindingUtilities;
-import io.reactivex.rxjava3.core.Observer;
+import $group__.ui.utilities.BindingUtilities.EnumOptions;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Streams;
+import io.reactivex.rxjava3.core.ObservableSource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Node;
 
 import javax.annotation.Nullable;
+import java.util.EnumSet;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -38,12 +41,14 @@ public interface IHasBinding {
 								.orElseGet(defaultValue)));
 	}
 
-	// TODO need some changes
-	default Iterable<IBindingField<?>> getBindingFields() { return BindingUtilities.getBindingFields(this); }
+	default Iterable<? extends IBindingField<?>> getBindingFields() { return BindingUtilities.getBindingFields(this, EnumSet.of(EnumOptions.SELF, EnumOptions.VARIABLES)); }
 
-	default Iterable<IBindingMethod<?>> getBindingMethods() { return BindingUtilities.getBindingMethods(this); }
+	default Iterable<? extends IBindingMethod<?>> getBindingMethods() { return BindingUtilities.getBindingMethods(this, EnumSet.of(EnumOptions.SELF, EnumOptions.VARIABLES)); }
 
-	default Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() {
-		return s -> BindingUtilities.getHasBindingsVariables(this).forEach(v -> v.getBinderSubscriber().accept(s));
+	@SuppressWarnings("UnstableApiUsage")
+	default Iterable<? extends ObservableSource<IBinderAction>> getBinderNotifiers() {
+		return Streams.stream(BindingUtilities.getHasBindingsVariables(this)).unordered()
+				.flatMap(v -> Streams.stream(v.getBinderNotifiers()))
+				.collect(ImmutableSet.toImmutableSet());
 	}
 }

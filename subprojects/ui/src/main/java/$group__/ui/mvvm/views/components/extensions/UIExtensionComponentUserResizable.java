@@ -286,16 +286,18 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 		@Override
 		@SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
 		public void onNext(GuiScreenEvent.DrawScreenEvent.Post event) {
-			getResizeData().ifPresent(d -> getContainer().filter(c -> {
-				Point2D cp = new Point2DImmutable(event.getMouseX(), event.getMouseY());
-				c.getManager().ifPresent(m -> {
-					Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
-					d.handle(r, cp);
-					DrawingUtilities.drawRectangle(m.getPathResolver().resolvePath(cp, true).getTransformCurrentView(),
-							r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
-				});
-				return true;
-			}));
+			getResizeData().ifPresent(d ->
+					getContainer().ifPresent(c -> {
+						Point2D cp = new Point2DImmutable(event.getMouseX(), event.getMouseY());
+						c.getManager().ifPresent(m -> {
+							Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
+							d.handle(r, cp);
+							UIObjectUtilities.acceptRectangular(r, (x, y, w, h) ->
+									r.setFrame(x, y, w - 1, h - 1));
+							DrawingUtilities.drawRectangle(m.getPathResolver().resolvePath(cp, true).getTransformCurrentView(),
+									r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
+						});
+					}));
 		}
 	}
 }

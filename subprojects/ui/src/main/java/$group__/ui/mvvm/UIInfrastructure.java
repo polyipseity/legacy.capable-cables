@@ -10,6 +10,7 @@ import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -95,8 +96,10 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 			getBinderDisposables().add(d);
 			return d;
 		};
-		getView().getBinderSubscriber().accept(s);
-		getViewModel().getBinderSubscriber().accept(s);
+		ImmutableSet.copyOf(getView().getBinderNotifiers()).forEach(n ->
+				n.subscribe(s.get()));
+		ImmutableSet.copyOf(getViewModel().getBinderNotifiers()).forEach(n ->
+				n.subscribe(s.get()));
 
 		setBound(true);
 	}

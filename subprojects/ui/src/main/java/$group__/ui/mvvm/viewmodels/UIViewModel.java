@@ -9,7 +9,9 @@ import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import com.google.common.collect.ImmutableMap;
-import io.reactivex.rxjava3.core.Observer;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.subjects.Subject;
 import io.reactivex.rxjava3.subjects.UnicastSubject;
 import org.apache.logging.log4j.LogManager;
@@ -20,8 +22,6 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
@@ -42,12 +42,7 @@ public class UIViewModel<M extends IUIModel>
 	public void setModel(M model) { this.model = model; }
 
 	@Override
-	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() {
-		return s -> {
-			getBinderNotifierSubject().subscribe(s.get());
-			IUIViewModel.super.getBinderSubscriber().accept(s);
-		};
-	}
+	public Iterable<? extends ObservableSource<IBinderAction>> getBinderNotifiers() { return Iterables.concat(ImmutableSet.of(getBinderNotifierSubject()), IUIViewModel.super.getBinderNotifiers()); }
 
 	protected Subject<IBinderAction> getBinderNotifierSubject() { return binderNotifierSubject; }
 

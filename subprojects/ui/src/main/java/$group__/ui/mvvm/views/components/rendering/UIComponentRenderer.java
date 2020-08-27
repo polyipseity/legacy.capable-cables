@@ -8,14 +8,14 @@ import $group__.ui.core.parsers.components.UIRendererConstructor;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import com.google.common.collect.ImmutableMap;
-import io.reactivex.rxjava3.core.Observer;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.subjects.Subject;
 import io.reactivex.rxjava3.subjects.UnicastSubject;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class UIComponentRenderer<C extends IUIComponent>
 		extends IHasGenericClass.Impl<C>
@@ -31,12 +31,7 @@ public class UIComponentRenderer<C extends IUIComponent>
 	}
 
 	@Override
-	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() {
-		return s -> {
-			getBinderNotifierSubject().subscribe(s.get());
-			IUIComponentRenderer.super.getBinderSubscriber().accept(s);
-		};
-	}
+	public Iterable<? extends ObservableSource<IBinderAction>> getBinderNotifiers() { return Iterables.concat(ImmutableSet.of(getBinderNotifierSubject()), IUIComponentRenderer.super.getBinderNotifiers()); }
 
 	protected Subject<IBinderAction> getBinderNotifierSubject() { return binderNotifierSubject; }
 

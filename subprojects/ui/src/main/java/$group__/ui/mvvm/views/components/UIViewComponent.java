@@ -17,16 +17,15 @@ import $group__.utilities.TreeUtilities;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import io.reactivex.rxjava3.core.Observer;
+import com.google.common.collect.Streams;
+import io.reactivex.rxjava3.core.ObservableSource;
 
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ConcurrentModificationException;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		extends UIView<S>
@@ -47,17 +46,18 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	@Override
 	public Optional<IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) { return getManager().changeFocus(currentFocus, next); }
 
+	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public Consumer<Supplier<? extends Observer<? super IBinderAction>>> getBinderSubscriber() {
-		return s -> {
-			super.getBinderSubscriber().accept(s);
-			getManager().getChildrenFlatView().forEach(c -> c.getBinderSubscriber().accept(s));
-		};
+	public Iterable<? extends ObservableSource<IBinderAction>> getBinderNotifiers() {
+		return Iterables.concat(getManager().getChildrenFlatView().stream().unordered()
+						.flatMap(c -> Streams.stream(c.getBinderNotifiers()))
+						.collect(ImmutableSet.toImmutableSet()),
+				super.getBinderNotifiers());
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Iterable<IBindingField<?>> getBindingFields() {
+	public Iterable<? extends IBindingField<?>> getBindingFields() {
 		return Iterables.concat(Lists.asList(
 				super.getBindingFields(),
 				(Iterable<IBindingField<?>>[]) // COMMENT should be safe
@@ -68,7 +68,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Iterable<IBindingMethod<?>> getBindingMethods() {
+	public Iterable<? extends IBindingMethod<?>> getBindingMethods() {
 		return Iterables.concat(Lists.asList(
 				super.getBindingMethods(),
 				(Iterable<IBindingMethod<?>>[]) // COMMENT should be safe
