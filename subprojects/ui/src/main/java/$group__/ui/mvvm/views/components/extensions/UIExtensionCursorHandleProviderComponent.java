@@ -32,11 +32,10 @@ public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent
 			IUIComponentPath cp = c.getManager().getPathResolver().resolvePath(cursorPosition, true);
 			try (IAffineTransformStack stack = cp.getTransformStackView()) {
 				for (IUIComponent e : Lists.reverse(cp.asList())) {
-					if (e instanceof IUIComponentCursorHandleProvider) {
-						if ((ret = ((IUIComponentCursorHandleProvider) e).getCursorHandle(stack, cursorPosition))
-								.isPresent())
-							break;
-					}
+					if ((ret = CastUtilities.castChecked(IUIComponentCursorHandleProvider.class, e)
+							.flatMap(ec -> ec.getCursorHandle(stack, cursorPosition)))
+							.isPresent())
+						break;
 					if (!stack.isClean())
 						stack.getDelegated().pop();
 				}

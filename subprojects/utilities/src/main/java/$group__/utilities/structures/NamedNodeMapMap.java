@@ -1,5 +1,6 @@
 package $group__.utilities.structures;
 
+import $group__.utilities.CastUtilities;
 import com.google.common.collect.ImmutableSet;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -81,12 +82,11 @@ public class NamedNodeMapMap
 	@Nullable
 	@Override
 	public Node get(@Nullable Object key) {
-		if (key instanceof String) {
-			String s = (String) key;
-			String[] ss = splitString(s);
-			return hasNamespaceURI(ss) ? getDelegated().getNamedItemNS(ss[0], ss[1]) : getDelegated().getNamedItem(s);
-		}
-		return null;
+		return CastUtilities.castChecked(String.class, key)
+				.map(s -> {
+					String[] ss = splitString(s);
+					return hasNamespaceURI(ss) ? getDelegated().getNamedItemNS(ss[0], ss[1]) : getDelegated().getNamedItem(s);
+				}).orElse(null);
 	}
 
 	@Override

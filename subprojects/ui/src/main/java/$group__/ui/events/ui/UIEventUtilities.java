@@ -6,6 +6,7 @@ import $group__.ui.core.structures.IUIDataKeyboardKeyPress;
 import $group__.ui.core.structures.IUIDataMouseButtonClick;
 import $group__.ui.mvvm.views.events.ui.*;
 import $group__.ui.utilities.UIDataMouseButtonClick;
+import $group__.utilities.CastUtilities;
 import $group__.utilities.PreconditionUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.interfaces.INamespacePrefixedString;
@@ -21,44 +22,42 @@ import java.util.Optional;
 public enum UIEventUtilities {
 	;
 
+	@SuppressWarnings("ObjectAllocationInLoop")
 	public static boolean dispatchEvent(IUIEvent event) {
 		RegUIEvent.checkEvent(event);
 		event.reset();
 
-		if (event.getTarget() instanceof IUINode) {
-			ImmutableList<IUINode> path = computeNodePath((IUINode) event.getTarget());
+		IUIEventTarget et = event.getTarget();
+		if (et instanceof IUINode) {
+			ImmutableList<IUINode> path = computeNodePath((IUINode) et);
 
 			event.advancePhase();
 			for (int i = 0, maxI = path.size() - 1; i < maxI; i++) {
 				@Nullable IUINode n = path.get(i);
-				if (n instanceof IUIEventTarget) {
-					IUIEventTarget nc = (IUIEventTarget) n;
-					if (nc.isActive())
-						nc.dispatchEvent(event);
-				}
+				CastUtilities.castChecked(IUIEventTarget.class, n)
+						.filter(IUIEventTarget::isActive)
+						.ifPresent(nc -> nc.dispatchEvent(event));
 			}
 
 			event.advancePhase();
-			if (event.getTarget().isActive())
-				event.getTarget().dispatchEvent(event);
+			if (et.isActive())
+				et.dispatchEvent(event);
 
 			if (!event.isPropagationStopped() && event.canBubble()) {
 				event.advancePhase();
 				ImmutableList<IUINode> pathReversed = path.reverse();
 				for (int i = 1, maxI = pathReversed.size(); i < maxI; i++) {
 					@Nullable IUINode n = pathReversed.get(i);
-					if (n instanceof IUIEventTarget) {
-						IUIEventTarget nc = (IUIEventTarget) n;
-						if (nc.isActive())
-							nc.dispatchEvent(event);
-					}
+					CastUtilities.castChecked(IUIEventTarget.class, n)
+							.filter(IUIEventTarget::isActive)
+							.ifPresent(nc -> nc.dispatchEvent(event));
 				}
 			}
 		} else {
 			event.advancePhase();
 			// COMMENT NOOP
 			event.advancePhase();
-			event.getTarget().dispatchEvent(event);
+			et.dispatchEvent(event);
 			if (event.canBubble())
 				event.advancePhase();
 			// COMMENT NOOP

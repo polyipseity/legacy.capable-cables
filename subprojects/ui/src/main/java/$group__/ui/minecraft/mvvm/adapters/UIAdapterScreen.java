@@ -456,9 +456,17 @@ public class UIAdapterScreen
 		Optional<IUIEventTarget> o = getTargetBeingHoveredByMouse();
 		Optional<IUIEventTarget> n = Optional.ofNullable(targetBeingHoveredByMouse);
 		if (!n.equals(o)) {
-			ImmutableList<?>
-					op = o.map(t -> t instanceof IUINode ? UIEventUtilities.computeNodePath((IUINode) t) : ImmutableList.of(t)).orElseGet(ImmutableList::of),
-					np = n.map(t -> t instanceof IUINode ? UIEventUtilities.computeNodePath((IUINode) t) : ImmutableList.of(t)).orElseGet(ImmutableList::of);
+			List<?>
+					op = o.map(t ->
+					CastUtilities.castChecked(IUINode.class, t)
+							.<List<?>>map(UIEventUtilities::computeNodePath)
+							.orElseGet(() -> ImmutableList.of(t)))
+					.orElseGet(ImmutableList::of),
+					np = n.map(t ->
+							CastUtilities.castChecked(IUINode.class, t)
+									.<List<?>>map(UIEventUtilities::computeNodePath)
+									.orElseGet(() -> ImmutableList.of(t)))
+							.orElseGet(ImmutableList::of);
 			int i = 0;
 			for (int maxI = Math.min(op.size(), np.size()); i < maxI; ++i) {
 				if (!Objects.equals(op.get(i), np.get(i)))
@@ -468,21 +476,19 @@ public class UIAdapterScreen
 			o.ifPresent(t -> {
 				UIEventUtilities.dispatchEvent(
 						UIEventUtilities.Factory.createEventMouseLeaveSelf(t, data, n.orElse(null))); // COMMENT consider bubbling
-				Lists.reverse(op.subList(iFinal, op.size())).forEach(t2 -> {
-					if (t2 instanceof IUIEventTarget)
-						UIEventUtilities.dispatchEvent(
-								UIEventUtilities.Factory.createEventMouseLeave((IUIEventTarget) t2, data, n.orElse(null)));
-				});
+				Lists.reverse(op.subList(iFinal, op.size())).forEach(t2 ->
+						CastUtilities.castChecked(IUIEventTarget.class, t2)
+								.ifPresent(t3 -> UIEventUtilities.dispatchEvent(
+										UIEventUtilities.Factory.createEventMouseLeave(t3, data, n.orElse(null)))));
 			});
 			this.targetBeingHoveredByMouse = targetBeingHoveredByMouse;
 			n.ifPresent(t -> {
 				UIEventUtilities.dispatchEvent(
 						UIEventUtilities.Factory.createEventMouseEnterSelf(t, data, o.orElse(null))); // COMMENT consider bubbling
-				np.subList(iFinal, np.size()).forEach(t2 -> {
-					if (t2 instanceof IUIEventTarget)
-						UIEventUtilities.dispatchEvent(
-								UIEventUtilities.Factory.createEventMouseEnter((IUIEventTarget) t2, data, o.orElse(null)));
-				});
+				np.subList(iFinal, np.size()).forEach(t2 ->
+						CastUtilities.castChecked(IUIEventTarget.class, t2)
+								.ifPresent(t3 -> UIEventUtilities.dispatchEvent(
+										UIEventUtilities.Factory.createEventMouseEnter(t3, data, o.orElse(null)))));
 			});
 		}
 	}

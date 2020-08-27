@@ -62,16 +62,13 @@ public class UIComponentManager<S extends Shape>
 
 	@Override
 	public Optional<IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) {
-		Optional<IUIEventTarget> ret = Optional.of(this);
-		if (currentFocus instanceof IUIComponent) {
-			ret = CacheManager.CHILDREN_FLAT_FOCUSABLE.getValue().get(this)
-					.filter(f -> !f.isEmpty())
-					.map(f -> f.get(Math.floorMod(
-							Math.max(f.indexOf(currentFocus), 0)
-									+ (next ? 1 : -1),
-							f.size())));
-		}
-		return ret;
+		return CastUtilities.castChecked(IUIComponent.class, currentFocus)
+				.<Optional<IUIEventTarget>>map(cf ->
+						CacheManager.CHILDREN_FLAT_FOCUSABLE.getValue().get(this)
+								.filter(f -> !f.isEmpty())
+								.map(f -> f.get(Math.floorMod(
+										Math.max(f.indexOf(cf), 0) + (next ? 1 : -1), f.size()))))
+				.orElseGet(() -> Optional.of(this));
 	}
 
 	@Override
@@ -97,8 +94,9 @@ public class UIComponentManager<S extends Shape>
 										ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
 										TreeUtilities.<IUIComponent, Object>visitNodesDepthFirst(i,
 												ret::add,
-												p -> p instanceof IUIComponentContainer ?
-														((IUIComponentContainer) p).getChildrenView() : ImmutableSet.of(), null, null);
+												p -> CastUtilities.castChecked(IUIComponentContainer.class, p)
+														.<Iterable<IUIComponent>>map(IUIComponentContainer::getChildrenView)
+														.orElseGet(ImmutableSet::of), null, null);
 										cache.getDelegated().put(t.getKey(),
 												ret.stream().sequential()
 														.map(WeakReference::new)
@@ -118,11 +116,9 @@ public class UIComponentManager<S extends Shape>
 									@Override
 									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 									public void onNext(EventUIComponentHierarchyChanged.Parent event) {
-										if (event.getStage() == EnumEventHookStage.POST) {
-											IUIComponent ec = event.getComponent();
-											if (ec instanceof IUIComponentManager)
-												t.invalidate((IUIComponentManager<?>) ec);
-										}
+										if (event.getStage() == EnumEventHookStage.POST)
+											CastUtilities.castChecked(IUIComponentManager.class, event.getComponent())
+													.ifPresent(t::invalidate);
 									}
 								})));
 		@SuppressWarnings("UnstableApiUsage")
@@ -156,11 +152,9 @@ public class UIComponentManager<S extends Shape>
 									@Override
 									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 									public void onNext(EventUIComponentHierarchyChanged.Parent event) {
-										if (event.getStage() == EnumEventHookStage.POST) {
-											IUIComponent ec = event.getComponent();
-											if (ec instanceof IUIComponentManager)
-												t.invalidate((IUIComponentManager<?>) ec);
-										}
+										if (event.getStage() == EnumEventHookStage.POST)
+											CastUtilities.castChecked(IUIComponentManager.class, event.getComponent())
+													.ifPresent(t::invalidate);
 									}
 								})));
 

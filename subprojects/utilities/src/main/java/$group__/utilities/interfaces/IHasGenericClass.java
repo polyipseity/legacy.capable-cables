@@ -1,5 +1,6 @@
 package $group__.utilities.interfaces;
 
+import $group__.utilities.CastUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 
 @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
@@ -8,9 +9,9 @@ public interface IHasGenericClass<T> {
 
 	@SuppressWarnings("unchecked")
 	static <T> Class<? extends T> getActualClass(IHasGenericClass<T> obj) {
-		return obj instanceof Extended
-				? (Class<? extends T>) ((Extended<?, ?>) obj).getExtendedClass() // COMMENT should always extends T
-				: obj.getGenericClass();
+		return CastUtilities.castChecked(Extended.class, obj)
+				.map(Extended::getExtendedClass)
+				.orElseGet(obj::getGenericClass);
 	}
 
 	class Impl<T>

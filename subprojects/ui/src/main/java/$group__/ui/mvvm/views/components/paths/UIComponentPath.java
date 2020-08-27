@@ -6,11 +6,13 @@ import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.ui.core.mvvm.views.components.paths.IUIComponentPath;
 import $group__.ui.mvvm.structures.AffineTransformStack;
 import $group__.ui.mvvm.views.paths.UINodePath;
+import $group__.utilities.CastUtilities;
 import sun.misc.Cleaner;
 
 import javax.annotation.Nullable;
 import java.awt.geom.AffineTransform;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class UIComponentPath<T extends IUIComponent>
 		extends UINodePath<T>
@@ -21,10 +23,10 @@ public class UIComponentPath<T extends IUIComponent>
 	public UIComponentPath(List<? extends T> delegated) {
 		super(delegated);
 
+		Consumer<IUIComponentContainer> transformer = c -> c.transformChildren(transformStack);
 		for (IUIComponent c : delegated) {
 			transformStack.push();
-			if (c instanceof IUIComponentContainer)
-				((IUIComponentContainer) c).transformChildren(transformStack);
+			CastUtilities.castChecked(IUIComponentContainer.class, c).ifPresent(transformer);
 		}
 		transformStack.getDelegated().pop();
 

@@ -1,6 +1,6 @@
 package $group__.ui.minecraft.mvvm.extensions;
 
-import $group__.ui.core.mvvm.views.IUIView;
+import $group__.ui.core.mvvm.IUICommon;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.components.IUIViewComponent;
 import $group__.ui.core.parsers.components.UIExtensionConstructor;
@@ -90,18 +90,12 @@ public class UIExtensionBackgroundMinecraft<E extends IUIComponentManager<?>>
 		@Override
 		@SubscribeEvent
 		public void onNext(@Nonnull EventUIViewMinecraft.Render event) {
-			if (event.getStage() == EnumEventHookStage.PRE) {
-				IUIView<?> ev = event.getView();
-				if (ev instanceof IUIViewComponent) {
-					IUIViewComponent<?, ?> evc = (IUIViewComponent<?, ?>) ev;
-					if (getContainer()
-							.filter(Predicate.isEqual(evc.getManager()))
-							.isPresent())
-						evc.getInfrastructure()
-								.flatMap(c -> IUIExtensionScreenProvider.TYPE.getValue().get(c))
-								.ifPresent(extScr -> renderBackground(extScr.getScreen(), event.getCursorPositionView(), event.getPartialTicks()));
-				}
-			}
+			if (event.getStage() == EnumEventHookStage.PRE)
+				CastUtilities.castChecked(IUIViewComponent.class, event.getView())
+						.filter(evc -> getContainer().filter(Predicate.isEqual(evc.getManager())).isPresent())
+						.flatMap(IUICommon::getInfrastructure)
+						.flatMap(c -> IUIExtensionScreenProvider.TYPE.getValue().get(c))
+						.ifPresent(extScr -> renderBackground(extScr.getScreen(), event.getCursorPositionView(), event.getPartialTicks()));
 		}
 	}
 }

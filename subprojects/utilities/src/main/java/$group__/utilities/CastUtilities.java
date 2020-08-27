@@ -12,7 +12,7 @@ public enum CastUtilities {
 	@Nullable
 	public static <T> T castUncheckedNullable(@Nullable Object obj) { return (T) obj; }
 
-	public static <T> Optional<T> castChecked(Class<T> clazz, @Nullable Object obj) {
+	public static <T> Optional<T> castChecked(Class<? extends T> clazz, @Nullable Object obj) {
 		if (clazz.isInstance(obj))
 			return Optional.of(clazz.cast(obj));
 		return Optional.empty();

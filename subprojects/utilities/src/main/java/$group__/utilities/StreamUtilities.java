@@ -15,11 +15,9 @@ public enum StreamUtilities {
 
 	@SuppressWarnings("UnstableApiUsage")
 	public static <T> Stream<T> streamSmart(Iterable<T> iterable, int cost) {
-		if (iterable instanceof Collection) {
-			Collection<T> collection = (Collection<T>) iterable;
-			return streamSmart(collection.size(), cost, collection::stream, collection::parallelStream);
-		}
-		return streamSmart(1, cost, () -> Streams.stream(iterable), () -> Streams.stream(iterable).parallel());
+		return CastUtilities.castChecked(CastUtilities.<Class<Collection<T>>>castUnchecked(Collection.class), iterable)
+				.map(c -> streamSmart(c.size(), cost, c::stream, c::parallelStream))
+				.orElseGet(() -> streamSmart(1, cost, () -> Streams.stream(iterable), () -> Streams.stream(iterable).parallel()));
 	}
 
 	// COMMENT from http://gee.cs.oswego.edu/dl/html/StreamParallelGuidance.html

@@ -1,6 +1,9 @@
 package $group__.utilities.references;
 
+import $group__.utilities.CastUtilities;
+
 import javax.annotation.Nullable;
+import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
@@ -14,11 +17,12 @@ public class WeakReferenceValueIdentity<T>
 	@Override
 	public int hashCode() { return Objects.hashCode(get()); }
 
-	@SuppressWarnings({"ObjectEquality"})
+	@SuppressWarnings({"ObjectEquality", "EqualsWhichDoesntCheckParameterClass"})
 	@Override
 	public boolean equals(@Nullable Object obj) {
-		if (obj instanceof WeakReference)
-			return get() == ((WeakReference<?>) obj).get();
-		return false;
+		return CastUtilities.castChecked(WeakReference.class, obj)
+				.map(Reference::get)
+				.filter(oc -> get() == oc)
+				.isPresent();
 	}
 }
