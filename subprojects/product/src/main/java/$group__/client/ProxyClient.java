@@ -18,7 +18,8 @@ public final class ProxyClient extends Proxy implements IProxyClient {
 
 	@Override
 	public boolean onModLifecycle(ModLifecycleEvent event) {
-		if (super.onModLifecycle(event)) return true;
+		if (super.onModLifecycle(event))
+			return true;
 		else if (event instanceof FMLClientSetupEvent)
 			return processEvent("Client setup", event, this::onSetupSided);
 		return false;

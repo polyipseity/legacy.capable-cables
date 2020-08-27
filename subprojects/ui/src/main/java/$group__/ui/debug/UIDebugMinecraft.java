@@ -53,6 +53,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.extensions.IForgeContainerType;
+import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.network.NetworkHooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -81,8 +82,17 @@ public enum UIDebugMinecraft {
 
 	public static ContainerType<DebugContainer> getContainerEntry() { return DebugContainer.Type.INSTANCE; }
 
+	@SuppressWarnings("deprecation")
 	@OnlyIn(Dist.CLIENT)
-	public static void registerUIFactory() { ScreenManager.registerFactory(DebugContainer.Type.INSTANCE, DebugUI.INSTANCE); }
+	public static void registerUIFactory() {
+		{
+			ContainerType<DebugContainer> ct = DebugContainer.Type.INSTANCE;
+			DebugUI uf = DebugUI.INSTANCE;
+			// COMMENT this should mean that class loading is executed in parallel
+			DeferredWorkQueue.runLater(() ->
+					ScreenManager.registerFactory(ct, uf));
+		}
+	}
 
 	@SuppressWarnings("HardcodedFileSeparator")
 	@OnlyIn(Dist.CLIENT)
