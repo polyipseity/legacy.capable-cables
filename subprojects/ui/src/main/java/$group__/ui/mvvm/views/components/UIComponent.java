@@ -58,7 +58,7 @@ public class UIComponent
 	protected final Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping;
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
-	protected final ConcurrentMap<INamespacePrefixedString, IBindingMethod.ISource<?>> eventTargetBindingMethods = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<INamespacePrefixedString, IBindingMethod.Source<?>> eventTargetBindingMethods = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	// todo add animation system
 	// todo cache transform
 	protected final IShapeDescriptor<?> shapeDescriptor;
@@ -122,9 +122,9 @@ public class UIComponent
 	public boolean dispatchEvent(IUIEvent event) {
 		boolean ret = super.dispatchEvent(event);
 		INamespacePrefixedString type = event.getType();
-		Optional.<IBindingMethod.ISource<?>>ofNullable(getEventTargetBindingMethods().get(type))
+		Optional.<IBindingMethod.Source<?>>ofNullable(getEventTargetBindingMethods().get(type))
 				.orElseGet(() -> {
-					IBindingMethod.ISource<? extends IUIEvent> r = new BindingMethodSource<>(event.getClass(),
+					IBindingMethod.Source<? extends IUIEvent> r = new BindingMethodSource<>(event.getClass(),
 							Optional.ofNullable(getMapping().get(type)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 					getEventTargetBindingMethods().put(type, r);
 					return r;
@@ -155,7 +155,7 @@ public class UIComponent
 	protected void setParent(@Nullable IUIComponentContainer parent) { this.parent = new WeakReference<>(parent); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<INamespacePrefixedString, IBindingMethod.ISource<?>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }
+	protected ConcurrentMap<INamespacePrefixedString, IBindingMethod.Source<?>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMapping() { return mapping; }

@@ -19,12 +19,12 @@ public interface IBindingMethod<T> extends IHasGenericClass<T>, IHasBindingKey {
 		DESTINATION
 	}
 
-	interface ISource<T> extends IBindingMethod<T> {
-		static <T> DisposableObserver<T> createDelegatingObserver(ISource<T> source, Iterable<? extends IDestination<?>> destination, Map<Class<?>, Map<Class<?>, Function<?, ?>>> transformers) {
+	interface Source<T> extends IBindingMethod<T> {
+		static <T> DisposableObserver<T> createDelegatingObserver(Source<T> source, Iterable<? extends Destination<?>> destination, Map<Class<?>, Map<Class<?>, Function<?, ?>>> transformers) {
 			return new DisposableObserverAuto<T>() {
 				@Override
 				public void onNext(@Nonnull T t) {
-					for (IDestination<?> d : destination) {
+					for (Destination<?> d : destination) {
 						try {
 							d.accept(CastUtilities.castUncheckedNullable(
 									IBinder.transform(transformers, t, source.getGenericClass(), d.getGenericClass()))); // COMMENT should be of the correct type
@@ -45,7 +45,7 @@ public interface IBindingMethod<T> extends IHasGenericClass<T>, IHasBindingKey {
 		void invoke(T argument);
 	}
 
-	interface IDestination<T>
+	interface Destination<T>
 			extends IBindingMethod<T>, Consumer<T> {
 		@Override
 		default EnumType getType() { return EnumType.DESTINATION; }

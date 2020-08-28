@@ -25,7 +25,22 @@ public class Binder implements IBinder {
 	protected final ConcurrentMap<Class<?>, Map<Class<?>, Function<?, ?>>> methodTransformers = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap();
 
 	@Override
-	public boolean unbindFields(Iterable<IBindingField<?>> fields) {
+	public boolean bindFields(Iterable<? extends IBindingField<?>> fields)
+			throws BindingTransformerNotFoundException {
+		final boolean[] ret = {false};
+		IBinder.sortAndTrimBindings(fields).asMap().forEach((s, fs) -> ret[0] |= getFieldBinding(s).add(fs));
+		return ret[0];
+	}
+
+	@Override
+	public boolean bindMethods(Iterable<? extends IBindingMethod<?>> methods) {
+		final boolean[] ret = {false};
+		IBinder.sortAndTrimBindings(methods).asMap().forEach((s, ms) -> ret[0] |= getMethodBinding(s).add(ms));
+		return ret[0];
+	}
+
+	@Override
+	public boolean unbindFields(Iterable<? extends IBindingField<?>> fields) {
 		final boolean[] ret = {false};
 		IBinder.sortAndTrimBindings(fields).asMap().forEach((s, fs) -> {
 			FieldBinding b = getFieldBinding(s);
@@ -37,7 +52,7 @@ public class Binder implements IBinder {
 	}
 
 	@Override
-	public boolean unbindMethods(Iterable<IBindingMethod<?>> methods) {
+	public boolean unbindMethods(Iterable<? extends IBindingMethod<?>> methods) {
 		final boolean[] ret = {false};
 		IBinder.sortAndTrimBindings(methods).asMap().forEach((s, ms) -> {
 			MethodBinding b = getMethodBinding(s);
@@ -45,21 +60,6 @@ public class Binder implements IBinder {
 			if (b.isEmpty())
 				getMethodBindings().remove(b.getBindingKey());
 		});
-		return ret[0];
-	}
-
-	@Override
-	public boolean bindFields(Iterable<IBindingField<?>> fields)
-			throws BindingTransformerNotFoundException {
-		final boolean[] ret = {false};
-		IBinder.sortAndTrimBindings(fields).asMap().forEach((s, fs) -> ret[0] |= getFieldBinding(s).add(fs));
-		return ret[0];
-	}
-
-	@Override
-	public boolean bindMethods(Iterable<IBindingMethod<?>> methods) {
-		final boolean[] ret = {false};
-		IBinder.sortAndTrimBindings(methods).asMap().forEach((s, ms) -> ret[0] |= getMethodBinding(s).add(ms));
 		return ret[0];
 	}
 
@@ -149,7 +149,7 @@ public class Binder implements IBinder {
 
 		protected final Object getCleanerRef() { return cleanerRef; }
 
-		public boolean add(Iterable<IBindingField<?>> fields)
+		public boolean add(Iterable<? extends IBindingField<?>> fields)
 				throws BindingTransformerNotFoundException {
 			final boolean[] ret = {false};
 			fields.forEach(f -> {
@@ -191,7 +191,7 @@ public class Binder implements IBinder {
 
 		public boolean isEmpty() { return getFields().isEmpty(); }
 
-		public boolean remove(Iterable<IBindingField<?>> fields) {
+		public boolean remove(Iterable<? extends IBindingField<?>> fields) {
 			final boolean[] ret = {false};
 			fields.forEach(f -> {
 				if (getFields().containsKey(f)) {
@@ -207,8 +207,8 @@ public class Binder implements IBinder {
 
 	protected static class MethodBinding {
 		protected final INamespacePrefixedString bindingKey;
-		protected final Map<IBindingMethod.ISource<?>, Disposable> sources = new HashMap<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
-		protected final Set<IBindingMethod.IDestination<?>> destinations = new HashSet<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
+		protected final Map<IBindingMethod.Source<?>, Disposable> sources = new HashMap<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
+		protected final Set<IBindingMethod.Destination<?>> destinations = new HashSet<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
 		protected final ConcurrentMap<Class<?>, Map<Class<?>, Function<?, ?>>> transformers;
 		protected final Object cleanerRef = new Object();
 
@@ -216,7 +216,7 @@ public class Binder implements IBinder {
 		public MethodBinding(INamespacePrefixedString bindingKey, ConcurrentMap<Class<?>, Map<Class<?>, Function<?, ?>>> transformers) {
 			this.bindingKey = bindingKey;
 			this.transformers = transformers; // COMMENT intended to be modified
-			@SuppressWarnings("UnnecessaryLocalVariable") Map<IBindingMethod.ISource<?>, Disposable> sourcesRef = sources;
+			@SuppressWarnings("UnnecessaryLocalVariable") Map<IBindingMethod.Source<?>, Disposable> sourcesRef = sources;
 			Cleaner.create(getCleanerRef(), () ->
 					sourcesRef.values().forEach(Disposable::dispose));
 		}
@@ -224,22 +224,22 @@ public class Binder implements IBinder {
 		protected final Object getCleanerRef() { return cleanerRef; }
 
 		@SuppressWarnings("SuspiciousMethodCalls")
-		public boolean add(Iterable<IBindingMethod<?>> methods) {
+		public boolean add(Iterable<? extends IBindingMethod<?>> methods) {
 			final boolean[] ret = {false};
 
 			methods.forEach(m -> {
 				switch (m.getType()) {
 					case SOURCE:
 						if (!getSources().containsKey(m)) {
-							IBindingMethod.ISource<?> s = (IBindingMethod.ISource<?>) m;
-							DisposableObserver<?> d = IBindingMethod.ISource.createDelegatingObserver(s, getDestinations(), getTransformers());
+							IBindingMethod.Source<?> s = (IBindingMethod.Source<?>) m;
+							DisposableObserver<?> d = IBindingMethod.Source.createDelegatingObserver(s, getDestinations(), getTransformers());
 							s.getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
 							getSources().put(s, d);
 							ret[0] = true;
 						}
 						break;
 					case DESTINATION:
-						ret[0] |= getDestinations().add((IBindingMethod.IDestination<?>) m);
+						ret[0] |= getDestinations().add((IBindingMethod.Destination<?>) m);
 						break;
 					default:
 						throw new InternalError();
@@ -249,12 +249,12 @@ public class Binder implements IBinder {
 		}
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-		protected Map<IBindingMethod.ISource<?>, Disposable> getSources() { return sources; }
+		protected Map<IBindingMethod.Source<?>, Disposable> getSources() { return sources; }
 
 		public INamespacePrefixedString getBindingKey() { return bindingKey; }
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-		protected Set<IBindingMethod.IDestination<?>> getDestinations() { return destinations; }
+		protected Set<IBindingMethod.Destination<?>> getDestinations() { return destinations; }
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 		protected ConcurrentMap<Class<?>, Map<Class<?>, Function<?, ?>>> getTransformers() { return transformers; }
@@ -271,7 +271,7 @@ public class Binder implements IBinder {
 		public boolean isEmpty() { return getSources().isEmpty() && getDestinations().isEmpty(); }
 
 		@SuppressWarnings("SuspiciousMethodCalls")
-		public boolean remove(Iterable<IBindingMethod<?>> methods) {
+		public boolean remove(Iterable<? extends IBindingMethod<?>> methods) {
 			final boolean[] ret = {false};
 			methods.forEach(m -> {
 				switch (m.getType()) {

@@ -186,7 +186,7 @@ public enum UIEventUtilities {
 		public static void checkEvent(IUIEvent event)
 				throws IllegalArgumentException {
 			if (!isEventValid(event))
-				throw BecauseOf.illegalArgument("Invalid event",
+				throw BecauseOf.illegalArgument("Unregistered event",
 						"event.getClass()", event.getClass(),
 						"event.getType()", event.getType(),
 						"event", event);

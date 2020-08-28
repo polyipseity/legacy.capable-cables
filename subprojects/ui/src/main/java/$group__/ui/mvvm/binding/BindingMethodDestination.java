@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 public class BindingMethodDestination<T>
 		extends IHasGenericClass.Impl<T>
-		implements IBindingMethod.IDestination<T> {
+		implements IBindingMethod.Destination<T> {
 	@Nullable
 	protected final INamespacePrefixedString bindingKey;
 	protected final Consumer<T> action;

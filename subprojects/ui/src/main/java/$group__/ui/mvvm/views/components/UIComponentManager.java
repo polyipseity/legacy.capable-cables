@@ -8,7 +8,6 @@ import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.components.IUIComponentShapeAnchorController;
 import $group__.ui.core.mvvm.views.components.extensions.caches.IUIExtensionCache;
 import $group__.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
-import $group__.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.mvvm.structures.AffineTransformStack;
@@ -58,17 +57,6 @@ public class UIComponentManager<S extends Shape>
 	@Override
 	public IShapeDescriptor<S> getShapeDescriptor() {
 		return (IShapeDescriptor<S>) super.getShapeDescriptor(); // COMMENT should be safe
-	}
-
-	@Override
-	public Optional<IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) {
-		return CastUtilities.castChecked(IUIComponent.class, currentFocus)
-				.<Optional<IUIEventTarget>>map(cf ->
-						CacheManager.CHILDREN_FLAT_FOCUSABLE.getValue().get(this)
-								.filter(f -> !f.isEmpty())
-								.map(f -> f.get(Math.floorMod(
-										Math.max(f.indexOf(cf), 0) + (next ? 1 : -1), f.size()))))
-				.orElseGet(() -> Optional.of(this));
 	}
 
 	@Override
@@ -163,6 +151,9 @@ public class UIComponentManager<S extends Shape>
 
 	@Override
 	public IUIComponentShapeAnchorController getShapeAnchorController() { return shapeAnchorController; }
+
+	@Override
+	public boolean isFocusable() { return true; }
 
 	public class PathResolver extends UIComponentPathResolver {
 		protected PathResolver() { super(UIComponentManager.this); }

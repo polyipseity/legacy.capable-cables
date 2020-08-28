@@ -4,9 +4,13 @@ import $group__.ui.ConfigurationUI;
 import $group__.ui.UIFacade;
 import $group__.ui.core.mvvm.binding.IBinder;
 import $group__.ui.core.mvvm.binding.IBindingField;
+import $group__.ui.core.mvvm.binding.IBindingMethod;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIViewComponent;
+import $group__.ui.core.mvvm.views.events.IUIEvent;
+import $group__.ui.core.mvvm.views.events.IUIEventKeyboard;
+import $group__.ui.core.mvvm.views.events.IUIEventMouse;
 import $group__.ui.core.parsers.IUIResourceParser;
 import $group__.ui.core.parsers.components.UIRendererConstructor;
 import $group__.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
@@ -18,8 +22,10 @@ import $group__.ui.minecraft.mvvm.components.parsers.dom.UIDOMPrototypeMinecraft
 import $group__.ui.minecraft.mvvm.viewmodels.UIViewModelMinecraft;
 import $group__.ui.mvvm.binding.Binder;
 import $group__.ui.mvvm.binding.BindingField;
+import $group__.ui.mvvm.binding.BindingMethodDestination;
 import $group__.ui.mvvm.binding.ObservableField;
 import $group__.ui.mvvm.models.UIModel;
+import $group__.ui.mvvm.views.components.common.UIComponentButton;
 import $group__.ui.mvvm.views.components.extensions.UIExtensionCursorHandleProviderComponent;
 import $group__.ui.parsers.components.UIDOMPrototypeParser;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
@@ -56,6 +62,7 @@ import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.network.NetworkHooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.glfw.GLFW;
 import org.w3c.dom.Document;
 
 import java.awt.*;
@@ -168,14 +175,54 @@ public enum UIDebugMinecraft {
 		private static final class ViewModel
 				extends UIViewModelMinecraft<Model> {
 			protected final IBindingField<Integer> anchoredWindowBorderColor = new BindingField<>(
-					new NamespacePrefixedString("manager.window.anchored.window.colors.border"),
+					new NamespacePrefixedString("anchoredWindowBorderColor"),
 					new ObservableField<>(Integer.class, null));
+			protected final IBindingMethod.Destination<UIComponentButton.IUIEventActivate> buttonOnActivate = new BindingMethodDestination<>(
+					UIComponentButton.IUIEventActivate.class,
+					new NamespacePrefixedString("buttonOnActivate"),
+					this::onButtonActivate);
+			protected boolean anchoredWindowFlickering = false;
 			protected final Random random = new Random();
+			protected final IBindingMethod.Destination<IUIEvent> buttonOnActivated = new BindingMethodDestination<>(
+					IUIEvent.class,
+					new NamespacePrefixedString("buttonOnActivated"),
+					this::onButtonActivated);
 
 			private ViewModel() { super(new Model()); }
 
 			@Override
-			public void tick() { getAnchoredWindowBorderColor().setValue(getRandom().nextInt()); }
+			public void tick() {
+				if (isAnchoredWindowFlickering())
+					getAnchoredWindowBorderColor().setValue(getRandom().nextInt());
+			}
+
+			protected boolean isAnchoredWindowFlickering() { return anchoredWindowFlickering; }
+
+			protected void setAnchoredWindowFlickering(boolean anchoredWindowFlickering) { this.anchoredWindowFlickering = anchoredWindowFlickering; }
+
+			@SuppressWarnings("unused")
+			protected IBindingMethod.Destination<IUIEvent> getButtonOnActivated() { return buttonOnActivated; }
+
+			@SuppressWarnings("unused")
+			protected IBindingMethod.Destination<UIComponentButton.IUIEventActivate> getButtonOnActivate() { return buttonOnActivate; }
+
+			protected void onButtonActivate(UIComponentButton.IUIEventActivate e) {
+				boolean ret = false;
+				IUIEvent ec = e.getCause();
+				if (ec instanceof IUIEventMouse) {
+					IUIEventMouse ecc = (IUIEventMouse) ec;
+					if (ecc.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT)
+						ret = true;
+				} else if (ec instanceof IUIEventKeyboard) {
+					IUIEventKeyboard ecc = (IUIEventKeyboard) ec;
+					if (ecc.getData().getKey() == GLFW.GLFW_KEY_ENTER)
+						ret = true;
+				}
+				if (!ret)
+					e.preventDefault();
+			}
+
+			protected void onButtonActivated(IUIEvent e) { setAnchoredWindowFlickering(!isAnchoredWindowFlickering()); }
 
 			protected IBindingField<Integer> getAnchoredWindowBorderColor() { return anchoredWindowBorderColor; }
 
@@ -186,92 +233,6 @@ public enum UIDebugMinecraft {
 		private static final class Model
 				extends UIModel {}
 	}
-
-/* TODO
-@OnlyIn(Dist.CLIENT)
-final class UIDebug extends GuiManagerWindows<AbstractShapeDescriptor.Rectangular<Rectangle2D>, GuiManagers.Data<GuiManagers.Events, DebugContainer>, DebugContainer> {
-	private static final Logger LOGGER = LogManager.getLogger();
-
-	@SuppressWarnings("MagicNumber")
-	UIDebug(ITextComponent title, DebugContainer container) {
-		super(title, AbstractShapeDescriptor.Rectangular::new,
-				new Data<>(new Events(), UIDebug::getLogger, new GuiBackgroundDefault<>(AbstractShapeDescriptor.Rectangular::new,
-						new UIComponentMinecraft.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger)), container));
-		{
-			UIComponentWindow<UIComponentWindow.Model, UIComponentWindow.View<?, ?>, UIComponentWindow.Controller, IUIComponent> window1 = new UIComponentWindow<>();
-			window1.setModel(new UIComponentWindow.Model<>(window1));
-			window1.setView(new UIComponentWindow.View<>(window1));
-			window1.getView().setShapeDescriptor(window1.getView().new AbstractShapeDescriptor<>(
-					new Rectangle2D.Double(10, 10, 100, 100),
-					new ShapeAnchorSet<>(null)));
-			window1.setController(new UIComponentWindow.Controller<>(window1));
-			UIComponentWindow<?, ?, ?, ?> window1 = new UIComponentWindow<>(new AbstractShapeDescriptor.Rectangular<>(
-					new UIComponentWindow.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new UIComponentWindow.Data.ColorData()));
-			UIComponentWindow<?, ?> window2 = new UIComponentWindow<AbstractShapeDescriptor.Rectangular<Rectangle2D.Double>, UIComponentWindow.Data<UIComponentMinecraft.Events, UIComponentWindow.Data.ColorData>>(new AbstractShapeDescriptor.Rectangular<>(new Rectangle2D.Double(50, 50, 200, 200)),
-					new UIComponentWindow.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new UIComponentWindow.Data.ColorData())) {
-				protected final Rectangle2D current = new Rectangle2D.Double();
-				protected final Random random = new Random();
-				protected double tick = 0;
-
-				@Override
-				public void renderTick(IAffineTransformStack stack, Point2D mouse, float partialTicks) {
-					tick = (tick + partialTicks) % 360;
-					if (tick % 120 == 0) {
-						UIObjectUtilities.acceptRectangular(getShapeDescriptor().getShape(), (x, y) -> (w, h) -> current.setFrame(x * random.nextDouble() * 2, y * random.nextDouble() * 2, w * random.nextDouble() * 2, y * random.nextDouble() * 2));
-						data.setActive(!data.isActive());
-					}
-					reshapeComponent(this, this, s -> s.adapt(current));
-					super.renderTick(stack, mouse, partialTicks);
-				}
-
-				@Override
-				public void onTick(IGuiLifecycleHandler handler, UIComponentMinecraft<?, ?> invoker) {
-					tick = (tick + 1) % 360;
-					if (tick % 120 == 0)
-						data.setActive(!data.isActive());
-					super.onTick(handler, invoker);
-				}
-			};
-			{
-				UIButtonComponentMinecraft button;
-				{
-					Random random = new Random();
-					button = new UIButtonComponentMinecraft(new AbstractShapeDescriptor.Rectangular<>(new Ellipse2D.Double(0, 0, 100, 100)),
-							new UIButtonComponentMinecraft.Data<>(new UIComponentMinecraft.Events(), UIDebug::getLogger, new UIButtonComponentMinecraft.Data.ColorData())) {
-						@Override
-						protected boolean onButtonKeyboardPressed(int key, int scanCode, int modifiers) { return key == GLFW.GLFW_KEY_ENTER; }
-
-						@Override
-						protected boolean onButtonMousePressed(int button) { return button == GLFW.GLFW_MOUSE_BUTTON_LEFT; }
-
-						@Override
-						protected boolean onButtonMouseReleased(int button) { return button == GLFW.GLFW_MOUSE_BUTTON_LEFT && onActivate(); }
-
-						protected boolean onActivate() {
-							data.colors.setBase(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-									.setBaseBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-									.setHovering(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-									.setHoveringBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-									.setClicking(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()))
-									.setClickingBorder(new Color(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat()));
-							data.visible = !data.visible;
-							return true;
-						}
-
-						@Override
-						protected boolean onButtonKeyboardReleased(int key, int scanCode, int modifiers) { return key == GLFW.GLFW_KEY_ENTER && onActivate(); }
-					};
-				}
-
-				window2.add(button);
-			}
-
-			add(window1, window2);
-		}
-	}
-
-	private static Logger getLogger() { return LOGGER; }
-}*/
 
 	private static final class DebugContainer extends Container {
 		private final TileEntity tileEntity;

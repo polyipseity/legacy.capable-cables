@@ -124,7 +124,7 @@ public class UIScreenAdapter
 	public Set<Integer> getChangeFocusKeysView() { return ImmutableSet.copyOf(getChangeFocusKeys()); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Set<Integer> getChangeFocusKeys() { return closeKeys; }
+	protected Set<Integer> getChangeFocusKeys() { return changeFocusKeys; }
 
 	public boolean addChangeFocusKeys(Iterable<Integer> keys) {
 		boolean ret = false;

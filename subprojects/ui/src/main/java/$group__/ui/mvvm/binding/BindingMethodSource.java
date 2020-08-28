@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class BindingMethodSource<T>
 		extends IHasGenericClass.Impl<T>
-		implements IBindingMethod.ISource<T> {
+		implements IBindingMethod.Source<T> {
 	@Nullable
 	protected final INamespacePrefixedString bindingKey;
 	protected final Subject<T> notifierSubject = PublishSubject.create();

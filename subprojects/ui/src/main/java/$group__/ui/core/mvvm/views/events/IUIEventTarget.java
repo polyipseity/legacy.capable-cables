@@ -12,4 +12,20 @@ public interface IUIEventTarget {
 	boolean isActive();
 
 	boolean isFocusable();
+
+	@FunctionalInterface
+	interface Functional
+			extends IUIEventTarget {
+		@Override
+		default boolean addEventListener(INamespacePrefixedString type, IUIEventListener<?> listener, boolean useCapture) { return false; }
+
+		@Override
+		default boolean removeEventListener(INamespacePrefixedString type, IUIEventListener<?> listener, boolean useCapture) { return false; }
+
+		@Override
+		default boolean isActive() { return true; }
+
+		@Override
+		default boolean isFocusable() { return false; }
+	}
 }

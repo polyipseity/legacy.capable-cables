@@ -88,7 +88,9 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 		IUIInfrastructure.checkBoundState(isBound(), false);
 
 		// COMMENT must bind the bindings of view first
-		getBinder().bindFields(Iterables.concat(getView().getBindingFields(), getViewModel().getBindingFields()));
+		// COMMENT the argument order of Iterables.concat does not correspond to the resulted Iterable
+		getBinder().bindFields(getView().getBindingFields());
+		getBinder().bindFields(getViewModel().getBindingFields());
 		getBinder().bindMethods(Iterables.concat(getView().getBindingMethods(), getViewModel().getBindingMethods()));
 
 		Supplier<? extends Observer<? super IBinderAction>> s = () -> {

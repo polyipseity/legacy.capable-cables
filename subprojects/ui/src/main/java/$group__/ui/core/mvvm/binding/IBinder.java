@@ -61,7 +61,7 @@ public interface IBinder {
 						.map(m -> (Function<T, R>) m.get(to));
 	}
 
-	boolean bindFields(Iterable<IBindingField<?>> fields)
+	boolean bindFields(Iterable<? extends IBindingField<?>> fields)
 			throws BindingTransformerNotFoundException;
 
 	@SuppressWarnings("unchecked")
@@ -92,11 +92,11 @@ public interface IBinder {
 		return ts.get().apply(value);
 	}
 
-	boolean bindMethods(Iterable<IBindingMethod<?>> methods);
+	boolean bindMethods(Iterable<? extends IBindingMethod<?>> methods);
 
-	boolean unbindFields(Iterable<IBindingField<?>> fields);
+	boolean unbindFields(Iterable<? extends IBindingField<?>> fields);
 
-	boolean unbindMethods(Iterable<IBindingMethod<?>> methods);
+	boolean unbindMethods(Iterable<? extends IBindingMethod<?>> methods);
 
 	<T, R> Optional<Function<T, R>> addFieldTransformer(Function<T, R> transformer);
 
