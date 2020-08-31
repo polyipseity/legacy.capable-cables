@@ -15,7 +15,8 @@ public interface IUIEvent {
 
 	EnumPhase getPhase();
 
-	void advancePhase();
+	void advancePhase()
+			throws IllegalStateException;
 
 	void reset();
 
@@ -29,12 +30,30 @@ public interface IUIEvent {
 
 	boolean isDefaultPrevented();
 
+	@SuppressWarnings("UnusedReturnValue")
 	boolean preventDefault();
 
 	enum EnumPhase {
-		NONE,
-		CAPTURING_PHASE,
-		AT_TARGET,
-		BUBBLING_PHASE,
+		NONE {
+			@Override
+			public EnumPhase getNextPhase() { return CAPTURING_PHASE; }
+		},
+		CAPTURING_PHASE {
+			@Override
+			public EnumPhase getNextPhase() { return AT_TARGET; }
+		},
+		AT_TARGET {
+			@Override
+			public EnumPhase getNextPhase() { return BUBBLING_PHASE; }
+		},
+		BUBBLING_PHASE {
+			@Override
+			public EnumPhase getNextPhase()
+					throws IllegalStateException { throw new IllegalStateException(); }
+		},
+		;
+
+		public abstract EnumPhase getNextPhase()
+				throws IllegalStateException;
 	}
 }

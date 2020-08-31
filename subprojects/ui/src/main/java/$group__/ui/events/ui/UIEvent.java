@@ -33,7 +33,8 @@ public class UIEvent implements IUIEvent {
 	public EnumPhase getPhase() { return phase; }
 
 	@Override
-	public void advancePhase() { setPhase(EnumPhase.values()[(phase.ordinal() + 1) % EnumPhase.values().length]); }
+	public void advancePhase()
+			throws IllegalStateException { setPhase(getPhase().getNextPhase()); }
 
 	@Override
 	public void stopPropagation() { setPropagationStopped(true); }
