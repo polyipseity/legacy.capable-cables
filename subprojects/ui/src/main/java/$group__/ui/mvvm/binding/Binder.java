@@ -65,7 +65,7 @@ public class Binder implements IBinder {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T, R> Optional<Function<T, R>> addFieldTransformer(Function<T, R> transformer) {
+	public <T, R> Optional<? extends Function<T, R>> addFieldTransformer(Function<T, R> transformer) {
 		Optional<Class<?>>[] types = IBinder.resolveFunctionTypes(transformer);
 		if (!types[0].isPresent() || !types[1].isPresent())
 			return Optional.of(transformer);
@@ -74,30 +74,18 @@ public class Binder implements IBinder {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T, R> Optional<Function<T, R>> addMethodTransformer(Function<T, R> transformer) {
+	public <T, R> Optional<? extends Function<T, R>> addMethodTransformer(Function<T, R> transformer) {
 		Optional<Class<?>>[] types = IBinder.resolveFunctionTypes(transformer);
 		if (!types[0].isPresent() || !types[1].isPresent())
 			return Optional.of(transformer);
 		return IBinder.putTransformer(getMethodTransformers(), (Class<T>) types[0].get(), (Class<R>) types[1].get(), transformer); // COMMENT should be of correct types
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T, R> Optional<Function<T, R>> removeFieldTransformer(Function<T, R> transformer) {
-		Optional<Class<?>>[] types = IBinder.resolveFunctionTypes(transformer);
-		if (!types[0].isPresent() || !types[1].isPresent())
-			return Optional.of(transformer);
-		return IBinder.removeTransformer(getFieldTransformers(), (Class<T>) types[0].get(), (Class<R>) types[1].get()); // COMMENT should be of correct types
-	}
+	public <T, R> Optional<? extends Function<T, R>> removeFieldTransformer(Class<T> from, Class<R> to) { return IBinder.removeTransformer(getFieldTransformers(), from, to); }
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T, R> Optional<Function<T, R>> removeMethodTransformer(Function<T, R> transformer) {
-		Optional<Class<?>>[] types = IBinder.resolveFunctionTypes(transformer);
-		if (!types[0].isPresent() || !types[1].isPresent())
-			return Optional.of(transformer);
-		return IBinder.removeTransformer(getMethodTransformers(), (Class<T>) types[0].get(), (Class<R>) types[1].get()); // COMMENT should be of correct types
-	}
+	public <T, R> Optional<? extends Function<T, R>> removeMethodTransformer(Class<T> from, Class<R> to) { return IBinder.removeTransformer(getMethodTransformers(), from, to); }
 
 	protected MethodBinding getMethodBinding(INamespacePrefixedString bindingKey) { return getMethodBindings().computeIfAbsent(bindingKey, k -> new MethodBinding(k, getMethodTransformers())); }
 

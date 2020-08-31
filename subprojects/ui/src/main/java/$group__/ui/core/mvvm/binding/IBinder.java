@@ -98,13 +98,13 @@ public interface IBinder {
 
 	boolean unbindMethods(Iterable<? extends IBindingMethod<?>> methods);
 
-	<T, R> Optional<Function<T, R>> addFieldTransformer(Function<T, R> transformer);
+	<T, R> Optional<? extends Function<T, R>> addFieldTransformer(Function<T, R> transformer);
 
-	<T, R> Optional<Function<T, R>> addMethodTransformer(Function<T, R> transformer);
+	<T, R> Optional<? extends Function<T, R>> addMethodTransformer(Function<T, R> transformer);
 
-	<T, R> Optional<Function<T, R>> removeFieldTransformer(Function<T, R> transformer);
+	<T, R> Optional<? extends Function<T, R>> removeFieldTransformer(Class<T> from, Class<R> to);
 
-	<T, R> Optional<Function<T, R>> removeMethodTransformer(Function<T, R> transformer);
+	<T, R> Optional<? extends Function<T, R>> removeMethodTransformer(Class<T> from, Class<R> to);
 
 	default boolean unbindAll() { return unbindAllFields() | unbindAllMethods(); }
 
