@@ -67,7 +67,7 @@ public class UIComponentWindow
 							.map(n -> n - WINDOW_VISIBLE_MINIMUM)
 							.orElse(null),
 					ConstantSupplier.of((double) WINDOW_VISIBLE_MINIMUM), ConstantSupplier.of((double) WINDOW_VISIBLE_MINIMUM),
-					ConstantSupplier.getNullSupplier(), ConstantSupplier.getNullSupplier()));
+					ConstantSupplier.empty(), ConstantSupplier.empty()));
 			return false;
 		});
 
