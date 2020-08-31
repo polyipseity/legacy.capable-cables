@@ -191,6 +191,7 @@
 	<!-- SECTION values -->
 
 	<!-- COMMENT IUIPropertyMappingValue -->
+	<!-- COMMENT 'valueTypes' without attributes or children nodes convert to 'null' -->
 	<xs:complexType name="valueType" id="valueType">
 		<xs:choice minOccurs="0" maxOccurs="unbounded">
 			<!-- COMMENT unique particle attribution :( -->

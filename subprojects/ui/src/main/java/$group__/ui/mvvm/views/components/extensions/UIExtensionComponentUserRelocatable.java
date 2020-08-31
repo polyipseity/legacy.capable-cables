@@ -172,14 +172,13 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 
 		@Override
 		public IShapeDescriptor<?> getShapeDescriptor() {
-			if (isRelocating())
-				return getManager()
-						.map(m -> new GenericShapeDescriptor(m.getShapeDescriptor().getShapeOutput()))
-						.orElseGet(() -> new GenericShapeDescriptor(new Rectangle2D.Double()));
-			else
-				return new GenericShapeDescriptor(getRelocateShape()
-						.<Shape>map(Function.identity())
-						.orElseGet(Rectangle2D.Double::new));
+			return isRelocating()
+					? getManager()
+					.map(m -> new GenericShapeDescriptor(m.getShapeDescriptor().getShapeOutput()))
+					.orElseGet(() -> new GenericShapeDescriptor(new Rectangle2D.Double()))
+					: new GenericShapeDescriptor(getRelocateShape()
+					.<Shape>map(Function.identity())
+					.orElseGet(Rectangle2D.Double::new));
 		}
 	}
 

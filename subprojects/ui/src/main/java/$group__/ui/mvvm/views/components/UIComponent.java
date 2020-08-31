@@ -80,8 +80,10 @@ public class UIComponent
 				.map(Node::getNodeValue)
 				.orElse(null);
 
-		this.visible = IHasBinding.createBindingField(Boolean.class, this.mapping.get(PROPERTY_VISIBLE_LOCATION), BindingUtilities.Deserializers::deserializeBoolean, true);
-		this.active = IHasBinding.createBindingField(Boolean.class, this.mapping.get(PROPERTY_ACTIVE_LOCATION), BindingUtilities.Deserializers::deserializeBoolean, true);
+		this.visible = IHasBinding.createBindingField(Boolean.class, false, true,
+				this.mapping.get(PROPERTY_VISIBLE_LOCATION), BindingUtilities.Deserializers::deserializeBoolean);
+		this.active = IHasBinding.createBindingField(Boolean.class, false, true,
+				this.mapping.get(PROPERTY_ACTIVE_LOCATION), BindingUtilities.Deserializers::deserializeBoolean);
 
 		IExtensionContainer.addExtensionChecked(this, new UIExtensionCache());
 	}

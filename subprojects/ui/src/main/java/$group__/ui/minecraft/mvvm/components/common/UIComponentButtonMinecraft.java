@@ -83,18 +83,18 @@ public class UIComponentButtonMinecraft
 		public DefaultRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, Class<C> containerClass) {
 			super(mapping, containerClass);
 
-			this.colorBase = IHasBinding.createBindingField(Color.class,
-					this.mapping.get(PROPERTY_COLOR_BASE_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.DARK_GRAY);
-			this.colorBaseBorder = IHasBinding.createBindingField(Color.class,
-					this.mapping.get(PROPERTY_COLOR_BASE_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.DARK_GRAY);
-			this.colorHovering = IHasBinding.createBindingField(Color.class,
-					this.mapping.get(PROPERTY_COLOR_HOVERING_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.GRAY);
-			this.colorHoveringBorder = IHasBinding.createBindingField(Color.class,
-					this.mapping.get(PROPERTY_COLOR_HOVERING_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.GRAY);
-			this.colorPressed = IHasBinding.createBindingField(Color.class,
-					this.mapping.get(PROPERTY_COLOR_PRESSED_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.LIGHT_GRAY);
-			this.colorPressedBorder = IHasBinding.createBindingField(Color.class,
-					this.mapping.get(PROPERTY_COLOR_PRESSED_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.LIGHT_GRAY);
+			this.colorBase = IHasBinding.createBindingField(Color.class, true, Color.DARK_GRAY,
+					this.mapping.get(PROPERTY_COLOR_BASE_LOCATION), BindingUtilities.Deserializers::deserializeColor);
+			this.colorBaseBorder = IHasBinding.createBindingField(Color.class, true, Color.DARK_GRAY,
+					this.mapping.get(PROPERTY_COLOR_BASE_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor);
+			this.colorHovering = IHasBinding.createBindingField(Color.class, true, Color.GRAY,
+					this.mapping.get(PROPERTY_COLOR_HOVERING_LOCATION), BindingUtilities.Deserializers::deserializeColor);
+			this.colorHoveringBorder = IHasBinding.createBindingField(Color.class, true, Color.GRAY,
+					this.mapping.get(PROPERTY_COLOR_HOVERING_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor);
+			this.colorPressed = IHasBinding.createBindingField(Color.class, true, Color.LIGHT_GRAY,
+					this.mapping.get(PROPERTY_COLOR_PRESSED_LOCATION), BindingUtilities.Deserializers::deserializeColor);
+			this.colorPressedBorder = IHasBinding.createBindingField(Color.class, true, Color.LIGHT_GRAY,
+					this.mapping.get(PROPERTY_COLOR_PRESSED_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor);
 		}
 
 		@Override

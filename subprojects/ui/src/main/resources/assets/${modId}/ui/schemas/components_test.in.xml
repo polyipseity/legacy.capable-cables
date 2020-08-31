@@ -17,6 +17,8 @@
 	       class="${group}.ui.minecraft.mvvm.components.common.UIComponentWindowMinecraft\$DefaultRenderer"/>
 	<using alias="renderer.component.window.debug.custom"
 	       class="${group}.ui.debug.UIDebugMinecraft\$DebugUI\$CustomWindowRenderer"/>
+	<using alias="renderer.component.button.default"
+	       class="${group}.ui.minecraft.mvvm.components.common.UIComponentButtonMinecraft\$DefaultRenderer"/>
 	<!-- COMMENT extensions -->
 	<using alias="extension.minecraft.background.default"
 	       class="${group}.ui.minecraft.mvvm.extensions.UIExtensionBackgroundMinecraft\$Default"/>
@@ -70,6 +72,12 @@
 						<operation method="translate" delimiter=" ">10 10</operation>
 					</transform>
 				</shape>
+
+				<renderer class="renderer.component.button.default">
+					<property key="button.colors.hovering">
+						<value/><!-- COMMENT null -->
+					</property>
+				</renderer>
 			</component>
 		</component>
 	</component>

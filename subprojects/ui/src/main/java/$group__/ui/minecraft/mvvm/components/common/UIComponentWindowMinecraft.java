@@ -68,10 +68,10 @@ public class UIComponentWindowMinecraft
 		public DefaultRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, Class<C> containerClass) {
 			super(mapping, containerClass);
 
-			this.colorBackground = IHasBinding.createBindingField(Color.class,
-					this.mapping.get(PROPERTY_COLOR_BACKGROUND_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.BLACK);
-			this.colorBorder = IHasBinding.createBindingField(Color.class,
-					this.mapping.get(PROPERTY_COLOR_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor, Color.WHITE);
+			this.colorBackground = IHasBinding.createBindingField(Color.class, true, Color.BLACK,
+					this.mapping.get(PROPERTY_COLOR_BACKGROUND_LOCATION), BindingUtilities.Deserializers::deserializeColor);
+			this.colorBorder = IHasBinding.createBindingField(Color.class, true, Color.WHITE,
+					this.mapping.get(PROPERTY_COLOR_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor);
 		}
 
 		@Override

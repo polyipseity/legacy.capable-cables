@@ -24,7 +24,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -140,7 +140,7 @@ public class UIDOMPrototypeParser<T extends IUIComponentManager<?>>
 	@SuppressWarnings("unchecked")
 	@Override
 	public T construct() {
-		List<Consumer<? super IUIComponentManager<?>>> queue = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM);
+		List<Consumer<? super IUIComponentManager<?>>> queue = new LinkedList<>();
 		return getPrototype()
 				.map(cp ->
 						(T) Try.call(() -> {

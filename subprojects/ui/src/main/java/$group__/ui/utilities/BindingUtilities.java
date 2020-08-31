@@ -139,9 +139,14 @@ public enum BindingUtilities {
 
 		private static final Logger LOGGER = LogManager.getLogger();
 
+		public static Optional<Boolean> deserializeBoolean(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "boolean")
+					.map(Boolean::valueOf), node);
+		}
+
 		// TODO some values are nullable
-		public static <T> Optional<T> warnIfNotPresent(@SuppressWarnings("OptionalUsedAsFieldOrParameterType") Optional<T> optional, Node node) {
-			if (!optional.isPresent())
+		public static <T> Optional<T> warnIfNotPresent(boolean nullable, @SuppressWarnings("OptionalUsedAsFieldOrParameterType") Optional<T> optional, Node node) {
+			if (!(nullable || optional.isPresent()))
 				LOGGER.warn(() -> LoggerUtilities.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(
 						LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot deserialize node:{}{}",
 								System.lineSeparator(), node),
@@ -150,47 +155,42 @@ public enum BindingUtilities {
 			return optional;
 		}
 
-		public static Optional<Boolean> deserializeBoolean(Node node) {
-			return warnIfNotPresent(DOMUtilities.getAttributeValue(node, "boolean")
-					.map(Boolean::valueOf), node);
-		}
-
-		public static Optional<Byte> deserializeByte(Node node) {
-			return warnIfNotPresent(DOMUtilities.getAttributeValue(node, "byte")
+		public static Optional<Byte> deserializeByte(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "byte")
 					.map(Byte::valueOf), node);
 		}
 
-		public static Optional<Short> deserializeShort(Node node) {
-			return warnIfNotPresent(DOMUtilities.getAttributeValue(node, "short")
+		public static Optional<Short> deserializeShort(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "short")
 					.map(Short::valueOf), node);
 		}
 
-		public static Optional<Integer> deserializeInt(Node node) {
-			return warnIfNotPresent(DOMUtilities.getAttributeValue(node, "int")
+		public static Optional<Integer> deserializeInt(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "int")
 					.map(Integer::valueOf), node);
 		}
 
-		public static Optional<Long> deserializeLong(Node node) {
-			return warnIfNotPresent(DOMUtilities.getAttributeValue(node, "long")
+		public static Optional<Long> deserializeLong(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "long")
 					.map(Long::valueOf), node);
 		}
 
-		public static Optional<Float> deserializeFloat(Node node) {
-			return warnIfNotPresent(DOMUtilities.getAttributeValue(node, "float")
+		public static Optional<Float> deserializeFloat(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "float")
 					.map(Float::valueOf), node);
 		}
 
-		public static Optional<Double> deserializeDouble(Node node) {
-			return warnIfNotPresent(DOMUtilities.getAttributeValue(node, "double")
+		public static Optional<Double> deserializeDouble(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "double")
 					.map(Double::valueOf), node);
 		}
 
-		public static Optional<String> deserializeString(Node node) {
-			return warnIfNotPresent(DOMUtilities.getAttributeValue(node, "string"), node);
+		public static Optional<String> deserializeString(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "string"), node);
 		}
 
-		public static Optional<Color> deserializeColor(Node node) {
-			return warnIfNotPresent(DOMUtilities.getChildByTagNameNS(node, UIDOMPrototypeParser.SCHEMA_NAMESPACE_URI, "color")
+		public static Optional<Color> deserializeColor(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getChildByTagNameNS(node, UIDOMPrototypeParser.SCHEMA_NAMESPACE_URI, "color")
 					.map(nc -> new Color(
 							Integer.valueOf(DOMUtilities.getAttributeValue(nc, "red").orElse("00"), RadixUtilities.RADIX_HEX),
 							Integer.valueOf(DOMUtilities.getAttributeValue(nc, "green").orElse("00"), RadixUtilities.RADIX_HEX),

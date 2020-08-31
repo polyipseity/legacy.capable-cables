@@ -41,11 +41,11 @@ public class UIComponentPathResolver
 			final int[] popTimes = new int[1];
 			List<IUIComponent> ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM);
 
+			ret.add(m);
 			@Nullable IUIComponent current = m;
 			while (current != null) {
 				current = CastUtilities.castChecked(IUIComponentContainer.class, current)
 						.map(container -> {
-							ret.add(container);
 							AffineTransform transform = stack.push();
 							container.transformChildren(stack);
 							getChildrenTransformers(container).forEach(t ->
@@ -69,6 +69,8 @@ public class UIComponentPathResolver
 								}
 							}
 
+							if (r != null)
+								ret.add(r);
 							return r;
 						})
 						.orElse(null);
