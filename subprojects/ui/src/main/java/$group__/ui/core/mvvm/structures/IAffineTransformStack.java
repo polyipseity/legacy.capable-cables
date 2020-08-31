@@ -1,5 +1,6 @@
 package $group__.ui.core.mvvm.structures;
 
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.LoggerUtilities;
 import $group__.utilities.MapUtilities;
 import $group__.utilities.ThrowableUtilities;
@@ -38,11 +39,7 @@ public interface IAffineTransformStack
 	default boolean isClean() { return isClean(getDelegated()); }
 
 	static boolean isClean(Stack<AffineTransform> delegated) {
-		if (delegated.size() != 1)
-			return false;
-		@Nullable AffineTransform t = delegated.get(0);
-		assert t != null;
-		return t.isIdentity();
+		return delegated.size() == 1 && AssertionUtilities.assertNonnull(delegated.firstElement()).isIdentity();
 	}
 
 	default Runnable createCleaner() {

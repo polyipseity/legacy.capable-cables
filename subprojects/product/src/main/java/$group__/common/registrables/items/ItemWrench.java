@@ -4,6 +4,7 @@ import $group__.common.registrables.items.groups.ItemGroupsThis;
 import $group__.common.registrables.utilities.RegistrableUtilities.BlockUtilities;
 import $group__.common.registrables.utilities.RegistrableUtilities.NBTUtilities;
 import $group__.common.registrables.utilities.RegistrableUtilities.RayTraceResultUtilities;
+import $group__.utilities.AssertionUtilities;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
@@ -57,8 +58,7 @@ public class ItemWrench extends Item {
 				if (user != null && user.isSneaking()) {
 					if (tag.pickedUpBlock != null) {
 						BlockPos targetPos = BlockUtilities.getPlacePosition(targetBlock);
-						assert tag.pickedUpBlockState != null;
-						BlockState state = Block.getStateById(tag.pickedUpBlockState);
+						BlockState state = Block.getStateById(AssertionUtilities.assertNonnull(tag.pickedUpBlockState));
 						// todo blacklist and whitelist system
 						return state.isValidPosition(world, targetPos) && BlockUtilities.checkNoEntityCollision(state, world, targetPos);
 					}
@@ -100,7 +100,9 @@ public class ItemWrench extends Item {
 					tag.pickedUpBlockState = null;
 					stack.setTag(tag.serializeNBT());
 				} else if (tag.pickedUpEntity != null) {
-					Optional<LivingEntity> entity = EntityType.loadEntityUnchecked(tag.pickedUpEntity, world).filter(LivingEntity.class::isInstance).map(LivingEntity.class::cast);
+					Optional<LivingEntity> entity = EntityType.loadEntityUnchecked(tag.pickedUpEntity, world)
+							.filter(LivingEntity.class::isInstance)
+							.map(LivingEntity.class::cast);
 					if (!entity.filter(e -> {
 						BlockPos targetPos = BlockUtilities.getPlacePosition(targetBlock);
 						e.setPosition(targetPos.getX(), targetPos.getY(), targetPos.getZ());

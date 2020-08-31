@@ -21,5 +21,5 @@ public class BindingField<T> implements IBindingField<T> {
 	public IObservableField<T> getField() { return field; }
 
 	@Override
-	public Optional<INamespacePrefixedString> getBindingKey() { return Optional.ofNullable(bindingKey); }
+	public Optional<? extends INamespacePrefixedString> getBindingKey() { return Optional.ofNullable(bindingKey); }
 }

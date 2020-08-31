@@ -18,5 +18,5 @@ public class UIEventFocus extends UIEvent implements IUIEventFocus {
 	}
 
 	@Override
-	public Optional<IUIEventTarget> getRelatedTarget() { return Optional.ofNullable(relatedTarget); }
+	public Optional<? extends IUIEventTarget> getRelatedTarget() { return Optional.ofNullable(relatedTarget); }
 }

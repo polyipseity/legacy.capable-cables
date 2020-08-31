@@ -6,7 +6,7 @@ import org.w3c.dom.Node;
 import java.util.Optional;
 
 public interface IUIPropertyMappingValue {
-	Optional<Node> getDefaultValue();
+	Optional<? extends Node> getDefaultValue();
 
-	Optional<INamespacePrefixedString> getBindingKey();
+	Optional<? extends INamespacePrefixedString> getBindingKey();
 }

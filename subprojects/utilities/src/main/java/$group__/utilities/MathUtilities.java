@@ -1,7 +1,6 @@
 package $group__.utilities;
 
 import javax.annotation.Nullable;
-import java.util.Optional;
 
 public enum MathUtilities {
 	;
@@ -10,13 +9,21 @@ public enum MathUtilities {
 	public static Double minNullable(@Nullable Double a, @Nullable Double b) {
 		if (a == null && b == null)
 			return null;
-		return Math.min(Optional.ofNullable(a).orElse(b), Optional.ofNullable(b).orElse(a));
+		else if (a == null)
+			a = b;
+		else if (b == null)
+			b = a;
+		return Math.min(a, b);
 	}
 
 	@Nullable
 	public static Double maxNullable(@Nullable Double a, @Nullable Double b) {
 		if (a == null && b == null)
 			return null;
-		return Math.max(Optional.ofNullable(a).orElse(b), Optional.ofNullable(b).orElse(a));
+		else if (a == null)
+			a = b;
+		else if (b == null)
+			b = a;
+		return Math.max(a, b);
 	}
 }

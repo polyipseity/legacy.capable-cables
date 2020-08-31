@@ -1,5 +1,6 @@
 package $group__.utilities.automata;
 
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.ObjectUtilities;
 import $group__.utilities.automata.core.IState;
 import $group__.utilities.automata.core.ITransitionSystem;
@@ -42,9 +43,9 @@ public class TransitionSystem<S extends IState<D>, E, D>
 		setInput(input);
 		for (Map.Entry<? extends BiPredicate<? super ITransitionSystem<? extends S, ? extends E, ? extends D>, ? super D>, ? extends Function<? super D, ? extends S>> t
 				: getTransitionsView().entrySet()) {
-			if (t.getKey().test(this, data)) {
+			if (AssertionUtilities.assertNonnull(t.getKey()).test(this, data)) {
 				getState().transitFromThis(data);
-				setState(t.getValue().apply(data));
+				setState(AssertionUtilities.assertNonnull(t.getValue()).apply(data));
 				getState().transitToThis(data);
 				break;
 			}
@@ -55,7 +56,7 @@ public class TransitionSystem<S extends IState<D>, E, D>
 	public S getState() { return state; }
 
 	@Override
-	public Optional<E> getInput() { return Optional.ofNullable(input); }
+	public Optional<? extends E> getInput() { return Optional.ofNullable(input); }
 
 	@Override
 	public Map<? extends BiPredicate<? super ITransitionSystem<? extends S, ? extends E, ? extends D>, ? super D>, ? extends Function<? super D, ? extends S>> getTransitionsView() { return transitionsView; }

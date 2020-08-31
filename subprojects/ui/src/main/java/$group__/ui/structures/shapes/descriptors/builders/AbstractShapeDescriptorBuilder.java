@@ -10,12 +10,12 @@ import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.interfaces.IHasGenericClass;
 import com.google.common.collect.Iterables;
 
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 
@@ -32,16 +32,13 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 
 	@Override
 	public AbstractShapeDescriptorBuilder<S> setProperty(String property, Object value) throws IllegalArgumentException {
-		Optional.ofNullable(getProperties().get(property))
-				.filter(c -> {
-					c.accept(CastUtilities.castUnchecked(value)); // COMMENT ClassCastException may be thrown
-					return true;
-				})
-				.orElseThrow(() ->
-						BecauseOf.illegalArgument("Property does not exist",
-								"property", property,
-								"getProperties()", getProperties(),
-								"value", value));
+		@Nullable Consumer<?> c = getProperties().get(property);
+		if (c == null)
+			throw BecauseOf.illegalArgument("Property does not exist",
+					"property", property,
+					"getProperties()", getProperties(),
+					"value", value);
+		c.accept(CastUtilities.castUnchecked(value)); // COMMENT ClassCastException may be thrown
 		return this;
 	}
 

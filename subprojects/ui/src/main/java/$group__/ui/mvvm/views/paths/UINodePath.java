@@ -2,9 +2,9 @@ package $group__.ui.mvvm.views.paths;
 
 import $group__.ui.core.mvvm.views.paths.IUINode;
 import $group__.ui.core.mvvm.views.paths.IUINodePath;
+import $group__.utilities.AssertionUtilities;
 import com.google.common.collect.ImmutableList;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class UINodePath<T extends IUINode>
@@ -19,11 +19,7 @@ public class UINodePath<T extends IUINode>
 	public int size() { return getDelegated().size(); }
 
 	@Override
-	public T getAt(int depth) {
-		@Nullable T ret = getDelegated().get(Math.floorMod(depth, size()));
-		assert ret != null;
-		return ret;
-	}
+	public T getAt(int depth) { return AssertionUtilities.assertNonnull(getDelegated().get(Math.floorMod(depth, size()))); }
 
 	@Override
 	public List<T> asList() { return ImmutableList.copyOf(getDelegated()); }

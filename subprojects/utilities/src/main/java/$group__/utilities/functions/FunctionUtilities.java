@@ -2,7 +2,7 @@ package $group__.utilities.functions;
 
 import java.util.function.Consumer;
 
-public enum SharedFunctions {
+public enum FunctionUtilities {
 	;
 
 	private static final Consumer<Object> EMPTY_CONSUMER = t -> {};

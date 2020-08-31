@@ -14,6 +14,7 @@ import $group__.ui.mvvm.views.components.UIComponentContainer;
 import $group__.ui.mvvm.views.events.bus.EventUIComponent;
 import $group__.ui.mvvm.views.events.ui.UIEventFocus;
 import $group__.ui.structures.shapes.interactions.ShapeConstraintSupplier;
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.functions.ConstantSupplier;
 import $group__.utilities.interfaces.INamespacePrefixedString;
@@ -94,14 +95,15 @@ public class UIComponentWindow
 	@Override
 	public void transformChildren(IAffineTransformStack stack) {
 		super.transformChildren(stack);
-		stack.getDelegated().peek().translate(0, WINDOW_DRAG_BAR_THICKNESS); // TODO move
+		AssertionUtilities.assertNonnull(stack.getDelegated().peek()).translate(0, WINDOW_DRAG_BAR_THICKNESS); // TODO move
 	}
 
 	@Override
 	public void initialize(IAffineTransformStack stack) {
 		UIEventBusEntryPoint.<EventUIComponent.ShapeDescriptorModify>getEventBus()
 				.subscribe(getObserverEventUIShapeDescriptorModify().accumulateAndGet(new ObserverEventUIShapeDescriptorModify(), (p, n) -> {
-					Optional.ofNullable(p).ifPresent(DisposableObserver::dispose);
+					if (p != null)
+						p.dispose();
 					return n;
 				}));
 		IUIReshapeExplicitly.refresh(this);

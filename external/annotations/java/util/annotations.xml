@@ -20,4 +20,7 @@
 	<item name='java.util.Map.Entry V setValue(V)'>
 		<annotation name='javax.annotation.Nullable'/>
 	</item>
+	<item name='java.util.Stack E peek()'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
 </root>

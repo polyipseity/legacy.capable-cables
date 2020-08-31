@@ -24,6 +24,5 @@ public class UIEventMouse extends UIEvent implements IUIEventMouse {
 	public IUIDataMouseButtonClick getData() { return data; }
 
 	@Override
-	public Optional<IUIEventTarget> getRelatedTarget() { return Optional.ofNullable(relatedTarget); }
-
+	public Optional<? extends IUIEventTarget> getRelatedTarget() { return Optional.ofNullable(relatedTarget); }
 }

@@ -1,6 +1,8 @@
 package $group__.ui.core.mvvm.views.components.extensions.caches;
 
 import $group__.ui.core.mvvm.extensions.IUIExtension;
+import $group__.ui.core.mvvm.views.components.IUIComponent;
+import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.PreconditionUtilities;
@@ -32,15 +34,20 @@ public interface IUIExtensionCache
 	Cache<INamespacePrefixedString, Object> getDelegated();
 
 	interface IType<V, I extends IExtensionContainer<INamespacePrefixedString>> {
-		Optional<V> get(I instance);
+		static void invalidateChildrenImpl(IUIComponentContainer instance, IType<?, ? super IUIComponent> type) {
+			instance.getChildrenView().stream().unordered()
+					.forEach(type::invalidate);
+		}
 
-		default void invalidate(I instance) { invalidate(instance, getKey()); }
+		default void invalidate(I instance) { invalidateImpl(instance, getKey()); }
 
-		static void invalidate(IExtensionContainer<INamespacePrefixedString> instance, INamespacePrefixedString key) {
+		static void invalidateImpl(IExtensionContainer<INamespacePrefixedString> instance, INamespacePrefixedString key) {
 			IUIExtensionCache.TYPE.getValue().get(instance)
 					.ifPresent(c ->
 							c.getDelegated().invalidate(key));
 		}
+
+		Optional<? extends V> get(I instance);
 
 		INamespacePrefixedString getKey();
 
@@ -61,13 +68,12 @@ public interface IUIExtensionCache
 				this.invalidator = invalidator;
 				this.eventListeners = ImmutableList.copyOf(eventListenersFunction.apply(this));
 
-				eventListeners.forEach(el ->
-						UIEventBusEntryPoint.getEventBus()
-								.subscribe(CastUtilities.<Observer<? super Object>>castUnchecked(el)) // COMMENT we do not care about the event type
-				);
+				eventListeners.stream().unordered()
+						.map(CastUtilities::<Observer<? super Object>>castUnchecked) // COMMENT we do not care about the event type
+						.forEach(UIEventBusEntryPoint.getEventBus()::subscribe);
 				@SuppressWarnings("UnnecessaryLocalVariable") List<? extends DisposableObserver<?>> eventListenersRef = eventListeners;
 				Cleaner.create(getCleanerRef(), () ->
-						eventListenersRef.forEach(DisposableObserver::dispose));
+						eventListenersRef.stream().unordered().forEach(DisposableObserver::dispose));
 			}
 
 			protected final Object getCleanerRef() { return cleanerRef; }
@@ -75,7 +81,7 @@ public interface IUIExtensionCache
 			protected List<? extends DisposableObserver<?>> getEventListeners() { return eventListeners; }
 
 			@Override
-			public Optional<V> get(I instance) { return getGetter().apply(this, instance).map(Function.identity()); }
+			public Optional<? extends V> get(I instance) { return getGetter().apply(this, instance).map(Function.identity()); }
 
 			@Override
 			public void invalidate(I instance) { getInvalidator().accept(this, instance); }

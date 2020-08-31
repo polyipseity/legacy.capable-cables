@@ -31,5 +31,5 @@ public class BindingMethodSource<T>
 	protected Subject<T> getNotifierSubject() { return notifierSubject; }
 
 	@Override
-	public Optional<INamespacePrefixedString> getBindingKey() { return Optional.ofNullable(bindingKey); }
+	public Optional<? extends INamespacePrefixedString> getBindingKey() { return Optional.ofNullable(bindingKey); }
 }

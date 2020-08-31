@@ -37,7 +37,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-// TODO could use some redesign
 public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
 		extends ExtensionContainerAware<INamespacePrefixedString, IUIComponent, E>
 		implements IUIExtensionComponentUserRelocatable<E> {
@@ -69,7 +68,8 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 		});
 		UIEventBusEntryPoint.<GuiScreenEvent.DrawScreenEvent.Post>getEventBus()
 				.subscribe(getObserverDrawScreenEventPost().accumulateAndGet(new ObserverDrawScreenEventPost(), (p, n) -> {
-					Optional.ofNullable(p).ifPresent(DisposableObserver::dispose);
+					if (p != null)
+						p.dispose();
 					return n;
 				}));
 	}
@@ -85,7 +85,7 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 	}
 
 	@Override
-	public Optional<IRelocateData> getRelocateData() { return Optional.ofNullable(relocateData); }
+	public Optional<? extends IRelocateData> getRelocateData() { return Optional.ofNullable(relocateData); }
 
 	protected void setRelocateData(@Nullable IRelocateData relocateData) { this.relocateData = relocateData; }
 
@@ -166,11 +166,8 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 		}
 
 		@Override
-		public Optional<Long> getCursorHandle(IAffineTransformStack stack, Point2D cursorPosition) {
-			if (isRelocating())
-				return Optional.of(MemoryUtil.NULL);
-			else
-				return Optional.empty();
+		public Optional<? extends Long> getCursorHandle(IAffineTransformStack stack, Point2D cursorPosition) {
+			return isRelocating() ? Optional.of(MemoryUtil.NULL) : Optional.empty();
 		}
 
 		@Override

@@ -195,8 +195,8 @@ public enum UIEventUtilities {
 		public static boolean isEventValid(IUIEvent event) {
 			return Optional.ofNullable(INSTANCE.getDelegated().get(event.getType()))
 					.map(RegistryObject::getValue)
-					.map(ec -> ec.isInstance(event))
-					.orElse(false);
+					.filter(ec -> ec.isInstance(event))
+					.isPresent();
 		}
 	}
 }

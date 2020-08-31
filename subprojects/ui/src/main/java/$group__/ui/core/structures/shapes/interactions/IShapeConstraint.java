@@ -28,21 +28,21 @@ public interface IShapeConstraint
 		rectangle.setRect(x[0], y[0], width[0], height[0]);
 	}
 
-	Optional<Double> getMinX();
+	Optional<? extends Double> getMinX();
 
-	Optional<Double> getMinY();
+	Optional<? extends Double> getMinY();
 
-	Optional<Double> getMaxX();
+	Optional<? extends Double> getMaxX();
 
-	Optional<Double> getMaxY();
+	Optional<? extends Double> getMaxY();
 
-	Optional<Double> getMinWidth();
+	Optional<? extends Double> getMinWidth();
 
-	Optional<Double> getMinHeight();
+	Optional<? extends Double> getMinHeight();
 
-	Optional<Double> getMaxWidth();
+	Optional<? extends Double> getMaxWidth();
 
-	Optional<Double> getMaxHeight();
+	Optional<? extends Double> getMaxHeight();
 
 	IShapeConstraint createIntersection(IShapeConstraint constraint);
 

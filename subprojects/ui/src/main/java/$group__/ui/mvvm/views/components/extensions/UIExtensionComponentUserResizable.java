@@ -20,6 +20,7 @@ import $group__.ui.structures.Point2DImmutable;
 import $group__.ui.structures.shapes.descriptors.GenericShapeDescriptor;
 import $group__.ui.utilities.UIObjectUtilities;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.reactive.DisposableObserverAuto;
@@ -32,17 +33,13 @@ import org.lwjgl.glfw.GLFW;
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
-import java.awt.geom.Area;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.RectangularShape;
+import java.awt.geom.*;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-// TODO could use some redesign
 public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
 		extends ExtensionContainerAware<INamespacePrefixedString, IUIComponent, E>
 		implements IUIExtensionComponentUserResizable<E> {
@@ -88,7 +85,8 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 		}));
 		UIEventBusEntryPoint.<GuiScreenEvent.DrawScreenEvent.Post>getEventBus()
 				.subscribe(getObserverDrawScreenEventPost().accumulateAndGet(new ObserverDrawScreenEventPost(), (p, n) -> {
-					Optional.ofNullable(p).ifPresent(DisposableObserver::dispose);
+					if (p != null)
+						p.dispose();
 					return n;
 				}));
 	}
@@ -231,21 +229,19 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 
 		@Override
 		public IShapeDescriptor<?> getShapeDescriptor() {
-			if (isResizing())
-				return getManager()
-						.map(m ->
-								new GenericShapeDescriptor(m.getShapeDescriptor().getShapeOutput()))
-						.orElseGet(() -> new GenericShapeDescriptor(new Rectangle2D.Double()));
-			else
-				return new GenericShapeDescriptor(getResizeShape()
-						.<Shape>map(Function.identity())
-						.orElseGet(Rectangle2D.Double::new));
+			return isResizing()
+					? getManager()
+					.map(m ->
+							new GenericShapeDescriptor(m.getShapeDescriptor().getShapeOutput()))
+					.orElseGet(() -> new GenericShapeDescriptor(new Rectangle2D.Double()))
+					: new GenericShapeDescriptor(getResizeShape()
+					.<Shape>map(Function.identity())
+					.orElseGet(Rectangle2D.Double::new));
 		}
 
-		@SuppressWarnings("Convert2MethodRef")
 		@Override
-		public Optional<Long> getCursorHandle(IAffineTransformStack stack, Point2D cursorPosition) {
-			return Optional.ofNullable(getResizeData()
+		public Optional<? extends Long> getCursorHandle(IAffineTransformStack stack, Point2D cursorPosition) {
+			@SuppressWarnings("Convert2MethodRef") @Nullable Long ret = getResizeData()
 					.map(d -> d.getBaseView()
 							.map(b -> {
 								Set<EnumUISide> sides = EnumUISide.getSidesMouseOver(
@@ -260,11 +256,19 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 								return null;
 							})
 							.orElseGet(() -> d.getInitialCursorHandle())) // COMMENT compiler bug, long does not get boxed to Long with a method reference
-					.orElseGet(() -> getContainer()
-							.filter(c -> isBeingHovered())
-							.flatMap(c ->
-									getCursor(EnumUISide.getSidesMouseOver(stack.getDelegated().peek().createTransformedShape(c.getShapeDescriptor().getShapeOutput()).getBounds2D(), cursorPosition)).map(EnumCursor::getHandle))
-							.orElse(null)));
+					.orElse(null);
+
+			if (ret == null)
+				ret = getContainer()
+						.filter(c -> isBeingHovered())
+						.flatMap(c -> {
+							AffineTransform transform = AssertionUtilities.assertNonnull(stack.getDelegated().peek());
+							return getCursor(EnumUISide.getSidesMouseOver(transform.createTransformedShape(c.getShapeDescriptor().getShapeOutput()).getBounds2D(), cursorPosition))
+									.map(EnumCursor::getHandle);
+						})
+						.orElse(null);
+
+			return Optional.ofNullable(ret);
 		}
 
 		protected boolean isBeingHovered() { return beingHovered; }

@@ -58,7 +58,7 @@ public class UIComponent
 	protected final Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping;
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
-	protected final ConcurrentMap<INamespacePrefixedString, IBindingMethod.Source<?>> eventTargetBindingMethods = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<INamespacePrefixedString, IBindingMethod.Source<? extends IUIEvent>> eventTargetBindingMethods = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	// todo add animation system
 	// todo cache transform
 	protected final IShapeDescriptor<?> shapeDescriptor;
@@ -116,24 +116,24 @@ public class UIComponent
 	}
 
 	@Override
-	public Optional<String> getID() { return Optional.ofNullable(id); }
+	public Optional<? extends String> getID() { return Optional.ofNullable(id); }
+
+	@Override
+	public Optional<? extends IUIComponentContainer> getParent() { return Optional.ofNullable(parent.get()); }
 
 	@Override
 	public boolean dispatchEvent(IUIEvent event) {
 		boolean ret = super.dispatchEvent(event);
 		INamespacePrefixedString type = event.getType();
-		Optional.<IBindingMethod.Source<?>>ofNullable(getEventTargetBindingMethods().get(type))
-				.orElseGet(() -> {
-					IBindingMethod.Source<? extends IUIEvent> r = new BindingMethodSource<>(event.getClass(),
-							Optional.ofNullable(getMapping().get(type)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
-					getEventTargetBindingMethods().put(type, r);
-					return r;
-				}).invoke(CastUtilities.castUnchecked(event)); // COMMENT should match
+		@Nullable IBindingMethod.Source<? extends IUIEvent> method = getEventTargetBindingMethods().get(type);
+		if (method == null) {
+			method = new BindingMethodSource<>(event.getClass(),
+					Optional.ofNullable(getMapping().get(type)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
+			getEventTargetBindingMethods().put(type, method);
+		}
+		method.invoke(CastUtilities.castUnchecked(event)); // COMMENT should match
 		return ret;
 	}
-
-	@Override
-	public Optional<IUIComponentContainer> getParent() { return Optional.ofNullable(parent.get()); }
 
 	@Override
 	public IShapeDescriptor<?> getShapeDescriptor() { return shapeDescriptor; }
@@ -155,7 +155,7 @@ public class UIComponent
 	protected void setParent(@Nullable IUIComponentContainer parent) { this.parent = new WeakReference<>(parent); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<INamespacePrefixedString, IBindingMethod.Source<?>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }
+	protected ConcurrentMap<INamespacePrefixedString, IBindingMethod.Source<? extends IUIEvent>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMapping() { return mapping; }

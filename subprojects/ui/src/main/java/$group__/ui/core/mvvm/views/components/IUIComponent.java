@@ -48,16 +48,17 @@ public interface IUIComponent
 				action.apply(shapeDescriptor));
 	}
 
-	Optional<String> getID();
+	Optional<? extends String> getID();
 
-	Optional<IUIComponentContainer> getParent();
+	Optional<? extends IUIComponentContainer> getParent();
 
-	default Optional<IUIComponentManager<?>> getManager() { return UIExtensionCache.CacheUniversal.MANAGER.getValue().get(this); }
+	default Optional<? extends IUIComponentManager<?>> getManager() { return UIExtensionCache.CacheUniversal.MANAGER.getValue().get(this); }
 
 	boolean isVisible();
 
 	void setVisible(boolean visible);
 
+	@SuppressWarnings("EmptyMethod")
 	void onIndexMove(int previous, int next);
 
 	void onParentChange(@Nullable IUIComponentContainer previous, @Nullable IUIComponentContainer next);

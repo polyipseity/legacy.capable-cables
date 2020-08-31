@@ -25,7 +25,7 @@ public interface IUIExtensionComponentUserRelocatable<E extends IUIComponent & I
 
 	default boolean isRelocating() { return getRelocateData().isPresent(); }
 
-	Optional<IRelocateData> getRelocateData();
+	Optional<? extends IRelocateData> getRelocateData();
 
 	interface IRelocateData {
 		Point2D getCursorPositionView();

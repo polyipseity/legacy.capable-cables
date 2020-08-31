@@ -8,6 +8,7 @@ import $group__.ui.mvvm.views.events.bus.EventUIComponent;
 import $group__.ui.structures.shapes.interactions.ShapeAnchorController;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.reactive.DisposableObserverAuto;
+import com.google.common.collect.ImmutableSet;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -73,17 +74,16 @@ public class UIComponentShapeAnchorController
 		}
 
 		protected void anchorOthers(EventUIComponent.ShapeDescriptorModify event, UIComponentShapeAnchorController controller) {
-			Optional.ofNullable(controller.getSubscribersMap().get(event.getComponent()))
-					.ifPresent(as ->
-							as.forEach(a -> a.getContainer()
-									.map(ac -> controller.getAnchorSetsInverse().get(ac))
-									.ifPresent(f -> {
-										if (getAnchoringAnchors().contains(a))
-											throw new ConcurrentModificationException("Anchor cycle:" + System.lineSeparator()
-													+ getAnchoringAnchors());
-										getAnchoringAnchors().push(a).anchor(f);
-										getAnchoringAnchors().pop();
-									})));
+			controller.getSubscribersMap().getOrDefault(event.getComponent(), ImmutableSet.of()).stream().unordered()
+					.forEach(a -> a.getContainer()
+							.map(ac -> controller.getAnchorSetsInverse().get(ac))
+							.ifPresent(f -> {
+								if (getAnchoringAnchors().contains(a))
+									throw new ConcurrentModificationException("Anchor cycle:" + System.lineSeparator()
+											+ getAnchoringAnchors());
+								getAnchoringAnchors().push(a).anchor(f);
+								getAnchoringAnchors().pop();
+							}));
 		}
 	}
 }

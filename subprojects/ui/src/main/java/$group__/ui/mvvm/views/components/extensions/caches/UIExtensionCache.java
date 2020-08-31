@@ -80,9 +80,9 @@ public class UIExtensionCache
 													return ret;
 												}, LOGGER)),
 								(t, i) -> {
-									IUIExtensionCache.IType.invalidate(i, t.getKey());
+									IUIExtensionCache.IType.invalidateImpl(i, t.getKey());
 									CastUtilities.castChecked(IUIComponentContainer.class, i)
-											.ifPresent(ic -> ic.getChildrenView().forEach(t::invalidate));
+											.ifPresent(ic -> IUIExtensionCache.IType.invalidateChildrenImpl(ic, t));
 								},
 								t -> ImmutableList.of(new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
 									@Override
@@ -105,9 +105,9 @@ public class UIExtensionCache
 											return ret;
 										}), LOGGER).map(CastUtilities::castUnchecked)),
 								(t, i) -> {
-									IUIExtensionCache.IType.invalidate(i, t.getKey());
+									IUIExtensionCache.IType.invalidateImpl(i, t.getKey());
 									CastUtilities.castChecked(IUIComponentContainer.class, i)
-											.ifPresent(ic -> ic.getChildrenView().forEach(t::invalidate));
+											.ifPresent(ic -> IUIExtensionCache.IType.invalidateChildrenImpl(ic, t));
 								},
 								t -> ImmutableList.of(new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
 									@Override

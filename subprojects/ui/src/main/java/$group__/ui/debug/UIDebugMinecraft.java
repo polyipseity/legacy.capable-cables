@@ -29,6 +29,7 @@ import $group__.ui.mvvm.views.components.common.UIComponentButton;
 import $group__.ui.mvvm.views.components.extensions.UIExtensionCursorHandleProviderComponent;
 import $group__.ui.parsers.components.UIDOMPrototypeParser;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.extensions.IExtensionContainer;
@@ -37,6 +38,7 @@ import $group__.utilities.structures.NamespacePrefixedString;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -160,7 +162,7 @@ public enum UIDebugMinecraft {
 			public void render(C container, EnumRenderStage stage, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks) {
 				super.render(container, stage, stack, cursorPosition, partialTicks);
 				if (stage == EnumRenderStage.PRE_CHILDREN) {
-					AffineTransform transform = stack.getDelegated().peek();
+					AffineTransform transform = AssertionUtilities.assertNonnull(stack.getDelegated().peek());
 					Shape transformed = transform.createTransformedShape(new Ellipse2D.Double(
 							cursorPosition.getX() - CURSOR_SHAPE_RADIUS, cursorPosition.getY() - CURSOR_SHAPE_RADIUS,
 							CURSOR_SHAPE_RADIUS << 1, CURSOR_SHAPE_RADIUS << 1));
@@ -250,10 +252,8 @@ public enum UIDebugMinecraft {
 		private enum Type {
 			;
 
-			private static final ContainerType<DebugContainer> INSTANCE = IForgeContainerType.create((windowId, inv, data) -> {
-				assert net.minecraft.client.Minecraft.getInstance().world != null;
-				return new DebugContainer(windowId, net.minecraft.client.Minecraft.getInstance().world, data.readBlockPos());
-			});
+			private static final ContainerType<DebugContainer> INSTANCE = IForgeContainerType.create((windowId, inv, data) ->
+					new DebugContainer(windowId, AssertionUtilities.assertNonnull(Minecraft.getInstance().world), data.readBlockPos()));
 		}
 	}
 

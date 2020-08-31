@@ -7,10 +7,7 @@ import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilder;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilderFactory;
 import $group__.ui.core.structures.shapes.interactions.IShapeConstraint;
 import $group__.ui.structures.shapes.interactions.ShapeConstraint;
-import $group__.utilities.DOMUtilities;
-import $group__.utilities.DynamicUtilities;
-import $group__.utilities.NumberUtilities;
-import $group__.utilities.ThrowableUtilities;
+import $group__.utilities.*;
 import $group__.utilities.client.AffineTransformUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamedNodeMapMap;
@@ -20,7 +17,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import javax.annotation.Nullable;
@@ -71,17 +67,11 @@ public class ShapeDescriptorPrototype
 	protected static ShapeDescriptorPrototype create(Map<String, String> aliases, @Nullable String namespaceURI, Node node)
 			throws ClassNotFoundException {
 		// COMMENT attributes
-		@Nullable NamedNodeMap nodeAs = node.getAttributes();
-		assert nodeAs != null;
 		Map<String, Number> attributes = ImmutableMap.copyOf(
 				Maps.filterValues(
-						Maps.transformValues(NamedNodeMapMap.wrap(nodeAs), a -> {
-							assert a != null;
-							@Nullable String av = a.getNodeValue();
-							assert av != null;
-							return NumberUtilities.tryParseDouble(av)
-									.orElse(null);
-						}),
+						Maps.transformValues(NamedNodeMapMap.wrap(AssertionUtilities.assertNonnull(node.getAttributes())), a ->
+								NumberUtilities.tryParseDouble(AssertionUtilities.assertNonnull(AssertionUtilities.assertNonnull(a).getNodeValue()))
+										.orElse(null)),
 						Objects::nonNull));
 
 		// COMMENT transform
@@ -93,21 +83,16 @@ public class ShapeDescriptorPrototype
 							.map(Node::getAttributes)
 							.ifPresent(vAs -> {
 								NamedNodeMapMap.wrap(vAs)
-										.forEach((s, a) -> Optional.ofNullable(TRANSFORM_INDEX_MAP.get(s))
-												.ifPresent(i -> {
-													@Nullable String av = a.getNodeValue();
-													assert av != null;
-													fm[i] = Double.parseDouble(av);
-												}));
+										.forEach((s, a) ->
+												Optional.ofNullable(TRANSFORM_INDEX_MAP.get(s))
+														.ifPresent(i -> fm[i] = Double.parseDouble(AssertionUtilities.assertNonnull(a.getNodeValue()))));
 								transform.setTransform(new AffineTransform(fm));
 							});
 					DOMUtilities.getChildrenByTagNameNS(nt, namespaceURI, "operation")
 							.forEach(op -> {
-								@Nullable String opv = op.getTextContent();
-								assert opv != null;
 								Double[] args = Arrays.stream(
-										opv.split(Pattern.quote(DOMUtilities.getAttributeValue(op, "delimiter")
-												.orElseThrow(InternalError::new))))
+										AssertionUtilities.assertNonnull(op.getTextContent()).split(Pattern.quote(DOMUtilities.getAttributeValue(op, "delimiter")
+												.orElseThrow(InternalError::new)))).sequential()
 										.map(Double::parseDouble)
 										.toArray(Double[]::new);
 								ThrowableUtilities.Try.run(() ->

@@ -52,7 +52,7 @@ public class UIDOMPrototypeParser<T extends IUIComponentManager<?>>
 
 	protected final ConcurrentMap<INamespacePrefixedString, BiFunction<? super IUIDOMPrototypeParser<?>, ? super Node, ? extends IGeneralPrototype>> visitors =
 			MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap();
-	protected ConcurrentMap<String, String> aliases = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
+	protected final ConcurrentMap<String, String> aliases = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 	@Nullable
 	protected UIComponentPrototype prototype;
 
@@ -152,7 +152,7 @@ public class UIDOMPrototypeParser<T extends IUIComponentManager<?>>
 				.orElseThrow(() -> new IllegalStateException("Prototype has not been created"));
 	}
 
-	protected Optional<UIComponentPrototype> getPrototype() { return Optional.ofNullable(prototype); }
+	protected Optional<? extends UIComponentPrototype> getPrototype() { return Optional.ofNullable(prototype); }
 
 	protected void setPrototype(@Nullable UIComponentPrototype prototype) { this.prototype = prototype; }
 }

@@ -45,28 +45,28 @@ public class ShapeConstraintSupplier
 	}
 
 	@Override
-	public Optional<Double> getMinX() { return Optional.ofNullable(getMinXSupplier().get()); }
+	public Optional<? extends Double> getMinX() { return Optional.ofNullable(getMinXSupplier().get()); }
 
 	@Override
-	public Optional<Double> getMinY() { return Optional.ofNullable(getMinYSupplier().get()); }
+	public Optional<? extends Double> getMinY() { return Optional.ofNullable(getMinYSupplier().get()); }
 
 	@Override
-	public Optional<Double> getMaxX() { return Optional.ofNullable(getMaxXSupplier().get()); }
+	public Optional<? extends Double> getMaxX() { return Optional.ofNullable(getMaxXSupplier().get()); }
 
 	@Override
-	public Optional<Double> getMaxY() { return Optional.ofNullable(getMaxYSupplier().get()); }
+	public Optional<? extends Double> getMaxY() { return Optional.ofNullable(getMaxYSupplier().get()); }
 
 	@Override
-	public Optional<Double> getMinWidth() { return Optional.ofNullable(getMinWidthSupplier().get()); }
+	public Optional<? extends Double> getMinWidth() { return Optional.ofNullable(getMinWidthSupplier().get()); }
 
 	@Override
-	public Optional<Double> getMinHeight() { return Optional.ofNullable(getMinHeightSupplier().get()); }
+	public Optional<? extends Double> getMinHeight() { return Optional.ofNullable(getMinHeightSupplier().get()); }
 
 	@Override
-	public Optional<Double> getMaxWidth() { return Optional.ofNullable(getMaxWidthSupplier().get()); }
+	public Optional<? extends Double> getMaxWidth() { return Optional.ofNullable(getMaxWidthSupplier().get()); }
 
 	@Override
-	public Optional<Double> getMaxHeight() { return Optional.ofNullable(getMaxHeightSupplier().get()); }
+	public Optional<? extends Double> getMaxHeight() { return Optional.ofNullable(getMaxHeightSupplier().get()); }
 
 	@Override
 	public ShapeConstraintSupplier copy() {

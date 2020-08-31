@@ -67,7 +67,7 @@ public enum GLUtilities {
 		}
 
 		public static void clearAll() {
-			STACKS.keySet().forEach(GLStacksUtilities::clear);
+			STACKS.keySet().stream().unordered().forEach(GLStacksUtilities::clear);
 			STACKS.clear();
 		}
 

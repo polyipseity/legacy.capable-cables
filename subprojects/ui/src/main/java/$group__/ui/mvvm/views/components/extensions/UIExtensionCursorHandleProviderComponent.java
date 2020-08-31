@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 
 import java.awt.geom.Point2D;
 import java.util.Optional;
+import java.util.function.Function;
 
 public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent<?, ?>>
 		extends ExtensionContainerAware<INamespacePrefixedString, IUIView<?>, E>
@@ -26,22 +27,23 @@ public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent
 	}
 
 	@Override
-	public Optional<Long> getCursorHandle(Point2D cursorPosition) {
-		return getContainer().map(c -> {
-			Optional<Long> ret = Optional.empty();
-			IUIComponentPath cp = c.getManager().getPathResolver().resolvePath(cursorPosition, true);
-			try (IAffineTransformStack stack = cp.getTransformStackView()) {
-				for (IUIComponent e : Lists.reverse(cp.asList())) {
-					if ((ret = CastUtilities.castChecked(IUIComponentCursorHandleProvider.class, e)
-							.flatMap(ec -> ec.getCursorHandle(stack, cursorPosition)))
-							.isPresent())
-						break;
-					if (!stack.isClean())
-						stack.getDelegated().pop();
-				}
-			}
-			return ret;
-		}).orElseGet(Optional::empty);
+	public Optional<? extends Long> getCursorHandle(Point2D cursorPosition) {
+		return getContainer()
+				.flatMap(c -> {
+					Optional<Long> ret = Optional.empty();
+					IUIComponentPath cp = c.getManager().getPathResolver().resolvePath(cursorPosition, true);
+					try (IAffineTransformStack stack = cp.getTransformStackView()) {
+						for (IUIComponent e : Lists.reverse(cp.asList())) {
+							if ((ret = CastUtilities.castChecked(IUIComponentCursorHandleProvider.class, e)
+									.flatMap(ec -> ec.getCursorHandle(stack, cursorPosition).map(Function.identity())))
+									.isPresent())
+								break;
+							if (!stack.isClean())
+								stack.getDelegated().pop();
+						}
+					}
+					return ret;
+				});
 	}
 
 	@Override

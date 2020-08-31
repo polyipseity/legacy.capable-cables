@@ -8,6 +8,8 @@ public enum CastUtilities {
 
 	public static <T> T castUnchecked(Object obj) { return AssertionUtilities.assertNonnull(castUncheckedNullable(obj)); }
 
+	public static <T> T upcast(T obj) { return obj; }
+
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public static <T> T castUncheckedNullable(@Nullable Object obj) { return (T) obj; }

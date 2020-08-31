@@ -1,6 +1,7 @@
 package $group__.ui.core.mvvm.binding;
 
 import $group__.utilities.CapacityUtilities;
+import $group__.utilities.CastUtilities;
 import $group__.utilities.DynamicUtilities;
 import $group__.utilities.MapUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
@@ -19,11 +20,12 @@ import java.util.function.Function;
 /**
  * Not thread-safe.
  */
+@SuppressWarnings("UnusedReturnValue")
 public interface IBinder {
 	static <B extends IHasBindingKey> Multimap<INamespacePrefixedString, B> sortAndTrimBindings(Iterable<B> bindings) {
 		@SuppressWarnings("UnstableApiUsage") Multimap<INamespacePrefixedString, B> ret = MultimapBuilder
-				.hashKeys(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)
-				.hashSetValues(CapacityUtilities.INITIAL_CAPACITY_TINY).build();
+				.linkedHashKeys(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)
+				.linkedHashSetValues(CapacityUtilities.INITIAL_CAPACITY_TINY).build(); // COMMENT order is important
 		bindings.forEach(f -> f.getBindingKey().ifPresent(rl -> ret.put(rl, f)));
 		return ret;
 	}
@@ -53,12 +55,14 @@ public interface IBinder {
 		};
 	}
 
-	@SuppressWarnings("unchecked")
-	static <T, R> Optional<Function<T, R>> getTransformer(Map<Class<?>, Map<Class<?>, Function<?, ?>>> transformers, Class<T> from, Class<R> to) {
-		// COMMENT should be of the right type
-		return from.equals(to) ? Optional.of(t -> (R) t) :
-				Optional.ofNullable(transformers.get(from))
-						.map(m -> (Function<T, R>) m.get(to));
+	@Nullable
+	static <T, R> R transform(Map<Class<?>, Map<Class<?>, Function<?, ?>>> transformers, @Nullable T value, Class<T> from, Class<R> to)
+			throws BindingTransformerNotFoundException {
+		return IBinder.getTransformer(transformers, from, to)
+				.map(t -> t.apply(value))
+				.orElseThrow(() -> new BindingTransformerNotFoundException(
+						"Cannot find transformer for '" + from + "' -> '" + to + "' in transformers:" + System.lineSeparator()
+								+ transformers));
 	}
 
 	boolean bindFields(Iterable<? extends IBindingField<?>> fields)
@@ -81,15 +85,12 @@ public interface IBinder {
 
 	static Optional<Class<?>>[] resolveFunctionTypes(Function<?, ?> transformer) { return DynamicUtilities.Extensions.wrapTypeResolverResults(TypeResolver.resolveRawArguments(Function.class, transformer.getClass())); }
 
-	@Nullable
-	static <T, R> R transform(Map<Class<?>, Map<Class<?>, Function<?, ?>>> transformers, @Nullable T value, Class<T> from, Class<R> to)
-			throws BindingTransformerNotFoundException {
-		Optional<? extends Function<T, R>> ts = IBinder.getTransformer(transformers, from, to);
-		if (!ts.isPresent())
-			throw new BindingTransformerNotFoundException(
-					"Cannot find transformer for '" + from + "' -> '" + to + "' in transformers:" + System.lineSeparator()
-							+ transformers);
-		return ts.get().apply(value);
+	@SuppressWarnings("unchecked")
+	static <T, R> Optional<Function<T, R>> getTransformer(Map<Class<?>, Map<Class<?>, Function<?, ?>>> transformers, Class<T> from, Class<R> to) {
+		// COMMENT should be of the right type
+		return from.equals(to) ? Optional.of(CastUtilities::castUncheckedNullable) :
+				Optional.ofNullable(transformers.get(from))
+						.map(m -> (Function<T, R>) m.get(to));
 	}
 
 	boolean bindMethods(Iterable<? extends IBindingMethod<?>> methods);

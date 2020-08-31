@@ -1,6 +1,8 @@
 package $group__.ui.mvvm.structures;
 
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
+import $group__.utilities.AssertionUtilities;
+import $group__.utilities.CastUtilities;
 import $group__.utilities.ObjectUtilities;
 import sun.misc.Cleaner;
 
@@ -23,16 +25,19 @@ public class AffineTransformStack implements IAffineTransformStack {
 	public Stack<AffineTransform> getDelegated() { return delegated; }
 
 	@Override
-	@SuppressWarnings("UnusedReturnValue")
-	public AffineTransform push() { return getDelegated().push((AffineTransform) getDelegated().peek().clone()); }
-
-	@Override
 	public AffineTransformStack copy() {
 		AffineTransformStack ret = new AffineTransformStack();
 		ret.getDelegated().clear();
-		getDelegated().forEach(t -> ret.getDelegated().add((AffineTransform) t.clone()));
+		getDelegated().stream().sequential()
+				.map(AffineTransform::clone)
+				.map(CastUtilities::<AffineTransform>castUnchecked)
+				.forEachOrdered(ret.getDelegated()::add);
 		return ret;
 	}
+
+	@Override
+	@SuppressWarnings("UnusedReturnValue")
+	public AffineTransform push() { return getDelegated().push((AffineTransform) AssertionUtilities.assertNonnull(getDelegated().peek()).clone()); }
 
 	@Override
 	public int hashCode() { return ObjectUtilities.hashCode(this, null, OBJECT_VARIABLES); }

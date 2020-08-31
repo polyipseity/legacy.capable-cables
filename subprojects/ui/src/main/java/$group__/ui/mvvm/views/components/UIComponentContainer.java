@@ -9,6 +9,7 @@ import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.events.EnumEventHookStage;
@@ -16,7 +17,6 @@ import $group__.utilities.events.EventUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import com.google.common.collect.ImmutableList;
 
-import javax.annotation.Nullable;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ public class UIComponentContainer
 	@Override
 	public void transformChildren(IAffineTransformStack stack) {
 		Rectangle2D bounds = getShapeDescriptor().getShapeOutput().getBounds2D();
-		stack.getDelegated().peek().translate(bounds.getX(), bounds.getY());
+		AssertionUtilities.assertNonnull(stack.getDelegated().peek()).translate(bounds.getX(), bounds.getY());
 	}
 
 	@Override
@@ -55,11 +55,8 @@ public class UIComponentContainer
 			ret = EventUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 						getChildren().add(index, component);
 						List<IUIComponent> childrenMoved = getChildren().subList(index + 1, getChildren().size());
-						for (int i = 0; i < childrenMoved.size(); i++) {
-							@Nullable IUIComponent cm = childrenMoved.get(i);
-							assert cm != null;
-							cm.onIndexMove(index + i, index + i + 1);
-						}
+						for (int i = 0; i < childrenMoved.size(); i++)
+							AssertionUtilities.assertNonnull(childrenMoved.get(i)).onIndexMove(index + i, index + i + 1);
 						component.onParentChange(null, this);
 						return true;
 					},
@@ -81,11 +78,8 @@ public class UIComponentContainer
 				ret |= EventUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 							getChildren().remove(component);
 							List<IUIComponent> childrenMoved = getChildren().subList(index, getChildren().size());
-							for (int i = 0; i < childrenMoved.size(); i++) {
-								@Nullable IUIComponent cm = childrenMoved.get(i);
-								assert cm != null;
-								cm.onIndexMove(index + i + 1, index + i);
-							}
+							for (int i = 0; i < childrenMoved.size(); i++)
+								AssertionUtilities.assertNonnull(childrenMoved.get(i)).onIndexMove(index + i + 1, index + i);
 							component.onParentChange(this, null);
 							return true;
 						},
@@ -109,18 +103,12 @@ public class UIComponentContainer
 					List<IUIComponent> childrenMoved;
 					if (index > previous) {
 						childrenMoved = getChildren().subList(previous, index);
-						for (int i = 0; i < childrenMoved.size(); i++) {
-							@Nullable IUIComponent cm = childrenMoved.get(i);
-							assert cm != null;
-							cm.onIndexMove(previous + i + 1, previous + i);
-						}
+						for (int i = 0; i < childrenMoved.size(); i++)
+							AssertionUtilities.assertNonnull(childrenMoved.get(i)).onIndexMove(previous + i + 1, previous + i);
 					} else {
 						childrenMoved = getChildren().subList(index + 1, previous + 1);
-						for (int i = 0; i < childrenMoved.size(); i++) {
-							@Nullable IUIComponent cm = childrenMoved.get(i);
-							assert cm != null;
-							cm.onIndexMove(index + i, index + i + 1);
-						}
+						for (int i = 0; i < childrenMoved.size(); i++)
+							AssertionUtilities.assertNonnull(childrenMoved.get(i)).onIndexMove(index + i, index + i + 1);
 					}
 					component.onIndexMove(previous, index);
 					return true;

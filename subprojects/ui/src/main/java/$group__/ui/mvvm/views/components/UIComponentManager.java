@@ -99,7 +99,7 @@ public class UIComponentManager<S extends Shape>
 									}
 									return ret;
 								}, LOGGER)),
-								(t, i) -> IUIExtensionCache.IType.invalidate(i, t.getKey()),
+								(t, i) -> IUIExtensionCache.IType.invalidateImpl(i, t.getKey()),
 								t -> ImmutableList.of(new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
 									@Override
 									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
@@ -135,7 +135,7 @@ public class UIComponentManager<S extends Shape>
 									}
 									return ret;
 								}, LOGGER)),
-								(t, i) -> IUIExtensionCache.IType.invalidate(i, t.getKey()),
+								(t, i) -> IUIExtensionCache.IType.invalidateImpl(i, t.getKey()),
 								t -> ImmutableList.of(new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
 									@Override
 									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)

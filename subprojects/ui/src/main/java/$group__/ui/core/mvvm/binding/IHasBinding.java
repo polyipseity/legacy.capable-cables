@@ -30,6 +30,7 @@ public interface IHasBinding {
 	static <T> IBindingField<T> createBindingField(Class<T> clazz,
 	                                               @Nullable IUIPropertyMappingValue mapping,
 	                                               Function<? super Node, ? extends Optional<? extends T>> deserializer, Supplier<T> defaultValue) {
+		// TODO nullable default value
 		return new BindingField<>(
 				Optional.ofNullable(mapping)
 						.flatMap(IUIPropertyMappingValue::getBindingKey)

@@ -1,5 +1,6 @@
 package $group__.utilities.events;
 
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.ThrowableUtilities;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -19,11 +20,7 @@ public class EventBusForge
 	private static final ThreadLocal<Subject<Event>> MOD_EVENT_BUS = ThreadLocal.withInitial(() ->
 			new EventBusForge(Bus.MOD.bus().get()));
 
-	public static Subject<Event> getModEventBus() {
-		@Nullable Subject<Event> ret = MOD_EVENT_BUS.get();
-		assert ret != null;
-		return ret;
-	}
+	public static Subject<Event> getModEventBus() { return AssertionUtilities.assertNonnull(MOD_EVENT_BUS.get()); }
 
 	protected final IEventBus delegated;
 

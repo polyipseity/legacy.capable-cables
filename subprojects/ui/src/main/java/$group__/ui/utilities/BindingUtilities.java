@@ -139,6 +139,7 @@ public enum BindingUtilities {
 
 		private static final Logger LOGGER = LogManager.getLogger();
 
+		// TODO some values are nullable
 		public static <T> Optional<T> warnIfNotPresent(@SuppressWarnings("OptionalUsedAsFieldOrParameterType") Optional<T> optional, Node node) {
 			if (!optional.isPresent())
 				LOGGER.warn(() -> LoggerUtilities.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(

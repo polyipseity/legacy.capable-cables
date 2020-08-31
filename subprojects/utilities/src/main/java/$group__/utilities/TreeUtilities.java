@@ -33,16 +33,19 @@ public enum TreeUtilities {
 	                                                      Function<? super T, ? extends Iterable<? extends T>> splitter,
 	                                                      @Nullable BiFunction<? super R, ? super Iterable<R>, ? extends R> combiner,
 	                                                      @Nullable Consumer<? super T> repeater) {
+		boolean shouldCombine = combiner != null;
 		Stack<Iterator<? extends T>> stackSplitter = new Stack<>();
-		Optional<Stack<Deque<R>>> stackCombiner = Optional.ofNullable(combiner).map(c -> new Stack<>());
+		@Nullable Stack<Deque<R>> stackCombiner = shouldCombine ? new Stack<>() : null;
 		Set<T> visited = new HashSet<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
 
 		stackSplitter.push(Iterators.forArray(obj));
-		stackCombiner.ifPresent(s -> s.push(new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_SMALL)));
+		if (shouldCombine)
+			stackCombiner.push(new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_SMALL));
 
 		while (!stackSplitter.isEmpty()) {
-			Iterator<? extends T> frameSplitter = stackSplitter.peek();
-			Optional<Deque<R>> frameCombiner = stackCombiner.map(Stack::peek);
+			Iterator<? extends T> frameSplitter = AssertionUtilities.assertNonnull(stackSplitter.peek());
+			@Nullable Deque<R> frameCombiner = shouldCombine ? stackCombiner.peek() : null;
+			assert !shouldCombine || frameCombiner != null;
 			if (frameSplitter.hasNext()) {
 				T current = frameSplitter.next();
 				if (!visited.add(current)) {
@@ -50,26 +53,28 @@ public enum TreeUtilities {
 						repeater.accept(current);
 				} else {
 					R currentRet = function.apply(current);
-					frameCombiner.ifPresent(f -> {
-						f.add(currentRet);
-						stackCombiner.orElseThrow(InternalError::new).push(new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM));
-					});
+					if (shouldCombine) {
+						frameCombiner.add(currentRet);
+						stackCombiner.push(new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM));
+					}
 					stackSplitter.push(splitter.apply(current).iterator());
 				}
 			} else {
 				stackSplitter.pop();
-				stackCombiner.ifPresent(s -> {
-					Deque<R> ret = s.pop();
-					if (s.isEmpty()) {
-						s.push(ret);
-						return;
+				if (shouldCombine) {
+					Deque<R> ret = stackCombiner.pop();
+					if (stackCombiner.isEmpty())
+						stackCombiner.push(ret);
+					else {
+						Deque<R> frameCombinerParent = AssertionUtilities.assertNonnull(stackCombiner.peek());
+						frameCombinerParent.addLast(combiner.apply(frameCombinerParent.removeLast(), frameCombiner));
 					}
-					Deque<R> frameCombinerParent = s.peek();
-					frameCombinerParent.addLast(combiner.apply(frameCombinerParent.removeLast(), frameCombiner.orElseThrow(InternalError::new)));
-				});
+				}
 			}
 		}
-		return stackCombiner.map(Stack::peek).map(Deque::getFirst);
+		return Optional.ofNullable(stackCombiner)
+				.map(Stack::peek)
+				.map(Deque::getFirst);
 	}
 
 	@SuppressWarnings("ObjectAllocationInLoop")
@@ -78,25 +83,30 @@ public enum TreeUtilities {
 	                                                        Function<? super T, ? extends Iterable<? extends T>> splitter,
 	                                                        @Nullable BiFunction<? super R, ? super Iterable<R>, ? extends R> combiner,
 	                                                        @Nullable Consumer<? super T> repeater) {
+		boolean shouldCombine = combiner != null;
 		List<T>
 				frameSplitter = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM),
 				frameSplitterNext = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM);
-		Optional<Stack<List<R>>> stackCombiner = Optional.ofNullable(combiner).map(c -> new Stack<>());
+		@Nullable Stack<List<R>> stackCombiner = shouldCombine ? new Stack<>() : null;
 		Set<T> visited = new HashSet<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
-		Optional<List<Runnable>>
-				combinerActions = Optional.ofNullable(combiner).map(c -> new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE)),
-				frameCombinerActions = Optional.ofNullable(combiner).map(c -> new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM));
+		@Nullable List<Runnable>
+				combinerActions = shouldCombine ? new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE) : null,
+				frameCombinerActions = shouldCombine ? new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE) : null;
 
 		frameSplitter.add(obj);
-		stackCombiner.ifPresent(s -> s.push(new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)));
+		if (shouldCombine)
+			stackCombiner.push(new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM));
 
 		while (!frameSplitter.isEmpty()) {
-			Optional<List<R>> frameCombiner = stackCombiner.map(Stack::peek);
-			stackCombiner.ifPresent(s -> s.push(new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)));
+			@Nullable List<R> frameCombiner = shouldCombine ? stackCombiner.peek() : null;
+			assert !shouldCombine || frameCombiner != null;
+			if (shouldCombine)
+				stackCombiner.push(new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM));
 			int nodeIndex = 0, childrenFlatIndex = 0;
 			for (T n : frameSplitter) {
 				R currentRet = function.apply(n);
-				frameCombiner.ifPresent(f -> f.add(currentRet));
+				if (shouldCombine)
+					frameCombiner.add(currentRet);
 				int childrenFlatIndexStart = childrenFlatIndex;
 				for (Iterator<? extends T> iterator = splitter.apply(n).iterator(); iterator.hasNext(); ++childrenFlatIndex) {
 					T c = iterator.next();
@@ -108,24 +118,26 @@ public enum TreeUtilities {
 				}
 
 				final int nodeIndexCopy = nodeIndex, childrenFlatIndexCopy = childrenFlatIndex;
-				stackCombiner.ifPresent(s -> {
-					List<R> frameCombinerChildren = s.peek(),
-							frameCombinerUnboxed = frameCombiner.orElseThrow(InternalError::new);
-					frameCombinerActions.orElseThrow(InternalError::new).add(0, () ->
-							frameCombinerUnboxed.add(combiner.apply(frameCombinerUnboxed.remove(nodeIndexCopy),
+				if (shouldCombine) {
+					List<R> frameCombinerChildren = AssertionUtilities.assertNonnull(stackCombiner.peek());
+					frameCombinerActions.add(0, () ->
+							frameCombiner.add(combiner.apply(frameCombiner.remove(nodeIndexCopy),
 									frameCombinerChildren.subList(childrenFlatIndexStart, childrenFlatIndexCopy))));
-				});
+				}
 				++nodeIndex;
 			}
 			frameSplitter = MiscellaneousUtilities.k(frameSplitterNext, frameSplitterNext = frameSplitter);
 			frameSplitterNext.clear();
-			frameCombinerActions.ifPresent(c -> {
-				combinerActions.orElseThrow(InternalError::new).addAll(c);
-				c.clear();
-			});
+			if (shouldCombine) {
+				combinerActions.addAll(frameCombinerActions);
+				frameCombinerActions.clear();
+			}
 		}
-		combinerActions.ifPresent(c -> Lists.reverse(c).forEach(Runnable::run));
-		return stackCombiner.map(Stack::peek).map(l -> l.get(0));
+		if (shouldCombine)
+			Lists.reverse(combinerActions).forEach(Runnable::run);
+		return Optional.ofNullable(stackCombiner)
+				.map(Stack::peek)
+				.map(l -> l.get(0));
 	}
 
 	public enum EnumStrategy {

@@ -5,6 +5,9 @@
 	<item name='java.util.concurrent.atomic.AtomicReference V getAndSet(V)'>
 		<annotation name='javax.annotation.Nullable'/>
 	</item>
+	<item name='java.util.concurrent.atomic.AtomicReference V getAndUpdate(java.util.function.UnaryOperator&lt;V&gt;)'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
 	<item name='java.util.concurrent.atomic.AtomicReference void set(V) 0'>
 		<annotation name='javax.annotation.Nullable'/>
 	</item>

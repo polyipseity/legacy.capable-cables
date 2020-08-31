@@ -22,7 +22,7 @@ public interface IExtension<K, C extends IExtensionContainer<? super K>> extends
 	IType<? extends K, ?, ? extends C> getType();
 
 	interface IType<K, V, I extends IExtensionContainer<?>> {
-		Optional<V> get(I instance);
+		Optional<? extends V> get(I instance);
 
 		K getKey();
 
@@ -37,7 +37,7 @@ public interface IExtension<K, C extends IExtensionContainer<? super K>> extends
 			}
 
 			@Override
-			public Optional<V> get(I instance) { return getGetter().apply(this, instance).map(Function.identity()); }
+			public Optional<? extends V> get(I instance) { return getGetter().apply(this, instance).map(Function.identity()); }
 
 			@Override
 			public K getKey() { return key; }

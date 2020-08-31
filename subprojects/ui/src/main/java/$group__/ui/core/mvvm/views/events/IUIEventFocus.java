@@ -16,5 +16,5 @@ public interface IUIEventFocus extends IUIEvent {
 			TYPE_FOCUS_IN_PRE = new NamespacePrefixedString(TYPE_FOCUS_IN_PRE_STRING),
 			TYPE_FOCUS_OUT_PRE = new NamespacePrefixedString(TYPE_FOCUS_OUT_PRE_STRING);
 
-	Optional<IUIEventTarget> getRelatedTarget();
+	Optional<? extends IUIEventTarget> getRelatedTarget();
 }

@@ -41,11 +41,13 @@ public enum RegistrableUtilities {
 		;
 
 		public static boolean setTagIfNotEmpty(CompoundNBT p, String k, CompoundNBT v) {
-			if (v.size() == 0) return false;
+			if (v.isEmpty())
+				return false;
 			p.put(k, v);
 			return true;
 		}
 
+		@SuppressWarnings("UnusedReturnValue")
 		public static <T> boolean setChildIfNotNull(CompoundNBT p, String k, @Nullable T v, TriConsumer<CompoundNBT, String, ? super T> c) {
 			if (v == null) return false;
 			c.accept(p, k, v);
@@ -54,12 +56,11 @@ public enum RegistrableUtilities {
 
 		public static <T> Optional<T> readChildIfHasKey(@Nullable CompoundNBT p, String key, Supplier<? extends INBT> type,
 		                                                BiFunction<CompoundNBT, String, T> f) {
-			if (p != null && p.contains(key, type.get().getId())) return Optional.of(f.apply(p, key));
-			return Optional.empty();
+			return Optional.ofNullable(p)
+					.filter(pt -> pt.contains(key, type.get().getId()))
+					.map(pt -> f.apply(pt, key));
 		}
 
-		public static Optional<CompoundNBT> returnTagIfNotEmpty(CompoundNBT p) {
-			return p.isEmpty() ? Optional.empty() : Optional.of(p);
-		}
+		public static Optional<CompoundNBT> returnTagIfNotEmpty(CompoundNBT p) { return Optional.of(p).filter(t -> !t.isEmpty()); }
 	}
 }

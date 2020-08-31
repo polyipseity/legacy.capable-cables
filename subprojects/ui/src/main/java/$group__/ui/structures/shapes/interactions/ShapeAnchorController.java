@@ -8,7 +8,9 @@ import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CollectionUtilities;
 import $group__.utilities.MapUtilities;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Streams;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
@@ -27,21 +29,27 @@ public class ShapeAnchorController<T extends IShapeDescriptorProvider>
 
 	@Override
 	public boolean addAnchors(T origin, Iterable<? extends IShapeAnchor> anchors) {
-		boolean ret = getAnchorSet(origin).addAnchors(anchors);
-		anchors.forEach(a ->
-				a.getTarget().ifPresent(t ->
-						getSubscribers(t).add(a)));
-		anchors.forEach(a ->
-				a.anchor(origin));
+		IShapeAnchorSet as = getAnchorSet(origin);
+		boolean ret = as.addAnchors(anchors);
+		as.getAnchorsView().values().stream().unordered()
+				.forEach(a ->
+						a.getTarget().ifPresent(t ->
+								getSubscribers(t).add(a)));
+		as.anchor(origin);
 		return ret;
 	}
 
+	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public boolean removeAnchors(T origin, Iterable<? extends IShapeAnchor> anchors) {
-		boolean ret = getAnchorSet(origin).removeAnchors(anchors);
-		anchors.forEach(a ->
-				a.getTarget().ifPresent(t ->
-						getSubscribers(t).remove(a)));
+		IShapeAnchorSet as = getAnchorSet(origin);
+		boolean ret = as.removeAnchors(anchors);
+		Streams.stream(anchors).unordered()
+				.forEach(a ->
+						a.getTarget().ifPresent(t ->
+								getSubscribers(t).remove(a)));
+		if (as.isEmpty())
+			removeAnchorSet(origin);
 		return ret;
 	}
 
@@ -51,6 +59,18 @@ public class ShapeAnchorController<T extends IShapeDescriptorProvider>
 			getAnchorSetsInverse().put(v, k);
 			return v;
 		});
+	}
+
+	@SuppressWarnings("UnusedReturnValue")
+	protected boolean removeAnchorSet(T origin) {
+		@Nullable IShapeAnchorSet v = getAnchorSets().remove(origin);
+		if (v != null) {
+			if (getAnchorSetsInverse().remove(v) != null)
+				return true;
+			assert false;
+			return false;
+		}
+		return false;
 	}
 
 	protected Set<IShapeAnchor> getSubscribers(IShapeDescriptorProvider notifier) {

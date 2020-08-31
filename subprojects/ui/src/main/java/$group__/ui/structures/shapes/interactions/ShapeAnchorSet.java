@@ -7,6 +7,7 @@ import $group__.ui.structures.EnumUISide;
 import $group__.utilities.MapUtilities;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
+import com.google.common.collect.Streams;
 
 import java.util.Map;
 import java.util.Optional;
@@ -43,14 +44,17 @@ public class ShapeAnchorSet
 	@Override
 	public Map<? extends EnumUISide, ? extends IShapeAnchor> getAnchorsView() { return ImmutableMap.copyOf(getAnchors()); }
 
+	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public boolean removeSides(Iterable<? extends EnumUISide> sides) {
-		final boolean[] ret = {false};
-		sides.forEach(side -> {
-			Optional.ofNullable(getAnchors().remove(side)).ifPresent(IShapeAnchor::onContainerRemoved);
-			ret[0] = true;
-		});
-		return ret[0];
+		return Streams.stream(sides).unordered()
+				.reduce(false, (r, side) ->
+						Optional.ofNullable(getAnchors().remove(side))
+								.filter(a -> {
+									a.onContainerRemoved();
+									return true;
+								})
+								.isPresent() || r, Boolean::logicalOr);
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")

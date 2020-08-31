@@ -60,7 +60,7 @@ public enum ThrowableUtilities {
 			else throw propagate(retrieve().orElseThrow(InternalError::new));
 		}
 
-		public static Optional<Throwable> retrieve() { return Optional.ofNullable(CAUGHT_THROWABLE.get()); }
+		public static Optional<? extends Throwable> retrieve() { return Optional.ofNullable(CAUGHT_THROWABLE.get()); }
 
 		public static void acceptIfCaught(Consumer<? super Throwable> consumer) {
 			if (caught()) consumer.accept(retrieve().orElseThrow(InternalError::new));

@@ -18,5 +18,5 @@ public interface IUIView<S extends Shape>
 		extends IUICommon, IUIReshapeExplicitly<S>, IHasBinding, IExtensionContainer<INamespacePrefixedString> {
 	IUIEventTarget getTargetAtPoint(Point2D point);
 
-	Optional<IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next);
+	Optional<? extends IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next);
 }

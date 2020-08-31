@@ -44,14 +44,17 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	public IAffineTransformStack getCleanTransformStack() { return getManager().getCleanTransformStack(); }
 
 	@Override
-	public Optional<IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) {
-		return CastUtilities.castChecked(IUIComponent.class, currentFocus)
-				.<Optional<IUIEventTarget>>map(cf ->
+	public Optional<? extends IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) {
+		@Nullable IUIEventTarget ret = CastUtilities.castChecked(IUIComponent.class, currentFocus)
+				.flatMap(cf ->
 						UIComponentManager.CacheManager.CHILDREN_FLAT_FOCUSABLE.getValue().get(getManager())
 								.filter(f -> !f.isEmpty())
 								.map(f -> f.get(Math.floorMod(
 										Math.max(f.indexOf(cf), 0) + (next ? 1 : -1), f.size()))))
-				.orElseGet(() -> Optional.of(getManager()));
+				.orElse(null);
+		if (ret == null)
+			ret = getManager();
+		return Optional.of(ret);
 	}
 
 	@SuppressWarnings("UnstableApiUsage")

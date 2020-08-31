@@ -1,12 +1,11 @@
 package $group__.utilities.structures;
 
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.LoggerUtilities;
 import $group__.utilities.MapUtilities;
-import $group__.utilities.StreamUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -40,9 +39,7 @@ public abstract class Registry<K, V> {
 			return v;
 		}) == null)
 			getDelegated().put(key, retRef.accumulateAndGet(new RegistryObject<>(value), (vp, vn) -> vn));
-		@Nullable RegistryObject<VL> ret = retRef.get();
-		assert ret != null;
-		return ret;
+		return AssertionUtilities.assertNonnull(retRef.get());
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
@@ -52,11 +49,11 @@ public abstract class Registry<K, V> {
 
 	public Logger getLogger() { return logger; }
 
-	public Optional<RegistryObject<? extends V>> get(K key) { return Optional.ofNullable(getDelegated().get(key)); }
+	public Optional<? extends RegistryObject<? extends V>> get(K key) { return Optional.ofNullable(getDelegated().get(key)); }
 
 	public boolean containsKey(K key) { return getDelegated().containsKey(key); }
 
-	public boolean containsValue(V value) { return StreamUtilities.streamSmart(getDelegated().values(), 1).anyMatch(o -> o.getValue().equals(value)); }
+	public boolean containsValue(V value) { return getDelegated().values().stream().unordered().anyMatch(o -> o.getValue().equals(value)); }
 
 	public static final class RegistryObject<V> {
 		protected V value;

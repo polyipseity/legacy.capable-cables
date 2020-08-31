@@ -5,5 +5,5 @@ import java.util.Optional;
 
 @FunctionalInterface
 public interface ICursorHandleProvider {
-	Optional<Long> getCursorHandle(Point2D cursorPosition);
+	Optional<? extends Long> getCursorHandle(Point2D cursorPosition);
 }

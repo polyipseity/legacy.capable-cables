@@ -8,6 +8,7 @@ import $group__.ui.core.parsers.components.IGeneralPrototype;
 import $group__.ui.core.parsers.components.IUIDOMPrototypeParser;
 import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.mvvm.structures.UIPropertyMappingValue;
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.DOMUtilities;
 import $group__.utilities.ThrowableUtilities;
@@ -22,7 +23,6 @@ import org.apache.logging.log4j.Logger;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -58,8 +58,7 @@ public class UIComponentPrototype
 			throws NoSuchMethodException, IllegalAccessException, ClassNotFoundException {
 		Map<String, String> aliases = parser.getAliasesView();
 
-		@Nullable NamedNodeMap as = node.getAttributes();
-		assert as != null;
+		NamedNodeMap as = AssertionUtilities.assertNonnull(node.getAttributes());
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping = new HashMap<>(as.getLength() + node.getChildNodes().getLength());
 		IUIDOMPrototypeParser.initializeMapping(mapping, node, parser.getMainNamespaceURI());
 

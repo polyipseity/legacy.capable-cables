@@ -10,8 +10,8 @@ import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Streams;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
@@ -83,14 +83,13 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Set<Disposable> getBinderDisposables() { return binderDisposables; }
 
+	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public void bind() {
 		IUIInfrastructure.checkBoundState(isBound(), false);
 
 		// COMMENT must bind the bindings of view first
-		// COMMENT the argument order of Iterables.concat does not correspond to the resulted Iterable
-		getBinder().bindFields(getView().getBindingFields());
-		getBinder().bindFields(getViewModel().getBindingFields());
+		getBinder().bindFields(Iterables.concat(getView().getBindingFields(), getViewModel().getBindingFields()));
 		getBinder().bindMethods(Iterables.concat(getView().getBindingMethods(), getViewModel().getBindingMethods()));
 
 		Supplier<? extends Observer<? super IBinderAction>> s = () -> {
@@ -98,10 +97,12 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 			getBinderDisposables().add(d);
 			return d;
 		};
-		ImmutableSet.copyOf(getView().getBinderNotifiers()).forEach(n ->
-				n.subscribe(s.get()));
-		ImmutableSet.copyOf(getViewModel().getBinderNotifiers()).forEach(n ->
-				n.subscribe(s.get()));
+		Streams.stream(getView().getBinderNotifiers()).unordered().distinct()
+				.forEach(n ->
+						n.subscribe(s.get()));
+		Streams.stream(getViewModel().getBinderNotifiers()).unordered().distinct()
+				.forEach(n ->
+						n.subscribe(s.get()));
 
 		setBound(true);
 	}
@@ -110,7 +111,8 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 	public void unbind() {
 		IUIInfrastructure.checkBoundState(isBound(), true);
 
-		getBinderDisposables().forEach(Disposable::dispose);
+		getBinderDisposables().stream().unordered()
+				.forEach(Disposable::dispose);
 		getBinderDisposables().clear();
 
 		getBinder().unbindAll();

@@ -30,10 +30,7 @@ public interface IShapeAnchorSet {
 
 	boolean removeSides(Iterable<? extends EnumUISide> sides);
 
-	default void anchor(IShapeDescriptorProvider from) {
-		getAnchorsView().forEach((k, v) ->
-				v.anchor(from));
-	}
+	default void anchor(IShapeDescriptorProvider from) { getAnchorsView().values().stream().unordered().forEach(v -> v.anchor(from)); }
 
 	default boolean isEmpty() { return getAnchorsView().isEmpty(); }
 

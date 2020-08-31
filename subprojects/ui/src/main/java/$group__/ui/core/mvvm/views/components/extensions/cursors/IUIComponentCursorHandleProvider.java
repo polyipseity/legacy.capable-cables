@@ -7,5 +7,5 @@ import java.util.Optional;
 
 @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface IUIComponentCursorHandleProvider {
-	Optional<Long> getCursorHandle(IAffineTransformStack stack, Point2D cursorPosition);
+	Optional<? extends Long> getCursorHandle(IAffineTransformStack stack, Point2D cursorPosition);
 }

@@ -18,9 +18,9 @@ public class UIComponentVirtual
 	}
 
 	@Override
-	public Optional<IUIComponentContainer> getParent() { return getRelatedComponent().flatMap(IUIComponent::getParent); }
+	public Optional<? extends IUIComponentContainer> getParent() { return getRelatedComponent().flatMap(IUIComponent::getParent); }
 
-	public Optional<IUIComponent> getRelatedComponent() { return Optional.ofNullable(relatedComponent.get()); }
+	public Optional<? extends IUIComponent> getRelatedComponent() { return Optional.ofNullable(relatedComponent.get()); }
 
 	public void setRelatedComponent(@Nullable IUIComponent relatedComponent) { this.relatedComponent = new WeakReference<>(relatedComponent); }
 }

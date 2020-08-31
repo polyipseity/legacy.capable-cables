@@ -4,15 +4,18 @@ import $group__.ui.core.mvvm.binding.BindingTransformerNotFoundException;
 import $group__.ui.core.mvvm.binding.IBinder;
 import $group__.ui.core.mvvm.binding.IBindingField;
 import $group__.ui.core.mvvm.binding.IBindingMethod;
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.MapUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.interfaces.IValue;
+import com.google.common.collect.Streams;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import sun.misc.Cleaner;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -27,40 +30,46 @@ public class Binder implements IBinder {
 	@Override
 	public boolean bindFields(Iterable<? extends IBindingField<?>> fields)
 			throws BindingTransformerNotFoundException {
-		final boolean[] ret = {false};
-		IBinder.sortAndTrimBindings(fields).asMap().forEach((s, fs) -> ret[0] |= getFieldBinding(s).add(fs));
-		return ret[0];
+		return IBinder.sortAndTrimBindings(fields).asMap().entrySet().stream().sequential() // COMMENT sequential, field binding order matters
+				.reduce(false,
+						(r, e) -> getFieldBinding(AssertionUtilities.assertNonnull(e.getKey())).add(AssertionUtilities.assertNonnull(e.getValue())) || r,
+						Boolean::logicalOr);
 	}
 
 	@Override
 	public boolean bindMethods(Iterable<? extends IBindingMethod<?>> methods) {
-		final boolean[] ret = {false};
-		IBinder.sortAndTrimBindings(methods).asMap().forEach((s, ms) -> ret[0] |= getMethodBinding(s).add(ms));
-		return ret[0];
+		return IBinder.sortAndTrimBindings(methods).asMap().entrySet().stream().unordered()
+				.reduce(false,
+						(r, e) -> getMethodBinding(AssertionUtilities.assertNonnull(e.getKey())).add(AssertionUtilities.assertNonnull(e.getValue())) || r,
+						Boolean::logicalOr);
 	}
 
 	@Override
 	public boolean unbindFields(Iterable<? extends IBindingField<?>> fields) {
-		final boolean[] ret = {false};
-		IBinder.sortAndTrimBindings(fields).asMap().forEach((s, fs) -> {
-			FieldBinding b = getFieldBinding(s);
-			ret[0] |= b.remove(fs);
-			if (b.isEmpty())
-				getFieldBindings().remove(b.getBindingKey());
-		});
-		return ret[0];
+		return IBinder.sortAndTrimBindings(fields).asMap().entrySet().stream().unordered()
+				.reduce(false,
+						(r, e) -> {
+							FieldBinding b = getFieldBinding(AssertionUtilities.assertNonnull(e.getKey()));
+							boolean ret = b.remove(AssertionUtilities.assertNonnull(e.getValue())) || r;
+							if (b.isEmpty())
+								getFieldBindings().remove(b.getBindingKey());
+							return ret;
+						},
+						Boolean::logicalOr);
 	}
 
 	@Override
 	public boolean unbindMethods(Iterable<? extends IBindingMethod<?>> methods) {
-		final boolean[] ret = {false};
-		IBinder.sortAndTrimBindings(methods).asMap().forEach((s, ms) -> {
-			MethodBinding b = getMethodBinding(s);
-			ret[0] |= b.remove(ms);
-			if (b.isEmpty())
-				getMethodBindings().remove(b.getBindingKey());
-		});
-		return ret[0];
+		return IBinder.sortAndTrimBindings(methods).asMap().entrySet().stream().unordered()
+				.reduce(false,
+						(r, e) -> {
+							MethodBinding b = getMethodBinding(AssertionUtilities.assertNonnull(e.getKey()));
+							boolean ret = b.remove(AssertionUtilities.assertNonnull(e.getValue())) || r;
+							if (b.isEmpty())
+								getMethodBindings().remove(b.getBindingKey());
+							return ret;
+						},
+						Boolean::logicalOr);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -94,18 +103,18 @@ public class Binder implements IBinder {
 
 	@Override
 	public boolean unbindAllFields() {
-		final boolean[] ret = {false};
-		getFieldBindings().forEach((s, b) -> ret[0] |= b.removeAll());
+		boolean ret = getFieldBindings().values().stream().unordered()
+				.reduce(false, (r, b) -> b.removeAll() || r, Boolean::logicalOr);
 		getFieldBindings().clear();
-		return ret[0];
+		return ret;
 	}
 
 	@Override
 	public boolean unbindAllMethods() {
-		final boolean[] ret = {false};
-		getMethodBindings().forEach((s, b) -> ret[0] |= b.removeAll());
+		boolean ret = getMethodBindings().values().stream().unordered()
+				.reduce(false, (r, b) -> b.removeAll() || r, Boolean::logicalOr);
 		getMethodBindings().clear();
-		return ret[0];
+		return ret;
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
@@ -132,31 +141,30 @@ public class Binder implements IBinder {
 			this.transformers = transformers; // COMMENT intended to be modified
 			@SuppressWarnings("UnnecessaryLocalVariable") Map<IBindingField<?>, Disposable> fieldsRef = fields;
 			Cleaner.create(getCleanerRef(), () ->
-					fieldsRef.values().forEach(Disposable::dispose));
+					fieldsRef.values().stream().unordered().forEach(Disposable::dispose));
 		}
 
 		protected final Object getCleanerRef() { return cleanerRef; }
 
+		@SuppressWarnings("UnstableApiUsage")
 		public boolean add(Iterable<? extends IBindingField<?>> fields)
 				throws BindingTransformerNotFoundException {
-			final boolean[] ret = {false};
-			fields.forEach(f -> {
-				if (!getFields().containsKey(f)) {
-					getFields().keySet().stream().unordered()
-							.findAny()
-							.ifPresent(fc ->
-									f.setValue(CastUtilities.castUncheckedNullable( // COMMENT should be of the right type
-											IBinder.transform(getTransformers(),
-													CastUtilities.castUncheckedNullable(fc.getValue().orElse(null)), // COMMENT should be always safe
-													fc.getGenericClass(),
-													f.getGenericClass()))));
-					DisposableObserver<? extends IValue<?>> d = IBindingField.createSynchronizationObserver(f, getFields().keySet(), getTransformers(), getIsSource());
-					getFields().put(f, d);
-					f.getField().getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
-					ret[0] = true;
-				}
-			});
-			return ret[0];
+			return Streams.stream(fields).sequential() // COMMENT sequential, field binding order matters
+					.filter(key -> !getFields().containsKey(key))
+					.reduce(false, (r, f) -> {
+						getFields().keySet().stream().unordered()
+								.findAny()
+								.ifPresent(fc ->
+										f.setValue(CastUtilities.castUncheckedNullable( // COMMENT should be of the right type
+												IBinder.transform(getTransformers(),
+														CastUtilities.castUncheckedNullable(fc.getValue().orElse(null)), // COMMENT should be always safe
+														fc.getGenericClass(),
+														f.getGenericClass()))));
+						DisposableObserver<? extends IValue<?>> d = IBindingField.createSynchronizationObserver(f, getFields().keySet(), getTransformers(), getIsSource());
+						getFields().put(f, d);
+						f.getField().getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
+						return true;
+					}, Boolean::logicalOr);
 		}
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
@@ -172,24 +180,22 @@ public class Binder implements IBinder {
 		public boolean removeAll() {
 			if (isEmpty())
 				return false;
-			getFields().values().forEach(Disposable::dispose);
+			getFields().values().stream().unordered().forEach(Disposable::dispose);
 			getFields().clear();
 			return true;
 		}
 
 		public boolean isEmpty() { return getFields().isEmpty(); }
 
+		@SuppressWarnings("UnstableApiUsage")
 		public boolean remove(Iterable<? extends IBindingField<?>> fields) {
-			final boolean[] ret = {false};
-			fields.forEach(f -> {
-				if (getFields().containsKey(f)) {
-					ret[0] |= Optional.ofNullable(getFields().remove(f)).filter(d -> {
+			return Streams.stream(fields).unordered()
+					.filter(getFields()::containsKey)
+					.reduce(false, (r, f) -> {
+						Disposable d = AssertionUtilities.assertNonnull(getFields().remove(f));
 						d.dispose();
 						return true;
-					}).isPresent();
-				}
-			});
-			return ret[0];
+					}, Boolean::logicalOr);
 		}
 	}
 
@@ -206,34 +212,31 @@ public class Binder implements IBinder {
 			this.transformers = transformers; // COMMENT intended to be modified
 			@SuppressWarnings("UnnecessaryLocalVariable") Map<IBindingMethod.Source<?>, Disposable> sourcesRef = sources;
 			Cleaner.create(getCleanerRef(), () ->
-					sourcesRef.values().forEach(Disposable::dispose));
+					sourcesRef.values().stream().unordered().forEach(Disposable::dispose));
 		}
 
 		protected final Object getCleanerRef() { return cleanerRef; }
 
-		@SuppressWarnings("SuspiciousMethodCalls")
+		@SuppressWarnings({"SuspiciousMethodCalls", "UnstableApiUsage"})
 		public boolean add(Iterable<? extends IBindingMethod<?>> methods) {
-			final boolean[] ret = {false};
-
-			methods.forEach(m -> {
-				switch (m.getType()) {
-					case SOURCE:
-						if (!getSources().containsKey(m)) {
-							IBindingMethod.Source<?> s = (IBindingMethod.Source<?>) m;
-							DisposableObserver<?> d = IBindingMethod.Source.createDelegatingObserver(s, getDestinations(), getTransformers());
-							s.getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
-							getSources().put(s, d);
-							ret[0] = true;
+			return Streams.stream(methods).unordered()
+					.reduce(false, (r, m) -> {
+						switch (m.getType()) {
+							case SOURCE:
+								if (!getSources().containsKey(m)) {
+									IBindingMethod.Source<?> s = (IBindingMethod.Source<?>) m;
+									DisposableObserver<?> d = IBindingMethod.Source.createDelegatingObserver(s, getDestinations(), getTransformers());
+									s.getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
+									getSources().put(s, d);
+									return true;
+								}
+								return false;
+							case DESTINATION:
+								return getDestinations().add((IBindingMethod.Destination<?>) m);
+							default:
+								throw new InternalError();
 						}
-						break;
-					case DESTINATION:
-						ret[0] |= getDestinations().add((IBindingMethod.Destination<?>) m);
-						break;
-					default:
-						throw new InternalError();
-				}
-			});
-			return ret[0];
+					}, Boolean::logicalOr);
 		}
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
@@ -250,7 +253,7 @@ public class Binder implements IBinder {
 		public boolean removeAll() {
 			if (isEmpty())
 				return false;
-			getSources().values().forEach(Disposable::dispose);
+			getSources().values().stream().unordered().forEach(Disposable::dispose);
 			getSources().clear();
 			getDestinations().clear();
 			return true;
@@ -258,25 +261,24 @@ public class Binder implements IBinder {
 
 		public boolean isEmpty() { return getSources().isEmpty() && getDestinations().isEmpty(); }
 
-		@SuppressWarnings("SuspiciousMethodCalls")
+		@SuppressWarnings({"SuspiciousMethodCalls", "UnstableApiUsage"})
 		public boolean remove(Iterable<? extends IBindingMethod<?>> methods) {
-			final boolean[] ret = {false};
-			methods.forEach(m -> {
-				switch (m.getType()) {
-					case SOURCE:
-						ret[0] |= Optional.ofNullable(getSources().remove(m)).filter(d -> {
-							d.dispose();
-							return true;
-						}).isPresent();
-						break;
-					case DESTINATION:
-						ret[0] |= getDestinations().remove(m);
-						break;
+			return Streams.stream(methods).unordered()
+					.reduce(false, (r, m) -> {
+						switch (m.getType()) {
+							case SOURCE:
+								@Nullable Disposable d = getSources().remove(m);
+								if (d != null) {
+									d.dispose();
+									return true;
+								}
+								return false;
+							case DESTINATION:
+								return getDestinations().remove(m);
 							default:
 								throw new InternalError();
 						}
-					});
-			return ret[0];
+					}, Boolean::logicalOr);
 		}
 	}
 }

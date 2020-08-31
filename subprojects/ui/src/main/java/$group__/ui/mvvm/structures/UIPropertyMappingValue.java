@@ -19,8 +19,8 @@ public class UIPropertyMappingValue implements IUIPropertyMappingValue {
 	}
 
 	@Override
-	public Optional<Node> getDefaultValue() { return Optional.ofNullable(defaultValue); }
+	public Optional<? extends Node> getDefaultValue() { return Optional.ofNullable(defaultValue); }
 
 	@Override
-	public Optional<INamespacePrefixedString> getBindingKey() { return Optional.ofNullable(bindingKey); }
+	public Optional<? extends INamespacePrefixedString> getBindingKey() { return Optional.ofNullable(bindingKey); }
 }

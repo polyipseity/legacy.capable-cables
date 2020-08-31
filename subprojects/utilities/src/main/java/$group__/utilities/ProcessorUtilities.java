@@ -9,10 +9,7 @@ import javax.lang.model.element.*;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -29,7 +26,7 @@ public enum ProcessorUtilities {
 
 	public static ImmutableSet<TypeElement> getLowerAndIntermediateSuperclasses(@Nullable TypeElement lower, @Nullable TypeElement upper, Types types) {
 		ImmutableSet.Builder<TypeElement> r = new ImmutableSet.Builder<>();
-		for (@Nullable TypeElement i = lower; i != upper && i != null; i =
+		for (@Nullable TypeElement i = lower; !Objects.equals(i, upper) && i != null; i =
 				(TypeElement) types.asElement(i.getSuperclass()))
 			r.add(i);
 		return r.build();
@@ -37,26 +34,42 @@ public enum ProcessorUtilities {
 
 	public static ImmutableSet<ImmutableSet<TypeElement>> getThisAndSuperclassesAndInterfaces(TypeElement type, Types types) { return new ImmutableSet.Builder<ImmutableSet<TypeElement>>().add(ImmutableSet.of(type)).addAll(getSuperclassesAndInterfaces(type, types)).build(); }
 
-	@SuppressWarnings("UnstableApiUsage")
+	@SuppressWarnings({"UnstableApiUsage", "ObjectAllocationInLoop"})
 	public static ImmutableSet<ImmutableSet<TypeElement>> getSuperclassesAndInterfaces(TypeElement type, Types types) {
-		LinkedHashSet<ImmutableSet<TypeElement>> r = new LinkedHashSet<>(INITIAL_CAPACITY_SMALL);
+		LinkedHashSet<ImmutableSet<TypeElement>> ret = new LinkedHashSet<>(INITIAL_CAPACITY_SMALL);
 
 		ImmutableSet<TypeElement> scs = getSuperclasses(type, types);
-		r.add(scs);
-		AtomicReference<List<TypeElement>> cur = new AtomicReference<>(StreamUtilities.streamSmart(type.getInterfaces(), 2).sequential().map(m -> (TypeElement) types.asElement(m)).collect(ImmutableList.toImmutableList()));
-		scs.forEach(sc -> r.add(ImmutableSet.copyOf(cur.getAndUpdate(c -> {
-			List<TypeElement> next = StreamUtilities.streamSmart(sc.getInterfaces(), 2).sequential().map(m -> (TypeElement) types.asElement(m)).collect(Collectors.toList());
-			c.forEach(t -> next.addAll(StreamUtilities.streamSmart(t.getInterfaces(), 2).sequential().map(m -> (TypeElement) types.asElement(m)).collect(ImmutableList.toImmutableList())));
-			return next;
-		}))));
-		while (!cur.get().isEmpty()) r.add(ImmutableSet.copyOf(cur.getAndUpdate(c -> {
-			List<TypeElement> next = new ArrayList<>(INITIAL_CAPACITY_SMALL);
-			c.forEach(t -> next.addAll(StreamUtilities.streamSmart(t.getInterfaces(), 2).sequential().map(m -> (TypeElement) types.asElement(m)).collect(ImmutableList.toImmutableList())));
-			return next;
-		})));
+		ret.add(scs);
+		AtomicReference<List<TypeElement>> cur = new AtomicReference<>(type.getInterfaces().stream().sequential().map(m -> (TypeElement) types.asElement(m)).collect(ImmutableList.toImmutableList()));
+		scs.forEach(sc -> {
+			List<TypeElement> next = sc.getInterfaces().stream().sequential()
+					.map(types::asElement)
+					.map(TypeElement.class::cast)
+					.collect(Collectors.toList());
+			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(cur.getAndUpdate(c -> {
+				List<TypeElement> n = new LinkedList<>(next);
+				c.forEach(t ->
+						n.addAll(t.getInterfaces().stream().sequential()
+								.map(types::asElement)
+								.map(TypeElement.class::cast)
+								.collect(ImmutableList.toImmutableList())));
+				return n;
+			}))));
+		});
+		while (!AssertionUtilities.assertNonnull(cur.get()).isEmpty()) {
+			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(cur.getAndUpdate(s -> {
+				List<TypeElement> n = new LinkedList<>();
+				s.forEach(t ->
+						n.addAll(t.getInterfaces().stream().sequential()
+								.map(types::asElement)
+								.map(TypeElement.class::cast)
+								.collect(ImmutableList.toImmutableList())));
+				return n;
+			}))));
+		}
 
-		r.removeIf(Collection::isEmpty);
-		return ImmutableSet.copyOf(r);
+		ret.removeIf(Collection::isEmpty);
+		return ImmutableSet.copyOf(ret);
 	}
 
 	public static ImmutableSet<TypeElement> getSuperclasses(TypeElement type, Types types) { return getIntermediateSuperclasses(type, null, types); }

@@ -6,5 +6,5 @@ import java.util.Optional;
 
 @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface IHasBindingKey {
-	Optional<INamespacePrefixedString> getBindingKey();
+	Optional<? extends INamespacePrefixedString> getBindingKey();
 }

@@ -95,10 +95,10 @@ public class UIComponentButton
 	public boolean isFocusable() { return true; }
 
 	@Override
-	public Optional<Long> getCursorHandle(IAffineTransformStack stack, Point2D cursorPosition) {
-		if (getButtonStates().contains(IButtonState.HOVERING))
-			return Optional.of(EnumCursor.STANDARD_HAND_CURSOR.getHandle());
-		return Optional.empty();
+	public Optional<? extends Long> getCursorHandle(IAffineTransformStack stack, Point2D cursorPosition) {
+		return getButtonStates().contains(IButtonState.HOVERING)
+				? Optional.of(EnumCursor.STANDARD_HAND_CURSOR.getHandle())
+				: Optional.empty();
 	}
 
 	public enum IButtonState {

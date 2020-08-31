@@ -48,7 +48,8 @@ public class UIExtensionBackgroundMinecraft<E extends IUIComponentManager<?>>
 		super.onExtensionAdded(container);
 		UIEventBusEntryPoint.<EventUIViewMinecraft.Render>getEventBus()
 				.subscribe(getObserverRender().accumulateAndGet(new ObserverRender(), (p, n) -> {
-					Optional.ofNullable(p).ifPresent(DisposableObserver::dispose);
+					if (p != null)
+						p.dispose();
 					return n;
 				}));
 	}

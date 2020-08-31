@@ -1,5 +1,6 @@
 package $group__.utilities.structures;
 
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CastUtilities;
 import com.google.common.collect.ImmutableSet;
 import org.w3c.dom.NamedNodeMap;
@@ -13,8 +14,6 @@ import java.util.regex.Pattern;
 /**
  * Operations are not thread-safe.
  */
-// TODO somebody will need to check this class... or make some unit testings
-// TODO there could also be some performance improvement to be made
 public class NamedNodeMapMap
 		implements Map<String, Node> {
 	protected final NamedNodeMap delegated;
@@ -121,9 +120,7 @@ public class NamedNodeMapMap
 	@Override
 	public void clear() {
 		while (size() != 0) {
-			@Nullable Node n = getDelegatedList().get(0);
-			assert n != null;
-			String k = constructKey(n);
+			String k = constructKey(AssertionUtilities.assertNonnull(getDelegatedList().get(0)));
 			String[] ks = splitString(k);
 			if (hasNamespaceURI(ks))
 				remove(ks[0], ks[1]);
@@ -154,6 +151,4 @@ public class NamedNodeMapMap
 				+ Optional.ofNullable(node.getLocalName())
 				.orElse("");
 	}
-
-
 }

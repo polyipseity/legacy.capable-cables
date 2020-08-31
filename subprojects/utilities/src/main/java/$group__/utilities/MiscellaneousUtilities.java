@@ -18,13 +18,10 @@ public enum MiscellaneousUtilities {
 	@SuppressWarnings("unchecked")
 	public static <T> Optional<T> getDefaultValue(@Nullable Class<T> type) {
 		return Optional.ofNullable(type)
-				.flatMap(tClass -> StreamUtilities.streamSmart(PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet(), 3).unordered()
-						.filter(e -> {
-							@Nullable Class<?> ek = e.getKey();
-							assert ek != null;
-							return ek.isAssignableFrom(tClass);
-						})
-						.findAny())
+				.flatMap(t ->
+						PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet().stream().unordered()
+								.filter(e -> AssertionUtilities.assertNonnull(e.getKey()).isAssignableFrom(t))
+								.findAny())
 				.map(e -> (T) e.getValue());
 	}
 

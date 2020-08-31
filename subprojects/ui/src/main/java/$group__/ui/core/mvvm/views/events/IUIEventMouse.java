@@ -31,5 +31,5 @@ public interface IUIEventMouse extends IUIEvent {
 
 	IUIDataMouseButtonClick getData();
 
-	Optional<IUIEventTarget> getRelatedTarget();
+	Optional<? extends IUIEventTarget> getRelatedTarget();
 }
