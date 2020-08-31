@@ -20,7 +20,6 @@ import $group__.ui.structures.Point2DImmutable;
 import $group__.ui.structures.shapes.descriptors.GenericShapeDescriptor;
 import $group__.ui.utilities.UIObjectUtilities;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
-import $group__.utilities.AssertionUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.reactive.DisposableObserverAuto;
@@ -33,7 +32,10 @@ import org.lwjgl.glfw.GLFW;
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
-import java.awt.geom.*;
+import java.awt.geom.Area;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RectangularShape;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
@@ -261,11 +263,9 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 			if (ret == null)
 				ret = getContainer()
 						.filter(c -> isBeingHovered())
-						.flatMap(c -> {
-							AffineTransform transform = AssertionUtilities.assertNonnull(stack.getDelegated().peek());
-							return getCursor(EnumUISide.getSidesMouseOver(transform.createTransformedShape(c.getShapeDescriptor().getShapeOutput()).getBounds2D(), cursorPosition))
-									.map(EnumCursor::getHandle);
-						})
+						.flatMap(c ->
+								getCursor(EnumUISide.getSidesMouseOver(stack.peek().createTransformedShape(c.getShapeDescriptor().getShapeOutput()).getBounds2D(), cursorPosition))
+										.map(EnumCursor::getHandle))
 						.orElse(null);
 
 			return Optional.ofNullable(ret);

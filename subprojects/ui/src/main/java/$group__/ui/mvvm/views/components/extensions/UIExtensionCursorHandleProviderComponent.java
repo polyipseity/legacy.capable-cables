@@ -39,7 +39,7 @@ public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent
 									.isPresent())
 								break;
 							if (!stack.isClean())
-								stack.getDelegated().pop();
+								stack.pop();
 						}
 					}
 					return ret;

@@ -28,7 +28,7 @@ public class UIComponentPath<T extends IUIComponent>
 			transformStack.push();
 			CastUtilities.castChecked(IUIComponentContainer.class, c).ifPresent(transformer);
 		}
-		transformStack.getDelegated().pop();
+		transformStack.pop();
 
 		Cleaner.create(getCleanerRef(), transformStack.createCleaner());
 	}

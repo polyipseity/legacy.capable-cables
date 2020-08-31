@@ -24,7 +24,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.RectangularShape;
 import java.util.Map;
@@ -78,8 +77,7 @@ public class UIComponentWindowMinecraft
 		@Override
 		public void render(C container, EnumRenderStage stage, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks) {
 			if (stage == EnumRenderStage.PRE_CHILDREN) {
-				AffineTransform transform = stack.getDelegated().peek();
-				Shape transformed = transform.createTransformedShape(container.getShapeDescriptor().getShapeOutput());
+				Shape transformed = stack.peek().createTransformedShape(container.getShapeDescriptor().getShapeOutput());
 				getColorBackground().getValue().ifPresent(c ->
 						DrawingUtilities.drawShape(transformed, true, c, 0));
 				getColorBorder().getValue().ifPresent(c ->

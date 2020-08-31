@@ -107,7 +107,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 							.orElseGet(ImmutableSet::of);
 				},
 				(p, c) -> {
-					stack.getDelegated().pop();
+					stack.pop();
 					return p;
 				},
 				r -> { throw new InternalError(); });
@@ -129,7 +129,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 							.orElseGet(ImmutableSet::of);
 				},
 				(p, c) -> {
-					stack.getDelegated().pop();
+					stack.pop();
 					return p;
 				},
 				r -> { throw new InternalError(); });

@@ -24,7 +24,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.Map;
 import java.util.Optional;
@@ -101,8 +100,7 @@ public class UIComponentButtonMinecraft
 		@Override
 		public void render(C container, EnumRenderStage stage, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks) {
 			if (stage == EnumRenderStage.PRE_CHILDREN) {
-				AffineTransform transform = stack.getDelegated().peek();
-				Shape transformed = transform.createTransformedShape(container.getShapeDescriptor().getShapeOutput());
+				Shape transformed = stack.peek().createTransformedShape(container.getShapeDescriptor().getShapeOutput());
 				if (container.getButtonStates().contains(IButtonState.PRESSING)) {
 					getColorPressed().getValue().ifPresent(c ->
 							DrawingUtilities.drawShape(transformed, true, c, 0));

@@ -7,7 +7,6 @@ import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.components.paths.IUIComponentPath;
 import $group__.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
 import $group__.ui.mvvm.views.paths.UINodePathResolver;
-import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.MapUtilities;
@@ -47,13 +46,11 @@ public class UIComponentPathResolver
 				current = CastUtilities.castChecked(IUIComponentContainer.class, current)
 						.map(container -> {
 							ret.add(container);
-							stack.push();
+							AffineTransform transform = stack.push();
 							container.transformChildren(stack);
 							getChildrenTransformers(container).forEach(t ->
 									t.accept(stack));
 							++popTimes[0];
-
-							AffineTransform transform = AssertionUtilities.assertNonnull(stack.getDelegated().peek());
 
 							@Nullable IUIComponent r = null;
 							childrenLoop:

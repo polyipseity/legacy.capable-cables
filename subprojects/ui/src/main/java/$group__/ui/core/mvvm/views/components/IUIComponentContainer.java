@@ -18,7 +18,7 @@ public interface IUIComponentContainer
 		stack.push();
 		self.transformChildren(stack);
 		R ret = call.get();
-		stack.getDelegated().pop();
+		stack.pop();
 		return ret;
 	}
 

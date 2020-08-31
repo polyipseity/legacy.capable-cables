@@ -30,8 +30,14 @@ public interface IAffineTransformStack
 
 	Stack<AffineTransform> getDelegated();
 
-	@SuppressWarnings("UnusedReturnValue")
-	AffineTransform push();
+	static void popMultiple(IAffineTransformStack stack, int times) {
+		for (; times > 0; --times)
+			stack.pop();
+	}
+
+	default AffineTransform pop() { return getDelegated().pop(); }
+
+	default AffineTransform push() { return getDelegated().push((AffineTransform) AssertionUtilities.assertNonnull(getDelegated().peek()).clone()); }
 
 	@Override
 	default void close() { createCleaner().run(); }
@@ -46,10 +52,7 @@ public interface IAffineTransformStack
 		return () -> IAffineTransformStack.popMultiple(this, getDelegated().size() - 1);
 	}
 
-	static void popMultiple(IAffineTransformStack stack, int times) {
-		for (; times > 0; --times)
-			stack.getDelegated().pop();
-	}
+	default AffineTransform peek() { return AssertionUtilities.assertNonnull(getDelegated().peek()); }
 
 	class LeakNotifier
 			implements Runnable {

@@ -68,7 +68,6 @@ import org.lwjgl.glfw.GLFW;
 import org.w3c.dom.Document;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.Map;
@@ -162,8 +161,7 @@ public enum UIDebugMinecraft {
 			public void render(C container, EnumRenderStage stage, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks) {
 				super.render(container, stage, stack, cursorPosition, partialTicks);
 				if (stage == EnumRenderStage.PRE_CHILDREN) {
-					AffineTransform transform = AssertionUtilities.assertNonnull(stack.getDelegated().peek());
-					Shape transformed = transform.createTransformedShape(new Ellipse2D.Double(
+					Shape transformed = stack.peek().createTransformedShape(new Ellipse2D.Double(
 							cursorPosition.getX() - CURSOR_SHAPE_RADIUS, cursorPosition.getY() - CURSOR_SHAPE_RADIUS,
 							CURSOR_SHAPE_RADIUS << 1, CURSOR_SHAPE_RADIUS << 1));
 					DrawingUtilities.drawShape(transformed, true, new Color(getRandom().nextInt(), true), 0);

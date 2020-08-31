@@ -65,7 +65,7 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 									CastUtilities.castChecked(IUIComponentMinecraft.class, p)
 											.flatMap(IUIComponentRendererContainer::getRenderer)
 											.ifPresent(pc -> {
-												stack.getDelegated().pop();
+												stack.pop();
 												pc.render(CastUtilities.castUnchecked(p), // COMMENT component should contain a renderer that accepts itself
 														EnumRenderStage.POST_CHILDREN, stack, cursorPosition, partialTicks);
 												pc.crop(CastUtilities.castUnchecked(p), // COMMENT component should contain a renderer that accepts itself
@@ -103,7 +103,7 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 				},
 				(p, c) -> {
 					if (p.isActive())
-						stack.getDelegated().pop();
+						stack.pop();
 					return p;
 				},
 				r -> { throw new InternalError(); });

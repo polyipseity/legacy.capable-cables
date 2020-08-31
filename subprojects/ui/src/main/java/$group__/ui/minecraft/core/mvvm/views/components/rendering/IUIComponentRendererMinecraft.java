@@ -8,7 +8,6 @@ import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
 import $group__.ui.utilities.UIObjectUtilities;
 import $group__.ui.utilities.minecraft.CoordinateUtilities;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
-import $group__.utilities.AssertionUtilities;
 import $group__.utilities.client.minecraft.GLUtilities;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraftforge.api.distmarker.Dist;
@@ -43,7 +42,7 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent>
 						GLUtilities.Stacks.push("colorMask",
 								() -> RenderSystem.colorMask(false, false, false, false), GLUtilities.Stacks.COLOR_MASK_FALLBACK);
 
-						DrawingUtilities.drawShape(stack.getDelegated().peek(), container.getShapeDescriptor().getShapeOutput(), true, Color.WHITE, 0);
+						DrawingUtilities.drawShape(stack.peek(), container.getShapeDescriptor().getShapeOutput(), true, Color.WHITE, 0);
 
 						GLUtilities.Stacks.pop("colorMask");
 						GLUtilities.Stacks.pop("stencilOp");
@@ -63,7 +62,7 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent>
 						GLUtilities.Stacks.push("colorMask",
 								() -> RenderSystem.colorMask(false, false, false, false), GLUtilities.Stacks.COLOR_MASK_FALLBACK);
 
-						DrawingUtilities.drawShape(stack.getDelegated().peek(), container.getShapeDescriptor().getShapeOutput().getBounds2D(), true, Color.BLACK, 0);
+						DrawingUtilities.drawShape(stack.peek(), container.getShapeDescriptor().getShapeOutput().getBounds2D(), true, Color.BLACK, 0);
 
 						GLUtilities.Stacks.pop("colorMask");
 						GLUtilities.Stacks.pop("stencilOp");
@@ -81,7 +80,7 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent>
 						GLUtilities.State.getIntegerValue(GL11.GL_SCISSOR_BOX, boundsBox);
 						UIObjectUtilities.acceptRectangular(
 								CoordinateUtilities.toNativeRectangle(
-										UIObjectUtilities.getRectangleExpanded(AssertionUtilities.assertNonnull(stack.getDelegated().peek()).createTransformedShape(container.getShapeDescriptor().getShapeOutput().getBounds2D()).getBounds2D()))
+										UIObjectUtilities.getRectangleExpanded(stack.peek().createTransformedShape(container.getShapeDescriptor().getShapeOutput().getBounds2D()).getBounds2D()))
 										.createIntersection(new Rectangle2D.Double(boundsBox[0], boundsBox[1], boundsBox[2], boundsBox[3])),
 								(x, y, w, h) -> GLUtilities.Stacks.push("glScissor",
 										() -> GLUtilities.State.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{x.intValue(), y.intValue(), w.intValue(), h.intValue()},
