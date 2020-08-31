@@ -20,6 +20,7 @@ public enum ConfigurationUI {
 	;
 
 	private static final AtomicReference<String> MOD_ID = new AtomicReference<>();
+	// TODO centralized logger
 
 	public static String getModId() {
 		return Optional.ofNullable(MOD_ID.get())

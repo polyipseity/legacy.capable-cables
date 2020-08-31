@@ -8,6 +8,7 @@ import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
 import $group__.ui.utilities.UIObjectUtilities;
 import $group__.ui.utilities.minecraft.CoordinateUtilities;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.client.minecraft.GLUtilities;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraftforge.api.distmarker.Dist;
@@ -33,41 +34,41 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent>
 			case STENCIL_BUFFER:
 				switch (stage) {
 					case CROP:
-						int stencilRef = Math.floorMod(UIExtensionCache.CacheUniversal.Z.getValue().get(container).orElseThrow(InternalError::new), (int) Math.pow(2, GLUtilities.GLStateUtilities.getInteger(GL11.GL_STENCIL_BITS)));
+						int stencilRef = Math.floorMod(UIExtensionCache.CacheUniversal.Z.getValue().get(container).orElseThrow(InternalError::new), (int) Math.pow(2, GLUtilities.State.getInteger(GL11.GL_STENCIL_BITS)));
 
-						GLUtilities.GLStacksUtilities.push("stencilFunc",
-								() -> RenderSystem.stencilFunc(GL11.GL_EQUAL, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLUtilities.GLStacksUtilities.STENCIL_FUNC_FALLBACK);
-						GLUtilities.GLStacksUtilities.push("stencilOp",
-								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL14.GL_INCR_WRAP, GL14.GL_INCR_WRAP), GLUtilities.GLStacksUtilities.STENCIL_OP_FALLBACK);
-						GLUtilities.GLStacksUtilities.push("colorMask",
-								() -> RenderSystem.colorMask(false, false, false, false), GLUtilities.GLStacksUtilities.COLOR_MASK_FALLBACK);
+						GLUtilities.Stacks.push("stencilFunc",
+								() -> RenderSystem.stencilFunc(GL11.GL_EQUAL, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLUtilities.Stacks.STENCIL_FUNC_FALLBACK);
+						GLUtilities.Stacks.push("stencilOp",
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL14.GL_INCR_WRAP, GL14.GL_INCR_WRAP), GLUtilities.Stacks.STENCIL_OP_FALLBACK);
+						GLUtilities.Stacks.push("colorMask",
+								() -> RenderSystem.colorMask(false, false, false, false), GLUtilities.Stacks.COLOR_MASK_FALLBACK);
 
 						DrawingUtilities.drawShape(stack.getDelegated().peek(), container.getShapeDescriptor().getShapeOutput(), true, Color.WHITE, 0);
 
-						GLUtilities.GLStacksUtilities.pop("colorMask");
-						GLUtilities.GLStacksUtilities.pop("stencilOp");
-						GLUtilities.GLStacksUtilities.pop("stencilFunc");
+						GLUtilities.Stacks.pop("colorMask");
+						GLUtilities.Stacks.pop("stencilOp");
+						GLUtilities.Stacks.pop("stencilFunc");
 
-						GLUtilities.GLStacksUtilities.push("stencilFunc",
-								() -> RenderSystem.stencilFunc(GL11.GL_LESS, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLUtilities.GLStacksUtilities.STENCIL_FUNC_FALLBACK);
+						GLUtilities.Stacks.push("stencilFunc",
+								() -> RenderSystem.stencilFunc(GL11.GL_LESS, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLUtilities.Stacks.STENCIL_FUNC_FALLBACK);
 
-						GLUtilities.GLStacksUtilities.push("stencilOp",
-								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP), GLUtilities.GLStacksUtilities.STENCIL_OP_FALLBACK);
+						GLUtilities.Stacks.push("stencilOp",
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP), GLUtilities.Stacks.STENCIL_OP_FALLBACK);
 						break;
 					case UN_CROP:
-						GLUtilities.GLStacksUtilities.pop("stencilOp");
+						GLUtilities.Stacks.pop("stencilOp");
 
-						GLUtilities.GLStacksUtilities.push("stencilOp",
-								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_REPLACE, GL11.GL_REPLACE), GLUtilities.GLStacksUtilities.STENCIL_OP_FALLBACK);
-						GLUtilities.GLStacksUtilities.push("colorMask",
-								() -> RenderSystem.colorMask(false, false, false, false), GLUtilities.GLStacksUtilities.COLOR_MASK_FALLBACK);
+						GLUtilities.Stacks.push("stencilOp",
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_REPLACE, GL11.GL_REPLACE), GLUtilities.Stacks.STENCIL_OP_FALLBACK);
+						GLUtilities.Stacks.push("colorMask",
+								() -> RenderSystem.colorMask(false, false, false, false), GLUtilities.Stacks.COLOR_MASK_FALLBACK);
 
 						DrawingUtilities.drawShape(stack.getDelegated().peek(), container.getShapeDescriptor().getShapeOutput().getBounds2D(), true, Color.BLACK, 0);
 
-						GLUtilities.GLStacksUtilities.pop("colorMask");
-						GLUtilities.GLStacksUtilities.pop("stencilOp");
+						GLUtilities.Stacks.pop("colorMask");
+						GLUtilities.Stacks.pop("stencilOp");
 
-						GLUtilities.GLStacksUtilities.pop("stencilFunc");
+						GLUtilities.Stacks.pop("stencilFunc");
 						break;
 					default:
 						throw new InternalError();
@@ -77,17 +78,17 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent>
 				switch (stage) {
 					case CROP:
 						int[] boundsBox = new int[4];
-						GLUtilities.GLStateUtilities.getIntegerValue(GL11.GL_SCISSOR_BOX, boundsBox);
+						GLUtilities.State.getIntegerValue(GL11.GL_SCISSOR_BOX, boundsBox);
 						UIObjectUtilities.acceptRectangular(
 								CoordinateUtilities.toNativeRectangle(
-										UIObjectUtilities.getRectangleExpanded(stack.getDelegated().peek().createTransformedShape(container.getShapeDescriptor().getShapeOutput().getBounds2D()).getBounds2D()))
+										UIObjectUtilities.getRectangleExpanded(AssertionUtilities.assertNonnull(stack.getDelegated().peek()).createTransformedShape(container.getShapeDescriptor().getShapeOutput().getBounds2D()).getBounds2D()))
 										.createIntersection(new Rectangle2D.Double(boundsBox[0], boundsBox[1], boundsBox[2], boundsBox[3])),
-								(x, y, w, h) -> GLUtilities.GLStacksUtilities.push("glScissor",
-										() -> GLUtilities.GLStateUtilities.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{x.intValue(), y.intValue(), w.intValue(), h.intValue()},
-												(i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3])), GLUtilities.GLStacksUtilities.GL_SCISSOR_FALLBACK));
+								(x, y, w, h) -> GLUtilities.Stacks.push("glScissor",
+										() -> GLUtilities.State.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{x.intValue(), y.intValue(), w.intValue(), h.intValue()},
+												(i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3])), GLUtilities.Stacks.GL_SCISSOR_FALLBACK));
 						break;
 					case UN_CROP:
-						GLUtilities.GLStacksUtilities.pop("glScissor");
+						GLUtilities.Stacks.pop("glScissor");
 						break;
 					default:
 						throw new InternalError();

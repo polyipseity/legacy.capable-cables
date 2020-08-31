@@ -12,29 +12,29 @@ public enum EnumCropMethod {
 	GL_SCISSOR {
 		@Override
 		public void enable() {
-			GLUtilities.GLStacksUtilities.push("GL_SCISSOR_TEST",
+			GLUtilities.Stacks.push("GL_SCISSOR_TEST",
 					() -> GL11.glEnable(GL11.GL_SCISSOR_TEST),
 					() -> GL11.glDisable(GL11.GL_SCISSOR_TEST));
 		}
 
 		@Override
 		public void disable() {
-			GLUtilities.GLStacksUtilities.pop("GL_SCISSOR_TEST");
+			GLUtilities.Stacks.pop("GL_SCISSOR_TEST");
 		}
 	},
 	STENCIL_BUFFER {
 		@Override
 		public void enable() {
-			GLUtilities.GLStacksUtilities.push("GL_STENCIL_TEST",
+			GLUtilities.Stacks.push("GL_STENCIL_TEST",
 					() -> GL11.glEnable(GL11.GL_STENCIL_TEST), () -> GL11.glDisable(GL11.GL_STENCIL_TEST));
-			GLUtilities.GLStacksUtilities.push("stencilMask",
-					() -> RenderSystem.stencilMask(GLUtilities.GL_MASK_ALL_BITS), GLUtilities.GLStacksUtilities.STENCIL_MASK_FALLBACK);
+			GLUtilities.Stacks.push("stencilMask",
+					() -> RenderSystem.stencilMask(GLUtilities.GL_MASK_ALL_BITS), GLUtilities.Stacks.STENCIL_MASK_FALLBACK);
 		}
 
 		@Override
 		public void disable() {
-			GLUtilities.GLStacksUtilities.pop("stencilMask");
-			GLUtilities.GLStacksUtilities.pop("GL_STENCIL_TEST");
+			GLUtilities.Stacks.pop("stencilMask");
+			GLUtilities.Stacks.pop("GL_STENCIL_TEST");
 		}
 	},
 	;

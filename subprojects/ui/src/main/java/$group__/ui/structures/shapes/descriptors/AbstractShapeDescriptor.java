@@ -16,7 +16,6 @@ import java.util.function.Supplier;
 
 import static $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor.checkIsBeingModified;
 
-// TODO needs better design, but I cannot think of one
 public abstract class AbstractShapeDescriptor<S extends Shape>
 		implements IShapeDescriptor<S> {
 	protected final List<IShapeConstraint> constraints = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
