@@ -3,7 +3,6 @@ package $group__.ui.mvvm.views.components;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
-import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.components.IUIComponentShapeAnchorController;
 import $group__.ui.core.mvvm.views.components.extensions.caches.IUIExtensionCache;
@@ -13,7 +12,6 @@ import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.mvvm.structures.AffineTransformStack;
 import $group__.ui.mvvm.views.components.paths.UIComponentPathResolver;
 import $group__.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
-import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.TreeUtilities;
@@ -79,16 +77,18 @@ public class UIComponentManager<S extends Shape>
 											(List<WeakReference<IUIComponent>>) cache.getDelegated().getIfPresent(t.getKey());
 									List<IUIComponent> ret;
 									if (cv == null) {
-										ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
-										TreeUtilities.<IUIComponent, Object>visitNodesDepthFirst(i,
-												ret::add,
-												p -> CastUtilities.castChecked(IUIComponentContainer.class, p)
-														.<Iterable<IUIComponent>>map(IUIComponentContainer::getChildrenView)
-														.orElseGet(ImmutableSet::of), null, null);
+										ret = new LinkedList<>();
+										TreeUtilities.<IUIComponent, Object>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, i,
+												e -> ret.addAll(CastUtilities.castChecked(IUIComponentManager.class, e)
+														.<Collection<? extends IUIComponent>>map(IUIComponentManager::getChildrenFlatView)
+														.orElseGet(() -> ImmutableSet.of(e))),
+												p -> CastUtilities.castChecked(IUIComponentManager.class, p)
+														.<Iterable<? extends IUIComponent>>map(ImmutableSet::of)
+														.orElseGet(p::getChildNodes), null, null);
 										cache.getDelegated().put(t.getKey(),
 												ret.stream().sequential()
 														.map(WeakReference::new)
-														.collect(Collectors.toList()));
+														.collect(Collectors.toCollection(LinkedList::new)));
 									} else {
 										cv.removeIf(wr ->
 												wr.get() == null);
@@ -124,7 +124,7 @@ public class UIComponentManager<S extends Shape>
 										cache.getDelegated().put(t.getKey(),
 												ret.stream().sequential()
 														.map(WeakReference::new)
-														.collect(Collectors.toList()));
+														.collect(Collectors.toCollection(LinkedList::new)));
 									} else {
 										cv.removeIf(wr ->
 												wr.get() == null);

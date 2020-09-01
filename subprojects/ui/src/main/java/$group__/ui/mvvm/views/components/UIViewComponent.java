@@ -94,7 +94,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	@Override
 	public void initialize() {
 		IAffineTransformStack stack = getCleanTransformStack();
-		TreeUtilities.<IUIComponent, IUIComponent>visitNodesDepthFirst(getManager(),
+		TreeUtilities.<IUIComponent, IUIComponent>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, getManager(),
 				Function.identity(),
 				c -> {
 					c.initialize(stack);
@@ -116,7 +116,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	@Override
 	public void removed() {
 		IAffineTransformStack stack = getCleanTransformStack();
-		TreeUtilities.<IUIComponent, IUIComponent>visitNodesDepthFirst(getManager(),
+		TreeUtilities.<IUIComponent, IUIComponent>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, getManager(),
 				Function.identity(),
 				c -> {
 					c.removed(stack);

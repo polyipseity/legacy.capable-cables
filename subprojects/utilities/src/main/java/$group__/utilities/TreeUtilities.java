@@ -10,9 +10,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public enum TreeUtilities {
-	/* MARK empty */;
+	;
 
-	public static <T, R> Optional<R> visitNodes(EnumStrategy strategy, T obj,
+	public static <T, R> Optional<R> visitNodes(EnumStrategy strategy,
+	                                            T obj,
 	                                            Function<? super T, ? extends R> function,
 	                                            Function<? super T, ? extends Iterable<? extends T>> splitter,
 	                                            @Nullable BiFunction<? super R, ? super Iterable<R>, ? extends R> combiner,
@@ -28,11 +29,11 @@ public enum TreeUtilities {
 	}
 
 	@SuppressWarnings("ObjectAllocationInLoop")
-	public static <T, R> Optional<R> visitNodesDepthFirst(T obj,
-	                                                      Function<? super T, ? extends R> function,
-	                                                      Function<? super T, ? extends Iterable<? extends T>> splitter,
-	                                                      @Nullable BiFunction<? super R, ? super Iterable<R>, ? extends R> combiner,
-	                                                      @Nullable Consumer<? super T> repeater) {
+	private static <T, R> Optional<R> visitNodesDepthFirst(T obj,
+	                                                       Function<? super T, ? extends R> function,
+	                                                       Function<? super T, ? extends Iterable<? extends T>> splitter,
+	                                                       @Nullable BiFunction<? super R, ? super Iterable<R>, ? extends R> combiner,
+	                                                       @Nullable Consumer<? super T> repeater) {
 		boolean shouldCombine = combiner != null;
 		Stack<Iterator<? extends T>> stackSplitter = new Stack<>();
 		@Nullable Stack<Deque<R>> stackCombiner = shouldCombine ? new Stack<>() : null;
@@ -78,11 +79,11 @@ public enum TreeUtilities {
 	}
 
 	@SuppressWarnings("ObjectAllocationInLoop")
-	public static <T, R> Optional<R> visitNodesBreadthFirst(T obj,
-	                                                        Function<? super T, ? extends R> function,
-	                                                        Function<? super T, ? extends Iterable<? extends T>> splitter,
-	                                                        @Nullable BiFunction<? super R, ? super Iterable<R>, ? extends R> combiner,
-	                                                        @Nullable Consumer<? super T> repeater) {
+	private static <T, R> Optional<R> visitNodesBreadthFirst(T obj,
+	                                                         Function<? super T, ? extends R> function,
+	                                                         Function<? super T, ? extends Iterable<? extends T>> splitter,
+	                                                         @Nullable BiFunction<? super R, ? super Iterable<R>, ? extends R> combiner,
+	                                                         @Nullable Consumer<? super T> repeater) {
 		boolean shouldCombine = combiner != null;
 		List<T>
 				frameSplitter = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM),

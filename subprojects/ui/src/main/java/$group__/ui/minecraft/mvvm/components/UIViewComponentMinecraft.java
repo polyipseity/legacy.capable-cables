@@ -37,7 +37,7 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 					IAffineTransformStack stack = getCleanTransformStack();
 					EnumCropMethod cropMethod = EnumCropMethod.getBestMethod();
 					cropMethod.enable();
-					TreeUtilities.<IUIComponent, IUIComponent>visitNodesDepthFirst(getManager(),
+					TreeUtilities.<IUIComponent, IUIComponent>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, getManager(),
 							Function.identity(),
 							c -> {
 								if (c.isVisible()) {
@@ -85,7 +85,7 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 	@Override
 	public void tick() {
 		IAffineTransformStack stack = getCleanTransformStack();
-		TreeUtilities.<IUIComponent, IUIComponent>visitNodesDepthFirst(getManager(),
+		TreeUtilities.<IUIComponent, IUIComponent>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, getManager(),
 				Function.identity(),
 				c -> {
 					if (c.isActive()) {

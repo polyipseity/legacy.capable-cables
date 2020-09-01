@@ -115,7 +115,7 @@ public class UIDOMPrototypeParser<T extends IUIComponentManager<?>>
 						"resource", resource);
 		}
 
-		setPrototype(TreeUtilities.visitNodesDepthFirst(managerNode,
+		setPrototype(TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, managerNode,
 				n -> Try.call(() ->
 						UIComponentPrototype.create(this, n), LOGGER)
 						.orElseThrow(ThrowableCatcher::rethrow),
