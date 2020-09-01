@@ -193,7 +193,7 @@ public enum UIEventUtilities {
 		}
 
 		public static boolean isEventValid(IUIEvent event) {
-			return Optional.ofNullable(INSTANCE.getDelegated().get(event.getType()))
+			return Optional.ofNullable(INSTANCE.getData().get(event.getType()))
 					.map(RegistryObject::getValue)
 					.filter(ec -> ec.isInstance(event))
 					.isPresent();

@@ -2,6 +2,7 @@ package $group__.ui.structures.shapes.descriptors;
 
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.core.structures.shapes.interactions.IShapeConstraint;
+import $group__.utilities.interfaces.IDelegating;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -11,15 +12,12 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class DelegatingShapeDescriptor<S extends Shape>
+		extends IDelegating.Impl<IShapeDescriptor<S>>
 		implements IShapeDescriptor<S> {
-	protected final IShapeDescriptor<S> delegated;
-
-	public DelegatingShapeDescriptor(IShapeDescriptor<S> delegated) { this.delegated = delegated; }
+	public DelegatingShapeDescriptor(IShapeDescriptor<S> delegated) { super(delegated); }
 
 	@Override
 	public boolean isBeingModified() { return getDelegated().isBeingModified(); }
-
-	protected IShapeDescriptor<S> getDelegated() { return delegated; }
 
 	@Override
 	public S getShapeOutput() { return getDelegated().getShapeOutput(); }

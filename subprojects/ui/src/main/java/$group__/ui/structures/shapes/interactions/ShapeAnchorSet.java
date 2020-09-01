@@ -4,7 +4,7 @@ import $group__.ui.core.structures.shapes.interactions.IShapeAnchor;
 import $group__.ui.core.structures.shapes.interactions.IShapeAnchorSet;
 import $group__.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
 import $group__.ui.structures.EnumUISide;
-import $group__.utilities.MapUtilities;
+import $group__.utilities.collections.MapUtilities;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;

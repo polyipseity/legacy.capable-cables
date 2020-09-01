@@ -5,8 +5,8 @@ import $group__.ui.core.structures.shapes.interactions.IShapeAnchorController;
 import $group__.ui.core.structures.shapes.interactions.IShapeAnchorSet;
 import $group__.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
 import $group__.utilities.CapacityUtilities;
-import $group__.utilities.CollectionUtilities;
-import $group__.utilities.MapUtilities;
+import $group__.utilities.collections.CollectionUtilities;
+import $group__.utilities.collections.MapUtilities;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
 

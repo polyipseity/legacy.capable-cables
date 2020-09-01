@@ -31,7 +31,7 @@ public interface IShapeDescriptorBuilderFactory {
 			super(true, LOGGER);
 			PreconditionUtilities.requireRunOnceOnly(LOGGER);
 
-			delegated.put(DefaultFactory.KEY, new Registry.RegistryObject<>(new DefaultFactory()));
+			data.put(DefaultFactory.KEY, new Registry.RegistryObject<>(new DefaultFactory()));
 		}
 
 		@Override
@@ -54,9 +54,9 @@ public interface IShapeDescriptorBuilderFactory {
 		protected DefaultFactory() {
 			super(true, LOGGER);
 
-			delegated.put(Rectangle2D.class, new RegistryObject<>(c ->
+			data.put(Rectangle2D.class, new RegistryObject<>(c ->
 					new RectangularShapeDescriptorBuilder.Rectangle2DSD()));
-			delegated.put(Ellipse2D.class, new RegistryObject<>(c ->
+			data.put(Ellipse2D.class, new RegistryObject<>(c ->
 					new RectangularShapeDescriptorBuilder.Ellipse2DSD()));
 		}
 

@@ -1,4 +1,4 @@
-package $group__.utilities;
+package $group__.utilities.collections;
 
 import java.util.Collections;
 import java.util.Set;

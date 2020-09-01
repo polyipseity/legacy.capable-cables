@@ -7,7 +7,7 @@ import $group__.ui.core.mvvm.binding.IBindingMethod;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.MapUtilities;
+import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.interfaces.IValue;
 import com.google.common.collect.Streams;

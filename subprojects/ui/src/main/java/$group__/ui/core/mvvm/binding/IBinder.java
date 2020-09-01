@@ -3,7 +3,7 @@ package $group__.ui.core.mvvm.binding;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.DynamicUtilities;
-import $group__.utilities.MapUtilities;
+import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.reactive.DisposableObserverAuto;
 import com.google.common.collect.Multimap;

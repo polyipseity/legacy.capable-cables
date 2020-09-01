@@ -1,6 +1,5 @@
-package $group__.utilities;
+package $group__.utilities.dom;
 
-import $group__.utilities.structures.NodeListList;
 import com.google.common.collect.ImmutableList;
 import org.w3c.dom.Node;
 
@@ -16,7 +15,7 @@ public enum DOMUtilities {
 
 	@SuppressWarnings("UnstableApiUsage")
 	public static List<Node> getChildrenByTagName(Node node, String name) {
-		return NodeListList.wrap(node.getChildNodes()).stream().sequential()
+		return new NodeListList(node.getChildNodes()).stream().sequential()
 				.filter(n -> name.equals(n.getLocalName()))
 				.collect(ImmutableList.toImmutableList());
 	}
@@ -25,7 +24,7 @@ public enum DOMUtilities {
 
 	@SuppressWarnings("UnstableApiUsage")
 	public static List<Node> getChildrenByTagNameNS(Node node, @Nullable String namespaceURI, String name) {
-		return NodeListList.wrap(node.getChildNodes()).stream().sequential()
+		return new NodeListList(node.getChildNodes()).stream().sequential()
 				.filter(n -> Objects.equals(n.getNamespaceURI(), namespaceURI)
 						&& name.equals(n.getLocalName()))
 				.collect(ImmutableList.toImmutableList());

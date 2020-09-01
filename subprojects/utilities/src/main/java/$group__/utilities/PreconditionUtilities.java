@@ -1,5 +1,6 @@
 package $group__.utilities;
 
+import $group__.utilities.collections.MapUtilities;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;

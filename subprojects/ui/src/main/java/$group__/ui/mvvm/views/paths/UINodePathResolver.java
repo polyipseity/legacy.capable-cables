@@ -3,7 +3,7 @@ package $group__.ui.mvvm.views.paths;
 import $group__.ui.core.mvvm.views.paths.IUINode;
 import $group__.ui.core.mvvm.views.paths.IUINodePathResolver;
 import $group__.utilities.CapacityUtilities;
-import $group__.utilities.MapUtilities;
+import $group__.utilities.collections.MapUtilities;
 
 import java.util.ArrayList;
 import java.util.List;

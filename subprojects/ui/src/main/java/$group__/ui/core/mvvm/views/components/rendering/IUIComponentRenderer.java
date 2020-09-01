@@ -4,8 +4,8 @@ import $group__.ui.core.mvvm.binding.IHasBinding;
 import $group__.ui.core.mvvm.binding.IHasBindingMap;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.utilities.CapacityUtilities;
-import $group__.utilities.MapUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
+import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
@@ -31,7 +31,7 @@ public interface IUIComponentRenderer<C extends IUIComponent>
 			super(true, logger);
 			this.variant = variant;
 
-			delegated.put(DEFAULT_KEY, new RegistryObject<>(defaultValue));
+			data.put(DEFAULT_KEY, new RegistryObject<>(defaultValue));
 		}
 
 		public static <R extends IUIComponentRenderer<?>> RegistryObject<? extends Class<? extends R>> getDefault(RegRenderer<R> registry) {

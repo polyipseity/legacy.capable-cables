@@ -2,7 +2,7 @@ package $group__.utilities.client.minecraft;
 
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.LoggerUtilities;
-import $group__.utilities.MapUtilities;
+import $group__.utilities.collections.MapUtilities;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;

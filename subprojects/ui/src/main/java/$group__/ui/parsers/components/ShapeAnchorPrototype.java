@@ -7,7 +7,7 @@ import $group__.ui.core.parsers.components.IUIDOMPrototypeParser;
 import $group__.ui.core.structures.shapes.interactions.IShapeAnchor;
 import $group__.ui.structures.EnumUISide;
 import $group__.ui.structures.shapes.interactions.ShapeAnchor;
-import $group__.utilities.DOMUtilities;
+import $group__.utilities.dom.DOMUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
 import com.google.common.collect.ImmutableSet;

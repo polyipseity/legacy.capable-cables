@@ -5,8 +5,8 @@ import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilder;
 import $group__.ui.core.structures.shapes.interactions.IShapeConstraint;
 import $group__.ui.utilities.UIObjectUtilities;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.MapUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
+import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.interfaces.IHasGenericClass;
 import com.google.common.collect.Iterables;
 

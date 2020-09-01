@@ -1,6 +1,6 @@
 package $group__.ui.core.structures;
 
-import $group__.utilities.MapUtilities;
+import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.interfaces.ICloneable;
 import $group__.utilities.interfaces.ICopyable;
 import com.google.common.collect.ImmutableList;

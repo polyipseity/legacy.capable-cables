@@ -20,11 +20,11 @@ public class UIComponentPath<T extends IUIComponent>
 	protected final IAffineTransformStack transformStack = new AffineTransformStack();
 	protected final Object cleanerRef = new Object();
 
-	public UIComponentPath(List<? extends T> delegated) {
-		super(delegated);
+	public UIComponentPath(List<? extends T> data) {
+		super(data);
 
 		Consumer<IUIComponentContainer> transformer = c -> c.transformChildren(transformStack);
-		for (IUIComponent c : delegated) {
+		for (IUIComponent c : this.data) {
 			transformStack.push();
 			CastUtilities.castChecked(IUIComponentContainer.class, c).ifPresent(transformer);
 		}
@@ -39,7 +39,7 @@ public class UIComponentPath<T extends IUIComponent>
 	public IAffineTransformStack getTransformStackView() { return getTransformStack().copy(); }
 
 	@Override
-	public AffineTransform getTransformView(int depth) { return (AffineTransform) AssertionUtilities.assertNonnull(getTransformStack().getDelegated().get(Math.floorMod(depth, sizeOfTransformStack()))).clone(); }
+	public AffineTransform getTransformView(int depth) { return (AffineTransform) AssertionUtilities.assertNonnull(getTransformStack().getData().get(Math.floorMod(depth, sizeOfTransformStack()))).clone(); }
 
 	protected IAffineTransformStack getTransformStack() { return transformStack; }
 }

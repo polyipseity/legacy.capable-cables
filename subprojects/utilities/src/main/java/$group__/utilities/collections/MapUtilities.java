@@ -1,5 +1,6 @@
-package $group__.utilities;
+package $group__.utilities.collections;
 
+import $group__.utilities.ThrowableUtilities;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.MapMaker;
 

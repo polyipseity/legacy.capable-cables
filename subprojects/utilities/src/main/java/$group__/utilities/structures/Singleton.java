@@ -1,7 +1,7 @@
 package $group__.utilities.structures;
 
 import $group__.utilities.CapacityUtilities;
-import $group__.utilities.MapUtilities;
+import $group__.utilities.collections.MapUtilities;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;

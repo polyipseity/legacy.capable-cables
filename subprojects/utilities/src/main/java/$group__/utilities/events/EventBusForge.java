@@ -2,6 +2,7 @@ package $group__.utilities.events;
 
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.ThrowableUtilities;
+import $group__.utilities.interfaces.IDelegating;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.subjects.Subject;
@@ -15,7 +16,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public class EventBusForge
-		extends Subject<Event> {
+		extends Subject<Event>
+		implements IDelegating<IEventBus> {
 	public static final Subject<Event> FORGE_EVENT_BUS = new EventBusForge(Bus.FORGE.bus().get());
 	private static final ThreadLocal<Subject<Event>> MOD_EVENT_BUS = ThreadLocal.withInitial(() ->
 			new EventBusForge(Bus.MOD.bus().get()));
@@ -54,7 +56,8 @@ public class EventBusForge
 		observer.onSubscribe(new EventBusForgeDisposable(getDelegated(), oc.getEventType(), oc));
 	}
 
-	protected IEventBus getDelegated() { return delegated; }
+	@Override
+	public IEventBus getDelegated() { return delegated; }
 
 	@Override
 	public void onSubscribe(@Nonnull Disposable d) { throw new UnsupportedOperationException(); }

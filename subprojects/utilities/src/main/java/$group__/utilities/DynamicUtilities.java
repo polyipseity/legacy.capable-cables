@@ -3,6 +3,7 @@ package $group__.utilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
+import $group__.utilities.collections.MapUtilities;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;

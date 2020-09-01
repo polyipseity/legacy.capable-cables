@@ -2,8 +2,8 @@ package $group__.ui.core.mvvm.structures;
 
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.LoggerUtilities;
-import $group__.utilities.MapUtilities;
 import $group__.utilities.ThrowableUtilities;
+import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.interfaces.ICopyable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -20,63 +20,63 @@ public interface IAffineTransformStack
 		extends ICopyable, AutoCloseable {
 	Logger LOGGER = LogManager.getLogger();
 	ImmutableList<Function<IAffineTransformStack, Object>> OBJECT_VARIABLES = ImmutableList.of(
-			IAffineTransformStack::getDelegated);
+			IAffineTransformStack::getData);
 	ImmutableMap<String, Function<IAffineTransformStack, Object>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
-			ImmutableList.of("delegated"),
+			ImmutableList.of("data"),
 			OBJECT_VARIABLES));
 
 	@Override
 	IAffineTransformStack copy();
 
-	Stack<AffineTransform> getDelegated();
+	default AffineTransform pop() { return getData().pop(); }
 
 	static void popMultiple(IAffineTransformStack stack, int times) {
 		for (; times > 0; --times)
 			stack.pop();
 	}
 
-	default AffineTransform pop() { return getDelegated().pop(); }
+	Stack<AffineTransform> getData();
 
-	default AffineTransform push() { return getDelegated().push((AffineTransform) AssertionUtilities.assertNonnull(getDelegated().peek()).clone()); }
+	default AffineTransform push() { return getData().push((AffineTransform) AssertionUtilities.assertNonnull(getData().peek()).clone()); }
 
 	@Override
 	default void close() { createCleaner().run(); }
 
-	default boolean isClean() { return isClean(getDelegated()); }
+	default boolean isClean() { return isClean(getData()); }
 
-	static boolean isClean(Stack<AffineTransform> delegated) {
-		return delegated.size() == 1 && AssertionUtilities.assertNonnull(delegated.firstElement()).isIdentity();
+	static boolean isClean(Stack<AffineTransform> data) {
+		return data.size() == 1 && AssertionUtilities.assertNonnull(data.firstElement()).isIdentity();
 	}
 
 	default Runnable createCleaner() {
-		return () -> IAffineTransformStack.popMultiple(this, getDelegated().size() - 1);
+		return () -> IAffineTransformStack.popMultiple(this, getData().size() - 1);
 	}
 
-	default AffineTransform peek() { return AssertionUtilities.assertNonnull(getDelegated().peek()); }
+	default AffineTransform peek() { return AssertionUtilities.assertNonnull(getData().peek()); }
 
 	class LeakNotifier
 			implements Runnable {
-		protected final Stack<AffineTransform> delegated;
+		protected final Stack<AffineTransform> data;
 		@Nullable
 		protected final Throwable throwable;
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-		public LeakNotifier(Stack<AffineTransform> delegated) {
-			this.delegated = delegated;
+		public LeakNotifier(Stack<AffineTransform> data) {
+			this.data = data;
 			this.throwable = ThrowableUtilities.createIfDebug().orElse(null);
 		}
 
 		@Override
 		public void run() {
-			if (!isClean(getDelegated()))
+			if (!isClean(getData()))
 				LOGGER.warn(() -> LoggerUtilities.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(
-						LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Stack not clean, content:{}{}", System.lineSeparator(), getDelegated()),
+						LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Stack not clean, content:{}{}", System.lineSeparator(), getData()),
 						getThrowable().orElse(null)
 				));
 		}
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-		protected Stack<AffineTransform> getDelegated() { return delegated; }
+		protected Stack<AffineTransform> getData() { return data; }
 
 		protected Optional<Throwable> getThrowable() { return Optional.ofNullable(throwable); }
 	}

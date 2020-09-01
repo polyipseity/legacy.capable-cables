@@ -9,7 +9,7 @@ import $group__.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
 import $group__.ui.mvvm.views.paths.UINodePathResolver;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.MapUtilities;
+import $group__.utilities.collections.MapUtilities;
 import com.google.common.collect.Lists;
 
 import javax.annotation.Nullable;

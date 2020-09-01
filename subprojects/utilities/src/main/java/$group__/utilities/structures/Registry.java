@@ -2,8 +2,8 @@ package $group__.utilities.structures;
 
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.LoggerUtilities;
-import $group__.utilities.MapUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
+import $group__.utilities.collections.MapUtilities;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public abstract class Registry<K, V> {
-	protected final ConcurrentMap<K, RegistryObject<? extends V>> delegated = MapUtilities.getMapMakerMultiThreaded().makeMap();
+	protected final ConcurrentMap<K, RegistryObject<? extends V>> data = MapUtilities.getMapMakerMultiThreaded().makeMap();
 	protected final boolean overridable;
 	protected final Logger logger;
 
@@ -27,7 +27,7 @@ public abstract class Registry<K, V> {
 
 	public <VL extends V> RegistryObject<VL> register(K key, VL value) {
 		AtomicReference<RegistryObject<VL>> retRef = new AtomicReference<>();
-		if (getDelegated().computeIfPresent(key, (k, v) -> {
+		if (getData().computeIfPresent(key, (k, v) -> {
 			if (isOverridable())
 				getLogger().info(() ->
 						LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{}: Overriding key '{}': Replacing value '{}' with '{}'", getClass().getName(), key, v, value));
@@ -38,22 +38,22 @@ public abstract class Registry<K, V> {
 			retRef.set(vc);
 			return v;
 		}) == null)
-			getDelegated().put(key, retRef.accumulateAndGet(new RegistryObject<>(value), (vp, vn) -> vn));
+			getData().put(key, retRef.accumulateAndGet(new RegistryObject<>(value), (vp, vn) -> vn));
 		return AssertionUtilities.assertNonnull(retRef.get());
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<K, RegistryObject<? extends V>> getDelegated() { return delegated; }
+	protected ConcurrentMap<K, RegistryObject<? extends V>> getData() { return data; }
 
 	public boolean isOverridable() { return overridable; }
 
 	public Logger getLogger() { return logger; }
 
-	public Optional<? extends RegistryObject<? extends V>> get(K key) { return Optional.ofNullable(getDelegated().get(key)); }
+	public Optional<? extends RegistryObject<? extends V>> get(K key) { return Optional.ofNullable(getData().get(key)); }
 
-	public boolean containsKey(K key) { return getDelegated().containsKey(key); }
+	public boolean containsKey(K key) { return getData().containsKey(key); }
 
-	public boolean containsValue(V value) { return getDelegated().values().stream().unordered().anyMatch(o -> o.getValue().equals(value)); }
+	public boolean containsValue(V value) { return getData().values().stream().unordered().anyMatch(o -> o.getValue().equals(value)); }
 
 	public static final class RegistryObject<V> {
 		protected V value;

@@ -1,7 +1,7 @@
 package $group__.ui.mvvm.models;
 
 import $group__.ui.core.mvvm.models.IUIModel;
-import $group__.utilities.MapUtilities;
+import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;

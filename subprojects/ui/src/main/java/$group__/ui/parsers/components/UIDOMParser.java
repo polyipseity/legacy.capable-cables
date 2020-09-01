@@ -2,7 +2,7 @@ package $group__.ui.parsers.components;
 
 import $group__.ui.core.parsers.components.IUIDOMParser;
 import $group__.utilities.CapacityUtilities;
-import $group__.utilities.MapUtilities;
+import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.interfaces.IHasGenericClass;
 import com.google.common.collect.ImmutableMap;
 import org.w3c.dom.Document;

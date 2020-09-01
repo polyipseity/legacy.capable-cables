@@ -16,7 +16,7 @@ import $group__.ui.mvvm.views.events.bus.EventUIComponent;
 import $group__.ui.structures.shapes.descriptors.DelegatingShapeDescriptor;
 import $group__.ui.utilities.BindingUtilities;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.MapUtilities;
+import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventUtilities;
 import $group__.utilities.extensions.IExtension;

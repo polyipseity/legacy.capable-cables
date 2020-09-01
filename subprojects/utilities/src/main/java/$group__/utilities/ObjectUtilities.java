@@ -1,5 +1,6 @@
 package $group__.utilities;
 
+import $group__.utilities.collections.MapUtilities;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;

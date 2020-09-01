@@ -6,6 +6,8 @@ import $group__.ui.core.mvvm.binding.IHasBinding;
 import $group__.ui.parsers.components.UIDOMPrototypeParser;
 import $group__.utilities.*;
 import $group__.utilities.ThrowableUtilities.Try;
+import $group__.utilities.collections.MapUtilities;
+import $group__.utilities.dom.DOMUtilities;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import org.apache.logging.log4j.LogManager;

@@ -4,7 +4,7 @@ import $group__.ui.core.mvvm.IUIInfrastructure;
 import $group__.ui.core.mvvm.binding.IBinderAction;
 import $group__.ui.core.mvvm.models.IUIModel;
 import $group__.ui.core.mvvm.viewmodels.IUIViewModel;
-import $group__.utilities.MapUtilities;
+import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;

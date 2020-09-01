@@ -2,7 +2,7 @@ package $group__.ui.core.parsers.components;
 
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.mvvm.structures.UIPropertyMappingValue;
-import $group__.utilities.DOMUtilities;
+import $group__.utilities.dom.DOMUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
 import org.w3c.dom.Node;

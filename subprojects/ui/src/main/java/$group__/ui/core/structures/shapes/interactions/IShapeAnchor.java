@@ -1,7 +1,7 @@
 package $group__.ui.core.structures.shapes.interactions;
 
 import $group__.ui.structures.EnumUISide;
-import $group__.utilities.MapUtilities;
+import $group__.utilities.collections.MapUtilities;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
