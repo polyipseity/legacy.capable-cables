@@ -1,8 +1,8 @@
 package $group__.ui.core.mvvm.views.components.rendering;
 
-import $group__.ui.core.mvvm.binding.IHasBinding;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.utilities.ThrowableUtilities;
+import $group__.utilities.binding.core.traits.IHasBinding;
 
 import javax.annotation.Nullable;
 import java.util.Optional;

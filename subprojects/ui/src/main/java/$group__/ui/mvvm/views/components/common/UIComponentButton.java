@@ -1,6 +1,5 @@
 package $group__.ui.mvvm.views.components.common;
 
-import $group__.ui.core.mvvm.binding.IBindingMethod;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
@@ -14,11 +13,12 @@ import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.ui.UIEvent;
 import $group__.ui.events.ui.UIEventListener;
 import $group__.ui.events.ui.UIEventUtilities;
-import $group__.ui.mvvm.binding.BindingMethodSource;
 import $group__.ui.mvvm.views.components.UIComponentContainer;
 import $group__.ui.mvvm.views.events.ui.UIEventKeyboard;
 import $group__.ui.mvvm.views.events.ui.UIEventMouse;
 import $group__.ui.structures.EnumCursor;
+import $group__.utilities.binding.core.methods.IBindingMethodSource;
+import $group__.utilities.binding.methods.BindingMethodSource;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
 
@@ -38,9 +38,9 @@ public class UIComponentButton
 	public static final INamespacePrefixedString METHOD_ON_ACTIVATED_LOCATION = new NamespacePrefixedString(METHOD_ON_ACTIVATED);
 
 	@UIMethod(METHOD_ON_ACTIVATE)
-	protected final IBindingMethod.Source<IUIEventActivate> methodOnActivate;
+	protected final IBindingMethodSource<IUIEventActivate> methodOnActivate;
 	@UIMethod(METHOD_ON_ACTIVATED)
-	protected final IBindingMethod.Source<IUIEvent> methodOnActivated;
+	protected final IBindingMethodSource<IUIEvent> methodOnActivated;
 
 	protected final Set<IButtonState> buttonStates = EnumSet.noneOf(IButtonState.class);
 
@@ -85,11 +85,11 @@ public class UIComponentButton
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Set<IButtonState> getButtonStates() { return buttonStates; }
 
-	protected IBindingMethod.Source<IUIEvent> getMethodOnActivated() {
+	protected IBindingMethodSource<IUIEvent> getMethodOnActivated() {
 		return methodOnActivated;
 	}
 
-	protected IBindingMethod.Source<IUIEventActivate> getMethodOnActivate() { return methodOnActivate; }
+	protected IBindingMethodSource<IUIEventActivate> getMethodOnActivate() { return methodOnActivate; }
 
 	@Override
 	public boolean isFocusable() { return true; }

@@ -1,9 +1,5 @@
 package $group__.ui.mvvm.views.components;
 
-import $group__.ui.core.mvvm.binding.IBinderAction;
-import $group__.ui.core.mvvm.binding.IBindingField;
-import $group__.ui.core.mvvm.binding.IBindingMethod;
-import $group__.ui.core.mvvm.binding.IHasBinding;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
@@ -14,6 +10,10 @@ import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.mvvm.views.UIView;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.TreeUtilities;
+import $group__.utilities.binding.core.IBinderAction;
+import $group__.utilities.binding.core.fields.IBindingField;
+import $group__.utilities.binding.core.methods.IBindingMethod;
+import $group__.utilities.binding.core.traits.IHasBinding;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;

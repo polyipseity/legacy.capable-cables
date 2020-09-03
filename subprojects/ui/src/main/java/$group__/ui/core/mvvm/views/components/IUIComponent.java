@@ -1,13 +1,13 @@
 package $group__.ui.core.mvvm.views.components;
 
-import $group__.ui.core.mvvm.binding.IHasBinding;
-import $group__.ui.core.mvvm.binding.IHasBindingMap;
+import $group__.ui.core.binding.traits.IHasBindingMap;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.ui.core.mvvm.views.paths.IUINode;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
 import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
+import $group__.utilities.binding.core.traits.IHasBinding;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;

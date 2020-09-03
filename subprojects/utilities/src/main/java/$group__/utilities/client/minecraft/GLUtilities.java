@@ -50,7 +50,7 @@ public enum GLUtilities {
 		private static final Logger LOGGER = LogManager.getLogger();
 
 
-		private static final ConcurrentMap<String, Deque<GLCall>> STACKS = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
+		private static final ConcurrentMap<String, Deque<GLCall>> STACKS = MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 
 		public static void push(String name, Runnable action, Runnable fallback) {
 			getStack(name).push(new GLCall(action, fallback));
@@ -101,7 +101,7 @@ public enum GLUtilities {
 	public enum State {
 		;
 
-		private static final ConcurrentMap<Integer, Object> STATE = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
+		private static final ConcurrentMap<Integer, Object> STATE = MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 
 		public static int getInteger(int name) { return (int) STATE.computeIfAbsent(name, GL11::glGetInteger); }
 

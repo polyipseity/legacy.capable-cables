@@ -1,34 +1,33 @@
 package $group__.ui.mvvm;
 
 import $group__.ui.core.mvvm.IUIInfrastructure;
-import $group__.ui.core.mvvm.binding.IBinder;
-import $group__.ui.core.mvvm.binding.IBinderAction;
 import $group__.ui.core.mvvm.viewmodels.IUIViewModel;
 import $group__.ui.core.mvvm.views.IUIView;
+import $group__.utilities.binding.core.BindingTransformerNotFoundException;
+import $group__.utilities.binding.core.IBinder;
+import $group__.utilities.binding.core.IBinderAction;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.reactive.DisposableObserverAuto;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
-import io.reactivex.rxjava3.core.Observer;
-import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 
-import java.util.HashSet;
+import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Supplier;
 
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
 public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, B extends IBinder>
 		implements IUIInfrastructure<V, VM, B> {
-	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
-	protected final Set<Disposable> binderDisposables = new HashSet<>(2);
+	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final CompositeDisposable binderDisposables = new CompositeDisposable();
 	protected V view;
 	protected VM viewModel;
 	protected B binder;
@@ -80,41 +79,36 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 
 	protected void setBound(boolean bound) { this.bound = bound; }
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Set<Disposable> getBinderDisposables() { return binderDisposables; }
-
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public void bind() {
 		IUIInfrastructure.checkBoundState(isBound(), false);
-
 		// COMMENT must bind the bindings of view first
-		getBinder().bindFields(Iterables.concat(getView().getBindingFields(), getViewModel().getBindingFields()));
-		getBinder().bindMethods(Iterables.concat(getView().getBindingMethods(), getViewModel().getBindingMethods()));
+		getBinder().bind(Iterables.concat(
+				// COMMENT fields
+				getView().getBindingFields(), getView().getBindingMethods(),
+				// COMMENT methods
+				getViewModel().getBindingFields(), getViewModel().getBindingMethods()));
 
-		Supplier<? extends Observer<? super IBinderAction>> s = () -> {
-			DisposableObserver<IBinderAction> d = IBinder.createBinderActionObserver(getBinder());
-			getBinderDisposables().add(d);
-			return d;
-		};
-		Streams.stream(getView().getBinderNotifiers()).unordered().distinct()
+		Streams.stream(
+				Iterables.concat(getView().getBinderNotifiers(), getViewModel().getBinderNotifiers())).unordered().distinct()
 				.forEach(n ->
-						n.subscribe(s.get()));
-		Streams.stream(getViewModel().getBinderNotifiers()).unordered().distinct()
-				.forEach(n ->
-						n.subscribe(s.get()));
+						n.subscribe(createBinderActionObserver()));
 
 		setBound(true);
+	}
+
+	protected DisposableObserver<IBinderAction> createBinderActionObserver() {
+		DisposableObserver<IBinderAction> d = createBinderActionObserver(getBinder());
+		getBinderDisposables().add(d);
+		return d;
 	}
 
 	@Override
 	public void unbind() {
 		IUIInfrastructure.checkBoundState(isBound(), true);
 
-		getBinderDisposables().stream().unordered()
-				.forEach(Disposable::dispose);
 		getBinderDisposables().clear();
-
 		getBinder().unbindAll();
 
 		setBound(false);
@@ -134,4 +128,29 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() { return extensions; }
+
+	public static DisposableObserver<IBinderAction> createBinderActionObserver(IBinder binder) {
+		return new DisposableObserverAuto<IBinderAction>() {
+			@Override
+			public void onNext(@Nonnull IBinderAction o) {
+				try {
+					switch (o.getActionType()) {
+						case BIND:
+							binder.bind(o.getBindings());
+							break;
+						case UNBIND:
+							binder.unbind(o.getBindings());
+							break;
+						default:
+							onError(new InternalError());
+							break;
+					}
+				} catch (BindingTransformerNotFoundException ex) {
+					onError(ex);
+				}
+			}
+		};
+	}
+
+	protected CompositeDisposable getBinderDisposables() { return binderDisposables; }
 }

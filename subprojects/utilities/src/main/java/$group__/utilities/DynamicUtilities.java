@@ -3,8 +3,8 @@ package $group__.utilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
+import $group__.utilities.collections.CacheUtilities;
 import $group__.utilities.collections.MapUtilities;
-import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
@@ -44,7 +44,7 @@ public enum DynamicUtilities {
 
 
 	public static final LoadingCache<String, Reflections> REFLECTIONS_CACHE =
-			CacheBuilder.newBuilder().initialCapacity(INITIAL_CAPACITY_SMALL).expireAfterAccess(MapUtilities.CACHE_EXPIRATION_ACCESS_DURATION, MapUtilities.CACHE_EXPIRATION_ACCESS_TIME_UNIT).concurrencyLevel(ConcurrencyUtilities.MULTI_THREAD_THREAD_COUNT).build(CacheLoader.from(t -> {
+			CacheUtilities.newCacheBuilderSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).expireAfterAccess(MapUtilities.CACHE_EXPIRATION_ACCESS_DURATION, MapUtilities.CACHE_EXPIRATION_ACCESS_TIME_UNIT).build(CacheLoader.from(t -> {
 				Reflections r = new Reflections(t);
 				r.expandSuperTypes();
 				return r;

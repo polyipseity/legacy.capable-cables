@@ -15,7 +15,7 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
 public class UIModel
 		implements IUIModel {
-	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 
 	@Override
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) { return IExtensionContainer.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension); }

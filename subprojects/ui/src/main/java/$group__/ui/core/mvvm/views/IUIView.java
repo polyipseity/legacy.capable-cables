@@ -1,8 +1,8 @@
 package $group__.ui.core.mvvm.views;
 
 import $group__.ui.core.mvvm.IUICommon;
-import $group__.ui.core.mvvm.binding.IHasBinding;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
+import $group__.utilities.binding.core.traits.IHasBinding;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 

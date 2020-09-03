@@ -26,7 +26,7 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 	protected final Rectangle2D bounds = IShapeDescriptor.getShapePlaceholderCopy();
 	protected final List<IShapeConstraint> constraints = new LinkedList<>();
 	protected final ConcurrentMap<String, Consumer<?>> properties =
-			MapUtilities.getMapMakerSingleThreaded().makeMap();
+			MapUtilities.newMapMakerSingleThreaded().makeMap();
 
 	protected AbstractShapeDescriptorBuilder(Class<S> genericClass) { super(genericClass); }
 

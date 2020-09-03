@@ -7,7 +7,7 @@ import com.google.common.collect.MapMaker;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static $group__.utilities.ConcurrencyUtilities.MULTI_THREAD_THREAD_COUNT;
+import static $group__.utilities.ConcurrencyUtilities.NORMAL_THREAD_THREAD_COUNT;
 import static $group__.utilities.ConcurrencyUtilities.SINGLE_THREAD_THREAD_COUNT;
 
 public enum MapUtilities {
@@ -16,13 +16,9 @@ public enum MapUtilities {
 	public static final long CACHE_EXPIRATION_ACCESS_DURATION = 15;
 	public static final TimeUnit CACHE_EXPIRATION_ACCESS_TIME_UNIT = TimeUnit.MINUTES;
 
-	public static MapMaker getMapMakerSingleThreaded() {
-		return new MapMaker().concurrencyLevel(SINGLE_THREAD_THREAD_COUNT);
-	}
+	public static MapMaker newMapMakerSingleThreaded() { return new MapMaker().concurrencyLevel(SINGLE_THREAD_THREAD_COUNT); }
 
-	public static MapMaker getMapMakerMultiThreaded() {
-		return new MapMaker().concurrencyLevel(MULTI_THREAD_THREAD_COUNT);
-	}
+	public static MapMaker newMapMakerNormalThreaded() { return new MapMaker().concurrencyLevel(NORMAL_THREAD_THREAD_COUNT); }
 
 	@SafeVarargs
 	public static <K, V> Map<K, V> concatMaps(Map<? extends K, ? extends V>... maps) {

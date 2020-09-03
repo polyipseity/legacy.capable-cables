@@ -2,9 +2,6 @@ package $group__.ui.debug;
 
 import $group__.ui.ConfigurationUI;
 import $group__.ui.UIFacade;
-import $group__.ui.core.mvvm.binding.IBinder;
-import $group__.ui.core.mvvm.binding.IBindingField;
-import $group__.ui.core.mvvm.binding.IBindingMethod;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIViewComponent;
@@ -20,10 +17,6 @@ import $group__.ui.minecraft.mvvm.components.UIViewComponentMinecraft;
 import $group__.ui.minecraft.mvvm.components.common.UIComponentWindowMinecraft;
 import $group__.ui.minecraft.mvvm.components.parsers.dom.UIDOMPrototypeMinecraftParser;
 import $group__.ui.minecraft.mvvm.viewmodels.UIViewModelMinecraft;
-import $group__.ui.mvvm.binding.Binder;
-import $group__.ui.mvvm.binding.BindingField;
-import $group__.ui.mvvm.binding.BindingMethodDestination;
-import $group__.ui.mvvm.binding.ObservableField;
 import $group__.ui.mvvm.models.UIModel;
 import $group__.ui.mvvm.views.components.common.UIComponentButton;
 import $group__.ui.mvvm.views.components.extensions.UIExtensionCursorHandleProviderComponent;
@@ -32,6 +25,14 @@ import $group__.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
+import $group__.utilities.binding.Binder;
+import $group__.utilities.binding.core.IBinder;
+import $group__.utilities.binding.core.IBinding.EnumBindingType;
+import $group__.utilities.binding.core.fields.IBindingField;
+import $group__.utilities.binding.core.methods.IBindingMethodDestination;
+import $group__.utilities.binding.fields.BindingField;
+import $group__.utilities.binding.fields.ObservableField;
+import $group__.utilities.binding.methods.BindingMethodDestination;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
@@ -129,8 +130,8 @@ public enum UIDebugMinecraft {
 		private static AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> createUI(DebugContainer container) {
 			IBinder binder = new Binder();
 			// COMMENT Color <-> Integer
-			binder.addFieldTransformer((Color color) -> Optional.ofNullable(color).map(Color::getRGB).orElse(null));
-			binder.addFieldTransformer((Integer t) -> Optional.ofNullable(t).map(i -> new Color(i, true)).orElse(null));
+			binder.addTransformer(EnumBindingType.FIELD, (Color color) -> Optional.ofNullable(color).map(Color::getRGB).orElse(null));
+			binder.addTransformer(EnumBindingType.FIELD, (Integer t) -> Optional.ofNullable(t).map(i -> new Color(i, true)).orElse(null));
 
 			AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> ret =
 					UIFacade.Minecraft.createScreen(
@@ -177,13 +178,13 @@ public enum UIDebugMinecraft {
 			protected final IBindingField<Integer> anchoredWindowBorderColor = new BindingField<>(
 					new NamespacePrefixedString("anchoredWindowBorderColor"),
 					new ObservableField<>(Integer.class, null));
-			protected final IBindingMethod.Destination<UIComponentButton.IUIEventActivate> buttonOnActivate = new BindingMethodDestination<>(
+			protected final IBindingMethodDestination<UIComponentButton.IUIEventActivate> buttonOnActivate = new BindingMethodDestination<>(
 					UIComponentButton.IUIEventActivate.class,
 					new NamespacePrefixedString("buttonOnActivate"),
 					this::onButtonActivate);
 			protected boolean anchoredWindowFlickering = false;
 			protected final Random random = new Random();
-			protected final IBindingMethod.Destination<IUIEvent> buttonOnActivated = new BindingMethodDestination<>(
+			protected final IBindingMethodDestination<IUIEvent> buttonOnActivated = new BindingMethodDestination<>(
 					IUIEvent.class,
 					new NamespacePrefixedString("buttonOnActivated"),
 					this::onButtonActivated);
@@ -201,10 +202,10 @@ public enum UIDebugMinecraft {
 			protected void setAnchoredWindowFlickering(boolean anchoredWindowFlickering) { this.anchoredWindowFlickering = anchoredWindowFlickering; }
 
 			@SuppressWarnings("unused")
-			protected IBindingMethod.Destination<IUIEvent> getButtonOnActivated() { return buttonOnActivated; }
+			protected IBindingMethodDestination<IUIEvent> getButtonOnActivated() { return buttonOnActivated; }
 
 			@SuppressWarnings("unused")
-			protected IBindingMethod.Destination<UIComponentButton.IUIEventActivate> getButtonOnActivate() { return buttonOnActivate; }
+			protected IBindingMethodDestination<UIComponentButton.IUIEventActivate> getButtonOnActivate() { return buttonOnActivate; }
 
 			protected void onButtonActivate(UIComponentButton.IUIEventActivate e) {
 				boolean ret = false;

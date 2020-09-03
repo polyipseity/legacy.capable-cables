@@ -1,6 +1,5 @@
 package $group__.ui.mvvm.views.components;
 
-import $group__.ui.core.mvvm.binding.*;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
@@ -10,12 +9,16 @@ import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.events.ui.UIEventTarget;
-import $group__.ui.mvvm.binding.BindingMethodSource;
 import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
 import $group__.ui.mvvm.views.events.bus.EventUIComponent;
+import $group__.ui.parsers.components.UIDOMPrototypeParser;
 import $group__.ui.structures.shapes.descriptors.DelegatingShapeDescriptor;
-import $group__.ui.utilities.BindingUtilities;
 import $group__.utilities.CastUtilities;
+import $group__.utilities.binding.core.IBinderAction;
+import $group__.utilities.binding.core.fields.IBindingField;
+import $group__.utilities.binding.core.fields.IField;
+import $group__.utilities.binding.core.methods.IBindingMethodSource;
+import $group__.utilities.binding.methods.BindingMethodSource;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventUtilities;
@@ -57,8 +60,8 @@ public class UIComponent
 	protected final String id;
 	protected final Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping;
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
-	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
-	protected final ConcurrentMap<INamespacePrefixedString, IBindingMethod.Source<? extends IUIEvent>> eventTargetBindingMethods = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<INamespacePrefixedString, IBindingMethodSource<? extends IUIEvent>> eventTargetBindingMethods = MapUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	// todo add animation system
 	// todo cache transform
 	protected final IShapeDescriptor<?> shapeDescriptor;
@@ -80,10 +83,10 @@ public class UIComponent
 				.map(Node::getNodeValue)
 				.orElse(null);
 
-		this.visible = IHasBinding.createBindingField(Boolean.class, false, true,
-				this.mapping.get(PROPERTY_VISIBLE_LOCATION), BindingUtilities.Deserializers::deserializeBoolean);
-		this.active = IHasBinding.createBindingField(Boolean.class, false, true,
-				this.mapping.get(PROPERTY_ACTIVE_LOCATION), BindingUtilities.Deserializers::deserializeBoolean);
+		this.visible = IUIPropertyMappingValue.createBindingField(Boolean.class, false, true,
+				this.mapping.get(PROPERTY_VISIBLE_LOCATION), UIDOMPrototypeParser.Deserializers::deserializeBoolean);
+		this.active = IUIPropertyMappingValue.createBindingField(Boolean.class, false, true,
+				this.mapping.get(PROPERTY_ACTIVE_LOCATION), UIDOMPrototypeParser.Deserializers::deserializeBoolean);
 
 		IExtensionContainer.addExtensionChecked(this, new UIExtensionCache());
 	}
@@ -127,7 +130,7 @@ public class UIComponent
 	public boolean dispatchEvent(IUIEvent event) {
 		boolean ret = super.dispatchEvent(event);
 		INamespacePrefixedString type = event.getType();
-		@Nullable IBindingMethod.Source<? extends IUIEvent> method = getEventTargetBindingMethods().get(type);
+		@Nullable IBindingMethodSource<? extends IUIEvent> method = getEventTargetBindingMethods().get(type);
 		if (method == null) {
 			method = new BindingMethodSource<>(event.getClass(),
 					Optional.ofNullable(getMapping().get(type)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
@@ -157,7 +160,7 @@ public class UIComponent
 	protected void setParent(@Nullable IUIComponentContainer parent) { this.parent = new WeakReference<>(parent); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<INamespacePrefixedString, IBindingMethod.Source<? extends IUIEvent>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }
+	protected ConcurrentMap<INamespacePrefixedString, IBindingMethodSource<? extends IUIEvent>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMapping() { return mapping; }

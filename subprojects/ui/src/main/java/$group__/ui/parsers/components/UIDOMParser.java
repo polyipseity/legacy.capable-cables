@@ -19,7 +19,7 @@ public abstract class UIDOMParser<T>
 		implements IUIDOMParser<T> {
 	protected final String mainNamespaceURI;
 	protected final ConcurrentMap<String, Schema> schemaMap =
-			MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_TINY).makeMap();
+			MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_TINY).makeMap();
 
 	public UIDOMParser(Class<T> genericClass, String mainNamespaceURI, Schema mainSchema) {
 		super(genericClass);

@@ -59,9 +59,9 @@ public class UIScreenAdapter
 		extends AbstractContainerScreenAdapter<I, C>
 		implements IUIAdapter<I> {
 	protected final ConcurrentMap<Integer, IUIEventKeyboard>
-			keyboardKeysBeingPressed = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+			keyboardKeysBeingPressed = MapUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected final ConcurrentMap<Integer, IUIEventMouse>
-			mouseButtonsBeingPressed = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+			mouseButtonsBeingPressed = MapUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 
 	protected final I infrastructure;
 	@Nullable

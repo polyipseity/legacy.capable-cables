@@ -1,8 +1,8 @@
 package $group__.ui.minecraft.core.mvvm;
 
 import $group__.ui.core.mvvm.IUIInfrastructure;
-import $group__.ui.core.mvvm.binding.IBinder;
 import $group__.ui.minecraft.core.mvvm.views.IUIViewMinecraft;
+import $group__.utilities.binding.core.IBinder;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 

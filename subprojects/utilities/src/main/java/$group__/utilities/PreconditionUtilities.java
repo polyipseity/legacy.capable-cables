@@ -16,7 +16,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 public enum PreconditionUtilities {
 	;
 
-	private static final Map<Class<?>, Throwable> RAN_ONCE = MapUtilities.getMapMakerMultiThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_LARGE).makeMap();
+	private static final Map<Class<?>, Throwable> RAN_ONCE = MapUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_LARGE).makeMap();
 
 
 	public static void checkArgumentTypes(Class<?>[] types, Object... args) {

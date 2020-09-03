@@ -27,7 +27,7 @@ public class UIComponentPathResolver
 		implements IUIComponentPathResolver<IUIComponent> {
 	protected final WeakReference<IUIComponentManager<?>> manager;
 	protected final ConcurrentMap<IUIComponent, List<Consumer<? super IAffineTransformStack>>> childrenTransformersMap =
-			MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).weakKeys().makeMap();
+			MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).weakKeys().makeMap();
 
 	public UIComponentPathResolver(IUIComponentManager<?> manager) {
 		this.manager = new WeakReference<>(manager);

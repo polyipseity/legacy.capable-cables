@@ -18,7 +18,7 @@ import static java.lang.System.lineSeparator;
 import static java.lang.invoke.MethodType.methodType;
 
 public abstract class Singleton {
-	protected static final Map<Class<?>, Map.Entry<? extends Singleton, String>> INSTANCES = Collections.synchronizedMap(MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap());
+	protected static final Map<Class<?>, Map.Entry<? extends Singleton, String>> INSTANCES = Collections.synchronizedMap(MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap());
 
 
 	protected Singleton(Logger logger) {

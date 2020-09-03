@@ -1,6 +1,5 @@
 package $group__.ui;
 
-import $group__.ui.core.mvvm.binding.IBinder;
 import $group__.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
 import $group__.ui.minecraft.core.mvvm.IUIViewModelMinecraft;
 import $group__.ui.minecraft.core.mvvm.views.IUIViewMinecraft;
@@ -11,6 +10,7 @@ import $group__.ui.minecraft.mvvm.adapters.UIScreenAdapter;
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
+import $group__.utilities.binding.core.IBinder;
 import $group__.utilities.client.minecraft.ResourceUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import net.minecraft.inventory.container.Container;

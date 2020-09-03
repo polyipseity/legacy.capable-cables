@@ -1,4 +1,4 @@
-package $group__.ui.core.mvvm.binding;
+package $group__.ui.core.binding.traits;
 
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.utilities.interfaces.INamespacePrefixedString;

@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public abstract class Registry<K, V> {
-	protected final ConcurrentMap<K, RegistryObject<? extends V>> data = MapUtilities.getMapMakerMultiThreaded().makeMap();
+	protected final ConcurrentMap<K, RegistryObject<? extends V>> data = MapUtilities.newMapMakerNormalThreaded().makeMap();
 	protected final boolean overridable;
 	protected final Logger logger;
 

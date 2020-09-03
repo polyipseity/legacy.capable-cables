@@ -1,8 +1,8 @@
 package $group__.ui.mvvm.views;
 
 import $group__.ui.core.mvvm.IUIInfrastructure;
-import $group__.ui.core.mvvm.binding.IBinderAction;
 import $group__.ui.core.mvvm.views.IUIView;
+import $group__.utilities.binding.core.IBinderAction;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
@@ -26,7 +26,7 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 public abstract class UIView<S extends Shape>
 		implements IUIView<S> {
 	protected WeakReference<IUIInfrastructure<?, ?, ?>> infrastructure = new WeakReference<>(null);
-	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 
 	@Override

@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class ShapeAnchorSet
 		implements IShapeAnchorSet {
-	protected final ConcurrentMap<EnumUISide, IShapeAnchor> anchors = MapUtilities.getMapMakerSingleThreaded().initialCapacity(EnumUISide.values().length).makeMap();
+	protected final ConcurrentMap<EnumUISide, IShapeAnchor> anchors = MapUtilities.newMapMakerSingleThreaded().initialCapacity(EnumUISide.values().length).makeMap();
 
 	public static Set<IShapeAnchor> getAnchorsToMatch(IShapeDescriptorProvider target) { return getAnchorsToMatch(target, 0); }
 

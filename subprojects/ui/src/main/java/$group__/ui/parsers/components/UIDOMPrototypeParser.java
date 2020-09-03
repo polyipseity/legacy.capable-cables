@@ -4,12 +4,10 @@ import $group__.ui.ConfigurationUI;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.parsers.components.IGeneralPrototype;
 import $group__.ui.core.parsers.components.IUIDOMPrototypeParser;
-import $group__.utilities.CapacityUtilities;
-import $group__.utilities.NamespaceUtilities;
+import $group__.utilities.*;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
-import $group__.utilities.TreeUtilities;
 import $group__.utilities.client.minecraft.ResourceUtilities;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.dom.DOMUtilities;
@@ -27,6 +25,7 @@ import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import java.awt.*;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,8 +54,8 @@ public class UIDOMPrototypeParser<T extends IUIComponentManager<?>>
 	}
 
 	protected final ConcurrentMap<INamespacePrefixedString, BiFunction<? super IUIDOMPrototypeParser<?>, ? super Node, ? extends IGeneralPrototype>> visitors =
-			MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap();
-	protected final ConcurrentMap<String, String> aliases = MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
+			MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<String, String> aliases = MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 	@Nullable
 	protected UIComponentPrototype prototype;
 
@@ -159,4 +158,69 @@ public class UIDOMPrototypeParser<T extends IUIComponentManager<?>>
 	protected Optional<? extends UIComponentPrototype> getPrototype() { return Optional.ofNullable(prototype); }
 
 	protected void setPrototype(@Nullable UIComponentPrototype prototype) { this.prototype = prototype; }
+
+	public enum Deserializers {
+		;
+
+		private static final Logger LOGGER = LogManager.getLogger();
+
+		public static Optional<Boolean> deserializeBoolean(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "boolean")
+					.map(Boolean::valueOf), node);
+		}
+
+		// TODO some values are nullable
+		public static <T> Optional<T> warnIfNotPresent(boolean nullable, @SuppressWarnings("OptionalUsedAsFieldOrParameterType") Optional<T> optional, Node node) {
+			if (!(nullable || optional.isPresent()))
+				LOGGER.warn(() -> LoggerUtilities.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(
+						LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot deserialize node:{}{}",
+								System.lineSeparator(), node),
+						ThrowableUtilities.createIfDebug().orElse(null)
+				));
+			return optional;
+		}
+
+		public static Optional<Byte> deserializeByte(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "byte")
+					.map(Byte::valueOf), node);
+		}
+
+		public static Optional<Short> deserializeShort(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "short")
+					.map(Short::valueOf), node);
+		}
+
+		public static Optional<Integer> deserializeInt(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "int")
+					.map(Integer::valueOf), node);
+		}
+
+		public static Optional<Long> deserializeLong(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "long")
+					.map(Long::valueOf), node);
+		}
+
+		public static Optional<Float> deserializeFloat(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "float")
+					.map(Float::valueOf), node);
+		}
+
+		public static Optional<Double> deserializeDouble(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "double")
+					.map(Double::valueOf), node);
+		}
+
+		public static Optional<String> deserializeString(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "string"), node);
+		}
+
+		public static Optional<Color> deserializeColor(Node node, boolean nullable) {
+			return warnIfNotPresent(nullable, DOMUtilities.getChildByTagNameNS(node, SCHEMA_NAMESPACE_URI, "color")
+					.map(nc -> new Color(
+							Integer.valueOf(DOMUtilities.getAttributeValue(nc, "red").orElse("00"), RadixUtilities.RADIX_HEX),
+							Integer.valueOf(DOMUtilities.getAttributeValue(nc, "green").orElse("00"), RadixUtilities.RADIX_HEX),
+							Integer.valueOf(DOMUtilities.getAttributeValue(nc, "blue").orElse("00"), RadixUtilities.RADIX_HEX),
+							Integer.valueOf(DOMUtilities.getAttributeValue(nc, "alpha").orElse("FF"), RadixUtilities.RADIX_HEX))), node);
+		}
+	}
 }

@@ -1,7 +1,5 @@
 package $group__.ui.minecraft.mvvm.components.common;
 
-import $group__.ui.core.mvvm.binding.IBindingField;
-import $group__.ui.core.mvvm.binding.IHasBinding;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRendererContainer;
@@ -14,8 +12,9 @@ import $group__.ui.minecraft.core.mvvm.views.components.rendering.IUIComponentRe
 import $group__.ui.minecraft.mvvm.components.rendering.UIComponentRendererMinecraft;
 import $group__.ui.mvvm.views.components.common.UIComponentWindow;
 import $group__.ui.mvvm.views.components.rendering.UIComponentRendererContainer;
-import $group__.ui.utilities.BindingUtilities;
+import $group__.ui.parsers.components.UIDOMPrototypeParser;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
+import $group__.utilities.binding.core.fields.IBindingField;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
 import com.google.common.collect.ImmutableMap;
@@ -68,10 +67,10 @@ public class UIComponentWindowMinecraft
 		public DefaultRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, Class<C> containerClass) {
 			super(mapping, containerClass);
 
-			this.colorBackground = IHasBinding.createBindingField(Color.class, true, Color.BLACK,
-					this.mapping.get(PROPERTY_COLOR_BACKGROUND_LOCATION), BindingUtilities.Deserializers::deserializeColor);
-			this.colorBorder = IHasBinding.createBindingField(Color.class, true, Color.WHITE,
-					this.mapping.get(PROPERTY_COLOR_BORDER_LOCATION), BindingUtilities.Deserializers::deserializeColor);
+			this.colorBackground = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.BLACK,
+					this.mapping.get(PROPERTY_COLOR_BACKGROUND_LOCATION), UIDOMPrototypeParser.Deserializers::deserializeColor);
+			this.colorBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.WHITE,
+					this.mapping.get(PROPERTY_COLOR_BORDER_LOCATION), UIDOMPrototypeParser.Deserializers::deserializeColor);
 		}
 
 		@Override

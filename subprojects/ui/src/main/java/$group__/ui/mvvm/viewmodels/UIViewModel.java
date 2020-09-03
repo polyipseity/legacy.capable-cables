@@ -1,9 +1,9 @@
 package $group__.ui.mvvm.viewmodels;
 
 import $group__.ui.core.mvvm.IUIInfrastructure;
-import $group__.ui.core.mvvm.binding.IBinderAction;
 import $group__.ui.core.mvvm.models.IUIModel;
 import $group__.ui.core.mvvm.viewmodels.IUIViewModel;
+import $group__.utilities.binding.core.IBinderAction;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
@@ -28,7 +28,7 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 public class UIViewModel<M extends IUIModel>
 		implements IUIViewModel<M> {
 	private static final Logger LOGGER = LogManager.getLogger();
-	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.getMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected WeakReference<IUIInfrastructure<?, ?, ?>> infrastructure = new WeakReference<>(null);
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 	protected M model;

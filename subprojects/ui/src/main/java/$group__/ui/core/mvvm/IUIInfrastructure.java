@@ -1,8 +1,8 @@
 package $group__.ui.core.mvvm;
 
-import $group__.ui.core.mvvm.binding.IBinder;
 import $group__.ui.core.mvvm.viewmodels.IUIViewModel;
 import $group__.ui.core.mvvm.views.IUIView;
+import $group__.utilities.binding.core.IBinder;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 

@@ -1,10 +1,10 @@
 package $group__.ui.core.mvvm.views.components.rendering;
 
-import $group__.ui.core.mvvm.binding.IHasBinding;
-import $group__.ui.core.mvvm.binding.IHasBindingMap;
+import $group__.ui.core.binding.traits.IHasBindingMap;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
+import $group__.utilities.binding.core.traits.IHasBinding;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.interfaces.INamespacePrefixedString;
@@ -24,7 +24,7 @@ public interface IUIComponentRenderer<C extends IUIComponent>
 		// TODO this class does nothing for now, useful for user custom theming later
 		public static final INamespacePrefixedString DEFAULT_KEY = new NamespacePrefixedString("default");
 		protected static final ConcurrentMap<Class<? extends IUIComponent>, RegRenderer<?>> INSTANCES =
-				MapUtilities.getMapMakerMultiThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
+				MapUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 		protected final Class<R> variant;
 
 		protected RegRenderer(Class<R> variant, Class<? extends R> defaultValue, Logger logger) {

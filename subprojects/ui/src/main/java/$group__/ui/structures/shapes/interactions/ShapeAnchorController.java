@@ -5,12 +5,12 @@ import $group__.ui.core.structures.shapes.interactions.IShapeAnchorController;
 import $group__.ui.core.structures.shapes.interactions.IShapeAnchorSet;
 import $group__.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
 import $group__.utilities.CapacityUtilities;
-import $group__.utilities.collections.CollectionUtilities;
 import $group__.utilities.collections.MapUtilities;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
@@ -18,11 +18,11 @@ import java.util.concurrent.ConcurrentMap;
 public class ShapeAnchorController<T extends IShapeDescriptorProvider>
 		implements IShapeAnchorController<T> {
 	protected final ConcurrentMap<T, IShapeAnchorSet> anchorSets =
-			MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).weakKeys().makeMap();
+			MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).weakKeys().makeMap();
 	protected final ConcurrentMap<IShapeAnchorSet, T> anchorSetsInverse =
-			MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).weakValues().makeMap();
+			MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).weakValues().makeMap();
 	protected final ConcurrentMap<IShapeDescriptorProvider, Set<IShapeAnchor>> subscribersMap =
-			MapUtilities.getMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).weakKeys().makeMap(); // COMMENT the keys and the values of the set are weak
+			MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).weakKeys().makeMap(); // COMMENT the keys and the values of the set are weak
 
 	@Override
 	public Map<? extends T, ? extends IShapeAnchorSet> getAnchorSetsView() { return ImmutableMap.copyOf(getAnchorSets()); }
@@ -75,7 +75,7 @@ public class ShapeAnchorController<T extends IShapeDescriptorProvider>
 
 	protected Set<IShapeAnchor> getSubscribers(IShapeDescriptorProvider notifier) {
 		return getSubscribersMap().computeIfAbsent(notifier, k ->
-				CollectionUtilities.newConcurrentWeakSet(CapacityUtilities.INITIAL_CAPACITY_SMALL));
+				Collections.newSetFromMap(MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap()));
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")

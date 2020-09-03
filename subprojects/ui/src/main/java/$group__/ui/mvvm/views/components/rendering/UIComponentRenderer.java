@@ -1,10 +1,10 @@
 package $group__.ui.mvvm.views.components.rendering;
 
-import $group__.ui.core.mvvm.binding.IBinderAction;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRenderer;
 import $group__.ui.core.parsers.components.UIRendererConstructor;
+import $group__.utilities.binding.core.IBinderAction;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import com.google.common.collect.ImmutableMap;
