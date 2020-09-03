@@ -1,6 +1,6 @@
-package $group__.ui.mvvm.binding;
+package $group__.utilities.binding.methods;
 
-import $group__.ui.core.mvvm.binding.IBindingMethod;
+import $group__.utilities.binding.core.methods.IBindingMethodDestination;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 
@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 public class BindingMethodDestination<T>
 		extends IHasGenericClass.Impl<T>
-		implements IBindingMethod.Destination<T> {
+		implements IBindingMethodDestination<T> {
 	@Nullable
 	protected final INamespacePrefixedString bindingKey;
 	protected final Consumer<T> action;

@@ -1,4 +1,4 @@
-package $group__.ui.core.mvvm.binding;
+package $group__.utilities.binding.core;
 
 public class BindingTransformerNotFoundException extends RuntimeException {
 	private static final long serialVersionUID = 7374170655174983888L;

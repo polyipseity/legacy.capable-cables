@@ -1,6 +1,6 @@
-package $group__.ui.mvvm.binding;
+package $group__.utilities.binding.methods;
 
-import $group__.ui.core.mvvm.binding.IBindingMethod;
+import $group__.utilities.binding.core.methods.IBindingMethodSource;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import io.reactivex.rxjava3.core.ObservableSource;
@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class BindingMethodSource<T>
 		extends IHasGenericClass.Impl<T>
-		implements IBindingMethod.Source<T> {
+		implements IBindingMethodSource<T> {
 	@Nullable
 	protected final INamespacePrefixedString bindingKey;
 	protected final Subject<T> notifierSubject = PublishSubject.create();

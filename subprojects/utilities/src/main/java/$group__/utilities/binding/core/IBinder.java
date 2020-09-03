@@ -1,20 +1,11 @@
-package $group__.ui.core.mvvm.binding;
+package $group__.utilities.binding.core;
 
-import $group__.utilities.CapacityUtilities;
-import $group__.utilities.CastUtilities;
 import $group__.utilities.DynamicUtilities;
-import $group__.utilities.collections.MapUtilities;
-import $group__.utilities.interfaces.INamespacePrefixedString;
-import $group__.utilities.reactive.DisposableObserverAuto;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
-import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.jodah.typetools.TypeResolver;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Map;
+import java.util.EnumSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -93,23 +84,16 @@ public interface IBinder {
 						.map(m -> (Function<T, R>) m.get(to));
 	}
 
-	boolean bindMethods(Iterable<? extends IBindingMethod<?>> methods);
+	boolean bind(Iterable<? extends IBinding<?>> bindings)
+			throws BindingTransformerNotFoundException;
 
-	boolean unbindFields(Iterable<? extends IBindingField<?>> fields);
+	boolean unbind(Iterable<? extends IBinding<?>> bindings);
 
-	boolean unbindMethods(Iterable<? extends IBindingMethod<?>> methods);
+	<T, R> Optional<? extends Function<T, R>> addTransformer(IBinding.EnumBindingType type, Function<T, R> transformer);
 
-	<T, R> Optional<? extends Function<T, R>> addFieldTransformer(Function<T, R> transformer);
+	<T, R> Optional<? extends Function<T, R>> removeTransformer(IBinding.EnumBindingType type, Class<T> from, Class<R> to);
 
-	<T, R> Optional<? extends Function<T, R>> addMethodTransformer(Function<T, R> transformer);
+	default boolean unbindAll() { return unbindAll(EnumSet.allOf(IBinding.EnumBindingType.class)); }
 
-	<T, R> Optional<? extends Function<T, R>> removeFieldTransformer(Class<T> from, Class<R> to);
-
-	<T, R> Optional<? extends Function<T, R>> removeMethodTransformer(Class<T> from, Class<R> to);
-
-	default boolean unbindAll() { return unbindAllFields() | unbindAllMethods(); }
-
-	boolean unbindAllFields();
-
-	boolean unbindAllMethods();
+	boolean unbindAll(Set<IBinding.EnumBindingType> types);
 }

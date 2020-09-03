@@ -1,7 +1,7 @@
-package $group__.ui.mvvm.binding;
+package $group__.utilities.binding.fields;
 
-import $group__.ui.core.mvvm.binding.IBindingField;
-import $group__.ui.core.mvvm.binding.IObservableField;
+import $group__.utilities.binding.core.fields.IBindingField;
+import $group__.utilities.binding.core.fields.IObservableField;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 
 import javax.annotation.Nullable;

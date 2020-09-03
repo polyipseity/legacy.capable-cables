@@ -1,21 +1,19 @@
-package $group__.ui.utilities;
+package $group__.utilities.binding;
 
-import $group__.ui.core.mvvm.binding.IBindingField;
-import $group__.ui.core.mvvm.binding.IBindingMethod;
-import $group__.ui.core.mvvm.binding.IHasBinding;
-import $group__.ui.parsers.components.UIDOMPrototypeParser;
-import $group__.utilities.*;
+import $group__.utilities.CapacityUtilities;
+import $group__.utilities.CastUtilities;
+import $group__.utilities.DynamicUtilities;
 import $group__.utilities.ThrowableUtilities.Try;
+import $group__.utilities.binding.core.fields.IBindingField;
+import $group__.utilities.binding.core.methods.IBindingMethod;
+import $group__.utilities.binding.core.traits.IHasBinding;
 import $group__.utilities.collections.MapUtilities;
-import $group__.utilities.dom.DOMUtilities;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.w3c.dom.Node;
 
 import javax.annotation.Nullable;
-import java.awt.*;
 import java.lang.reflect.Modifier;
 import java.util.EnumSet;
 import java.util.Optional;
@@ -28,11 +26,11 @@ import java.util.stream.Stream;
 public enum BindingUtilities {
 	;
 	protected static final ConcurrentMap<Class<?>, BiFunction<? super Set<EnumOptions>, ?, ? extends Iterable<IBindingField<?>>>> BINDING_FIELDS_MAP
-			= MapUtilities.getMapMakerMultiThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
+			= MapUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 	protected static final ConcurrentMap<Class<?>, BiFunction<? super Set<EnumOptions>, ?, ? extends Iterable<IBindingMethod<?>>>> BINDING_METHODS_MAP
-			= MapUtilities.getMapMakerMultiThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
+			= MapUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 	protected static final ConcurrentMap<Class<?>, Function<?, ? extends Iterable<IHasBinding>>> HAS_BINDING_VARIABLES_MAP
-			= MapUtilities.getMapMakerMultiThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
+			= MapUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 	private static final Logger LOGGER = LogManager.getLogger();
 
 	public static Iterable<IBindingField<?>> getBindingFields(Object object, Set<EnumOptions> options) { return getBindingFieldsFunction(object.getClass(), options).apply(CastUtilities.castUnchecked(object)); /* COMMENT should be safe */ }
@@ -129,75 +127,10 @@ public enum BindingUtilities {
 		}
 	}
 
+	public static Iterable<IHasBinding> getHasBindingsVariables(Object object) { return getHasBindingsVariablesFunction(object.getClass()).apply(CastUtilities.castUnchecked(object)); /* COMMENT should be safe */ }
+
 	public enum EnumOptions {
 		SELF,
 		VARIABLES,
-	}
-
-	public static Iterable<IHasBinding> getHasBindingsVariables(Object object) { return getHasBindingsVariablesFunction(object.getClass()).apply(CastUtilities.castUnchecked(object)); /* COMMENT should be safe */ }
-
-	public enum Deserializers {
-		;
-
-		private static final Logger LOGGER = LogManager.getLogger();
-
-		public static Optional<Boolean> deserializeBoolean(Node node, boolean nullable) {
-			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "boolean")
-					.map(Boolean::valueOf), node);
-		}
-
-		// TODO some values are nullable
-		public static <T> Optional<T> warnIfNotPresent(boolean nullable, @SuppressWarnings("OptionalUsedAsFieldOrParameterType") Optional<T> optional, Node node) {
-			if (!(nullable || optional.isPresent()))
-				LOGGER.warn(() -> LoggerUtilities.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(
-						LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Cannot deserialize node:{}{}",
-								System.lineSeparator(), node),
-						ThrowableUtilities.createIfDebug().orElse(null)
-				));
-			return optional;
-		}
-
-		public static Optional<Byte> deserializeByte(Node node, boolean nullable) {
-			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "byte")
-					.map(Byte::valueOf), node);
-		}
-
-		public static Optional<Short> deserializeShort(Node node, boolean nullable) {
-			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "short")
-					.map(Short::valueOf), node);
-		}
-
-		public static Optional<Integer> deserializeInt(Node node, boolean nullable) {
-			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "int")
-					.map(Integer::valueOf), node);
-		}
-
-		public static Optional<Long> deserializeLong(Node node, boolean nullable) {
-			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "long")
-					.map(Long::valueOf), node);
-		}
-
-		public static Optional<Float> deserializeFloat(Node node, boolean nullable) {
-			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "float")
-					.map(Float::valueOf), node);
-		}
-
-		public static Optional<Double> deserializeDouble(Node node, boolean nullable) {
-			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "double")
-					.map(Double::valueOf), node);
-		}
-
-		public static Optional<String> deserializeString(Node node, boolean nullable) {
-			return warnIfNotPresent(nullable, DOMUtilities.getAttributeValue(node, "string"), node);
-		}
-
-		public static Optional<Color> deserializeColor(Node node, boolean nullable) {
-			return warnIfNotPresent(nullable, DOMUtilities.getChildByTagNameNS(node, UIDOMPrototypeParser.SCHEMA_NAMESPACE_URI, "color")
-					.map(nc -> new Color(
-							Integer.valueOf(DOMUtilities.getAttributeValue(nc, "red").orElse("00"), RadixUtilities.RADIX_HEX),
-							Integer.valueOf(DOMUtilities.getAttributeValue(nc, "green").orElse("00"), RadixUtilities.RADIX_HEX),
-							Integer.valueOf(DOMUtilities.getAttributeValue(nc, "blue").orElse("00"), RadixUtilities.RADIX_HEX),
-							Integer.valueOf(DOMUtilities.getAttributeValue(nc, "alpha").orElse("FF"), RadixUtilities.RADIX_HEX))), node);
-		}
 	}
 }
