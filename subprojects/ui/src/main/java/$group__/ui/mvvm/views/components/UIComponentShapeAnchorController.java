@@ -6,6 +6,7 @@ import $group__.ui.core.structures.shapes.interactions.IShapeAnchor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.mvvm.views.events.bus.EventUIComponent;
 import $group__.ui.structures.shapes.interactions.ShapeAnchorController;
+import $group__.utilities.CapacityUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.reactive.DisposableObserverAuto;
 import com.google.common.collect.ImmutableSet;
@@ -17,10 +18,7 @@ import sun.misc.Cleaner;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
-import java.util.ConcurrentModificationException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Stack;
+import java.util.*;
 
 public class UIComponentShapeAnchorController
 		extends ShapeAnchorController<IUIComponent>
@@ -46,7 +44,7 @@ public class UIComponentShapeAnchorController
 		@Nullable
 		protected static final IShapeAnchor SELF_ANCHOR = null;
 		protected final WeakReference<UIComponentShapeAnchorController> controller;
-		protected final Stack<IShapeAnchor> anchoringAnchors = new Stack<>();
+		protected final Deque<IShapeAnchor> anchoringAnchors = new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM);
 
 		protected ObserverEventUIShapeDescriptorModify(UIComponentShapeAnchorController controller) { this.controller = new WeakReference<>(controller); }
 
@@ -63,16 +61,6 @@ public class UIComponentShapeAnchorController
 						});
 		}
 
-		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-		protected Stack<IShapeAnchor> getAnchoringAnchors() { return anchoringAnchors; }
-
-		protected Optional<? extends UIComponentShapeAnchorController> getController() { return Optional.ofNullable(controller.get()); }
-
-		protected void anchorSelf(EventUIComponent.ShapeDescriptorModify event, UIComponentShapeAnchorController controller) {
-			controller.getAnchorSet(event.getComponent())
-					.anchor(event.getComponent());
-		}
-
 		protected void anchorOthers(EventUIComponent.ShapeDescriptorModify event, UIComponentShapeAnchorController controller) {
 			controller.getSubscribersMap().getOrDefault(event.getComponent(), ImmutableSet.of()).stream().unordered()
 					.forEach(a -> a.getContainer()
@@ -81,9 +69,20 @@ public class UIComponentShapeAnchorController
 								if (getAnchoringAnchors().contains(a))
 									throw new ConcurrentModificationException("Anchor cycle:" + System.lineSeparator()
 											+ getAnchoringAnchors());
-								getAnchoringAnchors().push(a).anchor(f);
+								getAnchoringAnchors().push(a);
+								a.anchor(f);
 								getAnchoringAnchors().pop();
 							}));
+		}
+
+		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+		protected Deque<IShapeAnchor> getAnchoringAnchors() { return anchoringAnchors; }
+
+		protected Optional<? extends UIComponentShapeAnchorController> getController() { return Optional.ofNullable(controller.get()); }
+
+		protected void anchorSelf(EventUIComponent.ShapeDescriptorModify event, UIComponentShapeAnchorController controller) {
+			controller.getAnchorSet(event.getComponent())
+					.anchor(event.getComponent());
 		}
 	}
 }

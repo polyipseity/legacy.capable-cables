@@ -83,6 +83,7 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 	@Override
 	public void bind() {
 		IUIInfrastructure.checkBoundState(isBound(), false);
+
 		// COMMENT must bind the bindings of view first
 		getBinder().bind(Iterables.concat(
 				// COMMENT fields

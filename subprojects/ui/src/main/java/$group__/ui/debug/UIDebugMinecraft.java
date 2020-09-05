@@ -162,7 +162,7 @@ public enum UIDebugMinecraft {
 			public void render(C container, EnumRenderStage stage, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks) {
 				super.render(container, stage, stack, cursorPosition, partialTicks);
 				if (stage == EnumRenderStage.PRE_CHILDREN) {
-					Shape transformed = stack.peek().createTransformedShape(new Ellipse2D.Double(
+					Shape transformed = stack.element().createTransformedShape(new Ellipse2D.Double(
 							cursorPosition.getX() - CURSOR_SHAPE_RADIUS, cursorPosition.getY() - CURSOR_SHAPE_RADIUS,
 							CURSOR_SHAPE_RADIUS << 1, CURSOR_SHAPE_RADIUS << 1));
 					DrawingUtilities.drawShape(transformed, true, new Color(getRandom().nextInt(), true), 0);

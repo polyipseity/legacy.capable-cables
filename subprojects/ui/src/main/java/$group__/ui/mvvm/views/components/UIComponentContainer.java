@@ -33,7 +33,7 @@ public class UIComponentContainer
 	@Override
 	public void transformChildren(IAffineTransformStack stack) {
 		Rectangle2D bounds = getShapeDescriptor().getShapeOutput().getBounds2D();
-		stack.peek().translate(bounds.getX(), bounds.getY());
+		stack.element().translate(bounds.getX(), bounds.getY());
 	}
 
 	@Override

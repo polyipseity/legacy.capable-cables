@@ -94,7 +94,7 @@ public class UIComponentWindow
 	@Override
 	public void transformChildren(IAffineTransformStack stack) {
 		super.transformChildren(stack);
-		stack.peek().translate(0, WINDOW_DRAG_BAR_THICKNESS); // TODO move
+		stack.element().translate(0, WINDOW_DRAG_BAR_THICKNESS); // TODO move
 	}
 
 	@Override

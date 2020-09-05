@@ -264,7 +264,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 				ret = getContainer()
 						.filter(c -> isBeingHovered())
 						.flatMap(c ->
-								getCursor(EnumUISide.getSidesMouseOver(stack.peek().createTransformedShape(c.getShapeDescriptor().getShapeOutput()).getBounds2D(), cursorPosition))
+								getCursor(EnumUISide.getSidesMouseOver(stack.element().createTransformedShape(c.getShapeDescriptor().getShapeOutput()).getBounds2D(), cursorPosition))
 										.map(EnumCursor::getHandle))
 						.orElse(null);
 

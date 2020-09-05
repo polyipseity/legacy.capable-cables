@@ -75,7 +75,7 @@ public class UIComponentPrototype
 						}));
 
 		// COMMENT prototypes
-		List<IGeneralPrototype> prototypes = new LinkedList<>();
+		List<IGeneralPrototype> prototypes = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 		parser.getVisitorsView().forEach((k, v) ->
 				prototypes.addAll(
 						DOMUtilities.getChildrenByTagNameNS(node, k.getNamespace(), k.getPath()).stream().sequential()

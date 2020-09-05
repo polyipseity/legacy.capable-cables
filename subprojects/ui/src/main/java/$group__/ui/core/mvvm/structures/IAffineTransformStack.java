@@ -12,8 +12,8 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.awt.geom.AffineTransform;
+import java.util.Deque;
 import java.util.Optional;
-import java.util.Stack;
 import java.util.function.Function;
 
 public interface IAffineTransformStack
@@ -35,33 +35,37 @@ public interface IAffineTransformStack
 			stack.pop();
 	}
 
-	Stack<AffineTransform> getData();
+	static boolean isClean(Deque<AffineTransform> data) {
+		return Optional.ofNullable(data.peek()).filter(AffineTransform::isIdentity).isPresent();
+	}
 
-	default AffineTransform push() { return getData().push((AffineTransform) AssertionUtilities.assertNonnull(getData().peek()).clone()); }
+	default AffineTransform push() {
+		AffineTransform ret = (AffineTransform) AssertionUtilities.assertNonnull(getData().element()).clone();
+		getData().push(ret);
+		return ret;
+	}
 
 	@Override
 	default void close() { createCleaner().run(); }
 
 	default boolean isClean() { return isClean(getData()); }
 
-	static boolean isClean(Stack<AffineTransform> data) {
-		return data.size() == 1 && AssertionUtilities.assertNonnull(data.firstElement()).isIdentity();
-	}
+	Deque<AffineTransform> getData();
 
 	default Runnable createCleaner() {
 		return () -> IAffineTransformStack.popMultiple(this, getData().size() - 1);
 	}
 
-	default AffineTransform peek() { return AssertionUtilities.assertNonnull(getData().peek()); }
+	default AffineTransform element() { return AssertionUtilities.assertNonnull(getData().element()); }
 
 	class LeakNotifier
 			implements Runnable {
-		protected final Stack<AffineTransform> data;
+		protected final Deque<AffineTransform> data;
 		@Nullable
 		protected final Throwable throwable;
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-		public LeakNotifier(Stack<AffineTransform> data) {
+		public LeakNotifier(Deque<AffineTransform> data) {
 			this.data = data;
 			this.throwable = ThrowableUtilities.createIfDebug().orElse(null);
 		}
@@ -76,7 +80,7 @@ public interface IAffineTransformStack
 		}
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-		protected Stack<AffineTransform> getData() { return data; }
+		protected Deque<AffineTransform> getData() { return data; }
 
 		protected Optional<Throwable> getThrowable() { return Optional.ofNullable(throwable); }
 	}

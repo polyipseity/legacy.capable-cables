@@ -7,6 +7,7 @@ import $group__.utilities.collections.CacheUtilities;
 import $group__.utilities.collections.MapUtilities;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import net.jodah.typetools.TypeResolver;
@@ -171,9 +172,10 @@ public enum DynamicUtilities {
 		ret.add(scs);
 		AtomicReference<List<Class<?>>> cur = new AtomicReference<>(Arrays.asList(clazz.getInterfaces()));
 		scs.forEach(sc -> {
-			List<Class<?>> next = Arrays.asList(sc.getInterfaces());
+			List<Class<?>> next = ImmutableList.copyOf(sc.getInterfaces());
 			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(cur.getAndUpdate(c -> {
-				List<Class<?>> n = new LinkedList<>(next);
+				List<Class<?>> n = new ArrayList<>(next.size() + c.size() * CapacityUtilities.INITIAL_CAPACITY_TINY);
+				n.addAll(next);
 				c.forEach(t ->
 						Collections.addAll(n, t.getInterfaces()));
 				return n;
@@ -181,7 +183,7 @@ public enum DynamicUtilities {
 		});
 		while (!AssertionUtilities.assertNonnull(cur.get()).isEmpty()) {
 			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(cur.getAndUpdate(s -> {
-				List<Class<?>> n = new LinkedList<>();
+				List<Class<?>> n = new ArrayList<>(s.size() * CapacityUtilities.INITIAL_CAPACITY_TINY);
 				s.forEach(t ->
 						Collections.addAll(n, t.getInterfaces()));
 				return n;

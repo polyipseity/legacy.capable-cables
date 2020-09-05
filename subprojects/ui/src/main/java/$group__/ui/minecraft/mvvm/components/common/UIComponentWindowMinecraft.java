@@ -76,7 +76,7 @@ public class UIComponentWindowMinecraft
 		@Override
 		public void render(C container, EnumRenderStage stage, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks) {
 			if (stage == EnumRenderStage.PRE_CHILDREN) {
-				Shape transformed = stack.peek().createTransformedShape(container.getShapeDescriptor().getShapeOutput());
+				Shape transformed = stack.element().createTransformedShape(container.getShapeDescriptor().getShapeOutput());
 				getColorBackground().getValue().ifPresent(c ->
 						DrawingUtilities.drawShape(transformed, true, c, 0));
 				getColorBorder().getValue().ifPresent(c ->

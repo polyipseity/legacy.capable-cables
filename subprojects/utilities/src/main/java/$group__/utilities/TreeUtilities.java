@@ -35,8 +35,8 @@ public enum TreeUtilities {
 	                                                       @Nullable BiFunction<? super R, ? super Iterable<R>, ? extends R> combiner,
 	                                                       @Nullable Consumer<? super T> repeater) {
 		boolean shouldCombine = combiner != null;
-		Stack<Iterator<? extends T>> stackSplitter = new Stack<>();
-		@Nullable Stack<Deque<R>> stackCombiner = shouldCombine ? new Stack<>() : null;
+		Deque<Iterator<? extends T>> stackSplitter = new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+		@Nullable Deque<Deque<R>> stackCombiner = shouldCombine ? new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_SMALL) : null;
 		Set<T> visited = new HashSet<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
 
 		stackSplitter.push(Iterators.forArray(obj));
@@ -44,9 +44,8 @@ public enum TreeUtilities {
 			stackCombiner.push(new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_SMALL));
 
 		while (!stackSplitter.isEmpty()) {
-			Iterator<? extends T> frameSplitter = AssertionUtilities.assertNonnull(stackSplitter.peek());
-			@Nullable Deque<R> frameCombiner = shouldCombine ? stackCombiner.peek() : null;
-			assert !shouldCombine || frameCombiner != null;
+			Iterator<? extends T> frameSplitter = AssertionUtilities.assertNonnull(stackSplitter.element());
+			@Nullable Deque<R> frameCombiner = shouldCombine ? stackCombiner.element() : null;
 			if (frameSplitter.hasNext()) {
 				T current = frameSplitter.next();
 				if (!visited.add(current)) {
@@ -67,14 +66,14 @@ public enum TreeUtilities {
 					if (stackCombiner.isEmpty())
 						stackCombiner.push(ret);
 					else {
-						Deque<R> frameCombinerParent = AssertionUtilities.assertNonnull(stackCombiner.peek());
+						Deque<R> frameCombinerParent = AssertionUtilities.assertNonnull(stackCombiner.element());
 						frameCombinerParent.addLast(combiner.apply(frameCombinerParent.removeLast(), frameCombiner));
 					}
 				}
 			}
 		}
 		return Optional.ofNullable(stackCombiner)
-				.map(Stack::peek)
+				.map(Queue::element)
 				.map(Deque::getFirst);
 	}
 
@@ -88,7 +87,7 @@ public enum TreeUtilities {
 		List<T>
 				frameSplitter = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM),
 				frameSplitterNext = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM);
-		@Nullable Stack<List<R>> stackCombiner = shouldCombine ? new Stack<>() : null;
+		@Nullable Deque<List<R>> stackCombiner = shouldCombine ? new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_SMALL) : null;
 		Set<T> visited = new HashSet<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
 		@Nullable List<Runnable>
 				combinerActions = shouldCombine ? new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE) : null,
@@ -99,8 +98,7 @@ public enum TreeUtilities {
 			stackCombiner.push(new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM));
 
 		while (!frameSplitter.isEmpty()) {
-			@Nullable List<R> frameCombiner = shouldCombine ? stackCombiner.peek() : null;
-			assert !shouldCombine || frameCombiner != null;
+			@Nullable List<R> frameCombiner = shouldCombine ? stackCombiner.element() : null;
 			if (shouldCombine)
 				stackCombiner.push(new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM));
 			int nodeIndex = 0, childrenFlatIndex = 0;
@@ -120,7 +118,7 @@ public enum TreeUtilities {
 
 				final int nodeIndexCopy = nodeIndex, childrenFlatIndexCopy = childrenFlatIndex;
 				if (shouldCombine) {
-					List<R> frameCombinerChildren = AssertionUtilities.assertNonnull(stackCombiner.peek());
+					List<R> frameCombinerChildren = AssertionUtilities.assertNonnull(stackCombiner.element());
 					frameCombinerActions.add(0, () ->
 							frameCombiner.add(combiner.apply(frameCombiner.remove(nodeIndexCopy),
 									frameCombinerChildren.subList(childrenFlatIndexStart, childrenFlatIndexCopy))));
@@ -137,7 +135,7 @@ public enum TreeUtilities {
 		if (shouldCombine)
 			Lists.reverse(combinerActions).forEach(Runnable::run);
 		return Optional.ofNullable(stackCombiner)
-				.map(Stack::peek)
+				.map(Queue::element)
 				.map(l -> l.get(0));
 	}
 

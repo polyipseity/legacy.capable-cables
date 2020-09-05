@@ -1,21 +1,25 @@
 package $group__.ui.mvvm.structures;
 
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
-import $group__.utilities.CastUtilities;
+import $group__.utilities.CapacityUtilities;
 import $group__.utilities.ObjectUtilities;
 import sun.misc.Cleaner;
 
 import java.awt.geom.AffineTransform;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 public class AffineTransformStack
 		implements IAffineTransformStack {
-	protected final Stack<AffineTransform> data = new Stack<>();
+	protected final Deque<AffineTransform> data;
 	protected final Object cleanerRef = new Object();
 
-	public AffineTransformStack() {
-		data.push(new AffineTransform());
-		Cleaner.create(getCleanerRef(), new LeakNotifier(data));
+	public AffineTransformStack() { this(CapacityUtilities.INITIAL_CAPACITY_MEDIUM); }
+
+	public AffineTransformStack(int initialCapacity) {
+		this.data = new ArrayDeque<>(initialCapacity);
+		this.data.push(new AffineTransform());
+		Cleaner.create(getCleanerRef(), new LeakNotifier(this.data));
 	}
 
 	protected final Object getCleanerRef() { return cleanerRef; }
@@ -26,14 +30,14 @@ public class AffineTransformStack
 		ret.getData().clear();
 		getData().stream().sequential()
 				.map(AffineTransform::clone)
-				.map(CastUtilities::<AffineTransform>castUnchecked)
+				.map(AffineTransform.class::cast)
 				.forEachOrdered(ret.getData()::add);
 		return ret;
 	}
 
 	@Override
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	public Stack<AffineTransform> getData() { return data; }
+	public Deque<AffineTransform> getData() { return data; }
 
 	@Override
 	public int hashCode() { return ObjectUtilities.hashCode(this, null, OBJECT_VARIABLES); }

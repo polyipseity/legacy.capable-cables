@@ -4,6 +4,7 @@ import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilder;
 import $group__.ui.core.structures.shapes.interactions.IShapeConstraint;
 import $group__.ui.utilities.UIObjectUtilities;
+import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.collections.MapUtilities;
@@ -14,7 +15,7 @@ import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
@@ -24,7 +25,7 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 		implements IShapeDescriptorBuilder<S> {
 	protected final AffineTransform transform = new AffineTransform();
 	protected final Rectangle2D bounds = IShapeDescriptor.getShapePlaceholderCopy();
-	protected final List<IShapeConstraint> constraints = new LinkedList<>();
+	protected final List<IShapeConstraint> constraints = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 	protected final ConcurrentMap<String, Consumer<?>> properties =
 			MapUtilities.newMapMakerSingleThreaded().makeMap();
 

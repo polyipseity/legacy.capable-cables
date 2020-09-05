@@ -11,7 +11,6 @@ import javax.lang.model.util.Types;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
@@ -45,9 +44,10 @@ public enum ProcessorUtilities {
 			List<TypeElement> next = sc.getInterfaces().stream().sequential()
 					.map(types::asElement)
 					.map(TypeElement.class::cast)
-					.collect(Collectors.toList());
+					.collect(ImmutableList.toImmutableList());
 			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(cur.getAndUpdate(c -> {
-				List<TypeElement> n = new LinkedList<>(next);
+				List<TypeElement> n = new ArrayList<>(next.size() + c.size() * CapacityUtilities.INITIAL_CAPACITY_TINY);
+				n.addAll(next);
 				c.forEach(t ->
 						n.addAll(t.getInterfaces().stream().sequential()
 								.map(types::asElement)
@@ -58,7 +58,7 @@ public enum ProcessorUtilities {
 		});
 		while (!AssertionUtilities.assertNonnull(cur.get()).isEmpty()) {
 			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(cur.getAndUpdate(s -> {
-				List<TypeElement> n = new LinkedList<>();
+				List<TypeElement> n = new ArrayList<>(s.size() * CapacityUtilities.INITIAL_CAPACITY_TINY);
 				s.forEach(t ->
 						n.addAll(t.getInterfaces().stream().sequential()
 								.map(types::asElement)

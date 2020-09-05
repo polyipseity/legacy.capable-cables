@@ -12,6 +12,7 @@ import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.mvvm.structures.AffineTransformStack;
 import $group__.ui.mvvm.views.components.paths.UIComponentPathResolver;
 import $group__.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
+import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.TreeUtilities;
@@ -77,7 +78,7 @@ public class UIComponentManager<S extends Shape>
 											(List<WeakReference<IUIComponent>>) cache.getDelegated().getIfPresent(t.getKey());
 									List<IUIComponent> ret;
 									if (cv == null) {
-										ret = new LinkedList<>();
+										ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
 										TreeUtilities.<IUIComponent, Object>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, i,
 												e -> ret.addAll(CastUtilities.castChecked(IUIComponentManager.class, e)
 														.<Collection<? extends IUIComponent>>map(IUIComponentManager::getChildrenFlatView)

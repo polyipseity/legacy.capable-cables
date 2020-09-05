@@ -8,6 +8,7 @@ import $group__.ui.mvvm.structures.AffineTransformStack;
 import $group__.ui.mvvm.views.paths.UINodePath;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CastUtilities;
+import com.google.common.collect.Iterators;
 import sun.misc.Cleaner;
 
 import java.awt.geom.AffineTransform;
@@ -39,7 +40,12 @@ public class UIComponentPath<T extends IUIComponent>
 	public IAffineTransformStack getTransformStackView() { return getTransformStack().copy(); }
 
 	@Override
-	public AffineTransform getTransformView(int depth) { return (AffineTransform) AssertionUtilities.assertNonnull(getTransformStack().getData().get(Math.floorMod(depth, sizeOfTransformStack()))).clone(); }
+	public AffineTransform getTransformView(int depth) {
+		return (AffineTransform) Iterators.get(
+				AssertionUtilities.assertNonnull(getTransformStack().getData().descendingIterator()),
+				Math.floorMod(depth, sizeOfTransformStack()))
+				.clone();
+	}
 
 	protected IAffineTransformStack getTransformStack() { return transformStack; }
 }
