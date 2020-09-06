@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 import java.util.Map;
 
-import static $group__.utilities.DynamicUtilities.getCallerClass;
+import static $group__.utilities.DynamicUtilities.getCallerStackTraceElement;
 import static $group__.utilities.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkElementIndex;
@@ -16,7 +16,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 public enum PreconditionUtilities {
 	;
 
-	private static final Map<Class<?>, Throwable> RAN_ONCE = MapUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_LARGE).makeMap();
+	private static final Map<StackTraceElement, Throwable> RAN_ONCE = MapUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_LARGE).makeMap();
 
 
 	public static void checkArgumentTypes(Class<?>[] types, Object... args) {
@@ -34,19 +34,18 @@ public enum PreconditionUtilities {
 	}
 
 
-	@SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
 	public static void requireRunOnceOnly(@Nullable Logger logger) throws IllegalStateException {
 		Throwable t = ThrowableUtilities.create();
 
-		Class<?> cc = getCallerClass();
+		StackTraceElement st = getCallerStackTraceElement();
 		@Nullable Throwable t1;
-		synchronized (cc) {
-			t1 = RAN_ONCE.put(cc, t);
+		synchronized (st.toString().intern()) {
+			t1 = RAN_ONCE.put(st, t);
 		}
 		if (t1 != null) {
 			if (logger != null)
 				logger.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Illegal second invocation, previous stacktrace:{}{}", lineSeparator(), getStackTrace(t1)));
-			throw new IllegalStateException("Illegal second invocation", t);
+			throw new IllegalStateException("Illegal second invocation", t1);
 		}
 
 		if (logger != null)

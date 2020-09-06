@@ -102,6 +102,16 @@ public enum DynamicUtilities {
 
 	public static Class<?> getCallerClass() { return getClassStackTrace(2); }
 
+	public static StackTraceElement getCallerStackTraceElement() {
+		/* COMMENT
+		0 - create method
+		1 - this method
+		2 - caller of this method
+		3 - caller of the caller of this method
+		 */
+		return ThrowableUtilities.create().getStackTrace()[3];
+	}
+
 	public static Class<?> defineClass(String name, byte[] data) { return ClassLoaderHolder.INSTANCE.defineClassPublic(name, data); }
 
 	public static String getMethodNameDescriptor(Method m) { return m.getName() + org.objectweb.asm.Type.getMethodDescriptor(m); }

@@ -81,9 +81,11 @@ public class UIComponentManager<S extends Shape>
 										ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
 										TreeUtilities.<IUIComponent, Object>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, i,
 												e -> ret.addAll(CastUtilities.castChecked(IUIComponentManager.class, e)
+														.filter(m -> !m.equals(i))
 														.<Collection<? extends IUIComponent>>map(IUIComponentManager::getChildrenFlatView)
 														.orElseGet(() -> ImmutableSet.of(e))),
 												p -> CastUtilities.castChecked(IUIComponentManager.class, p)
+														.filter(m -> !m.equals(i))
 														.<Iterable<? extends IUIComponent>>map(ImmutableSet::of)
 														.orElseGet(p::getChildNodes), null, null);
 										cache.getDelegated().put(t.getKey(),

@@ -11,16 +11,15 @@ import $group__.utilities.CapacityUtilities;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.reactive.DisposableObserverAuto;
-import com.google.common.collect.ImmutableSet;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import sun.misc.Cleaner;
 
-import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.*;
+import java.util.stream.BaseStream;
 
 public class UIComponentShapeAnchorController
 		extends ShapeAnchorController<IUIComponent>
@@ -43,40 +42,26 @@ public class UIComponentShapeAnchorController
 
 	protected static class ObserverEventUIShapeDescriptorModify
 			extends DisposableObserverAuto<EventUIComponent.ShapeDescriptorModify> {
-		@Nullable
-		protected static final IShapeAnchor SELF_ANCHOR = null;
 		protected final WeakReference<UIComponentShapeAnchorController> controller;
 		protected final Deque<IShapeAnchor> anchoringAnchors = new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM);
+		protected boolean anchoringSelf = false;
 
 		protected ObserverEventUIShapeDescriptorModify(UIComponentShapeAnchorController controller) { this.controller = new WeakReference<>(controller); }
 
 		@Override
 		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 		public void onNext(EventUIComponent.ShapeDescriptorModify event) {
-			if (event.getStage() == EnumEventHookStage.POST && (getAnchoringAnchors().isEmpty() || !Objects.equals(getAnchoringAnchors().peek(), SELF_ANCHOR)))
+			if (event.getStage() == EnumEventHookStage.POST && !isAnchoringSelf())
 				getController()
 						.ifPresent(ctr -> {
-							getAnchoringAnchors().push(SELF_ANCHOR);
+							setAnchoringSelf(true);
 							anchorSelf(event, ctr);
-							getAnchoringAnchors().pop();
+							setAnchoringSelf(false);
 							anchorOthers(event, ctr);
 						});
 		}
 
-		protected void anchorOthers(EventUIComponent.ShapeDescriptorModify event, UIComponentShapeAnchorController controller) {
-			Map<IShapeAnchorSet, IUIComponent> inverse = MapUtilities.inverse(controller.getAnchorSets().asMap());
-			controller.getSubscribersMap().asMap().getOrDefault(event.getComponent(), ImmutableSet.of()).stream().unordered()
-					.forEach(a -> a.getContainer()
-							.map(inverse::get)
-							.ifPresent(f -> {
-								if (getAnchoringAnchors().contains(a))
-									throw new ConcurrentModificationException("Anchor cycle:" + System.lineSeparator()
-											+ getAnchoringAnchors());
-								getAnchoringAnchors().push(a);
-								a.anchor(f);
-								getAnchoringAnchors().pop();
-							}));
-		}
+		protected boolean isAnchoringSelf() { return anchoringSelf; }
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 		protected Deque<IShapeAnchor> getAnchoringAnchors() { return anchoringAnchors; }
@@ -87,5 +72,26 @@ public class UIComponentShapeAnchorController
 			Optional.ofNullable(controller.getAnchorSets().getIfPresent(event.getComponent()))
 					.ifPresent(as -> as.anchor(event.getComponent()));
 		}
+
+		protected void anchorOthers(EventUIComponent.ShapeDescriptorModify event, UIComponentShapeAnchorController controller) {
+			Optional.ofNullable(controller.getSubscribersMap().getIfPresent(event.getComponent()))
+					.map(Collection::stream)
+					.map(BaseStream::unordered)
+					.ifPresent(s -> {
+						Map<IShapeAnchorSet, IUIComponent> inverse = MapUtilities.inverse(controller.getAnchorSets().asMap());
+						s.forEach(a -> a.getContainer()
+								.map(inverse::get)
+								.ifPresent(f -> {
+									if (getAnchoringAnchors().contains(a))
+										throw new ConcurrentModificationException("Anchor cycle:" + System.lineSeparator()
+												+ getAnchoringAnchors());
+									getAnchoringAnchors().push(a);
+									a.anchor(f);
+									getAnchoringAnchors().pop();
+								}));
+					});
+		}
+
+		protected void setAnchoringSelf(boolean anchoringSelf) { this.anchoringSelf = anchoringSelf; }
 	}
 }
