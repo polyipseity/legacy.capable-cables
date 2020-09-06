@@ -22,13 +22,13 @@ public enum CacheUtilities {
 		return CacheLoader.from((Supplier<Cache<K, V>>) newCacheBuilderSingleThreaded().initialCapacity(initialCapacity)::build);
 	}
 
-	public static <K, V> Optional<V> getAndInvalidate(Cache<? super K, ? extends V> instance, K key) {
+	public static <K, V> Optional<V> remove(Cache<? super K, ? extends V> instance, K key) {
 		@Nullable V ret = instance.getIfPresent(key);
 		instance.invalidate(key);
 		return Optional.ofNullable(ret);
 	}
 
-	public static <K, V> Optional<V> getAndPut(Cache<? super K, V> instance, K key, V value) {
+	public static <K, V> Optional<V> replace(Cache<? super K, V> instance, K key, V value) {
 		@Nullable V ret = instance.getIfPresent(key);
 		instance.put(key, value);
 		return Optional.ofNullable(ret);

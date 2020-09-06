@@ -13,9 +13,9 @@ import java.util.function.Function;
 public interface IUIDataMouseButtonClick
 		extends ICopyable {
 	int MOUSE_BUTTON_NULL = -1;
-	ImmutableList<Function<IUIDataMouseButtonClick, Object>> OBJECT_VARIABLES = ImmutableList.of(
+	ImmutableList<Function<? super IUIDataMouseButtonClick, ?>> OBJECT_VARIABLES = ImmutableList.of(
 			IUIDataMouseButtonClick::getCursorPositionView, IUIDataMouseButtonClick::getButton, IUIDataMouseButtonClick::getTimestampMills);
-	ImmutableMap<String, Function<IUIDataMouseButtonClick, Object>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
+	ImmutableMap<String, Function<? super IUIDataMouseButtonClick, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
 			ImmutableList.of("cursorPositionView", "button", "timestampMills"),
 			OBJECT_VARIABLES));
 

@@ -1,14 +1,33 @@
 package $group__.utilities.collections;
 
+import $group__.utilities.DynamicUtilities;
+import $group__.utilities.LoopUtilities;
 import $group__.utilities.ThrowableUtilities;
+import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
+import $group__.utilities.ThrowableUtilities.Try;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.MapMaker;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.signature.SignatureVisitor;
+import org.objectweb.asm.signature.SignatureWriter;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodType;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static $group__.utilities.ConcurrencyUtilities.NORMAL_THREAD_THREAD_COUNT;
 import static $group__.utilities.ConcurrencyUtilities.SINGLE_THREAD_THREAD_COUNT;
+import static org.objectweb.asm.Opcodes.*;
 
 public enum MapUtilities {
 	;
@@ -47,5 +66,132 @@ public enum MapUtilities {
 			throw ThrowableUtilities.BecauseOf.illegalArgument("Values too long", "keys", keys, "values", values);
 
 		return ret;
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	public static <K, V> Map<V, K> inverse(Map<K, V> instance)
+			throws IllegalArgumentException {
+		return instance.entrySet().stream().sequential()
+				.collect(ImmutableMap.toImmutableMap(Map.Entry::getValue, Map.Entry::getKey));
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <K, V> BiMap<K, V> newBiMap(Map<K, V> forward, Map<V, K> backward) {
+		return (BiMap<K, V>) PublicAbstractBiMapHolder.CONSTRUCTOR_INVOKER.apply(forward, backward); // COMMENT should be safe
+	}
+
+	public enum PublicAbstractBiMapHolder {
+		;
+
+		private static final String SUPERCLASS_NAME = "com.google.common.collect.AbstractBiMap";
+		private static final String CLASS_SIMPLE_NAME = "PublicAbstractBiMap";
+		private static final Pattern LITERAL_SUPERCLASS_NAME = Pattern.compile("AbstractBiMap", Pattern.LITERAL);
+		private static final Logger LOGGER = LogManager.getLogger();
+		private static final Class<?> CLASS;
+		private static final MethodHandle CONSTRUCTOR;
+		private static final BiFunction<Map<?, ?>, Map<?, ?>, ? extends BiMap<?, ?>> CONSTRUCTOR_INVOKER;
+
+		static {
+			{
+				Class<?> superclass = Try.call(() -> Class.forName(SUPERCLASS_NAME), LOGGER)
+						.orElseThrow(ThrowableCatcher::rethrow);
+				String name = LITERAL_SUPERCLASS_NAME
+						.matcher(superclass.getName())
+						.replaceAll(Matcher.quoteReplacement(CLASS_SIMPLE_NAME));
+				String internalName = LITERAL_SUPERCLASS_NAME
+						.matcher(Type.getInternalName(superclass))
+						.replaceAll(Matcher.quoteReplacement(CLASS_SIMPLE_NAME));
+
+				ClassWriter cw = new ClassWriter(0);
+				{
+					SignatureVisitor sw = new SignatureWriter();
+					{
+						// CODE <K, V>
+						{
+							sw.visitFormalTypeParameter("K");
+							SignatureVisitor swB = sw.visitClassBound();
+							swB.visitClassType(Type.getInternalName(Object.class));
+							swB.visitEnd();
+						}
+						{
+							sw.visitFormalTypeParameter("V");
+							SignatureVisitor swB = sw.visitClassBound();
+							swB.visitClassType(Type.getInternalName(Object.class));
+							swB.visitEnd();
+						}
+					}
+					{
+						// CODE extends AbstractBiMap<K, V>
+						SignatureVisitor swSc = sw.visitSuperclass();
+						swSc.visitClassType(Type.getInternalName(superclass));
+						swSc.visitTypeArgument(SignatureVisitor.INSTANCEOF).visitTypeVariable("K");
+						swSc.visitTypeArgument(SignatureVisitor.INSTANCEOF).visitTypeVariable("V");
+						swSc.visitEnd();
+					}
+
+					// CODE package com.google.common.collect;
+					// CODE public class PublicAbstractBiMap
+					cw.visit(V1_6,
+							ACC_PUBLIC | ACC_SUPER,
+							internalName,
+							sw.toString(),
+							Type.getInternalName(superclass),
+							null);
+				}
+
+				{
+					MethodVisitor mv;
+					{
+						SignatureVisitor sw = new SignatureWriter();
+						// CODE (Map<K, V> forward, Map<K, V> backward)
+						LoopUtilities.doNTimes(2, () -> {
+							SignatureVisitor swPt = sw.visitParameterType();
+							{
+								swPt.visitClassType(Type.getInternalName(Map.class));
+								swPt.visitTypeArgument(SignatureVisitor.INSTANCEOF).visitTypeVariable("K");
+								swPt.visitTypeArgument(SignatureVisitor.INSTANCEOF).visitTypeVariable("V");
+								swPt.visitEnd();
+							}
+						});
+						{
+							// COMMENT return type
+							SignatureVisitor swRt = sw.visitReturnType();
+							swRt.visitClassType(Type.getInternalName(void.class));
+							swRt.visitEnd();
+						}
+
+						// COMMENT constructor
+						mv = cw.visitMethod(ACC_PUBLIC, "<init>",
+								Type.getMethodDescriptor(Type.getType(void.class), Type.getType(Map.class), Type.getType(Map.class)),
+								sw.toString(),
+								null);
+					}
+					mv.visitCode();
+					mv.visitVarInsn(ALOAD, 0); // CODE this
+					mv.visitVarInsn(ALOAD, 1); // CODE forward
+					mv.visitVarInsn(ALOAD, 2); // CODE backward
+					// CODE super(forward, backward);
+					mv.visitMethodInsn(INVOKESPECIAL,
+							Type.getInternalName(superclass),
+							"<init>",
+							Type.getMethodDescriptor(Type.getType(void.class), Type.getType(Map.class), Type.getType(Map.class)),
+							false);
+					mv.visitInsn(RETURN);
+					mv.visitMaxs(3, 3);
+					mv.visitEnd();
+				}
+				cw.visitEnd();
+
+				CLASS = DynamicUtilities.defineClass(name, cw.toByteArray());
+			}
+
+			{
+				CONSTRUCTOR = Try.call(() -> DynamicUtilities.IMPL_LOOKUP.findConstructor(CLASS, MethodType.methodType(void.class, Map.class, Map.class)), LOGGER)
+						.orElseThrow(ThrowableCatcher::rethrow);
+				CONSTRUCTOR_INVOKER = (forward, backward) ->
+						Try.call(() -> (BiMap<?, ?>) CONSTRUCTOR.invoke(forward, backward), LOGGER)
+								.orElseThrow(ThrowableCatcher::rethrow);
+			}
+		}
 	}
 }

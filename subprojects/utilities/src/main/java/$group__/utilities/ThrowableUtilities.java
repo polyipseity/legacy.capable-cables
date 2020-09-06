@@ -76,6 +76,8 @@ public enum ThrowableUtilities {
 			clear();
 			try {
 				runnable.run();
+			} catch (Error er) {
+				throw er; // COMMENT do NOT catch errors
 			} catch (Throwable t) {
 				catch_(t, logger);
 			}
@@ -85,6 +87,8 @@ public enum ThrowableUtilities {
 			clear();
 			try {
 				return Optional.ofNullable(callable.call());
+			} catch (Error er) {
+				throw er; // COMMENT do NOT catch errors
 			} catch (Throwable t) {
 				catch_(t, logger);
 				return Optional.empty();

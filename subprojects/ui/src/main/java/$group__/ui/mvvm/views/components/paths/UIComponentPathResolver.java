@@ -9,7 +9,10 @@ import $group__.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
 import $group__.ui.mvvm.views.paths.UINodePathResolver;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.collections.MapUtilities;
+import $group__.utilities.collections.CacheUtilities;
+import $group__.utilities.collections.ManualLoadingCache;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 
 import javax.annotation.Nullable;
@@ -19,15 +22,17 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 
 public class UIComponentPathResolver
 		extends UINodePathResolver<IUIComponent>
 		implements IUIComponentPathResolver<IUIComponent> {
 	protected final WeakReference<IUIComponentManager<?>> manager;
-	protected final ConcurrentMap<IUIComponent, List<Consumer<? super IAffineTransformStack>>> childrenTransformersMap =
-			MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).weakKeys().makeMap();
+	protected final LoadingCache<IUIComponent, List<Consumer<? super IAffineTransformStack>>> childrenTransformers =
+			ManualLoadingCache.newNestedLoadingCacheCollection(CacheUtilities.newCacheBuilderSingleThreaded()
+					.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL)
+					.weakKeys()
+					.build(CacheLoader.from(() -> new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL))));
 
 	public UIComponentPathResolver(IUIComponentManager<?> manager) {
 		this.manager = new WeakReference<>(manager);
@@ -48,18 +53,21 @@ public class UIComponentPathResolver
 						.map(container -> {
 							AffineTransform transform = stack.push();
 							container.transformChildren(stack);
-							getChildrenTransformers(container).forEach(t ->
-									t.accept(stack));
+							Optional.ofNullable(getChildrenTransformers().getIfPresent(container))
+									.ifPresent(ts -> ts.forEach(t -> t.accept(stack)));
 							++popTimes[0];
 
 							@Nullable IUIComponent r = null;
 							childrenLoop:
 							for (IUIComponent child : Lists.reverse(container.getChildrenView())) {
-								for (IUIComponent childVirtualElement : Lists.reverse(getVirtualElements(child))) {
-									if (transform.createTransformedShape(
-											childVirtualElement.getShapeDescriptor().getShapeOutput()).contains(point)) {
-										r = virtual ? childVirtualElement : child;
-										break childrenLoop;
+								@Nullable List<IUIComponent> cVe = getVirtualElements().getIfPresent(child);
+								if (cVe != null) {
+									for (IUIComponent childVirtualElement : Lists.reverse(cVe)) {
+										if (transform.createTransformedShape(
+												childVirtualElement.getShapeDescriptor().getShapeOutput()).contains(point)) {
+											r = virtual ? childVirtualElement : child;
+											break childrenLoop;
+										}
 									}
 								}
 								if (transform.createTransformedShape(
@@ -81,16 +89,20 @@ public class UIComponentPathResolver
 		}).orElseThrow(IllegalStateException::new);
 	}
 
-	protected List<Consumer<? super IAffineTransformStack>> getChildrenTransformers(IUIComponent element) { return getChildrenTransformersMap().computeIfAbsent(element, k -> new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL)); }
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<IUIComponent, List<Consumer<? super IAffineTransformStack>>> getChildrenTransformersMap() { return childrenTransformersMap; }
+	protected LoadingCache<IUIComponent, List<Consumer<? super IAffineTransformStack>>> getChildrenTransformers() { return childrenTransformers; }
 
 	@Override
-	public boolean addChildrenTransformer(IUIComponent element, Consumer<? super IAffineTransformStack> transformer) { return getChildrenTransformers(element).add(transformer); }
-
-	@Override
-	public boolean removeChildrenTransformer(IUIComponent element, Consumer<? super IAffineTransformStack> transformer) { return getChildrenTransformers(element).remove(transformer); }
+	public boolean addChildrenTransformer(IUIComponent element, Consumer<? super IAffineTransformStack> transformer) { return getChildrenTransformers().getUnchecked(element).add(transformer); }
 
 	protected Optional<? extends IUIComponentManager<?>> getManager() { return Optional.ofNullable(manager.get()); }
+
+	@Override
+	public boolean removeChildrenTransformer(IUIComponent element, Consumer<? super IAffineTransformStack> transformer) {
+		boolean ret = Optional.ofNullable(getChildrenTransformers().getIfPresent(element))
+				.filter(ts -> ts.remove(transformer))
+				.isPresent();
+		if (ret)
+			getChildrenTransformers().cleanUp();
+		return ret;
+	}
 }

@@ -24,6 +24,8 @@ import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.nio.ByteBuffer;
+import java.security.ProtectionDomain;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
@@ -94,11 +96,13 @@ public enum DynamicUtilities {
 	public static Class<?> getClassStackTrace(int depth) { return getClassStackTrace()[1 + depth]; }
 
 	public static Class<?>[] getClassStackTrace() {
-		Class<?>[] r = SecurityManagerReflections.INSTANCE.getClassContext();
+		Class<?>[] r = SecurityManagerHolder.INSTANCE.getClassContext();
 		return Arrays.copyOfRange(r, 1, r.length);
 	}
 
 	public static Class<?> getCallerClass() { return getClassStackTrace(2); }
+
+	public static Class<?> defineClass(String name, byte[] data) { return ClassLoaderHolder.INSTANCE.defineClassPublic(name, data); }
 
 	public static String getMethodNameDescriptor(Method m) { return m.getName() + org.objectweb.asm.Type.getMethodDescriptor(m); }
 
@@ -225,15 +229,43 @@ public enum DynamicUtilities {
 		}
 	}
 
+	public static final class SecurityManagerHolder extends SecurityManager {
+		public static final SecurityManagerHolder INSTANCE = new SecurityManagerHolder();
+		private static final Logger LOGGER = LogManager.getLogger();
 
-	private static final class SecurityManagerReflections extends SecurityManager {
-		private static final SecurityManagerReflections INSTANCE = new SecurityManagerReflections();
+		private SecurityManagerHolder() {
+			PreconditionUtilities.requireRunOnceOnly(LOGGER);
+		}
 
 		@Override
-		protected Class<?>[] getClassContext() {
+		public Class<?>[] getClassContext() {
 			Class<?>[] r = super.getClassContext();
 			return Arrays.copyOfRange(r, 1, r.length);
 		}
+	}
+
+	public static final class ClassLoaderHolder extends ClassLoader {
+		public static final ClassLoaderHolder INSTANCE = new ClassLoaderHolder();
+		private static final Logger LOGGER = LogManager.getLogger();
+
+		private ClassLoaderHolder() {
+			PreconditionUtilities.requireRunOnceOnly(LOGGER);
+		}
+
+		@Override
+		protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+			return Class.forName(name, resolve, Thread.currentThread().getContextClassLoader());
+		}
+
+		public Class<?> defineClassPublic(String name, byte[] b) { return defineClassPublic(name, b, 0, b.length); }
+
+		public Class<?> defineClassPublic(String name, byte[] b, int off, int len) { return defineClass(name, b, off, len); }
+
+		public Class<?> defineClassPublic(String name, ByteBuffer b, @Nullable ProtectionDomain protectionDomain) { return defineClass(name, b, protectionDomain); }
+
+		public Class<?> defineClassPublic(String name, byte[] b, @Nullable ProtectionDomain protectionDomain) { return defineClassPublic(name, b, 0, b.length, protectionDomain); }
+
+		public Class<?> defineClassPublic(String name, byte[] b, int off, int len, @Nullable ProtectionDomain protectionDomain) { return defineClass(name, b, off, len, protectionDomain); }
 	}
 
 	public enum Extensions {

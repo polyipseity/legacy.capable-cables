@@ -4,8 +4,15 @@ import $group__.ui.core.structures.shapes.interactions.IShapeAnchor;
 import $group__.ui.core.structures.shapes.interactions.IShapeAnchorController;
 import $group__.ui.core.structures.shapes.interactions.IShapeAnchorSet;
 import $group__.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CapacityUtilities;
+import $group__.utilities.collections.CacheUtilities;
+import $group__.utilities.collections.ManualLoadingCache;
 import $group__.utilities.collections.MapUtilities;
+import $group__.utilities.functions.ConstantSupplier;
+import $group__.utilities.functions.MappableSupplier;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
 
@@ -13,28 +20,35 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
 
 public class ShapeAnchorController<T extends IShapeDescriptorProvider>
 		implements IShapeAnchorController<T> {
-	protected final ConcurrentMap<T, IShapeAnchorSet> anchorSets =
-			MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).weakKeys().makeMap();
-	protected final ConcurrentMap<IShapeAnchorSet, T> anchorSetsInverse =
-			MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).weakValues().makeMap();
-	protected final ConcurrentMap<IShapeDescriptorProvider, Set<IShapeAnchor>> subscribersMap =
-			MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).weakKeys().makeMap(); // COMMENT the keys and the values of the set are weak
+	protected final LoadingCache<T, IShapeAnchorSet> anchorSets =
+			ManualLoadingCache.newNestedLoadingCache(CacheUtilities.newCacheBuilderSingleThreaded()
+							.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)
+							.weakKeys()
+							.build(CacheLoader.from(ShapeAnchorSet::new)),
+					e -> AssertionUtilities.assertNonnull(e.getValue()).isEmpty());
+	protected final LoadingCache<IShapeDescriptorProvider, Set<IShapeAnchor>> subscribersMap =
+			ManualLoadingCache.newNestedLoadingCacheCollection(CacheUtilities.newCacheBuilderSingleThreaded()
+					.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)
+					.weakKeys()
+					.build(CacheLoader.from(
+							new MappableSupplier<>(ConstantSupplier.of(MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL)))
+									.<Set<IShapeAnchor>>map(t -> Collections.newSetFromMap(t.makeMap()))
+									::get)));
 
 	@Override
-	public Map<? extends T, ? extends IShapeAnchorSet> getAnchorSetsView() { return ImmutableMap.copyOf(getAnchorSets()); }
+	public Map<? extends T, ? extends IShapeAnchorSet> getAnchorSetsView() { return ImmutableMap.copyOf(getAnchorSets().asMap()); }
 
 	@Override
 	public boolean addAnchors(T origin, Iterable<? extends IShapeAnchor> anchors) {
-		IShapeAnchorSet as = getAnchorSet(origin);
+		IShapeAnchorSet as = getAnchorSets().getUnchecked(origin);
 		boolean ret = as.addAnchors(anchors);
 		as.getAnchorsView().values().stream().unordered()
 				.forEach(a ->
 						a.getTarget().ifPresent(t ->
-								getSubscribers(t).add(a)));
+								getSubscribersMap().getUnchecked(t).add(a)));
 		as.anchor(origin);
 		return ret;
 	}
@@ -42,48 +56,20 @@ public class ShapeAnchorController<T extends IShapeDescriptorProvider>
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public boolean removeAnchors(T origin, Iterable<? extends IShapeAnchor> anchors) {
-		IShapeAnchorSet as = getAnchorSet(origin);
+		@Nullable IShapeAnchorSet as = getAnchorSets().getIfPresent(origin);
+		if (as == null)
+			return false;
 		boolean ret = as.removeAnchors(anchors);
 		Streams.stream(anchors).unordered()
 				.forEach(a ->
 						a.getTarget().ifPresent(t ->
-								getSubscribers(t).remove(a)));
-		if (as.isEmpty())
-			removeAnchorSet(origin);
+								getSubscribersMap().getUnchecked(t).remove(a)));
+		if (ret)
+			getSubscribersMap().cleanUp();
 		return ret;
 	}
 
-	protected IShapeAnchorSet getAnchorSet(T origin) {
-		return getAnchorSets().computeIfAbsent(origin, k -> {
-			IShapeAnchorSet v = new ShapeAnchorSet();
-			getAnchorSetsInverse().put(v, k);
-			return v;
-		});
-	}
+	protected LoadingCache<IShapeDescriptorProvider, Set<IShapeAnchor>> getSubscribersMap() { return subscribersMap; }
 
-	@SuppressWarnings("UnusedReturnValue")
-	protected boolean removeAnchorSet(T origin) {
-		@Nullable IShapeAnchorSet v = getAnchorSets().remove(origin);
-		if (v != null) {
-			if (getAnchorSetsInverse().remove(v) != null)
-				return true;
-			assert false;
-			return false;
-		}
-		return false;
-	}
-
-	protected Set<IShapeAnchor> getSubscribers(IShapeDescriptorProvider notifier) {
-		return getSubscribersMap().computeIfAbsent(notifier, k ->
-				Collections.newSetFromMap(MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap()));
-	}
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<IShapeAnchorSet, T> getAnchorSetsInverse() { return anchorSetsInverse; }
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<IShapeDescriptorProvider, Set<IShapeAnchor>> getSubscribersMap() { return subscribersMap; }
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<T, IShapeAnchorSet> getAnchorSets() { return anchorSets; }
+	protected LoadingCache<T, IShapeAnchorSet> getAnchorSets() { return anchorSets; }
 }

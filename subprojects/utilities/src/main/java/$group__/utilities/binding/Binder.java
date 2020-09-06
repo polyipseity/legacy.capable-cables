@@ -31,25 +31,23 @@ public class Binder implements IBinder {
 	protected final LoadingCache<IBinding.EnumBindingType, LoadingCache<INamespacePrefixedString, IBindings<?>>> bindings;
 	protected final LoadingCache<IBinding.EnumBindingType, LoadingCache<Class<?>, Cache<Class<?>, Function<?, ?>>>> transformers;
 
-	public Binder() {
+	{
 		CacheBuilder<Object, Object> cb = CacheUtilities.newCacheBuilderSingleThreaded()
 				.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL);
-		this.bindings = ManualLoadingCache.newNestedLoadingCache(
+		this.bindings = ManualLoadingCache.newNestedLoadingCacheCache(
 				CacheUtilities.newCacheBuilderSingleThreaded()
 						.initialCapacity(IBinding.EnumBindingType.values().length)
-						.build(CacheLoader.from(type ->
-								new ManualLoadingCache<>(
-										cb.build(CacheLoader.from(k ->
-												AssertionUtilities.assertNonnull(type).createBindings(AssertionUtilities.assertNonnull(k), () ->
-														getTransformers().getUnchecked(type)))),
-										t -> t.asMap().entrySet()
-												.removeIf(e -> AssertionUtilities.assertNonnull(e.getValue()).isEmpty())
-								))));
-		this.transformers = ManualLoadingCache.newNestedLoadingCache(
+						.build(CacheLoader.from(type -> ManualLoadingCache.newNestedLoadingCache(
+								cb.build(CacheLoader.from(k ->
+										AssertionUtilities.assertNonnull(type).createBindings(AssertionUtilities.assertNonnull(k), () ->
+												getTransformers().getUnchecked(type)))),
+								e -> AssertionUtilities.assertNonnull(e.getValue()).isEmpty())
+						)));
+		this.transformers = ManualLoadingCache.newNestedLoadingCacheCache(
 				CacheUtilities.newCacheBuilderSingleThreaded()
 						.initialCapacity(IBinding.EnumBindingType.values().length)
 						.build(CacheLoader.from(() ->
-								ManualLoadingCache.newNestedLoadingCache(
+								ManualLoadingCache.newNestedLoadingCacheCache(
 										cb.build(CacheUtilities.newCacheBuilderSingleThreadedLoader(CapacityUtilities.INITIAL_CAPACITY_SMALL))))));
 	}
 
@@ -85,7 +83,8 @@ public class Binder implements IBinder {
 											Boolean::logicalOr);
 						},
 						Boolean::logicalOr);
-		getBindings().cleanUp();
+		if (ret)
+			getBindings().cleanUp();
 		return ret;
 	}
 
@@ -95,16 +94,17 @@ public class Binder implements IBinder {
 		Optional<Class<?>>[] types = IBinder.resolveFunctionTypes(transformer);
 		if (!types[0].isPresent() || !types[1].isPresent())
 			return Optional.of(transformer);
-		return CacheUtilities.getAndPut(getTransformers().getUnchecked(type).getUnchecked(types[0].get()), types[1].get(), transformer)
+		return CacheUtilities.replace(getTransformers().getUnchecked(type).getUnchecked(types[0].get()), types[1].get(), transformer)
 				.map(r -> (Function<T, R>) r);
 	}
 
 	@Override
 	public <T, R> Optional<? extends Function<T, R>> removeTransformer(IBinding.EnumBindingType type, Class<T> from, Class<R> to) {
 		@SuppressWarnings("unchecked") Optional<? extends Function<T, R>> ret =
-				CacheUtilities.getAndInvalidate(getTransformers().getUnchecked(type).getUnchecked(from), to)
+				CacheUtilities.remove(getTransformers().getUnchecked(type).getUnchecked(from), to)
 						.map(r -> (Function<T, R>) r);
-		getTransformers().cleanUp();
+		if (ret.isPresent())
+			getTransformers().cleanUp();
 		return ret;
 	}
 
@@ -125,7 +125,8 @@ public class Binder implements IBinder {
 								.isPresent()
 								|| r,
 						Boolean::logicalOr);
-		getBindings().cleanUp();
+		if (ret)
+			getBindings().cleanUp();
 		return ret;
 	}
 

@@ -14,9 +14,9 @@ public interface INamespacePrefixedString {
 	String DEFAULT_NAMESPACE = "minecraft";
 	String DEFAULT_PREFIX = DEFAULT_NAMESPACE + SEPARATOR;
 
-	ImmutableList<Function<INamespacePrefixedString, Object>> OBJECT_VARIABLES = ImmutableList.of(
+	ImmutableList<Function<? super INamespacePrefixedString, ?>> OBJECT_VARIABLES = ImmutableList.of(
 			INamespacePrefixedString::getNamespace, INamespacePrefixedString::getPath);
-	ImmutableMap<String, Function<INamespacePrefixedString, Object>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
+	ImmutableMap<String, Function<? super INamespacePrefixedString, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
 			ImmutableList.of("namespace", "path"),
 			OBJECT_VARIABLES));
 

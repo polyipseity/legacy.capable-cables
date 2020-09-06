@@ -3,14 +3,22 @@ package $group__.ui.mvvm.structures;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.ObjectUtilities;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import sun.misc.Cleaner;
 
 import java.awt.geom.AffineTransform;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.function.Function;
 
 public class AffineTransformStack
 		implements IAffineTransformStack {
+	public static final ImmutableList<Function<? super AffineTransformStack, ?>> OBJECT_VARIABLES = ObjectUtilities.extendsObjectVariables(IAffineTransformStack.OBJECT_VARIABLES,
+			ImmutableList.of(AffineTransformStack::getCleanerRef));
+	public static final ImmutableMap<String, Function<? super AffineTransformStack, ?>> OBJECT_VARIABLES_MAP = ObjectUtilities.extendsObjectVariablesMap(OBJECT_VARIABLES,
+			IAffineTransformStack.OBJECT_VARIABLES_MAP,
+			ImmutableList.of("cleanerRef"));
 	protected final Deque<AffineTransform> data;
 	protected final Object cleanerRef = new Object();
 

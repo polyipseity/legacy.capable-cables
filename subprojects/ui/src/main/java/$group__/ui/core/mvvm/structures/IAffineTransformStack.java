@@ -19,9 +19,9 @@ import java.util.function.Function;
 public interface IAffineTransformStack
 		extends ICopyable, AutoCloseable {
 	Logger LOGGER = LogManager.getLogger();
-	ImmutableList<Function<IAffineTransformStack, Object>> OBJECT_VARIABLES = ImmutableList.of(
+	ImmutableList<Function<? super IAffineTransformStack, ?>> OBJECT_VARIABLES = ImmutableList.of(
 			IAffineTransformStack::getData);
-	ImmutableMap<String, Function<IAffineTransformStack, Object>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
+	ImmutableMap<String, Function<? super IAffineTransformStack, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
 			ImmutableList.of("data"),
 			OBJECT_VARIABLES));
 

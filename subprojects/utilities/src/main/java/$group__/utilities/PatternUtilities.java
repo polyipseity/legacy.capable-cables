@@ -1,5 +1,5 @@
 package $group__.utilities;
 
 public enum PatternUtilities {
-	// COMMENT cache patterns here
+	// COMMENT cache common patterns here
 }

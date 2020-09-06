@@ -3,10 +3,12 @@ package $group__.ui.mvvm.views.components;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentShapeAnchorController;
 import $group__.ui.core.structures.shapes.interactions.IShapeAnchor;
+import $group__.ui.core.structures.shapes.interactions.IShapeAnchorSet;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.mvvm.views.events.bus.EventUIComponent;
 import $group__.ui.structures.shapes.interactions.ShapeAnchorController;
 import $group__.utilities.CapacityUtilities;
+import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.reactive.DisposableObserverAuto;
 import com.google.common.collect.ImmutableSet;
@@ -62,9 +64,10 @@ public class UIComponentShapeAnchorController
 		}
 
 		protected void anchorOthers(EventUIComponent.ShapeDescriptorModify event, UIComponentShapeAnchorController controller) {
-			controller.getSubscribersMap().getOrDefault(event.getComponent(), ImmutableSet.of()).stream().unordered()
+			Map<IShapeAnchorSet, IUIComponent> inverse = MapUtilities.inverse(controller.getAnchorSets().asMap());
+			controller.getSubscribersMap().asMap().getOrDefault(event.getComponent(), ImmutableSet.of()).stream().unordered()
 					.forEach(a -> a.getContainer()
-							.map(ac -> controller.getAnchorSetsInverse().get(ac))
+							.map(inverse::get)
 							.ifPresent(f -> {
 								if (getAnchoringAnchors().contains(a))
 									throw new ConcurrentModificationException("Anchor cycle:" + System.lineSeparator()
@@ -81,8 +84,8 @@ public class UIComponentShapeAnchorController
 		protected Optional<? extends UIComponentShapeAnchorController> getController() { return Optional.ofNullable(controller.get()); }
 
 		protected void anchorSelf(EventUIComponent.ShapeDescriptorModify event, UIComponentShapeAnchorController controller) {
-			controller.getAnchorSet(event.getComponent())
-					.anchor(event.getComponent());
+			Optional.ofNullable(controller.getAnchorSets().getIfPresent(event.getComponent()))
+					.ifPresent(as -> as.anchor(event.getComponent()));
 		}
 	}
 }

@@ -11,9 +11,9 @@ import java.io.Serializable;
 import java.util.function.Function;
 
 public class Dimension2DDouble extends Dimension2D implements Serializable {
-	public static final ImmutableList<Function<Dimension2DDouble, Object>> OBJECT_VARIABLES = ImmutableList.of(
+	public static final ImmutableList<Function<? super Dimension2DDouble, ?>> OBJECT_VARIABLES = ImmutableList.of(
 			Dimension2DDouble::getWidth, Dimension2DDouble::getHeight);
-	public static final ImmutableMap<String, Function<Dimension2DDouble, Object>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
+	public static final ImmutableMap<String, Function<? super Dimension2DDouble, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
 			ImmutableList.of("width", "height"),
 			OBJECT_VARIABLES));
 	private static final long serialVersionUID = 4432299344969417136L;
@@ -38,11 +38,8 @@ public class Dimension2DDouble extends Dimension2D implements Serializable {
 		this.height = height;
 	}
 
-	@SuppressWarnings("unused")
 	@Transient
-	public Dimension2DDouble getSize() {
-		return new Dimension2DDouble(width, height);
-	}
+	public Dimension2DDouble getSize() { return new Dimension2DDouble(width, height); }
 
 	@Override
 	public int hashCode() {
