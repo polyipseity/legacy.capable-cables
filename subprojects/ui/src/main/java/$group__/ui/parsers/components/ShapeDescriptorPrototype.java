@@ -100,7 +100,7 @@ public class ShapeDescriptorPrototype
 										.map(Double::parseDouble)
 										.toArray(Double[]::new);
 								ThrowableUtilities.Try.run(() ->
-										DynamicUtilities.IMPL_LOOKUP.findVirtual(
+										DynamicUtilities.PUBLIC_LOOKUP.findVirtual(
 												AffineTransform.class,
 												DOMUtilities.getAttributeValue(op, "method")
 														.orElseThrow(InternalError::new),

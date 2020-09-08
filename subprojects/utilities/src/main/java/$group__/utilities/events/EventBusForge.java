@@ -47,7 +47,7 @@ public class EventBusForge
 				(Observer<? extends Event>) observer; // COMMENT consider parameter 'observer' 'Observer<? extends Event>' instead, this works due to type erasure
 		EventBusBridgeMethodFixConsumer<? extends Event, Observer<? extends Event>> oc;
 		try {
-			oc = new EventBusBridgeMethodFixConsumer<>(Observer.class, "onNext", oa);
+			oc = new EventBusBridgeMethodFixConsumer<>(oa, Observer.class, "onNext");
 			oc.register(getDelegated());
 		} catch (Throwable t) {
 			onError(t);

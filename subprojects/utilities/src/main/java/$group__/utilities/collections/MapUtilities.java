@@ -1,5 +1,6 @@
 package $group__.utilities.collections;
 
+import $group__.utilities.CastUtilities;
 import $group__.utilities.DynamicUtilities;
 import $group__.utilities.LoopUtilities;
 import $group__.utilities.ThrowableUtilities;
@@ -17,7 +18,6 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.signature.SignatureVisitor;
 import org.objectweb.asm.signature.SignatureWriter;
 
-import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -77,7 +77,7 @@ public enum MapUtilities {
 
 	@SuppressWarnings("unchecked")
 	public static <K, V> BiMap<K, V> newBiMap(Map<K, V> forward, Map<V, K> backward) {
-		return (BiMap<K, V>) PublicAbstractBiMapHolder.CONSTRUCTOR_INVOKER.apply(forward, backward); // COMMENT should be safe
+		return (BiMap<K, V>) PublicAbstractBiMapHolder.CONSTRUCTOR.apply(forward, backward); // COMMENT should be safe
 	}
 
 	public enum PublicAbstractBiMapHolder {
@@ -88,8 +88,7 @@ public enum MapUtilities {
 		private static final Pattern LITERAL_SUPERCLASS_NAME = Pattern.compile("AbstractBiMap", Pattern.LITERAL);
 		private static final Logger LOGGER = LogManager.getLogger();
 		private static final Class<?> CLASS;
-		private static final MethodHandle CONSTRUCTOR;
-		private static final BiFunction<Map<?, ?>, Map<?, ?>, ? extends BiMap<?, ?>> CONSTRUCTOR_INVOKER;
+		private static final BiFunction<Map<?, ?>, Map<?, ?>, ? extends BiMap<?, ?>> CONSTRUCTOR;
 
 		static {
 			{
@@ -185,13 +184,12 @@ public enum MapUtilities {
 				CLASS = DynamicUtilities.defineClass(name, cw.toByteArray());
 			}
 
-			{
-				CONSTRUCTOR = Try.call(() -> DynamicUtilities.IMPL_LOOKUP.findConstructor(CLASS, MethodType.methodType(void.class, Map.class, Map.class)), LOGGER)
-						.orElseThrow(ThrowableCatcher::rethrow);
-				CONSTRUCTOR_INVOKER = (forward, backward) ->
-						Try.call(() -> (BiMap<?, ?>) CONSTRUCTOR.invoke(forward, backward), LOGGER)
-								.orElseThrow(ThrowableCatcher::rethrow);
-			}
+			CONSTRUCTOR = Try.call(() ->
+					DynamicUtilities.InvocationUtilities.LambdaMetaFactoryUtilities
+							.makeBiFunction(DynamicUtilities.PUBLIC_LOOKUP.findConstructor(CLASS, MethodType.methodType(void.class, Map.class, Map.class)),
+									BiMap.class, Map.class, Map.class), LOGGER)
+					.map(CastUtilities::<BiFunction<Map<?, ?>, Map<?, ?>, ? extends BiMap<?, ?>>>castUnchecked)
+					.orElseThrow(ThrowableCatcher::rethrow);
 		}
 	}
 }

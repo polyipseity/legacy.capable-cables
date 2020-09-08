@@ -18,9 +18,11 @@ import sun.misc.Unsafe;
 
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
+import java.lang.invoke.LambdaMetafactory;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -28,18 +30,14 @@ import java.nio.ByteBuffer;
 import java.security.ProtectionDomain;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.stream.IntStream;
 
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 import static $group__.utilities.LoggerUtilities.EnumMessages.*;
-import static java.lang.invoke.LambdaMetafactory.metafactory;
-import static java.lang.invoke.MethodType.methodType;
 
 public enum DynamicUtilities {
-	INSTANCE;
+	;
 
 	public static final Lookup PUBLIC_LOOKUP = MethodHandles.publicLookup();
 	public static final Lookup IMPL_LOOKUP;
@@ -217,24 +215,61 @@ public enum DynamicUtilities {
 	public enum InvocationUtilities {
 		;
 
-		@SuppressWarnings("SpellCheckingInspection")
-		public enum LambdaMetafactoryUtilities {
+		public enum LambdaMetaFactoryUtilities {
 			;
 
+			private static final Lookup LOOKUP = MethodHandles.lookup();
+
 			@SuppressWarnings("unchecked")
-			public static <T, R> Function<T, R> makeFunction(Lookup lookup, MethodHandle method, Class<R> returnType,
-			                                                 Class<T> inputType) throws Throwable {
-				return (Function<T, R>) metafactory(lookup, "apply", methodType(Function.class),
-						methodType(Object.class, Object.class), method, methodType(returnType, inputType)).getTarget().invokeExact();
+			public static <T> Consumer<T> makeConsumer(MethodHandle method,
+			                                           Class<T> inputType) throws Throwable {
+				return (Consumer<T>) LambdaMetafactory.metafactory(LOOKUP,
+						"accept",
+						MethodType.methodType(Consumer.class),
+						MethodType.methodType(void.class, Object.class),
+						method,
+						MethodType.methodType(void.class, inputType))
+						.getTarget()
+						.invokeExact();
 			}
 
 			@SuppressWarnings("unchecked")
-			public static <T, U, R> BiFunction<T, U, R> makeBiFunction(Lookup lookup, MethodHandle method,
-			                                                           Class<R> returnType, Class<T> inputType1,
-			                                                           Class<U> inputType2) throws Throwable {
-				return (BiFunction<T, U, R>) metafactory(lookup, "apply", methodType(BiFunction.class),
-						methodType(Object.class, Object.class, Object.class), method, methodType(returnType,
-								inputType1, inputType2)).getTarget().invokeExact();
+			public static <T, U> BiConsumer<T, U> makeBiConsumer(MethodHandle method,
+			                                                     Class<T> inputType1, Class<U> inputType2) throws Throwable {
+				return (BiConsumer<T, U>) LambdaMetafactory.metafactory(LOOKUP,
+						"accept",
+						MethodType.methodType(BiConsumer.class),
+						MethodType.methodType(void.class, Object.class, Object.class),
+						method,
+						MethodType.methodType(void.class, inputType1, inputType2))
+						.getTarget()
+						.invokeExact();
+			}
+
+			@SuppressWarnings("unchecked")
+			public static <T, R> Function<T, R> makeFunction(MethodHandle method,
+			                                                 Class<R> returnType, Class<T> inputType) throws Throwable {
+				return (Function<T, R>) LambdaMetafactory.metafactory(LOOKUP,
+						"apply",
+						MethodType.methodType(Function.class),
+						MethodType.methodType(Object.class, Object.class),
+						method,
+						MethodType.methodType(returnType, inputType))
+						.getTarget()
+						.invokeExact();
+			}
+
+			@SuppressWarnings("unchecked")
+			public static <T, U, R> BiFunction<T, U, R> makeBiFunction(MethodHandle method,
+			                                                           Class<R> returnType, Class<T> inputType1, Class<U> inputType2) throws Throwable {
+				return (BiFunction<T, U, R>) LambdaMetafactory.metafactory(LOOKUP,
+						"apply",
+						MethodType.methodType(BiFunction.class),
+						MethodType.methodType(Object.class, Object.class, Object.class),
+						method,
+						MethodType.methodType(returnType, inputType1, inputType2))
+						.getTarget()
+						.invokeExact();
 			}
 		}
 	}
@@ -258,14 +293,10 @@ public enum DynamicUtilities {
 		public static final ClassLoaderHolder INSTANCE = new ClassLoaderHolder();
 		private static final Logger LOGGER = LogManager.getLogger();
 
-		private ClassLoaderHolder() {
-			PreconditionUtilities.requireRunOnceOnly(LOGGER);
-		}
+		private ClassLoaderHolder() { PreconditionUtilities.requireRunOnceOnly(LOGGER); }
 
 		@Override
-		protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-			return Class.forName(name, resolve, Thread.currentThread().getContextClassLoader());
-		}
+		protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException { return Class.forName(name, resolve, Thread.currentThread().getContextClassLoader()); }
 
 		public Class<?> defineClassPublic(String name, byte[] b) { return defineClassPublic(name, b, 0, b.length); }
 
