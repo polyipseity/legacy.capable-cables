@@ -33,7 +33,7 @@ public class UIComponentButtonMinecraft
 	protected final IUIComponentRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
 			new UIComponentRendererContainer<>(new DefaultRenderer<>(ImmutableMap.of(), UIComponentButtonMinecraft.class));
 
-	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
+	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
 	public UIComponentButtonMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<?> shapeDescriptor) { super(mappings, id, shapeDescriptor); }
 
 	@Override
@@ -77,7 +77,7 @@ public class UIComponentButtonMinecraft
 		@UIProperty(PROPERTY_COLOR_PRESSED_BORDER)
 		protected final IBindingField<Color> colorPressedBorder;
 
-		@UIRendererConstructor(type = UIRendererConstructor.ConstructorType.MAPPINGS__CONTAINER_CLASS)
+		@UIRendererConstructor(type = UIRendererConstructor.EnumConstructorType.MAPPINGS__CONTAINER_CLASS)
 		public DefaultRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, Class<C> containerClass) {
 			super(mappings, containerClass);
 

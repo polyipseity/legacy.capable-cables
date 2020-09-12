@@ -80,7 +80,7 @@ public class UIEventTarget
 	public static class IUIEventListenerWithParameters {
 		public static final ImmutableList<Function<? super IUIEventListenerWithParameters, ?>> OBJECT_VARIABLES = ImmutableList.of(
 				IUIEventListenerWithParameters::getListener, IUIEventListenerWithParameters::isUseCapture);
-		public static final ImmutableMap<String, Function<? super IUIEventListenerWithParameters, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
+		public static final ImmutableMap<String, Function<? super IUIEventListenerWithParameters, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchKeysValues(OBJECT_VARIABLES.size(),
 				ImmutableList.of("listener", "useCapture"),
 				OBJECT_VARIABLES));
 		protected final IUIEventListener<?> listener;

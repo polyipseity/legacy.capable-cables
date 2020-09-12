@@ -20,7 +20,7 @@ import $group__.utilities.binding.core.methods.IBindingMethodSource;
 import $group__.utilities.binding.methods.BindingMethodSource;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.events.EnumEventHookStage;
-import $group__.utilities.events.EventUtilities;
+import $group__.utilities.events.EventBusUtilities;
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
@@ -36,7 +36,6 @@ import javax.annotation.Nullable;
 import java.awt.*;
 import java.lang.ref.WeakReference;
 import java.util.ConcurrentModificationException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
@@ -71,9 +70,10 @@ public class UIComponent
 	protected final AtomicBoolean modifyingShape = new AtomicBoolean();
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
+	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
 	public UIComponent(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<?> shapeDescriptor) {
-		this.mappings = new HashMap<>(mappings);
+		this.mappings = MapUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
+		this.mappings.putAll(mappings);
 		this.id = id;
 		this.shapeDescriptor = new ComponentShapeDescriptor<>(shapeDescriptor);
 
@@ -88,7 +88,7 @@ public class UIComponent
 	@Override
 	public boolean modifyShape(Supplier<? extends Boolean> action) throws ConcurrentModificationException {
 		getModifyingShape().compareAndSet(false, true);
-		boolean ret = EventUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () ->
+		boolean ret = EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () ->
 						getShapeDescriptor().modify(action),
 				new EventUIComponent.ShapeDescriptorModify(EnumEventHookStage.PRE, this),
 				new EventUIComponent.ShapeDescriptorModify(EnumEventHookStage.POST, this));
@@ -190,5 +190,5 @@ public class UIComponent
 	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() { return extensions; }
 
 	@Override
-	public Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingView() { return ImmutableMap.copyOf(getMappings()); }
+	public Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(getMappings()); }
 }

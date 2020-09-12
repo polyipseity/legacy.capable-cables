@@ -8,9 +8,9 @@ import java.util.Map;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.CONSTRUCTOR)
 public @interface UIRendererConstructor {
-	ConstructorType type();
+	EnumConstructorType type();
 
-	enum ConstructorType
+	enum EnumConstructorType
 			implements IConstructorType {
 		MAPPINGS__CONTAINER_CLASS(MethodType.methodType(void.class, Map.class, Class.class)),
 		MAPPINGS(MethodType.methodType(void.class, Map.class)),
@@ -20,7 +20,7 @@ public @interface UIRendererConstructor {
 
 		protected final MethodType methodType;
 
-		ConstructorType(MethodType methodType) { this.methodType = methodType; }
+		EnumConstructorType(MethodType methodType) { this.methodType = methodType; }
 
 		@Override
 		public MethodType getMethodType() { return methodType; }

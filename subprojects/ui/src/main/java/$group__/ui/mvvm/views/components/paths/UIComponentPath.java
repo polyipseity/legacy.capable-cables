@@ -5,7 +5,7 @@ import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.ui.core.mvvm.views.components.paths.IUIComponentPath;
 import $group__.ui.mvvm.structures.AffineTransformStack;
-import $group__.ui.mvvm.views.paths.UINodePath;
+import $group__.ui.mvvm.views.paths.Path;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CastUtilities;
 import com.google.common.collect.Iterators;
@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class UIComponentPath<T extends IUIComponent>
-		extends UINodePath<T>
-		implements IUIComponentPath {
+		extends Path<T>
+		implements IUIComponentPath<T> {
 	protected final IAffineTransformStack transformStack = new AffineTransformStack();
 	protected final Object cleanerRef = new Object();
 

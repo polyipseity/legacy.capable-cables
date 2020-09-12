@@ -14,12 +14,12 @@ import $group__.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
 import $group__.ui.minecraft.core.mvvm.views.IUIViewComponentMinecraft;
 import $group__.ui.minecraft.mvvm.adapters.AbstractContainerScreenAdapter;
 import $group__.ui.minecraft.mvvm.components.common.UIComponentWindowMinecraft;
-import $group__.ui.minecraft.mvvm.components.parsers.UIDefaultMinecraftParser;
+import $group__.ui.minecraft.mvvm.components.parsers.UIDefaultMinecraftComponentParser;
 import $group__.ui.minecraft.mvvm.viewmodels.UIViewModelMinecraft;
 import $group__.ui.mvvm.models.UIModel;
 import $group__.ui.mvvm.views.components.common.UIComponentButton;
 import $group__.ui.mvvm.views.components.extensions.UIExtensionCursorHandleProviderComponent;
-import $group__.ui.parsers.components.UIDefaultParser;
+import $group__.ui.parsers.components.UIDefaultComponentParser;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CastUtilities;
@@ -114,9 +114,9 @@ public enum UIDebugMinecraft {
 
 		private static final Logger LOGGER = LogManager.getLogger();
 		private static final IUIResourceParser<IUIViewComponentMinecraft<?, ?>, Function<? super Unmarshaller, ?>> PARSER =
-				UIDefaultMinecraftParser.makeParserMinecraft(
-						UIDefaultParser.makeParserStandard(
-								new UIDefaultMinecraftParser<>(
+				UIDefaultMinecraftComponentParser.makeParserMinecraft(
+						UIDefaultComponentParser.makeParserStandard(
+								new UIDefaultMinecraftComponentParser<>(
 										CastUtilities.castUnchecked(IUIViewComponentMinecraft.class) // COMMENT should not matter
 								)));
 
@@ -127,7 +127,6 @@ public enum UIDebugMinecraft {
 				}
 			}, LOGGER).orElseThrow(ThrowableCatcher::rethrow)), LOGGER);
 			ThrowableCatcher.rethrow(true);
-
 			PARSER.construct(); // COMMENT early check
 		}
 
@@ -164,7 +163,7 @@ public enum UIDebugMinecraft {
 
 			protected final Random random = new Random();
 
-			@UIRendererConstructor(type = UIRendererConstructor.ConstructorType.MAPPINGS__CONTAINER_CLASS)
+			@UIRendererConstructor(type = UIRendererConstructor.EnumConstructorType.MAPPINGS__CONTAINER_CLASS)
 			public CustomWindowRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, Class<C> containerClass) { super(mappings, containerClass); }
 
 			@Override

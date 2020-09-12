@@ -2,7 +2,7 @@ package $group__.ui.core.parsers.components;
 
 import $group__.ui.ConfigurationUI;
 import $group__.ui.core.parsers.IUIResourceParser;
-import $group__.ui.parsers.components.UIDefaultParser;
+import $group__.ui.parsers.components.UIDefaultComponentParser;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.client.minecraft.ResourceUtilities;
 import $group__.utilities.functions.IConsumer3;
@@ -21,12 +21,12 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
 
-public interface IUIDefaultParser<T, R>
+public interface IUIComponentParser<T, R>
 		extends IUIResourceParser<T, R> {
 
 	Map<String, Class<?>> getAliasesView();
 
-	<H> void addHandler(Set<EnumHandlerType> types, Class<H> clazz, IConsumer3<? super UIDefaultParser.IParserContext, ?, ? super H> handler);
+	<H> void addHandler(Set<EnumHandlerType> types, Class<H> clazz, IConsumer3<? super UIDefaultComponentParser.IParserContext, ?, ? super H> handler);
 
 	@Immutable
 	enum EnumHandlerType {
@@ -53,7 +53,7 @@ public interface IUIDefaultParser<T, R>
 			}, LOGGER)
 					.orElseThrow(ThrowableUtilities.ThrowableCatcher::rethrow);
 			CONTEXT = ThrowableUtilities.Try.call(() ->
-					JAXBContext.newInstance(COMPONENTS_CONTEXT_PATH, UIDefaultParser.class.getClassLoader()), LOGGER).orElseThrow(ThrowableUtilities.ThrowableCatcher::rethrow);
+					JAXBContext.newInstance(COMPONENTS_CONTEXT_PATH, UIDefaultComponentParser.class.getClassLoader()), LOGGER).orElseThrow(ThrowableUtilities.ThrowableCatcher::rethrow);
 		}
 	}
 }

@@ -3,10 +3,10 @@ package $group__.ui.mvvm.views.components.paths;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
-import $group__.ui.core.mvvm.views.components.IUIComponentManager;
+import $group__.ui.core.mvvm.views.components.IUIViewComponent;
 import $group__.ui.core.mvvm.views.components.paths.IUIComponentPath;
 import $group__.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
-import $group__.ui.mvvm.views.paths.UINodePathResolver;
+import $group__.ui.mvvm.views.paths.AbstractPathResolver;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.collections.CacheUtilities;
@@ -25,68 +25,69 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public class UIComponentPathResolver
-		extends UINodePathResolver<IUIComponent>
+		extends AbstractPathResolver<IUIComponent>
 		implements IUIComponentPathResolver<IUIComponent> {
-	protected final WeakReference<IUIComponentManager<?>> manager;
+	protected final WeakReference<IUIViewComponent<?, ?>> view;
 	protected final LoadingCache<IUIComponent, List<Consumer<? super IAffineTransformStack>>> childrenTransformers =
 			ManualLoadingCache.newNestedLoadingCacheCollection(CacheUtilities.newCacheBuilderSingleThreaded()
 					.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL)
 					.weakKeys()
 					.build(CacheLoader.from(() -> new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL))));
 
-	public UIComponentPathResolver(IUIComponentManager<?> manager) {
-		this.manager = new WeakReference<>(manager);
+	public UIComponentPathResolver(IUIViewComponent<?, ?> view) {
+		this.view = new WeakReference<>(view);
 	}
 
 	@Override
-	public IUIComponentPath resolvePath(Point2D point, boolean virtual) {
-		return getManager().map(m -> {
-			// todo strategy or something
-			IAffineTransformStack stack = m.getCleanTransformStack();
-			final int[] popTimes = new int[1];
-			List<IUIComponent> ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM);
+	public IUIComponentPath<IUIComponent> resolvePath(Point2D point, boolean virtual) {
+		return getView()
+				.flatMap(view -> view.getManager().map(manager -> {
+					// todo strategy or something
+					IAffineTransformStack stack = view.getCleanTransformStack();
+					final int[] popTimes = new int[1];
+					List<IUIComponent> ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM);
 
-			ret.add(m);
-			@Nullable IUIComponent current = m;
-			while (current != null) {
-				current = CastUtilities.castChecked(IUIComponentContainer.class, current)
-						.map(container -> {
-							AffineTransform transform = stack.push();
-							container.transformChildren(stack);
-							Optional.ofNullable(getChildrenTransformers().getIfPresent(container))
-									.ifPresent(ts -> ts.forEach(t -> t.accept(stack)));
-							++popTimes[0];
+					ret.add(manager);
+					@Nullable IUIComponent current = manager;
+					while (current != null) {
+						current = CastUtilities.castChecked(IUIComponentContainer.class, current)
+								.map(container -> {
+									AffineTransform transform = stack.push();
+									container.transformChildren(stack);
+									Optional.ofNullable(getChildrenTransformers().getIfPresent(container))
+											.ifPresent(ts -> ts.forEach(t -> t.accept(stack)));
+									++popTimes[0];
 
-							@Nullable IUIComponent r = null;
-							childrenLoop:
-							for (IUIComponent child : Lists.reverse(container.getChildrenView())) {
-								@Nullable List<IUIComponent> cVe = getVirtualElements().getIfPresent(child);
-								if (cVe != null) {
-									for (IUIComponent childVirtualElement : Lists.reverse(cVe)) {
+									@Nullable IUIComponent r = null;
+									childrenLoop:
+									for (IUIComponent child : Lists.reverse(container.getChildrenView())) {
+										@Nullable List<IUIComponent> cVe = getVirtualElements().getIfPresent(child);
+										if (cVe != null) {
+											for (IUIComponent childVirtualElement : Lists.reverse(cVe)) {
+												if (transform.createTransformedShape(
+														childVirtualElement.getShapeDescriptor().getShapeOutput()).contains(point)) {
+													r = virtual ? childVirtualElement : child;
+													break childrenLoop;
+												}
+											}
+										}
 										if (transform.createTransformedShape(
-												childVirtualElement.getShapeDescriptor().getShapeOutput()).contains(point)) {
-											r = virtual ? childVirtualElement : child;
-											break childrenLoop;
+												child.getShapeDescriptor().getShapeOutput()).contains(point)) {
+											r = child;
+											break;
 										}
 									}
-								}
-								if (transform.createTransformedShape(
-										child.getShapeDescriptor().getShapeOutput()).contains(point)) {
-									r = child;
-									break;
-								}
-							}
 
-							if (r != null)
-								ret.add(r);
-							return r;
-						})
-						.orElse(null);
-			}
-			IAffineTransformStack.popMultiple(stack, popTimes[0]);
+									if (r != null)
+										ret.add(r);
+									return r;
+								})
+								.orElse(null);
+					}
+					IAffineTransformStack.popMultiple(stack, popTimes[0]);
 
-			return new UIComponentPath<>(ret);
-		}).orElseThrow(IllegalStateException::new);
+					return new UIComponentPath<>(ret);
+				})).orElseThrow(IllegalStateException::new);
 	}
 
 	protected LoadingCache<IUIComponent, List<Consumer<? super IAffineTransformStack>>> getChildrenTransformers() { return childrenTransformers; }
@@ -94,7 +95,7 @@ public class UIComponentPathResolver
 	@Override
 	public boolean addChildrenTransformer(IUIComponent element, Consumer<? super IAffineTransformStack> transformer) { return getChildrenTransformers().getUnchecked(element).add(transformer); }
 
-	protected Optional<? extends IUIComponentManager<?>> getManager() { return Optional.ofNullable(manager.get()); }
+	protected Optional<? extends IUIViewComponent<?, ?>> getView() { return Optional.ofNullable(view.get()); }
 
 	@Override
 	public boolean removeChildrenTransformer(IUIComponent element, Consumer<? super IAffineTransformStack> transformer) {

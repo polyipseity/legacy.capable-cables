@@ -52,7 +52,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 	@Nullable
 	protected IResizeData resizeData;
 
-	@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.CONTAINER_CLASS)
+	@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.CONTAINER_CLASS)
 	public UIExtensionComponentUserResizable(Class<E> containerClass) {
 		super(IUIComponent.class, containerClass);
 	}
@@ -81,10 +81,13 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 	@OverridingMethodsMustInvokeSuper
 	public void onExtensionAdded(IUIComponent container) {
 		super.onExtensionAdded(container);
-		getContainer().ifPresent(c -> c.getManager().ifPresent(m -> {
-			getVirtualComponent().setRelatedComponent(c);
-			m.getPathResolver().addVirtualElement(c, getVirtualComponent());
-		}));
+		getContainer()
+				.ifPresent(c -> c.getManager()
+						.flatMap(IUIComponentManager::getView)
+						.ifPresent(v -> {
+							getVirtualComponent().setRelatedComponent(c);
+							v.getPathResolver().addVirtualElement(c, getVirtualComponent());
+						}));
 		UIEventBusEntryPoint.<GuiScreenEvent.DrawScreenEvent.Post>getEventBus()
 				.subscribe(getObserverDrawScreenEventPost().accumulateAndGet(new ObserverDrawScreenEventPost(), (p, n) -> {
 					if (p != null)
@@ -174,12 +177,11 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 			addEventListener(UIEventMouse.TYPE_MOUSE_DOWN, new UIEventListener.Functional<IUIEventMouse>(evt -> {
 				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && startResizeMaybe(evt.getData().getCursorPositionView())) { // todo custom
 					getContainer().ifPresent(c -> {
-						c.getParent().ifPresent(p ->
-								p.moveChildToTop(c));
+						c.getParent()
+								.ifPresent(p -> p.moveChildToTop(c));
 						c.getManager()
-								.map(IUIComponentManager::getPathResolver)
-								.ifPresent(pr ->
-										pr.moveVirtualElementToTop(c, this));
+								.flatMap(IUIComponentManager::getView)
+								.ifPresent(v -> v.getPathResolver().moveVirtualElementToTop(c, this));
 					});
 					evt.stopPropagation();
 				}
@@ -191,28 +193,31 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 		}
 
 		protected boolean startResizeMaybe(Point2D cursorPosition) {
-			return getContainer().flatMap(c -> c.getManager().filter(m -> {
-				Rectangle2D spb = m.getPathResolver().resolvePath(cursorPosition, true).getTransformCurrentView().createTransformedShape(c.getShapeDescriptor().getShapeOutput()).getBounds2D();
-				Set<EnumUISide> sides = EnumUISide.getSidesMouseOver(spb, cursorPosition);
+			return getContainer()
+					.flatMap(c -> c.getManager()
+							.flatMap(IUIComponentManager::getView)
+							.filter(v -> {
+								Rectangle2D spb = v.getPathResolver().resolvePath(cursorPosition, true).getTransformCurrentView().createTransformedShape(c.getShapeDescriptor().getShapeOutput()).getBounds2D();
+								Set<EnumUISide> sides = EnumUISide.getSidesMouseOver(spb, cursorPosition);
 
-				@Nullable Point2D base = null;
-				if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT))
-					base = new Point2DImmutable(spb.getMaxX(), spb.getMaxY());
-				else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
-					base = new Point2DImmutable(spb.getX(), spb.getY());
-				else if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.RIGHT))
-					base = new Point2DImmutable(spb.getX(), spb.getMaxY());
-				else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
-					base = new Point2DImmutable(spb.getMaxX(), spb.getY());
+								@Nullable Point2D base = null;
+								if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT))
+									base = new Point2DImmutable(spb.getMaxX(), spb.getMaxY());
+								else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
+									base = new Point2DImmutable(spb.getX(), spb.getY());
+								else if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.RIGHT))
+									base = new Point2DImmutable(spb.getX(), spb.getMaxY());
+								else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
+									base = new Point2DImmutable(spb.getMaxX(), spb.getY());
 
-				IResizeData d = new ResizeData(cursorPosition, sides, base, getCursor(sides).orElseThrow(InternalError::new).getHandle());
-				synchronized (getLockObject()) {
-					if (getResizeData().isPresent())
-						return false;
-					setResizeData(d);
-					return true;
-				}
-			})).isPresent();
+								IResizeData d = new ResizeData(cursorPosition, sides, base, getCursor(sides).orElseThrow(InternalError::new).getHandle());
+								synchronized (getLockObject()) {
+									if (getResizeData().isPresent())
+										return false;
+									setResizeData(d);
+									return true;
+								}
+							})).isPresent();
 		}
 
 		protected boolean finishResizeMaybe(Point2D cursorPosition) {
@@ -290,18 +295,22 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 		@Override
 		@SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
 		public void onNext(GuiScreenEvent.DrawScreenEvent.Post event) {
-			getResizeData().ifPresent(d ->
-					getContainer().ifPresent(c -> {
-						Point2D cp = new Point2DImmutable(event.getMouseX(), event.getMouseY());
-						c.getManager().ifPresent(m -> {
-							Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
-							d.handle(r, cp);
-							UIObjectUtilities.acceptRectangular(r, (x, y, w, h) ->
-									r.setFrame(x, y, w - 1, h - 1));
-							DrawingUtilities.drawRectangle(m.getPathResolver().resolvePath(cp, true).getTransformCurrentView(),
-									r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
-						});
-					}));
+			getResizeData()
+					.ifPresent(d ->
+							getContainer()
+									.ifPresent(c -> {
+										Point2D cp = new Point2DImmutable(event.getMouseX(), event.getMouseY());
+										c.getManager()
+												.flatMap(IUIComponentManager::getView)
+												.ifPresent(m -> {
+													Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
+													d.handle(r, cp);
+													UIObjectUtilities.acceptRectangular(r, (x, y, w, h) ->
+															r.setFrame(x, y, w - 1, h - 1));
+													DrawingUtilities.drawRectangle(m.getPathResolver().resolvePath(cp, true).getTransformCurrentView(),
+															r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
+												});
+									}));
 		}
 	}
 }

@@ -16,7 +16,7 @@ public interface INamespacePrefixedString {
 
 	ImmutableList<Function<? super INamespacePrefixedString, ?>> OBJECT_VARIABLES = ImmutableList.of(
 			INamespacePrefixedString::getNamespace, INamespacePrefixedString::getPath);
-	ImmutableMap<String, Function<? super INamespacePrefixedString, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
+	ImmutableMap<String, Function<? super INamespacePrefixedString, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchKeysValues(OBJECT_VARIABLES.size(),
 			ImmutableList.of("namespace", "path"),
 			OBJECT_VARIABLES));
 

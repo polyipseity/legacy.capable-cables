@@ -88,7 +88,7 @@ public class EventBusForge
 		public void dispose() {
 			if (!getDisposed().getAndSet(true)) {
 				getOwner().unregister(getDownstream());
-				EventUtilities.cleanListenersCache(getOwner(), getEventType());
+				EventBusUtilities.cleanListenersCache(getOwner(), getEventType());
 			}
 		}
 

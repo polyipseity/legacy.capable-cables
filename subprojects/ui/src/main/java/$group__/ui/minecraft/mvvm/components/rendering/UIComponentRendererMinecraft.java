@@ -17,7 +17,7 @@ import java.util.Map;
 public class UIComponentRendererMinecraft<C extends IUIComponent>
 		extends UIComponentRenderer<C>
 		implements IUIComponentRendererMinecraft<C> {
-	@UIRendererConstructor(type = UIRendererConstructor.ConstructorType.MAPPINGS__CONTAINER_CLASS)
+	@UIRendererConstructor(type = UIRendererConstructor.EnumConstructorType.MAPPINGS__CONTAINER_CLASS)
 	public UIComponentRendererMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, Class<C> containerClass) { super(mappings, containerClass); }
 
 	@Override

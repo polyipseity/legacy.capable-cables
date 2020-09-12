@@ -16,7 +16,7 @@ import java.util.function.Function;
 public interface ITransitionSystem<S extends IState<D>, E, D> {
 	ImmutableList<Function<? super ITransitionSystem<?, ?, ?>, ?>> OBJECT_VARIABLES = ImmutableList.of(
 			ITransitionSystem::getState, ITransitionSystem::getInput, ITransitionSystem::getTransitionsView);
-	ImmutableMap<String, Function<? super ITransitionSystem<?, ?, ?>, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
+	ImmutableMap<String, Function<? super ITransitionSystem<?, ?, ?>, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchKeysValues(OBJECT_VARIABLES.size(),
 			ImmutableList.of("state", "input", "transitionsView"),
 			OBJECT_VARIABLES));
 

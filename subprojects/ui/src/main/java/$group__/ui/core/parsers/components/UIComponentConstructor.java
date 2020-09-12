@@ -10,16 +10,16 @@ import java.util.Map;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.CONSTRUCTOR)
 public @interface UIComponentConstructor {
-	ConstructorType type();
+	EnumConstructorType type();
 
-	enum ConstructorType
+	enum EnumConstructorType
 			implements IConstructorType {
 		MAPPINGS__ID__SHAPE_DESCRIPTOR(MethodType.methodType(void.class, Map.class, String.class, IShapeDescriptor.class)),
 		;
 
 		protected final MethodType methodType;
 
-		ConstructorType(MethodType methodType) { this.methodType = methodType; }
+		EnumConstructorType(MethodType methodType) { this.methodType = methodType; }
 
 		@Override
 		public MethodType getMethodType() { return methodType; }

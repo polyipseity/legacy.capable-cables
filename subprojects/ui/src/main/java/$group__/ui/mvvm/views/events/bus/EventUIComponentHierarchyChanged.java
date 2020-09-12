@@ -2,6 +2,7 @@ package $group__.ui.mvvm.views.events.bus;
 
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
+import $group__.ui.core.mvvm.views.components.IUIViewComponent;
 import $group__.utilities.events.EnumEventHookStage;
 
 import javax.annotation.Nullable;
@@ -14,6 +15,13 @@ public abstract class EventUIComponentHierarchyChanged<T> extends EventUICompone
 		public Parent(EnumEventHookStage stage, IUIComponent component,
 		              @Nullable IUIComponentContainer previous, @Nullable IUIComponentContainer current) {
 			super(stage, component, Optional.ofNullable(previous), Optional.ofNullable(current));
+		}
+	}
+
+	public static class View extends EventUIComponentChanged<Optional<IUIViewComponent<?, ?>>> {
+		public View(EnumEventHookStage stage, IUIComponent component,
+		            @Nullable IUIViewComponent<?, ?> previous, @Nullable IUIViewComponent<?, ?> next) {
+			super(stage, component, Optional.ofNullable(previous), Optional.ofNullable(next));
 		}
 	}
 

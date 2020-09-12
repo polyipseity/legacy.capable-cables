@@ -31,7 +31,7 @@ import java.util.function.Predicate;
 public class UIExtensionBackgroundMinecraft<E extends IUIComponentManager<?>>
 		extends ExtensionContainerAware<INamespacePrefixedString, IUIComponentManager<?>, E>
 		implements IUIExtensionBackgroundRenderer {
-	@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.CONTAINER_CLASS)
+	@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.CONTAINER_CLASS)
 	public UIExtensionBackgroundMinecraft(Class<E> containerClass) {
 		super(CastUtilities.castUnchecked(IUIComponentManager.class), // COMMENT the generics should not matter here
 				containerClass);
@@ -57,7 +57,7 @@ public class UIExtensionBackgroundMinecraft<E extends IUIComponentManager<?>>
 	@OnlyIn(Dist.CLIENT)
 	public static class Default<E extends IUIComponentManager<?>>
 			extends UIExtensionBackgroundMinecraft<E> {
-		@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.CONTAINER_CLASS)
+		@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.CONTAINER_CLASS)
 		public Default(Class<E> containerClass) { super(containerClass); }
 
 		@Override
@@ -69,7 +69,7 @@ public class UIExtensionBackgroundMinecraft<E extends IUIComponentManager<?>>
 	@OnlyIn(Dist.CLIENT)
 	public static class Dirt<E extends IUIComponentManager<?>>
 			extends UIExtensionBackgroundMinecraft<E> {
-		@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.CONTAINER_CLASS)
+		@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.CONTAINER_CLASS)
 		public Dirt(Class<E> containerClass) { super(containerClass); }
 
 		@Override

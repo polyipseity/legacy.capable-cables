@@ -30,7 +30,7 @@ public class UIComponentManagerMinecraft
 			new UIComponentRendererContainer<>(new UIComponentRendererMinecraft<>(ImmutableMap.of(), UIComponentManagerMinecraft.class));
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
+	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
 	public UIComponentManagerMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<Rectangle2D> shapeDescriptor) {
 		super(mappings, id, shapeDescriptor);
 

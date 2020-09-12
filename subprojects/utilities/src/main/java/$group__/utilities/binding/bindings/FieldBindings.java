@@ -5,6 +5,7 @@ import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.binding.core.BindingTransformerNotFoundException;
 import $group__.utilities.binding.core.fields.IBindingField;
+import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.interfaces.IValue;
 import $group__.utilities.reactive.DisposableObserverAuto;
@@ -15,7 +16,6 @@ import io.reactivex.rxjava3.observers.DisposableObserver;
 import sun.misc.Cleaner;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
@@ -23,7 +23,8 @@ import java.util.function.Supplier;
 
 public class FieldBindings
 		extends AbstractBindings<IBindingField<?>> {
-	protected final Map<IBindingField<?>, Disposable> fields = new HashMap<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
+	protected final Map<IBindingField<?>, Disposable> fields =
+			MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_TINY).makeMap();
 	protected final AtomicBoolean isSource = new AtomicBoolean(true);
 	protected final Object cleanerRef = new Object();
 

@@ -6,6 +6,7 @@ import $group__.utilities.binding.core.BindingTransformerNotFoundException;
 import $group__.utilities.binding.core.methods.IBindingMethod;
 import $group__.utilities.binding.core.methods.IBindingMethodDestination;
 import $group__.utilities.binding.core.methods.IBindingMethodSource;
+import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.reactive.DisposableObserverAuto;
 import com.google.common.cache.Cache;
@@ -16,8 +17,7 @@ import sun.misc.Cleaner;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -25,8 +25,10 @@ import java.util.function.Supplier;
 
 public class MethodBindings
 		extends AbstractBindings<IBindingMethod<?>> {
-	protected final Map<IBindingMethodSource<?>, Disposable> sources = new HashMap<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
-	protected final Set<IBindingMethodDestination<?>> destinations = new HashSet<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
+	protected final Map<IBindingMethodSource<?>, Disposable> sources =
+			MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_TINY).makeMap();
+	protected final Set<IBindingMethodDestination<?>> destinations =
+			Collections.newSetFromMap(MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_TINY).makeMap());
 	protected final Object cleanerRef = new Object();
 
 	public MethodBindings(INamespacePrefixedString bindingKey,

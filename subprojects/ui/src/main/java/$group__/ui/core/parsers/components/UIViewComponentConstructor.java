@@ -8,16 +8,16 @@ import java.util.Map;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.CONSTRUCTOR)
 public @interface UIViewComponentConstructor {
-	ConstructorType type();
+	EnumConstructorType type();
 
-	enum ConstructorType
+	enum EnumConstructorType
 			implements IConstructorType {
-		MAPPING(MethodType.methodType(void.class, Map.class)),
+		MAPPINGS(MethodType.methodType(void.class, Map.class)),
 		;
 
 		protected final MethodType methodType;
 
-		ConstructorType(MethodType methodType) { this.methodType = methodType; }
+		EnumConstructorType(MethodType methodType) { this.methodType = methodType; }
 
 		@Override
 		public MethodType getMethodType() { return methodType; }

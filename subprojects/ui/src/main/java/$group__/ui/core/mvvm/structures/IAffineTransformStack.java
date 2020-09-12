@@ -21,7 +21,7 @@ public interface IAffineTransformStack
 	Logger LOGGER = LogManager.getLogger();
 	ImmutableList<Function<? super IAffineTransformStack, ?>> OBJECT_VARIABLES = ImmutableList.of(
 			IAffineTransformStack::getData);
-	ImmutableMap<String, Function<? super IAffineTransformStack, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchIterables(OBJECT_VARIABLES.size(),
+	ImmutableMap<String, Function<? super IAffineTransformStack, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchKeysValues(OBJECT_VARIABLES.size(),
 			ImmutableList.of("data"),
 			OBJECT_VARIABLES));
 

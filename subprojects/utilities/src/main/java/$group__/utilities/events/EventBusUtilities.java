@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.function.Supplier;
 
-public enum EventUtilities {
+public enum EventBusUtilities {
 	;
 
 	private static final Logger LOGGER = LogManager.getLogger();
@@ -39,6 +39,12 @@ public enum EventUtilities {
 		}
 		bus.onNext(post);
 		return r;
+	}
+
+	public static void runWithPrePostHooks(Subject<Event> bus, Runnable action, Event pre, Event post) {
+		bus.onNext(pre);
+		action.run();
+		bus.onNext(post);
 	}
 
 	public static <E extends Event> void cleanListenersCache(IEventBus bus, Class<E> eventType) {

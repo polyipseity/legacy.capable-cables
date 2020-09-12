@@ -80,8 +80,10 @@ public class UIScreenAdapter
 		this.title = title;
 		this.infrastructure = infrastructure;
 		this.containerObject = containerObject;
-		this.closeKeys = new HashSet<>(closeKeys);
-		this.changeFocusKeys = new HashSet<>(changeFocusKeys);
+		this.closeKeys = Collections.newSetFromMap(MapUtilities.newMapMakerSingleThreaded().initialCapacity(closeKeys.size()).makeMap());
+		this.closeKeys.addAll(closeKeys);
+		this.changeFocusKeys = Collections.newSetFromMap(MapUtilities.newMapMakerSingleThreaded().initialCapacity(changeFocusKeys.size()).makeMap());
+		this.changeFocusKeys.addAll(changeFocusKeys);
 		IExtensionContainer.addExtensionChecked(infrastructure, new UIExtensionScreen());
 
 		if (containerObject != null)

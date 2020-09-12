@@ -1,7 +1,6 @@
 package $group__.ui.mvvm.views.paths;
 
-import $group__.ui.core.mvvm.views.paths.IUINode;
-import $group__.ui.core.mvvm.views.paths.IUINodePathResolver;
+import $group__.ui.core.mvvm.views.paths.IPathResolver;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.collections.CacheUtilities;
 import $group__.utilities.collections.ManualLoadingCache;
@@ -13,8 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class UINodePathResolver<T extends IUINode>
-		implements IUINodePathResolver<T> {
+public abstract class AbstractPathResolver<T>
+		implements IPathResolver<T> {
 	protected final LoadingCache<T, List<T>> virtualElements =
 			ManualLoadingCache.newNestedLoadingCacheCollection(CacheUtilities.newCacheBuilderSingleThreaded()
 					.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL)

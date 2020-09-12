@@ -7,5 +7,5 @@ import java.util.Map;
 
 @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface IHasBindingMap {
-	Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingView();
+	Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView();
 }

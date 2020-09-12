@@ -47,7 +47,7 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 	@Nullable
 	protected IRelocateData relocateData;
 
-	@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.CONTAINER_CLASS)
+	@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.CONTAINER_CLASS)
 	public UIExtensionComponentUserRelocatable(Class<E> containerClass) {
 		super(IUIComponent.class, containerClass);
 	}
@@ -63,8 +63,9 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 		super.onExtensionAdded(container);
 		getContainer().ifPresent(c -> {
 			getVirtualComponent().setRelatedComponent(c);
-			c.getManager().ifPresent(m ->
-					m.getPathResolver().addVirtualElement(c, getVirtualComponent()));
+			c.getManager()
+					.flatMap(IUIComponentManager::getView)
+					.ifPresent(v -> v.getPathResolver().addVirtualElement(c, getVirtualComponent()));
 		});
 		UIEventBusEntryPoint.<GuiScreenEvent.DrawScreenEvent.Post>getEventBus()
 				.subscribe(getObserverDrawScreenEventPost().accumulateAndGet(new ObserverDrawScreenEventPost(), (p, n) -> {
@@ -113,6 +114,21 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 		}
 	}
 
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void onExtensionRemoved() {
+		super.onExtensionRemoved();
+		getContainer().ifPresent(c -> {
+			getVirtualComponent().setRelatedComponent(null);
+			c.getManager()
+					.flatMap(IUIComponentManager::getView)
+					.ifPresent(v -> v.getPathResolver().removeVirtualElement(c, getVirtualComponent()));
+		});
+		Optional.ofNullable(getObserverDrawScreenEventPost().getAndSet(null)).ifPresent(DisposableObserver::dispose);
+	}
+
+	protected AtomicReference<ObserverDrawScreenEventPost> getObserverDrawScreenEventPost() { return observerDrawScreenEventPost; }
+
 	public class VirtualComponent
 			extends UIComponentVirtual
 			implements IUIComponentCursorHandleProvider {
@@ -126,9 +142,8 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 						c.getParent().ifPresent(p ->
 								p.moveChildToTop(c));
 						c.getManager()
-								.map(IUIComponentManager::getPathResolver)
-								.ifPresent(pr ->
-										pr.moveVirtualElementToTop(c, this));
+								.flatMap(IUIComponentManager::getView)
+								.ifPresent(v -> v.getPathResolver().moveVirtualElementToTop(c, this));
 					});
 					evt.stopPropagation();
 				}
@@ -182,32 +197,22 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 		}
 	}
 
-	protected AtomicReference<ObserverDrawScreenEventPost> getObserverDrawScreenEventPost() { return observerDrawScreenEventPost; }
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void onExtensionRemoved() {
-		super.onExtensionRemoved();
-		getContainer().ifPresent(c -> {
-			getVirtualComponent().setRelatedComponent(null);
-			c.getManager().ifPresent(m ->
-					m.getPathResolver().removeVirtualElement(c, getVirtualComponent()));
-		});
-		Optional.ofNullable(getObserverDrawScreenEventPost().getAndSet(null)).ifPresent(DisposableObserver::dispose);
-	}
-
 	public class ObserverDrawScreenEventPost
 			extends DisposableObserverAuto<GuiScreenEvent.DrawScreenEvent.Post> {
 		@Override
 		@SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
 		public void onNext(GuiScreenEvent.DrawScreenEvent.Post event) {
-			getRelocateData().ifPresent(d -> getContainer().ifPresent(c -> c.getManager().ifPresent(m -> {
-				Point2D cp = new Point2DImmutable(event.getMouseX(), event.getMouseY());
-				Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
-				d.handle(r, cp);
-				DrawingUtilities.drawRectangle(m.getPathResolver().resolvePath(cp, true).getTransformCurrentView(),
-						r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
-			})));
+			getRelocateData()
+					.ifPresent(d -> getContainer()
+							.ifPresent(c -> c.getManager()
+									.flatMap(IUIComponentManager::getView)
+									.ifPresent(v -> {
+										Point2D cp = new Point2DImmutable(event.getMouseX(), event.getMouseY());
+										Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
+										d.handle(r, cp);
+										DrawingUtilities.drawRectangle(v.getPathResolver().resolvePath(cp, true).getTransformCurrentView(),
+												r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
+									})));
 		}
 	}
 }

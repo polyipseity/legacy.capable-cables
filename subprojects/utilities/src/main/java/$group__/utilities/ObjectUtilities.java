@@ -72,6 +72,6 @@ public enum ObjectUtilities {
 
 	public static <T> ImmutableMap<String, Function<? super T, ?>> extendsObjectVariablesMap(Collection<? extends Function<? super T, ?>> variables, Map<? extends String, ? extends Function<? super T, ?>> extended, Iterable<? extends String> self) {
 		return ImmutableMap.copyOf(
-				MapUtilities.stitchIterables(variables.size(), Iterables.concat(extended.keySet(), self), variables));
+				MapUtilities.stitchKeysValues(variables.size(), Iterables.concat(extended.keySet(), self), variables));
 	}
 }

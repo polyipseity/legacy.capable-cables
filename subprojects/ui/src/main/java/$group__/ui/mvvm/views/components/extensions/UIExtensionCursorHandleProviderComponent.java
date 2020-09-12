@@ -20,7 +20,7 @@ import java.util.function.Function;
 public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent<?, ?>>
 		extends ExtensionContainerAware<INamespacePrefixedString, IUIView<?>, E>
 		implements IUIExtensionCursorHandleProvider {
-	@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.CONTAINER_CLASS)
+	@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.CONTAINER_CLASS)
 	public UIExtensionCursorHandleProviderComponent(Class<E> containerClass) {
 		super(CastUtilities.castUnchecked(IUIView.class), // COMMENT generics should not matter in this case
 				containerClass);
@@ -29,9 +29,9 @@ public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent
 	@Override
 	public Optional<? extends Long> getCursorHandle(Point2D cursorPosition) {
 		return getContainer()
-				.flatMap(c -> {
+				.flatMap(v -> {
 					Optional<Long> ret = Optional.empty();
-					IUIComponentPath cp = c.getManager().getPathResolver().resolvePath(cursorPosition, true);
+					IUIComponentPath<IUIComponent> cp = v.getPathResolver().resolvePath(cursorPosition, true);
 					try (IAffineTransformStack stack = cp.getTransformStackView()) {
 						for (IUIComponent e : Lists.reverse(cp.asList())) {
 							if ((ret = CastUtilities.castChecked(IUIComponentCursorHandleProvider.class, e)

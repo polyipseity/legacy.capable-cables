@@ -10,4 +10,15 @@ public interface IConsumer3<T1, T2, T3> {
 	}
 
 	void accept(T1 t1, T2 t2, T3 t3);
+
+	enum StaticHolder {
+		;
+
+		private static final IConsumer3<Object, Object, Object> EMPTY = (t1, t2, t3) -> {};
+
+		@SuppressWarnings("unchecked")
+		public static <T1, T2, T3> IConsumer3<T1, T2, T3> empty() {
+			return (IConsumer3<T1, T2, T3>) EMPTY; // COMMENT always safe, accepts Object
+		}
+	}
 }

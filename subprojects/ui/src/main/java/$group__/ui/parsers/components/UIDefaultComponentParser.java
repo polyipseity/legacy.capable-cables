@@ -38,9 +38,9 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-public class UIDefaultParser<T extends IUIViewComponent<?, ?>>
+public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		extends IHasGenericClass.Impl<T>
-		implements IUIDefaultParser<T, Function<? super Unmarshaller, ?>> {
+		implements IUIComponentParser<T, Function<? super Unmarshaller, ?>> {
 	private static final Logger LOGGER = LogManager.getLogger();
 
 	protected final ConcurrentMap<String, Class<?>> aliases = MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
@@ -49,11 +49,11 @@ public class UIDefaultParser<T extends IUIViewComponent<?, ?>>
 	@Nullable
 	protected Ui root;
 
-	public UIDefaultParser(Class<T> genericClass) {
+	public UIDefaultComponentParser(Class<T> genericClass) {
 		super(genericClass);
 	}
 
-	public static <T extends IUIDefaultParser<?, ?>> T makeParserStandard(T instance) {
+	public static <T extends IUIComponentParser<?, ?>> T makeParserStandard(T instance) {
 		instance.addHandler(EnumSet.allOf(EnumHandlerType.class), Extension.class, DefaultHandlers::handleExtension);
 		instance.addHandler(EnumSet.allOf(EnumHandlerType.class), Renderer.class, DefaultHandlers::handleRenderer);
 		return instance;
@@ -155,13 +155,14 @@ public class UIDefaultParser<T extends IUIViewComponent<?, ?>>
 	@SuppressWarnings("SwitchStatementWithTooFewBranches")
 	public static IUIViewComponent<?, ?> createView(IParserContext context, View view) {
 		Class<?> vc = AssertionUtilities.assertNonnull(context.getAliases().get(view.getClazz()));
-		UIViewComponentConstructor.ConstructorType ct = IConstructorType.getConstructorType(vc, UIViewComponentConstructor.class, UIViewComponentConstructor::type);
+		UIViewComponentConstructor.EnumConstructorType ct = IConstructorType.getConstructorType(vc, UIViewComponentConstructor.class, UIViewComponentConstructor::type);
 		return Try.call(() -> {
 			MethodHandle mh = DynamicUtilities.IMPL_LOOKUP.findConstructor(vc, ct.getMethodType());
+			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(view.getProperty(), view.getBinding());
 			switch (ct) {
-				case MAPPING:
+				case MAPPINGS:
 					return (IUIViewComponent<?, ?>) mh.invoke(
-							createMappings(view.getProperty(), view.getBinding())
+							mappings
 					);
 				default:
 					throw new InternalError();
@@ -175,7 +176,7 @@ public class UIDefaultParser<T extends IUIViewComponent<?, ?>>
 		return TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, component,
 				n -> {
 					Class<?> cc = AssertionUtilities.assertNonnull(context.getAliases().get(n.getClazz()));
-					UIComponentConstructor.ConstructorType ct = IConstructorType.getConstructorType(cc, UIComponentConstructor.class, UIComponentConstructor::type);
+					UIComponentConstructor.EnumConstructorType ct = IConstructorType.getConstructorType(cc, UIComponentConstructor.class, UIComponentConstructor::type);
 					return Try.call(() -> {
 						MethodHandle mh = DynamicUtilities.IMPL_LOOKUP.findConstructor(cc, ct.getMethodType());
 						Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(n.getProperty(), n.getBinding());
@@ -300,7 +301,7 @@ public class UIDefaultParser<T extends IUIViewComponent<?, ?>>
 			if (!(container instanceof IExtensionContainer))
 				return;
 			Class<?> oc = AssertionUtilities.assertNonnull(context.getAliases().get(object.getClazz()));
-			UIExtensionConstructor.ConstructorType ct = IConstructorType.getConstructorType(oc, UIExtensionConstructor.class, UIExtensionConstructor::type);
+			UIExtensionConstructor.EnumConstructorType ct = IConstructorType.getConstructorType(oc, UIExtensionConstructor.class, UIExtensionConstructor::type);
 			IUIExtension<?, ?> ret = Try.call(() -> {
 				MethodHandle mh = DynamicUtilities.IMPL_LOOKUP.findConstructor(oc, ct.getMethodType());
 				Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(object.getProperty(), object.getBinding());
@@ -324,7 +325,7 @@ public class UIDefaultParser<T extends IUIViewComponent<?, ?>>
 			if (!(container instanceof IUIComponentRendererContainer))
 				return;
 			Class<?> oc = AssertionUtilities.assertNonnull(context.getAliases().get(object.getClazz()));
-			UIRendererConstructor.ConstructorType ct = IConstructorType.getConstructorType(oc, UIRendererConstructor.class, UIRendererConstructor::type);
+			UIRendererConstructor.EnumConstructorType ct = IConstructorType.getConstructorType(oc, UIRendererConstructor.class, UIRendererConstructor::type);
 			IUIComponentRenderer<?> ret = Try.call(() -> {
 				MethodHandle mh = DynamicUtilities.IMPL_LOOKUP.findConstructor(oc, ct.getMethodType());
 				Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(object.getProperty(), object.getBinding());

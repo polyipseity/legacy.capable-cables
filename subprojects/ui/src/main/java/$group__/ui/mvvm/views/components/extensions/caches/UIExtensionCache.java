@@ -41,7 +41,7 @@ public class UIExtensionCache
 					.expireAfterAccess(MapUtilities.CACHE_EXPIRATION_ACCESS_DURATION, MapUtilities.CACHE_EXPIRATION_ACCESS_TIME_UNIT)
 					.concurrencyLevel(ConcurrencyUtilities.SINGLE_THREAD_THREAD_COUNT).build();
 
-	@UIExtensionConstructor(type = UIExtensionConstructor.ConstructorType.NO_ARGS)
+	@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.NO_ARGS)
 	public UIExtensionCache() {
 		super(CastUtilities.castUnchecked(IExtensionContainer.class), CastUtilities.castUnchecked(IExtensionContainer.class)); // COMMENT should not matter in this case
 	}
@@ -118,6 +118,6 @@ public class UIExtensionCache
 									}
 								})));
 
-		private static INamespacePrefixedString generateKey(String name) { return new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, "universal." + name); }
+		private static INamespacePrefixedString generateKey(String name) { return new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, CacheUniversal.class.getName() + '.' + name); }
 	}
 }

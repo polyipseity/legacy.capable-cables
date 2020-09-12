@@ -13,7 +13,7 @@ import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.events.EnumEventHookStage;
-import $group__.utilities.events.EventUtilities;
+import $group__.utilities.events.EventBusUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import com.google.common.collect.ImmutableList;
 
@@ -28,7 +28,7 @@ public class UIComponentContainer
 		implements IUIComponentContainer {
 	protected final List<IUIComponent> children = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 
-	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
+	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
 	public UIComponentContainer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<?> shapeDescriptor) { super(mappings, id, shapeDescriptor); }
 
 	@Override
@@ -53,7 +53,7 @@ public class UIComponentContainer
 			return moveChildTo(index, component);
 		boolean ret = false;
 		if (getParent().map(p -> p.removeChildren(ImmutableList.of(component))).orElse(true)) {
-			ret = EventUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
+			ret = EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 						getChildren().add(index, component);
 						List<IUIComponent> childrenMoved = getChildren().subList(index + 1, getChildren().size());
 						for (int i = 0; i < childrenMoved.size(); i++)
@@ -61,8 +61,8 @@ public class UIComponentContainer
 						component.onParentChange(null, this);
 						return true;
 					},
-					new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.PRE, this, null, this),
-					new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.POST, this, null, this));
+					new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.PRE, component, null, this),
+					new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.POST, component, null, this));
 		}
 		if (ret)
 			IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh);
@@ -76,7 +76,7 @@ public class UIComponentContainer
 		for (IUIComponent component : components) {
 			int index = getChildren().indexOf(component);
 			if (index != -1) {
-				ret |= EventUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
+				ret |= EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 							getChildren().remove(component);
 							List<IUIComponent> childrenMoved = getChildren().subList(index, getChildren().size());
 							for (int i = 0; i < childrenMoved.size(); i++)
@@ -84,8 +84,8 @@ public class UIComponentContainer
 							component.onParentChange(this, null);
 							return true;
 						},
-						new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.PRE, this, this, null),
-						new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.POST, this, this, null));
+						new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.PRE, component, this, null),
+						new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.POST, component, this, null));
 			}
 		}
 		if (ret)
@@ -98,7 +98,7 @@ public class UIComponentContainer
 		int previous = getChildren().indexOf(component);
 		if (previous == index)
 			return false;
-		return getChildren().contains(component) && EventUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
+		return getChildren().contains(component) && EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 					getChildren().remove(previous);
 					getChildren().add(index, component); // COMMENT cast is always safe
 					List<IUIComponent> childrenMoved;

@@ -1,17 +1,16 @@
 package $group__.ui.mvvm.views.paths;
 
-import $group__.ui.core.mvvm.views.paths.IUINode;
-import $group__.ui.core.mvvm.views.paths.IUINodePath;
+import $group__.ui.core.mvvm.views.paths.IPath;
 import $group__.utilities.AssertionUtilities;
 import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
-public class UINodePath<T extends IUINode>
-		implements IUINodePath {
+public class Path<T>
+		implements IPath<T> {
 	protected final List<T> data;
 
-	public UINodePath(List<? extends T> data) {
+	public Path(List<? extends T> data) {
 		this.data = ImmutableList.copyOf(data);
 	}
 

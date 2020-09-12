@@ -50,22 +50,22 @@ public enum MapUtilities {
 			keys.add(mk);
 			values.add(map.values());
 		}
-		return stitchIterables(size, Iterables.concat(keys), Iterables.concat(values));
+		return stitchKeysValues(size, Iterables.concat(keys), Iterables.concat(values));
 	}
 
-	public static <K, V> Map<K, V> stitchIterables(int size, Iterable<? extends K> keys, Iterable<? extends V> values) {
-		Map<K, V> ret = new HashMap<>(size);
+	public static <K, V> Map<K, V> stitchKeysValues(int size, Iterable<? extends K> keys, Iterable<? extends V> values) {
+		ImmutableMap.Builder<K, V> retBuilder = ImmutableMap.builder();
 
 		Iterator<? extends V> iteratorValues = values.iterator();
 		keys.forEach(k -> {
 			if (!iteratorValues.hasNext())
 				throw ThrowableUtilities.BecauseOf.illegalArgument("Keys too long", "keys", keys, "values", values);
-			ret.put(k, iteratorValues.next());
+			retBuilder.put(k, iteratorValues.next());
 		});
 		if (iteratorValues.hasNext())
 			throw ThrowableUtilities.BecauseOf.illegalArgument("Values too long", "keys", keys, "values", values);
 
-		return ret;
+		return retBuilder.build();
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
