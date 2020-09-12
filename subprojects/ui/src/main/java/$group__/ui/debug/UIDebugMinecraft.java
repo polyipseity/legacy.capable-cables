@@ -11,18 +11,18 @@ import $group__.ui.core.mvvm.views.events.IUIEventMouse;
 import $group__.ui.core.parsers.IUIResourceParser;
 import $group__.ui.core.parsers.components.UIRendererConstructor;
 import $group__.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
+import $group__.ui.minecraft.core.mvvm.views.IUIViewComponentMinecraft;
 import $group__.ui.minecraft.mvvm.adapters.AbstractContainerScreenAdapter;
-import $group__.ui.minecraft.mvvm.components.UIComponentManagerMinecraft;
-import $group__.ui.minecraft.mvvm.components.UIViewComponentMinecraft;
 import $group__.ui.minecraft.mvvm.components.common.UIComponentWindowMinecraft;
-import $group__.ui.minecraft.mvvm.components.parsers.dom.UIDOMPrototypeMinecraftParser;
+import $group__.ui.minecraft.mvvm.components.parsers.UIDefaultMinecraftParser;
 import $group__.ui.minecraft.mvvm.viewmodels.UIViewModelMinecraft;
 import $group__.ui.mvvm.models.UIModel;
 import $group__.ui.mvvm.views.components.common.UIComponentButton;
 import $group__.ui.mvvm.views.components.extensions.UIExtensionCursorHandleProviderComponent;
-import $group__.ui.parsers.components.UIDOMPrototypeParser;
+import $group__.ui.parsers.components.UIDefaultParser;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.AssertionUtilities;
+import $group__.utilities.CastUtilities;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.binding.Binder;
@@ -33,9 +33,11 @@ import $group__.utilities.binding.core.methods.IBindingMethodDestination;
 import $group__.utilities.binding.fields.BindingField;
 import $group__.utilities.binding.fields.ObservableField;
 import $group__.utilities.binding.methods.BindingMethodDestination;
+import $group__.utilities.client.minecraft.ResourceUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
+import jakarta.xml.bind.Unmarshaller;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -66,14 +68,15 @@ import net.minecraftforge.fml.network.NetworkHooks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
-import org.w3c.dom.Document;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Function;
 
 import static $group__.utilities.PreconditionUtilities.requireRunOnceOnly;
 import static java.util.Objects.requireNonNull;
@@ -110,15 +113,21 @@ public enum UIDebugMinecraft {
 		;
 
 		private static final Logger LOGGER = LogManager.getLogger();
-		private static final IUIResourceParser<UIComponentManagerMinecraft, Document> PARSER =
-				UIDOMPrototypeMinecraftParser.makeParserMinecraft(
-						UIDOMPrototypeParser.makeParserStandard(
-								new UIDOMPrototypeMinecraftParser<>(UIComponentManagerMinecraft.class)));
+		private static final IUIResourceParser<IUIViewComponentMinecraft<?, ?>, Function<? super Unmarshaller, ?>> PARSER =
+				UIDefaultMinecraftParser.makeParserMinecraft(
+						UIDefaultParser.makeParserStandard(
+								new UIDefaultMinecraftParser<>(
+										CastUtilities.castUnchecked(IUIViewComponentMinecraft.class) // COMMENT should not matter
+								)));
 
 		static {
-			Try.run(() ->
-					PARSER.parse(UIFacade.Minecraft.parseResourceDocument(new NamespacePrefixedString(ConfigurationUI.getModId(), "ui/schemas/components_test.xml"))), LOGGER);
+			Try.run(() -> PARSER.parse(u -> Try.call(() -> {
+				try (InputStream is = ResourceUtilities.getInputStream(new NamespacePrefixedString(ConfigurationUI.getModId(), "ui/schemas/components_test.xml"))) {
+					return u.unmarshal(is);
+				}
+			}, LOGGER).orElseThrow(ThrowableCatcher::rethrow)), LOGGER);
 			ThrowableCatcher.rethrow(true);
+
 			PARSER.construct(); // COMMENT early check
 		}
 
@@ -137,7 +146,7 @@ public enum UIDebugMinecraft {
 					UIFacade.Minecraft.createScreen(
 							DISPLAY_NAME,
 							UIFacade.Minecraft.createInfrastructure(
-									new UIViewComponentMinecraft<>(PARSER.construct()),
+									PARSER.construct(),
 									new ViewModel(),
 									binder
 							),
@@ -155,8 +164,8 @@ public enum UIDebugMinecraft {
 
 			protected final Random random = new Random();
 
-			@UIRendererConstructor(type = UIRendererConstructor.ConstructorType.MAPPING__CONTAINER_CLASS)
-			public CustomWindowRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, Class<C> containerClass) { super(mapping, containerClass); }
+			@UIRendererConstructor(type = UIRendererConstructor.ConstructorType.MAPPINGS__CONTAINER_CLASS)
+			public CustomWindowRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, Class<C> containerClass) { super(mappings, containerClass); }
 
 			@Override
 			public void render(C container, EnumRenderStage stage, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks) {

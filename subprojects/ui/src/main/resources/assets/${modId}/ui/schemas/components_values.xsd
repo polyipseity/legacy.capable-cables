@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values"
+           version="1.1.0"
+           xml:lang="EN">
+	<!-- SECTION primitives -->
+
+	<!-- COMMENT boolean -->
+	<xs:element name="boolean" type="xs:boolean" nillable="true"/>
+	<!-- COMMENT byte -->
+	<xs:element name="byte" type="xs:byte" nillable="true"/>
+	<!-- COMMENT short -->
+	<xs:element name="short" type="xs:short" nillable="true"/>
+	<!-- COMMENT int -->
+	<xs:element name="int" type="xs:int" nillable="true"/>
+	<!-- COMMENT long -->
+	<xs:element name="long" type="xs:long" nillable="true"/>
+	<!-- COMMENT float -->
+	<xs:element name="float" type="xs:float" nillable="true"/>
+	<!-- COMMENT double -->
+	<xs:element name="double" type="xs:double" nillable="true"/>
+
+	<!-- SECTION objects -->
+
+	<!-- COMMENT String -->
+	<xs:element name="String" type="xs:string" nillable="true"/>
+
+	<!-- COMMENT Color -->
+	<xs:element name="color" nillable="true">
+		<xs:complexType>
+			<xs:attribute name="red" type="xs:hexBinary" default="00"/>
+			<xs:attribute name="green" type="xs:hexBinary" default="00"/>
+			<xs:attribute name="blue" type="xs:hexBinary" default="00"/>
+			<xs:attribute name="alpha" type="xs:hexBinary" default="FF"/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

@@ -12,7 +12,6 @@ import $group__.ui.minecraft.core.mvvm.views.components.rendering.IUIComponentRe
 import $group__.ui.minecraft.mvvm.components.rendering.UIComponentRendererMinecraft;
 import $group__.ui.mvvm.views.components.common.UIComponentWindow;
 import $group__.ui.mvvm.views.components.rendering.UIComponentRendererContainer;
-import $group__.ui.parsers.components.UIDOMPrototypeParser;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.binding.core.fields.IBindingField;
 import $group__.utilities.interfaces.INamespacePrefixedString;
@@ -35,8 +34,8 @@ public class UIComponentWindowMinecraft
 	protected final IUIComponentRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
 			new UIComponentRendererContainer<>(new DefaultRenderer<>(ImmutableMap.of(), UIComponentWindowMinecraft.class));
 
-	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPING__SHAPE_DESCRIPTOR)
-	public UIComponentWindowMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, IShapeDescriptor<RectangularShape> shapeDescriptor) { super(mapping, shapeDescriptor); }
+	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
+	public UIComponentWindowMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<RectangularShape> shapeDescriptor) { super(mappings, id, shapeDescriptor); }
 
 	@Override
 	public Optional<? extends IUIComponentRendererMinecraft<?>> getRenderer() { return getRendererContainer().getRenderer(); }
@@ -63,14 +62,14 @@ public class UIComponentWindowMinecraft
 		@UIProperty(PROPERTY_COLOR_BORDER)
 		protected final IBindingField<Color> colorBorder;
 
-		@UIRendererConstructor(type = UIRendererConstructor.ConstructorType.MAPPING__CONTAINER_CLASS)
-		public DefaultRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, Class<C> containerClass) {
-			super(mapping, containerClass);
+		@UIRendererConstructor(type = UIRendererConstructor.ConstructorType.MAPPINGS__CONTAINER_CLASS)
+		public DefaultRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, Class<C> containerClass) {
+			super(mappings, containerClass);
 
 			this.colorBackground = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.BLACK,
-					this.mapping.get(PROPERTY_COLOR_BACKGROUND_LOCATION), UIDOMPrototypeParser.Deserializers::deserializeColor);
+					this.mappings.get(PROPERTY_COLOR_BACKGROUND_LOCATION));
 			this.colorBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.WHITE,
-					this.mapping.get(PROPERTY_COLOR_BORDER_LOCATION), UIDOMPrototypeParser.Deserializers::deserializeColor);
+					this.mappings.get(PROPERTY_COLOR_BORDER_LOCATION));
 		}
 
 		@Override

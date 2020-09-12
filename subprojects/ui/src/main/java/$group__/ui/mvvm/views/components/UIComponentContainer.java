@@ -17,6 +17,7 @@ import $group__.utilities.events.EventUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import com.google.common.collect.ImmutableList;
 
+import javax.annotation.Nullable;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +28,8 @@ public class UIComponentContainer
 		implements IUIComponentContainer {
 	protected final List<IUIComponent> children = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 
-	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPING__SHAPE_DESCRIPTOR)
-	public UIComponentContainer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, IShapeDescriptor<?> shapeDescriptor) { super(mapping, shapeDescriptor); }
+	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
+	public UIComponentContainer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<?> shapeDescriptor) { super(mappings, id, shapeDescriptor); }
 
 	@Override
 	public void transformChildren(IAffineTransformStack stack) {

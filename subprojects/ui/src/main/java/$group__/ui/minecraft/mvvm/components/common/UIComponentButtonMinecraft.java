@@ -12,7 +12,6 @@ import $group__.ui.minecraft.core.mvvm.views.components.rendering.IUIComponentRe
 import $group__.ui.minecraft.mvvm.components.rendering.UIComponentRendererMinecraft;
 import $group__.ui.mvvm.views.components.common.UIComponentButton;
 import $group__.ui.mvvm.views.components.rendering.UIComponentRendererContainer;
-import $group__.ui.parsers.components.UIDOMPrototypeParser;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.binding.core.fields.IBindingField;
 import $group__.utilities.interfaces.INamespacePrefixedString;
@@ -34,8 +33,8 @@ public class UIComponentButtonMinecraft
 	protected final IUIComponentRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
 			new UIComponentRendererContainer<>(new DefaultRenderer<>(ImmutableMap.of(), UIComponentButtonMinecraft.class));
 
-	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPING__SHAPE_DESCRIPTOR)
-	public UIComponentButtonMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, IShapeDescriptor<?> shapeDescriptor) { super(mapping, shapeDescriptor); }
+	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
+	public UIComponentButtonMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<?> shapeDescriptor) { super(mappings, id, shapeDescriptor); }
 
 	@Override
 	public Optional<? extends IUIComponentRendererMinecraft<?>> getRenderer() { return getRendererContainer().getRenderer(); }
@@ -78,22 +77,22 @@ public class UIComponentButtonMinecraft
 		@UIProperty(PROPERTY_COLOR_PRESSED_BORDER)
 		protected final IBindingField<Color> colorPressedBorder;
 
-		@UIRendererConstructor(type = UIRendererConstructor.ConstructorType.MAPPING__CONTAINER_CLASS)
-		public DefaultRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, Class<C> containerClass) {
-			super(mapping, containerClass);
+		@UIRendererConstructor(type = UIRendererConstructor.ConstructorType.MAPPINGS__CONTAINER_CLASS)
+		public DefaultRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, Class<C> containerClass) {
+			super(mappings, containerClass);
 
 			this.colorBase = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY,
-					this.mapping.get(PROPERTY_COLOR_BASE_LOCATION), UIDOMPrototypeParser.Deserializers::deserializeColor);
+					this.mappings.get(PROPERTY_COLOR_BASE_LOCATION));
 			this.colorBaseBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY,
-					this.mapping.get(PROPERTY_COLOR_BASE_BORDER_LOCATION), UIDOMPrototypeParser.Deserializers::deserializeColor);
+					this.mappings.get(PROPERTY_COLOR_BASE_BORDER_LOCATION));
 			this.colorHovering = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.GRAY,
-					this.mapping.get(PROPERTY_COLOR_HOVERING_LOCATION), UIDOMPrototypeParser.Deserializers::deserializeColor);
+					this.mappings.get(PROPERTY_COLOR_HOVERING_LOCATION));
 			this.colorHoveringBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.GRAY,
-					this.mapping.get(PROPERTY_COLOR_HOVERING_BORDER_LOCATION), UIDOMPrototypeParser.Deserializers::deserializeColor);
+					this.mappings.get(PROPERTY_COLOR_HOVERING_BORDER_LOCATION));
 			this.colorPressed = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.LIGHT_GRAY,
-					this.mapping.get(PROPERTY_COLOR_PRESSED_LOCATION), UIDOMPrototypeParser.Deserializers::deserializeColor);
+					this.mappings.get(PROPERTY_COLOR_PRESSED_LOCATION));
 			this.colorPressedBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.LIGHT_GRAY,
-					this.mapping.get(PROPERTY_COLOR_PRESSED_BORDER_LOCATION), UIDOMPrototypeParser.Deserializers::deserializeColor);
+					this.mappings.get(PROPERTY_COLOR_PRESSED_BORDER_LOCATION));
 		}
 
 		@Override

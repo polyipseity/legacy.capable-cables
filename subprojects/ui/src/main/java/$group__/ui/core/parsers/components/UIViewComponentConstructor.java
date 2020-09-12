@@ -7,15 +7,12 @@ import java.util.Map;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.CONSTRUCTOR)
-public @interface UIRendererConstructor {
+public @interface UIViewComponentConstructor {
 	ConstructorType type();
 
 	enum ConstructorType
 			implements IConstructorType {
-		MAPPINGS__CONTAINER_CLASS(MethodType.methodType(void.class, Map.class, Class.class)),
-		MAPPINGS(MethodType.methodType(void.class, Map.class)),
-		CONTAINER_CLASS(MethodType.methodType(void.class, Class.class)),
-		NO_ARGS(MethodType.methodType(void.class)),
+		MAPPING(MethodType.methodType(void.class, Map.class)),
 		;
 
 		protected final MethodType methodType;

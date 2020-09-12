@@ -22,6 +22,7 @@ import $group__.utilities.binding.methods.BindingMethodSource;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
 
+import javax.annotation.Nullable;
 import java.awt.geom.Point2D;
 import java.util.EnumSet;
 import java.util.Map;
@@ -45,14 +46,14 @@ public class UIComponentButton
 	protected final Set<IButtonState> buttonStates = EnumSet.noneOf(IButtonState.class);
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
-	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPING__SHAPE_DESCRIPTOR)
-	public UIComponentButton(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, IShapeDescriptor<?> shapeDescriptor) {
-		super(mapping, shapeDescriptor);
+	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
+	public UIComponentButton(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<?> shapeDescriptor) {
+		super(mappings, id, shapeDescriptor);
 
 		this.methodOnActivate = new BindingMethodSource<>(IUIEventActivate.class,
-				Optional.ofNullable(this.mapping.get(METHOD_ON_ACTIVATE_LOCATION)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
+				Optional.ofNullable(this.mappings.get(METHOD_ON_ACTIVATE_LOCATION)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 		this.methodOnActivated = new BindingMethodSource<>(IUIEvent.class,
-				Optional.ofNullable(this.mapping.get(METHOD_ON_ACTIVATED_LOCATION)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
+				Optional.ofNullable(this.mappings.get(METHOD_ON_ACTIVATED_LOCATION)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 
 		addEventListener(UIEventMouse.TYPE_MOUSE_ENTER_SELF, new UIEventListener.Functional<IUIEventMouse>(e -> {
 			if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET)

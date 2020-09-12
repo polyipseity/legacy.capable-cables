@@ -11,7 +11,6 @@ import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.events.ui.UIEventTarget;
 import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
 import $group__.ui.mvvm.views.events.bus.EventUIComponent;
-import $group__.ui.parsers.components.UIDOMPrototypeParser;
 import $group__.ui.structures.shapes.descriptors.DelegatingShapeDescriptor;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.binding.core.IBinderAction;
@@ -32,7 +31,6 @@ import com.google.common.collect.Iterables;
 import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.subjects.Subject;
 import io.reactivex.rxjava3.subjects.UnicastSubject;
-import org.w3c.dom.Node;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -58,7 +56,7 @@ public class UIComponent
 
 	@Nullable
 	protected final String id;
-	protected final Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping;
+	protected final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected final ConcurrentMap<INamespacePrefixedString, IBindingMethodSource<? extends IUIEvent>> eventTargetBindingMethods = MapUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
@@ -73,20 +71,16 @@ public class UIComponent
 	protected final AtomicBoolean modifyingShape = new AtomicBoolean();
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPING__SHAPE_DESCRIPTOR)
-	public UIComponent(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, IShapeDescriptor<?> shapeDescriptor) {
-		this.mapping = new HashMap<>(mapping);
+	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
+	public UIComponent(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<?> shapeDescriptor) {
+		this.mappings = new HashMap<>(mappings);
+		this.id = id;
 		this.shapeDescriptor = new ComponentShapeDescriptor<>(shapeDescriptor);
 
-		this.id = Optional.ofNullable(this.mapping.get(PROPERTY_ID_LOCATION))
-				.flatMap(IUIPropertyMappingValue::getDefaultValue)
-				.map(Node::getNodeValue)
-				.orElse(null);
-
 		this.visible = IUIPropertyMappingValue.createBindingField(Boolean.class, false, true,
-				this.mapping.get(PROPERTY_VISIBLE_LOCATION), UIDOMPrototypeParser.Deserializers::deserializeBoolean);
+				this.mappings.get(PROPERTY_VISIBLE_LOCATION));
 		this.active = IUIPropertyMappingValue.createBindingField(Boolean.class, false, true,
-				this.mapping.get(PROPERTY_ACTIVE_LOCATION), UIDOMPrototypeParser.Deserializers::deserializeBoolean);
+				this.mappings.get(PROPERTY_ACTIVE_LOCATION));
 
 		IExtensionContainer.addExtensionChecked(this, new UIExtensionCache());
 	}
@@ -133,7 +127,7 @@ public class UIComponent
 		@Nullable IBindingMethodSource<? extends IUIEvent> method = getEventTargetBindingMethods().get(type);
 		if (method == null) {
 			method = new BindingMethodSource<>(event.getClass(),
-					Optional.ofNullable(getMapping().get(type)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
+					Optional.ofNullable(getMappings().get(type)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 			getEventTargetBindingMethods().put(type, method);
 		}
 		method.invoke(CastUtilities.castUnchecked(event)); // COMMENT should match
@@ -163,7 +157,7 @@ public class UIComponent
 	protected ConcurrentMap<INamespacePrefixedString, IBindingMethodSource<? extends IUIEvent>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMapping() { return mapping; }
+	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappings() { return mappings; }
 
 	@Override
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
@@ -196,5 +190,5 @@ public class UIComponent
 	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() { return extensions; }
 
 	@Override
-	public Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingView() { return ImmutableMap.copyOf(getMapping()); }
+	public Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingView() { return ImmutableMap.copyOf(getMappings()); }
 }

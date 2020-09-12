@@ -4,13 +4,40 @@
 
 import static java.io.File.separator
 
+apply from: "$utilitiesDir${separator}io${separator}io.gradle"
+
+apply from: "$modulesDir${separator}optional${separator}generated.gradle"
 apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
+apply from: "$modulesDir${separator}optional${separator}jaxb.gradle"
+
+// COMMENT XJC
+File xjcMainComponentsGeneratedDir = file "${getGeneratedDirectory.call 'main'}${separator}xjc_components"
+String xjcMainComponentsContextPath = "${jaxbPackagePrefix}.components"
+sourceSets.main.java.srcDirs xjcMainComponentsGeneratedDir
+//noinspection SpellCheckingInspection
+tasks.compileJava.dependsOn createJaxbXJCTask.call('xjcMainComponents',
+		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/components*.xsd' }.files },
+		xjcMainComponentsGeneratedDir,
+		['-extension',
+		 '-p', xjcMainComponentsContextPath,
+		 '-readOnly',
+		 '-encoding', 'UTF-8',
+		 '-enableIntrospection',
+		 '-contentForWildcard',
+		 '-xmlschema',
+		 '-verbose',
+		 '-Xinject-code',
+		 '-Xlocator',
+		 '-mark-generated', '-Xann', 'javax.annotation.Generated'], // COMMENT -Xpropertyaccessors broken
+		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/components*.xjb' }.files })
+
 
 makeSourceTasks.call { Task it ->
 	//noinspection GrUnresolvedAccess
 	it.inputs.properties([
-			expand_group    : project.group,
-			expand_buildType: buildType,
+			expand_group                       : project.group,
+			expand_buildType                   : buildType,
+			expand_xjcMainComponentsContextPath: xjcMainComponentsContextPath,
 	])
 }
 

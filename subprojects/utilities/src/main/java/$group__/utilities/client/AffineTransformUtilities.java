@@ -1,6 +1,7 @@
 package $group__.utilities.client;
 
 import $group__.utilities.ThrowableUtilities;
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.renderer.Matrix4f;
 
 import java.awt.geom.AffineTransform;
@@ -16,6 +17,15 @@ public enum AffineTransformUtilities {
 	public static final int SHEAR_Y_INDEX = toFlatMatrixArrayIndex(1, 0);
 	public static final int SCALE_Y_INDEX = toFlatMatrixArrayIndex(1, 1);
 	public static final int TRANSLATE_X_INDEX = toFlatMatrixArrayIndex(0, 2);
+	public static final int TRANSLATE_Y_INDEX = toFlatMatrixArrayIndex(1, 2);
+	public static final ImmutableMap<String, Integer> NAME_TO_MATRIX_INDEX_MAP = ImmutableMap.<String, Integer>builder()
+			.put("translateX", AffineTransformUtilities.TRANSLATE_X_INDEX)
+			.put("translateY", AffineTransformUtilities.TRANSLATE_Y_INDEX)
+			.put("scaleX", AffineTransformUtilities.SCALE_X_INDEX)
+			.put("scaleY", AffineTransformUtilities.SCALE_Y_INDEX)
+			.put("shearX", AffineTransformUtilities.SHEAR_X_INDEX)
+			.put("shearY", AffineTransformUtilities.SHEAR_Y_INDEX)
+			.build();
 
 	public static AffineTransform getTransformFromTo(Rectangle2D from, Rectangle2D to) {
 		if (from.getWidth() == 0 || from.getHeight() == 0)
@@ -45,7 +55,6 @@ public enum AffineTransformUtilities {
 
 	public static void transformPoint(Point2D point, AffineTransform transform) { transformReturns(point, transform); }
 
-	public static final int TRANSLATE_Y_INDEX = toFlatMatrixArrayIndex(1, 2);
 	private static final double[] FLAT_MATRIX_IDENTITY = {
 			// COMMENT column-major
 			1, 0,

@@ -43,8 +43,8 @@ public class UIComponentManager<S extends Shape>
 	protected final IUIComponentPathResolver<IUIComponent> pathResolver = new PathResolver();
 	protected final IUIComponentShapeAnchorController shapeAnchorController = new UIComponentShapeAnchorController();
 
-	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPING__SHAPE_DESCRIPTOR)
-	public UIComponentManager(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, IShapeDescriptor<S> shapeDescriptor) { super(mapping, shapeDescriptor); }
+	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
+	public UIComponentManager(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<S> shapeDescriptor) { super(mappings, id, shapeDescriptor); }
 
 	@Override
 	public IUIComponentPathResolver<IUIComponent> getPathResolver() { return pathResolver; }

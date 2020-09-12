@@ -38,7 +38,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	public IUIEventTarget getTargetAtPoint(Point2D point) { return getManager().getPathResolver().resolvePath(point, true).getPathEnd(); }
 
 	@Override
-	public M getManager() { return manager; }
+	public Optional<? extends M> getManager() { return manager; }
 
 	@Override
 	public IAffineTransformStack getCleanTransformStack() { return getManager().getCleanTransformStack(); }

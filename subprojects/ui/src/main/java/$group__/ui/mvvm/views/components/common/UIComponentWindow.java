@@ -22,6 +22,7 @@ import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.geom.RectangularShape;
 import java.lang.ref.WeakReference;
@@ -41,9 +42,9 @@ public class UIComponentWindow
 			WINDOW_VISIBLE_MINIMUM = 10;
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
-	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPING__SHAPE_DESCRIPTOR)
-	public UIComponentWindow(Map<INamespacePrefixedString, IUIPropertyMappingValue> mapping, IShapeDescriptor<RectangularShape> shapeDescriptor) {
-		super(mapping, shapeDescriptor);
+	@UIComponentConstructor(type = UIComponentConstructor.ConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
+	public UIComponentWindow(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<RectangularShape> shapeDescriptor) {
+		super(mappings, id, shapeDescriptor);
 
 		IShapeDescriptor<?> sd = getShapeDescriptor();
 		modifyShape(() -> {

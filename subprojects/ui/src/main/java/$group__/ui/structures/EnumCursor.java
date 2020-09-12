@@ -2,7 +2,6 @@ package $group__.ui.structures;
 
 import $group__.ui.ConfigurationUI;
 import $group__.ui.utilities.UIObjectUtilities;
-import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.client.minecraft.ImageUtilities;
@@ -50,7 +49,7 @@ public enum EnumCursor {
 	public static void preload() {}
 
 	public static long createCursor(INamespacePrefixedString location, Point2D hotspot) throws IOException {
-		try (InputStream is = ResourceUtilities.getResource(NamespaceUtilities.toResourceLocation(location)).getInputStream();
+		try (InputStream is = ResourceUtilities.getInputStream(location);
 		     NativeImage ni = NativeImage.read(NativeImage.PixelFormat.RGBA, is);
 		     GLFWImage i = ImageUtilities.toGLFWImageCursor(ni)) {
 			Point hotspotF = UIObjectUtilities.getPointFloor(hotspot);

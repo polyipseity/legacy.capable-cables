@@ -7,7 +7,6 @@ import $group__.ui.minecraft.mvvm.UIInfrastructureMinecraft;
 import $group__.ui.minecraft.mvvm.adapters.AbstractContainerScreenAdapter;
 import $group__.ui.minecraft.mvvm.adapters.AbstractScreenAdapter;
 import $group__.ui.minecraft.mvvm.adapters.UIScreenAdapter;
-import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.binding.core.IBinder;
@@ -47,8 +46,8 @@ public enum UIFacade {
 			return new UIInfrastructureMinecraft<>(view, viewModel, binder);
 		}
 
-		public static Document parseResourceDocument(INamespacePrefixedString location) throws IOException, SAXException {
-			try (InputStream res = ResourceUtilities.getResource(NamespaceUtilities.toResourceLocation(location)).getInputStream()) {
+		public static Document parseResource(INamespacePrefixedString location) throws IOException, SAXException {
+			try (InputStream res = ResourceUtilities.getInputStream(location)) {
 				return Resources.parseDocumentInput(new InputSource(res));
 			}
 		}
