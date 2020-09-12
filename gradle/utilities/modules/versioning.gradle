@@ -9,7 +9,7 @@ ext {
 		major = major.toInteger()
 		minor = minor.toInteger()
 		patch = patch.toInteger()
-		ext.'final' = this.'final'.toBoolean()
+		project.ext.'final' = this.'final'.toBoolean()
 		pre = pre.toBoolean()
 		releaseCandidate = releaseCandidate.toInteger()
 		if (this.'final' && pre) throw new IllegalArgumentException('"final" and "pre" are both "true"')

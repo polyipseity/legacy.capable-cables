@@ -14,7 +14,6 @@ apply from: "$modulesDir${separator}optional${separator}jaxb.gradle"
 File xjcMainComponentsGeneratedDir = file "${getGeneratedDirectory.call 'main'}${separator}xjc_components"
 String xjcMainComponentsContextPath = "${jaxbPackagePrefix}.components"
 sourceSets.main.java.srcDirs xjcMainComponentsGeneratedDir
-//noinspection SpellCheckingInspection
 tasks.compileJava.dependsOn createJaxbXJCTask.call('xjcMainComponents',
 		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/components*.xsd' }.files },
 		xjcMainComponentsGeneratedDir,
@@ -33,7 +32,6 @@ tasks.compileJava.dependsOn createJaxbXJCTask.call('xjcMainComponents',
 
 
 makeSourceTasks.call { Task it ->
-	//noinspection GrUnresolvedAccess
 	it.inputs.properties([
 			expand_group                       : project.group,
 			expand_buildType                   : buildType,
@@ -42,7 +40,6 @@ makeSourceTasks.call { Task it ->
 }
 
 makeResourcesTasks.call { Task it ->
-	//noinspection GrUnresolvedAccess
 	it.inputs.properties([
 			expand_group: project.group,
 			expand_modId: modId,

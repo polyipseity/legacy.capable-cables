@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://jaxb.dev.java.net/plugin/code-injector"
+           version="1.0"
+           xml:lang="EN">
+	<!-- SECTION elements -->
+
+	<!-- COMMENT code -->
+	<xs:element name="code" type="xs:string">
+		<xs:annotation>
+			<xs:documentation>Injects the specified code into the class body of the specified type.
+
+				Do NOT use imports.
+			</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+</xs:schema>

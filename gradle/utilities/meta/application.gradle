@@ -27,6 +27,6 @@ else {
 project.ext.checkApply = { Iterable<String> functions ->
 	functions.each {
 		File f = methodMap.computeIfAbsent it, { throw new IllegalArgumentException("No such utility method: $it") }
-		if (!ext.has(it)) throw new IllegalStateException("'$f.canonicalPath' is not applied")
+		if (!project.ext.has(it)) throw new IllegalStateException("'$f.canonicalPath' is not applied")
 	}
 }

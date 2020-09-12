@@ -18,18 +18,12 @@ apply plugin: 'maven-publish'
 // Note you'll need to add a repository here
 publishing {
 	publications {
-		//noinspection GroovyAssignabilityCheck
 		mavenJava(MavenPublication) {
 			if (tasks.hasProperty('shadowJar'))
-			//noinspection GroovyAssignabilityCheck
 				artifact tasks.shadowJar
-			//noinspection GroovyAssignabilityCheck
 			artifact tasks.jar
-			//noinspection GroovyAssignabilityCheck
 			artifact tasks.deobfJar
-			//noinspection GroovyAssignabilityCheck
 			artifact tasks.javadocJar
-			//noinspection GroovyAssignabilityCheck
 			artifact tasks.sourceJar
 		}
 	}

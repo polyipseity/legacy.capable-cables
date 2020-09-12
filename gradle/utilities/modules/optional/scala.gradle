@@ -14,7 +14,6 @@ afterEvaluate {
 
 	afterEvaluate {
 		sourceSets.configureEach {
-			//noinspection GrUnresolvedAccess
 			scala.srcDirs += java.srcDirs
 			java.srcDirs = []
 		}

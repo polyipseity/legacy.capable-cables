@@ -13,7 +13,6 @@ project.ext.makeJUnitPlatformTests = {
 	test {
 		useJUnitPlatform()
 		testLogging {
-			//noinspection GrUnresolvedAccess
 			events 'started', 'passed', 'skipped', 'failed', 'standard_out', 'standard_error'
 		}
 	}

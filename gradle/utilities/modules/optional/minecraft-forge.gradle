@@ -24,7 +24,6 @@ minecraft {
     if (!accessTransformerPath.empty) accessTransformer = file accessTransformerPath
 }
 
-//noinspection SpellCheckingInspection
 dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And its patches will be applied.
@@ -75,7 +74,6 @@ afterEvaluate {
 		}
 	}
 
-    //noinspection SpellCheckingInspection
     shadowJar {
         configurations = [project.configurations.shade]
         // CODE relocate 'org.ejml', 'your.new.package.here.ejml' // COMMENT shading example

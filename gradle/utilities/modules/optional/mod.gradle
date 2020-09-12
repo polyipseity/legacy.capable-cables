@@ -13,7 +13,6 @@ minecraft {
 	// Default run configurations.
 	// These can be tweaked, removed, or duplicated as needed.
 	runs {
-		//noinspection SpellCheckingInspection
 		client {
 			// Recommended logging data for a userdev environment
 			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
@@ -22,7 +21,6 @@ minecraft {
 			property 'forge.logging.console.level', 'debug'
 		}
 
-		//noinspection SpellCheckingInspection
 		server {
 			// Recommended logging data for a userdev environment
 			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
@@ -31,7 +29,6 @@ minecraft {
 			property 'forge.logging.console.level', 'debug'
 		}
 
-		//noinspection SpellCheckingInspection
 		data {
 			// Recommended logging data for a userdev environment
 			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'

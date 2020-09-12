@@ -1,0 +1,80 @@
+//////////////////////////////////////////////////
+// TITLE JAXB
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply.call(['clearDirectory'])
+
+ext {
+	jaxbPackagePrefix = "\$group__.jaxb${path.replace(':', '.').replaceAll(/\.\u0024/, '.')}"
+}
+
+configurations {
+	jaxb
+	compileOnly.extendsFrom configurations.jaxb as Configuration
+}
+
+dependencies {
+	String version = '3.0.0-M4'
+
+	// COMMENT runtime
+	implementation "org.glassfish.jaxb:jaxb-runtime:$version"
+	shade "org.glassfish.jaxb:jaxb-runtime:$version"
+	// COMMENT compile
+	// COMMENT schema to Java
+	jaxb "org.glassfish.jaxb:jaxb-xjc:$version"
+	// COMMENT Java to schema
+	jaxb "org.glassfish.jaxb:jaxb-jxc:$version"
+}
+
+task xjc
+task jxc
+
+project.ext.createJaxbXJCTask = { String taskName, Collection<?> sources, File destDir, Collection<String> options = [], Collection<?> bindInfo = [] ->
+	tasks.xjc.dependsOn tasks.create(name: taskName, type: JavaExec, group: 'jaxb') {
+		List<File> s = sources.collectMany { files(it).files }
+		List<File> b = bindInfo.collectMany { files(it).files }
+
+		inputs.files s
+		inputs.property 'options', options
+		inputs.files b
+		outputs.dir destDir
+
+		classpath configurations.jaxb
+		main 'com.sun.tools.xjc.XJCFacade'
+
+		args((((['-d', destDir.canonicalPath] as List<String>)
+				+ options)
+				+ s.collect { it.canonicalPath })
+				+ b.collectMany { ['-b', it.canonicalPath] })
+
+		doFirst {
+			destDir.mkdirs()
+			clearDirectory.call destDir
+		}
+	}
+}
+
+project.ext.createJaxbJXCTask = { String taskName, Collection<?> sources, File destDir, Collection<String> options = [] ->
+	tasks.jxc.dependsOn tasks.create(name: taskName, type: JavaExec, group: 'jaxb') {
+		List<File> s = sources.collectMany { files(it).files }
+
+		inputs.files s
+		inputs.property 'options', options
+		outputs.dir destDir
+
+		classpath configurations.jaxb
+		main 'com.sun.tools.jxc.SchemaGeneratorFacade'
+
+		args(((['-d', destDir.canonicalPath] as List<String>)
+				+ options)
+				+ s.collect { it.canonicalPath })
+
+		doFirst {
+			destDir.mkdirs()
+			clearDirectory.call destDir
+		}
+	}
+}

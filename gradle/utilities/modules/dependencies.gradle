@@ -9,7 +9,6 @@ checkApply.call(['stringToStringMap', 'evaluateGString'])
 
 // COMMENT append
 afterEvaluate {
-	//noinspection SpellCheckingInspection
 	dependencies {
 		// COMMENT you may put jars on which you depend on in ./libs
 		// COMMENT or you may define them like so..

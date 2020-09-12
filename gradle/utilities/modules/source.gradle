@@ -52,7 +52,6 @@ project.ext.makeSourceTasks = { Closure c ->
 
 				Binding eb = new Binding(e)
 				eachFile {
-					//noinspection GrUnresolvedAccess
 					String parent = evaluateGStringString.call(it.relativePath.parent.pathString, eb).replace '.', separator
 					it.path = "$parent$separator${evaluateGStringString.call it.name, eb}"
 				}
@@ -91,14 +90,10 @@ project.ext.makeSourceTasks = { Closure c ->
 // COMMENT append
 afterEvaluate {
 	tasks.withType(AbstractCompile) {
-		//noinspection GrUnresolvedAccess
 		options.fork = false
-		//noinspection GrUnresolvedAccess
 		options.compilerArgs << '-Xlint'
 
-		if (buildType == 'DEBUG') {
-			//noinspection GrUnresolvedAccess
+		if (buildType == 'DEBUG')
 			options.verbose = true
-		}
 	}
 }

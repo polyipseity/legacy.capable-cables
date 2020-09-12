@@ -15,10 +15,20 @@ project.ext.createNewFileFromPath = { String s ->
 	f
 }
 
+project.ext.clearDirectory = { File f ->
+	if (!f.exists() || f.file)
+		false
+	else {
+		boolean r = false
+		f.eachFile { r |= it.directory ? it.deleteDir() : it.delete() }
+		r
+	}
+}
+
 project.ext.download = { String url, File dest ->
 	createNewFile.call dest
-	FileOutputStream fos = new FileOutputStream(dest)
 	long r = 0
+	FileOutputStream fos = new FileOutputStream(dest)
 	try {
 		r = fos.channel.transferFrom(Channels.newChannel(new URL(url).openStream()), 0, Long.MAX_VALUE)
 	} finally {

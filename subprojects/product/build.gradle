@@ -15,7 +15,6 @@ apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
 apply from: "$modulesDir${separator}optional${separator}mod.gradle"
 
 makeSourceTasks.call { Task it ->
-	//noinspection GrUnresolvedAccess
 	it.inputs.properties([
 			expand_group    : project.group,
 			expand_modId    : modId,
@@ -25,7 +24,6 @@ makeSourceTasks.call { Task it ->
 }
 
 makeResourcesTasks.call { Task it ->
-	//noinspection GrUnresolvedAccess
 	it.inputs.properties([
 			expand_modLoader         : modLoader,
 			expand_loaderVersion     : loaderVersion,

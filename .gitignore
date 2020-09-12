@@ -234,14 +234,16 @@ gradle-app.setting
 .idea/sbt.xml
 .idea/scala_compiler.xml
 
-# Custom files
+# Generated
 ext*.properties
+generated/
+generated_/
+
+# Local repository
+/repo/
 
 # Minecraft generated run configurations
 /.idea/runConfigurations/*run*.xml
 
 # Minecraft run directory
 run/
-
-# Minecraft run directory
-/repo/

@@ -11,6 +11,11 @@ afterEvaluate {
 	idea.module {
 		downloadSources = downloadJavadoc = true
 		excludeDirs += [file(minecraftRunDir), file(repositoryDirectoryLocal)]
+		if (project.ext.has('getGeneratedDirectory')) {
+			sourceSets.each {
+				generatedSourceDirs += file(project.ext.getGeneratedDirectory(it.name)).listFiles().findAll { it.directory }
+			}
+		}
 
 		// COMMENT the below code should, but does not work
 		// CODE scopes.RUNTIME.plus << configurations.debug
