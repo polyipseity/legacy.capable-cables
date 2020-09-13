@@ -10,7 +10,6 @@ import $group__.ui.minecraft.core.mvvm.extensions.IUIExtensionScreenProvider;
 import $group__.ui.minecraft.mvvm.events.bus.EventUIViewMinecraft;
 import $group__.ui.utilities.minecraft.UIBackgrounds;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.extensions.ExtensionContainerAware;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.reactive.DisposableObserverAuto;
@@ -91,7 +90,7 @@ public class UIExtensionBackgroundMinecraft<E extends IUIComponentManager<?>>
 		@Override
 		@SubscribeEvent
 		public void onNext(@Nonnull EventUIViewMinecraft.Render event) {
-			if (event.getStage() == EnumEventHookStage.PRE)
+			if (event.getStage().isPre())
 				CastUtilities.castChecked(IUIViewComponent.class, event.getView())
 						.filter(evc -> getContainer().filter(Predicate.isEqual(evc.getManager())).isPresent())
 						.flatMap(IUICommon::getInfrastructure)

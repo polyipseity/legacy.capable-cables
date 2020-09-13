@@ -1,6 +1,6 @@
 package $group__.common.registrables.blocks;
 
-import $group__.ui.ConstantsUI;
+import $group__.ui.UIConstants;
 import $group__.ui.debug.UIDebugMinecraft;
 import net.minecraft.block.Block;
 import net.minecraftforge.fml.RegistryObject;
@@ -23,6 +23,6 @@ public enum BlocksThis {
 	private static final RegistryObject<Block> DEBUG_UI;
 
 	static {
-		DEBUG_UI = ConstantsUI.BUILD_TYPE.isDebug() ? BLOCKS.register(UIDebugMinecraft.PATH, UIDebugMinecraft::getBlockEntry) : null;
+		DEBUG_UI = UIConstants.BUILD_TYPE.isDebug() ? BLOCKS.register(UIDebugMinecraft.PATH, UIDebugMinecraft::getBlockEntry) : null;
 	}
 }

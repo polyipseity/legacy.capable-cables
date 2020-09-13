@@ -6,15 +6,14 @@ import $group__.ui.core.mvvm.views.IUIReshapeExplicitly;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.events.IUIEventFocus;
+import $group__.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
 import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.events.ui.UIEventListener;
 import $group__.ui.mvvm.views.components.UIComponentContainer;
 import $group__.ui.mvvm.views.events.bus.EventUIComponent;
-import $group__.ui.mvvm.views.events.ui.UIEventFocus;
 import $group__.ui.structures.shapes.interactions.ShapeConstraintSupplier;
-import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.functions.ConstantSupplier;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.reactive.DisposableObserverAuto;
@@ -72,7 +71,7 @@ public class UIComponentWindow
 			return false;
 		});
 
-		addEventListener(UIEventFocus.TYPE_FOCUS_IN_POST, new UIEventListener.Functional<IUIEventFocus>(e ->
+		addEventListener(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(), new UIEventListener.Functional<IUIEventFocus>(e ->
 				getParent().orElseThrow(InternalError::new).moveChildToTop(this)), true);
 	}
 
@@ -117,7 +116,7 @@ public class UIComponentWindow
 		@Override
 		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 		public void onNext(EventUIComponent.ShapeDescriptorModify event) {
-			if (event.getStage() == EnumEventHookStage.POST && getParent().filter(p -> p.equals(event.getComponent())).isPresent())
+			if (event.getStage().isPost() && getParent().filter(p -> p.equals(event.getComponent())).isPresent())
 				IUIReshapeExplicitly.refresh(UIComponentWindow.this);
 		}
 	}

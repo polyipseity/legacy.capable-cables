@@ -7,12 +7,12 @@ import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.components.extensions.IUIExtensionComponentUserResizable;
 import $group__.ui.core.mvvm.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
 import $group__.ui.core.mvvm.views.events.IUIEventMouse;
+import $group__.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
 import $group__.ui.core.parsers.components.UIExtensionConstructor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.events.ui.UIEventListener;
 import $group__.ui.mvvm.views.components.UIComponentVirtual;
-import $group__.ui.mvvm.views.events.ui.UIEventMouse;
 import $group__.ui.structures.EnumCursor;
 import $group__.ui.structures.EnumUIAxis;
 import $group__.ui.structures.EnumUISide;
@@ -172,9 +172,9 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 		protected VirtualComponent() {
 			super(IShapeDescriptor.getShapeDescriptorPlaceholderCopy());
 
-			addEventListener(UIEventMouse.TYPE_MOUSE_ENTER, new UIEventListener.Functional<IUIEventMouse>(evt -> setBeingHovered(true)), false);
-			addEventListener(UIEventMouse.TYPE_MOUSE_LEAVE, new UIEventListener.Functional<IUIEventMouse>(evt -> setBeingHovered(false)), false);
-			addEventListener(UIEventMouse.TYPE_MOUSE_DOWN, new UIEventListener.Functional<IUIEventMouse>(evt -> {
+			addEventListener(EnumUIEventDOMType.MOUSE_ENTER.getEventType(), new UIEventListener.Functional<IUIEventMouse>(evt -> setBeingHovered(true)), false);
+			addEventListener(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(), new UIEventListener.Functional<IUIEventMouse>(evt -> setBeingHovered(false)), false);
+			addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new UIEventListener.Functional<IUIEventMouse>(evt -> {
 				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && startResizeMaybe(evt.getData().getCursorPositionView())) { // todo custom
 					getContainer().ifPresent(c -> {
 						c.getParent()
@@ -186,7 +186,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 					evt.stopPropagation();
 				}
 			}), false);
-			addEventListener(UIEventMouse.TYPE_MOUSE_UP, new UIEventListener.Functional<IUIEventMouse>(evt -> {
+			addEventListener(EnumUIEventDOMType.MOUSE_UP.getEventType(), new UIEventListener.Functional<IUIEventMouse>(evt -> {
 				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && finishResizeMaybe(evt.getData().getCursorPositionView()))
 					evt.stopPropagation();
 			}), false);

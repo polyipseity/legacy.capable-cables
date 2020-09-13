@@ -35,8 +35,7 @@ public class ShapeAnchorController<T extends IShapeDescriptorProvider>
 					.weakKeys()
 					.build(CacheLoader.from(
 							new MappableSupplier<>(ConstantSupplier.of(MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL)))
-									.<Set<IShapeAnchor>>map(t -> Collections.newSetFromMap(t.makeMap()))
-									::get)));
+									.map(t -> Collections.newSetFromMap(t.makeMap())))));
 
 	@Override
 	public Map<? extends T, ? extends IShapeAnchorSet> getAnchorSetsView() { return ImmutableMap.copyOf(getAnchorSets().asMap()); }

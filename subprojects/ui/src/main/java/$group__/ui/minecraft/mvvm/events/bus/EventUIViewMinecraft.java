@@ -29,5 +29,11 @@ public abstract class EventUIViewMinecraft
 		public Point2D getCursorPositionView() { return (Point2D) cursorPosition.clone(); }
 
 		public double getPartialTicks() { return partialTicks; }
+
+		@Override
+		public boolean isCancelable() { return getStage().isPre(); }
+
+		@Override
+		public boolean hasResult() { return getStage().isPre(); }
 	}
 }

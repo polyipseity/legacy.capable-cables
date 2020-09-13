@@ -16,7 +16,7 @@ public interface IConstructorType {
 	static <T extends IConstructorType, A extends Annotation> T getConstructorType(Class<?> clazz, Class<A> annotationType, Function<? super A, ? extends T> getter) {
 		return findConstructorType(clazz, annotationType, getter)
 				.orElseThrow(() ->
-						ThrowableUtilities.BecauseOf.illegalArgument("Cannot find any constructor annotated with 'UIComponentConstructor'",
+						ThrowableUtilities.BecauseOf.illegalArgument("Cannot find any annotated constructor",
 								"clazz.getDeclaredConstructors()", clazz.getDeclaredConstructors(),
 								"clazz", clazz));
 	}

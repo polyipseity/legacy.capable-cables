@@ -10,7 +10,6 @@ import $group__.utilities.CastUtilities;
 import $group__.utilities.ConcurrencyUtilities;
 import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.collections.MapUtilities;
-import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.extensions.ExtensionContainerAware;
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
@@ -88,7 +87,7 @@ public class UIExtensionCache
 									@Override
 									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 									public void onNext(EventUIComponentHierarchyChanged.Parent event) {
-										if (event.getStage() == EnumEventHookStage.POST)
+										if (event.getStage().isPost())
 											t.invalidate(event.getComponent());
 									}
 								})));
@@ -113,7 +112,7 @@ public class UIExtensionCache
 									@Override
 									@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 									public void onNext(EventUIComponentHierarchyChanged.Parent event) {
-										if (event.getStage() == EnumEventHookStage.POST)
+										if (event.getStage().isPost())
 											t.invalidate(event.getComponent());
 									}
 								})));

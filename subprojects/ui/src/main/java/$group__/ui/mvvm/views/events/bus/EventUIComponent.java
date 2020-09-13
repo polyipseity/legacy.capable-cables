@@ -16,5 +16,11 @@ public abstract class EventUIComponent extends EventUI {
 
 	public static class ShapeDescriptorModify extends EventUIComponent {
 		public ShapeDescriptorModify(EnumEventHookStage stage, IUIComponent component) { super(stage, component); }
+
+		@Override
+		public boolean isCancelable() { return getStage().isPre(); }
+
+		@Override
+		public boolean hasResult() { return getStage().isPre(); }
 	}
 }

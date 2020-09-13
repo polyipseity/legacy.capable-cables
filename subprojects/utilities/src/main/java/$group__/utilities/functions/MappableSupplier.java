@@ -9,7 +9,5 @@ public class MappableSupplier<T>
 
 	public <R> MappableSupplier<R> flatMap(Function<? super T, ? extends Supplier<? extends R>> mapper) { return map(mapper.andThen(Supplier::get)); }
 
-	public <R> MappableSupplier<R> map(Function<? super T, ? extends R> mapper) {
-		return new MappableSupplier<>(() -> mapper.apply(get()));
-	}
+	public <R> MappableSupplier<R> map(Function<? super T, ? extends R> mapper) { return new MappableSupplier<>(() -> mapper.apply(get())); }
 }

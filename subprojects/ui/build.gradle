@@ -27,7 +27,9 @@ tasks.compileJava.dependsOn createJaxbXJCTask.call('xjcMainComponents',
 		 '-verbose',
 		 '-Xinject-code',
 		 '-Xlocator',
-		 '-mark-generated', '-Xann', 'javax.annotation.Generated'], // COMMENT -Xpropertyaccessors broken
+		 '-mark-generated', '-Xann', 'javax.annotation.Generated',
+		 // COMMENT -Xpropertyaccessors broken
+		],
 		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/components*.xjb' }.files })
 
 

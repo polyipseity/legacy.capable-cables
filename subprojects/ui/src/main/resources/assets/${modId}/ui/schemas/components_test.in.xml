@@ -2,6 +2,7 @@
 <ui xmlns="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:val="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values"
+    xsi:schemaLocation="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values components_values.xsd"
     xml:lang="EN">
 	<!-- SECTION using -->
 
@@ -46,7 +47,7 @@
 
 			<renderer class="renderer.component.window.debug.custom">
 				<property key="window.colors.border">
-					<val:color green="80"/>
+					<val:color green="128"/>
 				</property>
 			</renderer>
 
@@ -60,17 +61,17 @@
 			</shape>
 
 			<renderer class="renderer.component.window.default">
-				<binding key="window.colors.border" binding="anchoredWindowBorderColor"/>
+				<property key="window.colors.border" bindingKey="anchoredWindowBorderColor"/>
 			</renderer>
 
 			<extension class="extension.user_relocatable"/>
 			<extension class="extension.user_resizable"/>
 
 			<component class="component.button" id="Button1">
-				<binding key="button.methods.activate" binding="buttonOnActivate"/>
-				<binding key="button.methods.activated" binding="buttonOnActivated"/>
+				<property key="button.methods.activate" bindingKey="buttonOnActivate"/>
+				<property key="button.methods.activated" bindingKey="buttonOnActivated"/>
 
-				<shape class="shape.ellipse" x="0" y="0" width="100" height="100">
+				<shape class="shape.ellipse" width="100" height="100">
 					<affineTransformDefiner>
 						<method name="rotate">1,1</method>
 						<method name="translate" delimiter=" ">10 10</method>

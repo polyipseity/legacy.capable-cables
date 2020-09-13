@@ -9,6 +9,7 @@ import $group__.utilities.binding.core.methods.IBindingMethod;
 import $group__.utilities.binding.core.traits.IHasBinding;
 import $group__.utilities.collections.MapUtilities;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,23 +26,23 @@ import java.util.stream.Stream;
 
 public enum BindingUtilities {
 	;
-	protected static final ConcurrentMap<Class<?>, BiFunction<? super Set<EnumOptions>, ?, ? extends Iterable<IBindingField<?>>>> BINDING_FIELDS_MAP
+	protected static final ConcurrentMap<Class<?>, BiFunction<? super Set<EnumScopeOptions>, ?, ? extends Iterable<IBindingField<?>>>> BINDING_FIELDS_MAP
 			= MapUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
-	protected static final ConcurrentMap<Class<?>, BiFunction<? super Set<EnumOptions>, ?, ? extends Iterable<IBindingMethod<?>>>> BINDING_METHODS_MAP
+	protected static final ConcurrentMap<Class<?>, BiFunction<? super Set<EnumScopeOptions>, ?, ? extends Iterable<IBindingMethod<?>>>> BINDING_METHODS_MAP
 			= MapUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 	protected static final ConcurrentMap<Class<?>, Function<?, ? extends Iterable<IHasBinding>>> HAS_BINDING_VARIABLES_MAP
 			= MapUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	public static Iterable<IBindingField<?>> getBindingFields(Object object, Set<EnumOptions> options) { return getBindingFieldsFunction(object.getClass(), options).apply(CastUtilities.castUnchecked(object)); /* COMMENT should be safe */ }
+	public static Iterable<IBindingField<?>> getBindingFields(Object object, Set<EnumScopeOptions> options) { return getBindingFieldsFunction(object.getClass(), options).apply(CastUtilities.castUnchecked(object)); /* COMMENT should be safe */ }
 
 	@SuppressWarnings({"SynchronizationOnLocalVariableOrMethodParameter", "UnstableApiUsage"})
-	public static <T> Function<T, Iterable<IBindingField<?>>> getBindingFieldsFunction(Class<T> clazz, Set<EnumOptions> options) {
+	public static <T> Function<T, Iterable<IBindingField<?>>> getBindingFieldsFunction(Class<T> clazz, Set<EnumScopeOptions> options) {
 		synchronized (clazz) {
-			final BiFunction<? super Set<EnumOptions>, T, ? extends Iterable<IBindingField<?>>> retF;
-			final Set<EnumOptions> optionsF = EnumSet.copyOf(options);
-			@SuppressWarnings("unchecked") @Nullable BiFunction<? super Set<EnumOptions>, T, ? extends Iterable<IBindingField<?>>> ret =
-					(BiFunction<? super Set<EnumOptions>, T, ? extends Iterable<IBindingField<?>>>) BINDING_FIELDS_MAP.get(clazz); // COMMENT should be safe
+			final BiFunction<? super Set<EnumScopeOptions>, T, ? extends Iterable<IBindingField<?>>> retF;
+			final Set<EnumScopeOptions> optionsF = EnumSet.copyOf(options);
+			@SuppressWarnings("unchecked") @Nullable BiFunction<? super Set<EnumScopeOptions>, T, ? extends Iterable<IBindingField<?>>> ret =
+					(BiFunction<? super Set<EnumScopeOptions>, T, ? extends Iterable<IBindingField<?>>>) BINDING_FIELDS_MAP.get(clazz); // COMMENT should be safe
 			if (ret != null) {
 				retF = ret;
 				return o -> retF.apply(optionsF, o);
@@ -55,11 +56,11 @@ public enum BindingUtilities {
 					.collect(ImmutableSet.toImmutableSet());
 			Function<T, Iterable<IHasBinding>> c = getHasBindingsVariablesFunction(clazz);
 			ret = (op, o) -> Streams.concat(
-					op.contains(EnumOptions.SELF) ? b.stream().unordered()
+					op.contains(EnumScopeOptions.SELF) ? b.stream().unordered()
 							.map(f -> f.apply(o))
 							.filter(Optional::isPresent)
 							.map(Optional::get) : Stream.empty(),
-					op.contains(EnumOptions.VARIABLES) ? Streams.stream(c.apply(o)).unordered()
+					op.contains(EnumScopeOptions.VARIABLES) ? Streams.stream(c.apply(o)).unordered()
 							.<IBindingField<?>>flatMap(hb -> Streams.stream(hb.getBindingFields())) : Stream.empty())
 					.collect(ImmutableSet.toImmutableSet());
 			BINDING_FIELDS_MAP.put(clazz, ret);
@@ -68,7 +69,7 @@ public enum BindingUtilities {
 		}
 	}
 
-	public static Iterable<IBindingMethod<?>> getBindingMethods(Object object, Set<EnumOptions> options) { return getBindingMethodsFunction(object.getClass(), options).apply(CastUtilities.castUnchecked(object)); /* COMMENT should be safe */ }
+	public static Iterable<IBindingMethod<?>> getBindingMethods(Object object, Set<EnumScopeOptions> options) { return getBindingMethodsFunction(object.getClass(), options).apply(CastUtilities.castUnchecked(object)); /* COMMENT should be safe */ }
 
 	@SuppressWarnings({"SynchronizationOnLocalVariableOrMethodParameter", "UnstableApiUsage"})
 	public static <T> Function<T, Iterable<IHasBinding>> getHasBindingsVariablesFunction(Class<T> clazz) {
@@ -95,12 +96,12 @@ public enum BindingUtilities {
 	}
 
 	@SuppressWarnings({"SynchronizationOnLocalVariableOrMethodParameter", "UnstableApiUsage"})
-	public static <T> Function<T, Iterable<IBindingMethod<?>>> getBindingMethodsFunction(Class<T> clazz, Set<EnumOptions> options) {
+	public static <T> Function<T, Iterable<IBindingMethod<?>>> getBindingMethodsFunction(Class<T> clazz, Set<EnumScopeOptions> options) {
 		synchronized (clazz) {
-			final BiFunction<? super Set<EnumOptions>, T, ? extends Iterable<IBindingMethod<?>>> retF;
-			final Set<EnumOptions> optionsF = EnumSet.copyOf(options);
-			@SuppressWarnings("unchecked") @Nullable BiFunction<? super Set<EnumOptions>, T, ? extends Iterable<IBindingMethod<?>>> ret =
-					(BiFunction<? super Set<EnumOptions>, T, ? extends Iterable<IBindingMethod<?>>>) BINDING_METHODS_MAP.get(clazz); // COMMENT should be safe
+			final BiFunction<? super Set<EnumScopeOptions>, T, ? extends Iterable<IBindingMethod<?>>> retF;
+			final Set<EnumScopeOptions> optionsF = EnumSet.copyOf(options);
+			@SuppressWarnings("unchecked") @Nullable BiFunction<? super Set<EnumScopeOptions>, T, ? extends Iterable<IBindingMethod<?>>> ret =
+					(BiFunction<? super Set<EnumScopeOptions>, T, ? extends Iterable<IBindingMethod<?>>>) BINDING_METHODS_MAP.get(clazz); // COMMENT should be safe
 			if (ret != null) {
 				retF = ret;
 				return o -> retF.apply(optionsF, o);
@@ -114,11 +115,11 @@ public enum BindingUtilities {
 					.collect(ImmutableSet.toImmutableSet());
 			Function<T, Iterable<IHasBinding>> c = getHasBindingsVariablesFunction(clazz);
 			ret = (op, o) -> Streams.concat(
-					op.contains(EnumOptions.SELF) ? b.stream().unordered()
+					op.contains(EnumScopeOptions.SELF) ? b.stream().unordered()
 							.map(f -> f.apply(o))
 							.filter(Optional::isPresent)
 							.map(Optional::get) : Stream.empty(),
-					op.contains(EnumOptions.VARIABLES) ? Streams.stream(c.apply(o)).unordered()
+					op.contains(EnumScopeOptions.VARIABLES) ? Streams.stream(c.apply(o)).unordered()
 							.<IBindingMethod<?>>flatMap(hb -> Streams.stream(hb.getBindingMethods())) : Stream.empty())
 					.collect(ImmutableSet.toImmutableSet());
 			BINDING_METHODS_MAP.put(clazz, ret);
@@ -129,8 +130,11 @@ public enum BindingUtilities {
 
 	public static Iterable<IHasBinding> getHasBindingsVariables(Object object) { return getHasBindingsVariablesFunction(object.getClass()).apply(CastUtilities.castUnchecked(object)); /* COMMENT should be safe */ }
 
-	public enum EnumOptions {
+	public enum EnumScopeOptions {
 		SELF,
 		VARIABLES,
+		;
+
+		public static final ImmutableSet<EnumScopeOptions> ALL = Sets.immutableEnumSet(EnumSet.allOf(EnumScopeOptions.class));
 	}
 }

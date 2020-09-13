@@ -1,6 +1,6 @@
 package $group__.ui.structures;
 
-import $group__.ui.ConfigurationUI;
+import $group__.ui.UIConfiguration;
 import $group__.ui.utilities.UIObjectUtilities;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
@@ -30,13 +30,13 @@ public enum EnumCursor {
 	@SuppressWarnings({"SpellCheckingInspection", "HardcodedFileSeparator"})
 	EXTENSION_RESIZE_NW_SE_CURSOR(() -> {
 		return Try.call(() -> createCursor(
-				new NamespacePrefixedString(ConfigurationUI.getModId(), "textures/cursors/aero_nwse/32x32.png"),
+				new NamespacePrefixedString(UIConfiguration.getModId(), "textures/cursors/aero_nwse/32x32.png"),
 				new Point(8, 8)), LoggerHolder.LOGGER).orElseThrow(ThrowableCatcher::rethrow);
 	}),
 	@SuppressWarnings({"SpellCheckingInspection", "HardcodedFileSeparator"})
 	EXTENSION_RESIZE_NE_SW_CURSOR(() -> {
 		return Try.call(() -> createCursor(
-				new NamespacePrefixedString(ConfigurationUI.getModId(), "textures/cursors/aero_nesw/32x32.png"),
+				new NamespacePrefixedString(UIConfiguration.getModId(), "textures/cursors/aero_nesw/32x32.png"),
 				new Point(8, 8)), LoggerHolder.LOGGER).orElseThrow(ThrowableCatcher::rethrow);
 	}),
 	;
@@ -46,7 +46,7 @@ public enum EnumCursor {
 	EnumCursor(Supplier<Long> handle) { this.handle = handle.get(); }
 
 	@SuppressWarnings("EmptyMethod")
-	public static void preload() {}
+	public static void initializeClass() {}
 
 	public static long createCursor(INamespacePrefixedString location, Point2D hotspot) throws IOException {
 		try (InputStream is = ResourceUtilities.getInputStream(location);

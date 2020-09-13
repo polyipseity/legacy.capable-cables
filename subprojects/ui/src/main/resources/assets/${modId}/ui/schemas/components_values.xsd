@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values"
-           version="1.1.0"
+           version="1.1.1"
            xml:lang="EN">
 	<!-- SECTION primitives -->
 
@@ -23,15 +23,15 @@
 	<!-- SECTION objects -->
 
 	<!-- COMMENT String -->
-	<xs:element name="String" type="xs:string" nillable="true"/>
+	<xs:element name="string" type="xs:string" nillable="true"/>
 
 	<!-- COMMENT Color -->
 	<xs:element name="color" nillable="true">
 		<xs:complexType>
-			<xs:attribute name="red" type="xs:hexBinary" default="00"/>
-			<xs:attribute name="green" type="xs:hexBinary" default="00"/>
-			<xs:attribute name="blue" type="xs:hexBinary" default="00"/>
-			<xs:attribute name="alpha" type="xs:hexBinary" default="FF"/>
+			<xs:attribute name="red" type="xs:unsignedByte" default="00"/>
+			<xs:attribute name="green" type="xs:unsignedByte" default="00"/>
+			<xs:attribute name="blue" type="xs:unsignedByte" default="00"/>
+			<xs:attribute name="alpha" type="xs:unsignedByte" default="255"/>
 		</xs:complexType>
 	</xs:element>
 </xs:schema>

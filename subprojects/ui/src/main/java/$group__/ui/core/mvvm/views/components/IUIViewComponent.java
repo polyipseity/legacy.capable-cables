@@ -5,6 +5,7 @@ import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.views.IUIView;
 import $group__.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
 import $group__.utilities.CastUtilities;
+import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.TreeUtilities;
 import $group__.utilities.binding.core.traits.IHasBinding;
 import $group__.utilities.functions.IConsumer3;
@@ -22,8 +23,17 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 		extends IHasBinding, IHasBindingMap, IUIView<S> {
 	Optional<? extends M> getManager();
 
-	static Optional<IUIComponent> getComponentByID(IUIViewComponent<?, ?> manager, String id) {
-		for (IUIComponent c : manager.getChildrenFlatView()) {
+	static IUIComponent getComponentByID(IUIViewComponent<?, ?> view, String id) {
+		return findComponentByID(view, id)
+				.orElseThrow(() ->
+						ThrowableUtilities.BecauseOf.illegalArgument("Cannot find the component with the specified ID",
+								"id", id,
+								"view.getChildrenFlatView()", view.getChildrenFlatView(),
+								"view", view));
+	}
+
+	static Optional<IUIComponent> findComponentByID(IUIViewComponent<?, ?> view, String id) {
+		for (IUIComponent c : view.getChildrenFlatView()) {
 			if (c.getID().filter(Predicate.isEqual(id)).isPresent())
 				return Optional.of(c);
 		}

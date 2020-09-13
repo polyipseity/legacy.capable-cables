@@ -218,7 +218,7 @@ public enum DynamicUtilities {
 		public enum LambdaMetaFactoryUtilities {
 			;
 
-			private static final Lookup LOOKUP = MethodHandles.lookup();
+			private static final Lookup LOOKUP = IMPL_LOOKUP;
 
 			@SuppressWarnings("unchecked")
 			public static <T> Consumer<T> makeConsumer(MethodHandle method,

@@ -54,18 +54,18 @@ public enum MapUtilities {
 	}
 
 	public static <K, V> Map<K, V> stitchKeysValues(int size, Iterable<? extends K> keys, Iterable<? extends V> values) {
-		ImmutableMap.Builder<K, V> retBuilder = ImmutableMap.builder();
+		Map<K, V> ret = new HashMap<>(size);
 
 		Iterator<? extends V> iteratorValues = values.iterator();
 		keys.forEach(k -> {
 			if (!iteratorValues.hasNext())
 				throw ThrowableUtilities.BecauseOf.illegalArgument("Keys too long", "keys", keys, "values", values);
-			retBuilder.put(k, iteratorValues.next());
+			ret.put(k, iteratorValues.next());
 		});
 		if (iteratorValues.hasNext())
 			throw ThrowableUtilities.BecauseOf.illegalArgument("Values too long", "keys", keys, "values", values);
 
-		return retBuilder.build();
+		return ImmutableMap.copyOf(ret);
 	}
 
 	@SuppressWarnings("UnstableApiUsage")

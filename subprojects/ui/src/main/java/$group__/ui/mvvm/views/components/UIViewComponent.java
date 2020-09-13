@@ -219,7 +219,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 											@Override
 											@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 											public void onNext(EventUIComponentHierarchyChanged.Parent event) {
-												if (event.getStage() == EnumEventHookStage.POST)
+												if (event.getStage().isPost())
 													CastUtilities.castChecked(IUIComponentManager.class, event.getComponent())
 															.flatMap(IUIComponent::getManager)
 															.flatMap(IUIComponentManager::getView)
@@ -230,7 +230,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 											@Override
 											@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 											public void onNext(EventUIComponentHierarchyChanged.View event) {
-												if (event.getStage() == EnumEventHookStage.POST)
+												if (event.getStage().isPost())
 													CastUtilities.castChecked(IUIComponentManager.class, event.getComponent())
 															.flatMap(IUIComponent::getManager)
 															.flatMap(IUIComponentManager::getView)
@@ -269,7 +269,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 											@Override
 											@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 											public void onNext(EventUIComponentHierarchyChanged.Parent event) {
-												if (event.getStage() == EnumEventHookStage.POST)
+												if (event.getStage().isPost())
 													CastUtilities.castChecked(IUIComponentManager.class, event.getComponent())
 															.flatMap(IUIComponent::getManager)
 															.flatMap(IUIComponentManager::getView)
@@ -280,7 +280,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 											@Override
 											@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 											public void onNext(EventUIComponentHierarchyChanged.View event) {
-												if (event.getStage() == EnumEventHookStage.POST)
+												if (event.getStage().isPost())
 													CastUtilities.castChecked(IUIComponentManager.class, event.getComponent())
 															.flatMap(IUIComponent::getManager)
 															.flatMap(IUIComponentManager::getView)

@@ -1,6 +1,6 @@
 package $group__.common.registrables.inventory;
 
-import $group__.ui.ConstantsUI;
+import $group__.ui.UIConstants;
 import $group__.ui.debug.UIDebugMinecraft;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraftforge.fml.RegistryObject;
@@ -21,6 +21,6 @@ public enum ContainersThis {
 	private static final RegistryObject<ContainerType<?>> DEBUG_UI;
 
 	static {
-		DEBUG_UI = ConstantsUI.BUILD_TYPE.isDebug() ? CONTAINERS.register(UIDebugMinecraft.PATH, UIDebugMinecraft::getContainerEntry) : null;
+		DEBUG_UI = UIConstants.BUILD_TYPE.isDebug() ? CONTAINERS.register(UIDebugMinecraft.PATH, UIDebugMinecraft::getContainerEntry) : null;
 	}
 }

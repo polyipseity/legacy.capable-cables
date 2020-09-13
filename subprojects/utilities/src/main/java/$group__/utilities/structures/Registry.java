@@ -6,6 +6,8 @@ import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.collections.MapUtilities;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
@@ -21,9 +23,7 @@ public abstract class Registry<K, V> {
 		this.logger = logger;
 	}
 
-	public <VL extends V> RegistryObject<VL> registerApply(K key, Function<? super K, ? extends VL> value) {
-		return register(key, value.apply(key));
-	}
+	public <VL extends V> RegistryObject<VL> registerApply(K key, Function<? super K, ? extends VL> value) { return register(key, value.apply(key)); }
 
 	public <VL extends V> RegistryObject<VL> register(K key, VL value) {
 		AtomicReference<RegistryObject<VL>> retRef = new AtomicReference<>();
@@ -47,7 +47,7 @@ public abstract class Registry<K, V> {
 
 	public boolean isOverridable() { return overridable; }
 
-	public Logger getLogger() { return logger; }
+	protected Logger getLogger() { return logger; }
 
 	public Optional<? extends RegistryObject<? extends V>> get(K key) { return Optional.ofNullable(getData().get(key)); }
 
@@ -55,8 +55,10 @@ public abstract class Registry<K, V> {
 
 	public boolean containsValue(V value) { return getData().values().stream().unordered().anyMatch(o -> o.getValue().equals(value)); }
 
-	public static final class RegistryObject<V> {
-		protected V value;
+	public static final class RegistryObject<V>
+			implements Serializable {
+		private static final long serialVersionUID = -7426757514591663232L;
+		protected transient V value;
 
 		public RegistryObject(V value) { this.value = value;}
 
@@ -65,5 +67,19 @@ public abstract class Registry<K, V> {
 		}
 
 		protected void setValue(V value) { this.value = value; }
+
+		@SuppressWarnings("NonSerializableObjectPassedToObjectStream")
+		private void writeObject(java.io.ObjectOutputStream out)
+				throws IOException {
+			out.defaultWriteObject();
+			out.writeObject(value);
+		}
+
+		@SuppressWarnings("unchecked")
+		private void readObject(java.io.ObjectInputStream in)
+				throws IOException, ClassNotFoundException {
+			in.defaultReadObject();
+			this.value = (V) in.readObject();
+		}
 	}
 }

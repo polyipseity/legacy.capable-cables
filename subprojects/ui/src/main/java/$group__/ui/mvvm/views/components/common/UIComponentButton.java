@@ -7,6 +7,7 @@ import $group__.ui.core.mvvm.views.events.IUIEvent;
 import $group__.ui.core.mvvm.views.events.IUIEventKeyboard;
 import $group__.ui.core.mvvm.views.events.IUIEventMouse;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
+import $group__.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
 import $group__.ui.core.parsers.binding.UIMethod;
 import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
@@ -14,8 +15,6 @@ import $group__.ui.events.ui.UIEvent;
 import $group__.ui.events.ui.UIEventListener;
 import $group__.ui.events.ui.UIEventUtilities;
 import $group__.ui.mvvm.views.components.UIComponentContainer;
-import $group__.ui.mvvm.views.events.ui.UIEventKeyboard;
-import $group__.ui.mvvm.views.events.ui.UIEventMouse;
 import $group__.ui.structures.EnumCursor;
 import $group__.utilities.binding.core.methods.IBindingMethodSource;
 import $group__.utilities.binding.methods.BindingMethodSource;
@@ -55,29 +54,29 @@ public class UIComponentButton
 		this.methodOnActivated = new BindingMethodSource<>(IUIEvent.class,
 				Optional.ofNullable(this.mappings.get(METHOD_ON_ACTIVATED_LOCATION)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 
-		addEventListener(UIEventMouse.TYPE_MOUSE_ENTER_SELF, new UIEventListener.Functional<IUIEventMouse>(e -> {
+		addEventListener(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(), new UIEventListener.Functional<IUIEventMouse>(e -> {
 			if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET)
 				getButtonStates().add(IButtonState.HOVERING);
 		}), false);
-		addEventListener(UIEventMouse.TYPE_MOUSE_LEAVE_SELF, new UIEventListener.Functional<IUIEventMouse>(e -> {
+		addEventListener(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(), new UIEventListener.Functional<IUIEventMouse>(e -> {
 			if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET)
 				getButtonStates().remove(IButtonState.HOVERING);
 		}), false);
 
-		addEventListener(UIEventMouse.TYPE_MOUSE_DOWN, new UIEventListener.Functional<IUIEventMouse>(e -> {
+		addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new UIEventListener.Functional<IUIEventMouse>(e -> {
 			if (IUIEventActivate.shouldActivate(this, e)) {
 				getButtonStates().add(IButtonState.PRESSING);
 				e.stopPropagation();
 			}
 		}), false);
-		addEventListener(UIEventMouse.TYPE_MOUSE_UP, new UIEventListener.Functional<IUIEventMouse>(e -> {
+		addEventListener(EnumUIEventDOMType.MOUSE_UP.getEventType(), new UIEventListener.Functional<IUIEventMouse>(e -> {
 			if (getButtonStates().remove(IButtonState.PRESSING) && getButtonStates().contains(IButtonState.HOVERING)) {
 				getMethodOnActivated().invoke(e);
 				e.stopPropagation();
 			}
 		}), false);
 
-		addEventListener(UIEventKeyboard.TYPE_KEY_DOWN, new UIEventListener.Functional<IUIEventKeyboard>(e -> {
+		addEventListener(EnumUIEventDOMType.KEY_DOWN.getEventType(), new UIEventListener.Functional<IUIEventKeyboard>(e -> {
 			if (IUIEventActivate.shouldActivate(this, e))
 				getMethodOnActivated().invoke(e);
 		}), false);

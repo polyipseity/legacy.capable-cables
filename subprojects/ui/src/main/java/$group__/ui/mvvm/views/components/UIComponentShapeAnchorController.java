@@ -9,7 +9,6 @@ import $group__.ui.mvvm.views.events.bus.EventUIComponent;
 import $group__.ui.structures.shapes.interactions.ShapeAnchorController;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.collections.MapUtilities;
-import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.reactive.DisposableObserverAuto;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
@@ -51,7 +50,7 @@ public class UIComponentShapeAnchorController
 		@Override
 		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 		public void onNext(EventUIComponent.ShapeDescriptorModify event) {
-			if (event.getStage() == EnumEventHookStage.POST && !isAnchoringSelf())
+			if (event.getStage().isPost() && !isAnchoringSelf())
 				getController()
 						.ifPresent(ctr -> {
 							setAnchoringSelf(true);

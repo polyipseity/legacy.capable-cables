@@ -1,6 +1,6 @@
 package $group__.ui.debug;
 
-import $group__.ui.ConfigurationUI;
+import $group__.ui.UIConfiguration;
 import $group__.ui.UIFacade;
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
@@ -122,7 +122,7 @@ public enum UIDebugMinecraft {
 
 		static {
 			Try.run(() -> PARSER.parse(u -> Try.call(() -> {
-				try (InputStream is = ResourceUtilities.getInputStream(new NamespacePrefixedString(ConfigurationUI.getModId(), "ui/schemas/components_test.xml"))) {
+				try (InputStream is = ResourceUtilities.getInputStream(new NamespacePrefixedString(UIConfiguration.getModId(), "ui/schemas/components_test.xml"))) {
 					return u.unmarshal(is);
 				}
 			}, LOGGER).orElseThrow(ThrowableCatcher::rethrow)), LOGGER);

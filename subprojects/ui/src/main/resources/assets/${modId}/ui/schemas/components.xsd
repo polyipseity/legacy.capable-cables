@@ -2,7 +2,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:ui="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
            targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
-           version="2.2.0"
+           version="2.3.0"
            xml:lang="EN">
 	<!-- SECTION ================================================== components ================================================== -->
 
@@ -52,86 +52,67 @@
 	<!-- COMMENT shape -->
 	<xs:element name="shape" id="shape">
 		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="ui:classBasedType">
-					<xs:sequence>
-						<xs:element ref="ui:affineTransformDefiner" minOccurs="0"/>
-						<xs:element ref="ui:constraint" minOccurs="0" maxOccurs="unbounded"/>
-						<xs:group ref="ui:propertyContainerGroup"/>
-					</xs:sequence>
-					<xs:attribute name="x" type="xs:double"/>
-					<xs:attribute name="y" type="xs:double"/>
-					<xs:attribute name="width" type="xs:double"/>
-					<xs:attribute name="height" type="xs:double"/>
-				</xs:extension>
-			</xs:complexContent>
+			<xs:sequence>
+				<xs:element ref="ui:affineTransformDefiner" minOccurs="0"/>
+				<xs:element ref="ui:constraint" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:group ref="ui:propertyContainerGroup"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="ui:classBasedAttributeGroup"/>
+			<xs:attribute name="x" type="xs:double" default="0"/>
+			<xs:attribute name="y" type="xs:double" default="0"/>
+			<xs:attribute name="width" type="xs:double" default="1"/>
+			<xs:attribute name="height" type="xs:double" default="1"/>
 		</xs:complexType>
 	</xs:element>
 
 	<!-- COMMENT renderer -->
 	<xs:element name="renderer">
 		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="ui:classBasedType">
-					<xs:sequence>
-						<xs:group ref="ui:propertyContainerGroup"/>
-						<xs:group ref="ui:bindingContainerGroup"/>
-					</xs:sequence>
-				</xs:extension>
-			</xs:complexContent>
+			<xs:sequence>
+				<xs:group ref="ui:propertyContainerGroup"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="ui:classBasedOptionalAttributeGroup"/>
 		</xs:complexType>
 	</xs:element>
 
 	<!-- COMMENT extension -->
 	<xs:element name="extension">
 		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="ui:classBasedType">
-					<xs:sequence>
-						<xs:group ref="ui:propertyContainerGroup"/>
-						<xs:group ref="ui:bindingContainerGroup"/>
-						<xs:element ref="ui:renderer" minOccurs="0"/>
-					</xs:sequence>
-				</xs:extension>
-			</xs:complexContent>
+			<xs:sequence>
+				<xs:group ref="ui:propertyContainerGroup"/>
+				<xs:element ref="ui:renderer" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="ui:classBasedAttributeGroup"/>
 		</xs:complexType>
 	</xs:element>
 
 	<!-- COMMENT view -->
 	<xs:element name="view">
 		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="ui:classBasedType">
-					<xs:sequence>
-						<xs:group ref="ui:propertyContainerGroup"/>
-						<xs:group ref="ui:bindingContainerGroup"/>
-						<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
-						<xs:element ref="ui:anyContainer" minOccurs="0"/>
-					</xs:sequence>
-				</xs:extension>
-			</xs:complexContent>
+			<xs:sequence>
+				<xs:group ref="ui:propertyContainerGroup"/>
+				<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:anyContainer" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="ui:classBasedAttributeGroup"/>
 		</xs:complexType>
 	</xs:element>
 
 	<!-- COMMENT component -->
 	<xs:element name="component">
 		<xs:complexType>
-			<xs:complexContent>
-				<xs:extension base="ui:classBasedType">
-					<xs:sequence>
-						<xs:group ref="ui:propertyContainerGroup"/>
-						<xs:group ref="ui:bindingContainerGroup"/>
-						<xs:element ref="ui:shape"/>
-						<xs:element ref="ui:anchor" minOccurs="0" maxOccurs="unbounded"/>
-						<xs:element ref="ui:renderer" minOccurs="0"/>
-						<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
-						<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
-						<xs:element ref="ui:anyContainer" minOccurs="0"/>
-					</xs:sequence>
-					<xs:attribute name="id" type="xs:string" use="required"/>
-					<xs:attributeGroup ref="ui:componentBindingsGroup"/>
-				</xs:extension>
-			</xs:complexContent>
+			<xs:sequence>
+				<xs:group ref="ui:propertyContainerGroup"/>
+				<xs:element ref="ui:shape"/>
+				<xs:element ref="ui:anchor" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:renderer" minOccurs="0"/>
+				<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:anyContainer" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="ui:classBasedAttributeGroup"/>
+			<xs:attribute name="id" type="xs:string" use="required"/>
+			<xs:attributeGroup ref="ui:componentEventsAttributeGroup"/>
 		</xs:complexType>
 	</xs:element>
 
@@ -146,70 +127,64 @@
 		</xs:sequence>
 	</xs:group>
 
-	<!-- COMMENT binding container group -->
-	<xs:group name="bindingContainerGroup">
-		<xs:sequence>
-			<xs:element ref="ui:binding" minOccurs="0" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:group>
-
-	<!-- COMMENT DOM bindings group -->
-	<xs:attributeGroup name="DOMBindingsGroup">
-		<xs:attribute name="load" type="xs:string"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="unload" type="xs:string"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="abort" type="xs:string"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="error" type="xs:string"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="select" type="xs:string"/>
-		<xs:attribute name="blur" type="xs:string"/>
-		<xs:attribute name="focus" type="xs:string"/>
-		<xs:attribute name="focusin" type="xs:string"/>
-		<xs:attribute name="focusout" type="xs:string"/>
-		<xs:attribute name="auxclick" type="xs:string"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="click" type="xs:string"/>
-		<xs:attribute name="dblclick" type="xs:string"/>
-		<xs:attribute name="mousedown" type="xs:string"/>
-		<xs:attribute name="mouseenter" type="xs:string"/>
-		<xs:attribute name="mouseleave" type="xs:string"/>
-		<xs:attribute name="mousemove" type="xs:string"/>
-		<xs:attribute name="mouseout" type="xs:string"/>
-		<xs:attribute name="mouseover" type="xs:string"/>
-		<xs:attribute name="mouseup" type="xs:string"/>
-		<xs:attribute name="wheel" type="xs:string"/>
-		<xs:attribute name="beforeinput" type="xs:string"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="input" type="xs:string"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="keydown" type="xs:string"/>
-		<xs:attribute name="keyup" type="xs:string"/>
-		<xs:attribute name="compositionstart" type="xs:string"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="compositionupdate" type="xs:string"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="compositionend" type="xs:string"/><!-- COMMENT unused, reserved -->
+	<!-- COMMENT class-based attribute groups -->
+	<xs:attributeGroup name="classBasedAttributeGroup">
+		<xs:attribute name="class" type="xs:string" use="required"/>
+	</xs:attributeGroup>
+	<xs:attributeGroup name="classBasedOptionalAttributeGroup">
+		<xs:attribute name="class" type="xs:string"/>
 	</xs:attributeGroup>
 
-	<!-- COMMENT component bindings group -->
-	<xs:attributeGroup name="componentBindingsGroup">
-		<xs:attributeGroup ref="ui:DOMBindingsGroup"/>
-		<xs:attribute name="char_typed" type="xs:string"/>
+	<!-- COMMENT DOM events attribute group -->
+	<xs:attributeGroup name="DOMEventsAttributeGroup">
+		<xs:attribute name="load" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="unload" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="abort" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="error" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="select" type="ui:NSPrefixedString"/>
+		<xs:attribute name="blur" type="ui:NSPrefixedString"/>
+		<xs:attribute name="focus" type="ui:NSPrefixedString"/>
+		<xs:attribute name="focusin" type="ui:NSPrefixedString"/>
+		<xs:attribute name="focusout" type="ui:NSPrefixedString"/>
+		<xs:attribute name="auxclick" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="click" type="ui:NSPrefixedString"/>
+		<xs:attribute name="dblclick" type="ui:NSPrefixedString"/>
+		<xs:attribute name="mousedown" type="ui:NSPrefixedString"/>
+		<xs:attribute name="mouseenter" type="ui:NSPrefixedString"/>
+		<xs:attribute name="mouseleave" type="ui:NSPrefixedString"/>
+		<xs:attribute name="mousemove" type="ui:NSPrefixedString"/>
+		<xs:attribute name="mouseout" type="ui:NSPrefixedString"/>
+		<xs:attribute name="mouseover" type="ui:NSPrefixedString"/>
+		<xs:attribute name="mouseup" type="ui:NSPrefixedString"/>
+		<xs:attribute name="wheel" type="ui:NSPrefixedString"/>
+		<xs:attribute name="beforeinput" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="input" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="keydown" type="ui:NSPrefixedString"/>
+		<xs:attribute name="keyup" type="ui:NSPrefixedString"/>
+		<xs:attribute name="compositionstart" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="compositionupdate" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="compositionend" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
+	</xs:attributeGroup>
+
+	<!-- COMMENT component events attribute group -->
+	<xs:attributeGroup name="componentEventsAttributeGroup">
+		<xs:attributeGroup ref="ui:DOMEventsAttributeGroup"/>
+		<xs:attribute name="char_typed" type="ui:NSPrefixedString"/>
 	</xs:attributeGroup>
 
 	<!-- SECTION elements -->
 
 	<!-- COMMENT IUIPropertyMappingValue -->
 	<!-- COMMENT property -->
-	<xs:element name="property" type="ui:propertyType"/>
-	<xs:complexType name="propertyType">
-		<xs:sequence>
-			<xs:any minOccurs="0"/>
-		</xs:sequence>
-		<xs:attribute name="key" type="xs:string" use="required"/>
-	</xs:complexType>
-	<!-- COMMENT binding -->
-	<xs:element name="binding" type="ui:bindingType"/>
-	<xs:complexType name="bindingType">
-		<xs:complexContent>
-			<xs:extension base="ui:propertyType">
-				<xs:attribute name="binding" type="xs:string" use="required"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
+	<xs:element name="property">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:any minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="key" type="xs:string" use="required"/>
+			<xs:attribute name="bindingKey" type="ui:NSPrefixedString"/>
+		</xs:complexType>
+	</xs:element>
 
 	<!-- COMMENT method -->
 	<xs:element name="method">
@@ -291,8 +266,10 @@
 
 	<!-- SECTION types -->
 
-	<!-- COMMENT class-based type -->
-	<xs:complexType name="classBasedType">
-		<xs:attribute name="class" type="xs:string" use="required"/>
-	</xs:complexType>
+	<!-- COMMENT INamespacePrefixedString -->
+	<xs:simpleType name="NSPrefixedString">
+		<xs:restriction base="xs:string">
+			<xs:pattern value=".*:?.*"/><!-- COMMENT the pattern is useless -->
+		</xs:restriction>
+	</xs:simpleType>
 </xs:schema>

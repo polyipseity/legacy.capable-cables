@@ -1,6 +1,6 @@
 package $group__.common.registrables.tileentities;
 
-import $group__.ui.ConstantsUI;
+import $group__.ui.UIConstants;
 import $group__.ui.debug.UIDebugMinecraft;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.fml.RegistryObject;
@@ -21,6 +21,6 @@ public enum TileEntityTypesThis {
 	private static final RegistryObject<TileEntityType<?>> DEBUG_UI;
 
 	static {
-		DEBUG_UI = ConstantsUI.BUILD_TYPE.isDebug() ? TILE_ENTITIES.register(UIDebugMinecraft.PATH, UIDebugMinecraft::getTileEntityEntry) : null;
+		DEBUG_UI = UIConstants.BUILD_TYPE.isDebug() ? TILE_ENTITIES.register(UIDebugMinecraft.PATH, UIDebugMinecraft::getTileEntityEntry) : null;
 	}
 }
