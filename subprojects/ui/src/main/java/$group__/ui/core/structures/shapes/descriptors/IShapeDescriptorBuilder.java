@@ -4,6 +4,7 @@ import $group__.ui.core.structures.shapes.interactions.IShapeConstraint;
 import $group__.utilities.interfaces.IHasGenericClass;
 import com.google.common.collect.Iterables;
 
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 
@@ -17,7 +18,7 @@ public interface IShapeDescriptorBuilder<S extends Shape>
 		});
 	}
 
-	IShapeDescriptorBuilder<S> setProperty(String property, Object value)
+	IShapeDescriptorBuilder<S> setProperty(String property, @Nullable Object value)
 			throws IllegalArgumentException;
 
 	IShapeDescriptorBuilder<S> transformConcatenate(AffineTransform transform);

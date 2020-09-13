@@ -32,7 +32,7 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 	protected AbstractShapeDescriptorBuilder(Class<S> genericClass) { super(genericClass); }
 
 	@Override
-	public AbstractShapeDescriptorBuilder<S> setProperty(String property, Object value) throws IllegalArgumentException {
+	public AbstractShapeDescriptorBuilder<S> setProperty(String property, @Nullable Object value) throws IllegalArgumentException {
 		@Nullable Consumer<?> c = getProperties().get(property);
 		if (c == null)
 			throw BecauseOf.illegalArgument("Property does not exist",

@@ -227,34 +227,92 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 							Map<INamespacePrefixedString, IUIPropertyMappingValue> attributes = new HashMap<>(
 									EnumUIEventDOMType.values().length + EnumUIEventComponentType.values().length
 							);
-							attributes.put(EnumUIEventDOMType.LOAD.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getLoad())));
-							attributes.put(EnumUIEventDOMType.UNLOAD.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getUnload())));
-							attributes.put(EnumUIEventDOMType.ABORT.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getAbort())));
-							attributes.put(EnumUIEventDOMType.ERROR.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getError())));
-							attributes.put(EnumUIEventDOMType.SELECT.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getSelect())));
-							attributes.put(EnumUIEventDOMType.FOCUS_OUT_POST.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getBlur())));
-							attributes.put(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getFocus())));
-							attributes.put(EnumUIEventDOMType.FOCUS_IN_PRE.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getFocusin())));
-							attributes.put(EnumUIEventDOMType.FOCUS_OUT_PRE.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getFocusout())));
-							attributes.put(EnumUIEventDOMType.CLICK_AUXILIARY.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getAuxclick())));
-							attributes.put(EnumUIEventDOMType.CLICK.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getClick())));
-							attributes.put(EnumUIEventDOMType.CLICK_DOUBLE.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getDblclick())));
-							attributes.put(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getMousedown())));
-							attributes.put(EnumUIEventDOMType.MOUSE_ENTER.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getMouseenter())));
-							attributes.put(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getMouseleave())));
-							attributes.put(EnumUIEventDOMType.MOUSE_MOVE.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getMousemove())));
-							attributes.put(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getMouseout())));
-							attributes.put(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getMouseover())));
-							attributes.put(EnumUIEventDOMType.MOUSE_UP.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getMouseup())));
-							attributes.put(EnumUIEventDOMType.WHEEL.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getWheel())));
-							attributes.put(EnumUIEventDOMType.UPDATE_PRE.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getBeforeinput())));
-							attributes.put(EnumUIEventDOMType.UPDATE_POST.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getInput())));
-							attributes.put(EnumUIEventDOMType.KEY_DOWN.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getKeydown())));
-							attributes.put(EnumUIEventDOMType.KEY_UP.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getKeyup())));
-							attributes.put(EnumUIEventDOMType.COMPOSITION_START.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getCompositionstart())));
-							attributes.put(EnumUIEventDOMType.COMPOSITION_UPDATE.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getCompositionupdate())));
-							attributes.put(EnumUIEventDOMType.COMPOSITION_END.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getCompositionend())));
-							attributes.put(EnumUIEventComponentType.CHAR_TYPED.getEventType(), new UIPropertyMappingValue(null, new NamespacePrefixedString(component.getCharTyped())));
+
+							attributes.put(EnumUIEventDOMType.LOAD.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getLoad()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.UNLOAD.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getUnload()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.ABORT.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getAbort()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.ERROR.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getError()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.SELECT.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getSelect()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.FOCUS_OUT_POST.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getBlur()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getFocus()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.FOCUS_IN_PRE.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getFocusin()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.FOCUS_OUT_PRE.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getFocusout()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.CLICK_AUXILIARY.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getAuxclick()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.CLICK.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getClick()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.CLICK_DOUBLE.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getDblclick()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.MOUSE_DOWN.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getMousedown()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.MOUSE_ENTER.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getMouseenter()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getMouseleave()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.MOUSE_MOVE.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getMousemove()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getMouseout()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getMouseover()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.MOUSE_UP.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getMouseup()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.WHEEL.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getWheel()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.UPDATE_PRE.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getBeforeinput()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.UPDATE_POST.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getInput()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.KEY_DOWN.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getKeydown()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.KEY_UP.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getKeyup()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.COMPOSITION_START.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getCompositionstart()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.COMPOSITION_UPDATE.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getCompositionupdate()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventDOMType.COMPOSITION_END.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getCompositionend()).map(NamespacePrefixedString::new).orElse(null)));
+							attributes.put(EnumUIEventComponentType.CHAR_TYPED.getEventType(),
+									new UIPropertyMappingValue(null,
+											Optional.ofNullable(component.getCharTyped()).map(NamespacePrefixedString::new).orElse(null)));
+
 							mappings = MapUtilities.concatMaps(mappings, attributes);
 						}
 						IShapeDescriptor<?> sd = createShapeDescriptor(context, n.getShape());
@@ -290,14 +348,13 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 	@SuppressWarnings("UnstableApiUsage")
 	public static Map<INamespacePrefixedString, IUIPropertyMappingValue> createMappings(Iterable<? extends Property> properties) {
 		return Streams.stream(properties).unordered()
-				.map(p -> {
-					Object value = p.getAny();
-					return Maps.immutableEntry(new NamespacePrefixedString(p.getKey()),
-							new UIPropertyMappingValue(JAXBAdapterRegistries.getAdapter(value).leftToRight(value),
-									Optional.ofNullable(p.getBindingKey())
-											.map(NamespacePrefixedString::new)
-											.orElse(null)));
-				})
+				.map(p -> Maps.immutableEntry(new NamespacePrefixedString(p.getKey()),
+						new UIPropertyMappingValue(Optional.ofNullable(p.getAny())
+								.map(value -> JAXBAdapterRegistries.getAdapter(value).leftToRight(value))
+								.orElse(null),
+								Optional.ofNullable(p.getBindingKey())
+										.map(NamespacePrefixedString::new)
+										.orElse(null))))
 				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
@@ -332,8 +389,9 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		shape.getProperty().stream().unordered()
 				.forEach(p -> {
 					assert p.getBindingKey() == null;
-					Object value = p.getAny();
-					sdb.setProperty(p.getKey(), JAXBAdapterRegistries.getAdapter(value).leftToRight(value));
+					sdb.setProperty(p.getKey(), Optional.ofNullable(p.getAny())
+							.map(value -> JAXBAdapterRegistries.getAdapter(value).leftToRight(value))
+							.orElse(null));
 				});
 
 		return sdb.setX(shape.getX()).setY(shape.getY()).setWidth(shape.getWidth()).setHeight(shape.getHeight())
@@ -386,7 +444,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 										ImmutableSet.of(getGenerator().apply(t)))));
 	}
 		 */
-		public static void handleAnchor(IParserContext context, Object container, Anchor object) {
+		public static void handleAnchor(@SuppressWarnings("unused") IParserContext context, Object container, Anchor object) {
 			if (!(container instanceof IUIComponent))
 				return;
 			IUIComponent component = (IUIComponent) container;
