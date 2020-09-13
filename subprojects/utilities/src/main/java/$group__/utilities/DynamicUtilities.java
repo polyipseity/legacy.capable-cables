@@ -11,6 +11,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import net.jodah.typetools.TypeResolver;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
@@ -26,8 +27,6 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.nio.ByteBuffer;
-import java.security.ProtectionDomain;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.*;
@@ -100,17 +99,51 @@ public enum DynamicUtilities {
 
 	public static Class<?> getCallerClass() { return getClassStackTrace(2); }
 
-	public static StackTraceElement getCallerStackTraceElement() {
+	private static final MethodHandle DEFINE_CLASS_METHOD_HANDLE =
+			Try.call(() ->
+					IMPL_LOOKUP.findVirtual(ClassLoader.class, "defineClass",
+							MethodType.methodType(Class.class, String.class, byte[].class, int.class, int.class)), LOGGER)
+					.orElseThrow(ThrowableCatcher::rethrow);
+
+	public static Optional<StackTraceElement> getCallerStackTraceElement() {
 		/* COMMENT
-		0 - create method
-		1 - this method
-		2 - caller of this method
-		3 - caller of the caller of this method
+		0 - this method
+		1 - caller of this method
+		2 - caller of the caller of this method
 		 */
-		return ThrowableUtilities.create().getStackTrace()[3];
+		return Optional.of(getCurrentStackTraceElements())
+				.filter(stacktrace -> stacktrace.length > 2)
+				.map(stacktrace -> stacktrace[2]);
 	}
 
-	public static Class<?> defineClass(String name, byte[] data) { return ClassLoaderHolder.INSTANCE.defineClassPublic(name, data); }
+	public static StackTraceElement[] getCurrentStackTraceElements() {
+		StackTraceElement[] ret = ThrowableUtilities.create().getStackTrace();
+		/* COMMENT
+		0 - create()
+		1 - this method
+		2 - caller of this method
+		 */
+		return Arrays.copyOfRange(ret, Math.min(2, ret.length), ret.length);
+	}
+
+	public static Optional<StackTraceElement> getCurrentStackTraceElement() {
+		/* COMMENT
+		0 - this method
+		1 - caller of this method
+		 */
+		return Optional.of(getCurrentStackTraceElements())
+				.filter(stacktrace -> stacktrace.length > 1)
+				.map(stacktrace -> stacktrace[1]);
+	}
+
+	public static String getCurrentStackTraceString() { return ExceptionUtils.getStackTrace(ThrowableUtilities.create()); }
+
+	public static Class<?> defineClass(ClassLoader classLoader, String name, byte[] data) {
+		// TODO Java 9 - use Lookup.defineClass
+		return Try.call(() ->
+				(Class<?>) DEFINE_CLASS_METHOD_HANDLE.invokeExact(classLoader, name, data, 0, data.length), LOGGER)
+				.orElseThrow(ThrowableCatcher::rethrow);
+	}
 
 	public static String getMethodNameDescriptor(Method m) { return m.getName() + org.objectweb.asm.Type.getMethodDescriptor(m); }
 
@@ -285,26 +318,6 @@ public enum DynamicUtilities {
 			Class<?>[] r = super.getClassContext();
 			return Arrays.copyOfRange(r, 1, r.length);
 		}
-	}
-
-	public static final class ClassLoaderHolder extends ClassLoader {
-		public static final ClassLoaderHolder INSTANCE = new ClassLoaderHolder();
-		private static final Logger LOGGER = LogManager.getLogger();
-
-		private ClassLoaderHolder() { PreconditionUtilities.requireRunOnceOnly(LOGGER); }
-
-		@Override
-		protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException { return Class.forName(name, resolve, Thread.currentThread().getContextClassLoader()); }
-
-		public Class<?> defineClassPublic(String name, byte[] b) { return defineClassPublic(name, b, 0, b.length); }
-
-		public Class<?> defineClassPublic(String name, byte[] b, int off, int len) { return defineClass(name, b, off, len); }
-
-		public Class<?> defineClassPublic(String name, ByteBuffer b, @Nullable ProtectionDomain protectionDomain) { return defineClass(name, b, protectionDomain); }
-
-		public Class<?> defineClassPublic(String name, byte[] b, @Nullable ProtectionDomain protectionDomain) { return defineClassPublic(name, b, 0, b.length, protectionDomain); }
-
-		public Class<?> defineClassPublic(String name, byte[] b, int off, int len, @Nullable ProtectionDomain protectionDomain) { return defineClass(name, b, off, len, protectionDomain); }
 	}
 
 	public enum Extensions {

@@ -30,6 +30,7 @@ import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventBusUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
+import $group__.utilities.functions.FunctionalUtilities;
 import $group__.utilities.functions.IConsumer3;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.reactive.DisposableObserverAuto;
@@ -78,7 +79,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		@Nullable Optional<? extends IUIEventTarget> ret = CastUtilities.castChecked(IUIComponent.class, currentFocus)
 				.flatMap(cf ->
 						CacheViewComponent.CHILDREN_FLAT_FOCUSABLE.getValue().get(this)
-								.filter(f -> !f.isEmpty())
+								.filter(FunctionalUtilities.not(Collection::isEmpty))
 								.map(f -> f.get(Math.floorMod(
 										Math.max(f.indexOf(cf), 0) + (next ? 1 : -1), f.size()))));
 		if (!ret.isPresent())

@@ -1,6 +1,7 @@
 package $group__.utilities.structures;
 
 import $group__.utilities.CapacityUtilities;
+import $group__.utilities.DynamicUtilities;
 import $group__.utilities.collections.MapUtilities;
 import org.apache.logging.log4j.Logger;
 
@@ -24,7 +25,7 @@ public abstract class Singleton {
 	protected Singleton(Logger logger) {
 		Class<? extends Singleton> clazz = getClass();
 		String classGS = clazz.toGenericString(),
-				sts = getCurrentStackTraceString();
+				sts = DynamicUtilities.getCurrentStackTraceString();
 
 		@SuppressWarnings("ThisEscapedInObjectConstruction") Map.Entry<? extends Singleton, String> v = immutableEntry(this, sts);
 		@Nullable Map.Entry<? extends Singleton, String> vo = INSTANCES.put(clazz, v);

@@ -27,10 +27,10 @@ public abstract class AbstractBindings<B extends IBinding<?>>
 	public static <T, R> R transform(Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>> transformers, @Nullable T value, Class<T> from, Class<R> to)
 			throws BindingTransformerNotFoundException {
 		return getTransformer(transformers, from, to)
-				.map(t -> t.apply(value))
 				.orElseThrow(() -> new BindingTransformerNotFoundException(
 						"Cannot find transformer for '" + from + "' -> '" + to + "' in transformers:" + System.lineSeparator()
-								+ transformers));
+								+ transformers))
+				.apply(value);
 	}
 
 	@SuppressWarnings("unchecked")

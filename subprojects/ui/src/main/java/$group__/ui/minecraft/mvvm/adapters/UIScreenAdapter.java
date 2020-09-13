@@ -473,7 +473,7 @@ public class UIScreenAdapter
 
 	protected boolean setFocus(@Nullable IUIEventTarget focus) {
 		Optional<? extends IUIEventTarget> p = getFocus(), n = Optional.ofNullable(focus);
-		if (p.map(IUIEventTarget::isFocusable).orElse(true) && !p.equals(n)) {
+		if (n.map(IUIEventTarget::isFocusable).orElse(true) && !n.equals(p)) {
 			@Nullable IUIEventTarget pv = p.orElse(null);
 			p.ifPresent(f -> UIEventUtilities.dispatchEvent(
 					UIEventUtilities.Factory.createEventFocusOutPre(f, focus)));

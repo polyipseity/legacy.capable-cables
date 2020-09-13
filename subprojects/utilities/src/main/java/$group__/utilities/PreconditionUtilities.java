@@ -5,9 +5,11 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Optional;
 
 import static $group__.utilities.DynamicUtilities.getCallerStackTraceElement;
 import static $group__.utilities.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
+import static $group__.utilities.LoggerUtilities.EnumMessages.FACTORY_SIMPLE_MESSAGE;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkElementIndex;
 import static java.lang.System.lineSeparator;
@@ -37,10 +39,15 @@ public enum PreconditionUtilities {
 	public static void requireRunOnceOnly(@Nullable Logger logger) throws IllegalStateException {
 		Throwable t = ThrowableUtilities.create();
 
-		StackTraceElement st = getCallerStackTraceElement();
+		Optional<StackTraceElement> st = getCallerStackTraceElement();
+		if (!st.isPresent()) {
+			if (logger != null)
+				logger.warn(() -> FACTORY_SIMPLE_MESSAGE.makeMessage("Unable to obtain stacktrace"));
+			return;
+		}
 		@Nullable Throwable t1;
 		synchronized (st.toString().intern()) {
-			t1 = RAN_ONCE.put(st, t);
+			t1 = RAN_ONCE.put(st.get(), t);
 		}
 		if (t1 != null) {
 			if (logger != null)

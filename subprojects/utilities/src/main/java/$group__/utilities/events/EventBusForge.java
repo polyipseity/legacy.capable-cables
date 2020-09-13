@@ -63,7 +63,13 @@ public class EventBusForge
 	public void onSubscribe(@Nonnull Disposable d) { throw new UnsupportedOperationException(); }
 
 	@Override
-	public void onNext(@Nonnull Event o) { getDelegated().post(o); }
+	public void onNext(@Nonnull Event o) {
+		try {
+			getDelegated().post(o);
+		} catch (Throwable t) {
+			onError(t);
+		}
+	}
 
 	@Override
 	public void onError(@Nonnull Throwable e) { throw ThrowableUtilities.propagate(e); }

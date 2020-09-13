@@ -72,7 +72,7 @@ public class UIExtensionCache
 													@Nullable IUIComponentManager<?> ret;
 													if (cv == null || (ret = cv.get()) == null) {
 														ret = IUIComponent.getYoungestParentInstanceOf(i, IUIComponentManager.class)
-																.orElseThrow(IllegalStateException::new);
+																.orElse(null);
 														cache.getDelegated().put(t.getKey(),
 																new WeakReference<>(ret));
 													}

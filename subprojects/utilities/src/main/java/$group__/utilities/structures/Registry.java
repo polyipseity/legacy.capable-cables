@@ -62,9 +62,7 @@ public abstract class Registry<K, V> {
 
 		public RegistryObject(V value) { this.value = value;}
 
-		public V getValue() {
-			return value;
-		}
+		public V getValue() { return value; }
 
 		protected void setValue(V value) { this.value = value; }
 

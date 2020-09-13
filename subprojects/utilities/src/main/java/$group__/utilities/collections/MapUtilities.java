@@ -83,9 +83,10 @@ public enum MapUtilities {
 	public enum PublicAbstractBiMapHolder {
 		;
 
+		private static final long serialVersionUID = 3864726593737949225L; // COMMENT should not affect Enum serialization
 		private static final String SUPERCLASS_NAME = "com.google.common.collect.AbstractBiMap";
-		private static final String CLASS_SIMPLE_NAME = "PublicAbstractBiMap";
-		private static final Pattern LITERAL_SUPERCLASS_NAME = Pattern.compile("AbstractBiMap", Pattern.LITERAL);
+		private static final String CLASS_SIMPLE_NAME = "AbstractBiMap_" + serialVersionUID; // COMMENT hopefully they will not name a new class like so...
+		private static final Pattern LITERAL_SUPERCLASS_SIMPLE_NAME = Pattern.compile("AbstractBiMap", Pattern.LITERAL);
 		private static final Logger LOGGER = LogManager.getLogger();
 		private static final Class<?> CLASS;
 		private static final BiFunction<Map<?, ?>, Map<?, ?>, ? extends BiMap<?, ?>> CONSTRUCTOR;
@@ -94,14 +95,15 @@ public enum MapUtilities {
 			{
 				Class<?> superclass = Try.call(() -> Class.forName(SUPERCLASS_NAME), LOGGER)
 						.orElseThrow(ThrowableCatcher::rethrow);
-				String name = LITERAL_SUPERCLASS_NAME
+				String name = LITERAL_SUPERCLASS_SIMPLE_NAME
 						.matcher(superclass.getName())
 						.replaceAll(Matcher.quoteReplacement(CLASS_SIMPLE_NAME));
-				String internalName = LITERAL_SUPERCLASS_NAME
+				String internalName = LITERAL_SUPERCLASS_SIMPLE_NAME
 						.matcher(Type.getInternalName(superclass))
 						.replaceAll(Matcher.quoteReplacement(CLASS_SIMPLE_NAME));
 
 				ClassWriter cw = new ClassWriter(0);
+				// COMMENT class
 				{
 					SignatureVisitor sw = new SignatureWriter();
 					{
@@ -120,7 +122,7 @@ public enum MapUtilities {
 						}
 					}
 					{
-						// CODE extends AbstractBiMap<K, V>
+						// CODE extends ...<K, V>
 						SignatureVisitor swSc = sw.visitSuperclass();
 						swSc.visitClassType(Type.getInternalName(superclass));
 						swSc.visitTypeArgument(SignatureVisitor.INSTANCEOF).visitTypeVariable("K");
@@ -128,16 +130,27 @@ public enum MapUtilities {
 						swSc.visitEnd();
 					}
 
-					// CODE package com.google.common.collect;
-					// CODE public class PublicAbstractBiMap
+					// CODE package ...;
+					// CODE public class ...
 					cw.visit(V1_6,
-							ACC_PUBLIC | ACC_SUPER,
-							internalName,
+							ACC_PUBLIC | ACC_SUPER, internalName,
 							sw.toString(),
 							Type.getInternalName(superclass),
 							null);
+					cw.visitSource(DynamicUtilities.getCurrentStackTraceElement()
+							.map(StackTraceElement::getFileName)
+							.orElse(null), "ASM");
 				}
-
+				// COMMENT field serialVersionUID
+				{
+					// CODE private static final long serialVersionUID = ...;
+					cw.visitField(ACC_PRIVATE | ACC_STATIC | ACC_FINAL, "serialVersionUID",
+							Type.LONG_TYPE.getDescriptor(),
+							null,
+							serialVersionUID)
+							.visitEnd();
+				}
+				// COMMENT method <init>
 				{
 					MethodVisitor mv;
 					{
@@ -159,7 +172,7 @@ public enum MapUtilities {
 							swRt.visitEnd();
 						}
 
-						// COMMENT constructor
+						// CODE public <init>
 						mv = cw.visitMethod(ACC_PUBLIC, "<init>",
 								Type.getMethodDescriptor(Type.getType(void.class), Type.getType(Map.class), Type.getType(Map.class)),
 								sw.toString(),
@@ -181,7 +194,7 @@ public enum MapUtilities {
 				}
 				cw.visitEnd();
 
-				CLASS = DynamicUtilities.defineClass(name, cw.toByteArray());
+				CLASS = DynamicUtilities.defineClass(superclass.getClassLoader(), name, cw.toByteArray());
 			}
 
 			{

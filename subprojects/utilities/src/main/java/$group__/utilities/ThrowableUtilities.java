@@ -1,6 +1,5 @@
 package $group__.utilities;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
@@ -25,8 +24,6 @@ public enum ThrowableUtilities {
 		UNSAFE.throwException(t);
 		throw new InternalError();
 	}
-
-	public static String getCurrentStackTraceString() { return ExceptionUtils.getStackTrace(create()); }
 
 	public static Throwable create() { return new Throwable("Instantiated throwable"); }
 
