@@ -2,7 +2,7 @@ package $group__.ui.minecraft.mvvm.components;
 
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
-import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRendererContainer;
+import $group__.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
@@ -10,10 +10,9 @@ import $group__.ui.minecraft.core.mvvm.views.components.rendering.IUIComponentRe
 import $group__.ui.minecraft.mvvm.components.rendering.UIComponentRendererMinecraft;
 import $group__.ui.minecraft.mvvm.extensions.UIExtensionBackgroundMinecraft;
 import $group__.ui.mvvm.views.components.UIComponentManager;
-import $group__.ui.mvvm.views.components.rendering.UIComponentRendererContainer;
+import $group__.ui.mvvm.views.components.rendering.UIRendererContainer;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
-import com.google.common.collect.ImmutableMap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -26,8 +25,8 @@ import java.util.Optional;
 public class UIComponentManagerMinecraft
 		extends UIComponentManager<Rectangle2D>
 		implements IUIComponentMinecraft {
-	protected final IUIComponentRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
-			new UIComponentRendererContainer<>(new UIComponentRendererMinecraft<>(ImmutableMap.of(), UIComponentManagerMinecraft.class));
+	protected final IUIRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
+			new UIRendererContainer<>(new UIComponentRendererMinecraft<>(UIComponentManagerMinecraft.class));
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
@@ -42,9 +41,12 @@ public class UIComponentManagerMinecraft
 
 	@Override
 	public void setRenderer(@Nullable IUIComponentRendererMinecraft<?> renderer) {
-		IUIComponentRendererContainer.setRendererImpl(this, renderer,
+		IUIRendererContainer.setRendererImpl(this, renderer,
 				(s, r) -> s.getRendererContainer().setRenderer(r));
 	}
 
-	protected IUIComponentRendererContainer<IUIComponentRendererMinecraft<?>> getRendererContainer() { return rendererContainer; }
+	@Override
+	public Class<? extends IUIComponentRendererMinecraft<?>> getDefaultRendererClass() { return getRendererContainer().getDefaultRendererClass(); }
+
+	protected IUIRendererContainer<IUIComponentRendererMinecraft<?>> getRendererContainer() { return rendererContainer; }
 }

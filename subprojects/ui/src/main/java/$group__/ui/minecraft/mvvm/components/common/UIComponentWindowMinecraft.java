@@ -2,7 +2,7 @@ package $group__.ui.minecraft.mvvm.components.common;
 
 import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
-import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRendererContainer;
+import $group__.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import $group__.ui.core.parsers.binding.UIProperty;
 import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.core.parsers.components.UIRendererConstructor;
@@ -11,7 +11,7 @@ import $group__.ui.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import $group__.ui.minecraft.core.mvvm.views.components.rendering.IUIComponentRendererMinecraft;
 import $group__.ui.minecraft.mvvm.components.rendering.UIComponentRendererMinecraft;
 import $group__.ui.mvvm.views.components.common.UIComponentWindow;
-import $group__.ui.mvvm.views.components.rendering.UIComponentRendererContainer;
+import $group__.ui.mvvm.views.components.rendering.UIRendererContainer;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.binding.core.fields.IBindingField;
 import $group__.utilities.interfaces.INamespacePrefixedString;
@@ -31,8 +31,8 @@ import java.util.Optional;
 public class UIComponentWindowMinecraft
 		extends UIComponentWindow
 		implements IUIComponentMinecraft {
-	protected final IUIComponentRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
-			new UIComponentRendererContainer<>(new DefaultRenderer<>(ImmutableMap.of(), UIComponentWindowMinecraft.class));
+	protected final IUIRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
+			new UIRendererContainer<>(new DefaultRenderer<>(ImmutableMap.of(), UIComponentWindowMinecraft.class));
 
 	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
 	public UIComponentWindowMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<RectangularShape> shapeDescriptor) { super(mappings, id, shapeDescriptor); }
@@ -42,11 +42,14 @@ public class UIComponentWindowMinecraft
 
 	@Override
 	public void setRenderer(@Nullable IUIComponentRendererMinecraft<?> renderer) {
-		IUIComponentRendererContainer.setRendererImpl(this, renderer,
+		IUIRendererContainer.setRendererImpl(this, renderer,
 				(s, r) -> s.getRendererContainer().setRenderer(r));
 	}
 
-	protected IUIComponentRendererContainer<IUIComponentRendererMinecraft<?>> getRendererContainer() { return rendererContainer; }
+	@Override
+	public Class<? extends IUIComponentRendererMinecraft<?>> getDefaultRendererClass() { return getRendererContainer().getDefaultRendererClass(); }
+
+	protected IUIRendererContainer<IUIComponentRendererMinecraft<?>> getRendererContainer() { return rendererContainer; }
 
 	@OnlyIn(Dist.CLIENT)
 	public static class DefaultRenderer<C extends UIComponentWindowMinecraft>

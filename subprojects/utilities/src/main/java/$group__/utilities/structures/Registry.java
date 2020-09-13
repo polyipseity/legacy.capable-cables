@@ -6,7 +6,6 @@ import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.collections.MapUtilities;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
@@ -58,26 +57,13 @@ public abstract class Registry<K, V> {
 	public static final class RegistryObject<V>
 			implements Serializable {
 		private static final long serialVersionUID = -7426757514591663232L;
-		protected transient V value;
+		@SuppressWarnings("NonSerializableFieldInSerializableClass")
+		protected V value;
 
 		public RegistryObject(V value) { this.value = value;}
 
 		public V getValue() { return value; }
 
 		protected void setValue(V value) { this.value = value; }
-
-		@SuppressWarnings("NonSerializableObjectPassedToObjectStream")
-		private void writeObject(java.io.ObjectOutputStream out)
-				throws IOException {
-			out.defaultWriteObject();
-			out.writeObject(value);
-		}
-
-		@SuppressWarnings("unchecked")
-		private void readObject(java.io.ObjectInputStream in)
-				throws IOException, ClassNotFoundException {
-			in.defaultReadObject();
-			this.value = (V) in.readObject();
-		}
 	}
 }

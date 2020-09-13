@@ -7,10 +7,10 @@ import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.components.IUIViewComponent;
-import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRenderer;
-import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRendererContainer;
 import $group__.ui.core.mvvm.views.events.types.EnumUIEventComponentType;
 import $group__.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
+import $group__.ui.core.mvvm.views.rendering.IUIRenderer;
+import $group__.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import $group__.ui.core.parsers.adapters.JAXBAdapterRegistries;
 import $group__.ui.core.parsers.components.*;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
@@ -460,27 +460,30 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		}
 
 		public static void handleRenderer(IParserContext context, Object container, Renderer object) {
-			if (!(container instanceof IUIComponentRendererContainer))
+			if (!(container instanceof IUIRendererContainer))
 				return;
-			Class<?> oc = AssertionUtilities.assertNonnull(context.getAliases().get(object.getClazz()));
+			IUIRendererContainer<?> rendererContainer = ((IUIRendererContainer<?>) container);
+			Class<?> oc = Optional.ofNullable(object.getClazz())
+					.<Class<?>>map(classAlias -> AssertionUtilities.assertNonnull(context.getAliases().get(classAlias)))
+					.orElseGet(rendererContainer::getDefaultRendererClass);
 			UIRendererConstructor.EnumConstructorType ct = IConstructorType.getConstructorType(oc, UIRendererConstructor.class, UIRendererConstructor::type);
-			IUIComponentRenderer<?> ret = Try.call(() -> {
+			IUIRenderer<?> ret = Try.call(() -> {
 				MethodHandle mh = DynamicUtilities.IMPL_LOOKUP.findConstructor(oc, ct.getMethodType());
 				Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(object.getProperty());
 				switch (ct) {
 					case MAPPINGS__CONTAINER_CLASS:
-						return (IUIComponentRenderer<?>) mh.invoke(mappings, container.getClass());
+						return (IUIRenderer<?>) mh.invoke(mappings, container.getClass());
 					case MAPPINGS:
-						return (IUIComponentRenderer<?>) mh.invoke(mappings);
+						return (IUIRenderer<?>) mh.invoke(mappings);
 					case CONTAINER_CLASS:
-						return (IUIComponentRenderer<?>) mh.invoke(container.getClass());
+						return (IUIRenderer<?>) mh.invoke(container.getClass());
 					case NO_ARGS:
-						return (IUIComponentRenderer<?>) mh.invoke();
+						return (IUIRenderer<?>) mh.invoke();
 					default:
 						throw new InternalError();
 				}
 			}, LOGGER).orElseThrow(ThrowableCatcher::rethrow);
-			((IUIComponentRendererContainer<?>) container).setRenderer(CastUtilities.castUnchecked(ret)); // COMMENT setRenderer should check
+			rendererContainer.setRenderer(CastUtilities.castUnchecked(ret)); // COMMENT setRenderer should check
 		}
 
 		public static void handleExtension(IParserContext context, Object container, Extension object) {

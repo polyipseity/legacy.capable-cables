@@ -4,6 +4,7 @@ import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRenderer;
 import $group__.ui.minecraft.core.mvvm.views.EnumCropMethod;
+import $group__.ui.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
 import $group__.ui.utilities.UIObjectUtilities;
 import $group__.ui.utilities.minecraft.CoordinateUtilities;
@@ -20,7 +21,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 @OnlyIn(Dist.CLIENT)
-public interface IUIComponentRendererMinecraft<C extends IUIComponent>
+public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUIComponentMinecraft>
 		extends IUIComponentRenderer<C> {
 	void render(C container, EnumRenderStage stage, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks);
 
