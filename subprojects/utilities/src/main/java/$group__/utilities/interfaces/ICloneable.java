@@ -5,23 +5,25 @@ import $group__.utilities.ThrowableUtilities;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
-import java.util.function.Function;
 
 @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface ICloneable
 		extends Cloneable {
 	Logger LOGGER = LogManager.getLogger();
-	Function<Object, Object> CLONE_FUNCTION = ThrowableUtilities.Try.call(() ->
-			DynamicUtilities.InvocationUtilities.LambdaMetaFactoryUtilities
-					.makeFunction(DynamicUtilities.IMPL_LOOKUP.findVirtual(Object.class, "clone", MethodType.methodType(Object.class)),
-							Object.class, Object.class), LOGGER)
+	MethodHandle CLONE_METHOD_HANDLE = ThrowableUtilities.Try.call(() ->
+			DynamicUtilities.IMPL_LOOKUP.findVirtual(Object.class, "clone", MethodType.methodType(Object.class)), LOGGER)
 			.orElseThrow(ThrowableUtilities.ThrowableCatcher::rethrow);
 
 	@SuppressWarnings("unchecked")
 	static <T extends Cloneable> T cloneUnchecked(T obj) {
-		return (T) CLONE_FUNCTION.apply(obj); // COMMENT should be safe
+		// TODO Java 9 - use LambdaMetaFactory
+		return ThrowableUtilities.Try.call(() ->
+				(T) CLONE_METHOD_HANDLE.invoke(obj), LOGGER)
+				.orElseThrow(ThrowableUtilities.ThrowableCatcher::rethrow);
 	}
 
+	@SuppressWarnings("override")
 	ICloneable clone() throws CloneNotSupportedException;
 }

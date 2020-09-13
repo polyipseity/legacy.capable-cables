@@ -1,6 +1,5 @@
 package $group__.utilities.collections;
 
-import $group__.utilities.CastUtilities;
 import $group__.utilities.DynamicUtilities;
 import $group__.utilities.LoopUtilities;
 import $group__.utilities.ThrowableUtilities;
@@ -18,6 +17,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.signature.SignatureVisitor;
 import org.objectweb.asm.signature.SignatureWriter;
 
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -184,12 +184,14 @@ public enum MapUtilities {
 				CLASS = DynamicUtilities.defineClass(name, cw.toByteArray());
 			}
 
-			CONSTRUCTOR = Try.call(() ->
-					DynamicUtilities.InvocationUtilities.LambdaMetaFactoryUtilities
-							.makeBiFunction(DynamicUtilities.PUBLIC_LOOKUP.findConstructor(CLASS, MethodType.methodType(void.class, Map.class, Map.class)),
-									BiMap.class, Map.class, Map.class), LOGGER)
-					.map(CastUtilities::<BiFunction<Map<?, ?>, Map<?, ?>, ? extends BiMap<?, ?>>>castUnchecked)
-					.orElseThrow(ThrowableCatcher::rethrow);
+			{
+				MethodHandle constructor = Try.call(() -> DynamicUtilities.IMPL_LOOKUP.findConstructor(CLASS, MethodType.methodType(void.class, Map.class, Map.class)), LOGGER)
+						.orElseThrow(ThrowableCatcher::rethrow);
+				// TODO Java 9 - use LambdaMetaFactory
+				CONSTRUCTOR = (forward, backward) ->
+						Try.call(() -> (BiMap<?, ?>) constructor.invoke(forward, backward), LOGGER)
+								.orElseThrow(ThrowableCatcher::rethrow);
+			}
 		}
 	}
 }

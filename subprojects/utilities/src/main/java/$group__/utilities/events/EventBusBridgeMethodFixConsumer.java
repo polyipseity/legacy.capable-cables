@@ -12,9 +12,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Method;
 import java.util.Optional;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class EventBusBridgeMethodFixConsumer<T extends Event, O>
@@ -28,7 +28,7 @@ public class EventBusBridgeMethodFixConsumer<T extends Event, O>
 	protected final boolean receiveCancelled;
 	@Nullable
 	protected final Class<?> genericClassFilter;
-	protected final BiConsumer<?, T> consumer;
+	protected final MethodHandle methodHandle;
 
 	@SuppressWarnings("unchecked")
 	public EventBusBridgeMethodFixConsumer(O delegated, Class<? super O> superClass, String methodName)
@@ -44,8 +44,8 @@ public class EventBusBridgeMethodFixConsumer<T extends Event, O>
 		Method m = Try.call(() ->
 				this.delegated.getClass().getDeclaredMethod(methodName, this.eventType), LOGGER)
 				.orElseThrow(ThrowableCatcher::rethrow);
-		this.consumer = DynamicUtilities.InvocationUtilities.LambdaMetaFactoryUtilities
-				.makeBiConsumer(DynamicUtilities.IMPL_LOOKUP.unreflect(m), this.delegated.getClass(), this.eventType);
+		// TODO Java 9 - use LambdaMetaFactory
+		this.methodHandle = DynamicUtilities.IMPL_LOOKUP.unreflect(m);
 
 		Optional<SubscribeEvent> se = Optional.ofNullable(m.getAnnotation(SubscribeEvent.class));
 		this.priority = se.map(SubscribeEvent::priority).orElse(EventPriority.NORMAL);
@@ -62,9 +62,12 @@ public class EventBusBridgeMethodFixConsumer<T extends Event, O>
 	}
 
 	@Override
-	public void accept(T t) { getConsumer().accept(CastUtilities.castUnchecked(getDelegated()), t); }
+	public void accept(T t) {
+		Try.run(() -> getMethodHandle().invoke(getDelegated(), t), LOGGER);
+		ThrowableCatcher.rethrow(true);
+	}
 
-	protected BiConsumer<?, T> getConsumer() { return consumer; }
+	protected MethodHandle getMethodHandle() { return methodHandle; }
 
 	public void register(IEventBus bus) {
 		if (!getGenericClassFilter().filter(gcf -> {

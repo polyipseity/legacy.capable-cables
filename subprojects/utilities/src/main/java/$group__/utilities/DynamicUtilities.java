@@ -218,12 +218,10 @@ public enum DynamicUtilities {
 		public enum LambdaMetaFactoryUtilities {
 			;
 
-			private static final Lookup LOOKUP = IMPL_LOOKUP;
-
 			@SuppressWarnings("unchecked")
-			public static <T> Consumer<T> makeConsumer(MethodHandle method,
+			public static <T> Consumer<T> makeConsumer(Lookup lookup, MethodHandle method,
 			                                           Class<T> inputType) throws Throwable {
-				return (Consumer<T>) LambdaMetafactory.metafactory(LOOKUP,
+				return (Consumer<T>) LambdaMetafactory.metafactory(lookup,
 						"accept",
 						MethodType.methodType(Consumer.class),
 						MethodType.methodType(void.class, Object.class),
@@ -234,9 +232,9 @@ public enum DynamicUtilities {
 			}
 
 			@SuppressWarnings("unchecked")
-			public static <T, U> BiConsumer<T, U> makeBiConsumer(MethodHandle method,
+			public static <T, U> BiConsumer<T, U> makeBiConsumer(Lookup lookup, MethodHandle method,
 			                                                     Class<T> inputType1, Class<U> inputType2) throws Throwable {
-				return (BiConsumer<T, U>) LambdaMetafactory.metafactory(LOOKUP,
+				return (BiConsumer<T, U>) LambdaMetafactory.metafactory(lookup,
 						"accept",
 						MethodType.methodType(BiConsumer.class),
 						MethodType.methodType(void.class, Object.class, Object.class),
@@ -247,9 +245,9 @@ public enum DynamicUtilities {
 			}
 
 			@SuppressWarnings("unchecked")
-			public static <T, R> Function<T, R> makeFunction(MethodHandle method,
+			public static <T, R> Function<T, R> makeFunction(Lookup lookup, MethodHandle method,
 			                                                 Class<R> returnType, Class<T> inputType) throws Throwable {
-				return (Function<T, R>) LambdaMetafactory.metafactory(LOOKUP,
+				return (Function<T, R>) LambdaMetafactory.metafactory(lookup,
 						"apply",
 						MethodType.methodType(Function.class),
 						MethodType.methodType(Object.class, Object.class),
@@ -260,9 +258,9 @@ public enum DynamicUtilities {
 			}
 
 			@SuppressWarnings("unchecked")
-			public static <T, U, R> BiFunction<T, U, R> makeBiFunction(MethodHandle method,
+			public static <T, U, R> BiFunction<T, U, R> makeBiFunction(Lookup lookup, MethodHandle method,
 			                                                           Class<R> returnType, Class<T> inputType1, Class<U> inputType2) throws Throwable {
-				return (BiFunction<T, U, R>) LambdaMetafactory.metafactory(LOOKUP,
+				return (BiFunction<T, U, R>) LambdaMetafactory.metafactory(lookup,
 						"apply",
 						MethodType.methodType(BiFunction.class),
 						MethodType.methodType(Object.class, Object.class, Object.class),
