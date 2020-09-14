@@ -1,18 +1,30 @@
 version: 2
 updates:
   - package-ecosystem: gradle
-    directory: "/"
-    schedule:
-      interval: daily
-      time: "00:00"
-    open-pull-requests-limit: 99
-  - package-ecosystem: gradle
     directory: "/buildSrc"
     schedule:
       interval: daily
       time: "00:00"
     open-pull-requests-limit: 99
   - package-ecosystem: gradle
+    directory: "/"
+    schedule:
+      interval: daily
+      time: "00:00"
+    open-pull-requests-limit: 99
+  - package-ecosystem: maven
+    directory: "/"
+    schedule:
+      interval: daily
+      time: "00:00"
+    open-pull-requests-limit: 99
+  - package-ecosystem: gradle
+    directory: "/subprojects/utilities"
+    schedule:
+      interval: daily
+      time: "00:00"
+    open-pull-requests-limit: 99
+  - package-ecosystem: maven
     directory: "/subprojects/utilities"
     schedule:
       interval: daily
@@ -24,7 +36,19 @@ updates:
       interval: daily
       time: "00:00"
     open-pull-requests-limit: 99
+  - package-ecosystem: maven
+    directory: "/subprojects/annotations"
+    schedule:
+      interval: daily
+      time: "00:00"
+    open-pull-requests-limit: 99
   - package-ecosystem: gradle
+    directory: "/subprojects/annotations/processors"
+    schedule:
+      interval: daily
+      time: "00:00"
+    open-pull-requests-limit: 99
+  - package-ecosystem: maven
     directory: "/subprojects/annotations/processors"
     schedule:
       interval: daily
@@ -36,7 +60,19 @@ updates:
       interval: daily
       time: "00:00"
     open-pull-requests-limit: 99
+  - package-ecosystem: maven
+    directory: "/subprojects/ui"
+    schedule:
+      interval: daily
+      time: "00:00"
+    open-pull-requests-limit: 99
   - package-ecosystem: gradle
+    directory: "/subprojects/product"
+    schedule:
+      interval: daily
+      time: "00:00"
+    open-pull-requests-limit: 99
+  - package-ecosystem: maven
     directory: "/subprojects/product"
     schedule:
       interval: daily
