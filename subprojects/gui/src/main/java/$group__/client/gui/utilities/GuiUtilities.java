@@ -1,6 +1,5 @@
 package $group__.client.gui.utilities;
 
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
@@ -196,19 +195,19 @@ public enum GuiUtilities {
 						current = start;
 						break;
 					case PathIterator.SEG_LINETO:
-						if (current == null) throw BecauseOf.unexpected();
+						if (current == null) throw new InternalError();
 						buffer.pos(current.getX(), current.getY(), z).color(r, g, b, a).endVertex();
 						buffer.pos(segment[0], segment[1], z).color(r, g, b, a).endVertex();
 						current = new Point2D.Double(segment[0], segment[1]);
 						break;
 					case PathIterator.SEG_CLOSE:
-						if (current == null) throw BecauseOf.unexpected();
+						if (current == null) throw new InternalError();
 						buffer.pos(current.getX(), current.getY(), z).color(r, g, b, a).endVertex();
 						buffer.pos(start.getX(), start.getY(), z).color(r, g, b, a).endVertex();
 						current = start;
 						break;
 					default:
-						throw BecauseOf.unexpected();
+						throw new InternalError();
 				}
 				path.next();
 			}

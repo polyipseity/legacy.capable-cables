@@ -3,7 +3,6 @@ package $group__.common.registrables.items;
 import $group__.client.gui.debug.GuiComponentDebug;
 import $group__.common.registrables.blocks.BlocksThis;
 import $group__.common.registrables.items.groups.ItemGroupsThis;
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.RegistryObject;
@@ -19,7 +18,7 @@ public enum ItemsThis {
 
 	public static final RegistryObject<Item> WRENCH = ITEMS.register("wrench", ItemWrench::new);
 
-	public static final RegistryObject<Item> CABLE = ITEMS.register(BlocksThis.CABLE.getId().getPath(), () -> new BlockItem(BlocksThis.CABLE.orElseThrow(BecauseOf::unexpected), new Item.Properties().group(ItemGroupsThis.DEFAULT)));
+	public static final RegistryObject<Item> CABLE = ITEMS.register(BlocksThis.CABLE.getId().getPath(), () -> new BlockItem(BlocksThis.CABLE.orElseThrow(InternalError::new), new Item.Properties().group(ItemGroupsThis.DEFAULT)));
 
 	// todo add debug flag
 	@SuppressWarnings("unused")

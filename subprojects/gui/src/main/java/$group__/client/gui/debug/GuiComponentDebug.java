@@ -8,7 +8,6 @@ import $group__.client.gui.components.roots.GuiRoot;
 import $group__.client.gui.components.roots.GuiRootWindows;
 import $group__.client.gui.structures.AffineTransformStack;
 import $group__.client.gui.traits.handlers.IGuiLifecycleHandler;
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -205,7 +204,7 @@ final class BlockDebug extends Block {
 			if (tileEntity instanceof INamedContainerProvider)
 				NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) tileEntity, tileEntity.getPos());
 			else
-				throw BecauseOf.unexpected();
+				throw new InternalError();
 		}
 		return ActionResultType.SUCCESS;
 	}

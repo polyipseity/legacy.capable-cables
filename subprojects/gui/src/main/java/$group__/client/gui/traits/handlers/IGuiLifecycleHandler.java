@@ -1,7 +1,6 @@
 package $group__.client.gui.traits.handlers;
 
 import $group__.client.gui.components.GuiComponent;
-import $group__.utilities.specific.ThrowableUtilities.BecauseOf;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;
@@ -31,14 +30,14 @@ public interface IGuiLifecycleHandler {
 
 		@Override
 		@Deprecated
-		public void tick(GuiComponent<?> invoker) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
+		public void tick(GuiComponent<?, ?> invoker) throws UnsupportedOperationException { throw new UnsupportedOperationException(); }
 
 		@Override
 		@Deprecated
-		public void close(GuiComponent<?> invoker) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
+		public void close(GuiComponent<?, ?> invoker) throws UnsupportedOperationException { throw new UnsupportedOperationException(); }
 
 		@Override
 		@Deprecated
-		public void destroy(GuiComponent<?> invoker) throws UnsupportedOperationException { throw BecauseOf.unsupportedOperation(); }
+		public void destroy(GuiComponent<?, ?> invoker) throws UnsupportedOperationException { throw new UnsupportedOperationException(); }
 	}
 }
