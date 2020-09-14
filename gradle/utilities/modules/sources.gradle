@@ -29,7 +29,7 @@ project.ext.makeSourcesTasks = { Closure c ->
 
 			doLast {
 				destinationDir.eachFileRecurse(FileType.FILES) {
-					it.writable true, false
+					it.setWritable true, false
 					// COMMENT standard
 					it.text = it.text.replace('\\', '\\\\').replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }.replaceAll ~/\$(?!\{)/, '\\\\\\$'
 				}
@@ -75,7 +75,7 @@ project.ext.makeSourcesTasks = { Closure c ->
 			destinationDir = file "$buildDir${separator}replaced"
 
 			if (createNewFile.call(archivePath)) {
-				archivePath.writable true, false
+				archivePath.setWritable true, false
 				archivePath.text = 'PK\u0005\u0006\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000'
 			}
 			gradle.projectsEvaluated { rootProject.dependencies.replaced files(archivePath) }
