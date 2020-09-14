@@ -81,6 +81,7 @@
 			<xs:sequence>
 				<xs:group ref="ui:propertyContainerGroup"/>
 				<xs:element ref="ui:renderer" minOccurs="0"/>
+				<xs:element ref="ui:anyContainer" minOccurs="0"/>
 			</xs:sequence>
 			<xs:attributeGroup ref="ui:classBasedAttributeGroup"/>
 		</xs:complexType>

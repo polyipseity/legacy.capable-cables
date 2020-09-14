@@ -35,13 +35,11 @@ import $group__.utilities.structures.NamespacePrefixedString;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.*;
-import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Unmarshaller;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 import java.awt.geom.AffineTransform;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
@@ -114,33 +112,31 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		return getRoot()
 				.map(root ->
 						Try.call(() -> {
-							IParserContext ctx = new ImmutableParserContext(getAliases());
-							View v = root.getView();
-							Component c = root.getComponent();
-							@SuppressWarnings("unchecked") T ret = (T) createView(ctx, v); // COMMENT should be checked
-							ret.setManager(
-									CastUtilities.castUnchecked(createComponent(ctx, c)) // COMMENT may throw
+							IParserContext viewContext = new ImmutableParserContext(EnumHandlerType.VIEW_HANDLER, getAliases(), getHandlers().asMap());
+							IParserContext componentContext = new ImmutableParserContext(EnumHandlerType.COMPONENT_HANDLER, getAliases(), getHandlers().asMap());
+							View viewRaw = root.getView();
+							Component componentRaw = root.getComponent();
+							@SuppressWarnings("unchecked") T view = (T) createView(viewContext, viewRaw); // COMMENT should be checked
+							view.setManager(
+									CastUtilities.castUnchecked(createComponent(viewContext, componentRaw)) // COMMENT may throw
 							);
-							Iterables.concat(v.getExtension(), Optional.ofNullable(v.getAnyContainer())
-									.map(AnyContainer::getAny)
-									.orElseGet(ImmutableList::of))
-									.forEach(t -> {
-												boolean element = t instanceof JAXBElement;
-												Optional.ofNullable(
-														getHandlers().getIfPresent(element ? EnumHandlerType.VIEW_ELEMENT_HANDLER : EnumHandlerType.VIEW_HANDLER))
-														.map(map -> map.get(element ? ((JAXBElement<?>) t).getDeclaredType() : t.getClass()))
-														.ifPresent(h -> h.accept(
-																ctx,
-																CastUtilities.castUnchecked(ret), // COMMENT may throw
-																CastUtilities.castUnchecked(t) // COMMENT should not throw
-														));
-											}
+							Iterables.concat(
+									viewRaw.getExtension(),
+									Optional.ofNullable(viewRaw.getAnyContainer())
+											.map(AnyContainer::getAny)
+											.orElseGet(ImmutableList::of))
+									.forEach(any -> IParserContext.StaticHolder.findHandler(viewContext, any)
+											.ifPresent(handler -> handler.accept(
+													viewContext,
+													CastUtilities.castUnchecked(view), // COMMENT may throw
+													CastUtilities.castUnchecked(any) // COMMENT should not throw
+											))
 									);
-							final IUIComponent[] cc = {ret.getManager()
+							final IUIComponent[] cc = {view.getManager()
 									.orElseThrow(IllegalStateException::new)};
-							TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, c,
+							TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, componentRaw,
 									n -> {
-										IUIComponent component = c.equals(n)
+										IUIComponent component = componentRaw.equals(n)
 												? cc[0]
 												: CastUtilities.castChecked(IUIComponentContainer.class, cc[0])
 												.map(IUIComponentContainer::getNamedChildrenMapView)
@@ -155,21 +151,16 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 												Optional.ofNullable(n.getAnyContainer())
 														.map(AnyContainer::getAny)
 														.orElseGet(ImmutableList::of))
-												.forEach(t -> {
-													boolean element = t instanceof JAXBElement;
-													Optional.ofNullable(
-															getHandlers().getIfPresent(element ? EnumHandlerType.COMPONENT_ELEMENT_HANDLER : EnumHandlerType.COMPONENT_HANDLER))
-															.map(map -> map.get(element ? ((JAXBElement<?>) t).getDeclaredType() : t.getClass()))
-															.ifPresent(h -> h.accept(
-																	ctx,
-																	CastUtilities.castUnchecked(component), // COMMENT may throw
-																	CastUtilities.castUnchecked(t) // COMMENT should not throw
-															));
-												});
+												.forEach(any -> IParserContext.StaticHolder.findHandler(componentContext, any)
+														.ifPresent(handler -> handler.accept(
+																componentContext,
+																CastUtilities.castUnchecked(component), // COMMENT may throw
+																CastUtilities.castUnchecked(any) // COMMENT should not throw
+														)));
 										return n;
 									},
 									n -> {
-										if (!c.equals(n))
+										if (!componentRaw.equals(n))
 											cc[0] = CastUtilities.castChecked(IUIComponentContainer.class, cc[0])
 													.map(IUIComponentContainer::getNamedChildrenMapView)
 													.map(m -> AssertionUtilities.assertNonnull(m.get(n.getId())))
@@ -177,16 +168,16 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 										return n.getComponent();
 									},
 									(p, ch) -> {
-										if (!c.equals(p))
+										if (!componentRaw.equals(p))
 											cc[0] = cc[0].getParent()
 													.orElseThrow(AssertionError::new);
 										return p;
 									}, n -> {
 										throw ThrowableUtilities.BecauseOf.illegalArgument("Cyclic hierarchy detected",
 												"n", n,
-												"c", c);
+												"componentRaw", componentRaw);
 									});
-							return ret;
+							return view;
 						}, LOGGER)
 								.orElseThrow(ThrowableCatcher::rethrow))
 				.orElseThrow(() -> new IllegalStateException("Prototype has not been created"));
@@ -408,9 +399,6 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 	protected ConcurrentMap<String, Class<?>> getAliases() { return aliases; }
 
 	@Override
-	public Map<String, Class<?>> getAliasesView() { return ImmutableMap.copyOf(getAliases()); }
-
-	@Override
 	public <H> void addHandler(Set<EnumHandlerType> types, Class<H> clazz, IConsumer3<? super IParserContext, ?, ? super H> handler) {
 		types.forEach(type ->
 				getHandlers().getUnchecked(type).put(clazz, handler));
@@ -421,29 +409,6 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 
 		private static final Logger LOGGER = LogManager.getLogger();
 
-		/*
-			protected static IGeneralPrototype create(@SuppressWarnings("unused") IUIDOMPrototypeParser<?> parser, Node node) {
-		return new ShapeAnchorPrototype(
-				DOMUtilities.getAttributeValue(node, "target")
-						.orElseThrow(InternalError::new),
-				t -> new ShapeAnchor(t,
-						EnumUISide.valueOf(DOMUtilities.getAttributeValue(node, "originSide")
-								.orElseThrow(InternalError::new)),
-						EnumUISide.valueOf(DOMUtilities.getAttributeValue(node, "targetSide")
-								.orElseThrow(InternalError::new)),
-						Double.parseDouble(DOMUtilities.getAttributeValue(node, "borderThickness")
-								.orElseThrow(InternalError::new))));
-	}
-
-	@Override
-	public void construct(List<Consumer<? super IUIComponentManager<?>>> queue, IUIComponent container) {
-		queue.add(m ->
-				IUIComponentManager.getComponentByID(m, getTarget())
-						.ifPresent(t ->
-								m.getShapeAnchorController().addAnchors(container,
-										ImmutableSet.of(getGenerator().apply(t)))));
-	}
-		 */
 		public static void handleAnchor(@SuppressWarnings("unused") IParserContext context, Object container, Anchor object) {
 			if (!(container instanceof IUIComponent))
 				return;
@@ -507,26 +472,20 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 						throw new InternalError();
 				}
 			}, LOGGER).orElseThrow(ThrowableCatcher::rethrow);
+			Iterables.concat(
+					Optional.ofNullable(object.getRenderer())
+							.map(ImmutableSet::of)
+							.orElseGet(ImmutableSet::of),
+					Optional.ofNullable(object.getAnyContainer())
+							.map(AnyContainer::getAny)
+							.orElseGet(ImmutableList::of))
+					.forEach(any -> IParserContext.StaticHolder.findHandler(context, any)
+							.ifPresent(handler -> handler.accept(
+									context,
+									CastUtilities.castUnchecked(ret), // COMMENT may throw
+									CastUtilities.castUnchecked(any) // COMMENT should not throw
+							)));
 			((IExtensionContainer<?>) container).addExtension(CastUtilities.castUnchecked(ret)); // COMMENT addExtension should check
 		}
-	}
-
-	@SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
-	@Immutable
-	public interface IParserContext {
-		Map<String, Class<?>> getAliases();
-	}
-
-	@Immutable
-	public static class ImmutableParserContext
-			implements IParserContext {
-		protected final Map<String, Class<?>> aliases;
-
-		public ImmutableParserContext(Map<String, Class<?>> aliases) {
-			this.aliases = ImmutableMap.copyOf(aliases);
-		}
-
-		@Override
-		public Map<String, Class<?>> getAliases() { return aliases; }
 	}
 }

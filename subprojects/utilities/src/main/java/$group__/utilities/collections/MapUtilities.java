@@ -5,10 +5,7 @@ import $group__.utilities.LoopUtilities;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.MapMaker;
+import com.google.common.collect.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassWriter;
@@ -17,6 +14,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.signature.SignatureVisitor;
 import org.objectweb.asm.signature.SignatureWriter;
 
+import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.util.*;
@@ -40,7 +38,7 @@ public enum MapUtilities {
 	public static MapMaker newMapMakerNormalThreaded() { return new MapMaker().concurrencyLevel(NORMAL_THREAD_THREAD_COUNT); }
 
 	@SafeVarargs
-	public static <K, V> Map<K, V> concatMaps(Map<? extends K, ? extends V>... maps) {
+	public static <K, V> ImmutableMap<K, V> concatMaps(Map<? extends K, ? extends V>... maps) {
 		List<Iterable<? extends K>> keys = new ArrayList<>(maps.length);
 		List<Iterable<? extends V>> values = new ArrayList<>(maps.length);
 		int size = 0;
@@ -53,7 +51,7 @@ public enum MapUtilities {
 		return stitchKeysValues(size, Iterables.concat(keys), Iterables.concat(values));
 	}
 
-	public static <K, V> Map<K, V> stitchKeysValues(int size, Iterable<? extends K> keys, Iterable<? extends V> values) {
+	public static <K, V> ImmutableMap<K, V> stitchKeysValues(int size, Iterable<? extends K> keys, Iterable<? extends V> values) {
 		Map<K, V> ret = new HashMap<>(size);
 
 		Iterator<? extends V> iteratorValues = values.iterator();
@@ -69,7 +67,7 @@ public enum MapUtilities {
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static <K, V> Map<V, K> inverse(Map<K, V> instance)
+	public static <K, V> ImmutableMap<V, K> inverse(Map<K, V> instance)
 			throws IllegalArgumentException {
 		return instance.entrySet().stream().sequential()
 				.collect(ImmutableMap.toImmutableMap(Map.Entry::getValue, Map.Entry::getKey));
@@ -78,6 +76,16 @@ public enum MapUtilities {
 	@SuppressWarnings("unchecked")
 	public static <K, V> BiMap<K, V> newBiMap(Map<K, V> forward, Map<V, K> backward) {
 		return (BiMap<K, V>) PublicAbstractBiMapHolder.CONSTRUCTOR.apply(forward, backward); // COMMENT should be safe
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	public static <K> ImmutableMap<K, ?> immutableDeepCopyOf(Map<K, ?> instance) {
+		return instance.entrySet().stream().sequential()
+				.map(entry -> {
+					@Nullable Object value = entry.getValue();
+					return Maps.immutableEntry(entry.getKey(), value instanceof Map ? immutableDeepCopyOf(((Map<?, ?>) value)) : value);
+				})
+				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
 	public enum PublicAbstractBiMapHolder {

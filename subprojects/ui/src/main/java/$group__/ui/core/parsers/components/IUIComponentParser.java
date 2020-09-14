@@ -15,6 +15,7 @@ import jakarta.xml.bind.JAXBContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
@@ -22,23 +23,30 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import java.io.InputStream;
 import java.util.EnumSet;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public interface IUIComponentParser<T, R>
 		extends IUIResourceParser<T, R> {
 
-	Map<String, Class<?>> getAliasesView();
-
-	<H> void addHandler(Set<EnumHandlerType> types, Class<H> clazz, IConsumer3<? super UIDefaultComponentParser.IParserContext, ?, ? super H> handler);
+	<H> void addHandler(Set<EnumHandlerType> types, Class<H> clazz, IConsumer3<? super IParserContext, ?, ? super H> handler);
 
 	@Immutable
 	enum EnumHandlerType {
-		VIEW_HANDLER(false),
-		COMPONENT_HANDLER(false),
-		VIEW_ELEMENT_HANDLER(true),
-		COMPONENT_ELEMENT_HANDLER(true),
+		VIEW_HANDLER(false) {
+			@Override
+			public EnumHandlerType getVariant(boolean element) { return element ? VIEW_ELEMENT_HANDLER : VIEW_HANDLER; }
+		},
+		COMPONENT_HANDLER(false) {
+			@Override
+			public EnumHandlerType getVariant(boolean element) { return element ? COMPONENT_ELEMENT_HANDLER : COMPONENT_HANDLER; }
+		},
+		VIEW_ELEMENT_HANDLER(true, VIEW_HANDLER),
+		COMPONENT_ELEMENT_HANDLER(true, COMPONENT_HANDLER),
 		;
+
+		@Nullable
+		protected final EnumHandlerType variantCounterpart;
 
 		public static final ImmutableSet<EnumHandlerType> ALL = Sets.immutableEnumSet(EnumSet.allOf(EnumHandlerType.class));
 		@SuppressWarnings("UnstableApiUsage")
@@ -51,9 +59,22 @@ public interface IUIComponentParser<T, R>
 				.collect(Sets.toImmutableEnumSet());
 		protected final boolean element;
 
-		EnumHandlerType(boolean element) { this.element = element; }
+		EnumHandlerType(boolean element) { this(element, null); }
+
+		EnumHandlerType(boolean element, @Nullable EnumHandlerType variantCounterpart) {
+			this.element = element;
+			this.variantCounterpart = variantCounterpart;
+		}
+
+		public EnumHandlerType getVariant(boolean element) {
+			return getVariantCounterpart().
+					orElseThrow(AssertionError::new)
+					.getVariant(element);
+		}
 
 		public boolean isElement() { return element; }
+
+		private Optional<? extends EnumHandlerType> getVariantCounterpart() { return Optional.ofNullable(variantCounterpart); }
 	}
 
 	enum SchemaHolder {
