@@ -6,7 +6,7 @@ import static java.io.File.separator
 
 apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
 
-makeSourceTasks.call { Task it ->
+makeSourcesTasks.call { Task it ->
 	it.inputs.properties([
 			expand_group: project.group,
 	])

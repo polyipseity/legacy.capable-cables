@@ -4,13 +4,10 @@
 
 import static java.io.File.separator
 
-
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['stringToStringMap', 'evaluateGString'])
 
-
 apply plugin: 'net.minecraftforge.gradle'
-
 
 minecraft {
     // The mappings can be changed at any time, and must be in the following format.

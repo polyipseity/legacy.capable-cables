@@ -9,7 +9,7 @@ apply from: "$utilitiesDir${separator}io${separator}io.gradle"
 apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
 apply from: "$modulesDir${separator}optional${separator}jaxb.gradle"
 
-makeSourceTasks.call { Task it ->
+makeSourcesTasks.call { Task it ->
 	it.inputs.properties([
 			expand_group    : project.group,
 			expand_buildType: buildType,

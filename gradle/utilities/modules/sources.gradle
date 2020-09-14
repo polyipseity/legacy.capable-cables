@@ -9,7 +9,7 @@ import static java.io.File.separator
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['evaluateGStringString', 'createNewFile'])
 
-project.ext.makeSourceTasks = { Closure c ->
+project.ext.makeSourcesTasks = { Closure c ->
 	tasks.withType(AbstractCompile) { AbstractCompile t ->
 		// COMMENT Avoid messing around internal tasks.
 		if (name.contains('_')) return
@@ -58,6 +58,13 @@ project.ext.makeSourceTasks = { Closure c ->
 			}
 		} as Sync
 		t.dependsOn process
+
+		afterEvaluate {
+			t.dependsOn.each {
+				if (it != process)
+					pre.mustRunAfter it
+			}
+		}
 
 		t.source = process.destinationDir
 

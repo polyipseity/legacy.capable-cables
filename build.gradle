@@ -24,7 +24,6 @@ buildscript {
 
 plugins {
 	id 'com.github.johnrengelman.shadow' version '4.0.4' apply false
-	id 'io.freefair.lombok' version '2.9.5' apply false
 }
 
 configurations {
@@ -35,8 +34,6 @@ configurations {
 }
 
 allprojects {
-	apply plugin: 'io.freefair.lombok'
-
 	ext {
 		utilitiesDir = "$rootDir${separator}gradle${separator}utilities".toString()
 		modulesDir = "$utilitiesDir${separator}modules".toString()
@@ -60,7 +57,7 @@ allprojects {
 	apply from: "$modulesDir${separator}repositories.gradle"
 	apply from: "$modulesDir${separator}dependencies.gradle"
 
-	apply from: "$modulesDir${separator}source.gradle"
+	apply from: "$modulesDir${separator}sources.gradle"
 	apply from: "$modulesDir${separator}resources.gradle"
 	apply from: "$modulesDir${separator}javadoc.gradle"
 

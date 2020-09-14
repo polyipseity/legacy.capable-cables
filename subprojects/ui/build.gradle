@@ -13,7 +13,7 @@ apply from: "$modulesDir${separator}optional${separator}jaxb.gradle"
 // COMMENT XJC
 File xjcMainComponentsGeneratedDir = file "${getGeneratedDirectory.call 'main'}${separator}xjc_components"
 String xjcMainComponentsContextPath = "${jaxbPackagePrefix}.components"
-sourceSets.main.java.srcDirs xjcMainComponentsGeneratedDir
+sourceSets.main.java.srcDir xjcMainComponentsGeneratedDir
 tasks.compileJava.dependsOn createJaxbXJCTask.call('xjcMainComponents',
 		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/components*.xsd' }.files },
 		xjcMainComponentsGeneratedDir,
@@ -33,7 +33,7 @@ tasks.compileJava.dependsOn createJaxbXJCTask.call('xjcMainComponents',
 		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/components*.xjb' }.files })
 
 
-makeSourceTasks.call { Task it ->
+makeSourcesTasks.call { Task it ->
 	it.inputs.properties([
 			expand_group                       : project.group,
 			expand_buildType                   : buildType,
