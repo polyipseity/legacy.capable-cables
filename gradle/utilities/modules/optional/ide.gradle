@@ -10,7 +10,7 @@ afterEvaluate {
 	eclipse.classpath { downloadSources = downloadJavadoc = true }
 	idea.module {
 		downloadSources = downloadJavadoc = true
-		excludeDirs += [file(minecraftRunDir), file(repositoryDirectoryLocal)]
+		excludeDirs += [file(minecraftRunDirectory), file(repositoryDirectoryLocal)]
 		if (project.ext.has('getGeneratedDirectory')) {
 			sourceSets.each {
 				generatedSourceDirs += file(project.ext.getGeneratedDirectory(it.name)).listFiles().findAll { it.directory }

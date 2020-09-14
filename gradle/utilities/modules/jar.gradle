@@ -9,23 +9,21 @@ checkApply.call([])
 
 apply plugin: 'com.github.johnrengelman.shadow'
 
+task deobfJar(type: Jar, dependsOn: tasks.jar) {
+	from sourceSets.main.java.outputDir
+	classifier 'dev'
+}
+task sourceJar(type: Jar, dependsOn: tasks.jar) {
+	from tasks.compileJava.source
+	classifier 'sources'
+}
+task javadocJar(type: Jar, dependsOn: tasks.javadoc) {
+	from tasks.javadoc.destinationDir
+	classifier 'javadoc'
+}
+
 // COMMENT append
 afterEvaluate {
-	task deobfJar(type: Jar, dependsOn: tasks.jar) {
-		from sourceSets.main.java.outputDir
-		classifier 'dev'
-	}
-
-	task sourceJar(type: Jar, dependsOn: tasks.jar) {
-		from tasks.compileJava.source
-		classifier 'sources'
-	}
-
-	task javadocJar(type: Jar, dependsOn: tasks.javadoc) {
-		from tasks.javadoc.destinationDir
-		classifier 'javadoc'
-	}
-
 	tasks.withType(org.gradle.jvm.tasks.Jar) { org.gradle.jvm.tasks.Jar t ->
 		if (buildType == 'RELEASE') exclude { it.file != null && it.directory ? it.path.contains('$') : it.path.endsWith('.in') }
 		artifacts.archives t

@@ -36,17 +36,17 @@ minecraft {
 			// Recommended logging level for the console
 			property 'forge.logging.console.level', 'debug'
 
-			args '--mod', modId, '--all', '--output', file('src/generated/resources/')
+			args '--mod', modID, '--all', '--output', file('src/generated/resources/')
 		}
 	}
 
 	afterEvaluate {
 		runs.configureEach {
-			workingDirectory file(minecraftRunDir)
+			workingDirectory file(minecraftRunDirectory)
 			if (project != rootProject) ideaModule "${rootProject.name}${project.path.replace ':', '.'}.main"
 			jvmArgs stringToStringList.call(minecraftJvmArguments) as List<String>
 
-			mods.create(modId) {
+			mods.create(modID) {
 				source sourceSets.main
 
 				configurations.runtimeClasspath.allDependencies.each { dependency ->

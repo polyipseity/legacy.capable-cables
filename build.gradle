@@ -66,12 +66,13 @@ allprojects {
 
 	apply from: "$modulesDir${separator}optional${separator}ide.gradle"
 
+	ext {
+		mainSubproject = project rootProject.ext.mainSubprojectPath
+	}
 
 	// COMMENT append
 	afterEvaluate { storeExt.call() }
 }
-
-apply from: "$utilitiesDir${separator}throwable.gradle"
 
 ext {
 	// COMMENT game
@@ -80,30 +81,36 @@ ext {
 	minecraftVersionMajor = minecraftVersions.first().toInteger()
 	minecraftVersionMinor = minecraftVersions[1].toInteger()
 	// COMMENT mod
-	modId = project.name
+	modID = project.name
 }
 
-apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
-apply from: "$modulesDir${separator}optional${separator}api.gradle"
-apply from: "$modulesDir${separator}optional${separator}publishing.gradle"
+apply from: "$utilitiesDir${separator}throwable.gradle"
 
-afterEvaluate {
-	Project pSub = project(subprojectMain)
-	if (pSub != project) {
-		evaluationDependsOn subprojectMain
-		pSub.tasks.each {
-			Task t = tasks.findByName(it.name)
-			if (t != null) {
-				t.dependsOn it
-				t.configure { enabled false }
-			} else task it.name, dependsOn: it
+apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
+
+if (mainSubproject == project) {
+	apply from: "$modulesDir${separator}optional${separator}publishing.gradle"
+
+	afterEvaluate {
+		writePOM()
+	}
+} else {
+	afterEvaluate {
+		mainSubproject.tasks.configureEach { Task subprojectTask ->
+			try {
+				TaskProvider<? extends Task> projectTask = tasks.named subprojectTask.name
+				projectTask.configure {
+					dependsOn subprojectTask
+					enabled false
+				}
+			} catch (UnknownTaskException ex) {
+				caughtThrowable ex
+				tasks.register(subprojectTask.name) {
+					it.group subprojectTask.group
+					it.dependsOn subprojectTask
+				}
+			}
 		}
-		pSub.tasks.whenTaskAdded { Task tSub ->
-			Task t = tasks.findByName(tSub.name)
-			if (t != null) {
-				t.dependsOn tSub
-				t.configure { enabled false }
-			} else task tSub.name, dependsOn: tSub
-		}
+		evaluationDependsOn mainSubproject.path
 	}
 }

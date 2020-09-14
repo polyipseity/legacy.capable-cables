@@ -59,7 +59,7 @@ afterEvaluate {
 		exclude 'dummyThing' // COMMENT dumb dummy
 		manifest {
 			attributes([
-					'Specification-Title'     : modId,
+					'Specification-Title'     : modID,
 					'Specification-Vendor'    : project.group,
 					'Specification-Version'   : version,
 					'Implementation-Title'    : project.name,

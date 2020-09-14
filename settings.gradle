@@ -9,3 +9,5 @@ include ':subprojects:annotations:processors'
 include ':subprojects:utilities'
 include ':subprojects:ui'
 include ':subprojects:product'
+
+enableFeaturePreview 'STABLE_PUBLISHING'
