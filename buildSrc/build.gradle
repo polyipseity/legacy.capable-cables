@@ -38,7 +38,7 @@ void updateGradleWrapperDistributionUrl(String newDistributionUrl) {
 		properties.distributionUrl = newDistributionUrl
 		FileOutputStream fos = new FileOutputStream(propertiesFile)
 		try {
-			properties.store fos, null
+			properties.store fos, ' suppress inspection "UnusedProperty" for whole file'
 		} finally {
 			fos.close()
 		}
