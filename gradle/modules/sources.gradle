@@ -67,14 +67,7 @@ project.ext.makeSourcesTasks = { Closure c ->
 		}
 		t.dependsOn process
 
-		pre.configure {
-			Closure action = { mustRunAfter t.dependsOn.findAll { it != process } }
-			if (project.state.executed)
-				action()
-			else {
-				afterEvaluate action
-			}
-		}
+		pre.configure { mustRunAfter t.dependsOn.findAll { it != process } }
 
 		t.source = process.get().destinationDir
 
