@@ -67,9 +67,12 @@ project.ext.makeSourcesTasks = { Closure c ->
 		}
 		t.dependsOn process
 
-		afterEvaluate {
-			pre.configure {
-				mustRunAfter t.dependsOn.findAll { it != process.get() }
+		pre.configure {
+			Closure action = { mustRunAfter t.dependsOn.findAll { it != process } }
+			if (project.state.executed)
+				action()
+			else {
+				afterEvaluate action
 			}
 		}
 
@@ -90,19 +93,17 @@ project.ext.makeSourcesTasks = { Closure c ->
 			gradle.projectsEvaluated { rootProject.dependencies.replaced files(archivePath) }
 		}
 
-		tasks.withType(Javadoc).configureEach { Javadoc t2 ->
+		tasks.withType(Javadoc).configureEach { Javadoc javadoc ->
 			boolean replaced = false
-			t2.source = t2.source.findAll {
+			javadoc.source = javadoc.source.findAll {
 				boolean r = false
 				String p = it.canonicalPath
-				sourceSet.each {
-					if (r) return
-					r = p.contains(it.canonicalPath)
-				}
+				r = sourceSet.any { p.contains it.canonicalPath }
 				replaced |= r
 				!r
 			}
-			if (replaced) t2.source process.get().destinationDir
+			if (replaced)
+				javadoc.source process.get().destinationDir
 		}
 	}
 }

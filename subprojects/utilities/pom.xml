@@ -12,16 +12,16 @@
 			<artifactId>forge</artifactId>
 			<version>1.15.2-31.2.31_mapped_snapshot_20200514-1.15.1</version>
 			<scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.minecraftforge</groupId>
-      <artifactId>forge</artifactId>
-      <version>1.15.2-31.2.31_mapped_snapshot_20200514-1.15.1</version>
-      <classifier>launcher</classifier>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.glassfish.jaxb</groupId>
+		</dependency>
+		<dependency>
+			<groupId>net.minecraftforge</groupId>
+			<artifactId>forge</artifactId>
+			<version>1.15.2-31.2.31_mapped_snapshot_20200514-1.15.1</version>
+			<classifier>launcher</classifier>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jaxb</groupId>
       <artifactId>jaxb-runtime</artifactId>
       <version>3.0.0-M4</version>
       <scope>runtime</scope>

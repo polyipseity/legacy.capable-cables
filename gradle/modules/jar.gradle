@@ -19,7 +19,7 @@ tasks.register('deobfJar', Jar) {
 }
 tasks.register('sourceJar', Jar) {
 	dependsOn jar
-	from sourceSets.main.java.srcDirs
+	from sourceSets.main.allSource.srcDirs
 	classifier 'source'
 }
 tasks.register('javadocJar', Jar) {

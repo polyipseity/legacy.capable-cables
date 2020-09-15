@@ -2,16 +2,16 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
          xmlns="http://maven.apache.org/POM/4.0.0">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables</groupId>
-	<artifactId>product</artifactId>
-	<version>0.0.1</version>
-	<dependencies>
-		<dependency>
-			<groupId>net.minecraftforge</groupId>
-			<artifactId>forge</artifactId>
-			<version>1.15.2-31.2.31_mapped_snapshot_20200514-1.15.1</version>
-			<scope>compile</scope>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables</groupId>
+  <artifactId>product</artifactId>
+  <version>0.0.1</version>
+  <dependencies>
+    <dependency>
+      <groupId>net.minecraftforge</groupId>
+      <artifactId>forge</artifactId>
+      <version>1.15.2-31.2.31_mapped_snapshot_20200514-1.15.1</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>net.minecraftforge</groupId>
