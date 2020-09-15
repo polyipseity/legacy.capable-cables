@@ -10,7 +10,7 @@ apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['evaluateGStringString', 'createNewFile'])
 
 project.ext.makeSourcesTasks = { Closure c ->
-	tasks.withType(AbstractCompile) { AbstractCompile t ->
+	tasks.withType(AbstractCompile).configureEach { AbstractCompile t ->
 		// COMMENT Avoid messing around internal tasks.
 		if (name.contains('_')) return
 
@@ -23,7 +23,10 @@ project.ext.makeSourcesTasks = { Closure c ->
 
 		Set<File> sourceSet = sourceSets."$sourceSetName"."${language.uncapitalize()}".srcDirs
 
-		Sync pre = task("preProcess${name.capitalize()}", type: Sync, description: "Prepare sources for processing $sourceSetName $language.") {
+		def pre = tasks.register("preProcess${name.capitalize()}", Sync) {
+			group t.group
+			description "Prepare sources for processing $sourceSetName $language."
+
 			from sourceSet
 			into temporaryDir
 
@@ -34,13 +37,17 @@ project.ext.makeSourcesTasks = { Closure c ->
 					it.text = it.text.replace('\\', '\\\\').replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }.replaceAll ~/\$(?!\{)/, '\\\\\\$'
 				}
 			}
-		} as Sync
+		}
 
-		Sync process = task("process${name.capitalize()}", type: Sync, description: "Process $sourceSetName $language.", dependsOn: pre) {
+		def process = tasks.register("process${name.capitalize()}", Sync) {
+			group t.group
+			description "Process $sourceSetName $language."
+			dependsOn pre
+
 			configure c
 
 			into temporaryDir
-			from(pre.temporaryDir) {
+			from(pre.get().temporaryDir) {
 				if (buildType == 'DEBUG') inputs.property 'expand_group', '$group__'
 				Map<String, Object> e = inputs.properties
 						.findAll { it.key.startsWith 'expand_' }
@@ -57,20 +64,22 @@ project.ext.makeSourcesTasks = { Closure c ->
 					it.path = "$parent$separator${evaluateGStringString.call it.name, eb}"
 				}
 			}
-		} as Sync
+		}
 		t.dependsOn process
 
 		afterEvaluate {
-			t.dependsOn.each {
-				if (it != process)
-					pre.mustRunAfter it
+			pre.configure {
+				mustRunAfter t.dependsOn.findAll { it != process.get() }
 			}
 		}
 
-		t.source = process.destinationDir
+		t.source = process.get().destinationDir
 
-		t.finalizedBy task("postProcess${name.capitalize()}", type: Jar, description: "Finalize after processing $sourceSetName $language.") {
-			from process.destinationDir
+		t.finalizedBy tasks.register("postProcess${name.capitalize()}", Jar) {
+			group t.group
+			description "Finalize after processing $sourceSetName $language."
+
+			from process.get().destinationDir
 			classifier "$sourceSetName$language"
 			destinationDir = file "$buildDir${separator}replaced"
 
@@ -81,7 +90,7 @@ project.ext.makeSourcesTasks = { Closure c ->
 			gradle.projectsEvaluated { rootProject.dependencies.replaced files(archivePath) }
 		}
 
-		tasks.withType(Javadoc) { Javadoc t2 ->
+		tasks.withType(Javadoc).configureEach { Javadoc t2 ->
 			boolean replaced = false
 			t2.source = t2.source.findAll {
 				boolean r = false
@@ -93,14 +102,14 @@ project.ext.makeSourcesTasks = { Closure c ->
 				replaced |= r
 				!r
 			}
-			if (replaced) t2.source process.destinationDir
+			if (replaced) t2.source process.get().destinationDir
 		}
 	}
 }
 
 // COMMENT append
 afterEvaluate {
-	tasks.withType(AbstractCompile) {
+	tasks.withType(AbstractCompile).configureEach {
 		options.fork = false
 		options.compilerArgs << '-Xlint'
 

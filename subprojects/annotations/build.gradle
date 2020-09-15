@@ -4,6 +4,7 @@
 
 import static java.io.File.separator
 
+apply from: "$utilitiesDir${separator}throwable.gradle"
 apply from: "$utilitiesDir${separator}io${separator}io.gradle"
 
 apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"

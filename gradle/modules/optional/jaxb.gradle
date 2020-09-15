@@ -13,7 +13,7 @@ ext {
 
 configurations {
 	jaxb
-	compileOnly.extendsFrom configurations.jaxb as Configuration
+	compileOnly.extendsFrom jaxb
 }
 
 dependencies {
@@ -29,11 +29,13 @@ dependencies {
 	jaxb "org.glassfish.jaxb:jaxb-jxc:$version"
 }
 
-task xjc
-task jxc
+def xjc = tasks.register 'xjc'
+def jxc = tasks.register 'jxc'
 
 project.ext.createJaxbXJCTask = { String taskName, Collection<?> sources, File destDir, Collection<String> options = [], Collection<?> bindInfo = [] ->
-	tasks.xjc.dependsOn tasks.create(name: taskName, type: JavaExec, group: 'jaxb') {
+	def task = tasks.register(taskName, JavaExec) {
+		group 'jaxb'
+
 		List<File> s = sources.collectMany { files(it).files }
 		List<File> b = bindInfo.collectMany { files(it).files }
 
@@ -55,10 +57,14 @@ project.ext.createJaxbXJCTask = { String taskName, Collection<?> sources, File d
 			clearDirectory.call destDir
 		}
 	}
+	xjc.configure { dependsOn task }
+	task
 }
 
 project.ext.createJaxbJXCTask = { String taskName, Collection<?> sources, File destDir, Collection<String> options = [] ->
-	tasks.jxc.dependsOn tasks.create(name: taskName, type: JavaExec, group: 'jaxb') {
+	def task = tasks.register(taskName, JaxaExec) {
+		group 'jaxb'
+
 		List<File> s = sources.collectMany { files(it).files }
 
 		inputs.files s
@@ -77,4 +83,6 @@ project.ext.createJaxbJXCTask = { String taskName, Collection<?> sources, File d
 			clearDirectory.call destDir
 		}
 	}
+	jxc.configure { dependsOn task }
+	task
 }

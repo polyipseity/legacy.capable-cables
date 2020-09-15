@@ -2,6 +2,7 @@
 // TITLE Test
 //////////////////////////////////////////////////
 
+def test = tasks.named 'test'
 
 project.ext.makeJUnitPlatformTests = {
 	dependencies {
@@ -10,7 +11,7 @@ project.ext.makeJUnitPlatformTests = {
 		testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
 	}
 
-	test {
+	test.configure {
 		useJUnitPlatform()
 		testLogging {
 			events 'started', 'passed', 'skipped', 'failed', 'standard_out', 'standard_error'

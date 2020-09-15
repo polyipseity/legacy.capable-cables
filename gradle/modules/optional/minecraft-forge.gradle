@@ -1,0 +1,74 @@
+//////////////////////////////////////////////////
+// TITLE Minecraft Forge
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply.call(['stringToStringMap', 'evaluateGString'])
+
+apply plugin: 'net.minecraftforge.gradle'
+
+def shadowJar = tasks.named 'shadowJar'
+
+minecraft {
+	// The mappings can be changed at any time, and must be in the following format.
+	// snapshot_YYYYMMDD   Snapshot are built nightly.
+	// stable_#            Stables are built at the discretion of the MCP team.
+	// Use non-default mappings at your own risk. they may not always work.
+	// Simply re-run your setup task after changing the mappings to update your workspace.
+	mappings channel: minecraftMappingsChannel, version: minecraftMappingsVersion
+	// makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+
+	if (!accessTransformerPath.empty) accessTransformer = file accessTransformerPath
+}
+
+dependencies {
+	// Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
+	// that the dep is a ForgeGradle 'patcher' dependency. And its patches will be applied.
+	// The userdev artifact is a special name and will get all sorts of transformations applied to it.
+	minecraft "net.minecraftforge:forge:$minecraftForgeVersion"
+
+	// You may put jars on which you depend on in ./libs or you may define them like so..
+	// compile "some.group:artifact:version:classifier"
+	// compile "some.group:artifact:version"
+
+	// Real examples
+	// compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
+	// compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
+
+	// The 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
+	// provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+	// These dependencies get remapped to your current MCP mappings
+	// deobf 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+	// For more info...
+	// https://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
+	// https://www.gradle.org/docs/current/userguide/dependency_management.html
+}
+
+configurations {
+	shade {
+		canBeResolved true
+		canBeConsumed false
+	}
+}
+
+// COMMENT append
+afterEvaluate {
+	shadowJar.configure {
+		configurations = [project.configurations.shade]
+		// CODE relocate 'org.ejml', 'your.new.package.here.ejml' // COMMENT shading example
+		if (buildType == 'RELEASE') project.configurations.shade.resolvedConfiguration.resolvedArtifacts.each {
+			if (it.moduleVersion.id.group != project.group) {
+				relocate it.moduleVersion.id.group, "${project.group}.shaded${project.path.replace ':', '.'}.${it.moduleVersion.id.group}"
+				relocate it.moduleVersion.id.name, "${project.group}.shaded${project.path.replace ':', '.'}.${it.moduleVersion.id.group}"
+			}
+		}
+		classifier ''
+	}
+
+	// COMMENT patches
+	// COMMENT currently none yay
+}

@@ -1,0 +1,17 @@
+//////////////////////////////////////////////////
+// TITLE Tasks
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply.call(['caughtThrowable'])
+
+project.ext.findNamedTask = { String name ->
+	try {
+		project.tasks.named name
+	} catch (UnknownTaskException ex) {
+		caughtThrowable ex
+		null
+	}
+}

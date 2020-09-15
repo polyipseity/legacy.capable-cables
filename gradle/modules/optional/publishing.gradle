@@ -5,7 +5,7 @@
 import static java.io.File.separator
 
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
-checkApply.call(['createNewFile'])
+checkApply.call(['caughtThrowable', 'createNewFile', 'stringToStringList'])
 
 apply plugin: 'maven-publish'
 
@@ -16,7 +16,7 @@ apply plugin: 'maven-publish'
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
-			project.ext.configurePOM = { Closure action -> action pom }
+			project.ext.configurePOM = { Closure action -> pom action }
 			project.ext.writePOM = { File destination = project.file 'pom.xml' ->
 				pom.withXml {
 					createNewFile destination
@@ -27,13 +27,11 @@ publishing {
 
 			from components.java
 
-			if (tasks.findByPath('shadowJar'))
-				artifact tasks.shadowJar
-			// COMMENT included already, including it again will make the task fail
-			// CODE artifact tasks.jar
-			artifact tasks.deobfJar
-			artifact tasks.javadocJar
-			artifact tasks.sourceJar
+			stringToStringList(publishedJarTaskNames).each { String taskName ->
+				// COMMENT 'jar' is included by the component already, including it again will make the task fail
+				if (taskName != 'jar')
+					artifact tasks[taskName] // COMMENT cannot use Provider
+			}
 		}
 	}
 	repositories {

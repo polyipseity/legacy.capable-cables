@@ -7,6 +7,7 @@ import static java.io.File.separator
 apply from: "$utilitiesDir${separator}miscellaneous.gradle"
 apply from: "$utilitiesDir${separator}globals.gradle"
 apply from: "$utilitiesDir${separator}collections.gradle"
+apply from: "$utilitiesDir${separator}throwable.gradle"
 apply from: "$utilitiesDir${separator}io${separator}io.gradle"
 apply from: "$utilitiesDir${separator}io${separator}properties${separator}properties.gradle"
 apply from: "$utilitiesDir${separator}io${separator}properties${separator}ext.properties.gradle"

@@ -11,17 +11,14 @@ ext {
 	utilitiesDir = "$rootDir${separator}gradle${separator}utilities".toString()
 }
 
-
 apply from: "$utilitiesDir${separator}io${separator}io.gradle"
 apply from: "$utilitiesDir${separator}io${separator}properties${separator}properties.gradle"
 apply from: "$utilitiesDir${separator}io${separator}properties${separator}ext.properties.gradle"
 
-
 loadExt.call "$rootDir${separator}module.properties"
 
-
 void updateGradleWrapperDistributionUrl(String newDistributionUrl) {
-	Wrapper wrapper = tasks.wrapper
+	Wrapper wrapper = tasks.wrapper // COMMENT cannot use Provider
 	Properties properties = new Properties()
 	File propertiesFile = file wrapper.propertiesFile.absolutePath.replace('buildSrc', '')
 	FileInputStream fis = new FileInputStream(propertiesFile)
@@ -32,7 +29,7 @@ void updateGradleWrapperDistributionUrl(String newDistributionUrl) {
 	}
 	String oldDistributionUrl = properties.distributionUrl
 	URL newDistribution = new URL(newDistributionUrl)
-	if (new URL(oldDistributionUrl) != newDistribution) {
+	if (newDistribution != new URL(oldDistributionUrl)) {
 		{ ->
 			HttpURLConnection huc = newDistribution.openConnection() as HttpURLConnection
 			huc.requestMethod = 'HEAD'
@@ -48,7 +45,6 @@ void updateGradleWrapperDistributionUrl(String newDistributionUrl) {
 		throw new IllegalStateException("Gradle wrapper distribution URL updated from '$oldDistributionUrl' to '$newDistributionUrl', re-run the build to apply the changes")
 	}
 }
-
 
 updateGradleWrapperDistributionUrl gradleDistributionUrl
 

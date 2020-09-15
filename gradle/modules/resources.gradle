@@ -8,7 +8,7 @@ apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['evaluateGStringString'])
 
 project.ext.makeResourcesTasks = { Closure c ->
-	tasks.withType(ProcessResources) { ProcessResources t ->
+	tasks.withType(ProcessResources).configureEach { ProcessResources t ->
 		// COMMENT Avoid messing around internal tasks.
 		if (name.contains('_')) return
 
@@ -45,6 +45,8 @@ project.ext.makeResourcesTasks = { Closure c ->
 			}
 		}
 
-		tasks."compile${taskSourceSetName}Java".finalizedBy t // COMMENT fix resources not processed
+		tasks.named("compile${taskSourceSetName}Java").configure {
+			finalizedBy t // COMMENT fix resources not processed
+		}
 	}
 }

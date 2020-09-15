@@ -36,7 +36,9 @@ configurations {
 allprojects {
 	ext {
 		utilitiesDir = "$rootDir${separator}gradle${separator}utilities".toString()
-		modulesDir = "$utilitiesDir${separator}modules".toString()
+		modulesDir = "$rootDir${separator}gradle${separator}modules".toString()
+		// COMMENT mod
+		modID = project.name
 	}
 
 	apply from: "$modulesDir${separator}plugins.gradle"
@@ -80,11 +82,10 @@ ext {
 	String[] minecraftVersions = minecraftVersion.split Pattern.quote('.')
 	minecraftVersionMajor = minecraftVersions.first().toInteger()
 	minecraftVersionMinor = minecraftVersions[1].toInteger()
-	// COMMENT mod
-	modID = project.name
 }
 
 apply from: "$utilitiesDir${separator}throwable.gradle"
+apply from: "$utilitiesDir${separator}gradle${separator}tasks.gradle"
 
 apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
 
@@ -97,14 +98,18 @@ if (mainSubproject == project) {
 } else {
 	afterEvaluate {
 		mainSubproject.tasks.configureEach { Task subprojectTask ->
-			try {
-				TaskProvider<? extends Task> projectTask = tasks.named subprojectTask.name
-				projectTask.configure {
-					dependsOn subprojectTask
-					enabled false
+			def projectTask = findNamedTask subprojectTask.name
+			if (projectTask) {
+				try {
+					projectTask.configure {
+						dependsOn subprojectTask
+						enabled false
+					}
+				} catch (IllegalStateException ex) {
+					// COMMENT task is not configurable
+					caughtThrowable ex
 				}
-			} catch (UnknownTaskException ex) {
-				caughtThrowable ex
+			} else {
 				tasks.register(subprojectTask.name) {
 					it.group subprojectTask.group
 					it.dependsOn subprojectTask

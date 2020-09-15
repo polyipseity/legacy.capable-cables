@@ -4,6 +4,7 @@
 
 import static java.io.File.separator
 
+apply from: "$utilitiesDir${separator}throwable.gradle"
 apply from: "$utilitiesDir${separator}io${separator}io.gradle"
 
 apply from: "$modulesDir${separator}optional${separator}generated.gradle"
@@ -11,11 +12,13 @@ apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
 apply from: "$modulesDir${separator}optional${separator}jaxb.gradle"
 apply from: "$modulesDir${separator}optional${separator}publishing.gradle"
 
+def compileJava = tasks.named 'compileJava'
+
 // COMMENT XJC
 File xjcMainComponentsGeneratedDir = file "${getGeneratedDirectory.call 'main'}${separator}xjc_components"
 String xjcMainComponentsContextPath = "${jaxbPackagePrefix}.components"
 sourceSets.main.java.srcDir xjcMainComponentsGeneratedDir
-tasks.compileJava.dependsOn createJaxbXJCTask.call('xjcMainComponents',
+def xjcMainComponents = createJaxbXJCTask.call('xjcMainComponents',
 		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/components*.xsd' }.files },
 		xjcMainComponentsGeneratedDir,
 		['-extension',
@@ -32,7 +35,7 @@ tasks.compileJava.dependsOn createJaxbXJCTask.call('xjcMainComponents',
 		 // COMMENT -Xpropertyaccessors broken
 		],
 		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/components*.xjb' }.files })
-
+compileJava.configure { dependsOn xjcMainComponents }
 
 makeSourcesTasks.call { Task it ->
 	it.inputs.properties([
