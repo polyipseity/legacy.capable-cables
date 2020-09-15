@@ -22,16 +22,16 @@
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.jaxb</groupId>
-      <artifactId>jaxb-runtime</artifactId>
-      <version>3.0.0-M4</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables</groupId>
-      <artifactId>annotations</artifactId>
-      <version>0.0.1</version>
-      <scope>runtime</scope>
-    </dependency>
+			<artifactId>jaxb-runtime</artifactId>
+			<version>3.0.0-M4</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables</groupId>
+			<artifactId>annotations</artifactId>
+			<version>0.0.1</version>
+			<scope>runtime</scope>
+		</dependency>
     <dependency>
       <groupId>org.reflections</groupId>
       <artifactId>reflections</artifactId>
