@@ -2,14 +2,14 @@ package $group__.ui.debug;
 
 import $group__.ui.UIConfiguration;
 import $group__.ui.UIFacade;
-import $group__.ui.core.mvvm.structures.IAffineTransformStack;
-import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
+import $group__.ui.core.binding.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIViewComponent;
 import $group__.ui.core.mvvm.views.events.IUIEvent;
 import $group__.ui.core.mvvm.views.events.IUIEventKeyboard;
 import $group__.ui.core.mvvm.views.events.IUIEventMouse;
 import $group__.ui.core.parsers.IUIResourceParser;
 import $group__.ui.core.parsers.components.UIRendererConstructor;
+import $group__.ui.core.structures.IAffineTransformStack;
 import $group__.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
 import $group__.ui.minecraft.core.mvvm.views.IUIViewComponentMinecraft;
 import $group__.ui.minecraft.mvvm.adapters.AbstractContainerScreenAdapter;

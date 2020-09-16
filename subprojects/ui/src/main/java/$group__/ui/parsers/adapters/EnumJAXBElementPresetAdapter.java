@@ -1,7 +1,7 @@
 package $group__.ui.parsers.adapters;
 
-import $group__.ui.UIJAXBObjectFactories;
 import $group__.ui.core.parsers.adapters.JAXBAdapterRegistries;
+import $group__.ui.parsers.UIJAXBObjectFactories;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.JAXBUtilities;
 import $group__.utilities.functions.IDuplexFunction;

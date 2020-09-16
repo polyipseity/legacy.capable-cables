@@ -1,6 +1,6 @@
-package $group__.ui.mvvm.structures;
+package $group__.ui.binding;
 
-import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
+import $group__.ui.core.binding.IUIPropertyMappingValue;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 
 import javax.annotation.Nullable;

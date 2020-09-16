@@ -1,4 +1,4 @@
-package $group__.ui.core.mvvm.structures;
+package $group__.ui.core.structures;
 
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.LoggerUtilities;

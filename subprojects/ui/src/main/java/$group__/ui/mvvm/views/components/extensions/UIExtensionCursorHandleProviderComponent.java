@@ -1,13 +1,13 @@
 package $group__.ui.mvvm.views.components.extensions;
 
 import $group__.ui.core.mvvm.extensions.cursors.IUIExtensionCursorHandleProvider;
-import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.views.IUIView;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIViewComponent;
 import $group__.ui.core.mvvm.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
 import $group__.ui.core.mvvm.views.components.paths.IUIComponentPath;
 import $group__.ui.core.parsers.components.UIExtensionConstructor;
+import $group__.ui.core.structures.IAffineTransformStack;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;
 import $group__.utilities.interfaces.INamespacePrefixedString;

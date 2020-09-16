@@ -7,4 +7,4 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public interface IUIViewModelMinecraft<M extends IUIModel>
-		extends IUIViewModel<M>, IUICommonMinecraft {}
+		extends IUIViewModel<M>, IUISubInfrastructureMinecraft {}

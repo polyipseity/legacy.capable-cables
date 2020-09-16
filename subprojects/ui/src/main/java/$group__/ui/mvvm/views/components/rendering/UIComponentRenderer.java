@@ -1,6 +1,6 @@
 package $group__.ui.mvvm.views.components.rendering;
 
-import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
+import $group__.ui.core.binding.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRenderer;
 import $group__.ui.core.parsers.components.UIRendererConstructor;

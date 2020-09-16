@@ -1,7 +1,6 @@
 package $group__.ui.mvvm.views.components.common;
 
-import $group__.ui.core.mvvm.structures.IAffineTransformStack;
-import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
+import $group__.ui.core.binding.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
 import $group__.ui.core.mvvm.views.events.IUIEvent;
 import $group__.ui.core.mvvm.views.events.IUIEventKeyboard;
@@ -10,6 +9,7 @@ import $group__.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
 import $group__.ui.core.parsers.binding.UIMethod;
 import $group__.ui.core.parsers.components.UIComponentConstructor;
+import $group__.ui.core.structures.IAffineTransformStack;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.ui.UIEvent;
 import $group__.ui.events.ui.UIEventListener;

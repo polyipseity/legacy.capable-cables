@@ -1,11 +1,11 @@
 package $group__.ui.mvvm.views.components.paths;
 
-import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.ui.core.mvvm.views.components.IUIViewComponent;
 import $group__.ui.core.mvvm.views.components.paths.IUIComponentPath;
 import $group__.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
+import $group__.ui.core.structures.IAffineTransformStack;
 import $group__.ui.mvvm.views.paths.AbstractPathResolver;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;

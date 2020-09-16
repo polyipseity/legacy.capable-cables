@@ -1,8 +1,9 @@
 package $group__.ui.parsers.components;
 
 import $group__.jaxb.subprojects.ui.components.*;
+import $group__.ui.binding.UIPropertyMappingValue;
+import $group__.ui.core.binding.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.extensions.IUIExtension;
-import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
@@ -16,7 +17,6 @@ import $group__.ui.core.parsers.components.*;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilder;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilderFactory;
-import $group__.ui.mvvm.structures.UIPropertyMappingValue;
 import $group__.ui.structures.shapes.interactions.ShapeAnchor;
 import $group__.ui.structures.shapes.interactions.ShapeConstraint;
 import $group__.utilities.*;

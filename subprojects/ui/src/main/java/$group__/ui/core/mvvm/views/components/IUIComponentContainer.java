@@ -1,6 +1,6 @@
 package $group__.ui.core.mvvm.views.components;
 
-import $group__.ui.core.mvvm.structures.IAffineTransformStack;
+import $group__.ui.core.structures.IAffineTransformStack;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.List;

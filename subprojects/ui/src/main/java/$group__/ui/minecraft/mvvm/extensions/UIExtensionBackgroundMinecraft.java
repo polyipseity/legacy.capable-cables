@@ -1,6 +1,6 @@
 package $group__.ui.minecraft.mvvm.extensions;
 
-import $group__.ui.core.mvvm.IUICommon;
+import $group__.ui.core.mvvm.IUISubInfrastructure;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.components.IUIViewComponent;
 import $group__.ui.core.parsers.components.UIExtensionConstructor;
@@ -93,7 +93,7 @@ public class UIExtensionBackgroundMinecraft<E extends IUIComponentManager<?>>
 			if (event.getStage().isPre())
 				CastUtilities.castChecked(IUIViewComponent.class, event.getView())
 						.filter(evc -> getContainer().filter(Predicate.isEqual(evc.getManager())).isPresent())
-						.flatMap(IUICommon::getInfrastructure)
+						.flatMap(IUISubInfrastructure::getInfrastructure)
 						.flatMap(c -> IUIExtensionScreenProvider.TYPE.getValue().get(c))
 						.ifPresent(extScr -> renderBackground(extScr.getScreen(), event.getCursorPositionView(), event.getPartialTicks()));
 		}

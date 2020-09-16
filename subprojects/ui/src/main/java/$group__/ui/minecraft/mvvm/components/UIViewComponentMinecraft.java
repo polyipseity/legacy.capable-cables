@@ -1,12 +1,12 @@
 package $group__.ui.minecraft.mvvm.components;
 
-import $group__.ui.core.mvvm.structures.IAffineTransformStack;
-import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
+import $group__.ui.core.binding.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import $group__.ui.core.parsers.components.UIViewComponentConstructor;
+import $group__.ui.core.structures.IAffineTransformStack;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.minecraft.core.mvvm.views.EnumCropMethod;
 import $group__.ui.minecraft.core.mvvm.views.IUIViewComponentMinecraft;

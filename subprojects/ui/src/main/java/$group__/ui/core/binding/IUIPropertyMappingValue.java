@@ -1,4 +1,4 @@
-package $group__.ui.core.mvvm.structures;
+package $group__.ui.core.binding;
 
 import $group__.utilities.binding.core.fields.IBindingField;
 import $group__.utilities.binding.fields.BindingField;

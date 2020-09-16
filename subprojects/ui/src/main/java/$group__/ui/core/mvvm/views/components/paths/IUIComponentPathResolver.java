@@ -1,8 +1,8 @@
 package $group__.ui.core.mvvm.views.components.paths;
 
-import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.paths.IPathResolver;
+import $group__.ui.core.structures.IAffineTransformStack;
 
 import java.awt.geom.Point2D;
 import java.util.function.Consumer;

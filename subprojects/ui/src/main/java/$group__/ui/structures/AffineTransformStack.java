@@ -1,6 +1,6 @@
-package $group__.ui.mvvm.structures;
+package $group__.ui.structures;
 
-import $group__.ui.core.mvvm.structures.IAffineTransformStack;
+import $group__.ui.core.structures.IAffineTransformStack;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.ObjectUtilities;
 import com.google.common.collect.ImmutableList;

@@ -1,6 +1,5 @@
 package $group__.ui.mvvm.views.components.extensions;
 
-import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.views.IUIReshapeExplicitly;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
@@ -9,6 +8,7 @@ import $group__.ui.core.mvvm.views.components.extensions.cursors.IUIComponentCur
 import $group__.ui.core.mvvm.views.events.IUIEventMouse;
 import $group__.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
 import $group__.ui.core.parsers.components.UIExtensionConstructor;
+import $group__.ui.core.structures.IAffineTransformStack;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.events.ui.UIEventListener;

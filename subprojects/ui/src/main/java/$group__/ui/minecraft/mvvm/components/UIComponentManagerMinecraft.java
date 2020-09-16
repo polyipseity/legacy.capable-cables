@@ -1,6 +1,6 @@
 package $group__.ui.minecraft.mvvm.components;
 
-import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
+import $group__.ui.core.binding.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import $group__.ui.core.parsers.components.UIComponentConstructor;

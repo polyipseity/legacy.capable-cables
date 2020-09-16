@@ -1,9 +1,9 @@
 package $group__.ui.core.mvvm.views.components;
 
 import $group__.ui.core.binding.traits.IHasBindingMap;
-import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.views.IUIView;
 import $group__.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
+import $group__.ui.core.structures.IAffineTransformStack;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.TreeUtilities;

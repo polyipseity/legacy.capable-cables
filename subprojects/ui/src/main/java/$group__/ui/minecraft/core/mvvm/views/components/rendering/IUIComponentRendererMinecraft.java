@@ -1,8 +1,8 @@
 package $group__.ui.minecraft.core.mvvm.views.components.rendering;
 
-import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRenderer;
+import $group__.ui.core.structures.IAffineTransformStack;
 import $group__.ui.minecraft.core.mvvm.views.EnumCropMethod;
 import $group__.ui.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;

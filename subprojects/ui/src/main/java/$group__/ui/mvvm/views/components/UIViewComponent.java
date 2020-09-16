@@ -1,7 +1,6 @@
 package $group__.ui.mvvm.views.components;
 
-import $group__.ui.core.mvvm.structures.IAffineTransformStack;
-import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
+import $group__.ui.core.binding.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.components.IUIComponentShapeAnchorController;
@@ -11,13 +10,14 @@ import $group__.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.ui.core.mvvm.views.paths.IPathResolver;
 import $group__.ui.core.parsers.components.UIViewComponentConstructor;
+import $group__.ui.core.structures.IAffineTransformStack;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
-import $group__.ui.mvvm.structures.AffineTransformStack;
 import $group__.ui.mvvm.views.UIView;
 import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
 import $group__.ui.mvvm.views.components.paths.UIComponentPathResolver;
 import $group__.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
+import $group__.ui.structures.AffineTransformStack;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.ThrowableUtilities;

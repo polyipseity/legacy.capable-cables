@@ -1,11 +1,11 @@
 package $group__.ui.mvvm.views.components.paths;
 
-import $group__.ui.core.mvvm.structures.IAffineTransformStack;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.ui.core.mvvm.views.components.paths.IUIComponentPath;
-import $group__.ui.mvvm.structures.AffineTransformStack;
+import $group__.ui.core.structures.IAffineTransformStack;
 import $group__.ui.mvvm.views.paths.Path;
+import $group__.ui.structures.AffineTransformStack;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CastUtilities;
 import com.google.common.collect.Iterators;

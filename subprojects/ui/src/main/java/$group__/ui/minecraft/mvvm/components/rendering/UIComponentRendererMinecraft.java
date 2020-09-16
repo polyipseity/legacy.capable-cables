@@ -1,9 +1,9 @@
 package $group__.ui.minecraft.mvvm.components.rendering;
 
-import $group__.ui.core.mvvm.structures.IAffineTransformStack;
-import $group__.ui.core.mvvm.structures.IUIPropertyMappingValue;
+import $group__.ui.core.binding.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.parsers.components.UIRendererConstructor;
+import $group__.ui.core.structures.IAffineTransformStack;
 import $group__.ui.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import $group__.ui.minecraft.core.mvvm.views.components.rendering.IUIComponentRendererMinecraft;
 import $group__.ui.mvvm.views.components.rendering.UIComponentRenderer;

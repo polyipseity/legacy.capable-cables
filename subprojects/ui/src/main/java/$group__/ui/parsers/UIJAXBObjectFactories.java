@@ -1,4 +1,4 @@
-package $group__.ui;
+package $group__.ui.parsers;
 
 public enum UIJAXBObjectFactories {
 	;

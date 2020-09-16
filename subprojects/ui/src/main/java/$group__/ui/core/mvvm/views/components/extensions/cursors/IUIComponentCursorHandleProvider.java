@@ -1,6 +1,6 @@
 package $group__.ui.core.mvvm.views.components.extensions.cursors;
 
-import $group__.ui.core.mvvm.structures.IAffineTransformStack;
+import $group__.ui.core.structures.IAffineTransformStack;
 
 import java.awt.geom.Point2D;
 import java.util.Optional;
