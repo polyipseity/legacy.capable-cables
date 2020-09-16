@@ -64,7 +64,7 @@ allprojects {
 	apply from: "$modulesDir${separator}javadoc.gradle"
 
 	apply from: "$modulesDir${separator}optional${separator}test.gradle"
-	apply from: "$modulesDir${separator}jar.gradle"
+	apply from: "$modulesDir${separator}artifacts.gradle"
 
 	apply from: "$modulesDir${separator}optional${separator}ide.gradle"
 
