@@ -107,80 +107,48 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		getAliases().clear();
 	}
 
-	@Override
-	public T construct() {
-		return getRoot()
-				.map(root ->
-						Try.call(() -> {
-							IParserContext viewContext = new ImmutableParserContext(EnumHandlerType.VIEW_HANDLER, getAliases(), getHandlers().asMap());
-							IParserContext componentContext = new ImmutableParserContext(EnumHandlerType.COMPONENT_HANDLER, getAliases(), getHandlers().asMap());
-							View viewRaw = root.getView();
-							Component componentRaw = root.getComponent();
-							@SuppressWarnings("unchecked") T view = (T) createView(viewContext, viewRaw); // COMMENT should be checked
-							view.setManager(
-									CastUtilities.castUnchecked(createComponent(viewContext, componentRaw)) // COMMENT may throw
-							);
-							Iterables.concat(
-									viewRaw.getExtension(),
-									Optional.ofNullable(viewRaw.getAnyContainer())
-											.map(AnyContainer::getAny)
-											.orElseGet(ImmutableList::of))
-									.forEach(any -> IParserContext.StaticHolder.findHandler(viewContext, any)
-											.ifPresent(handler -> handler.accept(
-													viewContext,
-													CastUtilities.castUnchecked(view), // COMMENT may throw
-													CastUtilities.castUnchecked(any) // COMMENT should not throw
-											))
-									);
-							final IUIComponent[] cc = {view.getManager()
-									.orElseThrow(IllegalStateException::new)};
-							TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, componentRaw,
-									n -> {
-										IUIComponent component = componentRaw.equals(n)
-												? cc[0]
-												: CastUtilities.castChecked(IUIComponentContainer.class, cc[0])
-												.map(IUIComponentContainer::getNamedChildrenMapView)
-												.map(children -> children.get(n.getId()))
-												.orElseThrow(AssertionError::new);
-										Iterables.concat(
-												n.getAnchor(),
-												Optional.ofNullable(n.getRenderer())
-														.map(ImmutableSet::of)
-														.orElseGet(ImmutableSet::of),
-												n.getExtension(),
-												Optional.ofNullable(n.getAnyContainer())
-														.map(AnyContainer::getAny)
-														.orElseGet(ImmutableList::of))
-												.forEach(any -> IParserContext.StaticHolder.findHandler(componentContext, any)
-														.ifPresent(handler -> handler.accept(
-																componentContext,
-																CastUtilities.castUnchecked(component), // COMMENT may throw
-																CastUtilities.castUnchecked(any) // COMMENT should not throw
-														)));
-										return n;
-									},
-									n -> {
-										if (!componentRaw.equals(n))
-											cc[0] = CastUtilities.castChecked(IUIComponentContainer.class, cc[0])
-													.map(IUIComponentContainer::getNamedChildrenMapView)
-													.map(m -> AssertionUtilities.assertNonnull(m.get(n.getId())))
-													.orElseGet(() -> cc[0]);
-										return n.getComponent();
-									},
-									(p, ch) -> {
-										if (!componentRaw.equals(p))
-											cc[0] = cc[0].getParent()
-													.orElseThrow(AssertionError::new);
-										return p;
-									}, n -> {
-										throw ThrowableUtilities.BecauseOf.illegalArgument("Cyclic hierarchy detected",
-												"n", n,
-												"componentRaw", componentRaw);
-									});
-							return view;
-						}, LOGGER)
-								.orElseThrow(ThrowableCatcher::rethrow))
-				.orElseThrow(() -> new IllegalStateException("Prototype has not been created"));
+	@SuppressWarnings("UnstableApiUsage")
+	public static IShapeDescriptor<?> createShapeDescriptor(IParserContext context, $group__.jaxb.subprojects.ui.components.Shape shape) {
+		AffineTransform transform = new AffineTransform();
+		shape.getAffineTransformDefiner()
+				.ifPresent(atd -> {
+					atd.getAffineTransform()
+							.ifPresent(at -> transform.setTransform(at.getScaleX(), at.getShearY(), at.getShearX(), at.getScaleY(), at.getTranslateX(), at.getTranslateY()));
+					atd.getMethod().forEach(m -> {
+						Double[] args = Arrays.stream(
+								AssertionUtilities.assertNonnull(m.getValue()).split(Pattern.quote(m.getDelimiter()))).sequential()
+								.map(Double::parseDouble)
+								.toArray(Double[]::new);
+						ThrowableUtilities.Try.run(() ->
+								DynamicUtilities.PUBLIC_LOOKUP.findVirtual(
+										AffineTransform.class,
+										m.getName(),
+										MethodType.methodType(void.class, Collections.nCopies(args.length, double.class)))
+										.bindTo(transform)
+										.invokeWithArguments((Object[]) args), LOGGER);
+						ThrowableUtilities.ThrowableCatcher.rethrow(true);
+					});
+				});
+
+		IShapeDescriptorBuilder<?> sdb = IShapeDescriptorBuilderFactory.getDefault()
+				.createBuilder(
+						CastUtilities.castUnchecked(AssertionUtilities.assertNonnull(context.getAliases().get(shape.getClazz()))) // COMMENT should not throw
+				);
+
+		shape.getProperty().stream().unordered()
+				.forEach(p -> {
+					assert p.getBindingKey() == null;
+					sdb.setProperty(p.getKey(), Optional.ofNullable(p.getAny())
+							.map(value -> JAXBAdapterRegistries.getAdapter(value).leftToRight(value))
+							.orElse(null));
+				});
+
+		return sdb.setX(shape.getX()).setY(shape.getY()).setWidth(shape.getWidth()).setHeight(shape.getHeight())
+				.transformConcatenate(transform)
+				.constrain(shape.getConstraint().stream().sequential()
+						.map(c -> new ShapeConstraint(c.getMinX(), c.getMinY(), c.getMaxX(), c.getMaxY(), c.getMinWidth(), c.getMinHeight(), c.getMaxWidth(), c.getMaxHeight()))
+						.collect(ImmutableList.toImmutableList()))
+				.build();
 	}
 
 	protected Optional<? extends Ui> getRoot() { return Optional.ofNullable(root); }
@@ -349,48 +317,80 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
-	public static IShapeDescriptor<?> createShapeDescriptor(IParserContext context, $group__.jaxb.subprojects.ui.components.Shape shape) {
-		AffineTransform transform = new AffineTransform();
-		Optional.ofNullable(shape.getAffineTransformDefiner())
-				.ifPresent(atd -> {
-					Optional.ofNullable(atd.getAffineTransform())
-							.ifPresent(at -> transform.setTransform(at.getScaleX(), at.getShearY(), at.getShearX(), at.getScaleY(), at.getTranslateX(), at.getTranslateY()));
-					atd.getMethod().forEach(m -> {
-						Double[] args = Arrays.stream(
-								AssertionUtilities.assertNonnull(m.getValue()).split(Pattern.quote(m.getDelimiter()))).sequential()
-								.map(Double::parseDouble)
-								.toArray(Double[]::new);
-						ThrowableUtilities.Try.run(() ->
-								DynamicUtilities.PUBLIC_LOOKUP.findVirtual(
-										AffineTransform.class,
-										m.getName(),
-										MethodType.methodType(void.class, Collections.nCopies(args.length, double.class)))
-										.bindTo(transform)
-										.invokeWithArguments((Object[]) args), LOGGER);
-						ThrowableUtilities.ThrowableCatcher.rethrow(true);
-					});
-				});
-
-		IShapeDescriptorBuilder<?> sdb = IShapeDescriptorBuilderFactory.getDefault()
-				.createBuilder(
-						CastUtilities.castUnchecked(AssertionUtilities.assertNonnull(context.getAliases().get(shape.getClazz()))) // COMMENT should not throw
-				);
-
-		shape.getProperty().stream().unordered()
-				.forEach(p -> {
-					assert p.getBindingKey() == null;
-					sdb.setProperty(p.getKey(), Optional.ofNullable(p.getAny())
-							.map(value -> JAXBAdapterRegistries.getAdapter(value).leftToRight(value))
-							.orElse(null));
-				});
-
-		return sdb.setX(shape.getX()).setY(shape.getY()).setWidth(shape.getWidth()).setHeight(shape.getHeight())
-				.transformConcatenate(transform)
-				.constrain(shape.getConstraint().stream().sequential()
-						.map(c -> new ShapeConstraint(c.getMinX(), c.getMinY(), c.getMaxX(), c.getMaxY(), c.getMinWidth(), c.getMinHeight(), c.getMaxWidth(), c.getMaxHeight()))
-						.collect(ImmutableList.toImmutableList()))
-				.build();
+	@Override
+	public T construct() {
+		return getRoot()
+				.map(root ->
+						Try.call(() -> {
+							IParserContext viewContext = new ImmutableParserContext(EnumHandlerType.VIEW_HANDLER, getAliases(), getHandlers().asMap());
+							IParserContext componentContext = new ImmutableParserContext(EnumHandlerType.COMPONENT_HANDLER, getAliases(), getHandlers().asMap());
+							View viewRaw = root.getView();
+							Component componentRaw = root.getComponent();
+							@SuppressWarnings("unchecked") T view = (T) createView(viewContext, viewRaw); // COMMENT should be checked
+							view.setManager(
+									CastUtilities.castUnchecked(createComponent(viewContext, componentRaw)) // COMMENT may throw
+							);
+							Iterables.concat(
+									viewRaw.getExtension(),
+									viewRaw.getAnyContainer()
+											.map(AnyContainer::getAny)
+											.orElseGet(ImmutableList::of))
+									.forEach(any -> IParserContext.StaticHolder.findHandler(viewContext, any)
+											.ifPresent(handler -> handler.accept(
+													viewContext,
+													CastUtilities.castUnchecked(view), // COMMENT may throw
+													CastUtilities.castUnchecked(any) // COMMENT should not throw
+											))
+									);
+							final IUIComponent[] cc = {view.getManager()
+									.orElseThrow(IllegalStateException::new)};
+							TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, componentRaw,
+									n -> {
+										IUIComponent component = componentRaw.equals(n)
+												? cc[0]
+												: CastUtilities.castChecked(IUIComponentContainer.class, cc[0])
+												.map(IUIComponentContainer::getNamedChildrenMapView)
+												.map(children -> children.get(n.getId()))
+												.orElseThrow(AssertionError::new);
+										Iterables.concat(
+												n.getAnchor(),
+												n.getRenderer()
+														.map(ImmutableSet::of)
+														.orElseGet(ImmutableSet::of),
+												n.getExtension(),
+												n.getAnyContainer()
+														.map(AnyContainer::getAny)
+														.orElseGet(ImmutableList::of))
+												.forEach(any -> IParserContext.StaticHolder.findHandler(componentContext, any)
+														.ifPresent(handler -> handler.accept(
+																componentContext,
+																CastUtilities.castUnchecked(component), // COMMENT may throw
+																CastUtilities.castUnchecked(any) // COMMENT should not throw
+														)));
+										return n;
+									},
+									n -> {
+										if (!componentRaw.equals(n))
+											cc[0] = CastUtilities.castChecked(IUIComponentContainer.class, cc[0])
+													.map(IUIComponentContainer::getNamedChildrenMapView)
+													.map(m -> AssertionUtilities.assertNonnull(m.get(n.getId())))
+													.orElseGet(() -> cc[0]);
+										return n.getComponent();
+									},
+									(p, ch) -> {
+										if (!componentRaw.equals(p))
+											cc[0] = cc[0].getParent()
+													.orElseThrow(AssertionError::new);
+										return p;
+									}, n -> {
+										throw ThrowableUtilities.BecauseOf.illegalArgument("Cyclic hierarchy detected",
+												"n", n,
+												"componentRaw", componentRaw);
+									});
+							return view;
+						}, LOGGER)
+								.orElseThrow(ThrowableCatcher::rethrow))
+				.orElseThrow(() -> new IllegalStateException("Prototype has not been created"));
 	}
 
 	protected void setRoot(@Nullable Ui root) { this.root = root; }
@@ -473,10 +473,10 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 				}
 			}, LOGGER).orElseThrow(ThrowableCatcher::rethrow);
 			Iterables.concat(
-					Optional.ofNullable(object.getRenderer())
+					object.getRenderer()
 							.map(ImmutableSet::of)
 							.orElseGet(ImmutableSet::of),
-					Optional.ofNullable(object.getAnyContainer())
+					object.getAnyContainer()
 							.map(AnyContainer::getAny)
 							.orElseGet(ImmutableList::of))
 					.forEach(any -> IParserContext.StaticHolder.findHandler(context, any)

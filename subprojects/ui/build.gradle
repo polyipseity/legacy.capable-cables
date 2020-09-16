@@ -14,7 +14,11 @@ apply from: "$modulesDir${separator}optional${separator}publishing.gradle"
 
 def compileJava = tasks.named 'compileJava'
 
-// COMMENT XJC
+// COMMENT JAXB
+dependencies {
+	// TODO jaxb 'codes.rafael.xjc:nullsafe:1.1'
+	jaxb files('libs/nullsafe-1.2-SNAPSHOT.jar')
+}
 File xjcMainComponentsGeneratedDir = file "${getGeneratedDirectory.call 'main'}${separator}xjc_components"
 String xjcMainComponentsContextPath = "${jaxbPackagePrefix}.components"
 sourceSets.main.java.srcDir xjcMainComponentsGeneratedDir
@@ -33,6 +37,7 @@ def xjcMainComponents = createJaxbXJCTask.call('xjcMainComponents',
 		 '-Xlocator',
 		 '-mark-generated', '-Xann', 'javax.annotation.Generated',
 		 // COMMENT -Xpropertyaccessors broken
+		 '-Xnullsafegetters'
 		],
 		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/components*.xjb' }.files })
 compileJava.configure { dependsOn xjcMainComponents }
