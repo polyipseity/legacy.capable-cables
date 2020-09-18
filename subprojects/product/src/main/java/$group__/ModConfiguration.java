@@ -1,4 +1,4 @@
-package $group__.utilities;
+package $group__;
 
 import $group__.utilities.templates.CommonConfigurationTemplate;
 import org.slf4j.Logger;
@@ -9,21 +9,24 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public final class UtilitiesConfiguration extends CommonConfigurationTemplate<UtilitiesConfiguration.ConfigurationData> {
-	private static final UtilitiesConfiguration INSTANCE = new UtilitiesConfiguration();
-	private static final Logger BOOTSTRAP_LOGGER = LoggerFactory.getLogger(UtilitiesConstants.DISPLAY_NAME);
+import static $group__.ModConstants.MOD_ID;
 
-	private UtilitiesConfiguration() { super(getBootstrapLogger()); }
+public final class ModConfiguration
+		extends CommonConfigurationTemplate<ModConfiguration.ConfigurationData> {
+	private static final ModConfiguration INSTANCE = new ModConfiguration();
+	private static final Logger BOOTSTRAP_LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	public static UtilitiesConfiguration getInstance() { return INSTANCE; }
+	private ModConfiguration() { super(getBootstrapLogger()); }
 
 	private static Logger getBootstrapLogger() { return BOOTSTRAP_LOGGER; }
+
+	public static ModConfiguration getInstance() { return INSTANCE; }
 
 	public static final class ConfigurationData
 			extends CommonConfigurationTemplate.ConfigurationData {
 		public ConfigurationData(@Nullable Supplier<? extends Logger> logger,
 		                         @Nullable Supplier<? extends Locale> localeSupplier) {
-			super(Optional.<Supplier<? extends Logger>>ofNullable(logger).orElse(UtilitiesConfiguration::getBootstrapLogger),
+			super(Optional.<Supplier<? extends Logger>>ofNullable(logger).orElse(ModConfiguration::getBootstrapLogger),
 					Optional.<Supplier<? extends Locale>>ofNullable(localeSupplier).orElse(Locale::getDefault));
 		}
 	}

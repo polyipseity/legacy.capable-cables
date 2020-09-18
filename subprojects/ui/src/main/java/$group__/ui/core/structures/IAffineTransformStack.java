@@ -8,8 +8,8 @@ import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.interfaces.ICopyable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
+import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.awt.geom.AffineTransform;
@@ -29,6 +29,7 @@ public interface IAffineTransformStack
 	@Override
 	IAffineTransformStack copy();
 
+	@SuppressWarnings("UnusedReturnValue")
 	default AffineTransform pop() { return getData().pop(); }
 
 	static void popMultiple(IAffineTransformStack stack, int times) {

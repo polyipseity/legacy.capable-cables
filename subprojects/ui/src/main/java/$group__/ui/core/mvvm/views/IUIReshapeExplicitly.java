@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 
 @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface IUIReshapeExplicitly<S extends Shape> {
+	@SuppressWarnings("UnusedReturnValue")
 	static boolean refresh(IUIReshapeExplicitly<?> trait) { return trait.reshape(FunctionUtilities.alwaysTruePredicate()); }
 
 	boolean reshape(Predicate<? super IShapeDescriptor<? super S>> action)

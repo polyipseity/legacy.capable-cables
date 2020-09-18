@@ -12,7 +12,7 @@ public enum EnumUIEventComponentType
 	protected final String eventTypeString;
 	protected final INamespacePrefixedString eventType;
 
-	EnumUIEventComponentType(String eventTypeString) {
+	EnumUIEventComponentType(@SuppressWarnings("SameParameterValue") String eventTypeString) {
 		this.eventTypeString = eventTypeString;
 		this.eventType = new NamespacePrefixedString(this.eventTypeString);
 	}

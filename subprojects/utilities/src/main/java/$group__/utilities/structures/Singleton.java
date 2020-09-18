@@ -3,7 +3,7 @@ package $group__.utilities.structures;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.DynamicUtilities;
 import $group__.utilities.collections.MapUtilities;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.Collections;

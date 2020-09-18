@@ -7,12 +7,16 @@ import com.google.common.cache.CacheLoader;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static $group__.utilities.ConcurrencyUtilities.NORMAL_THREAD_THREAD_COUNT;
 import static $group__.utilities.ConcurrencyUtilities.SINGLE_THREAD_THREAD_COUNT;
 
 public enum CacheUtilities {
 	;
+
+	public static final long CACHE_EXPIRATION_ACCESS_DURATION = 15;
+	public static final TimeUnit CACHE_EXPIRATION_ACCESS_TIME_UNIT = TimeUnit.MINUTES;
 
 	public static CacheBuilder<Object, Object> newCacheBuilderSingleThreaded() { return CacheBuilder.newBuilder().concurrencyLevel(SINGLE_THREAD_THREAD_COUNT); }
 

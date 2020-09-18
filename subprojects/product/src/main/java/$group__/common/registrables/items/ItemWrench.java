@@ -33,7 +33,7 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static $group__.ModGlobals.LOGGER;
+import static $group__.ModConfiguration.LOGGER;
 import static $group__.utilities.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
 
 public class ItemWrench extends Item {

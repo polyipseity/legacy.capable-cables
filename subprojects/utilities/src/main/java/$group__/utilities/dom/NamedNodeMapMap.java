@@ -76,6 +76,7 @@ public class NamedNodeMapMap
 				}).orElse(null);
 	}
 
+	@SuppressWarnings("CallToSuspiciousStringMethod")
 	@Override
 	public Node put(@Nullable String key, @Nullable Node value) {
 		Objects.requireNonNull(key);

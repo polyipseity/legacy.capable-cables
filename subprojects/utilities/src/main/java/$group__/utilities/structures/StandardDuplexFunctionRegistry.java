@@ -2,14 +2,14 @@ package $group__.utilities.structures;
 
 import $group__.utilities.CastUtilities;
 import $group__.utilities.functions.IDuplexFunction;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 
 import java.util.Optional;
 import java.util.function.Function;
 
 public abstract class StandardDuplexFunctionRegistry
 		extends Registry<Class<?>, IDuplexFunction<?, ?>> {
-	protected StandardDuplexFunctionRegistry(boolean overridable, Logger logger) { super(overridable, logger); }
+	protected StandardDuplexFunctionRegistry(@SuppressWarnings("SameParameterValue") boolean overridable, Logger logger) { super(overridable, logger); }
 
 	public <L, VL extends IDuplexFunction<L, ?>> RegistryObject<VL> registerSafe(Class<L> key, VL value) { return register(key, value); }
 

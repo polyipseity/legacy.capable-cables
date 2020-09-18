@@ -12,8 +12,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import net.jodah.typetools.TypeResolver;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
 import sun.misc.Unsafe;
 
 import javax.annotation.Nullable;
@@ -146,6 +146,7 @@ public enum DynamicUtilities {
 
 	public static String getMethodNameDescriptor(Method m) { return m.getName() + org.objectweb.asm.Type.getMethodDescriptor(m); }
 
+	@SuppressWarnings("CallToSuspiciousStringMethod")
 	public static boolean overrides(Method overrider, Method overridden) {
 		if (!(overridden.getName().equals(overrider.getName()) && overridden.getReturnType().isAssignableFrom(overrider.getReturnType())))
 			return false;

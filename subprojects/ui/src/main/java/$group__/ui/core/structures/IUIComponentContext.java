@@ -15,6 +15,7 @@ public interface IUIComponentContext
 
 	void push(IUIComponent element);
 
+	@SuppressWarnings("UnusedReturnValue")
 	IUIComponent pop();
 
 	@Override

@@ -4,13 +4,14 @@ import $group__.utilities.AssertionUtilities;
 import $group__.utilities.LoggerUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.collections.MapUtilities;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 
 import java.io.Serializable;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public abstract class Registry<K, V> {
 	protected final ConcurrentMap<K, RegistryObject<? extends V>> data = MapUtilities.newMapMakerNormalThreaded().makeMap();
@@ -55,7 +56,7 @@ public abstract class Registry<K, V> {
 	public boolean containsValue(V value) { return getData().values().stream().unordered().anyMatch(o -> o.getValue().equals(value)); }
 
 	public static final class RegistryObject<V>
-			implements Serializable {
+			implements Serializable, Supplier<V> {
 		private static final long serialVersionUID = -7426757514591663232L;
 		@SuppressWarnings("NonSerializableFieldInSerializableClass")
 		protected V value;
@@ -65,5 +66,8 @@ public abstract class Registry<K, V> {
 		public V getValue() { return value; }
 
 		protected void setValue(V value) { this.value = value; }
+
+		@Override
+		public V get() { return getValue(); }
 	}
 }

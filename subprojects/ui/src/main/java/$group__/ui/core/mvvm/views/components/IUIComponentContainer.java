@@ -19,6 +19,7 @@ public interface IUIComponentContainer
 		});
 	}
 
+	@SuppressWarnings("UnusedReturnValue")
 	static <R> R getAsChildren(IUIComponentContainer self, IUIComponentContext context, Supplier<R> call) {
 		IAffineTransformStack transformStack = context.getTransformStack();
 		transformStack.push();
@@ -30,14 +31,17 @@ public interface IUIComponentContainer
 
 	void transformChildren(IAffineTransformStack stack);
 
+	@SuppressWarnings("UnusedReturnValue")
 	boolean addChildren(Iterable<? extends IUIComponent> components);
 
 	boolean addChildAt(int index, IUIComponent component);
 
+	@SuppressWarnings("UnusedReturnValue")
 	boolean removeChildren(Iterable<? extends IUIComponent> components);
 
 	boolean moveChildTo(int index, IUIComponent component);
 
+	@SuppressWarnings("UnusedReturnValue")
 	boolean moveChildToTop(IUIComponent component);
 
 	@Override

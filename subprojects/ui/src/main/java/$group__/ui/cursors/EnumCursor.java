@@ -7,9 +7,9 @@ import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.client.minecraft.ImageUtilities;
 import net.minecraft.client.renderer.texture.NativeImage;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
+import org.slf4j.Logger;
 
 import java.awt.*;
 import java.awt.geom.Point2D;

@@ -5,6 +5,7 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -18,7 +19,7 @@ public enum ContainerBases {
 	                                                BiFunction<ItemStack, Integer, BiFunction<Integer, Boolean,
 			                                                ? extends Boolean>> mergeItemStackFunction) {
 		List<Slot> inv = container.inventorySlots;
-		Slot s = inv.get(index);
+		@Nullable Slot s = inv.get(index);
 		if (s != null && s.getHasStack()) {
 			ItemStack ss = s.getStack();
 			ItemStack r = ss.copy();

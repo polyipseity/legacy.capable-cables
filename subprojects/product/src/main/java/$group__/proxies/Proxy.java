@@ -3,12 +3,12 @@ package $group__.proxies;
 import $group__.utilities.structures.Singleton;
 import com.google.common.base.Stopwatch;
 import net.minecraftforge.fml.event.lifecycle.*;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.function.Consumer;
 
-import static $group__.ModGlobals.LOGGER;
+import static $group__.ModConfiguration.LOGGER;
 import static $group__.utilities.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
 import static $group__.utilities.LoggerUtilities.EnumMessages.PREFIX_MOD_LIFECYCLE_MESSAGE;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
@@ -36,6 +36,7 @@ public abstract class Proxy extends Singleton implements IProxy {
 		return false;
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	protected static <E extends ModLifecycleEvent> boolean processEvent(String name, E event, Consumer<? super E> processor) {
 		LOGGER.info(() -> PREFIX_MOD_LIFECYCLE_MESSAGE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} started", name)).getFormattedMessage());
 		Stopwatch stopwatch = Stopwatch.createStarted();

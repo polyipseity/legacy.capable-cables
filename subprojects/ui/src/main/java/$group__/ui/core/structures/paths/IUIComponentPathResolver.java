@@ -10,12 +10,14 @@ import java.util.function.Consumer;
 public interface IUIComponentPathResolver<T extends IUIComponent> {
 	void resolvePath(IUIComponentContext context, Point2D point, boolean virtual);
 
+	@SuppressWarnings("UnusedReturnValue")
 	boolean addVirtualElement(T element,
 	                          T virtualElement);
 
 	boolean removeVirtualElement(T element,
 	                             T virtualElement);
 
+	@SuppressWarnings("UnusedReturnValue")
 	boolean moveVirtualElementToTop(T element,
 	                                T virtualElement);
 

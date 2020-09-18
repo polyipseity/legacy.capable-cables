@@ -1,7 +1,7 @@
 package $group__.utilities.templates;
 
 import $group__.utilities.structures.Singleton;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;

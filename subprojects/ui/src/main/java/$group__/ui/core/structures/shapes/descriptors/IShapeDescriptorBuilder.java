@@ -18,7 +18,7 @@ public interface IShapeDescriptorBuilder<S extends Shape>
 		});
 	}
 
-	IShapeDescriptorBuilder<S> setProperty(String property, @Nullable Object value)
+	IShapeDescriptorBuilder<S> setProperty(String key, @Nullable Object value)
 			throws IllegalArgumentException;
 
 	IShapeDescriptorBuilder<S> transformConcatenate(AffineTransform transform);

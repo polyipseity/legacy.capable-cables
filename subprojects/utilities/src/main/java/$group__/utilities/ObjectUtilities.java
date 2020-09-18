@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.function.Predicate;
@@ -46,7 +47,7 @@ public enum ObjectUtilities {
 	 */
 	@SuppressWarnings("MagicNumber")
 	public static <T> int hashCode(T self, @Nullable IntSupplier superMethod, Iterable<? extends Function<? super T, ?>> variables) {
-		int result = (superMethod == null ? HASH_CODE_SUPER_METHOD_DEFAULT : superMethod).getAsInt();
+		int result = Optional.ofNullable(superMethod).orElse(HASH_CODE_SUPER_METHOD_DEFAULT).getAsInt();
 		for (Function<? super T, ?> variable : variables) {
 			result = 31 * result + Objects.hashCode(variable.apply(self));
 		}

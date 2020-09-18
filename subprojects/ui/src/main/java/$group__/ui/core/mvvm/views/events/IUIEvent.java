@@ -22,6 +22,7 @@ public interface IUIEvent {
 
 	boolean isCancelable();
 
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	boolean isDefaultPrevented();
 
 	@SuppressWarnings("UnusedReturnValue")

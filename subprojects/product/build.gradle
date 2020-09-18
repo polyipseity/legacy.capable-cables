@@ -21,7 +21,6 @@ makeSourcesTasks.call { Task it ->
 	it.inputs.properties([
 			expand_group    : project.group,
 			expand_modID    : modID,
-			expand_name     : name_,
 			expand_buildType: buildType,
 	])
 }

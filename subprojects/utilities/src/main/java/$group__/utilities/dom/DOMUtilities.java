@@ -13,7 +13,7 @@ public enum DOMUtilities {
 
 	public static Optional<Node> getChildByTagName(Node node, String name) { return getChildrenByTagName(node, name).stream().unordered().findAny(); }
 
-	@SuppressWarnings("UnstableApiUsage")
+	@SuppressWarnings({"UnstableApiUsage", "CallToSuspiciousStringMethod"})
 	public static List<Node> getChildrenByTagName(Node node, String name) {
 		return new NodeListList(node.getChildNodes()).stream().sequential()
 				.filter(n -> name.equals(n.getLocalName()))
@@ -22,7 +22,7 @@ public enum DOMUtilities {
 
 	public static Optional<Node> getChildByTagNameNS(Node node, @Nullable String namespaceURI, String name) { return getChildrenByTagNameNS(node, namespaceURI, name).stream().unordered().findAny(); }
 
-	@SuppressWarnings("UnstableApiUsage")
+	@SuppressWarnings({"UnstableApiUsage", "CallToSuspiciousStringMethod"})
 	public static List<Node> getChildrenByTagNameNS(Node node, @Nullable String namespaceURI, String name) {
 		return new NodeListList(node.getChildNodes()).stream().sequential()
 				.filter(n -> Objects.equals(n.getNamespaceURI(), namespaceURI)

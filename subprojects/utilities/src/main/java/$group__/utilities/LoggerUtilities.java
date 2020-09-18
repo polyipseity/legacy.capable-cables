@@ -25,7 +25,6 @@ import static java.util.Arrays.asList;
 public enum LoggerUtilities {
 	/* MARK empty */;
 
-
 	public static final String
 			PREFIX_MOD_LIFECYCLE = "Mod lifecycle: ",
 			PREFIX_REFLECTION = "Reflection: ",

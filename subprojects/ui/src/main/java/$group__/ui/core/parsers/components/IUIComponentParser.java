@@ -45,7 +45,7 @@ public interface IUIComponentParser<T, R>
 				.collect(Sets.toImmutableEnumSet());
 		protected final boolean element;
 
-		EnumHandlerType(boolean element) { this(element, null); }
+		EnumHandlerType(@SuppressWarnings("SameParameterValue") boolean element) { this(element, null); }
 
 		EnumHandlerType(boolean element, @Nullable EnumHandlerType variantCounterpart) {
 			this.element = element;

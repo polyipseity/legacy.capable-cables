@@ -4,13 +4,14 @@ import $group__.proxies.Proxy;
 import $group__.ui.UIConfiguration;
 import $group__.ui.UIConstants;
 import $group__.ui.debug.UIDebugMinecraft;
+import $group__.utilities.minecraft.internationalization.MinecraftLocaleUtilities;
 import $group__.utilities.templates.ConfigurationTemplate;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 
 @OnlyIn(Dist.CLIENT)
 public final class ProxyClient extends Proxy implements IProxyClient {
@@ -27,7 +28,8 @@ public final class ProxyClient extends Proxy implements IProxyClient {
 
 	@Override
 	public void onSetupClient(FMLClientSetupEvent event) {
-		ConfigurationTemplate.configureSafe(UIConfiguration.INSTANCE, () -> new UIConfiguration.ConfigurationData(null));
+		ConfigurationTemplate.configureSafe(UIConfiguration.getInstance(),
+				() -> new UIConfiguration.ConfigurationData(null, MinecraftLocaleUtilities::getCurrentLocale));
 		if (UIConstants.BUILD_TYPE.isDebug())
 			UIDebugMinecraft.registerUIFactory();
 	}

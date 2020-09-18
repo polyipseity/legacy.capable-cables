@@ -14,7 +14,7 @@ public class UIEvent implements IUIEvent {
 	protected final IUIEventTarget target;
 	protected EnumPhase phase = EnumPhase.NONE;
 	protected boolean propagationStopped = false;
-	protected AtomicBoolean defaultPrevented = new AtomicBoolean();
+	protected final AtomicBoolean defaultPrevented = new AtomicBoolean();
 
 	public UIEvent(INamespacePrefixedString type, boolean canBubble, boolean cancelable, IUIEventTarget target) {
 		this.type = type;

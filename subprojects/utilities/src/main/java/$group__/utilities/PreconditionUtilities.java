@@ -1,7 +1,7 @@
 package $group__.utilities;
 
 import $group__.utilities.collections.MapUtilities;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.Map;

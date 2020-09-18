@@ -17,7 +17,6 @@ import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,9 +27,6 @@ import static org.objectweb.asm.Opcodes.*;
 
 public enum MapUtilities {
 	;
-
-	public static final long CACHE_EXPIRATION_ACCESS_DURATION = 15;
-	public static final TimeUnit CACHE_EXPIRATION_ACCESS_TIME_UNIT = TimeUnit.MINUTES;
 
 	public static MapMaker newMapMakerSingleThreaded() { return new MapMaker().concurrencyLevel(SINGLE_THREAD_THREAD_COUNT); }
 
