@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-public class ShapeAnchorController<T extends IShapeDescriptorProvider>
+public class DefaultShapeAnchorController<T extends IShapeDescriptorProvider>
 		implements IShapeAnchorController<T> {
 	protected final LoadingCache<T, IShapeAnchorSet> anchorSets =
 			ManualLoadingCache.newNestedLoadingCache(CacheUtilities.newCacheBuilderSingleThreaded()

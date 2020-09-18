@@ -8,6 +8,7 @@ import $group__.utilities.CastUtilities;
 import $group__.utilities.ObjectUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.collections.MapUtilities;
+import $group__.utilities.functions.FunctionUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -52,7 +53,7 @@ public class UIEventTarget
 				shouldHandle = IUIEventListenerWithParameters::isUseCapture;
 				break;
 			case AT_TARGET:
-				shouldHandle = l -> true;
+				shouldHandle = FunctionUtilities.alwaysTruePredicate();
 				break;
 			case BUBBLING_PHASE:
 				shouldHandle = l -> !l.isUseCapture();

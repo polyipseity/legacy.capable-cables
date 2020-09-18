@@ -3,7 +3,6 @@ package $group__.ui.events.ui;
 import $group__.ui.core.mvvm.views.events.*;
 import $group__.ui.core.mvvm.views.events.types.EnumUIEventComponentType;
 import $group__.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
-import $group__.ui.core.mvvm.views.paths.IUINode;
 import $group__.ui.core.structures.IUIDataKeyboardKeyPress;
 import $group__.ui.core.structures.IUIDataMouseButtonClick;
 import $group__.ui.mvvm.views.events.ui.*;
@@ -13,6 +12,7 @@ import $group__.utilities.PreconditionUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.Registry;
+import $group__.utilities.structures.paths.INode;
 import com.google.common.collect.ImmutableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,12 +30,12 @@ public enum UIEventUtilities {
 		event.reset();
 
 		IUIEventTarget et = event.getTarget();
-		if (et instanceof IUINode) {
-			ImmutableList<IUINode> path = computeNodePath((IUINode) et);
+		if (et instanceof INode) {
+			ImmutableList<INode> path = computeNodePath((INode) et);
 
 			event.advancePhase();
 			for (int i = 0, maxI = path.size() - 1; i < maxI; i++) {
-				@Nullable IUINode n = path.get(i);
+				@Nullable INode n = path.get(i);
 				CastUtilities.castChecked(IUIEventTarget.class, n)
 						.filter(IUIEventTarget::isActive)
 						.ifPresent(nc -> nc.dispatchEvent(event));
@@ -47,9 +47,9 @@ public enum UIEventUtilities {
 
 			if (!event.isPropagationStopped() && event.canBubble()) {
 				event.advancePhase();
-				ImmutableList<IUINode> pathReversed = path.reverse();
+				ImmutableList<INode> pathReversed = path.reverse();
 				for (int i = 1, maxI = pathReversed.size(); i < maxI; i++) {
-					@Nullable IUINode n = pathReversed.get(i);
+					@Nullable INode n = pathReversed.get(i);
 					CastUtilities.castChecked(IUIEventTarget.class, n)
 							.filter(IUIEventTarget::isActive)
 							.ifPresent(nc -> nc.dispatchEvent(event));
@@ -68,10 +68,10 @@ public enum UIEventUtilities {
 		return !event.isDefaultPrevented();
 	}
 
-	public static ImmutableList<IUINode> computeNodePath(IUINode node) {
-		ImmutableList.Builder<IUINode> builder = ImmutableList.builder();
+	public static ImmutableList<INode> computeNodePath(INode node) {
+		ImmutableList.Builder<INode> builder = ImmutableList.builder();
 		builder.add(node);
-		Optional<? extends IUINode> parent = node.getParentNode();
+		Optional<? extends INode> parent = node.getParentNode();
 		while (parent.isPresent()) {
 			builder.add(parent.get());
 			parent = parent.get().getParentNode();

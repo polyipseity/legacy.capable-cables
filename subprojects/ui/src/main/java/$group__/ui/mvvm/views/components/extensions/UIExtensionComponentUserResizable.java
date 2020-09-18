@@ -8,7 +8,7 @@ import $group__.ui.core.mvvm.views.components.extensions.cursors.IUIComponentCur
 import $group__.ui.core.mvvm.views.events.IUIEventMouse;
 import $group__.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
 import $group__.ui.core.parsers.components.UIExtensionConstructor;
-import $group__.ui.core.structures.IAffineTransformStack;
+import $group__.ui.core.structures.IUIComponentContext;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.events.ui.UIEventListener;
@@ -196,8 +196,12 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 			return getContainer()
 					.flatMap(c -> c.getManager()
 							.flatMap(IUIComponentManager::getView)
-							.filter(v -> {
-								Rectangle2D spb = v.getPathResolver().resolvePath(cursorPosition, true).getTransformCurrentView().createTransformedShape(c.getShapeDescriptor().getShapeOutput()).getBounds2D();
+							.filter(view -> {
+								Rectangle2D spb;
+								try (IUIComponentContext context = view.createContext()) {
+									view.getPathResolver().resolvePath(context, cursorPosition, true);
+									spb = context.getTransformStack().element().createTransformedShape(c.getShapeDescriptor().getShapeOutput()).getBounds2D();
+								}
 								Set<EnumUISide> sides = EnumUISide.getSidesMouseOver(spb, cursorPosition);
 
 								@Nullable Point2D base = null;
@@ -247,7 +251,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 		}
 
 		@Override
-		public Optional<? extends Long> getCursorHandle(IAffineTransformStack stack, Point2D cursorPosition) {
+		public Optional<? extends Long> getCursorHandle(IUIComponentContext context, Point2D cursorPosition) {
 			@SuppressWarnings("Convert2MethodRef") @Nullable Long ret = getResizeData()
 					.map(d -> d.getBaseView()
 							.map(b -> {
@@ -269,7 +273,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 				ret = getContainer()
 						.filter(c -> isBeingHovered())
 						.flatMap(c ->
-								getCursor(EnumUISide.getSidesMouseOver(stack.element().createTransformedShape(c.getShapeDescriptor().getShapeOutput()).getBounds2D(), cursorPosition))
+								getCursor(EnumUISide.getSidesMouseOver(context.getTransformStack().element().createTransformedShape(c.getShapeDescriptor().getShapeOutput()).getBounds2D(), cursorPosition))
 										.map(EnumCursor::getHandle))
 						.orElse(null);
 
@@ -302,13 +306,16 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 										Point2D cp = new Point2DImmutable(event.getMouseX(), event.getMouseY());
 										c.getManager()
 												.flatMap(IUIComponentManager::getView)
-												.ifPresent(m -> {
+												.ifPresent(view -> {
 													Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
 													d.handle(r, cp);
 													UIObjectUtilities.acceptRectangular(r, (x, y, w, h) ->
 															r.setFrame(x, y, w - 1, h - 1));
-													DrawingUtilities.drawRectangle(m.getPathResolver().resolvePath(cp, true).getTransformCurrentView(),
-															r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
+													try (IUIComponentContext context = view.createContext()) {
+														view.getPathResolver().resolvePath(context, cp, true);
+														DrawingUtilities.drawRectangle(context.getTransformStack().element(),
+																r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
+													}
 												});
 									}));
 		}

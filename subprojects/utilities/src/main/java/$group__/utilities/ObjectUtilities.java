@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.IntSupplier;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public enum ObjectUtilities {
@@ -19,7 +20,7 @@ public enum ObjectUtilities {
 	public static final IntSupplier HASH_CODE_SUPER_METHOD_DEFAULT = () -> 1;
 
 	@SuppressWarnings("ObjectEquality")
-	public static <T> boolean equals(T self, @Nullable Object other, boolean acceptSubclasses, @Nullable Function<? super Object, ? extends Boolean> superMethod, Iterable<? extends Function<? super T, ?>> variables) {
+	public static <T> boolean equals(T self, @Nullable Object other, boolean acceptSubclasses, @Nullable Predicate<? super Object> superMethod, Iterable<? extends Function<? super T, ?>> variables) {
 		if (self == other)
 			return true;
 		if (acceptSubclasses) {
@@ -29,7 +30,7 @@ public enum ObjectUtilities {
 			if (other == null || !self.getClass().equals(other.getClass()))
 				return false;
 		}
-		if (superMethod != null && !superMethod.apply(other))
+		if (superMethod != null && !superMethod.test(other))
 			return false;
 
 		@SuppressWarnings("unchecked") T that = (T) other;

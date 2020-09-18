@@ -5,7 +5,7 @@ import $group__.ui.core.parsers.IUIResourceParser;
 import $group__.ui.parsers.components.UIDefaultComponentParser;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.client.minecraft.ResourceUtilities;
-import $group__.utilities.functions.FunctionalUtilities;
+import $group__.utilities.functions.FunctionUtilities;
 import $group__.utilities.functions.IConsumer3;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
@@ -55,7 +55,7 @@ public interface IUIComponentParser<T, R>
 				.collect(Sets.toImmutableEnumSet());
 		@SuppressWarnings("UnstableApiUsage")
 		public static final ImmutableSet<EnumHandlerType> OBJECTS_ONLY = ALL.stream().unordered()
-				.filter(FunctionalUtilities.not(EnumHandlerType::isElement))
+				.filter(FunctionUtilities.notPredicate(EnumHandlerType::isElement))
 				.collect(Sets.toImmutableEnumSet());
 		protected final boolean element;
 

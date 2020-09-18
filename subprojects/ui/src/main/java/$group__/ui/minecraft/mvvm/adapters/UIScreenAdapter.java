@@ -6,7 +6,6 @@ import $group__.ui.core.mvvm.extensions.cursors.IUIExtensionCursorHandleProvider
 import $group__.ui.core.mvvm.views.events.IUIEventKeyboard;
 import $group__.ui.core.mvvm.views.events.IUIEventMouse;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
-import $group__.ui.core.mvvm.views.paths.IUINode;
 import $group__.ui.core.structures.IUIDataMouseButtonClick;
 import $group__.ui.events.ui.UIEventUtilities;
 import $group__.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
@@ -30,6 +29,7 @@ import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.paths.INode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -495,12 +495,12 @@ public class UIScreenAdapter
 		if (!n.equals(o)) {
 			List<?>
 					op = o.map(t ->
-					CastUtilities.castChecked(IUINode.class, t)
+					CastUtilities.castChecked(INode.class, t)
 							.<List<?>>map(UIEventUtilities::computeNodePath)
 							.orElseGet(() -> ImmutableList.of(t)))
 					.orElseGet(ImmutableList::of),
 					np = n.map(t ->
-							CastUtilities.castChecked(IUINode.class, t)
+							CastUtilities.castChecked(INode.class, t)
 									.<List<?>>map(UIEventUtilities::computeNodePath)
 									.orElseGet(() -> ImmutableList.of(t)))
 							.orElseGet(ImmutableList::of);

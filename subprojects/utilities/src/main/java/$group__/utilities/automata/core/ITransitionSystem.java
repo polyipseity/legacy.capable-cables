@@ -26,5 +26,5 @@ public interface ITransitionSystem<S extends IState<D>, E, D> {
 
 	Optional<? extends E> getInput();
 
-	Map<? extends BiPredicate<? super ITransitionSystem<? extends S, ? extends E, ? extends D>, ? super D>, ? extends Function<? super D, ? extends S>> getTransitionsView();
+	Map<BiPredicate<? super ITransitionSystem<S, E, D>, ? super D>, Function<? super D, ? extends S>> getTransitionsView();
 }

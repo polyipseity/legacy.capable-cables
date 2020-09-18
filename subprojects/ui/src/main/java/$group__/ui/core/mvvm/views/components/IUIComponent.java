@@ -2,8 +2,7 @@ package $group__.ui.core.mvvm.views.components;
 
 import $group__.ui.core.binding.traits.IHasBindingMap;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
-import $group__.ui.core.mvvm.views.paths.IUINode;
-import $group__.ui.core.structures.IAffineTransformStack;
+import $group__.ui.core.structures.IUIComponentContext;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
 import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
@@ -11,6 +10,7 @@ import $group__.utilities.binding.core.traits.IHasBinding;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
+import $group__.utilities.structures.paths.INode;
 import com.google.common.collect.ImmutableList;
 
 import javax.annotation.Nullable;
@@ -18,13 +18,13 @@ import java.awt.*;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 /*
 TODO auto resizing based on min size and preferred size
  */
 public interface IUIComponent
-		extends IUINode, IShapeDescriptorProvider, IHasBinding, IHasBindingMap, IUIEventTarget, IExtensionContainer<INamespacePrefixedString> {
+		extends INode, IShapeDescriptorProvider, IHasBinding, IHasBindingMap, IUIEventTarget, IExtensionContainer<INamespacePrefixedString> {
 	String PROPERTY_ID = INamespacePrefixedString.DEFAULT_PREFIX + "id";
 	INamespacePrefixedString PROPERTY_ID_LOCATION = new NamespacePrefixedString(PROPERTY_ID);
 
@@ -42,10 +42,10 @@ public interface IUIComponent
 		return ret;
 	}
 
-	static <S extends Shape> boolean reshapeComponent(IUIComponent self, IShapeDescriptor<? super S> shapeDescriptor, Function<? super IShapeDescriptor<? super S>, ? extends Boolean> action)
+	static <S extends Shape> boolean reshapeComponent(IUIComponent self, IShapeDescriptor<? super S> shapeDescriptor, Predicate<? super IShapeDescriptor<? super S>> action)
 			throws ConcurrentModificationException {
 		return self.modifyShape(() ->
-				action.apply(shapeDescriptor));
+				action.test(shapeDescriptor));
 	}
 
 	Optional<? extends String> getID();
@@ -74,7 +74,7 @@ public interface IUIComponent
 	@Override
 	default Optional<? extends IUIComponentContainer> getParentNode() { return getParent(); }
 
-	default void initialize(IAffineTransformStack stack) {}
+	default void initialize(IUIComponentContext context) {}
 
-	default void removed(IAffineTransformStack stack) {}
+	default void removed(IUIComponentContext context) {}
 }

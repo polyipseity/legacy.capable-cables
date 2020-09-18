@@ -16,7 +16,6 @@ import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventBusUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 
 import javax.annotation.Nullable;
 import java.awt.geom.Rectangle2D;
@@ -53,7 +52,7 @@ public class UIComponentContainer
 		if (getChildren().contains(component))
 			return moveChildTo(index, component);
 		component.getParent()
-				.ifPresent(p -> p.removeChildren(ImmutableSet.of(component)));
+				.ifPresent(p -> p.removeChildren(ImmutableList.of(component)));
 		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 					getChildren().add(index, component);
 					List<IUIComponent> childrenMoved = getChildren().subList(index + 1, getChildren().size());

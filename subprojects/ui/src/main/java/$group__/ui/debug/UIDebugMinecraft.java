@@ -9,7 +9,7 @@ import $group__.ui.core.mvvm.views.events.IUIEventKeyboard;
 import $group__.ui.core.mvvm.views.events.IUIEventMouse;
 import $group__.ui.core.parsers.IUIResourceParser;
 import $group__.ui.core.parsers.components.UIRendererConstructor;
-import $group__.ui.core.structures.IAffineTransformStack;
+import $group__.ui.core.structures.IUIComponentContext;
 import $group__.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
 import $group__.ui.minecraft.core.mvvm.views.IUIViewComponentMinecraft;
 import $group__.ui.minecraft.mvvm.adapters.AbstractContainerScreenAdapter;
@@ -167,10 +167,11 @@ public enum UIDebugMinecraft {
 			public CustomWindowRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, Class<C> containerClass) { super(mappings, containerClass); }
 
 			@Override
-			public void render(C container, EnumRenderStage stage, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks) {
-				super.render(container, stage, stack, cursorPosition, partialTicks);
+			public void render(IUIComponentContext context, C container, EnumRenderStage stage, double partialTicks) {
+				super.render(context, container, stage, partialTicks);
 				if (stage == EnumRenderStage.PRE_CHILDREN) {
-					Shape transformed = stack.element().createTransformedShape(new Ellipse2D.Double(
+					Point2D cursorPosition = context.getCursorPositionView();
+					Shape transformed = context.getTransformStack().element().createTransformedShape(new Ellipse2D.Double(
 							cursorPosition.getX() - CURSOR_SHAPE_RADIUS, cursorPosition.getY() - CURSOR_SHAPE_RADIUS,
 							CURSOR_SHAPE_RADIUS << 1, CURSOR_SHAPE_RADIUS << 1));
 					DrawingUtilities.drawShape(transformed, true, new Color(getRandom().nextInt(), true), 0);

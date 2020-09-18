@@ -6,7 +6,7 @@ import $group__.ui.core.structures.shapes.interactions.IShapeAnchor;
 import $group__.ui.core.structures.shapes.interactions.IShapeAnchorSet;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.mvvm.views.events.bus.EventUIComponent;
-import $group__.ui.structures.shapes.interactions.ShapeAnchorController;
+import $group__.ui.structures.shapes.interactions.DefaultShapeAnchorController;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.reactive.DisposableObserverAuto;
@@ -20,13 +20,13 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.stream.BaseStream;
 
-public class UIComponentShapeAnchorController
-		extends ShapeAnchorController<IUIComponent>
+public class DefaultUIComponentShapeAnchorController
+		extends DefaultShapeAnchorController<IUIComponent>
 		implements IUIComponentShapeAnchorController {
 	protected final Disposable disposable;
 	protected final Object cleanerRef = new Object();
 
-	public UIComponentShapeAnchorController() {
+	public DefaultUIComponentShapeAnchorController() {
 		@SuppressWarnings("ThisEscapedInObjectConstruction")
 		DisposableObserver<EventUIComponent.ShapeDescriptorModify> od = new ObserverEventUIShapeDescriptorModify(this);
 		this.disposable = od;
@@ -41,11 +41,11 @@ public class UIComponentShapeAnchorController
 
 	protected static class ObserverEventUIShapeDescriptorModify
 			extends DisposableObserverAuto<EventUIComponent.ShapeDescriptorModify> {
-		protected final WeakReference<UIComponentShapeAnchorController> controller;
+		protected final WeakReference<DefaultUIComponentShapeAnchorController> controller;
 		protected final Deque<IShapeAnchor> anchoringAnchors = new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM);
 		protected boolean anchoringSelf = false;
 
-		protected ObserverEventUIShapeDescriptorModify(UIComponentShapeAnchorController controller) { this.controller = new WeakReference<>(controller); }
+		protected ObserverEventUIShapeDescriptorModify(DefaultUIComponentShapeAnchorController controller) { this.controller = new WeakReference<>(controller); }
 
 		@Override
 		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
@@ -65,14 +65,14 @@ public class UIComponentShapeAnchorController
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 		protected Deque<IShapeAnchor> getAnchoringAnchors() { return anchoringAnchors; }
 
-		protected Optional<? extends UIComponentShapeAnchorController> getController() { return Optional.ofNullable(controller.get()); }
+		protected Optional<? extends DefaultUIComponentShapeAnchorController> getController() { return Optional.ofNullable(controller.get()); }
 
-		protected void anchorSelf(EventUIComponent.ShapeDescriptorModify event, UIComponentShapeAnchorController controller) {
+		protected void anchorSelf(EventUIComponent.ShapeDescriptorModify event, DefaultUIComponentShapeAnchorController controller) {
 			Optional.ofNullable(controller.getAnchorSets().getIfPresent(event.getComponent()))
 					.ifPresent(as -> as.anchor(event.getComponent()));
 		}
 
-		protected void anchorOthers(EventUIComponent.ShapeDescriptorModify event, UIComponentShapeAnchorController controller) {
+		protected void anchorOthers(EventUIComponent.ShapeDescriptorModify event, DefaultUIComponentShapeAnchorController controller) {
 			Optional.ofNullable(controller.getSubscribersMap().getIfPresent(event.getComponent()))
 					.map(Collection::stream)
 					.map(BaseStream::unordered)

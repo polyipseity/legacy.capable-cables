@@ -8,7 +8,7 @@ import $group__.ui.core.mvvm.views.components.extensions.cursors.IUIComponentCur
 import $group__.ui.core.mvvm.views.events.IUIEventMouse;
 import $group__.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
 import $group__.ui.core.parsers.components.UIExtensionConstructor;
-import $group__.ui.core.structures.IAffineTransformStack;
+import $group__.ui.core.structures.IUIComponentContext;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.events.ui.UIEventListener;
@@ -181,7 +181,7 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 		}
 
 		@Override
-		public Optional<? extends Long> getCursorHandle(IAffineTransformStack stack, Point2D cursorPosition) {
+		public Optional<? extends Long> getCursorHandle(IUIComponentContext context, Point2D cursorPosition) {
 			return isRelocating() ? Optional.of(MemoryUtil.NULL) : Optional.empty();
 		}
 
@@ -210,8 +210,11 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 										Point2D cp = new Point2DImmutable(event.getMouseX(), event.getMouseY());
 										Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
 										d.handle(r, cp);
-										DrawingUtilities.drawRectangle(v.getPathResolver().resolvePath(cp, true).getTransformCurrentView(),
-												r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
+										try (IUIComponentContext context = v.createContext()) {
+											v.getPathResolver().resolvePath(context, cp, true);
+											DrawingUtilities.drawRectangle(context.getTransformStack().element(),
+													r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
+										}
 									})));
 		}
 	}

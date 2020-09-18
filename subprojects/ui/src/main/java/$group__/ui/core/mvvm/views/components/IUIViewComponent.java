@@ -2,21 +2,21 @@ package $group__.ui.core.mvvm.views.components;
 
 import $group__.ui.core.binding.traits.IHasBindingMap;
 import $group__.ui.core.mvvm.views.IUIView;
-import $group__.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
-import $group__.ui.core.structures.IAffineTransformStack;
+import $group__.ui.core.structures.IUIComponentContext;
+import $group__.ui.core.structures.paths.IUIComponentPathResolver;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.TreeUtilities;
 import $group__.utilities.binding.core.traits.IHasBinding;
+import $group__.utilities.functions.FunctionUtilities;
 import $group__.utilities.functions.IConsumer3;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager<?>>
@@ -40,34 +40,42 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 		return Optional.empty();
 	}
 
-	IAffineTransformStack getCleanTransformStack();
+	IUIComponentContext createContext();
 
 	List<IUIComponent> getChildrenFlatView();
-
-	static void traverseComponentTreeDefault(IAffineTransformStack stack, IUIComponent root, BiConsumer<? super IAffineTransformStack, ? super IUIComponent> pre, IConsumer3<? super IAffineTransformStack, ? super IUIComponent, ? super Iterable<? super IUIComponent>> post) {
-		TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, root,
-				Function.identity(),
-				component -> {
-					pre.accept(stack, component);
-					stack.push();
-					return CastUtilities.castChecked(IUIComponentContainer.class, component)
-							.<Iterable<IUIComponent>>map(container -> {
-								container.transformChildren(stack);
-								return container.getChildrenView();
-							})
-							.orElseGet(ImmutableSet::of);
-				},
-				(parent, children) -> {
-					stack.pop();
-					post.accept(stack, parent, children);
-					return parent;
-				},
-				repeated -> { throw new AssertionError(); });
-	}
-
-	void setManager(@Nullable M manager);
 
 	IUIComponentPathResolver<IUIComponent> getPathResolver();
 
 	IUIComponentShapeAnchorController getShapeAnchorController();
+
+	void setManager(@Nullable M manager);
+
+	enum StaticHolder {
+		;
+
+		public static void traverseComponentTreeDefault(IUIComponentContext context, IUIComponent root, BiConsumer<? super IUIComponentContext, ? super IUIComponent> pre, IConsumer3<? super IUIComponentContext, ? super IUIComponent, ? super Iterable<? super IUIComponent>> post) {traverseComponentTreeDefault(context, root, pre, post, FunctionUtilities.alwaysTruePredicate());}
+
+		public static void traverseComponentTreeDefault(IUIComponentContext context, IUIComponent root, BiConsumer<? super IUIComponentContext, ? super IUIComponent> pre, IConsumer3<? super IUIComponentContext, ? super IUIComponent, ? super Iterable<? super IUIComponent>> post, Predicate<? super IUIComponent> predicate) {
+			TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, root,
+					component -> {
+						if (predicate.test(component)) {
+							context.push(component);
+							pre.accept(context, component);
+						}
+						return component;
+					},
+					component -> CastUtilities.castChecked(IUIComponentContainer.class, component)
+							.filter(predicate)
+							.map(IUIComponentContainer::getChildrenView)
+							.orElseGet(ImmutableList::of),
+					(parent, children) -> {
+						if (predicate.test(parent)) {
+							post.accept(context, parent, children);
+							context.pop();
+						}
+						return parent;
+					},
+					repeated -> { throw new AssertionError(); });
+		}
+	}
 }

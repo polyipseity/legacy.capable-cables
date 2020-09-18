@@ -417,7 +417,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 					.flatMap(IUIComponentManager::getView)
 					.ifPresent(view ->
 							view.getShapeAnchorController().addAnchors(component,
-									ImmutableSet.of(new ShapeAnchor(
+									ImmutableList.of(new ShapeAnchor(
 											IUIViewComponent.getComponentByID(view, object.getTarget()),
 											object.getOriginSide().toJava(),
 											object.getTargetSide().toJava(),

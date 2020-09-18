@@ -5,7 +5,7 @@ import $group__.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import $group__.ui.core.parsers.binding.UIProperty;
 import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.core.parsers.components.UIRendererConstructor;
-import $group__.ui.core.structures.IAffineTransformStack;
+import $group__.ui.core.structures.IUIComponentContext;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import $group__.ui.minecraft.core.mvvm.views.components.rendering.IUIComponentRendererMinecraft;
@@ -22,7 +22,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.util.Map;
 import java.util.Optional;
 
@@ -99,9 +98,9 @@ public class UIComponentButtonMinecraft
 		}
 
 		@Override
-		public void render(C container, EnumRenderStage stage, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks) {
+		public void render(IUIComponentContext context, C container, EnumRenderStage stage, double partialTicks) {
 			if (stage == EnumRenderStage.PRE_CHILDREN) {
-				Shape transformed = stack.element().createTransformedShape(container.getShapeDescriptor().getShapeOutput());
+				Shape transformed = context.getTransformStack().element().createTransformedShape(container.getShapeDescriptor().getShapeOutput());
 				if (container.getButtonStates().contains(IButtonState.PRESSING)) {
 					getColorPressed().getValue().ifPresent(c ->
 							DrawingUtilities.drawShape(transformed, true, c, 0));

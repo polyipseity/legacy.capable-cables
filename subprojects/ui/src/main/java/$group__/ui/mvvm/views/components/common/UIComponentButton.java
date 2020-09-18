@@ -9,7 +9,7 @@ import $group__.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
 import $group__.ui.core.parsers.binding.UIMethod;
 import $group__.ui.core.parsers.components.UIComponentConstructor;
-import $group__.ui.core.structures.IAffineTransformStack;
+import $group__.ui.core.structures.IUIComponentContext;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.ui.UIEvent;
 import $group__.ui.events.ui.UIEventListener;
@@ -95,7 +95,7 @@ public class UIComponentButton
 	public boolean isFocusable() { return true; }
 
 	@Override
-	public Optional<? extends Long> getCursorHandle(IAffineTransformStack stack, Point2D cursorPosition) {
+	public Optional<? extends Long> getCursorHandle(IUIComponentContext context, Point2D cursorPosition) {
 		return getButtonStates().contains(IButtonState.HOVERING)
 				? Optional.of(EnumCursor.STANDARD_HAND_CURSOR.getHandle())
 				: Optional.empty();

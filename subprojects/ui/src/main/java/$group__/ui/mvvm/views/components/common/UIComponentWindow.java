@@ -8,6 +8,7 @@ import $group__.ui.core.mvvm.views.events.IUIEventFocus;
 import $group__.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
 import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.core.structures.IAffineTransformStack;
+import $group__.ui.core.structures.IUIComponentContext;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.events.ui.UIEventListener;
@@ -29,7 +30,7 @@ import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class UIComponentWindow
 		extends UIComponentContainer
@@ -82,7 +83,7 @@ public class UIComponentWindow
 	}
 
 	@Override
-	public boolean reshape(Function<? super IShapeDescriptor<? super RectangularShape>, ? extends Boolean> action) throws ConcurrentModificationException {
+	public boolean reshape(Predicate<? super IShapeDescriptor<? super RectangularShape>> action) throws ConcurrentModificationException {
 		return IUIComponent.reshapeComponent(this, getShapeDescriptor(), action);
 		// TODO resizing logic
 	}
@@ -98,7 +99,7 @@ public class UIComponentWindow
 	}
 
 	@Override
-	public void initialize(IAffineTransformStack stack) {
+	public void initialize(IUIComponentContext context) {
 		UIEventBusEntryPoint.<EventUIComponent.ShapeDescriptorModify>getEventBus()
 				.subscribe(getObserverEventUIShapeDescriptorModify().accumulateAndGet(new ObserverEventUIShapeDescriptorModify(), (p, n) -> {
 					if (p != null)
@@ -109,7 +110,7 @@ public class UIComponentWindow
 	}
 
 	@Override
-	public void removed(IAffineTransformStack stack) { Optional.ofNullable(getObserverEventUIShapeDescriptorModify().getAndSet(null)).ifPresent(DisposableObserver::dispose); }
+	public void removed(IUIComponentContext context) { Optional.ofNullable(getObserverEventUIShapeDescriptorModify().getAndSet(null)).ifPresent(DisposableObserver::dispose); }
 
 	public class ObserverEventUIShapeDescriptorModify
 			extends DisposableObserverAuto<EventUIComponent.ShapeDescriptorModify> {

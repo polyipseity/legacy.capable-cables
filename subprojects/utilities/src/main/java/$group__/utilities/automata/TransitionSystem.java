@@ -4,6 +4,7 @@ import $group__.utilities.AssertionUtilities;
 import $group__.utilities.ObjectUtilities;
 import $group__.utilities.automata.core.IState;
 import $group__.utilities.automata.core.ITransitionSystem;
+import $group__.utilities.functions.FunctionUtilities;
 import com.google.common.collect.ImmutableMap;
 
 import javax.annotation.Nullable;
@@ -21,13 +22,13 @@ public class TransitionSystem<S extends IState<D>, E, D>
 		@Override
 		public void transitToThis(Object argument) { throw new UnsupportedOperationException(); }
 	}, null, ImmutableMap
-			.of((ts, d) -> true, d -> { throw new UnsupportedOperationException(); }));
-	protected final Map<? extends BiPredicate<? super ITransitionSystem<? extends S, ? extends E, ? extends D>, ? super D>, ? extends Function<? super D, ? extends S>> transitionsView;
+			.of(FunctionUtilities.alwaysTrueBiPredicate(), d -> { throw new UnsupportedOperationException(); }));
+	protected final Map<BiPredicate<? super ITransitionSystem<S, E, D>, ? super D>, Function<? super D, ? extends S>> transitionsView;
 	protected S state;
 	@Nullable
 	protected E input;
 
-	public TransitionSystem(S state, @Nullable E input, Map<? extends BiPredicate<? super ITransitionSystem<? extends S, ? extends E, ? extends D>, ? super D>, ? extends Function<? super D, ? extends S>> transitions) {
+	public TransitionSystem(S state, @Nullable E input, Map<? extends BiPredicate<? super ITransitionSystem<S, E, D>, ? super D>, ? extends Function<? super D, ? extends S>> transitions) {
 		this.state = state;
 		this.input = input;
 		this.transitionsView = ImmutableMap.copyOf(transitions);
@@ -41,7 +42,7 @@ public class TransitionSystem<S extends IState<D>, E, D>
 	@Override
 	public void step(@Nullable E input, D data) {
 		setInput(input);
-		for (Map.Entry<? extends BiPredicate<? super ITransitionSystem<? extends S, ? extends E, ? extends D>, ? super D>, ? extends Function<? super D, ? extends S>> t
+		for (Map.Entry<BiPredicate<? super ITransitionSystem<S, E, D>, ? super D>, Function<? super D, ? extends S>> t
 				: getTransitionsView().entrySet()) {
 			if (AssertionUtilities.assertNonnull(t.getKey()).test(this, data)) {
 				getState().transitFromThis(data);
@@ -59,7 +60,7 @@ public class TransitionSystem<S extends IState<D>, E, D>
 	public Optional<? extends E> getInput() { return Optional.ofNullable(input); }
 
 	@Override
-	public Map<? extends BiPredicate<? super ITransitionSystem<? extends S, ? extends E, ? extends D>, ? super D>, ? extends Function<? super D, ? extends S>> getTransitionsView() { return transitionsView; }
+	public Map<BiPredicate<? super ITransitionSystem<S, E, D>, ? super D>, Function<? super D, ? extends S>> getTransitionsView() { return transitionsView; }
 
 	protected void setInput(@Nullable E input) { this.input = input; }
 

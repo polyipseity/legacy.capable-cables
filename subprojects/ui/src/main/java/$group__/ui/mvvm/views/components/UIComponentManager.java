@@ -14,7 +14,7 @@ import java.lang.ref.WeakReference;
 import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class UIComponentManager<S extends Shape>
 		extends UIComponentContainer
@@ -25,7 +25,7 @@ public class UIComponentManager<S extends Shape>
 	public UIComponentManager(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<S> shapeDescriptor) { super(mappings, id, shapeDescriptor); }
 
 	@Override
-	public boolean reshape(Function<? super IShapeDescriptor<? super S>, ? extends Boolean> action) throws ConcurrentModificationException { return IUIComponent.reshapeComponent(this, getShapeDescriptor(), action); }
+	public boolean reshape(Predicate<? super IShapeDescriptor<? super S>> action) throws ConcurrentModificationException { return IUIComponent.reshapeComponent(this, getShapeDescriptor(), action); }
 
 	@SuppressWarnings("unchecked")
 	@Override

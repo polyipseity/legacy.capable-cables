@@ -1,6 +1,8 @@
-package $group__.ui.mvvm.views.paths;
+package $group__.ui.structures.paths;
 
-import $group__.ui.core.mvvm.views.paths.IPathResolver;
+import $group__.ui.core.mvvm.views.components.IUIComponent;
+import $group__.ui.core.structures.IAffineTransformStack;
+import $group__.ui.core.structures.paths.IUIComponentPathResolver;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.collections.CacheUtilities;
 import $group__.utilities.collections.ManualLoadingCache;
@@ -11,10 +13,16 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
-public abstract class AbstractPathResolver<T>
-		implements IPathResolver<T> {
+public abstract class AbstractPathResolver<T extends IUIComponent>
+		implements IUIComponentPathResolver<T> {
 	protected final LoadingCache<T, List<T>> virtualElements =
+			ManualLoadingCache.newNestedLoadingCacheCollection(CacheUtilities.newCacheBuilderSingleThreaded()
+					.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL)
+					.weakKeys()
+					.build(CacheLoader.from(() -> new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL))));
+	protected final LoadingCache<IUIComponent, List<Consumer<? super IAffineTransformStack>>> childrenTransformers =
 			ManualLoadingCache.newNestedLoadingCacheCollection(CacheUtilities.newCacheBuilderSingleThreaded()
 					.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL)
 					.weakKeys()
@@ -50,4 +58,19 @@ public abstract class AbstractPathResolver<T>
 	}
 
 	protected LoadingCache<T, List<T>> getVirtualElements() { return virtualElements; }
+
+	@Override
+	public boolean addChildrenTransformer(T element, Consumer<? super IAffineTransformStack> transformer) { return getChildrenTransformers().getUnchecked(element).add(transformer); }
+
+	protected LoadingCache<IUIComponent, List<Consumer<? super IAffineTransformStack>>> getChildrenTransformers() { return childrenTransformers; }
+
+	@Override
+	public boolean removeChildrenTransformer(T element, Consumer<? super IAffineTransformStack> transformer) {
+		boolean ret = Optional.ofNullable(getChildrenTransformers().getIfPresent(element))
+				.filter(ts -> ts.remove(transformer))
+				.isPresent();
+		if (ret)
+			getChildrenTransformers().cleanUp();
+		return ret;
+	}
 }

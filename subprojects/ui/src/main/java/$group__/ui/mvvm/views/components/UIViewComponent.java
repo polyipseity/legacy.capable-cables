@@ -6,18 +6,18 @@ import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.components.IUIComponentShapeAnchorController;
 import $group__.ui.core.mvvm.views.components.IUIViewComponent;
 import $group__.ui.core.mvvm.views.components.extensions.caches.IUIExtensionCache;
-import $group__.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
-import $group__.ui.core.mvvm.views.paths.IPathResolver;
 import $group__.ui.core.parsers.components.UIViewComponentConstructor;
-import $group__.ui.core.structures.IAffineTransformStack;
+import $group__.ui.core.structures.IUIComponentContext;
+import $group__.ui.core.structures.paths.IUIComponentPathResolver;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.mvvm.views.UIView;
 import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
-import $group__.ui.mvvm.views.components.paths.UIComponentPathResolver;
 import $group__.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
-import $group__.ui.structures.AffineTransformStack;
+import $group__.ui.structures.ArrayAffineTransformStack;
+import $group__.ui.structures.DefaultUIComponentContext;
+import $group__.ui.structures.paths.DefaultUIComponentPathResolver;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.ThrowableUtilities;
@@ -26,16 +26,18 @@ import $group__.utilities.binding.core.IBinderAction;
 import $group__.utilities.binding.core.fields.IBindingField;
 import $group__.utilities.binding.core.methods.IBindingMethod;
 import $group__.utilities.binding.core.traits.IHasBinding;
+import $group__.utilities.client.minecraft.GLUtilities;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventBusUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
-import $group__.utilities.functions.FunctionalUtilities;
+import $group__.utilities.functions.FunctionUtilities;
 import $group__.utilities.functions.IConsumer3;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.reactive.DisposableObserverAuto;
 import $group__.utilities.structures.NamespacePrefixedString;
 import $group__.utilities.structures.Registry;
+import $group__.utilities.structures.paths.FunctionalPath;
 import com.google.common.collect.*;
 import io.reactivex.rxjava3.core.ObservableSource;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -50,15 +52,15 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		extends UIView<S>
 		implements IUIViewComponent<S, M> {
 	protected final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
-	protected final IUIComponentPathResolver<IUIComponent> pathResolver = new InnerPathResolver();
-	protected final IUIComponentShapeAnchorController shapeAnchorController = new UIComponentShapeAnchorController();
+	protected final IUIComponentPathResolver<IUIComponent> pathResolver = new DefaultUIComponentPathResolver();
+	protected final IUIComponentShapeAnchorController shapeAnchorController = new DefaultUIComponentShapeAnchorController();
 	@Nullable
 	protected M manager;
 
@@ -72,14 +74,19 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	}
 
 	@Override
-	public IUIEventTarget getTargetAtPoint(Point2D point) { return IPathResolver.getTargetAtPoint(getPathResolver(), point); }
+	public IUIEventTarget getTargetAtPoint(Point2D point) {
+		try (IUIComponentContext context = createContext()) {
+			getPathResolver().resolvePath(context, point, true);
+			return context.getPath().getPathEnd();
+		}
+	}
 
 	@Override
 	public Optional<? extends IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) {
 		@Nullable Optional<? extends IUIEventTarget> ret = CastUtilities.castChecked(IUIComponent.class, currentFocus)
 				.flatMap(cf ->
 						CacheViewComponent.CHILDREN_FLAT_FOCUSABLE.getValue().get(this)
-								.filter(FunctionalUtilities.not(Collection::isEmpty))
+								.filter(FunctionUtilities.notPredicate(Collection::isEmpty))
 								.map(f -> f.get(Math.floorMod(
 										Math.max(f.indexOf(cf), 0) + (next ? 1 : -1), f.size()))));
 		if (!ret.isPresent())
@@ -110,7 +117,14 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	public IUIComponentShapeAnchorController getShapeAnchorController() { return shapeAnchorController; }
 
 	@Override
-	public IAffineTransformStack getCleanTransformStack() { return new AffineTransformStack(); }
+	public IUIComponentContext createContext() {
+		return new DefaultUIComponentContext(
+				new FunctionalPath<>(ImmutableList.of(getManager()
+						.orElseThrow(IllegalStateException::new)), Lists::newArrayList),
+				new ArrayAffineTransformStack(),
+				GLUtilities.getCursorPos()
+		);
+	}
 
 	@Override
 	public List<IUIComponent> getChildrenFlatView() {
@@ -150,7 +164,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	}
 
 	@Override
-	public boolean reshape(Function<? super IShapeDescriptor<? super S>, ? extends Boolean> action) throws ConcurrentModificationException {
+	public boolean reshape(Predicate<? super IShapeDescriptor<? super S>> action) throws ConcurrentModificationException {
 		return getManager()
 				.filter(manager -> manager.reshape(action))
 				.isPresent();
@@ -159,7 +173,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	@Override
 	public void initialize() {
 		getManager().ifPresent(manager ->
-				IUIViewComponent.traverseComponentTreeDefault(getCleanTransformStack(),
+				StaticHolder.traverseComponentTreeDefault(createContext(),
 						manager,
 						(context, component) -> component.initialize(context),
 						IConsumer3.StaticHolder.empty()));
@@ -168,7 +182,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	@Override
 	public void removed() {
 		getManager().ifPresent(manager ->
-				IUIViewComponent.traverseComponentTreeDefault(getCleanTransformStack(),
+				StaticHolder.traverseComponentTreeDefault(createContext(),
 						manager,
 						(context, component) -> component.removed(context),
 						IConsumer3.StaticHolder.empty()));
@@ -291,10 +305,4 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 
 		private static INamespacePrefixedString generateKey(@SuppressWarnings("SameParameterValue") String name) { return new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, CacheViewComponent.class.getName() + '.' + name); }
 	}
-
-	protected class InnerPathResolver extends UIComponentPathResolver {
-		protected InnerPathResolver() { super(UIViewComponent.this); }
-	}
-
-
 }

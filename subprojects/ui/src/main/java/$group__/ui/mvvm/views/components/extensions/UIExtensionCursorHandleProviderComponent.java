@@ -5,13 +5,11 @@ import $group__.ui.core.mvvm.views.IUIView;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIViewComponent;
 import $group__.ui.core.mvvm.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
-import $group__.ui.core.mvvm.views.components.paths.IUIComponentPath;
 import $group__.ui.core.parsers.components.UIExtensionConstructor;
-import $group__.ui.core.structures.IAffineTransformStack;
+import $group__.ui.core.structures.IUIComponentContext;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;
 import $group__.utilities.interfaces.INamespacePrefixedString;
-import com.google.common.collect.Lists;
 
 import java.awt.geom.Point2D;
 import java.util.Optional;
@@ -29,17 +27,17 @@ public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent
 	@Override
 	public Optional<? extends Long> getCursorHandle(Point2D cursorPosition) {
 		return getContainer()
-				.flatMap(v -> {
+				.flatMap(view -> {
 					Optional<Long> ret = Optional.empty();
-					IUIComponentPath<IUIComponent> cp = v.getPathResolver().resolvePath(cursorPosition, true);
-					try (IAffineTransformStack stack = cp.getTransformStackView()) {
-						for (IUIComponent e : Lists.reverse(cp.asList())) {
-							if ((ret = CastUtilities.castChecked(IUIComponentCursorHandleProvider.class, e)
-									.flatMap(ec -> ec.getCursorHandle(stack, cursorPosition).map(Function.identity())))
+					try (IUIComponentContext context = view.createContext()) {
+						view.getPathResolver().resolvePath(context, cursorPosition, true);
+						while (!context.getPath().isRoot()) {
+							IUIComponent component = context.getPath().getPathEnd();
+							if ((ret = CastUtilities.castChecked(IUIComponentCursorHandleProvider.class, component)
+									.flatMap(ec -> ec.getCursorHandle(context, cursorPosition).map(Function.identity())))
 									.isPresent())
 								break;
-							if (!stack.isClean())
-								stack.pop();
+							context.pop();
 						}
 					}
 					return ret;

@@ -12,19 +12,19 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.function.Function;
 
-public class AffineTransformStack
+public class ArrayAffineTransformStack
 		implements IAffineTransformStack {
-	public static final ImmutableList<Function<? super AffineTransformStack, ?>> OBJECT_VARIABLES = ObjectUtilities.extendsObjectVariables(IAffineTransformStack.OBJECT_VARIABLES,
-			ImmutableList.of(AffineTransformStack::getCleanerRef));
-	public static final ImmutableMap<String, Function<? super AffineTransformStack, ?>> OBJECT_VARIABLES_MAP = ObjectUtilities.extendsObjectVariablesMap(OBJECT_VARIABLES,
+	public static final ImmutableList<Function<? super ArrayAffineTransformStack, ?>> OBJECT_VARIABLES = ObjectUtilities.extendsObjectVariables(IAffineTransformStack.OBJECT_VARIABLES,
+			ImmutableList.of(ArrayAffineTransformStack::getCleanerRef));
+	public static final ImmutableMap<String, Function<? super ArrayAffineTransformStack, ?>> OBJECT_VARIABLES_MAP = ObjectUtilities.extendsObjectVariablesMap(OBJECT_VARIABLES,
 			IAffineTransformStack.OBJECT_VARIABLES_MAP,
 			ImmutableList.of("cleanerRef"));
 	protected final Deque<AffineTransform> data;
 	protected final Object cleanerRef = new Object();
 
-	public AffineTransformStack() { this(CapacityUtilities.INITIAL_CAPACITY_MEDIUM); }
+	public ArrayAffineTransformStack() { this(CapacityUtilities.INITIAL_CAPACITY_MEDIUM); }
 
-	public AffineTransformStack(int initialCapacity) {
+	public ArrayAffineTransformStack(int initialCapacity) {
 		this.data = new ArrayDeque<>(initialCapacity);
 		this.data.push(new AffineTransform());
 		Cleaner.create(getCleanerRef(), new LeakNotifier(this.data));
@@ -33,8 +33,8 @@ public class AffineTransformStack
 	protected final Object getCleanerRef() { return cleanerRef; }
 
 	@Override
-	public AffineTransformStack copy() {
-		AffineTransformStack ret = new AffineTransformStack();
+	public ArrayAffineTransformStack copy() {
+		ArrayAffineTransformStack ret = new ArrayAffineTransformStack();
 		ret.getData().clear();
 		getData().stream().sequential()
 				.map(AffineTransform::clone)

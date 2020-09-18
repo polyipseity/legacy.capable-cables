@@ -2,7 +2,7 @@ package $group__.ui.minecraft.core.mvvm.views.components.rendering;
 
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRenderer;
-import $group__.ui.core.structures.IAffineTransformStack;
+import $group__.ui.core.structures.IUIComponentContext;
 import $group__.ui.minecraft.core.mvvm.views.EnumCropMethod;
 import $group__.ui.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
@@ -17,19 +17,20 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
 import java.awt.*;
-import java.awt.geom.Point2D;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
 @OnlyIn(Dist.CLIENT)
 public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUIComponentMinecraft>
 		extends IUIComponentRenderer<C> {
-	void render(C container, EnumRenderStage stage, IAffineTransformStack stack, Point2D cursorPosition, double partialTicks);
+	void render(IUIComponentContext context, C container, EnumRenderStage stage, double partialTicks);
 
-	default void crop(C container, EnumCropStage stage, IAffineTransformStack stack, EnumCropMethod method, Point2D mouse, double partialTicks) {
-		IUIComponentRendererMinecraft.cropImpl(container, stage, stack, method, mouse, partialTicks);
+	default void crop(IUIComponentContext context, C container, EnumCropStage stage, EnumCropMethod method, double partialTicks) {
+		IUIComponentRendererMinecraft.cropImpl(context, container, stage, method, partialTicks);
 	}
 
-	static void cropImpl(final IUIComponent container, EnumCropStage stage, IAffineTransformStack stack, EnumCropMethod method, @SuppressWarnings("unused") Point2D mouse, @SuppressWarnings("unused") double partialTicks) {
+	static void cropImpl(IUIComponentContext context, final IUIComponent container, EnumCropStage stage, EnumCropMethod method, @SuppressWarnings("unused") double partialTicks) {
+		AffineTransform transform = context.getTransformStack().element();
 		switch (method) {
 			case STENCIL_BUFFER:
 				switch (stage) {
@@ -43,7 +44,7 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUICompo
 						GLUtilities.Stacks.push("colorMask",
 								() -> RenderSystem.colorMask(false, false, false, false), GLUtilities.Stacks.COLOR_MASK_FALLBACK);
 
-						DrawingUtilities.drawShape(stack.element(), container.getShapeDescriptor().getShapeOutput(), true, Color.WHITE, 0);
+						DrawingUtilities.drawShape(transform, container.getShapeDescriptor().getShapeOutput(), true, Color.WHITE, 0);
 
 						GLUtilities.Stacks.pop("colorMask");
 						GLUtilities.Stacks.pop("stencilOp");
@@ -63,7 +64,7 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUICompo
 						GLUtilities.Stacks.push("colorMask",
 								() -> RenderSystem.colorMask(false, false, false, false), GLUtilities.Stacks.COLOR_MASK_FALLBACK);
 
-						DrawingUtilities.drawShape(stack.element(), container.getShapeDescriptor().getShapeOutput().getBounds2D(), true, Color.BLACK, 0);
+						DrawingUtilities.drawShape(transform, container.getShapeDescriptor().getShapeOutput().getBounds2D(), true, Color.BLACK, 0);
 
 						GLUtilities.Stacks.pop("colorMask");
 						GLUtilities.Stacks.pop("stencilOp");
@@ -81,7 +82,7 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUICompo
 						GLUtilities.State.getIntegerValue(GL11.GL_SCISSOR_BOX, boundsBox);
 						UIObjectUtilities.acceptRectangular(
 								CoordinateUtilities.toNativeRectangle(
-										UIObjectUtilities.getRectangleExpanded(stack.element().createTransformedShape(container.getShapeDescriptor().getShapeOutput().getBounds2D()).getBounds2D()))
+										UIObjectUtilities.getRectangleExpanded(transform.createTransformedShape(container.getShapeDescriptor().getShapeOutput().getBounds2D()).getBounds2D()))
 										.createIntersection(new Rectangle2D.Double(boundsBox[0], boundsBox[1], boundsBox[2], boundsBox[3])),
 								(x, y, w, h) -> GLUtilities.Stacks.push("glScissor",
 										() -> GLUtilities.State.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{x.intValue(), y.intValue(), w.intValue(), h.intValue()},

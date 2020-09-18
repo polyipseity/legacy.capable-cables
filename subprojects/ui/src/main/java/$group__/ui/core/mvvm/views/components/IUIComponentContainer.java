@@ -1,6 +1,7 @@
 package $group__.ui.core.mvvm.views.components;
 
 import $group__.ui.core.structures.IAffineTransformStack;
+import $group__.ui.core.structures.IUIComponentContext;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
@@ -11,18 +12,19 @@ import java.util.function.Supplier;
 
 public interface IUIComponentContainer
 		extends IUIComponent {
-	static void runWithStackTransformed(IUIComponentContainer self, IAffineTransformStack stack, Runnable call) {
-		getWithStackTransformed(self, stack, () -> {
+	static void runAsChildren(IUIComponentContainer self, IUIComponentContext context, Runnable call) {
+		getAsChildren(self, context, () -> {
 			call.run();
 			return null;
 		});
 	}
 
-	static <R> R getWithStackTransformed(IUIComponentContainer self, IAffineTransformStack stack, Supplier<R> call) {
-		stack.push();
-		self.transformChildren(stack);
+	static <R> R getAsChildren(IUIComponentContainer self, IUIComponentContext context, Supplier<R> call) {
+		IAffineTransformStack transformStack = context.getTransformStack();
+		transformStack.push();
+		self.transformChildren(transformStack);
 		R ret = call.get();
-		stack.pop();
+		transformStack.pop();
 		return ret;
 	}
 

@@ -8,8 +8,14 @@ public class Point2DImmutable
 		extends Point2D {
 	protected final double x, y;
 
-	public Point2DImmutable(Point2D point) {
+	protected Point2DImmutable(Point2D point) {
 		this(point.getX(), point.getY());
+	}
+
+	public static Point2DImmutable copyOf(Point2D point) {
+		if (point instanceof Point2DImmutable)
+			return (Point2DImmutable) point;
+		return new Point2DImmutable(point);
 	}
 
 	public Point2DImmutable(double x, double y) {
@@ -26,7 +32,8 @@ public class Point2DImmutable
 	public double getY() { return y; }
 
 	@Override
-	public void setLocation(double x, double y) { throw new UnsupportedOperationException(); }
+	public void setLocation(double x, double y)
+			throws UnsupportedOperationException { throw new UnsupportedOperationException(); }
 
 	@Override
 	public Point2DImmutable clone() {
