@@ -4,7 +4,9 @@ import $group__.client.ProxyClient;
 import $group__.proxies.IProxy;
 import $group__.server.ProxyServer;
 import $group__.utilities.NamespaceUtilities;
+import $group__.utilities.UtilitiesConfiguration;
 import $group__.utilities.structures.Singleton;
+import $group__.utilities.templates.ConfigurationTemplate;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -14,8 +16,8 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
 
-import static $group__.ConstantsProduct.MOD_ID;
-import static $group__.Globals.LOGGER;
+import static $group__.ModConstants.MOD_ID;
+import static $group__.ModGlobals.LOGGER;
 import static $group__.common.registrables.blocks.BlocksThis.BLOCKS;
 import static $group__.common.registrables.inventory.ContainersThis.CONTAINERS;
 import static $group__.common.registrables.items.ItemsThis.ITEMS;
@@ -28,15 +30,19 @@ import static $group__.utilities.LoggerUtilities.EnumMessages.PREFIX_MOD_LIFECYC
 public final class ModThis extends Singleton {
 	public final IProxy proxy = DistExecutor.unsafeRunForDist(() -> ModThis::getProxyClientSupplier, () -> ModThis::getProxyServerSupplier);
 
+	static {
+		ConfigurationTemplate.configureSafe(UtilitiesConfiguration.INSTANCE, () -> new UtilitiesConfiguration.ConfigurationData(null)); // COMMENT configure as early as possible
+	}
+
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public ModThis() {
 		super(LOGGER);
 		IEventBus eventBusMod = Bus.MOD.bus().get();
+		eventBusMod.register(this);
 		BLOCKS.register(eventBusMod);
 		ITEMS.register(eventBusMod);
 		TILE_ENTITIES.register(eventBusMod);
 		CONTAINERS.register(eventBusMod);
-		eventBusMod.register(this);
 	}
 
 	public static ResourceLocation getResourceLocation(String path) { return new ResourceLocation(MOD_ID, path); }

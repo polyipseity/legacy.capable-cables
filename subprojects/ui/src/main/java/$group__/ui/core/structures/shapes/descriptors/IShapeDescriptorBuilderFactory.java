@@ -1,13 +1,12 @@
 package $group__.ui.core.structures.shapes.descriptors;
 
+import $group__.ui.UIConfiguration;
 import $group__.ui.structures.shapes.descriptors.builders.RectangularShapeDescriptorBuilder;
 import $group__.utilities.PreconditionUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
 import $group__.utilities.structures.Registry;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -24,12 +23,11 @@ public interface IShapeDescriptorBuilderFactory {
 			throws ShapeDescriptorBuilderNotFoundException;
 
 	class RegSDBFactory extends Registry<INamespacePrefixedString, IShapeDescriptorBuilderFactory> {
-		private static final Logger LOGGER = LogManager.getLogger();
 		public static final RegSDBFactory INSTANCE = new RegSDBFactory();
 
 		protected RegSDBFactory() {
-			super(true, LOGGER);
-			PreconditionUtilities.requireRunOnceOnly(LOGGER);
+			super(true, UIConfiguration.INSTANCE.getLogger());
+			PreconditionUtilities.requireRunOnceOnly(UIConfiguration.INSTANCE.getLogger());
 
 			data.put(DefaultFactory.KEY, new Registry.RegistryObject<>(new DefaultFactory()));
 		}
@@ -49,10 +47,9 @@ public interface IShapeDescriptorBuilderFactory {
 			extends Registry<Class<? extends Shape>, Function<? super Class<? extends Shape>, ? extends IShapeDescriptorBuilder<?>>>
 			implements IShapeDescriptorBuilderFactory {
 		public static final INamespacePrefixedString KEY = new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, "default");
-		private static final Logger LOGGER = LogManager.getLogger();
 
 		protected DefaultFactory() {
-			super(true, LOGGER);
+			super(true, UIConfiguration.INSTANCE.getLogger());
 
 			data.put(Rectangle2D.class, new RegistryObject<>(c ->
 					new RectangularShapeDescriptorBuilder.Rectangle2DSD()));

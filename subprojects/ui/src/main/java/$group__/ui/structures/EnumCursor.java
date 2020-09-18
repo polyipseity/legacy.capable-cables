@@ -9,8 +9,6 @@ import $group__.utilities.client.minecraft.ResourceUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
 import net.minecraft.client.renderer.texture.NativeImage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 
@@ -30,14 +28,14 @@ public enum EnumCursor {
 	@SuppressWarnings({"SpellCheckingInspection", "HardcodedFileSeparator"})
 	EXTENSION_RESIZE_NW_SE_CURSOR(() -> {
 		return Try.call(() -> createCursor(
-				new NamespacePrefixedString(UIConfiguration.getModId(), "textures/cursors/aero_nwse/32x32.png"),
-				new Point(8, 8)), LoggerHolder.LOGGER).orElseThrow(ThrowableCatcher::rethrow);
+				new NamespacePrefixedString(UIConfiguration.INSTANCE.getModID(), "textures/cursors/aero_nwse/32x32.png"),
+				new Point(8, 8)), UIConfiguration.INSTANCE.getLogger()).orElseThrow(ThrowableCatcher::rethrow);
 	}),
 	@SuppressWarnings({"SpellCheckingInspection", "HardcodedFileSeparator"})
 	EXTENSION_RESIZE_NE_SW_CURSOR(() -> {
 		return Try.call(() -> createCursor(
-				new NamespacePrefixedString(UIConfiguration.getModId(), "textures/cursors/aero_nesw/32x32.png"),
-				new Point(8, 8)), LoggerHolder.LOGGER).orElseThrow(ThrowableCatcher::rethrow);
+				new NamespacePrefixedString(UIConfiguration.INSTANCE.getModID(), "textures/cursors/aero_nesw/32x32.png"),
+				new Point(8, 8)), UIConfiguration.INSTANCE.getLogger()).orElseThrow(ThrowableCatcher::rethrow);
 	}),
 	;
 
@@ -58,10 +56,4 @@ public enum EnumCursor {
 	}
 
 	public long getHandle() { return handle; }
-
-	protected enum LoggerHolder {
-		;
-
-		private static final Logger LOGGER = LogManager.getLogger();
-	}
 }

@@ -23,6 +23,7 @@ import $group__.ui.parsers.components.UIDefaultComponentParser;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CastUtilities;
+import $group__.utilities.PreconditionUtilities;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.binding.Binder;
@@ -65,8 +66,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.network.NetworkHooks;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -78,7 +77,6 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
 
-import static $group__.utilities.PreconditionUtilities.requireRunOnceOnly;
 import static java.util.Objects.requireNonNull;
 
 public enum UIDebugMinecraft {
@@ -112,7 +110,6 @@ public enum UIDebugMinecraft {
 		INSTANCE,
 		;
 
-		private static final Logger LOGGER = LogManager.getLogger();
 		private static final IUIResourceParser<IUIViewComponentMinecraft<?, ?>, Function<? super Unmarshaller, ?>> PARSER =
 				UIDefaultMinecraftComponentParser.makeParserMinecraft(
 						UIDefaultComponentParser.makeParserStandard(
@@ -122,10 +119,10 @@ public enum UIDebugMinecraft {
 
 		static {
 			Try.run(() -> PARSER.parse(u -> Try.call(() -> {
-				try (InputStream is = ResourceUtilities.getInputStream(new NamespacePrefixedString(UIConfiguration.getModId(), "ui/schemas/components_test.xml"))) {
+				try (InputStream is = ResourceUtilities.getInputStream(new NamespacePrefixedString(UIConfiguration.INSTANCE.getModID(), "ui/schemas/components_test.xml"))) {
 					return u.unmarshal(is);
 				}
-			}, LOGGER).orElseThrow(ThrowableCatcher::rethrow)), LOGGER);
+			}, UIConfiguration.INSTANCE.getLogger()).orElseThrow(ThrowableCatcher::rethrow)), UIConfiguration.INSTANCE.getLogger());
 			ThrowableCatcher.rethrow(true);
 			PARSER.construct(); // COMMENT early check
 		}
@@ -267,11 +264,10 @@ public enum UIDebugMinecraft {
 
 	private static final class DebugBlock extends Block {
 		private static final DebugBlock INSTANCE = new DebugBlock();
-		private static final Logger LOGGER = LogManager.getLogger();
 
 		private DebugBlock() {
 			super(Properties.from(Blocks.STONE));
-			requireRunOnceOnly(LOGGER);
+			PreconditionUtilities.requireRunOnceOnly(UIConfiguration.INSTANCE.getLogger());
 		}
 
 		@Override

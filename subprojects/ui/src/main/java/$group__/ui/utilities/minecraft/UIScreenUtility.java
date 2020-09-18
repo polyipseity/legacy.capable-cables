@@ -1,5 +1,6 @@
 package $group__.ui.utilities.minecraft;
 
+import $group__.ui.UIConfiguration;
 import $group__.utilities.PreconditionUtilities;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -10,19 +11,16 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 
 @OnlyIn(Dist.CLIENT)
 public final class UIScreenUtility extends Screen {
 	public static final UIScreenUtility INSTANCE = new UIScreenUtility();
-	private static final Logger LOGGER = LogManager.getLogger();
 
 	private UIScreenUtility() {
 		super(new StringTextComponent(""));
-		PreconditionUtilities.requireRunOnceOnly(LOGGER);
+		PreconditionUtilities.requireRunOnceOnly(UIConfiguration.INSTANCE.getLogger());
 	}
 
 	public UIScreenUtility setClient_(@Nullable Minecraft client) {

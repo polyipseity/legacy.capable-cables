@@ -12,7 +12,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import net.jodah.typetools.TypeResolver;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.reflections.Reflections;
 import sun.misc.Unsafe;
@@ -50,20 +49,21 @@ public enum DynamicUtilities {
 				return r;
 			}));
 
-	private static final Logger LOGGER = LogManager.getLogger(DynamicUtilities.class);
-
 	private static final int TRUSTED_LOOKUP_MODES = 15;
 
+	private static final MethodHandle DEFINE_CLASS_METHOD_HANDLE;
+
 	static {
+		Logger logger = UtilitiesConfiguration.INSTANCE.getLogger();
 		IMPL_LOOKUP = Arrays.stream(Lookup.class.getDeclaredFields()).unordered()
 				.filter(f -> Lookup.class.equals(f.getType()))
 				.map(f -> {
-					Try.run(() -> f.setAccessible(true), LOGGER);
-					ThrowableCatcher.acceptIfCaught(t -> LOGGER.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("impl lookup field", f, Lookup.class, true), t)));
+					Try.run(() -> f.setAccessible(true), logger);
+					ThrowableCatcher.acceptIfCaught(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("impl lookup field", f, Lookup.class, true), t)));
 
-					@Nullable Optional<Lookup> ret = Try.call(() -> (Lookup) PUBLIC_LOOKUP.unreflectGetter(f).invokeExact(), LOGGER).filter(l -> l.lookupModes() == TRUSTED_LOOKUP_MODES);
+					@Nullable Optional<Lookup> ret = Try.call(() -> (Lookup) PUBLIC_LOOKUP.unreflectGetter(f).invokeExact(), logger).filter(l -> l.lookupModes() == TRUSTED_LOOKUP_MODES);
 
-					Try.run(() -> f.setAccessible(false), LOGGER);
+					Try.run(() -> f.setAccessible(false), logger);
 					return ret;
 				})
 				.filter(Optional::isPresent)
@@ -73,11 +73,16 @@ public enum DynamicUtilities {
 
 		UNSAFE = Arrays.stream(Unsafe.class.getDeclaredFields()).unordered()
 				.filter(f -> Unsafe.class.equals(f.getType()))
-				.map(f -> Try.call(() -> (Unsafe) IMPL_LOOKUP.unreflectGetter(f).invokeExact(), LOGGER))
+				.map(f -> Try.call(() -> (Unsafe) IMPL_LOOKUP.unreflectGetter(f).invokeExact(), logger))
 				.filter(Optional::isPresent)
 				.map(Optional::get)
 				.findAny()
 				.orElseThrow(InternalError::new);
+
+		DEFINE_CLASS_METHOD_HANDLE = Try.call(() ->
+				IMPL_LOOKUP.findVirtual(ClassLoader.class, "defineClass",
+						MethodType.methodType(Class.class, String.class, byte[].class, int.class, int.class)), UtilitiesConfiguration.INSTANCE.getLogger())
+				.orElseThrow(ThrowableCatcher::rethrow);
 	}
 
 	public static boolean isClassAbstract(Class<?> clazz) { return clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()); }
@@ -98,12 +103,6 @@ public enum DynamicUtilities {
 	}
 
 	public static Class<?> getCallerClass() { return getClassStackTrace(2); }
-
-	private static final MethodHandle DEFINE_CLASS_METHOD_HANDLE =
-			Try.call(() ->
-					IMPL_LOOKUP.findVirtual(ClassLoader.class, "defineClass",
-							MethodType.methodType(Class.class, String.class, byte[].class, int.class, int.class)), LOGGER)
-					.orElseThrow(ThrowableCatcher::rethrow);
 
 	public static Optional<StackTraceElement> getCallerStackTraceElement() {
 		/* COMMENT
@@ -141,7 +140,7 @@ public enum DynamicUtilities {
 	public static Class<?> defineClass(ClassLoader classLoader, String name, byte[] data) {
 		// TODO Java 9 - use Lookup.defineClass
 		return Try.call(() ->
-				(Class<?>) DEFINE_CLASS_METHOD_HANDLE.invokeExact(classLoader, name, data, 0, data.length), LOGGER)
+				(Class<?>) DEFINE_CLASS_METHOD_HANDLE.invokeExact(classLoader, name, data, 0, data.length), UtilitiesConfiguration.INSTANCE.getLogger())
 				.orElseThrow(ThrowableCatcher::rethrow);
 	}
 
@@ -307,11 +306,8 @@ public enum DynamicUtilities {
 
 	public static final class SecurityManagerHolder extends SecurityManager {
 		public static final SecurityManagerHolder INSTANCE = new SecurityManagerHolder();
-		private static final Logger LOGGER = LogManager.getLogger();
 
-		private SecurityManagerHolder() {
-			PreconditionUtilities.requireRunOnceOnly(LOGGER);
-		}
+		private SecurityManagerHolder() { PreconditionUtilities.requireRunOnceOnly(UtilitiesConfiguration.INSTANCE.getLogger()); }
 
 		@Override
 		public Class<?>[] getClassContext() {

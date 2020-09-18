@@ -1,8 +1,8 @@
-package $group__.ui;
+package $group__.utilities;
 
 import $group__.utilities.compile.EnumBuildType;
 
-public enum UIConstants {
+public enum UtilitiesConstants {
 	;
 
 	public static final String DISPLAY_NAME = "${displayName}";

@@ -2,11 +2,10 @@ package $group__.utilities.extensions;
 
 import $group__.utilities.PreconditionUtilities;
 import $group__.utilities.ThrowableUtilities;
+import $group__.utilities.UtilitiesConfiguration;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.Registry;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -47,12 +46,11 @@ public interface IExtension<K, C extends IExtensionContainer<? super K>> extends
 	}
 
 	final class RegExtension extends Registry<INamespacePrefixedString, IType<? extends INamespacePrefixedString, ?, ?>> {
-		private static final Logger LOGGER = LogManager.getLogger();
 		public static final RegExtension INSTANCE = new RegExtension();
 
 		protected RegExtension() {
-			super(true, LOGGER);
-			PreconditionUtilities.requireRunOnceOnly(LOGGER);
+			super(true, UtilitiesConfiguration.INSTANCE.getLogger());
+			PreconditionUtilities.requireRunOnceOnly(UtilitiesConfiguration.INSTANCE.getLogger());
 		}
 
 		public static void checkExtensionRegistered(IExtension<? extends INamespacePrefixedString, ?> extension) {

@@ -12,8 +12,6 @@ import $group__.utilities.structures.NamespacePrefixedString;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import jakarta.xml.bind.JAXBContext;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
@@ -82,21 +80,20 @@ public interface IUIComponentParser<T, R>
 
 		public static final String COMPONENTS_CONTEXT_PATH = "${xjcMainComponentsContextPath}";
 		@SuppressWarnings("HardcodedFileSeparator")
-		public static final INamespacePrefixedString SCHEMA_LOCATION = new NamespacePrefixedString(UIConfiguration.getModId(), "ui/schemas/components.xsd");
+		public static final INamespacePrefixedString SCHEMA_LOCATION = new NamespacePrefixedString(UIConfiguration.INSTANCE.getModID(), "ui/schemas/components.xsd");
 		public static final Schema SCHEMA;
 		public static final String SCHEMA_NAMESPACE_URI = "https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components";
 		public static final JAXBContext CONTEXT;
-		private static final Logger LOGGER = LogManager.getLogger();
 
 		static {
 			SCHEMA = ThrowableUtilities.Try.call(() -> {
 				try (InputStream res = ResourceUtilities.getInputStream(SCHEMA_LOCATION)) {
 					return SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new StreamSource(res));
 				}
-			}, LOGGER)
+			}, UIConfiguration.INSTANCE.getLogger())
 					.orElseThrow(ThrowableUtilities.ThrowableCatcher::rethrow);
 			CONTEXT = ThrowableUtilities.Try.call(() ->
-					JAXBContext.newInstance(COMPONENTS_CONTEXT_PATH, UIDefaultComponentParser.class.getClassLoader()), LOGGER).orElseThrow(ThrowableUtilities.ThrowableCatcher::rethrow);
+					JAXBContext.newInstance(COMPONENTS_CONTEXT_PATH, UIDefaultComponentParser.class.getClassLoader()), UIConfiguration.INSTANCE.getLogger()).orElseThrow(ThrowableUtilities.ThrowableCatcher::rethrow);
 		}
 	}
 }

@@ -14,8 +14,6 @@ import com.google.common.collect.Iterables;
 import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.subjects.Subject;
 import io.reactivex.rxjava3.subjects.UnicastSubject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
@@ -27,7 +25,6 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
 public class UIViewModel<M extends IUIModel>
 		implements IUIViewModel<M> {
-	private static final Logger LOGGER = LogManager.getLogger();
 	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected WeakReference<IUIInfrastructure<?, ?, ?>> infrastructure = new WeakReference<>(null);
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();

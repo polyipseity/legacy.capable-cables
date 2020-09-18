@@ -4,20 +4,17 @@ import $group__.utilities.ConstantsUtilities;
 import $group__.utilities.DynamicUtilities;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.ThrowableUtilities.BecauseOf;
+import $group__.utilities.UtilitiesConfiguration;
 import io.reactivex.rxjava3.subjects.Subject;
 import net.minecraftforge.eventbus.EventBus;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventListenerHelper;
 import net.minecraftforge.eventbus.api.IEventBus;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.function.Supplier;
 
 public enum EventBusUtilities {
 	;
-
-	private static final Logger LOGGER = LogManager.getLogger();
 
 	public static boolean callWithPrePostHooks(Subject<Event> bus, Supplier<Boolean> action, Event pre, Event post) {
 		if (!pre.hasResult())
@@ -58,7 +55,7 @@ public enum EventBusUtilities {
 			  The exact nature of this race condition is unknown to us at this time.
 			 */
 			ThrowableUtilities.Try.call(() ->
-					(int) DynamicUtilities.IMPL_LOOKUP.findGetter(EventBus.class, "busID", int.class).invokeExact((EventBus) bus), LOGGER)
+					(int) DynamicUtilities.IMPL_LOOKUP.findGetter(EventBus.class, "busID", int.class).invokeExact((EventBus) bus), UtilitiesConfiguration.INSTANCE.getLogger())
 					.ifPresent(id ->
 							EventListenerHelper.getListenerList(eventType).getListeners(id));
 		}

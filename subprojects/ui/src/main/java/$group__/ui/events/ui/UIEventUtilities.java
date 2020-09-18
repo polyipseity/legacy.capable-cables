@@ -1,5 +1,6 @@
 package $group__.ui.events.ui;
 
+import $group__.ui.UIConfiguration;
 import $group__.ui.core.mvvm.views.events.*;
 import $group__.ui.core.mvvm.views.events.types.EnumUIEventComponentType;
 import $group__.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
@@ -14,8 +15,6 @@ import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.Registry;
 import $group__.utilities.structures.paths.INode;
 import com.google.common.collect.ImmutableList;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.awt.geom.Point2D;
@@ -177,12 +176,11 @@ public enum UIEventUtilities {
 	}
 
 	public static final class RegUIEvent extends Registry<INamespacePrefixedString, Class<? extends IUIEvent>> {
-		private static final Logger LOGGER = LogManager.getLogger();
 		public static final RegUIEvent INSTANCE = new RegUIEvent();
 
 		protected RegUIEvent() {
-			super(false, LOGGER);
-			PreconditionUtilities.requireRunOnceOnly(LOGGER);
+			super(false, UIConfiguration.INSTANCE.getLogger());
+			PreconditionUtilities.requireRunOnceOnly(UIConfiguration.INSTANCE.getLogger());
 		}
 
 		public static void checkEvent(IUIEvent event)

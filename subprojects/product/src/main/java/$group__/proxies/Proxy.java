@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.function.Consumer;
 
-import static $group__.Globals.LOGGER;
+import static $group__.ModGlobals.LOGGER;
 import static $group__.utilities.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
 import static $group__.utilities.LoggerUtilities.EnumMessages.PREFIX_MOD_LIFECYCLE_MESSAGE;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;

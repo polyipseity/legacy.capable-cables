@@ -1,5 +1,6 @@
 package $group__.ui.core.mvvm.views.components.extensions.caches;
 
+import $group__.ui.UIConfiguration;
 import $group__.ui.core.mvvm.extensions.IUIExtension;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
@@ -14,8 +15,6 @@ import com.google.common.cache.Cache;
 import com.google.common.collect.ImmutableList;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.observers.DisposableObserver;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import sun.misc.Cleaner;
 
 import java.util.List;
@@ -96,12 +95,11 @@ public interface IUIExtensionCache
 	}
 
 	final class RegUICache extends Registry<INamespacePrefixedString, IType<?, ?>> {
-		private static final Logger LOGGER = LogManager.getLogger();
 		public static final RegUICache INSTANCE = new RegUICache();
 
 		protected RegUICache() {
-			super(true, LOGGER);
-			PreconditionUtilities.requireRunOnceOnly(LOGGER);
+			super(true, UIConfiguration.INSTANCE.getLogger());
+			PreconditionUtilities.requireRunOnceOnly(UIConfiguration.INSTANCE.getLogger());
 		}
 	}
 }

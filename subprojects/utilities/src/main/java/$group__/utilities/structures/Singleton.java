@@ -21,7 +21,6 @@ import static java.lang.invoke.MethodType.methodType;
 public abstract class Singleton {
 	protected static final Map<Class<?>, Map.Entry<? extends Singleton, String>> INSTANCES = Collections.synchronizedMap(MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap());
 
-
 	protected Singleton(Logger logger) {
 		Class<? extends Singleton> clazz = getClass();
 		String classGS = clazz.toGenericString(),

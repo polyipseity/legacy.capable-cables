@@ -5,9 +5,8 @@ import $group__.utilities.LoopUtilities;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
+import $group__.utilities.UtilitiesConfiguration;
 import com.google.common.collect.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -95,13 +94,12 @@ public enum MapUtilities {
 		private static final String SUPERCLASS_NAME = "com.google.common.collect.AbstractBiMap";
 		private static final String CLASS_SIMPLE_NAME = "AbstractBiMap_" + serialVersionUID; // COMMENT hopefully they will not name a new class like so...
 		private static final Pattern LITERAL_SUPERCLASS_SIMPLE_NAME = Pattern.compile("AbstractBiMap", Pattern.LITERAL);
-		private static final Logger LOGGER = LogManager.getLogger();
 		private static final Class<?> CLASS;
 		private static final BiFunction<Map<?, ?>, Map<?, ?>, ? extends BiMap<?, ?>> CONSTRUCTOR;
 
 		static {
 			{
-				Class<?> superclass = Try.call(() -> Class.forName(SUPERCLASS_NAME), LOGGER)
+				Class<?> superclass = Try.call(() -> Class.forName(SUPERCLASS_NAME), UtilitiesConfiguration.INSTANCE.getLogger())
 						.orElseThrow(ThrowableCatcher::rethrow);
 				String name = LITERAL_SUPERCLASS_SIMPLE_NAME
 						.matcher(superclass.getName())
@@ -206,11 +204,11 @@ public enum MapUtilities {
 			}
 
 			{
-				MethodHandle constructor = Try.call(() -> DynamicUtilities.IMPL_LOOKUP.findConstructor(CLASS, MethodType.methodType(void.class, Map.class, Map.class)), LOGGER)
+				MethodHandle constructor = Try.call(() -> DynamicUtilities.IMPL_LOOKUP.findConstructor(CLASS, MethodType.methodType(void.class, Map.class, Map.class)), UtilitiesConfiguration.INSTANCE.getLogger())
 						.orElseThrow(ThrowableCatcher::rethrow);
 				// TODO Java 9 - use LambdaMetaFactory
 				CONSTRUCTOR = (forward, backward) ->
-						Try.call(() -> (BiMap<?, ?>) constructor.invoke(forward, backward), LOGGER)
+						Try.call(() -> (BiMap<?, ?>) constructor.invoke(forward, backward), UtilitiesConfiguration.INSTANCE.getLogger())
 								.orElseThrow(ThrowableCatcher::rethrow);
 			}
 		}

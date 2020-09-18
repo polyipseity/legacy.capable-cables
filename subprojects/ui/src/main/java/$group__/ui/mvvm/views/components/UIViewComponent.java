@@ -1,5 +1,6 @@
 package $group__.ui.mvvm.views.components;
 
+import $group__.ui.UIConfiguration;
 import $group__.ui.core.binding.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
@@ -42,8 +43,6 @@ import com.google.common.collect.*;
 import io.reactivex.rxjava3.core.ObservableSource;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -197,8 +196,6 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	public enum CacheViewComponent {
 		;
 
-		private static final Logger LOGGER = LogManager.getLogger();
-
 		@SuppressWarnings("UnstableApiUsage")
 		public static final Registry.RegistryObject<IUIExtensionCache.IType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
 				IUIExtensionCache.RegUICache.INSTANCE.registerApply(generateKey("children_flat"),
@@ -227,7 +224,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 												.collect(ImmutableList.toImmutableList());
 									}
 									return ret;
-								}, LOGGER)),
+								}, UIConfiguration.INSTANCE.getLogger())),
 								(t, i) -> IUIExtensionCache.IType.invalidateImpl(i, t.getKey()),
 								type -> ImmutableList.of(
 										new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
@@ -277,7 +274,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 												.collect(ImmutableList.toImmutableList());
 									}
 									return ret;
-								}, LOGGER)),
+								}, UIConfiguration.INSTANCE.getLogger())),
 								(t, i) -> IUIExtensionCache.IType.invalidateImpl(i, t.getKey()),
 								type -> ImmutableList.of(
 										new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {

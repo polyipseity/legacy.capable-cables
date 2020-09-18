@@ -3,6 +3,7 @@ package $group__.utilities.client.minecraft;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.LoggerUtilities;
+import $group__.utilities.UtilitiesConfiguration;
 import $group__.utilities.collections.CacheUtilities;
 import $group__.utilities.collections.ManualLoadingCache;
 import $group__.utilities.collections.MapUtilities;
@@ -14,8 +15,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
@@ -53,8 +52,6 @@ public enum GLUtilities {
 				STENCIL_FUNC_FALLBACK = () -> RenderSystem.stencilFunc(GL11.GL_ALWAYS, 0, GLUtilities.GL_MASK_ALL_BITS),
 				STENCIL_OP_FALLBACK = () -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP),
 				COLOR_MASK_FALLBACK = () -> RenderSystem.colorMask(true, true, true, true);
-		private static final Logger LOGGER = LogManager.getLogger();
-
 
 		private static final LoadingCache<String, Deque<GLCall>> STACKS =
 				ManualLoadingCache.newNestedLoadingCacheCollection(
@@ -77,7 +74,7 @@ public enum GLUtilities {
 			Optional.ofNullable(STACKS.getIfPresent(name))
 					.filter(s -> !s.isEmpty())
 					.ifPresent(s -> {
-						LOGGER.warn(() ->
+						UtilitiesConfiguration.INSTANCE.getLogger().warn(() ->
 								LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} leak: {}: {} not popped", Stacks.class.getSimpleName(), name, s.size()));
 						while (!s.isEmpty())
 							pop(name);

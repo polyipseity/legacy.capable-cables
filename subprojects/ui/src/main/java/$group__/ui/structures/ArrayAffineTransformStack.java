@@ -1,5 +1,6 @@
 package $group__.ui.structures;
 
+import $group__.ui.UIConfiguration;
 import $group__.ui.core.structures.IAffineTransformStack;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.ObjectUtilities;
@@ -27,7 +28,7 @@ public class ArrayAffineTransformStack
 	public ArrayAffineTransformStack(int initialCapacity) {
 		this.data = new ArrayDeque<>(initialCapacity);
 		this.data.push(new AffineTransform());
-		Cleaner.create(getCleanerRef(), new LeakNotifier(this.data));
+		Cleaner.create(getCleanerRef(), new LeakNotifier(this.data, UIConfiguration.INSTANCE.getLogger()));
 	}
 
 	protected final Object getCleanerRef() { return cleanerRef; }

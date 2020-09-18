@@ -15,6 +15,7 @@ import static $group__.utilities.LoggerUtilities.EnumMessages.FACTORY_SIMPLE_MES
 import static $group__.utilities.LoggerUtilities.EnumMessages.SUFFIX_WITH_THROWABLE;
 import static $group__.utilities.ThrowableUtilities.ThrowableCatcher.*;
 
+// TODO review this
 public enum ThrowableUtilities {
 	;
 

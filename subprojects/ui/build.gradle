@@ -12,6 +12,7 @@ apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
 apply from: "$modulesDir${separator}optional${separator}jaxb.gradle"
 apply from: "$modulesDir${separator}optional${separator}publishing.gradle"
 
+def displayName = 'UI'
 def compileJava = tasks.named 'compileJava'
 
 // COMMENT JAXB
@@ -44,6 +45,7 @@ compileJava.configure { dependsOn xjcMainComponents }
 
 makeSourcesTasks.call { Task it ->
 	it.inputs.properties([
+			expand_displayName                 : displayName,
 			expand_group                       : project.group,
 			expand_buildType                   : buildType,
 			expand_xjcMainComponentsContextPath: xjcMainComponentsContextPath,

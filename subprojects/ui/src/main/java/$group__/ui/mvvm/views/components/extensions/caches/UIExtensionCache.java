@@ -1,5 +1,6 @@
 package $group__.ui.mvvm.views.components.extensions.caches;
 
+import $group__.ui.UIConfiguration;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
@@ -22,8 +23,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
@@ -59,7 +58,6 @@ public class UIExtensionCache
 
 	public enum CacheUniversal {
 		;
-		private static final Logger LOGGER = LogManager.getLogger();
 
 		public static final Registry.RegistryObject<IUIExtensionCache.IType<IUIComponentManager<?>, IUIComponent>> MANAGER =
 				RegUICache.INSTANCE.registerApply(generateKey("manager"),
@@ -77,7 +75,7 @@ public class UIExtensionCache
 																new WeakReference<>(ret));
 													}
 													return ret;
-												}, LOGGER)),
+												}, UIConfiguration.INSTANCE.getLogger())),
 								(t, i) -> {
 									IUIExtensionCache.IType.invalidateImpl(i, t.getKey());
 									CastUtilities.castChecked(IUIComponentContainer.class, i)
@@ -102,7 +100,7 @@ public class UIExtensionCache
 											     parent = parent.flatMap(IUIComponent::getParent))
 												++ret;
 											return ret;
-										}), LOGGER).map(CastUtilities::castUnchecked)),
+										}), UIConfiguration.INSTANCE.getLogger()).map(CastUtilities::castUnchecked)),
 								(t, i) -> {
 									IUIExtensionCache.IType.invalidateImpl(i, t.getKey());
 									CastUtilities.castChecked(IUIComponentContainer.class, i)

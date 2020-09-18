@@ -1,5 +1,6 @@
 package $group__.ui.core.structures;
 
+import $group__.ui.UIMarkers;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.LoggerUtilities;
 import $group__.utilities.ThrowableUtilities;
@@ -7,8 +8,8 @@ import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.interfaces.ICopyable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
 
 import javax.annotation.Nullable;
 import java.awt.geom.AffineTransform;
@@ -18,7 +19,7 @@ import java.util.function.Function;
 
 public interface IAffineTransformStack
 		extends ICopyable, AutoCloseable {
-	Logger LOGGER = LogManager.getLogger();
+	Marker CLASS_MARKER = UIMarkers.INSTANCE.getClassMarker(IAffineTransformStack.class).addParents(UIMarkers.INSTANCE.getMarkerStructure());
 	ImmutableList<Function<? super IAffineTransformStack, ?>> OBJECT_VARIABLES = ImmutableList.of(
 			IAffineTransformStack::getData);
 	ImmutableMap<String, Function<? super IAffineTransformStack, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchKeysValues(OBJECT_VARIABLES.size(),
@@ -61,19 +62,21 @@ public interface IAffineTransformStack
 	class LeakNotifier
 			implements Runnable {
 		protected final Deque<AffineTransform> data;
+		protected final Logger logger;
 		@Nullable
 		protected final Throwable throwable;
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-		public LeakNotifier(Deque<AffineTransform> data) {
+		public LeakNotifier(Deque<AffineTransform> data, Logger logger) {
 			this.data = data;
+			this.logger = logger;
 			this.throwable = ThrowableUtilities.createIfDebug().orElse(null);
 		}
 
 		@Override
 		public void run() {
 			if (!isClean(getData()))
-				LOGGER.warn(() -> LoggerUtilities.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(
+				logger.warn(CLASS_MARKER, () -> LoggerUtilities.EnumMessages.SUFFIX_WITH_THROWABLE.makeMessage(
 						LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Stack not clean, content:{}{}", System.lineSeparator(), getData()),
 						getThrowable().orElse(null)
 				));

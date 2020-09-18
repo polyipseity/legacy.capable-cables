@@ -1,5 +1,6 @@
 package $group__.ui.core.parsers.adapters;
 
+import $group__.ui.UIConfiguration;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.PreconditionUtilities;
 import $group__.utilities.ThrowableUtilities;
@@ -7,8 +8,6 @@ import $group__.utilities.functions.IDuplexFunction;
 import $group__.utilities.structures.Registry;
 import $group__.utilities.structures.StandardDuplexFunctionRegistry;
 import jakarta.xml.bind.JAXBElement;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -38,22 +37,20 @@ public enum JAXBAdapterRegistries {
 	public static final class Object
 			extends StandardDuplexFunctionRegistry {
 		public static final Object INSTANCE = new Object();
-		private static final Logger LOGGER = LogManager.getLogger();
 
 		protected Object() {
-			super(true, LOGGER);
-			PreconditionUtilities.requireRunOnceOnly(LOGGER);
+			super(true, UIConfiguration.INSTANCE.getLogger());
+			PreconditionUtilities.requireRunOnceOnly(UIConfiguration.INSTANCE.getLogger());
 		}
 	}
 
 	public static final class Element
 			extends Registry<Class<?>, IDuplexFunction<JAXBElement<?>, ?>> {
 		public static final Element INSTANCE = new Element();
-		private static final Logger LOGGER = LogManager.getLogger();
 
 		protected Element() {
-			super(true, LOGGER);
-			PreconditionUtilities.requireRunOnceOnly(LOGGER);
+			super(true, UIConfiguration.INSTANCE.getLogger());
+			PreconditionUtilities.requireRunOnceOnly(UIConfiguration.INSTANCE.getLogger());
 		}
 
 		public <L, VL extends IDuplexFunction<JAXBElement<L>, ?>> RegistryObject<VL> registerSafe(Class<L> key, VL value) {
