@@ -1,25 +1,13 @@
 package $group__.ui.core.parsers.components;
 
-import $group__.ui.UIConfiguration;
 import $group__.ui.core.parsers.IUIResourceParser;
-import $group__.ui.parsers.components.UIDefaultComponentParser;
-import $group__.utilities.ThrowableUtilities;
-import $group__.utilities.client.minecraft.ResourceUtilities;
 import $group__.utilities.functions.FunctionUtilities;
 import $group__.utilities.functions.IConsumer3;
-import $group__.utilities.interfaces.INamespacePrefixedString;
-import $group__.utilities.structures.NamespacePrefixedString;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import jakarta.xml.bind.JAXBContext;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
-import javax.xml.XMLConstants;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import java.io.InputStream;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
@@ -73,27 +61,5 @@ public interface IUIComponentParser<T, R>
 		public boolean isElement() { return element; }
 
 		private Optional<? extends EnumHandlerType> getVariantCounterpart() { return Optional.ofNullable(variantCounterpart); }
-	}
-
-	enum SchemaHolder {
-		;
-
-		public static final String COMPONENTS_CONTEXT_PATH = "${xjcMainComponentsContextPath}";
-		@SuppressWarnings("HardcodedFileSeparator")
-		public static final INamespacePrefixedString SCHEMA_LOCATION = new NamespacePrefixedString(UIConfiguration.INSTANCE.getModID(), "ui/schemas/components.xsd");
-		public static final Schema SCHEMA;
-		public static final String SCHEMA_NAMESPACE_URI = "https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components";
-		public static final JAXBContext CONTEXT;
-
-		static {
-			SCHEMA = ThrowableUtilities.Try.call(() -> {
-				try (InputStream res = ResourceUtilities.getInputStream(SCHEMA_LOCATION)) {
-					return SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new StreamSource(res));
-				}
-			}, UIConfiguration.INSTANCE.getLogger())
-					.orElseThrow(ThrowableUtilities.ThrowableCatcher::rethrow);
-			CONTEXT = ThrowableUtilities.Try.call(() ->
-					JAXBContext.newInstance(COMPONENTS_CONTEXT_PATH, UIDefaultComponentParser.class.getClassLoader()), UIConfiguration.INSTANCE.getLogger()).orElseThrow(ThrowableUtilities.ThrowableCatcher::rethrow);
-		}
 	}
 }

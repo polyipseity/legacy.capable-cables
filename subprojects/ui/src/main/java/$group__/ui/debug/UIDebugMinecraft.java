@@ -34,7 +34,6 @@ import $group__.utilities.binding.core.methods.IBindingMethodDestination;
 import $group__.utilities.binding.fields.BindingField;
 import $group__.utilities.binding.fields.ObservableField;
 import $group__.utilities.binding.methods.BindingMethodDestination;
-import $group__.utilities.client.minecraft.ResourceUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
@@ -103,13 +102,13 @@ public enum UIDebugMinecraft {
 		}
 	}
 
-	@SuppressWarnings("HardcodedFileSeparator")
 	@OnlyIn(Dist.CLIENT)
 	private enum DebugUI
 			implements ScreenManager.IScreenFactory<DebugContainer, AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer>> {
 		INSTANCE,
 		;
 
+		public static final String COMPONENT_TEST_DATA = "components_test.xml";
 		private static final IUIResourceParser<IUIViewComponentMinecraft<?, ?>, Function<? super Unmarshaller, ?>> PARSER =
 				UIDefaultMinecraftComponentParser.makeParserMinecraft(
 						UIDefaultComponentParser.makeParserStandard(
@@ -119,7 +118,7 @@ public enum UIDebugMinecraft {
 
 		static {
 			Try.run(() -> PARSER.parse(u -> Try.call(() -> {
-				try (InputStream is = ResourceUtilities.getInputStream(new NamespacePrefixedString(UIConfiguration.INSTANCE.getModID(), "ui/schemas/components_test.xml"))) {
+				try (InputStream is = AssertionUtilities.assertNonnull(DebugUI.class.getResourceAsStream(COMPONENT_TEST_DATA))) {
 					return u.unmarshal(is);
 				}
 			}, UIConfiguration.INSTANCE.getLogger()).orElseThrow(ThrowableCatcher::rethrow)), UIConfiguration.INSTANCE.getLogger());

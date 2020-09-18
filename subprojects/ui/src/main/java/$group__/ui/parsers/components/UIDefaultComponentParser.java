@@ -76,7 +76,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public void parse(Function<? super Unmarshaller, ?> resource) throws Throwable {
-		Unmarshaller um = SchemaHolder.CONTEXT.createUnmarshaller();
+		Unmarshaller um = DefaultSchemaHolder.CONTEXT.createUnmarshaller();
 		// COMMENT do NOT set a schema
 		Ui root = (Ui) resource.apply(um);
 		reset();

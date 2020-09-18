@@ -1,6 +1,5 @@
 package $group__.client;
 
-import $group__.ModConstants;
 import $group__.proxies.Proxy;
 import $group__.ui.UIConfiguration;
 import $group__.ui.UIConstants;
@@ -28,13 +27,13 @@ public final class ProxyClient extends Proxy implements IProxyClient {
 
 	@Override
 	public void onSetupClient(FMLClientSetupEvent event) {
-		ConfigurationTemplate.configureSafe(UIConfiguration.INSTANCE, () -> new UIConfiguration.ConfigurationData(ModConstants.MOD_ID, null));
+		ConfigurationTemplate.configureSafe(UIConfiguration.INSTANCE, () -> new UIConfiguration.ConfigurationData(null));
 		if (UIConstants.BUILD_TYPE.isDebug())
 			UIDebugMinecraft.registerUIFactory();
 	}
 
 	@Override
 	public void onLoadComplete(FMLLoadCompleteEvent event) {
-		UIConfiguration.loadComplete();
+		UIConfiguration.MinecraftSpecific.loadComplete();
 	}
 }

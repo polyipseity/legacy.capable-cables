@@ -1,14 +1,13 @@
-package $group__.ui.structures;
+package $group__.ui.cursors;
 
 import $group__.ui.UIConfiguration;
 import $group__.ui.utilities.UIObjectUtilities;
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.client.minecraft.ImageUtilities;
-import $group__.utilities.client.minecraft.ResourceUtilities;
-import $group__.utilities.interfaces.INamespacePrefixedString;
-import $group__.utilities.structures.NamespacePrefixedString;
 import net.minecraft.client.renderer.texture.NativeImage;
+import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 
@@ -25,17 +24,29 @@ public enum EnumCursor {
 	STANDARD_HAND_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR)),
 	STANDARD_RESIZE_HORIZONTAL_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_HRESIZE_CURSOR)),
 	STANDARD_RESIZE_VERTICAL_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_VRESIZE_CURSOR)),
-	@SuppressWarnings({"SpellCheckingInspection", "HardcodedFileSeparator"})
+	@SuppressWarnings({"SpellCheckingInspection"})
 	EXTENSION_RESIZE_NW_SE_CURSOR(() -> {
-		return Try.call(() -> createCursor(
-				new NamespacePrefixedString(UIConfiguration.INSTANCE.getModID(), "textures/cursors/aero_nwse/32x32.png"),
-				new Point(8, 8)), UIConfiguration.INSTANCE.getLogger()).orElseThrow(ThrowableCatcher::rethrow);
+		Logger logger = UIConfiguration.INSTANCE.getLogger();
+		InputStream input = AssertionUtilities.assertNonnull(EnumCursor.class.getResourceAsStream("aero_nwse/32x32.png"));
+		try {
+			return Try.call(() -> createCursor(
+					input,
+					new Point(8, 8)), UIConfiguration.INSTANCE.getLogger()).orElseThrow(ThrowableCatcher::rethrow);
+		} finally {
+			Try.run(input::close, logger);
+		}
 	}),
-	@SuppressWarnings({"SpellCheckingInspection", "HardcodedFileSeparator"})
+	@SuppressWarnings({"SpellCheckingInspection"})
 	EXTENSION_RESIZE_NE_SW_CURSOR(() -> {
-		return Try.call(() -> createCursor(
-				new NamespacePrefixedString(UIConfiguration.INSTANCE.getModID(), "textures/cursors/aero_nesw/32x32.png"),
-				new Point(8, 8)), UIConfiguration.INSTANCE.getLogger()).orElseThrow(ThrowableCatcher::rethrow);
+		Logger logger = UIConfiguration.INSTANCE.getLogger();
+		InputStream input = AssertionUtilities.assertNonnull(EnumCursor.class.getResourceAsStream("aero_nesw/32x32.png"));
+		try {
+			return Try.call(() -> createCursor(
+					input,
+					new Point(8, 8)), UIConfiguration.INSTANCE.getLogger()).orElseThrow(ThrowableCatcher::rethrow);
+		} finally {
+			Try.run(input::close, logger);
+		}
 	}),
 	;
 
@@ -46,9 +57,8 @@ public enum EnumCursor {
 	@SuppressWarnings("EmptyMethod")
 	public static void initializeClass() {}
 
-	public static long createCursor(INamespacePrefixedString location, Point2D hotspot) throws IOException {
-		try (InputStream is = ResourceUtilities.getInputStream(location);
-		     NativeImage ni = NativeImage.read(NativeImage.PixelFormat.RGBA, is);
+	public static long createCursor(InputStream input, Point2D hotspot) throws IOException {
+		try (NativeImage ni = NativeImage.read(NativeImage.PixelFormat.RGBA, input);
 		     GLFWImage i = ImageUtilities.toGLFWImageCursor(ni)) {
 			Point hotspotF = UIObjectUtilities.getPointFloor(hotspot);
 			return GLFW.glfwCreateCursor(i, hotspotF.x, hotspotF.y);
