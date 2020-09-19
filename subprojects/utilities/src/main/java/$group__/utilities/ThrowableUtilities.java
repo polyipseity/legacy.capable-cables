@@ -2,6 +2,7 @@ package $group__.utilities;
 
 import org.apache.logging.log4j.Level;
 import org.slf4j.Logger;
+import org.slf4j.ext.XLogger;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -18,6 +19,14 @@ import static $group__.utilities.ThrowableUtilities.ThrowableCatcher.*;
 // TODO review this
 public enum ThrowableUtilities {
 	;
+
+	public static <T extends Throwable> T logAndThrow(T throwable, Logger logger)
+			throws T {
+		XLogger xLogger = CastUtilities.castChecked(XLogger.class, logger)
+				.orElseGet(() -> new XLogger(logger));
+		xLogger.throwing(throwable);
+		throw throwable;
+	}
 
 	public static RuntimeException wrap(Throwable t) { return new RuntimeException("Wrapped throwable", t); }
 

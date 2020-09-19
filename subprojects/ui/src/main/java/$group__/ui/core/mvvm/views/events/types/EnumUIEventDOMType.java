@@ -3,6 +3,7 @@ package $group__.ui.core.mvvm.views.events.types;
 import $group__.ui.core.mvvm.views.events.IUIEventType;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
+import org.jetbrains.annotations.NonNls;
 
 public enum EnumUIEventDOMType
 		implements IUIEventType {
@@ -51,15 +52,17 @@ public enum EnumUIEventDOMType
 	COMPOSITION_END(INamespacePrefixedString.DEFAULT_PREFIX + "compositionend"),
 	;
 
+	@NonNls
 	protected final String eventTypeString;
 	protected final INamespacePrefixedString eventType;
 
-	EnumUIEventDOMType(String eventTypeString) {
+	EnumUIEventDOMType(@NonNls String eventTypeString) {
 		this.eventTypeString = eventTypeString;
 		this.eventType = new NamespacePrefixedString(this.eventTypeString);
 	}
 
 	@Override
+	@NonNls
 	public String getEventTypeString() { return eventTypeString; }
 
 	@Override

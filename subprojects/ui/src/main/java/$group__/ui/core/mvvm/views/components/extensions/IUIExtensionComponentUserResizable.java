@@ -21,7 +21,7 @@ public interface IUIExtensionComponentUserResizable<E extends IUIComponent & IUI
 	INamespacePrefixedString KEY = new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, AREA_UI + ".component.user_resizable");
 	@SuppressWarnings("unchecked")
 	Registry.RegistryObject<IUIExtension.IType<INamespacePrefixedString, IUIExtensionComponentUserResizable<?>, IUIComponent>> TYPE =
-			RegExtension.INSTANCE.registerApply(KEY, k -> new IUIExtension.IType.Impl<>(k, (t, i) -> (Optional<? extends IUIExtensionComponentUserResizable<?>>) i.getExtension(t.getKey())));
+			ExtensionRegistry.INSTANCE.registerApply(KEY, k -> new IUIExtension.IType.Impl<>(k, (t, i) -> (Optional<? extends IUIExtensionComponentUserResizable<?>>) i.getExtension(t.getKey())));
 
 	Optional<? extends Shape> getResizeShape();
 

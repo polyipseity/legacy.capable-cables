@@ -14,12 +14,14 @@ import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.cursors.EnumCursor;
 import $group__.ui.events.ui.UIEvent;
 import $group__.ui.events.ui.UIEventListener;
+import $group__.ui.events.ui.UIEventRegistry;
 import $group__.ui.events.ui.UIEventUtilities;
 import $group__.ui.mvvm.views.components.UIComponentContainer;
 import $group__.utilities.binding.core.methods.IBindingMethodSource;
 import $group__.utilities.binding.methods.BindingMethodSource;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
+import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
 import java.awt.geom.Point2D;
@@ -31,7 +33,9 @@ import java.util.Set;
 public class UIComponentButton
 		extends UIComponentContainer
 		implements IUIComponentCursorHandleProvider {
+	@NonNls
 	public static final String METHOD_ON_ACTIVATE = INamespacePrefixedString.DEFAULT_PREFIX + "button.methods.activate";
+	@NonNls
 	public static final String METHOD_ON_ACTIVATED = INamespacePrefixedString.DEFAULT_PREFIX + "button.methods.activated";
 
 	public static final INamespacePrefixedString METHOD_ON_ACTIVATE_LOCATION = new NamespacePrefixedString(METHOD_ON_ACTIVATE);
@@ -107,7 +111,7 @@ public class UIComponentButton
 	}
 
 	public interface IUIEventActivate extends IUIEvent {
-		String TYPE_STRING = INamespacePrefixedString.DEFAULT_PREFIX + "button.activated";
+		@NonNls String TYPE_STRING = INamespacePrefixedString.DEFAULT_PREFIX + "button.activated";
 		INamespacePrefixedString TYPE = new NamespacePrefixedString(TYPE_STRING);
 
 		static boolean shouldActivate(UIComponentButton self, IUIEvent event) {
@@ -123,7 +127,7 @@ public class UIComponentButton
 				extends UIEvent
 				implements IUIEventActivate {
 			static {
-				UIEventUtilities.RegUIEvent.INSTANCE.register(TYPE, IUIEventActivate.class); // COMMENT custom: button will be activated
+				UIEventRegistry.getINSTANCE().register(TYPE, IUIEventActivate.class); // COMMENT custom: button will be activated
 			}
 
 			protected final IUIEvent cause;

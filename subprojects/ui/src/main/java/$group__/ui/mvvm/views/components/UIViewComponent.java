@@ -7,6 +7,8 @@ import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.components.IUIComponentShapeAnchorController;
 import $group__.ui.core.mvvm.views.components.IUIViewComponent;
 import $group__.ui.core.mvvm.views.components.extensions.caches.IUIExtensionCache;
+import $group__.ui.core.mvvm.views.components.extensions.caches.IUIExtensionCacheType;
+import $group__.ui.core.mvvm.views.components.extensions.caches.UICacheRegistry;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.ui.core.parsers.components.UIViewComponentConstructor;
 import $group__.ui.core.structures.IUIComponentContext;
@@ -43,6 +45,7 @@ import com.google.common.collect.*;
 import io.reactivex.rxjava3.core.ObservableSource;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -197,9 +200,9 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		;
 
 		@SuppressWarnings("UnstableApiUsage")
-		public static final Registry.RegistryObject<IUIExtensionCache.IType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
-				IUIExtensionCache.RegUICache.INSTANCE.registerApply(generateKey("children_flat"),
-						k -> new IUIExtensionCache.IType.Impl<>(k,
+		public static final Registry.RegistryObject<IUIExtensionCacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
+				UICacheRegistry.getInstance().registerApply(generateKey("children_flat"),
+						k -> new IUIExtensionCacheType.Impl<>(k,
 								(type, instance) -> IUIExtensionCache.TYPE.getValue().get(instance).flatMap(cache -> ThrowableUtilities.Try.call(() -> {
 									@SuppressWarnings("unchecked") @Nullable List<WeakReference<IUIComponent>> cv =
 											(java.util.List<WeakReference<IUIComponent>>) cache.getDelegated().getIfPresent(type.getKey());
@@ -225,7 +228,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 									}
 									return ret;
 								}, UIConfiguration.INSTANCE.getLogger())),
-								(t, i) -> IUIExtensionCache.IType.invalidateImpl(i, t.getKey()),
+								(t, i) -> IUIExtensionCacheType.invalidateImpl(i, t.getKey()),
 								type -> ImmutableList.of(
 										new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
 											@Override
@@ -250,9 +253,9 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 											}
 										})));
 		@SuppressWarnings("UnstableApiUsage")
-		public static final Registry.RegistryObject<IUIExtensionCache.IType<java.util.List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
-				IUIExtensionCache.RegUICache.INSTANCE.registerApply(generateKey("children_flat.focusable"),
-						k -> new IUIExtensionCache.IType.Impl<>(k,
+		public static final Registry.RegistryObject<IUIExtensionCacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
+				UICacheRegistry.getInstance().registerApply(generateKey("children_flat.focusable"),
+						k -> new IUIExtensionCacheType.Impl<>(k,
 								(t, i) -> IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> ThrowableUtilities.Try.call(() -> {
 									@SuppressWarnings("unchecked") @Nullable java.util.List<WeakReference<IUIComponent>> cv =
 											(java.util.List<WeakReference<IUIComponent>>) cache.getDelegated().getIfPresent(t.getKey());
@@ -275,7 +278,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 									}
 									return ret;
 								}, UIConfiguration.INSTANCE.getLogger())),
-								(t, i) -> IUIExtensionCache.IType.invalidateImpl(i, t.getKey()),
+								(t, i) -> IUIExtensionCacheType.invalidateImpl(i, t.getKey()),
 								type -> ImmutableList.of(
 										new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
 											@Override
@@ -300,6 +303,6 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 											}
 										})));
 
-		private static INamespacePrefixedString generateKey(@SuppressWarnings("SameParameterValue") String name) { return new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, CacheViewComponent.class.getName() + '.' + name); }
+		private static INamespacePrefixedString generateKey(@SuppressWarnings("SameParameterValue") @NonNls String name) { return new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, CacheViewComponent.class.getName() + '.' + name); /* TODO extract this method */ }
 	}
 }

@@ -4,6 +4,7 @@ import $group__.utilities.collections.MapUtilities;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -72,7 +73,7 @@ public enum ObjectUtilities {
 
 	public static <T> ImmutableList<Function<? super T, ?>> extendsObjectVariables(Iterable<? extends Function<? super T, ?>> extended, Iterable<? extends Function<? super T, ?>> self) { return ImmutableList.copyOf(Iterables.concat(extended, self)); }
 
-	public static <T> ImmutableMap<String, Function<? super T, ?>> extendsObjectVariablesMap(Collection<? extends Function<? super T, ?>> variables, Map<? extends String, ? extends Function<? super T, ?>> extended, Iterable<? extends String> self) {
+	public static <T> @NonNls ImmutableMap<String, Function<? super T, ?>> extendsObjectVariablesMap(Collection<? extends Function<? super T, ?>> variables, Map<? extends String, ? extends Function<? super T, ?>> extended, Iterable<? extends String> self) {
 		return ImmutableMap.copyOf(
 				MapUtilities.stitchKeysValues(variables.size(), Iterables.concat(extended.keySet(), self), variables));
 	}

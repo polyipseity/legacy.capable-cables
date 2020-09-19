@@ -12,7 +12,6 @@ import $group__.utilities.collections.MapUtilities;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
-import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Modifier;
@@ -39,7 +38,6 @@ public enum BindingUtilities {
 	public static <T> Function<T, Iterable<IBindingField<?>>> getBindingFieldsFunction(Class<T> clazz, Set<EnumScopeOptions> options) {
 		final BiFunction<? super Set<EnumScopeOptions>, T, ? extends Iterable<IBindingField<?>>> retF;
 		final Set<EnumScopeOptions> optionsF = EnumSet.copyOf(options);
-		Logger logger = UtilitiesConfiguration.INSTANCE.getLogger();
 		synchronized (clazz) {
 			@SuppressWarnings("unchecked") @Nullable BiFunction<? super Set<EnumScopeOptions>, T, ? extends Iterable<IBindingField<?>>> ret =
 					(BiFunction<? super Set<EnumScopeOptions>, T, ? extends Iterable<IBindingField<?>>>) BINDING_FIELDS_MAP.get(clazz); // COMMENT should be safe
@@ -47,10 +45,10 @@ public enum BindingUtilities {
 				return o -> ret.apply(optionsF, o);
 			ImmutableSet<Function<T, Optional<IBindingField<?>>>> b = DynamicUtilities.getAllFields(clazz).stream().unordered()
 					.filter(f -> !Modifier.isStatic(f.getModifiers()) && IBindingField.class.isAssignableFrom(f.getType()))
-					.map(f -> Try.call(() -> DynamicUtilities.IMPL_LOOKUP.unreflectGetter(f), logger))
+					.map(f -> Try.call(() -> DynamicUtilities.IMPL_LOOKUP.unreflectGetter(f), UtilitiesConfiguration.getInstance().getLogger()))
 					.filter(Optional::isPresent)
 					.map(m -> (Function<T, Optional<IBindingField<?>>>) o ->
-							Try.call(() -> (IBindingField<?>) m.get().invoke(o), logger))
+							Try.call(() -> (IBindingField<?>) m.get().invoke(o), UtilitiesConfiguration.getInstance().getLogger()))
 					.collect(ImmutableSet.toImmutableSet());
 			Function<T, Iterable<IHasBinding>> c = getHasBindingsVariablesFunction(clazz);
 			retF = (op, o) -> Streams.concat(
@@ -71,17 +69,16 @@ public enum BindingUtilities {
 	@SuppressWarnings({"SynchronizationOnLocalVariableOrMethodParameter", "UnstableApiUsage", "unchecked"})
 	public static <T> Function<T, Iterable<IHasBinding>> getHasBindingsVariablesFunction(Class<T> clazz) {
 		@Nullable Function<T, Iterable<IHasBinding>> ret;
-		Logger logger = UtilitiesConfiguration.INSTANCE.getLogger();
 		synchronized (clazz) {
 			ret = (Function<T, Iterable<IHasBinding>>) HAS_BINDING_VARIABLES_MAP.get(clazz); // COMMENT should be safe
 			if (ret != null)
 				return ret;
 			ImmutableSet<Function<T, Optional<IHasBinding>>> v = DynamicUtilities.getAllFields(clazz).stream().unordered()
 					.filter(f -> !Modifier.isStatic(f.getModifiers()) && IHasBinding.class.isAssignableFrom(f.getType()))
-					.map(f -> Try.call(() -> DynamicUtilities.IMPL_LOOKUP.unreflectGetter(f), logger))
+					.map(f -> Try.call(() -> DynamicUtilities.IMPL_LOOKUP.unreflectGetter(f), UtilitiesConfiguration.getInstance().getLogger()))
 					.filter(Optional::isPresent)
 					.map(m -> (Function<T, Optional<IHasBinding>>) o ->
-							Try.call(() -> (IHasBinding) m.get().invoke(o), logger))
+							Try.call(() -> (IHasBinding) m.get().invoke(o), UtilitiesConfiguration.getInstance().getLogger()))
 					.collect(ImmutableSet.toImmutableSet());
 			ret = o -> v.stream().unordered()
 					.map(f -> f.apply(o))
@@ -97,7 +94,6 @@ public enum BindingUtilities {
 	public static <T> Function<T, Iterable<IBindingMethod<?>>> getBindingMethodsFunction(Class<T> clazz, Set<EnumScopeOptions> options) {
 		final BiFunction<? super Set<EnumScopeOptions>, T, ? extends Iterable<IBindingMethod<?>>> retF;
 		final Set<EnumScopeOptions> optionsF = EnumSet.copyOf(options);
-		Logger logger = UtilitiesConfiguration.INSTANCE.getLogger();
 		synchronized (clazz) {
 			@SuppressWarnings("unchecked") @Nullable final BiFunction<? super Set<EnumScopeOptions>, T, ? extends Iterable<IBindingMethod<?>>> ret =
 					(BiFunction<? super Set<EnumScopeOptions>, T, ? extends Iterable<IBindingMethod<?>>>) BINDING_METHODS_MAP.get(clazz); // COMMENT should be safe
@@ -105,10 +101,10 @@ public enum BindingUtilities {
 				return o -> ret.apply(optionsF, o);
 			ImmutableSet<Function<T, Optional<IBindingMethod<?>>>> b = DynamicUtilities.getAllFields(clazz).stream().unordered()
 					.filter(f -> !Modifier.isStatic(f.getModifiers()) && IBindingMethod.class.isAssignableFrom(f.getType()))
-					.map(f -> Try.call(() -> DynamicUtilities.IMPL_LOOKUP.unreflectGetter(f), logger))
+					.map(f -> Try.call(() -> DynamicUtilities.IMPL_LOOKUP.unreflectGetter(f), UtilitiesConfiguration.getInstance().getLogger()))
 					.filter(Optional::isPresent)
 					.map(m -> (Function<T, Optional<IBindingMethod<?>>>) o ->
-							Try.call(() -> (IBindingMethod<?>) m.get().invoke(o), logger))
+							Try.call(() -> (IBindingMethod<?>) m.get().invoke(o), UtilitiesConfiguration.getInstance().getLogger()))
 					.collect(ImmutableSet.toImmutableSet());
 			Function<T, Iterable<IHasBinding>> c = getHasBindingsVariablesFunction(clazz);
 			retF = (op, o) -> Streams.concat(

@@ -78,7 +78,7 @@ public final class ShapeAnchor implements IShapeAnchor {
 	public void onContainerRemoved() { setContainer(null); }
 
 	@Override
-	public String toString() { return ObjectUtilities.toString(this, super::toString, OBJECT_VARIABLES_MAP); }
+	public String toString() { return ObjectUtilities.toString(this, super::toString, StaticHolder.getObjectVariablesMap()); }
 
 	@Override
 	public void onContainerAdded(IShapeAnchorSet container) {

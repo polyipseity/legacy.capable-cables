@@ -23,6 +23,6 @@ public enum BlocksThis {
 	private static final RegistryObject<Block> DEBUG_UI;
 
 	static {
-		DEBUG_UI = UIConstants.BUILD_TYPE.isDebug() ? BLOCKS.register(UIDebugMinecraft.PATH, UIDebugMinecraft::getBlockEntry) : null;
+		DEBUG_UI = UIConstants.BUILD_TYPE.isDebug() ? BLOCKS.register(UIDebugMinecraft.getPATH(), UIDebugMinecraft::getBlockEntry) : null;
 	}
 }

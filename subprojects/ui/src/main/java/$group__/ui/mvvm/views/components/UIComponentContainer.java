@@ -1,5 +1,6 @@
 package $group__.ui.mvvm.views.components;
 
+import $group__.ui.UIConfiguration;
 import $group__.ui.core.binding.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.IUIReshapeExplicitly;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
@@ -11,10 +12,12 @@ import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CapacityUtilities;
+import $group__.utilities.LogMessageBuilder;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventBusUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.templates.CommonConfigurationTemplate;
 import com.google.common.collect.ImmutableList;
 
 import javax.annotation.Nullable;
@@ -22,10 +25,42 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 public class UIComponentContainer
 		extends UIComponent
 		implements IUIComponentContainer {
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
+
+	@Override
+	public boolean addChildAt(int index, IUIComponent component) {
+		if (equals(component))
+			throw ThrowableUtilities.logAndThrow(
+					new IllegalArgumentException(
+							new LogMessageBuilder()
+									.addKeyValue("index", index).addKeyValue("component", component)
+									.appendMessages(getResourceBundle().getString("children.add.self"))
+									.build()
+					),
+					UIConfiguration.getInstance().getLogger()
+			);
+		if (getChildren().contains(component))
+			return moveChildTo(index, component);
+		component.getParent()
+				.ifPresent(p -> p.removeChildren(ImmutableList.of(component)));
+		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
+					getChildren().add(index, component);
+					List<IUIComponent> childrenMoved = getChildren().subList(index + 1, getChildren().size());
+					for (int i = 0; i < childrenMoved.size(); i++)
+						AssertionUtilities.assertNonnull(childrenMoved.get(i)).onIndexMove(index + i, index + i + 1);
+					component.onParentChange(null, this);
+				},
+				new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.PRE, component, null, this),
+				new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.POST, component, null, this));
+		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh);
+		return true;
+	}
+
 	protected final List<IUIComponent> children = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 
 	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
@@ -45,26 +80,7 @@ public class UIComponentContainer
 		return ret;
 	}
 
-	@Override
-	public boolean addChildAt(int index, IUIComponent component) {
-		if (equals(component))
-			throw ThrowableUtilities.BecauseOf.illegalArgument("Adding self as child", "component", component);
-		if (getChildren().contains(component))
-			return moveChildTo(index, component);
-		component.getParent()
-				.ifPresent(p -> p.removeChildren(ImmutableList.of(component)));
-		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
-					getChildren().add(index, component);
-					List<IUIComponent> childrenMoved = getChildren().subList(index + 1, getChildren().size());
-					for (int i = 0; i < childrenMoved.size(); i++)
-						AssertionUtilities.assertNonnull(childrenMoved.get(i)).onIndexMove(index + i, index + i + 1);
-					component.onParentChange(null, this);
-				},
-				new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.PRE, component, null, this),
-				new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.POST, component, null, this));
-		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh);
-		return true;
-	}
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	@SuppressWarnings({"ObjectAllocationInLoop"})
 	@Override

@@ -5,6 +5,8 @@ import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.parsers.adapters.EnumJAXBElementPresetAdapter;
 import $group__.ui.parsers.adapters.EnumJAXBObjectPresetAdapter;
 import $group__.utilities.events.EventBusForge;
+import $group__.utilities.minecraft.client.ClientUtilities;
+import $group__.utilities.structures.Singleton;
 import $group__.utilities.templates.CommonConfigurationTemplate;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -18,8 +20,8 @@ import java.util.function.Supplier;
 
 public final class UIConfiguration
 		extends CommonConfigurationTemplate<UIConfiguration.ConfigurationData> {
-	private static final UIConfiguration INSTANCE = new UIConfiguration();
-	private static final Logger BOOTSTRAP_LOGGER = LoggerFactory.getLogger(UIConstants.DISPLAY_NAME);
+	private static final Logger BOOTSTRAP_LOGGER = LoggerFactory.getLogger(UIConstants.MODULE_NAME);
+	private static final UIConfiguration INSTANCE = Singleton.getSingletonInstance(UIConfiguration.class, getBootstrapLogger());
 
 	private UIConfiguration() { super(getBootstrapLogger()); }
 

@@ -54,16 +54,15 @@ public enum DynamicUtilities {
 	private static final MethodHandle DEFINE_CLASS_METHOD_HANDLE;
 
 	static {
-		Logger logger = UtilitiesConfiguration.INSTANCE.getLogger();
 		IMPL_LOOKUP = Arrays.stream(Lookup.class.getDeclaredFields()).unordered()
 				.filter(f -> Lookup.class.equals(f.getType()))
 				.map(f -> {
-					Try.run(() -> f.setAccessible(true), logger);
-					ThrowableCatcher.acceptIfCaught(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("impl lookup field", f, Lookup.class, true), t)));
+					Try.run(() -> f.setAccessible(true), UtilitiesConfiguration.getInstance().getLogger());
+					ThrowableCatcher.acceptIfCaught(t -> UtilitiesConfiguration.getInstance().getLogger().warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("impl lookup field", f, Lookup.class, true), t)));
 
-					@Nullable Optional<Lookup> ret = Try.call(() -> (Lookup) PUBLIC_LOOKUP.unreflectGetter(f).invokeExact(), logger).filter(l -> l.lookupModes() == TRUSTED_LOOKUP_MODES);
+					@Nullable Optional<Lookup> ret = Try.call(() -> (Lookup) PUBLIC_LOOKUP.unreflectGetter(f).invokeExact(), UtilitiesConfiguration.getInstance().getLogger()).filter(l -> l.lookupModes() == TRUSTED_LOOKUP_MODES);
 
-					Try.run(() -> f.setAccessible(false), logger);
+					Try.run(() -> f.setAccessible(false), UtilitiesConfiguration.getInstance().getLogger());
 					return ret;
 				})
 				.filter(Optional::isPresent)
@@ -81,7 +80,7 @@ public enum DynamicUtilities {
 
 		DEFINE_CLASS_METHOD_HANDLE = Try.call(() ->
 				IMPL_LOOKUP.findVirtual(ClassLoader.class, "defineClass",
-						MethodType.methodType(Class.class, String.class, byte[].class, int.class, int.class)), UtilitiesConfiguration.INSTANCE.getLogger())
+						MethodType.methodType(Class.class, String.class, byte[].class, int.class, int.class)), UtilitiesConfiguration.getInstance().getLogger())
 				.orElseThrow(ThrowableCatcher::rethrow);
 	}
 

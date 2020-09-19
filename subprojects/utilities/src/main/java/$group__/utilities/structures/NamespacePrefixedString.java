@@ -2,6 +2,7 @@ package $group__.utilities.structures;
 
 import $group__.utilities.ObjectUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
+import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.concurrent.Immutable;
 
@@ -11,20 +12,20 @@ public class NamespacePrefixedString
 	protected final String namespace;
 	protected final String path;
 
-	public NamespacePrefixedString(String string) { this(INamespacePrefixedString.decompose(string)); }
+	public NamespacePrefixedString(@NonNls String string) { this(INamespacePrefixedString.decompose(string)); }
 
 	protected NamespacePrefixedString(String[] parts) { this(parts[0], parts[1]); }
 
-	public NamespacePrefixedString(String namespace, String path) {
+	public NamespacePrefixedString(@NonNls String namespace, @NonNls String path) {
 		this.namespace = namespace;
 		this.path = path;
 	}
 
 	@Override
-	public String getNamespace() { return namespace; }
+	public @NonNls String getNamespace() { return namespace; }
 
 	@Override
-	public String getPath() { return path; }
+	public @NonNls String getPath() { return path; }
 
 	@Override
 	public int hashCode() { return ObjectUtilities.hashCode(this, null, OBJECT_VARIABLES); }

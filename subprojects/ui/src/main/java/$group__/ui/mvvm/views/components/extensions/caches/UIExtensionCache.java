@@ -5,12 +5,14 @@ import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.components.extensions.caches.IUIExtensionCache;
+import $group__.ui.core.mvvm.views.components.extensions.caches.IUIExtensionCacheType;
+import $group__.ui.core.mvvm.views.components.extensions.caches.UICacheRegistry;
 import $group__.ui.core.parsers.components.UIExtensionConstructor;
 import $group__.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.ConcurrencyUtilities;
 import $group__.utilities.ThrowableUtilities.Try;
-import $group__.utilities.collections.MapUtilities;
+import $group__.utilities.collections.CacheUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
@@ -23,6 +25,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
@@ -36,7 +39,7 @@ public class UIExtensionCache
 	protected final Cache<INamespacePrefixedString, Object> cache =
 			CacheBuilder.newBuilder()
 					.initialCapacity(INITIAL_CAPACITY_SMALL)
-					.expireAfterAccess(MapUtilities.CACHE_EXPIRATION_ACCESS_DURATION, MapUtilities.CACHE_EXPIRATION_ACCESS_TIME_UNIT)
+					.expireAfterAccess(CacheUtilities.CACHE_EXPIRATION_ACCESS_DURATION, CacheUtilities.CACHE_EXPIRATION_ACCESS_TIME_UNIT)
 					.concurrencyLevel(ConcurrencyUtilities.SINGLE_THREAD_THREAD_COUNT).build();
 
 	@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.NO_ARGS)
@@ -59,9 +62,9 @@ public class UIExtensionCache
 	public enum CacheUniversal {
 		;
 
-		public static final Registry.RegistryObject<IUIExtensionCache.IType<IUIComponentManager<?>, IUIComponent>> MANAGER =
-				RegUICache.INSTANCE.registerApply(generateKey("manager"),
-						k -> new IUIExtensionCache.IType.Impl<>(k,
+		public static final Registry.RegistryObject<IUIExtensionCacheType<IUIComponentManager<?>, IUIComponent>> MANAGER =
+				UICacheRegistry.getInstance().registerApply(generateKey("manager"),
+						k -> new IUIExtensionCacheType.Impl<>(k,
 								(t, i) ->
 										IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache ->
 												Try.call(() -> {
@@ -75,11 +78,11 @@ public class UIExtensionCache
 																new WeakReference<>(ret));
 													}
 													return ret;
-												}, UIConfiguration.INSTANCE.getLogger())),
+												}, UIConfiguration.getInstance().getLogger())),
 								(t, i) -> {
-									IUIExtensionCache.IType.invalidateImpl(i, t.getKey());
+									IUIExtensionCacheType.invalidateImpl(i, t.getKey());
 									CastUtilities.castChecked(IUIComponentContainer.class, i)
-											.ifPresent(ic -> IUIExtensionCache.IType.invalidateChildrenImpl(ic, t));
+											.ifPresent(ic -> IUIExtensionCacheType.invalidateChildrenImpl(ic, t));
 								},
 								t -> ImmutableList.of(new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
 									@Override
@@ -89,9 +92,9 @@ public class UIExtensionCache
 											t.invalidate(event.getComponent());
 									}
 								})));
-		public static final Registry.RegistryObject<IUIExtensionCache.IType<Integer, IUIComponent>> Z =
-				RegUICache.INSTANCE.registerApply(generateKey("z"),
-						k -> new IUIExtensionCache.IType.Impl<>(k,
+		public static final Registry.RegistryObject<IUIExtensionCacheType<Integer, IUIComponent>> Z =
+				UICacheRegistry.getInstance().registerApply(generateKey("z"),
+						k -> new IUIExtensionCacheType.Impl<>(k,
 								(t, i) -> IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> Try.call(() -> cache.getDelegated().get(t.getKey(),
 										() -> {
 											int ret = -1;
@@ -100,11 +103,11 @@ public class UIExtensionCache
 											     parent = parent.flatMap(IUIComponent::getParent))
 												++ret;
 											return ret;
-										}), UIConfiguration.INSTANCE.getLogger()).map(CastUtilities::castUnchecked)),
+										}), UIConfiguration.getInstance().getLogger()).map(CastUtilities::castUnchecked)),
 								(t, i) -> {
-									IUIExtensionCache.IType.invalidateImpl(i, t.getKey());
+									IUIExtensionCacheType.invalidateImpl(i, t.getKey());
 									CastUtilities.castChecked(IUIComponentContainer.class, i)
-											.ifPresent(ic -> IUIExtensionCache.IType.invalidateChildrenImpl(ic, t));
+											.ifPresent(ic -> IUIExtensionCacheType.invalidateChildrenImpl(ic, t));
 								},
 								t -> ImmutableList.of(new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
 									@Override
@@ -115,6 +118,6 @@ public class UIExtensionCache
 									}
 								})));
 
-		private static INamespacePrefixedString generateKey(String name) { return new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, CacheUniversal.class.getName() + '.' + name); }
+		private static INamespacePrefixedString generateKey(@NonNls String name) { return new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, CacheUniversal.class.getName() + '.' + name); /* TODO make this a utility method perhaps */ }
 	}
 }

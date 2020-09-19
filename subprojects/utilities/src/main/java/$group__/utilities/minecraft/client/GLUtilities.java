@@ -1,9 +1,6 @@
 package $group__.utilities.minecraft.client;
 
-import $group__.utilities.AssertionUtilities;
-import $group__.utilities.CapacityUtilities;
-import $group__.utilities.LoggerUtilities;
-import $group__.utilities.UtilitiesConfiguration;
+import $group__.utilities.*;
 import $group__.utilities.collections.CacheUtilities;
 import $group__.utilities.collections.ManualLoadingCache;
 import $group__.utilities.collections.MapUtilities;
@@ -14,6 +11,7 @@ import net.minecraft.client.MainWindow;
 import net.minecraft.client.MouseHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.NonNls;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
@@ -58,7 +56,7 @@ public enum GLUtilities {
 								.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)
 								.build(CacheLoader.from(k -> new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM))));
 
-		public static void push(String name, Runnable action, Runnable fallback) {
+		public static void push(@NonNls String name, Runnable action, Runnable fallback) {
 			STACKS.getUnchecked(name).push(new GLCall(action, fallback));
 			action.run();
 		}
@@ -69,7 +67,7 @@ public enum GLUtilities {
 			assert STACKS.asMap().isEmpty();
 		}
 
-		public static void clear(String name) {
+		public static void clear(@NonNls String name) {
 			Optional.ofNullable(STACKS.getIfPresent(name))
 					.filter(s -> !s.isEmpty())
 					.ifPresent(s -> {
@@ -80,10 +78,12 @@ public enum GLUtilities {
 					});
 		}
 
-		public static void pop(String name) {
+		public static void pop(@NonNls String name) {
 			@Nullable Deque<GLCall> s = STACKS.getIfPresent(name);
 			if (s == null)
-				throw new NoSuchElementException();
+				throw ThrowableUtilities.logAndThrow(new NoSuchElementException(
+						asd
+				), UtilitiesConfiguration.getInstance().getLogger())
 			Runnable fb = s.pop().getFallback();
 			(s.isEmpty() ? fb : AssertionUtilities.assertNonnull(s.element())).run();
 			STACKS.cleanUp();

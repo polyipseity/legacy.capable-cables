@@ -16,5 +16,5 @@ public interface IUIExtensionBackgroundRenderer
 	INamespacePrefixedString KEY = new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, AREA_UI + ".background");
 	@SuppressWarnings("unchecked")
 	Registry.RegistryObject<IType<INamespacePrefixedString, IUIExtensionBackgroundRenderer, IUIComponentManager<?>>> TYPE =
-			RegExtension.INSTANCE.registerApply(KEY, k -> new IType.Impl<>(k, (t, i) -> (Optional<? extends IUIExtensionBackgroundRenderer>) i.getExtension(t.getKey())));
+			ExtensionRegistry.INSTANCE.registerApply(KEY, k -> new IType.Impl<>(k, (t, i) -> (Optional<? extends IUIExtensionBackgroundRenderer>) i.getExtension(t.getKey())));
 }

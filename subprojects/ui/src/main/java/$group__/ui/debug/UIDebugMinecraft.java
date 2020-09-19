@@ -14,12 +14,12 @@ import $group__.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
 import $group__.ui.minecraft.core.mvvm.views.IUIViewComponentMinecraft;
 import $group__.ui.minecraft.mvvm.adapters.AbstractContainerScreenAdapter;
 import $group__.ui.minecraft.mvvm.components.common.UIComponentWindowMinecraft;
-import $group__.ui.minecraft.mvvm.components.parsers.UIDefaultMinecraftComponentParser;
+import $group__.ui.minecraft.mvvm.components.parsers.DefaultMinecraftUIComponentParser;
 import $group__.ui.minecraft.mvvm.viewmodels.UIViewModelMinecraft;
 import $group__.ui.mvvm.models.UIModel;
 import $group__.ui.mvvm.views.components.common.UIComponentButton;
 import $group__.ui.mvvm.views.components.extensions.UIExtensionCursorHandleProviderComponent;
-import $group__.ui.parsers.components.UIDefaultComponentParser;
+import $group__.ui.parsers.components.DefaultUIComponentParser;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CastUtilities;
@@ -36,6 +36,7 @@ import $group__.utilities.binding.fields.ObservableField;
 import $group__.utilities.binding.methods.BindingMethodDestination;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.minecraft.client.ClientUtilities;
 import $group__.utilities.structures.NamespacePrefixedString;
 import jakarta.xml.bind.Unmarshaller;
 import net.minecraft.block.Block;
@@ -64,6 +65,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.network.NetworkHooks;
+import org.jetbrains.annotations.NonNls;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -80,8 +82,9 @@ import static java.util.Objects.requireNonNull;
 public enum UIDebugMinecraft {
 	;
 
-	public static final String PATH = "debug_ui";
-	public static final ITextComponent DISPLAY_NAME = new StringTextComponent("MVVM GUI Debug UI");
+	@NonNls
+	private static final String PATH = "debug_ui";
+	private static final ITextComponent DISPLAY_NAME = new StringTextComponent("");
 
 	public static Block getBlockEntry() { return DebugBlock.INSTANCE; }
 
@@ -101,26 +104,31 @@ public enum UIDebugMinecraft {
 		}
 	}
 
+	public static String getPATH() { return PATH; }
+
+	public static ITextComponent getDisplayName() { return DISPLAY_NAME; }
+
 	@OnlyIn(Dist.CLIENT)
 	private enum DebugUI
 			implements ScreenManager.IScreenFactory<DebugContainer, AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer>> {
 		INSTANCE,
 		;
 
-		public static final String COMPONENT_TEST_DATA = "components_test.xml";
+		@NonNls
+		public static final String COMPONENT_TEST_XML_PATH = "components_test.xml";
 		private static final IUIResourceParser<IUIViewComponentMinecraft<?, ?>, Function<? super Unmarshaller, ?>> PARSER =
-				UIDefaultMinecraftComponentParser.makeParserMinecraft(
-						UIDefaultComponentParser.makeParserStandard(
-								new UIDefaultMinecraftComponentParser<>(
+				DefaultMinecraftUIComponentParser.makeParserMinecraft(
+						DefaultUIComponentParser.makeParserStandard(
+								new DefaultMinecraftUIComponentParser<>(
 										CastUtilities.castUnchecked(IUIViewComponentMinecraft.class) // COMMENT should not matter
 								)));
 
 		static {
 			Try.run(() -> PARSER.parse(u -> Try.call(() -> {
-				try (InputStream is = AssertionUtilities.assertNonnull(DebugUI.class.getResourceAsStream(COMPONENT_TEST_DATA))) {
+				try (InputStream is = AssertionUtilities.assertNonnull(DebugUI.class.getResourceAsStream(COMPONENT_TEST_XML_PATH))) {
 					return u.unmarshal(is);
 				}
-			}, UIConfiguration.INSTANCE.getLogger()).orElseThrow(ThrowableCatcher::rethrow)), UIConfiguration.INSTANCE.getLogger());
+			}, UIConfiguration.getInstance().getLogger()).orElseThrow(ThrowableCatcher::rethrow)), UIConfiguration.getInstance().getLogger());
 			ThrowableCatcher.rethrow(true);
 			PARSER.construct(); // COMMENT early check
 		}
@@ -138,7 +146,7 @@ public enum UIDebugMinecraft {
 
 			AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> ret =
 					UIFacade.Minecraft.createScreen(
-							DISPLAY_NAME,
+							new StringTextComponent(""),
 							UIFacade.Minecraft.createInfrastructure(
 									PARSER.construct(),
 									new ViewModel(),
@@ -265,7 +273,7 @@ public enum UIDebugMinecraft {
 
 		private DebugBlock() {
 			super(Properties.from(Blocks.STONE));
-			PreconditionUtilities.requireRunOnceOnly(UIConfiguration.INSTANCE.getLogger());
+			PreconditionUtilities.requireRunOnceOnly(UIConfiguration.getInstance().getLogger());
 		}
 
 		@Override
@@ -295,7 +303,7 @@ public enum UIDebugMinecraft {
 		public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) { return new DebugContainer(id, requireNonNull(getWorld()), getPos()); }
 
 		@Override
-		public ITextComponent getDisplayName() { return UIDebugMinecraft.DISPLAY_NAME; }
+		public ITextComponent getDisplayName() { return UIDebugMinecraft.getDisplayName(); }
 
 		private enum Type {
 			;

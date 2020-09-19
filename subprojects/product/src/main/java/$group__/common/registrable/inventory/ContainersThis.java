@@ -21,6 +21,6 @@ public enum ContainersThis {
 	private static final RegistryObject<ContainerType<?>> DEBUG_UI;
 
 	static {
-		DEBUG_UI = UIConstants.BUILD_TYPE.isDebug() ? CONTAINERS.register(UIDebugMinecraft.PATH, UIDebugMinecraft::getContainerEntry) : null;
+		DEBUG_UI = UIConstants.BUILD_TYPE.isDebug() ? CONTAINERS.register(UIDebugMinecraft.getPATH(), UIDebugMinecraft::getContainerEntry) : null;
 	}
 }

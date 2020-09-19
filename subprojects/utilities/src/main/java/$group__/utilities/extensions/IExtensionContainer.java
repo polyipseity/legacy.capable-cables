@@ -22,7 +22,7 @@ public interface IExtensionContainer<K> {
 	@SuppressWarnings("unchecked")
 	static <K> Optional<? extends IExtension<? extends K, ?>> addExtensionImpl(IExtensionContainer<K> self, Map<K, ? super IExtension<? extends K, ?>> extensions, K key, IExtension<? extends K, ?> extension) {
 		if (extension.getType().getKey() instanceof INamespacePrefixedString)
-			IExtension.RegExtension.checkExtensionRegistered((IExtension<? extends INamespacePrefixedString, ?>) extension); // COMMENT checked
+			IExtension.ExtensionRegistry.checkExtensionRegistered((IExtension<? extends INamespacePrefixedString, ?>) extension); // COMMENT checked
 		if (!extension.getGenericClass().isInstance(self))
 			throw BecauseOf.illegalArgument("Self is not an instance of extension's container class",
 					"self.getClass()", self.getClass(),

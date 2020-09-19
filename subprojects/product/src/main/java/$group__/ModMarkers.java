@@ -2,6 +2,7 @@ package $group__;
 
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CastUtilities;
+import $group__.utilities.structures.Singleton;
 import $group__.utilities.templates.MarkerUtilitiesTemplate;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -12,7 +13,7 @@ import org.jetbrains.annotations.NonNls;
 import org.slf4j.Marker;
 
 public final class ModMarkers extends MarkerUtilitiesTemplate {
-	private static final ModMarkers INSTANCE = new ModMarkers();
+	private static final ModMarkers INSTANCE = Singleton.getSingletonInstance(ModMarkers.class, ModConfiguration.getInstance().getLogger());
 
 	@NonNls
 	private final Marker markerModLifecycle = getMarker("mod lifecycle");

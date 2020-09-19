@@ -45,10 +45,10 @@ public interface IExtension<K, C extends IExtensionContainer<? super K>> extends
 		}
 	}
 
-	final class RegExtension extends Registry<INamespacePrefixedString, IType<? extends INamespacePrefixedString, ?, ?>> {
-		public static final RegExtension INSTANCE = new RegExtension();
+	final class ExtensionRegistry extends Registry<INamespacePrefixedString, IType<? extends INamespacePrefixedString, ?, ?>> {
+		public static final ExtensionRegistry INSTANCE = new ExtensionRegistry();
 
-		protected RegExtension() {
+		protected ExtensionRegistry() {
 			super(true, UtilitiesConfiguration.INSTANCE.getLogger());
 			PreconditionUtilities.requireRunOnceOnly(UtilitiesConfiguration.INSTANCE.getLogger());
 		}

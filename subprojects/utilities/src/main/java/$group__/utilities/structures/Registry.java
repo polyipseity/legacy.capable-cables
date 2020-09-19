@@ -14,9 +14,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class Registry<K, V> {
-	protected final ConcurrentMap<K, RegistryObject<? extends V>> data = MapUtilities.newMapMakerNormalThreaded().makeMap();
-	protected final boolean overridable;
-	protected final Logger logger;
+	private final ConcurrentMap<K, RegistryObject<? extends V>> data = MapUtilities.newMapMakerNormalThreaded().makeMap();
+	private final boolean overridable;
+	private final Logger logger;
 
 	protected Registry(boolean overridable, Logger logger) {
 		this.overridable = overridable;

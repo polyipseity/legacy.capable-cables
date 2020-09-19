@@ -28,11 +28,11 @@ public final class UIDataKeyboardKeyPress implements IUIDataKeyboardKeyPress, Cl
 	public int getModifiers() { return modifiers; }
 
 	@Override
-	public int hashCode() { return ObjectUtilities.hashCode(this, null, OBJECT_VARIABLES); }
+	public int hashCode() { return ObjectUtilities.hashCode(this, null, StaticHolder.getObjectVariables()); }
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
-	public boolean equals(Object obj) { return ObjectUtilities.equals(this, obj, false, null, OBJECT_VARIABLES); }
+	public boolean equals(Object obj) { return ObjectUtilities.equals(this, obj, false, null, StaticHolder.getObjectVariables()); }
 
 	@Override
 	public UIDataKeyboardKeyPress clone() throws CloneNotSupportedException { return (UIDataKeyboardKeyPress) super.clone(); }
@@ -41,7 +41,7 @@ public final class UIDataKeyboardKeyPress implements IUIDataKeyboardKeyPress, Cl
 	public long getTimestampMills() { return timestamp; }
 
 	@Override
-	public String toString() { return ObjectUtilities.toString(this, super::toString, OBJECT_VARIABLES_MAP); }
+	public String toString() { return ObjectUtilities.toString(this, super::toString, StaticHolder.getObjectVariablesMap()); }
 
 	@Override
 	public IUIDataKeyboardKeyPress recreate() { return new UIDataKeyboardKeyPress(getKey(), getScanCode(), getModifiers()); }

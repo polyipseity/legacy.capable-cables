@@ -21,6 +21,6 @@ public enum TileEntityTypesThis {
 	private static final RegistryObject<TileEntityType<?>> DEBUG_UI;
 
 	static {
-		DEBUG_UI = UIConstants.BUILD_TYPE.isDebug() ? TILE_ENTITIES.register(UIDebugMinecraft.PATH, UIDebugMinecraft::getTileEntityEntry) : null;
+		DEBUG_UI = UIConstants.BUILD_TYPE.isDebug() ? TILE_ENTITIES.register(UIDebugMinecraft.getPATH(), UIDebugMinecraft::getTileEntityEntry) : null;
 	}
 }

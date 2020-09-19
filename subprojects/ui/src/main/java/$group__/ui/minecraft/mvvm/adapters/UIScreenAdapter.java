@@ -191,7 +191,7 @@ public class UIScreenAdapter
 	@Override
 	@Deprecated
 	protected void init() {
-		IUIInfrastructure.bindSafe(getInfrastructure());
+		IUIInfrastructure.StaticHolder.bindSafe(getInfrastructure());
 		setSize(width, height);
 		getInfrastructure().initialize();
 	}
@@ -275,7 +275,7 @@ public class UIScreenAdapter
 			setFocus(null);
 		}
 		getInfrastructure().removed();
-		IUIInfrastructure.unbindSafe(getInfrastructure());
+		IUIInfrastructure.StaticHolder.unbindSafe(getInfrastructure());
 	}
 
 	@Override

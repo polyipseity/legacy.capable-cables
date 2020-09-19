@@ -4,15 +4,16 @@ import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.collections.MapUtilities;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.jetbrains.annotations.NonNls;
 
 import java.util.Arrays;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
 public interface INamespacePrefixedString {
-	String SEPARATOR = ":";
-	String DEFAULT_NAMESPACE = "minecraft";
-	String DEFAULT_PREFIX = DEFAULT_NAMESPACE + SEPARATOR;
+	@NonNls String SEPARATOR = ":";
+	@NonNls String DEFAULT_NAMESPACE = "minecraft";
+	@NonNls String DEFAULT_PREFIX = DEFAULT_NAMESPACE + SEPARATOR;
 
 	ImmutableList<Function<? super INamespacePrefixedString, ?>> OBJECT_VARIABLES = ImmutableList.of(
 			INamespacePrefixedString::getNamespace, INamespacePrefixedString::getPath);
@@ -36,7 +37,9 @@ public interface INamespacePrefixedString {
 
 	default String asString() { return getNamespace() + SEPARATOR + getPath(); }
 
+	@NonNls
 	String getNamespace();
 
+	@NonNls
 	String getPath();
 }

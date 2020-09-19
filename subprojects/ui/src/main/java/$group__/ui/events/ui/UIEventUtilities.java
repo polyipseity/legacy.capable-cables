@@ -9,23 +9,23 @@ import $group__.ui.core.structures.IUIDataMouseButtonClick;
 import $group__.ui.mvvm.views.events.ui.*;
 import $group__.ui.utilities.UIDataMouseButtonClick;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.PreconditionUtilities;
-import $group__.utilities.ThrowableUtilities.BecauseOf;
-import $group__.utilities.interfaces.INamespacePrefixedString;
-import $group__.utilities.structures.Registry;
+import $group__.utilities.LogMessageBuilder;
+import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.structures.paths.INode;
+import $group__.utilities.templates.CommonConfigurationTemplate;
 import com.google.common.collect.ImmutableList;
 
 import javax.annotation.Nullable;
 import java.awt.geom.Point2D;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
 public enum UIEventUtilities {
 	;
 
 	@SuppressWarnings("ObjectAllocationInLoop")
 	public static boolean dispatchEvent(IUIEvent event) {
-		RegUIEvent.checkEvent(event);
+		UIEventRegistry.checkEvent(event);
 		event.reset();
 
 		IUIEventTarget et = event.getTarget();
@@ -82,6 +82,8 @@ public enum UIEventUtilities {
 	public enum Factory {
 		;
 
+		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
+
 		static {
 			/* SECTION DOM */
 			// COMMENT load
@@ -89,32 +91,46 @@ public enum UIEventUtilities {
 			// COMMENT abort
 			// COMMENT error
 			// TODO implement select
-			RegUIEvent.INSTANCE.register(EnumUIEventDOMType.SELECT.getEventType(), IUIEvent.class); // COMMENT select: NO default
-			RegUIEvent.INSTANCE.register(EnumUIEventDOMType.FOCUS_OUT_POST.getEventType(), IUIEventFocus.class); // COMMENT blur: NO default
-			RegUIEvent.INSTANCE.register(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(), IUIEventFocus.class); // COMMENT focus: NO default
-			RegUIEvent.INSTANCE.register(EnumUIEventDOMType.FOCUS_IN_PRE.getEventType(), IUIEventFocus.class); // COMMENT focusin: NO default
-			RegUIEvent.INSTANCE.register(EnumUIEventDOMType.FOCUS_OUT_PRE.getEventType(), IUIEventFocus.class); // COMMENT focusout: NO default
+			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.SELECT.getEventType(), IUIEvent.class); // COMMENT select: NO default
+			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.FOCUS_OUT_POST.getEventType(), IUIEventFocus.class); // COMMENT blur: NO default
+			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(), IUIEventFocus.class); // COMMENT focus: NO default
+			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.FOCUS_IN_PRE.getEventType(), IUIEventFocus.class); // COMMENT focusin: NO default
+			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.FOCUS_OUT_PRE.getEventType(), IUIEventFocus.class); // COMMENT focusout: NO default
 			// COMMENT auxclick
-			RegUIEvent.INSTANCE.register(EnumUIEventDOMType.CLICK.getEventType(), IUIEventMouse.class); // COMMENT click: activate, and/or focus
-			RegUIEvent.INSTANCE.register(EnumUIEventDOMType.CLICK_DOUBLE.getEventType(), IUIEventMouse.class); // COMMENT dblclick: activate, focus, and/or select
-			RegUIEvent.INSTANCE.register(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), IUIEventMouse.class); // COMMENT mousedown: drag, start select, scroll, and/or pan
-			RegUIEvent.INSTANCE.register(EnumUIEventDOMType.MOUSE_ENTER.getEventType(), IUIEventMouse.class); // COMMENT mousenter: NO default
-			RegUIEvent.INSTANCE.register(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(), IUIEventMouse.class); // COMMENT mouseleave: NO default
-			RegUIEvent.INSTANCE.register(EnumUIEventDOMType.MOUSE_MOVE.getEventType(), IUIEventMouse.class); // COMMENT mousemove: may have default
-			RegUIEvent.INSTANCE.register(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(), IUIEventMouse.class); // COMMENT mouseout: may have default
-			RegUIEvent.INSTANCE.register(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(), IUIEventMouse.class); // COMMENT mouseover: may have default
-			RegUIEvent.INSTANCE.register(EnumUIEventDOMType.MOUSE_UP.getEventType(), IUIEventMouse.class);// COMMENT mouseup: context menu
-			RegUIEvent.INSTANCE.register(EnumUIEventDOMType.WHEEL.getEventType(), IUIEventMouseWheel.class); // COMMENT wheel: scroll or zoom, cancelability varies
+			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.CLICK.getEventType(), IUIEventMouse.class); // COMMENT click: activate, and/or focus
+			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.CLICK_DOUBLE.getEventType(), IUIEventMouse.class); // COMMENT dblclick: activate, focus, and/or select
+			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), IUIEventMouse.class); // COMMENT mousedown: drag, start select, scroll, and/or pan
+			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.MOUSE_ENTER.getEventType(), IUIEventMouse.class); // COMMENT mousenter: NO default
+			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(), IUIEventMouse.class); // COMMENT mouseleave: NO default
+			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.MOUSE_MOVE.getEventType(), IUIEventMouse.class); // COMMENT mousemove: may have default
+			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(), IUIEventMouse.class); // COMMENT mouseout: may have default
+			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(), IUIEventMouse.class); // COMMENT mouseover: may have default
+			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.MOUSE_UP.getEventType(), IUIEventMouse.class);// COMMENT mouseup: context menu
+			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.WHEEL.getEventType(), IUIEventMouseWheel.class); // COMMENT wheel: scroll or zoom, cancelability varies
 			// COMMENT beforeinput
 			// COMMENT input
-			RegUIEvent.INSTANCE.register(EnumUIEventDOMType.KEY_DOWN.getEventType(), IUIEventKeyboard.class); // COMMENT keydown: focus, keypress, and/or activate
-			RegUIEvent.INSTANCE.register(EnumUIEventDOMType.KEY_UP.getEventType(), IUIEventKeyboard.class); // COMMENT keyup: may have default
+			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.KEY_DOWN.getEventType(), IUIEventKeyboard.class); // COMMENT keydown: focus, keypress, and/or activate
+			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.KEY_UP.getEventType(), IUIEventKeyboard.class); // COMMENT keyup: may have default
 			// COMMENT compositionstart
 			// COMMENT compositionupdate
 			// COMMENT compositionend
 
 			/* SECTION component */
-			RegUIEvent.INSTANCE.register(EnumUIEventComponentType.CHAR_TYPED.getEventType(), IUIEventChar.class); // COMMENT char_typed: NO default
+			UIEventRegistry.getINSTANCE().register(EnumUIEventComponentType.CHAR_TYPED.getEventType(), IUIEventChar.class); // COMMENT char_typed: NO default
+		}
+
+		public static IUIEventKeyboard generateSyntheticEventKeyboardOpposite(IUIEventKeyboard event) {
+			if (EnumUIEventDOMType.KEY_DOWN.getEventType().equals(event.getType()))
+				return createEventKeyUp(event.getTarget(), event.getData().recreate());
+			throw ThrowableUtilities.logAndThrow(
+					new IllegalArgumentException(
+							new LogMessageBuilder()
+									.addKeyValue("event", event)
+									.appendMessages(getResourceBundle().getString("synthetic.event.type.invalid"))
+									.build()
+					),
+					UIConfiguration.getInstance().getLogger()
+			);
 		}
 
 		public static IUIEvent createEventSelect(IUIEventTarget target) { return new UIEvent(EnumUIEventDOMType.SELECT.getEventType(), true, false, target); }
@@ -145,13 +161,7 @@ public enum UIEventUtilities {
 
 		public static IUIEventKeyboard createEventKeyDown(IUIEventTarget target, IUIDataKeyboardKeyPress data) { return new UIEventKeyboard(EnumUIEventDOMType.KEY_DOWN.getEventType(), true, true, target, data); }
 
-		public static IUIEventKeyboard generateSyntheticEventKeyboardOpposite(IUIEventKeyboard event) {
-			if (EnumUIEventDOMType.KEY_DOWN.getEventType().equals(event.getType()))
-				return createEventKeyUp(event.getTarget(), event.getData().recreate());
-			throw BecauseOf.illegalArgument("Illgeal event type",
-					"event.getType()", event.getType(),
-					"event", event);
-		}
+		protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 		public static IUIEventKeyboard createEventKeyUp(IUIEventTarget target, IUIDataKeyboardKeyPress data) { return new UIEventKeyboard(EnumUIEventDOMType.KEY_UP.getEventType(), true, true, target, data); }
 
@@ -163,9 +173,15 @@ public enum UIEventUtilities {
 				return createEventMouseLeave(event.getTarget(), data, event.getRelatedTarget().orElse(null));
 			else if (EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType().equals(event.getType()))
 				return createEventMouseLeaveSelf(event.getTarget(), data, event.getRelatedTarget().orElse(null));
-			throw BecauseOf.illegalArgument("Illgeal event type",
-					"event.getType()", event.getType(),
-					"event", event);
+			throw ThrowableUtilities.logAndThrow(
+					new IllegalArgumentException(
+							new LogMessageBuilder()
+									.addKeyValue("event", event)
+									.appendMessages(getResourceBundle().getString("synthetic.event.type.invalid"))
+									.build()
+					),
+					UIConfiguration.getInstance().getLogger()
+			);
 		}
 
 		public static IUIEventMouse createEventMouseUp(IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(EnumUIEventDOMType.MOUSE_UP.getEventType(), true, true, target, data, null); }
@@ -173,30 +189,5 @@ public enum UIEventUtilities {
 		public static IUIEventMouse createEventMouseLeave(IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingEntered) { return new UIEventMouse(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(), false, false, target, data, targetBeingEntered); }
 
 		public static IUIEventMouse createEventMouseLeaveSelf(IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingEntered) { return new UIEventMouse(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(), true, true, target, data, targetBeingEntered); }
-	}
-
-	public static final class RegUIEvent extends Registry<INamespacePrefixedString, Class<? extends IUIEvent>> {
-		public static final RegUIEvent INSTANCE = new RegUIEvent();
-
-		protected RegUIEvent() {
-			super(false, UIConfiguration.INSTANCE.getLogger());
-			PreconditionUtilities.requireRunOnceOnly(UIConfiguration.INSTANCE.getLogger());
-		}
-
-		public static void checkEvent(IUIEvent event)
-				throws IllegalArgumentException {
-			if (!isEventValid(event))
-				throw BecauseOf.illegalArgument("Unregistered event",
-						"event.getClass()", event.getClass(),
-						"event.getType()", event.getType(),
-						"event", event);
-		}
-
-		public static boolean isEventValid(IUIEvent event) {
-			return Optional.ofNullable(INSTANCE.getData().get(event.getType()))
-					.map(RegistryObject::getValue)
-					.filter(ec -> ec.isInstance(event))
-					.isPresent();
-		}
 	}
 }

@@ -41,7 +41,7 @@ public class UIComponentManagerMinecraft
 
 	@Override
 	public void setRenderer(@Nullable IUIComponentRendererMinecraft<?> renderer) {
-		IUIRendererContainer.setRendererImpl(this, renderer,
+		StaticHolder.setRendererImpl(this, renderer,
 				(s, r) -> s.getRendererContainer().setRenderer(r));
 	}
 

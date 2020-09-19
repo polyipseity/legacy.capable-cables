@@ -15,13 +15,13 @@ import java.util.function.Function;
 
 public class ArrayAffineTransformStack
 		implements IAffineTransformStack {
-	public static final ImmutableList<Function<? super ArrayAffineTransformStack, ?>> OBJECT_VARIABLES = ObjectUtilities.extendsObjectVariables(IAffineTransformStack.OBJECT_VARIABLES,
+	private static final ImmutableList<Function<? super ArrayAffineTransformStack, ?>> OBJECT_VARIABLES = ObjectUtilities.extendsObjectVariables(StaticHolder.getObjectVariables(),
 			ImmutableList.of(ArrayAffineTransformStack::getCleanerRef));
-	public static final ImmutableMap<String, Function<? super ArrayAffineTransformStack, ?>> OBJECT_VARIABLES_MAP = ObjectUtilities.extendsObjectVariablesMap(OBJECT_VARIABLES,
-			IAffineTransformStack.OBJECT_VARIABLES_MAP,
+	private static final ImmutableMap<String, Function<? super ArrayAffineTransformStack, ?>> OBJECT_VARIABLES_MAP = ObjectUtilities.extendsObjectVariablesMap(getObjectVariables(),
+			StaticHolder.getObjectVariablesMap(),
 			ImmutableList.of("cleanerRef"));
-	protected final Deque<AffineTransform> data;
-	protected final Object cleanerRef = new Object();
+	private final Deque<AffineTransform> data;
+	private final Object cleanerRef = new Object();
 
 	public ArrayAffineTransformStack() { this(CapacityUtilities.INITIAL_CAPACITY_MEDIUM); }
 
@@ -30,6 +30,11 @@ public class ArrayAffineTransformStack
 		this.data.push(new AffineTransform());
 		Cleaner.create(getCleanerRef(), new LeakNotifier(this.data, UIConfiguration.INSTANCE.getLogger()));
 	}
+
+	@Override
+	public int hashCode() { return ObjectUtilities.hashCode(this, null, getObjectVariables()); }
+
+	public static ImmutableList<Function<? super ArrayAffineTransformStack, ?>> getObjectVariables() { return OBJECT_VARIABLES; }
 
 	protected final Object getCleanerRef() { return cleanerRef; }
 
@@ -48,13 +53,12 @@ public class ArrayAffineTransformStack
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	public Deque<AffineTransform> getData() { return data; }
 
-	@Override
-	public int hashCode() { return ObjectUtilities.hashCode(this, null, OBJECT_VARIABLES); }
-
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
-	public boolean equals(Object obj) { return ObjectUtilities.equals(this, obj, false, null, OBJECT_VARIABLES); }
+	public boolean equals(Object obj) { return ObjectUtilities.equals(this, obj, false, null, getObjectVariables()); }
 
 	@Override
-	public String toString() { return ObjectUtilities.toString(this, super::toString, OBJECT_VARIABLES_MAP); }
+	public String toString() { return ObjectUtilities.toString(this, super::toString, getObjectVariablesMap()); }
+
+	public static ImmutableMap<String, Function<? super ArrayAffineTransformStack, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
 }

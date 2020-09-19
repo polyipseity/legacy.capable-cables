@@ -1,45 +1,32 @@
 package $group__.ui.events.ui;
 
+import $group__.ui.UIConfiguration;
 import $group__.ui.core.mvvm.views.events.IUIEvent;
 import $group__.ui.core.mvvm.views.events.IUIEventListener;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
-import $group__.utilities.CapacityUtilities;
-import $group__.utilities.CastUtilities;
-import $group__.utilities.ObjectUtilities;
-import $group__.utilities.ThrowableUtilities.BecauseOf;
+import $group__.utilities.*;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.functions.FunctionUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.templates.CommonConfigurationTemplate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
+import org.jetbrains.annotations.NonNls;
 
+import java.util.ResourceBundle;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class UIEventTarget
 		implements IUIEventTarget {
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	@SuppressWarnings("UnstableApiUsage")
-	protected final SetMultimap<INamespacePrefixedString, IUIEventListenerWithParameters> eventTargetListeners = MultimapBuilder
+	private final SetMultimap<INamespacePrefixedString, IUIEventListenerWithParameters> eventTargetListeners = MultimapBuilder
 			.hashKeys(CapacityUtilities.INITIAL_CAPACITY_SMALL)
 			.linkedHashSetValues(CapacityUtilities.INITIAL_CAPACITY_SMALL)
 			.build();
-
-	@Override
-	public boolean addEventListener(INamespacePrefixedString type, IUIEventListener<?> listener, boolean useCapture) { return getEventTargetListeners().put(type, new IUIEventListenerWithParameters(listener, useCapture)); }
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected SetMultimap<INamespacePrefixedString, IUIEventListenerWithParameters> getEventTargetListeners() { return eventTargetListeners; }
-
-	@Override
-	public boolean removeEventListener(INamespacePrefixedString type, IUIEventListener<?> listener, boolean useCapture) {
-		if (getEventTargetListeners().remove(type, new IUIEventListenerWithParameters(listener, useCapture))) {
-			listener.markAsRemoved();
-			return true;
-		} else
-			return false;
-	}
 
 	@Override
 	public boolean dispatchEvent(IUIEvent event) {
@@ -59,9 +46,15 @@ public class UIEventTarget
 				shouldHandle = l -> !l.isUseCapture();
 				break;
 			default:
-				throw BecauseOf.illegalArgument("Invalid event phase", event,
-						"event.getPhase()", event.getPhase(),
-						"event", event);
+				throw ThrowableUtilities.logAndThrow(
+						new IllegalArgumentException(
+								new LogMessageBuilder()
+										.addKeyValue("event", event)
+										.appendMessages(getResourceBundle().getString("dispatch.phase.invalid"))
+										.build()
+						),
+						UIConfiguration.getInstance().getLogger()
+				);
 		}
 
 		for (IUIEventListenerWithParameters l : ls) {
@@ -73,37 +66,59 @@ public class UIEventTarget
 	}
 
 	@Override
+	public boolean addEventListener(INamespacePrefixedString type, IUIEventListener<?> listener, boolean useCapture) { return getEventTargetListeners().put(type, new IUIEventListenerWithParameters(listener, useCapture)); }
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected SetMultimap<INamespacePrefixedString, IUIEventListenerWithParameters> getEventTargetListeners() { return eventTargetListeners; }
+
+	@Override
+	public boolean removeEventListener(INamespacePrefixedString type, IUIEventListener<?> listener, boolean useCapture) {
+		if (getEventTargetListeners().remove(type, new IUIEventListenerWithParameters(listener, useCapture))) {
+			listener.markAsRemoved();
+			return true;
+		} else
+			return false;
+	}
+
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
+
+	@Override
 	public boolean isFocusable() { return false; }
 
 	@Override
 	public boolean isActive() { return true; }
 
 	public static class IUIEventListenerWithParameters {
-		public static final ImmutableList<Function<? super IUIEventListenerWithParameters, ?>> OBJECT_VARIABLES = ImmutableList.of(
+		private static final ImmutableList<Function<? super IUIEventListenerWithParameters, ?>> OBJECT_VARIABLES = ImmutableList.of(
 				IUIEventListenerWithParameters::getListener, IUIEventListenerWithParameters::isUseCapture);
-		public static final ImmutableMap<String, Function<? super IUIEventListenerWithParameters, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchKeysValues(OBJECT_VARIABLES.size(),
+		@NonNls
+		private static final ImmutableMap<String, Function<? super IUIEventListenerWithParameters, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchKeysValues(getObjectVariables().size(),
 				ImmutableList.of("listener", "useCapture"),
-				OBJECT_VARIABLES));
-		protected final IUIEventListener<?> listener;
-		protected final boolean useCapture;
+				getObjectVariables()));
+		private final IUIEventListener<?> listener;
+		private final boolean useCapture;
 
 		public IUIEventListenerWithParameters(IUIEventListener<?> listener, boolean useCapture) {
 			this.listener = listener;
 			this.useCapture = useCapture;
 		}
 
+		@Override
+		public int hashCode() { return ObjectUtilities.hashCode(this, null, getObjectVariables()); }
+
+		public static ImmutableList<Function<? super IUIEventListenerWithParameters, ?>> getObjectVariables() { return OBJECT_VARIABLES; }
+
 		public IUIEventListener<?> getListener() { return listener; }
 
 		public boolean isUseCapture() { return useCapture; }
 
-		@Override
-		public int hashCode() { return ObjectUtilities.hashCode(this, null, OBJECT_VARIABLES); }
-
 		@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 		@Override
-		public boolean equals(Object obj) { return ObjectUtilities.equals(this, obj, false, null, OBJECT_VARIABLES); }
+		public boolean equals(Object obj) { return ObjectUtilities.equals(this, obj, false, null, getObjectVariables()); }
 
 		@Override
-		public String toString() { return ObjectUtilities.toString(this, super::toString, OBJECT_VARIABLES_MAP); }
+		public String toString() { return ObjectUtilities.toString(this, super::toString, getObjectVariablesMap()); }
+
+		public static ImmutableMap<String, Function<? super IUIEventListenerWithParameters, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
 	}
 }

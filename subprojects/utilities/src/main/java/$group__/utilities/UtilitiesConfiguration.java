@@ -1,5 +1,6 @@
 package $group__.utilities;
 
+import $group__.utilities.structures.Singleton;
 import $group__.utilities.templates.CommonConfigurationTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,8 +11,8 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public final class UtilitiesConfiguration extends CommonConfigurationTemplate<UtilitiesConfiguration.ConfigurationData> {
-	private static final UtilitiesConfiguration INSTANCE = new UtilitiesConfiguration();
-	private static final Logger BOOTSTRAP_LOGGER = LoggerFactory.getLogger(UtilitiesConstants.DISPLAY_NAME);
+	private static final Logger BOOTSTRAP_LOGGER = LoggerFactory.getLogger(UtilitiesConstants.MODULE_NAME);
+	private static final UtilitiesConfiguration INSTANCE = Singleton.getSingletonInstance(UtilitiesConfiguration.class, getBootstrapLogger());
 
 	private UtilitiesConfiguration() { super(getBootstrapLogger()); }
 

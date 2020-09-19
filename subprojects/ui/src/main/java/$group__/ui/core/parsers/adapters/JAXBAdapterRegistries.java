@@ -2,26 +2,36 @@ package $group__.ui.core.parsers.adapters;
 
 import $group__.ui.UIConfiguration;
 import $group__.utilities.CastUtilities;
+import $group__.utilities.LogMessageBuilder;
 import $group__.utilities.PreconditionUtilities;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.functions.IDuplexFunction;
 import $group__.utilities.structures.Registry;
 import $group__.utilities.structures.StandardDuplexFunctionRegistry;
+import $group__.utilities.templates.CommonConfigurationTemplate;
 import jakarta.xml.bind.JAXBElement;
 
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.function.Function;
 
 public enum JAXBAdapterRegistries {
 	;
 
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
+
 	public static <L> IDuplexFunction<L, ?> getAdapter(L jaxbObj) {
 		return findAdapter(jaxbObj)
 				.orElseThrow(() ->
-						ThrowableUtilities.BecauseOf.illegalArgument("Cannot find JAXB adapter",
-								"jaxbObj.getClass()", jaxbObj.getClass(),
-								"jaxbObj", jaxbObj));
+						ThrowableUtilities.logAndThrow(new IllegalArgumentException(
+								new LogMessageBuilder()
+										.addKeyValue("jaxbObj", jaxbObj)
+										.appendMessages(getResourceBundle().getString("adapter.find.not_found"))
+										.build()
+						), UIConfiguration.getInstance().getLogger()));
 	}
+
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	@SuppressWarnings("unchecked")
 	public static <L> Optional<? extends IDuplexFunction<L, ?>> findAdapter(L jaxbObj) {
@@ -39,8 +49,8 @@ public enum JAXBAdapterRegistries {
 		public static final Object INSTANCE = new Object();
 
 		protected Object() {
-			super(true, UIConfiguration.INSTANCE.getLogger());
-			PreconditionUtilities.requireRunOnceOnly(UIConfiguration.INSTANCE.getLogger());
+			super(true, UIConfiguration.getInstance().getLogger());
+			PreconditionUtilities.requireRunOnceOnly(UIConfiguration.getInstance().getLogger());
 		}
 	}
 
@@ -49,8 +59,8 @@ public enum JAXBAdapterRegistries {
 		public static final Element INSTANCE = new Element();
 
 		protected Element() {
-			super(true, UIConfiguration.INSTANCE.getLogger());
-			PreconditionUtilities.requireRunOnceOnly(UIConfiguration.INSTANCE.getLogger());
+			super(true, UIConfiguration.getInstance().getLogger());
+			PreconditionUtilities.requireRunOnceOnly(UIConfiguration.getInstance().getLogger());
 		}
 
 		public <L, VL extends IDuplexFunction<JAXBElement<L>, ?>> RegistryObject<VL> registerSafe(Class<L> key, VL value) {

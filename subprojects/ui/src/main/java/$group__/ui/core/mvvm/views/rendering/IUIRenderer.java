@@ -23,7 +23,7 @@ public interface IUIRenderer<C>
 			data.put(DEFAULT_KEY, new RegistryObject<>(defaultValue));
 		}
 
-		public static <R extends IUIComponentRenderer<?>> RegistryObject<? extends Class<? extends R>> getDefault(RegRenderer<R> registry) {
+		public static <R extends IUIComponentRenderer<?>> RegistryObject<? extends Class<? extends R>> getDefaultFactory(RegRenderer<R> registry) {
 			return registry.get(DEFAULT_KEY)
 					.orElseThrow(InternalError::new);
 		}

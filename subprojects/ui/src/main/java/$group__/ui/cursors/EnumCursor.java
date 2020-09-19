@@ -7,9 +7,9 @@ import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.minecraft.client.ImageUtilities;
 import net.minecraft.client.renderer.texture.NativeImage;
+import org.jetbrains.annotations.NonNls;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
-import org.slf4j.Logger;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -25,28 +25,24 @@ public enum EnumCursor
 	STANDARD_HAND_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR)),
 	STANDARD_RESIZE_HORIZONTAL_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_HRESIZE_CURSOR)),
 	STANDARD_RESIZE_VERTICAL_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_VRESIZE_CURSOR)),
-	@SuppressWarnings({"SpellCheckingInspection"})
 	EXTENSION_RESIZE_NW_SE_CURSOR(() -> {
-		Logger logger = UIConfiguration.INSTANCE.getLogger();
-		InputStream input = AssertionUtilities.assertNonnull(EnumCursor.class.getResourceAsStream("aero_nwse/32x32.png"));
+		InputStream input = AssertionUtilities.assertNonnull(EnumCursor.class.getResourceAsStream(StaticHolder.getExtensionResizeNwSeCursorPath()));
 		try {
 			return Try.call(() -> createCursor(
 					input,
-					new Point(8, 8)), UIConfiguration.INSTANCE.getLogger()).orElseThrow(ThrowableCatcher::rethrow);
+					new Point(8, 8)), UIConfiguration.getInstance().getLogger()).orElseThrow(ThrowableCatcher::rethrow);
 		} finally {
-			Try.run(input::close, logger);
+			Try.run(input::close, UIConfiguration.getInstance().getLogger());
 		}
 	}),
-	@SuppressWarnings({"SpellCheckingInspection"})
 	EXTENSION_RESIZE_NE_SW_CURSOR(() -> {
-		Logger logger = UIConfiguration.INSTANCE.getLogger();
-		InputStream input = AssertionUtilities.assertNonnull(EnumCursor.class.getResourceAsStream("aero_nesw/32x32.png"));
+		InputStream input = AssertionUtilities.assertNonnull(EnumCursor.class.getResourceAsStream(StaticHolder.getExtensionResizeNeSwCursorPath()));
 		try {
 			return Try.call(() -> createCursor(
 					input,
-					new Point(8, 8)), UIConfiguration.INSTANCE.getLogger()).orElseThrow(ThrowableCatcher::rethrow);
+					new Point(8, 8)), UIConfiguration.getInstance().getLogger()).orElseThrow(ThrowableCatcher::rethrow);
 		} finally {
-			Try.run(input::close, logger);
+			Try.run(input::close, UIConfiguration.getInstance().getLogger());
 		}
 	}),
 	;
@@ -71,4 +67,19 @@ public enum EnumCursor
 
 	@Override
 	public void close() { GLFW.glfwDestroyCursor(getHandle()); }
+
+	public enum StaticHolder {
+		;
+
+		@SuppressWarnings("HardcodedFileSeparator")
+		@NonNls
+		private static final String EXTENSION_RESIZE_NW_SE_CURSOR_PATH = "aero_nwse/32x32.png";
+		@SuppressWarnings("HardcodedFileSeparator")
+		@NonNls
+		private static final String EXTENSION_RESIZE_NE_SW_CURSOR_PATH = "aero_nesw/32x32.png";
+
+		public static String getExtensionResizeNwSeCursorPath() { return EXTENSION_RESIZE_NW_SE_CURSOR_PATH; }
+
+		public static String getExtensionResizeNeSwCursorPath() { return EXTENSION_RESIZE_NE_SW_CURSOR_PATH; }
+	}
 }

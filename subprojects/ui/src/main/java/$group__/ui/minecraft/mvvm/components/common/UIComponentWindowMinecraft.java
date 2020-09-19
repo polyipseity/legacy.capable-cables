@@ -19,6 +19,7 @@ import $group__.utilities.structures.NamespacePrefixedString;
 import com.google.common.collect.ImmutableMap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -41,7 +42,7 @@ public class UIComponentWindowMinecraft
 
 	@Override
 	public void setRenderer(@Nullable IUIComponentRendererMinecraft<?> renderer) {
-		IUIRendererContainer.setRendererImpl(this, renderer,
+		StaticHolder.setRendererImpl(this, renderer,
 				(s, r) -> s.getRendererContainer().setRenderer(r));
 	}
 
@@ -53,7 +54,9 @@ public class UIComponentWindowMinecraft
 	@OnlyIn(Dist.CLIENT)
 	public static class DefaultRenderer<C extends UIComponentWindowMinecraft>
 			extends UIComponentRendererMinecraft<C> {
+		@NonNls
 		public static final String PROPERTY_COLOR_BACKGROUND = INamespacePrefixedString.DEFAULT_PREFIX + "window.colors.background";
+		@NonNls
 		public static final String PROPERTY_COLOR_BORDER = INamespacePrefixedString.DEFAULT_PREFIX + "window.colors.border";
 
 		public static final INamespacePrefixedString PROPERTY_COLOR_BACKGROUND_LOCATION = new NamespacePrefixedString(PROPERTY_COLOR_BACKGROUND);

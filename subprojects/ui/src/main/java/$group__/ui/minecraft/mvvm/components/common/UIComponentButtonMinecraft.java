@@ -19,6 +19,7 @@ import $group__.utilities.structures.NamespacePrefixedString;
 import com.google.common.collect.ImmutableMap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -38,9 +39,10 @@ public class UIComponentButtonMinecraft
 	@Override
 	public Optional<? extends IUIComponentRendererMinecraft<?>> getRenderer() { return getRendererContainer().getRenderer(); }
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void setRenderer(@Nullable IUIComponentRendererMinecraft<?> renderer) {
-		IUIRendererContainer.setRendererImpl(this, renderer,
+		StaticHolder.setRendererImpl(this, renderer,
 				(s, r) -> s.getRendererContainer().setRenderer(r));
 	}
 
@@ -52,11 +54,17 @@ public class UIComponentButtonMinecraft
 	@OnlyIn(Dist.CLIENT)
 	public static class DefaultRenderer<C extends UIComponentButtonMinecraft>
 			extends UIComponentRendererMinecraft<C> {
+		@NonNls
 		public static final String PROPERTY_COLOR_BASE = INamespacePrefixedString.DEFAULT_PREFIX + "button.colors.base";
+		@NonNls
 		public static final String PROPERTY_COLOR_BASE_BORDER = INamespacePrefixedString.DEFAULT_PREFIX + "button.colors.base.border";
+		@NonNls
 		public static final String PROPERTY_COLOR_HOVERING = INamespacePrefixedString.DEFAULT_PREFIX + "button.colors.hovering";
+		@NonNls
 		public static final String PROPERTY_COLOR_HOVERING_BORDER = INamespacePrefixedString.DEFAULT_PREFIX + "button.colors.hovering.border";
+		@NonNls
 		public static final String PROPERTY_COLOR_PRESSED = INamespacePrefixedString.DEFAULT_PREFIX + "button.colors.pressed";
+		@NonNls
 		public static final String PROPERTY_COLOR_PRESSED_BORDER = INamespacePrefixedString.DEFAULT_PREFIX + "button.colors.pressed.border";
 
 		public static final INamespacePrefixedString PROPERTY_COLOR_BASE_LOCATION = new NamespacePrefixedString(PROPERTY_COLOR_BASE);

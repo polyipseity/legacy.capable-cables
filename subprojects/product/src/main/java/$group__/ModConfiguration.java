@@ -1,6 +1,7 @@
 package $group__;
 
 import $group__.utilities.minecraft.internationalization.MinecraftLocaleUtilities;
+import $group__.utilities.structures.Singleton;
 import $group__.utilities.templates.CommonConfigurationTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +15,8 @@ import static $group__.ModConstants.MOD_ID;
 
 public final class ModConfiguration
 		extends CommonConfigurationTemplate<ModConfiguration.ConfigurationData> {
-	private static final ModConfiguration INSTANCE = new ModConfiguration();
 	private static final Logger BOOTSTRAP_LOGGER = LoggerFactory.getLogger(MOD_ID);
+	private static final ModConfiguration INSTANCE = Singleton.getSingletonInstance(ModConfiguration.class, getBootstrapLogger());
 
 	private ModConfiguration() { super(getBootstrapLogger()); }
 

@@ -19,7 +19,7 @@ public interface IUIExtensionScreenProvider
 	INamespacePrefixedString KEY = new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, AREA_UI + ".screen");
 	@SuppressWarnings("unchecked")
 	Registry.RegistryObject<IType<INamespacePrefixedString, IUIExtensionScreenProvider, IUIInfrastructure<?, ?, ?>>> TYPE =
-			RegExtension.INSTANCE.registerApply(KEY, k -> new IType.Impl<>(k, (t, i) -> (Optional<? extends IUIExtensionScreenProvider>) i.getExtension(t.getKey())));
+			ExtensionRegistry.INSTANCE.registerApply(KEY, k -> new IType.Impl<>(k, (t, i) -> (Optional<? extends IUIExtensionScreenProvider>) i.getExtension(t.getKey())));
 
 	Screen getScreen();
 

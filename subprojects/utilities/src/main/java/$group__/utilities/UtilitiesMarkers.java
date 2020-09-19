@@ -1,12 +1,10 @@
 package $group__.utilities;
 
+import $group__.utilities.structures.Singleton;
 import $group__.utilities.templates.MarkerUtilitiesTemplate;
-import org.slf4j.Marker;
 
 public final class UtilitiesMarkers extends MarkerUtilitiesTemplate {
-	public static final UtilitiesMarkers INSTANCE = new UtilitiesMarkers();
+	public static final UtilitiesMarkers INSTANCE = Singleton.getSingletonInstance(UtilitiesMarkers.class, UtilitiesConfiguration.getInstance().getLogger());
 
-	private final Marker markerDynamic = getMarker("dynamic");
-
-	private UtilitiesMarkers() { super(UtilitiesConstants.DISPLAY_NAME, UtilitiesConfiguration.INSTANCE.getLogger()); }
+	private UtilitiesMarkers() { super(UtilitiesConstants.MODULE_NAME, UtilitiesConfiguration.getInstance().getLogger()); }
 }

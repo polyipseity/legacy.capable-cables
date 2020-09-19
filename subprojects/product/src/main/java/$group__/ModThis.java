@@ -10,6 +10,7 @@ import $group__.utilities.minecraft.internationalization.MinecraftLocaleUtilitie
 import $group__.utilities.structures.Singleton;
 import $group__.utilities.templates.CommonConfigurationTemplate;
 import $group__.utilities.templates.ConfigurationTemplate;
+import com.google.common.base.Suppliers;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -20,6 +21,7 @@ import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
 import org.jetbrains.annotations.NonNls;
 
 import java.util.ResourceBundle;
+import java.util.function.Supplier;
 
 import static $group__.ModConstants.MOD_ID;
 import static $group__.common.registrable.blocks.BlocksThis.BLOCKS;
@@ -30,6 +32,7 @@ import static $group__.common.registrable.tileentities.TileEntityTypesThis.TILE_
 @Mod(MOD_ID)
 public final class ModThis
 		extends Singleton {
+	private static final Supplier<ModThis> INSTANCE = Suppliers.memoize(() -> Singleton.getSingletonInstance(ModThis.class, ModConfiguration.getInstance().getLogger()));
 	private static final ResourceBundle RESOURCE_BUNDLE;
 
 	static {
@@ -66,6 +69,8 @@ public final class ModThis
 
 	public IProxy getProxy() { return proxy; }
 
+	public static ModThis getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+
 	private enum DistLambdaHolder {
 		;
 
@@ -83,7 +88,7 @@ public final class ModThis
 	}
 
 	private final class EventHandler extends Singleton {
-		protected EventHandler() { super(ModConfiguration.getInstance().getLogger()); }
+		private EventHandler() { super(ModConfiguration.getInstance().getLogger()); }
 
 		@SubscribeEvent
 		protected void onModLifecycleEvent(ModLifecycleEvent event) {

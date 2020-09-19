@@ -54,7 +54,7 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 
 	@Override
 	public void setView(V view) {
-		IUIInfrastructure.checkBoundState(isBound(), false);
+		StaticHolder.checkBoundState(isBound(), false);
 		getView().setInfrastructure(null);
 		this.view = view;
 		getView().setInfrastructure(this);
@@ -62,7 +62,7 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 
 	@Override
 	public void setViewModel(VM viewModel) {
-		IUIInfrastructure.checkBoundState(isBound(), false);
+		StaticHolder.checkBoundState(isBound(), false);
 		getViewModel().setInfrastructure(null);
 		this.viewModel = viewModel;
 		getViewModel().setInfrastructure(this);
@@ -70,7 +70,7 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 
 	@Override
 	public void setBinder(B binder) {
-		IUIInfrastructure.checkBoundState(isBound(), false);
+		StaticHolder.checkBoundState(isBound(), false);
 		this.binder = binder;
 	}
 
@@ -82,7 +82,7 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public void bind() {
-		IUIInfrastructure.checkBoundState(isBound(), false);
+		StaticHolder.checkBoundState(isBound(), false);
 
 		// COMMENT must bind the bindings of view first
 		getBinder().bind(Iterables.concat(
@@ -107,7 +107,7 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 
 	@Override
 	public void unbind() {
-		IUIInfrastructure.checkBoundState(isBound(), true);
+		StaticHolder.checkBoundState(isBound(), true);
 
 		getBinderDisposables().clear();
 		getBinder().unbindAll();

@@ -1,6 +1,7 @@
 package $group__.utilities;
 
 import $group__.utilities.functions.ConstantSupplier;
+import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -12,9 +13,9 @@ public class LogMessageBuilder {
 	private final List<Supplier<?>> arguments = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 	private final Map<String, Supplier<?>> keyValuePairs = new HashMap<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 
-	public LogMessageBuilder addKeyValue(String key, @Nullable Object value) { return addKeyValue(key, ConstantSupplier.ofNullable(value)); }
+	public LogMessageBuilder addKeyValue(@NonNls String key, @Nullable Object value) { return addKeyValue(key, ConstantSupplier.ofNullable(value)); }
 
-	public LogMessageBuilder addKeyValue(String key, Supplier<?> value) {
+	public LogMessageBuilder addKeyValue(@NonNls String key, Supplier<?> value) {
 		getKeyValuePairs().put(key, value);
 		return this;
 	}

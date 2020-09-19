@@ -17,7 +17,7 @@ import $group__.ui.core.parsers.adapters.JAXBAdapterRegistries;
 import $group__.ui.core.parsers.components.*;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilder;
-import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilderFactory;
+import $group__.ui.structures.shapes.descriptors.ShapeDescriptorBuilderFactoryRegistry;
 import $group__.ui.structures.shapes.interactions.ShapeAnchor;
 import $group__.ui.structures.shapes.interactions.ShapeConstraint;
 import $group__.utilities.*;
@@ -33,6 +33,7 @@ import $group__.utilities.functions.MappableSupplier;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
+import $group__.utilities.templates.CommonConfigurationTemplate;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.*;
@@ -47,11 +48,12 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
+public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 		extends IHasGenericClass.Impl<T>
 		implements IUIComponentParser<T, Function<? super Unmarshaller, ?>> {
-	protected final ConcurrentMap<String, Class<?>> aliases = MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
-	protected final LoadingCache<EnumHandlerType, ConcurrentMap<Class<?>, IConsumer3<? super IParserContext, ?, ?>>> handlers =
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
+	private final ConcurrentMap<String, Class<?>> aliases = MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
+	private final LoadingCache<EnumHandlerType, ConcurrentMap<Class<?>, IConsumer3<? super IParserContext, ?, ?>>> handlers =
 			ManualLoadingCache.newNestedLoadingCacheMap(
 					CacheUtilities.newCacheBuilderSingleThreaded()
 							.initialCapacity(EnumHandlerType.values().length)
@@ -60,10 +62,37 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 											ConstantSupplier.of(MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM))
 									).map(MapMaker::makeMap))));
 	@Nullable
-	protected Ui root;
+	private Ui root;
 
-	public UIDefaultComponentParser(Class<T> genericClass) {
+	public DefaultUIComponentParser(Class<T> genericClass) {
 		super(genericClass);
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	@Override
+	public void parse(Function<? super Unmarshaller, ?> resource) throws Throwable {
+		Unmarshaller um = DefaultSchemaHolder.getContext().createUnmarshaller();
+		// COMMENT do NOT set a schema
+		Ui root = (Ui) resource.apply(um);
+		reset();
+
+		getAliases().putAll(
+				root.getUsing().stream().unordered()
+						.map(u -> Maps.immutableEntry(u.getAlias(), Try.call(() -> Class.forName(u.getTarget()), UIConfiguration.getInstance().getLogger()).orElseThrow(ThrowableCatcher::rethrow)))
+						.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
+
+		{
+			Class<?> viewClass = AssertionUtilities.assertNonnull(getAliases().get(root.getView().getClazz()));
+			if (!getGenericClass().isAssignableFrom(viewClass))
+				throw ThrowableUtilities.logAndThrow(new IllegalArgumentException(
+						new LogMessageBuilder()
+								.addKeyValue("viewClass", viewClass).addKeyValue("getGenericClass()", getGenericClass())
+								.appendMessages(getResourceBundle().getString("construct.view.instance_of.fail"))
+								.build()
+				), UIConfiguration.getInstance().getLogger());
+		}
+
+		setRoot(root);
 	}
 
 	public static <T extends IUIComponentParser<?, ?>> T makeParserStandard(T instance) {
@@ -73,30 +102,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		return instance;
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
-	@Override
-	public void parse(Function<? super Unmarshaller, ?> resource) throws Throwable {
-		Unmarshaller um = DefaultSchemaHolder.CONTEXT.createUnmarshaller();
-		// COMMENT do NOT set a schema
-		Ui root = (Ui) resource.apply(um);
-		reset();
-
-		getAliases().putAll(
-				root.getUsing().stream().unordered()
-						.map(u -> Maps.immutableEntry(u.getAlias(), Try.call(() -> Class.forName(u.getTarget()), UIConfiguration.INSTANCE.getLogger()).orElseThrow(ThrowableCatcher::rethrow)))
-						.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
-
-		{
-			Class<?> viewClass = AssertionUtilities.assertNonnull(getAliases().get(root.getView().getClazz()));
-			if (!getGenericClass().isAssignableFrom(viewClass))
-				throw ThrowableUtilities.BecauseOf.illegalArgument("Generic class is not assignable from view type",
-						"viewClass", viewClass,
-						"getGenericClass()", getGenericClass(),
-						"resource", resource);
-		}
-
-		setRoot(root);
-	}
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	@Override
 	public void reset() {
@@ -170,12 +176,18 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 													.orElseThrow(AssertionError::new);
 										return p;
 									}, n -> {
-										throw ThrowableUtilities.BecauseOf.illegalArgument("Cyclic hierarchy detected",
-												"n", n,
-												"componentRaw", componentRaw);
+										throw ThrowableUtilities.logAndThrow(
+												new IllegalArgumentException(
+														new LogMessageBuilder()
+																.addKeyValue("n", n).addKeyValue("componentRaw", componentRaw)
+																.appendMessages(getResourceBundle().getString("construct.view.tree.cyclic"))
+																.build()
+												),
+												UIConfiguration.getInstance().getLogger()
+										);
 									});
 							return view;
-						}, UIConfiguration.INSTANCE.getLogger())
+						}, UIConfiguration.getInstance().getLogger())
 								.orElseThrow(ThrowableCatcher::rethrow))
 				.orElseThrow(() -> new IllegalStateException("Prototype has not been created"));
 	}
@@ -185,7 +197,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 	@SuppressWarnings("SwitchStatementWithTooFewBranches")
 	public static IUIViewComponent<?, ?> createView(IParserContext context, View view) {
 		Class<?> vc = AssertionUtilities.assertNonnull(context.getAliases().get(view.getClazz()));
-		UIViewComponentConstructor.EnumConstructorType ct = IConstructorType.getConstructorType(vc, UIViewComponentConstructor.class, UIViewComponentConstructor::type);
+		UIViewComponentConstructor.EnumConstructorType ct = IConstructorType.StaticHolder.getConstructorType(vc, UIViewComponentConstructor.class, UIViewComponentConstructor::type);
 		return Try.call(() -> {
 			MethodHandle mh = DynamicUtilities.IMPL_LOOKUP.findConstructor(vc, ct.getMethodType());
 			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(view.getProperty());
@@ -197,7 +209,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 				default:
 					throw new InternalError();
 			}
-		}, UIConfiguration.INSTANCE.getLogger())
+		}, UIConfiguration.getInstance().getLogger())
 				.orElseThrow(ThrowableCatcher::rethrow);
 	}
 
@@ -206,7 +218,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		return TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, component,
 				n -> {
 					Class<?> cc = AssertionUtilities.assertNonnull(context.getAliases().get(n.getClazz()));
-					UIComponentConstructor.EnumConstructorType ct = IConstructorType.getConstructorType(cc, UIComponentConstructor.class, UIComponentConstructor::type);
+					UIComponentConstructor.EnumConstructorType ct = IConstructorType.StaticHolder.getConstructorType(cc, UIComponentConstructor.class, UIComponentConstructor::type);
 					return Try.call(() -> {
 						MethodHandle mh = DynamicUtilities.IMPL_LOOKUP.findConstructor(cc, ct.getMethodType());
 						Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(n.getProperty());
@@ -310,23 +322,35 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 							default:
 								throw new InternalError();
 						}
-					}, UIConfiguration.INSTANCE.getLogger())
+					}, UIConfiguration.getInstance().getLogger())
 							.orElseThrow(ThrowableCatcher::rethrow);
 				},
 				Component::getComponent,
 				(p, c) -> {
 					if (!Iterables.isEmpty(c)) {
 						if (!(p instanceof IUIComponentContainer))
-							throw ThrowableUtilities.BecauseOf.illegalArgument("UI component is not a container",
-									"p.getClass()", p.getClass(),
-									"p", p);
+							throw ThrowableUtilities.logAndThrow(
+									new IllegalArgumentException(
+											new LogMessageBuilder()
+													.addKeyValue("p", p).addKeyValue("c", c)
+													.appendMessages(getResourceBundle().getString("construct.component.container.instance_of.fail"))
+													.build()
+									),
+									UIConfiguration.getInstance().getLogger()
+							);
 						((IUIComponentContainer) p).addChildren(c);
 					}
 					return p;
 				}, n -> {
-					throw ThrowableUtilities.BecauseOf.illegalArgument("Cyclic hierarchy detected",
-							"n", n,
-							"component", component);
+					throw ThrowableUtilities.logAndThrow(
+							new IllegalArgumentException(
+									new LogMessageBuilder()
+											.addKeyValue("n", n).addKeyValue("component", component)
+											.appendMessages(getResourceBundle().getString("construct.view.tree.cyclic"))
+											.build()
+							),
+							UIConfiguration.getInstance().getLogger()
+					);
 				})
 				.orElseThrow(InternalError::new);
 	}
@@ -364,12 +388,12 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 										m.getName(),
 										MethodType.methodType(void.class, Collections.nCopies(args.length, double.class)))
 										.bindTo(transform)
-										.invokeWithArguments((Object[]) args), UIConfiguration.INSTANCE.getLogger());
+										.invokeWithArguments((Object[]) args), UIConfiguration.getInstance().getLogger());
 						ThrowableUtilities.ThrowableCatcher.rethrow(true);
 					});
 				});
 
-		IShapeDescriptorBuilder<?> sdb = IShapeDescriptorBuilderFactory.getDefault()
+		IShapeDescriptorBuilder<?> sdb = ShapeDescriptorBuilderFactoryRegistry.getDefaultFactory()
 				.createBuilder(
 						CastUtilities.castUnchecked(AssertionUtilities.assertNonnull(context.getAliases().get(shape.getClazz()))) // COMMENT should not throw
 				);
@@ -413,12 +437,13 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 					.ifPresent(view ->
 							view.getShapeAnchorController().addAnchors(component,
 									ImmutableList.of(new ShapeAnchor(
-											IUIViewComponent.getComponentByID(view, object.getTarget()),
+											IUIViewComponent.StaticHolder.getComponentByID(view, object.getTarget()),
 											object.getOriginSide().toJava(),
 											object.getTargetSide().toJava(),
 											object.getBorderThickness()))));
 		}
 
+		@SuppressWarnings("deprecation")
 		public static void handleRenderer(IParserContext context, Object container, Renderer object) {
 			if (!(container instanceof IUIRendererContainer))
 				return;
@@ -426,7 +451,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 			Class<?> oc = Optional.ofNullable(object.getClazz())
 					.<Class<?>>map(classAlias -> AssertionUtilities.assertNonnull(context.getAliases().get(classAlias)))
 					.orElseGet(rendererContainer::getDefaultRendererClass);
-			UIRendererConstructor.EnumConstructorType ct = IConstructorType.getConstructorType(oc, UIRendererConstructor.class, UIRendererConstructor::type);
+			UIRendererConstructor.EnumConstructorType ct = IConstructorType.StaticHolder.getConstructorType(oc, UIRendererConstructor.class, UIRendererConstructor::type);
 			IUIRenderer<?> ret = Try.call(() -> {
 				MethodHandle mh = DynamicUtilities.IMPL_LOOKUP.findConstructor(oc, ct.getMethodType());
 				Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(object.getProperty());
@@ -442,7 +467,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 					default:
 						throw new InternalError();
 				}
-			}, UIConfiguration.INSTANCE.getLogger()).orElseThrow(ThrowableCatcher::rethrow);
+			}, UIConfiguration.getInstance().getLogger()).orElseThrow(ThrowableCatcher::rethrow);
 			rendererContainer.setRenderer(CastUtilities.castUnchecked(ret)); // COMMENT setRenderer should check
 		}
 
@@ -450,7 +475,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 			if (!(container instanceof IExtensionContainer))
 				return;
 			Class<?> oc = AssertionUtilities.assertNonnull(context.getAliases().get(object.getClazz()));
-			UIExtensionConstructor.EnumConstructorType ct = IConstructorType.getConstructorType(oc, UIExtensionConstructor.class, UIExtensionConstructor::type);
+			UIExtensionConstructor.EnumConstructorType ct = IConstructorType.StaticHolder.getConstructorType(oc, UIExtensionConstructor.class, UIExtensionConstructor::type);
 			IUIExtension<?, ?> ret = Try.call(() -> {
 				MethodHandle mh = DynamicUtilities.IMPL_LOOKUP.findConstructor(oc, ct.getMethodType());
 				Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(object.getProperty());
@@ -466,7 +491,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 					default:
 						throw new InternalError();
 				}
-			}, UIConfiguration.INSTANCE.getLogger()).orElseThrow(ThrowableCatcher::rethrow);
+			}, UIConfiguration.getInstance().getLogger()).orElseThrow(ThrowableCatcher::rethrow);
 			Iterables.concat(
 					object.getRenderer()
 							.map(ImmutableSet::of)

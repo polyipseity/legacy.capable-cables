@@ -31,6 +31,7 @@ import com.google.common.collect.Iterables;
 import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.subjects.Subject;
 import io.reactivex.rxjava3.subjects.UnicastSubject;
+import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -47,7 +48,9 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 public class UIComponent
 		extends UIEventTarget
 		implements IUIComponent {
+	@NonNls
 	public static final String PROPERTY_VISIBLE = INamespacePrefixedString.DEFAULT_PREFIX + "component.visible";
+	@NonNls
 	public static final String PROPERTY_ACTIVE = INamespacePrefixedString.DEFAULT_PREFIX + "component.active";
 
 	public static final INamespacePrefixedString PROPERTY_VISIBLE_LOCATION = new NamespacePrefixedString(PROPERTY_VISIBLE);
