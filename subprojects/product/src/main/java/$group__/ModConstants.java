@@ -1,13 +1,14 @@
 package $group__;
 
 import $group__.utilities.compile.EnumBuildType;
+import org.jetbrains.annotations.NonNls;
 
 public enum ModConstants {
 	;
 
-	@SuppressWarnings("HardCodedStringLiteral")
+	@NonNls
 	public static final String MOD_ID = "${modID}";
-	@SuppressWarnings("HardCodedStringLiteral")
+	@NonNls
 	public static final String BUILD_TYPE_STRING = "${buildType}";
 	public static final EnumBuildType BUILD_TYPE = EnumBuildType.valueOfSafe(BUILD_TYPE_STRING);
 }

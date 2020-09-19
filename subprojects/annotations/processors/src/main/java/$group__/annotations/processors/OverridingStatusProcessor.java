@@ -2,8 +2,10 @@ package $group__.annotations.processors;
 
 import $group__.annotations.OverridingStatus;
 import $group__.utilities.AssertionUtilities;
+import $group__.utilities.LogMessageBuilder;
 import $group__.utilities.ProcessorUtilities;
 import $group__.utilities.StreamUtilities;
+import $group__.utilities.internationalization.ChangingLocaleResourceBundle;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
@@ -24,6 +26,7 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_ENORMOUS;
@@ -31,6 +34,8 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
 @SuppressWarnings("unused")
 public final class OverridingStatusProcessor extends AbstractProcessor {
+	protected static final ResourceBundle RESOURCE_BUNDLE = new ChangingLocaleResourceBundle.Builder().build();
+
 	@Override
 	public Set<String> getSupportedAnnotationTypes() { return Collections.singleton(OverridingStatus.class.getCanonicalName()); }
 
@@ -83,24 +88,40 @@ public final class OverridingStatusProcessor extends AbstractProcessor {
 
 												if (subMethod == null) {
 													if (whenB == null)
-														messager.printMessage(Diagnostic.Kind.NOTE, "Does not override super method '" + superMethod + '\'', subclass);
+														messager.printMessage(Diagnostic.Kind.NOTE, new LogMessageBuilder()
+																.appendMessages(RESOURCE_BUNDLE.getString("info.override.false"))
+																.appendArguments(superMethod)
+																.build(), subclass);
 													else if (whenB) {
 														for (TypeElement superclass1 : ProcessorUtilities.getIntermediateSuperclasses(subclass,
 																(TypeElement) types.asElement(superclass.getSuperclass()), types)) {
 															for (Element superMethod1 : superclass1.getEnclosedElements()) {
 																if (superMethod1.getKind() == ElementKind.METHOD && ProcessorUtilities.isElementFinal(superMethod1) && elements.overrides((ExecutableElement) superMethod1, superMethod, superclass1)) {
-																	messager.printMessage(superclass1.getQualifiedName().toString().startsWith(a.group()) ? Diagnostic.Kind.WARNING : Diagnostic.Kind.NOTE, "Requirement impossible: cannot override final super method '" + superMethod1 + '\'');
+																	messager.printMessage(superclass1.getQualifiedName().toString().startsWith(a.group()) ? Diagnostic.Kind.WARNING : Diagnostic.Kind.NOTE,
+																			new LogMessageBuilder()
+																					.appendMessages(RESOURCE_BUNDLE.getString("warning.always.impossible"))
+																					.appendArguments(superMethod1)
+																					.build(), subclass);
 																	return;
 																}
 															}
 														}
-														messager.printMessage(Diagnostic.Kind.ERROR, "Requirement unfulfilled: should override super" + ' ' + "method '" + superMethod + '\'');
+														messager.printMessage(Diagnostic.Kind.ERROR, new LogMessageBuilder()
+																.appendMessages(RESOURCE_BUNDLE.getString("error.always.fail"))
+																.appendArguments(superMethod)
+																.build(), subclass);
 													}
 												} else if (ProcessorUtilities.getEffectiveAnnotationWithInheritingConsidered(OverridingStatus.class, subMethod, elements, types).equals(a)) {
 													if (whenB == null)
-														messager.printMessage(Diagnostic.Kind.NOTE, "Overrides super method '" + superMethod + '\'', subMethod);
+														messager.printMessage(Diagnostic.Kind.NOTE, new LogMessageBuilder()
+																.appendMessages(RESOURCE_BUNDLE.getString("info.override.true"))
+																.appendArguments(superMethod)
+																.build(), subMethod);
 													else if (!whenB)
-														messager.printMessage(Diagnostic.Kind.ERROR, "Requirement unfulfilled: should " + "NOT" + ' ' + "override super method '" + superMethod + '\'', subMethod);
+														messager.printMessage(Diagnostic.Kind.ERROR, new LogMessageBuilder()
+																.appendMessages(RESOURCE_BUNDLE.getString("error.never.fail"))
+																.appendArguments(superMethod)
+																.build(), subMethod);
 												}
 											}));
 				});

@@ -19,7 +19,7 @@ import static java.lang.System.lineSeparator;
 import static java.lang.invoke.MethodType.methodType;
 
 public abstract class Singleton {
-	protected static final Map<Class<?>, Map.Entry<? extends Singleton, String>> INSTANCES = Collections.synchronizedMap(MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap());
+	private static final Map<Class<?>, Map.Entry<? extends Singleton, String>> INSTANCES = Collections.synchronizedMap(MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap());
 
 	protected Singleton(Logger logger) {
 		Class<? extends Singleton> clazz = getClass();
@@ -27,7 +27,7 @@ public abstract class Singleton {
 				sts = DynamicUtilities.getCurrentStackTraceString();
 
 		@SuppressWarnings("ThisEscapedInObjectConstruction") Map.Entry<? extends Singleton, String> v = immutableEntry(this, sts);
-		@Nullable Map.Entry<? extends Singleton, String> vo = INSTANCES.put(clazz, v);
+		@Nullable Map.Entry<? extends Singleton, String> vo = getInstances().put(clazz, v);
 		if (vo != null) {
 			logger.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("The singleton instance of '{}' already created, previous stacktrace:{}{}", classGS, lineSeparator(), vo.getValue()));
 			throw BecauseOf.instantiation();
@@ -36,6 +36,7 @@ public abstract class Singleton {
 		logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("The singleton instance of '{}' created, stacktrace:{}{}", classGS, lineSeparator(), sts));
 	}
 
+	private static Map<Class<?>, Map.Entry<? extends Singleton, String>> getInstances() { return INSTANCES; }
 
 	@SuppressWarnings("unchecked")
 	public static <T extends Singleton> T getSingletonInstance(Class<T> clazz, @Nullable Logger logger) {
@@ -48,7 +49,7 @@ public abstract class Singleton {
 
 	public static <T extends Singleton> Optional<T> tryGetSingletonInstance(Class<T> clazz, boolean instantiate,
 	                                                                        Function<Class<T>, ? extends Optional<T>> instantiation) {
-		@SuppressWarnings("unchecked") Optional<T> r = (Optional<T>) Optional.ofNullable(INSTANCES.get(clazz))
+		@SuppressWarnings("unchecked") Optional<T> r = (Optional<T>) Optional.ofNullable(getInstances().get(clazz))
 				.map(Map.Entry::getKey);
 		if (!r.isPresent() && instantiate)
 			r = instantiation.apply(clazz);

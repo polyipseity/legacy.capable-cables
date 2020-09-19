@@ -1,5 +1,6 @@
 package $group__;
 
+import $group__.utilities.minecraft.internationalization.MinecraftLocaleUtilities;
 import $group__.utilities.templates.CommonConfigurationTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,10 +25,10 @@ public final class ModConfiguration
 
 	public static final class ConfigurationData
 			extends CommonConfigurationTemplate.ConfigurationData {
-		public ConfigurationData(@Nullable Supplier<? extends Logger> logger,
+		public ConfigurationData(@Nullable Logger logger,
 		                         @Nullable Supplier<? extends Locale> localeSupplier) {
-			super(Optional.<Supplier<? extends Logger>>ofNullable(logger).orElse(ModConfiguration::getBootstrapLogger),
-					Optional.<Supplier<? extends Locale>>ofNullable(localeSupplier).orElse(Locale::getDefault));
+			super(Optional.ofNullable(logger).orElseGet(ModConfiguration::getBootstrapLogger),
+					Optional.<Supplier<? extends Locale>>ofNullable(localeSupplier).orElse(MinecraftLocaleUtilities::getCurrentLocale));
 		}
 	}
 }

@@ -50,9 +50,9 @@ public final class UIConfiguration
 
 	public static final class ConfigurationData
 			extends CommonConfigurationTemplate.ConfigurationData {
-		public ConfigurationData(@Nullable Supplier<? extends Logger> logger,
+		public ConfigurationData(@Nullable Logger logger,
 		                         @Nullable Supplier<? extends Locale> localeSupplier) {
-			super(Optional.<Supplier<? extends Logger>>ofNullable(logger).orElse(UIConfiguration::getBootstrapLogger),
+			super(Optional.ofNullable(logger).orElseGet(UIConfiguration::getBootstrapLogger),
 					Optional.<Supplier<? extends Locale>>ofNullable(localeSupplier).orElse(Locale::getDefault));
 		}
 	}

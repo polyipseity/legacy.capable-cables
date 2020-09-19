@@ -1,0 +1,5 @@
+<root>
+	<item name='org.slf4j.spi.LoggingEventBuilder org.slf4j.spi.LoggingEventBuilder addKeyValue(java.lang.String, java.lang.Object) 0'>
+		<annotation name='org.jetbrains.annotations.NonNls'/>
+	</item>
+</root>

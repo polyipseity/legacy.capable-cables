@@ -21,9 +21,9 @@ public final class UtilitiesConfiguration extends CommonConfigurationTemplate<Ut
 
 	public static final class ConfigurationData
 			extends CommonConfigurationTemplate.ConfigurationData {
-		public ConfigurationData(@Nullable Supplier<? extends Logger> logger,
+		public ConfigurationData(@Nullable Logger logger,
 		                         @Nullable Supplier<? extends Locale> localeSupplier) {
-			super(Optional.<Supplier<? extends Logger>>ofNullable(logger).orElse(UtilitiesConfiguration::getBootstrapLogger),
+			super(Optional.ofNullable(logger).orElseGet(UtilitiesConfiguration::getBootstrapLogger),
 					Optional.<Supplier<? extends Locale>>ofNullable(localeSupplier).orElse(Locale::getDefault));
 		}
 	}

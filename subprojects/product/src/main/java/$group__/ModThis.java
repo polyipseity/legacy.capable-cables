@@ -3,63 +3,68 @@ package $group__;
 import $group__.client.ProxyClient;
 import $group__.proxies.IProxy;
 import $group__.server.ProxyServer;
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.UtilitiesConfiguration;
 import $group__.utilities.minecraft.internationalization.MinecraftLocaleUtilities;
 import $group__.utilities.structures.Singleton;
+import $group__.utilities.templates.CommonConfigurationTemplate;
 import $group__.utilities.templates.ConfigurationTemplate;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
+import org.jetbrains.annotations.NonNls;
 
-import static $group__.ModConfiguration.LOGGER;
+import java.util.ResourceBundle;
+
 import static $group__.ModConstants.MOD_ID;
-import static $group__.common.registrables.blocks.BlocksThis.BLOCKS;
-import static $group__.common.registrables.inventory.ContainersThis.CONTAINERS;
-import static $group__.common.registrables.items.ItemsThis.ITEMS;
-import static $group__.common.registrables.tileentities.TileEntityTypesThis.TILE_ENTITIES;
-import static $group__.utilities.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
-import static $group__.utilities.LoggerUtilities.EnumMessages.PREFIX_MOD_LIFECYCLE_MESSAGE;
+import static $group__.common.registrable.blocks.BlocksThis.BLOCKS;
+import static $group__.common.registrable.inventory.ContainersThis.CONTAINERS;
+import static $group__.common.registrable.items.ItemsThis.ITEMS;
+import static $group__.common.registrable.tileentities.TileEntityTypesThis.TILE_ENTITIES;
 
 @Mod(MOD_ID)
-@EventBusSubscriber(bus = Bus.MOD)
-public final class ModThis extends Singleton {
+public final class ModThis
+		extends Singleton {
+	private static final ResourceBundle RESOURCE_BUNDLE;
+
 	static {
 		ConfigurationTemplate.configureSafe(UtilitiesConfiguration.getInstance(),
 				() -> new UtilitiesConfiguration.ConfigurationData(null, MinecraftLocaleUtilities::getCurrentLocale)); // COMMENT configure as early as possible
 		ConfigurationTemplate.configureSafe(ModConfiguration.getInstance(),
-				() -> new ModConfiguration.ConfigurationData(null, MinecraftLocaleUtilities::getCurrentLocale));
+				() -> new ModConfiguration.ConfigurationData(null, null));
+		RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(ModConfiguration.getInstance());
 	}
 
-	public final IProxy proxy = DistExecutor.unsafeRunForDist(
+	private final EventHandler eventHandler = Singleton.getSingletonInstance(EventHandler.class, ModConfiguration.getInstance().getLogger());
+	private final IProxy proxy = DistExecutor.unsafeRunForDist(
 			() -> DistLambdaHolder.Client::getProxyClient,
 			() -> DistLambdaHolder.Server::getProxyServer);
 
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public ModThis() {
-		super(LOGGER);
-		IEventBus eventBusMod = Bus.MOD.bus().get();
-		eventBusMod.register(this);
+		// COMMENT entry point
+		super(ModConfiguration.getInstance().getLogger());
+		IEventBus eventBusMod = AssertionUtilities.assertNonnull(Bus.MOD.bus().get());
+		eventBusMod.register(getEventHandler());
 		BLOCKS.register(eventBusMod);
 		ITEMS.register(eventBusMod);
 		TILE_ENTITIES.register(eventBusMod);
 		CONTAINERS.register(eventBusMod);
 	}
 
-	public static ResourceLocation getResourceLocation(String path) { return new ResourceLocation(MOD_ID, path); }
+	private EventHandler getEventHandler() { return eventHandler; }
 
-	public static String getNamespacePrefixedString(String separator, String string) { return NamespaceUtilities.getNamespacePrefixedString(separator, MOD_ID, string); }
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
-	@SubscribeEvent
-	protected void onModLifecycleEvent(ModLifecycleEvent event) {
-		if (!proxy.onModLifecycle(event))
-			LOGGER.info(() -> PREFIX_MOD_LIFECYCLE_MESSAGE.makeMessage(FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Event '{}' received, but processing of the event is NOT implemented", event)).getFormattedMessage());
-	}
+	public static ResourceLocation createResourceLocation(@NonNls String path) { return new ResourceLocation(MOD_ID, path); }
+
+	public static String getNamespacePrefixedString(@NonNls String separator, @NonNls String string) { return NamespaceUtilities.getNamespacePrefixedString(separator, MOD_ID, string); }
+
+	public IProxy getProxy() { return proxy; }
 
 	private enum DistLambdaHolder {
 		;
@@ -67,13 +72,25 @@ public final class ModThis extends Singleton {
 		private enum Client {
 			;
 
-			private static IProxy getProxyClient() { return new ProxyClient(LOGGER); }
+			private static IProxy getProxyClient() { return new ProxyClient(ModConfiguration.getInstance().getLogger()); }
 		}
 
 		private enum Server {
 			;
 
-			private static IProxy getProxyServer() { return new ProxyServer(LOGGER); }
+			private static IProxy getProxyServer() { return new ProxyServer(ModConfiguration.getInstance().getLogger()); }
+		}
+	}
+
+	private final class EventHandler extends Singleton {
+		protected EventHandler() { super(ModConfiguration.getInstance().getLogger()); }
+
+		@SubscribeEvent
+		protected void onModLifecycleEvent(ModLifecycleEvent event) {
+			if (!getProxy().onModLifecycle(event))
+				ModConfiguration.getInstance().getLogger().atInfo()
+						.addKeyValue("event", event)
+						.log(getResourceBundle().getString("event.lifecycle.unhandled"));
 		}
 	}
 }
