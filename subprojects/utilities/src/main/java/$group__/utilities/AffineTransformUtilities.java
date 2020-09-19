@@ -1,6 +1,5 @@
-package $group__.utilities.client;
+package $group__.utilities;
 
-import $group__.utilities.ThrowableUtilities;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.renderer.Matrix4f;
 

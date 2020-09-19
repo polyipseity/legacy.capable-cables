@@ -1,8 +1,7 @@
-package $group__.utilities.client.minecraft;
+package $group__.utilities.minecraft.client;
 
 import $group__.utilities.NamespaceUtilities;
 import $group__.utilities.interfaces.INamespacePrefixedString;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.IResource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -16,5 +15,5 @@ public enum ResourceUtilities {
 
 	public static InputStream getInputStream(INamespacePrefixedString location) throws IOException { return getResource(location).getInputStream(); }
 
-	public static IResource getResource(INamespacePrefixedString location) throws IOException { return Minecraft.getInstance().getResourceManager().getResource(NamespaceUtilities.toResourceLocation(location)); }
+	public static IResource getResource(INamespacePrefixedString location) throws IOException { return ClientUtilities.getMinecraftNonnull().getResourceManager().getResource(NamespaceUtilities.toResourceLocation(location)); }
 }

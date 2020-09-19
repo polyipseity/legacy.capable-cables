@@ -11,6 +11,7 @@ import $group__.ui.core.parsers.components.UIExtensionConstructor;
 import $group__.ui.core.structures.IUIComponentContext;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.cursors.EnumCursor;
+import $group__.ui.cursors.ICursor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.events.ui.UIEventListener;
 import $group__.ui.mvvm.views.components.UIComponentVirtual;
@@ -57,8 +58,8 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 		super(IUIComponent.class, containerClass);
 	}
 
-	protected static Optional<EnumCursor> getCursor(Set<? extends EnumUISide> sides) {
-		@Nullable EnumCursor cursor = null;
+	protected static Optional<ICursor> getCursor(Set<? extends EnumUISide> sides) {
+		@Nullable ICursor cursor = null;
 		if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT)
 				|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
 			cursor = EnumCursor.EXTENSION_RESIZE_NW_SE_CURSOR;

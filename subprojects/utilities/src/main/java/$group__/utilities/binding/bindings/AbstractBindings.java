@@ -1,5 +1,6 @@
 package $group__.utilities.binding.bindings;
 
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.binding.core.BindingTransformerNotFoundException;
 import $group__.utilities.binding.core.IBinding;
@@ -43,7 +44,7 @@ public abstract class AbstractBindings<B extends IBinding<?>>
 	@Override
 	public Optional<? extends INamespacePrefixedString> getBindingKey() { return Optional.of(bindingKey); }
 
-	protected Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>> getTransformers() { return getTransformersSupplier().get(); }
+	protected Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>> getTransformers() { return AssertionUtilities.assertNonnull(getTransformersSupplier().get()); }
 
 	protected Supplier<? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>>> getTransformersSupplier() { return transformersSupplier; }
 }

@@ -1,7 +1,7 @@
 package $group__.ui.utilities;
 
 import $group__.ui.structures.Dimension2DDouble;
-import $group__.utilities.client.AffineTransformUtilities;
+import $group__.utilities.AffineTransformUtilities;
 import $group__.utilities.functions.IConsumer4;
 import $group__.utilities.functions.IFunction4;
 

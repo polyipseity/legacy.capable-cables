@@ -94,7 +94,7 @@ public enum ThrowableUtilities {
 		}
 
 		public static <V> Optional<V> withLogging(Supplier<? extends Optional<V>> delegation, @Nullable Logger logger) {
-			Optional<V> r = delegation.get();
+			Optional<V> r = AssertionUtilities.assertNonnull(delegation.get());
 			if (logger != null)
 				acceptIfCaught(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_SIMPLE_MESSAGE.makeMessage("Failed try"), t)));
 			return r;

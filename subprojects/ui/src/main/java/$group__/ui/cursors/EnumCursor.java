@@ -5,7 +5,7 @@ import $group__.ui.utilities.UIObjectUtilities;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
-import $group__.utilities.client.minecraft.ImageUtilities;
+import $group__.utilities.minecraft.client.ImageUtilities;
 import net.minecraft.client.renderer.texture.NativeImage;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
@@ -15,9 +15,10 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.function.Supplier;
+import java.util.function.LongSupplier;
 
-public enum EnumCursor {
+public enum EnumCursor
+		implements ICursor {
 	STANDARD_ARROW_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR)),
 	STANDARD_I_BEAM_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_IBEAM_CURSOR)),
 	STANDARD_CROSS_HAIR_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_CROSSHAIR_CURSOR)),
@@ -52,7 +53,7 @@ public enum EnumCursor {
 
 	protected final long handle;
 
-	EnumCursor(Supplier<Long> handle) { this.handle = handle.get(); }
+	EnumCursor(LongSupplier handle) { this.handle = handle.getAsLong(); }
 
 	@SuppressWarnings("EmptyMethod")
 	public static void initializeClass() {}
@@ -65,5 +66,9 @@ public enum EnumCursor {
 		}
 	}
 
+	@Override
 	public long getHandle() { return handle; }
+
+	@Override
+	public void close() { GLFW.glfwDestroyCursor(getHandle()); }
 }

@@ -1,7 +1,7 @@
 package $group__.ui.structures.shapes.descriptors;
 
 import $group__.ui.utilities.UIObjectUtilities;
-import $group__.utilities.client.AffineTransformUtilities;
+import $group__.utilities.AffineTransformUtilities;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;

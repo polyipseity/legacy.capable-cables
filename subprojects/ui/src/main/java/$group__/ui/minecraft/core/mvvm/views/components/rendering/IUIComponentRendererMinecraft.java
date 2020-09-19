@@ -9,7 +9,7 @@ import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
 import $group__.ui.utilities.UIObjectUtilities;
 import $group__.ui.utilities.minecraft.CoordinateUtilities;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
-import $group__.utilities.client.minecraft.GLUtilities;
+import $group__.utilities.minecraft.client.GLUtilities;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;

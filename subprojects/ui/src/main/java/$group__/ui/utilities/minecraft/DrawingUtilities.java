@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.geom.*;
 
-import static $group__.utilities.client.AffineTransformUtilities.*;
+import static $group__.utilities.AffineTransformUtilities.*;
 
 @OnlyIn(Dist.CLIENT)
 public enum DrawingUtilities {

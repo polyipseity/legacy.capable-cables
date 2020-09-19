@@ -1,8 +1,7 @@
 package $group__.ui.minecraft.core.mvvm.views;
 
-import $group__.utilities.client.minecraft.GLUtilities;
+import $group__.utilities.minecraft.client.GLUtilities;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
@@ -40,7 +39,7 @@ public enum EnumCropMethod {
 	;
 
 	public static EnumCropMethod getBestMethod() {
-		return Minecraft.getInstance().getFramebuffer().isStencilEnabled() ?
+		return ClientUtilities.getMinecraftNonnull().getFramebuffer().isStencilEnabled() ?
 				EnumCropMethod.STENCIL_BUFFER : EnumCropMethod.GL_SCISSOR;
 	}
 

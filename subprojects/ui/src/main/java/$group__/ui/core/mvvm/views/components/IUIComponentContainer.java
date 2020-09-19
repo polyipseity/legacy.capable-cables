@@ -4,6 +4,7 @@ import $group__.ui.core.structures.IAffineTransformStack;
 import $group__.ui.core.structures.IUIComponentContext;
 import com.google.common.collect.ImmutableMap;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,13 +21,13 @@ public interface IUIComponentContainer
 	}
 
 	@SuppressWarnings("UnusedReturnValue")
-	static <R> R getAsChildren(IUIComponentContainer self, IUIComponentContext context, Supplier<R> call) {
+	static <R> Optional<R> getAsChildren(IUIComponentContainer self, IUIComponentContext context, Supplier<R> call) {
 		IAffineTransformStack transformStack = context.getTransformStack();
 		transformStack.push();
 		self.transformChildren(transformStack);
-		R ret = call.get();
+		@Nullable R ret = call.get();
 		transformStack.pop();
-		return ret;
+		return Optional.ofNullable(ret);
 	}
 
 	void transformChildren(IAffineTransformStack stack);

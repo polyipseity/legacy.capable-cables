@@ -11,19 +11,19 @@ import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventListenerHelper;
 import net.minecraftforge.eventbus.api.IEventBus;
 
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 public enum EventBusUtilities {
 	;
 
-	public static boolean callWithPrePostHooks(Subject<Event> bus, Supplier<Boolean> action, Event pre, Event post) {
+	public static boolean callWithPrePostHooks(Subject<Event> bus, BooleanSupplier action, Event pre, Event post) {
 		if (!pre.hasResult())
 			throw BecauseOf.illegalArgument("Event does not have a result", "pre", pre);
 		bus.onNext(pre);
 		boolean r;
 		switch (pre.getResult()) {
 			case DEFAULT:
-				r = action.get();
+				r = action.getAsBoolean();
 				break;
 			case ALLOW:
 				r = true;

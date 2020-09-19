@@ -1,5 +1,6 @@
 package $group__.common.registrable.utilities;
 
+import $group__.utilities.AssertionUtilities;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
@@ -58,7 +59,7 @@ public enum RegistrableUtilities {
 		public static <T> Optional<T> readChildIfHasKey(@Nullable CompoundNBT p, @NonNls String key, Supplier<? extends INBT> type,
 		                                                BiFunction<CompoundNBT, String, T> f) {
 			return Optional.ofNullable(p)
-					.filter(pt -> pt.contains(key, type.get().getId()))
+					.filter(pt -> pt.contains(key, AssertionUtilities.assertNonnull(type.get()).getId()))
 					.map(pt -> f.apply(pt, key));
 		}
 

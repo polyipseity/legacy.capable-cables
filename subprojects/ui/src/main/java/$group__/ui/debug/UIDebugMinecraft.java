@@ -41,7 +41,6 @@ import jakarta.xml.bind.Unmarshaller;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -257,7 +256,7 @@ public enum UIDebugMinecraft {
 			;
 
 			private static final ContainerType<DebugContainer> INSTANCE = IForgeContainerType.create((windowId, inv, data) ->
-					new DebugContainer(windowId, AssertionUtilities.assertNonnull(Minecraft.getInstance().world), data.readBlockPos()));
+					new DebugContainer(windowId, AssertionUtilities.assertNonnull(ClientUtilities.getMinecraftNonnull().world), data.readBlockPos()));
 		}
 	}
 

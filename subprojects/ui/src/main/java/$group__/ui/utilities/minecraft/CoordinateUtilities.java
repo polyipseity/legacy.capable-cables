@@ -1,7 +1,6 @@
 package $group__.ui.utilities.minecraft;
 
 import $group__.ui.structures.Dimension2DDouble;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -21,7 +20,7 @@ public enum CoordinateUtilities {
 
 	public static Point2D toScaledPoint(Point2D point) {
 		Point2D p = (Point2D) point.clone();
-		p.setLocation(toScaledCoordinate(p.getX()), toScaledCoordinate(Minecraft.getInstance().getMainWindow().getFramebufferHeight() - p.getY()));
+		p.setLocation(toScaledCoordinate(p.getX()), toScaledCoordinate(ClientUtilities.getMinecraftNonnull().getMainWindow().getFramebufferHeight() - p.getY()));
 		return p;
 	}
 
@@ -31,7 +30,7 @@ public enum CoordinateUtilities {
 		return dim;
 	}
 
-	public static double toScaledCoordinate(double d) { return d / Minecraft.getInstance().getMainWindow().getGuiScaleFactor(); }
+	public static double toScaledCoordinate(double d) { return d / ClientUtilities.getMinecraftNonnull().getMainWindow().getGuiScaleFactor(); }
 
 	public static Rectangle2D toNativeRectangle(Rectangle2D rectangle) {
 		Rectangle2D r = (Rectangle2D) rectangle.clone();
@@ -41,7 +40,7 @@ public enum CoordinateUtilities {
 
 	public static Point2D toNativePoint(Point2D point) {
 		Point2D p = (Point2D) point.clone();
-		p.setLocation(toNativeCoordinate(p.getX()), toNativeCoordinate(Minecraft.getInstance().getMainWindow().getScaledHeight() - p.getY()));
+		p.setLocation(toNativeCoordinate(p.getX()), toNativeCoordinate(ClientUtilities.getMinecraftNonnull().getMainWindow().getScaledHeight() - p.getY()));
 		return p;
 	}
 
@@ -51,5 +50,5 @@ public enum CoordinateUtilities {
 		return dim;
 	}
 
-	public static double toNativeCoordinate(double d) { return d * Minecraft.getInstance().getMainWindow().getGuiScaleFactor(); }
+	public static double toNativeCoordinate(double d) { return d * ClientUtilities.getMinecraftNonnull().getMainWindow().getGuiScaleFactor(); }
 }

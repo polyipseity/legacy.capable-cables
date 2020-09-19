@@ -1,5 +1,6 @@
 package $group__.utilities.internationalization;
 
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.DynamicUtilities;
 import $group__.utilities.collections.CacheUtilities;
@@ -50,7 +51,7 @@ public class ChangingLocaleResourceBundle
 	@Override
 	protected Set<String> handleKeySet() { return getCurrentBundle(this).keySet(); }
 
-	protected static ResourceBundle getCurrentBundle(ChangingLocaleResourceBundle self) { return self.getBundleMap().getUnchecked(self.getLocaleSupplier().get()); }
+	protected static ResourceBundle getCurrentBundle(ChangingLocaleResourceBundle self) { return self.getBundleMap().getUnchecked(AssertionUtilities.assertNonnull(self.getLocaleSupplier().get())); }
 
 	protected LoadingCache<Locale, ResourceBundle> getBundleMap() { return bundleMap; }
 

@@ -1,5 +1,6 @@
 package $group__.utilities.templates;
 
+import $group__.utilities.AssertionUtilities;
 import $group__.utilities.structures.Singleton;
 import org.slf4j.Logger;
 
@@ -15,7 +16,7 @@ public abstract class ConfigurationTemplate<D> extends Singleton {
 	public static <D> boolean configureSafe(ConfigurationTemplate<D> self, Supplier<? extends D> data) {
 		synchronized (self) {
 			if (!self.isConfigured()) {
-				self.configure(data.get());
+				self.configure(AssertionUtilities.assertNonnull(data.get()));
 				return true;
 			}
 		}

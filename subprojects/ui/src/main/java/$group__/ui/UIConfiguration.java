@@ -4,10 +4,8 @@ import $group__.ui.cursors.EnumCursor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.parsers.adapters.EnumJAXBElementPresetAdapter;
 import $group__.ui.parsers.adapters.EnumJAXBObjectPresetAdapter;
-import $group__.utilities.AssertionUtilities;
 import $group__.utilities.events.EventBusForge;
 import $group__.utilities.templates.CommonConfigurationTemplate;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.slf4j.Logger;
@@ -45,7 +43,7 @@ public final class UIConfiguration
 	public enum MinecraftSpecific {
 		;
 
-		public static void loadComplete() { AssertionUtilities.assertNonnull(Minecraft.getInstance()).getFramebuffer().enableStencil(); }
+		public static void loadComplete() { ClientUtilities.getMinecraftNonnull().getFramebuffer().enableStencil(); }
 	}
 
 	public static final class ConfigurationData

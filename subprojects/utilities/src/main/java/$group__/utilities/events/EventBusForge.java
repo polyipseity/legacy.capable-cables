@@ -18,9 +18,9 @@ import java.util.function.Consumer;
 public class EventBusForge
 		extends Subject<Event>
 		implements IDelegating<IEventBus> {
-	public static final Subject<Event> FORGE_EVENT_BUS = new EventBusForge(Bus.FORGE.bus().get());
+	public static final Subject<Event> FORGE_EVENT_BUS = new EventBusForge(AssertionUtilities.assertNonnull(Bus.FORGE.bus().get()));
 	private static final ThreadLocal<Subject<Event>> MOD_EVENT_BUS = ThreadLocal.withInitial(() ->
-			new EventBusForge(Bus.MOD.bus().get()));
+			new EventBusForge(AssertionUtilities.assertNonnull(Bus.MOD.bus().get())));
 
 	public static Subject<Event> getModEventBus() { return AssertionUtilities.assertNonnull(MOD_EVENT_BUS.get()); }
 

@@ -1,4 +1,4 @@
-package $group__.utilities.client.minecraft;
+package $group__.utilities.minecraft.client;
 
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CapacityUtilities;
@@ -11,7 +11,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MainWindow;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -34,18 +33,18 @@ public enum GLUtilities {
 			GL_MASK_ALL_BITS = 0xFFFFFFFF;
 
 	public static Point2D getCursorPos() {
-		MouseHelper mh = Minecraft.getInstance().mouseHelper;
+		MouseHelper mh = ClientUtilities.getMinecraftNonnull().mouseHelper;
 		return new Point2D.Double(mh.getMouseX(), mh.getMouseY());
 	}
 
-	public static long getWindowHandle() { return Minecraft.getInstance().getMainWindow().getHandle(); }
+	public static long getWindowHandle() { return ClientUtilities.getMinecraftNonnull().getMainWindow().getHandle(); }
 
 	@OnlyIn(Dist.CLIENT)
 	public enum Stacks {
 		;
 
 		public static final Runnable GL_SCISSOR_FALLBACK = () -> {
-			MainWindow window = Minecraft.getInstance().getMainWindow();
+			MainWindow window = ClientUtilities.getMinecraftNonnull().getMainWindow();
 			State.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{0, 0, window.getFramebufferWidth(), window.getFramebufferHeight()}, (i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3]));
 		},
 				STENCIL_MASK_FALLBACK = () -> RenderSystem.stencilMask(GLUtilities.GL_MASK_ALL_BITS),
