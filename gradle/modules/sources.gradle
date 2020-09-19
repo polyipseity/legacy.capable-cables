@@ -96,9 +96,8 @@ project.ext.makeSourcesTasks = { Closure c ->
 			tasks.withType(Javadoc).configureEach { Javadoc javadoc ->
 				boolean replaced = false
 				javadoc.source = javadoc.source.findAll {
-					boolean r = false
 					String p = it.canonicalPath
-					r = sourceSet.any { p.contains it.canonicalPath }
+					boolean r = sourceSet.any { p.contains it.canonicalPath }
 					replaced |= r
 					!r
 				}
