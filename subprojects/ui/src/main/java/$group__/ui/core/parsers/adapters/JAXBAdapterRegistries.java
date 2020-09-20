@@ -1,6 +1,7 @@
 package $group__.ui.core.parsers.adapters;
 
 import $group__.ui.UIConfiguration;
+import $group__.ui.UIMarkers;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.LogMessageBuilder;
 import $group__.utilities.PreconditionUtilities;
@@ -25,8 +26,9 @@ public enum JAXBAdapterRegistries {
 				.orElseThrow(() ->
 						ThrowableUtilities.logAndThrow(new IllegalArgumentException(
 								new LogMessageBuilder()
+										.addMarkers(UIMarkers.getInstance()::getMarkerJAXB)
 										.addKeyValue("jaxbObj", jaxbObj)
-										.appendMessages(getResourceBundle().getString("adapter.find.not_found"))
+										.addMessages(() -> getResourceBundle().getString("adapter.find.not_found"))
 										.build()
 						), UIConfiguration.getInstance().getLogger()));
 	}

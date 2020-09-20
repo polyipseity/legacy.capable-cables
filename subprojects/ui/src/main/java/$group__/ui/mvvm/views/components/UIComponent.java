@@ -141,7 +141,7 @@ public class UIComponent
 	public IShapeDescriptor<?> getShapeDescriptor() { return shapeDescriptor; }
 
 	@Override
-	public boolean isVisible() { return IField.getValueNonnull(getVisible()); }
+	public boolean isVisible() { return IField.StaticHolder.getValueNonnull(getVisible()); }
 
 	public IBindingField<Boolean> getVisible() { return visible; }
 
@@ -179,7 +179,7 @@ public class UIComponent
 	protected Subject<IBinderAction> getBinderNotifierSubject() { return binderNotifierSubject; }
 
 	@Override
-	public boolean isActive() { return IField.getValueNonnull(getActive()); }
+	public boolean isActive() { return IField.StaticHolder.getValueNonnull(getActive()); }
 
 	public IBindingField<Boolean> getActive() { return active; }
 

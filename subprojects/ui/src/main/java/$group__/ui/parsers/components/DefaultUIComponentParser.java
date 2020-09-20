@@ -2,6 +2,7 @@ package $group__.ui.parsers.components;
 
 import $group__.jaxb.subprojects.ui.components.*;
 import $group__.ui.UIConfiguration;
+import $group__.ui.UIMarkers;
 import $group__.ui.binding.UIPropertyMappingValue;
 import $group__.ui.core.binding.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.extensions.IUIExtension;
@@ -86,8 +87,9 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 			if (!getGenericClass().isAssignableFrom(viewClass))
 				throw ThrowableUtilities.logAndThrow(new IllegalArgumentException(
 						new LogMessageBuilder()
-								.addKeyValue("viewClass", viewClass).addKeyValue("getGenericClass()", getGenericClass())
-								.appendMessages(getResourceBundle().getString("construct.view.instance_of.fail"))
+								.addMarkers(UIMarkers.getInstance()::getMarkerParser)
+								.addKeyValue("viewClass", viewClass).addKeyValue("getGenericClass()", this::getGenericClass)
+								.addMessages(() -> getResourceBundle().getString("construct.view.instance_of.fail"))
 								.build()
 				), UIConfiguration.getInstance().getLogger());
 		}
@@ -179,8 +181,9 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 										throw ThrowableUtilities.logAndThrow(
 												new IllegalArgumentException(
 														new LogMessageBuilder()
+																.addMarkers(UIMarkers.getInstance()::getMarkerParser)
 																.addKeyValue("n", n).addKeyValue("componentRaw", componentRaw)
-																.appendMessages(getResourceBundle().getString("construct.view.tree.cyclic"))
+																.addMessages(() -> getResourceBundle().getString("construct.view.tree.cyclic"))
 																.build()
 												),
 												UIConfiguration.getInstance().getLogger()
@@ -332,8 +335,9 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 							throw ThrowableUtilities.logAndThrow(
 									new IllegalArgumentException(
 											new LogMessageBuilder()
+													.addMarkers(UIMarkers.getInstance()::getMarkerParser)
 													.addKeyValue("p", p).addKeyValue("c", c)
-													.appendMessages(getResourceBundle().getString("construct.component.container.instance_of.fail"))
+													.addMessages(() -> getResourceBundle().getString("construct.component.container.instance_of.fail"))
 													.build()
 									),
 									UIConfiguration.getInstance().getLogger()
@@ -345,8 +349,9 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 					throw ThrowableUtilities.logAndThrow(
 							new IllegalArgumentException(
 									new LogMessageBuilder()
+											.addMarkers(UIMarkers.getInstance()::getMarkerParser)
 											.addKeyValue("n", n).addKeyValue("component", component)
-											.appendMessages(getResourceBundle().getString("construct.view.tree.cyclic"))
+											.addMessages(() -> getResourceBundle().getString("construct.view.tree.cyclic"))
 											.build()
 							),
 							UIConfiguration.getInstance().getLogger()

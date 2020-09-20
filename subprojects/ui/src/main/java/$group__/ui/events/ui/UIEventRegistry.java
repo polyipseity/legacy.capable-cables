@@ -1,6 +1,7 @@
 package $group__.ui.events.ui;
 
 import $group__.ui.UIConfiguration;
+import $group__.ui.UIMarkers;
 import $group__.ui.core.mvvm.views.events.IUIEvent;
 import $group__.utilities.LogMessageBuilder;
 import $group__.utilities.PreconditionUtilities;
@@ -27,8 +28,9 @@ public final class UIEventRegistry extends Registry<INamespacePrefixedString, Cl
 			throw ThrowableUtilities.logAndThrow(
 					new IllegalArgumentException(
 							new LogMessageBuilder()
+									.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)
 									.addKeyValue("event", event)
-									.appendMessages(getResourceBundle().getString("check.event.unregistered"))
+									.addMessages(() -> getResourceBundle().getString("check.event.unregistered"))
 									.build()
 					),
 					UIConfiguration.getInstance().getLogger()

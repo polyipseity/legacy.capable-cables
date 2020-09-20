@@ -1,6 +1,7 @@
 package $group__.ui.mvvm.views.components;
 
 import $group__.ui.UIConfiguration;
+import $group__.ui.UIMarkers;
 import $group__.ui.core.binding.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.IUIReshapeExplicitly;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
@@ -38,8 +39,9 @@ public class UIComponentContainer
 			throw ThrowableUtilities.logAndThrow(
 					new IllegalArgumentException(
 							new LogMessageBuilder()
+									.addMarkers(UIMarkers.getInstance()::getMarkerUIComponent)
 									.addKeyValue("index", index).addKeyValue("component", component)
-									.appendMessages(getResourceBundle().getString("children.add.self"))
+									.addMessages(() -> getResourceBundle().getString("children.add.self"))
 									.build()
 					),
 					UIConfiguration.getInstance().getLogger()

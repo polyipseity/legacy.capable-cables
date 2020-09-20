@@ -10,26 +10,29 @@ import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.structures.NamespacePrefixedString;
 import $group__.utilities.structures.RegistryWithDefaults;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Optional;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class DefaultShapeDescriptorBuilderFactory
 		extends RegistryWithDefaults<Class<? extends Shape>, Supplier<? extends IShapeDescriptorBuilder<?>>>
 		implements IShapeDescriptorBuilderFactory {
 	private static final INamespacePrefixedString DEFAULT_FACTORY_KEY = new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, "default");
-	private static final ImmutableMap<Class<? extends Shape>, RegistryObject<? extends Supplier<? extends IShapeDescriptorBuilder<?>>>> DEFAULT_ENTRIES =
-			ImmutableMap.<Class<? extends Shape>, RegistryObject<? extends Supplier<? extends IShapeDescriptorBuilder<?>>>>builder()
-					.put(Rectangle2D.class, new RegistryObject<>(RectangularShapeDescriptorBuilder.Rectangle2DSD::new))
-					.put(Ellipse2D.class, new RegistryObject<>(RectangularShapeDescriptorBuilder.Ellipse2DSD::new))
+	private static final ImmutableMap<Class<? extends Shape>, Supplier<RegistryObject<Supplier<? extends IShapeDescriptorBuilder<?>>>>> DEFAULTS_SUPPLIER =
+			ImmutableMap.<Class<? extends Shape>, Supplier<RegistryObject<Supplier<? extends IShapeDescriptorBuilder<?>>>>>builder()
+					.put(Rectangle2D.class, () -> new RegistryObject<>(RectangularShapeDescriptorBuilder.Rectangle2DSD::new))
+					.put(Ellipse2D.class, () -> new RegistryObject<>(RectangularShapeDescriptorBuilder.Ellipse2DSD::new))
 					.build();
+	private final ImmutableMap<Class<? extends Shape>, RegistryObject<? extends Supplier<? extends IShapeDescriptorBuilder<?>>>> defaults =
+			ImmutableMap.copyOf(Maps.transformValues(getDefaultsSupplier(), Supplier::get));
 
-	public DefaultShapeDescriptorBuilderFactory() { super(true, getDefaultEntries(), UIConfiguration.getInstance().getLogger()); }
+	public DefaultShapeDescriptorBuilderFactory() { super(true, UIConfiguration.getInstance().getLogger()); }
 
-	protected static ImmutableMap<Class<? extends Shape>, RegistryObject<? extends Supplier<? extends IShapeDescriptorBuilder<?>>>> getDefaultEntries() { return DEFAULT_ENTRIES; }
+	protected static ImmutableMap<Class<? extends Shape>, Supplier<RegistryObject<Supplier<? extends IShapeDescriptorBuilder<?>>>>> getDefaultsSupplier() { return DEFAULTS_SUPPLIER; }
 
 	public static INamespacePrefixedString getDefaultFactoryKey() { return DEFAULT_FACTORY_KEY; }
 
@@ -46,10 +49,5 @@ public class DefaultShapeDescriptorBuilderFactory
 	}
 
 	@Override
-	public Optional<? extends RegistryObject<? extends Supplier<? extends IShapeDescriptorBuilder<?>>>> get(Class<? extends Shape> key) {
-		Optional<? extends RegistryObject<? extends Supplier<? extends IShapeDescriptorBuilder<?>>>> ret = super.get(key);
-		if (!ret.isPresent())
-			ret = Optional.ofNullable(getDefaultEntries().get(key));
-		return ret;
-	}
+	protected Map<Class<? extends Shape>, RegistryObject<? extends Supplier<? extends IShapeDescriptorBuilder<?>>>> getDefaults() { return defaults; }
 }

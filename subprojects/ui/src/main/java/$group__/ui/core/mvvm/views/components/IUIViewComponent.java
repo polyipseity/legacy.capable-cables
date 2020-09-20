@@ -1,6 +1,7 @@
 package $group__.ui.core.mvvm.views.components;
 
 import $group__.ui.UIConfiguration;
+import $group__.ui.UIMarkers;
 import $group__.ui.core.binding.traits.IHasBindingMap;
 import $group__.ui.core.mvvm.views.IUIView;
 import $group__.ui.core.structures.IUIComponentContext;
@@ -49,8 +50,9 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 							ThrowableUtilities.logAndThrow(
 									new IllegalArgumentException(
 											new LogMessageBuilder()
+													.addMarkers(UIMarkers.getInstance()::getMarkerUIView, UIMarkers.getInstance()::getMarkerUIComponent)
 													.addKeyValue("view", view).addKeyValue("id", id)
-													.appendMessages(getResourceBundle().getString("component.get.id.fail"))
+													.addMessages(() -> getResourceBundle().getString("component.get.id.fail"))
 													.build()
 									)
 									, UIConfiguration.getInstance().getLogger()));

@@ -33,14 +33,9 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_ENORMOUS;
 import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
 @SuppressWarnings("unused")
-public final class OverridingStatusProcessor extends AbstractProcessor {
-	protected static final ResourceBundle RESOURCE_BUNDLE = new ChangingLocaleResourceBundle.Builder().build();
-
-	@Override
-	public Set<String> getSupportedAnnotationTypes() { return Collections.singleton(OverridingStatus.class.getCanonicalName()); }
-
-	@Override
-	public SourceVersion getSupportedSourceVersion() { return SourceVersion.latest(); }
+public final class OverridingStatusProcessor
+		extends AbstractProcessor {
+	private static final ResourceBundle RESOURCE_BUNDLE = new ChangingLocaleResourceBundle.Builder().build();
 
 	@SuppressWarnings("MagicNumber")
 	@Override
@@ -89,8 +84,8 @@ public final class OverridingStatusProcessor extends AbstractProcessor {
 												if (subMethod == null) {
 													if (whenB == null)
 														messager.printMessage(Diagnostic.Kind.NOTE, new LogMessageBuilder()
-																.appendMessages(RESOURCE_BUNDLE.getString("info.override.false"))
-																.appendArguments(superMethod)
+																.addMessages(() -> getResourceBundle().getString("info.override.false"))
+																.addArguments(superMethod)
 																.build(), subclass);
 													else if (whenB) {
 														for (TypeElement superclass1 : ProcessorUtilities.getIntermediateSuperclasses(subclass,
@@ -99,32 +94,40 @@ public final class OverridingStatusProcessor extends AbstractProcessor {
 																if (superMethod1.getKind() == ElementKind.METHOD && ProcessorUtilities.isElementFinal(superMethod1) && elements.overrides((ExecutableElement) superMethod1, superMethod, superclass1)) {
 																	messager.printMessage(superclass1.getQualifiedName().toString().startsWith(a.group()) ? Diagnostic.Kind.WARNING : Diagnostic.Kind.NOTE,
 																			new LogMessageBuilder()
-																					.appendMessages(RESOURCE_BUNDLE.getString("warning.always.impossible"))
-																					.appendArguments(superMethod1)
+																					.addMessages(() -> getResourceBundle().getString("warning.always.impossible"))
+																					.addArguments(superMethod1)
 																					.build(), subclass);
 																	return;
 																}
 															}
 														}
 														messager.printMessage(Diagnostic.Kind.ERROR, new LogMessageBuilder()
-																.appendMessages(RESOURCE_BUNDLE.getString("error.always.fail"))
-																.appendArguments(superMethod)
+																.addMessages(() -> getResourceBundle().getString("error.always.fail"))
+																.addArguments(superMethod)
 																.build(), subclass);
 													}
 												} else if (ProcessorUtilities.getEffectiveAnnotationWithInheritingConsidered(OverridingStatus.class, subMethod, elements, types).equals(a)) {
 													if (whenB == null)
 														messager.printMessage(Diagnostic.Kind.NOTE, new LogMessageBuilder()
-																.appendMessages(RESOURCE_BUNDLE.getString("info.override.true"))
-																.appendArguments(superMethod)
+																.addMessages(() -> getResourceBundle().getString("info.override.true"))
+																.addArguments(superMethod)
 																.build(), subMethod);
 													else if (!whenB)
 														messager.printMessage(Diagnostic.Kind.ERROR, new LogMessageBuilder()
-																.appendMessages(RESOURCE_BUNDLE.getString("error.never.fail"))
-																.appendArguments(superMethod)
+																.addMessages(() -> getResourceBundle().getString("error.never.fail"))
+																.addArguments(superMethod)
 																.build(), subMethod);
 												}
 											}));
 				});
 		return true;
 	}
+
+	@Override
+	public Set<String> getSupportedAnnotationTypes() { return Collections.singleton(OverridingStatus.class.getCanonicalName()); }
+
+	@Override
+	public SourceVersion getSupportedSourceVersion() { return SourceVersion.latest(); }
+
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 }

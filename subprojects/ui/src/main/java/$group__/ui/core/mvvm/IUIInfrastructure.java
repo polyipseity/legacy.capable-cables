@@ -1,6 +1,7 @@
 package $group__.ui.core.mvvm;
 
 import $group__.ui.UIConfiguration;
+import $group__.ui.UIMarkers;
 import $group__.ui.core.mvvm.viewmodels.IUIViewModel;
 import $group__.ui.core.mvvm.views.IUIView;
 import $group__.utilities.LogMessageBuilder;
@@ -61,8 +62,9 @@ public interface IUIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel
 				throw ThrowableUtilities.logAndThrow(
 						new IllegalStateException(
 								new LogMessageBuilder()
+										.addMarkers(UIMarkers.getInstance()::getMarkerUIInfrastructure)
 										.addKeyValue("bound", bound).addKeyValue("expected", expected)
-										.appendMessages(getResourceBundle().getString(bound ? "check.bound.true" : "check.bound.false"))
+										.addMessages(() -> getResourceBundle().getString(bound ? "check.bound.true" : "check.bound.false"))
 										.build()),
 						UIConfiguration.getInstance().getLogger());
 		}

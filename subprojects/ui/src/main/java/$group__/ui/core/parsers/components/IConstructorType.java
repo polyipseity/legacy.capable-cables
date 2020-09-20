@@ -1,9 +1,11 @@
 package $group__.ui.core.parsers.components;
 
 import $group__.ui.UIConfiguration;
+import $group__.ui.UIMarkers;
 import $group__.utilities.LogMessageBuilder;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.templates.CommonConfigurationTemplate;
+import org.slf4j.Marker;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodType;
@@ -20,18 +22,23 @@ public interface IConstructorType {
 	enum StaticHolder {
 		;
 
-		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
+		private static final Marker CLASS_MARKER = UIMarkers.getInstance().getClassMarker(IConstructorType.class);
 
 		public static <T extends IConstructorType, A extends Annotation> T getConstructorType(Class<?> clazz, Class<A> annotationType, Function<? super A, ? extends T> getter) {
 			return findConstructorType(clazz, annotationType, getter)
 					.orElseThrow(() ->
 							ThrowableUtilities.logAndThrow(new IllegalStateException(
 									new LogMessageBuilder()
+											.addMarkers(StaticHolder::getClassMarker)
 											.addKeyValue("clazz", clazz).addKeyValue("annotationType", annotationType).addKeyValue("getter", getter)
-											.appendMessages(getResourceBundle().getString("constructor_type.find.missing"))
+											.addMessages(() -> getResourceBundle().getString("constructor_type.find.missing"))
 											.build()
 							), UIConfiguration.getInstance().getLogger()));
 		}
+
+		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
+
+		public static Marker getClassMarker() { return CLASS_MARKER; }
 
 		public static <T extends IConstructorType, A extends Annotation> Optional<T> findConstructorType(Class<?> clazz, Class<A> annotationType, Function<? super A, ? extends T> getter) {
 			return Arrays.stream(clazz.getDeclaredConstructors()).unordered()

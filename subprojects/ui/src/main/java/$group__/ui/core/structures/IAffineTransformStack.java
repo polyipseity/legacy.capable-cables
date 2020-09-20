@@ -7,6 +7,7 @@ import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.interfaces.ICopyable;
 import $group__.utilities.templates.CommonConfigurationTemplate;
+import $group__.utilities.templates.MarkerUtilitiesTemplate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.jetbrains.annotations.NonNls;
@@ -51,18 +52,14 @@ public interface IAffineTransformStack
 	enum StaticHolder {
 		;
 
-		private static final Marker CLASS_MARKER;
+		private static final Marker CLASS_MARKER = MarkerUtilitiesTemplate.addReferences(UIMarkers.getInstance().getClassMarker(IAffineTransformStack.class),
+				UIMarkers.getInstance().getMarkerStructure());
 		private static final ImmutableList<Function<? super IAffineTransformStack, ?>> OBJECT_VARIABLES = ImmutableList.of(
 				IAffineTransformStack::getData);
 		@NonNls
 		private static final ImmutableMap<String, Function<? super IAffineTransformStack, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchKeysValues(getObjectVariables().size(),
 				ImmutableList.of("data"),
 				getObjectVariables()));
-
-		static {
-			CLASS_MARKER = UIMarkers.getInstance().getClassMarker(IAffineTransformStack.class);
-			UIMarkers.getInstance().getMarkerStructure().add(getClassMarker());
-		}
 
 		public static void popMultiple(IAffineTransformStack stack, int times) {
 			for (; times > 0; --times)

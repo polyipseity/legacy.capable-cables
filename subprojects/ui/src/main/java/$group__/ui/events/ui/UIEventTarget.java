@@ -1,6 +1,7 @@
 package $group__.ui.events.ui;
 
 import $group__.ui.UIConfiguration;
+import $group__.ui.UIMarkers;
 import $group__.ui.core.mvvm.views.events.IUIEvent;
 import $group__.ui.core.mvvm.views.events.IUIEventListener;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
@@ -49,8 +50,9 @@ public class UIEventTarget
 				throw ThrowableUtilities.logAndThrow(
 						new IllegalArgumentException(
 								new LogMessageBuilder()
+										.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)
 										.addKeyValue("event", event)
-										.appendMessages(getResourceBundle().getString("dispatch.phase.invalid"))
+										.addMessages(() -> getResourceBundle().getString("dispatch.phase.invalid"))
 										.build()
 						),
 						UIConfiguration.getInstance().getLogger()

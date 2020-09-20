@@ -93,7 +93,9 @@ public final class ModThis
 		@SubscribeEvent
 		protected void onModLifecycleEvent(ModLifecycleEvent event) {
 			if (!getProxy().onModLifecycle(event))
-				ModConfiguration.getInstance().getLogger().atInfo()
+				ModConfiguration.getInstance().getLogger()
+						.atInfo()
+						.addMarker(ModMarkers.getInstance().getMarkerModLifecycle())
 						.addKeyValue("event", event)
 						.log(getResourceBundle().getString("event.lifecycle.unhandled"));
 		}

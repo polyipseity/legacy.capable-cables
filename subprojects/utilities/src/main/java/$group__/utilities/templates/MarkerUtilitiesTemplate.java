@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
+import java.util.Arrays;
+
 public abstract class MarkerUtilitiesTemplate extends Singleton {
 	@NonNls
 	private static final String SEPARATOR = "-";
@@ -27,9 +29,8 @@ public abstract class MarkerUtilitiesTemplate extends Singleton {
 	protected final LoadingCache<Class<?>, Marker> classMarkers =
 			getMarkersBuilder().build(CacheLoader.from(clazz -> {
 				assert clazz != null;
-				@SuppressWarnings("StringConcatenation") Marker ret = getMarker(clazz.getSimpleName() + '@' + Integer.toHexString(clazz.getName().hashCode()));
-				getMarkerClass().add(ret);
-				return ret;
+				return addReferences(getMarker(clazz.getSimpleName() + '@' + Integer.toHexString(clazz.getName().hashCode())),
+						getMarkerClass());
 			}));
 
 	protected static CacheBuilder<Object, Object> getMarkersBuilder() { return MARKERS_BUILDER; }
@@ -41,7 +42,12 @@ public abstract class MarkerUtilitiesTemplate extends Singleton {
 		this.namespace = namespace;
 	}
 
-	public final Marker getMarker(String string) { return MarkerFactory.getMarker(getNamespacePrefixedString(string)); }
+	public static Marker addReferences(Marker marker, Marker... references) {
+		Arrays.stream(references).sequential().forEachOrdered(marker::add);
+		return marker;
+	}
+
+	public final Marker getMarker(@NonNls String string) { return MarkerFactory.getMarker(getNamespacePrefixedString(string)); }
 
 	public static String getSeparator() { return SEPARATOR; }
 

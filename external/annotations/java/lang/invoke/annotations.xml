@@ -1,2 +1,5 @@
 <root>
+	<item name='java.lang.invoke.MethodHandles.Lookup java.lang.invoke.MethodHandle findGetter(java.lang.Class&lt;?&gt;, java.lang.String, java.lang.Class&lt;?&gt;) 1'>
+		<annotation name='org.jetbrains.annotations.NonNls'/>
+	</item>
 </root>

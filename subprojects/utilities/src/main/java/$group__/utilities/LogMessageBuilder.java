@@ -8,8 +8,8 @@ import java.util.*;
 import java.util.function.Supplier;
 
 public class LogMessageBuilder {
-	@SuppressWarnings("StringBufferField")
-	private final StringBuilder messageBuilder = new StringBuilder(CapacityUtilities.INITIAL_CAPACITY_LARGE);
+	private final Set<Supplier<?>> markers = new LinkedHashSet<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+	private final List<Supplier<?>> messages = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
 	private final List<Supplier<?>> arguments = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 	private final Map<String, Supplier<?>> keyValuePairs = new HashMap<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 
@@ -23,35 +23,67 @@ public class LogMessageBuilder {
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Map<String, Supplier<?>> getKeyValuePairs() { return keyValuePairs; }
 
-	public LogMessageBuilder appendMessages(String... messages) {
-		for (String message : messages)
-			getMessageBuilder().append(message);
+	public LogMessageBuilder addMarkers(Object... markers) {
+		return addMarkers(
+				Arrays.stream(markers).sequential()
+						.map(ConstantSupplier::ofNullable)
+						.toArray(Supplier[]::new));
+	}
+
+	public LogMessageBuilder addMarkers(Supplier<?>... markers) {
+		Collections.addAll(getMarkers(), markers);
 		return this;
 	}
 
-	protected StringBuilder getMessageBuilder() { return messageBuilder; }
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected Set<Supplier<?>> getMarkers() { return markers; }
 
-	public LogMessageBuilder appendArguments(Object... arguments) {
-		return appendArguments(
+	public LogMessageBuilder addMessages(Object... messages) {
+		return addMessages(
+				Arrays.stream(messages).sequential()
+						.map(ConstantSupplier::ofNullable)
+						.toArray(Supplier[]::new));
+	}
+
+	public LogMessageBuilder addMessages(Supplier<?>... messages) {
+		Collections.addAll(getMessages(), messages);
+		return this;
+	}
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected List<Supplier<?>> getMessages() { return messages; }
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected List<Supplier<?>> getArguments() { return arguments; }
+
+	public LogMessageBuilder addArguments(Object... arguments) {
+		return addArguments(
 				Arrays.stream(arguments).sequential()
 						.map(ConstantSupplier::ofNullable)
 						.toArray(Supplier[]::new));
 	}
 
-	public LogMessageBuilder appendArguments(Supplier<?>... arguments) {
+	public LogMessageBuilder addArguments(Supplier<?>... arguments) {
 		Collections.addAll(getArguments(), arguments);
 		return this;
 	}
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected List<Supplier<?>> getArguments() { return arguments; }
-
 	public String build() {
 		StringBuilder ret = new StringBuilder(CapacityUtilities.INITIAL_CAPACITY_LARGE);
+		boolean[] hasMarkers = {false};
+		getMarkers().forEach(marker -> {
+			ret.append('[').append(marker.get()).append(']');
+			hasMarkers[0] = true;
+		});
+		if (hasMarkers[0])
+			ret.append(' ');
 		getKeyValuePairs().forEach((key, value) ->
 				ret.append(key).append('=').append(value.get()).append(' '));
 		ret.append(FormattingUtilities.formatSimpleParameterized(
-				getMessageBuilder().toString(),
+				getMessages().stream().sequential()
+						.map(Supplier::get)
+						.map(Objects::toString)
+						.reduce("", String::concat, String::concat),
 				getArguments().stream().sequential()
 						.map(Supplier::get)
 						.toArray()));

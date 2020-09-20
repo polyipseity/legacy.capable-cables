@@ -55,4 +55,14 @@ public abstract class Singleton {
 			r = instantiation.apply(clazz);
 		return r;
 	}
+
+	public final Marker getMarker() { return marker; }
+
+	public enum ResourceBundleHolder {
+		;
+
+		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
+
+		protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
+	}
 }

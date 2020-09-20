@@ -1,6 +1,7 @@
 package $group__.ui.events.ui;
 
 import $group__.ui.UIConfiguration;
+import $group__.ui.UIMarkers;
 import $group__.ui.core.mvvm.views.events.*;
 import $group__.ui.core.mvvm.views.events.types.EnumUIEventComponentType;
 import $group__.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
@@ -125,8 +126,9 @@ public enum UIEventUtilities {
 			throw ThrowableUtilities.logAndThrow(
 					new IllegalArgumentException(
 							new LogMessageBuilder()
+									.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)
 									.addKeyValue("event", event)
-									.appendMessages(getResourceBundle().getString("synthetic.event.type.invalid"))
+									.addMessages(() -> getResourceBundle().getString("synthetic.event.type.invalid"))
 									.build()
 					),
 					UIConfiguration.getInstance().getLogger()
@@ -176,8 +178,9 @@ public enum UIEventUtilities {
 			throw ThrowableUtilities.logAndThrow(
 					new IllegalArgumentException(
 							new LogMessageBuilder()
+									.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)
 									.addKeyValue("event", event)
-									.appendMessages(getResourceBundle().getString("synthetic.event.type.invalid"))
+									.addMessages(() -> getResourceBundle().getString("synthetic.event.type.invalid"))
 									.build()
 					),
 					UIConfiguration.getInstance().getLogger()

@@ -9,29 +9,22 @@ import com.google.common.cache.LoadingCache;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
-import org.jetbrains.annotations.NonNls;
 import org.slf4j.Marker;
 
 public final class ModMarkers extends MarkerUtilitiesTemplate {
 	private static final ModMarkers INSTANCE = Singleton.getSingletonInstance(ModMarkers.class, ModConfiguration.getInstance().getLogger());
 
-	@NonNls
 	private final Marker markerModLifecycle = getMarker("mod lifecycle");
-	@NonNls
 	private final Marker markerRegistrable = getMarker("registrable");
 	private final LoadingCache<IForgeRegistry<?>, Marker> registryMarkers =
-			MarkerUtilitiesTemplate.getMarkersBuilder().build(CacheLoader.from(registry -> {
-				assert registry != null;
-				Marker ret = getMarker(registry.getRegistryName().toString());
-				getMarkerRegistrable().add(ret);
-				return ret;
-			}));
+			MarkerUtilitiesTemplate.getMarkersBuilder().build(CacheLoader.from(registry ->
+					addReferences(getMarker(AssertionUtilities.assertNonnull(registry).getRegistryName().toString()),
+							getMarkerRegistrable())));
 	private final LoadingCache<IForgeRegistryEntry<?>, Marker> registryEntryMarkers =
 			MarkerUtilitiesTemplate.getMarkersBuilder().build(CacheLoader.from(registryEntry -> {
 				assert registryEntry != null;
-				Marker ret = getMarker(AssertionUtilities.assertNonnull(registryEntry.getRegistryName()).toString());
-				getRegistryMarker(GameRegistry.findRegistry(CastUtilities.castUnchecked(registryEntry.getRegistryType()))).add(ret);
-				return ret;
+				return addReferences(getMarker(AssertionUtilities.assertNonnull(registryEntry.getRegistryName()).toString()),
+						getRegistryMarker(GameRegistry.findRegistry(CastUtilities.castUnchecked(registryEntry.getRegistryType()))));
 			}));
 
 	private ModMarkers() { super(ModConstants.MOD_ID, ModConfiguration.getInstance().getLogger()); }

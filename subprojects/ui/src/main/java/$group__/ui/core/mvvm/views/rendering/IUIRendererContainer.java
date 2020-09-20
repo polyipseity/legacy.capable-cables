@@ -1,6 +1,7 @@
 package $group__.ui.core.mvvm.views.rendering;
 
 import $group__.ui.UIConfiguration;
+import $group__.ui.UIMarkers;
 import $group__.utilities.LogMessageBuilder;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.binding.core.traits.IHasBinding;
@@ -32,8 +33,9 @@ public interface IUIRendererContainer<R extends IUIRenderer<?>>
 			if (!(renderer == null || renderer.getGenericClass().isInstance(container)))
 				throw ThrowableUtilities.logAndThrow(new IllegalArgumentException(
 						new LogMessageBuilder()
+								.addMarkers(UIMarkers.getInstance()::getMarkerUIComponentRenderer)
 								.addKeyValue("container", container).addKeyValue("renderer", renderer).addKeyValue("setter", setter)
-								.appendMessages(getResourceBundle().getString("renderer.set.impl.instance_of.fail"))
+								.addMessages(() -> getResourceBundle().getString("renderer.set.impl.instance_of.fail"))
 								.build()
 				), UIConfiguration.getInstance().getLogger());
 			setter.accept(container, renderer);

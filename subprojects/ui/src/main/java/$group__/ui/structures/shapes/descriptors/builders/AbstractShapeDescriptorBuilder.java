@@ -1,6 +1,7 @@
 package $group__.ui.structures.shapes.descriptors.builders;
 
 import $group__.ui.UIConfiguration;
+import $group__.ui.UIMarkers;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilder;
 import $group__.ui.core.structures.shapes.interactions.IShapeConstraint;
@@ -27,11 +28,11 @@ import java.util.function.Consumer;
 public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 		extends IHasGenericClass.Impl<S>
 		implements IShapeDescriptorBuilder<S> {
-	protected static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
-	protected final AffineTransform transform = new AffineTransform();
-	protected final Rectangle2D bounds = IShapeDescriptor.getShapePlaceholderCopy();
-	protected final List<IShapeConstraint> constraints = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
-	protected final ConcurrentMap<String, Consumer<?>> properties =
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
+	private final AffineTransform transform = new AffineTransform();
+	private final Rectangle2D bounds = IShapeDescriptor.getShapePlaceholderCopy();
+	private final List<IShapeConstraint> constraints = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+	private final ConcurrentMap<String, Consumer<?>> properties =
 			MapUtilities.newMapMakerSingleThreaded().makeMap();
 
 	protected AbstractShapeDescriptorBuilder(Class<S> genericClass) { super(genericClass); }
@@ -43,8 +44,9 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 			throw ThrowableUtilities.logAndThrow(
 					new IllegalStateException(
 							new LogMessageBuilder()
+									.addMarkers(UIMarkers.getInstance()::getMarkerShape)
 									.addKeyValue("key", key).addKeyValue("value", value)
-									.appendMessages(RESOURCE_BUNDLE.getString("property.key.missing"))
+									.addMessages(() -> getResourceBundle().getString("property.key.missing"))
 									.build()
 					),
 					UIConfiguration.getInstance().getLogger());
@@ -52,6 +54,8 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 		c.accept(CastUtilities.castUncheckedNullable(value)); // COMMENT ClassCastException may be thrown
 		return this;
 	}
+
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	@Override
 	public AbstractShapeDescriptorBuilder<S> transformConcatenate(AffineTransform transform) {
