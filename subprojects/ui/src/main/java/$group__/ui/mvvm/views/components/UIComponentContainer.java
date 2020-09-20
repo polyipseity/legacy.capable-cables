@@ -17,7 +17,7 @@ import $group__.utilities.LogMessageBuilder;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventBusUtilities;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 import $group__.utilities.templates.CommonConfigurationTemplate;
 import com.google.common.collect.ImmutableList;
 

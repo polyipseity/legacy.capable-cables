@@ -55,7 +55,7 @@ public class ItemWrench extends Item {
 								.atWarn()
 								.addMarker(ModMarkers.getInstance().getRegistryEntryMarker(stack.getItem()))
 								.addKeyValue("pos", pos).addKeyValue("state", state)
-								.log(getResourceBundle().getString("use.place.block.fail"));
+								.log(() -> getResourceBundle().getString("use.place.block.fail"));
 						return false;
 					} else if (tag.pickedUpBlockTile != null) {
 						@Nullable TileEntity tile = state.getBlock().createTileEntity(state, world);
@@ -64,7 +64,7 @@ public class ItemWrench extends Item {
 									.atError()
 									.addMarker(ModMarkers.getInstance().getRegistryEntryMarker(stack.getItem()))
 									.addKeyValue("pos", pos).addKeyValue("state", state).addKeyValue("world", world)
-									.log(getResourceBundle().getString("use.place.block.entity.fail"));
+									.log(() -> getResourceBundle().getString("use.place.block.entity.fail"));
 							return false;
 						}
 						tile.deserializeNBT(tag.pickedUpBlockTile);
@@ -88,7 +88,7 @@ public class ItemWrench extends Item {
 								.atError()
 								.addMarker(ModMarkers.getInstance().getRegistryEntryMarker(stack.getItem()))
 								.addKeyValue("tag.pickedUpEntity", tag.pickedUpEntity)
-								.log(getResourceBundle().getString("use.place.entity.fail"));
+								.log(() -> getResourceBundle().getString("use.place.entity.fail"));
 						return false;
 					}
 				} else {

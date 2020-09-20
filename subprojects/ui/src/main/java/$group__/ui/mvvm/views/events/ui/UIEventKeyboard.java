@@ -4,7 +4,7 @@ import $group__.ui.core.mvvm.views.events.IUIEventKeyboard;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.ui.core.structures.IUIDataKeyboardKeyPress;
 import $group__.ui.events.ui.UIEvent;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 
 public class UIEventKeyboard extends UIEvent implements IUIEventKeyboard {
 	protected final IUIDataKeyboardKeyPress data;

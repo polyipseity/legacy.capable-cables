@@ -5,7 +5,7 @@ import $group__.ui.core.mvvm.views.components.IUIComponentContainer;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 import com.google.common.collect.ImmutableList;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.observers.DisposableObserver;

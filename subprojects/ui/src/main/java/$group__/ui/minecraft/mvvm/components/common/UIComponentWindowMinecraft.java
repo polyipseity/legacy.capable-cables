@@ -14,8 +14,8 @@ import $group__.ui.mvvm.views.components.common.UIComponentWindow;
 import $group__.ui.mvvm.views.components.rendering.UIRendererContainer;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
 import $group__.utilities.binding.core.fields.IBindingField;
-import $group__.utilities.interfaces.INamespacePrefixedString;
-import $group__.utilities.structures.NamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
+import $group__.utilities.structures.ImmutableNamespacePrefixedString;
 import com.google.common.collect.ImmutableMap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -55,12 +55,12 @@ public class UIComponentWindowMinecraft
 	public static class DefaultRenderer<C extends UIComponentWindowMinecraft>
 			extends UIComponentRendererMinecraft<C> {
 		@NonNls
-		public static final String PROPERTY_COLOR_BACKGROUND = INamespacePrefixedString.DEFAULT_PREFIX + "window.colors.background";
+		public static final String PROPERTY_COLOR_BACKGROUND = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "window.colors.background";
 		@NonNls
-		public static final String PROPERTY_COLOR_BORDER = INamespacePrefixedString.DEFAULT_PREFIX + "window.colors.border";
+		public static final String PROPERTY_COLOR_BORDER = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "window.colors.border";
 
-		public static final INamespacePrefixedString PROPERTY_COLOR_BACKGROUND_LOCATION = new NamespacePrefixedString(PROPERTY_COLOR_BACKGROUND);
-		public static final INamespacePrefixedString PROPERTY_COLOR_BORDER_LOCATION = new NamespacePrefixedString(PROPERTY_COLOR_BORDER);
+		public static final INamespacePrefixedString PROPERTY_COLOR_BACKGROUND_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_COLOR_BACKGROUND);
+		public static final INamespacePrefixedString PROPERTY_COLOR_BORDER_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_COLOR_BORDER);
 
 		@UIProperty(PROPERTY_COLOR_BACKGROUND)
 		protected final IBindingField<Color> colorBackground;

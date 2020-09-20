@@ -3,8 +3,7 @@ package $group__.ui.mvvm.models;
 import $group__.ui.core.mvvm.models.IUIModel;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.extensions.IExtension;
-import $group__.utilities.extensions.IExtensionContainer;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
@@ -18,10 +17,10 @@ public class UIModel
 	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 
 	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) { return IExtensionContainer.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) { return StaticHolder.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension); }
 
 	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return StaticHolder.removeExtensionImpl(getExtensions(), key); }
 
 	@Override
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return Optional.ofNullable(getExtensions().get(key)); }

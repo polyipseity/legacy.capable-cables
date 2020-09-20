@@ -1,13 +1,13 @@
 package $group__.ui.core.mvvm.views.events.types;
 
 import $group__.ui.core.mvvm.views.events.IUIEventType;
-import $group__.utilities.interfaces.INamespacePrefixedString;
-import $group__.utilities.structures.NamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
+import $group__.utilities.structures.ImmutableNamespacePrefixedString;
 import org.jetbrains.annotations.NonNls;
 
 public enum EnumUIEventComponentType
 		implements IUIEventType {
-	CHAR_TYPED(INamespacePrefixedString.DEFAULT_PREFIX + "char_typed"),
+	CHAR_TYPED(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "char_typed"),
 	;
 
 	@NonNls
@@ -16,7 +16,7 @@ public enum EnumUIEventComponentType
 
 	EnumUIEventComponentType(@SuppressWarnings("SameParameterValue") @NonNls String eventTypeString) {
 		this.eventTypeString = eventTypeString;
-		this.eventType = new NamespacePrefixedString(this.eventTypeString);
+		this.eventType = new ImmutableNamespacePrefixedString(this.eventTypeString);
 	}
 
 	@Override

@@ -1,2 +1,5 @@
 <root>
+	<item name='java.util.regex.Matcher java.lang.String replaceFirst(java.lang.String) 0'>
+		<annotation name='org.jetbrains.annotations.NonNls'/>
+	</item>
 </root>

@@ -9,10 +9,14 @@ public final class UtilitiesMarkers extends MarkerUtilitiesTemplate {
 
 	private final Marker markerRender;
 	private final Marker markerOpenGL;
+	private final Marker markerEvent;
+	private final Marker markerExtension;
 
 	{
 		markerRender = getMarker("render");
 		markerOpenGL = addReferences(getMarker("OpenGL"), getMarkerRender());
+		markerEvent = getMarker("event");
+		markerExtension = getMarker("extension");
 	}
 
 	private UtilitiesMarkers() { super(UtilitiesConstants.MODULE_NAME, UtilitiesConfiguration.getInstance().getLogger()); }
@@ -22,4 +26,8 @@ public final class UtilitiesMarkers extends MarkerUtilitiesTemplate {
 	public Marker getMarkerRender() { return markerRender; }
 
 	public Marker getMarkerOpenGL() { return markerOpenGL; }
+
+	public Marker getMarkerEvent() { return markerEvent; }
+
+	public Marker getMarkerExtension() { return markerExtension; }
 }

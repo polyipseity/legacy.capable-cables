@@ -9,7 +9,7 @@ import $group__.ui.core.parsers.components.UIExtensionConstructor;
 import $group__.ui.core.structures.IUIComponentContext;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 
 import java.awt.geom.Point2D;
 import java.util.Optional;

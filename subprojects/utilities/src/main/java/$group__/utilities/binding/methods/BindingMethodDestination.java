@@ -2,7 +2,7 @@ package $group__.utilities.binding.methods;
 
 import $group__.utilities.binding.core.methods.IBindingMethodDestination;
 import $group__.utilities.interfaces.IHasGenericClass;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 
 import javax.annotation.Nullable;
 import java.util.Optional;

@@ -9,7 +9,7 @@ import $group__.utilities.binding.core.IBinding;
 import $group__.utilities.binding.core.bindings.IBindings;
 import $group__.utilities.collections.CacheUtilities;
 import $group__.utilities.collections.ManualLoadingCache;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;

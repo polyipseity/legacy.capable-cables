@@ -7,7 +7,7 @@ import $group__.ui.core.parsers.components.UIRendererConstructor;
 import $group__.utilities.binding.core.IBinderAction;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.interfaces.IHasGenericClass;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;

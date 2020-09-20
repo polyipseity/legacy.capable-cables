@@ -45,7 +45,7 @@ public abstract class Proxy extends Singleton implements IProxy {
 				.atInfo()
 				.addMarker(ModMarkers.getInstance().getMarkerModLifecycle())
 				.addArgument(name)
-				.log(getResourceBundle().getString("event.process.start"));
+				.log(() -> getResourceBundle().getString("event.process.start"));
 		Stopwatch stopwatch = Stopwatch.createStarted();
 		processor.accept(event);
 		stopwatch.stop();
@@ -53,7 +53,7 @@ public abstract class Proxy extends Singleton implements IProxy {
 				.atInfo()
 				.addMarker(ModMarkers.getInstance().getMarkerModLifecycle())
 				.addArgument(name).addArgument(stopwatch::toString).addArgument(() -> stopwatch.elapsed(NANOSECONDS))
-				.log(getResourceBundle().getString("event.process.end"));
+				.log(() -> getResourceBundle().getString("event.process.end"));
 		return true;
 	}
 

@@ -16,9 +16,9 @@ import $group__.utilities.collections.CacheUtilities;
 import $group__.utilities.extensions.ExtensionContainerAware;
 import $group__.utilities.extensions.IExtension;
 import $group__.utilities.extensions.IExtensionContainer;
-import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.reactive.DisposableObserverAuto;
-import $group__.utilities.structures.NamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
+import $group__.utilities.structures.ImmutableNamespacePrefixedString;
 import $group__.utilities.structures.Registry;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -118,6 +118,6 @@ public class UIExtensionCache
 									}
 								})));
 
-		private static INamespacePrefixedString generateKey(@NonNls String name) { return new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, CacheUniversal.class.getName() + '.' + name); /* TODO make this a utility method perhaps */ }
+		private static INamespacePrefixedString generateKey(@NonNls String name) { return new ImmutableNamespacePrefixedString(INamespacePrefixedString.StaticHolder.getDefaultNamespace(), CacheUniversal.class.getName() + '.' + name); /* TODO make this a utility method perhaps */ }
 	}
 }

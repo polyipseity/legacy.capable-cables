@@ -1,8 +1,9 @@
 package $group__.utilities;
 
-import $group__.utilities.ThrowableUtilities.BecauseOf;
+import $group__.utilities.templates.CommonConfigurationTemplate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import org.slf4j.Marker;
 
 import javax.annotation.Nullable;
 import javax.lang.model.element.*;
@@ -16,6 +17,27 @@ import static $group__.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
 public enum ProcessorUtilities {
 	;
+
+	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker(ProcessorUtilities.class);
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
+
+	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Class<A> annotationType, ExecutableElement executable, Elements elements, Types types) throws IllegalArgumentException {
+		A[] r = getEffectiveAnnotationsWithInheritingConsidered(annotationType, executable, elements, types);
+		if (r.length != 1)
+			throw ThrowableUtilities.logAndThrow(
+					new IllegalArgumentException(
+							new LogMessageBuilder()
+									.addMarkers(ProcessorUtilities::getClassMarker)
+									.addKeyValue("annotationType", annotationType).addKeyValue("executable", executable).addKeyValue("elements", elements).addKeyValue("types", types)
+									.addMessages(() -> getResourceBundle().getString("annotations.get.plural.fail"))
+									.build()
+					),
+					UtilitiesConfiguration.getInstance().getLogger()
+			);
+		return r[0];
+	}
+
+	public static Marker getClassMarker() { return CLASS_MARKER; }
 
 	public static boolean isElementAbstract(Element element) { return element.getModifiers().contains(Modifier.ABSTRACT) || element.getKind().isInterface(); }
 
@@ -76,12 +98,7 @@ public enum ProcessorUtilities {
 
 	public static ImmutableSet<TypeElement> getIntermediateSuperclasses(TypeElement lower, @Nullable TypeElement upper, Types types) { return getLowerAndIntermediateSuperclasses((TypeElement) types.asElement(lower.getSuperclass()), upper, types); }
 
-	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Class<A> annotationType, ExecutableElement executable, Elements elements, Types types) throws IllegalArgumentException {
-		A[] r = getEffectiveAnnotationsWithInheritingConsidered(annotationType, executable, elements, types);
-		if (r.length != 1)
-			throw BecauseOf.illegalArgument("Too many or not enough annotations", "annotationType", annotationType, "executable", executable);
-		return r[0];
-	}
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	public static <A extends Annotation> A[] getEffectiveAnnotationsWithInheritingConsidered(Class<A> annotationType, ExecutableElement executable, Elements elements, Types types) {
 		A[] r = executable.getAnnotationsByType(annotationType);

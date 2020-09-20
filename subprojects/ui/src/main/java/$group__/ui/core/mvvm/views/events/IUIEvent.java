@@ -1,6 +1,6 @@
 package $group__.ui.core.mvvm.views.events;
 
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 
 public interface IUIEvent {
 	INamespacePrefixedString getType();

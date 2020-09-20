@@ -8,8 +8,8 @@ import $group__.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
 import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
 import $group__.utilities.binding.core.traits.IHasBinding;
 import $group__.utilities.extensions.IExtensionContainer;
-import $group__.utilities.interfaces.INamespacePrefixedString;
-import $group__.utilities.structures.NamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
+import $group__.utilities.structures.ImmutableNamespacePrefixedString;
 import $group__.utilities.structures.paths.INode;
 import com.google.common.collect.ImmutableList;
 
@@ -25,8 +25,8 @@ TODO auto resizing based on min size and preferred size
  */
 public interface IUIComponent
 		extends INode, IShapeDescriptorProvider, IHasBinding, IHasBindingMap, IUIEventTarget, IExtensionContainer<INamespacePrefixedString> {
-	String PROPERTY_ID = INamespacePrefixedString.DEFAULT_PREFIX + "id";
-	INamespacePrefixedString PROPERTY_ID_LOCATION = new NamespacePrefixedString(PROPERTY_ID);
+	String PROPERTY_ID = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "id";
+	INamespacePrefixedString PROPERTY_ID_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_ID);
 
 	static <T> Optional<T> getYoungestParentInstanceOf(IUIComponent self, Class<T> clazz) {
 		Optional<? extends IUIComponentContainer> parent = self.getParent();

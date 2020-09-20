@@ -2,7 +2,7 @@ package $group__.utilities.binding.fields;
 
 import $group__.utilities.binding.core.fields.IBindingField;
 import $group__.utilities.binding.core.fields.IObservableField;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 
 import javax.annotation.Nullable;
 import java.util.Optional;

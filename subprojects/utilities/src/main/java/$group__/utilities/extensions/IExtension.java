@@ -1,18 +1,14 @@
 package $group__.utilities.extensions;
 
-import $group__.utilities.PreconditionUtilities;
-import $group__.utilities.ThrowableUtilities;
-import $group__.utilities.UtilitiesConfiguration;
 import $group__.utilities.interfaces.IHasGenericClass;
-import $group__.utilities.interfaces.INamespacePrefixedString;
-import $group__.utilities.structures.Registry;
+import org.jetbrains.annotations.NonNls;
 
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public interface IExtension<K, C extends IExtensionContainer<? super K>> extends IHasGenericClass<C> {
-	String AREA_UI = "ui";
+	@NonNls String AREA_UI = "ui"; // TODO move
 
 	default void onExtensionAdded(C container) {}
 
@@ -45,20 +41,4 @@ public interface IExtension<K, C extends IExtensionContainer<? super K>> extends
 		}
 	}
 
-	final class ExtensionRegistry extends Registry<INamespacePrefixedString, IType<? extends INamespacePrefixedString, ?, ?>> {
-		public static final ExtensionRegistry INSTANCE = new ExtensionRegistry();
-
-		protected ExtensionRegistry() {
-			super(true, UtilitiesConfiguration.INSTANCE.getLogger());
-			PreconditionUtilities.requireRunOnceOnly(UtilitiesConfiguration.INSTANCE.getLogger());
-		}
-
-		public static void checkExtensionRegistered(IExtension<? extends INamespacePrefixedString, ?> extension) {
-			if (!INSTANCE.containsValue(extension.getType())) {
-				throw ThrowableUtilities.BecauseOf.illegalArgument("Unregistered UI extension type",
-						"extension.getType()", extension.getType(),
-						"extension", extension);
-			}
-		}
-	}
 }

@@ -1,21 +1,46 @@
 package $group__.utilities.minecraft.client;
 
-import $group__.utilities.AffineTransformUtilities;
-import $group__.utilities.ThrowableUtilities;
+import $group__.utilities.*;
+import $group__.utilities.templates.CommonConfigurationTemplate;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Vector4f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.slf4j.Marker;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.nio.FloatBuffer;
+import java.util.ResourceBundle;
 
 @OnlyIn(Dist.CLIENT)
 public enum MatrixUtilities {
 	;
+
+	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker(MatrixUtilities.class);
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
+
+	public static void transformFromTo(MatrixStack matrix, Rectangle2D from, Rectangle2D to) {
+		if (from.getWidth() == 0 || from.getHeight() == 0)
+			throw ThrowableUtilities.logAndThrow(
+					new IllegalArgumentException(
+							new LogMessageBuilder()
+									.addMarkers(MatrixUtilities::getClassMarker)
+									.addKeyValue("matrix", matrix).addKeyValue("from", from).addKeyValue("to", to)
+									.addMessages(() -> getResourceBundle().getString("transform.from_to.un_computable"))
+									.build()
+					),
+					UtilitiesConfiguration.getInstance().getLogger()
+			);
+		double scaleX = to.getWidth() / from.getWidth(),
+				scaleY = to.getHeight() / from.getHeight();
+		matrix.translate(from.getX() * scaleX - to.getX(), from.getY() * scaleY - to.getY(), 0);
+		matrix.scale((float) scaleX, (float) scaleY, 1);
+	}
+
+	public static Marker getClassMarker() { return CLASS_MARKER; }
 
 	public static final int MATRIX_ARRAY_LENGTH = 16;
 	private static final Matrix4f IDENTITY = new Matrix4f();
@@ -26,14 +51,7 @@ public enum MatrixUtilities {
 
 	public static Matrix4f getIdentity() { return IDENTITY.copy(); }
 
-	public static void transformFromTo(MatrixStack matrix, Rectangle2D from, Rectangle2D to) {
-		if (from.getWidth() == 0 || from.getHeight() == 0)
-			throw ThrowableUtilities.BecauseOf.illegalArgument("Cannot calculate transform", "from", from, "to", to);
-		double scaleX = to.getWidth() / from.getWidth(),
-				scaleY = to.getHeight() / from.getHeight();
-		matrix.translate(from.getX() * scaleX - to.getX(), from.getY() * scaleY - to.getY(), 0);
-		matrix.scale((float) scaleX, (float) scaleY, 1);
-	}
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	public static double transformX(double x, Matrix4f matrix) { return transformReturns(new Vector4f((float) x, 0, 0, 1), matrix).getX(); }
 

@@ -1,14 +1,32 @@
 package $group__.utilities;
 
+import $group__.utilities.minecraft.client.MatrixUtilities;
+import $group__.utilities.templates.CommonConfigurationTemplate;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.renderer.Matrix4f;
+import org.jetbrains.annotations.NonNls;
+import org.slf4j.Marker;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ResourceBundle;
 
 public enum AffineTransformUtilities {
 	;
+
+	public static final @NonNls ImmutableMap<String, Integer> NAME_TO_MATRIX_INDEX_MAP = ImmutableMap.<String, Integer>builder()
+			.put("translateX", AffineTransformUtilities.TRANSLATE_X_INDEX)
+			.put("translateY", AffineTransformUtilities.TRANSLATE_Y_INDEX)
+			.put("scaleX", AffineTransformUtilities.SCALE_X_INDEX)
+			.put("scaleY", AffineTransformUtilities.SCALE_Y_INDEX)
+			.put("shearX", AffineTransformUtilities.SHEAR_X_INDEX)
+			.put("shearY", AffineTransformUtilities.SHEAR_Y_INDEX)
+			.build();
+	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker(MatrixUtilities.class);
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
+
+	public static Marker getClassMarker() { return CLASS_MARKER; }
 
 	private static final AffineTransform IDENTITY = new AffineTransform();
 	public static final int SCALE_X_INDEX = toFlatMatrixArrayIndex(0, 0);
@@ -17,24 +35,27 @@ public enum AffineTransformUtilities {
 	public static final int SCALE_Y_INDEX = toFlatMatrixArrayIndex(1, 1);
 	public static final int TRANSLATE_X_INDEX = toFlatMatrixArrayIndex(0, 2);
 	public static final int TRANSLATE_Y_INDEX = toFlatMatrixArrayIndex(1, 2);
-	public static final ImmutableMap<String, Integer> NAME_TO_MATRIX_INDEX_MAP = ImmutableMap.<String, Integer>builder()
-			.put("translateX", AffineTransformUtilities.TRANSLATE_X_INDEX)
-			.put("translateY", AffineTransformUtilities.TRANSLATE_Y_INDEX)
-			.put("scaleX", AffineTransformUtilities.SCALE_X_INDEX)
-			.put("scaleY", AffineTransformUtilities.SCALE_Y_INDEX)
-			.put("shearX", AffineTransformUtilities.SHEAR_X_INDEX)
-			.put("shearY", AffineTransformUtilities.SHEAR_Y_INDEX)
-			.build();
 
 	public static AffineTransform getTransformFromTo(Rectangle2D from, Rectangle2D to) {
 		if (from.getWidth() == 0 || from.getHeight() == 0)
-			throw ThrowableUtilities.BecauseOf.illegalArgument("Cannot calculate transform", "from", from, "to", to);
+			throw ThrowableUtilities.logAndThrow(
+					new IllegalArgumentException(
+							new LogMessageBuilder()
+									.addMarkers(MatrixUtilities::getClassMarker)
+									.addKeyValue("from", from).addKeyValue("to", to)
+									.addMessages(() -> getResourceBundle().getString("transform.from_to.un_computable"))
+									.build()
+					),
+					UtilitiesConfiguration.getInstance().getLogger()
+			);
 		double scaleX = to.getWidth() / from.getWidth(),
 				scaleY = to.getHeight() / from.getHeight();
 		AffineTransform transform = AffineTransform.getTranslateInstance(to.getX() - from.getX() * scaleX, to.getY() - from.getY() * scaleY);
 		transform.scale(scaleX, scaleY);
 		return transform;
 	}
+
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	public static double transformX(double x, AffineTransform transform) { return transformReturns(new Point2D.Double(x, 0), transform).getX(); }
 

@@ -8,7 +8,7 @@ import $group__.utilities.LogMessageBuilder;
 import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.binding.core.IBinder;
 import $group__.utilities.extensions.IExtensionContainer;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 import $group__.utilities.templates.CommonConfigurationTemplate;
 
 import java.util.ResourceBundle;

@@ -2,7 +2,7 @@ package $group__.ui.events.ui;
 
 import $group__.ui.core.mvvm.views.events.IUIEvent;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

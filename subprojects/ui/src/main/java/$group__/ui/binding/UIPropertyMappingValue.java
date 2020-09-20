@@ -1,7 +1,7 @@
 package $group__.ui.binding;
 
 import $group__.ui.core.binding.IUIPropertyMappingValue;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 
 import javax.annotation.Nullable;
 import java.util.Optional;

@@ -16,7 +16,7 @@ import $group__.utilities.CastUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventBusUtilities;
 import $group__.utilities.functions.IConsumer3;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 

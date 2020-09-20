@@ -4,7 +4,7 @@ import $group__.utilities.binding.core.fields.IBindingField;
 import $group__.utilities.binding.fields.BindingField;
 import $group__.utilities.binding.fields.ObservableField;
 import $group__.utilities.functions.ConstantSupplier;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 
 import javax.annotation.Nullable;
 import java.util.Optional;

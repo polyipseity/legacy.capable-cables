@@ -1,22 +1,60 @@
 package $group__.utilities;
 
 import $group__.utilities.collections.MapUtilities;
-import org.slf4j.Logger;
+import $group__.utilities.templates.CommonConfigurationTemplate;
+import org.slf4j.Marker;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
+import java.util.ResourceBundle;
 
 import static $group__.utilities.DynamicUtilities.getCallerStackTraceElement;
-import static $group__.utilities.LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE;
-import static $group__.utilities.LoggerUtilities.EnumMessages.FACTORY_SIMPLE_MESSAGE;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkElementIndex;
-import static java.lang.System.lineSeparator;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 public enum PreconditionUtilities {
 	;
+
+	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker(PreconditionUtilities.class);
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
+
+	public static void requireRunOnceOnly()
+			throws IllegalStateException {
+		Throwable t = ThrowableUtilities.create();
+
+		Optional<StackTraceElement> st = getCallerStackTraceElement();
+		if (!st.isPresent()) {
+			UtilitiesConfiguration.getInstance().getLogger()
+					.atWarn()
+					.addMarker(getClassMarker())
+					.log(() -> getResourceBundle().getString("run_once_only.stacktrace.null"));
+			return;
+		}
+		@Nullable Throwable t1;
+		synchronized (st.toString().intern()) {
+			t1 = RAN_ONCE.put(st.get(), t);
+		}
+		if (t1 != null) {
+			throw ThrowableUtilities.logAndThrow(
+					new IllegalStateException(
+							new LogMessageBuilder()
+									.addMarkers(PreconditionUtilities::getClassMarker)
+									.addMessages(() -> getResourceBundle().getString("run_once_only.illegal"))
+									.build(),
+							t1
+					),
+					UtilitiesConfiguration.getInstance().getLogger()
+			);
+		}
+
+		UtilitiesConfiguration.getInstance().getLogger().atDebug()
+				.addMarker(getClassMarker())
+				.setCause(t)
+				.log(() -> getResourceBundle().getString("run_once_only.first"));
+	}
+
+	public static Marker getClassMarker() { return CLASS_MARKER; }
 
 	private static final Map<StackTraceElement, Throwable> RAN_ONCE = MapUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_LARGE).makeMap();
 
@@ -35,27 +73,5 @@ public enum PreconditionUtilities {
 			checkArgument(o == null || type.isInstance(o));
 	}
 
-
-	public static void requireRunOnceOnly(@Nullable Logger logger) throws IllegalStateException {
-		Throwable t = ThrowableUtilities.create();
-
-		Optional<StackTraceElement> st = getCallerStackTraceElement();
-		if (!st.isPresent()) {
-			if (logger != null)
-				logger.warn(() -> FACTORY_SIMPLE_MESSAGE.makeMessage("Unable to obtain stacktrace"));
-			return;
-		}
-		@Nullable Throwable t1;
-		synchronized (st.toString().intern()) {
-			t1 = RAN_ONCE.put(st.get(), t);
-		}
-		if (t1 != null) {
-			if (logger != null)
-				logger.error(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("Illegal second invocation, previous stacktrace:{}{}", lineSeparator(), getStackTrace(t1)));
-			throw new IllegalStateException("Illegal second invocation", t1);
-		}
-
-		if (logger != null)
-			logger.debug(() -> FACTORY_PARAMETERIZED_MESSAGE.makeMessage("First ONLY invocation, stacktrace:{}{}", lineSeparator(), getStackTrace(t)));
-	}
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 }

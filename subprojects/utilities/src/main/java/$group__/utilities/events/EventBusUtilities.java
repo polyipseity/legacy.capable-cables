@@ -1,24 +1,33 @@
 package $group__.utilities.events;
 
-import $group__.utilities.ConstantsUtilities;
-import $group__.utilities.DynamicUtilities;
-import $group__.utilities.ThrowableUtilities;
-import $group__.utilities.ThrowableUtilities.BecauseOf;
-import $group__.utilities.UtilitiesConfiguration;
+import $group__.utilities.*;
+import $group__.utilities.templates.CommonConfigurationTemplate;
 import io.reactivex.rxjava3.subjects.Subject;
 import net.minecraftforge.eventbus.EventBus;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventListenerHelper;
 import net.minecraftforge.eventbus.api.IEventBus;
 
+import java.util.ResourceBundle;
 import java.util.function.BooleanSupplier;
 
 public enum EventBusUtilities {
 	;
 
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
+
 	public static boolean callWithPrePostHooks(Subject<Event> bus, BooleanSupplier action, Event pre, Event post) {
 		if (!pre.hasResult())
-			throw BecauseOf.illegalArgument("Event does not have a result", "pre", pre);
+			throw ThrowableUtilities.logAndThrow(
+					new IllegalArgumentException(
+							new LogMessageBuilder()
+									.addMarkers(UtilitiesMarkers.getInstance()::getMarkerEvent)
+									.addKeyValue("bus", bus).addKeyValue("action", action).addKeyValue("pre", pre).addKeyValue("post", post)
+									.addMessages(() -> getResourceBundle().getString("event.call.hooks.result.void"))
+									.build()
+					),
+					UtilitiesConfiguration.getInstance().getLogger()
+			);
 		bus.onNext(pre);
 		boolean r;
 		switch (pre.getResult()) {
@@ -38,6 +47,8 @@ public enum EventBusUtilities {
 		return r;
 	}
 
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
+
 	public static void runWithPrePostHooks(Subject<Event> bus, Runnable action, Event pre, Event post) {
 		bus.onNext(pre);
 		action.run();
@@ -45,7 +56,7 @@ public enum EventBusUtilities {
 	}
 
 	public static <E extends Event> void cleanListenersCache(IEventBus bus, Class<E> eventType) {
-		if (ConstantsUtilities.BUILD_TYPE.isDebug()) {
+		if (UtilitiesConstants.BUILD_TYPE.isDebug()) {
 			/* COMMENT
 			Only clean up when debugging as
 			- Rarely useful in production. The extra memory used is not large enough that it deserves such a fix.
@@ -55,7 +66,7 @@ public enum EventBusUtilities {
 			  The exact nature of this race condition is unknown to us at this time.
 			 */
 			ThrowableUtilities.Try.call(() ->
-					(int) DynamicUtilities.IMPL_LOOKUP.findGetter(EventBus.class, "busID", int.class).invokeExact((EventBus) bus), UtilitiesConfiguration.INSTANCE.getLogger())
+					(int) DynamicUtilities.IMPL_LOOKUP.findGetter(EventBus.class, "busID", int.class).invokeExact((EventBus) bus), UtilitiesConfiguration.getInstance().getLogger())
 					.ifPresent(id ->
 							EventListenerHelper.getListenerList(eventType).getListeners(id));
 		}

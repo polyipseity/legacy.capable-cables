@@ -1,6 +1,6 @@
 package $group__.utilities;
 
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 import net.minecraft.util.ResourceLocation;
 
 public enum NamespaceUtilities {

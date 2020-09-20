@@ -35,10 +35,10 @@ import $group__.utilities.events.EventBusUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.functions.FunctionUtilities;
 import $group__.utilities.functions.IConsumer3;
-import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.minecraft.client.GLUtilities;
 import $group__.utilities.reactive.DisposableObserverAuto;
-import $group__.utilities.structures.NamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
+import $group__.utilities.structures.ImmutableNamespacePrefixedString;
 import $group__.utilities.structures.Registry;
 import $group__.utilities.structures.paths.FunctionalPath;
 import com.google.common.collect.*;
@@ -72,7 +72,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		this.mappings = MapUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
 
-		IExtensionContainer.addExtensionChecked(this, new UIExtensionCache());
+		IExtensionContainer.StaticHolder.addExtensionChecked(this, new UIExtensionCache());
 	}
 
 	@Override
@@ -303,6 +303,6 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 											}
 										})));
 
-		private static INamespacePrefixedString generateKey(@SuppressWarnings("SameParameterValue") @NonNls String name) { return new NamespacePrefixedString(INamespacePrefixedString.DEFAULT_NAMESPACE, CacheViewComponent.class.getName() + '.' + name); /* TODO extract this method */ }
+		private static INamespacePrefixedString generateKey(@SuppressWarnings("SameParameterValue") @NonNls String name) { return new ImmutableNamespacePrefixedString(INamespacePrefixedString.StaticHolder.getDefaultNamespace(), CacheViewComponent.class.getName() + '.' + name); /* TODO extract this method */ }
 	}
 }

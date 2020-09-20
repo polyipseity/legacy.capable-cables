@@ -2,7 +2,7 @@ package $group__.utilities.binding.methods;
 
 import $group__.utilities.binding.core.methods.IBindingMethodSource;
 import $group__.utilities.interfaces.IHasGenericClass;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;

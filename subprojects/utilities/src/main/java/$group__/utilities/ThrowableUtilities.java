@@ -37,7 +37,7 @@ public enum ThrowableUtilities {
 
 	public static Throwable create() { return new Throwable("Instantiated throwable"); }
 
-	public static Optional<Throwable> createIfDebug() { return ConstantsUtilities.BUILD_TYPE.isDebug() ? Optional.of(ThrowableUtilities.create()) : Optional.empty(); }
+	public static Optional<Throwable> createIfDebug() { return UtilitiesConstants.BUILD_TYPE.isDebug() ? Optional.of(ThrowableUtilities.create()) : Optional.empty(); }
 
 	public enum ThrowableCatcher {
 		;
@@ -105,7 +105,7 @@ public enum ThrowableUtilities {
 		public static <V> Optional<V> withLogging(Supplier<? extends Optional<V>> delegation, @Nullable Logger logger) {
 			Optional<V> r = AssertionUtilities.assertNonnull(delegation.get());
 			if (logger != null)
-				acceptIfCaught(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_SIMPLE_MESSAGE.makeMessage("Failed try"), t)));
+				acceptIfCaught(t -> logger.warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(FACTORY_SIMPLE_MESSAGE.makeMessage("Failed try"), t))); // TODO
 			return r;
 		}
 

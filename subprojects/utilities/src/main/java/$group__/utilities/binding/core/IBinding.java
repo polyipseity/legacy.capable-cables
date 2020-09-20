@@ -5,7 +5,7 @@ import $group__.utilities.binding.bindings.MethodBindings;
 import $group__.utilities.binding.core.bindings.IBindings;
 import $group__.utilities.binding.core.traits.IHasBindingKey;
 import $group__.utilities.interfaces.IHasGenericClass;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 import com.google.common.cache.Cache;
 
 import java.util.function.Function;

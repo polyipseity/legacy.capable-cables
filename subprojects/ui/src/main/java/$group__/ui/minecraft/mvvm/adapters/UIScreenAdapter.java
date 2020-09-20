@@ -27,8 +27,8 @@ import $group__.utilities.CastUtilities;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.extensions.IExtensionContainer;
 import $group__.utilities.interfaces.IHasGenericClass;
-import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.minecraft.client.GLUtilities;
+import $group__.utilities.structures.INamespacePrefixedString;
 import $group__.utilities.structures.paths.INode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -84,10 +84,10 @@ public class UIScreenAdapter
 		this.closeKeys.addAll(closeKeys);
 		this.changeFocusKeys = Collections.newSetFromMap(MapUtilities.newMapMakerSingleThreaded().initialCapacity(changeFocusKeys.size()).makeMap());
 		this.changeFocusKeys.addAll(changeFocusKeys);
-		IExtensionContainer.addExtensionChecked(infrastructure, new UIExtensionScreen());
+		IExtensionContainer.StaticHolder.addExtensionChecked(infrastructure, new UIExtensionScreen());
 
 		if (containerObject != null)
-			IExtensionContainer.addExtensionChecked(infrastructure, new UIExtensionContainer(containerObject));
+			IExtensionContainer.StaticHolder.addExtensionChecked(infrastructure, new UIExtensionContainer(containerObject));
 	}
 
 	@Override

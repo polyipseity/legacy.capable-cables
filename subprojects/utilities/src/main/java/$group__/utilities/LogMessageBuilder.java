@@ -1,6 +1,7 @@
 package $group__.utilities;
 
 import $group__.utilities.functions.ConstantSupplier;
+import $group__.utilities.logging.FormattingUtilities;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;

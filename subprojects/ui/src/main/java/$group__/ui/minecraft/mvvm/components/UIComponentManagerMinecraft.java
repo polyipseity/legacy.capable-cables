@@ -12,7 +12,7 @@ import $group__.ui.minecraft.mvvm.extensions.UIExtensionBackgroundMinecraft;
 import $group__.ui.mvvm.views.components.UIComponentManager;
 import $group__.ui.mvvm.views.components.rendering.UIRendererContainer;
 import $group__.utilities.extensions.IExtensionContainer;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -33,7 +33,7 @@ public class UIComponentManagerMinecraft
 	public UIComponentManagerMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<Rectangle2D> shapeDescriptor) {
 		super(mappings, id, shapeDescriptor);
 
-		IExtensionContainer.addExtensionExtendedChecked(this, new UIExtensionBackgroundMinecraft<>(IUIComponentManager.class)); // COMMENT to ensure that 'GuiScreenEvent.BackgroundDrawnEvent' is fired
+		IExtensionContainer.StaticHolder.addExtensionExtendedChecked(this, new UIExtensionBackgroundMinecraft<>(IUIComponentManager.class)); // COMMENT to ensure that 'GuiScreenEvent.BackgroundDrawnEvent' is fired
 	}
 
 	@Override

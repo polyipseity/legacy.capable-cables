@@ -4,6 +4,7 @@ import $group__.utilities.*;
 import $group__.utilities.collections.CacheUtilities;
 import $group__.utilities.collections.ManualLoadingCache;
 import $group__.utilities.collections.MapUtilities;
+import $group__.utilities.templates.CommonConfigurationTemplate;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -16,10 +17,7 @@ import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
 import java.awt.geom.Point2D;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
 
@@ -40,6 +38,23 @@ public enum GLUtilities {
 	@OnlyIn(Dist.CLIENT)
 	public enum Stacks {
 		;
+
+		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
+
+		public static void clear(@NonNls String name) {
+			Optional.ofNullable(STACKS.getIfPresent(name))
+					.filter(s -> !s.isEmpty())
+					.ifPresent(s -> {
+						UtilitiesConfiguration.getInstance().getLogger()
+								.atWarn()
+								.addMarker(UtilitiesMarkers.getInstance().getMarkerOpenGL())
+								.addKeyValue("name", name)
+								.addArgument(s)
+								.log(() -> getResourceBundle().getString("clear.dirty"));
+						while (!s.isEmpty())
+							pop(name);
+					});
+		}
 
 		public static final Runnable GL_SCISSOR_FALLBACK = () -> {
 			MainWindow window = ClientUtilities.getMinecraftNonnull().getMainWindow();
@@ -67,23 +82,18 @@ public enum GLUtilities {
 			assert STACKS.asMap().isEmpty();
 		}
 
-		public static void clear(@NonNls String name) {
-			Optional.ofNullable(STACKS.getIfPresent(name))
-					.filter(s -> !s.isEmpty())
-					.ifPresent(s -> {
-						UtilitiesConfiguration.INSTANCE.getLogger().warn(() ->
-								LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{} leak: {}: {} not popped", Stacks.class.getSimpleName(), name, s.size()));
-						while (!s.isEmpty())
-							pop(name);
-					});
-		}
+		protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 		public static void pop(@NonNls String name) {
 			@Nullable Deque<GLCall> s = STACKS.getIfPresent(name);
 			if (s == null)
 				throw ThrowableUtilities.logAndThrow(new NoSuchElementException(
-						asd
-				), UtilitiesConfiguration.getInstance().getLogger())
+						new LogMessageBuilder()
+								.addMarkers(UtilitiesMarkers.getInstance()::getMarkerOpenGL)
+								.addKeyValue("name", name)
+								.addMessages(() -> getResourceBundle().getString("pop.empty"))
+								.build()
+				), UtilitiesConfiguration.getInstance().getLogger());
 			Runnable fb = s.pop().getFallback();
 			(s.isEmpty() ? fb : AssertionUtilities.assertNonnull(s.element())).run();
 			STACKS.cleanUp();

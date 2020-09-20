@@ -97,7 +97,7 @@ public final class ModThis
 						.atInfo()
 						.addMarker(ModMarkers.getInstance().getMarkerModLifecycle())
 						.addKeyValue("event", event)
-						.log(getResourceBundle().getString("event.lifecycle.unhandled"));
+						.log(() -> getResourceBundle().getString("event.lifecycle.unhandled"));
 		}
 	}
 }

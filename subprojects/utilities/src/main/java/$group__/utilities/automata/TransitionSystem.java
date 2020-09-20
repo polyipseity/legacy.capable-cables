@@ -67,12 +67,12 @@ public class TransitionSystem<S extends IState<D>, E, D>
 	protected void setState(S state) { this.state = state; }
 
 	@Override
-	public int hashCode() { return ObjectUtilities.hashCode(this, null, OBJECT_VARIABLES); }
+	public int hashCode() { return ObjectUtilities.hashCode(this, null, StaticHolder.getObjectVariables()); }
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
-	public boolean equals(Object obj) { return ObjectUtilities.equals(this, obj, false, null, OBJECT_VARIABLES); }
+	public boolean equals(Object obj) { return ObjectUtilities.equals(this, obj, false, null, StaticHolder.getObjectVariables()); }
 
 	@Override
-	public String toString() { return ObjectUtilities.toString(this, super::toString, OBJECT_VARIABLES_MAP); }
+	public String toString() { return ObjectUtilities.toString(this, super::toString, StaticHolder.getObjectVariablesMap()); }
 }

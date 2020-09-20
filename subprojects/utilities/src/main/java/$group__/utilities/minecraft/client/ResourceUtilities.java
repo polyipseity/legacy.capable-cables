@@ -1,7 +1,7 @@
 package $group__.utilities.minecraft.client;
 
 import $group__.utilities.NamespaceUtilities;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 import net.minecraft.resources.IResource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;

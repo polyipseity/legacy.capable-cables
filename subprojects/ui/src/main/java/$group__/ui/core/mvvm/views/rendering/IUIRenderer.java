@@ -11,7 +11,7 @@ public interface IUIRenderer<C>
 			extends Registry<INamespacePrefixedString, Class<? extends R>>
 			implements IHasGenericClass<R> {
 		// TODO this class does nothing for now, useful for user custom theming later
-		public static final INamespacePrefixedString DEFAULT_KEY = new NamespacePrefixedString("default");
+		public static final INamespacePrefixedString DEFAULT_KEY = new ImmutableNamespacePrefixedString("default");
 		protected static final ConcurrentMap<Class<? extends IUIComponent>, RegRenderer<?>> INSTANCES =
 				MapUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 		protected final Class<R> variant;

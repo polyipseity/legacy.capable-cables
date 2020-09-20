@@ -22,9 +22,8 @@ import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.events.EnumEventHookStage;
 import $group__.utilities.events.EventBusUtilities;
 import $group__.utilities.extensions.IExtension;
-import $group__.utilities.extensions.IExtensionContainer;
-import $group__.utilities.interfaces.INamespacePrefixedString;
-import $group__.utilities.structures.NamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
+import $group__.utilities.structures.ImmutableNamespacePrefixedString;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -49,12 +48,12 @@ public class UIComponent
 		extends UIEventTarget
 		implements IUIComponent {
 	@NonNls
-	public static final String PROPERTY_VISIBLE = INamespacePrefixedString.DEFAULT_PREFIX + "component.visible";
+	public static final String PROPERTY_VISIBLE = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "component.visible";
 	@NonNls
-	public static final String PROPERTY_ACTIVE = INamespacePrefixedString.DEFAULT_PREFIX + "component.active";
+	public static final String PROPERTY_ACTIVE = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "component.active";
 
-	public static final INamespacePrefixedString PROPERTY_VISIBLE_LOCATION = new NamespacePrefixedString(PROPERTY_VISIBLE);
-	public static final INamespacePrefixedString PROPERTY_ACTIVE_LOCATION = new NamespacePrefixedString(PROPERTY_ACTIVE);
+	public static final INamespacePrefixedString PROPERTY_VISIBLE_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_VISIBLE);
+	public static final INamespacePrefixedString PROPERTY_ACTIVE_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_ACTIVE);
 
 	@Nullable
 	protected final String id;
@@ -85,7 +84,7 @@ public class UIComponent
 		this.active = IUIPropertyMappingValue.createBindingField(Boolean.class, false, true,
 				this.mappings.get(PROPERTY_ACTIVE_LOCATION));
 
-		IExtensionContainer.addExtensionChecked(this, new UIExtensionCache());
+		StaticHolder.addExtensionChecked(this, new UIExtensionCache());
 	}
 
 	@Override
@@ -164,11 +163,11 @@ public class UIComponent
 
 	@Override
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
-		return IExtensionContainer.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension);
+		return StaticHolder.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension);
 	}
 
 	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtension(getExtensions(), key); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return StaticHolder.removeExtensionImpl(getExtensions(), key); }
 
 	@Override
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return Optional.ofNullable(getExtensions().get(key)); }

@@ -1,19 +1,52 @@
 package $group__.utilities.structures;
 
-import $group__.utilities.AssertionUtilities;
-import $group__.utilities.LoggerUtilities;
-import $group__.utilities.ThrowableUtilities.BecauseOf;
+import $group__.utilities.*;
 import $group__.utilities.collections.MapUtilities;
+import $group__.utilities.templates.CommonConfigurationTemplate;
 import org.slf4j.Logger;
+import org.slf4j.Marker;
 
 import java.io.Serializable;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public abstract class Registry<K, V> {
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
+	private final Marker marker = UtilitiesMarkers.getInstance().getClassMarker(getClass());
+
+	public <VL extends V> RegistryObject<VL> register(K key, VL value) {
+		AtomicReference<RegistryObject<VL>> retRef = new AtomicReference<>();
+		if (getData().computeIfPresent(key, (keyToo, registryObject) -> {
+			if (isOverridable())
+				getLogger().atInfo()
+						.addMarker(getMarker())
+						.addKeyValue("keyToo", keyToo).addKeyValue("value", value).addKeyValue("registryObject", registryObject)
+						.log(() -> getResourceBundle().getString("override.allowed"));
+			else
+				throw ThrowableUtilities.logAndThrow(
+						new IllegalArgumentException(
+								new LogMessageBuilder()
+										.addMarkers(this::getMarker)
+										.addKeyValue("keyToo", keyToo).addKeyValue("value", value).addKeyValue("registryObject", registryObject)
+										.addMessages(() -> getResourceBundle().getString("override.disabled"))
+										.build()
+						),
+						getLogger()
+				);
+			@SuppressWarnings("unchecked") RegistryObject<VL> vc = (RegistryObject<VL>) registryObject; // COMMENT responsibility goes to the caller
+			vc.setValue(value);
+			retRef.set(vc);
+			return registryObject;
+		}) == null)
+			getData().put(key, retRef.accumulateAndGet(new RegistryObject<>(value), (vp, vn) -> vn));
+		return AssertionUtilities.assertNonnull(retRef.get());
+	}
+
 	private final ConcurrentMap<K, RegistryObject<? extends V>> data = MapUtilities.newMapMakerNormalThreaded().makeMap();
 	private final boolean overridable;
 	private final Logger logger;
@@ -25,25 +58,12 @@ public abstract class Registry<K, V> {
 
 	public <VL extends V> RegistryObject<VL> registerApply(K key, Function<? super K, ? extends VL> value) { return register(key, value.apply(key)); }
 
-	public <VL extends V> RegistryObject<VL> register(K key, VL value) {
-		AtomicReference<RegistryObject<VL>> retRef = new AtomicReference<>();
-		if (getData().computeIfPresent(key, (k, v) -> {
-			if (isOverridable())
-				getLogger().info(() ->
-						LoggerUtilities.EnumMessages.FACTORY_PARAMETERIZED_MESSAGE.makeMessage("{}: Overriding key '{}': Replacing value '{}' with '{}'", getClass().getName(), key, v, value));
-			else
-				throw BecauseOf.illegalArgument(getClass().getName() + ": Cannot override entry", "key", key);
-			@SuppressWarnings("unchecked") RegistryObject<VL> vc = (RegistryObject<VL>) v; // COMMENT responsibility goes to the caller
-			vc.setValue(value);
-			retRef.set(vc);
-			return v;
-		}) == null)
-			getData().put(key, retRef.accumulateAndGet(new RegistryObject<>(value), (vp, vn) -> vn));
-		return AssertionUtilities.assertNonnull(retRef.get());
-	}
+	public Marker getMarker() { return marker; }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<K, RegistryObject<? extends V>> getData() { return data; }
+
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	public boolean isOverridable() { return overridable; }
 
@@ -51,9 +71,14 @@ public abstract class Registry<K, V> {
 
 	public Optional<? extends RegistryObject<? extends V>> get(K key) { return Optional.ofNullable(getData().get(key)); }
 
-	public boolean containsKey(K key) { return getData().containsKey(key); }
+	@SuppressWarnings("SuspiciousMethodCalls")
+	public boolean containsKey(Object key) { return getData().containsKey(key); }
 
-	public boolean containsValue(V value) { return getData().values().stream().unordered().anyMatch(o -> o.getValue().equals(value)); }
+	public boolean containsValue(Object value) {
+		return getData().values().stream().unordered()
+				.map(RegistryObject::getValue)
+				.anyMatch(Predicate.isEqual(value));
+	}
 
 	public static final class RegistryObject<V>
 			implements Serializable, Supplier<V> {

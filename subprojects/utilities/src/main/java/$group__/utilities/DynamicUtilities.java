@@ -1,10 +1,9 @@
 package $group__.utilities;
 
-import $group__.utilities.ThrowableUtilities.BecauseOf;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.collections.CacheUtilities;
-import $group__.utilities.collections.MapUtilities;
+import $group__.utilities.templates.CommonConfigurationTemplate;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
@@ -14,6 +13,7 @@ import net.jodah.typetools.TypeResolver;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
+import org.slf4j.Marker;
 import sun.misc.Unsafe;
 
 import javax.annotation.Nullable;
@@ -41,24 +41,22 @@ public enum DynamicUtilities {
 	public static final Lookup IMPL_LOOKUP;
 	public static final Unsafe UNSAFE;
 
-
 	public static final LoadingCache<String, Reflections> REFLECTIONS_CACHE =
-			CacheUtilities.newCacheBuilderSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).expireAfterAccess(MapUtilities.CACHE_EXPIRATION_ACCESS_DURATION, MapUtilities.CACHE_EXPIRATION_ACCESS_TIME_UNIT).build(CacheLoader.from(t -> {
+			CacheUtilities.newCacheBuilderSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL)
+					.expireAfterAccess(CacheUtilities.CACHE_EXPIRATION_ACCESS_DURATION, CacheUtilities.CACHE_EXPIRATION_ACCESS_TIME_UNIT).build(CacheLoader.from(t -> {
 				Reflections r = new Reflections(t);
 				r.expandSuperTypes();
 				return r;
 			}));
-
-	private static final int TRUSTED_LOOKUP_MODES = 15;
-
-	private static final MethodHandle DEFINE_CLASS_METHOD_HANDLE;
+	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker(DynamicUtilities.class);
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 
 	static {
 		IMPL_LOOKUP = Arrays.stream(Lookup.class.getDeclaredFields()).unordered()
 				.filter(f -> Lookup.class.equals(f.getType()))
 				.map(f -> {
 					Try.run(() -> f.setAccessible(true), UtilitiesConfiguration.getInstance().getLogger());
-					ThrowableCatcher.acceptIfCaught(t -> UtilitiesConfiguration.getInstance().getLogger().warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("impl lookup field", f, Lookup.class, true), t)));
+					ThrowableCatcher.acceptIfCaught(t -> UtilitiesConfiguration.getInstance().getLogger().warn(() -> SUFFIX_WITH_THROWABLE.makeMessage(REFLECTION_UNABLE_TO_SET_ACCESSIBLE.makeMessage("impl lookup field", f, Lookup.class, true), t))); // TODO
 
 					@Nullable Optional<Lookup> ret = Try.call(() -> (Lookup) PUBLIC_LOOKUP.unreflectGetter(f).invokeExact(), UtilitiesConfiguration.getInstance().getLogger()).filter(l -> l.lookupModes() == TRUSTED_LOOKUP_MODES);
 
@@ -82,6 +80,28 @@ public enum DynamicUtilities {
 				IMPL_LOOKUP.findVirtual(ClassLoader.class, "defineClass",
 						MethodType.methodType(Class.class, String.class, byte[].class, int.class, int.class)), UtilitiesConfiguration.getInstance().getLogger())
 				.orElseThrow(ThrowableCatcher::rethrow);
+	}
+
+	public static Marker getClassMarker() { return CLASS_MARKER; }
+
+	private static final int TRUSTED_LOOKUP_MODES = 15;
+
+	private static final MethodHandle DEFINE_CLASS_METHOD_HANDLE;
+
+	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Class<A> annotationType, Method method) throws IllegalArgumentException {
+		A[] r = getEffectiveAnnotationsWithInheritingConsidered(annotationType, method);
+		if (r.length != 1)
+			throw ThrowableUtilities.logAndThrow(
+					new IllegalArgumentException(
+							new LogMessageBuilder()
+									.addMarkers(ProcessorUtilities::getClassMarker)
+									.addKeyValue("annotationType", annotationType).addKeyValue("method", method)
+									.addMessages(() -> getResourceBundle().getString("annotations.get.plural.fail"))
+									.build()
+					),
+					UtilitiesConfiguration.getInstance().getLogger()
+			);
+		return r[0];
 	}
 
 	public static boolean isClassAbstract(Class<?> clazz) { return clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()); }
@@ -200,13 +220,7 @@ public enum DynamicUtilities {
 		return r;
 	}
 
-	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Class<A> annotationType, Method method, @Nullable Logger logger) throws IllegalArgumentException {
-		A[] r = getEffectiveAnnotationsWithInheritingConsidered(annotationType, method, logger);
-		if (r.length != 1) throw BecauseOf.illegalArgument("Too many or not enough annotations",
-				"annotationType", annotationType,
-				"method", method);
-		return r[0];
-	}
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	@SuppressWarnings("ObjectAllocationInLoop")
 	public static ImmutableSet<ImmutableSet<Class<?>>> getSuperclassesAndInterfaces(Class<?> clazz) {

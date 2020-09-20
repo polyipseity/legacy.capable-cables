@@ -8,7 +8,7 @@ import $group__.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.utilities.*;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.functions.FunctionUtilities;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 import $group__.utilities.templates.CommonConfigurationTemplate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;

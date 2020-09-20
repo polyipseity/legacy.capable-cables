@@ -35,9 +35,9 @@ import $group__.utilities.binding.fields.BindingField;
 import $group__.utilities.binding.fields.ObservableField;
 import $group__.utilities.binding.methods.BindingMethodDestination;
 import $group__.utilities.extensions.IExtensionContainer;
-import $group__.utilities.interfaces.INamespacePrefixedString;
 import $group__.utilities.minecraft.client.ClientUtilities;
-import $group__.utilities.structures.NamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
+import $group__.utilities.structures.ImmutableNamespacePrefixedString;
 import jakarta.xml.bind.Unmarshaller;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -153,7 +153,7 @@ public enum UIDebugMinecraft {
 									binder
 							),
 							container);
-			IExtensionContainer.addExtensionChecked(ret.getInfrastructure().getView(),
+			IExtensionContainer.StaticHolder.addExtensionChecked(ret.getInfrastructure().getView(),
 					new UIExtensionCursorHandleProviderComponent<>(IUIViewComponent.class));
 
 			return ret;
@@ -188,17 +188,17 @@ public enum UIDebugMinecraft {
 		private static final class ViewModel
 				extends UIViewModelMinecraft<Model> {
 			protected final IBindingField<Integer> anchoredWindowBorderColor = new BindingField<>(
-					new NamespacePrefixedString("anchoredWindowBorderColor"),
+					new ImmutableNamespacePrefixedString("anchoredWindowBorderColor"),
 					new ObservableField<>(Integer.class, null));
 			protected final IBindingMethodDestination<UIComponentButton.IUIEventActivate> buttonOnActivate = new BindingMethodDestination<>(
 					UIComponentButton.IUIEventActivate.class,
-					new NamespacePrefixedString("buttonOnActivate"),
+					new ImmutableNamespacePrefixedString("buttonOnActivate"),
 					this::onButtonActivate);
 			protected boolean anchoredWindowFlickering = false;
 			protected final Random random = new Random();
 			protected final IBindingMethodDestination<IUIEvent> buttonOnActivated = new BindingMethodDestination<>(
 					IUIEvent.class,
-					new NamespacePrefixedString("buttonOnActivated"),
+					new ImmutableNamespacePrefixedString("buttonOnActivated"),
 					this::onButtonActivated);
 
 			private ViewModel() { super(new Model()); }

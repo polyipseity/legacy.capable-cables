@@ -87,18 +87,20 @@ public interface IAffineTransformStack
 			implements Runnable {
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
+		private final Deque<AffineTransform> data;
+		private final Logger logger;
+		@Nullable
+		private final Throwable throwable;
+
 		@Override
 		public void run() {
 			if (!StaticHolder.isClean(getData()))
-				logger.warn(StaticHolder.getClassMarker(),
-						getResourceBundle().getString("stack.clean.not"), getData(),
-						getThrowable());
+				getLogger().atWarn()
+						.addMarker(StaticHolder.getClassMarker())
+						.addArgument(this::getData)
+						.setCause(getThrowable().orElse(null))
+						.log(() -> getResourceBundle().getString("stack.clean.not"));
 		}
-
-		protected final Deque<AffineTransform> data;
-		protected final Logger logger;
-		@Nullable
-		protected final Throwable throwable;
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 		public LeakNotifier(Deque<AffineTransform> data, Logger logger) {
@@ -113,5 +115,7 @@ public interface IAffineTransformStack
 		protected Deque<AffineTransform> getData() { return data; }
 
 		protected Optional<Throwable> getThrowable() { return Optional.ofNullable(throwable); }
+
+		protected Logger getLogger() { return logger; }
 	}
 }

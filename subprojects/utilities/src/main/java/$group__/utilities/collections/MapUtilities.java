@@ -1,17 +1,17 @@
 package $group__.utilities.collections;
 
-import $group__.utilities.DynamicUtilities;
-import $group__.utilities.LoopUtilities;
-import $group__.utilities.ThrowableUtilities;
+import $group__.utilities.*;
 import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.ThrowableUtilities.Try;
-import $group__.utilities.UtilitiesConfiguration;
+import $group__.utilities.templates.CommonConfigurationTemplate;
 import com.google.common.collect.*;
+import org.jetbrains.annotations.NonNls;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.signature.SignatureVisitor;
 import org.objectweb.asm.signature.SignatureWriter;
+import org.slf4j.Marker;
 
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
@@ -27,6 +27,44 @@ import static org.objectweb.asm.Opcodes.*;
 
 public enum MapUtilities {
 	;
+
+	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker(MapUtilities.class);
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
+
+	public static <K, V> ImmutableMap<K, V> stitchKeysValues(int size, Iterable<? extends K> keys, Iterable<? extends V> values) {
+		Map<K, V> ret = new HashMap<>(size);
+
+		Iterator<? extends V> iteratorValues = values.iterator();
+		keys.forEach(k -> {
+			if (!iteratorValues.hasNext())
+				throw ThrowableUtilities.logAndThrow(
+						new IllegalArgumentException(
+								new LogMessageBuilder()
+										.addMarkers(MapUtilities::getClassMarker)
+										.addKeyValue("size", size).addKeyValue("keys", keys).addKeyValue("values", values)
+										.addMessages(() -> getResourceBundle().getString("stitch.keys.long"))
+										.build()
+						),
+						UtilitiesConfiguration.getInstance().getLogger()
+				);
+			ret.put(k, iteratorValues.next());
+		});
+		if (iteratorValues.hasNext())
+			throw ThrowableUtilities.logAndThrow(
+					new IllegalArgumentException(
+							new LogMessageBuilder()
+									.addMarkers(MapUtilities::getClassMarker)
+									.addKeyValue("size", size).addKeyValue("keys", keys).addKeyValue("values", values)
+									.addMessages(() -> getResourceBundle().getString("stitch.values.long"))
+									.build()
+					),
+					UtilitiesConfiguration.getInstance().getLogger()
+			);
+
+		return ImmutableMap.copyOf(ret);
+	}
+
+	public static Marker getClassMarker() { return CLASS_MARKER; }
 
 	public static MapMaker newMapMakerSingleThreaded() { return new MapMaker().concurrencyLevel(SINGLE_THREAD_THREAD_COUNT); }
 
@@ -46,20 +84,7 @@ public enum MapUtilities {
 		return stitchKeysValues(size, Iterables.concat(keys), Iterables.concat(values));
 	}
 
-	public static <K, V> ImmutableMap<K, V> stitchKeysValues(int size, Iterable<? extends K> keys, Iterable<? extends V> values) {
-		Map<K, V> ret = new HashMap<>(size);
-
-		Iterator<? extends V> iteratorValues = values.iterator();
-		keys.forEach(k -> {
-			if (!iteratorValues.hasNext())
-				throw ThrowableUtilities.BecauseOf.illegalArgument("Keys too long", "keys", keys, "values", values);
-			ret.put(k, iteratorValues.next());
-		});
-		if (iteratorValues.hasNext())
-			throw ThrowableUtilities.BecauseOf.illegalArgument("Values too long", "keys", keys, "values", values);
-
-		return ImmutableMap.copyOf(ret);
-	}
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	@SuppressWarnings("UnstableApiUsage")
 	public static <K, V> ImmutableMap<V, K> inverse(Map<K, V> instance)
@@ -88,14 +113,15 @@ public enum MapUtilities {
 
 		private static final long serialVersionUID = 3864726593737949225L; // COMMENT should not affect Enum serialization
 		private static final String SUPERCLASS_NAME = "com.google.common.collect.AbstractBiMap";
-		private static final String CLASS_SIMPLE_NAME = "AbstractBiMap_" + serialVersionUID; // COMMENT hopefully they will not name a new class like so...
+		private static final @NonNls String CLASS_SIMPLE_NAME = "AbstractBiMap_" + serialVersionUID; // COMMENT hopefully they will not name a new class like so...
 		private static final Pattern LITERAL_SUPERCLASS_SIMPLE_NAME = Pattern.compile("AbstractBiMap", Pattern.LITERAL);
+		private static final @NonNls String SOURCE_DEBUG = "ASM";
 		private static final Class<?> CLASS;
 		private static final BiFunction<Map<?, ?>, Map<?, ?>, ? extends BiMap<?, ?>> CONSTRUCTOR;
 
 		static {
 			{
-				Class<?> superclass = Try.call(() -> Class.forName(SUPERCLASS_NAME), UtilitiesConfiguration.INSTANCE.getLogger())
+				Class<?> superclass = Try.call(() -> Class.forName(SUPERCLASS_NAME), UtilitiesConfiguration.getInstance().getLogger())
 						.orElseThrow(ThrowableCatcher::rethrow);
 				String name = LITERAL_SUPERCLASS_SIMPLE_NAME
 						.matcher(superclass.getName())
@@ -141,7 +167,7 @@ public enum MapUtilities {
 							null);
 					cw.visitSource(DynamicUtilities.getCurrentStackTraceElement()
 							.map(StackTraceElement::getFileName)
-							.orElse(null), "ASM");
+							.orElse(null), SOURCE_DEBUG);
 				}
 				// COMMENT field serialVersionUID
 				{
@@ -200,11 +226,11 @@ public enum MapUtilities {
 			}
 
 			{
-				MethodHandle constructor = Try.call(() -> DynamicUtilities.IMPL_LOOKUP.findConstructor(CLASS, MethodType.methodType(void.class, Map.class, Map.class)), UtilitiesConfiguration.INSTANCE.getLogger())
+				MethodHandle constructor = Try.call(() -> DynamicUtilities.IMPL_LOOKUP.findConstructor(CLASS, MethodType.methodType(void.class, Map.class, Map.class)), UtilitiesConfiguration.getInstance().getLogger())
 						.orElseThrow(ThrowableCatcher::rethrow);
 				// TODO Java 9 - use LambdaMetaFactory
 				CONSTRUCTOR = (forward, backward) ->
-						Try.call(() -> (BiMap<?, ?>) constructor.invoke(forward, backward), UtilitiesConfiguration.INSTANCE.getLogger())
+						Try.call(() -> (BiMap<?, ?>) constructor.invoke(forward, backward), UtilitiesConfiguration.getInstance().getLogger())
 								.orElseThrow(ThrowableCatcher::rethrow);
 			}
 		}

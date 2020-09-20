@@ -19,8 +19,8 @@ import $group__.ui.events.ui.UIEventUtilities;
 import $group__.ui.mvvm.views.components.UIComponentContainer;
 import $group__.utilities.binding.core.methods.IBindingMethodSource;
 import $group__.utilities.binding.methods.BindingMethodSource;
-import $group__.utilities.interfaces.INamespacePrefixedString;
-import $group__.utilities.structures.NamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
+import $group__.utilities.structures.ImmutableNamespacePrefixedString;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
@@ -34,12 +34,12 @@ public class UIComponentButton
 		extends UIComponentContainer
 		implements IUIComponentCursorHandleProvider {
 	@NonNls
-	public static final String METHOD_ON_ACTIVATE = INamespacePrefixedString.DEFAULT_PREFIX + "button.methods.activate";
+	public static final String METHOD_ON_ACTIVATE = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "button.methods.activate";
 	@NonNls
-	public static final String METHOD_ON_ACTIVATED = INamespacePrefixedString.DEFAULT_PREFIX + "button.methods.activated";
+	public static final String METHOD_ON_ACTIVATED = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "button.methods.activated";
 
-	public static final INamespacePrefixedString METHOD_ON_ACTIVATE_LOCATION = new NamespacePrefixedString(METHOD_ON_ACTIVATE);
-	public static final INamespacePrefixedString METHOD_ON_ACTIVATED_LOCATION = new NamespacePrefixedString(METHOD_ON_ACTIVATED);
+	public static final INamespacePrefixedString METHOD_ON_ACTIVATE_LOCATION = new ImmutableNamespacePrefixedString(METHOD_ON_ACTIVATE);
+	public static final INamespacePrefixedString METHOD_ON_ACTIVATED_LOCATION = new ImmutableNamespacePrefixedString(METHOD_ON_ACTIVATED);
 
 	@UIMethod(METHOD_ON_ACTIVATE)
 	protected final IBindingMethodSource<IUIEventActivate> methodOnActivate;
@@ -111,8 +111,8 @@ public class UIComponentButton
 	}
 
 	public interface IUIEventActivate extends IUIEvent {
-		@NonNls String TYPE_STRING = INamespacePrefixedString.DEFAULT_PREFIX + "button.activated";
-		INamespacePrefixedString TYPE = new NamespacePrefixedString(TYPE_STRING);
+		@NonNls String TYPE_STRING = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "button.activated";
+		INamespacePrefixedString TYPE = new ImmutableNamespacePrefixedString(TYPE_STRING);
 
 		static boolean shouldActivate(UIComponentButton self, IUIEvent event) {
 			return UIEventUtilities.dispatchEvent(new IUIEventActivate.Impl((Functional) e -> {

@@ -3,7 +3,7 @@ package $group__.ui.mvvm.views.events.ui;
 import $group__.ui.core.mvvm.views.events.IUIEventChar;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.ui.events.ui.UIEvent;
-import $group__.utilities.interfaces.INamespacePrefixedString;
+import $group__.utilities.structures.INamespacePrefixedString;
 
 public class UIEventChar extends UIEvent implements IUIEventChar {
 	protected final char codePoint;
