@@ -19,7 +19,6 @@ project.ext.makeResourcesTasks = { Closure c ->
 
 			task.configure {
 				configure c
-				if (buildType == 'DEBUG') inputs.property 'expand_group', '$group__'
 				Map<String, Object> e = inputs.properties
 						.findAll { it.key.startsWith 'expand_' }
 						.collectEntries { [(it.key.replace('expand_', '')): it.value] } as Map<String, Object>
@@ -35,15 +34,6 @@ project.ext.makeResourcesTasks = { Closure c ->
 
 				// COMMENT copy everything else except the processed files
 				from(sourceSets."$sourceSetName".resources.srcDirs) { exclude '**/*.in*' }
-
-				Binding eb = new Binding(e)
-				eachFile { it.path = evaluateGStringString.call it.path, eb }
-
-				doLast {
-					List<File> markedForDeletion = []
-					destinationDir.eachDirRecurse { if (it.directorySize() == 0) markedForDeletion << it }
-					markedForDeletion.each { it.deleteDir() }
-				}
 			}
 
 			tasks.named("compile${taskSourceSetName}Java").configure {

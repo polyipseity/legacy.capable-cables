@@ -8,7 +8,7 @@ apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['clearDirectory'])
 
 ext {
-	jaxbPackagePrefix = "\$group__.jaxb${path.replace(':', '.').replaceAll(/\.\u0024/, '.')}"
+	jaxbPackagePrefix = "${project.group}.jaxb${path.replace(':', '.').replaceAll(/\.\u0024/, '.')}"
 }
 
 configurations {

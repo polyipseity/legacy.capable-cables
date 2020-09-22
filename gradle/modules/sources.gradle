@@ -2,8 +2,6 @@
 // TITLE Source
 //////////////////////////////////////////////////
 
-import groovy.io.FileType
-
 import static java.io.File.separator
 
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
@@ -33,14 +31,6 @@ project.ext.makeSourcesTasks = { Closure c ->
 
 				from sourceSet
 				into temporaryDir
-
-				doLast {
-					destinationDir.eachFileRecurse(FileType.FILES) {
-						it.setWritable true, false
-						// COMMENT standard
-						it.text = it.text.replace('\\', '\\\\').replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }.replaceAll ~/\$(?!\{)/, '\\\\\\$'
-					}
-				}
 			}
 
 			def process = tasks.register("process${taskName.capitalize()}", Sync) {
@@ -51,59 +41,25 @@ project.ext.makeSourcesTasks = { Closure c ->
 				configure c
 
 				into temporaryDir
+
 				from(pre.get().temporaryDir) {
-					if (buildType == 'DEBUG') inputs.property 'expand_group', '$group__'
+					include inputs.properties.expand$pattern
+
 					Map<String, Object> e = inputs.properties
 							.findAll { it.key.startsWith 'expand_' }
-							.collectEntries {
-								String k = it.key.replace('expand_', '')
-								[(k): it.value, ("${k}__".toString()): it.value]
-							} as Map<String, Object>
-
+							.collectEntries {[(it.key.replace('expand_', '')): it.value] } as Map<String, Object>
 					expand e
+				}
 
-					Binding eb = new Binding(e)
-					eachFile {
-						String parent = evaluateGStringString.call(it.relativePath.parent.pathString, eb).replace '.', separator
-						it.path = "$parent$separator${evaluateGStringString.call it.name, eb}"
-					}
+				from(pre.get().temporaryDir) {
+					exclude inputs.properties.expand$pattern
 				}
 
 				task.get().source = destinationDir
 			}
 
-			def post = tasks.register("postProcess${taskName.capitalize()}", Jar) {
-				group task.get().group
-				description "Finalize after processing $sourceSetName $language."
-
-				from process.get().destinationDir
-				classifier "$sourceSetName$language"
-				destinationDir = file "$buildDir${separator}replaced"
-
-				if (createNewFile.call(archivePath)) {
-					archivePath.setWritable true, false
-					archivePath.text = 'PK\u0005\u0006\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000'
-				}
-				rootProject.dependencies.replaced files(archivePath)
-			}
-
 			pre.configure { mustRunAfter task.get().dependsOn.findAll { it != process } }
-			task.configure {
-				dependsOn process
-				finalizedBy post
-			}
-
-			tasks.withType(Javadoc).configureEach { Javadoc javadoc ->
-				boolean replaced = false
-				javadoc.source = javadoc.source.findAll {
-					String p = it.canonicalPath
-					boolean r = sourceSet.any { p.contains it.canonicalPath }
-					replaced |= r
-					!r
-				}
-				if (replaced)
-					javadoc.source process.get().destinationDir
-			}
+			task.configure { dependsOn process }
 		}
 	}
 }

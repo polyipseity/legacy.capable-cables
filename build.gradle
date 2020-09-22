@@ -26,13 +26,6 @@ plugins {
 	id 'com.github.johnrengelman.shadow' version '4.0.4' apply false
 }
 
-configurations {
-	replaced {
-		canBeResolved false
-		canBeConsumed false
-	}
-}
-
 allprojects {
 	ext {
 		utilitiesDir = "$rootDir${separator}gradle${separator}utilities".toString()

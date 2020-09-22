@@ -12,18 +12,21 @@ apply plugin: 'com.github.johnrengelman.shadow'
 def jar = tasks.named 'jar'
 def javadoc = tasks.named 'javadoc'
 
+jar.configure {
+	classifier 'thin'
+}
 tasks.register('deobfJar', Jar) {
 	dependsOn jar
 	from sourceSets.main.java.outputDir
 	classifier 'dev'
 }
-tasks.register('sourceJar', Jar) {
+tasks.register('sourcesJar', Jar) {
 	dependsOn jar
 	from sourceSets.main.allSource.srcDirs
-	classifier 'source'
+	classifier 'sources'
 }
 tasks.register('javadocJar', Jar) {
-	dependsOn javadoc
+	dependsOn jar
 	from javadoc.get().destinationDir
 	classifier 'javadoc'
 }
@@ -32,7 +35,6 @@ stringToStringList(artifactTaskNames).each { String taskName ->
 	def task = tasks.named taskName
 
 	task.configure {
-		exclude 'dummyThing' // COMMENT dumb dummy
 		manifest {
 			attributes([
 					'Specification-Title'     : modID,
@@ -42,7 +44,6 @@ stringToStringList(artifactTaskNames).each { String taskName ->
 					'Implementation-Vendor'   : project.group,
 					'Implementation-Version'  : version,
 			])
-			classifier 'thin'
 		}
 
 		doFirst {
