@@ -1,0 +1,108 @@
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables;
+
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.client.ProxyClient;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.IProxy;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.server.ProxyServer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.NamespaceUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.internationalization.MinecraftLocaleUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Singleton;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.ConfigurationTemplate;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.LoggingThrowableHandler;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThreadLocalThrowableHandler;
+import com.google.common.base.Suppliers;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
+import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
+import org.jetbrains.annotations.NonNls;
+
+import java.util.ResourceBundle;
+import java.util.function.Supplier;
+
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.blocks.BlocksThis.BLOCKS;
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.inventory.ContainersThis.CONTAINERS;
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items.ItemsThis.ITEMS;
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.tileentities.TileEntityTypesThis.TILE_ENTITIES;
+
+@Mod(ModConstants.MOD_ID)
+public final class ModThis
+		extends Singleton {
+	private static final Supplier<ModThis> INSTANCE = Suppliers.memoize(() -> Singleton.getSingletonInstance(ModThis.class));
+	private static final ResourceBundle RESOURCE_BUNDLE;
+
+	static {
+		ConfigurationTemplate.configureSafe(UtilitiesConfiguration.getInstance(),
+				() -> new UtilitiesConfiguration.ConfigurationData(UtilitiesConfiguration.getBootstrapLogger(),
+						new LoggingThrowableHandler<>(new ThreadLocalThrowableHandler<>(), UtilitiesConfiguration.getBootstrapLogger()),
+						MinecraftLocaleUtilities::getCurrentLocale)); // COMMENT configure as early as possible
+		ConfigurationTemplate.configureSafe(ModConfiguration.getInstance(),
+				() -> new ModConfiguration.ConfigurationData(ModConfiguration.getBootstrapLogger(),
+						new LoggingThrowableHandler<>(new ThreadLocalThrowableHandler<>(), ModConfiguration.getBootstrapLogger()),
+						MinecraftLocaleUtilities::getCurrentLocale));
+		RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(ModConfiguration.getInstance());
+	}
+
+	private final EventHandler eventHandler = Singleton.getSingletonInstance(EventHandler.class);
+	private final IProxy proxy = DistExecutor.unsafeRunForDist(
+			() -> DistLambdaHolder.Client::getProxyClient,
+			() -> DistLambdaHolder.Server::getProxyServer);
+
+	public ModThis() {
+		// COMMENT entry point
+		super(ModConfiguration.getInstance().getLogger());
+		IEventBus eventBusMod = AssertionUtilities.assertNonnull(Bus.MOD.bus().get());
+		eventBusMod.register(getEventHandler());
+		BLOCKS.register(eventBusMod);
+		ITEMS.register(eventBusMod);
+		TILE_ENTITIES.register(eventBusMod);
+		CONTAINERS.register(eventBusMod);
+	}
+
+	private EventHandler getEventHandler() { return eventHandler; }
+
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
+
+	public static ResourceLocation createResourceLocation(@NonNls String path) { return new ResourceLocation(ModConstants.MOD_ID, path); }
+
+	public static String getNamespacePrefixedString(@NonNls String separator, @NonNls String string) { return NamespaceUtilities.getNamespacePrefixedString(separator, ModConstants.MOD_ID, string); }
+
+	public IProxy getProxy() { return proxy; }
+
+	public static ModThis getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+
+	private enum DistLambdaHolder {
+		;
+
+		private enum Client {
+			;
+
+			private static IProxy getProxyClient() { return new ProxyClient(ModConfiguration.getInstance().getLogger()); }
+		}
+
+		private enum Server {
+			;
+
+			private static IProxy getProxyServer() { return new ProxyServer(ModConfiguration.getInstance().getLogger()); }
+		}
+	}
+
+	private final class EventHandler extends Singleton {
+		private EventHandler() { super(ModConfiguration.getInstance().getLogger()); }
+
+		@SubscribeEvent
+		protected void onModLifecycleEvent(ModLifecycleEvent event) {
+			if (!getProxy().onModLifecycle(event))
+				ModConfiguration.getInstance().getLogger()
+						.atInfo()
+						.addMarker(ModMarkers.getInstance().getMarkerModLifecycle())
+						.addKeyValue("event", event)
+						.log(() -> getResourceBundle().getString("event.lifecycle.unhandled"));
+		}
+	}
+}

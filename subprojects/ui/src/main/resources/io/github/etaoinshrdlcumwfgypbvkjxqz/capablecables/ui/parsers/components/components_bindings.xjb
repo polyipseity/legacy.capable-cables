@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<bindings xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:ci="http://jaxb.dev.java.net/plugin/code-injector"
+          xmlns="http://java.sun.com/xml/ns/jaxb"
+          version="1.0">
+	<bindings schemaLocation="components.xsd">
+		<!-- COMMENT sideType -->
+		<bindings node="/xs:schema/xs:simpleType[@name='sideType']">
+			<ci:code>
+				<![CDATA[
+				import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.SideType;
+				import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.EnumUISide;protected final SideType thisObj = this;
+
+					public EnumUISide toJava() {
+						return EnumUISide.valueOf(thisObj.name());
+					}
+
+					public static SideType fromJava(EnumUISide obj) {
+						return SideType.valueOf(obj.name());
+					}
+				]]>
+			</ci:code>
+		</bindings>
+	</bindings>
+	<bindings schemaLocation="components_values.xsd">
+		<!-- COMMENT color -->
+		<bindings node="/xs:schema/xs:element[@name='color']/xs:complexType">
+			<ci:code>
+				<![CDATA[
+				import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Color;protected final Color thisObj = this;
+
+					public java.awt.Color toJava() {
+						return new java.awt.Color(thisObj.getRed(), thisObj.getGreen(), thisObj.getBlue(), thisObj.getAlpha());
+					}
+
+					public static Color fromJava(java.awt.Color obj) {
+						Color ret = new Color();
+						ret.setRed((short) obj.getRed());
+						ret.setGreen((short) obj.getGreen());
+						ret.setBlue((short) obj.getBlue());
+						ret.setAlpha((short) obj.getAlpha());
+						return ret;
+					}
+				]]>
+			</ci:code>
+		</bindings>
+	</bindings>
+</bindings>

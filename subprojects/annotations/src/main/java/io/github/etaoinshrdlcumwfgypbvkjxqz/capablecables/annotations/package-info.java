@@ -1,0 +1,7 @@
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+@FieldsAreNonnullByDefault
+@LocalVariablesAreNonnullByDefault
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations;
+
+import javax.annotation.ParametersAreNonnullByDefault;
