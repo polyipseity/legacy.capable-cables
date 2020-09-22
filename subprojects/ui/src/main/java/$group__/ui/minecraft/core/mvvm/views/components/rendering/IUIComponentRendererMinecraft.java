@@ -95,6 +95,8 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUICompo
 						throw new InternalError();
 				}
 				break;
+			default:
+				throw new AssertionError();
 		}
 	}
 

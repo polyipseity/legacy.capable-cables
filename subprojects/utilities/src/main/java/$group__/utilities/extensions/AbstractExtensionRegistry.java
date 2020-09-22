@@ -14,7 +14,7 @@ public abstract class AbstractExtensionRegistry<K, V extends IExtensionType<? ex
 		extends Registry<K, V> {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 
-	protected AbstractExtensionRegistry(boolean overridable, Logger logger) { super(overridable, logger); }
+	protected AbstractExtensionRegistry(@SuppressWarnings("SameParameterValue") boolean overridable, Logger logger) { super(overridable, logger); }
 
 	public void checkExtensionRegistered(IExtension<?, ?> extension) {
 		if (!containsValue(extension.getType()))

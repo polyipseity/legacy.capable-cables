@@ -35,6 +35,7 @@ public interface ICloneable
 			}
 		}
 
+		@SuppressWarnings("SameReturnValue")
 		private static MethodHandle getCloneMethodHandle() { return CLONE_METHOD_HANDLE; }
 	}
 }

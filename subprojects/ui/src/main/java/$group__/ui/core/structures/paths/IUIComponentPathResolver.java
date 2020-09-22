@@ -14,6 +14,7 @@ public interface IUIComponentPathResolver<T extends IUIComponent> {
 	boolean addVirtualElement(T element,
 	                          T virtualElement);
 
+	@SuppressWarnings("UnusedReturnValue")
 	boolean removeVirtualElement(T element,
 	                             T virtualElement);
 

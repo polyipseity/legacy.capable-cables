@@ -43,6 +43,7 @@ public abstract class Singleton {
 				ResourceBundleHolder.getResourceBundle().getString("construct.new"), throwable);
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	private static Map<Class<?>, Map.Entry<? extends Singleton, Throwable>> getInstances() { return INSTANCES; }
 
 	@SuppressWarnings("unchecked")

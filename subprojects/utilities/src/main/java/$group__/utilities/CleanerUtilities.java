@@ -13,5 +13,6 @@ public enum CleanerUtilities {
 
 	public static Object getCleanerReferent(Object object) { return getCleanerReferentMap().getUnchecked(object); }
 
+	@SuppressWarnings("SameReturnValue")
 	private static LoadingCache<Object, Object> getCleanerReferentMap() { return CLEANER_REFERENT_MAP; }
 }

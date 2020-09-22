@@ -20,5 +20,6 @@ public enum LoggingUtilities {
 				.orElseGet(() -> getXLoggers().getUnchecked(logger));
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	private static LoadingCache<Logger, XLogger> getXLoggers() { return X_LOGGERS; }
 }

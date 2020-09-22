@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public abstract class RegistryWithDefaults<K, V>
 		extends Registry<K, V> {
-	protected RegistryWithDefaults(boolean overrideable, Logger logger) { super(overrideable, logger); }
+	protected RegistryWithDefaults(@SuppressWarnings("SameParameterValue") boolean overrideable, Logger logger) { super(overrideable, logger); }
 
 	@Override
 	public Optional<? extends RegistryObject<? extends V>> get(K key) {

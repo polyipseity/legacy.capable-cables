@@ -32,6 +32,7 @@ public abstract class CompositeDisposableCollector<DC extends Disposable & Dispo
 		private static final SetCompositeDisposableCollector INSTANCE = new SetCompositeDisposableCollector();
 		private static final ImmutableSet<Characteristics> CHARACTERISTICS = Sets.immutableEnumSet(Characteristics.IDENTITY_FINISH, Characteristics.UNORDERED);
 
+		@SuppressWarnings("SameReturnValue")
 		private static SetCompositeDisposableCollector getInstance() { return INSTANCE; }
 
 		@Override
@@ -51,6 +52,7 @@ public abstract class CompositeDisposableCollector<DC extends Disposable & Dispo
 		private static final ListCompositeDisposableCollector INSTANCE = new ListCompositeDisposableCollector();
 		private static final ImmutableSet<Characteristics> CHARACTERISTICS = Sets.immutableEnumSet(Characteristics.IDENTITY_FINISH);
 
+		@SuppressWarnings("SameReturnValue")
 		private static ListCompositeDisposableCollector getInstance() { return INSTANCE; }
 
 		@Override

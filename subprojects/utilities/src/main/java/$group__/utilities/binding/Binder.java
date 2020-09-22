@@ -18,10 +18,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 public class Binder implements IBinder {
@@ -63,10 +60,13 @@ public class Binder implements IBinder {
 							LoadingCache<INamespacePrefixedString, IBindings<?>> bs = getBindings().getUnchecked(AssertionUtilities.assertNonnull(e.getKey()));
 							return AssertionUtilities.assertNonnull(e.getValue()).asMap().entrySet().stream().sequential() // COMMENT sequential, field binding order matters
 									.reduce(false,
-											IThrowingBiFunction.execute((r2, e2) ->
-													bs.getUnchecked(AssertionUtilities.assertNonnull(e2.getKey()))
-															.add(CastUtilities.castUnchecked( // COMMENT should be of the right type
-																	AssertionUtilities.assertNonnull(e2.getValue()))) || r2),
+											IThrowingBiFunction.
+													<Boolean, Map.Entry<INamespacePrefixedString, ? extends Collection<? extends IBinding<?>>>, Boolean,
+															NoSuchBindingTransformerException>
+															execute((r2, e2) ->
+															bs.getUnchecked(AssertionUtilities.assertNonnull(e2.getKey()))
+																	.add(CastUtilities.castUnchecked( // COMMENT should be of the right type
+																			AssertionUtilities.assertNonnull(e2.getValue()))) || r2),
 											Boolean::logicalOr);
 						}),
 						Boolean::logicalOr);

@@ -131,6 +131,7 @@ public enum BindingUtilities {
 		return o -> getBindingFieldsMap().getUnchecked(clazz).apply(optionsCopy, CastUtilities.castUnchecked(o));
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	private static LoadingCache<Class<?>, BiFunction<? super Set<EnumScopeOptions>, ?, ? extends Iterable<IBindingField<?>>>> getBindingFieldsMap() { return BINDING_FIELDS_MAP; }
 
 	public static Iterable<IBindingMethod<?>> getBindingMethods(Object object, Set<EnumScopeOptions> options) { return getBindingMethodsFunction(object.getClass(), options).apply(CastUtilities.castUnchecked(object)); }
@@ -140,6 +141,7 @@ public enum BindingUtilities {
 		return o -> getBindingMethodsMap().getUnchecked(clazz).apply(optionsCopy, CastUtilities.castUnchecked(o));
 	}
 
+	@SuppressWarnings("SameReturnValue")
 	private static LoadingCache<Class<?>, BiFunction<? super Set<EnumScopeOptions>, ?, ? extends Iterable<IBindingMethod<?>>>> getBindingMethodsMap() { return BINDING_METHODS_MAP; }
 
 	public static Iterable<IHasBinding> getHasBindingsVariables(Object object) { return getHasBindingsVariablesFunction(object.getClass()).apply(CastUtilities.castUnchecked(object)); }
@@ -147,6 +149,7 @@ public enum BindingUtilities {
 	@SuppressWarnings("unchecked")
 	public static <T> Function<T, Iterable<IHasBinding>> getHasBindingsVariablesFunction(Class<T> clazz) { return (Function<T, Iterable<IHasBinding>>) getHasBindingVariablesMap().getUnchecked(clazz); }
 
+	@SuppressWarnings("SameReturnValue")
 	private static LoadingCache<Class<?>, Function<?, ? extends Iterable<IHasBinding>>> getHasBindingVariablesMap() { return HAS_BINDING_VARIABLES_MAP; }
 
 	public enum EnumScopeOptions {

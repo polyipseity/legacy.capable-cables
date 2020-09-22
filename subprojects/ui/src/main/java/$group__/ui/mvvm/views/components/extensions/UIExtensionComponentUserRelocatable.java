@@ -45,7 +45,7 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, E>
 		implements IUIExtensionComponentUserRelocatable<E> {
 	public static final int RELOCATE_BORDER_THICKNESS_DEFAULT = 10;
-	protected final int relocateBorderThickness = RELOCATE_BORDER_THICKNESS_DEFAULT; // TODO make this a property and strategy or something like that
+	private final int relocateBorderThickness = RELOCATE_BORDER_THICKNESS_DEFAULT; // TODO make this a property and strategy or something like that
 	private final Object lockObject = new Object();
 	private final VirtualComponent virtualComponent = new VirtualComponent();
 	@Nullable
