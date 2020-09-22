@@ -9,10 +9,10 @@ import java.lang.ref.WeakReference;
 import java.util.Objects;
 
 public class WeakReferenceValueIdentity<T>
-		extends WeakReference<T> {
-	public WeakReferenceValueIdentity(T referent) { super(referent); }
+		extends OptionalWeakReference<T> {
+	public WeakReferenceValueIdentity(@Nullable T referent) { super(referent); }
 
-	public WeakReferenceValueIdentity(T referent, ReferenceQueue<? super T> queue) { super(referent, queue); }
+	public WeakReferenceValueIdentity(@Nullable T referent, @Nullable ReferenceQueue<? super T> queue) { super(referent, queue); }
 
 	@Override
 	public int hashCode() { return Objects.hashCode(get()); }

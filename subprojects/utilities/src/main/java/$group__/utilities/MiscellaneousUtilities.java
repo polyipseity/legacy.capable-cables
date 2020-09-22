@@ -13,7 +13,7 @@ import static $group__.utilities.PrimitiveUtilities.PRIMITIVE_DATA_TYPE_TO_DEFAU
  * @since 0.0.1
  */
 public enum MiscellaneousUtilities {
-	/* MARK empty */;
+	;
 
 	@SuppressWarnings("unchecked")
 	public static <T> Optional<T> getDefaultValue(@Nullable Class<T> type) {

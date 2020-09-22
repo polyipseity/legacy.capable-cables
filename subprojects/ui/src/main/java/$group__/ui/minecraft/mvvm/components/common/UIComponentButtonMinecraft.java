@@ -39,10 +39,10 @@ public class UIComponentButtonMinecraft
 	@Override
 	public Optional<? extends IUIComponentRendererMinecraft<?>> getRenderer() { return getRendererContainer().getRenderer(); }
 
-	@SuppressWarnings("deprecation")
 	@Override
+	@Deprecated
 	public void setRenderer(@Nullable IUIComponentRendererMinecraft<?> renderer) {
-		StaticHolder.setRendererImpl(this, renderer,
+		IUIRendererContainer.StaticHolder.setRendererImpl(this, renderer,
 				(s, r) -> s.getRendererContainer().setRenderer(r));
 	}
 
@@ -55,17 +55,17 @@ public class UIComponentButtonMinecraft
 	public static class DefaultRenderer<C extends UIComponentButtonMinecraft>
 			extends UIComponentRendererMinecraft<C> {
 		@NonNls
-		public static final String PROPERTY_COLOR_BASE = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "button.colors.base";
+		public static final String PROPERTY_COLOR_BASE = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "button.colors.base";
 		@NonNls
-		public static final String PROPERTY_COLOR_BASE_BORDER = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "button.colors.base.border";
+		public static final String PROPERTY_COLOR_BASE_BORDER = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "button.colors.base.border";
 		@NonNls
-		public static final String PROPERTY_COLOR_HOVERING = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "button.colors.hovering";
+		public static final String PROPERTY_COLOR_HOVERING = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "button.colors.hovering";
 		@NonNls
-		public static final String PROPERTY_COLOR_HOVERING_BORDER = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "button.colors.hovering.border";
+		public static final String PROPERTY_COLOR_HOVERING_BORDER = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "button.colors.hovering.border";
 		@NonNls
-		public static final String PROPERTY_COLOR_PRESSED = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "button.colors.pressed";
+		public static final String PROPERTY_COLOR_PRESSED = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "button.colors.pressed";
 		@NonNls
-		public static final String PROPERTY_COLOR_PRESSED_BORDER = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "button.colors.pressed.border";
+		public static final String PROPERTY_COLOR_PRESSED_BORDER = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "button.colors.pressed.border";
 
 		public static final INamespacePrefixedString PROPERTY_COLOR_BASE_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_COLOR_BASE);
 		public static final INamespacePrefixedString PROPERTY_COLOR_BASE_BORDER_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_COLOR_BASE_BORDER);

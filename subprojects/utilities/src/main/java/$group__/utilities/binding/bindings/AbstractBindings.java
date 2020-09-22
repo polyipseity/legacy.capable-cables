@@ -2,8 +2,8 @@ package $group__.utilities.binding.bindings;
 
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.binding.core.BindingTransformerNotFoundException;
 import $group__.utilities.binding.core.IBinding;
+import $group__.utilities.binding.core.NoSuchBindingTransformerException;
 import $group__.utilities.binding.core.bindings.IBindings;
 import $group__.utilities.structures.INamespacePrefixedString;
 import com.google.common.cache.Cache;
@@ -26,9 +26,9 @@ public abstract class AbstractBindings<B extends IBinding<?>>
 
 	@Nullable
 	public static <T, R> R transform(Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>> transformers, @Nullable T value, Class<T> from, Class<R> to)
-			throws BindingTransformerNotFoundException {
+			throws NoSuchBindingTransformerException {
 		return getTransformer(transformers, from, to)
-				.orElseThrow(() -> new BindingTransformerNotFoundException(
+				.orElseThrow(() -> new NoSuchBindingTransformerException(
 						"Cannot find transformer for '" + from + "' -> '" + to + "' in transformers:" + System.lineSeparator()
 								+ transformers))
 				.apply(value);

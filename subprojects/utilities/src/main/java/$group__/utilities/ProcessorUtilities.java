@@ -24,15 +24,12 @@ public enum ProcessorUtilities {
 	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Class<A> annotationType, ExecutableElement executable, Elements elements, Types types) throws IllegalArgumentException {
 		A[] r = getEffectiveAnnotationsWithInheritingConsidered(annotationType, executable, elements, types);
 		if (r.length != 1)
-			throw ThrowableUtilities.logAndThrow(
-					new IllegalArgumentException(
-							new LogMessageBuilder()
-									.addMarkers(ProcessorUtilities::getClassMarker)
-									.addKeyValue("annotationType", annotationType).addKeyValue("executable", executable).addKeyValue("elements", elements).addKeyValue("types", types)
-									.addMessages(() -> getResourceBundle().getString("annotations.get.plural.fail"))
-									.build()
-					),
-					UtilitiesConfiguration.getInstance().getLogger()
+			throw new IllegalArgumentException(
+					new LogMessageBuilder()
+							.addMarkers(ProcessorUtilities::getClassMarker)
+							.addKeyValue("annotationType", annotationType).addKeyValue("executable", executable).addKeyValue("elements", elements).addKeyValue("types", types)
+							.addMessages(() -> getResourceBundle().getString("annotations.get.plural.fail"))
+							.build()
 			);
 		return r[0];
 	}

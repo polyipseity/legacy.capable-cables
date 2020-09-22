@@ -1,7 +1,7 @@
 package $group__.utilities.compile;
 
-import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.UtilitiesConfiguration;
+import $group__.utilities.throwable.ThrowableUtilities;
 
 public enum EnumBuildType {
 	DEBUG,
@@ -9,8 +9,8 @@ public enum EnumBuildType {
 	;
 
 	public static EnumBuildType valueOfSafe(String name) {
-		return ThrowableUtilities.Try.call(() ->
-				valueOf(name), UtilitiesConfiguration.INSTANCE.getLogger())
+		return ThrowableUtilities.getQuietly(() ->
+				valueOf(name), IllegalArgumentException.class, UtilitiesConfiguration.getInstance().getThrowableHandler())
 				.orElse(DEBUG); // COMMENT default value in case the string did not get replaced
 	}
 

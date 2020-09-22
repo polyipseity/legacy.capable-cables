@@ -5,7 +5,6 @@ import $group__.ui.UIMarkers;
 import $group__.ui.core.mvvm.views.events.IUIEvent;
 import $group__.utilities.LogMessageBuilder;
 import $group__.utilities.PreconditionUtilities;
-import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.structures.INamespacePrefixedString;
 import $group__.utilities.structures.Registry;
 import $group__.utilities.templates.CommonConfigurationTemplate;
@@ -15,25 +14,22 @@ import java.util.ResourceBundle;
 
 public final class UIEventRegistry extends Registry<INamespacePrefixedString, Class<? extends IUIEvent>> {
 	private static final UIEventRegistry INSTANCE = new UIEventRegistry();
-	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(.getInstance())
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
 	protected UIEventRegistry() {
 		super(false, UIConfiguration.getInstance().getLogger());
-		PreconditionUtilities.requireRunOnceOnly(UIConfiguration.getInstance().getLogger());
+		PreconditionUtilities.requireRunOnceOnly();
 	}
 
 	public static void checkEvent(IUIEvent event)
 			throws IllegalArgumentException {
 		if (!isEventValid(event))
-			throw ThrowableUtilities.logAndThrow(
-					new IllegalArgumentException(
-							new LogMessageBuilder()
-									.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)
-									.addKeyValue("event", event)
-									.addMessages(() -> getResourceBundle().getString("check.event.unregistered"))
-									.build()
-					),
-					UIConfiguration.getInstance().getLogger()
+			throw new IllegalArgumentException(
+					new LogMessageBuilder()
+							.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)
+							.addKeyValue("event", event)
+							.addMessages(() -> getResourceBundle().getString("check.event.unregistered"))
+							.build()
 			);
 	}
 

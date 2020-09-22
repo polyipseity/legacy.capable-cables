@@ -22,7 +22,7 @@ public interface IShapeDescriptor<S extends Shape> {
 			throw new IllegalStateException("Not marked as being modified");
 	}
 
-	static IShapeDescriptor<?> getShapeDescriptorPlaceholderCopy() { return new GenericShapeDescriptor(getShapePlaceholderCopy()); }
+	static IShapeDescriptor<?> getShapeDescriptorPlaceholder() { return new GenericShapeDescriptor(getShapePlaceholderCopy()); }
 
 	static Rectangle2D getShapePlaceholderCopy() { return (Rectangle2D) SHAPE_PLACEHOLDER.clone(); }
 

@@ -15,7 +15,7 @@ import java.util.Set;
 public interface IUIComponentParser<T, R>
 		extends IUIResourceParser<T, R> {
 
-	<H> void addHandler(Set<EnumHandlerType> types, Class<H> clazz, IConsumer3<? super IParserContext, ?, ? super H> handler);
+	<H> void addHandler(Set<EnumHandlerType> types, Class<H> clazz, IConsumer3<? super IParserContext, ?, ? super H, ?> handler);
 
 	@Immutable
 	enum EnumHandlerType {

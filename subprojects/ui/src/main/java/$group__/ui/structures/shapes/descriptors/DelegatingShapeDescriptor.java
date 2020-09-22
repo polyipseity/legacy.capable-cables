@@ -2,7 +2,7 @@ package $group__.ui.structures.shapes.descriptors;
 
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.core.structures.shapes.interactions.IShapeConstraint;
-import $group__.utilities.interfaces.IDelegating;
+import $group__.utilities.AbstractDelegatingObject;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -12,28 +12,28 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class DelegatingShapeDescriptor<S extends Shape>
-		extends IDelegating.Impl<IShapeDescriptor<S>>
+		extends AbstractDelegatingObject<IShapeDescriptor<S>>
 		implements IShapeDescriptor<S> {
 	public DelegatingShapeDescriptor(IShapeDescriptor<S> delegated) { super(delegated); }
 
 	@Override
-	public boolean isBeingModified() { return getDelegated().isBeingModified(); }
+	public boolean isBeingModified() { return getDelegate().isBeingModified(); }
 
 	@Override
-	public S getShapeOutput() { return getDelegated().getShapeOutput(); }
+	public S getShapeOutput() { return getDelegate().getShapeOutput(); }
 
 	@Override
-	public List<IShapeConstraint> getConstraintsView() { return getDelegated().getConstraintsView(); }
+	public List<IShapeConstraint> getConstraintsView() { return getDelegate().getConstraintsView(); }
 
 	@Override
-	public List<IShapeConstraint> getConstraintsRef() throws IllegalStateException { return getDelegated().getConstraintsRef(); }
+	public List<IShapeConstraint> getConstraintsRef() throws IllegalStateException { return getDelegate().getConstraintsRef(); }
 
 	@Override
-	public boolean modify(Supplier<? extends Boolean> action) throws ConcurrentModificationException { return getDelegated().modify(action); }
+	public boolean modify(Supplier<? extends Boolean> action) throws ConcurrentModificationException { return getDelegate().modify(action); }
 
 	@Override
-	public boolean bound(Rectangle2D bounds) throws IllegalStateException { return getDelegated().bound(bounds); }
+	public boolean bound(Rectangle2D bounds) throws IllegalStateException { return getDelegate().bound(bounds); }
 
 	@Override
-	public boolean transform(AffineTransform transform) throws IllegalStateException { return getDelegated().transform(transform); }
+	public boolean transform(AffineTransform transform) throws IllegalStateException { return getDelegate().transform(transform); }
 }

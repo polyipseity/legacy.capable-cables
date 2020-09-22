@@ -11,7 +11,6 @@ import $group__.ui.mvvm.views.events.ui.*;
 import $group__.ui.utilities.UIDataMouseButtonClick;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.LogMessageBuilder;
-import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.structures.paths.INode;
 import $group__.utilities.templates.CommonConfigurationTemplate;
 import com.google.common.collect.ImmutableList;
@@ -123,15 +122,12 @@ public enum UIEventUtilities {
 		public static IUIEventKeyboard generateSyntheticEventKeyboardOpposite(IUIEventKeyboard event) {
 			if (EnumUIEventDOMType.KEY_DOWN.getEventType().equals(event.getType()))
 				return createEventKeyUp(event.getTarget(), event.getData().recreate());
-			throw ThrowableUtilities.logAndThrow(
-					new IllegalArgumentException(
-							new LogMessageBuilder()
-									.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)
-									.addKeyValue("event", event)
-									.addMessages(() -> getResourceBundle().getString("synthetic.event.type.invalid"))
-									.build()
-					),
-					UIConfiguration.getInstance().getLogger()
+			throw new IllegalArgumentException(
+					new LogMessageBuilder()
+							.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)
+							.addKeyValue("event", event)
+							.addMessages(() -> getResourceBundle().getString("synthetic.event.type.invalid"))
+							.build()
 			);
 		}
 
@@ -175,15 +171,12 @@ public enum UIEventUtilities {
 				return createEventMouseLeave(event.getTarget(), data, event.getRelatedTarget().orElse(null));
 			else if (EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType().equals(event.getType()))
 				return createEventMouseLeaveSelf(event.getTarget(), data, event.getRelatedTarget().orElse(null));
-			throw ThrowableUtilities.logAndThrow(
-					new IllegalArgumentException(
-							new LogMessageBuilder()
-									.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)
-									.addKeyValue("event", event)
-									.addMessages(() -> getResourceBundle().getString("synthetic.event.type.invalid"))
-									.build()
-					),
-					UIConfiguration.getInstance().getLogger()
+			throw new IllegalArgumentException(
+					new LogMessageBuilder()
+							.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)
+							.addKeyValue("event", event)
+							.addMessages(() -> getResourceBundle().getString("synthetic.event.type.invalid"))
+							.build()
 			);
 		}
 

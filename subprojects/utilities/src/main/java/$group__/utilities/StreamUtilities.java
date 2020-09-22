@@ -7,7 +7,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public enum StreamUtilities {
-	/* MARK empty */;
+	;
 
 
 	// COMMENT from http://gee.cs.oswego.edu/dl/html/StreamParallelGuidance.html

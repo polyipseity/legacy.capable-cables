@@ -5,4 +5,7 @@
 	<item name='java.lang.reflect.Method T getAnnotation(java.lang.Class&lt;T&gt;)'>
 		<annotation name='javax.annotation.Nullable'/>
 	</item>
+	<item name='java.lang.reflect.Method java.lang.String getName()'>
+		<annotation name='org.jetbrains.annotations.NonNls'/>
+	</item>
 </root>

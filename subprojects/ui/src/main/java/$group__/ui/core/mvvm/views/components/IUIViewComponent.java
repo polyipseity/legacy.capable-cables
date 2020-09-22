@@ -8,11 +8,11 @@ import $group__.ui.core.structures.IUIComponentContext;
 import $group__.ui.core.structures.paths.IUIComponentPathResolver;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.LogMessageBuilder;
-import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.TreeUtilities;
 import $group__.utilities.binding.core.traits.IHasBinding;
 import $group__.utilities.functions.FunctionUtilities;
 import $group__.utilities.functions.IConsumer3;
+import $group__.utilities.functions.IThrowingBiFunction;
 import $group__.utilities.templates.CommonConfigurationTemplate;
 import com.google.common.collect.ImmutableList;
 
@@ -42,23 +42,18 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 		;
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
-		public static void traverseComponentTreeDefault(IUIComponentContext context, IUIComponent root, BiConsumer<? super IUIComponentContext, ? super IUIComponent> pre, IConsumer3<? super IUIComponentContext, ? super IUIComponent, ? super Iterable<? super IUIComponent>> post) { traverseComponentTreeDefault(context, root, pre, post, FunctionUtilities.alwaysTruePredicate()); }
-
-		public static IUIComponent getComponentByID(IUIViewComponent<?, ?> view, String id) {
-			return findComponentByID(view, id)
-					.orElseThrow(() ->
-							ThrowableUtilities.logAndThrow(
-									new IllegalArgumentException(
-											new LogMessageBuilder()
-													.addMarkers(UIMarkers.getInstance()::getMarkerUIView, UIMarkers.getInstance()::getMarkerUIComponent)
-													.addKeyValue("view", view).addKeyValue("id", id)
-													.addMessages(() -> getResourceBundle().getString("component.get.id.fail"))
-													.build()
-									)
-									, UIConfiguration.getInstance().getLogger()));
+		public static <T extends Throwable> void traverseComponentTreeDefault(IUIComponentContext context,
+		                                                                      IUIComponent root,
+		                                                                      BiConsumer<? super IUIComponentContext, ? super IUIComponent> pre,
+		                                                                      IConsumer3<? super IUIComponentContext, ? super IUIComponent, ? super Iterable<? super IUIComponent>, ? extends T> post) throws T {
+			traverseComponentTreeDefault(context, root, pre, post, FunctionUtilities.alwaysTruePredicate());
 		}
 
-		public static void traverseComponentTreeDefault(IUIComponentContext context, IUIComponent root, BiConsumer<? super IUIComponentContext, ? super IUIComponent> pre, IConsumer3<? super IUIComponentContext, ? super IUIComponent, ? super Iterable<? super IUIComponent>> post, Predicate<? super IUIComponent> predicate) {
+		public static <T extends Throwable> void traverseComponentTreeDefault(IUIComponentContext context,
+		                                                                      IUIComponent root,
+		                                                                      BiConsumer<? super IUIComponentContext, ? super IUIComponent> pre,
+		                                                                      IConsumer3<? super IUIComponentContext, ? super IUIComponent, ? super Iterable<? super IUIComponent>, ? extends T> post,
+		                                                                      Predicate<? super IUIComponent> predicate) throws T {
 			TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, root,
 					component -> {
 						if (predicate.test(component)) {
@@ -71,14 +66,26 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 							.filter(predicate)
 							.map(IUIComponentContainer::getChildrenView)
 							.orElseGet(ImmutableList::of),
-					(parent, children) -> {
+					IThrowingBiFunction.execute((parent, children) -> {
 						if (predicate.test(parent)) {
 							post.accept(context, parent, children);
 							context.pop();
 						}
 						return parent;
-					},
+					}),
 					repeated -> { throw new AssertionError(); });
+		}
+
+		public static IUIComponent getComponentByID(IUIViewComponent<?, ?> view, String id) {
+			return findComponentByID(view, id)
+					.orElseThrow(() ->
+							new IllegalArgumentException(
+									new LogMessageBuilder()
+											.addMarkers(UIMarkers.getInstance()::getMarkerUIView, UIMarkers.getInstance()::getMarkerUIComponent)
+											.addKeyValue("view", view).addKeyValue("id", id)
+											.addMessages(() -> getResourceBundle().getString("component.get.id.fail"))
+											.build()
+							));
 		}
 
 		public static Optional<IUIComponent> findComponentByID(IUIViewComponent<?, ?> view, String id) {

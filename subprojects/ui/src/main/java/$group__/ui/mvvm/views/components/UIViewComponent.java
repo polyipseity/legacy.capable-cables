@@ -6,8 +6,7 @@ import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.components.IUIComponentShapeAnchorController;
 import $group__.ui.core.mvvm.views.components.IUIViewComponent;
-import $group__.ui.core.mvvm.views.components.extensions.caches.IUIExtensionCache;
-import $group__.ui.core.mvvm.views.components.extensions.caches.IUIExtensionCacheType;
+import $group__.ui.core.mvvm.views.components.extensions.caches.IUICacheType;
 import $group__.ui.core.mvvm.views.components.extensions.caches.UICacheRegistry;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.ui.core.parsers.components.UIViewComponentConstructor;
@@ -16,27 +15,28 @@ import $group__.ui.core.structures.paths.IUIComponentPathResolver;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.mvvm.views.UIView;
-import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
-import $group__.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
+import $group__.ui.mvvm.views.components.extensions.caches.AbstractUICacheType;
+import $group__.ui.mvvm.views.components.extensions.caches.UICacheExtension;
+import $group__.ui.mvvm.views.events.bus.UIComponentHierarchyChangedBusEvent;
 import $group__.ui.structures.ArrayAffineTransformStack;
 import $group__.ui.structures.DefaultUIComponentContext;
 import $group__.ui.structures.paths.DefaultUIComponentPathResolver;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.ThrowableUtilities;
+import $group__.utilities.CleanerUtilities;
 import $group__.utilities.TreeUtilities;
 import $group__.utilities.binding.core.IBinderAction;
 import $group__.utilities.binding.core.fields.IBindingField;
 import $group__.utilities.binding.core.methods.IBindingMethod;
 import $group__.utilities.binding.core.traits.IHasBinding;
 import $group__.utilities.collections.MapUtilities;
-import $group__.utilities.events.EnumEventHookStage;
-import $group__.utilities.events.EventBusUtilities;
-import $group__.utilities.extensions.IExtensionContainer;
+import $group__.utilities.events.*;
+import $group__.utilities.extensions.core.IExtensionContainer;
 import $group__.utilities.functions.FunctionUtilities;
 import $group__.utilities.functions.IConsumer3;
 import $group__.utilities.minecraft.client.GLUtilities;
-import $group__.utilities.reactive.DisposableObserverAuto;
+import $group__.utilities.reactive.LoggingDisposableObserver;
+import $group__.utilities.references.OptionalWeakReference;
 import $group__.utilities.structures.INamespacePrefixedString;
 import $group__.utilities.structures.ImmutableNamespacePrefixedString;
 import $group__.utilities.structures.Registry;
@@ -44,27 +44,24 @@ import $group__.utilities.structures.paths.FunctionalPath;
 import com.google.common.collect.*;
 import io.reactivex.rxjava3.core.ObservableSource;
 import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.NonNls;
+import sun.misc.Cleaner;
 
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		extends UIView<S>
 		implements IUIViewComponent<S, M> {
-	protected final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
-	protected final IUIComponentPathResolver<IUIComponent> pathResolver = new DefaultUIComponentPathResolver();
-	protected final IUIComponentShapeAnchorController shapeAnchorController = new DefaultUIComponentShapeAnchorController();
+	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
+	private final IUIComponentPathResolver<IUIComponent> pathResolver = new DefaultUIComponentPathResolver();
+	private final IUIComponentShapeAnchorController shapeAnchorController = new DefaultUIComponentShapeAnchorController();
 	@Nullable
-	protected M manager;
+	private M manager;
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	@UIViewComponentConstructor(type = UIViewComponentConstructor.EnumConstructorType.MAPPINGS)
@@ -72,7 +69,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		this.mappings = MapUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
 
-		IExtensionContainer.StaticHolder.addExtensionChecked(this, new UIExtensionCache());
+		IExtensionContainer.StaticHolder.addExtensionChecked(this, new UICacheExtension());
 	}
 
 	@Override
@@ -103,13 +100,13 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	public void setManager(@Nullable M manager) {
 		getManager().ifPresent(previousManager -> EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(),
 				() -> previousManager.setView(null),
-				new EventUIComponentHierarchyChanged.View(EnumEventHookStage.PRE, previousManager, this, null),
-				new EventUIComponentHierarchyChanged.View(EnumEventHookStage.POST, previousManager, this, null)));
+				new UIComponentHierarchyChangedBusEvent.View(EnumHookStage.PRE, previousManager, this, null),
+				new UIComponentHierarchyChangedBusEvent.View(EnumHookStage.POST, previousManager, this, null)));
 		this.manager = manager;
 		Optional.ofNullable(manager).ifPresent(nextManager -> EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(),
 				() -> nextManager.setView(this),
-				new EventUIComponentHierarchyChanged.View(EnumEventHookStage.PRE, nextManager, this, null),
-				new EventUIComponentHierarchyChanged.View(EnumEventHookStage.POST, nextManager, this, null)));
+				new UIComponentHierarchyChangedBusEvent.View(EnumHookStage.PRE, nextManager, this, null),
+				new UIComponentHierarchyChangedBusEvent.View(EnumHookStage.POST, nextManager, this, null)));
 	}
 
 	@Override
@@ -172,19 +169,21 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 				.isPresent();
 	}
 
+	@SuppressWarnings("RedundantTypeArguments")
 	@Override
 	public void initialize() {
 		getManager().ifPresent(manager ->
-				StaticHolder.traverseComponentTreeDefault(createContext(),
+				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createContext(),
 						manager,
 						(context, component) -> component.initialize(context),
 						IConsumer3.StaticHolder.empty()));
 	}
 
+	@SuppressWarnings("RedundantTypeArguments")
 	@Override
 	public void removed() {
 		getManager().ifPresent(manager ->
-				StaticHolder.traverseComponentTreeDefault(createContext(),
+				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createContext(),
 						manager,
 						(context, component) -> component.removed(context),
 						IConsumer3.StaticHolder.empty()));
@@ -199,110 +198,99 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	public enum CacheViewComponent {
 		;
 
-		@SuppressWarnings("UnstableApiUsage")
-		public static final Registry.RegistryObject<IUIExtensionCacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
+		@SuppressWarnings("ThisEscapedInObjectConstruction")
+		public static final Registry.RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
 				UICacheRegistry.getInstance().registerApply(generateKey("children_flat"),
-						k -> new IUIExtensionCacheType.Impl<>(k,
-								(type, instance) -> IUIExtensionCache.TYPE.getValue().get(instance).flatMap(cache -> ThrowableUtilities.Try.call(() -> {
-									@SuppressWarnings("unchecked") @Nullable List<WeakReference<IUIComponent>> cv =
-											(java.util.List<WeakReference<IUIComponent>>) cache.getDelegated().getIfPresent(type.getKey());
-									List<IUIComponent> ret;
-									if (cv == null) {
-										ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
-										instance.getManager()
-												.ifPresent(manager ->
-														TreeUtilities.<IUIComponent, Object>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, manager,
-																ret::add,
-																IUIComponent::getChildNodes, null, null));
-										cache.getDelegated().put(type.getKey(),
-												ret.stream().sequential()
-														.map(WeakReference::new)
-														.collect(Collectors.toCollection(LinkedList::new)));
-									} else {
-										cv.removeIf(wr ->
-												wr.get() == null);
-										ret = cv.stream().sequential()
-												.map(Reference::get)
-												.filter(Objects::nonNull)
-												.collect(ImmutableList.toImmutableList());
-									}
-									return ret;
-								}, UIConfiguration.INSTANCE.getLogger())),
-								(t, i) -> IUIExtensionCacheType.invalidateImpl(i, t.getKey()),
-								type -> ImmutableList.of(
-										new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
-											@Override
-											@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-											public void onNext(EventUIComponentHierarchyChanged.Parent event) {
-												if (event.getStage().isPost())
-													CastUtilities.castChecked(IUIComponentManager.class, event.getComponent())
-															.flatMap(IUIComponent::getManager)
-															.flatMap(IUIComponentManager::getView)
-															.ifPresent(type::invalidate);
-											}
-										},
-										new DisposableObserverAuto<EventUIComponentHierarchyChanged.View>() {
-											@Override
-											@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-											public void onNext(EventUIComponentHierarchyChanged.View event) {
-												if (event.getStage().isPost())
-													CastUtilities.castChecked(IUIComponentManager.class, event.getComponent())
-															.flatMap(IUIComponent::getManager)
-															.flatMap(IUIComponentManager::getView)
-															.ifPresent(type::invalidate);
-											}
-										})));
-		@SuppressWarnings("UnstableApiUsage")
-		public static final Registry.RegistryObject<IUIExtensionCacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
-				UICacheRegistry.getInstance().registerApply(generateKey("children_flat.focusable"),
-						k -> new IUIExtensionCacheType.Impl<>(k,
-								(t, i) -> IUIExtensionCache.TYPE.getValue().get(i).flatMap(cache -> ThrowableUtilities.Try.call(() -> {
-									@SuppressWarnings("unchecked") @Nullable java.util.List<WeakReference<IUIComponent>> cv =
-											(java.util.List<WeakReference<IUIComponent>>) cache.getDelegated().getIfPresent(t.getKey());
-									List<IUIComponent> ret;
-									if (cv == null) {
-										ret = i.getChildrenFlatView().stream().sequential()
-												.filter(IUIComponent::isFocusable)
-												.collect(ImmutableList.toImmutableList());
-										cache.getDelegated().put(t.getKey(),
-												ret.stream().sequential()
-														.map(WeakReference::new)
-														.collect(Collectors.toCollection(LinkedList::new)));
-									} else {
-										cv.removeIf(wr ->
-												wr.get() == null);
-										ret = cv.stream().sequential()
-												.map(Reference::get)
-												.filter(Objects::nonNull)
-												.collect(ImmutableList.toImmutableList());
-									}
-									return ret;
-								}, UIConfiguration.INSTANCE.getLogger())),
-								(t, i) -> IUIExtensionCacheType.invalidateImpl(i, t.getKey()),
-								type -> ImmutableList.of(
-										new DisposableObserverAuto<EventUIComponentHierarchyChanged.Parent>() {
-											@Override
-											@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-											public void onNext(EventUIComponentHierarchyChanged.Parent event) {
-												if (event.getStage().isPost())
-													CastUtilities.castChecked(IUIComponentManager.class, event.getComponent())
-															.flatMap(IUIComponent::getManager)
-															.flatMap(IUIComponentManager::getView)
-															.ifPresent(type::invalidate);
-											}
-										},
-										new DisposableObserverAuto<EventUIComponentHierarchyChanged.View>() {
-											@Override
-											@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-											public void onNext(EventUIComponentHierarchyChanged.View event) {
-												if (event.getStage().isPost())
-													CastUtilities.castChecked(IUIComponentManager.class, event.getComponent())
-															.flatMap(IUIComponent::getManager)
-															.flatMap(IUIComponentManager::getView)
-															.ifPresent(type::invalidate);
-											}
-										})));
+						key -> new AbstractUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
+							{
+								OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
+										new OptionalWeakReference<>(this);
+								Cleaner.create(CleanerUtilities.getCleanerReferent(this),
+										new AutoSubscribingCompositeDisposable<>(
+												UIEventBusEntryPoint.getEventBus(),
+												new LoggingDisposableObserver<>(
+														new FunctionalEventBusDisposableObserver<UIComponentHierarchyChangedBusEvent.Parent>(
+																new SubscribeEventObject(EventPriority.LOWEST, true),
+																event -> {
+																	if (event.getStage().isPost())
+																		thisRef.getOptional()
+																				.ifPresent(t -> event.getComponent().getManager()
+																						.flatMap(IUIComponentManager::getView)
+																						.ifPresent(view -> t.invalidate(view)));
+																}),
+														UIConfiguration.getInstance().getLogger()
+												),
+												new LoggingDisposableObserver<>(
+														new FunctionalEventBusDisposableObserver<UIComponentHierarchyChangedBusEvent.View>(
+																new SubscribeEventObject(EventPriority.LOWEST, true),
+																event -> {
+																	if (event.getStage().isPost())
+																		thisRef.getOptional()
+																				.ifPresent(t -> event.getComponent().getManager()
+																						.flatMap(IUIComponentManager::getView)
+																						.ifPresent(view -> t.invalidate(view)));
+																}),
+														UIConfiguration.getInstance().getLogger()
+												)
+										)::dispose);
+							}
 
-		private static INamespacePrefixedString generateKey(@SuppressWarnings("SameParameterValue") @NonNls String name) { return new ImmutableNamespacePrefixedString(INamespacePrefixedString.StaticHolder.getDefaultNamespace(), CacheViewComponent.class.getName() + '.' + name); /* TODO extract this method */ }
+							@Override
+							protected List<IUIComponent> load(IUIViewComponent<?, ?> container) {
+								List<IUIComponent> ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
+								container.getManager()
+										.ifPresent(manager ->
+												TreeUtilities.<IUIComponent, Object>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, manager,
+														ret::add,
+														IUIComponent::getChildNodes, null, null));
+								return ImmutableList.copyOf(ret);
+							}
+						});
+		@SuppressWarnings({"UnstableApiUsage", "ThisEscapedInObjectConstruction"})
+		public static final Registry.RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
+				UICacheRegistry.getInstance().registerApply(generateKey("children_flat.focusable"),
+						key -> new AbstractUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
+							{
+								OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
+										new OptionalWeakReference<>(this);
+								Cleaner.create(CleanerUtilities.getCleanerReferent(this),
+										new AutoSubscribingCompositeDisposable<>(
+												UIEventBusEntryPoint.getEventBus(),
+												new LoggingDisposableObserver<>(
+														new FunctionalEventBusDisposableObserver<UIComponentHierarchyChangedBusEvent.Parent>(
+																new SubscribeEventObject(EventPriority.LOWEST, true),
+																event -> {
+																	if (event.getStage().isPost())
+																		thisRef.getOptional()
+																				.ifPresent(t -> event.getComponent().getManager()
+																						.flatMap(IUIComponentManager::getView)
+																						.ifPresent(view -> t.invalidate(view)));
+																}),
+														UIConfiguration.getInstance().getLogger()
+												),
+												new LoggingDisposableObserver<>(
+														new FunctionalEventBusDisposableObserver<UIComponentHierarchyChangedBusEvent.View>(
+																new SubscribeEventObject(EventPriority.LOWEST, true),
+																event -> {
+																	if (event.getStage().isPost())
+																		thisRef.getOptional()
+																				.ifPresent(t -> event.getComponent().getManager()
+																						.flatMap(IUIComponentManager::getView)
+																						.ifPresent(view -> t.invalidate(view)));
+																}),
+														UIConfiguration.getInstance().getLogger()
+												)
+										)::dispose);
+							}
+
+							@Override
+							protected List<IUIComponent> load(IUIViewComponent<?, ?> container) {
+								return container.getChildrenFlatView().stream().sequential()
+										.filter(IUIComponent::isFocusable)
+										.collect(ImmutableList.toImmutableList());
+							}
+						});
+
+		private static INamespacePrefixedString generateKey(@SuppressWarnings("SameParameterValue") @NonNls String name) { return new ImmutableNamespacePrefixedString(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, CacheViewComponent.class.getName() + '.' + name); /* TODO extract this method */ }
 	}
 }

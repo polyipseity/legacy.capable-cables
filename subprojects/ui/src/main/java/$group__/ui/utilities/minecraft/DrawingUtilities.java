@@ -68,7 +68,7 @@ public enum DrawingUtilities {
 		Rectangle2D r = (Rectangle2D) rectangle.clone();
 		transformRectangle(rectangle, transform);
 		Rectangle rF = UIObjectUtilities.getRectangleExpanded(r);
-		UIScreenUtility.INSTANCE
+		UIScreenUtility.getInstance()
 				.setBlitOffset_(z)
 				.fillGradient((int) rF.getX(), (int) rF.getY(), (int) rF.getMaxX(), (int) rF.getMaxY(), colorTop, colorBottom);
 	}
@@ -80,7 +80,7 @@ public enum DrawingUtilities {
 		Point2D xy = (Point2D) p.clone();
 		transformPoint(xy, transform);
 		Point xyF = UIObjectUtilities.getPointFloor(xy);
-		UIScreenUtility.INSTANCE
+		UIScreenUtility.getInstance()
 				.drawCenteredString(font, string, (int) xyF.getX(), (int) xyF.getY(), color);
 	}
 
@@ -91,7 +91,7 @@ public enum DrawingUtilities {
 		Point2D xy = (Point2D) p.clone();
 		transformPoint(xy, transform);
 		Point xyF = UIObjectUtilities.getPointFloor(xy);
-		UIScreenUtility.INSTANCE
+		UIScreenUtility.getInstance()
 				.drawRightAlignedString(font, string, (int) xyF.getX(), (int) xyF.getY(), color);
 	}
 
@@ -102,7 +102,7 @@ public enum DrawingUtilities {
 		Point2D xy = (Point2D) p.clone();
 		transformPoint(xy, transform);
 		Point xyF = UIObjectUtilities.getPointFloor(xy);
-		UIScreenUtility.INSTANCE
+		UIScreenUtility.getInstance()
 				.drawString(font, string, (int) xyF.getX(), (int) xyF.getY(), color);
 	}
 

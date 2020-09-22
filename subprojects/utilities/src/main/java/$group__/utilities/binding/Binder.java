@@ -3,12 +3,13 @@ package $group__.utilities.binding;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.binding.core.BindingTransformerNotFoundException;
 import $group__.utilities.binding.core.IBinder;
 import $group__.utilities.binding.core.IBinding;
+import $group__.utilities.binding.core.NoSuchBindingTransformerException;
 import $group__.utilities.binding.core.bindings.IBindings;
 import $group__.utilities.collections.CacheUtilities;
 import $group__.utilities.collections.ManualLoadingCache;
+import $group__.utilities.functions.IThrowingBiFunction;
 import $group__.utilities.structures.INamespacePrefixedString;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -54,18 +55,20 @@ public class Binder implements IBinder {
 	protected LoadingCache<IBinding.EnumBindingType, LoadingCache<Class<?>, Cache<Class<?>, Function<?, ?>>>> getTransformers() { return transformers; }
 
 	@Override
-	public boolean bind(Iterable<? extends IBinding<?>> bindings) throws BindingTransformerNotFoundException {
+	public boolean bind(Iterable<? extends IBinding<?>> bindings)
+			throws NoSuchBindingTransformerException {
 		return sortAndTrimBindings(bindings).entrySet().stream().unordered()
 				.reduce(false,
-						(r, e) -> {
+						IThrowingBiFunction.execute((r, e) -> {
 							LoadingCache<INamespacePrefixedString, IBindings<?>> bs = getBindings().getUnchecked(AssertionUtilities.assertNonnull(e.getKey()));
 							return AssertionUtilities.assertNonnull(e.getValue()).asMap().entrySet().stream().sequential() // COMMENT sequential, field binding order matters
 									.reduce(false,
-											(r2, e2) -> bs.getUnchecked(AssertionUtilities.assertNonnull(e2.getKey()))
-													.add(CastUtilities.castUnchecked( // COMMENT should be of the right type
-															AssertionUtilities.assertNonnull(e2.getValue()))) || r2,
+											IThrowingBiFunction.execute((r2, e2) ->
+													bs.getUnchecked(AssertionUtilities.assertNonnull(e2.getKey()))
+															.add(CastUtilities.castUnchecked( // COMMENT should be of the right type
+																	AssertionUtilities.assertNonnull(e2.getValue()))) || r2),
 											Boolean::logicalOr);
-						},
+						}),
 						Boolean::logicalOr);
 	}
 

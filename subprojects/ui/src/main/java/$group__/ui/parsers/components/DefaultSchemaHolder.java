@@ -3,14 +3,17 @@ package $group__.ui.parsers.components;
 import $group__.ui.UIConfiguration;
 import $group__.ui.UIConstants;
 import $group__.utilities.AssertionUtilities;
-import $group__.utilities.ThrowableUtilities;
+import $group__.utilities.throwable.ThrowableUtilities;
 import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import org.jetbrains.annotations.NonNls;
+import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import java.io.IOException;
 import java.io.InputStream;
 
 public enum DefaultSchemaHolder {
@@ -26,14 +29,19 @@ public enum DefaultSchemaHolder {
 	private static final JAXBContext CONTEXT;
 
 	static {
-		SCHEMA = ThrowableUtilities.Try.call(() -> {
-			try (InputStream res = AssertionUtilities.assertNonnull(DefaultSchemaHolder.class.getResourceAsStream(getSchemaLocation()))) {
-				return SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new StreamSource(res));
-			}
-		}, UIConfiguration.getInstance().getLogger())
-				.orElseThrow(ThrowableUtilities.ThrowableCatcher::rethrow);
-		CONTEXT = ThrowableUtilities.Try.call(() ->
-				JAXBContext.newInstance(getContextPath(), DefaultUIComponentParser.class.getClassLoader()), UIConfiguration.getInstance().getLogger()).orElseThrow(ThrowableUtilities.ThrowableCatcher::rethrow);
+		InputStream res = AssertionUtilities.assertNonnull(DefaultSchemaHolder.class.getResourceAsStream(getSchemaLocation()));
+		try {
+			SCHEMA = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new StreamSource(res));
+		} catch (SAXException e) {
+			throw ThrowableUtilities.propagate(e);
+		} finally {
+			ThrowableUtilities.runQuietly(res::close, IOException.class, UIConfiguration.getInstance().getThrowableHandler());
+		}
+		try {
+			CONTEXT = JAXBContext.newInstance(getContextPath(), DefaultUIComponentParser.class.getClassLoader());
+		} catch (JAXBException e) {
+			throw ThrowableUtilities.propagate(e);
+		}
 	}
 
 	public static String getContextPath() { return CONTEXT_PATH; }

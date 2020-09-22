@@ -87,13 +87,13 @@ public enum GLUtilities {
 		public static void pop(@NonNls String name) {
 			@Nullable Deque<GLCall> s = STACKS.getIfPresent(name);
 			if (s == null)
-				throw ThrowableUtilities.logAndThrow(new NoSuchElementException(
+				throw new NoSuchElementException(
 						new LogMessageBuilder()
 								.addMarkers(UtilitiesMarkers.getInstance()::getMarkerOpenGL)
 								.addKeyValue("name", name)
 								.addMessages(() -> getResourceBundle().getString("pop.empty"))
 								.build()
-				), UtilitiesConfiguration.getInstance().getLogger());
+				);
 			Runnable fb = s.pop().getFallback();
 			(s.isEmpty() ? fb : AssertionUtilities.assertNonnull(s.element())).run();
 			STACKS.cleanUp();

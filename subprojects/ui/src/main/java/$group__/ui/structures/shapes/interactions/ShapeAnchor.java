@@ -5,27 +5,27 @@ import $group__.ui.core.structures.shapes.interactions.IShapeAnchorSet;
 import $group__.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
 import $group__.ui.structures.EnumUISide;
 import $group__.utilities.ObjectUtilities;
+import $group__.utilities.references.OptionalWeakReference;
 import com.google.common.collect.Sets;
 import sun.misc.Cleaner;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import java.awt.geom.Rectangle2D;
-import java.lang.ref.WeakReference;
 import java.util.ConcurrentModificationException;
 import java.util.Optional;
 
 @Immutable
 public final class ShapeAnchor implements IShapeAnchor {
-	protected final WeakReference<IShapeDescriptorProvider> target;
+	protected final OptionalWeakReference<IShapeDescriptorProvider> target;
 	protected final EnumUISide originSide, targetSide;
 	protected final double borderThickness;
-	protected WeakReference<IShapeAnchorSet> container = new WeakReference<>(null);
+	protected OptionalWeakReference<IShapeAnchorSet> container = new OptionalWeakReference<>(null);
 
 	public ShapeAnchor(IShapeDescriptorProvider target, EnumUISide originSide, EnumUISide targetSide) { this(target, originSide, targetSide, 0); }
 
 	public ShapeAnchor(IShapeDescriptorProvider target, EnumUISide originSide, EnumUISide targetSide, double borderThickness) {
-		this.target = new WeakReference<>(target);
+		this.target = new OptionalWeakReference<>(target);
 		this.originSide = originSide;
 		this.targetSide = targetSide;
 		this.borderThickness = borderThickness;
@@ -35,15 +35,15 @@ public final class ShapeAnchor implements IShapeAnchor {
 	}
 
 	@Override
-	public Optional<? extends IShapeAnchorSet> getContainer() { return Optional.ofNullable(container.get()); }
+	public Optional<? extends IShapeDescriptorProvider> getTarget() { return target.getOptional(); }
 
-	protected void setContainer(@Nullable IShapeAnchorSet container) { this.container = new WeakReference<>(container); }
+	@Override
+	public Optional<? extends IShapeAnchorSet> getContainer() { return container.getOptional(); }
 
 	@Override
 	public double getBorderThickness() { return borderThickness; }
 
-	@Override
-	public Optional<? extends IShapeDescriptorProvider> getTarget() { return Optional.ofNullable(target.get()); }
+	protected void setContainer(@Nullable IShapeAnchorSet container) { this.container = new OptionalWeakReference<>(container); }
 
 	@Override
 	public EnumUISide getOriginSide() { return originSide; }

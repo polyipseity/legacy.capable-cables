@@ -5,7 +5,10 @@ import $group__.ui.UIMarkers;
 import $group__.ui.core.mvvm.views.events.IUIEvent;
 import $group__.ui.core.mvvm.views.events.IUIEventListener;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
-import $group__.utilities.*;
+import $group__.utilities.CapacityUtilities;
+import $group__.utilities.CastUtilities;
+import $group__.utilities.LogMessageBuilder;
+import $group__.utilities.ObjectUtilities;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.functions.FunctionUtilities;
 import $group__.utilities.structures.INamespacePrefixedString;
@@ -47,15 +50,12 @@ public class UIEventTarget
 				shouldHandle = l -> !l.isUseCapture();
 				break;
 			default:
-				throw ThrowableUtilities.logAndThrow(
-						new IllegalArgumentException(
-								new LogMessageBuilder()
-										.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)
-										.addKeyValue("event", event)
-										.addMessages(() -> getResourceBundle().getString("dispatch.phase.invalid"))
-										.build()
-						),
-						UIConfiguration.getInstance().getLogger()
+				throw new IllegalArgumentException(
+						new LogMessageBuilder()
+								.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)
+								.addKeyValue("event", event)
+								.addMessages(() -> getResourceBundle().getString("dispatch.phase.invalid"))
+								.build()
 				);
 		}
 

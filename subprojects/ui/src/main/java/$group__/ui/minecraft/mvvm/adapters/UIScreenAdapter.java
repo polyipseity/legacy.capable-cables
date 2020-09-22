@@ -12,7 +12,7 @@ import $group__.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
 import $group__.ui.minecraft.core.mvvm.extensions.IUIExtensionContainerProvider;
 import $group__.ui.minecraft.core.mvvm.extensions.IUIExtensionScreenProvider;
 import $group__.ui.structures.Dimension2DDouble;
-import $group__.ui.structures.Point2DImmutable;
+import $group__.ui.structures.ImmutablePoint2D;
 import $group__.ui.utilities.InputUtilities;
 import $group__.ui.utilities.UIDataKeyboardKeyPress;
 import $group__.ui.utilities.UIDataMouseButtonClick;
@@ -24,12 +24,15 @@ import $group__.ui.utilities.minecraft.UIBackgrounds;
 import $group__.utilities.AffineTransformUtilities;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CastUtilities;
+import $group__.utilities.binding.core.NoSuchBindingTransformerException;
 import $group__.utilities.collections.MapUtilities;
-import $group__.utilities.extensions.IExtensionContainer;
+import $group__.utilities.extensions.core.IExtensionContainer;
+import $group__.utilities.extensions.core.IExtensionType;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.minecraft.client.GLUtilities;
 import $group__.utilities.structures.INamespacePrefixedString;
 import $group__.utilities.structures.paths.INode;
+import $group__.utilities.throwable.ThrowableUtilities;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -98,9 +101,9 @@ public class UIScreenAdapter
 	@Override
 	@Deprecated
 	public void render(int mouseX, int mouseY, float partialTicks) {
-		Point2D cp = new Point2DImmutable(mouseX, mouseY);
+		Point2D cp = new ImmutablePoint2D(mouseX, mouseY);
 		getInfrastructure().getView().render(cp, partialTicks);
-		IUIExtensionCursorHandleProvider.TYPE.getValue().get(getInfrastructure().getView()).ifPresent(ext ->
+		IUIExtensionCursorHandleProvider.TYPE.getValue().find(getInfrastructure().getView()).ifPresent(ext ->
 				GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), ext.getCursorHandle(cp).map(CastUtilities::<Long>upcast).orElse(MemoryUtil.NULL)));
 	}
 
@@ -191,7 +194,11 @@ public class UIScreenAdapter
 	@Override
 	@Deprecated
 	protected void init() {
-		IUIInfrastructure.StaticHolder.bindSafe(getInfrastructure());
+		try {
+			IUIInfrastructure.StaticHolder.bindSafe(getInfrastructure());
+		} catch (NoSuchBindingTransformerException e) {
+			throw ThrowableUtilities.propagate(e);
+		}
 		setSize(width, height);
 		getInfrastructure().initialize();
 	}
@@ -213,7 +220,7 @@ public class UIScreenAdapter
 	@Override
 	@Deprecated
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		Point2D cp = new Point2DImmutable(mouseX, mouseY);
+		Point2D cp = new ImmutablePoint2D(mouseX, mouseY);
 		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
 		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(cp);
 		if (UIEventUtilities.dispatchEvent(addEventMouse(this, UIEventUtilities.Factory.createEventMouseDown(t, d)))) {
@@ -228,7 +235,7 @@ public class UIScreenAdapter
 	@Deprecated
 	public boolean mouseReleased(double mouseX, double mouseY, int button) {
 		// TODO test if release works when multiple buttons are clicked
-		Point2D cp = new Point2DImmutable(mouseX, mouseY);
+		Point2D cp = new ImmutablePoint2D(mouseX, mouseY);
 		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
 		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(cp);
 		removeEventMouse(this, button).ifPresent(e -> {
@@ -281,7 +288,7 @@ public class UIScreenAdapter
 	@Override
 	@Deprecated
 	public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-		Point2D cp = new Point2DImmutable(mouseX, mouseY);
+		Point2D cp = new ImmutablePoint2D(mouseX, mouseY);
 		IUIEventTarget target = getInfrastructure().getView().getTargetAtPoint(cp);
 		UIEventUtilities.dispatchEvent(
 				UIEventUtilities.Factory.createEventWheel(false, target, new UIDataMouseButtonClick(cp), target, delta)); // COMMENT nothing to be scrolled
@@ -368,22 +375,14 @@ public class UIScreenAdapter
 				.orElseThrow(UnsupportedOperationException::new);
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	public static class UIExtensionContainer
-			extends IHasGenericClass.Impl<IUIInfrastructure<?, ?, ?>>
-			implements IUIExtensionContainerProvider {
-		protected final Container container;
-
-		public UIExtensionContainer(Container container) {
-			super(CastUtilities.castUnchecked(IUIInfrastructure.class)); // COMMENT class should not care about it
-			this.container = container;
-		}
-
-		@Override
-		public Container getContainer() { return container; }
-
-		@Override
-		public IType<? extends INamespacePrefixedString, ?, ? extends IUIInfrastructure<?, ?, ?>> getType() { return IUIExtensionContainerProvider.TYPE.getValue(); }
+	@Override
+	@Deprecated
+	public void mouseMoved(double mouseX, double mouseY) {
+		Point2D cp = new ImmutablePoint2D(mouseX, mouseY);
+		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp);
+		UIEventUtilities.dispatchEvent(
+				UIEventUtilities.Factory.createEventMouseMove(getInfrastructure().getView().getTargetAtPoint(cp), d));
+		setTargetBeingHoveredByMouse(getInfrastructure().getView().getTargetAtPoint(cp), d);
 	}
 
 	@SuppressWarnings("unused")
@@ -536,42 +535,50 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	public void mouseMoved(double mouseX, double mouseY) {
-		Point2D cp = new Point2DImmutable(mouseX, mouseY);
-		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp);
-		UIEventUtilities.dispatchEvent(
-				UIEventUtilities.Factory.createEventMouseMove(getInfrastructure().getView().getTargetAtPoint(cp), d));
-		setTargetBeingHoveredByMouse(getInfrastructure().getView().getTargetAtPoint(cp), d);
-	}
+	protected void hLine(int x1, int x2, int y, int color) { DrawingUtilities.hLine(AffineTransformUtilities.getIdentity(), x1, x2, y, color, getBlitOffset()); }
 
 	@Override
 	@Deprecated
-	protected void hLine(int x1, int x2, int y, int color) { DrawingUtilities.hLine(AffineTransformUtilities.getIdentityCopy(), x1, x2, y, color, getBlitOffset()); }
+	protected void vLine(int x, int y1, int y2, int color) { DrawingUtilities.vLine(AffineTransformUtilities.getIdentity(), x, y1, y2, color, getBlitOffset()); }
 
 	@Override
 	@Deprecated
-	protected void vLine(int x, int y1, int y2, int color) { DrawingUtilities.vLine(AffineTransformUtilities.getIdentityCopy(), x, y1, y2, color, getBlitOffset()); }
+	protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) { DrawingUtilities.fillGradient(AffineTransformUtilities.getIdentity(), UIObjectUtilities.getRectangleFromDiagonal(new ImmutablePoint2D(x1, y1), new ImmutablePoint2D(x2, y2)), colorTop, colorBottom, getBlitOffset()); }
 
 	@Override
 	@Deprecated
-	protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) { DrawingUtilities.fillGradient(AffineTransformUtilities.getIdentityCopy(), UIObjectUtilities.getRectangleFromDiagonal(new Point2DImmutable(x1, y1), new Point2DImmutable(x2, y2)), colorTop, colorBottom, getBlitOffset()); }
+	public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawCenteredString(AffineTransformUtilities.getIdentity(), font, string, new ImmutablePoint2D(x, y), color); }
 
 	@Override
 	@Deprecated
-	public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawCenteredString(AffineTransformUtilities.getIdentityCopy(), font, string, new Point2DImmutable(x, y), color); }
+	public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawRightAlignedString(AffineTransformUtilities.getIdentity(), font, string, new ImmutablePoint2D(x, y), color); }
 
 	@Override
 	@Deprecated
-	public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawRightAlignedString(AffineTransformUtilities.getIdentityCopy(), font, string, new Point2DImmutable(x, y), color); }
-
-	@Override
-	@Deprecated
-	public void drawString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawString(AffineTransformUtilities.getIdentityCopy(), font, string, new Point2DImmutable(x, y), color); }
+	public void drawString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawString(AffineTransformUtilities.getIdentity(), font, string, new ImmutablePoint2D(x, y), color); }
 
 	@SuppressWarnings("MagicNumber")
 	@Override
 	@Deprecated
-	public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(AffineTransformUtilities.getIdentityCopy(), new Rectangle2D.Double(x, y, w, h), new Point2DImmutable(u, v), new Dimension2DDouble(256, 256), getBlitOffset()); }
+	public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(AffineTransformUtilities.getIdentity(), new Rectangle2D.Double(x, y, w, h), new ImmutablePoint2D(u, v), new Dimension2DDouble(256, 256), getBlitOffset()); }
+
+	@OnlyIn(Dist.CLIENT)
+	public static class UIExtensionContainer
+			extends IHasGenericClass.Impl<IUIInfrastructure<?, ?, ?>>
+			implements IUIExtensionContainerProvider {
+		protected final Container container;
+
+		public UIExtensionContainer(Container container) {
+			super(CastUtilities.castUnchecked(IUIInfrastructure.class)); // COMMENT class should not care about it
+			this.container = container;
+		}
+
+		@Override
+		public Container getContainer() { return container; }
+
+		@Override
+		public IExtensionType<INamespacePrefixedString, ?, IUIInfrastructure<?, ?, ?>> getType() { return IUIExtensionContainerProvider.TYPE.getValue(); }
+	}
 
 	@OnlyIn(Dist.CLIENT)
 	public class UIExtensionScreen
@@ -597,6 +604,6 @@ public class UIScreenAdapter
 		public void setTitle(ITextComponent title) { UIScreenAdapter.this.setTitle(title); }
 
 		@Override
-		public IType<? extends INamespacePrefixedString, ?, ? extends IUIInfrastructure<?, ?, ?>> getType() { return IUIExtensionScreenProvider.TYPE.getValue(); }
+		public IExtensionType<INamespacePrefixedString, ?, IUIInfrastructure<?, ?, ?>> getType() { return IUIExtensionScreenProvider.TYPE.getValue(); }
 	}
 }

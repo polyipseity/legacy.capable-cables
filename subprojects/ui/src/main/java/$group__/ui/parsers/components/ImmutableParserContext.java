@@ -14,15 +14,15 @@ public class ImmutableParserContext
 		implements IParserContext {
 	protected final IUIComponentParser.EnumHandlerType handlingType;
 	protected final Map<String, Class<?>> aliases;
-	protected final Map<IUIComponentParser.EnumHandlerType, ? extends Map<Class<?>, IConsumer3<? super IParserContext, ?, ?>>> handlers;
+	protected final Map<IUIComponentParser.EnumHandlerType, ? extends Map<Class<?>, IConsumer3<? super IParserContext, ?, ?, ?>>> handlers;
 
 	@SuppressWarnings("unchecked")
 	public ImmutableParserContext(IUIComponentParser.EnumHandlerType handlingType,
 	                              Map<String, Class<?>> aliases,
-	                              Map<IUIComponentParser.EnumHandlerType, ? extends Map<Class<?>, IConsumer3<? super IParserContext, ?, ?>>> handlers) {
+	                              Map<IUIComponentParser.EnumHandlerType, ? extends Map<Class<?>, IConsumer3<? super IParserContext, ?, ?, ?>>> handlers) {
 		this.handlingType = handlingType;
 		this.aliases = ImmutableMap.copyOf(aliases);
-		this.handlers = (Map<IUIComponentParser.EnumHandlerType, ? extends Map<Class<?>, IConsumer3<? super IParserContext, ?, ?>>>) MapUtilities.immutableDeepCopyOf(handlers); // COMMENT should be safe
+		this.handlers = (Map<IUIComponentParser.EnumHandlerType, ? extends Map<Class<?>, IConsumer3<? super IParserContext, ?, ?, ?>>>) MapUtilities.immutableDeepCopyOf(handlers); // COMMENT should be safe
 	}
 
 	@Override
@@ -32,5 +32,5 @@ public class ImmutableParserContext
 	public Map<String, Class<?>> getAliases() { return aliases; }
 
 	@Override
-	public Map<IUIComponentParser.EnumHandlerType, ? extends Map<Class<?>, IConsumer3<? super IParserContext, ?, ?>>> getHandlers() { return handlers; }
+	public Map<IUIComponentParser.EnumHandlerType, ? extends Map<Class<?>, IConsumer3<? super IParserContext, ?, ?, ?>>> getHandlers() { return handlers; }
 }

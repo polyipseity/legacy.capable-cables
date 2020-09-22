@@ -1,6 +1,9 @@
 package $group__.utilities.structures;
 
-import $group__.utilities.*;
+import $group__.utilities.AssertionUtilities;
+import $group__.utilities.LogMessageBuilder;
+import $group__.utilities.UtilitiesConfiguration;
+import $group__.utilities.UtilitiesMarkers;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.templates.CommonConfigurationTemplate;
 import org.slf4j.Logger;
@@ -28,15 +31,12 @@ public abstract class Registry<K, V> {
 						.addKeyValue("keyToo", keyToo).addKeyValue("value", value).addKeyValue("registryObject", registryObject)
 						.log(() -> getResourceBundle().getString("override.allowed"));
 			else
-				throw ThrowableUtilities.logAndThrow(
-						new IllegalArgumentException(
-								new LogMessageBuilder()
-										.addMarkers(this::getMarker)
-										.addKeyValue("keyToo", keyToo).addKeyValue("value", value).addKeyValue("registryObject", registryObject)
-										.addMessages(() -> getResourceBundle().getString("override.disabled"))
-										.build()
-						),
-						getLogger()
+				throw new IllegalArgumentException(
+						new LogMessageBuilder()
+								.addMarkers(this::getMarker)
+								.addKeyValue("keyToo", keyToo).addKeyValue("value", value).addKeyValue("registryObject", registryObject)
+								.addMessages(() -> getResourceBundle().getString("override.disabled"))
+								.build()
 				);
 			@SuppressWarnings("unchecked") RegistryObject<VL> vc = (RegistryObject<VL>) registryObject; // COMMENT responsibility goes to the caller
 			vc.setValue(value);

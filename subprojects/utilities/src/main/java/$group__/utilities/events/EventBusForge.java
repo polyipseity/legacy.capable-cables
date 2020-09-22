@@ -1,8 +1,7 @@
 package $group__.utilities.events;
 
 import $group__.utilities.AssertionUtilities;
-import $group__.utilities.ThrowableUtilities;
-import $group__.utilities.interfaces.IDelegating;
+import $group__.utilities.throwable.ThrowableUtilities;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.subjects.Subject;
@@ -16,17 +15,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public class EventBusForge
-		extends Subject<Event>
-		implements IDelegating<IEventBus> {
+		extends Subject<Event> {
 	public static final Subject<Event> FORGE_EVENT_BUS = new EventBusForge(AssertionUtilities.assertNonnull(Bus.FORGE.bus().get()));
 	private static final ThreadLocal<Subject<Event>> MOD_EVENT_BUS = ThreadLocal.withInitial(() ->
 			new EventBusForge(AssertionUtilities.assertNonnull(Bus.MOD.bus().get())));
 
 	public static Subject<Event> getModEventBus() { return AssertionUtilities.assertNonnull(MOD_EVENT_BUS.get()); }
 
-	protected final IEventBus delegated;
+	private final IEventBus delegate;
 
-	public EventBusForge(IEventBus delegated) { this.delegated = delegated; }
+	public EventBusForge(IEventBus delegate) { this.delegate = delegate; }
 
 	@Override
 	public boolean hasObservers() { return true; }
@@ -48,27 +46,21 @@ public class EventBusForge
 		EventBusBridgeMethodFixConsumer<? extends Event, Observer<? extends Event>> oc;
 		try {
 			oc = new EventBusBridgeMethodFixConsumer<>(oa, Observer.class, "onNext");
-			oc.register(getDelegated());
-		} catch (Throwable t) {
-			onError(t);
-			return;
+		} catch (NoSuchMethodException e) {
+			throw ThrowableUtilities.propagate(e);
 		}
-		observer.onSubscribe(new EventBusForgeDisposable(getDelegated(), oc.getEventType(), oc));
+		oc.register(getDelegate());
+		observer.onSubscribe(new EventBusForgeDisposable(getDelegate(), oc.getEventType(), oc));
 	}
 
-	@Override
-	public IEventBus getDelegated() { return delegated; }
+	protected IEventBus getDelegate() { return delegate; }
 
 	@Override
 	public void onSubscribe(@Nonnull Disposable d) { throw new UnsupportedOperationException(); }
 
 	@Override
 	public void onNext(@Nonnull Event o) {
-		try {
-			getDelegated().post(o);
-		} catch (Throwable t) {
-			onError(t);
-		}
+		getDelegate().post(o);
 	}
 
 	@Override

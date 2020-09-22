@@ -19,7 +19,7 @@ public enum UIBackgrounds {
 	 * @see Screen#renderBackground()
 	 */
 	public static void renderBackgroundAndNotify(@Nullable Minecraft client, int width, int height) {
-		UIScreenUtility.INSTANCE
+		UIScreenUtility.getInstance()
 				.setClient_(client)
 				.setWidth_(width)
 				.setHeight_(height)
@@ -30,7 +30,7 @@ public enum UIBackgrounds {
 	 * @see Screen#renderBackground(int)
 	 */
 	public static void renderBackgroundAndNotify(@Nullable Minecraft client, int width, int height, int blitOffset) {
-		UIScreenUtility.INSTANCE
+		UIScreenUtility.getInstance()
 				.setClient_(client)
 				.setWidth_(width)
 				.setHeight_(height)
@@ -41,7 +41,7 @@ public enum UIBackgrounds {
 	 * @see Screen#renderDirtBackground(int)
 	 */
 	public static void renderDirtBackgroundAndNotify(@Nullable Minecraft client, int width, int height, int blitOffset) {
-		UIScreenUtility.INSTANCE
+		UIScreenUtility.getInstance()
 				.setClient_(client)
 				.setWidth_(width)
 				.setHeight_(height)

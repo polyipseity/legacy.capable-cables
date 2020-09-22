@@ -2,6 +2,7 @@ package $group__.ui.minecraft.mvvm.components;
 
 import $group__.ui.core.binding.IUIPropertyMappingValue;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
+import $group__.ui.core.mvvm.views.components.IUIViewComponent;
 import $group__.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.ui.core.parsers.components.UIViewComponentConstructor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
@@ -10,10 +11,10 @@ import $group__.ui.minecraft.core.mvvm.views.IUIViewComponentMinecraft;
 import $group__.ui.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import $group__.ui.minecraft.core.mvvm.views.components.rendering.IUIComponentRendererMinecraft.EnumCropStage;
 import $group__.ui.minecraft.core.mvvm.views.components.rendering.IUIComponentRendererMinecraft.EnumRenderStage;
-import $group__.ui.minecraft.mvvm.events.bus.EventUIViewMinecraft;
+import $group__.ui.minecraft.mvvm.events.bus.UIViewMinecraftBusEvent;
 import $group__.ui.mvvm.views.components.UIViewComponent;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.events.EnumEventHookStage;
+import $group__.utilities.events.EnumHookStage;
 import $group__.utilities.events.EventBusUtilities;
 import $group__.utilities.functions.IConsumer3;
 import $group__.utilities.structures.INamespacePrefixedString;
@@ -40,7 +41,7 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 						EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 									EnumCropMethod cropMethod = EnumCropMethod.getBestMethod();
 									cropMethod.enable();
-									StaticHolder.traverseComponentTreeDefault(createContext(),
+									IUIViewComponent.StaticHolder.traverseComponentTreeDefault(createContext(),
 											manager,
 											(context, component) -> {
 												assert component instanceof IUIComponentMinecraft;
@@ -68,15 +69,16 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 									cropMethod.disable();
 									return true;
 								},
-								new EventUIViewMinecraft.Render(EnumEventHookStage.PRE, this, cursorPosition, partialTicks),
-								new EventUIViewMinecraft.Render(EnumEventHookStage.POST, this, cursorPosition, partialTicks))
+								new UIViewMinecraftBusEvent.Render(EnumHookStage.PRE, this, cursorPosition, partialTicks),
+								new UIViewMinecraftBusEvent.Render(EnumHookStage.POST, this, cursorPosition, partialTicks))
 				);
 	}
 
+	@SuppressWarnings("RedundantTypeArguments")
 	@Override
 	public void tick() {
 		getManager()
-				.ifPresent(manager -> StaticHolder.traverseComponentTreeDefault(createContext(),
+				.ifPresent(manager -> IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createContext(),
 						manager,
 						(context, component) -> CastUtilities.castChecked(IUIComponentMinecraft.class, component).ifPresent(cc ->
 								cc.tick(context)),

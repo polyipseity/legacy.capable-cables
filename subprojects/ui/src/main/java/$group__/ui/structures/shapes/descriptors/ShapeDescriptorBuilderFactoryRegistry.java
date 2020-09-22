@@ -5,7 +5,6 @@ import $group__.ui.UIMarkers;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilderFactory;
 import $group__.utilities.LogMessageBuilder;
 import $group__.utilities.PreconditionUtilities;
-import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.structures.INamespacePrefixedString;
 import $group__.utilities.structures.RegistryWithDefaults;
 import $group__.utilities.templates.CommonConfigurationTemplate;
@@ -29,7 +28,7 @@ public final class ShapeDescriptorBuilderFactoryRegistry
 
 	private ShapeDescriptorBuilderFactoryRegistry() {
 		super(true, UIConfiguration.getInstance().getLogger());
-		PreconditionUtilities.requireRunOnceOnly(UIConfiguration.getInstance().getLogger());
+		PreconditionUtilities.requireRunOnceOnly();
 	}
 
 	public static DefaultShapeDescriptorBuilderFactory getDefaultFactory() {
@@ -46,15 +45,12 @@ public final class ShapeDescriptorBuilderFactoryRegistry
 	@Override
 	public <VL extends IShapeDescriptorBuilderFactory> RegistryObject<VL> register(INamespacePrefixedString key, VL value) {
 		if (DefaultShapeDescriptorBuilderFactory.getDefaultFactoryKey().equals(key))
-			throw ThrowableUtilities.logAndThrow(
-					new IllegalStateException(
-							new LogMessageBuilder()
-									.addMarkers(UIMarkers.getInstance()::getMarkerShape)
-									.addKeyValue("key", key).addKeyValue("value", value)
-									.addMessages(() -> getResourceBundle().getString("register.default.irreplaceable"))
-									.build()
-					),
-					UIConfiguration.getInstance().getLogger()
+			throw new IllegalStateException(
+					new LogMessageBuilder()
+							.addMarkers(UIMarkers.getInstance()::getMarkerShape)
+							.addKeyValue("key", key).addKeyValue("value", value)
+							.addMessages(() -> getResourceBundle().getString("register.default.irreplaceable"))
+							.build()
 			);
 		return super.register(key, value);
 	}

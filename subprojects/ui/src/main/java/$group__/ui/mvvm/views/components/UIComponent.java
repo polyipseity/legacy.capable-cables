@@ -9,8 +9,9 @@ import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.events.ui.UIEventTarget;
-import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
-import $group__.ui.mvvm.views.events.bus.EventUIComponent;
+import $group__.ui.mvvm.extensions.UIExtensionRegistry;
+import $group__.ui.mvvm.views.components.extensions.caches.UICacheExtension;
+import $group__.ui.mvvm.views.events.bus.UIComponentBusEvent;
 import $group__.ui.structures.shapes.descriptors.DelegatingShapeDescriptor;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.binding.core.IBinderAction;
@@ -19,9 +20,10 @@ import $group__.utilities.binding.core.fields.IField;
 import $group__.utilities.binding.core.methods.IBindingMethodSource;
 import $group__.utilities.binding.methods.BindingMethodSource;
 import $group__.utilities.collections.MapUtilities;
-import $group__.utilities.events.EnumEventHookStage;
+import $group__.utilities.events.EnumHookStage;
 import $group__.utilities.events.EventBusUtilities;
-import $group__.utilities.extensions.IExtension;
+import $group__.utilities.extensions.core.IExtension;
+import $group__.utilities.references.OptionalWeakReference;
 import $group__.utilities.structures.INamespacePrefixedString;
 import $group__.utilities.structures.ImmutableNamespacePrefixedString;
 import com.google.common.collect.ImmutableList;
@@ -34,7 +36,6 @@ import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.lang.ref.WeakReference;
 import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.Optional;
@@ -48,12 +49,12 @@ public class UIComponent
 		extends UIEventTarget
 		implements IUIComponent {
 	@NonNls
-	public static final String PROPERTY_VISIBLE = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "component.visible";
+	public static final String PROPERTY_VISIBLE = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "component.visible";
 	@NonNls
-	public static final String PROPERTY_ACTIVE = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "component.active";
+	public static final String PROPERTY_ACTIVE = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "component.active";
 
-	public static final INamespacePrefixedString PROPERTY_VISIBLE_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_VISIBLE);
-	public static final INamespacePrefixedString PROPERTY_ACTIVE_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_ACTIVE);
+	private static final INamespacePrefixedString PROPERTY_VISIBLE_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_VISIBLE);
+	private static final INamespacePrefixedString PROPERTY_ACTIVE_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_ACTIVE);
 
 	@Nullable
 	protected final String id;
@@ -68,7 +69,7 @@ public class UIComponent
 	protected final IBindingField<Boolean> visible;
 	@UIProperty(PROPERTY_ACTIVE)
 	protected final IBindingField<Boolean> active;
-	protected WeakReference<IUIComponentContainer> parent = new WeakReference<>(null);
+	protected OptionalWeakReference<IUIComponentContainer> parent = new OptionalWeakReference<>(null);
 	protected final AtomicBoolean modifyingShape = new AtomicBoolean();
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
@@ -80,20 +81,24 @@ public class UIComponent
 		this.shapeDescriptor = new ComponentShapeDescriptor<>(shapeDescriptor);
 
 		this.visible = IUIPropertyMappingValue.createBindingField(Boolean.class, false, true,
-				this.mappings.get(PROPERTY_VISIBLE_LOCATION));
+				this.mappings.get(getPropertyVisibleLocation()));
 		this.active = IUIPropertyMappingValue.createBindingField(Boolean.class, false, true,
-				this.mappings.get(PROPERTY_ACTIVE_LOCATION));
+				this.mappings.get(getPropertyActiveLocation()));
 
-		StaticHolder.addExtensionChecked(this, new UIExtensionCache());
+		StaticHolder.addExtensionChecked(this, new UICacheExtension());
 	}
+
+	public static INamespacePrefixedString getPropertyVisibleLocation() { return PROPERTY_VISIBLE_LOCATION; }
+
+	public static INamespacePrefixedString getPropertyActiveLocation() { return PROPERTY_ACTIVE_LOCATION; }
 
 	@Override
 	public boolean modifyShape(Supplier<? extends Boolean> action) throws ConcurrentModificationException {
 		getModifyingShape().compareAndSet(false, true);
 		boolean ret = EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () ->
 						getShapeDescriptor().modify(action),
-				new EventUIComponent.ShapeDescriptorModify(EnumEventHookStage.PRE, this),
-				new EventUIComponent.ShapeDescriptorModify(EnumEventHookStage.POST, this));
+				new UIComponentBusEvent.ModifyShapeDescriptor(EnumHookStage.PRE, this),
+				new UIComponentBusEvent.ModifyShapeDescriptor(EnumHookStage.POST, this));
 		getModifyingShape().compareAndSet(true, false);
 		return ret;
 	}
@@ -120,7 +125,7 @@ public class UIComponent
 	public Optional<? extends String> getID() { return Optional.ofNullable(id); }
 
 	@Override
-	public Optional<? extends IUIComponentContainer> getParent() { return Optional.ofNullable(parent.get()); }
+	public Optional<? extends IUIComponentContainer> getParent() { return parent.getOptional(); }
 
 	@Override
 	public boolean dispatchEvent(IUIEvent event) {
@@ -153,7 +158,7 @@ public class UIComponent
 	@Override
 	public void onParentChange(@Nullable IUIComponentContainer previous, @Nullable IUIComponentContainer next) { setParent(next); }
 
-	protected void setParent(@Nullable IUIComponentContainer parent) { this.parent = new WeakReference<>(parent); }
+	protected void setParent(@Nullable IUIComponentContainer parent) { this.parent = new OptionalWeakReference<>(parent); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<INamespacePrefixedString, IBindingMethodSource<? extends IUIEvent>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }
@@ -162,7 +167,9 @@ public class UIComponent
 	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappings() { return mappings; }
 
 	@Override
+	@Deprecated
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
+		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
 		return StaticHolder.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension);
 	}
 
@@ -170,7 +177,7 @@ public class UIComponent
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return StaticHolder.removeExtensionImpl(getExtensions(), key); }
 
 	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return Optional.ofNullable(getExtensions().get(key)); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return StaticHolder.getExtensionImpl(getExtensions(), key); }
 
 	@Override
 	public Iterable<? extends ObservableSource<IBinderAction>> getBinderNotifiers() { return Iterables.concat(ImmutableList.of(getBinderNotifierSubject()), IUIComponent.super.getBinderNotifiers()); }

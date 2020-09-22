@@ -7,11 +7,10 @@ import $group__.ui.minecraft.mvvm.UIInfrastructureMinecraft;
 import $group__.ui.minecraft.mvvm.adapters.AbstractContainerScreenAdapter;
 import $group__.ui.minecraft.mvvm.adapters.AbstractScreenAdapter;
 import $group__.ui.minecraft.mvvm.adapters.UIScreenAdapter;
-import $group__.utilities.ThrowableUtilities;
-import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
 import $group__.utilities.binding.core.IBinder;
 import $group__.utilities.minecraft.client.ResourceUtilities;
 import $group__.utilities.structures.INamespacePrefixedString;
+import $group__.utilities.throwable.ThrowableUtilities;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
@@ -22,6 +21,7 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -59,7 +59,11 @@ public enum UIFacade {
 		static {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			dbf.setNamespaceAware(true);
-			DOCUMENT_BUILDER = ThrowableUtilities.Try.call(dbf::newDocumentBuilder, UIConfiguration.INSTANCE.getLogger()).orElseThrow(ThrowableCatcher::rethrow);
+			try {
+				DOCUMENT_BUILDER = dbf.newDocumentBuilder();
+			} catch (ParserConfigurationException e) {
+				throw ThrowableUtilities.propagate(e);
+			}
 		}
 
 		public static Document parseDocumentInput(InputSource is) throws IOException, SAXException { return DOCUMENT_BUILDER.parse(is); }

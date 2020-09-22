@@ -1,6 +1,9 @@
 package $group__.utilities.minecraft.client;
 
-import $group__.utilities.*;
+import $group__.utilities.AffineTransformUtilities;
+import $group__.utilities.LogMessageBuilder;
+import $group__.utilities.UtilitiesConfiguration;
+import $group__.utilities.UtilitiesMarkers;
 import $group__.utilities.templates.CommonConfigurationTemplate;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.Matrix4f;
@@ -24,15 +27,12 @@ public enum MatrixUtilities {
 
 	public static void transformFromTo(MatrixStack matrix, Rectangle2D from, Rectangle2D to) {
 		if (from.getWidth() == 0 || from.getHeight() == 0)
-			throw ThrowableUtilities.logAndThrow(
-					new IllegalArgumentException(
-							new LogMessageBuilder()
-									.addMarkers(MatrixUtilities::getClassMarker)
-									.addKeyValue("matrix", matrix).addKeyValue("from", from).addKeyValue("to", to)
-									.addMessages(() -> getResourceBundle().getString("transform.from_to.un_computable"))
-									.build()
-					),
-					UtilitiesConfiguration.getInstance().getLogger()
+			throw new IllegalArgumentException(
+					new LogMessageBuilder()
+							.addMarkers(MatrixUtilities::getClassMarker)
+							.addKeyValue("matrix", matrix).addKeyValue("from", from).addKeyValue("to", to)
+							.addMessages(() -> getResourceBundle().getString("transform.from_to.un_computable"))
+							.build()
 			);
 		double scaleX = to.getWidth() / from.getWidth(),
 				scaleY = to.getHeight() / from.getHeight();

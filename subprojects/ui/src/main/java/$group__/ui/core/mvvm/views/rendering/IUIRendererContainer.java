@@ -3,7 +3,6 @@ package $group__.ui.core.mvvm.views.rendering;
 import $group__.ui.UIConfiguration;
 import $group__.ui.UIMarkers;
 import $group__.utilities.LogMessageBuilder;
-import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.binding.core.traits.IHasBinding;
 import $group__.utilities.templates.CommonConfigurationTemplate;
 
@@ -31,13 +30,13 @@ public interface IUIRendererContainer<R extends IUIRenderer<?>>
 
 		public static <C, R extends IUIRenderer<?>> void setRendererImpl(C container, @Nullable R renderer, BiConsumer<? super C, ? super R> setter) {
 			if (!(renderer == null || renderer.getGenericClass().isInstance(container)))
-				throw ThrowableUtilities.logAndThrow(new IllegalArgumentException(
+				throw new IllegalArgumentException(
 						new LogMessageBuilder()
 								.addMarkers(UIMarkers.getInstance()::getMarkerUIComponentRenderer)
 								.addKeyValue("container", container).addKeyValue("renderer", renderer).addKeyValue("setter", setter)
 								.addMessages(() -> getResourceBundle().getString("renderer.set.impl.instance_of.fail"))
 								.build()
-				), UIConfiguration.getInstance().getLogger());
+				);
 			setter.accept(container, renderer);
 		}
 

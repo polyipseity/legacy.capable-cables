@@ -2,6 +2,7 @@ package $group__.utilities;
 
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.templates.CommonConfigurationTemplate;
+import $group__.utilities.throwable.ThrowableUtilities;
 import org.slf4j.Marker;
 
 import javax.annotation.Nullable;
@@ -36,15 +37,12 @@ public enum PreconditionUtilities {
 			t1 = RAN_ONCE.put(st.get(), t);
 		}
 		if (t1 != null) {
-			throw ThrowableUtilities.logAndThrow(
-					new IllegalStateException(
-							new LogMessageBuilder()
-									.addMarkers(PreconditionUtilities::getClassMarker)
-									.addMessages(() -> getResourceBundle().getString("run_once_only.illegal"))
-									.build(),
-							t1
-					),
-					UtilitiesConfiguration.getInstance().getLogger()
+			throw new IllegalStateException(
+					new LogMessageBuilder()
+							.addMarkers(PreconditionUtilities::getClassMarker)
+							.addMessages(() -> getResourceBundle().getString("run_once_only.illegal"))
+							.build(),
+					t1
 			);
 		}
 

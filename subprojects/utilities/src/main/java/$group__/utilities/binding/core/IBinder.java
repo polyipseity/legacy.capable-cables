@@ -16,7 +16,7 @@ public interface IBinder {
 	static Optional<Class<?>>[] resolveFunctionTypes(Function<?, ?> transformer) { return DynamicUtilities.Extensions.wrapTypeResolverResults(TypeResolver.resolveRawArguments(Function.class, transformer.getClass())); }
 
 	boolean bind(Iterable<? extends IBinding<?>> bindings)
-			throws BindingTransformerNotFoundException;
+			throws NoSuchBindingTransformerException;
 
 	boolean unbind(Iterable<? extends IBinding<?>> bindings);
 

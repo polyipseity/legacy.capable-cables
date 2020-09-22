@@ -10,10 +10,10 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 public class WeakReferenceValueEquals<T>
-		extends WeakReference<T> {
-	public WeakReferenceValueEquals(T referent) { super(referent); }
+		extends OptionalWeakReference<T> {
+	public WeakReferenceValueEquals(@Nullable T referent) { super(referent); }
 
-	public WeakReferenceValueEquals(T referent, ReferenceQueue<? super T> queue) { super(referent, queue); }
+	public WeakReferenceValueEquals(@Nullable T referent, @Nullable ReferenceQueue<? super T> queue) { super(referent, queue); }
 
 	@Override
 	public int hashCode() { return Objects.hashCode(get()); }

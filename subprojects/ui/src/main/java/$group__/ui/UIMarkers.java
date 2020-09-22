@@ -1,11 +1,11 @@
 package $group__.ui;
 
 import $group__.utilities.structures.Singleton;
-import $group__.utilities.templates.MarkerUtilitiesTemplate;
+import $group__.utilities.templates.MarkersTemplate;
 import org.slf4j.Marker;
 
-public final class UIMarkers extends MarkerUtilitiesTemplate {
-	private static final UIMarkers INSTANCE = Singleton.getSingletonInstance(UIMarkers.class, UIConfiguration.getInstance().getLogger());
+public final class UIMarkers extends MarkersTemplate {
+	private static final UIMarkers INSTANCE = Singleton.getSingletonInstance(UIMarkers.class);
 
 	private final Marker markerShape;
 	private final Marker markerParser;

@@ -1,13 +1,14 @@
 package $group__.ui.core.structures;
 
 import $group__.ui.UIConfiguration;
+import $group__.ui.UIConstants;
 import $group__.ui.UIMarkers;
 import $group__.utilities.AssertionUtilities;
-import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.interfaces.ICopyable;
 import $group__.utilities.templates.CommonConfigurationTemplate;
-import $group__.utilities.templates.MarkerUtilitiesTemplate;
+import $group__.utilities.templates.MarkersTemplate;
+import $group__.utilities.throwable.ThrowableUtilities;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.jetbrains.annotations.NonNls;
@@ -52,7 +53,7 @@ public interface IAffineTransformStack
 	enum StaticHolder {
 		;
 
-		private static final Marker CLASS_MARKER = MarkerUtilitiesTemplate.addReferences(UIMarkers.getInstance().getClassMarker(IAffineTransformStack.class),
+		private static final Marker CLASS_MARKER = MarkersTemplate.addReferences(UIMarkers.getInstance().getClassMarker(IAffineTransformStack.class),
 				UIMarkers.getInstance().getMarkerStructure());
 		private static final ImmutableList<Function<? super IAffineTransformStack, ?>> OBJECT_VARIABLES = ImmutableList.of(
 				IAffineTransformStack::getData);
@@ -106,7 +107,7 @@ public interface IAffineTransformStack
 		public LeakNotifier(Deque<AffineTransform> data, Logger logger) {
 			this.data = data;
 			this.logger = logger;
-			this.throwable = ThrowableUtilities.createIfDebug().orElse(null);
+			this.throwable = UIConstants.BUILD_TYPE.isDebug() ? ThrowableUtilities.create() : null;
 		}
 
 		protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }

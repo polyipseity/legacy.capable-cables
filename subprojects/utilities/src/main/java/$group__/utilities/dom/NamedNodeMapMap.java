@@ -1,9 +1,10 @@
 package $group__.utilities.dom;
 
+import $group__.utilities.AbstractDelegatingObject;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.interfaces.IDelegating;
 import com.google.common.collect.ImmutableSet;
+import org.jetbrains.annotations.NonNls;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -15,13 +16,13 @@ import java.util.regex.Pattern;
  * Operations are not thread-safe.
  */
 public class NamedNodeMapMap
-		extends IDelegating.Impl<NamedNodeMap>
+		extends AbstractDelegatingObject<NamedNodeMap>
 		implements Map<String, Node> {
 	protected final NodeListList asList;
 
-	public NamedNodeMapMap(NamedNodeMap delegated) {
-		super(delegated);
-		this.asList = new NodeListList(new NamedNodeMapNodeList(this.delegated));
+	public NamedNodeMapMap(NamedNodeMap delegate) {
+		super(delegate);
+		this.asList = new NodeListList(new NamedNodeMapNodeList(delegate));
 	}
 
 	public static NamedNodeMapMap wrap(NamedNodeMap delegated) { return new NamedNodeMapMap(delegated); }
@@ -55,7 +56,7 @@ public class NamedNodeMapMap
 	}
 
 	@Override
-	public int size() { return getDelegated().getLength(); }
+	public int size() { return getDelegate().getLength(); }
 
 	@Override
 	public boolean isEmpty() { return size() == 0; }
@@ -72,7 +73,7 @@ public class NamedNodeMapMap
 		return CastUtilities.castChecked(String.class, key)
 				.map(s -> {
 					String[] ss = splitString(s);
-					return hasNamespaceURI(ss) ? getDelegated().getNamedItemNS(ss[0], ss[1]) : getDelegated().getNamedItem(s);
+					return hasNamespaceURI(ss) ? getDelegate().getNamedItemNS(ss[0], ss[1]) : getDelegate().getNamedItem(s);
 				}).orElse(null);
 	}
 
@@ -84,11 +85,11 @@ public class NamedNodeMapMap
 		String[] ss = splitString(key);
 		if (hasNamespaceURI(ss)) {
 			if (ss[0].equals(value.getNamespaceURI()) && ss[1].equals(value.getLocalName()))
-				return getDelegated().setNamedItemNS(value);
+				return getDelegate().setNamedItemNS(value);
 			throw new UnsupportedOperationException();
 		}
 		if (key.equals(value.getLocalName()))
-			return getDelegated().setNamedItem(value);
+			return getDelegate().setNamedItem(value);
 		throw new UnsupportedOperationException();
 	}
 
@@ -98,7 +99,7 @@ public class NamedNodeMapMap
 		if (containsKey(key)) {
 			String s = (String) key;
 			String[] ss = splitString(s);
-			return ss.length == 2 ? getDelegated().removeNamedItemNS(ss[0], ss[1]) : getDelegated().removeNamedItem(s);
+			return ss.length == 2 ? getDelegate().removeNamedItemNS(ss[0], ss[1]) : getDelegate().removeNamedItem(s);
 		}
 		return null;
 	}
@@ -109,7 +110,7 @@ public class NamedNodeMapMap
 	@Override
 	public void clear() {
 		while (size() != 0) {
-			String k = constructKey(AssertionUtilities.assertNonnull(getDelegated().item(0)));
+			String k = constructKey(AssertionUtilities.assertNonnull(getDelegate().item(0)));
 			String[] ks = splitString(k);
 			if (hasNamespaceURI(ks))
 				remove(ks[0], ks[1]);
@@ -140,9 +141,10 @@ public class NamedNodeMapMap
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected NodeListList getAsList() { return asList; }
 
-	protected static String constructKey(Node node) {
+	@SuppressWarnings("RedundantLambdaParameterType")
+	protected static @NonNls String constructKey(Node node) {
 		return Optional.ofNullable(node.getNamespaceURI())
-				.map(ns -> ns + ':')
+				.map((@NonNls String ns) -> ns + ':')
 				.orElse("")
 				+ Optional.ofNullable(node.getLocalName())
 				.orElse("");

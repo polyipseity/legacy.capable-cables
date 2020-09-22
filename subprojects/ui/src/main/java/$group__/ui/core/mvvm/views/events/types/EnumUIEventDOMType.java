@@ -7,49 +7,49 @@ import org.jetbrains.annotations.NonNls;
 
 public enum EnumUIEventDOMType
 		implements IUIEventType {
-	LOAD(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "load"),
-	UNLOAD(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "unload"),
-	ABORT(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "abort"),
-	ERROR(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "error"),
-	SELECT(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "select"),
-	FOCUS_OUT_POST(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "blur"),
-	FOCUS_IN_POST(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "focus"),
+	LOAD(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "load"),
+	UNLOAD(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "unload"),
+	ABORT(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "abort"),
+	ERROR(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "error"),
+	SELECT(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "select"),
+	FOCUS_OUT_POST(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "blur"),
+	FOCUS_IN_POST(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "focus"),
 	@SuppressWarnings("SpellCheckingInspection")
-	FOCUS_IN_PRE(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "focusin"),
+	FOCUS_IN_PRE(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "focusin"),
 	@SuppressWarnings("SpellCheckingInspection")
-	FOCUS_OUT_PRE(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "focusout"),
+	FOCUS_OUT_PRE(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "focusout"),
 	@SuppressWarnings("SpellCheckingInspection")
-	CLICK_AUXILIARY(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "auxclick"),
-	CLICK(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "click"),
+	CLICK_AUXILIARY(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "auxclick"),
+	CLICK(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "click"),
 	@SuppressWarnings("SpellCheckingInspection")
-	CLICK_DOUBLE(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "dblclick"),
+	CLICK_DOUBLE(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "dblclick"),
 	@SuppressWarnings("SpellCheckingInspection")
-	MOUSE_DOWN(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "mousedown"),
+	MOUSE_DOWN(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "mousedown"),
 	@SuppressWarnings("SpellCheckingInspection")
-	MOUSE_ENTER(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "mouseenter"),
+	MOUSE_ENTER(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "mouseenter"),
 	@SuppressWarnings("SpellCheckingInspection")
-	MOUSE_LEAVE(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "mouseleave"),
+	MOUSE_LEAVE(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "mouseleave"),
 	@SuppressWarnings("SpellCheckingInspection")
-	MOUSE_MOVE(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "mousemove"),
+	MOUSE_MOVE(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "mousemove"),
 	@SuppressWarnings("SpellCheckingInspection")
-	MOUSE_LEAVE_SELF(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "mouseout"),
-	MOUSE_ENTER_SELF(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "mouseover"),
+	MOUSE_LEAVE_SELF(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "mouseout"),
+	MOUSE_ENTER_SELF(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "mouseover"),
 	@SuppressWarnings("SpellCheckingInspection")
-	MOUSE_UP(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "mouseup"),
-	WHEEL(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "wheel"),
+	MOUSE_UP(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "mouseup"),
+	WHEEL(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "wheel"),
 	@SuppressWarnings("SpellCheckingInspection")
-	UPDATE_PRE(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "beforeinput"),
-	UPDATE_POST(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "input"),
+	UPDATE_PRE(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "beforeinput"),
+	UPDATE_POST(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "input"),
 	@SuppressWarnings("SpellCheckingInspection")
-	KEY_DOWN(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "keydown"),
+	KEY_DOWN(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "keydown"),
 	@SuppressWarnings("SpellCheckingInspection")
-	KEY_UP(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "keyup"),
+	KEY_UP(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "keyup"),
 	@SuppressWarnings("SpellCheckingInspection")
-	COMPOSITION_START(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "compositionstart"),
+	COMPOSITION_START(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "compositionstart"),
 	@SuppressWarnings("SpellCheckingInspection")
-	COMPOSITION_UPDATE(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "compositionupdate"),
+	COMPOSITION_UPDATE(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "compositionupdate"),
 	@SuppressWarnings("SpellCheckingInspection")
-	COMPOSITION_END(INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "compositionend"),
+	COMPOSITION_END(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "compositionend"),
 	;
 
 	@NonNls

@@ -16,7 +16,7 @@ import static java.lang.Math.min;
 public enum UIObjectUtilities {
 	;
 
-	public static Shape copyShape(Shape shape) { return AffineTransformUtilities.getIdentityCopy().createTransformedShape(shape); }
+	public static Shape copyShape(Shape shape) { return AffineTransformUtilities.getIdentity().createTransformedShape(shape); }
 
 	public static Rectangle2D getRectangleFromDiagonal(Point2D p1, Point2D p2) {
 		Rectangle2D ret = new Rectangle2D.Double();
@@ -36,11 +36,12 @@ public enum UIObjectUtilities {
 
 	public static Point getPointCeil(Point2D point) { return new Point((int) Math.ceil(point.getX()), (int) Math.ceil(point.getY())); }
 
-	public static <T> void acceptPoint(Point2D point, BiConsumer<Double, Double> action) { action.accept(point.getX(), point.getY()); }
+	public static void acceptPoint(Point2D point, BiConsumer<Double, Double> action) { action.accept(point.getX(), point.getY()); }
 
-	public static <T> void acceptDimension(Dimension2D dimension, BiConsumer<Double, Double> action) { action.accept(dimension.getWidth(), dimension.getHeight()); }
+	public static void acceptDimension(Dimension2D dimension, BiConsumer<Double, Double> action) { action.accept(dimension.getWidth(), dimension.getHeight()); }
 
-	public static void acceptRectangular(RectangularShape rectangular, IConsumer4<Double, Double, Double, Double> action) { action.accept(rectangular.getX(), rectangular.getY(), rectangular.getWidth(), rectangular.getHeight()); }
+	public static <TH extends Throwable> void acceptRectangular(RectangularShape rectangular, IConsumer4<Double, Double, Double, Double, ? extends TH> action)
+			throws TH { action.accept(rectangular.getX(), rectangular.getY(), rectangular.getWidth(), rectangular.getHeight()); }
 
 	public static Point2D minPoint(Point2D a, Point2D b) { return applyPoint(a, (ax, ay) -> applyPoint(b, (bx, by) -> new Point2D.Double(min(ax, bx), min(ay, by)))); }
 
@@ -54,11 +55,14 @@ public enum UIObjectUtilities {
 
 	public static Dimension2D maxDimension(Dimension2D a, Dimension2D b) { return applyDimension(a, (ax, ay) -> applyDimension(b, (bx, by) -> new Dimension2DDouble(max(ax, bx), max(ay, by)))); }
 
-	public static Rectangle2D minRectangle(Rectangle2D a, Rectangle2D b) { return applyRectangular(a, (ax, ay, aw, ah) -> applyRectangular(b, (bx, by, bw, bh) -> new Rectangle2D.Double(min(ax, bx), min(ay, by), min(aw, bw), min(ah, bh)))); }
+	@SuppressWarnings("RedundantCast")
+	public static Rectangle2D minRectangle(Rectangle2D a, Rectangle2D b) { return applyRectangular(a, (IFunction4<Double, Double, Double, Double, Rectangle2D.Double, RuntimeException>) (ax, ay, aw, ah) -> applyRectangular(b, (bx, by, bw, bh) -> new Rectangle2D.Double(min(ax, bx), min(ay, by), min(aw, bw), min(ah, bh)))); }
 
-	public static <T> T applyRectangular(RectangularShape rectangular, IFunction4<Double, Double, Double, Double, T> action) { return action.apply(rectangular.getX(), rectangular.getY(), rectangular.getWidth(), rectangular.getHeight()); }
+	public static <T, TH extends Throwable> T applyRectangular(RectangularShape rectangular, IFunction4<Double, Double, Double, Double, T, ? extends TH> action)
+			throws TH { return action.apply(rectangular.getX(), rectangular.getY(), rectangular.getWidth(), rectangular.getHeight()); }
 
-	public static Rectangle2D maxRectangle(Rectangle2D a, Rectangle2D b) { return applyRectangular(a, (ax, ay, aw, ah) -> applyRectangular(b, (bx, by, bw, bh) -> new Rectangle2D.Double(max(ax, bx), max(ay, by), max(aw, bw), max(ah, bh)))); }
+	@SuppressWarnings("RedundantCast")
+	public static Rectangle2D maxRectangle(Rectangle2D a, Rectangle2D b) { return applyRectangular(a, (IFunction4<Double, Double, Double, Double, Rectangle2D.Double, RuntimeException>) (ax, ay, aw, ah) -> applyRectangular(b, (bx, by, bw, bh) -> new Rectangle2D.Double(max(ax, bx), max(ay, by), max(aw, bw), max(ah, bh)))); }
 
 	public static void transformRectangular(AffineTransform transform, RectangularShape rectangular) {
 		UIObjectUtilities.acceptRectangular(rectangular, (x, y, h, w) ->

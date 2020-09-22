@@ -2,12 +2,14 @@ package $group__.utilities.binding.bindings;
 
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.binding.core.BindingTransformerNotFoundException;
+import $group__.utilities.UtilitiesConfiguration;
+import $group__.utilities.binding.core.NoSuchBindingTransformerException;
 import $group__.utilities.binding.core.methods.IBindingMethod;
 import $group__.utilities.binding.core.methods.IBindingMethodDestination;
 import $group__.utilities.binding.core.methods.IBindingMethodSource;
 import $group__.utilities.collections.MapUtilities;
-import $group__.utilities.reactive.DisposableObserverAuto;
+import $group__.utilities.reactive.DefaultDisposableObserver;
+import $group__.utilities.reactive.LoggingDisposableObserver;
 import $group__.utilities.structures.INamespacePrefixedString;
 import com.google.common.cache.Cache;
 import com.google.common.collect.Streams;
@@ -70,20 +72,20 @@ public class MethodBindings
 	public static <T> DisposableObserver<T> createDelegatingObserver(IBindingMethodSource<T> source,
 	                                                                 Iterable<? extends IBindingMethodDestination<?>> destination,
 	                                                                 Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>> transformers) {
-		return new DisposableObserverAuto<T>() {
+		return new LoggingDisposableObserver<>(new DefaultDisposableObserver<T>() {
 			@Override
 			public void onNext(@Nonnull T t) {
 				for (IBindingMethodDestination<?> d : destination) {
 					try {
 						d.accept(CastUtilities.castUncheckedNullable(
 								transform(transformers, t, source.getGenericClass(), d.getGenericClass()))); // COMMENT should be of the correct type
-					} catch (BindingTransformerNotFoundException ex) {
+					} catch (NoSuchBindingTransformerException ex) {
 						onError(ex);
 						break;
 					}
 				}
 			}
-		};
+		}, UtilitiesConfiguration.getInstance().getLogger());
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")

@@ -10,6 +10,8 @@ import $group__.utilities.minecraft.internationalization.MinecraftLocaleUtilitie
 import $group__.utilities.structures.Singleton;
 import $group__.utilities.templates.CommonConfigurationTemplate;
 import $group__.utilities.templates.ConfigurationTemplate;
+import $group__.utilities.throwable.LoggingThrowableHandler;
+import $group__.utilities.throwable.ThreadLocalThrowableHandler;
 import com.google.common.base.Suppliers;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -32,18 +34,22 @@ import static $group__.common.registrable.tileentities.TileEntityTypesThis.TILE_
 @Mod(MOD_ID)
 public final class ModThis
 		extends Singleton {
-	private static final Supplier<ModThis> INSTANCE = Suppliers.memoize(() -> Singleton.getSingletonInstance(ModThis.class, ModConfiguration.getInstance().getLogger()));
+	private static final Supplier<ModThis> INSTANCE = Suppliers.memoize(() -> Singleton.getSingletonInstance(ModThis.class));
 	private static final ResourceBundle RESOURCE_BUNDLE;
 
 	static {
 		ConfigurationTemplate.configureSafe(UtilitiesConfiguration.getInstance(),
-				() -> new UtilitiesConfiguration.ConfigurationData(null, MinecraftLocaleUtilities::getCurrentLocale)); // COMMENT configure as early as possible
+				() -> new UtilitiesConfiguration.ConfigurationData(UtilitiesConfiguration.getBootstrapLogger(),
+						new LoggingThrowableHandler<>(new ThreadLocalThrowableHandler<>(), UtilitiesConfiguration.getBootstrapLogger()),
+						MinecraftLocaleUtilities::getCurrentLocale)); // COMMENT configure as early as possible
 		ConfigurationTemplate.configureSafe(ModConfiguration.getInstance(),
-				() -> new ModConfiguration.ConfigurationData(null, null));
+				() -> new ModConfiguration.ConfigurationData(ModConfiguration.getBootstrapLogger(),
+						new LoggingThrowableHandler<>(new ThreadLocalThrowableHandler<>(), ModConfiguration.getBootstrapLogger()),
+						MinecraftLocaleUtilities::getCurrentLocale));
 		RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(ModConfiguration.getInstance());
 	}
 
-	private final EventHandler eventHandler = Singleton.getSingletonInstance(EventHandler.class, ModConfiguration.getInstance().getLogger());
+	private final EventHandler eventHandler = Singleton.getSingletonInstance(EventHandler.class);
 	private final IProxy proxy = DistExecutor.unsafeRunForDist(
 			() -> DistLambdaHolder.Client::getProxyClient,
 			() -> DistLambdaHolder.Server::getProxyServer);

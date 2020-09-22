@@ -8,7 +8,8 @@ import $group__.ui.core.mvvm.views.components.extensions.cursors.IUIComponentCur
 import $group__.ui.core.parsers.components.UIExtensionConstructor;
 import $group__.ui.core.structures.IUIComponentContext;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.extensions.ExtensionContainerAware;
+import $group__.utilities.extensions.AbstractContainerAwareExtension;
+import $group__.utilities.extensions.core.IExtensionType;
 import $group__.utilities.structures.INamespacePrefixedString;
 
 import java.awt.geom.Point2D;
@@ -16,7 +17,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent<?, ?>>
-		extends ExtensionContainerAware<INamespacePrefixedString, IUIView<?>, E>
+		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIView<?>, E>
 		implements IUIExtensionCursorHandleProvider {
 	@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.CONTAINER_CLASS)
 	public UIExtensionCursorHandleProviderComponent(Class<E> containerClass) {
@@ -45,5 +46,5 @@ public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent
 	}
 
 	@Override
-	public IType<? extends INamespacePrefixedString, ?, ? extends IUIView<?>> getType() { return TYPE.getValue(); }
+	public IExtensionType<INamespacePrefixedString, ?, IUIView<?>> getType() { return TYPE.getValue(); }
 }

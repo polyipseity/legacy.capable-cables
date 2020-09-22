@@ -11,7 +11,7 @@ import $group__.ui.core.parsers.binding.UIMethod;
 import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.core.structures.IUIComponentContext;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
-import $group__.ui.cursors.EnumCursor;
+import $group__.ui.cursors.EnumGLFWCursor;
 import $group__.ui.events.ui.UIEvent;
 import $group__.ui.events.ui.UIEventListener;
 import $group__.ui.events.ui.UIEventRegistry;
@@ -34,9 +34,9 @@ public class UIComponentButton
 		extends UIComponentContainer
 		implements IUIComponentCursorHandleProvider {
 	@NonNls
-	public static final String METHOD_ON_ACTIVATE = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "button.methods.activate";
+	public static final String METHOD_ON_ACTIVATE = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "button.methods.activate";
 	@NonNls
-	public static final String METHOD_ON_ACTIVATED = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "button.methods.activated";
+	public static final String METHOD_ON_ACTIVATED = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "button.methods.activated";
 
 	public static final INamespacePrefixedString METHOD_ON_ACTIVATE_LOCATION = new ImmutableNamespacePrefixedString(METHOD_ON_ACTIVATE);
 	public static final INamespacePrefixedString METHOD_ON_ACTIVATED_LOCATION = new ImmutableNamespacePrefixedString(METHOD_ON_ACTIVATED);
@@ -101,7 +101,7 @@ public class UIComponentButton
 	@Override
 	public Optional<? extends Long> getCursorHandle(IUIComponentContext context, Point2D cursorPosition) {
 		return getButtonStates().contains(IButtonState.HOVERING)
-				? Optional.of(EnumCursor.STANDARD_HAND_CURSOR.getHandle())
+				? Optional.of(EnumGLFWCursor.STANDARD_HAND_CURSOR.getHandle())
 				: Optional.empty();
 	}
 
@@ -111,7 +111,7 @@ public class UIComponentButton
 	}
 
 	public interface IUIEventActivate extends IUIEvent {
-		@NonNls String TYPE_STRING = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "button.activated";
+		@NonNls String TYPE_STRING = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "button.activated";
 		INamespacePrefixedString TYPE = new ImmutableNamespacePrefixedString(TYPE_STRING);
 
 		static boolean shouldActivate(UIComponentButton self, IUIEvent event) {

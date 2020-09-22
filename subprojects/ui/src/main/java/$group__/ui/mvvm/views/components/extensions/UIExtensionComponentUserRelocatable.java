@@ -1,5 +1,6 @@
 package $group__.ui.mvvm.views.components.extensions;
 
+import $group__.ui.UIConfiguration;
 import $group__.ui.core.mvvm.views.IUIReshapeExplicitly;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
@@ -12,20 +13,24 @@ import $group__.ui.core.structures.IUIComponentContext;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.events.ui.UIEventListener;
+import $group__.ui.minecraft.mvvm.events.bus.UIViewMinecraftBusEvent;
 import $group__.ui.mvvm.views.components.UIComponentVirtual;
-import $group__.ui.structures.Point2DImmutable;
+import $group__.ui.structures.ImmutablePoint2D;
 import $group__.ui.structures.shapes.descriptors.GenericShapeDescriptor;
 import $group__.ui.utilities.UIObjectUtilities;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
-import $group__.utilities.extensions.ExtensionContainerAware;
-import $group__.utilities.reactive.DisposableObserverAuto;
+import $group__.utilities.AutoCloseableRotator;
+import $group__.utilities.extensions.AbstractContainerAwareExtension;
+import $group__.utilities.extensions.core.IExtensionType;
+import $group__.utilities.reactive.LoggingDisposableObserver;
+import $group__.utilities.references.OptionalWeakReference;
 import $group__.utilities.structures.INamespacePrefixedString;
-import io.reactivex.rxjava3.observers.DisposableObserver;
-import net.minecraftforge.client.event.GuiScreenEvent;
+import io.reactivex.rxjava3.disposables.Disposable;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
+import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
@@ -34,18 +39,20 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
-		extends ExtensionContainerAware<INamespacePrefixedString, IUIComponent, E>
+		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, E>
 		implements IUIExtensionComponentUserRelocatable<E> {
 	public static final int RELOCATE_BORDER_THICKNESS_DEFAULT = 10;
 	protected final int relocateBorderThickness = RELOCATE_BORDER_THICKNESS_DEFAULT; // TODO make this a property and strategy or something like that
-	protected final Object lockObject = new Object();
-	protected final VirtualComponent virtualComponent = new VirtualComponent();
+	private final Object lockObject = new Object();
+	private final VirtualComponent virtualComponent = new VirtualComponent();
 	@Nullable
 	protected IRelocateData relocateData;
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
+	private final AutoCloseableRotator<RenderObserver, RuntimeException> renderObserverRotator =
+			new AutoCloseableRotator<>(() -> new RenderObserver(this, UIConfiguration.getInstance().getLogger()), Disposable::dispose);
 
 	@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.CONTAINER_CLASS)
 	public UIExtensionComponentUserRelocatable(Class<E> containerClass) {
@@ -53,9 +60,7 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 	}
 
 	@Override
-	public IType<? extends INamespacePrefixedString, ?, ? extends IUIComponent> getType() { return TYPE.getValue(); }
-
-	protected final AtomicReference<ObserverDrawScreenEventPost> observerDrawScreenEventPost = new AtomicReference<>();
+	public IExtensionType<INamespacePrefixedString, ?, IUIComponent> getType() { return TYPE.getValue(); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -67,13 +72,10 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 					.flatMap(IUIComponentManager::getView)
 					.ifPresent(v -> v.getPathResolver().addVirtualElement(c, getVirtualComponent()));
 		});
-		UIEventBusEntryPoint.<GuiScreenEvent.DrawScreenEvent.Post>getEventBus()
-				.subscribe(getObserverDrawScreenEventPost().accumulateAndGet(new ObserverDrawScreenEventPost(), (p, n) -> {
-					if (p != null)
-						p.dispose();
-					return n;
-				}));
+		UIEventBusEntryPoint.<UIViewMinecraftBusEvent.Render>getEventBus().subscribe(getRenderObserverRotator().get().orElseThrow(AssertionError::new));
 	}
+
+	protected AutoCloseableRotator<RenderObserver, RuntimeException> getRenderObserverRotator() { return renderObserverRotator; }
 
 	@SuppressWarnings("ReturnOfInnerClass")
 	protected VirtualComponent getVirtualComponent() { return virtualComponent; }
@@ -124,17 +126,49 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 					.flatMap(IUIComponentManager::getView)
 					.ifPresent(v -> v.getPathResolver().removeVirtualElement(c, getVirtualComponent()));
 		});
-		Optional.ofNullable(getObserverDrawScreenEventPost().getAndSet(null)).ifPresent(DisposableObserver::dispose);
+		getRenderObserverRotator().close();
 	}
 
-	protected AtomicReference<ObserverDrawScreenEventPost> getObserverDrawScreenEventPost() { return observerDrawScreenEventPost; }
+	protected static class RenderObserver
+			extends LoggingDisposableObserver<UIViewMinecraftBusEvent.Render> {
+		private final OptionalWeakReference<UIExtensionComponentUserRelocatable<?>> owner;
+
+		public RenderObserver(UIExtensionComponentUserRelocatable<?> owner, Logger logger) {
+			super(logger);
+			this.owner = new OptionalWeakReference<>(owner);
+		}
+
+		@Override
+		@SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
+		public void onNext(UIViewMinecraftBusEvent.Render event) {
+			super.onNext(event);
+			if (event.getStage().isPost())
+				getOwner().ifPresent(owner ->
+						owner.getRelocateData()
+								.ifPresent(d -> owner.getContainer()
+										.ifPresent(c -> c.getManager()
+												.flatMap(IUIComponentManager::getView)
+												.ifPresent(v -> {
+													ImmutablePoint2D cp = event.getCursorPositionView();
+													Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
+													d.handle(r, cp);
+													try (IUIComponentContext context = v.createContext()) {
+														v.getPathResolver().resolvePath(context, cp, true);
+														DrawingUtilities.drawRectangle(context.getTransformStack().element(),
+																r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
+													}
+												}))));
+		}
+
+		protected Optional<? extends UIExtensionComponentUserRelocatable<?>> getOwner() { return owner.getOptional(); }
+	}
 
 	public class VirtualComponent
 			extends UIComponentVirtual
 			implements IUIComponentCursorHandleProvider {
 		@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 		protected VirtualComponent() {
-			super(IShapeDescriptor.getShapeDescriptorPlaceholderCopy());
+			super(IShapeDescriptor.getShapeDescriptorPlaceholder());
 
 			addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new UIEventListener.Functional<IUIEventMouse>(evt -> {
 				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && startRelocateMaybe(evt.getData().getCursorPositionView())) { // todo custom
@@ -194,28 +228,6 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 					: new GenericShapeDescriptor(getRelocateShape()
 					.<Shape>map(Function.identity())
 					.orElseGet(Rectangle2D.Double::new));
-		}
-	}
-
-	public class ObserverDrawScreenEventPost
-			extends DisposableObserverAuto<GuiScreenEvent.DrawScreenEvent.Post> {
-		@Override
-		@SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-		public void onNext(GuiScreenEvent.DrawScreenEvent.Post event) {
-			getRelocateData()
-					.ifPresent(d -> getContainer()
-							.ifPresent(c -> c.getManager()
-									.flatMap(IUIComponentManager::getView)
-									.ifPresent(v -> {
-										Point2D cp = new Point2DImmutable(event.getMouseX(), event.getMouseY());
-										Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
-										d.handle(r, cp);
-										try (IUIComponentContext context = v.createContext()) {
-											v.getPathResolver().resolvePath(context, cp, true);
-											DrawingUtilities.drawRectangle(context.getTransformStack().element(),
-													r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
-										}
-									})));
 		}
 	}
 }

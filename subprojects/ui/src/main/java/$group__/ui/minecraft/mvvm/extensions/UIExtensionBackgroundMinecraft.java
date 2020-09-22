@@ -1,5 +1,6 @@
 package $group__.ui.minecraft.mvvm.extensions;
 
+import $group__.ui.UIConfiguration;
 import $group__.ui.core.mvvm.IUISubInfrastructure;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
 import $group__.ui.core.mvvm.views.components.IUIViewComponent;
@@ -7,11 +8,12 @@ import $group__.ui.core.parsers.components.UIExtensionConstructor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.minecraft.core.mvvm.extensions.IUIExtensionBackgroundRenderer;
 import $group__.ui.minecraft.core.mvvm.extensions.IUIExtensionScreenProvider;
-import $group__.ui.minecraft.mvvm.events.bus.EventUIViewMinecraft;
+import $group__.ui.minecraft.mvvm.events.bus.UIViewMinecraftBusEvent;
 import $group__.ui.utilities.minecraft.UIBackgrounds;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.extensions.ExtensionContainerAware;
-import $group__.utilities.reactive.DisposableObserverAuto;
+import $group__.utilities.extensions.AbstractContainerAwareExtension;
+import $group__.utilities.extensions.core.IExtensionType;
+import $group__.utilities.reactive.LoggingDisposableObserver;
 import $group__.utilities.structures.INamespacePrefixedString;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraft.client.gui.screen.Screen;
@@ -28,7 +30,7 @@ import java.util.function.Predicate;
 
 @OnlyIn(Dist.CLIENT)
 public class UIExtensionBackgroundMinecraft<E extends IUIComponentManager<?>>
-		extends ExtensionContainerAware<INamespacePrefixedString, IUIComponentManager<?>, E>
+		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponentManager<?>, E>
 		implements IUIExtensionBackgroundRenderer {
 	@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.CONTAINER_CLASS)
 	public UIExtensionBackgroundMinecraft(Class<E> containerClass) {
@@ -38,20 +40,10 @@ public class UIExtensionBackgroundMinecraft<E extends IUIComponentManager<?>>
 
 	protected void renderBackground(Screen screen, Point2D mouse, double partialTicks) { UIBackgrounds.notifyBackgroundDrawn(screen); }
 
-	@Override
-	public IType<? extends INamespacePrefixedString, ?, ? extends IUIComponentManager<?>> getType() { return IUIExtensionBackgroundRenderer.TYPE.getValue(); }
+	protected final AtomicReference<RenderObserver> observerRender = new AtomicReference<>();
 
 	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void onExtensionAdded(IUIComponentManager<?> container) {
-		super.onExtensionAdded(container);
-		UIEventBusEntryPoint.<EventUIViewMinecraft.Render>getEventBus()
-				.subscribe(getObserverRender().accumulateAndGet(new ObserverRender(), (p, n) -> {
-					if (p != null)
-						p.dispose();
-					return n;
-				}));
-	}
+	public IExtensionType<INamespacePrefixedString, ?, IUIComponentManager<?>> getType() { return IUIExtensionBackgroundRenderer.TYPE.getValue(); }
 
 	@OnlyIn(Dist.CLIENT)
 	public static class Default<E extends IUIComponentManager<?>>
@@ -63,7 +55,17 @@ public class UIExtensionBackgroundMinecraft<E extends IUIComponentManager<?>>
 		protected void renderBackground(Screen screen, Point2D mouse, double partialTicks) { UIBackgrounds.renderBackgroundAndNotify(screen.getMinecraft(), screen.width, screen.height, 0); }
 	}
 
-	protected final AtomicReference<ObserverRender> observerRender = new AtomicReference<>();
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void onExtensionAdded(IUIComponentManager<?> container) {
+		super.onExtensionAdded(container);
+		UIEventBusEntryPoint.<UIViewMinecraftBusEvent.Render>getEventBus()
+				.subscribe(getObserverRender().accumulateAndGet(new RenderObserver(), (p, n) -> {
+					if (p != null)
+						p.dispose();
+					return n;
+				}));
+	}
 
 	@OnlyIn(Dist.CLIENT)
 	public static class Dirt<E extends IUIComponentManager<?>>
@@ -82,19 +84,22 @@ public class UIExtensionBackgroundMinecraft<E extends IUIComponentManager<?>>
 		Optional.ofNullable(getObserverRender().getAndSet(null)).ifPresent(DisposableObserver::dispose);
 	}
 
-	protected AtomicReference<ObserverRender> getObserverRender() { return observerRender; }
+	protected AtomicReference<RenderObserver> getObserverRender() { return observerRender; }
 
 	@OnlyIn(Dist.CLIENT)
-	public class ObserverRender
-			extends DisposableObserverAuto<EventUIViewMinecraft.Render> {
+	public class RenderObserver
+			extends LoggingDisposableObserver<UIViewMinecraftBusEvent.Render> {
+		public RenderObserver() { super(UIConfiguration.getInstance().getLogger()); }
+
 		@Override
 		@SubscribeEvent
-		public void onNext(@Nonnull EventUIViewMinecraft.Render event) {
+		public void onNext(@Nonnull UIViewMinecraftBusEvent.Render event) {
+			super.onNext(event);
 			if (event.getStage().isPre())
 				CastUtilities.castChecked(IUIViewComponent.class, event.getView())
 						.filter(evc -> getContainer().filter(Predicate.isEqual(evc.getManager())).isPresent())
 						.flatMap(IUISubInfrastructure::getInfrastructure)
-						.flatMap(c -> IUIExtensionScreenProvider.TYPE.getValue().get(c))
+						.flatMap(IUIExtensionScreenProvider.TYPE.getValue()::find)
 						.ifPresent(extScr -> renderBackground(extScr.getScreen(), event.getCursorPositionView(), event.getPartialTicks()));
 		}
 	}

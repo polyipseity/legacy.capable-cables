@@ -8,6 +8,7 @@ import $group__.ui.core.mvvm.views.events.IUIEvent;
 import $group__.ui.core.mvvm.views.events.IUIEventKeyboard;
 import $group__.ui.core.mvvm.views.events.IUIEventMouse;
 import $group__.ui.core.parsers.IUIResourceParser;
+import $group__.ui.core.parsers.UIParserCheckedException;
 import $group__.ui.core.parsers.components.UIRendererConstructor;
 import $group__.ui.core.structures.IUIComponentContext;
 import $group__.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
@@ -21,11 +22,10 @@ import $group__.ui.mvvm.views.components.common.UIComponentButton;
 import $group__.ui.mvvm.views.components.extensions.UIExtensionCursorHandleProviderComponent;
 import $group__.ui.parsers.components.DefaultUIComponentParser;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
+import $group__.ui.utilities.minecraft.TextComponentUtilities;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.PreconditionUtilities;
-import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
-import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.binding.Binder;
 import $group__.utilities.binding.core.IBinder;
 import $group__.utilities.binding.core.IBinding.EnumBindingType;
@@ -34,10 +34,13 @@ import $group__.utilities.binding.core.methods.IBindingMethodDestination;
 import $group__.utilities.binding.fields.BindingField;
 import $group__.utilities.binding.fields.ObservableField;
 import $group__.utilities.binding.methods.BindingMethodDestination;
-import $group__.utilities.extensions.IExtensionContainer;
+import $group__.utilities.extensions.core.IExtensionContainer;
+import $group__.utilities.functions.IThrowingFunction;
 import $group__.utilities.minecraft.client.ClientUtilities;
 import $group__.utilities.structures.INamespacePrefixedString;
 import $group__.utilities.structures.ImmutableNamespacePrefixedString;
+import $group__.utilities.throwable.ThrowableUtilities;
+import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -57,7 +60,6 @@ import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -71,6 +73,7 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
@@ -84,7 +87,7 @@ public enum UIDebugMinecraft {
 
 	@NonNls
 	private static final String PATH = "debug_ui";
-	private static final ITextComponent DISPLAY_NAME = new StringTextComponent("");
+	private static final ITextComponent DISPLAY_NAME = TextComponentUtilities.getEmpty();
 
 	public static Block getBlockEntry() { return DebugBlock.INSTANCE; }
 
@@ -124,13 +127,23 @@ public enum UIDebugMinecraft {
 								)));
 
 		static {
-			Try.run(() -> PARSER.parse(u -> Try.call(() -> {
-				try (InputStream is = AssertionUtilities.assertNonnull(DebugUI.class.getResourceAsStream(COMPONENT_TEST_XML_PATH))) {
-					return u.unmarshal(is);
-				}
-			}, UIConfiguration.getInstance().getLogger()).orElseThrow(ThrowableCatcher::rethrow)), UIConfiguration.getInstance().getLogger());
-			ThrowableCatcher.rethrow(true);
-			PARSER.construct(); // COMMENT early check
+			try {
+				PARSER.parse(IThrowingFunction.execute(u -> {
+					InputStream is = AssertionUtilities.assertNonnull(DebugUI.class.getResourceAsStream(COMPONENT_TEST_XML_PATH));
+					try {
+						return u.unmarshal(is);
+					} finally {
+						ThrowableUtilities.runQuietly(is::close, IOException.class, UIConfiguration.getInstance().getThrowableHandler());
+					}
+				}));
+			} catch (UIParserCheckedException | JAXBException e) {
+				throw ThrowableUtilities.propagate(e);
+			}
+			try {
+				PARSER.construct(); // COMMENT early check
+			} catch (UIParserCheckedException e) {
+				throw ThrowableUtilities.propagate(e);
+			}
 		}
 
 		@Override
@@ -144,15 +157,19 @@ public enum UIDebugMinecraft {
 			binder.addTransformer(EnumBindingType.FIELD, (Color color) -> Optional.ofNullable(color).map(Color::getRGB).orElse(null));
 			binder.addTransformer(EnumBindingType.FIELD, (Integer t) -> Optional.ofNullable(t).map(i -> new Color(i, true)).orElse(null));
 
-			AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> ret =
-					UIFacade.Minecraft.createScreen(
-							new StringTextComponent(""),
-							UIFacade.Minecraft.createInfrastructure(
-									PARSER.construct(),
-									new ViewModel(),
-									binder
-							),
-							container);
+			AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> ret;
+			try {
+				ret = UIFacade.Minecraft.createScreen(
+						getDisplayName(),
+						UIFacade.Minecraft.createInfrastructure(
+								PARSER.construct(),
+								new ViewModel(),
+								binder
+						),
+						container);
+			} catch (UIParserCheckedException e) {
+				throw ThrowableUtilities.propagate(e);
+			}
 			IExtensionContainer.StaticHolder.addExtensionChecked(ret.getInfrastructure().getView(),
 					new UIExtensionCursorHandleProviderComponent<>(IUIViewComponent.class));
 
@@ -273,7 +290,7 @@ public enum UIDebugMinecraft {
 
 		private DebugBlock() {
 			super(Properties.from(Blocks.STONE));
-			PreconditionUtilities.requireRunOnceOnly(UIConfiguration.getInstance().getLogger());
+			PreconditionUtilities.requireRunOnceOnly();
 		}
 
 		@Override

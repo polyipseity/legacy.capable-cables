@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 public enum PrimitiveUtilities {
-	/* MARK empty */;
+	;
 
 
 	public static final Class<?>[]

@@ -1,9 +1,8 @@
 package $group__.utilities.collections;
 
 import $group__.utilities.*;
-import $group__.utilities.ThrowableUtilities.ThrowableCatcher;
-import $group__.utilities.ThrowableUtilities.Try;
 import $group__.utilities.templates.CommonConfigurationTemplate;
+import $group__.utilities.throwable.ThrowableUtilities;
 import com.google.common.collect.*;
 import org.jetbrains.annotations.NonNls;
 import org.objectweb.asm.ClassWriter;
@@ -37,28 +36,22 @@ public enum MapUtilities {
 		Iterator<? extends V> iteratorValues = values.iterator();
 		keys.forEach(k -> {
 			if (!iteratorValues.hasNext())
-				throw ThrowableUtilities.logAndThrow(
-						new IllegalArgumentException(
-								new LogMessageBuilder()
-										.addMarkers(MapUtilities::getClassMarker)
-										.addKeyValue("size", size).addKeyValue("keys", keys).addKeyValue("values", values)
-										.addMessages(() -> getResourceBundle().getString("stitch.keys.long"))
-										.build()
-						),
-						UtilitiesConfiguration.getInstance().getLogger()
+				throw new IllegalArgumentException(
+						new LogMessageBuilder()
+								.addMarkers(MapUtilities::getClassMarker)
+								.addKeyValue("size", size).addKeyValue("keys", keys).addKeyValue("values", values)
+								.addMessages(() -> getResourceBundle().getString("stitch.keys.long"))
+								.build()
 				);
 			ret.put(k, iteratorValues.next());
 		});
 		if (iteratorValues.hasNext())
-			throw ThrowableUtilities.logAndThrow(
-					new IllegalArgumentException(
-							new LogMessageBuilder()
-									.addMarkers(MapUtilities::getClassMarker)
-									.addKeyValue("size", size).addKeyValue("keys", keys).addKeyValue("values", values)
-									.addMessages(() -> getResourceBundle().getString("stitch.values.long"))
-									.build()
-					),
-					UtilitiesConfiguration.getInstance().getLogger()
+			throw new IllegalArgumentException(
+					new LogMessageBuilder()
+							.addMarkers(MapUtilities::getClassMarker)
+							.addKeyValue("size", size).addKeyValue("keys", keys).addKeyValue("values", values)
+							.addMessages(() -> getResourceBundle().getString("stitch.values.long"))
+							.build()
 			);
 
 		return ImmutableMap.copyOf(ret);
@@ -121,8 +114,12 @@ public enum MapUtilities {
 
 		static {
 			{
-				Class<?> superclass = Try.call(() -> Class.forName(SUPERCLASS_NAME), UtilitiesConfiguration.getInstance().getLogger())
-						.orElseThrow(ThrowableCatcher::rethrow);
+				Class<?> superclass;
+				try {
+					superclass = Class.forName(SUPERCLASS_NAME);
+				} catch (ClassNotFoundException e) {
+					throw ThrowableUtilities.propagate(e);
+				}
 				String name = LITERAL_SUPERCLASS_SIMPLE_NAME
 						.matcher(superclass.getName())
 						.replaceAll(Matcher.quoteReplacement(CLASS_SIMPLE_NAME));
@@ -226,12 +223,20 @@ public enum MapUtilities {
 			}
 
 			{
-				MethodHandle constructor = Try.call(() -> DynamicUtilities.IMPL_LOOKUP.findConstructor(CLASS, MethodType.methodType(void.class, Map.class, Map.class)), UtilitiesConfiguration.getInstance().getLogger())
-						.orElseThrow(ThrowableCatcher::rethrow);
+				MethodHandle constructor;
+				try {
+					constructor = DynamicUtilities.IMPL_LOOKUP.findConstructor(CLASS, MethodType.methodType(void.class, Map.class, Map.class));
+				} catch (NoSuchMethodException | IllegalAccessException e) {
+					throw ThrowableUtilities.propagate(e);
+				}
 				// TODO Java 9 - use LambdaMetaFactory
-				CONSTRUCTOR = (forward, backward) ->
-						Try.call(() -> (BiMap<?, ?>) constructor.invoke(forward, backward), UtilitiesConfiguration.getInstance().getLogger())
-								.orElseThrow(ThrowableCatcher::rethrow);
+				CONSTRUCTOR = (forward, backward) -> {
+					try {
+						return (BiMap<?, ?>) constructor.invoke(forward, backward);
+					} catch (Throwable throwable) {
+						throw ThrowableUtilities.propagate(throwable);
+					}
+				};
 			}
 		}
 	}

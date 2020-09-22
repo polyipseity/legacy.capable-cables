@@ -1,5 +1,6 @@
 package $group__.ui.minecraft.core.mvvm.views;
 
+import $group__.utilities.minecraft.client.ClientUtilities;
 import $group__.utilities.minecraft.client.GLUtilities;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraftforge.api.distmarker.Dist;

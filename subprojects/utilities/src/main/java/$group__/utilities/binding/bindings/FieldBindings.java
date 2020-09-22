@@ -3,11 +3,15 @@ package $group__.utilities.binding.bindings;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
-import $group__.utilities.binding.core.BindingTransformerNotFoundException;
+import $group__.utilities.UtilitiesConfiguration;
+import $group__.utilities.binding.core.NoSuchBindingTransformerException;
 import $group__.utilities.binding.core.fields.IBindingField;
 import $group__.utilities.collections.MapUtilities;
+import $group__.utilities.functions.IThrowingBiFunction;
+import $group__.utilities.functions.IThrowingConsumer;
 import $group__.utilities.interfaces.IValue;
-import $group__.utilities.reactive.DisposableObserverAuto;
+import $group__.utilities.reactive.DefaultDisposableObserver;
+import $group__.utilities.reactive.LoggingDisposableObserver;
 import $group__.utilities.structures.INamespacePrefixedString;
 import com.google.common.cache.Cache;
 import com.google.common.collect.Streams;
@@ -41,23 +45,23 @@ public class FieldBindings
 	@Override
 	@SuppressWarnings("UnstableApiUsage")
 	public boolean add(Iterable<? extends IBindingField<?>> fields)
-			throws BindingTransformerNotFoundException {
+			throws NoSuchBindingTransformerException {
 		return Streams.stream(fields).sequential() // COMMENT sequential, field binding order matters
 				.filter(key -> !getFields().containsKey(key))
-				.reduce(false, (r, f) -> {
+				.reduce(false, IThrowingBiFunction.execute((r, f) -> {
 					getFields().keySet().stream().unordered()
 							.findAny()
-							.ifPresent(fc ->
+							.ifPresent(IThrowingConsumer.execute(fc ->
 									f.setValue(CastUtilities.castUncheckedNullable( // COMMENT should be of the right type
 											transform(getTransformers(),
 													CastUtilities.castUncheckedNullable(fc.getValue().orElse(null)), // COMMENT should be always safe
 													fc.getGenericClass(),
-													f.getGenericClass()))));
+													f.getGenericClass())))));
 					DisposableObserver<? extends IValue<?>> d = createSynchronizationObserver(f, getFields().keySet(), getTransformers(), getIsSource());
 					getFields().put(f, d);
 					f.getField().getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
 					return true;
-				}, Boolean::logicalOr);
+				}), Boolean::logicalOr);
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
@@ -67,7 +71,7 @@ public class FieldBindings
 	                                                                              Iterable<? extends IBindingField<?>> to,
 	                                                                              Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>> transformers,
 	                                                                              AtomicBoolean isSource) {
-		return new DisposableObserverAuto<IValue<T>>() {
+		return new LoggingDisposableObserver<>(new DefaultDisposableObserver<IValue<T>>() {
 			@Override
 			public void onNext(@Nonnull IValue<T> t) {
 				if (isSource.getAndSet(false)) {
@@ -76,9 +80,9 @@ public class FieldBindings
 							try {
 								k.setValue(CastUtilities.castUncheckedNullable(
 										transform(transformers, t.getValue().orElse(null), from.getGenericClass(), k.getGenericClass()))); // COMMENT should be of the correct type
-							} catch (BindingTransformerNotFoundException ex) {
-								onError(ex);
+							} catch (NoSuchBindingTransformerException ex) {
 								isSource.set(true);
+								onError(ex);
 								break;
 							}
 						}
@@ -86,7 +90,7 @@ public class FieldBindings
 					isSource.set(true);
 				}
 			}
-		};
+		}, UtilitiesConfiguration.getInstance().getLogger());
 	}
 
 	public AtomicBoolean getIsSource() { return isSource; }

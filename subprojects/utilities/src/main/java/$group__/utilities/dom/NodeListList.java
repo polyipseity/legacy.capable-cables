@@ -1,24 +1,21 @@
 package $group__.utilities.dom;
 
-import $group__.utilities.interfaces.IDelegating;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.AbstractList;
 
 public class NodeListList
-		extends AbstractList<Node>
-		implements IDelegating<NodeList> {
-	protected final NodeList delegated;
+		extends AbstractList<Node> {
+	protected final NodeList delegate;
 
-	public NodeListList(NodeList delegated) { this.delegated = delegated; }
-
-	@Override
-	public Node get(int index) { return getDelegated().item(index); }
+	public NodeListList(NodeList delegate) { this.delegate = delegate; }
 
 	@Override
-	public NodeList getDelegated() { return delegated; }
+	public Node get(int index) { return getDelegate().item(index); }
+
+	protected NodeList getDelegate() { return delegate; }
 
 	@Override
-	public int size() { return getDelegated().getLength(); }
+	public int size() { return getDelegate().getLength(); }
 }

@@ -11,7 +11,7 @@ import $group__.ui.minecraft.mvvm.components.rendering.UIComponentRendererMinecr
 import $group__.ui.minecraft.mvvm.extensions.UIExtensionBackgroundMinecraft;
 import $group__.ui.mvvm.views.components.UIComponentManager;
 import $group__.ui.mvvm.views.components.rendering.UIRendererContainer;
-import $group__.utilities.extensions.IExtensionContainer;
+import $group__.utilities.extensions.core.IExtensionContainer;
 import $group__.utilities.structures.INamespacePrefixedString;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -40,8 +40,9 @@ public class UIComponentManagerMinecraft
 	public Optional<? extends IUIComponentRendererMinecraft<?>> getRenderer() { return getRendererContainer().getRenderer(); }
 
 	@Override
+	@Deprecated
 	public void setRenderer(@Nullable IUIComponentRendererMinecraft<?> renderer) {
-		StaticHolder.setRendererImpl(this, renderer,
+		IUIRendererContainer.StaticHolder.setRendererImpl(this, renderer,
 				(s, r) -> s.getRendererContainer().setRenderer(r));
 	}
 

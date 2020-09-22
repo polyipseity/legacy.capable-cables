@@ -9,7 +9,6 @@ import $group__.ui.utilities.UIObjectUtilities;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.LogMessageBuilder;
-import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.interfaces.IHasGenericClass;
 import $group__.utilities.templates.CommonConfigurationTemplate;
@@ -41,15 +40,13 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 	public AbstractShapeDescriptorBuilder<S> setProperty(String key, @Nullable Object value) throws IllegalArgumentException {
 		@Nullable Consumer<?> c = getProperties().get(key);
 		if (c == null)
-			throw ThrowableUtilities.logAndThrow(
-					new IllegalStateException(
-							new LogMessageBuilder()
-									.addMarkers(UIMarkers.getInstance()::getMarkerShape)
-									.addKeyValue("key", key).addKeyValue("value", value)
-									.addMessages(() -> getResourceBundle().getString("property.key.missing"))
-									.build()
-					),
-					UIConfiguration.getInstance().getLogger());
+			throw new IllegalStateException(
+					new LogMessageBuilder()
+							.addMarkers(UIMarkers.getInstance()::getMarkerShape)
+							.addKeyValue("key", key).addKeyValue("value", value)
+							.addMessages(() -> getResourceBundle().getString("property.key.missing"))
+							.build()
+			);
 
 		c.accept(CastUtilities.castUncheckedNullable(value)); // COMMENT ClassCastException may be thrown
 		return this;

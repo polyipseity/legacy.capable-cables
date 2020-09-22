@@ -41,8 +41,9 @@ public class UIComponentWindowMinecraft
 	public Optional<? extends IUIComponentRendererMinecraft<?>> getRenderer() { return getRendererContainer().getRenderer(); }
 
 	@Override
+	@Deprecated
 	public void setRenderer(@Nullable IUIComponentRendererMinecraft<?> renderer) {
-		StaticHolder.setRendererImpl(this, renderer,
+		IUIRendererContainer.StaticHolder.setRendererImpl(this, renderer,
 				(s, r) -> s.getRendererContainer().setRenderer(r));
 	}
 
@@ -55,9 +56,9 @@ public class UIComponentWindowMinecraft
 	public static class DefaultRenderer<C extends UIComponentWindowMinecraft>
 			extends UIComponentRendererMinecraft<C> {
 		@NonNls
-		public static final String PROPERTY_COLOR_BACKGROUND = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "window.colors.background";
+		public static final String PROPERTY_COLOR_BACKGROUND = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "window.colors.background";
 		@NonNls
-		public static final String PROPERTY_COLOR_BORDER = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "window.colors.border";
+		public static final String PROPERTY_COLOR_BORDER = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "window.colors.border";
 
 		public static final INamespacePrefixedString PROPERTY_COLOR_BACKGROUND_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_COLOR_BACKGROUND);
 		public static final INamespacePrefixedString PROPERTY_COLOR_BORDER_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_COLOR_BORDER);

@@ -5,7 +5,7 @@ import $group__.ui.core.mvvm.views.components.rendering.IUIComponentRenderer;
 import $group__.ui.core.structures.IUIComponentContext;
 import $group__.ui.minecraft.core.mvvm.views.EnumCropMethod;
 import $group__.ui.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
-import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
+import $group__.ui.mvvm.views.components.extensions.caches.UICacheExtension;
 import $group__.ui.utilities.UIObjectUtilities;
 import $group__.ui.utilities.minecraft.CoordinateUtilities;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
@@ -35,7 +35,7 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUICompo
 			case STENCIL_BUFFER:
 				switch (stage) {
 					case CROP:
-						int stencilRef = Math.floorMod(UIExtensionCache.CacheUniversal.Z.getValue().get(container).orElseThrow(InternalError::new), (int) Math.pow(2, GLUtilities.State.getInteger(GL11.GL_STENCIL_BITS)));
+						int stencilRef = Math.floorMod(UICacheExtension.CacheUniversal.Z.getValue().get(container).orElseThrow(InternalError::new), (int) Math.pow(2, GLUtilities.State.getInteger(GL11.GL_STENCIL_BITS)));
 
 						GLUtilities.Stacks.push("stencilFunc",
 								() -> RenderSystem.stencilFunc(GL11.GL_EQUAL, stencilRef, GLUtilities.GL_MASK_ALL_BITS), GLUtilities.Stacks.STENCIL_FUNC_FALLBACK);

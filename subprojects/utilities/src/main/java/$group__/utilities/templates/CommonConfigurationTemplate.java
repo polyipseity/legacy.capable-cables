@@ -4,6 +4,7 @@ import $group__.utilities.AssertionUtilities;
 import $group__.utilities.DynamicUtilities;
 import $group__.utilities.interfaces.IRecordCandidate;
 import $group__.utilities.internationalization.ChangingLocaleResourceBundle;
+import $group__.utilities.throwable.IThrowableHandler;
 import org.slf4j.Logger;
 import org.slf4j.ext.XLogger;
 
@@ -16,9 +17,11 @@ import java.util.function.Supplier;
 public abstract class CommonConfigurationTemplate<D extends CommonConfigurationTemplate.ConfigurationData>
 		extends ConfigurationTemplate<D> {
 	@Nullable
-	protected volatile XLogger logger;
+	private volatile XLogger logger;
 	@Nullable
-	protected volatile Supplier<? extends Locale> localeSupplier;
+	private volatile IThrowableHandler<Throwable> throwableHandler;
+	@Nullable
+	private volatile Supplier<? extends Locale> localeSupplier;
 
 	protected CommonConfigurationTemplate(Logger logger) { super(logger); }
 
@@ -33,25 +36,39 @@ public abstract class CommonConfigurationTemplate<D extends CommonConfigurationT
 
 	public XLogger getLogger() { return AssertionUtilities.assertNonnull(logger); }
 
+	public IThrowableHandler<Throwable> getThrowableHandler() { return AssertionUtilities.assertNonnull(throwableHandler); }
+
+	protected void setThrowableHandler(@Nullable IThrowableHandler<Throwable> throwableHandler) { this.throwableHandler = throwableHandler; }
+
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	protected void configure0(D data) {
-		logger = new XLogger(data.getLogger());
-		localeSupplier = data.getLocaleSupplier();
+		setLogger(new XLogger(data.getLogger())); // COMMENT create 'XLogger' directly to avoid classloading
+		setThrowableHandler(data.getThrowableHandler());
+		setLocaleSupplier(data.getLocaleSupplier());
 	}
 
-	public static abstract class ConfigurationData implements IRecordCandidate {
-		protected final Logger logger;
-		protected final Supplier<? extends Locale> localeSupplier;
+	protected void setLogger(@Nullable XLogger logger) { this.logger = logger; }
 
-		public ConfigurationData(Logger logger,
-		                         Supplier<? extends Locale> localeSupplier) {
+	protected void setLocaleSupplier(@Nullable Supplier<? extends Locale> localeSupplier) { this.localeSupplier = localeSupplier; }
+
+	public static abstract class ConfigurationData implements IRecordCandidate {
+		private final Logger logger;
+		private final IThrowableHandler<Throwable> throwableHandler;
+		private final Supplier<? extends Locale> localeSupplier;
+
+		protected ConfigurationData(Logger logger,
+		                            IThrowableHandler<Throwable> throwableHandler,
+		                            Supplier<? extends Locale> localeSupplier) {
 			this.logger = logger;
+			this.throwableHandler = throwableHandler;
 			this.localeSupplier = localeSupplier;
 		}
 
-		public Logger getLogger() { return logger; }
+		protected Logger getLogger() { return logger; }
 
-		public Supplier<? extends Locale> getLocaleSupplier() { return localeSupplier; }
+		protected IThrowableHandler<Throwable> getThrowableHandler() { return throwableHandler; }
+
+		protected Supplier<? extends Locale> getLocaleSupplier() { return localeSupplier; }
 	}
 }

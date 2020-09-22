@@ -5,7 +5,6 @@ import $group__.ui.UIMarkers;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.LogMessageBuilder;
 import $group__.utilities.PreconditionUtilities;
-import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.functions.IDuplexFunction;
 import $group__.utilities.structures.Registry;
 import $group__.utilities.structures.StandardDuplexFunctionRegistry;
@@ -24,13 +23,13 @@ public enum JAXBAdapterRegistries {
 	public static <L> IDuplexFunction<L, ?> getAdapter(L jaxbObj) {
 		return findAdapter(jaxbObj)
 				.orElseThrow(() ->
-						ThrowableUtilities.logAndThrow(new IllegalArgumentException(
+						new IllegalArgumentException(
 								new LogMessageBuilder()
 										.addMarkers(UIMarkers.getInstance()::getMarkerJAXB)
 										.addKeyValue("jaxbObj", jaxbObj)
 										.addMessages(() -> getResourceBundle().getString("adapter.find.not_found"))
 										.build()
-						), UIConfiguration.getInstance().getLogger()));
+						));
 	}
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
@@ -52,7 +51,7 @@ public enum JAXBAdapterRegistries {
 
 		protected Object() {
 			super(true, UIConfiguration.getInstance().getLogger());
-			PreconditionUtilities.requireRunOnceOnly(UIConfiguration.getInstance().getLogger());
+			PreconditionUtilities.requireRunOnceOnly();
 		}
 	}
 
@@ -62,7 +61,7 @@ public enum JAXBAdapterRegistries {
 
 		protected Element() {
 			super(true, UIConfiguration.getInstance().getLogger());
-			PreconditionUtilities.requireRunOnceOnly(UIConfiguration.getInstance().getLogger());
+			PreconditionUtilities.requireRunOnceOnly();
 		}
 
 		public <L, VL extends IDuplexFunction<JAXBElement<L>, ?>> RegistryObject<VL> registerSafe(Class<L> key, VL value) {

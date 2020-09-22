@@ -10,9 +10,9 @@ import com.google.common.collect.Streams;
 import io.reactivex.rxjava3.core.ObservableSource;
 
 public interface IHasBinding {
-	default Iterable<? extends IBindingField<?>> getBindingFields() { return BindingUtilities.getBindingFields(this, EnumScopeOptions.ALL); }
+	default Iterable<? extends IBindingField<?>> getBindingFields() { return BindingUtilities.getBindingFields(this, EnumScopeOptions.getAll()); }
 
-	default Iterable<? extends IBindingMethod<?>> getBindingMethods() { return BindingUtilities.getBindingMethods(this, EnumScopeOptions.ALL); }
+	default Iterable<? extends IBindingMethod<?>> getBindingMethods() { return BindingUtilities.getBindingMethods(this, EnumScopeOptions.getAll()); }
 
 	@SuppressWarnings("UnstableApiUsage")
 	default Iterable<? extends ObservableSource<IBinderAction>> getBinderNotifiers() {

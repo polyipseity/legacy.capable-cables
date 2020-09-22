@@ -1,5 +1,6 @@
 package $group__.ui.mvvm.views.components.extensions;
 
+import $group__.ui.UIConfiguration;
 import $group__.ui.core.mvvm.views.IUIReshapeExplicitly;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentManager;
@@ -10,25 +11,29 @@ import $group__.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
 import $group__.ui.core.parsers.components.UIExtensionConstructor;
 import $group__.ui.core.structures.IUIComponentContext;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
-import $group__.ui.cursors.EnumCursor;
+import $group__.ui.cursors.EnumGLFWCursor;
 import $group__.ui.cursors.ICursor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
 import $group__.ui.events.ui.UIEventListener;
+import $group__.ui.minecraft.mvvm.events.bus.UIViewMinecraftBusEvent;
 import $group__.ui.mvvm.views.components.UIComponentVirtual;
 import $group__.ui.structures.EnumUIAxis;
 import $group__.ui.structures.EnumUISide;
-import $group__.ui.structures.Point2DImmutable;
+import $group__.ui.structures.ImmutablePoint2D;
 import $group__.ui.structures.shapes.descriptors.GenericShapeDescriptor;
 import $group__.ui.utilities.UIObjectUtilities;
 import $group__.ui.utilities.minecraft.DrawingUtilities;
-import $group__.utilities.extensions.ExtensionContainerAware;
-import $group__.utilities.reactive.DisposableObserverAuto;
+import $group__.utilities.AutoCloseableRotator;
+import $group__.utilities.extensions.AbstractContainerAwareExtension;
+import $group__.utilities.extensions.core.IExtensionType;
+import $group__.utilities.reactive.LoggingDisposableObserver;
+import $group__.utilities.references.OptionalWeakReference;
 import $group__.utilities.structures.INamespacePrefixedString;
-import io.reactivex.rxjava3.observers.DisposableObserver;
-import net.minecraftforge.client.event.GuiScreenEvent;
+import io.reactivex.rxjava3.disposables.Disposable;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
+import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
@@ -40,43 +45,43 @@ import java.awt.geom.RectangularShape;
 import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
-		extends ExtensionContainerAware<INamespacePrefixedString, IUIComponent, E>
+		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, E>
 		implements IUIExtensionComponentUserResizable<E> {
 	public static final int RESIZE_BORDER_THICKNESS_DEFAULT = 10;
-	protected final int resizeBorderThickness = RESIZE_BORDER_THICKNESS_DEFAULT; // TODO make this a property and strategy or something like that
-	protected final Object lockObject = new Object();
-	protected final VirtualComponent virtualComponent = new VirtualComponent();
+	private final int resizeBorderThickness = RESIZE_BORDER_THICKNESS_DEFAULT; // TODO make this a property and strategy or something like that
+	private final Object lockObject = new Object();
+	private final VirtualComponent virtualComponent = new VirtualComponent();
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
+	private final AutoCloseableRotator<RenderObserver, RuntimeException> renderObserverRotator =
+			new AutoCloseableRotator<>(() -> new RenderObserver(this, UIConfiguration.getInstance().getLogger()), Disposable::dispose);
 	@Nullable
-	protected IResizeData resizeData;
+	private IResizeData resizeData;
+
+	protected static Optional<ICursor> getCursor(Set<? extends EnumUISide> sides) {
+		@Nullable ICursor cursor = null;
+		if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT)
+				|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
+			cursor = EnumGLFWCursor.EXTENSION_RESIZE_NW_SE_CURSOR;
+		else if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.RIGHT)
+				|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
+			cursor = EnumGLFWCursor.EXTENSION_RESIZE_NE_SW_CURSOR;
+		else if (sides.contains(EnumUISide.LEFT) || sides.contains(EnumUISide.RIGHT))
+			cursor = EnumGLFWCursor.STANDARD_RESIZE_HORIZONTAL_CURSOR;
+		else if (sides.contains(EnumUISide.UP) || sides.contains(EnumUISide.DOWN))
+			cursor = EnumGLFWCursor.STANDARD_RESIZE_VERTICAL_CURSOR;
+		return Optional.ofNullable(cursor);
+	}
 
 	@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.CONTAINER_CLASS)
 	public UIExtensionComponentUserResizable(Class<E> containerClass) {
 		super(IUIComponent.class, containerClass);
 	}
 
-	protected static Optional<ICursor> getCursor(Set<? extends EnumUISide> sides) {
-		@Nullable ICursor cursor = null;
-		if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT)
-				|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
-			cursor = EnumCursor.EXTENSION_RESIZE_NW_SE_CURSOR;
-		else if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.RIGHT)
-				|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
-			cursor = EnumCursor.EXTENSION_RESIZE_NE_SW_CURSOR;
-		else if (sides.contains(EnumUISide.LEFT) || sides.contains(EnumUISide.RIGHT))
-			cursor = EnumCursor.STANDARD_RESIZE_HORIZONTAL_CURSOR;
-		else if (sides.contains(EnumUISide.UP) || sides.contains(EnumUISide.DOWN))
-			cursor = EnumCursor.STANDARD_RESIZE_VERTICAL_CURSOR;
-		return Optional.ofNullable(cursor);
-	}
-
 	@Override
-	public IType<? extends INamespacePrefixedString, ?, ? extends IUIComponent> getType() { return TYPE.getValue(); }
-
-	protected final AtomicReference<ObserverDrawScreenEventPost> observerDrawScreenEventPost = new AtomicReference<>();
+	public IExtensionType<INamespacePrefixedString, ?, IUIComponent> getType() { return TYPE.getValue(); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -89,13 +94,12 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 							getVirtualComponent().setRelatedComponent(c);
 							v.getPathResolver().addVirtualElement(c, getVirtualComponent());
 						}));
-		UIEventBusEntryPoint.<GuiScreenEvent.DrawScreenEvent.Post>getEventBus()
-				.subscribe(getObserverDrawScreenEventPost().accumulateAndGet(new ObserverDrawScreenEventPost(), (p, n) -> {
-					if (p != null)
-						p.dispose();
-					return n;
-				}));
+		UIEventBusEntryPoint.<UIViewMinecraftBusEvent.Render>getEventBus()
+				.subscribe(getRenderObserverRotator().get()
+						.orElseThrow(AssertionError::new));
 	}
+
+	protected AutoCloseableRotator<RenderObserver, RuntimeException> getRenderObserverRotator() { return renderObserverRotator; }
 
 	@SuppressWarnings("ReturnOfInnerClass")
 	protected VirtualComponent getVirtualComponent() { return virtualComponent; }
@@ -164,6 +168,51 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 		protected Point2D getCursorPosition() { return cursorPosition; }
 	}
 
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void onExtensionRemoved() {
+		super.onExtensionRemoved();
+		getRenderObserverRotator().close();
+	}
+
+	protected static class RenderObserver
+			extends LoggingDisposableObserver<UIViewMinecraftBusEvent.Render> {
+		private final OptionalWeakReference<UIExtensionComponentUserResizable<?>> owner;
+
+		public RenderObserver(UIExtensionComponentUserResizable<?> owner, Logger logger) {
+			super(logger);
+			this.owner = new OptionalWeakReference<>(owner);
+		}
+
+		@Override
+		@SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
+		public void onNext(UIViewMinecraftBusEvent.Render event) {
+			super.onNext(event);
+			if (event.getStage().isPost())
+				getOwner()
+						.ifPresent(owner ->
+								owner.getResizeData()
+										.ifPresent(d ->
+												owner.getContainer()
+														.ifPresent(c -> c.getManager()
+																.flatMap(IUIComponentManager::getView)
+																.ifPresent(view -> {
+																	ImmutablePoint2D cp = event.getCursorPositionView();
+																	Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
+																	d.handle(r, cp);
+																	UIObjectUtilities.acceptRectangular(r, (x, y, w, h) ->
+																			r.setFrame(x, y, w - 1, h - 1));
+																	try (IUIComponentContext context = view.createContext()) {
+																		view.getPathResolver().resolvePath(context, cp, true);
+																		DrawingUtilities.drawRectangle(context.getTransformStack().element(),
+																				r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
+																	}
+																}))));
+		}
+
+		protected Optional<? extends UIExtensionComponentUserResizable<?>> getOwner() { return owner.getOptional(); }
+	}
+
 	public class VirtualComponent
 			extends UIComponentVirtual
 			implements IUIComponentCursorHandleProvider {
@@ -171,7 +220,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 
 		@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 		protected VirtualComponent() {
-			super(IShapeDescriptor.getShapeDescriptorPlaceholderCopy());
+			super(IShapeDescriptor.getShapeDescriptorPlaceholder());
 
 			addEventListener(EnumUIEventDOMType.MOUSE_ENTER.getEventType(), new UIEventListener.Functional<IUIEventMouse>(evt -> setBeingHovered(true)), false);
 			addEventListener(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(), new UIEventListener.Functional<IUIEventMouse>(evt -> setBeingHovered(false)), false);
@@ -207,13 +256,13 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 
 								@Nullable Point2D base = null;
 								if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT))
-									base = new Point2DImmutable(spb.getMaxX(), spb.getMaxY());
+									base = new ImmutablePoint2D(spb.getMaxX(), spb.getMaxY());
 								else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
-									base = new Point2DImmutable(spb.getX(), spb.getY());
+									base = new ImmutablePoint2D(spb.getX(), spb.getY());
 								else if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.RIGHT))
-									base = new Point2DImmutable(spb.getX(), spb.getMaxY());
+									base = new ImmutablePoint2D(spb.getX(), spb.getMaxY());
 								else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
-									base = new Point2DImmutable(spb.getMaxX(), spb.getY());
+									base = new ImmutablePoint2D(spb.getMaxX(), spb.getY());
 
 								IResizeData d = new ResizeData(cursorPosition, sides, base, getCursor(sides).orElseThrow(InternalError::new).getHandle());
 								synchronized (getLockObject()) {
@@ -253,7 +302,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 
 		@Override
 		public Optional<? extends Long> getCursorHandle(IUIComponentContext context, Point2D cursorPosition) {
-			@SuppressWarnings("Convert2MethodRef") @Nullable Long ret = getResizeData()
+			@SuppressWarnings("Convert2MethodRef") @Nullable Optional<? extends Long> ret = getResizeData()
 					.map(d -> d.getBaseView()
 							.map(b -> {
 								Set<EnumUISide> sides = EnumUISide.getSidesMouseOver(
@@ -261,64 +310,29 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 										cursorPosition);
 								if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT)
 										|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
-									return EnumCursor.EXTENSION_RESIZE_NW_SE_CURSOR.getHandle();
+									return EnumGLFWCursor.EXTENSION_RESIZE_NW_SE_CURSOR.getHandle();
 								else if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.RIGHT)
 										|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
-									return EnumCursor.EXTENSION_RESIZE_NE_SW_CURSOR.getHandle();
+									return EnumGLFWCursor.EXTENSION_RESIZE_NE_SW_CURSOR.getHandle();
 								return null;
 							})
-							.orElseGet(() -> d.getInitialCursorHandle())) // COMMENT compiler bug, long does not get boxed to Long with a method reference
-					.orElse(null);
+							.orElseGet(() -> d.getInitialCursorHandle())); // COMMENT compiler bug, long does not get boxed to Long with a method reference
 
-			if (ret == null)
+			if (!ret.isPresent())
 				ret = getContainer()
 						.filter(c -> isBeingHovered())
 						.flatMap(c ->
-								getCursor(EnumUISide.getSidesMouseOver(context.getTransformStack().element().createTransformedShape(c.getShapeDescriptor().getShapeOutput()).getBounds2D(), cursorPosition))
-										.map(EnumCursor::getHandle))
-						.orElse(null);
+								getCursor(
+										EnumUISide.getSidesMouseOver(
+												context.getTransformStack().element()
+														.createTransformedShape(c.getShapeDescriptor().getShapeOutput()).getBounds2D(), cursorPosition))
+										.map(ICursor::getHandle));
 
-			return Optional.ofNullable(ret);
+			return ret;
 		}
 
 		protected boolean isBeingHovered() { return beingHovered; }
 
 		protected void setBeingHovered(boolean beingHovered) { this.beingHovered = beingHovered; }
-	}
-
-	protected AtomicReference<ObserverDrawScreenEventPost> getObserverDrawScreenEventPost() { return observerDrawScreenEventPost; }
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void onExtensionRemoved() {
-		super.onExtensionRemoved();
-		Optional.ofNullable(getObserverDrawScreenEventPost().getAndSet(null)).ifPresent(DisposableObserver::dispose);
-	}
-
-	public class ObserverDrawScreenEventPost
-			extends DisposableObserverAuto<GuiScreenEvent.DrawScreenEvent.Post> {
-		@Override
-		@SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-		public void onNext(GuiScreenEvent.DrawScreenEvent.Post event) {
-			getResizeData()
-					.ifPresent(d ->
-							getContainer()
-									.ifPresent(c -> {
-										Point2D cp = new Point2DImmutable(event.getMouseX(), event.getMouseY());
-										c.getManager()
-												.flatMap(IUIComponentManager::getView)
-												.ifPresent(view -> {
-													Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
-													d.handle(r, cp);
-													UIObjectUtilities.acceptRectangular(r, (x, y, w, h) ->
-															r.setFrame(x, y, w - 1, h - 1));
-													try (IUIComponentContext context = view.createContext()) {
-														view.getPathResolver().resolvePath(context, cp, true);
-														DrawingUtilities.drawRectangle(context.getTransformStack().element(),
-																r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
-													}
-												});
-									}));
-		}
 	}
 }

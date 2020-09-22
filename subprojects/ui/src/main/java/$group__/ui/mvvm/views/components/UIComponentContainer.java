@@ -10,12 +10,11 @@ import $group__.ui.core.parsers.components.UIComponentConstructor;
 import $group__.ui.core.structures.IAffineTransformStack;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.events.bus.UIEventBusEntryPoint;
-import $group__.ui.mvvm.views.events.bus.EventUIComponentHierarchyChanged;
+import $group__.ui.mvvm.views.events.bus.UIComponentHierarchyChangedBusEvent;
 import $group__.utilities.AssertionUtilities;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.LogMessageBuilder;
-import $group__.utilities.ThrowableUtilities;
-import $group__.utilities.events.EnumEventHookStage;
+import $group__.utilities.events.EnumHookStage;
 import $group__.utilities.events.EventBusUtilities;
 import $group__.utilities.structures.INamespacePrefixedString;
 import $group__.utilities.templates.CommonConfigurationTemplate;
@@ -36,15 +35,12 @@ public class UIComponentContainer
 	@Override
 	public boolean addChildAt(int index, IUIComponent component) {
 		if (equals(component))
-			throw ThrowableUtilities.logAndThrow(
-					new IllegalArgumentException(
-							new LogMessageBuilder()
-									.addMarkers(UIMarkers.getInstance()::getMarkerUIComponent)
-									.addKeyValue("index", index).addKeyValue("component", component)
-									.addMessages(() -> getResourceBundle().getString("children.add.self"))
-									.build()
-					),
-					UIConfiguration.getInstance().getLogger()
+			throw new IllegalArgumentException(
+					new LogMessageBuilder()
+							.addMarkers(UIMarkers.getInstance()::getMarkerUIComponent)
+							.addKeyValue("index", index).addKeyValue("component", component)
+							.addMessages(() -> getResourceBundle().getString("children.add.self"))
+							.build()
 			);
 		if (getChildren().contains(component))
 			return moveChildTo(index, component);
@@ -57,8 +53,8 @@ public class UIComponentContainer
 						AssertionUtilities.assertNonnull(childrenMoved.get(i)).onIndexMove(index + i, index + i + 1);
 					component.onParentChange(null, this);
 				},
-				new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.PRE, component, null, this),
-				new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.POST, component, null, this));
+				new UIComponentHierarchyChangedBusEvent.Parent(EnumHookStage.PRE, component, null, this),
+				new UIComponentHierarchyChangedBusEvent.Parent(EnumHookStage.POST, component, null, this));
 		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh);
 		return true;
 	}
@@ -98,8 +94,8 @@ public class UIComponentContainer
 								AssertionUtilities.assertNonnull(childrenMoved.get(i)).onIndexMove(index + i + 1, index + i);
 							component.onParentChange(this, null);
 						},
-						new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.PRE, component, this, null),
-						new EventUIComponentHierarchyChanged.Parent(EnumEventHookStage.POST, component, this, null));
+						new UIComponentHierarchyChangedBusEvent.Parent(EnumHookStage.PRE, component, this, null),
+						new UIComponentHierarchyChangedBusEvent.Parent(EnumHookStage.POST, component, this, null));
 				ret = true;
 			}
 		}
@@ -127,8 +123,8 @@ public class UIComponentContainer
 					}
 					component.onIndexMove(previous, index);
 				},
-				new EventUIComponentHierarchyChanged.Index(EnumEventHookStage.PRE, this, previous, index),
-				new EventUIComponentHierarchyChanged.Index(EnumEventHookStage.POST, this, previous, index));
+				new UIComponentHierarchyChangedBusEvent.Index(EnumHookStage.PRE, this, previous, index),
+				new UIComponentHierarchyChangedBusEvent.Index(EnumHookStage.POST, this, previous, index));
 		return true;
 	}
 

@@ -28,7 +28,7 @@ public class ArrayAffineTransformStack
 	public ArrayAffineTransformStack(int initialCapacity) {
 		this.data = new ArrayDeque<>(initialCapacity);
 		this.data.push(new AffineTransform());
-		Cleaner.create(getCleanerRef(), new LeakNotifier(this.data, UIConfiguration.INSTANCE.getLogger()));
+		Cleaner.create(getCleanerRef(), new LeakNotifier(this.data, UIConfiguration.getInstance().getLogger()));
 	}
 
 	@Override

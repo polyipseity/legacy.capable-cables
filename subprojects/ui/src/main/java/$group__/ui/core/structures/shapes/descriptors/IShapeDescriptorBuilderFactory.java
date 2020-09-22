@@ -4,5 +4,5 @@ import java.awt.*;
 
 public interface IShapeDescriptorBuilderFactory {
 	<S extends Shape> IShapeDescriptorBuilder<S> createBuilder(Class<S> clazz)
-			throws ShapeDescriptorBuilderNotFoundException;
+			throws NoSuchShapeDescriptorBuilderException;
 }

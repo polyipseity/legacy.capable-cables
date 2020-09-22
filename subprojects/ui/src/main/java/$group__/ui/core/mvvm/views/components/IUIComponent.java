@@ -5,9 +5,9 @@ import $group__.ui.core.mvvm.views.events.IUIEventTarget;
 import $group__.ui.core.structures.IUIComponentContext;
 import $group__.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import $group__.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
-import $group__.ui.mvvm.views.components.extensions.caches.UIExtensionCache;
+import $group__.ui.mvvm.views.components.extensions.caches.UICacheExtension;
 import $group__.utilities.binding.core.traits.IHasBinding;
-import $group__.utilities.extensions.IExtensionContainer;
+import $group__.utilities.extensions.core.IExtensionContainer;
 import $group__.utilities.structures.INamespacePrefixedString;
 import $group__.utilities.structures.ImmutableNamespacePrefixedString;
 import $group__.utilities.structures.paths.INode;
@@ -25,7 +25,7 @@ TODO auto resizing based on min size and preferred size
  */
 public interface IUIComponent
 		extends INode, IShapeDescriptorProvider, IHasBinding, IHasBindingMap, IUIEventTarget, IExtensionContainer<INamespacePrefixedString> {
-	String PROPERTY_ID = INamespacePrefixedString.StaticHolder.getDefaultPrefix() + "id";
+	String PROPERTY_ID = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "id";
 	INamespacePrefixedString PROPERTY_ID_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_ID);
 
 	static <T> Optional<T> getYoungestParentInstanceOf(IUIComponent self, Class<T> clazz) {
@@ -52,7 +52,7 @@ public interface IUIComponent
 
 	Optional<? extends IUIComponentContainer> getParent();
 
-	default Optional<? extends IUIComponentManager<?>> getManager() { return UIExtensionCache.CacheUniversal.MANAGER.getValue().get(this); }
+	default Optional<? extends IUIComponentManager<?>> getManager() { return UICacheExtension.CacheUniversal.MANAGER.getValue().get(this); }
 
 	boolean isVisible();
 

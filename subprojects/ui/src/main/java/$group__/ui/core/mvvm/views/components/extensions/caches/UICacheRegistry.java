@@ -6,12 +6,12 @@ import $group__.utilities.structures.INamespacePrefixedString;
 import $group__.utilities.structures.Registry;
 
 public final class UICacheRegistry
-		extends Registry<INamespacePrefixedString, IUIExtensionCacheType<?, ?>> {
+		extends Registry<INamespacePrefixedString, IUICacheType<?, ?>> {
 	private static final UICacheRegistry INSTANCE = new UICacheRegistry();
 
 	protected UICacheRegistry() {
 		super(true, UIConfiguration.getInstance().getLogger());
-		PreconditionUtilities.requireRunOnceOnly(UIConfiguration.getInstance().getLogger());
+		PreconditionUtilities.requireRunOnceOnly();
 	}
 
 	public static UICacheRegistry getInstance() { return INSTANCE; }

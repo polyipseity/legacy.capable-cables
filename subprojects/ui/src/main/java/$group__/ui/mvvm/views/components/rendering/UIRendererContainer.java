@@ -9,9 +9,9 @@ import java.util.Optional;
 
 public class UIRendererContainer<R extends IUIRenderer<?>>
 		implements IUIRendererContainer<R> {
+	private final Class<? extends R> defaultRendererClass;
 	@Nullable
-	protected R renderer;
-	protected final Class<? extends R> defaultRendererClass;
+	private R renderer;
 
 	public UIRendererContainer(R renderer) {
 		this(CastUtilities.<Class<? extends R>>castUnchecked(renderer.getClass())); // COMMENT should be safe
@@ -24,6 +24,7 @@ public class UIRendererContainer<R extends IUIRenderer<?>>
 	public Optional<? extends R> getRenderer() { return Optional.ofNullable(renderer); }
 
 	@Override
+	@Deprecated
 	public void setRenderer(@Nullable R renderer) { this.renderer = renderer; }
 
 	@Override

@@ -18,7 +18,7 @@ public class DefaultUIComponentContext
 	public DefaultUIComponentContext(IPath<IUIComponent> path, IAffineTransformStack transformStack, Point2D cursorPosition) {
 		this.path = path.copy();
 		this.transformStack = transformStack.copy(); // COMMENT do not automatically pop
-		this.cursorPosition = Point2DImmutable.copyOf(cursorPosition);
+		this.cursorPosition = ImmutablePoint2D.copyOf(cursorPosition);
 	}
 
 	@Override

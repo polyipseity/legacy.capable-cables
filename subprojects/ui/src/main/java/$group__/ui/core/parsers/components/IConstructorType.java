@@ -3,7 +3,6 @@ package $group__.ui.core.parsers.components;
 import $group__.ui.UIConfiguration;
 import $group__.ui.UIMarkers;
 import $group__.utilities.LogMessageBuilder;
-import $group__.utilities.ThrowableUtilities;
 import $group__.utilities.templates.CommonConfigurationTemplate;
 import org.slf4j.Marker;
 
@@ -27,13 +26,13 @@ public interface IConstructorType {
 		public static <T extends IConstructorType, A extends Annotation> T getConstructorType(Class<?> clazz, Class<A> annotationType, Function<? super A, ? extends T> getter) {
 			return findConstructorType(clazz, annotationType, getter)
 					.orElseThrow(() ->
-							ThrowableUtilities.logAndThrow(new IllegalStateException(
+							new IllegalStateException(
 									new LogMessageBuilder()
 											.addMarkers(StaticHolder::getClassMarker)
 											.addKeyValue("clazz", clazz).addKeyValue("annotationType", annotationType).addKeyValue("getter", getter)
 											.addMessages(() -> getResourceBundle().getString("constructor_type.find.missing"))
 											.build()
-							), UIConfiguration.getInstance().getLogger()));
+							));
 		}
 
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
