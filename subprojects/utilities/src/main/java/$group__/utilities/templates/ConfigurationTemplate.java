@@ -1,14 +1,21 @@
 package $group__.utilities.templates;
 
 import $group__.utilities.AssertionUtilities;
+import $group__.utilities.LogMessageBuilder;
+import $group__.utilities.UtilitiesConfiguration;
+import $group__.utilities.UtilitiesMarkers;
 import $group__.utilities.structures.Singleton;
+import com.google.common.base.Suppliers;
 import org.slf4j.Logger;
+import org.slf4j.Marker;
 
+import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 public abstract class ConfigurationTemplate<D> extends Singleton {
-	protected final AtomicBoolean configured = new AtomicBoolean();
+	private static final Supplier<Marker> CLASS_MARKER = Suppliers.memoize(() -> UtilitiesMarkers.getInstance().getClassMarker(ConfigurationTemplate.class));
+	private final AtomicBoolean configured = new AtomicBoolean();
 
 	protected ConfigurationTemplate(Logger logger) { super(logger); }
 
@@ -26,12 +33,30 @@ public abstract class ConfigurationTemplate<D> extends Singleton {
 	public boolean isConfigured() { return getConfigured().get(); }
 
 	public final void configure(D data) {
-		if (getConfigured().getAndSet(true))
-			throw new IllegalStateException("Setup already done"); // TODO
+		if (getConfigured().getAndSet(true)) {
+			// COMMENT this should only be invoked after all the configurations needed to make this call are ready
+			throw new IllegalStateException(
+					new LogMessageBuilder()
+							.addMarkers(ConfigurationTemplate::getClassMarker)
+							.addKeyValue("this", this).addKeyValue("data", data)
+							.addMessages(() -> StaticHolder.getResourceBundle().getString("configure.done.already"))
+							.build()
+			);
+		}
 		configure0(data);
 	}
 
 	protected AtomicBoolean getConfigured() { return configured; }
 
 	protected abstract void configure0(D data);
+
+	public static Marker getClassMarker() { return AssertionUtilities.assertNonnull(CLASS_MARKER.get()); }
+
+	public enum StaticHolder {
+		;
+
+		private static final Supplier<ResourceBundle> RESOURCE_BUNDLE = Suppliers.memoize(() -> CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance()));
+
+		protected static ResourceBundle getResourceBundle() { return AssertionUtilities.assertNonnull(RESOURCE_BUNDLE.get()); }
+	}
 }

@@ -12,7 +12,7 @@ import $group__.ui.events.ui.UIEventTarget;
 import $group__.ui.mvvm.extensions.UIExtensionRegistry;
 import $group__.ui.mvvm.views.components.extensions.caches.UICacheExtension;
 import $group__.ui.mvvm.views.events.bus.UIComponentBusEvent;
-import $group__.ui.structures.shapes.descriptors.DelegatingShapeDescriptor;
+import $group__.ui.structures.shapes.interactions.ProviderShapeDescriptor;
 import $group__.utilities.CastUtilities;
 import $group__.utilities.binding.core.IBinderAction;
 import $group__.utilities.binding.core.fields.IBindingField;
@@ -35,7 +35,6 @@ import io.reactivex.rxjava3.subjects.UnicastSubject;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
-import java.awt.*;
 import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.Optional;
@@ -78,7 +77,7 @@ public class UIComponent
 		this.mappings = MapUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
 		this.id = id;
-		this.shapeDescriptor = new ComponentShapeDescriptor<>(shapeDescriptor);
+		this.shapeDescriptor = new ProviderShapeDescriptor<>(this, shapeDescriptor);
 
 		this.visible = IUIPropertyMappingValue.createBindingField(Boolean.class, false, true,
 				this.mappings.get(getPropertyVisibleLocation()));
@@ -107,19 +106,6 @@ public class UIComponent
 
 	@Override
 	public boolean isModifyingShape() { return getModifyingShape().get(); }
-
-	public class ComponentShapeDescriptor<S extends Shape>
-			extends DelegatingShapeDescriptor<S> {
-		protected ComponentShapeDescriptor(IShapeDescriptor<S> delegated) { super(delegated); }
-
-		@Override
-		public boolean modify(Supplier<? extends Boolean> action)
-				throws ConcurrentModificationException {
-			if (!getModifyingShape().get())
-				throw new IllegalStateException("Use 'IShapeDescriptorProvider.modifyShape' instead");
-			return super.modify(action);
-		}
-	}
 
 	@Override
 	public Optional<? extends String> getID() { return Optional.ofNullable(id); }

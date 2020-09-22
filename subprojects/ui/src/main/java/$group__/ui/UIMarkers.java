@@ -15,6 +15,7 @@ public final class UIMarkers extends MarkersTemplate {
 	private final Marker markerUIView;
 	private final Marker markerUIViewModel;
 	private final Marker markerUIModel;
+	private final Marker markerUIAnchor;
 	private final Marker markerUIEvent;
 	private final Marker markerUIComponent;
 	private final Marker markerUIComponentRenderer;
@@ -27,14 +28,15 @@ public final class UIMarkers extends MarkersTemplate {
 		markerJAXB = addReferences(getMarker("JAXB"), getMarkerParser());
 		// COMMENT UI
 		markerUI = getMarker("UI");
-		markerUIInfrastructure = addReferences(getMarker("UI infrastructure"), getMarkerUI());
-		markerUIView = addReferences(getMarker("UI view"), getMarkerUIInfrastructure());
-		markerUIViewModel = addReferences(getMarker("UI view-model"), getMarkerUIInfrastructure());
-		markerUIModel = addReferences(getMarker("UI model"), getMarkerUIInfrastructure());
-		markerUIEvent = addReferences(getMarker("UI event"), getMarkerUIView());
+		markerUIInfrastructure = addReferences(getMarker("infrastructure"), getMarkerUI());
+		markerUIView = addReferences(getMarker("view"), getMarkerUIInfrastructure());
+		markerUIViewModel = addReferences(getMarker("view-model"), getMarkerUIInfrastructure());
+		markerUIModel = addReferences(getMarker("model"), getMarkerUIInfrastructure());
+		markerUIAnchor = addReferences(getMarker("anchor"), getMarkerUIView());
+		markerUIEvent = addReferences(getMarker("event"), getMarkerUIView());
 		// COMMENT UI component
-		markerUIComponent = addReferences(getMarker("UI component"), getMarkerUIView());
-		markerUIComponentRenderer = addReferences(getMarker("UI component renderer"), getMarkerUIComponent());
+		markerUIComponent = addReferences(getMarker("component"), getMarkerUIView());
+		markerUIComponentRenderer = addReferences(getMarker("renderer"), getMarkerUIComponent());
 	}
 
 	private UIMarkers() { super(UIConstants.MODULE_NAME, UIConfiguration.getInstance().getLogger()); }
@@ -62,4 +64,6 @@ public final class UIMarkers extends MarkersTemplate {
 	public Marker getMarkerJAXB() { return markerJAXB; }
 
 	public Marker getMarkerUIEvent() { return markerUIEvent; }
+
+	public Marker getMarkerUIAnchor() { return markerUIAnchor; }
 }

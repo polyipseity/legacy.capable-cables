@@ -1,6 +1,7 @@
 package $group__.ui.mvvm.views.components;
 
 import $group__.ui.UIConfiguration;
+import $group__.ui.UIMarkers;
 import $group__.ui.core.mvvm.views.components.IUIComponent;
 import $group__.ui.core.mvvm.views.components.IUIComponentShapeAnchorController;
 import $group__.ui.core.structures.shapes.interactions.IShapeAnchor;
@@ -10,10 +11,12 @@ import $group__.ui.mvvm.views.events.bus.UIComponentBusEvent;
 import $group__.ui.structures.shapes.interactions.DefaultShapeAnchorController;
 import $group__.utilities.CapacityUtilities;
 import $group__.utilities.CleanerUtilities;
+import $group__.utilities.LogMessageBuilder;
 import $group__.utilities.collections.MapUtilities;
 import $group__.utilities.events.AutoSubscribingCompositeDisposable;
 import $group__.utilities.reactive.LoggingDisposableObserver;
 import $group__.utilities.references.OptionalWeakReference;
+import $group__.utilities.templates.CommonConfigurationTemplate;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.slf4j.Logger;
@@ -36,6 +39,32 @@ public class DefaultUIComponentShapeAnchorController
 
 	protected static class ModifyShapeDescriptorObserver
 			extends LoggingDisposableObserver<UIComponentBusEvent.ModifyShapeDescriptor> {
+		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
+
+		protected void anchorOthers(UIComponentBusEvent.ModifyShapeDescriptor event, DefaultUIComponentShapeAnchorController controller) {
+			Optional.ofNullable(controller.getSubscribersMap().getIfPresent(event.getComponent()))
+					.map(Collection::stream)
+					.map(BaseStream::unordered)
+					.ifPresent(s -> {
+						Map<IShapeAnchorSet, IUIComponent> inverse = MapUtilities.inverse(controller.getAnchorSets().asMap());
+						s.forEach(a -> a.getContainer()
+								.map(inverse::get)
+								.ifPresent(f -> {
+									if (getAnchoringAnchors().contains(a))
+										throw new ConcurrentModificationException(
+												new LogMessageBuilder()
+														.addMarkers(UIMarkers.getInstance()::getMarkerUIAnchor)
+														.addKeyValue("this", this).addKeyValue("event", event).addKeyValue("controller", controller)
+														.addMessages(() -> getResourceBundle().getString("anchor.others.cyclic"))
+														.build()
+										);
+									getAnchoringAnchors().push(a);
+									a.anchor(f);
+									getAnchoringAnchors().pop();
+								}));
+					});
+		}
+
 		protected final OptionalWeakReference<DefaultUIComponentShapeAnchorController> owner;
 		protected final Deque<IShapeAnchor> anchoringAnchors = new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM);
 		protected boolean anchoringSelf = false;
@@ -71,24 +100,7 @@ public class DefaultUIComponentShapeAnchorController
 					.ifPresent(as -> as.anchor(event.getComponent()));
 		}
 
-		protected void anchorOthers(UIComponentBusEvent.ModifyShapeDescriptor event, DefaultUIComponentShapeAnchorController controller) {
-			Optional.ofNullable(controller.getSubscribersMap().getIfPresent(event.getComponent()))
-					.map(Collection::stream)
-					.map(BaseStream::unordered)
-					.ifPresent(s -> {
-						Map<IShapeAnchorSet, IUIComponent> inverse = MapUtilities.inverse(controller.getAnchorSets().asMap());
-						s.forEach(a -> a.getContainer()
-								.map(inverse::get)
-								.ifPresent(f -> {
-									if (getAnchoringAnchors().contains(a))
-										throw new ConcurrentModificationException("Anchor cycle:" + System.lineSeparator()
-												+ getAnchoringAnchors());
-									getAnchoringAnchors().push(a);
-									a.anchor(f);
-									getAnchoringAnchors().pop();
-								}));
-					});
-		}
+		protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 		protected void setAnchoringSelf(boolean anchoringSelf) { this.anchoringSelf = anchoringSelf; }
 	}

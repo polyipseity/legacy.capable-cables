@@ -29,7 +29,7 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 		implements IShapeDescriptorBuilder<S> {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	private final AffineTransform transform = new AffineTransform();
-	private final Rectangle2D bounds = IShapeDescriptor.getShapePlaceholderCopy();
+	private final Rectangle2D bounds = IShapeDescriptor.StaticHolder.getShapePlaceholder();
 	private final List<IShapeConstraint> constraints = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 	private final ConcurrentMap<String, Consumer<?>> properties =
 			MapUtilities.newMapMakerSingleThreaded().makeMap();

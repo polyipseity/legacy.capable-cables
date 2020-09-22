@@ -220,7 +220,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 
 		@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 		protected VirtualComponent() {
-			super(IShapeDescriptor.getShapeDescriptorPlaceholder());
+			super(IShapeDescriptor.StaticHolder.getShapeDescriptorPlaceholder());
 
 			addEventListener(EnumUIEventDOMType.MOUSE_ENTER.getEventType(), new UIEventListener.Functional<IUIEventMouse>(evt -> setBeingHovered(true)), false);
 			addEventListener(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(), new UIEventListener.Functional<IUIEventMouse>(evt -> setBeingHovered(false)), false);

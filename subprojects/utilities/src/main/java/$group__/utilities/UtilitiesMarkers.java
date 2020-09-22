@@ -8,6 +8,7 @@ public final class UtilitiesMarkers extends MarkersTemplate {
 	private static final UtilitiesMarkers INSTANCE = Singleton.getSingletonInstance(UtilitiesMarkers.class);
 
 	private final Marker markerThrowable;
+	private final Marker markerBinding;
 	private final Marker markerRender;
 	private final Marker markerOpenGL;
 	private final Marker markerEvent;
@@ -15,6 +16,7 @@ public final class UtilitiesMarkers extends MarkersTemplate {
 
 	{
 		markerThrowable = getMarker("throwable");
+		markerBinding = getMarker("binding");
 		markerRender = getMarker("render");
 		markerOpenGL = addReferences(getMarker("OpenGL"), getMarkerRender());
 		markerEvent = getMarker("event");
@@ -26,6 +28,8 @@ public final class UtilitiesMarkers extends MarkersTemplate {
 	public static UtilitiesMarkers getInstance() { return INSTANCE; }
 
 	public Marker getMarkerThrowable() { return markerThrowable; }
+
+	public Marker getMarkerBinding() { return markerBinding; }
 
 	public Marker getMarkerRender() { return markerRender; }
 
