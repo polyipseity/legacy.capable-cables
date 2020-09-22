@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////
-// TITLE Source
+// TITLE Sources
 //////////////////////////////////////////////////
 
 import static java.io.File.separator
@@ -42,17 +42,21 @@ project.ext.makeSourcesTasks = { Closure c ->
 
 				into temporaryDir
 
-				from(pre.get().temporaryDir) {
-					include inputs.properties.expand$pattern
+				if (inputs.properties.containsKey('expand$pattern')) {
+					from(pre.get().temporaryDir) {
+						include inputs.properties.expand$pattern
 
-					Map<String, Object> e = inputs.properties
-							.findAll { it.key.startsWith 'expand_' }
-							.collectEntries {[(it.key.replace('expand_', '')): it.value] } as Map<String, Object>
-					expand e
-				}
+						Map<String, Object> e = inputs.properties
+								.findAll { it.key.startsWith 'expand_' }
+								.collectEntries {[(it.key.replace('expand_', '')): it.value] } as Map<String, Object>
+						expand e
+					}
 
-				from(pre.get().temporaryDir) {
-					exclude inputs.properties.expand$pattern
+					from(pre.get().temporaryDir) {
+						exclude inputs.properties.expand$pattern
+					}
+				} else {
+					from pre.get().temporaryDir
 				}
 
 				task.get().source = destinationDir
