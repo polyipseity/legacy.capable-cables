@@ -45,16 +45,10 @@ compileJava.configure { dependsOn xjcMainComponents }
 
 makeSourcesTasks.call { Task it ->
 	it.inputs.properties([
+			expand$pattern                     : '**/*Constants.*',
 			expand_moduleName                  : moduleName,
-			expand_group                       : project.group,
 			expand_buildType                   : buildType,
 			expand_xjcMainComponentsContextPath: xjcMainComponentsContextPath,
-	])
-}
-
-makeResourcesTasks.call { Task it ->
-	it.inputs.properties([
-			expand_group: project.group,
 	])
 }
 

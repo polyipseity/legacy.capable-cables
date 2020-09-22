@@ -10,18 +10,6 @@ apply from: "$utilitiesDir${separator}io${separator}io.gradle"
 apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
 apply from: "$modulesDir${separator}optional${separator}publishing.gradle"
 
-makeSourcesTasks.call { Task it ->
-	it.inputs.properties([
-			expand_group: project.group,
-	])
-}
-
-makeResourcesTasks.call { Task it ->
-	it.inputs.properties([
-			expand_group: project.group,
-	])
-}
-
 makeJUnitPlatformTests.call()
 
 afterEvaluate {

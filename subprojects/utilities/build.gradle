@@ -15,8 +15,8 @@ def moduleName = 'Utilities'
 
 makeSourcesTasks.call { Task it ->
 	it.inputs.properties([
+			expand$pattern   : '**/*Constants.*',
 			expand_moduleName: moduleName,
-			expand_group     : project.group,
 			expand_buildType : buildType,
 	])
 }

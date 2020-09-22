@@ -19,10 +19,10 @@
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.components.common.UIComponentButtonMinecraft"/>
 	<!-- COMMENT renderer -->
 	<using alias="renderer.component.window.debug.custom"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIDebugMinecraft\$DebugUI\$CustomWindowRenderer"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIDebugMinecraft$DebugUI$CustomWindowRenderer"/>
 	<!-- COMMENT extensions -->
 	<using alias="extension.minecraft.background.default"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.UIExtensionBackgroundMinecraft\$Default"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.UIExtensionBackgroundMinecraft$Default"/>
 	<using alias="extension.user_relocatable"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.UIExtensionComponentUserRelocatable"/>
 	<using alias="extension.user_resizable"

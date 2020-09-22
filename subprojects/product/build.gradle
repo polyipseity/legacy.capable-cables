@@ -19,7 +19,7 @@ apply from: "$modulesDir${separator}optional${separator}publishing.gradle"
 
 makeSourcesTasks.call { Task it ->
 	it.inputs.properties([
-			expand_group    : project.group,
+			expand$pattern  : '**/*Constants.*',
 			expand_modID    : modID,
 			expand_buildType: buildType,
 	])
