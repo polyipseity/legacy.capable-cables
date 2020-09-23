@@ -2,11 +2,12 @@
 // TITLE Gradle Settings
 //////////////////////////////////////////////////
 
-rootProject.name = 'capablecables'
+rootProject.name = 'capable-cables'
 
 include ':subprojects:annotations'
 include ':subprojects:annotations:processors'
 include ':subprojects:utilities'
+include ':subprojects:utilities:non-contextual'
 include ':subprojects:ui'
 include ':subprojects:product'
 
