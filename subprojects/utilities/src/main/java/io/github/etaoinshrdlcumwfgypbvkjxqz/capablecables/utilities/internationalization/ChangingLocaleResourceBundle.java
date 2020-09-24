@@ -1,13 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.internationalization;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.DynamicUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.StackTraceUtilities;
 
 import java.util.Enumeration;
 import java.util.Locale;
@@ -59,7 +59,7 @@ public class ChangingLocaleResourceBundle
 
 	public static class Builder {
 		private static final ConcurrentMap<String, ChangingLocaleResourceBundle> BASE_NAME_BUNDLE_MAP =
-				MapUtilities.newMapMakerNormalThreaded()
+				MapBuilderUtilities.newMapMakerNormalThreaded()
 						.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL)
 						.weakValues()
 						.makeMap();
@@ -67,7 +67,7 @@ public class ChangingLocaleResourceBundle
 		protected BiFunction<? super String, ? super Locale, ? extends ResourceBundle> loader = ResourceBundle::getBundle;
 		protected Supplier<? extends Locale> localeSupplier = Locale::getDefault;
 
-		public Builder() { this.baseName = DynamicUtilities.getCallerClass().getName(); }
+		public Builder() { this.baseName = StackTraceUtilities.getCallerClass().getName(); }
 
 		public ChangingLocaleResourceBundle build() { return getBundle(getBaseName(), getLoader(), getLocaleSupplier()); }
 

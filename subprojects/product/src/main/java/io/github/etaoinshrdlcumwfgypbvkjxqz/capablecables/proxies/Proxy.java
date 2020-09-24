@@ -1,12 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies;
 
+import com.google.common.base.Stopwatch;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModMarkers;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Singleton;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
-import com.google.common.base.Stopwatch;
 import net.minecraftforge.fml.event.lifecycle.*;
-import org.slf4j.Logger;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.ResourceBundle;
@@ -14,7 +12,7 @@ import java.util.function.Consumer;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
-public abstract class Proxy extends Singleton implements IProxy {
+public abstract class Proxy implements IProxy {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(ModConfiguration.getInstance());
 
 	@Override
@@ -37,7 +35,7 @@ public abstract class Proxy extends Singleton implements IProxy {
 		return false;
 	}
 
-	protected Proxy(Logger logger) { super(logger); }
+	protected Proxy() {}
 
 	@SuppressWarnings("SameReturnValue")
 	protected static <E extends ModLifecycleEvent> boolean processEvent(String name, E event, Consumer<? super E> processor) {

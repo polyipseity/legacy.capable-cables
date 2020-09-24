@@ -1,20 +1,19 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.NamespaceUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Singleton;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.NamespaceUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.StackTraceUtilities;
 import org.jetbrains.annotations.NonNls;
-import org.slf4j.Logger;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
 import java.util.Arrays;
 
-public abstract class MarkersTemplate extends Singleton {
+public abstract class MarkersTemplate {
 	@NonNls
 	private static final String SEPARATOR = "-";
 	private static final CacheBuilder<Object, Object> MARKERS_BUILDER = CacheUtilities.newCacheBuilderNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_LARGE).weakKeys();
@@ -37,8 +36,7 @@ public abstract class MarkersTemplate extends Singleton {
 
 	protected String getNamespacePrefixedString(String string) { return NamespaceUtilities.getNamespacePrefixedString(getSeparator(), getNamespace(), string); }
 
-	protected MarkersTemplate(String namespace, Logger logger) {
-		super(logger);
+	protected MarkersTemplate(String namespace) {
 		this.namespace = namespace;
 	}
 
@@ -52,6 +50,8 @@ public abstract class MarkersTemplate extends Singleton {
 	public static String getSeparator() { return SEPARATOR; }
 
 	protected String getNamespace() { return namespace; }
+
+	public Marker getClassMarker() { return getClassMarkers().getUnchecked(StackTraceUtilities.getCallerClass()); }
 
 	public Marker getClassMarker(Class<?> clazz) { return getClassMarkers().getUnchecked(clazz); }
 

@@ -23,11 +23,11 @@ public abstract class CommonConfigurationTemplate<D extends CommonConfigurationT
 	@Nullable
 	private volatile Supplier<? extends Locale> localeSupplier;
 
-	protected CommonConfigurationTemplate(Logger logger) { super(logger); }
+	protected CommonConfigurationTemplate() {}
 
 	public static ResourceBundle createBundle(CommonConfigurationTemplate<?> instance) {
 		return new ChangingLocaleResourceBundle.Builder()
-				.setBaseName(DynamicUtilities.getCallerClass())
+				.setBaseName(StackTraceUtilities.getCallerClass())
 				.setLocaleSupplier(instance.getLocaleSupplier())
 				.build();
 	}
@@ -39,6 +39,8 @@ public abstract class CommonConfigurationTemplate<D extends CommonConfigurationT
 	public IThrowableHandler<Throwable> getThrowableHandler() { return AssertionUtilities.assertNonnull(throwableHandler); }
 
 	protected void setThrowableHandler(@Nullable IThrowableHandler<Throwable> throwableHandler) { this.throwableHandler = throwableHandler; }
+
+	protected void setLogger(@Nullable Logger logger) { this.logger = logger; }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper

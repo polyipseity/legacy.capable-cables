@@ -1,5 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components;
 
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
@@ -26,7 +29,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.i
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.ManualLoadingCache;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
@@ -34,9 +39,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.I
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.*;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
@@ -53,14 +55,14 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 		extends IHasGenericClass.Impl<T>
 		implements IUIComponentParser<T, Function<? super Unmarshaller, ?>> {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
-	private final ConcurrentMap<String, Class<?>> aliases = MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
+	private final ConcurrentMap<String, Class<?>> aliases = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 	private final LoadingCache<EnumHandlerType, ConcurrentMap<Class<?>, IConsumer3<? super IParserContext, ?, ?, ?>>> handlers =
 			ManualLoadingCache.newNestedLoadingCacheMap(
 					CacheUtilities.newCacheBuilderSingleThreaded()
 							.initialCapacity(EnumHandlerType.values().length)
 							.build(CacheLoader.from(
 									new MappableSupplier<>(
-											ConstantSupplier.of(MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM))
+											ConstantSupplier.of(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM))
 									).map(MapMaker::makeMap))));
 	@Nullable
 	private Ui root;
@@ -220,7 +222,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 			throws Throwable {
 		Class<?> vc = AssertionUtilities.assertNonnull(context.getAliases().get(view.getClazz()));
 		UIViewComponentConstructor.EnumConstructorType ct = IConstructorType.StaticHolder.getConstructorType(vc, UIViewComponentConstructor.class, UIViewComponentConstructor::type);
-		MethodHandle mh = DynamicUtilities.IMPL_LOOKUP.findConstructor(vc, ct.getMethodType());
+		MethodHandle mh = InvokeUtilities.IMPL_LOOKUP.findConstructor(vc, ct.getMethodType());
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(view.getProperty());
 		switch (ct) {
 			case MAPPINGS:
@@ -228,6 +230,19 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 			default:
 				throw new AssertionError();
 		}
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	public static Map<INamespacePrefixedString, IUIPropertyMappingValue> createMappings(Iterable<? extends Property> properties) {
+		return Streams.stream(properties).unordered()
+				.map(p -> Maps.immutableEntry(new ImmutableNamespacePrefixedString(p.getKey()),
+						new UIPropertyMappingValue(p.getAny()
+								.map(value -> JAXBAdapterRegistries.getAdapter(value).leftToRight(value))
+								.orElse(null),
+								Optional.ofNullable(p.getBindingKey())
+										.map(ImmutableNamespacePrefixedString::new)
+										.orElse(null))))
+				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
 	@SuppressWarnings("SwitchStatementWithTooFewBranches")
@@ -332,7 +347,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 						mappings = MapUtilities.concatMaps(mappings, attributes);
 					}
 					IShapeDescriptor<?> sd = createShapeDescriptor(context, n.getShape());
-					MethodHandle mh = DynamicUtilities.IMPL_LOOKUP.findConstructor(cc, ct.getMethodType());
+					MethodHandle mh = InvokeUtilities.IMPL_LOOKUP.findConstructor(cc, ct.getMethodType());
 					switch (ct) {
 						case MAPPINGS__ID__SHAPE_DESCRIPTOR:
 							return (IUIComponent) mh.invoke(mappings, n.getId(), sd);
@@ -367,6 +382,9 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 				.orElseThrow(AssertionError::new);
 	}
 
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected ConcurrentMap<String, Class<?>> getAliases() { return aliases; }
+
 	@SuppressWarnings("UnstableApiUsage")
 	public static IShapeDescriptor<?> createShapeDescriptor(IParserContext context, Shape shape)
 			throws Throwable {
@@ -381,7 +399,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 								.map(Double::parseDouble)
 								.toArray(Double[]::new);
 
-						DynamicUtilities.PUBLIC_LOOKUP.findVirtual(
+						InvokeUtilities.PUBLIC_LOOKUP.findVirtual(
 								AffineTransform.class,
 								m.getName(),
 								MethodType.methodType(void.class, Collections.nCopies(args.length, double.class)))
@@ -463,7 +481,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 					.<Class<?>>map(classAlias -> AssertionUtilities.assertNonnull(context.getAliases().get(classAlias)))
 					.orElseGet(rendererContainer::getDefaultRendererClass);
 			UIRendererConstructor.EnumConstructorType ct = IConstructorType.StaticHolder.getConstructorType(oc, UIRendererConstructor.class, UIRendererConstructor::type);
-			MethodHandle mh = DynamicUtilities.IMPL_LOOKUP.findConstructor(oc, ct.getMethodType());
+			MethodHandle mh = InvokeUtilities.IMPL_LOOKUP.findConstructor(oc, ct.getMethodType());
 			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(object.getProperty());
 			IUIRenderer<?> ret;
 			switch (ct) {
@@ -492,7 +510,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 				return;
 			Class<?> oc = AssertionUtilities.assertNonnull(context.getAliases().get(object.getClazz()));
 			UIExtensionConstructor.EnumConstructorType ct = IConstructorType.StaticHolder.getConstructorType(oc, UIExtensionConstructor.class, UIExtensionConstructor::type);
-			MethodHandle mh = DynamicUtilities.IMPL_LOOKUP.findConstructor(oc, ct.getMethodType());
+			MethodHandle mh = InvokeUtilities.IMPL_LOOKUP.findConstructor(oc, ct.getMethodType());
 			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(object.getProperty());
 			IUIExtension<?, ?> ret;
 			switch (ct) {

@@ -1,18 +1,19 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.DynamicUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.methods.IBindingMethod;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.traits.IHasBinding;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.methods.IBindingMethod;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.traits.IHasBinding;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.ClassUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Modifier;
@@ -29,11 +30,11 @@ public enum BindingUtilities {
 			CacheUtilities.newCacheBuilderNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).weakKeys()
 					.build(CacheLoader.from(key -> {
 						assert key != null;
-						ImmutableSet<MethodHandle> variableHandles = DynamicUtilities.getAllFields(key).stream().unordered()
+						ImmutableSet<MethodHandle> variableHandles = ClassUtilities.getAllFields(key).stream().unordered()
 								.filter(f -> !Modifier.isStatic(f.getModifiers()) && IHasBinding.class.isAssignableFrom(f.getType()))
 								.map(f -> {
 									try {
-										return DynamicUtilities.IMPL_LOOKUP.unreflectGetter(f);
+										return InvokeUtilities.IMPL_LOOKUP.unreflectGetter(f);
 									} catch (IllegalAccessException e) {
 										throw ThrowableUtilities.propagate(e);
 									}
@@ -56,11 +57,11 @@ public enum BindingUtilities {
 			CacheUtilities.newCacheBuilderNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).weakKeys()
 					.build(CacheLoader.from(key -> {
 						assert key != null;
-						ImmutableSet<MethodHandle> bindingHandles = DynamicUtilities.getAllFields(key).stream().unordered()
+						ImmutableSet<MethodHandle> bindingHandles = ClassUtilities.getAllFields(key).stream().unordered()
 								.filter(f -> !Modifier.isStatic(f.getModifiers()) && IBindingField.class.isAssignableFrom(f.getType()))
 								.map(f -> {
 									try {
-										return DynamicUtilities.IMPL_LOOKUP.unreflectGetter(f);
+										return InvokeUtilities.IMPL_LOOKUP.unreflectGetter(f);
 									} catch (IllegalAccessException e) {
 										throw ThrowableUtilities.propagate(e);
 									}
@@ -92,11 +93,11 @@ public enum BindingUtilities {
 			CacheUtilities.newCacheBuilderNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).weakKeys()
 					.build(CacheLoader.from(key -> {
 						assert key != null;
-						ImmutableSet<MethodHandle> bindingHandles = DynamicUtilities.getAllFields(key).stream().unordered()
+						ImmutableSet<MethodHandle> bindingHandles = ClassUtilities.getAllFields(key).stream().unordered()
 								.filter(f -> !Modifier.isStatic(f.getModifiers()) && IBindingMethod.class.isAssignableFrom(f.getType()))
 								.map(f -> {
 									try {
-										return DynamicUtilities.IMPL_LOOKUP.unreflectGetter(f);
+										return InvokeUtilities.IMPL_LOOKUP.unreflectGetter(f);
 									} catch (IllegalAccessException e) {
 										throw ThrowableUtilities.propagate(e);
 									}

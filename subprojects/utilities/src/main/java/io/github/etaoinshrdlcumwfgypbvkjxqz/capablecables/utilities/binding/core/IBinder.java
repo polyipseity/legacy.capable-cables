@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.DynamicUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.DynamicUtilities;
 import net.jodah.typetools.TypeResolver;
 
 import java.util.EnumSet;

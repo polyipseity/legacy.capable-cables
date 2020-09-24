@@ -6,7 +6,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.adapters.En
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.adapters.EnumJAXBObjectPresetAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EventBusForge;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ClientUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Singleton;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.IThrowableHandler;
 import net.minecraftforge.api.distmarker.Dist;
@@ -20,9 +19,9 @@ import java.util.function.Supplier;
 public final class UIConfiguration
 		extends CommonConfigurationTemplate<UIConfiguration.ConfigurationData> {
 	private static final Logger BOOTSTRAP_LOGGER = LoggerFactory.getLogger(UIConstants.MODULE_NAME);
-	private static final UIConfiguration INSTANCE = Singleton.getSingletonInstance(UIConfiguration.class);
+	private static final Supplier<UIConfiguration> INSTANCE = Suppliers.memoize(UIConfiguration::new);
 
-	private UIConfiguration() { super(getBootstrapLogger()); }
+	private UIConfiguration() {}
 
 	public static Logger getBootstrapLogger() { return BOOTSTRAP_LOGGER; }
 

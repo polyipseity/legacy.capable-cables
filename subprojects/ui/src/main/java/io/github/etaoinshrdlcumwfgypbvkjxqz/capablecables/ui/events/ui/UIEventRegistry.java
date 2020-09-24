@@ -3,8 +3,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.PreconditionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Registry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
@@ -18,7 +18,6 @@ public final class UIEventRegistry extends Registry<INamespacePrefixedString, Cl
 
 	protected UIEventRegistry() {
 		super(false, UIConfiguration.getInstance().getLogger());
-		PreconditionUtilities.requireRunOnceOnly();
 	}
 
 	public static void checkEvent(IUIEvent event)

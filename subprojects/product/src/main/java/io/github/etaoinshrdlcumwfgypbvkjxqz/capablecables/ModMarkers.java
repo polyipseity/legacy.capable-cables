@@ -1,18 +1,18 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Singleton;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.MarkersTemplate;
+import com.google.common.base.Suppliers;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.MarkersTemplate;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.slf4j.Marker;
 
 public final class ModMarkers extends MarkersTemplate {
-	private static final ModMarkers INSTANCE = Singleton.getSingletonInstance(ModMarkers.class);
+	private static final Supplier<ModMarkers> INSTANCE = Suppliers.memoize(ModMarkers::new);
 
 	private final Marker markerModLifecycle = getMarker("mod lifecycle");
 	private final Marker markerRegistrable = getMarker("registrable");
@@ -27,7 +27,7 @@ public final class ModMarkers extends MarkersTemplate {
 						getRegistryMarker(GameRegistry.findRegistry(CastUtilities.castUnchecked(registryEntry.getRegistryType()))));
 			}));
 
-	private ModMarkers() { super(ModConstants.MOD_ID, ModConfiguration.getInstance().getLogger()); }
+	private ModMarkers() { super(ModConstants.MOD_ID); }
 
 	public static ModMarkers getInstance() { return INSTANCE; }
 

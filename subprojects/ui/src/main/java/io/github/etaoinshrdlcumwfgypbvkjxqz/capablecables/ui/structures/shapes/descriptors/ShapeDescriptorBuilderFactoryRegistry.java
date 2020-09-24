@@ -1,15 +1,16 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.descriptors;
 
+import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilderFactory;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.PreconditionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.RegistryWithDefaults;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -28,7 +29,6 @@ public final class ShapeDescriptorBuilderFactoryRegistry
 
 	private ShapeDescriptorBuilderFactoryRegistry() {
 		super(true, UIConfiguration.getInstance().getLogger());
-		PreconditionUtilities.requireRunOnceOnly();
 	}
 
 	public static DefaultShapeDescriptorBuilderFactory getDefaultFactory() {

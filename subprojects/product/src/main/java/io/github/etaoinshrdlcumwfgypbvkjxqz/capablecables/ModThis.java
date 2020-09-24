@@ -7,12 +7,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.NamespaceUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.internationalization.MinecraftLocaleUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Singleton;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.ConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.LoggingThrowableHandler;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThreadLocalThrowableHandler;
-import com.google.common.base.Suppliers;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -22,8 +20,8 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
 import org.jetbrains.annotations.NonNls;
 
+import javax.annotation.Nullable;
 import java.util.ResourceBundle;
-import java.util.function.Supplier;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.blocks.BlocksThis.BLOCKS;
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.inventory.ContainersThis.CONTAINERS;
@@ -31,9 +29,9 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registra
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.tileentities.TileEntityTypesThis.TILE_ENTITIES;
 
 @Mod(ModConstants.MOD_ID)
-public final class ModThis
-		extends Singleton {
-	private static final Supplier<ModThis> INSTANCE = Suppliers.memoize(() -> Singleton.getSingletonInstance(ModThis.class));
+public final class ModThis {
+	@Nullable
+	private static ModThis instance = null;
 	private static final ResourceBundle RESOURCE_BUNDLE;
 
 	static {
@@ -48,20 +46,21 @@ public final class ModThis
 		RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(ModConfiguration.getInstance());
 	}
 
-	private final EventHandler eventHandler = Singleton.getSingletonInstance(EventHandler.class);
+	private final EventHandler eventHandler = EventHandler.INSTANCE;
 	private final IProxy proxy = DistExecutor.unsafeRunForDist(
 			() -> DistLambdaHolder.Client::getProxyClient,
 			() -> DistLambdaHolder.Server::getProxyServer);
 
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public ModThis() {
 		// COMMENT entry point
-		super(ModConfiguration.getInstance().getLogger());
 		IEventBus eventBusMod = AssertionUtilities.assertNonnull(Bus.MOD.bus().get());
 		eventBusMod.register(getEventHandler());
 		BLOCKS.register(eventBusMod);
 		ITEMS.register(eventBusMod);
 		TILE_ENTITIES.register(eventBusMod);
 		CONTAINERS.register(eventBusMod);
+		instance = this;
 	}
 
 	private EventHandler getEventHandler() { return eventHandler; }
@@ -74,7 +73,7 @@ public final class ModThis
 
 	public IProxy getProxy() { return proxy; }
 
-	public static ModThis getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+	public static ModThis getInstance() { return AssertionUtilities.assertNonnull(instance); }
 
 	private enum DistLambdaHolder {
 		;
@@ -82,22 +81,22 @@ public final class ModThis
 		private enum Client {
 			;
 
-			private static IProxy getProxyClient() { return new ProxyClient(ModConfiguration.getInstance().getLogger()); }
+			private static IProxy getProxyClient() { return ProxyClient.getInstance(); }
 		}
 
 		private enum Server {
 			;
 
-			private static IProxy getProxyServer() { return new ProxyServer(ModConfiguration.getInstance().getLogger()); }
+			private static IProxy getProxyServer() { return ProxyServer.getInstance(); }
 		}
 	}
 
-	private final class EventHandler extends Singleton {
-		private EventHandler() { super(ModConfiguration.getInstance().getLogger()); }
+	private enum EventHandler {
+		INSTANCE;
 
 		@SubscribeEvent
 		protected void onModLifecycleEvent(ModLifecycleEvent event) {
-			if (!getProxy().onModLifecycle(event))
+			if (!getInstance().getProxy().onModLifecycle(event))
 				ModConfiguration.getInstance().getLogger()
 						.atInfo()
 						.addMarker(ModMarkers.getInstance().getMarkerModLifecycle())

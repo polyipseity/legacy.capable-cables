@@ -5,8 +5,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.Ma
 import org.slf4j.Marker;
 
 public final class UtilitiesMarkers extends MarkersTemplate {
-	private static final UtilitiesMarkers INSTANCE = Singleton.getSingletonInstance(UtilitiesMarkers.class);
+	private static final Supplier<UtilitiesMarkers> INSTANCE = Suppliers.memoize(UtilitiesMarkers::new);
 
+	private final Marker markerLogging;
 	private final Marker markerThrowable;
 	private final Marker markerBinding;
 	private final Marker markerRender;
@@ -23,7 +24,7 @@ public final class UtilitiesMarkers extends MarkersTemplate {
 		markerExtension = getMarker("extension");
 	}
 
-	private UtilitiesMarkers() { super(UtilitiesConstants.MODULE_NAME, UtilitiesConfiguration.getInstance().getLogger()); }
+	private UtilitiesMarkers() { super(UtilitiesConstants.MODULE_NAME); }
 
 	public static UtilitiesMarkers getInstance() { return INSTANCE; }
 

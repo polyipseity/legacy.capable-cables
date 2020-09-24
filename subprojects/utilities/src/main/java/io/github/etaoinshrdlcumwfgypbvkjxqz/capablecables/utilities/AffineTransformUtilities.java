@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
+import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MatrixUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.renderer.Matrix4f;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Marker;
@@ -30,7 +30,7 @@ public enum AffineTransformUtilities {
 			.put("shearX", AffineTransformUtilities.getShearXIndex())
 			.put("shearY", AffineTransformUtilities.getShearYIndex())
 			.build();
-	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker(MatrixUtilities.class);
+	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker();
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 	private static final AffineTransform IDENTITY = new AffineTransform();
 	private static final double[] FLAT_MATRIX_IDENTITY = {

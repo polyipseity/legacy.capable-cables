@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.descriptors.builders;
 
+import com.google.common.collect.Iterables;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
@@ -9,10 +10,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIObjectU
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
-import com.google.common.collect.Iterables;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -32,7 +32,7 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 	private final Rectangle2D bounds = IShapeDescriptor.StaticHolder.getShapePlaceholder();
 	private final List<IShapeConstraint> constraints = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 	private final ConcurrentMap<String, Consumer<?>> properties =
-			MapUtilities.newMapMakerSingleThreaded().makeMap();
+			MapBuilderUtilities.newMapMakerSingleThreaded().makeMap();
 
 	protected AbstractShapeDescriptorBuilder(Class<S> genericClass) { super(genericClass); }
 

@@ -1,7 +1,16 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections;
 
-import com.google.common.collect.*;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LoopUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.ClassUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.StackTraceUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 import org.jetbrains.annotations.NonNls;
@@ -25,7 +34,7 @@ import static org.objectweb.asm.Opcodes.*;
 public enum MapUtilities {
 	;
 
-	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker(MapUtilities.class);
+	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker();
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 
 	public static <K, V> ImmutableMap<K, V> stitchKeysValues(int size, Iterable<? extends K> keys, Iterable<? extends V> values) {
@@ -56,10 +65,6 @@ public enum MapUtilities {
 	}
 
 	public static Marker getClassMarker() { return CLASS_MARKER; }
-
-	public static MapMaker newMapMakerSingleThreaded() { return new MapMaker().concurrencyLevel(ConcurrencyUtilities.SINGLE_THREAD_THREAD_COUNT); }
-
-	public static MapMaker newMapMakerNormalThreaded() { return new MapMaker().concurrencyLevel(ConcurrencyUtilities.NORMAL_THREAD_THREAD_COUNT); }
 
 	@SafeVarargs
 	public static <K, V> ImmutableMap<K, V> concatMaps(Map<? extends K, ? extends V>... maps) {
@@ -160,7 +165,7 @@ public enum MapUtilities {
 							sw.toString(),
 							Type.getInternalName(superclass),
 							null);
-					cw.visitSource(DynamicUtilities.getCurrentStackTraceElement()
+					cw.visitSource(StackTraceUtilities.getCurrentStackTraceElement()
 							.map(StackTraceElement::getFileName)
 							.orElse(null), SOURCE_DEBUG);
 				}
@@ -217,13 +222,13 @@ public enum MapUtilities {
 				}
 				cw.visitEnd();
 
-				CLASS = DynamicUtilities.defineClass(superclass.getClassLoader(), name, cw.toByteArray());
+				CLASS = ClassUtilities.defineClass(superclass.getClassLoader(), name, cw.toByteArray());
 			}
 
 			{
 				MethodHandle constructor;
 				try {
-					constructor = DynamicUtilities.IMPL_LOOKUP.findConstructor(CLASS, MethodType.methodType(void.class, Map.class, Map.class));
+					constructor = InvokeUtilities.IMPL_LOOKUP.findConstructor(CLASS, MethodType.methodType(void.class, Map.class, Map.class));
 				} catch (NoSuchMethodException | IllegalAccessException e) {
 					throw ThrowableUtilities.propagate(e);
 				}

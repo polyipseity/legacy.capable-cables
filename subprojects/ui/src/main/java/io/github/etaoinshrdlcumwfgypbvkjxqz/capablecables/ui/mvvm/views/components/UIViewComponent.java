@@ -66,7 +66,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	@UIViewComponentConstructor(type = UIViewComponentConstructor.EnumConstructorType.MAPPINGS)
 	public UIViewComponent(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings) {
-		this.mappings = MapUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
+		this.mappings = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
 
 		IExtensionContainer.StaticHolder.addExtensionChecked(this, new UICacheExtension());
@@ -115,6 +115,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	@Override
 	public IUIComponentShapeAnchorController getShapeAnchorController() { return shapeAnchorController; }
 
+	@SuppressWarnings("RedundantTypeArguments")
 	@Override
 	public IUIComponentContext createContext() {
 		return new DefaultUIComponentContext(
@@ -169,7 +170,6 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 				.isPresent();
 	}
 
-	@SuppressWarnings("RedundantTypeArguments")
 	@Override
 	public void initialize() {
 		getManager().ifPresent(manager ->

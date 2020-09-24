@@ -4,11 +4,11 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilitie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.DynamicUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingSupplier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.logging.LoggingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.DynamicUtilities;
 import org.slf4j.Logger;
 import org.slf4j.ext.XLogger;
 

@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.PreconditionUtilities;
+import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -18,7 +19,6 @@ public final class UIScreenUtility extends Screen {
 
 	private UIScreenUtility() {
 		super(TextComponentUtilities.getEmpty());
-		PreconditionUtilities.requireRunOnceOnly();
 	}
 
 	public static UIScreenUtility getInstance() { return INSTANCE; }

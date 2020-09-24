@@ -1,5 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.adapters;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.adapters.IUIAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.extensions.cursors.IUIExtensionCursorHandleProvider;
@@ -25,7 +28,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransf
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.NoSuchBindingTransformerException;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
@@ -33,9 +36,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.cl
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.INode;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.IGuiEventListener;
@@ -62,9 +62,9 @@ public class UIScreenAdapter
 		extends AbstractContainerScreenAdapter<I, C>
 		implements IUIAdapter<I> {
 	protected final ConcurrentMap<Integer, IUIEventKeyboard>
-			keyboardKeysBeingPressed = MapUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+			keyboardKeysBeingPressed = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	protected final ConcurrentMap<Integer, IUIEventMouse>
-			mouseButtonsBeingPressed = MapUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+			mouseButtonsBeingPressed = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 
 	protected final I infrastructure;
 	@Nullable
@@ -83,9 +83,9 @@ public class UIScreenAdapter
 		this.title = title;
 		this.infrastructure = infrastructure;
 		this.containerObject = containerObject;
-		this.closeKeys = Collections.newSetFromMap(MapUtilities.newMapMakerSingleThreaded().initialCapacity(closeKeys.size()).makeMap());
+		this.closeKeys = Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(closeKeys.size()).makeMap());
 		this.closeKeys.addAll(closeKeys);
-		this.changeFocusKeys = Collections.newSetFromMap(MapUtilities.newMapMakerSingleThreaded().initialCapacity(changeFocusKeys.size()).makeMap());
+		this.changeFocusKeys = Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(changeFocusKeys.size()).makeMap());
 		this.changeFocusKeys.addAll(changeFocusKeys);
 		IExtensionContainer.StaticHolder.addExtensionChecked(infrastructure, new UIExtensionScreen());
 

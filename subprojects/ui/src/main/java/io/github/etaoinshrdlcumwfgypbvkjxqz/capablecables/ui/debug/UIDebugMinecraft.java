@@ -272,6 +272,8 @@ public enum UIDebugMinecraft {
 			tileEntity = requireNonNull(world.getTileEntity(pos));
 		}
 
+		private static ContainerType<DebugContainer> getTypeInstance() { return AssertionUtilities.assertNonnull(TYPE_INSTANCE.get()); }
+
 		@Override
 		public boolean canInteractWith(PlayerEntity playerIn) {
 			return isWithinUsableDistance(IWorldPosCallable.of(requireNonNull(tileEntity.getWorld()), tileEntity.getPos()), playerIn, DebugBlock.INSTANCE);
@@ -290,7 +292,6 @@ public enum UIDebugMinecraft {
 
 		private DebugBlock() {
 			super(Properties.from(Blocks.STONE));
-			PreconditionUtilities.requireRunOnceOnly();
 		}
 
 		@Override
@@ -315,6 +316,8 @@ public enum UIDebugMinecraft {
 
 	private static final class DebugTileEntity extends TileEntity implements INamedContainerProvider {
 		private DebugTileEntity() { super(requireNonNull(Type.INSTANCE)); }
+
+		private static TileEntityType<DebugTileEntity> getTypeInstance() { return AssertionUtilities.assertNonnull(TYPE_INSTANCE.get()); }
 
 		@Override
 		public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) { return new DebugContainer(id, requireNonNull(getWorld()), getPos()); }

@@ -6,7 +6,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.ManualLoadingCache;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import net.minecraft.client.MainWindow;
 import net.minecraft.client.MouseHelper;
@@ -122,7 +122,7 @@ public enum GLUtilities {
 		;
 
 		private static final ConcurrentMap<Integer, Object> STATE =
-				MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
+				MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 
 		public static int getInteger(int name) { return (int) STATE.computeIfAbsent(name, GL11::glGetInteger); }
 

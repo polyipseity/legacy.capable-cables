@@ -1,13 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.MarkersTemplate;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Marker;
 
@@ -35,7 +35,7 @@ public interface INamespacePrefixedString {
 		@NonNls
 		public static final String DEFAULT_PREFIX = DEFAULT_NAMESPACE + SEPARATOR;
 		private static final Marker CLASS_MARKER =
-				MarkersTemplate.addReferences(UtilitiesMarkers.getInstance().getClassMarker(INamespacePrefixedString.class),
+				MarkersTemplate.addReferences(UtilitiesMarkers.getInstance().getClassMarker(),
 						UtilitiesMarkers.getInstance().getMarkerStructure());
 		private static final ImmutableList<Function<? super INamespacePrefixedString, ?>> OBJECT_VARIABLES = ImmutableList.of(
 				INamespacePrefixedString::getNamespace, INamespacePrefixedString::getPath);

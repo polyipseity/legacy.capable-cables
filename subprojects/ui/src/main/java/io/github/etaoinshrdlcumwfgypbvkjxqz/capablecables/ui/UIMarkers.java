@@ -5,7 +5,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.Ma
 import org.slf4j.Marker;
 
 public final class UIMarkers extends MarkersTemplate {
-	private static final UIMarkers INSTANCE = Singleton.getSingletonInstance(UIMarkers.class);
+	private static final Supplier<UIMarkers> INSTANCE = Suppliers.memoize(UIMarkers::new);
 
 	private final Marker markerShape;
 	private final Marker markerParser;
@@ -39,7 +39,7 @@ public final class UIMarkers extends MarkersTemplate {
 		markerUIComponentRenderer = addReferences(getMarker("renderer"), getMarkerUIComponent());
 	}
 
-	private UIMarkers() { super(UIConstants.MODULE_NAME, UIConfiguration.getInstance().getLogger()); }
+	private UIMarkers() { super(UIConstants.MODULE_NAME); }
 
 	public static UIMarkers getInstance() { return INSTANCE; }
 

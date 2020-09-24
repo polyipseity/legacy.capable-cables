@@ -1,5 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.bindings;
 
+import com.google.common.cache.Cache;
+import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
@@ -7,12 +9,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.methods.IBindingMethod;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.methods.IBindingMethodDestination;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.methods.IBindingMethodSource;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.DefaultDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
-import com.google.common.cache.Cache;
-import com.google.common.collect.Streams;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import sun.misc.Cleaner;
@@ -28,9 +28,9 @@ import java.util.function.Supplier;
 public class MethodBindings
 		extends AbstractBindings<IBindingMethod<?>> {
 	protected final Map<IBindingMethodSource<?>, Disposable> sources =
-			MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_TINY).makeMap();
+			MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_TINY).makeMap();
 	protected final Set<IBindingMethodDestination<?>> destinations =
-			Collections.newSetFromMap(MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_TINY).makeMap());
+			Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_TINY).makeMap());
 	protected final Object cleanerRef = new Object();
 
 	public MethodBindings(INamespacePrefixedString bindingKey,

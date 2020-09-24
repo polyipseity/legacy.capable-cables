@@ -20,7 +20,7 @@ public interface IField<T> {
 		;
 
 		private static final Marker CLASS_MARKER =
-				MarkersTemplate.addReferences(UtilitiesMarkers.getInstance().getClassMarker(IField.class),
+				MarkersTemplate.addReferences(UtilitiesMarkers.getInstance().getClassMarker(),
 						UtilitiesMarkers.getInstance().getMarkerStructure());
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 

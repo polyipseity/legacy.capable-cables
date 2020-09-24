@@ -1,11 +1,11 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
-import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Vector4f;
 import net.minecraftforge.api.distmarker.Dist;
@@ -22,7 +22,7 @@ import java.util.ResourceBundle;
 public enum MatrixUtilities {
 	;
 
-	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker(MatrixUtilities.class);
+	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker();
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 
 	public static void transformFromTo(MatrixStack matrix, Rectangle2D from, Rectangle2D to) {

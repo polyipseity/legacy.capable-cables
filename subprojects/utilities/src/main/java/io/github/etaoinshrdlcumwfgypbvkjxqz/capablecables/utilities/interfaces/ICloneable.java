@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.DynamicUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 
 import java.lang.invoke.MethodHandle;
@@ -19,7 +19,7 @@ public interface ICloneable
 
 		static {
 			try {
-				CLONE_METHOD_HANDLE = DynamicUtilities.IMPL_LOOKUP.findVirtual(Object.class, "clone", MethodType.methodType(Object.class));
+				CLONE_METHOD_HANDLE = InvokeUtilities.IMPL_LOOKUP.findVirtual(Object.class, "clone", MethodType.methodType(Object.class));
 			} catch (NoSuchMethodException | IllegalAccessException e) {
 				throw ThrowableUtilities.propagate(e);
 			}

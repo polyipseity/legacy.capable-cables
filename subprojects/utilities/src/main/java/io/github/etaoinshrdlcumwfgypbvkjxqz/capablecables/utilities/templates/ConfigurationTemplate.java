@@ -1,23 +1,21 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates;
 
+import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Singleton;
-import com.google.common.base.Suppliers;
-import org.slf4j.Logger;
 import org.slf4j.Marker;
 
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
-public abstract class ConfigurationTemplate<D> extends Singleton {
+public abstract class ConfigurationTemplate<D> {
 	private static final Supplier<Marker> CLASS_MARKER = Suppliers.memoize(() -> UtilitiesMarkers.getInstance().getClassMarker(ConfigurationTemplate.class));
 	private final AtomicBoolean configured = new AtomicBoolean();
 
-	protected ConfigurationTemplate(Logger logger) { super(logger); }
+	protected ConfigurationTemplate() {}
 
 	@SuppressWarnings({"SynchronizationOnLocalVariableOrMethodParameter", "UnusedReturnValue"})
 	public static <D> boolean configureSafe(ConfigurationTemplate<D> self, Supplier<? extends D> data) {

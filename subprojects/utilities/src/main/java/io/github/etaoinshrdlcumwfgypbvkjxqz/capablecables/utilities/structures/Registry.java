@@ -4,7 +4,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
@@ -47,7 +47,7 @@ public abstract class Registry<K, V> {
 		return AssertionUtilities.assertNonnull(retRef.get());
 	}
 
-	private final ConcurrentMap<K, RegistryObject<? extends V>> data = MapUtilities.newMapMakerNormalThreaded().makeMap();
+	private final ConcurrentMap<K, RegistryObject<? extends V>> data = MapBuilderUtilities.newMapMakerNormalThreaded().makeMap();
 	private final boolean overridable;
 	private final Logger logger;
 

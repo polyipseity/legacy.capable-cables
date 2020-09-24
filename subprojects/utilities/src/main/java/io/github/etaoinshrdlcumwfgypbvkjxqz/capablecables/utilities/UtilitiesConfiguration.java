@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Singleton;
+import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.IThrowableHandler;
 import org.slf4j.Logger;
@@ -11,9 +11,9 @@ import java.util.function.Supplier;
 
 public final class UtilitiesConfiguration extends CommonConfigurationTemplate<UtilitiesConfiguration.ConfigurationData> {
 	private static final Logger BOOTSTRAP_LOGGER = LoggerFactory.getLogger(UtilitiesConstants.MODULE_NAME);
-	private static final UtilitiesConfiguration INSTANCE = Singleton.getSingletonInstance(UtilitiesConfiguration.class);
+	private static final Supplier<UtilitiesConfiguration> INSTANCE = Suppliers.memoize(UtilitiesConfiguration::new);
 
-	private UtilitiesConfiguration() { super(getBootstrapLogger()); }
+	private UtilitiesConfiguration() {}
 
 	public static UtilitiesConfiguration getInstance() { return INSTANCE; }
 

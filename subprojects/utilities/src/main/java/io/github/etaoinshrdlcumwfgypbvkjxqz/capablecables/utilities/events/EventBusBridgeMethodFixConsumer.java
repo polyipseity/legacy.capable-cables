@@ -1,6 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events;
 
+import com.google.common.collect.ImmutableSet;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.ClassUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.DynamicUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 import net.jodah.typetools.TypeResolver;
@@ -46,7 +50,8 @@ public class EventBusBridgeMethodFixConsumer<T extends Event, O>
 		Method m = delegated.getClass().getDeclaredMethod(methodName, this.eventType);
 		// TODO Java 9 - use LambdaMetaFactory
 		try {
-			this.methodHandle = DynamicUtilities.IMPL_LOOKUP.unreflect(m);
+			// TODO Java 9 - use LambdaMetaFactory
+			this.methodHandle = InvokeUtilities.IMPL_LOOKUP.unreflect(m);
 		} catch (IllegalAccessException e) {
 			throw ThrowableUtilities.propagate(e);
 		}

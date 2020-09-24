@@ -22,8 +22,11 @@ import java.util.ResourceBundle;
 @OnlyIn(Dist.CLIENT)
 public final class ProxyClient extends Proxy implements IProxyClient {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(ModConfiguration.getInstance());
+	private static final Supplier<ProxyClient> INSTANCE = Suppliers.memoize(ProxyClient::new);
 
-	public ProxyClient(Logger logger) { super(logger); }
+	private ProxyClient() {}
+
+	public static ProxyClient getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
 	@Override
 	public boolean onModLifecycle(ModLifecycleEvent event) {

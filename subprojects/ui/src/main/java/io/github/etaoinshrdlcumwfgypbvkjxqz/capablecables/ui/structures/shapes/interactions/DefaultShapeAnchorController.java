@@ -1,5 +1,9 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.interactions;
 
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeAnchor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeAnchorController;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeAnchorSet;
@@ -8,13 +12,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.ManualLoadingCache;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.ConstantSupplier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.MappableSupplier;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Streams;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -34,7 +34,7 @@ public class DefaultShapeAnchorController<T extends IShapeDescriptorProvider>
 					.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)
 					.weakKeys()
 					.build(CacheLoader.from(
-							new MappableSupplier<>(ConstantSupplier.of(MapUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL)))
+							new MappableSupplier<>(ConstantSupplier.of(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL)))
 									.map(t -> Collections.newSetFromMap(t.makeMap())))));
 
 	@Override

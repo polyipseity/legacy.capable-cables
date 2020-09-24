@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Singleton;
+import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.SharedResourceBundleTemplate;
 import org.jetbrains.annotations.NonNls;
@@ -8,10 +8,10 @@ import org.jetbrains.annotations.PropertyKey;
 
 public final class UtilitiesSharedResourceBundle
 		extends SharedResourceBundleTemplate {
-	private static final UtilitiesSharedResourceBundle INSTANCE = Singleton.getSingletonInstance(UtilitiesSharedResourceBundle.class);
+	private static final Supplier<UtilitiesSharedResourceBundle> INSTANCE = Suppliers.memoize(UtilitiesSharedResourceBundle::new);
 
 	private UtilitiesSharedResourceBundle() {
-		super(CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance()), UtilitiesConfiguration.getInstance().getLogger());
+		super(CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance()));
 	}
 
 	public static UtilitiesSharedResourceBundle getInstance() { return INSTANCE; }

@@ -1,6 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConstants;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 import io.reactivex.rxjava3.subjects.Subject;
@@ -30,7 +34,7 @@ public enum EventBusUtilities {
 
 	static {
 		try {
-			BUS_ID_GETTER_METHOD_HANDLE = DynamicUtilities.IMPL_LOOKUP.findGetter(EventBus.class, "busID", int.class);
+			BUS_ID_GETTER_METHOD_HANDLE = InvokeUtilities.IMPL_LOOKUP.findGetter(EventBus.class, "busID", int.class);
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			throw ThrowableUtilities.propagate(e);
 		}

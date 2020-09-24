@@ -4,7 +4,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.PreconditionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IDuplexFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Registry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.StandardDuplexFunctionRegistry;
@@ -51,7 +50,6 @@ public enum JAXBAdapterRegistries {
 
 		protected Object() {
 			super(true, UIConfiguration.getInstance().getLogger());
-			PreconditionUtilities.requireRunOnceOnly();
 		}
 	}
 
@@ -61,8 +59,9 @@ public enum JAXBAdapterRegistries {
 
 		protected Element() {
 			super(true, UIConfiguration.getInstance().getLogger());
-			PreconditionUtilities.requireRunOnceOnly();
 		}
+
+		public static Element getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
 		public <L, VL extends IDuplexFunction<JAXBElement<L>, ?>> RegistryObject<VL> registerSafe(Class<L> key, VL value) {
 			return CastUtilities.castUnchecked(register(key, CastUtilities.castUnchecked(value))); // COMMENT should be safe

@@ -1,8 +1,9 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.processors.utilities;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import org.slf4j.Marker;
 
 import javax.annotation.Nullable;
@@ -13,12 +14,10 @@ import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
-
 public enum ProcessorUtilities {
 	;
 
-	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker(ProcessorUtilities.class);
+	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker();
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 
 	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Class<A> annotationType, ExecutableElement executable, Elements elements, Types types) throws IllegalArgumentException {
@@ -54,7 +53,7 @@ public enum ProcessorUtilities {
 
 	@SuppressWarnings({"UnstableApiUsage", "ObjectAllocationInLoop"})
 	public static ImmutableSet<ImmutableSet<TypeElement>> getSuperclassesAndInterfaces(TypeElement type, Types types) {
-		LinkedHashSet<ImmutableSet<TypeElement>> ret = new LinkedHashSet<>(INITIAL_CAPACITY_SMALL);
+		LinkedHashSet<ImmutableSet<TypeElement>> ret = new LinkedHashSet<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 
 		ImmutableSet<TypeElement> scs = getSuperclasses(type, types);
 		ret.add(scs);

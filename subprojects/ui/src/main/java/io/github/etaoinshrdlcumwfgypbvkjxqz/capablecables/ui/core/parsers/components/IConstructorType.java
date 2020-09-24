@@ -21,7 +21,7 @@ public interface IConstructorType {
 	enum StaticHolder {
 		;
 
-		private static final Marker CLASS_MARKER = UIMarkers.getInstance().getClassMarker(IConstructorType.class);
+		private static final Marker CLASS_MARKER = UIMarkers.getInstance().getClassMarker();
 
 		public static <T extends IConstructorType, A extends Annotation> T getConstructorType(Class<?> clazz, Class<A> annotationType, Function<? super A, ? extends T> getter) {
 			return findConstructorType(clazz, annotationType, getter)

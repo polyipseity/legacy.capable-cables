@@ -1,7 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches;
 
+import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.PreconditionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Registry;
 
@@ -11,7 +12,6 @@ public final class UICacheRegistry
 
 	protected UICacheRegistry() {
 		super(true, UIConfiguration.getInstance().getLogger());
-		PreconditionUtilities.requireRunOnceOnly();
 	}
 
 	public static UICacheRegistry getInstance() { return INSTANCE; }
