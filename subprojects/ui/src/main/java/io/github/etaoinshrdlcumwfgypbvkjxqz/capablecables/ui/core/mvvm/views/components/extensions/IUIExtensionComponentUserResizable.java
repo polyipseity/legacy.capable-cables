@@ -8,6 +8,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.extensions.UIE
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.DefaultExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IFunction4;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
@@ -41,6 +42,9 @@ public interface IUIExtensionComponentUserResizable<E extends IUIComponent & IUI
 
 		long getInitialCursorHandle();
 
-		void handle(RectangularShape rectangular, Point2D cursorPosition);
+		<T extends RectangularShape, TH extends Throwable> T handle(RectangularShape rectangular,
+		                                                            Point2D cursorPosition,
+		                                                            IFunction4<? super Double, ? super Double, ? super Double, ? super Double, ? extends T, ? extends TH> constructor)
+				throws TH;
 	}
 }

@@ -14,10 +14,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.UIEventUt
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.extensions.IUIExtensionContainerProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.extensions.IUIExtensionScreenProvider;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.InputUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIDataKeyboardKeyPress;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIDataMouseButtonClick;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIObjectUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIInputUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.DrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.UIBackgrounds;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
@@ -35,6 +34,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.cl
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.DoubleDimension2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableRectangle2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.INode;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 import net.minecraft.client.Minecraft;
@@ -51,7 +51,6 @@ import org.lwjgl.system.MemoryUtil;
 
 import javax.annotation.Nullable;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
@@ -210,7 +209,7 @@ public class UIScreenAdapter
 	public void setSize(int width, int height) {
 		super.setSize(width, height);
 		getInfrastructure().getView().reshape(s -> {
-			s.bound(new Rectangle2D.Double(0, 0, width, height));
+			s.bound(ImmutableRectangle2D.of(0, 0, width, height));
 			return true;
 		});
 	}
@@ -318,7 +317,7 @@ public class UIScreenAdapter
 	protected void setLastMouseClickData(@Nullable UIDataMouseButtonClick newMouseClickData, @Nullable IUIEventTarget target) {
 		boolean ret = getLastMouseClickData()
 				.flatMap(dl -> Optional.ofNullable(newMouseClickData)
-						.filter(d -> InputUtilities.isDoubleClick(dl, d)
+						.filter(d -> UIInputUtilities.isDoubleClick(dl, d)
 								&& UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClickDouble(AssertionUtilities.assertNonnull(target), d))))
 				.isPresent();
 		this.lastMouseClickData = newMouseClickData;
@@ -545,7 +544,7 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) { DrawingUtilities.fillGradient(AffineTransformUtilities.getIdentity(), UIObjectUtilities.getRectangleFromDiagonal(ImmutablePoint2D.of(x1, y1), ImmutablePoint2D.of(x2, y2)), colorTop, colorBottom, getBlitOffset()); }
+	protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) { DrawingUtilities.fillGradient(AffineTransformUtilities.getIdentity(), ImmutableRectangle2D.fromDiagonal(ImmutablePoint2D.of(x1, y1), ImmutablePoint2D.of(x2, y2)), colorTop, colorBottom, getBlitOffset()); }
 
 	@Override
 	@Deprecated
@@ -562,7 +561,7 @@ public class UIScreenAdapter
 	@SuppressWarnings("MagicNumber")
 	@Override
 	@Deprecated
-	public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(AffineTransformUtilities.getIdentity(), new Rectangle2D.Double(x, y, w, h), ImmutablePoint2D.of(u, v), new DoubleDimension2D(256, 256), getBlitOffset()); }
+	public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(AffineTransformUtilities.getIdentity(), ImmutableRectangle2D.of(x, y, w, h), ImmutablePoint2D.of(u, v), new DoubleDimension2D(256, 256), getBlitOffset()); }
 
 	@OnlyIn(Dist.CLIENT)
 	public static class UIExtensionContainer

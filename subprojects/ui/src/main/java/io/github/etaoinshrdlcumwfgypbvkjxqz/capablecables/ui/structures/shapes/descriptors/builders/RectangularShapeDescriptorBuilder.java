@@ -3,7 +3,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.descriptors.RectangularShapeDescriptor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIObjectUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableRectangle2D;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.UIObjectUtilities;
 
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
@@ -16,9 +17,9 @@ public abstract class RectangularShapeDescriptorBuilder<S extends RectangularSha
 	@SuppressWarnings("Convert2MethodRef")
 	@Override
 	public IShapeDescriptor<S> build() {
-		S s = createRectangularShape();
+		S s = createRectangularShape(); // COMMENT must be mutable
 		UIObjectUtilities.acceptRectangular(getBounds(), (x, y, w, h) -> s.setFrame(x, y, w, h)); // COMMENT javac bug, no method ref here
-		UIObjectUtilities.transformRectangular(getTransform(), s);
+		s.setFrame(UIObjectUtilities.transformRectangular(getTransform(), s, ImmutableRectangle2D::of));
 		IShapeDescriptor<S> ret = new RectangularShapeDescriptor<>(s);
 		IShapeDescriptorBuilder.addUIObjects(ret, getConstraints());
 		return ret;

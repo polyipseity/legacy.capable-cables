@@ -1,16 +1,16 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.cursors;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftImageUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.UIObjectUtilities;
 import net.minecraft.client.renderer.texture.NativeImage;
 import org.jetbrains.annotations.NonNls;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
 
-import java.awt.*;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,7 +28,7 @@ public enum EnumGLFWCursor
 		InputStream input = AssertionUtilities.assertNonnull(EnumGLFWCursor.class.getResourceAsStream(StaticHolder.getExtensionResizeNwSeCursorPath()));
 		try {
 			try {
-				return createCursor(input, new Point(8, 8));
+				return createCursor(input, ImmutablePoint2D.of(8, 8));
 			} catch (IOException e) {
 				throw ThrowableUtilities.propagate(e);
 			}
@@ -40,7 +40,7 @@ public enum EnumGLFWCursor
 		InputStream input = AssertionUtilities.assertNonnull(EnumGLFWCursor.class.getResourceAsStream(StaticHolder.getExtensionResizeNeSwCursorPath()));
 		try {
 			try {
-				return createCursor(input, new Point(8, 8));
+				return createCursor(input, ImmutablePoint2D.of(8, 8));
 			} catch (IOException e) {
 				throw ThrowableUtilities.propagate(e);
 			}
@@ -61,8 +61,8 @@ public enum EnumGLFWCursor
 			throws IOException {
 		try (NativeImage ni = NativeImage.read(NativeImage.PixelFormat.RGBA, input);
 		     GLFWImage i = MinecraftImageUtilities.toGLFWImageCursor(ni)) {
-			Point hotspotF = UIObjectUtilities.getPointFloor(hotspot);
-			return GLFW.glfwCreateCursor(i, hotspotF.x, hotspotF.y);
+			ImmutablePoint2D hotspotF = UIObjectUtilities.getPointFloor(hotspot);
+			return GLFW.glfwCreateCursor(i, (int) hotspotF.getX(), (int) hotspotF.getY());
 		}
 	}
 

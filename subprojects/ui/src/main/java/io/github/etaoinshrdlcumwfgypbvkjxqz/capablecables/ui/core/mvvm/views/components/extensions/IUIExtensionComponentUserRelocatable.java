@@ -7,6 +7,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.sha
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.extensions.UIExtensionRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.DefaultExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IFunction4;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
@@ -33,6 +34,9 @@ public interface IUIExtensionComponentUserRelocatable<E extends IUIComponent & I
 	interface IRelocateData {
 		Point2D getCursorPositionView();
 
-		void handle(RectangularShape rectangular, Point2D cursorPosition);
+		<T extends RectangularShape, TH extends Throwable> T handle(RectangularShape rectangular,
+		                                                            Point2D cursorPosition,
+		                                                            IFunction4<? super Double, ? super Double, ? super Double, ? super Double, T, ? extends TH> action)
+				throws TH;
 	}
 }

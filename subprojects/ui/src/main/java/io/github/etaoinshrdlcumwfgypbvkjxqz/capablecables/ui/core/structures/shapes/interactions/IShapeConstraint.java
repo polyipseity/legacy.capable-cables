@@ -3,6 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.sh
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.interactions.ShapeConstraint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICloneable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICopyable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableRectangle2D;
 
 import java.awt.geom.Rectangle2D;
 import java.util.Optional;
@@ -11,7 +12,7 @@ public interface IShapeConstraint
 		extends ICopyable, ICloneable {
 	IShapeConstraint CONSTRAINT_NULL = new ShapeConstraint(null, null, null, null, null, null, null, null);
 
-	default void constrain(Rectangle2D rectangle) {
+	default ImmutableRectangle2D constrain(Rectangle2D rectangle) {
 		final double[]
 				x = new double[]{rectangle.getX()},
 				y = new double[]{rectangle.getY()},
@@ -25,7 +26,7 @@ public interface IShapeConstraint
 		height[0] = getMinHeight().map(t -> Math.max(height[0], t)).orElseGet(() -> height[0]);
 		width[0] = getMaxWidth().map(t -> Math.min(width[0], t)).orElseGet(() -> width[0]);
 		height[0] = getMaxHeight().map(t -> Math.min(height[0], t)).orElseGet(() -> height[0]);
-		rectangle.setRect(x[0], y[0], width[0], height[0]);
+		return ImmutableRectangle2D.of(x[0], y[0], width[0], height[0]);
 	}
 
 	Optional<? extends Double> getMinX();

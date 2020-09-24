@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICopyable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.EmptyPathException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.IPath;
 
 import java.awt.geom.Point2D;
@@ -16,12 +17,13 @@ public interface IUIComponentContext
 	void push(IUIComponent element);
 
 	@SuppressWarnings("UnusedReturnValue")
-	IUIComponent pop();
+	IUIComponent pop()
+			throws EmptyPathException;
 
 	@Override
 	default void close() {
 		IPath<IUIComponent> path = getPath();
-		path.parentPath(path.size() - 1);
+		path.parentPath(path.size());
 		getTransformStack().close();
 	}
 

@@ -7,10 +7,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUI
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.EnumCropMethod;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.caches.UICacheExtension;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.DrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftOpenGLUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftCoordinateUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.EnumMinecraftUICoordinateSystem;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableRectangle2D;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.CoordinateSystemUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.UIObjectUtilities;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
@@ -18,7 +20,6 @@ import org.lwjgl.opengl.GL14;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 
 @OnlyIn(Dist.CLIENT)
 public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUIComponentMinecraft>
@@ -81,9 +82,11 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUICompo
 						int[] boundsBox = new int[4];
 						MinecraftOpenGLUtilities.State.getIntegerValue(GL11.GL_SCISSOR_BOX, boundsBox);
 						UIObjectUtilities.acceptRectangular(
-								MinecraftCoordinateUtilities.toNativeRectangle(
-										UIObjectUtilities.getRectangleExpanded(transform.createTransformedShape(container.getShapeDescriptor().getShapeOutput().getBounds2D()).getBounds2D()))
-										.createIntersection(new Rectangle2D.Double(boundsBox[0], boundsBox[1], boundsBox[2], boundsBox[3])),
+								CoordinateSystemUtilities.convertRectangle(
+										UIObjectUtilities.getRectangleExpanded(transform.createTransformedShape(container.getShapeDescriptor().getShapeOutput().getBounds2D()).getBounds2D()),
+										EnumMinecraftUICoordinateSystem.SCALED, EnumMinecraftUICoordinateSystem.NATIVE
+								)
+										.createIntersection(ImmutableRectangle2D.of(boundsBox[0], boundsBox[1], boundsBox[2], boundsBox[3])),
 								(x, y, w, h) -> MinecraftOpenGLUtilities.Stacks.push("glScissor",
 										() -> MinecraftOpenGLUtilities.State.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{x.intValue(), y.intValue(), w.intValue(), h.intValue()},
 												(i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3])), MinecraftOpenGLUtilities.Stacks.GL_SCISSOR_FALLBACK));

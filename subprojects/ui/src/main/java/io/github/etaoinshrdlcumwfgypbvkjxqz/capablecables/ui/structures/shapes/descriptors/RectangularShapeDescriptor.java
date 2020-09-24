@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.descriptors;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIObjectUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableRectangle2D;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.UIObjectUtilities;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.geom.AffineTransform;
@@ -37,7 +38,7 @@ public class RectangularShapeDescriptor<S extends RectangularShape>
 	public boolean transform(AffineTransform transform)
 			throws IllegalStateException {
 		super.transform(transform);
-		UIObjectUtilities.transformRectangular(transform, getShape());
+		getShape().setFrame(UIObjectUtilities.transformRectangular(transform, getShape(), ImmutableRectangle2D::of));
 		return true;
 	}
 }

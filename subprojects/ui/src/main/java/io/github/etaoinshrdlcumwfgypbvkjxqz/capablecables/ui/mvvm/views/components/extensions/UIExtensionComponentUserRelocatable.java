@@ -17,15 +17,17 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.UIEventLi
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.events.bus.UIViewMinecraftBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.UIComponentVirtual;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.descriptors.GenericShapeDescriptor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.DrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IFunction4;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableRectangle2D;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.UIObjectUtilities;
 import io.reactivex.rxjava3.disposables.Disposable;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -86,7 +88,7 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 	public Optional<? extends Shape> getRelocateShape() {
 		return getContainer().map(c ->
 				UIObjectUtilities.applyRectangular(c.getShapeDescriptor().getShapeOutput().getBounds2D(),
-						(x, y, w, h) -> new Rectangle2D.Double(x, y, w, getRelocateBorderThickness())));
+						(x, y, w, h) -> ImmutableRectangle2D.of(x, y, w, getRelocateBorderThickness())));
 	}
 
 	@Override
@@ -99,22 +101,25 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 	protected Object getLockObject() { return lockObject; }
 
 	public static class RelocateData implements IRelocateData {
-		protected final Point2D cursorPosition;
+		protected final ImmutablePoint2D cursorPosition;
 
 		public RelocateData(Point2D cursorPosition) {
-			this.cursorPosition = (Point2D) cursorPosition.clone();
+			this.cursorPosition = ImmutablePoint2D.of(cursorPosition);
 		}
 
 		@Override
-		public Point2D getCursorPositionView() { return (Point2D) getCursorPosition().clone(); }
+		public ImmutablePoint2D getCursorPositionView() { return getCursorPosition(); }
 
-		protected Point2D getCursorPosition() { return cursorPosition; }
+		protected ImmutablePoint2D getCursorPosition() { return cursorPosition; }
 
 		@Override
-		public void handle(RectangularShape rectangular, Point2D cursorPosition) {
-			Point2D o = getCursorPosition();
-			rectangular.setFrame(rectangular.getX() + (cursorPosition.getX() - o.getX()), rectangular.getY() + (cursorPosition.getY() - o.getY()),
-					rectangular.getWidth(), rectangular.getHeight());
+		public <T extends RectangularShape, TH extends Throwable> T handle(RectangularShape rectangular, Point2D cursorPosition, IFunction4<? super Double, ? super Double, ? super Double, ? super Double, T, ? extends TH> action) throws TH {
+			ImmutablePoint2D cp1 = getCursorPosition();
+			return action.apply(
+					rectangular.getX() + (cursorPosition.getX() - cp1.getX()),
+					rectangular.getY() + (cursorPosition.getY() - cp1.getY()),
+					rectangular.getWidth(),
+					rectangular.getHeight());
 		}
 	}
 
@@ -155,12 +160,12 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 												.ifPresent(view -> IUIViewComponent.StaticHolder.createComponentContextWithManager(view)
 														.ifPresent(context -> {
 															ImmutablePoint2D cp = event.getCursorPositionView();
-															Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
-															d.handle(r, cp);
 															try (IUIComponentContext ctx = context) {
 																view.getPathResolver().resolvePath(ctx, cp, true);
 																DrawingUtilities.drawRectangle(ctx.getTransformStack().element(),
-																		r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
+																		d.handle(c.getShapeDescriptor().getShapeOutput().getBounds2D(), cp, ImmutableRectangle2D::of),
+																		Color.DARK_GRAY.getRGB(),
+																		0); // TODO customize
 															}
 														})))));
 		}
@@ -207,8 +212,7 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 
 		protected boolean finishRelocateMaybe(Point2D cursorPosition) {
 			return getContainer().flatMap(c -> getRelocateData().filter(d -> {
-				Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
-				d.handle(r, cursorPosition);
+				Rectangle2D r = d.handle(c.getShapeDescriptor().getShapeOutput().getBounds2D(), cursorPosition, ImmutableRectangle2D::of);
 				synchronized (getLockObject()) {
 					if (!getRelocateData().isPresent())
 						return false;
@@ -229,7 +233,7 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 			return isRelocating()
 					? getManager()
 					.map(m -> new GenericShapeDescriptor(m.getShapeDescriptor().getShapeOutput()))
-					.orElseGet(() -> new GenericShapeDescriptor(new Rectangle2D.Double()))
+					.orElseGet(() -> new GenericShapeDescriptor(ImmutableRectangle2D.of()))
 					: new GenericShapeDescriptor(getRelocateShape()
 					.<Shape>map(Function.identity())
 					.orElseGet(Rectangle2D.Double::new));

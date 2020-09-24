@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIDataMouseButtonClick;
 
-public enum InputUtilities {
+public enum UIInputUtilities {
 	;
 
 	public static final long DOUBLE_CLICK_INTERVAL_MAX = 250L;

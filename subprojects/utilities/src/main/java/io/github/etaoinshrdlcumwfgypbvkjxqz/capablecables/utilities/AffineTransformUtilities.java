@@ -2,6 +2,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftMatrixUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableRectangle2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import net.minecraft.client.renderer.Matrix4f;
 import org.jetbrains.annotations.NonNls;
@@ -66,23 +68,18 @@ public enum AffineTransformUtilities {
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
-	public static double transformX(double x, AffineTransform transform) { return transformReturns(new Point2D.Double(x, 0), transform).getX(); }
+	public static double transformX(double x, AffineTransform transform) { return transformPoint(ImmutablePoint2D.of(x, 0), transform).getX(); }
 
-	public static <T extends Point2D> T transformReturns(T point, AffineTransform transform) {
-		transform.transform(point, point);
-		return point;
+	public static ImmutablePoint2D transformPoint(Point2D point, AffineTransform transform) {
+		return ImmutablePoint2D.of(transform.transform(point, new Point2D.Double()));
 	}
 
-	public static double transformY(double y, AffineTransform transform) { return transformReturns(new Point2D.Double(0, y), transform).getY(); }
+	public static double transformY(double y, AffineTransform transform) { return transformPoint(ImmutablePoint2D.of(0, y), transform).getY(); }
 
-	public static void transformRectangle(Rectangle2D rectangle, AffineTransform transform) {
-		Point2D min = new Point2D.Double(rectangle.getX(), rectangle.getY()), max = new Point2D.Double(rectangle.getMaxX(), rectangle.getMaxY());
-		transformPoint(min, transform);
-		transformPoint(max, transform);
-		rectangle.setFrameFromDiagonal(min, max);
+	public static ImmutableRectangle2D transformRectangle(Rectangle2D rectangle, AffineTransform transform) {
+		return ImmutableRectangle2D.fromDiagonal(transformPoint(ImmutablePoint2D.of(rectangle.getX(), rectangle.getY()), transform),
+				transformPoint(ImmutablePoint2D.of(rectangle.getMaxX(), rectangle.getMaxY()), transform));
 	}
-
-	public static void transformPoint(Point2D point, AffineTransform transform) { transformReturns(point, transform); }
 
 	public static double[] getFlatMatrixIdentity() { return FLAT_MATRIX_IDENTITY.clone(); }
 
