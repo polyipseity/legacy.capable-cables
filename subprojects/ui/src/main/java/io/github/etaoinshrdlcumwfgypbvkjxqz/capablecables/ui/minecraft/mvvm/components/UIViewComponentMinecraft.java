@@ -41,7 +41,7 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 						EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 									EnumCropMethod cropMethod = EnumCropMethod.getBestMethod();
 									cropMethod.enable();
-									IUIViewComponent.StaticHolder.traverseComponentTreeDefault(createContext(),
+									IUIViewComponent.StaticHolder.traverseComponentTreeDefault(createComponentContext(),
 											manager,
 											(context, component) -> {
 												assert component instanceof IUIComponentMinecraft;
@@ -78,7 +78,7 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 	@Override
 	public void tick() {
 		getManager()
-				.ifPresent(manager -> IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createContext(),
+				.ifPresent(manager -> IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext(),
 						manager,
 						(context, component) -> CastUtilities.castChecked(IUIComponentMinecraft.class, component).ifPresent(cc ->
 								cc.tick(context)),

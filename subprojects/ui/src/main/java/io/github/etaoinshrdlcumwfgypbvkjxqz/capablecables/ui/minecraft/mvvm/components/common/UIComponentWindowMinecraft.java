@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.components.common;
 
+import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.binding.UIProperty;
@@ -16,7 +17,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
-import com.google.common.collect.ImmutableMap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NonNls;
@@ -80,7 +80,7 @@ public class UIComponentWindowMinecraft
 
 		@Override
 		public void render(IUIComponentContext context, C container, EnumRenderStage stage, double partialTicks) {
-			if (stage == EnumRenderStage.PRE_CHILDREN) {
+			if (stage.isPreChildren()) {
 				Shape transformed = context.getTransformStack().element().createTransformedShape(container.getShapeDescriptor().getShapeOutput());
 				getColorBackground().getValue().ifPresent(c ->
 						DrawingUtilities.drawShape(transformed, true, c, 0));

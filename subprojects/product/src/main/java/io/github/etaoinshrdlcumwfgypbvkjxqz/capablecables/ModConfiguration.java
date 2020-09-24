@@ -19,7 +19,7 @@ public final class ModConfiguration
 
 	public static Logger getBootstrapLogger() { return BOOTSTRAP_LOGGER; }
 
-	public static ModConfiguration getInstance() { return INSTANCE; }
+	public static ModConfiguration getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
 	public static final class ConfigurationData
 			extends CommonConfigurationTemplate.ConfigurationData {

@@ -1,8 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.disposables.DisposableContainer;
@@ -29,11 +31,11 @@ public abstract class CompositeDisposableCollector<DC extends Disposable & Dispo
 
 	protected static class SetCompositeDisposableCollector
 			extends CompositeDisposableCollector<CompositeDisposable> {
-		private static final SetCompositeDisposableCollector INSTANCE = new SetCompositeDisposableCollector();
+		private static final Supplier<SetCompositeDisposableCollector> INSTANCE = Suppliers.memoize(SetCompositeDisposableCollector::new);
 		private static final ImmutableSet<Characteristics> CHARACTERISTICS = Sets.immutableEnumSet(Characteristics.IDENTITY_FINISH, Characteristics.UNORDERED);
 
 		@SuppressWarnings("SameReturnValue")
-		private static SetCompositeDisposableCollector getInstance() { return INSTANCE; }
+		private static SetCompositeDisposableCollector getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
 		@Override
 		public Supplier<CompositeDisposable> supplier() { return CompositeDisposable::new; }
@@ -49,11 +51,11 @@ public abstract class CompositeDisposableCollector<DC extends Disposable & Dispo
 
 	protected static class ListCompositeDisposableCollector
 			extends CompositeDisposableCollector<ListCompositeDisposable> {
-		private static final ListCompositeDisposableCollector INSTANCE = new ListCompositeDisposableCollector();
+		private static final Supplier<ListCompositeDisposableCollector> INSTANCE = Suppliers.memoize(ListCompositeDisposableCollector::new);
 		private static final ImmutableSet<Characteristics> CHARACTERISTICS = Sets.immutableEnumSet(Characteristics.IDENTITY_FINISH);
 
 		@SuppressWarnings("SameReturnValue")
-		private static ListCompositeDisposableCollector getInstance() { return INSTANCE; }
+		private static ListCompositeDisposableCollector getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
 		@Override
 		public Supplier<ListCompositeDisposable> supplier() { return ListCompositeDisposable::new; }

@@ -47,7 +47,8 @@ public class EventBusForge
 		try {
 			oc = new EventBusBridgeMethodFixConsumer<>(oa, Observer.class, "onNext");
 		} catch (NoSuchMethodException e) {
-			throw ThrowableUtilities.propagate(e);
+			onError(e);
+			return;
 		}
 		oc.register(getDelegate());
 		observer.onSubscribe(new EventBusForgeDisposable(getDelegate(), oc.getEventType(), oc));

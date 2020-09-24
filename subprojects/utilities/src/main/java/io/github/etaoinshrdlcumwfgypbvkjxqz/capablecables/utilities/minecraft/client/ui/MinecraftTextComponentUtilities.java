@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -10,7 +10,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public enum TextComponentUtilities {
+public enum MinecraftTextComponentUtilities {
 	;
 
 	private static final TextComponent EMPTY = new StringTextComponent("");
@@ -22,7 +22,7 @@ public enum TextComponentUtilities {
 	 */
 	@SuppressWarnings("JavadocReference")
 	public static void renderComponentHoverEffect(Minecraft client, int width, int height, FontRenderer font, ITextComponent component, int mouseX, int mouseY) {
-		UIScreenUtility.getInstance()
+		MinecraftScreenUtility.getInstance()
 				.setClient_(client)
 				.setWidth_(width)
 				.setHeight_(height)

@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -22,10 +23,10 @@ public abstract class AbstractConcurrentPath<T>
 	protected ReadWriteLock getLock() { return lock; }
 
 	@Override
-	public T getAt(int depth) {
+	public Optional<? extends T> getAt(int depth) {
 		Lock readLock = getLock().readLock();
 		readLock.lock();
-		T ret = super.getAt(depth);
+		Optional<? extends T> ret = super.getAt(depth);
 		readLock.unlock();
 		return ret;
 	}
@@ -48,7 +49,8 @@ public abstract class AbstractConcurrentPath<T>
 	}
 
 	@Override
-	public void parentPath(int amount) {
+	public void parentPath(int amount)
+			throws EmptyPathException {
 		Lock writeLock = getLock().writeLock();
 		writeLock.lock();
 		super.parentPath(amount);

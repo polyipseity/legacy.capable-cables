@@ -416,7 +416,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 		shape.getProperty().stream().unordered()
 				.forEach(p -> {
 					assert p.getBindingKey() == null;
-					sdb.setProperty(p.getKey(), Optional.ofNullable(p.getAny())
+					sdb.setProperty(p.getKey(), p.getAny()
 							.map(value -> JAXBAdapterRegistries.getAdapter(value).leftToRight(value))
 							.orElse(null));
 				});
@@ -427,22 +427,6 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 						.map(c -> new ShapeConstraint(c.getMinX(), c.getMinY(), c.getMaxX(), c.getMaxY(), c.getMinWidth(), c.getMinHeight(), c.getMaxWidth(), c.getMaxHeight()))
 						.collect(ImmutableList.toImmutableList()))
 				.build();
-	}
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<String, Class<?>> getAliases() { return aliases; }
-
-	@SuppressWarnings("UnstableApiUsage")
-	public static Map<INamespacePrefixedString, IUIPropertyMappingValue> createMappings(Iterable<? extends Property> properties) {
-		return Streams.stream(properties).unordered()
-				.map(p -> Maps.immutableEntry(new ImmutableNamespacePrefixedString(p.getKey()),
-						new UIPropertyMappingValue(Optional.ofNullable(p.getAny())
-								.map(value -> JAXBAdapterRegistries.getAdapter(value).leftToRight(value))
-								.orElse(null),
-								Optional.ofNullable(p.getBindingKey())
-										.map(ImmutableNamespacePrefixedString::new)
-										.orElse(null))))
-				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }

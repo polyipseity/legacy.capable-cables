@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -11,14 +11,14 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import java.util.List;
 
 @OnlyIn(Dist.CLIENT)
-public enum TooltipUtilities {
+public enum MinecraftTooltipUtilities {
 	;
 
 	/**
 	 * @see Screen#getTooltipFromItem(ItemStack)
 	 */
 	public static List<String> getTooltipFromItem(Minecraft client, ItemStack stack) {
-		return UIScreenUtility.getInstance()
+		return MinecraftScreenUtility.getInstance()
 				.setClient_(client)
 				.getTooltipFromItem(stack);
 	}
@@ -28,7 +28,7 @@ public enum TooltipUtilities {
 	 */
 	@SuppressWarnings("JavadocReference")
 	public static void renderTooltip(Minecraft client, int width, int height, FontRenderer font, ItemRenderer itemRenderer, ItemStack item, int mouseX, int mouseY) {
-		UIScreenUtility.getInstance()
+		MinecraftScreenUtility.getInstance()
 				.setClient_(client)
 				.setWidth_(width)
 				.setHeight_(height)
@@ -41,7 +41,7 @@ public enum TooltipUtilities {
 	 * @see Screen#renderTooltip(String, int, int)
 	 */
 	public static void renderTooltip(int width, int height, FontRenderer font, ItemRenderer itemRenderer, String tooltip, int mouseX, int mouseY) {
-		UIScreenUtility.getInstance()
+		MinecraftScreenUtility.getInstance()
 				.setWidth_(width)
 				.setHeight_(height)
 				.setFont_(font)
@@ -53,7 +53,7 @@ public enum TooltipUtilities {
 	 * @see Screen#renderTooltip(List, int, int)
 	 */
 	public static void renderTooltip(int width, int height, FontRenderer font, ItemRenderer itemRenderer, List<String> tooltip, int mouseX, int mouseY) {
-		UIScreenUtility.getInstance()
+		MinecraftScreenUtility.getInstance()
 				.setWidth_(width)
 				.setHeight_(height)
 				.setFont_(font)
@@ -65,7 +65,7 @@ public enum TooltipUtilities {
 	 * @see Screen#renderTooltip(List, int, int, FontRenderer)
 	 */
 	public static void renderTooltip(int width, int height, ItemRenderer itemRenderer, List<String> tooltip, int mouseX, int mouseY, FontRenderer font) {
-		UIScreenUtility.getInstance()
+		MinecraftScreenUtility.getInstance()
 				.setWidth_(width)
 				.setHeight_(height)
 				.setItemRenderer_(itemRenderer)

@@ -4,6 +4,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.IUIExtensionComponentUserRelocatable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventMouse;
@@ -15,7 +16,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventB
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.UIEventListener;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.events.bus.UIViewMinecraftBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.UIComponentVirtual;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.ImmutablePoint2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.descriptors.GenericShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.DrawingUtilities;
@@ -25,6 +25,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
 import io.reactivex.rxjava3.disposables.Disposable;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -73,7 +74,7 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 					.flatMap(IUIComponentManager::getView)
 					.ifPresent(v -> v.getPathResolver().addVirtualElement(c, getVirtualComponent()));
 		});
-		UIEventBusEntryPoint.<UIViewMinecraftBusEvent.Render>getEventBus().subscribe(getRenderObserverRotator().get().orElseThrow(AssertionError::new));
+		UIEventBusEntryPoint.<UIViewMinecraftBusEvent.Render>getEventBus().subscribe(getRenderObserverRotator().get());
 	}
 
 	protected AutoCloseableRotator<RenderObserver, RuntimeException> getRenderObserverRotator() { return renderObserverRotator; }
@@ -151,16 +152,17 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 								.ifPresent(d -> owner.getContainer()
 										.ifPresent(c -> c.getManager()
 												.flatMap(IUIComponentManager::getView)
-												.ifPresent(v -> {
-													ImmutablePoint2D cp = event.getCursorPositionView();
-													Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
-													d.handle(r, cp);
-													try (IUIComponentContext context = v.createContext()) {
-														v.getPathResolver().resolvePath(context, cp, true);
-														DrawingUtilities.drawRectangle(context.getTransformStack().element(),
-																r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
-													}
-												}))));
+												.ifPresent(view -> IUIViewComponent.StaticHolder.createComponentContextWithManager(view)
+														.ifPresent(context -> {
+															ImmutablePoint2D cp = event.getCursorPositionView();
+															Rectangle2D r = c.getShapeDescriptor().getShapeOutput().getBounds2D();
+															d.handle(r, cp);
+															try (IUIComponentContext ctx = context) {
+																view.getPathResolver().resolvePath(ctx, cp, true);
+																DrawingUtilities.drawRectangle(ctx.getTransformStack().element(),
+																		r, Color.DARK_GRAY.getRGB(), 0); // TODO customize
+															}
+														})))));
 		}
 
 		protected Optional<? extends UIExtensionComponentUserRelocatable<?>> getOwner() { return owner.getOptional(); }

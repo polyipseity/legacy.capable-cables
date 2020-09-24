@@ -7,17 +7,17 @@ import javax.annotation.OverridingMethodsMustInvokeSuper;
 
 public class DelegatingDisposableObserver<T>
 		extends DisposableObserver<T> {
-	private final DisposableObserver<T> delegate;
+	private final DisposableObserver<? super T> delegate;
 
-	protected DelegatingDisposableObserver() { this(DefaultDisposableObserver.getEmpty()); }
+	protected DelegatingDisposableObserver() { this(new DefaultDisposableObserver<>()); }
 
-	public DelegatingDisposableObserver(DisposableObserver<T> delegate) { this.delegate = delegate; }
+	public DelegatingDisposableObserver(DisposableObserver<? super T> delegate) { this.delegate = delegate; }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	protected void onStart() { getDelegate().onSubscribe(this); }
 
-	protected DisposableObserver<T> getDelegate() { return delegate; }
+	protected DisposableObserver<? super T> getDelegate() { return delegate; }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper

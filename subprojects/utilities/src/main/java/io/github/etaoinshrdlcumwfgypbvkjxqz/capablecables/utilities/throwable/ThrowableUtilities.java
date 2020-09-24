@@ -52,7 +52,7 @@ public enum ThrowableUtilities {
 	                                                                                                           Function<? super T, RC> checkedWrapper,
 	                                                                                                           Function<? super T, RU> uncheckedWrapper)
 			throws RC, RU, RuntimeException, Error {
-		throwIfUnrecoverable(throwable);
+		throwIfCritical(throwable);
 		if (isUnchecked(throwable))
 			throw uncheckedWrapper.apply(throwable);
 		else
@@ -66,7 +66,7 @@ public enum ThrowableUtilities {
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
-	public static void throwIfUnrecoverable(Throwable throwable)
+	public static void throwIfCritical(Throwable throwable)
 			throws RuntimeException, Error {
 		if (throwable instanceof VirtualMachineError)
 			throw (VirtualMachineError) throwable;
@@ -98,7 +98,7 @@ public enum ThrowableUtilities {
 		try {
 			return Optional.ofNullable(lambda.get());
 		} catch (Throwable throwable) {
-			throwIfUnrecoverable(throwable);
+			throwIfCritical(throwable);
 			Optional<TH> throwableCasted = CastUtilities.castChecked(throwableClass, throwable);
 			throwableCasted.ifPresent(handler);
 			if (!throwableCasted.isPresent())

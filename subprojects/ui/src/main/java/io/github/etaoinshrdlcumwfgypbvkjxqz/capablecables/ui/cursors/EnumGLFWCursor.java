@@ -3,7 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.cursors;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ImageUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftImageUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 import net.minecraft.client.renderer.texture.NativeImage;
 import org.jetbrains.annotations.NonNls;
@@ -60,7 +60,7 @@ public enum EnumGLFWCursor
 	public static long createCursor(InputStream input, Point2D hotspot)
 			throws IOException {
 		try (NativeImage ni = NativeImage.read(NativeImage.PixelFormat.RGBA, input);
-		     GLFWImage i = ImageUtilities.toGLFWImageCursor(ni)) {
+		     GLFWImage i = MinecraftImageUtilities.toGLFWImageCursor(ni)) {
 			Point hotspotF = UIObjectUtilities.getPointFloor(hotspot);
 			return GLFW.glfwCreateCursor(i, hotspotF.x, hotspotF.y);
 		}

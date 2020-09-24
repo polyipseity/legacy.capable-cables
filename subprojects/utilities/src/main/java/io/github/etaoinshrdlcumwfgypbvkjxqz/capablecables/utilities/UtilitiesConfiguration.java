@@ -15,7 +15,7 @@ public final class UtilitiesConfiguration extends CommonConfigurationTemplate<Ut
 
 	private UtilitiesConfiguration() {}
 
-	public static UtilitiesConfiguration getInstance() { return INSTANCE; }
+	public static UtilitiesConfiguration getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
 	public static Logger getBootstrapLogger() { return BOOTSTRAP_LOGGER; }
 

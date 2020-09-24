@@ -28,21 +28,22 @@ public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent
 	@Override
 	public Optional<? extends Long> getCursorHandle(Point2D cursorPosition) {
 		return getContainer()
-				.flatMap(view -> {
-					Optional<Long> ret = Optional.empty();
-					try (IUIComponentContext context = view.createContext()) {
-						view.getPathResolver().resolvePath(context, cursorPosition, true);
-						while (!context.getPath().isRoot()) {
-							IUIComponent component = context.getPath().getPathEnd();
-							if ((ret = CastUtilities.castChecked(IUIComponentCursorHandleProvider.class, component)
-									.flatMap(ec -> ec.getCursorHandle(context, cursorPosition).map(Function.identity())))
-									.isPresent())
-								break;
-							context.pop();
-						}
-					}
-					return ret;
-				});
+				.flatMap(view -> IUIViewComponent.StaticHolder.createComponentContextWithManager(view)
+						.flatMap(context -> {
+							Optional<Long> ret = Optional.empty();
+							try (IUIComponentContext ctx = context) {
+								view.getPathResolver().resolvePath(ctx, cursorPosition, true);
+								while (!ctx.getPath().isEmpty()) {
+									IUIComponent component = ctx.getPath().getPathEnd().orElseThrow(AssertionError::new);
+									if ((ret = CastUtilities.castChecked(IUIComponentCursorHandleProvider.class, component)
+											.flatMap(ec -> ec.getCursorHandle(ctx, cursorPosition).map(Function.identity())))
+											.isPresent())
+										break;
+									ctx.pop();
+								}
+							}
+							return ret;
+						}));
 	}
 
 	@Override

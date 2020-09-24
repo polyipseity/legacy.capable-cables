@@ -6,13 +6,15 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Registry;
 
+import java.util.function.Supplier;
+
 public final class UICacheRegistry
 		extends Registry<INamespacePrefixedString, IUICacheType<?, ?>> {
-	private static final UICacheRegistry INSTANCE = new UICacheRegistry();
+	private static final Supplier<UICacheRegistry> INSTANCE = Suppliers.memoize(UICacheRegistry::new);
 
 	protected UICacheRegistry() {
 		super(true, UIConfiguration.getInstance().getLogger());
 	}
 
-	public static UICacheRegistry getInstance() { return INSTANCE; }
+	public static UICacheRegistry getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 }

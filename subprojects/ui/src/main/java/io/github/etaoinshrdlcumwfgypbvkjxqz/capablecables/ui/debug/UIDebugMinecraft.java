@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug;
 
+import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIFacade;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
@@ -22,10 +23,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.componen
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.UIExtensionCursorHandleProviderComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.DefaultUIComponentParser;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.DrawingUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.TextComponentUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.PreconditionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.Binder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinding.EnumBindingType;
@@ -36,7 +35,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.fiel
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.methods.BindingMethodDestination;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingFunction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ClientUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftClientUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTextComponentUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
@@ -79,6 +79,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
@@ -87,27 +88,27 @@ public enum UIDebugMinecraft {
 
 	@NonNls
 	private static final String PATH = "debug_ui";
-	private static final ITextComponent DISPLAY_NAME = TextComponentUtilities.getEmpty();
+	private static final ITextComponent DISPLAY_NAME = MinecraftTextComponentUtilities.getEmpty();
 
-	public static Block getBlockEntry() { return DebugBlock.INSTANCE; }
+	public static Block getBlockEntry() { return DebugBlock.getInstance(); }
 
-	public static TileEntityType<DebugTileEntity> getTileEntityEntry() { return DebugTileEntity.Type.INSTANCE; }
+	public static TileEntityType<DebugTileEntity> getTileEntityEntry() { return DebugTileEntity.getTypeInstance(); }
 
-	public static ContainerType<DebugContainer> getContainerEntry() { return DebugContainer.Type.INSTANCE; }
+	public static ContainerType<DebugContainer> getContainerEntry() { return DebugContainer.getTypeInstance(); }
 
 	@SuppressWarnings("deprecation")
 	@OnlyIn(Dist.CLIENT)
 	public static void registerUIFactory() {
 		{
-			ContainerType<DebugContainer> ct = DebugContainer.Type.INSTANCE;
-			DebugUI uf = DebugUI.INSTANCE;
-			// COMMENT this should mean that class loading is executed in parallel
+			ContainerType<DebugContainer> containerType = DebugContainer.getTypeInstance();
+			DebugUI uiFactory = DebugUI.INSTANCE;
+			// COMMENT this should mean that classloading is executed in parallel
 			DeferredWorkQueue.runLater(() ->
-					ScreenManager.registerFactory(ct, uf));
+					ScreenManager.registerFactory(containerType, uiFactory));
 		}
 	}
 
-	public static String getPATH() { return PATH; }
+	public static String getPath() { return PATH; }
 
 	public static ITextComponent getDisplayName() { return DISPLAY_NAME; }
 
@@ -189,7 +190,7 @@ public enum UIDebugMinecraft {
 			@Override
 			public void render(IUIComponentContext context, C container, EnumRenderStage stage, double partialTicks) {
 				super.render(context, container, stage, partialTicks);
-				if (stage == EnumRenderStage.PRE_CHILDREN) {
+				if (stage.isPreChildren()) {
 					Point2D cursorPosition = context.getCursorPositionView();
 					Shape transformed = context.getTransformStack().element().createTransformedShape(new Ellipse2D.Double(
 							cursorPosition.getX() - CURSOR_SHAPE_RADIUS, cursorPosition.getY() - CURSOR_SHAPE_RADIUS,
@@ -265,10 +266,13 @@ public enum UIDebugMinecraft {
 	}
 
 	private static final class DebugContainer extends Container {
+		private static final Supplier<ContainerType<DebugContainer>> TYPE_INSTANCE = Suppliers.memoize(() ->
+				IForgeContainerType.create((windowId, inv, data) ->
+						new DebugContainer(windowId, AssertionUtilities.assertNonnull(MinecraftClientUtilities.getMinecraftNonnull().world), data.readBlockPos())));
 		private final TileEntity tileEntity;
 
 		private DebugContainer(int id, World world, BlockPos pos) {
-			super(Type.INSTANCE, id);
+			super(getTypeInstance(), id);
 			tileEntity = requireNonNull(world.getTileEntity(pos));
 		}
 
@@ -276,19 +280,14 @@ public enum UIDebugMinecraft {
 
 		@Override
 		public boolean canInteractWith(PlayerEntity playerIn) {
-			return isWithinUsableDistance(IWorldPosCallable.of(requireNonNull(tileEntity.getWorld()), tileEntity.getPos()), playerIn, DebugBlock.INSTANCE);
-		}
-
-		private enum Type {
-			;
-
-			private static final ContainerType<DebugContainer> INSTANCE = IForgeContainerType.create((windowId, inv, data) ->
-					new DebugContainer(windowId, AssertionUtilities.assertNonnull(ClientUtilities.getMinecraftNonnull().world), data.readBlockPos()));
+			return isWithinUsableDistance(IWorldPosCallable.of(requireNonNull(tileEntity.getWorld()), tileEntity.getPos()), playerIn, DebugBlock.getInstance());
 		}
 	}
 
 	private static final class DebugBlock extends Block {
-		private static final DebugBlock INSTANCE = new DebugBlock();
+		private static final Supplier<DebugBlock> INSTANCE = Suppliers.memoize(DebugBlock::new);
+
+		private static DebugBlock getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
 		private DebugBlock() {
 			super(Properties.from(Blocks.STONE));
@@ -315,7 +314,10 @@ public enum UIDebugMinecraft {
 	}
 
 	private static final class DebugTileEntity extends TileEntity implements INamedContainerProvider {
-		private DebugTileEntity() { super(requireNonNull(Type.INSTANCE)); }
+		private static final Supplier<TileEntityType<DebugTileEntity>> TYPE_INSTANCE = Suppliers.memoize(() ->
+				TileEntityType.Builder.create(DebugTileEntity::new, DebugBlock.getInstance()).build(null));
+
+		private DebugTileEntity() { super(requireNonNull(getTypeInstance())); }
 
 		private static TileEntityType<DebugTileEntity> getTypeInstance() { return AssertionUtilities.assertNonnull(TYPE_INSTANCE.get()); }
 
@@ -324,11 +326,5 @@ public enum UIDebugMinecraft {
 
 		@Override
 		public ITextComponent getDisplayName() { return UIDebugMinecraft.getDisplayName(); }
-
-		private enum Type {
-			;
-
-			private static final TileEntityType<DebugTileEntity> INSTANCE = TileEntityType.Builder.create(DebugTileEntity::new, DebugBlock.INSTANCE).build(null);
-		}
 	}
 }

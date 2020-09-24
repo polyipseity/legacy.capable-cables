@@ -1,8 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Singleton;
+import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.MarkersTemplate;
 import org.slf4j.Marker;
+
+import java.util.function.Supplier;
 
 public final class UtilitiesMarkers extends MarkersTemplate {
 	private static final Supplier<UtilitiesMarkers> INSTANCE = Suppliers.memoize(UtilitiesMarkers::new);
@@ -16,6 +18,7 @@ public final class UtilitiesMarkers extends MarkersTemplate {
 	private final Marker markerExtension;
 
 	{
+		markerLogging = getMarker("logging");
 		markerThrowable = getMarker("throwable");
 		markerBinding = getMarker("binding");
 		markerRender = getMarker("render");
@@ -26,7 +29,9 @@ public final class UtilitiesMarkers extends MarkersTemplate {
 
 	private UtilitiesMarkers() { super(UtilitiesConstants.MODULE_NAME); }
 
-	public static UtilitiesMarkers getInstance() { return INSTANCE; }
+	public static UtilitiesMarkers getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+
+	public Marker getMarkerLogging() { return markerLogging; }
 
 	public Marker getMarkerThrowable() { return markerThrowable; }
 

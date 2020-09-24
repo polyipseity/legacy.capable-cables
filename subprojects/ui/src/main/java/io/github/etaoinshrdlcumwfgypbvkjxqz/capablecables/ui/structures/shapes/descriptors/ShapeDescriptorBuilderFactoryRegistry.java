@@ -18,12 +18,12 @@ import java.util.function.Supplier;
 
 public final class ShapeDescriptorBuilderFactoryRegistry
 		extends RegistryWithDefaults<INamespacePrefixedString, IShapeDescriptorBuilderFactory> {
-	private static final ShapeDescriptorBuilderFactoryRegistry INSTANCE = new ShapeDescriptorBuilderFactoryRegistry();
+	private static final Supplier<ShapeDescriptorBuilderFactoryRegistry> INSTANCE = Suppliers.memoize(ShapeDescriptorBuilderFactoryRegistry::new);
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
-	private static final ImmutableMap<INamespacePrefixedString, Supplier<RegistryObject<? extends IShapeDescriptorBuilderFactory>>> DEFAULTS_SUPPLIER =
-			ImmutableMap.<INamespacePrefixedString, Supplier<RegistryObject<? extends IShapeDescriptorBuilderFactory>>>builder()
-					.put(DefaultShapeDescriptorBuilderFactory.getDefaultFactoryKey(), () -> new RegistryObject<>(new DefaultShapeDescriptorBuilderFactory()))
-					.build();
+	private static final ImmutableMap<INamespacePrefixedString, Supplier<RegistryObject<? extends IShapeDescriptorBuilderFactory>>> DEFAULTS_SUPPLIER = ImmutableMap.<INamespacePrefixedString, Supplier<RegistryObject<? extends IShapeDescriptorBuilderFactory>>>builder()
+			.put(DefaultShapeDescriptorBuilderFactory.getDefaultFactoryKey(), () -> new RegistryObject<>(new DefaultShapeDescriptorBuilderFactory()))
+			.build();
+
 	private final Map<INamespacePrefixedString, RegistryObject<? extends IShapeDescriptorBuilderFactory>> defaults =
 			ImmutableMap.copyOf(Maps.transformValues(getDefaultsSupplier(), Supplier::get));
 
@@ -38,7 +38,7 @@ public final class ShapeDescriptorBuilderFactoryRegistry
 				.getValue();
 	}
 
-	public static ShapeDescriptorBuilderFactoryRegistry getInstance() { return INSTANCE; }
+	public static ShapeDescriptorBuilderFactoryRegistry getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
 	protected static ImmutableMap<INamespacePrefixedString, Supplier<RegistryObject<? extends IShapeDescriptorBuilderFactory>>> getDefaultsSupplier() { return DEFAULTS_SUPPLIER; }
 

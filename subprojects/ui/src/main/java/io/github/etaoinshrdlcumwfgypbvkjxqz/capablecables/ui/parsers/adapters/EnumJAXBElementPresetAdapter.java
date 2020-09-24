@@ -35,7 +35,7 @@ public enum EnumJAXBElementPresetAdapter
 
 	<L, V extends IDuplexFunction<JAXBElement<L>, ?> & Serializable> EnumJAXBElementPresetAdapter(Class<L> key, V value) {
 		this.key = key;
-		this.value = CastUtilities.castUnchecked(JAXBAdapterRegistries.Element.INSTANCE.registerSafe(key, value));
+		this.value = CastUtilities.castUnchecked(JAXBAdapterRegistries.Element.getInstance().registerSafe(key, value));
 	}
 
 	@SuppressWarnings("EmptyMethod")

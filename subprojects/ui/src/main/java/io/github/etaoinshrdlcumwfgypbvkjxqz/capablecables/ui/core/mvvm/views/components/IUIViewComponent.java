@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components;
 
+import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.traits.IHasBindingMap;
@@ -14,7 +15,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.Fu
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingBiFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
-import com.google.common.collect.ImmutableList;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -28,7 +28,7 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 		extends IHasBinding, IHasBindingMap, IUIView<S> {
 	Optional<? extends M> getManager();
 
-	IUIComponentContext createContext();
+	IUIComponentContext createComponentContext();
 
 	List<IUIComponent> getChildrenFlatView();
 
@@ -41,6 +41,15 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 	enum StaticHolder {
 		;
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
+
+		public static Optional<IUIComponentContext> createComponentContextWithManager(IUIViewComponent<?, ?> view) {
+			return view.getManager()
+					.map(manager -> {
+						IUIComponentContext context = view.createComponentContext();
+						context.push(manager);
+						return context;
+					});
+		}
 
 		public static <T extends Throwable> void traverseComponentTreeDefault(IUIComponentContext context,
 		                                                                      IUIComponent root,
@@ -81,7 +90,7 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 					.orElseThrow(() ->
 							new IllegalArgumentException(
 									new LogMessageBuilder()
-											.addMarkers(UIMarkers.getInstance()::getMarkerUIView, UIMarkers.getInstance()::getMarkerUIComponent)
+											.addMarkers(UIMarkers.getInstance()::getMarkerUIView)
 											.addKeyValue("view", view).addKeyValue("id", id)
 											.addMessages(() -> getResourceBundle().getString("component.get.id.fail"))
 											.build()

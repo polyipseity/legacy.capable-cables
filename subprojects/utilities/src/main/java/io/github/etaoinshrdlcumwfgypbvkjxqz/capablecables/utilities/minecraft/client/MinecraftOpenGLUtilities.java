@@ -9,31 +9,24 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import net.minecraft.client.MainWindow;
-import net.minecraft.client.MouseHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NonNls;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
-import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
 
 @OnlyIn(Dist.CLIENT)
-public enum GLUtilities {
+public enum MinecraftOpenGLUtilities {
 	;
 
 	public static final int
 			GL_MASK_ALL_BITS = 0xFFFFFFFF;
 
-	public static Point2D getCursorPos() {
-		MouseHelper mh = ClientUtilities.getMinecraftNonnull().mouseHelper;
-		return new Point2D.Double(mh.getMouseX(), mh.getMouseY());
-	}
-
-	public static long getWindowHandle() { return ClientUtilities.getMinecraftNonnull().getMainWindow().getHandle(); }
+	public static long getWindowHandle() { return MinecraftClientUtilities.getMinecraftNonnull().getMainWindow().getHandle(); }
 
 	@OnlyIn(Dist.CLIENT)
 	public enum Stacks {
@@ -57,11 +50,11 @@ public enum GLUtilities {
 		}
 
 		public static final Runnable GL_SCISSOR_FALLBACK = () -> {
-			MainWindow window = ClientUtilities.getMinecraftNonnull().getMainWindow();
+			MainWindow window = MinecraftClientUtilities.getMinecraftNonnull().getMainWindow();
 			State.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{0, 0, window.getFramebufferWidth(), window.getFramebufferHeight()}, (i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3]));
 		},
-				STENCIL_MASK_FALLBACK = () -> RenderSystem.stencilMask(GLUtilities.GL_MASK_ALL_BITS),
-				STENCIL_FUNC_FALLBACK = () -> RenderSystem.stencilFunc(GL11.GL_ALWAYS, 0, GLUtilities.GL_MASK_ALL_BITS),
+				STENCIL_MASK_FALLBACK = () -> RenderSystem.stencilMask(MinecraftOpenGLUtilities.GL_MASK_ALL_BITS),
+				STENCIL_FUNC_FALLBACK = () -> RenderSystem.stencilFunc(GL11.GL_ALWAYS, 0, MinecraftOpenGLUtilities.GL_MASK_ALL_BITS),
 				STENCIL_OP_FALLBACK = () -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP),
 				COLOR_MASK_FALLBACK = () -> RenderSystem.colorMask(true, true, true, true);
 

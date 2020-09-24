@@ -14,15 +14,11 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.UIEventUt
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.extensions.IUIExtensionContainerProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.extensions.IUIExtensionScreenProvider;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.Dimension2DDouble;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.ImmutablePoint2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.InputUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIDataKeyboardKeyPress;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIDataMouseButtonClick;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.DrawingUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.TextComponentUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.TooltipUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.UIBackgrounds;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
@@ -32,8 +28,13 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.GLUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftInputUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftOpenGLUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTextComponentUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTooltipUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.DoubleDimension2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.INode;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 import net.minecraft.client.Minecraft;
@@ -53,6 +54,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
@@ -101,10 +103,10 @@ public class UIScreenAdapter
 	@Override
 	@Deprecated
 	public void render(int mouseX, int mouseY, float partialTicks) {
-		Point2D cp = new ImmutablePoint2D(mouseX, mouseY);
+		Point2D cp = ImmutablePoint2D.of(mouseX, mouseY);
 		getInfrastructure().getView().render(cp, partialTicks);
 		IUIExtensionCursorHandleProvider.TYPE.getValue().find(getInfrastructure().getView()).ifPresent(ext ->
-				GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), ext.getCursorHandle(cp).map(CastUtilities::<Long>upcast).orElse(MemoryUtil.NULL)));
+				GLFW.glfwSetCursor(MinecraftOpenGLUtilities.getWindowHandle(), ext.getCursorHandle(cp).<Long>map(Function.identity()).orElse(MemoryUtil.NULL)));
 	}
 
 	public Set<Integer> getCloseKeysView() { return ImmutableSet.copyOf(getCloseKeys()); }
@@ -165,31 +167,31 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	protected void renderTooltip(ItemStack item, int mouseX, int mouseY) { TooltipUtilities.renderTooltip(getMinecraft(), width, height, font, itemRenderer, item, mouseX, mouseY); }
+	protected void renderTooltip(ItemStack item, int mouseX, int mouseY) { MinecraftTooltipUtilities.renderTooltip(getMinecraft(), width, height, font, itemRenderer, item, mouseX, mouseY); }
 
 	@Override
 	@Deprecated
-	public List<String> getTooltipFromItem(ItemStack item) { return TooltipUtilities.getTooltipFromItem(getMinecraft(), item); }
+	public List<String> getTooltipFromItem(ItemStack item) { return MinecraftTooltipUtilities.getTooltipFromItem(getMinecraft(), item); }
 
 	@Override
 	@Deprecated
-	public void renderTooltip(String tooltip, int mouseX, int mouseY) { TooltipUtilities.renderTooltip(width, height, font, itemRenderer, tooltip, mouseX, mouseY); }
+	public void renderTooltip(String tooltip, int mouseX, int mouseY) { MinecraftTooltipUtilities.renderTooltip(width, height, font, itemRenderer, tooltip, mouseX, mouseY); }
 
 	@Override
 	@Deprecated
-	public void renderTooltip(List<String> tooltip, int mouseX, int mouseY) { TooltipUtilities.renderTooltip(width, height, font, itemRenderer, tooltip, mouseX, mouseY); }
+	public void renderTooltip(List<String> tooltip, int mouseX, int mouseY) { MinecraftTooltipUtilities.renderTooltip(width, height, font, itemRenderer, tooltip, mouseX, mouseY); }
 
 	@Override
 	@Deprecated
-	public void renderTooltip(List<String> tooltip, int mouseX, int mouseY, FontRenderer font) { TooltipUtilities.renderTooltip(width, height, itemRenderer, tooltip, mouseX, mouseY, font); }
+	public void renderTooltip(List<String> tooltip, int mouseX, int mouseY, FontRenderer font) { MinecraftTooltipUtilities.renderTooltip(width, height, itemRenderer, tooltip, mouseX, mouseY, font); }
 
 	@Override
 	@Deprecated
-	protected void renderComponentHoverEffect(ITextComponent component, int mouseX, int mouseY) { TextComponentUtilities.renderComponentHoverEffect(getMinecraft(), width, height, font, component, mouseX, mouseY); }
+	protected void renderComponentHoverEffect(ITextComponent component, int mouseX, int mouseY) { MinecraftTextComponentUtilities.renderComponentHoverEffect(getMinecraft(), width, height, font, component, mouseX, mouseY); }
 
 	@Override
 	@Deprecated
-	public boolean handleComponentClicked(ITextComponent component) { return TextComponentUtilities.handleComponentClicked(this, component); }
+	public boolean handleComponentClicked(ITextComponent component) { return MinecraftTextComponentUtilities.handleComponentClicked(this, component); }
 
 	@Override
 	@Deprecated
@@ -219,8 +221,32 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
+	public void removed() {
+		GLFW.glfwSetCursor(MinecraftOpenGLUtilities.getWindowHandle(), MemoryUtil.NULL);
+		{
+			// COMMENT generate opposite synthetic events
+			// COMMENT NO default actions
+			ImmutableSet.copyOf(getKeyboardKeysBeingPressed().keySet()).stream().unordered()
+					.forEach(k ->
+							removeEventKeyboard(this, k).ifPresent(e2 ->
+									UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventKeyboardOpposite(e2))));
+			Point2D cp = MinecraftInputUtilities.getScaledCursorPosition();
+			ImmutableSet.copyOf(getMouseButtonsBeingPressed().keySet()).stream().unordered()
+					.forEach(k ->
+							removeEventMouse(this, AssertionUtilities.assertNonnull(k)).ifPresent(e2 ->
+									UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e2, cp))));
+			setTargetBeingHoveredByMouse(null, new UIDataMouseButtonClick(cp));
+			setLastMouseClickData(null, null);
+			setFocus(null);
+		}
+		getInfrastructure().removed();
+		IUIInfrastructure.StaticHolder.unbindSafe(getInfrastructure());
+	}
+
+	@Override
+	@Deprecated
 	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		Point2D cp = new ImmutablePoint2D(mouseX, mouseY);
+		Point2D cp = ImmutablePoint2D.of(mouseX, mouseY);
 		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
 		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(cp);
 		if (UIEventUtilities.dispatchEvent(addEventMouse(this, UIEventUtilities.Factory.createEventMouseDown(t, d)))) {
@@ -228,25 +254,6 @@ public class UIScreenAdapter
 			// TODO drag or drop perhaps
 			// TODO scroll/pan
 		}
-		return true;
-	}
-
-	@Override
-	@Deprecated
-	public boolean mouseReleased(double mouseX, double mouseY, int button) {
-		// TODO test if release works when multiple buttons are clicked
-		Point2D cp = new ImmutablePoint2D(mouseX, mouseY);
-		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
-		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(cp);
-		removeEventMouse(this, button).ifPresent(e -> {
-			if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e, cp)))
-				; // TODO context menu
-			if (t.equals(e.getTarget())) {
-				if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClick(t, d)))
-					setFocus(t);
-				setLastMouseClickData(d, t);
-			}
-		});
 		return true;
 	}
 
@@ -263,32 +270,27 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	public void removed() {
-		GLFW.glfwSetCursor(GLUtilities.getWindowHandle(), MemoryUtil.NULL);
-		{
-			// COMMENT generate opposite synthetic events
-			// COMMENT NO default actions
-			ImmutableSet.copyOf(getKeyboardKeysBeingPressed().keySet()).stream().unordered()
-					.forEach(k ->
-							removeEventKeyboard(this, k).ifPresent(e2 ->
-									UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventKeyboardOpposite(e2))));
-			Point2D cp = GLUtilities.getCursorPos();
-			ImmutableSet.copyOf(getMouseButtonsBeingPressed().keySet()).stream().unordered()
-					.forEach(k ->
-							removeEventMouse(this, AssertionUtilities.assertNonnull(k)).ifPresent(e2 ->
-									UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e2, cp))));
-			setTargetBeingHoveredByMouse(null, new UIDataMouseButtonClick(cp));
-			setLastMouseClickData(null, null);
-			setFocus(null);
-		}
-		getInfrastructure().removed();
-		IUIInfrastructure.StaticHolder.unbindSafe(getInfrastructure());
+	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+		// TODO test if release works when multiple buttons are clicked
+		Point2D cp = ImmutablePoint2D.of(mouseX, mouseY);
+		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
+		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(cp);
+		removeEventMouse(this, button).ifPresent(e -> {
+			if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e, cp)))
+				; // TODO context menu
+			if (t.equals(e.getTarget())) {
+				if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClick(t, d)))
+					setFocus(t);
+				setLastMouseClickData(d, t);
+			}
+		});
+		return true;
 	}
 
 	@Override
 	@Deprecated
 	public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-		Point2D cp = new ImmutablePoint2D(mouseX, mouseY);
+		Point2D cp = ImmutablePoint2D.of(mouseX, mouseY);
 		IUIEventTarget target = getInfrastructure().getView().getTargetAtPoint(cp);
 		UIEventUtilities.dispatchEvent(
 				UIEventUtilities.Factory.createEventWheel(false, target, new UIDataMouseButtonClick(cp), target, delta)); // COMMENT nothing to be scrolled
@@ -378,7 +380,7 @@ public class UIScreenAdapter
 	@Override
 	@Deprecated
 	public void mouseMoved(double mouseX, double mouseY) {
-		Point2D cp = new ImmutablePoint2D(mouseX, mouseY);
+		Point2D cp = ImmutablePoint2D.of(mouseX, mouseY);
 		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp);
 		UIEventUtilities.dispatchEvent(
 				UIEventUtilities.Factory.createEventMouseMove(getInfrastructure().getView().getTargetAtPoint(cp), d));
@@ -543,24 +545,24 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) { DrawingUtilities.fillGradient(AffineTransformUtilities.getIdentity(), UIObjectUtilities.getRectangleFromDiagonal(new ImmutablePoint2D(x1, y1), new ImmutablePoint2D(x2, y2)), colorTop, colorBottom, getBlitOffset()); }
+	protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) { DrawingUtilities.fillGradient(AffineTransformUtilities.getIdentity(), UIObjectUtilities.getRectangleFromDiagonal(ImmutablePoint2D.of(x1, y1), ImmutablePoint2D.of(x2, y2)), colorTop, colorBottom, getBlitOffset()); }
 
 	@Override
 	@Deprecated
-	public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawCenteredString(AffineTransformUtilities.getIdentity(), font, string, new ImmutablePoint2D(x, y), color); }
+	public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawCenteredString(AffineTransformUtilities.getIdentity(), font, string, ImmutablePoint2D.of(x, y), color); }
 
 	@Override
 	@Deprecated
-	public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawRightAlignedString(AffineTransformUtilities.getIdentity(), font, string, new ImmutablePoint2D(x, y), color); }
+	public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawRightAlignedString(AffineTransformUtilities.getIdentity(), font, string, ImmutablePoint2D.of(x, y), color); }
 
 	@Override
 	@Deprecated
-	public void drawString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawString(AffineTransformUtilities.getIdentity(), font, string, new ImmutablePoint2D(x, y), color); }
+	public void drawString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawString(AffineTransformUtilities.getIdentity(), font, string, ImmutablePoint2D.of(x, y), color); }
 
 	@SuppressWarnings("MagicNumber")
 	@Override
 	@Deprecated
-	public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(AffineTransformUtilities.getIdentity(), new Rectangle2D.Double(x, y, w, h), new ImmutablePoint2D(u, v), new Dimension2DDouble(256, 256), getBlitOffset()); }
+	public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(AffineTransformUtilities.getIdentity(), new Rectangle2D.Double(x, y, w, h), ImmutablePoint2D.of(u, v), new DoubleDimension2D(256, 256), getBlitOffset()); }
 
 	@OnlyIn(Dist.CLIENT)
 	public static class UIExtensionContainer

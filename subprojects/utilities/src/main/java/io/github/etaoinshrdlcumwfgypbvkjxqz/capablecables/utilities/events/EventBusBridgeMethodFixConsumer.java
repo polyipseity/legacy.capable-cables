@@ -31,7 +31,7 @@ public class EventBusBridgeMethodFixConsumer<T extends Event, O>
 	private final Class<?> genericClassFilter;
 	private final MethodHandle methodHandle;
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked"})
 	public EventBusBridgeMethodFixConsumer(O delegated, Class<? super O> superClass, @NonNls String methodName)
 			throws NoSuchMethodException {
 		super(delegated);
@@ -47,8 +47,23 @@ public class EventBusBridgeMethodFixConsumer<T extends Event, O>
 			);
 		this.eventType = (Class<T>) et.get(); // COMMENT should be of the right type
 
-		Method m = delegated.getClass().getDeclaredMethod(methodName, this.eventType);
-		// TODO Java 9 - use LambdaMetaFactory
+		Method m;
+		{
+			Optional<Method> methodTemporary = ClassUtilities.getAnyMethod(delegated.getClass(), methodName, eventType); // COMMENT quick search
+			if (!methodTemporary.isPresent()) {
+				findMethodExtensively:
+				// COMMENT extensive search
+				for (ImmutableSet<Class<?>> eventTypeHierarchy : ClassUtilities.getThisAndSuperclassesAndInterfaces(eventType)) {
+					for (Class<?> otherEventType : eventTypeHierarchy) {
+						methodTemporary = ClassUtilities.getAnyMethod(delegated.getClass(), methodName, otherEventType);
+						if (methodTemporary.isPresent())
+							break findMethodExtensively;
+					}
+				}
+			}
+			m = methodTemporary
+					.orElseThrow(NoSuchMethodException::new);
+		}
 		try {
 			// TODO Java 9 - use LambdaMetaFactory
 			this.methodHandle = InvokeUtilities.IMPL_LOOKUP.unreflect(m);

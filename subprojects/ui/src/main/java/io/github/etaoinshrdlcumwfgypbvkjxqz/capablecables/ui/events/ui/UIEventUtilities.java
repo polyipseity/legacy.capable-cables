@@ -91,32 +91,32 @@ public enum UIEventUtilities {
 			// COMMENT abort
 			// COMMENT error
 			// TODO implement select
-			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.SELECT.getEventType(), IUIEvent.class); // COMMENT select: NO default
-			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.FOCUS_OUT_POST.getEventType(), IUIEventFocus.class); // COMMENT blur: NO default
-			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(), IUIEventFocus.class); // COMMENT focus: NO default
-			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.FOCUS_IN_PRE.getEventType(), IUIEventFocus.class); // COMMENT focusin: NO default
-			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.FOCUS_OUT_PRE.getEventType(), IUIEventFocus.class); // COMMENT focusout: NO default
+			UIEventRegistry.getInstance().register(EnumUIEventDOMType.SELECT.getEventType(), IUIEvent.class); // COMMENT select: NO default
+			UIEventRegistry.getInstance().register(EnumUIEventDOMType.FOCUS_OUT_POST.getEventType(), IUIEventFocus.class); // COMMENT blur: NO default
+			UIEventRegistry.getInstance().register(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(), IUIEventFocus.class); // COMMENT focus: NO default
+			UIEventRegistry.getInstance().register(EnumUIEventDOMType.FOCUS_IN_PRE.getEventType(), IUIEventFocus.class); // COMMENT focusin: NO default
+			UIEventRegistry.getInstance().register(EnumUIEventDOMType.FOCUS_OUT_PRE.getEventType(), IUIEventFocus.class); // COMMENT focusout: NO default
 			// COMMENT auxclick
-			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.CLICK.getEventType(), IUIEventMouse.class); // COMMENT click: activate, and/or focus
-			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.CLICK_DOUBLE.getEventType(), IUIEventMouse.class); // COMMENT dblclick: activate, focus, and/or select
-			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), IUIEventMouse.class); // COMMENT mousedown: drag, start select, scroll, and/or pan
-			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.MOUSE_ENTER.getEventType(), IUIEventMouse.class); // COMMENT mousenter: NO default
-			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(), IUIEventMouse.class); // COMMENT mouseleave: NO default
-			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.MOUSE_MOVE.getEventType(), IUIEventMouse.class); // COMMENT mousemove: may have default
-			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(), IUIEventMouse.class); // COMMENT mouseout: may have default
-			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(), IUIEventMouse.class); // COMMENT mouseover: may have default
-			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.MOUSE_UP.getEventType(), IUIEventMouse.class);// COMMENT mouseup: context menu
-			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.WHEEL.getEventType(), IUIEventMouseWheel.class); // COMMENT wheel: scroll or zoom, cancelability varies
+			UIEventRegistry.getInstance().register(EnumUIEventDOMType.CLICK.getEventType(), IUIEventMouse.class); // COMMENT click: activate, and/or focus
+			UIEventRegistry.getInstance().register(EnumUIEventDOMType.CLICK_DOUBLE.getEventType(), IUIEventMouse.class); // COMMENT dblclick: activate, focus, and/or select
+			UIEventRegistry.getInstance().register(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), IUIEventMouse.class); // COMMENT mousedown: drag, start select, scroll, and/or pan
+			UIEventRegistry.getInstance().register(EnumUIEventDOMType.MOUSE_ENTER.getEventType(), IUIEventMouse.class); // COMMENT mousenter: NO default
+			UIEventRegistry.getInstance().register(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(), IUIEventMouse.class); // COMMENT mouseleave: NO default
+			UIEventRegistry.getInstance().register(EnumUIEventDOMType.MOUSE_MOVE.getEventType(), IUIEventMouse.class); // COMMENT mousemove: may have default
+			UIEventRegistry.getInstance().register(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(), IUIEventMouse.class); // COMMENT mouseout: may have default
+			UIEventRegistry.getInstance().register(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(), IUIEventMouse.class); // COMMENT mouseover: may have default
+			UIEventRegistry.getInstance().register(EnumUIEventDOMType.MOUSE_UP.getEventType(), IUIEventMouse.class);// COMMENT mouseup: context menu
+			UIEventRegistry.getInstance().register(EnumUIEventDOMType.WHEEL.getEventType(), IUIEventMouseWheel.class); // COMMENT wheel: scroll or zoom, cancelability varies
 			// COMMENT beforeinput
 			// COMMENT input
-			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.KEY_DOWN.getEventType(), IUIEventKeyboard.class); // COMMENT keydown: focus, keypress, and/or activate
-			UIEventRegistry.getINSTANCE().register(EnumUIEventDOMType.KEY_UP.getEventType(), IUIEventKeyboard.class); // COMMENT keyup: may have default
+			UIEventRegistry.getInstance().register(EnumUIEventDOMType.KEY_DOWN.getEventType(), IUIEventKeyboard.class); // COMMENT keydown: focus, keypress, and/or activate
+			UIEventRegistry.getInstance().register(EnumUIEventDOMType.KEY_UP.getEventType(), IUIEventKeyboard.class); // COMMENT keyup: may have default
 			// COMMENT compositionstart
 			// COMMENT compositionupdate
 			// COMMENT compositionend
 
 			/* SECTION component */
-			UIEventRegistry.getINSTANCE().register(EnumUIEventComponentType.CHAR_TYPED.getEventType(), IUIEventChar.class); // COMMENT char_typed: NO default
+			UIEventRegistry.getInstance().register(EnumUIEventComponentType.CHAR_TYPED.getEventType(), IUIEventChar.class); // COMMENT char_typed: NO default
 		}
 
 		public static IUIEventKeyboard generateSyntheticEventKeyboardOpposite(IUIEventKeyboard event) {

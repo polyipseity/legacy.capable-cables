@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public class AutoCloseableRotator<T, TH extends Exception>
-		implements AutoCloseable, IThrowingSupplier<Optional<? extends T>, TH> {
+		implements AutoCloseable, IThrowingSupplier<T, TH> {
 	private final Supplier<? extends T> supplier;
 	private final IThrowingConsumer<? super T, ? extends TH> closer;
 	private final AtomicReference<T> activeReference = new AtomicReference<>(null);
@@ -30,13 +30,15 @@ public class AutoCloseableRotator<T, TH extends Exception>
 
 	@Override
 	@Nonnull
-	public Optional<? extends T> get()
+	public T get()
 			throws TH {
-		return Optional.ofNullable(getActiveReference().accumulateAndGet(getSupplier().get(),
+		return getActiveReference().accumulateAndGet(
+				AssertionUtilities.assertNonnull(getSupplier().get()),
 				IThrowingBiFunction.<T, T, T, TH>execute((previous, next) -> {
-					getCloser().accept(previous);
+					close();
 					return next;
-				})::apply));
+				})::apply
+		);
 	}
 
 	protected Supplier<? extends T> getSupplier() { return supplier; }

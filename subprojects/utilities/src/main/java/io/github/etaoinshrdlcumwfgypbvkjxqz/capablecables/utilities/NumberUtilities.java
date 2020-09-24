@@ -1,7 +1,5 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
-
 import java.util.Optional;
 
 import static java.lang.Double.doubleToLongBits;
@@ -18,7 +16,10 @@ public enum NumberUtilities {
 	public static boolean isDouble(String string) { return tryParseDouble(string).isPresent(); }
 
 	public static Optional<Double> tryParseDouble(String string) {
-		return ThrowableUtilities.getQuietly(() ->
-				Double.parseDouble(string), NumberFormatException.class, UtilitiesConfiguration.getInstance().getThrowableHandler());
+		try {
+			return Optional.of(Double.parseDouble(string));
+		} catch (NumberFormatException ex) {
+			return Optional.empty();
+		}
 	}
 }

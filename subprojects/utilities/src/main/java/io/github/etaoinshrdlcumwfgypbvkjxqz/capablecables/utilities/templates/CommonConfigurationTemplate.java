@@ -1,12 +1,12 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.DynamicUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.StackTraceUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IRecordCandidate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.internationalization.ChangingLocaleResourceBundle;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.logging.ProperLoggingEventBuilderLogger;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.IThrowableHandler;
 import org.slf4j.Logger;
-import org.slf4j.ext.XLogger;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 public abstract class CommonConfigurationTemplate<D extends CommonConfigurationTemplate.ConfigurationData>
 		extends ConfigurationTemplate<D> {
 	@Nullable
-	private volatile XLogger logger;
+	private volatile Logger logger;
 	@Nullable
 	private volatile IThrowableHandler<Throwable> throwableHandler;
 	@Nullable
@@ -34,7 +34,7 @@ public abstract class CommonConfigurationTemplate<D extends CommonConfigurationT
 
 	public Supplier<? extends Locale> getLocaleSupplier() { return AssertionUtilities.assertNonnull(localeSupplier); }
 
-	public XLogger getLogger() { return AssertionUtilities.assertNonnull(logger); }
+	public Logger getLogger() { return AssertionUtilities.assertNonnull(logger); }
 
 	public IThrowableHandler<Throwable> getThrowableHandler() { return AssertionUtilities.assertNonnull(throwableHandler); }
 
@@ -45,12 +45,10 @@ public abstract class CommonConfigurationTemplate<D extends CommonConfigurationT
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	protected void configure0(D data) {
-		setLogger(new XLogger(data.getLogger())); // COMMENT create 'XLogger' directly to avoid classloading
+		setLogger(new ProperLoggingEventBuilderLogger<>(data.getLogger()));
 		setThrowableHandler(data.getThrowableHandler());
 		setLocaleSupplier(data.getLocaleSupplier());
 	}
-
-	protected void setLogger(@Nullable XLogger logger) { this.logger = logger; }
 
 	protected void setLocaleSupplier(@Nullable Supplier<? extends Locale> localeSupplier) { this.localeSupplier = localeSupplier; }
 

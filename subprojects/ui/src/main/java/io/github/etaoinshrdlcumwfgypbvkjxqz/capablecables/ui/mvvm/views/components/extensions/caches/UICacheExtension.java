@@ -74,8 +74,8 @@ public class UICacheExtension
 										new OptionalWeakReference<>(this);
 								Cleaner.create(CleanerUtilities.getCleanerReferent(this),
 										new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
-												new LoggingDisposableObserver<>(
-														new FunctionalEventBusDisposableObserver<UIComponentHierarchyChangedBusEvent.Parent>(
+												new LoggingDisposableObserver<UIComponentHierarchyChangedBusEvent.Parent>(
+														new FunctionalEventBusDisposableObserver<>(
 																new SubscribeEventObject(EventPriority.LOWEST, true),
 																event -> {
 																	if (event.getStage().isPost())
@@ -84,7 +84,7 @@ public class UICacheExtension
 																}
 														),
 														UIConfiguration.getInstance().getLogger()
-												)
+												) {}
 										)::dispose);
 							}
 
@@ -104,8 +104,8 @@ public class UICacheExtension
 										new OptionalWeakReference<>(this);
 								Cleaner.create(CleanerUtilities.getCleanerReferent(this),
 										new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
-												new LoggingDisposableObserver<>(
-														new FunctionalEventBusDisposableObserver<UIComponentHierarchyChangedBusEvent.Parent>(
+												new LoggingDisposableObserver<UIComponentHierarchyChangedBusEvent.Parent>(
+														new FunctionalEventBusDisposableObserver<>(
 																new SubscribeEventObject(EventPriority.LOWEST, true),
 																event -> {
 																	if (event.getStage().isPost())
@@ -114,7 +114,7 @@ public class UICacheExtension
 																}
 														),
 														UIConfiguration.getInstance().getLogger()
-												)
+												) {}
 										)::dispose);
 							}
 

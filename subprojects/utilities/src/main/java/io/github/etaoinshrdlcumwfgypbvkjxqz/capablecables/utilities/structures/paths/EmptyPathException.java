@@ -1,7 +1,5 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths;
 
-import java.util.Collection;
-
 public class EmptyPathException
 		extends RuntimeException {
 	private static final long serialVersionUID = 760193064178512586L;
@@ -10,9 +8,9 @@ public class EmptyPathException
 
 	public EmptyPathException(String message) { super(message); }
 
-	public static void checkPathData(Collection<?> data)
+	public static void checkSize(int size)
 			throws EmptyPathException {
-		if (data.size() <= 1)
+		if (size < 0)
 			throw new EmptyPathException();
 	}
 }

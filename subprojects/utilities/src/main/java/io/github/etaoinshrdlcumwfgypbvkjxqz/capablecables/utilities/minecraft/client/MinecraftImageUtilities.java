@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 @OnlyIn(Dist.CLIENT)
-public enum ImageUtilities {
+public enum MinecraftImageUtilities {
 	;
 
 	public static GLFWImage toGLFWImageCursor(NativeImage image) {

@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui;
 
+import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
@@ -11,9 +12,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.Co
 
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Supplier;
 
 public final class UIEventRegistry extends Registry<INamespacePrefixedString, Class<? extends IUIEvent>> {
-	private static final UIEventRegistry INSTANCE = new UIEventRegistry();
+	private static final Supplier<UIEventRegistry> INSTANCE = Suppliers.memoize(UIEventRegistry::new);
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
 	protected UIEventRegistry() {
@@ -33,7 +35,7 @@ public final class UIEventRegistry extends Registry<INamespacePrefixedString, Cl
 	}
 
 	public static boolean isEventValid(IUIEvent event) {
-		return Optional.ofNullable(getINSTANCE().getData().get(event.getType()))
+		return Optional.ofNullable(getInstance().getData().get(event.getType()))
 				.map(RegistryObject::getValue)
 				.filter(ec -> ec.isInstance(event))
 				.isPresent();
@@ -41,5 +43,5 @@ public final class UIEventRegistry extends Registry<INamespacePrefixedString, Cl
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
-	public static UIEventRegistry getINSTANCE() { return INSTANCE; }
+	public static UIEventRegistry getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 }

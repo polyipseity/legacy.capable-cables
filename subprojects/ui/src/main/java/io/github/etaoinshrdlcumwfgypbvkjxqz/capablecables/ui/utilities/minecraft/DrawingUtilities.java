@@ -1,7 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIObjectUtilities;
 import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIObjectUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftScreenUtility;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -68,7 +69,7 @@ public enum DrawingUtilities {
 		Rectangle2D r = (Rectangle2D) rectangle.clone();
 		transformRectangle(rectangle, transform);
 		Rectangle rF = UIObjectUtilities.getRectangleExpanded(r);
-		UIScreenUtility.getInstance()
+		MinecraftScreenUtility.getInstance()
 				.setBlitOffset_(z)
 				.fillGradient((int) rF.getX(), (int) rF.getY(), (int) rF.getMaxX(), (int) rF.getMaxY(), colorTop, colorBottom);
 	}
@@ -80,7 +81,7 @@ public enum DrawingUtilities {
 		Point2D xy = (Point2D) p.clone();
 		transformPoint(xy, transform);
 		Point xyF = UIObjectUtilities.getPointFloor(xy);
-		UIScreenUtility.getInstance()
+		MinecraftScreenUtility.getInstance()
 				.drawCenteredString(font, string, (int) xyF.getX(), (int) xyF.getY(), color);
 	}
 
@@ -91,7 +92,7 @@ public enum DrawingUtilities {
 		Point2D xy = (Point2D) p.clone();
 		transformPoint(xy, transform);
 		Point xyF = UIObjectUtilities.getPointFloor(xy);
-		UIScreenUtility.getInstance()
+		MinecraftScreenUtility.getInstance()
 				.drawRightAlignedString(font, string, (int) xyF.getX(), (int) xyF.getY(), color);
 	}
 
@@ -102,7 +103,7 @@ public enum DrawingUtilities {
 		Point2D xy = (Point2D) p.clone();
 		transformPoint(xy, transform);
 		Point xyF = UIObjectUtilities.getPointFloor(xy);
-		UIScreenUtility.getInstance()
+		MinecraftScreenUtility.getInstance()
 				.drawString(font, string, (int) xyF.getX(), (int) xyF.getY(), color);
 	}
 

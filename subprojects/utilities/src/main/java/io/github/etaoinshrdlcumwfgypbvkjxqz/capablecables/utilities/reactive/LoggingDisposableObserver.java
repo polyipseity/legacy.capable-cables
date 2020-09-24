@@ -11,9 +11,9 @@ public class LoggingDisposableObserver<T>
 		extends DelegatingDisposableObserver<T> {
 	private final Logger logger;
 
-	protected LoggingDisposableObserver(Logger logger) { this(DefaultDisposableObserver.getEmpty(), logger); }
+	protected LoggingDisposableObserver(Logger logger) { this(new DefaultDisposableObserver<>(), logger); }
 
-	public LoggingDisposableObserver(DisposableObserver<T> delegate, Logger logger) {
+	public LoggingDisposableObserver(DisposableObserver<? super T> delegate, Logger logger) {
 		super(delegate);
 		this.logger = logger;
 	}

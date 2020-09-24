@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventBusEntryPoint;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftScreenUtility;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.api.distmarker.Dist;
@@ -19,7 +20,7 @@ public enum UIBackgrounds {
 	 * @see Screen#renderBackground()
 	 */
 	public static void renderBackgroundAndNotify(@Nullable Minecraft client, int width, int height) {
-		UIScreenUtility.getInstance()
+		MinecraftScreenUtility.getInstance()
 				.setClient_(client)
 				.setWidth_(width)
 				.setHeight_(height)
@@ -30,7 +31,7 @@ public enum UIBackgrounds {
 	 * @see Screen#renderBackground(int)
 	 */
 	public static void renderBackgroundAndNotify(@Nullable Minecraft client, int width, int height, int blitOffset) {
-		UIScreenUtility.getInstance()
+		MinecraftScreenUtility.getInstance()
 				.setClient_(client)
 				.setWidth_(width)
 				.setHeight_(height)
@@ -41,7 +42,7 @@ public enum UIBackgrounds {
 	 * @see Screen#renderDirtBackground(int)
 	 */
 	public static void renderDirtBackgroundAndNotify(@Nullable Minecraft client, int width, int height, int blitOffset) {
-		UIScreenUtility.getInstance()
+		MinecraftScreenUtility.getInstance()
 				.setClient_(client)
 				.setWidth_(width)
 				.setHeight_(height)

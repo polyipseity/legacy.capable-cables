@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui;
 
 import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
@@ -12,43 +12,44 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
+import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
-public final class UIScreenUtility extends Screen {
-	private static final UIScreenUtility INSTANCE = new UIScreenUtility();
+public final class MinecraftScreenUtility extends Screen {
+	private static final Supplier<MinecraftScreenUtility> INSTANCE = Suppliers.memoize(MinecraftScreenUtility::new);
 
-	private UIScreenUtility() {
-		super(TextComponentUtilities.getEmpty());
+	private MinecraftScreenUtility() {
+		super(MinecraftTextComponentUtilities.getEmpty());
 	}
 
-	public static UIScreenUtility getInstance() { return INSTANCE; }
+	public static MinecraftScreenUtility getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
-	public UIScreenUtility setClient_(@Nullable Minecraft client) {
+	public MinecraftScreenUtility setClient_(@Nullable Minecraft client) {
 		minecraft = client;
 		return this;
 	}
 
-	public UIScreenUtility setWidth_(int width) {
+	public MinecraftScreenUtility setWidth_(int width) {
 		this.width = width;
 		return this;
 	}
 
-	public UIScreenUtility setHeight_(int height) {
+	public MinecraftScreenUtility setHeight_(int height) {
 		this.height = height;
 		return this;
 	}
 
-	public UIScreenUtility setBlitOffset_(int blitOffset) {
+	public MinecraftScreenUtility setBlitOffset_(int blitOffset) {
 		setBlitOffset(blitOffset);
 		return this;
 	}
 
-	public UIScreenUtility setFont_(FontRenderer font) {
+	public MinecraftScreenUtility setFont_(FontRenderer font) {
 		this.font = font;
 		return this;
 	}
 
-	public UIScreenUtility setItemRenderer_(ItemRenderer itemRenderer) {
+	public MinecraftScreenUtility setItemRenderer_(ItemRenderer itemRenderer) {
 		this.itemRenderer = itemRenderer;
 		return this;
 	}

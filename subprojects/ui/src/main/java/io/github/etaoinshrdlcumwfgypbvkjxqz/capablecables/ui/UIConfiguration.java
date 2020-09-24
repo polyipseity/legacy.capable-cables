@@ -1,15 +1,18 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui;
 
+import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.cursors.EnumGLFWCursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.adapters.EnumJAXBElementPresetAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.adapters.EnumJAXBObjectPresetAdapter;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EventBusForge;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ClientUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftClientUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.IThrowableHandler;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.DeferredWorkQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +28,7 @@ public final class UIConfiguration
 
 	public static Logger getBootstrapLogger() { return BOOTSTRAP_LOGGER; }
 
-	public static UIConfiguration getInstance() { return INSTANCE; }
+	public static UIConfiguration getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
 	@Override
 	protected void configure0(ConfigurationData data) {
@@ -43,7 +46,10 @@ public final class UIConfiguration
 	public enum MinecraftSpecific {
 		;
 
-		public static void loadComplete() { ClientUtilities.getMinecraftNonnull().getFramebuffer().enableStencil(); }
+		@SuppressWarnings("deprecation")
+		public static void loadComplete() {
+			DeferredWorkQueue.runLater(MinecraftClientUtilities.getMinecraftNonnull().getFramebuffer()::enableStencil);
+		}
 	}
 
 	public static final class ConfigurationData

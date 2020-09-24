@@ -11,6 +11,8 @@ import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.slf4j.Marker;
 
+import java.util.function.Supplier;
+
 public final class ModMarkers extends MarkersTemplate {
 	private static final Supplier<ModMarkers> INSTANCE = Suppliers.memoize(ModMarkers::new);
 
@@ -29,7 +31,7 @@ public final class ModMarkers extends MarkersTemplate {
 
 	private ModMarkers() { super(ModConstants.MOD_ID); }
 
-	public static ModMarkers getInstance() { return INSTANCE; }
+	public static ModMarkers getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
 	public Marker getRegistryMarker(IForgeRegistry<?> key) { return getRegistryMarkers().getUnchecked(key); }
 

@@ -6,6 +6,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.Sh
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.PropertyKey;
 
+import java.util.function.Supplier;
+
 public final class UtilitiesSharedResourceBundle
 		extends SharedResourceBundleTemplate {
 	private static final Supplier<UtilitiesSharedResourceBundle> INSTANCE = Suppliers.memoize(UtilitiesSharedResourceBundle::new);
@@ -14,7 +16,7 @@ public final class UtilitiesSharedResourceBundle
 		super(CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance()));
 	}
 
-	public static UtilitiesSharedResourceBundle getInstance() { return INSTANCE; }
+	public static UtilitiesSharedResourceBundle getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
 	public enum EnumKey
 			implements IResourceBundleKey {

@@ -1,6 +1,5 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.caches;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches.IUICacheType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheLoaderLoadedNullException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
@@ -31,10 +30,8 @@ public abstract class AbstractUICacheType<V, C extends IExtensionContainer<IName
 						return (V) cache.getDelegated()
 								.get(getKey(), () -> load(container));
 					} catch (ExecutionException e) {
-						if (e.getCause() instanceof CacheLoaderLoadedNullException) {
-							UIConfiguration.getInstance().getThrowableHandler().catch_(e);
+						if (e.getCause() instanceof CacheLoaderLoadedNullException)
 							return null;
-						}
 						throw ThrowableUtilities.propagate(e);
 					}
 				});

@@ -19,7 +19,7 @@ import java.nio.FloatBuffer;
 import java.util.ResourceBundle;
 
 @OnlyIn(Dist.CLIENT)
-public enum MatrixUtilities {
+public enum MinecraftMatrixUtilities {
 	;
 
 	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker();
@@ -29,7 +29,7 @@ public enum MatrixUtilities {
 		if (from.getWidth() == 0 || from.getHeight() == 0)
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
-							.addMarkers(MatrixUtilities::getClassMarker)
+							.addMarkers(MinecraftMatrixUtilities::getClassMarker)
 							.addKeyValue("matrix", matrix).addKeyValue("from", from).addKeyValue("to", to)
 							.addMessages(() -> getResourceBundle().getString("transform.from_to.un_computable"))
 							.build()

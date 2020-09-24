@@ -2,7 +2,7 @@
 <ui xmlns="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:val="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values"
-    xsi:schemaLocation="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values components_values.xsd"
+    xsi:schemaLocation="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values ../parsers/components/components_values.xsd"
     xml:lang="EN">
 	<!-- SECTION using -->
 

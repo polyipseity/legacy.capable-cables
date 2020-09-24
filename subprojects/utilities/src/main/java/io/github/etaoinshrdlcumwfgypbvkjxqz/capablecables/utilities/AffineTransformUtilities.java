@@ -1,7 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
 import com.google.common.collect.ImmutableMap;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MatrixUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftMatrixUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import net.minecraft.client.renderer.Matrix4f;
 import org.jetbrains.annotations.NonNls;
@@ -52,7 +52,7 @@ public enum AffineTransformUtilities {
 		if (from.getWidth() == 0 || from.getHeight() == 0)
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
-							.addMarkers(MatrixUtilities::getClassMarker)
+							.addMarkers(MinecraftMatrixUtilities::getClassMarker)
 							.addKeyValue("from", from).addKeyValue("to", to)
 							.addMessages(() -> getResourceBundle().getString("transform.from_to.un_computable"))
 							.build()

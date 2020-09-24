@@ -1,7 +1,9 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters;
 
+import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IDuplexFunction;
@@ -13,6 +15,7 @@ import jakarta.xml.bind.JAXBElement;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public enum JAXBAdapterRegistries {
 	;
@@ -37,27 +40,29 @@ public enum JAXBAdapterRegistries {
 	public static <L> Optional<? extends IDuplexFunction<L, ?>> findAdapter(L jaxbObj) {
 		if (jaxbObj instanceof JAXBElement)
 			return (Optional<? extends IDuplexFunction<L, ?>>) // COMMENT should be safe
-					Element.INSTANCE.getSafe(((JAXBElement<?>) jaxbObj).getDeclaredType())
+					Element.getInstance().getSafe(((JAXBElement<?>) jaxbObj).getDeclaredType())
 							.map(Registry.RegistryObject::getValue);
 		return (Optional<? extends IDuplexFunction<L, ?>>) // COMMENT should be safe
-				Object.INSTANCE.getSafe(jaxbObj.getClass())
+				Object.getInstance().getSafe(jaxbObj.getClass())
 						.map(Registry.RegistryObject::getValue);
 	}
 
 	public static final class Object
 			extends StandardDuplexFunctionRegistry {
-		public static final Object INSTANCE = new Object();
+		private static final Supplier<Object> INSTANCE = Suppliers.memoize(Object::new);
 
-		protected Object() {
+		private Object() {
 			super(true, UIConfiguration.getInstance().getLogger());
 		}
+
+		public static Object getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 	}
 
 	public static final class Element
 			extends Registry<Class<?>, IDuplexFunction<JAXBElement<?>, ?>> {
-		public static final Element INSTANCE = new Element();
+		private static final Supplier<Element> INSTANCE = Suppliers.memoize(Element::new);
 
-		protected Element() {
+		private Element() {
 			super(true, UIConfiguration.getInstance().getLogger());
 		}
 

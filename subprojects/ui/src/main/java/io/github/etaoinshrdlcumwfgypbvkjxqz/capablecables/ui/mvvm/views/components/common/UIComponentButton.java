@@ -127,7 +127,7 @@ public class UIComponentButton
 				extends UIEvent
 				implements IUIEventActivate {
 			static {
-				UIEventRegistry.getINSTANCE().register(TYPE, IUIEventActivate.class); // COMMENT custom: button will be activated
+				UIEventRegistry.getInstance().register(TYPE, IUIEventActivate.class); // COMMENT custom: button will be activated
 			}
 
 			protected final IUIEvent cause;

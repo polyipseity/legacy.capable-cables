@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components;
 
+import com.google.common.collect.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
@@ -29,19 +30,18 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.methods.IBindingMethod;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.traits.IHasBinding;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer3;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.GLUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftInputUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Registry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.FunctionalPath;
-import com.google.common.collect.*;
 import io.reactivex.rxjava3.core.ObservableSource;
 import net.minecraftforge.eventbus.api.EventPriority;
 import org.jetbrains.annotations.NonNls;
@@ -74,9 +74,10 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 
 	@Override
 	public IUIEventTarget getTargetAtPoint(Point2D point) {
-		try (IUIComponentContext context = createContext()) {
+		try (IUIComponentContext context = IUIViewComponent.StaticHolder.createComponentContextWithManager(this).orElseThrow(IllegalStateException::new)) {
 			getPathResolver().resolvePath(context, point, true);
-			return context.getPath().getPathEnd();
+			return context.getPath().getPathEnd()
+					.orElseThrow(AssertionError::new);
 		}
 	}
 
@@ -117,13 +118,12 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 
 	@SuppressWarnings("RedundantTypeArguments")
 	@Override
-	public IUIComponentContext createContext() {
-		return new DefaultUIComponentContext(
-				new FunctionalPath<>(ImmutableList.of(getManager()
-						.orElseThrow(IllegalStateException::new)), Lists::newArrayList),
-				new ArrayAffineTransformStack(),
-				GLUtilities.getCursorPos()
-		);
+	public void initialize() {
+		getManager().ifPresent(manager ->
+				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext(),
+						manager,
+						(context, component) -> component.initialize(context),
+						IConsumer3.StaticHolder.empty()));
 	}
 
 	@Override
@@ -171,19 +171,19 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	}
 
 	@Override
-	public void initialize() {
-		getManager().ifPresent(manager ->
-				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createContext(),
-						manager,
-						(context, component) -> component.initialize(context),
-						IConsumer3.StaticHolder.empty()));
+	public IUIComponentContext createComponentContext() {
+		return new DefaultUIComponentContext(
+				new FunctionalPath<>(ImmutableList.of(), Lists::newArrayList),
+				new ArrayAffineTransformStack(),
+				MinecraftInputUtilities.getScaledCursorPosition()
+		);
 	}
 
 	@SuppressWarnings("RedundantTypeArguments")
 	@Override
 	public void removed() {
 		getManager().ifPresent(manager ->
-				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createContext(),
+				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext(),
 						manager,
 						(context, component) -> component.removed(context),
 						IConsumer3.StaticHolder.empty()));
@@ -208,8 +208,8 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 								Cleaner.create(CleanerUtilities.getCleanerReferent(this),
 										new AutoSubscribingCompositeDisposable<>(
 												UIEventBusEntryPoint.getEventBus(),
-												new LoggingDisposableObserver<>(
-														new FunctionalEventBusDisposableObserver<UIComponentHierarchyChangedBusEvent.Parent>(
+												new LoggingDisposableObserver<UIComponentHierarchyChangedBusEvent.Parent>(
+														new FunctionalEventBusDisposableObserver<>(
 																new SubscribeEventObject(EventPriority.LOWEST, true),
 																event -> {
 																	if (event.getStage().isPost())
@@ -219,9 +219,9 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 																						.ifPresent(view -> t.invalidate(view)));
 																}),
 														UIConfiguration.getInstance().getLogger()
-												),
-												new LoggingDisposableObserver<>(
-														new FunctionalEventBusDisposableObserver<UIComponentHierarchyChangedBusEvent.View>(
+												) {},
+												new LoggingDisposableObserver<UIComponentHierarchyChangedBusEvent.View>(
+														new FunctionalEventBusDisposableObserver<>(
 																new SubscribeEventObject(EventPriority.LOWEST, true),
 																event -> {
 																	if (event.getStage().isPost())
@@ -231,7 +231,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 																						.ifPresent(view -> t.invalidate(view)));
 																}),
 														UIConfiguration.getInstance().getLogger()
-												)
+												) {}
 										)::dispose);
 							}
 
@@ -256,8 +256,8 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 								Cleaner.create(CleanerUtilities.getCleanerReferent(this),
 										new AutoSubscribingCompositeDisposable<>(
 												UIEventBusEntryPoint.getEventBus(),
-												new LoggingDisposableObserver<>(
-														new FunctionalEventBusDisposableObserver<UIComponentHierarchyChangedBusEvent.Parent>(
+												new LoggingDisposableObserver<UIComponentHierarchyChangedBusEvent.Parent>(
+														new FunctionalEventBusDisposableObserver<>(
 																new SubscribeEventObject(EventPriority.LOWEST, true),
 																event -> {
 																	if (event.getStage().isPost())
@@ -267,9 +267,9 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 																						.ifPresent(view -> t.invalidate(view)));
 																}),
 														UIConfiguration.getInstance().getLogger()
-												),
-												new LoggingDisposableObserver<>(
-														new FunctionalEventBusDisposableObserver<UIComponentHierarchyChangedBusEvent.View>(
+												) {},
+												new LoggingDisposableObserver<UIComponentHierarchyChangedBusEvent.View>(
+														new FunctionalEventBusDisposableObserver<>(
 																new SubscribeEventObject(EventPriority.LOWEST, true),
 																event -> {
 																	if (event.getStage().isPost())
@@ -279,7 +279,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 																						.ifPresent(view -> t.invalidate(view)));
 																}),
 														UIConfiguration.getInstance().getLogger()
-												)
+												) {}
 										)::dispose);
 							}
 

@@ -8,18 +8,9 @@ public class FunctionalPath<T>
 	protected final List<T> data;
 	protected final Function<? super Iterable<? extends T>, ? extends List<T>> generator;
 
-	public FunctionalPath(Iterable<? extends T> data, Function<? super Iterable<? extends T>, ? extends List<T>> generator)
-			throws EmptyPathException {
+	public FunctionalPath(Iterable<? extends T> data, Function<? super Iterable<? extends T>, ? extends List<T>> generator) {
 		this.generator = generator;
 		this.data = this.generator.apply(data);
-		EmptyPathException.checkPathData(this.data);
-	}
-
-	@Override
-	public IPath<T> getParentPath()
-			throws EmptyPathException {
-		List<T> data = getGenerator().apply(getData()); // COMMENT snapshot data
-		return new FunctionalPath<>(data.subList(0, data.size() - 1), getGenerator());
 	}
 
 	protected Function<? super Iterable<? extends T>, ? extends List<T>> getGenerator() { return generator; }

@@ -19,7 +19,7 @@ public enum EnumJAXBObjectPresetAdapter
 
 	<L, V extends IDuplexFunction<L, ?> & Serializable> EnumJAXBObjectPresetAdapter(Class<L> key, V value) {
 		this.key = key;
-		this.value = CastUtilities.castUnchecked(JAXBAdapterRegistries.Object.INSTANCE.registerSafe(key, value));
+		this.value = CastUtilities.castUnchecked(JAXBAdapterRegistries.Object.getInstance().registerSafe(key, value));
 	}
 
 	@SuppressWarnings("EmptyMethod")

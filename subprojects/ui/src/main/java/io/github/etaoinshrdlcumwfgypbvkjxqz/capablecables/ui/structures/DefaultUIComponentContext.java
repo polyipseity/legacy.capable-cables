@@ -1,13 +1,16 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures;
 
+import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IAffineTransformStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIComponentContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.EmptyPathException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.IPath;
-import com.google.common.collect.ImmutableList;
 
 import java.awt.geom.Point2D;
+import java.util.Optional;
 
 public class DefaultUIComponentContext
 		implements IUIComponentContext {
@@ -16,9 +19,10 @@ public class DefaultUIComponentContext
 	protected final Point2D cursorPosition;
 
 	public DefaultUIComponentContext(IPath<IUIComponent> path, IAffineTransformStack transformStack, Point2D cursorPosition) {
+		assert transformStack.getData().size() - path.size() == 1;
 		this.path = path.copy();
 		this.transformStack = transformStack.copy(); // COMMENT do not automatically pop
-		this.cursorPosition = ImmutablePoint2D.copyOf(cursorPosition);
+		this.cursorPosition = ImmutablePoint2D.of(cursorPosition);
 	}
 
 	@Override
@@ -31,21 +35,25 @@ public class DefaultUIComponentContext
 
 	@Override
 	public void push(IUIComponent element) {
-		IUIComponent pathEnd = getPath().getPathEnd();
+		Optional<? extends IUIComponent> pathEnd = getPath().getPathEnd();
 		getTransformStack().push();
-		if (pathEnd instanceof IUIComponentContainer)
-			((IUIComponentContainer) pathEnd).transformChildren(getTransformStack());
-		else
-			throw new IllegalStateException();
+		pathEnd.ifPresent(pathEnd2 -> {
+			if (pathEnd2 instanceof IUIComponentContainer)
+				((IUIComponentContainer) pathEnd2).transformChildren(getTransformStack());
+			else
+				throw new IllegalStateException();
+		});
 		getPath().subPath(ImmutableList.of(element));
 	}
 
 	@Override
-	public IUIComponent pop() {
-		IUIComponent pathEnd = getPath().getPathEnd();
+	public IUIComponent pop()
+			throws EmptyPathException {
+		Optional<? extends IUIComponent> pathEnd = getPath().getPathEnd();
 		getPath().parentPath(1);
+		assert pathEnd.isPresent();
 		getTransformStack().pop();
-		return pathEnd;
+		return pathEnd.get();
 	}
 
 	@Override

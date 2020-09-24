@@ -1,13 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.paths;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IAffineTransformStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.IPath;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 import javax.annotation.Nullable;
 import java.awt.geom.AffineTransform;
@@ -20,11 +20,10 @@ public class DefaultUIComponentPathResolver
 	@SuppressWarnings("ObjectAllocationInLoop")
 	@Override
 	public void resolvePath(IUIComponentContext context, Point2D point, boolean virtual) {
-		// TODO strategy or something
 		IAffineTransformStack stack = context.getTransformStack();
 		IPath<IUIComponent> path = context.getPath();
 
-		@Nullable IUIComponent current = path.getPathEnd();
+		@Nullable IUIComponent current = path.getPathEnd().orElseThrow(IllegalArgumentException::new);
 		while (current != null) {
 			current = CastUtilities.castChecked(IUIComponentContainer.class, current)
 					.map(container -> {

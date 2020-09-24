@@ -1,9 +1,9 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.Dimension2DDouble;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer4;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IFunction4;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.DoubleDimension2D;
 
 import java.awt.*;
 import java.awt.geom.*;
@@ -49,11 +49,11 @@ public enum UIObjectUtilities {
 
 	public static Point2D maxPoint(Point2D a, Point2D b) { return applyPoint(a, (ax, ay) -> applyPoint(b, (bx, by) -> new Point2D.Double(max(ax, bx), max(ay, by)))); }
 
-	public static Dimension2D minDimension(Dimension2D a, Dimension2D b) { return applyDimension(a, (ax, ay) -> applyDimension(b, (bx, by) -> new Dimension2DDouble(min(ax, bx), min(ay, by)))); }
+	public static Dimension2D minDimension(Dimension2D a, Dimension2D b) { return applyDimension(a, (ax, ay) -> applyDimension(b, (bx, by) -> new DoubleDimension2D(min(ax, bx), min(ay, by)))); }
 
 	public static <T> T applyDimension(Dimension2D dimension, BiFunction<Double, Double, T> action) { return action.apply(dimension.getWidth(), dimension.getHeight()); }
 
-	public static Dimension2D maxDimension(Dimension2D a, Dimension2D b) { return applyDimension(a, (ax, ay) -> applyDimension(b, (bx, by) -> new Dimension2DDouble(max(ax, bx), max(ay, by)))); }
+	public static Dimension2D maxDimension(Dimension2D a, Dimension2D b) { return applyDimension(a, (ax, ay) -> applyDimension(b, (bx, by) -> new DoubleDimension2D(max(ax, bx), max(ay, by)))); }
 
 	@SuppressWarnings("RedundantCast")
 	public static Rectangle2D minRectangle(Rectangle2D a, Rectangle2D b) { return applyRectangular(a, (IFunction4<Double, Double, Double, Double, Rectangle2D.Double, RuntimeException>) (ax, ay, aw, ah) -> applyRectangular(b, (bx, by, bw, bh) -> new Rectangle2D.Double(min(ax, bx), min(ay, by), min(aw, bw), min(ah, bh)))); }
