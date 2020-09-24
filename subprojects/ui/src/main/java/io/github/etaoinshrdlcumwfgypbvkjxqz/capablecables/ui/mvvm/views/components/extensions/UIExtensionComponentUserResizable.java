@@ -85,6 +85,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
+	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 	public void onExtensionAdded(IUIComponent container) {
 		super.onExtensionAdded(container);
 		getContainer()
@@ -186,6 +187,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 
 		@Override
 		@SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
+		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 		public void onNext(UIViewMinecraftBusEvent.Render event) {
 			super.onNext(event);
 			if (event.getStage().isPost())
@@ -218,7 +220,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 			implements IUIComponentCursorHandleProvider {
 		protected boolean beingHovered = false;
 
-		@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
+		@SuppressWarnings({"OverridableMethodCallDuringObjectConstruction", "rawtypes", "RedundantSuppression"})
 		protected VirtualComponent() {
 			super(IShapeDescriptor.StaticHolder.getShapeDescriptorPlaceholder());
 
@@ -242,6 +244,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 			}), false);
 		}
 
+		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 		protected boolean startResizeMaybe(Point2D cursorPosition) {
 			return getContainer()
 					.flatMap(c -> c.getManager()

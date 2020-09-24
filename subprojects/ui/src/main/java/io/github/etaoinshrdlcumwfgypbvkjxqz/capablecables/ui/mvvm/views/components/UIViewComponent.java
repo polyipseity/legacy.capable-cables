@@ -85,7 +85,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		@Nullable Optional<? extends IUIEventTarget> ret = CastUtilities.castChecked(IUIComponent.class, currentFocus)
 				.flatMap(cf ->
 						CacheViewComponent.CHILDREN_FLAT_FOCUSABLE.getValue().get(this)
-								.filter(FunctionUtilities.notPredicate(Collection::isEmpty))
+								.filter(FunctionUtilities.notPredicate(Collection<IUIComponent>::isEmpty))
 								.map(f -> f.get(Math.floorMod(
 										Math.max(f.indexOf(cf), 0) + (next ? 1 : -1), f.size()))));
 		if (!ret.isPresent())
@@ -198,7 +198,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	public enum CacheViewComponent {
 		;
 
-		@SuppressWarnings("ThisEscapedInObjectConstruction")
+		@SuppressWarnings({"ThisEscapedInObjectConstruction", "rawtypes", "RedundantSuppression", "unchecked", "AnonymousInnerClassMayBeStatic"})
 		public static final Registry.RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
 				UICacheRegistry.getInstance().registerApply(generateKey("children_flat"),
 						key -> new AbstractUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
@@ -246,7 +246,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 								return ImmutableList.copyOf(ret);
 							}
 						});
-		@SuppressWarnings({"UnstableApiUsage", "ThisEscapedInObjectConstruction"})
+		@SuppressWarnings({"UnstableApiUsage", "ThisEscapedInObjectConstruction", "rawtypes", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
 		public static final Registry.RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
 				UICacheRegistry.getInstance().registerApply(generateKey("children_flat.focusable"),
 						key -> new AbstractUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {

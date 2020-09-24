@@ -1,5 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.caches;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
@@ -26,8 +28,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.O
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Registry;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import net.minecraftforge.eventbus.api.EventPriority;
 import org.jetbrains.annotations.NonNls;
 import sun.misc.Cleaner;
@@ -65,7 +65,7 @@ public class UICacheExtension
 	public enum CacheUniversal {
 		;
 
-		@SuppressWarnings("ThisEscapedInObjectConstruction")
+		@SuppressWarnings({"ThisEscapedInObjectConstruction", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
 		public static final Registry.RegistryObject<IUICacheType<IUIComponentManager<?>, IUIComponent>> MANAGER =
 				UICacheRegistry.getInstance().registerApply(generateKey("manager"),
 						key -> new AbstractUICacheType<IUIComponentManager<?>, IUIComponent>(key) {
@@ -95,7 +95,7 @@ public class UICacheExtension
 										.orElseThrow(CacheLoaderLoadedNullException::new);
 							}
 						});
-		@SuppressWarnings("ThisEscapedInObjectConstruction")
+		@SuppressWarnings({"ThisEscapedInObjectConstruction", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
 		public static final Registry.RegistryObject<IUICacheType<Integer, IUIComponent>> Z =
 				UICacheRegistry.getInstance().registerApply(generateKey("z"),
 						key -> new AbstractUICacheType<Integer, IUIComponent>(key) {

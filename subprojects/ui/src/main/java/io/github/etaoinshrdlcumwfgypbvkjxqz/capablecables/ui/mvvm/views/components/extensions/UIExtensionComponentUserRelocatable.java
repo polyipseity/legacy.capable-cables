@@ -64,6 +64,7 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
+	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 	public void onExtensionAdded(IUIComponent container) {
 		super.onExtensionAdded(container);
 		getContainer().ifPresent(c -> {
@@ -118,6 +119,7 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
+	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 	public void onExtensionRemoved() {
 		super.onExtensionRemoved();
 		getContainer().ifPresent(c -> {
@@ -140,6 +142,7 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 
 		@Override
 		@SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
+		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 		public void onNext(UIViewMinecraftBusEvent.Render event) {
 			super.onNext(event);
 			if (event.getStage().isPost())
@@ -166,7 +169,7 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 	public class VirtualComponent
 			extends UIComponentVirtual
 			implements IUIComponentCursorHandleProvider {
-		@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
+		@SuppressWarnings({"OverridableMethodCallDuringObjectConstruction", "rawtypes", "RedundantSuppression"})
 		protected VirtualComponent() {
 			super(IShapeDescriptor.StaticHolder.getShapeDescriptorPlaceholder());
 

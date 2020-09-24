@@ -6,10 +6,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilitie
 public interface IHasGenericClass<T> {
 	Class<T> getGenericClass();
 
-	@SuppressWarnings("unchecked")
-	static <T> Class<? extends T> getActualClass(IHasGenericClass<T> obj) {
+	static <T, E extends T> Class<? extends T> getActualClass(IHasGenericClass<T> obj) {
 		return CastUtilities.castChecked(Extended.class, obj)
-				.map(Extended::getExtendedClass)
+				.<Class<? extends T>>map(Extended<T, E>::getExtendedClass)
 				.orElseGet(obj::getGenericClass);
 	}
 

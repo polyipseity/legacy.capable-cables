@@ -456,6 +456,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 	public enum DefaultHandlers {
 		;
 
+		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 		public static void handleAnchor(@SuppressWarnings("unused") IParserContext context, Object container, Anchor object) {
 			if (!(container instanceof IUIComponent))
 				return;

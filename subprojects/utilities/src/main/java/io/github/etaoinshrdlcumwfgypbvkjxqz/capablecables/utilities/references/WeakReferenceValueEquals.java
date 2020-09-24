@@ -22,7 +22,7 @@ public class WeakReferenceValueEquals<T>
 	@Override
 	public boolean equals(@Nullable Object obj) {
 		return CastUtilities.castChecked(WeakReference.class, obj)
-				.map(Reference::get)
+				.map(Reference<Object>::get)
 				.filter(Predicate.isEqual(get()))
 				.isPresent();
 	}

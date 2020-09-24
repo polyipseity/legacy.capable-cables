@@ -33,7 +33,7 @@ public enum JAXBAdapterRegistries {
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"unchecked", "rawtypes", "RedundantSuppression"})
 	public static <L> Optional<? extends IDuplexFunction<L, ?>> findAdapter(L jaxbObj) {
 		if (jaxbObj instanceof JAXBElement)
 			return (Optional<? extends IDuplexFunction<L, ?>>) // COMMENT should be safe

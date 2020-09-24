@@ -16,13 +16,15 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.UIEventLi
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.UIComponentContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIComponentBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.interactions.ShapeConstraintSupplier;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.ConstantSupplier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
-import io.reactivex.rxjava3.observers.DisposableObserver;
+import io.reactivex.rxjava3.disposables.Disposable;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -30,7 +32,6 @@ import java.awt.geom.RectangularShape;
 import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 public class UIComponentWindow
@@ -42,21 +43,11 @@ public class UIComponentWindow
 			WINDOW_DRAG_BAR_THICKNESS = 10, // COMMENT internal top
 			WINDOW_VISIBLE_MINIMUM = 10;
 
-	protected final AtomicReference<UICBEMSDObserver> observerEventUIShapeDescriptorModify = new AtomicReference<>();
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
+	private final AutoCloseableRotator<ModifyShapeDescriptorObserver, RuntimeException> modifyShapeDescriptorObserver =
+			new AutoCloseableRotator<>(() -> new ModifyShapeDescriptorObserver(this, UIConfiguration.getInstance().getLogger()), Disposable::dispose);
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public IShapeDescriptor<RectangularShape> getShapeDescriptor() {
-		return (IShapeDescriptor<RectangularShape>) super.getShapeDescriptor(); // COMMENT should be safe, see constructor
-	}
-
-	@Override
-	public boolean reshape(Predicate<? super IShapeDescriptor<? super RectangularShape>> action) throws ConcurrentModificationException {
-		return IUIComponent.reshapeComponent(this, getShapeDescriptor(), action);
-		// TODO resizing logic
-	}
-
-	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
+	@SuppressWarnings({"OverridableMethodCallDuringObjectConstruction", "rawtypes", "RedundantSuppression"})
 	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
 	public UIComponentWindow(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<RectangularShape> shapeDescriptor) {
 		super(mappings, id, shapeDescriptor);
@@ -91,16 +82,26 @@ public class UIComponentWindow
 				getParent().orElseThrow(InternalError::new).moveChildToTop(this)), true);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public IShapeDescriptor<RectangularShape> getShapeDescriptor() {
+		return (IShapeDescriptor<RectangularShape>) super.getShapeDescriptor(); // COMMENT should be safe, see constructor
+	}
+
+	@Override
+	public boolean reshape(Predicate<? super IShapeDescriptor<? super RectangularShape>> action) throws ConcurrentModificationException {
+		return IUIComponent.reshapeComponent(this, getShapeDescriptor(), action);
+		// TODO resizing logic
+	}
+
 	@Override
 	public void initialize(IUIComponentContext context) {
 		UIEventBusEntryPoint.<UIComponentBusEvent.ModifyShapeDescriptor>getEventBus()
-				.subscribe(getObserverEventUIShapeDescriptorModify().accumulateAndGet(new UICBEMSDObserver(), (p, n) -> {
-					if (p != null)
-						p.dispose();
-					return n;
-				}));
+				.subscribe(getModifyShapeDescriptorObserver().get());
 		IUIReshapeExplicitly.refresh(this);
 	}
+
+	protected AutoCloseableRotator<ModifyShapeDescriptorObserver, RuntimeException> getModifyShapeDescriptorObserver() { return modifyShapeDescriptorObserver; }
 
 	@Override
 	public void transformChildren(IAffineTransformStack stack) {
@@ -108,21 +109,30 @@ public class UIComponentWindow
 		stack.element().translate(0, WINDOW_DRAG_BAR_THICKNESS); // TODO move
 	}
 
-	protected AtomicReference<UICBEMSDObserver> getObserverEventUIShapeDescriptorModify() { return observerEventUIShapeDescriptorModify; }
-
 	@Override
-	public void removed(IUIComponentContext context) { Optional.ofNullable(getObserverEventUIShapeDescriptorModify().getAndSet(null)).ifPresent(DisposableObserver::dispose); }
+	public void removed(IUIComponentContext context) {
+		getModifyShapeDescriptorObserver().close();
+	}
 
-	public class UICBEMSDObserver
+	protected static class ModifyShapeDescriptorObserver
 			extends LoggingDisposableObserver<UIComponentBusEvent.ModifyShapeDescriptor> {
-		public UICBEMSDObserver() { super(UIConfiguration.getInstance().getLogger()); }
+		private final OptionalWeakReference<UIComponentWindow> owner;
+
+		public ModifyShapeDescriptorObserver(UIComponentWindow owner, Logger logger) {
+			super(logger);
+			this.owner = new OptionalWeakReference<>(owner);
+		}
 
 		@Override
 		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 		public void onNext(UIComponentBusEvent.ModifyShapeDescriptor event) {
 			super.onNext(event);
-			if (event.getStage().isPost() && getParent().filter(p -> p.equals(event.getComponent())).isPresent())
-				IUIReshapeExplicitly.refresh(UIComponentWindow.this);
+			if (event.getStage().isPost())
+				getOwner()
+						.filter(owner -> owner.getParent().filter(p -> p.equals(event.getComponent())).isPresent())
+						.ifPresent(IUIReshapeExplicitly::refresh);
 		}
+
+		protected Optional<? extends UIComponentWindow> getOwner() { return owner.getOptional(); }
 	}
 }

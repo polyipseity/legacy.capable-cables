@@ -21,7 +21,7 @@ public class WeakReferenceValueIdentity<T>
 	@Override
 	public boolean equals(@Nullable Object obj) {
 		return CastUtilities.castChecked(WeakReference.class, obj)
-				.map(Reference::get)
+				.map(Reference<Object>::get)
 				.filter(oc -> get() == oc)
 				.isPresent();
 	}

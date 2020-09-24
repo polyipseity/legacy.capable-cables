@@ -48,6 +48,6 @@ public class DisposableObserverWeakReference<T, R extends Disposable & Observer<
 	@Override
 	public void onComplete() {
 		getOptional()
-				.ifPresent(Observer::onComplete);
+				.ifPresent(R::onComplete);
 	}
 }

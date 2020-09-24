@@ -37,6 +37,7 @@ public class UIComponentManager<S extends Shape>
 	public boolean isFocusable() { return true; }
 
 	@Override
+	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 	public Optional<? extends IUIViewComponent<?, ?>> getView() {
 		@Nullable Optional<? extends IUIViewComponent<?, ?>> ret;
 		if ((ret = view.getOptional()).isPresent())
