@@ -6,13 +6,13 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeConstraint;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.UIObjectUtilities;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -68,28 +68,28 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 
 	@Override
 	public AbstractShapeDescriptorBuilder<S> setWidth(double width) {
-		UIObjectUtilities.acceptRectangular(getBounds(), (rx, ry, rw, rh) ->
+		UIObjectUtilities.acceptRectangularShape(getBounds(), (rx, ry, rw, rh) ->
 				getBounds().setFrame(rx, ry, width, rh));
 		return this;
 	}
 
 	@Override
 	public AbstractShapeDescriptorBuilder<S> setHeight(double height) {
-		UIObjectUtilities.acceptRectangular(getBounds(), (rx, ry, rw, rh) ->
+		UIObjectUtilities.acceptRectangularShape(getBounds(), (rx, ry, rw, rh) ->
 				getBounds().setFrame(rx, ry, rw, height));
 		return this;
 	}
 
 	@Override
 	public AbstractShapeDescriptorBuilder<S> setX(double x) {
-		UIObjectUtilities.acceptRectangular(getBounds(), (rx, ry, rw, rh) ->
+		UIObjectUtilities.acceptRectangularShape(getBounds(), (rx, ry, rw, rh) ->
 				getBounds().setFrame(x, ry, rw, rh));
 		return this;
 	}
 
 	@Override
 	public AbstractShapeDescriptorBuilder<S> setY(double y) {
-		UIObjectUtilities.acceptRectangular(getBounds(), (rx, ry, rw, rh) ->
+		UIObjectUtilities.acceptRectangularShape(getBounds(), (rx, ry, rw, rh) ->
 				getBounds().setFrame(rx, y, rw, rh));
 		return this;
 	}

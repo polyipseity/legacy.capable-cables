@@ -24,7 +24,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.I
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
-import java.awt.geom.Point2D;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Optional;
@@ -99,7 +98,7 @@ public class UIComponentButton
 	public boolean isFocusable() { return true; }
 
 	@Override
-	public Optional<? extends Long> getCursorHandle(IUIComponentContext context, Point2D cursorPosition) {
+	public Optional<? extends Long> getCursorHandle(IUIComponentContext context) {
 		return getButtonStates().contains(IButtonState.HOVERING)
 				? Optional.of(EnumGLFWCursor.STANDARD_HAND_CURSOR.getHandle())
 				: Optional.empty();

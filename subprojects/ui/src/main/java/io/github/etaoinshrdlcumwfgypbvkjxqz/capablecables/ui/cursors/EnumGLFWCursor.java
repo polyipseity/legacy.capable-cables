@@ -3,7 +3,6 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.cursors;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftImageUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.UIObjectUtilities;
 import net.minecraft.client.renderer.texture.NativeImage;
@@ -28,7 +27,7 @@ public enum EnumGLFWCursor
 		InputStream input = AssertionUtilities.assertNonnull(EnumGLFWCursor.class.getResourceAsStream(StaticHolder.getExtensionResizeNwSeCursorPath()));
 		try {
 			try {
-				return createCursor(input, ImmutablePoint2D.of(8, 8));
+				return createCursor(input, new Point2D.Double(8, 8));
 			} catch (IOException e) {
 				throw ThrowableUtilities.propagate(e);
 			}
@@ -40,7 +39,7 @@ public enum EnumGLFWCursor
 		InputStream input = AssertionUtilities.assertNonnull(EnumGLFWCursor.class.getResourceAsStream(StaticHolder.getExtensionResizeNeSwCursorPath()));
 		try {
 			try {
-				return createCursor(input, ImmutablePoint2D.of(8, 8));
+				return createCursor(input, new Point2D.Double(8, 8));
 			} catch (IOException e) {
 				throw ThrowableUtilities.propagate(e);
 			}
@@ -61,7 +60,7 @@ public enum EnumGLFWCursor
 			throws IOException {
 		try (NativeImage ni = NativeImage.read(NativeImage.PixelFormat.RGBA, input);
 		     GLFWImage i = MinecraftImageUtilities.toGLFWImageCursor(ni)) {
-			ImmutablePoint2D hotspotF = UIObjectUtilities.getPointFloor(hotspot);
+			Point2D hotspotF = UIObjectUtilities.floorPoint(hotspot, new Point2D.Double());
 			return GLFW.glfwCreateCursor(i, (int) hotspotF.getX(), (int) hotspotF.getY());
 		}
 	}

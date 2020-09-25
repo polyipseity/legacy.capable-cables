@@ -2,16 +2,15 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftMatrixUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableRectangle2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.UIObjectUtilities;
 import net.minecraft.client.renderer.Matrix4f;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Marker;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.RectangularShape;
 import java.util.ResourceBundle;
 
 public enum AffineTransformUtilities {
@@ -50,7 +49,7 @@ public enum AffineTransformUtilities {
 
 	public static Marker getClassMarker() { return CLASS_MARKER; }
 
-	public static AffineTransform getTransformFromTo(Rectangle2D from, Rectangle2D to) {
+	public static AffineTransform getTransformFromTo(RectangularShape from, RectangularShape to) {
 		if (from.getWidth() == 0 || from.getHeight() == 0)
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
@@ -68,17 +67,15 @@ public enum AffineTransformUtilities {
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
-	public static double transformX(double x, AffineTransform transform) { return transformPoint(ImmutablePoint2D.of(x, 0), transform).getX(); }
-
-	public static ImmutablePoint2D transformPoint(Point2D point, AffineTransform transform) {
-		return ImmutablePoint2D.of(transform.transform(point, new Point2D.Double()));
+	public static <R extends RectangularShape> R transformRectangularShape(AffineTransform transform, RectangularShape source, R destination) {
+		Point2D[] points = UIObjectUtilities.getDiagonalsFromRectangular(source);
+		destination.setFrameFromDiagonal(transformPoint(transform, points[0], points[0]), transformPoint(transform, points[1], points[1]));
+		return destination;
 	}
 
-	public static double transformY(double y, AffineTransform transform) { return transformPoint(ImmutablePoint2D.of(0, y), transform).getY(); }
-
-	public static ImmutableRectangle2D transformRectangle(Rectangle2D rectangle, AffineTransform transform) {
-		return ImmutableRectangle2D.fromDiagonal(transformPoint(ImmutablePoint2D.of(rectangle.getX(), rectangle.getY()), transform),
-				transformPoint(ImmutablePoint2D.of(rectangle.getMaxX(), rectangle.getMaxY()), transform));
+	public static <R extends Point2D> R transformPoint(AffineTransform transform, Point2D source, R destination) {
+		transform.transform(source, destination);
+		return destination;
 	}
 
 	public static double[] getFlatMatrixIdentity() { return FLAT_MATRIX_IDENTITY.clone(); }

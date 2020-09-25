@@ -2,9 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraf
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftScreenUtility;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableDimension2D;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableRectangle2D;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.DoubleDimension2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.UIObjectUtilities;
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
@@ -25,11 +23,11 @@ import java.awt.geom.*;
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities.*;
 
 @OnlyIn(Dist.CLIENT)
-public enum DrawingUtilities {
+public enum MinecraftDrawingUtilities {
 	;
 
 	public static void drawRectangle(AffineTransform transform, Rectangle2D rectangle, int color, int z) {
-		ImmutableRectangle2D rF = UIObjectUtilities.getRectangleExpanded(rectangle);
+		Rectangle2D rF = UIObjectUtilities.floorRectangularShape(rectangle, new Rectangle2D.Double());
 		hLine(transform, rF.getX(), rF.getMaxX(), rF.getY(), color, z);
 		vLine(transform, rF.getX(), rF.getY(), rF.getMaxY(), color, z);
 		hLine(transform, rF.getX(), rF.getMaxX(), rF.getMaxY(), color, z);
@@ -40,19 +38,19 @@ public enum DrawingUtilities {
 	 * @see AbstractGui#hLine(int, int, int, int)
 	 */
 	@SuppressWarnings("JavadocReference")
-	public static void hLine(AffineTransform transform, double x1, double x2, double y, int color, int z) { fill(transform, ImmutableRectangle2D.of(x1, y, Math.abs(x2 - x1), 1), color, z); }
+	public static void hLine(AffineTransform transform, double x1, double x2, double y, int color, int z) { fill(transform, new Rectangle2D.Double(x1, y, Math.abs(x2 - x1), 1), color, z); }
 
 	/**
 	 * @see AbstractGui#vLine(int, int, int, int)
 	 */
 	@SuppressWarnings("JavadocReference")
-	public static void vLine(AffineTransform transform, double x, double y1, double y2, int color, int z) { fill(transform, ImmutableRectangle2D.of(x, y1, 1, Math.abs(y2 - y1)), color, z); }
+	public static void vLine(AffineTransform transform, double x, double y1, double y2, int color, int z) { fill(transform, new Rectangle2D.Double(x, y1, 1, Math.abs(y2 - y1)), color, z); }
 
 	/**
 	 * @see AbstractGui#fill(Matrix4f, int, int, int, int, int)
 	 */
 	public static void fill(AffineTransform transform, Rectangle2D rectangle, int color, int z) {
-		ImmutableRectangle2D rF = UIObjectUtilities.getRectangleExpanded(rectangle);
+		Rectangle2D rF = UIObjectUtilities.floorRectangularShape(rectangle, new Rectangle2D.Double());
 		Matrix4f m = toMatrix(transform);
 		if (z != 0) m.translate(new Vector3f(0, 0, z));
 		AbstractGui.fill(m, (int) rF.getX(), (int) rF.getY(), (int) rF.getMaxX(), (int) rF.getMaxY(), color);
@@ -69,8 +67,8 @@ public enum DrawingUtilities {
 	 */
 	@SuppressWarnings("JavadocReference")
 	public static void fillGradient(AffineTransform transform, Rectangle2D rectangle, int colorTop, int colorBottom, int z) {
-		ImmutableRectangle2D r = transformRectangle(rectangle, transform);
-		ImmutableRectangle2D rF = UIObjectUtilities.getRectangleExpanded(r);
+		Rectangle2D rF = new Rectangle2D.Double();
+		UIObjectUtilities.floorRectangularShape(transformRectangularShape(transform, rectangle, rF), rF);
 		MinecraftScreenUtility.getInstance()
 				.setBlitOffset_(z)
 				.fillGradient((int) rF.getX(), (int) rF.getY(), (int) rF.getMaxX(), (int) rF.getMaxY(), colorTop, colorBottom);
@@ -80,8 +78,8 @@ public enum DrawingUtilities {
 	 * @see AbstractGui#drawCenteredString(FontRenderer, String, int, int, int)
 	 */
 	public static void drawCenteredString(AffineTransform transform, FontRenderer font, String string, Point2D p, int color) {
-		Point2D xy = transformPoint(p, transform);
-		ImmutablePoint2D xyF = UIObjectUtilities.getPointFloor(xy);
+		Point2D xyF = new Point2D.Double();
+		UIObjectUtilities.floorPoint(transformPoint(transform, p, xyF), xyF);
 		MinecraftScreenUtility.getInstance()
 				.drawCenteredString(font, string, (int) xyF.getX(), (int) xyF.getY(), color);
 	}
@@ -90,8 +88,8 @@ public enum DrawingUtilities {
 	 * @see AbstractGui#drawRightAlignedString(FontRenderer, String, int, int, int)
 	 */
 	public static void drawRightAlignedString(AffineTransform transform, FontRenderer font, String string, Point2D p, int color) {
-		Point2D xy = transformPoint(p, transform);
-		ImmutablePoint2D xyF = UIObjectUtilities.getPointFloor(xy);
+		Point2D xyF = new Point2D.Double();
+		UIObjectUtilities.floorPoint(transformPoint(transform, p, xyF), xyF);
 		MinecraftScreenUtility.getInstance()
 				.drawRightAlignedString(font, string, (int) xyF.getX(), (int) xyF.getY(), color);
 	}
@@ -100,8 +98,8 @@ public enum DrawingUtilities {
 	 * @see AbstractGui#drawString(FontRenderer, String, int, int, int)
 	 */
 	public static void drawString(AffineTransform transform, FontRenderer font, String string, Point2D p, int color) {
-		Point2D xy = transformPoint(p, transform);
-		ImmutablePoint2D xyF = UIObjectUtilities.getPointFloor(xy);
+		Point2D xyF = new Point2D.Double();
+		UIObjectUtilities.floorPoint(transformPoint(transform, p, xyF), xyF);
 		MinecraftScreenUtility.getInstance()
 				.drawString(font, string, (int) xyF.getX(), (int) xyF.getY(), color);
 	}
@@ -110,8 +108,8 @@ public enum DrawingUtilities {
 	 * @see AbstractGui#blit(int, int, int, int, int, TextureAtlasSprite)
 	 */
 	public static void blit(AffineTransform transform, Rectangle2D gui, TextureAtlasSprite sprite, double z) {
-		ImmutableRectangle2D g = transformRectangle(gui, transform);
-		ImmutableRectangle2D gF = UIObjectUtilities.getRectangleExpanded(g);
+		Rectangle2D gF = new Rectangle2D.Double();
+		UIObjectUtilities.floorRectangularShape(transformRectangularShape(transform, gui, gF), gF);
 		AbstractGui.blit((int) gF.getX(), (int) gF.getY(), (int) Math.floor(z),
 				(int) gF.getWidth(), (int) gF.getHeight(), sprite);
 	}
@@ -120,9 +118,9 @@ public enum DrawingUtilities {
 	 * @see AbstractGui#blit(int, int, int, float, float, int, int, int, int)
 	 */
 	public static void blit(AffineTransform transform, Rectangle2D gui, Point2D sprite, Dimension2D texture, double z) {
-		ImmutableRectangle2D g = transformRectangle(gui, transform);
-		ImmutableRectangle2D gF = UIObjectUtilities.getRectangleExpanded(g);
-		ImmutableDimension2D textureF = UIObjectUtilities.getDimensionFloor(texture);
+		Rectangle2D gF = new Rectangle2D.Double();
+		UIObjectUtilities.floorRectangularShape(transformRectangularShape(transform, gui, gF), gF);
+		Dimension2D textureF = UIObjectUtilities.floorDimension(texture, new DoubleDimension2D());
 		AbstractGui.blit((int) gF.getX(), (int) gF.getY(), (int) z,
 				(float) sprite.getX(), (float) sprite.getY(),
 				(int) gF.getWidth(), (int) gF.getHeight(),
@@ -133,10 +131,10 @@ public enum DrawingUtilities {
 	 * @see AbstractGui#blit(int, int, int, int, float, float, int, int, int, int)
 	 */
 	public static void blit(AffineTransform transform, Rectangle2D gui, Rectangle2D sprite, Dimension2D texture) {
-		ImmutableRectangle2D g = transformRectangle(gui, transform);
-		ImmutableRectangle2D gF = UIObjectUtilities.getRectangleExpanded(g);
-		ImmutableRectangle2D spriteF = UIObjectUtilities.getRectangleExpanded(sprite);
-		ImmutableDimension2D textureF = UIObjectUtilities.getDimensionFloor(texture);
+		Rectangle2D gF = new Rectangle2D.Double();
+		UIObjectUtilities.floorRectangularShape(transformRectangularShape(transform, gui, gF), gF);
+		Rectangle2D spriteF = UIObjectUtilities.floorRectangularShape(sprite, new Rectangle2D.Double());
+		Dimension2D textureF = UIObjectUtilities.floorDimension(texture, new DoubleDimension2D());
 		AbstractGui.blit((int) gF.getX(), (int) gF.getY(),
 				(int) gF.getWidth(), (int) gF.getHeight(),
 				(float) sprite.getX(), (float) sprite.getY(),
@@ -148,9 +146,9 @@ public enum DrawingUtilities {
 	 * @see AbstractGui#blit(int, int, float, float, int, int, int, int)
 	 */
 	public static void blit(AffineTransform transform, Rectangle2D gui, Point2D sprite, Dimension2D texture) {
-		ImmutableRectangle2D g = transformRectangle(gui, transform);
-		ImmutableRectangle2D gF = UIObjectUtilities.getRectangleExpanded(g);
-		ImmutableDimension2D textureF = UIObjectUtilities.getDimensionFloor(texture);
+		Rectangle2D gF = new Rectangle2D.Double();
+		UIObjectUtilities.floorRectangularShape(transformRectangularShape(transform, gui, gF), gF);
+		Dimension2D textureF = UIObjectUtilities.floorDimension(texture, new DoubleDimension2D());
 		AbstractGui.blit((int) gF.getX(), (int) gF.getY(),
 				(float) sprite.getX(), (float) sprite.getY(),
 				(int) gF.getWidth(), (int) gF.getHeight(),

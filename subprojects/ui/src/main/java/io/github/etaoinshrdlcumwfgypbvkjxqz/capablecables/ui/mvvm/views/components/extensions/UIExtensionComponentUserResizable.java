@@ -21,16 +21,14 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.componen
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.EnumUIAxis;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.descriptors.GenericShapeDescriptor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.DrawingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IFunction4;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableRectangle2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.UIObjectUtilities;
 import io.reactivex.rxjava3.disposables.Disposable;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -111,8 +109,8 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 	public Optional<? extends Shape> getResizeShape() {
 		return getContainer().map(c -> {
 			Rectangle2D spb = c.getShapeDescriptor().getShapeOutput().getBounds2D();
-			Area ret = new Area(UIObjectUtilities.applyRectangular(spb, (x, y, w, h) ->
-					ImmutableRectangle2D.of(x - getResizeBorderThickness(), y - getResizeBorderThickness(),
+			Area ret = new Area(UIObjectUtilities.applyRectangularShape(spb, (x, y, w, h) ->
+					new Rectangle2D.Double(x - getResizeBorderThickness(), y - getResizeBorderThickness(),
 							w + (getResizeBorderThickness() << 1), h + (getResizeBorderThickness() << 1))));
 			ret.subtract(new Area(spb));
 			return ret;
@@ -129,50 +127,47 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 	protected Object getLockObject() { return lockObject; }
 
 	public static class ResizeData implements IResizeData {
-		protected final ImmutablePoint2D cursorPosition;
+		protected final Point2D cursorPosition;
 		protected final Set<EnumUISide> sides;
 		@Nullable
-		protected final ImmutablePoint2D base;
+		protected final Point2D base;
 		protected final long initialCursorHandle;
 
 		public ResizeData(Point2D cursorPosition, Set<EnumUISide> sides, @Nullable Point2D base, long initialCursorHandle) {
-			this.cursorPosition = ImmutablePoint2D.of(cursorPosition);
+			this.cursorPosition = (Point2D) cursorPosition.clone();
 			this.sides = EnumSet.copyOf(sides);
-			this.base = Optional.ofNullable(base).map(ImmutablePoint2D::of).orElse(null);
+			this.base = Optional.ofNullable(base).map(Point2D::clone).map(CastUtilities::<Point2D>castUnchecked).orElse(null);
 			this.initialCursorHandle = initialCursorHandle;
 		}
 
 		@Override
-		public ImmutablePoint2D getCursorPositionView() { return getCursorPosition(); }
+		public Point2D getCursorPositionView() { return getCursorPosition(); }
 
 		@Override
 		public Set<? extends EnumUISide> getSidesView() { return EnumSet.copyOf(getSides()); }
 
 		@Override
-		public Optional<? extends ImmutablePoint2D> getBaseView() { return getBase().map(ImmutablePoint2D::clone); }
+		public Optional<? extends Point2D> getBaseView() { return getBase().map(Point2D::clone).map(CastUtilities::castUnchecked); }
 
 		@Override
 		public long getInitialCursorHandle() { return initialCursorHandle; }
 
 		@Override
-		public <T extends RectangularShape, TH extends Throwable> T handle(RectangularShape rectangular,
-		                                                                   Point2D cursorPosition,
-		                                                                   IFunction4<? super Double, ? super Double, ? super Double, ? super Double, ? extends T, ? extends TH> constructor) throws TH {
-			Rectangle2D ret = new Rectangle2D.Double();
+		public <R extends RectangularShape> R handle(Point2D cursorPosition, RectangularShape source, R destination) {
 			Point2D previousCursorPosition = getCursorPosition();
 			for (EnumUISide side : getSides()) {
 				EnumUIAxis axis = side.getAxis();
-				side.getSetter().accept(ret, side.getGetter().apply(ret) + (axis.getCoordinate(cursorPosition) - axis.getCoordinate(previousCursorPosition)));
+				side.getSetter().accept(destination, side.getGetter().apply(source) + (axis.getCoordinate(cursorPosition) - axis.getCoordinate(previousCursorPosition)));
 			}
-			return UIObjectUtilities.applyRectangular(ret, constructor);
+			return destination;
 		}
 
-		protected Optional<ImmutablePoint2D> getBase() { return Optional.ofNullable(base); }
+		protected Optional<Point2D> getBase() { return Optional.ofNullable(base); }
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 		protected Set<EnumUISide> getSides() { return sides; }
 
-		protected ImmutablePoint2D getCursorPosition() { return cursorPosition; }
+		protected Point2D getCursorPosition() { return cursorPosition; }
 	}
 
 	@Override
@@ -206,16 +201,16 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 																.flatMap(IUIComponentManager::getView)
 																.ifPresent(view -> IUIViewComponent.StaticHolder.createComponentContextWithManager(view)
 																		.ifPresent(context -> {
-																			ImmutablePoint2D cp = event.getCursorPositionView();
+																			Point2D previousCursorPosition = event.getCursorPositionView();
+																			Rectangle2D resultRectangle = c.getShapeDescriptor().getShapeOutput().getBounds2D();
 																			try (IUIComponentContext ctx = context) {
-																				view.getPathResolver().resolvePath(ctx, cp, true);
-																				DrawingUtilities.drawRectangle(ctx.getTransformStack().element(),
-																						UIObjectUtilities.applyRectangular(d.handle(
-																								c.getShapeDescriptor().getShapeOutput().getBounds2D(),
-																								cp,
-																								ImmutableRectangle2D::of),
-																								(x, y, w, h) ->
-																										ImmutableRectangle2D.of(x, y, w - 1, h - 1)),
+																				view.getPathResolver().resolvePath(ctx, (Point2D) previousCursorPosition.clone(), true);
+																				UIObjectUtilities.acceptRectangularShape(
+																						d.handle((Point2D) previousCursorPosition.clone(), resultRectangle, resultRectangle),
+																						(x, y, w, h) ->
+																								resultRectangle.setFrame(x, y, w - 1, h - 1));
+																				MinecraftDrawingUtilities.drawRectangle(ctx.getTransformStack().element(),
+																						resultRectangle,
 																						Color.DARK_GRAY.getRGB(),
 																						0); // TODO customize
 																			}
@@ -263,20 +258,20 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 									.map(context -> {
 										Rectangle2D spb;
 										try (IUIComponentContext ctx = context) {
-											view.getPathResolver().resolvePath(ctx, cursorPosition, true);
+											view.getPathResolver().resolvePath(ctx, (Point2D) cursorPosition.clone(), true);
 											spb = ctx.getTransformStack().element().createTransformedShape(c.getShapeDescriptor().getShapeOutput()).getBounds2D();
 										}
 										Set<EnumUISide> sides = EnumUISide.getSidesMouseOver(spb, cursorPosition);
 
 										@Nullable Point2D base = null;
 										if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT))
-											base = ImmutablePoint2D.of(spb.getMaxX(), spb.getMaxY());
+											base = new Point2D.Double(spb.getMaxX(), spb.getMaxY());
 										else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
-											base = ImmutablePoint2D.of(spb.getX(), spb.getY());
+											base = new Point2D.Double(spb.getX(), spb.getY());
 										else if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.RIGHT))
-											base = ImmutablePoint2D.of(spb.getX(), spb.getMaxY());
+											base = new Point2D.Double(spb.getX(), spb.getMaxY());
 										else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
-											base = ImmutablePoint2D.of(spb.getMaxX(), spb.getY());
+											base = new Point2D.Double(spb.getMaxX(), spb.getY());
 
 										IResizeData d = new ResizeData(cursorPosition, sides, base, getCursor(sides).orElseThrow(InternalError::new).getHandle());
 										synchronized (getLockObject()) {
@@ -291,11 +286,12 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 
 		protected boolean finishResizeMaybe(Point2D cursorPosition) {
 			return getContainer().flatMap(c -> getResizeData().filter(d -> {
-				ImmutableRectangle2D r = d.handle(c.getShapeDescriptor().getShapeOutput().getBounds2D(), cursorPosition, ImmutableRectangle2D::of);
+				Rectangle2D resultRectangle = c.getShapeDescriptor().getShapeOutput().getBounds2D();
+				d.handle((Point2D) cursorPosition.clone(), resultRectangle, resultRectangle);
 				synchronized (getLockObject()) {
 					if (!getResizeData().isPresent())
 						return false;
-					c.reshape(s -> s.bound(r));
+					c.reshape(s -> s.bound(resultRectangle));
 					setResizeData(null);
 					return true;
 				}
@@ -308,19 +304,20 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 					? getManager()
 					.map(m ->
 							new GenericShapeDescriptor(m.getShapeDescriptor().getShapeOutput()))
-					.orElseGet(() -> new GenericShapeDescriptor(ImmutableRectangle2D.of()))
+					.orElseGet(() -> new GenericShapeDescriptor(new Rectangle2D.Double()))
 					: new GenericShapeDescriptor(getResizeShape()
 					.<Shape>map(Function.identity())
 					.orElseGet(Rectangle2D.Double::new));
 		}
 
 		@Override
-		public Optional<? extends Long> getCursorHandle(IUIComponentContext context, Point2D cursorPosition) {
+		public Optional<? extends Long> getCursorHandle(IUIComponentContext context) {
+			Point2D cursorPosition = context.getCursorPositionView();
 			@SuppressWarnings("Convert2MethodRef") @Nullable Optional<? extends Long> ret = getResizeData()
 					.map(d -> d.getBaseView()
 							.map(b -> {
 								Set<EnumUISide> sides = EnumUISide.getSidesMouseOver(
-										ImmutableRectangle2D.of(b.getX(), b.getY(), 0, 0),
+										new Rectangle2D.Double(b.getX(), b.getY(), 0, 0),
 										cursorPosition);
 								if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT)
 										|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))

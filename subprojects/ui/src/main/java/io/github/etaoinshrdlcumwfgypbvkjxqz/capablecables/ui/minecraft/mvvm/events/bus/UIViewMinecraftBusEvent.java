@@ -3,7 +3,6 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.eve
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIViewBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EnumHookStage;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -18,16 +17,18 @@ public abstract class UIViewMinecraftBusEvent
 
 	@OnlyIn(Dist.CLIENT)
 	public static class Render extends UIViewMinecraftBusEvent {
-		protected final ImmutablePoint2D cursorPosition;
-		protected final double partialTicks;
+		private final Point2D cursorPosition;
+		private final double partialTicks;
 
 		public Render(EnumHookStage stage, IUIView<?> view, Point2D cursorPosition, double partialTicks) {
 			super(stage, view);
-			this.cursorPosition = ImmutablePoint2D.of(cursorPosition);
+			this.cursorPosition = (Point2D) cursorPosition.clone();
 			this.partialTicks = partialTicks;
 		}
 
-		public ImmutablePoint2D getCursorPositionView() { return cursorPosition; }
+		public Point2D getCursorPositionView() { return (Point2D) getCursorPosition().clone(); }
+
+		protected Point2D getCursorPosition() { return cursorPosition; }
 
 		public double getPartialTicks() { return partialTicks; }
 

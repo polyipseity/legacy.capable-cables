@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.descriptors;
 
+import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
@@ -7,7 +8,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.sha
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
-import com.google.common.collect.ImmutableList;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
@@ -64,8 +64,7 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 		boolean ret = action.get();
 		if (ret) {
 			Rectangle2D bounds = getShapeOutput().getBounds2D();
-			StaticHolder.constrain(bounds, getConstraints());
-			bound(bounds);
+			bound(StaticHolder.constrain(getConstraints(), bounds, bounds));
 		}
 		return ret;
 	}

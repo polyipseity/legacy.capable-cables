@@ -5,7 +5,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IAffineTransformStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIComponentContext;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.EmptyPathException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.IPath;
 
@@ -22,11 +21,11 @@ public class DefaultUIComponentContext
 		assert transformStack.getData().size() - path.size() == 1;
 		this.path = path.copy();
 		this.transformStack = transformStack.copy(); // COMMENT do not automatically pop
-		this.cursorPosition = ImmutablePoint2D.of(cursorPosition);
+		this.cursorPosition = (Point2D) cursorPosition.clone();
 	}
 
 	@Override
-	public Point2D getCursorPositionView() { return getCursorPosition(); }
+	public Point2D getCursorPositionView() { return (Point2D) getCursorPosition().clone(); }
 
 	protected Point2D getCursorPosition() { return cursorPosition; }
 

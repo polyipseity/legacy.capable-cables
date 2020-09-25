@@ -7,10 +7,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUI
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.EnumCropMethod;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.caches.UICacheExtension;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.DrawingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftOpenGLUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.EnumMinecraftUICoordinateSystem;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableRectangle2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.CoordinateSystemUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.UIObjectUtilities;
 import net.minecraftforge.api.distmarker.Dist;
@@ -20,6 +19,7 @@ import org.lwjgl.opengl.GL14;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 
 @OnlyIn(Dist.CLIENT)
 public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUIComponentMinecraft>
@@ -45,7 +45,7 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUICompo
 						MinecraftOpenGLUtilities.Stacks.push("colorMask",
 								() -> RenderSystem.colorMask(false, false, false, false), MinecraftOpenGLUtilities.Stacks.COLOR_MASK_FALLBACK);
 
-						DrawingUtilities.drawShape(transform, container.getShapeDescriptor().getShapeOutput(), true, Color.WHITE, 0);
+						MinecraftDrawingUtilities.drawShape(transform, container.getShapeDescriptor().getShapeOutput(), true, Color.WHITE, 0);
 
 						MinecraftOpenGLUtilities.Stacks.pop("colorMask");
 						MinecraftOpenGLUtilities.Stacks.pop("stencilOp");
@@ -65,7 +65,7 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUICompo
 						MinecraftOpenGLUtilities.Stacks.push("colorMask",
 								() -> RenderSystem.colorMask(false, false, false, false), MinecraftOpenGLUtilities.Stacks.COLOR_MASK_FALLBACK);
 
-						DrawingUtilities.drawShape(transform, container.getShapeDescriptor().getShapeOutput().getBounds2D(), true, Color.BLACK, 0);
+						MinecraftDrawingUtilities.drawShape(transform, container.getShapeDescriptor().getShapeOutput().getBounds2D(), true, Color.BLACK, 0);
 
 						MinecraftOpenGLUtilities.Stacks.pop("colorMask");
 						MinecraftOpenGLUtilities.Stacks.pop("stencilOp");
@@ -79,14 +79,15 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUICompo
 			case GL_SCISSOR:
 				switch (stage) {
 					case CROP:
-						int[] boundsBox = new int[4];
-						MinecraftOpenGLUtilities.State.getIntegerValue(GL11.GL_SCISSOR_BOX, boundsBox);
-						UIObjectUtilities.acceptRectangular(
-								CoordinateSystemUtilities.convertRectangle(
-										UIObjectUtilities.getRectangleExpanded(transform.createTransformedShape(container.getShapeDescriptor().getShapeOutput().getBounds2D()).getBounds2D()),
+						int[] oldBounds = new int[4];
+						MinecraftOpenGLUtilities.State.getIntegerValue(GL11.GL_SCISSOR_BOX, oldBounds);
+						Rectangle2D newBounds = transform.createTransformedShape(container.getShapeDescriptor().getShapeOutput().getBounds2D()).getBounds2D();
+						UIObjectUtilities.acceptRectangularShape(
+								CoordinateSystemUtilities.convertRectangularShape(
+										UIObjectUtilities.floorRectangularShape(newBounds, newBounds),
+										newBounds,
 										EnumMinecraftUICoordinateSystem.SCALED, EnumMinecraftUICoordinateSystem.NATIVE
-								)
-										.createIntersection(ImmutableRectangle2D.of(boundsBox[0], boundsBox[1], boundsBox[2], boundsBox[3])),
+								).createIntersection(new Rectangle2D.Double(oldBounds[0], oldBounds[1], oldBounds[2], oldBounds[3])),
 								(x, y, w, h) -> MinecraftOpenGLUtilities.Stacks.push("glScissor",
 										() -> MinecraftOpenGLUtilities.State.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{x.intValue(), y.intValue(), w.intValue(), h.intValue()},
 												(i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3])), MinecraftOpenGLUtilities.Stacks.GL_SCISSOR_FALLBACK));

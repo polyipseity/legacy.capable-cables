@@ -3,7 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui;
 import java.awt.geom.Point2D;
 
 public interface ICoordinateSystem {
-	Point2D specialize(Point2D point);
+	<R extends Point2D> R specialize(Point2D source, R destination);
 
-	Point2D generalize(Point2D point);
+	<R extends Point2D> R generalize(Point2D source, R destination);
 }

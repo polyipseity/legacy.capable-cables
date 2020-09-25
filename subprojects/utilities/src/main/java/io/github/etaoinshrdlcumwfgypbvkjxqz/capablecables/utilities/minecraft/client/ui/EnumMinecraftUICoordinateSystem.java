@@ -1,7 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftClientUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.ICoordinateSystem;
 
 import java.awt.geom.Point2D;
@@ -10,26 +9,30 @@ public enum EnumMinecraftUICoordinateSystem
 		implements ICoordinateSystem {
 	SCALED {
 		@Override
-		public Point2D specialize(Point2D point) {
+		public <R extends Point2D> R specialize(Point2D source, R destination) {
 			double scaleFactor = getScaleFactor();
-			return ImmutablePoint2D.of(point.getX() / scaleFactor, point.getY() / scaleFactor);
+			destination.setLocation(source.getX() / scaleFactor, source.getY() / scaleFactor);
+			return destination;
 		}
 
 		@Override
-		public Point2D generalize(Point2D point) {
+		public <R extends Point2D> R generalize(Point2D source, R destination) {
 			double scaleFactor = getScaleFactor();
-			return ImmutablePoint2D.of(point.getX() * scaleFactor, point.getY() * scaleFactor);
+			destination.setLocation(source.getX() * scaleFactor, source.getY() * scaleFactor);
+			return destination;
 		}
 	},
 	NATIVE {
 		@Override
-		public Point2D generalize(Point2D point) {
-			return ImmutablePoint2D.of(point.getX(), getFrameBufferHeight() - point.getY());
+		public <R extends Point2D> R generalize(Point2D source, R destination) {
+			destination.setLocation(source.getX(), getFrameBufferHeight() - source.getY());
+			return destination;
 		}
 
 		@Override
-		public Point2D specialize(Point2D point) {
-			return ImmutablePoint2D.of(point.getX(), getFrameBufferHeight() - point.getY());
+		public <R extends Point2D> R specialize(Point2D source, R destination) {
+			destination.setLocation(source.getX(), getFrameBufferHeight() - source.getY());
+			return destination;
 		}
 	},
 	;

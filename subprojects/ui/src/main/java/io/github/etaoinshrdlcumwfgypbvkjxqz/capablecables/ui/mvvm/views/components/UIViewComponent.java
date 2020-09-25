@@ -75,7 +75,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	@Override
 	public IUIEventTarget getTargetAtPoint(Point2D point) {
 		try (IUIComponentContext context = IUIViewComponent.StaticHolder.createComponentContextWithManager(this).orElseThrow(IllegalStateException::new)) {
-			getPathResolver().resolvePath(context, point, true);
+			getPathResolver().resolvePath(context, (Point2D) point.clone(), true);
 			return context.getPath().getPathEnd()
 					.orElseThrow(AssertionError::new);
 		}

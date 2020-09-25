@@ -17,7 +17,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIDataKeyboardKeyPress;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIDataMouseButtonClick;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIInputUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.DrawingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.UIBackgrounds;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
@@ -33,8 +33,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.cl
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTooltipUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.DoubleDimension2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableRectangle2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.INode;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 import net.minecraft.client.Minecraft;
@@ -51,6 +49,7 @@ import org.lwjgl.system.MemoryUtil;
 
 import javax.annotation.Nullable;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
@@ -102,10 +101,10 @@ public class UIScreenAdapter
 	@Override
 	@Deprecated
 	public void render(int mouseX, int mouseY, float partialTicks) {
-		Point2D cp = ImmutablePoint2D.of(mouseX, mouseY);
-		getInfrastructure().getView().render(cp, partialTicks);
+		Point2D cp = new Point2D.Double(mouseX, mouseY);
+		getInfrastructure().getView().render((Point2D) cp.clone(), partialTicks);
 		IUIExtensionCursorHandleProvider.TYPE.getValue().find(getInfrastructure().getView()).ifPresent(ext ->
-				GLFW.glfwSetCursor(MinecraftOpenGLUtilities.getWindowHandle(), ext.getCursorHandle(cp).<Long>map(Function.identity()).orElse(MemoryUtil.NULL)));
+				GLFW.glfwSetCursor(MinecraftOpenGLUtilities.getWindowHandle(), ext.getCursorHandle((Point2D) cp.clone()).<Long>map(Function.identity()).orElse(MemoryUtil.NULL)));
 	}
 
 	public Set<Integer> getCloseKeysView() { return ImmutableSet.copyOf(getCloseKeys()); }
@@ -209,7 +208,7 @@ public class UIScreenAdapter
 	public void setSize(int width, int height) {
 		super.setSize(width, height);
 		getInfrastructure().getView().reshape(s -> {
-			s.bound(ImmutableRectangle2D.of(0, 0, width, height));
+			s.bound(new Rectangle2D.Double(0, 0, width, height));
 			return true;
 		});
 	}
@@ -244,17 +243,7 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		Point2D cp = ImmutablePoint2D.of(mouseX, mouseY);
-		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
-		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(cp);
-		if (UIEventUtilities.dispatchEvent(addEventMouse(this, UIEventUtilities.Factory.createEventMouseDown(t, d)))) {
-			// TODO select
-			// TODO drag or drop perhaps
-			// TODO scroll/pan
-		}
-		return true;
-	}
+	public void renderBackground() { UIBackgrounds.renderDefaultBackgroundAndNotify(getMinecraft(), width, height); }
 
 	@Override
 	@Deprecated
@@ -269,30 +258,19 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	public boolean mouseReleased(double mouseX, double mouseY, int button) {
-		// TODO test if release works when multiple buttons are clicked
-		Point2D cp = ImmutablePoint2D.of(mouseX, mouseY);
-		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
-		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(cp);
-		removeEventMouse(this, button).ifPresent(e -> {
-			if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e, cp)))
-				; // TODO context menu
-			if (t.equals(e.getTarget())) {
-				if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClick(t, d)))
-					setFocus(t);
-				setLastMouseClickData(d, t);
-			}
-		});
-		return true;
-	}
+	public void renderBackground(int blitOffset) { UIBackgrounds.renderDefaultBackgroundAndNotify(getMinecraft(), width, height, blitOffset); }
 
 	@Override
 	@Deprecated
-	public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-		Point2D cp = ImmutablePoint2D.of(mouseX, mouseY);
-		IUIEventTarget target = getInfrastructure().getView().getTargetAtPoint(cp);
-		UIEventUtilities.dispatchEvent(
-				UIEventUtilities.Factory.createEventWheel(false, target, new UIDataMouseButtonClick(cp), target, delta)); // COMMENT nothing to be scrolled
+	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+		Point2D cp = new Point2D.Double(mouseX, mouseY);
+		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
+		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone());
+		if (UIEventUtilities.dispatchEvent(addEventMouse(this, UIEventUtilities.Factory.createEventMouseDown(t, d)))) {
+			// TODO select
+			// TODO drag or drop perhaps
+			// TODO scroll/pan
+		}
 		return true;
 	}
 
@@ -328,11 +306,32 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	public void renderBackground() { UIBackgrounds.renderBackgroundAndNotify(getMinecraft(), width, height); }
+	public boolean mouseReleased(double mouseX, double mouseY, int button) {
+		// TODO test if release works when multiple buttons are clicked
+		Point2D cp = new Point2D.Double(mouseX, mouseY);
+		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
+		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone());
+		removeEventMouse(this, button).ifPresent(e -> {
+			if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e, cp)))
+				; // TODO context menu
+			if (t.equals(e.getTarget())) {
+				if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClick(t, d)))
+					setFocus(t);
+				setLastMouseClickData(d, t);
+			}
+		});
+		return true;
+	}
 
 	@Override
 	@Deprecated
-	public void renderBackground(int blitOffset) { UIBackgrounds.renderBackgroundAndNotify(getMinecraft(), width, height, blitOffset); }
+	public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+		Point2D cp = new Point2D.Double(mouseX, mouseY);
+		IUIEventTarget target = getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone());
+		UIEventUtilities.dispatchEvent(
+				UIEventUtilities.Factory.createEventWheel(false, target, new UIDataMouseButtonClick(cp), target, delta)); // COMMENT nothing to be scrolled
+		return true;
+	}
 
 	@Override
 	@Deprecated
@@ -379,11 +378,11 @@ public class UIScreenAdapter
 	@Override
 	@Deprecated
 	public void mouseMoved(double mouseX, double mouseY) {
-		Point2D cp = ImmutablePoint2D.of(mouseX, mouseY);
+		Point2D cp = new Point2D.Double(mouseX, mouseY);
 		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp);
 		UIEventUtilities.dispatchEvent(
-				UIEventUtilities.Factory.createEventMouseMove(getInfrastructure().getView().getTargetAtPoint(cp), d));
-		setTargetBeingHoveredByMouse(getInfrastructure().getView().getTargetAtPoint(cp), d);
+				UIEventUtilities.Factory.createEventMouseMove(getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone()), d));
+		setTargetBeingHoveredByMouse(getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone()), d);
 	}
 
 	@SuppressWarnings("unused")
@@ -536,32 +535,36 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	protected void hLine(int x1, int x2, int y, int color) { DrawingUtilities.hLine(AffineTransformUtilities.getIdentity(), x1, x2, y, color, getBlitOffset()); }
+	protected void hLine(int x1, int x2, int y, int color) { MinecraftDrawingUtilities.hLine(AffineTransformUtilities.getIdentity(), x1, x2, y, color, getBlitOffset()); }
 
 	@Override
 	@Deprecated
-	protected void vLine(int x, int y1, int y2, int color) { DrawingUtilities.vLine(AffineTransformUtilities.getIdentity(), x, y1, y2, color, getBlitOffset()); }
+	protected void vLine(int x, int y1, int y2, int color) { MinecraftDrawingUtilities.vLine(AffineTransformUtilities.getIdentity(), x, y1, y2, color, getBlitOffset()); }
 
 	@Override
 	@Deprecated
-	protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) { DrawingUtilities.fillGradient(AffineTransformUtilities.getIdentity(), ImmutableRectangle2D.fromDiagonal(ImmutablePoint2D.of(x1, y1), ImmutablePoint2D.of(x2, y2)), colorTop, colorBottom, getBlitOffset()); }
+	protected void fillGradient(int x1, int y1, int x2, int y2, int colorTop, int colorBottom) {
+		Rectangle2D shape = new Rectangle2D.Double();
+		shape.setFrameFromDiagonal(x1, y1, x2, y2);
+		MinecraftDrawingUtilities.fillGradient(AffineTransformUtilities.getIdentity(), shape, colorTop, colorBottom, getBlitOffset());
+	}
 
 	@Override
 	@Deprecated
-	public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawCenteredString(AffineTransformUtilities.getIdentity(), font, string, ImmutablePoint2D.of(x, y), color); }
+	public void drawCenteredString(FontRenderer font, String string, int x, int y, int color) { MinecraftDrawingUtilities.drawCenteredString(AffineTransformUtilities.getIdentity(), font, string, new Point2D.Double(x, y), color); }
 
 	@Override
 	@Deprecated
-	public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawRightAlignedString(AffineTransformUtilities.getIdentity(), font, string, ImmutablePoint2D.of(x, y), color); }
+	public void drawRightAlignedString(FontRenderer font, String string, int x, int y, int color) { MinecraftDrawingUtilities.drawRightAlignedString(AffineTransformUtilities.getIdentity(), font, string, new Point2D.Double(x, y), color); }
 
 	@Override
 	@Deprecated
-	public void drawString(FontRenderer font, String string, int x, int y, int color) { DrawingUtilities.drawString(AffineTransformUtilities.getIdentity(), font, string, ImmutablePoint2D.of(x, y), color); }
+	public void drawString(FontRenderer font, String string, int x, int y, int color) { MinecraftDrawingUtilities.drawString(AffineTransformUtilities.getIdentity(), font, string, new Point2D.Double(x, y), color); }
 
 	@SuppressWarnings("MagicNumber")
 	@Override
 	@Deprecated
-	public void blit(int x, int y, int u, int v, int w, int h) { DrawingUtilities.blit(AffineTransformUtilities.getIdentity(), ImmutableRectangle2D.of(x, y, w, h), ImmutablePoint2D.of(u, v), new DoubleDimension2D(256, 256), getBlitOffset()); }
+	public void blit(int x, int y, int u, int v, int w, int h) { MinecraftDrawingUtilities.blit(AffineTransformUtilities.getIdentity(), new Rectangle2D.Double(x, y, w, h), new Point2D.Double(u, v), new DoubleDimension2D(256, 256), getBlitOffset()); }
 
 	@OnlyIn(Dist.CLIENT)
 	public static class UIExtensionContainer

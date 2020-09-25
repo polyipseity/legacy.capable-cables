@@ -2,14 +2,13 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIDataMouseButtonClick;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
 import jdk.nashorn.internal.ir.annotations.Immutable;
 
 import java.awt.geom.Point2D;
 
 @Immutable
 public final class UIDataMouseButtonClick implements IUIDataMouseButtonClick {
-	private final ImmutablePoint2D cursorPosition;
+	private final Point2D cursorPosition;
 	private final int button;
 	private final long timestamp;
 
@@ -18,15 +17,15 @@ public final class UIDataMouseButtonClick implements IUIDataMouseButtonClick {
 	public UIDataMouseButtonClick(Point2D cursorPosition, int button) { this(cursorPosition, button, System.currentTimeMillis()); }
 
 	protected UIDataMouseButtonClick(Point2D cursorPosition, int button, long timestamp) {
-		this.cursorPosition = ImmutablePoint2D.of(cursorPosition);
+		this.cursorPosition = (Point2D) cursorPosition.clone();
 		this.button = button;
 		this.timestamp = timestamp;
 	}
 
 	@Override
-	public Point2D getCursorPositionView() { return getCursorPosition(); }
+	public Point2D getCursorPositionView() { return (Point2D) getCursorPosition().clone(); }
 
-	protected ImmutablePoint2D getCursorPosition() { return cursorPosition; }
+	protected Point2D getCursorPosition() { return cursorPosition; }
 
 	@Override
 	public int getButton() { return button; }

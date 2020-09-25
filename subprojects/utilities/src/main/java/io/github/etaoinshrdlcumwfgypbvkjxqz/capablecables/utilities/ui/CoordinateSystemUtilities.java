@@ -1,21 +1,18 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableRectangle2D;
-
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
+import java.awt.geom.RectangularShape;
 
 public class CoordinateSystemUtilities {
 	;
 
-	public static ImmutableRectangle2D convertRectangle(Rectangle2D rectangle, ICoordinateSystem from, ICoordinateSystem to) {
-		return ImmutableRectangle2D.fromDiagonal(
-				convertPoint(ImmutablePoint2D.of(rectangle.getX(), rectangle.getY()), from, to),
-				convertPoint(ImmutablePoint2D.of(rectangle.getMaxX(), rectangle.getMaxY()), from, to));
+	public static <R extends RectangularShape> R convertRectangularShape(RectangularShape source, R destination, ICoordinateSystem from, ICoordinateSystem to) {
+		Point2D[] points = UIObjectUtilities.getDiagonalsFromRectangular(source);
+		destination.setFrameFromDiagonal(convertPoint(points[0], points[0], from, to), convertPoint(points[1], points[1], from, to));
+		return destination;
 	}
 
-	public static ImmutablePoint2D convertPoint(Point2D point, ICoordinateSystem from, ICoordinateSystem to) {
-		return ImmutablePoint2D.of(to.specialize(from.generalize(point)));
+	public static <R extends Point2D> R convertPoint(Point2D source, R destination, ICoordinateSystem from, ICoordinateSystem to) {
+		return to.specialize(from.generalize(source, destination), destination);
 	}
 }

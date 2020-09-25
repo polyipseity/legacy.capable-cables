@@ -32,11 +32,11 @@ public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent
 						.flatMap(context -> {
 							Optional<Long> ret = Optional.empty();
 							try (IUIComponentContext ctx = context) {
-								view.getPathResolver().resolvePath(ctx, cursorPosition, true);
+								view.getPathResolver().resolvePath(ctx, (Point2D) cursorPosition.clone(), true);
 								while (!ctx.getPath().isEmpty()) {
 									IUIComponent component = ctx.getPath().getPathEnd().orElseThrow(AssertionError::new);
 									if ((ret = CastUtilities.castChecked(IUIComponentCursorHandleProvider.class, component)
-											.flatMap(ec -> ec.getCursorHandle(ctx, cursorPosition).map(Function.identity())))
+											.flatMap(ec -> ec.getCursorHandle(ctx).map(Function.identity())))
 											.isPresent())
 										break;
 									ctx.pop();

@@ -1,7 +1,5 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutablePoint2D;
-
 import java.awt.geom.Point2D;
 
 public enum CommonUICoordinateSystem
@@ -10,8 +8,14 @@ public enum CommonUICoordinateSystem
 	;
 
 	@Override
-	public Point2D specialize(Point2D point) { return ImmutablePoint2D.of(point); }
+	public <R extends Point2D> R specialize(Point2D source, R destination) {
+		destination.setLocation(source);
+		return destination;
+	}
 
 	@Override
-	public Point2D generalize(Point2D point) { return ImmutablePoint2D.of(point); }
+	public <R extends Point2D> R generalize(Point2D source, R destination) {
+		destination.setLocation(source);
+		return destination;
+	}
 }

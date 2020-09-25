@@ -52,7 +52,7 @@ public class UIExtensionBackgroundMinecraft<E extends IUIComponentManager<?>>
 		public Default(Class<E> containerClass) { super(containerClass); }
 
 		@Override
-		protected void renderBackground(Screen screen, Point2D mouse, double partialTicks) { UIBackgrounds.renderBackgroundAndNotify(screen.getMinecraft(), screen.width, screen.height, 0); }
+		protected void renderBackground(Screen screen, Point2D mouse, double partialTicks) { UIBackgrounds.renderDefaultBackgroundAndNotify(screen.getMinecraft(), screen.width, screen.height, 0); }
 	}
 
 	@Override

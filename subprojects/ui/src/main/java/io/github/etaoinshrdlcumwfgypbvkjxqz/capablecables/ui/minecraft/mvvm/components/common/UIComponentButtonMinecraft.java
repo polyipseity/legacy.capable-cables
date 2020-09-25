@@ -13,7 +13,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.components.rendering.UIComponentRendererMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.common.UIComponentButton;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.rendering.UIRendererContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.DrawingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
@@ -111,19 +111,19 @@ public class UIComponentButtonMinecraft
 				Shape transformed = context.getTransformStack().element().createTransformedShape(container.getShapeDescriptor().getShapeOutput());
 				if (container.getButtonStates().contains(IButtonState.PRESSING)) {
 					getColorPressed().getValue().ifPresent(c ->
-							DrawingUtilities.drawShape(transformed, true, c, 0));
+							MinecraftDrawingUtilities.drawShape(transformed, true, c, 0));
 					getColorPressedBorder().getValue().ifPresent(c ->
-							DrawingUtilities.drawShape(transformed, false, c, 0));
+							MinecraftDrawingUtilities.drawShape(transformed, false, c, 0));
 				} else if (container.getButtonStates().contains(IButtonState.HOVERING)) {
 					getColorHovering().getValue().ifPresent(c ->
-							DrawingUtilities.drawShape(transformed, true, c, 0));
+							MinecraftDrawingUtilities.drawShape(transformed, true, c, 0));
 					getColorHoveringBorder().getValue().ifPresent(c ->
-							DrawingUtilities.drawShape(transformed, false, c, 0));
+							MinecraftDrawingUtilities.drawShape(transformed, false, c, 0));
 				} else {
 					getColorBase().getValue().ifPresent(c ->
-							DrawingUtilities.drawShape(transformed, true, c, 0));
+							MinecraftDrawingUtilities.drawShape(transformed, true, c, 0));
 					getColorBaseBorder().getValue().ifPresent(c ->
-							DrawingUtilities.drawShape(transformed, false, c, 0));
+							MinecraftDrawingUtilities.drawShape(transformed, false, c, 0));
 				}
 			}
 		}
