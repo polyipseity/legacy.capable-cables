@@ -7,8 +7,6 @@ import static java.io.File.separator
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call([])
 
-apply plugin: 'com.github.johnrengelman.shadow'
-
 def jar = tasks.named 'jar'
 def javadoc = tasks.named 'javadoc'
 
@@ -31,29 +29,31 @@ tasks.register('javadocJar', Jar) {
 	classifier 'javadoc'
 }
 
-stringToStringList(artifactTaskNames).each { String taskName ->
-	def task = tasks.named taskName
+afterEvaluate {
+	stringToStringList(artifactTaskNames).each { String taskName ->
+		def task = tasks.named taskName
 
-	task.configure {
-		manifest {
-			attributes([
-					'Specification-Title'     : modID,
-					'Specification-Vendor'    : rootProject.group,
-					'Specification-Version'   : version,
-					'Implementation-Title'    : project.name,
-					'Implementation-Vendor'   : project.group,
-					'Implementation-Version'  : version,
-			])
-		}
-
-		doFirst {
+		task.configure {
 			manifest {
 				attributes([
-						'Implementation-Timestamp': new Date().format('yyyy-MM-dd\'T\'HH:mm:ssZ'), // COMMENT this should not affect whether the task is up-to-date
+						'Specification-Title'     : modID,
+						'Specification-Vendor'    : rootProject.group,
+						'Specification-Version'   : version,
+						'Implementation-Title'    : project.name,
+						'Implementation-Vendor'   : project.group,
+						'Implementation-Version'  : version,
 				])
 			}
-		}
-	}
 
-	artifacts.archives task
+			doFirst {
+				manifest {
+					attributes([
+							'Implementation-Timestamp': new Date().format('yyyy-MM-dd\'T\'HH:mm:ssZ'), // COMMENT this should not affect whether the task is up-to-date
+					])
+				}
+			}
+		}
+
+		artifacts.archives task
+	}
 }

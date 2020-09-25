@@ -21,7 +21,6 @@ dependencies {
 
 	// COMMENT runtime
 	implementation "org.glassfish.jaxb:jaxb-runtime:$version"
-	shade "org.glassfish.jaxb:jaxb-runtime:$version"
 	// COMMENT compile
 	// COMMENT schema to Java
 	jaxb "org.glassfish.jaxb:jaxb-xjc:$version"
