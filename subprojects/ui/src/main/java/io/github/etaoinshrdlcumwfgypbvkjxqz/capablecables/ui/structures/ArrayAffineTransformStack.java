@@ -3,40 +3,29 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IAffineTransformStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CleanerUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import sun.misc.Cleaner;
 
 import java.awt.geom.AffineTransform;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.function.Function;
 
 public class ArrayAffineTransformStack
 		implements IAffineTransformStack {
-	private static final ImmutableList<Function<? super ArrayAffineTransformStack, ?>> OBJECT_VARIABLES = ObjectUtilities.extendsObjectVariables(StaticHolder.getObjectVariables(),
-			ImmutableList.of(ArrayAffineTransformStack::getCleanerRef));
-	private static final ImmutableMap<String, Function<? super ArrayAffineTransformStack, ?>> OBJECT_VARIABLES_MAP = ObjectUtilities.extendsObjectVariablesMap(getObjectVariables(),
-			StaticHolder.getObjectVariablesMap(),
-			ImmutableList.of("cleanerRef"));
 	private final Deque<AffineTransform> data;
-	private final Object cleanerRef = new Object();
 
 	public ArrayAffineTransformStack() { this(CapacityUtilities.INITIAL_CAPACITY_MEDIUM); }
 
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public ArrayAffineTransformStack(int initialCapacity) {
 		this.data = new ArrayDeque<>(initialCapacity);
 		this.data.push(new AffineTransform());
-		Cleaner.create(getCleanerRef(), new LeakNotifier(this.data, UIConfiguration.getInstance().getLogger()));
+		Cleaner.create(CleanerUtilities.getCleanerReferent(this), new LeakNotifier(this.data, UIConfiguration.getInstance().getLogger()));
 	}
 
 	@Override
-	public int hashCode() { return ObjectUtilities.hashCode(this, null, getObjectVariables()); }
-
-	public static ImmutableList<Function<? super ArrayAffineTransformStack, ?>> getObjectVariables() { return OBJECT_VARIABLES; }
-
-	protected final Object getCleanerRef() { return cleanerRef; }
+	public int hashCode() { return ObjectUtilities.hashCode(this, null, StaticHolder.getObjectVariables()); }
 
 	@Override
 	public ArrayAffineTransformStack copy() {
@@ -55,10 +44,8 @@ public class ArrayAffineTransformStack
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
-	public boolean equals(Object obj) { return ObjectUtilities.equals(this, obj, false, null, getObjectVariables()); }
+	public boolean equals(Object obj) { return ObjectUtilities.equals(this, obj, false, null, StaticHolder.getObjectVariables()); }
 
 	@Override
-	public String toString() { return ObjectUtilities.toString(this, super::toString, getObjectVariablesMap()); }
-
-	public static ImmutableMap<String, Function<? super ArrayAffineTransformStack, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
+	public String toString() { return ObjectUtilities.toString(this, super::toString, StaticHolder.getObjectVariablesMap()); }
 }

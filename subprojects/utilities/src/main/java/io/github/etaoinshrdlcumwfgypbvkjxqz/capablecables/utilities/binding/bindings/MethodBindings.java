@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CleanerUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.NoSuchBindingTransformerException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.methods.IBindingMethod;
@@ -31,17 +32,15 @@ public class MethodBindings
 			MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_TINY).makeMap();
 	protected final Set<IBindingMethodDestination<?>> destinations =
 			Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_TINY).makeMap());
-	protected final Object cleanerRef = new Object();
 
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public MethodBindings(INamespacePrefixedString bindingKey,
 	                      Supplier<? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>>> transformersSupplier) {
 		super(bindingKey, transformersSupplier);
 		@SuppressWarnings("UnnecessaryLocalVariable") Map<IBindingMethodSource<?>, Disposable> sourcesRef = sources;
-		Cleaner.create(getCleanerRef(), () ->
+		Cleaner.create(CleanerUtilities.getCleanerReferent(this), () ->
 				sourcesRef.values().stream().unordered().forEach(Disposable::dispose));
 	}
-
-	protected final Object getCleanerRef() { return cleanerRef; }
 
 	@Override
 	@SuppressWarnings({"SuspiciousMethodCalls", "UnstableApiUsage"})

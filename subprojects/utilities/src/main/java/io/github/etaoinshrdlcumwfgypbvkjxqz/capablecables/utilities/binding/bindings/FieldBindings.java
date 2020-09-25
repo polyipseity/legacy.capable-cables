@@ -2,10 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.bin
 
 import com.google.common.cache.Cache;
 import com.google.common.collect.Streams;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.NoSuchBindingTransformerException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
@@ -30,17 +27,15 @@ public class FieldBindings
 	protected final Map<IBindingField<?>, Disposable> fields =
 			MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_TINY).makeMap();
 	protected final AtomicBoolean isSource = new AtomicBoolean(true);
-	protected final Object cleanerRef = new Object();
 
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public FieldBindings(INamespacePrefixedString bindingKey,
 	                     Supplier<? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>>> transformersSupplier) {
 		super(bindingKey, transformersSupplier);
 		@SuppressWarnings("UnnecessaryLocalVariable") Map<IBindingField<?>, Disposable> fieldsRef = fields;
-		Cleaner.create(getCleanerRef(), () ->
+		Cleaner.create(CleanerUtilities.getCleanerReferent(this), () ->
 				fieldsRef.values().stream().unordered().forEach(Disposable::dispose));
 	}
-
-	protected final Object getCleanerRef() { return cleanerRef; }
 
 	@Override
 	@SuppressWarnings("UnstableApiUsage")
