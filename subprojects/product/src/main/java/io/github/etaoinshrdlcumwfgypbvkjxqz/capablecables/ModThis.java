@@ -31,7 +31,7 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registra
 @Mod(ModConstants.MOD_ID)
 public final class ModThis {
 	@Nullable
-	private static ModThis instance = null;
+	private static volatile ModThis instance = null;
 	private static final ResourceBundle RESOURCE_BUNDLE;
 
 	static {
@@ -46,7 +46,6 @@ public final class ModThis {
 		RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(ModConfiguration.getInstance());
 	}
 
-	private final EventHandler eventHandler = EventHandler.INSTANCE;
 	private final IProxy proxy = DistExecutor.unsafeRunForDist(
 			() -> DistLambdaHolder.Client::getProxyClient,
 			() -> DistLambdaHolder.Server::getProxyServer);
@@ -55,15 +54,14 @@ public final class ModThis {
 	public ModThis() {
 		// COMMENT entry point
 		IEventBus eventBusMod = AssertionUtilities.assertNonnull(Bus.MOD.bus().get());
-		eventBusMod.register(getEventHandler());
+		eventBusMod.register(this);
 		BLOCKS.register(eventBusMod);
 		ITEMS.register(eventBusMod);
 		TILE_ENTITIES.register(eventBusMod);
 		CONTAINERS.register(eventBusMod);
-		instance = this;
-	}
 
-	private EventHandler getEventHandler() { return eventHandler; }
+		setInstance(this); // COMMENT would really love to have a way to specify an alternative way to provide the instance
+	}
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
@@ -74,6 +72,18 @@ public final class ModThis {
 	public IProxy getProxy() { return proxy; }
 
 	public static ModThis getInstance() { return AssertionUtilities.assertNonnull(instance); }
+
+	private static void setInstance(@Nullable ModThis instance) { ModThis.instance = instance; }
+
+	@SubscribeEvent
+	protected void onModLifecycleEvent(ModLifecycleEvent event) {
+		if (!getProxy().onModLifecycle(event))
+			ModConfiguration.getInstance().getLogger()
+					.atInfo()
+					.addMarker(ModMarkers.getInstance().getMarkerModLifecycle())
+					.addKeyValue("event", event)
+					.log(() -> getResourceBundle().getString("event.lifecycle.unhandled"));
+	}
 
 	private enum DistLambdaHolder {
 		;
@@ -88,20 +98,6 @@ public final class ModThis {
 			;
 
 			private static IProxy getProxyServer() { return ProxyServer.getInstance(); }
-		}
-	}
-
-	private enum EventHandler {
-		INSTANCE;
-
-		@SubscribeEvent
-		protected void onModLifecycleEvent(ModLifecycleEvent event) {
-			if (!getInstance().getProxy().onModLifecycle(event))
-				ModConfiguration.getInstance().getLogger()
-						.atInfo()
-						.addMarker(ModMarkers.getInstance().getMarkerModLifecycle())
-						.addKeyValue("event", event)
-						.log(() -> getResourceBundle().getString("event.lifecycle.unhandled"));
 		}
 	}
 }
