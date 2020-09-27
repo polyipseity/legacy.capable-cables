@@ -1,10 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIBusEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIBusHookEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EnumHookStage;
 
-public abstract class UIComponentBusEvent extends UIBusEvent {
+public abstract class UIComponentBusEvent extends UIBusHookEvent {
 	protected final IUIComponent component;
 
 	protected UIComponentBusEvent(EnumHookStage stage, IUIComponent component) {

@@ -1,6 +1,7 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
@@ -20,4 +21,6 @@ public class JAXBContextRegisterEvent
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Set<Class<?>> getClassesToBeBound() { return classesToBeBound; }
+
+	public ImmutableSet<Class<?>> getClassesToBeBoundView() { return ImmutableSet.copyOf(getClassesToBeBound()); }
 }

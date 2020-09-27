@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.JAXBContextRegisterEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.UIJAXBObjectFactories;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
@@ -43,7 +44,7 @@ public enum DefaultUIComponentSchemaHolder {
 			JAXBContextRegisterEvent registerEvent = new JAXBContextRegisterEvent();
 			registerEvent.addClassesToBeBound(UIJAXBObjectFactories.getDefaultComponentObjectFactory().getClass());
 			UIEventBusEntryPoint.getEventBus().onNext(registerEvent);
-			CONTEXT = JAXBContext.newInstance(registerEvent.getClassesToBeBound().toArray(new Class<?>[0]));
+			CONTEXT = JAXBContext.newInstance(registerEvent.getClassesToBeBoundView().toArray(new Class<?>[0]));
 		} catch (JAXBException e) {
 			throw ThrowableUtilities.propagate(e);
 		}
