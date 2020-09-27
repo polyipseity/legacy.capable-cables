@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
-public abstract class Proxy implements IProxy {
+public abstract class Proxy<T extends ModLifecycleEvent> implements IProxy<T> {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(ModConfiguration.getInstance());
 
 	@Override

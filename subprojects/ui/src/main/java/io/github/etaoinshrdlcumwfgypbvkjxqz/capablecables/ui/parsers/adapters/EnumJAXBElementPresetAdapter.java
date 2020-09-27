@@ -17,17 +17,17 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public enum EnumJAXBElementPresetAdapter
 		implements Map.Entry<Class<?>, Registry.RegistryObject<IDuplexFunction<JAXBElement<?>, ?>>> {
-	BOOLEAN(Boolean.class, new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBObjectFactories.COMPONENTS::createBoolean)),
-	BYTE(Byte.class, new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBObjectFactories.COMPONENTS::createByte)),
-	SHORT(Short.class, new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBObjectFactories.COMPONENTS::createShort)),
-	INT(Integer.class, new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBObjectFactories.COMPONENTS::createInt)),
-	LONG(Long.class, new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBObjectFactories.COMPONENTS::createLong)),
-	FLOAT(Float.class, new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBObjectFactories.COMPONENTS::createFloat)),
-	DOUBLE(Double.class, new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBObjectFactories.COMPONENTS::createDouble)),
-	STRING(String.class, new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBObjectFactories.COMPONENTS::createString)),
+	BOOLEAN(Boolean.class, new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBObjectFactories.getDefaultComponentObjectFactory()::createBoolean)),
+	BYTE(Byte.class, new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBObjectFactories.getDefaultComponentObjectFactory()::createByte)),
+	SHORT(Short.class, new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBObjectFactories.getDefaultComponentObjectFactory()::createShort)),
+	INT(Integer.class, new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBObjectFactories.getDefaultComponentObjectFactory()::createInt)),
+	LONG(Long.class, new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBObjectFactories.getDefaultComponentObjectFactory()::createLong)),
+	FLOAT(Float.class, new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBObjectFactories.getDefaultComponentObjectFactory()::createFloat)),
+	DOUBLE(Double.class, new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBObjectFactories.getDefaultComponentObjectFactory()::createDouble)),
+	STRING(String.class, new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBObjectFactories.getDefaultComponentObjectFactory()::createString)),
 	COLOR(io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Color.class, new IDuplexFunction.Functional<>(
 			left -> JAXBUtilities.getActualValueOptional(left).map(io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Color::toJava).orElse(null),
-			(Color right) -> UIJAXBObjectFactories.COMPONENTS.createColor(io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Color.fromJava(right)))),
+			(Color right) -> UIJAXBObjectFactories.getDefaultComponentObjectFactory().createColor(io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Color.fromJava(right)))),
 	;
 
 	protected final Class<?> key;

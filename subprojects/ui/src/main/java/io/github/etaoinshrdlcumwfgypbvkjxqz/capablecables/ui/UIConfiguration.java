@@ -2,11 +2,9 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui;
 
 import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.cursors.EnumGLFWCursor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.adapters.EnumJAXBElementPresetAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.adapters.EnumJAXBObjectPresetAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EventBusForge;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftClientUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.IThrowableHandler;
@@ -36,8 +34,6 @@ public final class UIConfiguration
 		// COMMENT JAXB adapters
 		EnumJAXBElementPresetAdapter.initializeClass();
 		EnumJAXBObjectPresetAdapter.initializeClass();
-		// COMMENT event bus
-		UIEventBusEntryPoint.setEventBus(EventBusForge.FORGE_EVENT_BUS);
 		// COMMENT cursors
 		EnumGLFWCursor.initializeClass();
 	}

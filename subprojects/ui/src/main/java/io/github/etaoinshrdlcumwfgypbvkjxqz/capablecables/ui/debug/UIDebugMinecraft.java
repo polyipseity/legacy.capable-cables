@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug;
 
 import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Ui;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIFacade;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
@@ -22,6 +23,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.models.UIModel
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.common.UIComponentButton;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.UIExtensionCursorHandleProviderComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.DefaultUIComponentParser;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.DefaultUIComponentSchemaHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
@@ -34,14 +36,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.fiel
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.fields.ObservableField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.methods.BindingMethodDestination;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftClientUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTextComponentUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -78,7 +78,6 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
@@ -120,7 +119,7 @@ public enum UIDebugMinecraft {
 
 		@NonNls
 		public static final String COMPONENT_TEST_XML_PATH = "components_test.xml";
-		private static final IUIResourceParser<IUIViewComponentMinecraft<?, ?>, Function<? super Unmarshaller, ?>> PARSER =
+		private static final IUIResourceParser<IUIViewComponentMinecraft<?, ?>, Ui> PARSER =
 				DefaultMinecraftUIComponentParser.makeParserMinecraft(
 						DefaultUIComponentParser.makeParserStandard(
 								new DefaultMinecraftUIComponentParser<>(
@@ -128,17 +127,15 @@ public enum UIDebugMinecraft {
 								)));
 
 		static {
+			InputStream is = AssertionUtilities.assertNonnull(DebugUI.class.getResourceAsStream(COMPONENT_TEST_XML_PATH));
 			try {
-				PARSER.parse(IThrowingFunction.execute(u -> {
-					InputStream is = AssertionUtilities.assertNonnull(DebugUI.class.getResourceAsStream(COMPONENT_TEST_XML_PATH));
-					try {
-						return u.unmarshal(is);
-					} finally {
-						ThrowableUtilities.runQuietly(is::close, IOException.class, UIConfiguration.getInstance().getThrowableHandler());
-					}
-				}));
-			} catch (UIParserCheckedException | JAXBException e) {
-				throw ThrowableUtilities.propagate(e);
+				try {
+					PARSER.parse((Ui) DefaultUIComponentSchemaHolder.getContext().createUnmarshaller().unmarshal(is));
+				} catch (UIParserCheckedException | JAXBException e) {
+					throw ThrowableUtilities.propagate(e);
+				}
+			} finally {
+				ThrowableUtilities.runQuietly(is::close, IOException.class, UIConfiguration.getInstance().getThrowableHandler());
 			}
 			try {
 				PARSER.construct(); // COMMENT early check

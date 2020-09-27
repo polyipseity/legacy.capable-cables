@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.DEDICATED_SERVER)
-public final class ProxyServer extends Proxy implements IProxyServer {
+public final class ProxyServer extends Proxy<FMLDedicatedServerSetupEvent> implements IProxyServer {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(ModConfiguration.getInstance());
 	private static final Supplier<ProxyServer> INSTANCE = Suppliers.memoize(ProxyServer::new);
 
@@ -23,7 +23,7 @@ public final class ProxyServer extends Proxy implements IProxyServer {
 		if (super.onModLifecycle(event))
 			return true;
 		else if (event instanceof FMLDedicatedServerSetupEvent)
-			return processEvent(getResourceBundle().getString("event.server_setup.name"), event, this::onSetupSided);
+			return processEvent(getResourceBundle().getString("event.server_setup.name"), (FMLDedicatedServerSetupEvent) event, this::onSetupSided);
 		return false;
 	}
 

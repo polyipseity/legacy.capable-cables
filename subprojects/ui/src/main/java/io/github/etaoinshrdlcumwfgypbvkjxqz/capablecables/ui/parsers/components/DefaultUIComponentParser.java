@@ -39,8 +39,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.I
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
 
 import javax.annotation.Nullable;
 import java.awt.geom.AffineTransform;
@@ -48,12 +46,11 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 
 public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 		extends IHasGenericClass.Impl<T>
-		implements IUIComponentParser<T, Function<? super Unmarshaller, ?>> {
+		implements IUIComponentParser<T, Ui> {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	private final ConcurrentMap<String, Class<?>> aliases = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
 	private final LoadingCache<EnumHandlerType, ConcurrentMap<Class<?>, IConsumer3<? super IParserContext, ?, ?, ?>>> handlers =
@@ -80,21 +77,13 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public void parse(Function<? super Unmarshaller, ?> resource)
+	public void parse(Ui resource)
 			throws UIParserCheckedException, UIParserUncheckedException {
-		Unmarshaller um;
-		try {
-			um = DefaultSchemaHolder.getContext().createUnmarshaller();
-		} catch (JAXBException e) {
-			throw ThrowableUtilities.propagate(e, UIParserCheckedException::new, UIParserUncheckedException::new);
-		}
-		// COMMENT do NOT set a schema
-		Ui root = (Ui) resource.apply(um);
 		reset();
 
 		try {
 			getAliases().putAll(
-					root.getUsing().stream().unordered()
+					resource.getUsing().stream().unordered()
 							.map(IThrowingFunction.execute(u -> Maps.immutableEntry(u.getAlias(), Class.forName(u.getTarget()))))
 							.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
 		} catch (ClassNotFoundException e) {
@@ -102,7 +91,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 		}
 
 		{
-			Class<?> viewClass = AssertionUtilities.assertNonnull(getAliases().get(root.getView().getClazz()));
+			Class<?> viewClass = AssertionUtilities.assertNonnull(getAliases().get(resource.getView().getClazz()));
 			if (!getGenericClass().isAssignableFrom(viewClass))
 				throw new IllegalArgumentException(
 						new LogMessageBuilder()
@@ -113,7 +102,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 				);
 		}
 
-		setRoot(root);
+		setRoot(resource);
 	}
 
 	@Override
@@ -514,6 +503,8 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 				default:
 					throw new AssertionError();
 			}
+			((IExtensionContainer<?>) container).addExtension(CastUtilities.castUnchecked(ret)); // COMMENT addExtension should check
+			// COMMENT add other stuff after adding the extension
 			Iterables.concat(
 					object.getRenderer()
 							.map(ImmutableSet::of)
@@ -527,7 +518,6 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 									CastUtilities.castUnchecked(ret), // COMMENT may throw
 									CastUtilities.castUnchecked(any) // COMMENT should not throw
 							)))));
-			((IExtensionContainer<?>) container).addExtension(CastUtilities.castUnchecked(ret)); // COMMENT addExtension should check
 		}
 	}
 }

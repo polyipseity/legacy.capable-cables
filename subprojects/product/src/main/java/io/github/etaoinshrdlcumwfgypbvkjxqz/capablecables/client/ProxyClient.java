@@ -15,6 +15,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.Th
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
 
@@ -22,7 +23,7 @@ import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
-public final class ProxyClient extends Proxy implements IProxyClient {
+public final class ProxyClient extends Proxy<FMLClientSetupEvent> implements IProxyClient {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(ModConfiguration.getInstance());
 	private static final Supplier<ProxyClient> INSTANCE = Suppliers.memoize(ProxyClient::new);
 
@@ -35,16 +36,22 @@ public final class ProxyClient extends Proxy implements IProxyClient {
 		if (super.onModLifecycle(event))
 			return true;
 		else if (event instanceof FMLClientSetupEvent)
-			return processEvent(getResourceBundle().getString("event.client_setup.name"), event, this::onSetupSided);
+			return processEvent(getResourceBundle().getString("event.client_setup.name"), (FMLClientSetupEvent) event, this::onSetupSided);
 		return false;
 	}
 
 	@Override
-	public void onSetupClient(FMLClientSetupEvent event) {
+	public void onSetup(FMLCommonSetupEvent event) {
+		// COMMENT sneak the configuring in effectively-client common setup
+		// COMMENT there may be a better solution though...  suggestions welcome
 		ConfigurationTemplate.configureSafe(UIConfiguration.getInstance(),
 				() -> new UIConfiguration.ConfigurationData(UIConfiguration.getBootstrapLogger(),
 						new LoggingThrowableHandler<>(new ThreadLocalThrowableHandler<>(), UIConfiguration.getBootstrapLogger()),
 						MinecraftLocaleUtilities::getCurrentLocale));
+	}
+
+	@Override
+	public void onSetupSided(FMLClientSetupEvent event) {
 		if (UIConstants.BUILD_TYPE.isDebug())
 			UIDebugMinecraft.registerUIFactory();
 	}

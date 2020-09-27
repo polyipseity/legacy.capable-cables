@@ -5,5 +5,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.co
 public enum UIJAXBObjectFactories {
 	;
 
-	public static final ObjectFactory COMPONENTS = new ObjectFactory();
+	private static final ObjectFactory DEFAULT_COMPONENT_OBJECT_FACTORY = new ObjectFactory();
+
+	public static ObjectFactory getDefaultComponentObjectFactory() { return DEFAULT_COMPONENT_OBJECT_FACTORY; }
 }

@@ -5,6 +5,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.Th
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.subjects.Subject;
+import net.minecraftforge.eventbus.api.BusBuilder;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -16,11 +17,16 @@ import java.util.function.Consumer;
 
 public class EventBusForge
 		extends Subject<Event> {
-	public static final Subject<Event> FORGE_EVENT_BUS = new EventBusForge(AssertionUtilities.assertNonnull(Bus.FORGE.bus().get()));
+	private static final Subject<Event> FORGE_EVENT_BUS = new EventBusForge(AssertionUtilities.assertNonnull(Bus.FORGE.bus().get()));
 	private static final ThreadLocal<Subject<Event>> MOD_EVENT_BUS = ThreadLocal.withInitial(() ->
 			new EventBusForge(AssertionUtilities.assertNonnull(Bus.MOD.bus().get())));
+	private static final Subject<Event> UI_EVENT_BUS = new EventBusForge(new BusBuilder().build());
 
 	public static Subject<Event> getModEventBus() { return AssertionUtilities.assertNonnull(MOD_EVENT_BUS.get()); }
+
+	public static Subject<Event> getUIEventBus() { return UI_EVENT_BUS; }
+
+	public static Subject<Event> getForgeEventBus() { return FORGE_EVENT_BUS; }
 
 	private final IEventBus delegate;
 
@@ -43,9 +49,9 @@ public class EventBusForge
 	protected void subscribeActual(@Nonnull Observer<? super Event> observer) {
 		@SuppressWarnings("unchecked") Observer<? extends Event> oa =
 				(Observer<? extends Event>) observer; // COMMENT consider parameter 'observer' 'Observer<? extends Event>' instead, this works due to type erasure
-		EventBusBridgeMethodFixConsumer<? extends Event, Observer<? extends Event>> oc;
+		ObserverToEventBusListenerAdapter<? extends Event, Observer<? extends Event>> oc;
 		try {
-			oc = new EventBusBridgeMethodFixConsumer<>(oa, Observer.class, "onNext");
+			oc = new ObserverToEventBusListenerAdapter<>(oa, Observer.class, "onNext");
 		} catch (NoSuchMethodException e) {
 			onError(e);
 			return;
@@ -61,7 +67,11 @@ public class EventBusForge
 
 	@Override
 	public void onNext(@Nonnull Event o) {
-		getDelegate().post(o);
+		try {
+			getDelegate().post(o);
+		} catch (Throwable t) {
+			onError(t);
+		}
 	}
 
 	@Override
