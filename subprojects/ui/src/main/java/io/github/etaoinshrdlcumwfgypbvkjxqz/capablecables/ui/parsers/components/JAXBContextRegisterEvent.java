@@ -9,12 +9,10 @@ import net.minecraftforge.eventbus.api.Event;
 import java.util.Collections;
 import java.util.Set;
 
-public final class DefaultUIJAXBContextRegisterEvent
+public class JAXBContextRegisterEvent
 		extends Event {
 	private final Set<Class<?>> classesToBeBound = Collections.newSetFromMap(
 			MapBuilderUtilities.newMapMakerNormalThreaded().weakKeys().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap());
-
-	protected DefaultUIJAXBContextRegisterEvent() {}
 
 	public boolean addClassesToBeBound(Class<?>... classes) { return addClassesToBeBound(ImmutableList.copyOf(classes)); }
 

@@ -40,7 +40,7 @@ public enum DefaultUIComponentSchemaHolder {
 			ThrowableUtilities.runQuietly(res::close, IOException.class, UIConfiguration.getInstance().getThrowableHandler());
 		}
 		try {
-			DefaultUIJAXBContextRegisterEvent registerEvent = new DefaultUIJAXBContextRegisterEvent();
+			JAXBContextRegisterEvent registerEvent = new JAXBContextRegisterEvent();
 			registerEvent.addClassesToBeBound(UIJAXBObjectFactories.getDefaultComponentObjectFactory().getClass());
 			UIEventBusEntryPoint.getEventBus().onNext(registerEvent);
 			CONTEXT = JAXBContext.newInstance(registerEvent.getClassesToBeBound().toArray(new Class<?>[0]));
