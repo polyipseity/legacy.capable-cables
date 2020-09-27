@@ -8,23 +8,21 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.binding.UIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.extensions.IUIExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventComponentType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRenderer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.UIParserCheckedException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.UIParserUncheckedException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.JAXBAdapterRegistries;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.DefaultUIComponentParserAnchorHandler;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.DefaultUIComponentParserExtensionHandler;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.DefaultUIComponentParserRendererHandler;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.descriptors.ShapeDescriptorBuilderFactoryRegistry;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.interactions.ShapeAnchor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.interactions.ShapeConstraint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
@@ -32,7 +30,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
@@ -69,9 +66,9 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 	}
 
 	public static <T extends IUIComponentParser<?, ?>> T makeParserStandard(T instance) {
-		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, Anchor.class, DefaultHandlers::handleAnchor);
-		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, Renderer.class, DefaultHandlers::handleRenderer);
-		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, Extension.class, DefaultHandlers::handleExtension);
+		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, Anchor.class, new DefaultUIComponentParserAnchorHandler<>());
+		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, Renderer.class, new DefaultUIComponentParserRendererHandler());
+		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, Extension.class, new DefaultUIComponentParserExtensionHandler());
 		return instance;
 	}
 
@@ -424,100 +421,5 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 	public <H> void addHandler(Set<EnumHandlerType> types, Class<H> clazz, IConsumer3<? super IParserContext, ?, ? super H, ?> handler) {
 		types.forEach(type ->
 				getHandlers().getUnchecked(type).put(clazz, handler));
-	}
-
-	public enum DefaultHandlers {
-		;
-
-		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
-		public static void handleAnchor(@SuppressWarnings("unused") IParserContext context, Object container, Anchor object) {
-			if (!(container instanceof IUIComponent))
-				return;
-			IUIComponent component = (IUIComponent) container;
-			component.getManager()
-					.flatMap(IUIComponentManager::getView)
-					.ifPresent(view ->
-							view.getShapeAnchorController().addAnchors(component,
-									ImmutableList.of(new ShapeAnchor(
-											IUIViewComponent.StaticHolder.getComponentByID(view, object.getTarget()),
-											object.getOriginSide().toJava(),
-											object.getTargetSide().toJava(),
-											object.getBorderThickness()))));
-		}
-
-		@SuppressWarnings("deprecation")
-		public static void handleRenderer(IParserContext context, Object container, Renderer object)
-				throws Throwable {
-			if (!(container instanceof IUIRendererContainer))
-				return;
-			IUIRendererContainer<?> rendererContainer = ((IUIRendererContainer<?>) container);
-			Class<?> oc = Optional.ofNullable(object.getClazz())
-					.<Class<?>>map(classAlias -> AssertionUtilities.assertNonnull(context.getAliases().get(classAlias)))
-					.orElseGet(rendererContainer::getDefaultRendererClass);
-			UIRendererConstructor.EnumConstructorType ct = IConstructorType.StaticHolder.getConstructorType(oc, UIRendererConstructor.class, UIRendererConstructor::type);
-			MethodHandle mh = InvokeUtilities.IMPL_LOOKUP.findConstructor(oc, ct.getMethodType());
-			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(object.getProperty());
-			IUIRenderer<?> ret;
-			switch (ct) {
-				case MAPPINGS__CONTAINER_CLASS:
-					ret = (IUIRenderer<?>) mh.invoke(mappings, container.getClass());
-					break;
-				case MAPPINGS:
-					ret = (IUIRenderer<?>) mh.invoke(mappings);
-					break;
-				case CONTAINER_CLASS:
-					ret = (IUIRenderer<?>) mh.invoke(container.getClass());
-					break;
-				case NO_ARGS:
-					ret = (IUIRenderer<?>) mh.invoke();
-					break;
-				default:
-					throw new AssertionError();
-			}
-			rendererContainer.setRenderer(CastUtilities.castUnchecked(ret)); // COMMENT setRenderer should check
-		}
-
-		@SuppressWarnings("deprecation")
-		public static void handleExtension(IParserContext context, Object container, Extension object)
-				throws Throwable {
-			if (!(container instanceof IExtensionContainer))
-				return;
-			Class<?> oc = AssertionUtilities.assertNonnull(context.getAliases().get(object.getClazz()));
-			UIExtensionConstructor.EnumConstructorType ct = IConstructorType.StaticHolder.getConstructorType(oc, UIExtensionConstructor.class, UIExtensionConstructor::type);
-			MethodHandle mh = InvokeUtilities.IMPL_LOOKUP.findConstructor(oc, ct.getMethodType());
-			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(object.getProperty());
-			IUIExtension<?, ?> ret;
-			switch (ct) {
-				case MAPPINGS__CONTAINER_CLASS:
-					ret = (IUIExtension<?, ?>) mh.invoke(mappings, container.getClass());
-					break;
-				case MAPPINGS:
-					ret = (IUIExtension<?, ?>) mh.invoke(mappings);
-					break;
-				case CONTAINER_CLASS:
-					ret = (IUIExtension<?, ?>) mh.invoke(container.getClass());
-					break;
-				case NO_ARGS:
-					ret = (IUIExtension<?, ?>) mh.invoke();
-					break;
-				default:
-					throw new AssertionError();
-			}
-			((IExtensionContainer<?>) container).addExtension(CastUtilities.castUnchecked(ret)); // COMMENT addExtension should check
-			// COMMENT add other stuff after adding the extension
-			Iterables.concat(
-					object.getRenderer()
-							.map(ImmutableSet::of)
-							.orElseGet(ImmutableSet::of),
-					object.getAnyContainer()
-							.map(AnyContainer::getAny)
-							.orElseGet(ImmutableList::of))
-					.forEach(IThrowingConsumer.execute(any -> IParserContext.StaticHolder.findHandler(context, any)
-							.ifPresent(IThrowingConsumer.execute(handler -> handler.accept(
-									context,
-									CastUtilities.castUnchecked(ret), // COMMENT may throw
-									CastUtilities.castUnchecked(any) // COMMENT should not throw
-							)))));
-		}
 	}
 }
