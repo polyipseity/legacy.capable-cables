@@ -2,7 +2,7 @@
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
 @LocalVariablesAreNonnullByDefault
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.components.rendering;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.rendering;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.FieldsAreNonnullByDefault;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.LocalVariablesAreNonnullByDefault;

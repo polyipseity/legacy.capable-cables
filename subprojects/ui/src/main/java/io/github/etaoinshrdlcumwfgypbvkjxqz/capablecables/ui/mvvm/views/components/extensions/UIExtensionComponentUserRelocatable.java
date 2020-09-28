@@ -1,6 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions;
 
+import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
@@ -9,16 +11,21 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventMouse;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIExtensionConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.UIEventListener;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.events.bus.UIViewMinecraftBusEvent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.UIComponentVirtual;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.UINullVirtualComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.DefaultUIRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.NullUIRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.descriptors.GenericShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
@@ -38,6 +45,7 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -46,17 +54,23 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 		implements IUIExtensionComponentUserRelocatable<E> {
 	public static final int RELOCATE_BORDER_THICKNESS_DEFAULT = 10;
 	private final int relocateBorderThickness = RELOCATE_BORDER_THICKNESS_DEFAULT; // TODO make this a property and strategy or something like that
-	private final Object lockObject = new Object();
 	private final VirtualComponent virtualComponent = new VirtualComponent();
 	@Nullable
 	protected IRelocateData relocateData;
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final AutoCloseableRotator<RenderObserver, RuntimeException> renderObserverRotator =
 			new AutoCloseableRotator<>(() -> new RenderObserver(this, UIConfiguration.getInstance().getLogger()), Disposable::dispose);
+	private final IUIRendererContainer<IRelocatingRenderer> rendererContainer =
+			new DefaultUIRendererContainer<>(new DefaultRelocatingRenderer(ImmutableMap.of()));
 
 	@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.CONTAINER_CLASS)
 	public UIExtensionComponentUserRelocatable(Class<E> containerClass) {
 		super(IUIComponent.class, containerClass);
+	}
+
+	@Override
+	public Optional<? extends IRelocatingRenderer> getRenderer() {
+		return getRendererContainer().getRenderer();
 	}
 
 	@Override
@@ -95,7 +109,18 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 
 	public int getRelocateBorderThickness() { return relocateBorderThickness; }
 
-	protected Object getLockObject() { return lockObject; }
+	protected IUIRendererContainer<IRelocatingRenderer> getRendererContainer() { return rendererContainer; }
+
+	@Override
+	@Deprecated
+	public void setRenderer(@Nullable IRelocatingRenderer renderer) {
+		StaticHolder.setRendererImpl(this, renderer, getRendererContainer()::setRenderer);
+	}
+
+	@Override
+	public Class<? extends IRelocatingRenderer> getDefaultRendererClass() {
+		return getRendererContainer().getDefaultRendererClass();
+	}
 
 	public static class RelocateData implements IRelocateData {
 		protected final Point2D cursorPosition;
@@ -148,33 +173,70 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 		@SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
 		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 		public void onNext(UIViewMinecraftBusEvent.Render event) {
+			// TODO render locally
 			super.onNext(event);
 			if (event.getStage().isPost())
 				getOwner().ifPresent(owner ->
-						owner.getRelocateData()
-								.ifPresent(d -> owner.getContainer()
-										.ifPresent(c -> c.getManager()
+						owner.getRelocateData().ifPresent(data ->
+								owner.getRenderer().ifPresent(renderer ->
+										owner.getContainer().ifPresent(container -> container.getManager()
 												.flatMap(IUIComponentManager::getView)
 												.ifPresent(view -> IUIViewComponent.StaticHolder.createComponentContextWithManager(view)
 														.ifPresent(context -> {
-															Point2D previousCursorPosition = event.getCursorPositionView();
-															Rectangle2D resultRectangle = c.getShapeDescriptor().getShapeOutput().getBounds2D();
 															try (IUIComponentContext ctx = context) {
-																view.getPathResolver().resolvePath(ctx, (Point2D) previousCursorPosition.clone(), true);
-																MinecraftDrawingUtilities.drawRectangle(ctx.getTransformStack().element(),
-																		d.handle((Point2D) previousCursorPosition.clone(), resultRectangle, resultRectangle),
-																		Color.DARK_GRAY.getRGB(),
-																		0); // TODO customize
+																Point2D previousCursorPosition = data.getCursorPositionView();
+																view.getPathResolver().resolvePath(ctx, (Point2D) previousCursorPosition.clone(), false);
+																// TODO cancel if not matching
+																renderer.render(container, ctx, data);
 															}
-														})))));
+														})
+												)
+										)
+								)
+						)
+				);
 		}
 
 		protected Optional<? extends UIExtensionComponentUserRelocatable<?>> getOwner() { return owner.getOptional(); }
 	}
 
-	public class VirtualComponent
-			extends UIComponentVirtual
+	protected static class DefaultRelocatingRenderer
+			extends NullUIRenderer<IUIExtensionComponentUserRelocatable<?>>
+			implements IRelocatingRenderer {
+		@UIRendererConstructor(type = UIRendererConstructor.EnumConstructorType.MAPPINGS)
+		protected DefaultRelocatingRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings) {
+			super(mappings, CastUtilities.castUnchecked(IUIExtensionComponentUserRelocatable.class));
+		}
+
+		@Override
+		public void render(IUIComponent container, IUIComponentContext context, IRelocateData data) {
+			Point2D currentCursorPosition = context.getCursorPositionView();
+			Rectangle2D resultRectangle = container.getShapeDescriptor().getShapeOutput().getBounds2D();
+			MinecraftDrawingUtilities.drawRectangle(context.getTransformStack().element(),
+					data.handle((Point2D) currentCursorPosition.clone(), resultRectangle, resultRectangle),
+					Color.DARK_GRAY.getRGB(),
+					0); // TODO customize
+		}
+	}
+
+	protected class VirtualComponent
+			extends UINullVirtualComponent
 			implements IUIComponentCursorHandleProvider {
+		// TODO make static
+		private final Object lockObject = new Object();
+
+		protected boolean startRelocateMaybe(Point2D cursorPosition) {
+			return getContainer().map(c -> {
+				IRelocateData d = new RelocateData(cursorPosition);
+				synchronized (getLockObject()) {
+					if (getRelocateData().isPresent())
+						return false;
+					setRelocateData(d);
+				}
+				return true;
+			}).orElse(false);
+		}
+
 		@SuppressWarnings({"OverridableMethodCallDuringObjectConstruction", "rawtypes", "RedundantSuppression"})
 		protected VirtualComponent() {
 			super(IShapeDescriptor.StaticHolder.getShapeDescriptorPlaceholder());
@@ -197,29 +259,20 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 			}), false);
 		}
 
-		protected boolean startRelocateMaybe(Point2D cursorPosition) {
-			return getContainer().map(c -> {
-				IRelocateData d = new RelocateData(cursorPosition);
-				synchronized (getLockObject()) {
-					if (getRelocateData().isPresent())
-						return false;
-					setRelocateData(d);
-					return true;
-				}
-			}).orElse(false);
-		}
+		protected Object getLockObject() { return lockObject; }
 
 		protected boolean finishRelocateMaybe(Point2D cursorPosition) {
 			return getContainer().flatMap(c -> getRelocateData().filter(d -> {
 				Rectangle2D resultRectangle = c.getShapeDescriptor().getShapeOutput().getBounds2D();
 				d.handle((Point2D) cursorPosition.clone(), resultRectangle, resultRectangle);
+				boolean ret;
 				synchronized (getLockObject()) {
 					if (!getRelocateData().isPresent())
 						return false;
-					c.reshape(s -> s.bound(resultRectangle));
+					ret = c.reshape(s -> s.bound(resultRectangle));
 					setRelocateData(null);
-					return true;
 				}
+				return ret;
 			})).isPresent();
 		}
 

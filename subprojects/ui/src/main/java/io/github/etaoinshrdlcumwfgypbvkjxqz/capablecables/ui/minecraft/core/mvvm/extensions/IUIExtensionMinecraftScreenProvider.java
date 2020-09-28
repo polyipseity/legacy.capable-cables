@@ -8,19 +8,29 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Registry;
-import net.minecraft.inventory.container.Container;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.Optional;
+import java.util.Set;
 
 @OnlyIn(Dist.CLIENT)
-public interface IUIExtensionContainerProvider
+public interface IUIExtensionMinecraftScreenProvider
 		extends IUIExtension<INamespacePrefixedString, IUIInfrastructure<?, ?, ?>> {
-	INamespacePrefixedString KEY = new ImmutableNamespacePrefixedString(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, "container");
+	INamespacePrefixedString KEY = new ImmutableNamespacePrefixedString(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, "screen");
 	@SuppressWarnings("unchecked")
-	Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIExtensionContainerProvider, IUIInfrastructure<?, ?, ?>>> TYPE =
-			UIExtensionRegistry.getInstance().registerApply(KEY, k -> new DefaultExtensionType<>(k, (t, i) -> (Optional<? extends IUIExtensionContainerProvider>) i.getExtension(t.getKey())));
+	Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIExtensionMinecraftScreenProvider, IUIInfrastructure<?, ?, ?>>> TYPE =
+			UIExtensionRegistry.getInstance().registerApply(KEY, k -> new DefaultExtensionType<>(k, (t, i) -> (Optional<? extends IUIExtensionMinecraftScreenProvider>) i.getExtension(t.getKey())));
 
-	Container getContainer();
+	Optional<? extends Screen> getScreen();
+
+	Optional<? extends Set<Integer>> getCloseKeys();
+
+	Optional<? extends Set<Integer>> getChangeFocusKeys();
+
+	boolean setPaused(boolean paused);
+
+	boolean setTitle(ITextComponent title);
 }

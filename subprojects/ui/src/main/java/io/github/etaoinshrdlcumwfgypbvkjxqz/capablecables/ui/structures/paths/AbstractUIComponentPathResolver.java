@@ -1,13 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.paths;
 
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IAffineTransformStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.paths.IUIComponentPathResolver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.ManualLoadingCache;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public abstract class AbstractPathResolver<T extends IUIComponent>
+public abstract class AbstractUIComponentPathResolver<T extends IUIComponent>
 		implements IUIComponentPathResolver<T> {
 	protected final LoadingCache<T, List<T>> virtualElements =
 			ManualLoadingCache.newNestedLoadingCacheCollection(CacheUtilities.newCacheBuilderSingleThreaded()

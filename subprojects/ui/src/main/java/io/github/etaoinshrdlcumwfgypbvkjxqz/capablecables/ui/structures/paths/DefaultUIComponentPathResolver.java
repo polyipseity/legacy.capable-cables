@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class DefaultUIComponentPathResolver
-		extends AbstractPathResolver<IUIComponent> {
+		extends AbstractUIComponentPathResolver<IUIComponent> {
 	@SuppressWarnings("ObjectAllocationInLoop")
 	@Override
 	public void resolvePath(IUIComponentContext context, Point2D point, boolean virtual) {

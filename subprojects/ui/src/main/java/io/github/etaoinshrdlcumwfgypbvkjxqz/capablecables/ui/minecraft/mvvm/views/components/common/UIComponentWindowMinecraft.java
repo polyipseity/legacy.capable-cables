@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.components.common;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.common;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
@@ -9,10 +9,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.compon
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.components.rendering.IUIComponentRendererMinecraft;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.components.rendering.UIComponentRendererMinecraft;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.rendering.IUIComponentRendererMinecraft;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.rendering.NullUIComponentRendererMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.common.UIComponentWindow;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.rendering.UIRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.DefaultUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
@@ -32,7 +32,7 @@ public class UIComponentWindowMinecraft
 		extends UIComponentWindow
 		implements IUIComponentMinecraft {
 	protected final IUIRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
-			new UIRendererContainer<>(new DefaultRenderer<>(ImmutableMap.of(), UIComponentWindowMinecraft.class));
+			new DefaultUIRendererContainer<>(new DefaultRenderer<>(ImmutableMap.of(), UIComponentWindowMinecraft.class));
 
 	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
 	public UIComponentWindowMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<RectangularShape> shapeDescriptor) { super(mappings, id, shapeDescriptor); }
@@ -43,8 +43,7 @@ public class UIComponentWindowMinecraft
 	@Override
 	@Deprecated
 	public void setRenderer(@Nullable IUIComponentRendererMinecraft<?> renderer) {
-		IUIRendererContainer.StaticHolder.setRendererImpl(this, renderer,
-				(s, r) -> s.getRendererContainer().setRenderer(r));
+		IUIRendererContainer.StaticHolder.setRendererImpl(this, renderer, getRendererContainer()::setRenderer);
 	}
 
 	@Override
@@ -54,7 +53,7 @@ public class UIComponentWindowMinecraft
 
 	@OnlyIn(Dist.CLIENT)
 	public static class DefaultRenderer<C extends UIComponentWindowMinecraft>
-			extends UIComponentRendererMinecraft<C> {
+			extends NullUIComponentRendererMinecraft<C> {
 		@NonNls
 		public static final String PROPERTY_COLOR_BACKGROUND = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "window.colors.background";
 		@NonNls

@@ -3,6 +3,9 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.co
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.extensions.IUIExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRenderer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.extensions.UIExtensionRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.EnumUISide;
@@ -20,7 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface IUIExtensionComponentUserResizable<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
-		extends IUIExtension<INamespacePrefixedString, IUIComponent>, IHasGenericClass.Extended<IUIComponent, E> {
+		extends IUIExtension<INamespacePrefixedString, IUIComponent>, IHasGenericClass.Extended<IUIComponent, E>, IUIRendererContainer<IUIExtensionComponentUserResizable.IResizingRenderer> {
 	INamespacePrefixedString KEY = new ImmutableNamespacePrefixedString(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, "component.user_resizable");
 	@SuppressWarnings("unchecked")
 	Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIExtensionComponentUserResizable<?>, IUIComponent>> TYPE =
@@ -44,5 +47,10 @@ public interface IUIExtensionComponentUserResizable<E extends IUIComponent & IUI
 		<R extends RectangularShape> R handle(Point2D cursorPosition,
 		                                      RectangularShape source,
 		                                      R destination);
+	}
+
+	interface IResizingRenderer
+			extends IUIRenderer<IUIExtensionComponentUserResizable<?>> {
+		void render(IUIComponent container, IUIComponentContext context, IResizeData data);
 	}
 }

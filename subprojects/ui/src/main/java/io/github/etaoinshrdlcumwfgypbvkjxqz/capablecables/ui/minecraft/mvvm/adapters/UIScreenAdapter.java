@@ -12,8 +12,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.eve
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIDataMouseButtonClick;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.UIEventUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.extensions.IUIExtensionContainerProvider;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.extensions.IUIExtensionScreenProvider;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.extensions.IUIExtensionMinecraftScreenProvider;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.UIExtensionMinecraftContainerProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIDataKeyboardKeyPress;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIDataMouseButtonClick;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIInputUtilities;
@@ -31,6 +31,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.cl
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftOpenGLUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTextComponentUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTooltipUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.DoubleDimension2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.INode;
@@ -78,6 +79,7 @@ public class UIScreenAdapter
 	@Nullable
 	protected IUIEventTarget focus;
 
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	protected UIScreenAdapter(ITextComponent title, I infrastructure, @Nullable C containerObject, Set<Integer> closeKeys, Set<Integer> changeFocusKeys) {
 		super(title);
 		this.title = title;
@@ -87,10 +89,10 @@ public class UIScreenAdapter
 		this.closeKeys.addAll(closeKeys);
 		this.changeFocusKeys = Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(changeFocusKeys.size()).makeMap());
 		this.changeFocusKeys.addAll(changeFocusKeys);
-		IExtensionContainer.StaticHolder.addExtensionChecked(infrastructure, new UIExtensionScreen());
 
+		IExtensionContainer.StaticHolder.addExtensionChecked(this.infrastructure, new UIExtensionMinecraftScreenProvider(this));
 		if (containerObject != null)
-			IExtensionContainer.StaticHolder.addExtensionChecked(infrastructure, new UIExtensionContainer(containerObject));
+			IExtensionContainer.StaticHolder.addExtensionChecked(this.infrastructure, new UIExtensionMinecraftContainerProvider(this.containerObject));
 	}
 
 	@Override
@@ -385,7 +387,6 @@ public class UIScreenAdapter
 		setTargetBeingHoveredByMouse(getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone()), d);
 	}
 
-	@SuppressWarnings("unused")
 	@OnlyIn(Dist.CLIENT)
 	public static class Builder<I extends IUIInfrastructureMinecraft<?, ?, ?>, C extends Container> {
 		protected final ITextComponent title;
@@ -427,7 +428,6 @@ public class UIScreenAdapter
 			return this;
 		}
 
-		@SuppressWarnings("unused")
 		@OnlyIn(Dist.CLIENT)
 		public static class WithChildren<I extends IUIInfrastructureMinecraft<?, ?, ?>, C extends Container>
 				extends Builder<I, C> {
@@ -567,47 +567,50 @@ public class UIScreenAdapter
 	public void blit(int x, int y, int u, int v, int w, int h) { MinecraftDrawingUtilities.blit(AffineTransformUtilities.getIdentity(), new Rectangle2D.Double(x, y, w, h), new Point2D.Double(u, v), new DoubleDimension2D(256, 256), getBlitOffset()); }
 
 	@OnlyIn(Dist.CLIENT)
-	public static class UIExtensionContainer
+	public static class UIExtensionMinecraftScreenProvider
 			extends IHasGenericClass.Impl<IUIInfrastructure<?, ?, ?>>
-			implements IUIExtensionContainerProvider {
-		protected final Container container;
+			implements IUIExtensionMinecraftScreenProvider {
+		private final OptionalWeakReference<UIScreenAdapter<?, ?>> owner;
 
-		public UIExtensionContainer(Container container) {
+		public UIExtensionMinecraftScreenProvider(UIScreenAdapter<?, ?> owner) {
 			super(CastUtilities.castUnchecked(IUIInfrastructure.class)); // COMMENT class should not care about it
-			this.container = container;
+			this.owner = new OptionalWeakReference<>(owner);
 		}
 
 		@Override
-		public Container getContainer() { return container; }
+		public Optional<? extends Screen> getScreen() { return getOwner(); }
+
+		protected Optional<? extends UIScreenAdapter<?, ?>> getOwner() { return owner.getOptional(); }
 
 		@Override
-		public IExtensionType<INamespacePrefixedString, ?, IUIInfrastructure<?, ?, ?>> getType() { return IUIExtensionContainerProvider.TYPE.getValue(); }
-	}
+		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
+		public Optional<? extends Set<Integer>> getCloseKeys() { return getOwner().map(UIScreenAdapter::getCloseKeys); }
 
-	@OnlyIn(Dist.CLIENT)
-	public class UIExtensionScreen
-			extends IHasGenericClass.Impl<IUIInfrastructure<?, ?, ?>>
-			implements IUIExtensionScreenProvider {
-		protected UIExtensionScreen() {
-			super(CastUtilities.castUnchecked(IUIInfrastructure.class)); // COMMENT class should not care about it
+		@Override
+		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
+		public Optional<? extends Set<Integer>> getChangeFocusKeys() { return getOwner().map(UIScreenAdapter::getChangeFocusKeys); }
+
+		@Override
+		public boolean setPaused(boolean paused) {
+			return getOwner()
+					.filter(owner -> {
+						owner.setPaused(paused);
+						return true;
+					})
+					.isPresent();
 		}
 
 		@Override
-		public Screen getScreen() { return UIScreenAdapter.this; }
+		public boolean setTitle(ITextComponent title) {
+			return getOwner()
+					.filter(owner -> {
+						owner.setTitle(title);
+						return true;
+					})
+					.isPresent();
+		}
 
 		@Override
-		public Set<Integer> getCloseKeys() { return UIScreenAdapter.this.getCloseKeys(); }
-
-		@Override
-		public Set<Integer> getChangeFocusKeys() { return UIScreenAdapter.this.getChangeFocusKeys(); }
-
-		@Override
-		public void setPaused(boolean paused) { UIScreenAdapter.this.setPaused(paused); }
-
-		@Override
-		public void setTitle(ITextComponent title) { UIScreenAdapter.this.setTitle(title); }
-
-		@Override
-		public IExtensionType<INamespacePrefixedString, ?, IUIInfrastructure<?, ?, ?>> getType() { return IUIExtensionScreenProvider.TYPE.getValue(); }
+		public IExtensionType<INamespacePrefixedString, ?, IUIInfrastructure<?, ?, ?>> getType() { return IUIExtensionMinecraftScreenProvider.TYPE.getValue(); }
 	}
 }

@@ -3,6 +3,9 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.co
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.extensions.IUIExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRenderer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.extensions.UIExtensionRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.DefaultExtensionType;
@@ -18,7 +21,7 @@ import java.awt.geom.RectangularShape;
 import java.util.Optional;
 
 public interface IUIExtensionComponentUserRelocatable<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
-		extends IUIExtension<INamespacePrefixedString, IUIComponent>, IHasGenericClass.Extended<IUIComponent, E> {
+		extends IUIExtension<INamespacePrefixedString, IUIComponent>, IHasGenericClass.Extended<IUIComponent, E>, IUIRendererContainer<IUIExtensionComponentUserRelocatable.IRelocatingRenderer> {
 	INamespacePrefixedString KEY = new ImmutableNamespacePrefixedString(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, "component.user_relocatable");
 	@SuppressWarnings("unchecked")
 	Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIExtensionComponentUserRelocatable<?>, IUIComponent>> TYPE =
@@ -36,5 +39,10 @@ public interface IUIExtensionComponentUserRelocatable<E extends IUIComponent & I
 		<R extends RectangularShape> R handle(Point2D cursorPosition,
 		                                      RectangularShape source,
 		                                      R destination);
+	}
+
+	interface IRelocatingRenderer
+			extends IUIRenderer<IUIExtensionComponentUserRelocatable<?>> {
+		void render(IUIComponent container, IUIComponentContext context, IRelocateData data);
 	}
 }

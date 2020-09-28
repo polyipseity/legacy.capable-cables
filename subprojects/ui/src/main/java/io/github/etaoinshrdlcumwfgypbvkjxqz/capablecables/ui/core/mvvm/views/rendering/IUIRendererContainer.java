@@ -9,14 +9,14 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.Co
 import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public interface IUIRendererContainer<R extends IUIRenderer<?>>
 		extends IHasBinding {
 	Optional<? extends R> getRenderer();
 
 	@Deprecated
-		// COMMENT unchecked, use 'setRendererChecked'
+		// COMMENT unchecked, use one of the checked variants
 	void setRenderer(@Nullable R renderer);
 
 	static <C extends IUIRendererContainer<? super R>, R extends IUIRenderer<? super C>> void setRendererChecked(C container, R renderer) { container.setRenderer(renderer); }
@@ -28,7 +28,7 @@ public interface IUIRendererContainer<R extends IUIRenderer<?>>
 
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
-		public static <C, R extends IUIRenderer<?>> void setRendererImpl(C container, @Nullable R renderer, BiConsumer<? super C, ? super R> setter) {
+		public static <R extends IUIRenderer<?>> void setRendererImpl(Object container, @Nullable R renderer, Consumer<? super R> setter) {
 			if (!(renderer == null || renderer.getGenericClass().isInstance(container)))
 				throw new IllegalArgumentException(
 						new LogMessageBuilder()
@@ -37,7 +37,7 @@ public interface IUIRendererContainer<R extends IUIRenderer<?>>
 								.addMessages(() -> getResourceBundle().getString("renderer.set.impl.instance_of.fail"))
 								.build()
 				);
-			setter.accept(container, renderer);
+			setter.accept(renderer);
 		}
 
 		protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }

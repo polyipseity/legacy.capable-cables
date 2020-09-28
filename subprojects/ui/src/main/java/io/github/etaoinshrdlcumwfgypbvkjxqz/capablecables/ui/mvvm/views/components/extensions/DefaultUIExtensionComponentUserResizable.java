@@ -1,6 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions;
 
+import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
@@ -9,7 +11,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventMouse;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIExtensionConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.cursors.EnumGLFWCursor;
@@ -17,7 +21,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.cursors.ICursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.UIEventListener;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.events.bus.UIViewMinecraftBusEvent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.UIComponentVirtual;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.UINullVirtualComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.DefaultUIRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.NullUIRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.EnumUIAxis;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.descriptors.GenericShapeDescriptor;
@@ -44,22 +50,24 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
+public class DefaultUIExtensionComponentUserResizable<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, E>
 		implements IUIExtensionComponentUserResizable<E> {
 	public static final int RESIZE_BORDER_THICKNESS_DEFAULT = 10;
 	private final int resizeBorderThickness = RESIZE_BORDER_THICKNESS_DEFAULT; // TODO make this a property and strategy or something like that
-	private final Object lockObject = new Object();
 	private final VirtualComponent virtualComponent = new VirtualComponent();
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final AutoCloseableRotator<RenderObserver, RuntimeException> renderObserverRotator =
 			new AutoCloseableRotator<>(() -> new RenderObserver(this, UIConfiguration.getInstance().getLogger()), Disposable::dispose);
 	@Nullable
 	private IResizeData resizeData;
+	private final IUIRendererContainer<IResizingRenderer> rendererContainer =
+			new DefaultUIRendererContainer<>(new DefaultResizingRenderer(ImmutableMap.of()));
 
 	protected static Optional<ICursor> getCursor(Set<? extends EnumUISide> sides) {
 		@Nullable ICursor cursor = null;
@@ -77,7 +85,7 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 	}
 
 	@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.CONTAINER_CLASS)
-	public UIExtensionComponentUserResizable(Class<E> containerClass) {
+	public DefaultUIExtensionComponentUserResizable(Class<E> containerClass) {
 		super(IUIComponent.class, containerClass);
 	}
 
@@ -105,6 +113,8 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 	@SuppressWarnings("ReturnOfInnerClass")
 	protected VirtualComponent getVirtualComponent() { return virtualComponent; }
 
+	protected void setResizeData(@Nullable IResizeData resizeData) { this.resizeData = resizeData; }
+
 	@Override
 	public Optional<? extends Shape> getResizeShape() {
 		return getContainer().map(c -> {
@@ -120,11 +130,25 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 	@Override
 	public Optional<? extends IResizeData> getResizeData() { return Optional.ofNullable(resizeData); }
 
-	protected void setResizeData(@Nullable IResizeData resizeData) { this.resizeData = resizeData; }
-
 	public int getResizeBorderThickness() { return resizeBorderThickness; }
 
-	protected Object getLockObject() { return lockObject; }
+	@Override
+	public Optional<? extends IResizingRenderer> getRenderer() {
+		return getRendererContainer().getRenderer();
+	}
+
+	protected IUIRendererContainer<IResizingRenderer> getRendererContainer() { return rendererContainer; }
+
+	@Override
+	@Deprecated
+	public void setRenderer(@Nullable IResizingRenderer renderer) {
+		StaticHolder.setRendererImpl(this, renderer, getRendererContainer()::setRenderer);
+	}
+
+	@Override
+	public Class<? extends IResizingRenderer> getDefaultRendererClass() {
+		return getRendererContainer().getDefaultRendererClass();
+	}
 
 	public static class ResizeData implements IResizeData {
 		protected final Point2D cursorPosition;
@@ -177,11 +201,35 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 		getRenderObserverRotator().close();
 	}
 
+	protected static class DefaultResizingRenderer
+			extends NullUIRenderer<IUIExtensionComponentUserResizable<?>>
+			implements IResizingRenderer {
+
+		@UIRendererConstructor(type = UIRendererConstructor.EnumConstructorType.MAPPINGS)
+		public DefaultResizingRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings) {
+			super(mappings, CastUtilities.castUnchecked(IUIExtensionComponentUserResizable.class));
+		}
+
+		@Override
+		public void render(IUIComponent container, IUIComponentContext context, IResizeData data) {
+			Point2D currentCursorPosition = context.getCursorPositionView();
+			Rectangle2D resultRectangle = container.getShapeDescriptor().getShapeOutput().getBounds2D();
+			UIObjectUtilities.acceptRectangularShape(
+					data.handle((Point2D) currentCursorPosition.clone(), resultRectangle, resultRectangle),
+					(x, y, w, h) ->
+							resultRectangle.setFrame(x, y, w - 1, h - 1));
+			MinecraftDrawingUtilities.drawRectangle(context.getTransformStack().element(),
+					resultRectangle,
+					Color.DARK_GRAY.getRGB(),
+					0); // TODO customize
+		}
+	}
+
 	protected static class RenderObserver
 			extends LoggingDisposableObserver<UIViewMinecraftBusEvent.Render> {
-		private final OptionalWeakReference<UIExtensionComponentUserResizable<?>> owner;
+		private final OptionalWeakReference<DefaultUIExtensionComponentUserResizable<?>> owner;
 
-		public RenderObserver(UIExtensionComponentUserResizable<?> owner, Logger logger) {
+		public RenderObserver(DefaultUIExtensionComponentUserResizable<?> owner, Logger logger) {
 			super(logger);
 			this.owner = new OptionalWeakReference<>(owner);
 		}
@@ -190,40 +238,40 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 		@SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
 		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 		public void onNext(UIViewMinecraftBusEvent.Render event) {
+			// TODO render locally
 			super.onNext(event);
 			if (event.getStage().isPost())
-				getOwner()
-						.ifPresent(owner ->
-								owner.getResizeData()
-										.ifPresent(d ->
-												owner.getContainer()
-														.ifPresent(c -> c.getManager()
-																.flatMap(IUIComponentManager::getView)
-																.ifPresent(view -> IUIViewComponent.StaticHolder.createComponentContextWithManager(view)
-																		.ifPresent(context -> {
-																			Point2D previousCursorPosition = event.getCursorPositionView();
-																			Rectangle2D resultRectangle = c.getShapeDescriptor().getShapeOutput().getBounds2D();
-																			try (IUIComponentContext ctx = context) {
-																				view.getPathResolver().resolvePath(ctx, (Point2D) previousCursorPosition.clone(), true);
-																				UIObjectUtilities.acceptRectangularShape(
-																						d.handle((Point2D) previousCursorPosition.clone(), resultRectangle, resultRectangle),
-																						(x, y, w, h) ->
-																								resultRectangle.setFrame(x, y, w - 1, h - 1));
-																				MinecraftDrawingUtilities.drawRectangle(ctx.getTransformStack().element(),
-																						resultRectangle,
-																						Color.DARK_GRAY.getRGB(),
-																						0); // TODO customize
-																			}
-																		})))));
+				getOwner().ifPresent(owner -> // COMMENT has owner
+						owner.getResizeData().ifPresent(data -> // COMMENT is resizing
+								owner.getRenderer().ifPresent(renderer -> // COMMENT owner has renderer
+										owner.getContainer().ifPresent(container -> // COMMENT owner has container
+												container.getManager()
+														.flatMap(IUIComponentManager::getView)
+														.ifPresent(view -> IUIViewComponent.StaticHolder.createComponentContextWithManager(view)
+																.ifPresent(context -> {
+																	try (IUIComponentContext ctx = context) {
+																		Point2D previousCursorPosition = data.getCursorPositionView();
+																		view.getPathResolver().resolvePath(ctx, (Point2D) previousCursorPosition.clone(), false);
+																		// TODO cancel if not matching
+																		renderer.render(container, ctx, data);
+																	}
+																})
+														)
+										)
+								)
+						)
+				);
 		}
 
-		protected Optional<? extends UIExtensionComponentUserResizable<?>> getOwner() { return owner.getOptional(); }
+		protected Optional<? extends DefaultUIExtensionComponentUserResizable<?>> getOwner() { return owner.getOptional(); }
 	}
 
-	public class VirtualComponent
-			extends UIComponentVirtual
+	protected class VirtualComponent
+			extends UINullVirtualComponent
 			implements IUIComponentCursorHandleProvider {
-		protected boolean beingHovered = false;
+		private final Object lockObject = new Object();
+		// TODO make static
+		private boolean beingHovered = false;
 
 		@SuppressWarnings({"OverridableMethodCallDuringObjectConstruction", "rawtypes", "RedundantSuppression"})
 		protected VirtualComponent() {
@@ -278,8 +326,8 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 											if (getResizeData().isPresent())
 												return false;
 											setResizeData(d);
-											return true;
 										}
+										return true;
 									})))
 					.orElse(false);
 		}
@@ -288,15 +336,18 @@ public class UIExtensionComponentUserResizable<E extends IUIComponent & IUIResha
 			return getContainer().flatMap(c -> getResizeData().filter(d -> {
 				Rectangle2D resultRectangle = c.getShapeDescriptor().getShapeOutput().getBounds2D();
 				d.handle((Point2D) cursorPosition.clone(), resultRectangle, resultRectangle);
+				boolean ret;
 				synchronized (getLockObject()) {
 					if (!getResizeData().isPresent())
 						return false;
-					c.reshape(s -> s.bound(resultRectangle));
+					ret = c.reshape(s -> s.bound(resultRectangle));
 					setResizeData(null);
-					return true;
 				}
+				return ret;
 			})).isPresent();
 		}
+
+		protected Object getLockObject() { return lockObject; }
 
 		@Override
 		public IShapeDescriptor<?> getShapeDescriptor() {

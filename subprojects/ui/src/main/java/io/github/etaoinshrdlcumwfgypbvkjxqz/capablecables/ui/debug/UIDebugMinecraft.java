@@ -16,9 +16,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUI
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.IUIViewComponentMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.adapters.AbstractContainerScreenAdapter;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.components.common.UIComponentWindowMinecraft;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.components.parsers.DefaultMinecraftUIComponentParser;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.viewmodels.UIViewModelMinecraft;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.common.UIComponentWindowMinecraft;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.parsers.DefaultMinecraftUIComponentParser;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.models.UIModel;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.common.UIComponentButton;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.UIExtensionCursorHandleProviderComponent;

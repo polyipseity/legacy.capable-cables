@@ -8,29 +8,19 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Registry;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.inventory.container.Container;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.Optional;
-import java.util.Set;
 
 @OnlyIn(Dist.CLIENT)
-public interface IUIExtensionScreenProvider
+public interface IUIExtensionMinecraftContainerProvider
 		extends IUIExtension<INamespacePrefixedString, IUIInfrastructure<?, ?, ?>> {
-	INamespacePrefixedString KEY = new ImmutableNamespacePrefixedString(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, "screen");
+	INamespacePrefixedString KEY = new ImmutableNamespacePrefixedString(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, "container");
 	@SuppressWarnings("unchecked")
-	Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIExtensionScreenProvider, IUIInfrastructure<?, ?, ?>>> TYPE =
-			UIExtensionRegistry.getInstance().registerApply(KEY, k -> new DefaultExtensionType<>(k, (t, i) -> (Optional<? extends IUIExtensionScreenProvider>) i.getExtension(t.getKey())));
+	Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIExtensionMinecraftContainerProvider, IUIInfrastructure<?, ?, ?>>> TYPE =
+			UIExtensionRegistry.getInstance().registerApply(KEY, k -> new DefaultExtensionType<>(k, (t, i) -> (Optional<? extends IUIExtensionMinecraftContainerProvider>) i.getExtension(t.getKey())));
 
-	Screen getScreen();
-
-	Set<Integer> getCloseKeys();
-
-	Set<Integer> getChangeFocusKeys();
-
-	void setPaused(boolean paused);
-
-	void setTitle(ITextComponent title);
+	Container getContainer();
 }

@@ -10,32 +10,38 @@
 	<using alias="shape.rectangle" target="java.awt.geom.Rectangle2D"/>
 	<using alias="shape.ellipse" target="java.awt.geom.Ellipse2D"/>
 	<!-- COMMENT views -->
-	<using alias="view.minecraft" target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.components.UIViewComponentMinecraft"/>
+	<using alias="view.minecraft"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.UIViewComponentMinecraft"/>
 	<!-- COMMENT components -->
-	<using alias="component.manager" target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.components.UIComponentManagerMinecraft"/>
+	<using alias="component.manager"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.UIComponentManagerMinecraft"/>
 	<using alias="component.window"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.components.common.UIComponentWindowMinecraft"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.common.UIComponentWindowMinecraft"/>
 	<using alias="component.button"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.components.common.UIComponentButtonMinecraft"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.common.UIComponentButtonMinecraft"/>
 	<!-- COMMENT renderer -->
 	<using alias="renderer.component.window.debug.custom"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIDebugMinecraft$DebugUI$CustomWindowRenderer"/>
 	<!-- COMMENT extensions -->
-	<using alias="extension.minecraft.background.default"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.UIExtensionBackgroundMinecraft$Default"/>
+	<using alias="extension.minecraft.background"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.DefaultUIExtensionMinecraftBackground"/>
+	<using alias="extension.minecraft.background.renderer.default"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.DefaultUIExtensionMinecraftBackground.DefaultBackgroundRenderer"/>
 	<using alias="extension.user_relocatable"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.UIExtensionComponentUserRelocatable"/>
 	<using alias="extension.user_resizable"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.UIExtensionComponentUserResizable"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.DefaultUIExtensionComponentUserResizable"/>
 
 	<!-- SECTION view -->
-	<view class="view.minecraft"/>
+	<view class="view.minecraft">
+		<extension class="extension.minecraft.background.default">
+			<renderer class="extension.minecraft.background.renderer.default"/>
+		</extension>
+	</view>
 
 	<!-- SECTION component -->
 	<component class="component.manager" id="Root">
 		<shape class="shape.rectangle"/>
-
-		<extension class="extension.minecraft.background.default"/>
 
 		<component class="component.window" id="Window1">
 			<shape class="shape.rectangle" x="10" y="10" width="100" height="100"/>
