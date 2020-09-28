@@ -307,30 +307,30 @@ public class DefaultUIExtensionComponentUserResizable<E extends IUIComponent & I
 							.flatMap(IUIComponentManager::getView)
 							.flatMap(view -> IUIViewComponent.StaticHolder.createComponentContextWithManager(view)
 									.map(context -> {
-										Rectangle2D spb;
 										try (IUIComponentContext ctx = context) {
+											Rectangle2D spb;
 											view.getPathResolver().resolvePath(ctx, (Point2D) cursorPosition.clone(), true);
 											spb = ctx.getTransformStack().element().createTransformedShape(c.getShapeDescriptor().getShapeOutput()).getBounds2D();
-										}
-										Set<EnumUISide> sides = EnumUISide.getSidesMouseOver(spb, cursorPosition);
+											Set<EnumUISide> sides = EnumUISide.getSidesMouseOver(spb, cursorPosition);
 
-										@Nullable Point2D base = null;
-										if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT))
-											base = new Point2D.Double(spb.getMaxX(), spb.getMaxY());
-										else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
-											base = new Point2D.Double(spb.getX(), spb.getY());
-										else if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.RIGHT))
-											base = new Point2D.Double(spb.getX(), spb.getMaxY());
-										else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
-											base = new Point2D.Double(spb.getMaxX(), spb.getY());
+											@Nullable Point2D base = null;
+											if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT))
+												base = new Point2D.Double(spb.getMaxX(), spb.getMaxY());
+											else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
+												base = new Point2D.Double(spb.getX(), spb.getY());
+											else if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.RIGHT))
+												base = new Point2D.Double(spb.getX(), spb.getMaxY());
+											else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
+												base = new Point2D.Double(spb.getMaxX(), spb.getY());
 
-										IResizeData d = new ResizeData(cursorPosition, sides, base, getCursor(sides).orElseThrow(InternalError::new).getHandle());
-										synchronized (getLockObject()) {
-											if (getResizeData().isPresent())
-												return false;
-											setResizeData(d);
+											IResizeData d = new ResizeData(cursorPosition, sides, base, getCursor(sides).orElseThrow(InternalError::new).getHandle());
+											synchronized (getLockObject()) {
+												if (getResizeData().isPresent())
+													return false;
+												setResizeData(d);
+											}
+											return true;
 										}
-										return true;
 									})))
 					.orElse(false);
 		}

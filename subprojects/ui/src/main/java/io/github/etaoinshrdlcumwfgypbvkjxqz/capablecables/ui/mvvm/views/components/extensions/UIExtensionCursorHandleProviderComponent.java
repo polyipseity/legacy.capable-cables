@@ -30,8 +30,8 @@ public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent
 		return getContainer()
 				.flatMap(view -> IUIViewComponent.StaticHolder.createComponentContextWithManager(view)
 						.flatMap(context -> {
-							Optional<Long> ret = Optional.empty();
 							try (IUIComponentContext ctx = context) {
+								Optional<Long> ret = Optional.empty();
 								view.getPathResolver().resolvePath(ctx, (Point2D) cursorPosition.clone(), true);
 								while (!ctx.getPath().isEmpty()) {
 									IUIComponent component = ctx.getPath().getPathEnd().orElseThrow(AssertionError::new);
@@ -41,8 +41,8 @@ public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent
 										break;
 									ctx.pop();
 								}
+								return ret;
 							}
-							return ret;
 						}));
 	}
 
