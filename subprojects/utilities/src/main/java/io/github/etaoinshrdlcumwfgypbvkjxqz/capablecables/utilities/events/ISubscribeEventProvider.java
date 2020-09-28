@@ -5,6 +5,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import java.util.Optional;
 
 @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
-public interface ISubscribeEventSupplier {
+public interface ISubscribeEventProvider {
 	Optional<? extends SubscribeEvent> getSubscribeEvent();
 }

@@ -48,6 +48,7 @@ import java.awt.geom.RectangularShape;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, E>
@@ -186,8 +187,9 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 															try (IUIComponentContext ctx = context) {
 																Point2D previousCursorPosition = data.getCursorPositionView();
 																view.getPathResolver().resolvePath(ctx, (Point2D) previousCursorPosition.clone(), false);
-																// TODO cancel if not matching
-																renderer.render(container, ctx, data);
+																ctx.getPath().getPathEnd()
+																		.filter(Predicate.isEqual(container))
+																		.ifPresent(pathEnd -> renderer.render(ctx, data));
 															}
 														})
 												)
@@ -209,7 +211,8 @@ public class UIExtensionComponentUserRelocatable<E extends IUIComponent & IUIRes
 		}
 
 		@Override
-		public void render(IUIComponent container, IUIComponentContext context, IRelocateData data) {
+		public void render(IUIComponentContext context, IRelocateData data) {
+			IUIComponent container = context.getPath().getPathEnd().orElseThrow(AssertionError::new);
 			Point2D currentCursorPosition = context.getCursorPositionView();
 			Rectangle2D resultRectangle = container.getShapeDescriptor().getShapeOutput().getBounds2D();
 			MinecraftDrawingUtilities.drawRectangle(context.getTransformStack().element(),

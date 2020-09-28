@@ -72,8 +72,8 @@ public class ObserverToEventBusListenerAdapter<T extends Event, O>
 		}
 
 		Optional<? extends SubscribeEvent> se = Optional.ofNullable(m.getAnnotation(SubscribeEvent.class));
-		if (!se.isPresent() && delegated instanceof ISubscribeEventSupplier)
-			se = ((ISubscribeEventSupplier) delegated).getSubscribeEvent();
+		if (!se.isPresent() && delegated instanceof ISubscribeEventProvider)
+			se = ((ISubscribeEventProvider) delegated).getSubscribeEvent();
 		this.priority = se.map(SubscribeEvent::priority).orElse(EventPriority.NORMAL);
 		this.receiveCancelled = se.filter(SubscribeEvent::receiveCanceled).isPresent();
 

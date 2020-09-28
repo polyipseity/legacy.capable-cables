@@ -43,6 +43,6 @@ public interface IUIExtensionComponentUserRelocatable<E extends IUIComponent & I
 
 	interface IRelocatingRenderer
 			extends IUIRenderer<IUIExtensionComponentUserRelocatable<?>> {
-		void render(IUIComponent container, IUIComponentContext context, IRelocateData data);
+		void render(IUIComponentContext context, IRelocateData data);
 	}
 }

@@ -54,6 +54,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class DefaultUIExtensionComponentUserResizable<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, E>
@@ -211,7 +212,8 @@ public class DefaultUIExtensionComponentUserResizable<E extends IUIComponent & I
 		}
 
 		@Override
-		public void render(IUIComponent container, IUIComponentContext context, IResizeData data) {
+		public void render(IUIComponentContext context, IResizeData data) {
+			IUIComponent container = context.getPath().getPathEnd().orElseThrow(AssertionError::new);
 			Point2D currentCursorPosition = context.getCursorPositionView();
 			Rectangle2D resultRectangle = container.getShapeDescriptor().getShapeOutput().getBounds2D();
 			UIObjectUtilities.acceptRectangularShape(
@@ -252,8 +254,9 @@ public class DefaultUIExtensionComponentUserResizable<E extends IUIComponent & I
 																	try (IUIComponentContext ctx = context) {
 																		Point2D previousCursorPosition = data.getCursorPositionView();
 																		view.getPathResolver().resolvePath(ctx, (Point2D) previousCursorPosition.clone(), false);
-																		// TODO cancel if not matching
-																		renderer.render(container, ctx, data);
+																		ctx.getPath().getPathEnd()
+																				.filter(Predicate.isEqual(container))
+																				.ifPresent(pathEnd -> renderer.render(ctx, data));
 																	}
 																})
 														)

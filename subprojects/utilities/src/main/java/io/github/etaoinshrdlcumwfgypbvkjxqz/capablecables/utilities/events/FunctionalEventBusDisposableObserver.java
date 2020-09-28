@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 public class FunctionalEventBusDisposableObserver<T>
 		extends DefaultDisposableObserver<T>
-		implements ISubscribeEventSupplier {
+		implements ISubscribeEventProvider {
 	@Nullable
 	private final SubscribeEvent subscribeEvent;
 	private final Consumer<? super T> action;

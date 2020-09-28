@@ -51,6 +51,6 @@ public interface IUIExtensionComponentUserResizable<E extends IUIComponent & IUI
 
 	interface IResizingRenderer
 			extends IUIRenderer<IUIExtensionComponentUserResizable<?>> {
-		void render(IUIComponent container, IUIComponentContext context, IResizeData data);
+		void render(IUIComponentContext context, IResizeData data);
 	}
 }
