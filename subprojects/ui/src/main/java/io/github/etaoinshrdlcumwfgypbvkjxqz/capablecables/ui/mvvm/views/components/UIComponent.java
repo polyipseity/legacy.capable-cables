@@ -56,7 +56,7 @@ public class UIComponent
 	private static final INamespacePrefixedString PROPERTY_ACTIVE_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_ACTIVE);
 
 	@Nullable
-	protected final String id;
+	protected final String name;
 	protected final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
@@ -72,11 +72,11 @@ public class UIComponent
 	protected final AtomicBoolean modifyingShape = new AtomicBoolean();
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
-	public UIComponent(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<?> shapeDescriptor) {
+	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__NAME__SHAPE_DESCRIPTOR)
+	public UIComponent(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String name, IShapeDescriptor<?> shapeDescriptor) {
 		this.mappings = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
-		this.id = id;
+		this.name = name;
 		this.shapeDescriptor = new ProviderShapeDescriptor<>(this, shapeDescriptor);
 
 		this.visible = IUIPropertyMappingValue.createBindingField(Boolean.class, false, true,
@@ -108,7 +108,7 @@ public class UIComponent
 	public boolean isModifyingShape() { return getModifyingShape().get(); }
 
 	@Override
-	public Optional<? extends String> getID() { return Optional.ofNullable(id); }
+	public Optional<? extends String> getName() { return Optional.ofNullable(name); }
 
 	@Override
 	public Optional<? extends IUIComponentContainer> getParent() { return parent.getOptional(); }

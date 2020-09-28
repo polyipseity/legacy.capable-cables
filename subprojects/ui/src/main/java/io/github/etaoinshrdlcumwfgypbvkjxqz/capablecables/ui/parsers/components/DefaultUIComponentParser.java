@@ -142,7 +142,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 											? cc[0]
 											: CastUtilities.castChecked(IUIComponentContainer.class, cc[0])
 											.map(IUIComponentContainer::getNamedChildrenMapView)
-											.map(children -> children.get(n.getId()))
+											.map(children -> children.get(n.getName()))
 											.orElseThrow(AssertionError::new);
 									Iterables.concat(
 											n.getAnchor(),
@@ -165,7 +165,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 									if (!componentRaw.equals(n))
 										cc[0] = CastUtilities.castChecked(IUIComponentContainer.class, cc[0])
 												.map(IUIComponentContainer::getNamedChildrenMapView)
-												.map(m -> AssertionUtilities.assertNonnull(m.get(n.getId())))
+												.map(m -> AssertionUtilities.assertNonnull(m.get(n.getName())))
 												.orElseGet(() -> cc[0]);
 									return n.getComponent();
 								},
@@ -335,8 +335,8 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 					IShapeDescriptor<?> sd = createShapeDescriptor(context, n.getShape());
 					MethodHandle mh = InvokeUtilities.IMPL_LOOKUP.findConstructor(cc, ct.getMethodType());
 					switch (ct) {
-						case MAPPINGS__ID__SHAPE_DESCRIPTOR:
-							return (IUIComponent) mh.invoke(mappings, n.getId(), sd);
+						case MAPPINGS__NAME__SHAPE_DESCRIPTOR:
+							return (IUIComponent) mh.invoke(mappings, n.getName(), sd);
 						default:
 							throw new AssertionError();
 					}

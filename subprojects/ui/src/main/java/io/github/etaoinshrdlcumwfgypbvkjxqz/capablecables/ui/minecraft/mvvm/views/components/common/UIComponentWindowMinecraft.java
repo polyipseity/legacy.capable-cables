@@ -34,8 +34,8 @@ public class UIComponentWindowMinecraft
 	protected final IUIRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
 			new DefaultUIRendererContainer<>(new DefaultRenderer<>(ImmutableMap.of(), UIComponentWindowMinecraft.class));
 
-	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
-	public UIComponentWindowMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<RectangularShape> shapeDescriptor) { super(mappings, id, shapeDescriptor); }
+	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__NAME__SHAPE_DESCRIPTOR)
+	public UIComponentWindowMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String name, IShapeDescriptor<RectangularShape> shapeDescriptor) { super(mappings, name, shapeDescriptor); }
 
 	@Override
 	public Optional<? extends IUIComponentRendererMinecraft<?>> getRenderer() { return getRendererContainer().getRenderer(); }

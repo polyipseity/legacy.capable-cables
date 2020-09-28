@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components;
 
+import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IAffineTransformStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIComponentContext;
-import com.google.common.collect.ImmutableMap;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -51,9 +51,9 @@ public interface IUIComponentContainer
 	@SuppressWarnings("UnstableApiUsage")
 	default Map<String, IUIComponent> getNamedChildrenMapView() {
 		return getChildrenView().stream().unordered()
-				.filter(c -> c.getID().isPresent())
+				.filter(c -> c.getName().isPresent())
 				.collect(ImmutableMap.toImmutableMap(c -> {
-					Optional<? extends String> id = c.getID();
+					Optional<? extends String> id = c.getName();
 					assert id.isPresent();
 					return id.get();
 				}, Function.identity()));

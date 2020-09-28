@@ -48,9 +48,9 @@ public class UIComponentWindow
 			new AutoCloseableRotator<>(() -> new ModifyShapeDescriptorObserver(this, UIConfiguration.getInstance().getLogger()), Disposable::dispose);
 
 	@SuppressWarnings({"OverridableMethodCallDuringObjectConstruction", "rawtypes", "RedundantSuppression"})
-	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
-	public UIComponentWindow(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<RectangularShape> shapeDescriptor) {
-		super(mappings, id, shapeDescriptor);
+	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__NAME__SHAPE_DESCRIPTOR)
+	public UIComponentWindow(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String name, IShapeDescriptor<RectangularShape> shapeDescriptor) {
+		super(mappings, name, shapeDescriptor);
 
 		IShapeDescriptor<?> sd = getShapeDescriptor();
 		modifyShape(() -> {

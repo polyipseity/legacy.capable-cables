@@ -25,9 +25,9 @@ public class UIComponentManagerMinecraft
 	protected final IUIRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
 			new DefaultUIRendererContainer<>(new NullUIComponentRendererMinecraft<>(UIComponentManagerMinecraft.class));
 
-	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
-	public UIComponentManagerMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<Rectangle2D> shapeDescriptor) {
-		super(mappings, id, shapeDescriptor);
+	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__NAME__SHAPE_DESCRIPTOR)
+	public UIComponentManagerMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String name, IShapeDescriptor<Rectangle2D> shapeDescriptor) {
+		super(mappings, name, shapeDescriptor);
 	}
 
 	@Override

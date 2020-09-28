@@ -21,8 +21,8 @@ public class UIComponentManager<S extends Shape>
 		implements IUIComponentManager<S> {
 	protected OptionalWeakReference<IUIViewComponent<?, ?>> view = new OptionalWeakReference<>(null);
 
-	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
-	public UIComponentManager(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<S> shapeDescriptor) { super(mappings, id, shapeDescriptor); }
+	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__NAME__SHAPE_DESCRIPTOR)
+	public UIComponentManager(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String name, IShapeDescriptor<S> shapeDescriptor) { super(mappings, name, shapeDescriptor); }
 
 	@Override
 	public boolean reshape(Predicate<? super IShapeDescriptor<? super S>> action) throws ConcurrentModificationException { return IUIComponent.reshapeComponent(this, getShapeDescriptor(), action); }

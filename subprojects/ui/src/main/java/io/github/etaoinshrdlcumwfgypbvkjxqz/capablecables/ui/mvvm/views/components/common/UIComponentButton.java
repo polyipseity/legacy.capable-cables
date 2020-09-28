@@ -48,9 +48,9 @@ public class UIComponentButton
 	protected final Set<IButtonState> buttonStates = EnumSet.noneOf(IButtonState.class);
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
-	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
-	public UIComponentButton(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<?> shapeDescriptor) {
-		super(mappings, id, shapeDescriptor);
+	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__NAME__SHAPE_DESCRIPTOR)
+	public UIComponentButton(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String name, IShapeDescriptor<?> shapeDescriptor) {
+		super(mappings, name, shapeDescriptor);
 
 		this.methodOnActivate = new BindingMethodSource<>(IUIEventActivate.class,
 				Optional.ofNullable(this.mappings.get(METHOD_ON_ACTIVATE_LOCATION)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));

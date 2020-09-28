@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components;
 
+import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
@@ -18,7 +19,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EnumH
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EventBusUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
-import com.google.common.collect.ImmutableList;
 
 import javax.annotation.Nullable;
 import java.awt.geom.Rectangle2D;
@@ -61,8 +61,8 @@ public class UIComponentContainer
 
 	protected final List<IUIComponent> children = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 
-	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
-	public UIComponentContainer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<?> shapeDescriptor) { super(mappings, id, shapeDescriptor); }
+	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__NAME__SHAPE_DESCRIPTOR)
+	public UIComponentContainer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String name, IShapeDescriptor<?> shapeDescriptor) { super(mappings, name, shapeDescriptor); }
 
 	@Override
 	public void transformChildren(IAffineTransformStack stack) {

@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components;
 
+import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.traits.IHasBindingMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIComponentContext;
@@ -11,7 +12,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.INode;
-import com.google.common.collect.ImmutableList;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -48,7 +48,7 @@ public interface IUIComponent
 				action.test(shapeDescriptor));
 	}
 
-	Optional<? extends String> getID();
+	Optional<? extends String> getName();
 
 	Optional<? extends IUIComponentContainer> getParent();
 

@@ -33,8 +33,8 @@ public class UIComponentButtonMinecraft
 	protected final IUIRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
 			new DefaultUIRendererContainer<>(new DefaultRenderer<>(ImmutableMap.of(), UIComponentButtonMinecraft.class));
 
-	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__ID__SHAPE_DESCRIPTOR)
-	public UIComponentButtonMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String id, IShapeDescriptor<?> shapeDescriptor) { super(mappings, id, shapeDescriptor); }
+	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__NAME__SHAPE_DESCRIPTOR)
+	public UIComponentButtonMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String name, IShapeDescriptor<?> shapeDescriptor) { super(mappings, name, shapeDescriptor); }
 
 	@Override
 	public Optional<? extends IUIComponentRendererMinecraft<?>> getRenderer() { return getRendererContainer().getRenderer(); }

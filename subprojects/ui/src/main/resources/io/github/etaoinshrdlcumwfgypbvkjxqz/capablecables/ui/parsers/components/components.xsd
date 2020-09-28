@@ -19,7 +19,7 @@
 		<!-- COMMENT component id -->
 		<xs:key name="componentID">
 			<xs:selector xpath=".//ui:component"/>
-			<xs:field xpath="@id"/>
+			<xs:field xpath="@name"/>
 		</xs:key>
 		<xs:keyref name="componentIDRef" refer="ui:componentID">
 			<xs:selector xpath=".//ui:anchor"/>
@@ -112,7 +112,7 @@
 				<xs:element ref="ui:anyContainer" minOccurs="0"/>
 			</xs:sequence>
 			<xs:attributeGroup ref="ui:classBasedAttributeGroup"/>
-			<xs:attribute name="id" type="xs:string" use="required"/>
+			<xs:attribute name="name" type="xs:string" use="required"/>
 			<xs:attributeGroup ref="ui:componentEventsAttributeGroup"/>
 		</xs:complexType>
 	</xs:element>

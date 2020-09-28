@@ -86,7 +86,7 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 		}
 
 		public static IUIComponent getComponentByID(IUIViewComponent<?, ?> view, String id) {
-			return findComponentByID(view, id)
+			return findComponentByName(view, id)
 					.orElseThrow(() ->
 							new IllegalArgumentException(
 									new LogMessageBuilder()
@@ -97,9 +97,9 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 							));
 		}
 
-		public static Optional<IUIComponent> findComponentByID(IUIViewComponent<?, ?> view, String id) {
+		public static Optional<IUIComponent> findComponentByName(IUIViewComponent<?, ?> view, String name) {
 			for (IUIComponent c : view.getChildrenFlatView()) {
-				if (c.getID().filter(Predicate.isEqual(id)).isPresent())
+				if (c.getName().filter(Predicate.isEqual(name)).isPresent())
 					return Optional.of(c);
 			}
 			return Optional.empty();
