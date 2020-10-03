@@ -5,7 +5,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.UIJAXBObjec
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.JAXBUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IDuplexFunction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Registry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.registering.Registry;
 import jakarta.xml.bind.JAXBElement;
 
 import javax.annotation.Nonnull;

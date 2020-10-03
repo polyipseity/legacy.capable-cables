@@ -3,7 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.adapters;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.JAXBAdapterRegistries;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IDuplexFunction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Registry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.registering.Registry;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

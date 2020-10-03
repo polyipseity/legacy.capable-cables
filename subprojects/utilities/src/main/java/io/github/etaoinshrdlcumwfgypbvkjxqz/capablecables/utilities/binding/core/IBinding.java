@@ -1,12 +1,12 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core;
 
+import com.google.common.cache.Cache;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.bindings.FieldBindings;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.bindings.MethodBindings;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.bindings.IBindings;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
-import com.google.common.cache.Cache;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 
 import java.util.function.Function;
 import java.util.function.Supplier;

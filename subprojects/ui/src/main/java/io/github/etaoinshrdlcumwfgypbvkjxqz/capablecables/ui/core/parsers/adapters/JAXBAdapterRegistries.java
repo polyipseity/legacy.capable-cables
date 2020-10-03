@@ -7,8 +7,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IDuplexFunction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Registry;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.StandardDuplexFunctionRegistry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.registering.Registry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.registering.StandardDuplexFunctionRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import jakarta.xml.bind.JAXBElement;
 

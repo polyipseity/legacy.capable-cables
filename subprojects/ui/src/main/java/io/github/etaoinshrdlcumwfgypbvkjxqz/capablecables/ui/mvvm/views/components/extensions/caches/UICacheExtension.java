@@ -25,9 +25,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.registering.Registry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.Registry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import net.minecraftforge.eventbus.api.EventPriority;
 import org.jetbrains.annotations.NonNls;
 import sun.misc.Cleaner;

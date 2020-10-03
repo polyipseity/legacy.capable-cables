@@ -1,5 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.EmptyPathException;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.IConcurrentPath;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;

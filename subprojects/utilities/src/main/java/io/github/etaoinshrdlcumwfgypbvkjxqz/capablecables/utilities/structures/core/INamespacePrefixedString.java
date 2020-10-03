@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;

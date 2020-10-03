@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICopyable;
 

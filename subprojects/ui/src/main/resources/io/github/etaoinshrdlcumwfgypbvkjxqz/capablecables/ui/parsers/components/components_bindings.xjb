@@ -8,13 +8,13 @@
 		<bindings node="/xs:schema/xs:simpleType[@name='sideType']">
 			<ci:code>
 				<![CDATA[
-				import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.EnumUISide;private final io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.SideType thisObj = this;
+					private final io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.SideType thisObj = this;
 
-					public EnumUISide toJava() {
-						return EnumUISide.valueOf(thisObj.name());
+					public io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.EnumUISide toJava() {
+						return io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.EnumUISide.valueOf(thisObj.name());
 					}
 
-					public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.SideType fromJava(EnumUISide obj) {
+					public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.SideType fromJava(io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.EnumUISide obj) {
 						return io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.SideType.valueOf(obj.name());
 					}
 				]]>

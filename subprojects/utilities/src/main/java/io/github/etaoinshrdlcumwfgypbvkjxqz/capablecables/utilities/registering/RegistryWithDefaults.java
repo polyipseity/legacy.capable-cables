@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.registering;
 
 import org.slf4j.Logger;
 
