@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.ui;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventFocus;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.UIEvent;
@@ -12,8 +13,8 @@ public class UIEventFocus extends UIEvent implements IUIEventFocus {
 	@Nullable
 	protected final IUIEventTarget relatedTarget;
 
-	public UIEventFocus(INamespacePrefixedString type, boolean canBubble, boolean cancelable, IUIEventTarget target, @Nullable IUIEventTarget relatedTarget) {
-		super(type, canBubble, cancelable, target);
+	public UIEventFocus(INamespacePrefixedString type, boolean canBubble, boolean cancelable, IUIViewContext viewContext, IUIEventTarget target, @Nullable IUIEventTarget relatedTarget) {
+		super(type, canBubble, cancelable, viewContext, target);
 		this.relatedTarget = relatedTarget;
 	}
 

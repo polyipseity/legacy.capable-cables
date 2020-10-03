@@ -16,21 +16,25 @@
 	<using alias="component.manager"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.UIComponentManagerMinecraft"/>
 	<using alias="component.window"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.common.UIComponentWindowMinecraft"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.impl.UIComponentWindowMinecraft"/>
 	<using alias="component.button"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.common.UIComponentButtonMinecraft"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.impl.UIComponentButtonMinecraft"/>
 	<!-- COMMENT renderer -->
 	<using alias="renderer.component.window.debug.custom"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIDebugMinecraft$DebugUI$CustomWindowRenderer"/>
+	<using alias="renderer.extension.user_relocatable.previewing.minecraft"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.extensions.relocatable.UIComponentUserRelocatableMinecraftExtensionPreviewingRelocatingRenderer"/>
+	<using alias="renderer.extension.user_resizable.previewing.minecraft"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.extensions.resizable.UIComponentUserResizableMinecraftExtensionPreviewingRelocatingRenderer"/>
 	<!-- COMMENT extensions -->
-	<using alias="extension.minecraft.background"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.DefaultUIExtensionMinecraftBackground"/>
+	<using alias="extension.minecraft.background.default"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.background.DefaultUIExtensionMinecraftBackground"/>
 	<using alias="extension.minecraft.background.renderer.default"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.DefaultUIExtensionMinecraftBackground.DefaultBackgroundRenderer"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.background.UIExtensionMinecraftBackgroundDefaultBackgroundRenderer"/>
 	<using alias="extension.user_relocatable"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.UIExtensionComponentUserRelocatable"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.relocatable.UITeleportingComponentUserRelocatableExtension"/>
 	<using alias="extension.user_resizable"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.DefaultUIExtensionComponentUserResizable"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.resizable.UITeleportingComponentUserResizableExtension"/>
 
 	<!-- SECTION view -->
 	<view class="view.minecraft">
@@ -53,8 +57,12 @@
 				</property>
 			</renderer>
 
-			<extension class="extension.user_relocatable"/>
-			<extension class="extension.user_resizable"/>
+			<extension class="extension.user_relocatable">
+				<renderer class="renderer.extension.user_relocatable.previewing.minecraft"/>
+			</extension>
+			<extension class="extension.user_resizable">
+				<renderer class="renderer.extension.user_resizable.previewing.minecraft"/>
+			</extension>
 		</component>
 
 		<component class="component.window" name="manager.window.anchored">
@@ -66,8 +74,12 @@
 				<property key="window.colors.border" bindingKey="anchoredWindowBorderColor"/>
 			</renderer>
 
-			<extension class="extension.user_relocatable"/>
-			<extension class="extension.user_resizable"/>
+			<extension class="extension.user_relocatable">
+				<renderer class="renderer.extension.user_relocatable.previewing.minecraft"/>
+			</extension>
+			<extension class="extension.user_resizable">
+				<renderer class="renderer.extension.user_resizable.previewing.minecraft"/>
+			</extension>
 
 			<component class="component.button" name="Button1">
 				<property key="button.methods.activate" bindingKey="buttonOnActivate"/>

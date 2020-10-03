@@ -9,4 +9,8 @@ public enum AssertionUtilities {
 		assert o != null;
 		return o;
 	}
+
+	public static void assertTrue(boolean o) {
+		assert o;
+	}
 }

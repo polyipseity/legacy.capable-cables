@@ -2,19 +2,21 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.compone
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.extensions.cursors.IUIExtensionCursorHandleProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.cursors.IUIComponentCursorHandleProvider;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentCursorHandleProviderModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIComponentContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.modifiers.NullUIComponentCursorHandleProviderModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.inputs.IInputPointerDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.optionals.Optional2;
 
-import java.awt.geom.Point2D;
 import java.util.Optional;
-import java.util.function.Function;
 
 public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent<?, ?>>
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIView<?>, E>
@@ -26,24 +28,33 @@ public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent
 	}
 
 	@Override
-	public Optional<? extends Long> getCursorHandle(Point2D cursorPosition) {
-		return getContainer()
-				.flatMap(view -> IUIViewComponent.StaticHolder.createComponentContextWithManager(view)
-						.flatMap(context -> {
-							try (IUIComponentContext ctx = context) {
-								Optional<Long> ret = Optional.empty();
-								view.getPathResolver().resolvePath(ctx, (Point2D) cursorPosition.clone(), true);
-								while (!ctx.getPath().isEmpty()) {
-									IUIComponent component = ctx.getPath().getPathEnd().orElseThrow(AssertionError::new);
-									if ((ret = CastUtilities.castChecked(IUIComponentCursorHandleProvider.class, component)
-											.flatMap(ec -> ec.getCursorHandle(ctx).map(Function.identity())))
-											.isPresent())
-										break;
-									ctx.pop();
+	public Optional<Long> getCursorHandle(IUIViewContext context) {
+		return Optional2.of(getContainer().orElse(null), context.getInputDevices().getPointerDevice().orElse(null))
+				.flatMap(values -> {
+					E view = values.getValue1Nonnull();
+					IInputPointerDevice pointerDevice = values.getValue2Nonnull();
+					return IUIViewComponent.StaticHolder.createComponentContextWithManager(view, context)
+							.flatMap(componentContext -> {
+								try (IUIComponentContext cCtx = componentContext) {
+									Optional<Long> ret = Optional.empty();
+									view.getPathResolver().resolvePath(cCtx, pointerDevice.getPositionView());
+									while (!cCtx.getPath().isEmpty()) {
+										IUIComponent component = cCtx.getPath().getPathEnd().orElseThrow(AssertionError::new);
+										IUIComponentCursorHandleProviderModifier componentAsModifier =
+												CastUtilities.castChecked(IUIComponentCursorHandleProviderModifier.class, component)
+														.orElseGet(NullUIComponentCursorHandleProviderModifier::getInstance);
+										ret = IUIComponentCursorHandleProviderModifier.StaticHolder
+												.handleComponentModifiers(componentAsModifier,
+														component.getModifiersView(),
+														cCtx);
+										if (ret.isPresent())
+											break;
+										cCtx.getMutator().pop(cCtx);
+									}
+									return ret;
 								}
-								return ret;
-							}
-						}));
+							});
+				});
 	}
 
 	@Override

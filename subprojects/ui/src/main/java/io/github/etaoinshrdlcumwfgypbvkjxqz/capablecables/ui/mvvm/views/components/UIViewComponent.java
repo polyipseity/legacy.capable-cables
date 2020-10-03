@@ -3,12 +3,14 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.compone
 import com.google.common.collect.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentShapeAnchorController;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches.IUICacheType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches.UICacheRegistry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentLifecycleModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIViewComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIComponentContext;
@@ -21,6 +23,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.componen
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIComponentHierarchyChangedBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.ArrayAffineTransformStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.DefaultUIComponentContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.DefaultUIComponentContextMutator;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.paths.DefaultUIComponentPathResolver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
@@ -35,7 +38,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer3;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftInputUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
@@ -58,7 +60,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		extends UIView<S>
 		implements IUIViewComponent<S, M> {
 	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
-	private final IUIComponentPathResolver<IUIComponent> pathResolver = new DefaultUIComponentPathResolver();
+	private final IUIComponentPathResolver pathResolver = new DefaultUIComponentPathResolver();
 	private final IUIComponentShapeAnchorController shapeAnchorController = new DefaultUIComponentShapeAnchorController();
 	@Nullable
 	private M manager;
@@ -73,16 +75,14 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	}
 
 	@Override
-	public IUIEventTarget getTargetAtPoint(Point2D point) {
-		try (IUIComponentContext context = IUIViewComponent.StaticHolder.createComponentContextWithManager(this).orElseThrow(IllegalStateException::new)) {
-			getPathResolver().resolvePath(context, (Point2D) point.clone(), true);
-			return context.getPath().getPathEnd()
-					.orElseThrow(AssertionError::new);
+	public IUIEventTarget getTargetAtPoint(IUIViewContext context, Point2D point) {
+		try (IUIComponentContext cCtx = IUIViewComponent.StaticHolder.createComponentContextWithManager(this, context).orElseThrow(IllegalStateException::new)) {
+			return getPathResolver().resolvePath(cCtx, (Point2D) point.clone()).getComponent().orElseThrow(AssertionError::new);
 		}
 	}
 
 	@Override
-	public Optional<? extends IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) {
+	public Optional<? extends IUIEventTarget> changeFocus(IUIViewContext context, @Nullable IUIEventTarget currentFocus, boolean next) {
 		@Nullable Optional<? extends IUIEventTarget> ret = CastUtilities.castChecked(IUIComponent.class, currentFocus)
 				.flatMap(cf ->
 						CacheViewComponent.CHILDREN_FLAT_FOCUSABLE.getValue().get(this)
@@ -110,20 +110,32 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 				new UIComponentHierarchyChangedBusEvent.View(EnumHookStage.POST, nextManager, this, null)));
 	}
 
+	@SuppressWarnings("RedundantTypeArguments")
 	@Override
-	public IUIComponentPathResolver<IUIComponent> getPathResolver() { return pathResolver; }
+	public void initialize(IUIViewContext context) {
+		getManager().ifPresent(manager ->
+				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext(context),
+						manager,
+						(componentContext, result) ->
+								IUIComponentLifecycleModifier.StaticHolder.handleComponentModifiers(result.getComponent(),
+										result.getModifiersView(),
+										componentContext,
+										IUIComponentLifecycleModifier::initialize),
+						IConsumer3.StaticHolder.getEmpty()));
+	}
 
 	@Override
 	public IUIComponentShapeAnchorController getShapeAnchorController() { return shapeAnchorController; }
 
-	@SuppressWarnings("RedundantTypeArguments")
 	@Override
-	public void initialize() {
-		getManager().ifPresent(manager ->
-				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext(),
-						manager,
-						(context, component) -> component.initialize(context),
-						IConsumer3.StaticHolder.empty()));
+	public IUIComponentContext createComponentContext(IUIViewContext viewContext) {
+		return new DefaultUIComponentContext(
+				this,
+				new DefaultUIComponentContextMutator(),
+				new FunctionalPath<>(ImmutableList.of(), Lists::newArrayList),
+				new ArrayAffineTransformStack(),
+				viewContext
+		);
 	}
 
 	@Override
@@ -171,22 +183,20 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	}
 
 	@Override
-	public IUIComponentContext createComponentContext() {
-		return new DefaultUIComponentContext(
-				new FunctionalPath<>(ImmutableList.of(), Lists::newArrayList),
-				new ArrayAffineTransformStack(),
-				MinecraftInputUtilities.getScaledCursorPosition()
-		);
-	}
+	public IUIComponentPathResolver getPathResolver() { return pathResolver; }
 
 	@SuppressWarnings("RedundantTypeArguments")
 	@Override
-	public void removed() {
+	public void removed(IUIViewContext context) {
 		getManager().ifPresent(manager ->
-				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext(),
+				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext(context),
 						manager,
-						(context, component) -> component.removed(context),
-						IConsumer3.StaticHolder.empty()));
+						(componentContext, result) ->
+								IUIComponentLifecycleModifier.StaticHolder.handleComponentModifiers(result.getComponent(),
+										result.getModifiersView(),
+										componentContext,
+										IUIComponentLifecycleModifier::removed),
+						IConsumer3.StaticHolder.getEmpty()));
 	}
 
 	@Override

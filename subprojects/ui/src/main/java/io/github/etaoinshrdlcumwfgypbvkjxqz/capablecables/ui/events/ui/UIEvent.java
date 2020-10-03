@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
@@ -7,19 +8,21 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.I
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UIEvent implements IUIEvent {
-	protected final INamespacePrefixedString type;
-	protected final boolean
+	private final INamespacePrefixedString type;
+	private final boolean
 			canBubble,
 			cancelable;
-	protected final IUIEventTarget target;
-	protected EnumPhase phase = EnumPhase.NONE;
-	protected boolean propagationStopped = false;
-	protected final AtomicBoolean defaultPrevented = new AtomicBoolean();
+	private final IUIViewContext viewContext;
+	private final IUIEventTarget target;
+	private final AtomicBoolean defaultPrevented = new AtomicBoolean();
+	private EnumPhase phase = EnumPhase.NONE;
+	private boolean propagationStopped = false;
 
-	public UIEvent(INamespacePrefixedString type, boolean canBubble, boolean cancelable, IUIEventTarget target) {
+	public UIEvent(INamespacePrefixedString type, boolean canBubble, boolean cancelable, IUIViewContext viewContext, IUIEventTarget target) {
 		this.type = type;
 		this.canBubble = canBubble;
 		this.cancelable = cancelable;
+		this.viewContext = viewContext.copy();
 		this.target = target;
 	}
 
@@ -60,6 +63,9 @@ public class UIEvent implements IUIEvent {
 
 	@Override
 	public boolean preventDefault() { return isCancelable() && !getDefaultPrevented().getAndSet(true); }
+
+	@Override
+	public IUIViewContext getViewContextView() { return viewContext.copy(); }
 
 	protected void setPropagationStopped(boolean propagationStopped) { this.propagationStopped = propagationStopped; }
 

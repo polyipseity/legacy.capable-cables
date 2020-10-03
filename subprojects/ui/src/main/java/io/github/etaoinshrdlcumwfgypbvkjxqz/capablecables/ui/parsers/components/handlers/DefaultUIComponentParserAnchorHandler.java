@@ -23,7 +23,7 @@ public class DefaultUIComponentParserAnchorHandler<TH extends Throwable>
 				.ifPresent(view ->
 						view.getShapeAnchorController().addAnchors(component,
 								ImmutableList.of(new ShapeAnchor(
-										IUIViewComponent.StaticHolder.getComponentByID(view, object.getTarget()),
+										IUIViewComponent.StaticHolder.getComponentByName(view, object.getTarget()),
 										object.getOriginSide().toJava(),
 										object.getTargetSide().toJava(),
 										object.getBorderThickness()))));

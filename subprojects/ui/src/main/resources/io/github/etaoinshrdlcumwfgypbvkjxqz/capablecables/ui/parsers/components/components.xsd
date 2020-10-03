@@ -31,8 +31,7 @@
 			<xs:field xpath="@alias"/>
 		</xs:key>
 		<xs:keyref name="usingIDRef" refer="ui:usingID">
-			<xs:selector
-					xpath="ui:view|.//ui:component|.//ui:shape|.//ui:renderer|.//ui:extension"/><!-- COMMENT no idea why './/ui:*' does not work -->
+			<xs:selector xpath=".//ui:*"/><!-- TODO no idea why './/ui:*' does not work -->
 			<xs:field xpath="@class"/>
 		</xs:keyref>
 	</xs:element>

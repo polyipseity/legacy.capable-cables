@@ -60,8 +60,8 @@ public class DefaultUIComponentParserExtensionHandler
 				object.getAnyContainer()
 						.map(AnyContainer::getAny)
 						.orElseGet(ImmutableList::of))
-				.forEach(IThrowingConsumer.execute(any -> IParserContext.StaticHolder.findHandler(context, any)
-						.ifPresent(IThrowingConsumer.execute(handler -> handler.accept(
+				.forEach(IThrowingConsumer.executeNow(any -> IParserContext.StaticHolder.findHandler(context, any)
+						.ifPresent(IThrowingConsumer.executeNow(handler -> handler.accept(
 								context,
 								CastUtilities.castUnchecked(ret), // COMMENT may throw
 								CastUtilities.castUnchecked(any) // COMMENT should not throw

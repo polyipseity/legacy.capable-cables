@@ -1,5 +1,11 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
@@ -11,12 +17,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.ManualLoadingCache;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingBiFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
 
 import java.util.*;
 import java.util.function.Function;
@@ -56,14 +56,14 @@ public class Binder implements IBinder {
 			throws NoSuchBindingTransformerException {
 		return sortAndTrimBindings(bindings).entrySet().stream().unordered()
 				.reduce(false,
-						IThrowingBiFunction.execute((r, e) -> {
+						IThrowingBiFunction.executeNow((r, e) -> {
 							LoadingCache<INamespacePrefixedString, IBindings<?>> bs = getBindings().getUnchecked(AssertionUtilities.assertNonnull(e.getKey()));
 							return AssertionUtilities.assertNonnull(e.getValue()).asMap().entrySet().stream().sequential() // COMMENT sequential, field binding order matters
 									.reduce(false,
 											IThrowingBiFunction.
 													<Boolean, Map.Entry<INamespacePrefixedString, ? extends Collection<? extends IBinding<?>>>, Boolean,
 															NoSuchBindingTransformerException>
-															execute((r2, e2) ->
+															executeNow((r2, e2) ->
 															bs.getUnchecked(AssertionUtilities.assertNonnull(e2.getKey()))
 																	.add(CastUtilities.castUnchecked( // COMMENT should be of the right type
 																			AssertionUtilities.assertNonnull(e2.getValue()))) || r2),

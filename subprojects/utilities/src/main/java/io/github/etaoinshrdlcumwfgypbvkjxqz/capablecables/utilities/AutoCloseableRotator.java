@@ -34,7 +34,7 @@ public class AutoCloseableRotator<T, TH extends Exception>
 			throws TH {
 		return getActiveReference().accumulateAndGet(
 				AssertionUtilities.assertNonnull(getSupplier().get()),
-				IThrowingBiFunction.<T, T, T, TH>execute((previous, next) -> {
+				IThrowingBiFunction.<T, T, T, TH>executeNow((previous, next) -> {
 					close();
 					return next;
 				})::apply
@@ -47,7 +47,7 @@ public class AutoCloseableRotator<T, TH extends Exception>
 	public void close()
 			throws TH {
 		Optional.ofNullable(getActiveReference().getAndSet(null))
-				.ifPresent(IThrowingConsumer.execute(getCloser()));
+				.ifPresent(IThrowingConsumer.executeNow(getCloser()));
 	}
 
 	protected IThrowingConsumer<? super T, ? extends TH> getCloser() { return closer; }

@@ -43,10 +43,10 @@ public class FieldBindings
 			throws NoSuchBindingTransformerException {
 		return Streams.stream(fields).sequential() // COMMENT sequential, field binding order matters
 				.filter(key -> !getFields().containsKey(key))
-				.reduce(false, IThrowingBiFunction.execute((r, f) -> {
+				.reduce(false, IThrowingBiFunction.executeNow((r, f) -> {
 					getFields().keySet().stream().unordered()
 							.findAny()
-							.ifPresent(IThrowingConsumer.execute(fc ->
+							.ifPresent(IThrowingConsumer.executeNow(fc ->
 									f.setValue(CastUtilities.castUncheckedNullable( // COMMENT should be of the right type
 											transform(getTransformers(),
 													CastUtilities.castUncheckedNullable(fc.getValue().orElse(null)), // COMMENT should be always safe

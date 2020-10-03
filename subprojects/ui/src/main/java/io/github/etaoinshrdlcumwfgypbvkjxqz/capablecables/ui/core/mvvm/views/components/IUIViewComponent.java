@@ -5,7 +5,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.traits.IHasBindingMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIComponentContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIComponentContextMutatorResult;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.paths.IUIComponentPathResolver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
@@ -28,46 +30,45 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 		extends IHasBinding, IHasBindingMap, IUIView<S> {
 	Optional<? extends M> getManager();
 
-	IUIComponentContext createComponentContext();
+	void setManager(@Nullable M manager);
+
+	IUIComponentContext createComponentContext(IUIViewContext viewContext);
 
 	List<IUIComponent> getChildrenFlatView();
 
-	IUIComponentPathResolver<IUIComponent> getPathResolver();
+	IUIComponentPathResolver getPathResolver();
 
 	IUIComponentShapeAnchorController getShapeAnchorController();
-
-	void setManager(@Nullable M manager);
 
 	enum StaticHolder {
 		;
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
-		public static Optional<IUIComponentContext> createComponentContextWithManager(IUIViewComponent<?, ?> view) {
+		public static Optional<IUIComponentContext> createComponentContextWithManager(IUIViewComponent<?, ?> view, IUIViewContext viewContext) {
 			return view.getManager()
 					.map(manager -> {
-						IUIComponentContext context = view.createComponentContext();
-						context.push(manager);
+						IUIComponentContext context = view.createComponentContext(viewContext);
+						context.getMutator().push(context, manager);
 						return context;
 					});
 		}
 
 		public static <T extends Throwable> void traverseComponentTreeDefault(IUIComponentContext context,
 		                                                                      IUIComponent root,
-		                                                                      BiConsumer<? super IUIComponentContext, ? super IUIComponent> pre,
-		                                                                      IConsumer3<? super IUIComponentContext, ? super IUIComponent, ? super Iterable<? super IUIComponent>, ? extends T> post) throws T {
+		                                                                      BiConsumer<? super IUIComponentContext, ? super IUIComponentContextMutatorResult> pre,
+		                                                                      IConsumer3<? super IUIComponentContext, ? super IUIComponentContextMutatorResult, ? super Iterable<? super IUIComponent>, ? extends T> post) throws T {
 			traverseComponentTreeDefault(context, root, pre, post, FunctionUtilities.alwaysTruePredicate());
 		}
 
 		public static <T extends Throwable> void traverseComponentTreeDefault(IUIComponentContext context,
 		                                                                      IUIComponent root,
-		                                                                      BiConsumer<? super IUIComponentContext, ? super IUIComponent> pre,
-		                                                                      IConsumer3<? super IUIComponentContext, ? super IUIComponent, ? super Iterable<? super IUIComponent>, ? extends T> post,
+		                                                                      BiConsumer<? super IUIComponentContext, ? super IUIComponentContextMutatorResult> pre,
+		                                                                      IConsumer3<? super IUIComponentContext, ? super IUIComponentContextMutatorResult, ? super Iterable<? super IUIComponent>, ? extends T> post,
 		                                                                      Predicate<? super IUIComponent> predicate) throws T {
 			TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, root,
 					component -> {
 						if (predicate.test(component)) {
-							context.push(component);
-							pre.accept(context, component);
+							pre.accept(context, context.getMutator().push(context, component));
 						}
 						return component;
 					},
@@ -75,23 +76,24 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 							.filter(predicate)
 							.map(IUIComponentContainer::getChildrenView)
 							.orElseGet(ImmutableList::of),
-					IThrowingBiFunction.execute((parent, children) -> {
+					IThrowingBiFunction.executeNow((parent, children) -> {
 						if (predicate.test(parent)) {
-							post.accept(context, parent, children);
-							context.pop();
+							IUIComponentContext contextCopy = context.copy();
+							post.accept(context, contextCopy.getMutator().pop(contextCopy), children);
+							context.getMutator().pop(context);
 						}
 						return parent;
 					}),
 					repeated -> { throw new AssertionError(); });
 		}
 
-		public static IUIComponent getComponentByID(IUIViewComponent<?, ?> view, String id) {
-			return findComponentByName(view, id)
+		public static IUIComponent getComponentByName(IUIViewComponent<?, ?> view, String name) {
+			return findComponentByName(view, name)
 					.orElseThrow(() ->
 							new IllegalArgumentException(
 									new LogMessageBuilder()
 											.addMarkers(UIMarkers.getInstance()::getMarkerUIView)
-											.addKeyValue("view", view).addKeyValue("id", id)
+											.addKeyValue("view", view).addKeyValue("name", name)
 											.addMessages(() -> getResourceBundle().getString("component.get.id.fail"))
 											.build()
 							));

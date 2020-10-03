@@ -1,36 +1,18 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components;
 
 import com.google.common.collect.ImmutableMap;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IAffineTransformStack;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIComponentContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentTransformChildrenModifier;
 
-import javax.annotation.Nullable;
+import java.awt.geom.AffineTransform;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public interface IUIComponentContainer
-		extends IUIComponent {
-	static void runAsChildren(IUIComponentContainer self, IUIComponentContext context, Runnable call) {
-		getAsChildren(self, context, () -> {
-			call.run();
-			return null;
-		});
-	}
-
-	@SuppressWarnings("UnusedReturnValue")
-	static <R> Optional<R> getAsChildren(IUIComponentContainer self, IUIComponentContext context, Supplier<R> call) {
-		IAffineTransformStack transformStack = context.getTransformStack();
-		transformStack.push();
-		self.transformChildren(transformStack);
-		@Nullable R ret = call.get();
-		transformStack.pop();
-		return Optional.ofNullable(ret);
-	}
-
-	void transformChildren(IAffineTransformStack stack);
+		extends IUIComponent, IUIComponentTransformChildrenModifier {
+	@Override
+	void transformChildren(AffineTransform transform);
 
 	@SuppressWarnings("UnusedReturnValue")
 	boolean addChildren(Iterable<? extends IUIComponent> components);

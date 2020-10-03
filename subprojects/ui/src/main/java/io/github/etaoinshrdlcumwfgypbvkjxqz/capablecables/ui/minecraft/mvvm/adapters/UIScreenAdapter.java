@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIInfrastructure;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIInfrastructureContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.adapters.IUIAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.extensions.cursors.IUIExtensionCursorHandleProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventKeyboard;
@@ -14,6 +15,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.UIEventUt
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.extensions.IUIExtensionMinecraftScreenProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.UIExtensionMinecraftContainerProvider;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.DefaultUIInfrastructureContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.viewmodels.DefaultUIViewModelContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.DefaultUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIDataKeyboardKeyPress;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIDataMouseButtonClick;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIInputUtilities;
@@ -26,11 +30,13 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.inputs.IInputDevices;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.inputs.core.ImmutableInputDevices;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftInputUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftOpenGLUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTextComponentUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTooltipUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.inputs.MinecraftInputPointerDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.DoubleDimension2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
@@ -53,7 +59,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Function;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
@@ -67,17 +72,19 @@ public class UIScreenAdapter
 	protected final ConcurrentMap<Integer, IUIEventMouse>
 			mouseButtonsBeingPressed = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 
-	protected final I infrastructure;
+	private final I infrastructure;
 	@Nullable
-	protected final C containerObject;
-	protected final Set<Integer> closeKeys, changeFocusKeys;
-	protected boolean paused = false;
+	private final C containerObject;
+	private final Set<Integer> closeKeys, changeFocusKeys;
+	private final IInputDevices inputDevices = new ImmutableInputDevices.Builder()
+			.setPointerDevice(new MinecraftInputPointerDevice())
+			.build();
+	private boolean paused = false;
 	@Nullable
-	protected IUIEventTarget targetBeingHoveredByMouse = null;
-	protected ITextComponent title;
-
+	private IUIEventTarget targetBeingHoveredByMouse = null;
+	private ITextComponent title;
 	@Nullable
-	protected IUIEventTarget focus;
+	private IUIEventTarget focus;
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	protected UIScreenAdapter(ITextComponent title, I infrastructure, @Nullable C containerObject, Set<Integer> closeKeys, Set<Integer> changeFocusKeys) {
@@ -96,18 +103,31 @@ public class UIScreenAdapter
 	}
 
 	@Override
+	@Deprecated
+	public void render(int mouseX, int mouseY, float partialTicks) {
+		IUIInfrastructureContext context = createContext();
+		getInfrastructure().getView().render(context.getViewContext(), partialTicks);
+		IUIExtensionCursorHandleProvider.TYPE.getValue().find(getInfrastructure().getView()).ifPresent(ext ->
+				GLFW.glfwSetCursor(
+						MinecraftOpenGLUtilities.getWindowHandle(),
+						ext.getCursorHandle(context.getViewContext()).orElse(MemoryUtil.NULL)
+				)
+		);
+	}
+
+	@Override
 	public ITextComponent getTitle() { return title; }
 
 	public void setTitle(ITextComponent title) { this.title = title; }
 
-	@Override
-	@Deprecated
-	public void render(int mouseX, int mouseY, float partialTicks) {
-		Point2D cp = new Point2D.Double(mouseX, mouseY);
-		getInfrastructure().getView().render((Point2D) cp.clone(), partialTicks);
-		IUIExtensionCursorHandleProvider.TYPE.getValue().find(getInfrastructure().getView()).ifPresent(ext ->
-				GLFW.glfwSetCursor(MinecraftOpenGLUtilities.getWindowHandle(), ext.getCursorHandle((Point2D) cp.clone()).<Long>map(Function.identity()).orElse(MemoryUtil.NULL)));
+	protected IUIInfrastructureContext createContext() {
+		return new DefaultUIInfrastructureContext(
+				new DefaultUIViewContext(new ImmutableInputDevices.Builder(getInputDevices()).strongImmutability().build()),
+				new DefaultUIViewModelContext()
+		);
 	}
+
+	protected IInputDevices getInputDevices() { return inputDevices; }
 
 	public Set<Integer> getCloseKeysView() { return ImmutableSet.copyOf(getCloseKeys()); }
 
@@ -195,14 +215,17 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	protected void init() {
-		try {
-			IUIInfrastructure.StaticHolder.bindSafe(getInfrastructure());
-		} catch (NoSuchBindingTransformerException e) {
-			throw ThrowableUtilities.propagate(e);
+	public boolean keyPressed(int key, int scanCode, int modifiers) {
+		IUIInfrastructureContext context = createContext();
+		if (getFocus().map(f -> UIEventUtilities.dispatchEvent(
+				addEventKeyboard(this, UIEventUtilities.Factory.createEventKeyDown(context.getViewContext(), f,
+						new UIDataKeyboardKeyPress(key, scanCode, modifiers))))).orElse(true)) {
+			if (getCloseKeys().contains(key))
+				onClose();
+			if (getChangeFocusKeys().contains(key))
+				changeFocus((modifiers & GLFW.GLFW_MOD_SHIFT) == 0);
 		}
-		setSize(width, height);
-		getInfrastructure().initialize();
+		return true;
 	}
 
 	@Override
@@ -221,26 +244,14 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	public void removed() {
-		GLFW.glfwSetCursor(MinecraftOpenGLUtilities.getWindowHandle(), MemoryUtil.NULL);
-		{
-			// COMMENT generate opposite synthetic events
-			// COMMENT NO default actions
-			ImmutableSet.copyOf(getKeyboardKeysBeingPressed().keySet()).stream().unordered()
-					.forEach(k ->
-							removeEventKeyboard(this, k).ifPresent(e2 ->
-									UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventKeyboardOpposite(e2))));
-			Point2D cp = MinecraftInputUtilities.getScaledCursorPosition();
-			ImmutableSet.copyOf(getMouseButtonsBeingPressed().keySet()).stream().unordered()
-					.forEach(k ->
-							removeEventMouse(this, AssertionUtilities.assertNonnull(k)).ifPresent(e2 ->
-									UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e2, cp))));
-			setTargetBeingHoveredByMouse(null, new UIDataMouseButtonClick(cp));
-			setLastMouseClickData(null, null);
-			setFocus(null);
+	protected void init() {
+		try {
+			IUIInfrastructure.StaticHolder.bindSafe(getInfrastructure());
+		} catch (NoSuchBindingTransformerException e) {
+			throw ThrowableUtilities.propagate(e);
 		}
-		getInfrastructure().removed();
-		IUIInfrastructure.StaticHolder.unbindSafe(getInfrastructure());
+		setSize(width, height);
+		getInfrastructure().initialize(createContext());
 	}
 
 	@Override
@@ -249,7 +260,7 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	public void tick() { getInfrastructure().tick(); }
+	public void tick() { getInfrastructure().tick(createContext()); }
 
 	protected static Optional<IUIEventKeyboard> removeEventKeyboard(UIScreenAdapter<?, ?> self, int key) { return Optional.ofNullable(self.getKeyboardKeysBeingPressed().remove(key)); }
 
@@ -264,16 +275,28 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		Point2D cp = new Point2D.Double(mouseX, mouseY);
-		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
-		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone());
-		if (UIEventUtilities.dispatchEvent(addEventMouse(this, UIEventUtilities.Factory.createEventMouseDown(t, d)))) {
-			// TODO select
-			// TODO drag or drop perhaps
-			// TODO scroll/pan
+	public void removed() {
+		IUIInfrastructureContext context = createContext();
+
+		GLFW.glfwSetCursor(MinecraftOpenGLUtilities.getWindowHandle(), MemoryUtil.NULL);
+		{
+			// COMMENT generate opposite synthetic events
+			// COMMENT NO default actions
+			ImmutableSet.copyOf(getKeyboardKeysBeingPressed().keySet()).stream().unordered()
+					.forEach(k ->
+							removeEventKeyboard(this, k).ifPresent(e2 ->
+									UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventKeyboardOpposite(e2))));
+			Point2D cp = getInputDevices().getPointerDevice().orElseThrow(AssertionError::new).getPositionView();
+			ImmutableSet.copyOf(getMouseButtonsBeingPressed().keySet()).stream().unordered()
+					.forEach(k ->
+							removeEventMouse(this, AssertionUtilities.assertNonnull(k)).ifPresent(e2 ->
+									UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e2, cp))));
+			setTargetBeingHoveredByMouse(context, null, new UIDataMouseButtonClick(cp));
+			setLastMouseClickData(context, null, null);
+			setFocus(context, null);
 		}
-		return true;
+		getInfrastructure().removed(context);
+		IUIInfrastructure.StaticHolder.unbindSafe(getInfrastructure());
 	}
 
 	@Override
@@ -288,38 +311,34 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	public boolean charTyped(char codePoint, int modifiers) {
-		getFocus().ifPresent(f -> UIEventUtilities.dispatchEvent(
-				UIEventUtilities.Factory.createEventChar(f, codePoint, modifiers)));
+	public boolean mouseClicked(double mouseX, double mouseY, int button) {
+		IUIInfrastructureContext context = createContext();
+		Point2D cp = new Point2D.Double(mouseX, mouseY);
+		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
+		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(context.getViewContext(), (Point2D) cp.clone());
+		if (UIEventUtilities.dispatchEvent(addEventMouse(this, UIEventUtilities.Factory.createEventMouseDown(context.getViewContext(), t, d)))) {
+			// TODO select
+			// TODO drag or drop perhaps
+			// TODO scroll/pan
+		}
 		return true;
-	}
-
-	protected void setLastMouseClickData(@Nullable UIDataMouseButtonClick newMouseClickData, @Nullable IUIEventTarget target) {
-		boolean ret = getLastMouseClickData()
-				.flatMap(dl -> Optional.ofNullable(newMouseClickData)
-						.filter(d -> UIInputUtilities.isDoubleClick(dl, d)
-								&& UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClickDouble(AssertionUtilities.assertNonnull(target), d))))
-				.isPresent();
-		this.lastMouseClickData = newMouseClickData;
-		if (ret)
-			setFocus(target);
-		// TODO select
 	}
 
 	@Override
 	@Deprecated
 	public boolean mouseReleased(double mouseX, double mouseY, int button) {
 		// TODO test if release works when multiple buttons are clicked
+		IUIInfrastructureContext context = createContext();
 		Point2D cp = new Point2D.Double(mouseX, mouseY);
 		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
-		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone());
+		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(context.getViewContext(), (Point2D) cp.clone());
 		removeEventMouse(this, button).ifPresent(e -> {
 			if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e, cp)))
 				; // TODO context menu
 			if (t.equals(e.getTarget())) {
-				if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClick(t, d)))
-					setFocus(t);
-				setLastMouseClickData(d, t);
+				if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClick(context.getViewContext(), t, d)))
+					setFocus(context, t);
+				setLastMouseClickData(context, d, t);
 			}
 		});
 		return true;
@@ -328,10 +347,20 @@ public class UIScreenAdapter
 	@Override
 	@Deprecated
 	public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+		IUIInfrastructureContext context = createContext();
 		Point2D cp = new Point2D.Double(mouseX, mouseY);
-		IUIEventTarget target = getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone());
+		IUIEventTarget target = getInfrastructure().getView().getTargetAtPoint(context.getViewContext(), (Point2D) cp.clone());
 		UIEventUtilities.dispatchEvent(
-				UIEventUtilities.Factory.createEventWheel(false, target, new UIDataMouseButtonClick(cp), target, delta)); // COMMENT nothing to be scrolled
+				UIEventUtilities.Factory.createEventWheel(false, context.getViewContext(), target, new UIDataMouseButtonClick(cp), target, delta)); // COMMENT nothing to be scrolled
+		return true;
+	}
+
+	@Override
+	@Deprecated
+	public boolean charTyped(char codePoint, int modifiers) {
+		IUIInfrastructureContext context = createContext();
+		getFocus().ifPresent(f -> UIEventUtilities.dispatchEvent(
+				UIEventUtilities.Factory.createEventChar(context.getViewContext(), f, codePoint, modifiers)));
 		return true;
 	}
 
@@ -379,12 +408,9 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	public void mouseMoved(double mouseX, double mouseY) {
-		Point2D cp = new Point2D.Double(mouseX, mouseY);
-		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp);
-		UIEventUtilities.dispatchEvent(
-				UIEventUtilities.Factory.createEventMouseMove(getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone()), d));
-		setTargetBeingHoveredByMouse(getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone()), d);
+	public boolean changeFocus(boolean next) {
+		IUIInfrastructureContext context = createContext();
+		return setFocus(context, getInfrastructure().getView().changeFocus(context.getViewContext(), getFocus().orElse(null), next).orElse(null));
 	}
 
 	@OnlyIn(Dist.CLIENT)
@@ -456,39 +482,48 @@ public class UIScreenAdapter
 	@Deprecated
 	public boolean mouseDragged(double mouseX, double mouseY, int button, double mouseXDiff, double mouseYDiff) { return getMouseButtonsBeingPressed().containsKey(button); }
 
-	@Override
-	@Deprecated
-	public boolean keyPressed(int key, int scanCode, int modifiers) {
-		if (getFocus().map(f -> UIEventUtilities.dispatchEvent(
-				addEventKeyboard(this, UIEventUtilities.Factory.createEventKeyDown(f,
-						new UIDataKeyboardKeyPress(key, scanCode, modifiers))))).orElse(true)) {
-			if (getCloseKeys().contains(key))
-				onClose();
-			if (getChangeFocusKeys().contains(key))
-				changeFocus((modifiers & GLFW.GLFW_MOD_SHIFT) == 0);
-		}
-		return true;
-	}
-
-	protected boolean setFocus(@Nullable IUIEventTarget focus) {
+	protected boolean setFocus(IUIInfrastructureContext context, @Nullable IUIEventTarget focus) {
 		Optional<? extends IUIEventTarget> p = getFocus(), n = Optional.ofNullable(focus);
 		if (n.map(IUIEventTarget::isFocusable).orElse(true) && !n.equals(p)) {
 			@Nullable IUIEventTarget pv = p.orElse(null);
 			p.ifPresent(f -> UIEventUtilities.dispatchEvent(
-					UIEventUtilities.Factory.createEventFocusOutPre(f, focus)));
+					UIEventUtilities.Factory.createEventFocusOutPre(context.getViewContext(), f, focus)));
 			n.ifPresent(f -> UIEventUtilities.dispatchEvent(
-					UIEventUtilities.Factory.createEventFocusInPre(f, pv)));
+					UIEventUtilities.Factory.createEventFocusInPre(context.getViewContext(), f, pv)));
 			this.focus = focus;
 			p.ifPresent(f -> UIEventUtilities.dispatchEvent(
-					UIEventUtilities.Factory.createEventFocusOutPost(f, focus)));
+					UIEventUtilities.Factory.createEventFocusOutPost(context.getViewContext(), f, focus)));
 			n.ifPresent(f -> UIEventUtilities.dispatchEvent(
-					UIEventUtilities.Factory.createEventFocusInPost(f, pv)));
+					UIEventUtilities.Factory.createEventFocusInPost(context.getViewContext(), f, pv)));
 			return true;
 		}
 		return false;
 	}
 
-	protected void setTargetBeingHoveredByMouse(@Nullable IUIEventTarget targetBeingHoveredByMouse, IUIDataMouseButtonClick data) {
+	protected void setLastMouseClickData(IUIInfrastructureContext context, @Nullable UIDataMouseButtonClick newMouseClickData, @Nullable IUIEventTarget target) {
+		boolean ret = getLastMouseClickData()
+				.flatMap(dl -> Optional.ofNullable(newMouseClickData)
+						.filter(d -> UIInputUtilities.isDoubleClick(dl, d)
+								&& UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.createEventClickDouble(context.getViewContext(), AssertionUtilities.assertNonnull(target), d))))
+				.isPresent();
+		this.lastMouseClickData = newMouseClickData;
+		if (ret)
+			setFocus(context, target);
+		// TODO select
+	}
+
+	@Override
+	@Deprecated
+	public void mouseMoved(double mouseX, double mouseY) {
+		IUIInfrastructureContext context = createContext();
+		Point2D cp = new Point2D.Double(mouseX, mouseY);
+		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp);
+		UIEventUtilities.dispatchEvent(
+				UIEventUtilities.Factory.createEventMouseMove(context.getViewContext(), getInfrastructure().getView().getTargetAtPoint(context.getViewContext(), (Point2D) cp.clone()), d));
+		setTargetBeingHoveredByMouse(context, getInfrastructure().getView().getTargetAtPoint(context.getViewContext(), (Point2D) cp.clone()), d);
+	}
+
+	protected void setTargetBeingHoveredByMouse(IUIInfrastructureContext context, @Nullable IUIEventTarget targetBeingHoveredByMouse, IUIDataMouseButtonClick data) {
 		Optional<? extends IUIEventTarget> o = getTargetBeingHoveredByMouse();
 		Optional<IUIEventTarget> n = Optional.ofNullable(targetBeingHoveredByMouse);
 		if (!n.equals(o)) {
@@ -511,27 +546,23 @@ public class UIScreenAdapter
 			int iFinal = i; // COMMENT paths equal for [0,i)
 			o.ifPresent(t -> {
 				UIEventUtilities.dispatchEvent(
-						UIEventUtilities.Factory.createEventMouseLeaveSelf(t, data, n.orElse(null))); // COMMENT consider bubbling
+						UIEventUtilities.Factory.createEventMouseLeaveSelf(context.getViewContext(), t, data, n.orElse(null))); // COMMENT consider bubbling
 				Lists.reverse(op.subList(iFinal, op.size())).forEach(t2 ->
 						CastUtilities.castChecked(IUIEventTarget.class, t2)
 								.ifPresent(t3 -> UIEventUtilities.dispatchEvent(
-										UIEventUtilities.Factory.createEventMouseLeave(t3, data, n.orElse(null)))));
+										UIEventUtilities.Factory.createEventMouseLeave(context.getViewContext(), t3, data, n.orElse(null)))));
 			});
 			this.targetBeingHoveredByMouse = targetBeingHoveredByMouse;
 			n.ifPresent(t -> {
 				UIEventUtilities.dispatchEvent(
-						UIEventUtilities.Factory.createEventMouseEnterSelf(t, data, o.orElse(null))); // COMMENT consider bubbling
+						UIEventUtilities.Factory.createEventMouseEnterSelf(context.getViewContext(), t, data, o.orElse(null))); // COMMENT consider bubbling
 				np.subList(iFinal, np.size()).forEach(t2 ->
 						CastUtilities.castChecked(IUIEventTarget.class, t2)
 								.ifPresent(t3 -> UIEventUtilities.dispatchEvent(
-										UIEventUtilities.Factory.createEventMouseEnter(t3, data, o.orElse(null)))));
+										UIEventUtilities.Factory.createEventMouseEnter(context.getViewContext(), t3, data, o.orElse(null)))));
 			});
 		}
 	}
-
-	@Override
-	@Deprecated
-	public boolean changeFocus(boolean next) { return setFocus(getInfrastructure().getView().changeFocus(getFocus().orElse(null), next).orElse(null)); }
 
 	@Override
 	@Deprecated

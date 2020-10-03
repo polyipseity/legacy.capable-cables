@@ -6,9 +6,11 @@ import com.google.common.collect.Iterables;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.binding.UIProperty;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIComponentConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.UIEventTarget;
@@ -16,6 +18,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.extensions.UIE
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.caches.UICacheExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIComponentBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.interactions.ProviderShapeDescriptor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
@@ -26,6 +30,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EnumHookStage;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EventBusUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtension;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
@@ -35,9 +40,8 @@ import io.reactivex.rxjava3.subjects.UnicastSubject;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
-import java.util.ConcurrentModificationException;
-import java.util.Map;
-import java.util.Optional;
+import java.awt.geom.Point2D;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
@@ -56,20 +60,21 @@ public class UIComponent
 	private static final INamespacePrefixedString PROPERTY_ACTIVE_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_ACTIVE);
 
 	@Nullable
-	protected final String name;
-	protected final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
-	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
-	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
-	protected final ConcurrentMap<INamespacePrefixedString, IBindingMethodSource<? extends IUIEvent>> eventTargetBindingMethods = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	private final String name;
+	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
+	private final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
+	private final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	private final ConcurrentMap<INamespacePrefixedString, IBindingMethodSource<? extends IUIEvent>> eventTargetBindingMethods = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	// todo add animation system
 	// todo cache transform
-	protected final IShapeDescriptor<?> shapeDescriptor;
+	private final IShapeDescriptor<?> shapeDescriptor;
 	@UIProperty(PROPERTY_VISIBLE)
-	protected final IBindingField<Boolean> visible;
+	private final IBindingField<Boolean> visible;
 	@UIProperty(PROPERTY_ACTIVE)
-	protected final IBindingField<Boolean> active;
-	protected OptionalWeakReference<IUIComponentContainer> parent = new OptionalWeakReference<>(null);
-	protected final AtomicBoolean modifyingShape = new AtomicBoolean();
+	private final IBindingField<Boolean> active;
+	private final AtomicBoolean modifyingShape = new AtomicBoolean();
+	private final List<IUIComponentModifier> modifiers = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+	private OptionalWeakReference<IUIComponentContainer> parent = new OptionalWeakReference<>(null);
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__NAME__SHAPE_DESCRIPTOR)
@@ -84,7 +89,7 @@ public class UIComponent
 		this.active = IUIPropertyMappingValue.createBindingField(Boolean.class, false, true,
 				this.mappings.get(getPropertyActiveLocation()));
 
-		StaticHolder.addExtensionChecked(this, new UICacheExtension());
+		IExtensionContainer.StaticHolder.addExtensionChecked(this, new UICacheExtension());
 	}
 
 	public static INamespacePrefixedString getPropertyVisibleLocation() { return PROPERTY_VISIBLE_LOCATION; }
@@ -156,14 +161,14 @@ public class UIComponent
 	@Deprecated
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
 		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
-		return StaticHolder.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension);
+		return IExtensionContainer.StaticHolder.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension);
 	}
 
 	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return StaticHolder.removeExtensionImpl(getExtensions(), key); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.StaticHolder.removeExtensionImpl(getExtensions(), key); }
 
 	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return StaticHolder.getExtensionImpl(getExtensions(), key); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return IExtensionContainer.StaticHolder.getExtensionImpl(getExtensions(), key); }
 
 	@Override
 	public Iterable<? extends ObservableSource<IBinderAction>> getBinderNotifiers() { return Iterables.concat(ImmutableList.of(getBinderNotifierSubject()), IUIComponent.super.getBinderNotifiers()); }
@@ -179,6 +184,69 @@ public class UIComponent
 	public void setActive(boolean active) { getActive().setValue(active); }
 
 	@Override
+	public List<? extends IUIComponentModifier> getModifiersView() { return ImmutableList.copyOf(getModifiers()); }
+
+	@Override
+	public boolean addModifier(IUIComponentModifier modifier) {
+		boolean ret;
+		if (modifier.getTargetComponent()
+				.map(previousTargetComponent -> previousTargetComponent.removeModifier(modifier))
+				.orElse(true)) {
+			AssertionUtilities.assertTrue(getModifiers().add(modifier));
+			modifier.setTargetComponent(this);
+			ret = true;
+		} else
+			ret = false;
+		assertModifierPresence(this, modifier, ret);
+		return ret;
+	}
+
+	@Override
+	public boolean removeModifier(IUIComponentModifier modifier) {
+		boolean ret;
+		assertModifierUnique(this, modifier);
+		if (getModifiers().remove(modifier)) {
+			modifier.setTargetComponent(null);
+			ret = true;
+		} else
+			ret = false;
+		assertModifierPresence(this, modifier, false);
+		return ret;
+	}
+
+	@Override
+	public boolean moveModifierToTop(IUIComponentModifier modifier) {
+		boolean ret;
+		assertModifierUnique(this, modifier);
+		if (getModifiers().remove(modifier)) {
+			AssertionUtilities.assertTrue(getModifiers().add(modifier));
+			ret = true;
+		} else
+			ret = false;
+		assertModifierPresence(this, modifier, ret);
+		return ret;
+	}
+
+	@Override
+	public void initialize(IUIComponentContext context) {}
+
+	@Override
+	public void removed(IUIComponentContext context) {}
+
+	@Override
+	public boolean containsPoint(IUIComponentContext context, Point2D point) {
+		return StaticHolder.getContextualShape(context, this).contains(point);
+	}
+
+	protected static void assertModifierUnique(UIComponent self, IUIComponentModifier modifier) {
+		assert self.getModifiers().indexOf(modifier) == self.getModifiers().lastIndexOf(modifier);
+	}
+
+	protected static void assertModifierPresence(UIComponent self, IUIComponentModifier modifier, boolean present) {
+		assert self.getModifiers().contains(modifier) == present;
+	}
+
+	@Override
 	public Map<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
@@ -186,4 +254,7 @@ public class UIComponent
 
 	@Override
 	public Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(getMappings()); }
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected List<IUIComponentModifier> getModifiers() { return modifiers; }
 }

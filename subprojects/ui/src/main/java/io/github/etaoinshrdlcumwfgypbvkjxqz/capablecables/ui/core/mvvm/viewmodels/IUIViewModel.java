@@ -8,7 +8,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.I
 
 // TODO need to consider about threading
 public interface IUIViewModel<M extends IUIModel>
-		extends IUISubInfrastructure, IHasBinding, IExtensionContainer<INamespacePrefixedString> {
+		extends IUISubInfrastructure<IUIViewModelContext>, IHasBinding, IExtensionContainer<INamespacePrefixedString> {
 	M getModel();
 
 	void setModel(M model);

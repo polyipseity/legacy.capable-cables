@@ -39,7 +39,7 @@ public enum EnumUIEventDOMType
 	WHEEL(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "wheel"),
 	@SuppressWarnings("SpellCheckingInspection")
 	UPDATE_PRE(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "beforeinput"),
-	UPDATE_POST(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "input"),
+	UPDATE_POST(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "inputs"),
 	@SuppressWarnings("SpellCheckingInspection")
 	KEY_DOWN(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "keydown"),
 	@SuppressWarnings("SpellCheckingInspection")

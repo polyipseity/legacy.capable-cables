@@ -2,12 +2,13 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 
+import javax.annotation.Nullable;
 import java.util.function.Function;
 
 @FunctionalInterface
 public interface IThrowingFunction<T, R, TH extends Throwable> {
 	@SuppressWarnings("RedundantThrows")
-	static <T, R, TH extends Throwable> Function<T, R> execute(IThrowingFunction<T, R, TH> lambda)
+	static <T, R, TH extends Throwable> Function<T, R> executeNow(IThrowingFunction<T, R, TH> lambda)
 			throws TH {
 		return t -> {
 			try {
@@ -18,5 +19,6 @@ public interface IThrowingFunction<T, R, TH extends Throwable> {
 		};
 	}
 
-	R apply(T t) throws TH;
+	@Nullable
+	R apply(@Nullable T t) throws TH;
 }

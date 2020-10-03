@@ -12,4 +12,4 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Nonnull
 @TypeQualifierDefault(METHOD)
 @Retention(RUNTIME)
-public @interface MethodsReturnNonnullByDefault { /* MARK empty */}
+public @interface MethodsReturnNonnullByDefault {}

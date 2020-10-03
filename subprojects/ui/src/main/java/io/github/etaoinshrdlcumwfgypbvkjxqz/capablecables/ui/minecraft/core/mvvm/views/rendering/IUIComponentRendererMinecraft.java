@@ -81,7 +81,7 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUICompo
 					case CROP:
 						int[] oldBounds = new int[4];
 						MinecraftOpenGLUtilities.State.getIntegerValue(GL11.GL_SCISSOR_BOX, oldBounds);
-						Rectangle2D newBounds = transform.createTransformedShape(container.getShapeDescriptor().getShapeOutput().getBounds2D()).getBounds2D();
+						Rectangle2D newBounds = IUIComponent.StaticHolder.getContextualShape(context, container).getBounds2D();
 						UIObjectUtilities.acceptRectangularShape(
 								CoordinateSystemUtilities.convertRectangularShape(
 										UIObjectUtilities.floorRectangularShape(newBounds, newBounds),

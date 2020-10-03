@@ -5,7 +5,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.Th
 @FunctionalInterface
 public interface IThrowingRunnable<TH extends Throwable> {
 	@SuppressWarnings("RedundantThrows")
-	static <TH extends Throwable> Runnable execute(IThrowingRunnable<TH> lambda)
+	static <TH extends Throwable> Runnable executeNow(IThrowingRunnable<TH> lambda)
 			throws TH {
 		return () -> {
 			try {

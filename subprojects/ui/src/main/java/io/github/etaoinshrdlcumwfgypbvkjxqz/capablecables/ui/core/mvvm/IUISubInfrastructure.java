@@ -3,12 +3,12 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public interface IUISubInfrastructure {
+public interface IUISubInfrastructure<C extends IUISubInfrastructureContext> {
 	Optional<? extends IUIInfrastructure<?, ?, ?>> getInfrastructure();
 
 	void setInfrastructure(@Nullable IUIInfrastructure<?, ?, ?> infrastructure);
 
-	void initialize();
+	void initialize(C context);
 
-	void removed();
+	void removed(C context);
 }

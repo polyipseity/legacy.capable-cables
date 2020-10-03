@@ -46,7 +46,7 @@ public final class ModThis {
 		RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(ModConfiguration.getInstance());
 	}
 
-	private final IProxy proxy = DistExecutor.unsafeRunForDist(
+	private final IProxy<?> proxy = DistExecutor.unsafeRunForDist(
 			() -> DistLambdaHolder.Client::getProxyClient,
 			() -> DistLambdaHolder.Server::getProxyServer);
 
@@ -69,7 +69,7 @@ public final class ModThis {
 
 	public static String getNamespacePrefixedString(@NonNls String separator, @NonNls String string) { return NamespaceUtilities.getNamespacePrefixedString(separator, ModConstants.MOD_ID, string); }
 
-	public IProxy getProxy() { return proxy; }
+	public IProxy<?> getProxy() { return proxy; }
 
 	public static ModThis getInstance() { return AssertionUtilities.assertNonnull(instance); }
 
@@ -91,13 +91,13 @@ public final class ModThis {
 		private enum Client {
 			;
 
-			private static IProxy getProxyClient() { return ProxyClient.getInstance(); }
+			private static IProxy<?> getProxyClient() { return ProxyClient.getInstance(); }
 		}
 
 		private enum Server {
 			;
 
-			private static IProxy getProxyServer() { return ProxyServer.getInstance(); }
+			private static IProxy<?> getProxyServer() { return ProxyServer.getInstance(); }
 		}
 	}
 }

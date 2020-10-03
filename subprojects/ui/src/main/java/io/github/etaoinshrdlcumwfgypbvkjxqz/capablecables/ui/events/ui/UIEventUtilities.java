@@ -3,6 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui;
 import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventComponentType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
@@ -108,7 +109,7 @@ public enum UIEventUtilities {
 			UIEventRegistry.getInstance().register(EnumUIEventDOMType.MOUSE_UP.getEventType(), IUIEventMouse.class);// COMMENT mouseup: context menu
 			UIEventRegistry.getInstance().register(EnumUIEventDOMType.WHEEL.getEventType(), IUIEventMouseWheel.class); // COMMENT wheel: scroll or zoom, cancelability varies
 			// COMMENT beforeinput
-			// COMMENT input
+			// COMMENT inputs
 			UIEventRegistry.getInstance().register(EnumUIEventDOMType.KEY_DOWN.getEventType(), IUIEventKeyboard.class); // COMMENT keydown: focus, keypress, and/or activate
 			UIEventRegistry.getInstance().register(EnumUIEventDOMType.KEY_UP.getEventType(), IUIEventKeyboard.class); // COMMENT keyup: may have default
 			// COMMENT compositionstart
@@ -121,7 +122,7 @@ public enum UIEventUtilities {
 
 		public static IUIEventKeyboard generateSyntheticEventKeyboardOpposite(IUIEventKeyboard event) {
 			if (EnumUIEventDOMType.KEY_DOWN.getEventType().equals(event.getType()))
-				return createEventKeyUp(event.getTarget(), event.getData().recreate());
+				return createEventKeyUp(event.getViewContextView(), event.getTarget(), event.getData().recreate());
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
 							.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)
@@ -131,46 +132,46 @@ public enum UIEventUtilities {
 			);
 		}
 
-		public static IUIEvent createEventSelect(IUIEventTarget target) { return new UIEvent(EnumUIEventDOMType.SELECT.getEventType(), true, false, target); }
+		public static IUIEventKeyboard createEventKeyUp(IUIViewContext viewContext, IUIEventTarget target, IUIDataKeyboardKeyPress data) { return new UIEventKeyboard(EnumUIEventDOMType.KEY_UP.getEventType(), true, true, viewContext, target, data); }
 
-		public static IUIEventFocus createEventFocusOutPost(IUIEventTarget target, @Nullable IUIEventTarget targetBeingFocused) { return new UIEventFocus(EnumUIEventDOMType.FOCUS_OUT_POST.getEventType(), false, false, target, targetBeingFocused); }
+		public static IUIEvent createEventSelect(IUIViewContext viewContext, IUIEventTarget target) { return new UIEvent(EnumUIEventDOMType.SELECT.getEventType(), true, false, viewContext, target); }
 
-		public static IUIEventFocus createEventFocusInPost(IUIEventTarget target, @Nullable IUIEventTarget targetBeingUnfocused) { return new UIEventFocus(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(), false, false, target, targetBeingUnfocused); }
+		public static IUIEventFocus createEventFocusOutPost(IUIViewContext viewContext, IUIEventTarget target, @Nullable IUIEventTarget targetBeingFocused) { return new UIEventFocus(EnumUIEventDOMType.FOCUS_OUT_POST.getEventType(), false, false, viewContext, target, targetBeingFocused); }
 
-		public static IUIEventFocus createEventFocusInPre(IUIEventTarget target, @Nullable IUIEventTarget targetBeingUnfocused) { return new UIEventFocus(EnumUIEventDOMType.FOCUS_IN_PRE.getEventType(), true, false, target, targetBeingUnfocused); }
+		public static IUIEventFocus createEventFocusInPost(IUIViewContext viewContext, IUIEventTarget target, @Nullable IUIEventTarget targetBeingUnfocused) { return new UIEventFocus(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(), false, false, viewContext, target, targetBeingUnfocused); }
 
-		public static IUIEventFocus createEventFocusOutPre(IUIEventTarget target, @Nullable IUIEventTarget targetBeingFocused) { return new UIEventFocus(EnumUIEventDOMType.FOCUS_OUT_PRE.getEventType(), true, false, target, targetBeingFocused); }
+		public static IUIEventFocus createEventFocusInPre(IUIViewContext viewContext, IUIEventTarget target, @Nullable IUIEventTarget targetBeingUnfocused) { return new UIEventFocus(EnumUIEventDOMType.FOCUS_IN_PRE.getEventType(), true, false, viewContext, target, targetBeingUnfocused); }
 
-		public static IUIEventMouse createEventClick(IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(EnumUIEventDOMType.CLICK.getEventType(), true, true, target, data, null); }
+		public static IUIEventFocus createEventFocusOutPre(IUIViewContext viewContext, IUIEventTarget target, @Nullable IUIEventTarget targetBeingFocused) { return new UIEventFocus(EnumUIEventDOMType.FOCUS_OUT_PRE.getEventType(), true, false, viewContext, target, targetBeingFocused); }
 
-		public static IUIEventMouse createEventClickDouble(IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(EnumUIEventDOMType.CLICK_DOUBLE.getEventType(), true, true, target, data, null); }
+		public static IUIEventMouse createEventClick(IUIViewContext viewContext, IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(EnumUIEventDOMType.CLICK.getEventType(), true, true, viewContext, target, data, null); }
 
-		public static IUIEventMouse createEventMouseDown(IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), true, true, target, data, null); }
+		public static IUIEventMouse createEventClickDouble(IUIViewContext viewContext, IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(EnumUIEventDOMType.CLICK_DOUBLE.getEventType(), true, true, viewContext, target, data, null); }
 
-		public static IUIEventMouse createEventMouseEnter(IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingLeft) { return new UIEventMouse(EnumUIEventDOMType.MOUSE_ENTER.getEventType(), false, false, target, data, targetBeingLeft); }
+		public static IUIEventMouse createEventMouseDown(IUIViewContext viewContext, IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), true, true, viewContext, target, data, null); }
 
-		public static IUIEventMouse createEventMouseMove(IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(EnumUIEventDOMType.MOUSE_MOVE.getEventType(), true, true, target, data, null); }
+		public static IUIEventMouse createEventMouseEnter(IUIViewContext viewContext, IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingLeft) { return new UIEventMouse(EnumUIEventDOMType.MOUSE_ENTER.getEventType(), false, false, viewContext, target, data, targetBeingLeft); }
 
-		public static IUIEventMouse createEventMouseEnterSelf(IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingLeft) { return new UIEventMouse(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(), true, true, target, data, targetBeingLeft); }
+		public static IUIEventMouse createEventMouseMove(IUIViewContext viewContext, IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(EnumUIEventDOMType.MOUSE_MOVE.getEventType(), true, true, viewContext, target, data, null); }
 
-		public static IUIEventChar createEventChar(IUIEventTarget target, char codePoint, int modifiers) { return new UIEventChar(EnumUIEventComponentType.CHAR_TYPED.getEventType(), true, false, target, codePoint, modifiers); }
+		public static IUIEventMouse createEventMouseEnterSelf(IUIViewContext viewContext, IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingLeft) { return new UIEventMouse(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(), true, true, viewContext, target, data, targetBeingLeft); }
 
-		public static IUIEventMouseWheel createEventWheel(boolean cancelable, IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingPointed, double delta) { return new UIEventMouseWheel(EnumUIEventDOMType.WHEEL.getEventType(), true, cancelable, target, data, targetBeingPointed, delta); }
+		public static IUIEventChar createEventChar(IUIViewContext viewContext, IUIEventTarget target, char codePoint, int modifiers) { return new UIEventChar(EnumUIEventComponentType.CHAR_TYPED.getEventType(), true, false, viewContext, target, codePoint, modifiers); }
 
-		public static IUIEventKeyboard createEventKeyDown(IUIEventTarget target, IUIDataKeyboardKeyPress data) { return new UIEventKeyboard(EnumUIEventDOMType.KEY_DOWN.getEventType(), true, true, target, data); }
+		public static IUIEventMouseWheel createEventWheel(boolean cancelable, IUIViewContext viewContext, IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingPointed, double delta) { return new UIEventMouseWheel(EnumUIEventDOMType.WHEEL.getEventType(), true, cancelable, viewContext, target, data, targetBeingPointed, delta); }
 
 		protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
-		public static IUIEventKeyboard createEventKeyUp(IUIEventTarget target, IUIDataKeyboardKeyPress data) { return new UIEventKeyboard(EnumUIEventDOMType.KEY_UP.getEventType(), true, true, target, data); }
+		public static IUIEventKeyboard createEventKeyDown(IUIViewContext viewContext, IUIEventTarget target, IUIDataKeyboardKeyPress data) { return new UIEventKeyboard(EnumUIEventDOMType.KEY_DOWN.getEventType(), true, true, viewContext, target, data); }
 
 		public static IUIEventMouse generateSyntheticEventMouseOpposite(IUIEventMouse event, Point2D cursorPosition) {
 			UIDataMouseButtonClick data = new UIDataMouseButtonClick(cursorPosition, event.getData().getButton());
 			if (EnumUIEventDOMType.MOUSE_DOWN.getEventType().equals(event.getType()))
-				return createEventMouseUp(event.getTarget(), data);
+				return createEventMouseUp(event.getViewContextView(), event.getTarget(), data);
 			else if (EnumUIEventDOMType.MOUSE_ENTER.getEventType().equals(event.getType()))
-				return createEventMouseLeave(event.getTarget(), data, event.getRelatedTarget().orElse(null));
+				return createEventMouseLeave(event.getViewContextView(), event.getTarget(), data, event.getRelatedTarget().orElse(null));
 			else if (EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType().equals(event.getType()))
-				return createEventMouseLeaveSelf(event.getTarget(), data, event.getRelatedTarget().orElse(null));
+				return createEventMouseLeaveSelf(event.getViewContextView(), event.getTarget(), data, event.getRelatedTarget().orElse(null));
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
 							.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)
@@ -180,10 +181,10 @@ public enum UIEventUtilities {
 			);
 		}
 
-		public static IUIEventMouse createEventMouseUp(IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(EnumUIEventDOMType.MOUSE_UP.getEventType(), true, true, target, data, null); }
+		public static IUIEventMouse createEventMouseUp(IUIViewContext viewContext, IUIEventTarget target, IUIDataMouseButtonClick data) { return new UIEventMouse(EnumUIEventDOMType.MOUSE_UP.getEventType(), true, true, viewContext, target, data, null); }
 
-		public static IUIEventMouse createEventMouseLeave(IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingEntered) { return new UIEventMouse(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(), false, false, target, data, targetBeingEntered); }
+		public static IUIEventMouse createEventMouseLeave(IUIViewContext viewContext, IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingEntered) { return new UIEventMouse(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(), false, false, viewContext, target, data, targetBeingEntered); }
 
-		public static IUIEventMouse createEventMouseLeaveSelf(IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingEntered) { return new UIEventMouse(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(), true, true, target, data, targetBeingEntered); }
+		public static IUIEventMouse createEventMouseLeaveSelf(IUIViewContext viewContext, IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget targetBeingEntered) { return new UIEventMouse(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(), true, true, viewContext, target, data, targetBeingEntered); }
 	}
 }

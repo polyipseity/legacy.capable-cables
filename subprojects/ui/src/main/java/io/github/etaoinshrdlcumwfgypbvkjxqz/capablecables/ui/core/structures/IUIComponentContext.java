@@ -1,24 +1,21 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICopyable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.EmptyPathException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.IPath;
 
-import java.awt.geom.Point2D;
+import java.awt.*;
 
 public interface IUIComponentContext
 		extends ICopyable, AutoCloseable {
-	Point2D getCursorPositionView();
+	IUIViewComponent<?, ?> getView();
+
+	IUIComponentContextMutator getMutator();
 
 	@Override
 	IUIComponentContext copy();
-
-	void push(IUIComponent element);
-
-	@SuppressWarnings("UnusedReturnValue")
-	IUIComponent pop()
-			throws EmptyPathException;
 
 	@Override
 	default void close() {
@@ -30,4 +27,14 @@ public interface IUIComponentContext
 	IPath<IUIComponent> getPath();
 
 	IAffineTransformStack getTransformStack();
+
+	IUIViewContext getViewContext();
+
+	enum StaticHolder {
+		;
+
+		public static Shape createContextualShape(IUIComponentContext context, Shape shape) {
+			return context.getTransformStack().element().createTransformedShape(shape);
+		}
+	}
 }

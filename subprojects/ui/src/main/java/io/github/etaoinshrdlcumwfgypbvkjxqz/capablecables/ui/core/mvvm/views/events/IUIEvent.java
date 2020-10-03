@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.INamespacePrefixedString;
 
 public interface IUIEvent {
@@ -22,11 +23,12 @@ public interface IUIEvent {
 
 	boolean isCancelable();
 
-	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	boolean isDefaultPrevented();
 
 	@SuppressWarnings("UnusedReturnValue")
 	boolean preventDefault();
+
+	IUIViewContext getViewContextView();
 
 	enum EnumPhase {
 		NONE {
