@@ -1,8 +1,9 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIDataKeyboardKeyPress;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
-import jdk.nashorn.internal.ir.annotations.Immutable;
+
+import javax.annotation.concurrent.Immutable;
 
 @Immutable
 public final class UIDataKeyboardKeyPress implements IUIDataKeyboardKeyPress, Cloneable {

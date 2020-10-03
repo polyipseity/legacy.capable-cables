@@ -15,14 +15,14 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.UIEventUt
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.extensions.IUIExtensionMinecraftScreenProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.UIExtensionMinecraftContainerProvider;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.utilities.MinecraftDrawingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.utilities.UIMinecraftBackgrounds;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.DefaultUIInfrastructureContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.viewmodels.DefaultUIViewModelContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.DefaultUIViewContext;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIDataKeyboardKeyPress;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIDataMouseButtonClick;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.UIDataKeyboardKeyPress;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.UIDataMouseButtonClick;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIInputUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.MinecraftDrawingUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft.UIBackgrounds;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
@@ -256,7 +256,7 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	public void renderBackground() { UIBackgrounds.renderDefaultBackgroundAndNotify(getMinecraft(), width, height); }
+	public void renderBackground() { UIMinecraftBackgrounds.renderDefaultBackgroundAndNotify(getMinecraft(), width, height); }
 
 	@Override
 	@Deprecated
@@ -271,7 +271,7 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	public void renderBackground(int blitOffset) { UIBackgrounds.renderDefaultBackgroundAndNotify(getMinecraft(), width, height, blitOffset); }
+	public void renderBackground(int blitOffset) { UIMinecraftBackgrounds.renderDefaultBackgroundAndNotify(getMinecraft(), width, height, blitOffset); }
 
 	@Override
 	@Deprecated
@@ -366,7 +366,7 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	public void renderDirtBackground(int blitOffset) { UIBackgrounds.renderDirtBackgroundAndNotify(getMinecraft(), width, height, blitOffset); }
+	public void renderDirtBackground(int blitOffset) { UIMinecraftBackgrounds.renderDirtBackgroundAndNotify(getMinecraft(), width, height, blitOffset); }
 
 	@Override
 	@Deprecated

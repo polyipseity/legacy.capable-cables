@@ -2,9 +2,9 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.MathUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.ConstantSupplier;
-import jdk.nashorn.internal.ir.annotations.Immutable;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import java.util.Optional;
 
 @Immutable

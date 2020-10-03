@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.minecraft;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.utilities;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftScreenUtility;
@@ -11,7 +11,7 @@ import net.minecraftforge.client.event.GuiScreenEvent;
 import javax.annotation.Nullable;
 
 @OnlyIn(Dist.CLIENT)
-public enum UIBackgrounds {
+public enum UIMinecraftBackgrounds {
 	;
 
 	public static void notifyBackgroundDrawn(Screen screen) { UIEventBusEntryPoint.getEventBus().onNext(new GuiScreenEvent.BackgroundDrawnEvent(screen)); }

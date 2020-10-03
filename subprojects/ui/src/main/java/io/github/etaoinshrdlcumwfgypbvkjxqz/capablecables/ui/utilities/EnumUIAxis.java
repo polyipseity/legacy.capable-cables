@@ -1,7 +1,9 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities;
 
+import javax.annotation.concurrent.Immutable;
 import java.awt.geom.Point2D;
 
+@Immutable
 public enum EnumUIAxis {
 	X {
 		@Override

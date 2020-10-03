@@ -1,5 +1,6 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities;
 
+import javax.annotation.concurrent.Immutable;
 import java.awt.geom.Point2D;
 import java.awt.geom.RectangularShape;
 import java.util.EnumSet;
@@ -9,6 +10,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+@Immutable
 public enum EnumUISide {
 	UP {
 		@Override

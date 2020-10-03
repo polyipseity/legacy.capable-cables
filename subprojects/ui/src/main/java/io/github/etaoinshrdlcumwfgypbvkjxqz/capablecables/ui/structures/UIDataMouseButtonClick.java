@@ -1,9 +1,9 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIDataMouseButtonClick;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
-import jdk.nashorn.internal.ir.annotations.Immutable;
 
+import javax.annotation.concurrent.Immutable;
 import java.awt.geom.Point2D;
 
 @Immutable
