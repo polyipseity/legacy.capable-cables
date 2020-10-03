@@ -1,43 +1,33 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.client;
 
 import com.google.common.base.Suppliers;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModConfiguration;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.Proxy;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.AbstractClientProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIDebugMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.internationalization.MinecraftLocaleUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.ConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.LoggingThrowableHandler;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThreadLocalThrowableHandler;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
+import net.minecraftforge.fml.event.lifecycle.*;
 
-import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
-public final class ProxyClient extends Proxy<FMLClientSetupEvent> implements IProxyClient {
-	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(ModConfiguration.getInstance());
-	private static final Supplier<ProxyClient> INSTANCE = Suppliers.memoize(ProxyClient::new);
+public final class ModClientProxy
+		extends AbstractClientProxy {
+	private static final Supplier<ModClientProxy> INSTANCE = Suppliers.memoize(ModClientProxy::new);
 
-	private ProxyClient() {}
+	private ModClientProxy() {}
 
-	public static ProxyClient getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+	public static ModClientProxy getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
 	@Override
-	public boolean onModLifecycle(ModLifecycleEvent event) {
-		if (super.onModLifecycle(event))
-			return true;
-		else if (event instanceof FMLClientSetupEvent)
-			return processEvent(getResourceBundle().getString("event.client_setup.name"), (FMLClientSetupEvent) event, this::onSetupSided);
-		return false;
+	public void onFingerprintViolation(FMLFingerprintViolationEvent event) {
+
 	}
 
 	@Override
@@ -57,9 +47,27 @@ public final class ProxyClient extends Proxy<FMLClientSetupEvent> implements IPr
 	}
 
 	@Override
+	public void onInterModEnqueue(InterModEnqueueEvent event) {
+
+	}
+
+	@Override
+	public void onInterModProcess(InterModProcessEvent event) {
+
+	}
+
+	@Override
 	public void onLoadComplete(FMLLoadCompleteEvent event) {
 		UIConfiguration.MinecraftSpecific.loadComplete();
 	}
 
-	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
+	@Override
+	public void onGatherData(GatherDataEvent event) {
+
+	}
+
+	@Override
+	public void onModIdMapping(FMLModIdMappingEvent event) {
+
+	}
 }

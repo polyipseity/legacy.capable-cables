@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
-public abstract class Proxy<T extends ModLifecycleEvent> implements IProxy<T> {
+public abstract class AbstractProxy<T extends ModLifecycleEvent> implements IProxy<T> {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(ModConfiguration.getInstance());
 
 	@Override
@@ -34,8 +34,6 @@ public abstract class Proxy<T extends ModLifecycleEvent> implements IProxy<T> {
 			return processEvent(getResourceBundle().getString("event.gather_data.name"), (GatherDataEvent) event, this::onGatherData);
 		return false;
 	}
-
-	protected Proxy() {}
 
 	@SuppressWarnings("SameReturnValue")
 	protected static <E extends ModLifecycleEvent> boolean processEvent(String name, E event, Consumer<? super E> processor) {

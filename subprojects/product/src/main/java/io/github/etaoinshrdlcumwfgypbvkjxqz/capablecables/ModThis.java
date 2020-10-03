@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.client.ProxyClient;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.client.ModClientProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.IProxy;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.server.ProxyServer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.server.ModServerProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.NamespaceUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
@@ -91,13 +91,13 @@ public final class ModThis {
 		private enum Client {
 			;
 
-			private static IProxy<?> getProxyClient() { return ProxyClient.getInstance(); }
+			private static IProxy<?> getProxyClient() { return ModClientProxy.getInstance(); }
 		}
 
 		private enum Server {
 			;
 
-			private static IProxy<?> getProxyServer() { return ProxyServer.getInstance(); }
+			private static IProxy<?> getProxyServer() { return ModServerProxy.getInstance(); }
 		}
 	}
 }
