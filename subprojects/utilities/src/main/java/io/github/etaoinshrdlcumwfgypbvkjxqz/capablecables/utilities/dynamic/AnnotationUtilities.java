@@ -1,6 +1,5 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic;
 
-import com.google.common.collect.ImmutableSet;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
@@ -9,6 +8,8 @@ import org.slf4j.Marker;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public enum AnnotationUtilities {
@@ -32,23 +33,26 @@ public enum AnnotationUtilities {
 
 	@SuppressWarnings("ObjectAllocationInLoop")
 	static <A extends Annotation> A[] getEffectiveAnnotationsWithInheritingConsidered(Class<A> annotationType, Method method) {
+		A[] ret = method.getDeclaredAnnotationsByType(annotationType);
+		if (ret.length != 0)
+			return ret;
+
 		String mName = method.getName();
 		Class<?>[] mArgs = method.getParameterTypes();
-
-		A[] r = method.getDeclaredAnnotationsByType(annotationType);
-		if (r.length != 0)
-			return r;
-		sss:
-		for (ImmutableSet<Class<?>> ss : ClassUtilities.getSuperclassesAndInterfaces(method.getDeclaringClass())) {
-			for (Class<?> s : ss) {
-				try {
-					r = s.getDeclaredMethod(mName, mArgs).getAnnotationsByType(annotationType);
-				} catch (NoSuchMethodException ignored) {}
-				if (r.length != 0) break sss;
-			}
-		}
-
-		return r;
+		return ClassUtilities.getSuperclassesAndInterfaces(method.getDeclaringClass()).stream().sequential()
+				.flatMap(Collection::stream)
+				.map(clazz -> {
+					try {
+						return clazz.getDeclaredMethod(mName, mArgs);
+					} catch (NoSuchMethodException e) {
+						return null;
+					}
+				})
+				.filter(Objects::nonNull)
+				.map(superMethod -> superMethod.getAnnotationsByType(annotationType))
+				.filter(annotations -> annotations.length != 0)
+				.findFirst()
+				.orElse(ret);
 	}
 
 	public static Marker getClassMarker() { return CLASS_MARKER; }

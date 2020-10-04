@@ -34,7 +34,7 @@ public interface IUIComponentUserRelocatableExtension<E extends IUIComponent & I
 	Optional<? extends IRelocateData> getRelocateData();
 
 	interface IRelocateData {
-		Point2D getPointView();
+		Point2D getPreviousPointView();
 
 		<R extends RectangularShape> R handle(Point2D point,
 		                                      RectangularShape source,

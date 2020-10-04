@@ -1,9 +1,11 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Streams;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
@@ -21,7 +23,7 @@ public enum ObjectUtilities {
 
 	public static final IntSupplier HASH_CODE_SUPER_METHOD_DEFAULT = () -> 1;
 
-	@SuppressWarnings("ObjectEquality")
+	@SuppressWarnings({"ObjectEquality", "UnstableApiUsage"})
 	public static <T> boolean equals(T self, @Nullable Object other, boolean acceptSubclasses, @Nullable Predicate<? super Object> superMethod, Iterable<? extends Function<? super T, ?>> variables) {
 		if (self == other)
 			return true;
@@ -36,36 +38,37 @@ public enum ObjectUtilities {
 			return false;
 
 		@SuppressWarnings("unchecked") T that = (T) other;
-		for (Function<? super T, ?> variable : variables) {
-			if (!Objects.equals(variable.apply(self), variable.apply(that)))
-				return false;
-		}
-		return true;
+		return Streams.stream(variables).unordered()
+				.allMatch(variable -> Objects.equals(variable.apply(self), variable.apply(that)));
 	}
 
 	/**
 	 * @see java.util.Arrays#hashCode(Object[])
 	 */
-	@SuppressWarnings("MagicNumber")
+	@SuppressWarnings({"MagicNumber", "UnstableApiUsage"})
 	public static <T> int hashCode(T self, @Nullable IntSupplier superMethod, Iterable<? extends Function<? super T, ?>> variables) {
-		int result = Optional.ofNullable(superMethod).orElse(HASH_CODE_SUPER_METHOD_DEFAULT).getAsInt();
-		for (Function<? super T, ?> variable : variables) {
-			result = 31 * result + Objects.hashCode(variable.apply(self));
-		}
-		return result;
+		final int[] result = {Optional.ofNullable(superMethod).orElse(HASH_CODE_SUPER_METHOD_DEFAULT).getAsInt()};
+		Streams.stream(variables).sequential()
+				.map(FunctionUtilities.applyToFunction(self))
+				.mapToInt(Objects::hashCode)
+				.forEachOrdered(variableHashCode -> {
+					result[0] *= 31;
+					result[0] += variableHashCode;
+				});
+		return result[0];
 	}
 
 	public static <T> String toString(T self, @Nullable Supplier<? extends String> superMethod, Map<? extends String, ? extends Function<? super T, ?>> variables) {
 		StringBuilder ret = new StringBuilder(CapacityUtilities.INITIAL_CAPACITY_LARGE);
 		ret.append(self.getClass().getSimpleName());
-		boolean comma = false;
-		for (Map.Entry<? extends String, ? extends Function<? super T, ?>> entry : variables.entrySet()) {
-			if (comma)
+		final boolean[] comma = {false};
+		variables.forEach((key, value) -> {
+			if (comma[0])
 				ret.append(',');
 			else
-				comma = true;
-			ret.append(entry.getKey()).append('=').append(entry.getValue());
-		}
+				comma[0] = true;
+			ret.append(key).append('=').append(value);
+		});
 		if (superMethod != null)
 			ret.append(superMethod.get());
 		return ret.toString();
@@ -75,6 +78,6 @@ public enum ObjectUtilities {
 
 	public static <T> @NonNls ImmutableMap<String, Function<? super T, ?>> extendsObjectVariablesMap(Collection<? extends Function<? super T, ?>> variables, Map<? extends String, ? extends Function<? super T, ?>> extended, Iterable<? extends String> self) {
 		return ImmutableMap.copyOf(
-				MapUtilities.stitchKeysValues(variables.size(), Iterables.concat(extended.keySet(), self), variables));
+				MapUtilities.zipKeysValues(Iterables.concat(extended.keySet(), self), variables));
 	}
 }

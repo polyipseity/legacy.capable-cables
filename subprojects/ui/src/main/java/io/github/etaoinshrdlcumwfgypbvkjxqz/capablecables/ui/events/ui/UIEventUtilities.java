@@ -11,7 +11,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUI
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIDataMouseButtonClick;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.ui.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.UIDataMouseButtonClick;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.INode;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
@@ -24,7 +23,6 @@ import java.util.ResourceBundle;
 public enum UIEventUtilities {
 	;
 
-	@SuppressWarnings("ObjectAllocationInLoop")
 	public static boolean dispatchEvent(IUIEvent event) {
 		UIEventRegistry.checkEvent(event);
 		event.reset();
@@ -34,12 +32,11 @@ public enum UIEventUtilities {
 			ImmutableList<INode> path = computeNodePath((INode) et);
 
 			event.advancePhase();
-			for (int i = 0, maxI = path.size() - 1; i < maxI; i++) {
-				@Nullable INode n = path.get(i);
-				CastUtilities.castChecked(IUIEventTarget.class, n)
-						.filter(IUIEventTarget::isActive)
-						.ifPresent(nc -> nc.dispatchEvent(event));
-			}
+			path.subList(0, path.size() - 1).stream().sequential()
+					.filter(IUIEventTarget.class::isInstance)
+					.map(IUIEventTarget.class::cast)
+					.filter(IUIEventTarget::isActive)
+					.forEachOrdered(eventTarget -> eventTarget.dispatchEvent(event));
 
 			event.advancePhase();
 			if (et.isActive())
@@ -47,13 +44,11 @@ public enum UIEventUtilities {
 
 			if (!event.isPropagationStopped() && event.canBubble()) {
 				event.advancePhase();
-				ImmutableList<INode> pathReversed = path.reverse();
-				for (int i = 1, maxI = pathReversed.size(); i < maxI; i++) {
-					@Nullable INode n = pathReversed.get(i);
-					CastUtilities.castChecked(IUIEventTarget.class, n)
-							.filter(IUIEventTarget::isActive)
-							.ifPresent(nc -> nc.dispatchEvent(event));
-				}
+				path.subList(0, path.size() - 1).reverse().stream().sequential()
+						.filter(IUIEventTarget.class::isInstance)
+						.map(IUIEventTarget.class::cast)
+						.filter(IUIEventTarget::isActive)
+						.forEachOrdered(eventTarget -> eventTarget.dispatchEvent(event));
 			}
 		} else {
 			event.advancePhase();

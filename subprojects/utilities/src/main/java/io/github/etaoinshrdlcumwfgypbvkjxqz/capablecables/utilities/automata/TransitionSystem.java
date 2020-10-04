@@ -1,11 +1,11 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.automata;
 
+import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.automata.core.IState;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.automata.core.ITransitionSystem;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
-import com.google.common.collect.ImmutableMap;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -42,15 +42,15 @@ public class TransitionSystem<S extends IState<D>, E, D>
 	@Override
 	public void step(@Nullable E input, D data) {
 		setInput(input);
-		for (Map.Entry<BiPredicate<? super ITransitionSystem<S, E, D>, ? super D>, Function<? super D, ? extends S>> t
-				: getTransitionsView().entrySet()) {
-			if (AssertionUtilities.assertNonnull(t.getKey()).test(this, data)) {
-				getState().transitFromThis(data);
-				setState(AssertionUtilities.assertNonnull(t.getValue()).apply(data));
-				getState().transitToThis(data);
-				break;
-			}
-		}
+		getTransitionsView().entrySet().stream().unordered()
+				.filter(entry -> AssertionUtilities.assertNonnull(entry.getKey()).test(this, data))
+				.map(Map.Entry::getValue)
+				.findFirst()
+				.ifPresent(newState -> {
+					getState().transitFromThis(data);
+					setState(AssertionUtilities.assertNonnull(newState.apply(data)));
+					getState().transitToThis(data);
+				});
 	}
 
 	@Override

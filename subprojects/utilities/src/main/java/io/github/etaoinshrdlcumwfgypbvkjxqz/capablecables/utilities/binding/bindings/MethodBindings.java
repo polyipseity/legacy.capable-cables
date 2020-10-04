@@ -2,15 +2,13 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.bin
 
 import com.google.common.cache.Cache;
 import com.google.common.collect.Streams;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CleanerUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.NoSuchBindingTransformerException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.methods.IBindingMethod;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.methods.IBindingMethodDestination;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.methods.IBindingMethodSource;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingConsumer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.DefaultDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -69,19 +67,18 @@ public class MethodBindings
 	protected Map<IBindingMethodSource<?>, Disposable> getSources() { return sources; }
 
 	public static <T> DisposableObserver<T> createDelegatingObserver(IBindingMethodSource<T> source,
-	                                                                 Iterable<? extends IBindingMethodDestination<?>> destination,
+	                                                                 Iterable<? extends IBindingMethodDestination<?>> destinations,
 	                                                                 Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>> transformers) {
 		return new LoggingDisposableObserver<>(new DefaultDisposableObserver<T>() {
 			@Override
 			public void onNext(@Nonnull T t) {
-				for (IBindingMethodDestination<?> d : destination) {
-					try {
-						d.accept(CastUtilities.castUncheckedNullable(
-								transform(transformers, t, source.getGenericClass(), d.getGenericClass()))); // COMMENT should be of the correct type
-					} catch (NoSuchBindingTransformerException ex) {
-						onError(ex);
-						break;
-					}
+				try {
+					destinations.forEach(IThrowingConsumer.executeNow(destination -> {
+						AssertionUtilities.assertNonnull(destination).accept(CastUtilities.castUncheckedNullable(
+								transform(transformers, t, source.getGenericClass(), destination.getGenericClass()))); // COMMENT should be of the correct type
+					}));
+				} catch (NoSuchBindingTransformerException ex) {
+					onError(ex);
 				}
 			}
 		}, UtilitiesConfiguration.getInstance().getLogger());

@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LoopUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IFunction3;
 
@@ -78,9 +79,7 @@ public enum EnumModifyStage {
 	}
 
 	public void advanceModifyStage(IUIComponentModifier modifier) {
-		int advanceTimes = ordinal() - modifier.getModifyStage().ordinal();
-		for (int i = 0; i < advanceTimes; ++i)
-			modifier.advanceModifyStage();
+		LoopUtilities.doNTimes(ordinal() - modifier.getModifyStage().ordinal(), modifier::advanceModifyStage);
 	}
 
 	public boolean isPre() { return this == PRE; }

@@ -1,9 +1,12 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities;
 
-import javax.annotation.concurrent.Immutable;
+import com.google.common.collect.Sets;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Unmodifiable;
+
 import java.awt.geom.Point2D;
 import java.awt.geom.RectangularShape;
-import java.util.EnumSet;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -121,12 +124,13 @@ public enum EnumUISide {
 		public BiFunction<Double, Double, Double> getApplyBorder() { return (i, b) -> i; }
 	};
 
+	@SuppressWarnings("UnstableApiUsage")
+	@Unmodifiable
+	@Immutable
 	public static Set<EnumUISide> getSidesMouseOver(RectangularShape rectangular, Point2D mouse) {
-		Set<EnumUISide> sides = EnumSet.noneOf(EnumUISide.class);
-		for (EnumUISide side : EnumUISide.values())
-			if (side.isMouseOver(rectangular, mouse))
-				sides.add(side);
-		return sides;
+		return Arrays.stream(EnumUISide.values()).unordered()
+				.filter(side -> side.isMouseOver(rectangular, mouse))
+				.collect(Sets.toImmutableEnumSet());
 	}
 
 	public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return false; }

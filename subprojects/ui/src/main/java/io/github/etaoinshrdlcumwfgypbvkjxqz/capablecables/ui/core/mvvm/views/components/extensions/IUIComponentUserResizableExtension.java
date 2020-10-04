@@ -36,7 +36,7 @@ public interface IUIComponentUserResizableExtension<E extends IUIComponent & IUI
 	Optional<? extends IResizeData> getResizeData();
 
 	interface IResizeData {
-		Point2D getPointView();
+		Point2D getPreviousPointView();
 
 		Set<? extends EnumUISide> getSidesView();
 

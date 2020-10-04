@@ -3,6 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.ada
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIInfrastructureContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.adapters.IUIAdapter;
@@ -134,18 +135,18 @@ public class UIScreenAdapter
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Set<Integer> getCloseKeys() { return closeKeys; }
 
+	@SuppressWarnings("UnstableApiUsage")
 	public boolean addCloseKeys(Iterable<Integer> keys) {
-		boolean ret = false;
-		for (Integer k : keys)
-			ret |= getCloseKeys().add(k);
-		return ret;
+		return Streams.stream(keys).unordered()
+				.map(getCloseKeys()::add)
+				.reduce(false, Boolean::logicalOr);
 	}
 
+	@SuppressWarnings("UnstableApiUsage")
 	public boolean removeCloseKeys(Iterable<Integer> keys) {
-		boolean ret = false;
-		for (Integer k : keys)
-			ret |= getCloseKeys().remove(k);
-		return ret;
+		return Streams.stream(keys).unordered()
+				.map(getCloseKeys()::remove)
+				.reduce(false, Boolean::logicalOr);
 	}
 
 	public Set<Integer> getChangeFocusKeysView() { return ImmutableSet.copyOf(getChangeFocusKeys()); }
@@ -153,18 +154,18 @@ public class UIScreenAdapter
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Set<Integer> getChangeFocusKeys() { return changeFocusKeys; }
 
+	@SuppressWarnings("UnstableApiUsage")
 	public boolean addChangeFocusKeys(Iterable<Integer> keys) {
-		boolean ret = false;
-		for (Integer k : keys)
-			ret |= getChangeFocusKeys().add(k);
-		return ret;
+		return Streams.stream(keys).unordered()
+				.map(getChangeFocusKeys()::add)
+				.reduce(false, Boolean::logicalOr);
 	}
 
+	@SuppressWarnings("UnstableApiUsage")
 	public boolean removeChangeFocusKeys(Iterable<Integer> keys) {
-		boolean ret = false;
-		for (Integer k : keys)
-			ret |= getChangeFocusKeys().remove(k);
-		return ret;
+		return Streams.stream(keys).unordered()
+				.map(getChangeFocusKeys()::remove)
+				.reduce(false, Boolean::logicalOr);
 	}
 
 	@Override
@@ -538,16 +539,20 @@ public class UIScreenAdapter
 									.<List<?>>map(UIEventUtilities::computeNodePath)
 									.orElseGet(() -> ImmutableList.of(t)))
 							.orElseGet(ImmutableList::of);
-			int i = 0;
-			for (int maxI = Math.min(op.size(), np.size()); i < maxI; ++i) {
-				if (!Objects.equals(op.get(i), np.get(i)))
+			int equalParents = 0;
+			for (@SuppressWarnings("UnstableApiUsage") Iterator<Boolean> iterator =
+			     Streams.zip(op.stream().sequential(), np.stream().sequential(), Object::equals).sequential()
+					     .iterator();
+			     iterator.hasNext(); ) {
+				if (!iterator.next())
 					break;
+				++equalParents;
 			}
-			int iFinal = i; // COMMENT paths equal for [0,i)
+			int finalEqualParents = equalParents; // COMMENT paths equal for [0,equalParents)
 			o.ifPresent(t -> {
 				UIEventUtilities.dispatchEvent(
 						UIEventUtilities.Factory.createEventMouseLeaveSelf(context.getViewContext(), t, data, n.orElse(null))); // COMMENT consider bubbling
-				Lists.reverse(op.subList(iFinal, op.size())).forEach(t2 ->
+				Lists.reverse(op.subList(finalEqualParents, op.size())).forEach(t2 ->
 						CastUtilities.castChecked(IUIEventTarget.class, t2)
 								.ifPresent(t3 -> UIEventUtilities.dispatchEvent(
 										UIEventUtilities.Factory.createEventMouseLeave(context.getViewContext(), t3, data, n.orElse(null)))));
@@ -556,7 +561,7 @@ public class UIScreenAdapter
 			n.ifPresent(t -> {
 				UIEventUtilities.dispatchEvent(
 						UIEventUtilities.Factory.createEventMouseEnterSelf(context.getViewContext(), t, data, o.orElse(null))); // COMMENT consider bubbling
-				np.subList(iFinal, np.size()).forEach(t2 ->
+				np.subList(finalEqualParents, np.size()).forEach(t2 ->
 						CastUtilities.castChecked(IUIEventTarget.class, t2)
 								.ifPresent(t3 -> UIEventUtilities.dispatchEvent(
 										UIEventUtilities.Factory.createEventMouseEnter(context.getViewContext(), t3, data, o.orElse(null)))));

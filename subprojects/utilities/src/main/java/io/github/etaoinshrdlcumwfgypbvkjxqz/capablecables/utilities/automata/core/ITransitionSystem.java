@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.automata.core;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
@@ -30,7 +30,7 @@ public interface ITransitionSystem<S extends IState<D>, E, D> {
 				ITransitionSystem::getState, ITransitionSystem::getInput, ITransitionSystem::getTransitionsView);
 		@NonNls
 		private static final
-		ImmutableMap<String, Function<? super ITransitionSystem<?, ?, ?>, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchKeysValues(getObjectVariables().size(),
+		ImmutableMap<String, Function<? super ITransitionSystem<?, ?, ?>, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.zipKeysValues(
 				ImmutableList.of("state", "input", "transitionsView"),
 				getObjectVariables()));
 

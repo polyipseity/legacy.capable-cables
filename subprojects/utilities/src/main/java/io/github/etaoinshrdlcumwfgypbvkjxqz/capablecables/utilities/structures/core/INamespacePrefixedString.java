@@ -39,7 +39,7 @@ public interface INamespacePrefixedString {
 						UtilitiesMarkers.getInstance().getMarkerStructure());
 		private static final ImmutableList<Function<? super INamespacePrefixedString, ?>> OBJECT_VARIABLES = ImmutableList.of(
 				INamespacePrefixedString::getNamespace, INamespacePrefixedString::getPath);
-		private static final ImmutableMap<String, Function<? super INamespacePrefixedString, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchKeysValues(getObjectVariables().size(),
+		private static final ImmutableMap<String, Function<? super INamespacePrefixedString, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.zipKeysValues(
 				ImmutableList.of("namespace", "path"),
 				getObjectVariables()));
 

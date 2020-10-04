@@ -3,7 +3,6 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.compone
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIVirtualComponent;
@@ -30,19 +29,24 @@ public abstract class AbstractUIComponentPathResolver
 
 	@Override
 	public IUIComponentPathResolverResult resolveDirectChild(IUIComponentContext context, Point2D point) {
-		for (IUIComponent child :
-				context.getPath().getPathEnd()
-						.flatMap(pathEnd -> CastUtilities.castChecked(IUIComponentContainer.class, pathEnd))
-						.map(IUIComponentContainer::getChildrenView)
-						.map(Lists::reverse)
-						.orElseGet(ImmutableList::of)) {
-			context.getMutator().push(context, child);
-			IUIComponentPathResolverResult ret = getResult(context, (Point2D) point.clone());
-			if (ret.isPresent())
-				return ret;
-			context.getMutator().pop(context);
-		}
-		return ImmutableUIComponentPathResolverResult.getEmpty();
+		IUIComponentPathResolverResult result = context.getPath().getPathEnd()
+				.flatMap(pathEnd -> CastUtilities.castChecked(IUIComponentContainer.class, pathEnd))
+				.map(IUIComponentContainer::getChildrenView)
+				.map(Lists::reverse)
+				.orElseGet(ImmutableList::of)
+				.stream().sequential()
+				.map(child -> {
+					try (IUIComponentContext ctx = context.copy()) {
+						ctx.getMutator().push(ctx, child);
+						return getResult(ctx, (Point2D) point.clone());
+					}
+				})
+				.filter(IUIComponentPathResolverResult::isPresent)
+				.findFirst()
+				.orElseGet(ImmutableUIComponentPathResolverResult::getEmpty);
+		result.getConcreteComponent()
+				.ifPresent(child -> context.getMutator().push(context, child));
+		return result;
 	}
 
 	@Override

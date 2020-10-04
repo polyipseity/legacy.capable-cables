@@ -101,30 +101,32 @@ public enum TreeUtilities {
 			@Nullable List<R> frameCombiner = shouldCombine ? stackCombiner.element() : null;
 			if (shouldCombine)
 				stackCombiner.push(new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM));
-			int nodeIndex = 0, childrenFlatIndex = 0;
-			for (T n : frameSplitter) {
-				R currentRet = function.apply(n);
+			final int[] nodeIndex = {0};
+			final int[] childrenFlatIndex = {0};
+			List<T> finalFrameSplitterNext = frameSplitterNext;
+			frameSplitter.forEach(node -> {
+				R currentRet = AssertionUtilities.assertNonnull(function.apply(node));
 				if (shouldCombine)
 					frameCombiner.add(currentRet);
-				int childrenFlatIndexStart = childrenFlatIndex;
-				for (Iterator<? extends T> iterator = splitter.apply(n).iterator(); iterator.hasNext(); ++childrenFlatIndex) {
-					T c = iterator.next();
-					if (!visited.add(c)) {
+				int childrenFlatIndexStart = childrenFlatIndex[0];
+				AssertionUtilities.assertNonnull(splitter.apply(node)).forEach(child -> {
+					if (!visited.add(child)) {
 						if (repeater != null)
-							repeater.accept(c);
+							repeater.accept(child);
 					} else
-						frameSplitterNext.add(c);
-				}
+						finalFrameSplitterNext.add(child);
+					++childrenFlatIndex[0];
+				});
 
-				final int nodeIndexCopy = nodeIndex, childrenFlatIndexCopy = childrenFlatIndex;
+				final int nodeIndexCopy = nodeIndex[0], childrenFlatIndexCopy = childrenFlatIndex[0];
 				if (shouldCombine) {
 					List<R> frameCombinerChildren = AssertionUtilities.assertNonnull(stackCombiner.element());
 					frameCombinerActions.add(0, () ->
 							frameCombiner.add(combiner.apply(frameCombiner.remove(nodeIndexCopy),
 									frameCombinerChildren.subList(childrenFlatIndexStart, childrenFlatIndexCopy))));
 				}
-				++nodeIndex;
-			}
+				++nodeIndex[0];
+			});
 			frameSplitter = MiscellaneousUtilities.k(frameSplitterNext, frameSplitterNext = frameSplitter);
 			frameSplitterNext.clear();
 			if (shouldCombine) {

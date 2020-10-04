@@ -36,7 +36,7 @@ public interface IShapeAnchor {
 		private static final ImmutableList<Function<? super IShapeAnchor, ?>> OBJECT_VARIABLES = ImmutableList.of(
 				IShapeAnchor::getTarget, IShapeAnchor::getOriginSide, IShapeAnchor::getTargetSide, IShapeAnchor::getBorderThickness, IShapeAnchor::getContainer);
 		@NonNls
-		private static final ImmutableMap<String, Function<? super IShapeAnchor, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchKeysValues(getObjectVariables().size(),
+		private static final ImmutableMap<String, Function<? super IShapeAnchor, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.zipKeysValues(
 				ImmutableList.of("target", "originSide", "targetSide", "borderThickness", "container"), getObjectVariables()));
 
 		public static ImmutableList<Function<? super IShapeAnchor, ?>> getObjectVariables() { return OBJECT_VARIABLES; }

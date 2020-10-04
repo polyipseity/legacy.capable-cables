@@ -36,7 +36,7 @@ public class UIEventTarget
 	public boolean dispatchEvent(IUIEvent event) {
 		if (event.isPropagationStopped())
 			return false;
-		ImmutableList<IUIEventListenerWithParameters> ls = ImmutableList.copyOf(getEventTargetListeners().get(event.getType()));
+		ImmutableList<IUIEventListenerWithParameters> listeners = ImmutableList.copyOf(getEventTargetListeners().get(event.getType()));
 
 		Predicate<IUIEventListenerWithParameters> shouldHandle;
 		switch (event.getPhase()) {
@@ -59,12 +59,14 @@ public class UIEventTarget
 				);
 		}
 
-		for (IUIEventListenerWithParameters l : ls) {
-			if (shouldHandle.test(l))
-				l.getListener().accept(CastUtilities.castUnchecked(event));
-		}
-
-		return !ls.isEmpty();
+		return listeners.stream().sequential()
+				.filter(shouldHandle)
+				.map(IUIEventListenerWithParameters::getListener)
+				.map(listener -> {
+					listener.accept(CastUtilities.castUnchecked(event));
+					return true;
+				})
+				.reduce(false, Boolean::logicalOr);
 	}
 
 	@Override
@@ -94,7 +96,7 @@ public class UIEventTarget
 		private static final ImmutableList<Function<? super IUIEventListenerWithParameters, ?>> OBJECT_VARIABLES = ImmutableList.of(
 				IUIEventListenerWithParameters::getListener, IUIEventListenerWithParameters::isUseCapture);
 		@NonNls
-		private static final ImmutableMap<String, Function<? super IUIEventListenerWithParameters, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchKeysValues(getObjectVariables().size(),
+		private static final ImmutableMap<String, Function<? super IUIEventListenerWithParameters, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.zipKeysValues(
 				ImmutableList.of("listener", "useCapture"),
 				getObjectVariables()));
 		private final IUIEventListener<?> listener;

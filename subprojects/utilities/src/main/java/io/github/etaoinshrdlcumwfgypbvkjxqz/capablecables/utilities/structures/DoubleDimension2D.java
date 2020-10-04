@@ -15,7 +15,7 @@ public class DoubleDimension2D extends Dimension2D implements Serializable {
 	private static final ImmutableList<Function<? super DoubleDimension2D, ?>> OBJECT_VARIABLES = ImmutableList.of(
 			DoubleDimension2D::getWidth, DoubleDimension2D::getHeight);
 	@NonNls
-	private static final ImmutableMap<String, Function<? super DoubleDimension2D, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchKeysValues(getObjectVariables().size(),
+	private static final ImmutableMap<String, Function<? super DoubleDimension2D, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.zipKeysValues(
 			ImmutableList.of("width", "height"),
 			getObjectVariables()));
 	private static final long serialVersionUID = 4432299344969417136L;

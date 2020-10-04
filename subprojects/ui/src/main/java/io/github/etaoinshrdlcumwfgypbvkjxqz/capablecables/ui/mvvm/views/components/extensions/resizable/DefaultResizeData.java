@@ -14,21 +14,21 @@ import java.util.Optional;
 import java.util.Set;
 
 public class DefaultResizeData implements IUIComponentUserResizableExtension.IResizeData {
-	protected final Point2D point;
+	protected final Point2D previousPoint;
 	protected final Set<EnumUISide> sides;
 	@Nullable
 	protected final Point2D base;
 	protected final long initialCursorHandle;
 
-	public DefaultResizeData(Point2D point, Set<EnumUISide> sides, @Nullable Point2D base, long initialCursorHandle) {
-		this.point = (Point2D) point.clone();
+	public DefaultResizeData(Point2D previousPoint, Set<EnumUISide> sides, @Nullable Point2D base, long initialCursorHandle) {
+		this.previousPoint = (Point2D) previousPoint.clone();
 		this.sides = EnumSet.copyOf(sides);
 		this.base = Optional.ofNullable(base).map(Point2D::clone).map(CastUtilities::<Point2D>castUnchecked).orElse(null);
 		this.initialCursorHandle = initialCursorHandle;
 	}
 
 	@Override
-	public Point2D getPointView() { return getPoint(); }
+	public Point2D getPreviousPointView() { return (Point2D) getPreviousPoint().clone(); }
 
 	@Override
 	public Set<? extends EnumUISide> getSidesView() { return EnumSet.copyOf(getSides()); }
@@ -41,12 +41,12 @@ public class DefaultResizeData implements IUIComponentUserResizableExtension.IRe
 
 	@Override
 	public <R extends RectangularShape> R handle(Point2D point, RectangularShape source, R destination) {
-		Point2D previousCursorPosition = getPoint();
-		for (EnumUISide side : getSides()) {
+		Point2D previousPoint = getPreviousPoint();
+		getSides().forEach(side -> {
 			EnumUIAxis axis = side.getAxis();
 			side.getSetter().accept(destination, AssertionUtilities.assertNonnull(side.getGetter().apply(source))
-					+ (axis.getCoordinate(point) - axis.getCoordinate(previousCursorPosition)));
-		}
+					+ (axis.getCoordinate(point) - axis.getCoordinate(previousPoint)));
+		});
 		return destination;
 	}
 
@@ -55,5 +55,5 @@ public class DefaultResizeData implements IUIComponentUserResizableExtension.IRe
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Set<EnumUISide> getSides() { return sides; }
 
-	protected Point2D getPoint() { return point; }
+	protected Point2D getPreviousPoint() { return previousPoint; }
 }

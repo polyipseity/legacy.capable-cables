@@ -28,17 +28,18 @@ public class ShapeAnchorSet
 				new ShapeAnchor(target, EnumUISide.RIGHT, EnumUISide.LEFT, borderThickness));
 	}
 
+	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public boolean addAnchors(Iterable<? extends IShapeAnchor> anchors) {
-		boolean ret = false;
-		for (IShapeAnchor anchor : anchors) {
-			removeSides(Optional.ofNullable(EXCLUSIVE_SIDES_MAP.get(anchor.getOriginSide()))
-					.orElseThrow(InternalError::new));
-			getAnchors().put(anchor.getOriginSide(), anchor);
-			anchor.onContainerAdded(this);
-			ret = true;
-		}
-		return ret;
+		return Streams.stream(anchors)
+				.map(anchor -> {
+					removeSides(Optional.ofNullable(EXCLUSIVE_SIDES_MAP.get(anchor.getOriginSide()))
+							.orElseThrow(InternalError::new));
+					getAnchors().put(anchor.getOriginSide(), anchor);
+					anchor.onContainerAdded(this);
+					return true;
+				})
+				.reduce(false, Boolean::logicalOr);
 	}
 
 	@Override

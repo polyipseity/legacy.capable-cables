@@ -1,6 +1,5 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events;
 
-import com.google.common.collect.ImmutableSet;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.ClassUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.DynamicUtilities;
@@ -14,6 +13,7 @@ import org.jetbrains.annotations.NonNls;
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -35,8 +35,9 @@ public class ObserverToEventBusListenerAdapter<T extends Event, O>
 	public ObserverToEventBusListenerAdapter(O delegated, Class<? super O> superClass, @NonNls String methodName)
 			throws NoSuchMethodException {
 		super(delegated);
+		Class<?> delegatedClazz = delegated.getClass();
 
-		Optional<Class<?>> et = DynamicUtilities.Extensions.wrapTypeResolverResult(TypeResolver.resolveRawArgument(superClass, delegated.getClass()));
+		Optional<Class<?>> et = DynamicUtilities.Extensions.wrapTypeResolverResult(TypeResolver.resolveRawArgument(superClass, delegatedClazz));
 		if (!et.isPresent())
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
@@ -49,17 +50,15 @@ public class ObserverToEventBusListenerAdapter<T extends Event, O>
 
 		Method m;
 		{
-			Optional<Method> methodTemporary = ClassUtilities.getAnyMethod(delegated.getClass(), methodName, eventType); // COMMENT quick search
+			Optional<Method> methodTemporary = ClassUtilities.getAnyMethod(delegatedClazz, methodName, eventType); // COMMENT quick search
 			if (!methodTemporary.isPresent()) {
-				findMethodExtensively:
 				// COMMENT extensive search
-				for (ImmutableSet<Class<?>> eventTypeHierarchy : ClassUtilities.getThisAndSuperclassesAndInterfaces(eventType)) {
-					for (Class<?> otherEventType : eventTypeHierarchy) {
-						methodTemporary = ClassUtilities.getAnyMethod(delegated.getClass(), methodName, otherEventType);
-						if (methodTemporary.isPresent())
-							break findMethodExtensively;
-					}
-				}
+				methodTemporary = ClassUtilities.getThisAndSuperclassesAndInterfaces(eventType).stream().sequential()
+						.flatMap(Collection::stream)
+						.map(otherEventType -> ClassUtilities.getAnyMethod(delegatedClazz, methodName, otherEventType))
+						.filter(Optional::isPresent)
+						.map(Optional::get)
+						.findFirst();
 			}
 			m = methodTemporary
 					.orElseThrow(NoSuchMethodException::new);

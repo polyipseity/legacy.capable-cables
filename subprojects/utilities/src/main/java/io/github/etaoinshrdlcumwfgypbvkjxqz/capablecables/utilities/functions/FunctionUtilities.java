@@ -44,4 +44,8 @@ public enum FunctionUtilities {
 	}
 
 	public static Predicate<Boolean> getPredicateIdentity() { return PREDICATE_IDENTITY; }
+
+	public static <O, T extends Function<? super O, ? extends R>, R> Function<T, R> applyToFunction(O object) {
+		return t -> t.apply(object);
+	}
 }

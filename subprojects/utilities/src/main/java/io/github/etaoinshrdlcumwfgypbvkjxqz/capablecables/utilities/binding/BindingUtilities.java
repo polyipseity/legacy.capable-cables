@@ -5,6 +5,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
@@ -13,6 +14,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.ClassUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 
 import java.lang.invoke.MethodHandle;
@@ -43,9 +45,11 @@ public enum BindingUtilities {
 						return object -> {
 							ImmutableSet.Builder<IHasBinding> builder = ImmutableSet.builder();
 							try {
-								for (MethodHandle variableHandle : variableHandles) {
-									builder.add((IHasBinding) variableHandle.invoke(object));
-								}
+								variableHandles.stream().unordered()
+										.map(IThrowingFunction.executeNow(variableHandle ->
+												AssertionUtilities.assertNonnull(variableHandle).invoke(object)))
+										.map(IHasBinding.class::cast)
+										.forEach(builder::add);
 							} catch (Throwable throwable) {
 								throw ThrowableUtilities.propagate(throwable);
 							}
@@ -70,9 +74,11 @@ public enum BindingUtilities {
 						Function<Object, ImmutableSet<IBindingField<?>>> bindings = object -> {
 							ImmutableSet.Builder<IBindingField<?>> builder = ImmutableSet.builder();
 							try {
-								for (MethodHandle bindingHandle : bindingHandles) {
-									builder.add((IBindingField<?>) bindingHandle.invoke(object));
-								}
+								bindingHandles.stream().unordered()
+										.map(IThrowingFunction.executeNow(bindingHandle ->
+												AssertionUtilities.assertNonnull(bindingHandle).invoke(object)))
+										.map(IBindingField.class::cast)
+										.forEach(builder::add);
 							} catch (Throwable throwable) {
 								throw ThrowableUtilities.propagate(throwable);
 							}
@@ -106,9 +112,11 @@ public enum BindingUtilities {
 						Function<Object, ImmutableSet<IBindingMethod<?>>> bindings = object -> {
 							ImmutableSet.Builder<IBindingMethod<?>> builder = ImmutableSet.builder();
 							try {
-								for (MethodHandle bindingHandle : bindingHandles) {
-									builder.add((IBindingMethod<?>) bindingHandle.invoke(object));
-								}
+								bindingHandles.stream().unordered()
+										.map(IThrowingFunction.executeNow(bindingHandle ->
+												AssertionUtilities.assertNonnull(bindingHandle).invoke(object)))
+										.map(IBindingMethod.class::cast)
+										.forEach(builder::add);
 							} catch (Throwable throwable) {
 								throw ThrowableUtilities.propagate(throwable);
 							}

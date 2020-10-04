@@ -1,9 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
+import com.google.common.collect.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LoopUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
@@ -24,7 +21,9 @@ import org.slf4j.Marker;
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,8 +36,22 @@ public enum MapUtilities {
 	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker();
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 
-	public static <K, V> ImmutableMap<K, V> stitchKeysValues(int size, Iterable<? extends K> keys, Iterable<? extends V> values) {
-		Map<K, V> ret = new HashMap<>(size);
+	@SafeVarargs
+	@SuppressWarnings("varargs")
+	public static <K, V> ImmutableMap<K, V> concatMaps(Map<? extends K, ? extends V>... maps) { return concatMaps(ImmutableList.copyOf(maps)); }
+
+	public static <K, V> ImmutableMap<K, V> concatMaps(Iterable<? extends Map<? extends K, ? extends V>> maps) {
+		ImmutableList.Builder<Iterable<? extends K>> keys = ImmutableList.builder();
+		ImmutableList.Builder<Iterable<? extends V>> values = ImmutableList.builder();
+		maps.forEach(map -> {
+			keys.add(map.keySet());
+			values.add(map.values());
+		});
+		return zipKeysValues(Iterables.concat(keys.build()), Iterables.concat(values.build()));
+	}
+
+	public static <K, V> ImmutableMap<K, V> zipKeysValues(Iterable<? extends K> keys, Iterable<? extends V> values) {
+		ImmutableMap.Builder<K, V> ret = ImmutableMap.builder();
 
 		Iterator<? extends V> iteratorValues = values.iterator();
 		keys.forEach(k -> {
@@ -46,7 +59,7 @@ public enum MapUtilities {
 				throw new IllegalArgumentException(
 						new LogMessageBuilder()
 								.addMarkers(MapUtilities::getClassMarker)
-								.addKeyValue("size", size).addKeyValue("keys", keys).addKeyValue("values", values)
+								.addKeyValue("keys", keys).addKeyValue("values", values)
 								.addMessages(() -> getResourceBundle().getString("stitch.keys.long"))
 								.build()
 				);
@@ -56,29 +69,15 @@ public enum MapUtilities {
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
 							.addMarkers(MapUtilities::getClassMarker)
-							.addKeyValue("size", size).addKeyValue("keys", keys).addKeyValue("values", values)
+							.addKeyValue("keys", keys).addKeyValue("values", values)
 							.addMessages(() -> getResourceBundle().getString("stitch.values.long"))
 							.build()
 			);
 
-		return ImmutableMap.copyOf(ret);
+		return ret.build();
 	}
 
 	public static Marker getClassMarker() { return CLASS_MARKER; }
-
-	@SafeVarargs
-	public static <K, V> ImmutableMap<K, V> concatMaps(Map<? extends K, ? extends V>... maps) {
-		List<Iterable<? extends K>> keys = new ArrayList<>(maps.length);
-		List<Iterable<? extends V>> values = new ArrayList<>(maps.length);
-		int size = 0;
-		for (Map<? extends K, ? extends V> map : maps) {
-			Collection<? extends K> mk = map.keySet();
-			size += mk.size();
-			keys.add(mk);
-			values.add(map.values());
-		}
-		return stitchKeysValues(size, Iterables.concat(keys), Iterables.concat(values));
-	}
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 

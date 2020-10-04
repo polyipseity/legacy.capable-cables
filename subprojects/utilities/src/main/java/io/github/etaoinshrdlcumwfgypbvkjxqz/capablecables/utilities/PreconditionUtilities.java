@@ -1,24 +1,25 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
-import javax.annotation.Nullable;
+import com.google.common.base.Preconditions;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkElementIndex;
+import javax.annotation.Nullable;
+import java.util.Arrays;
 
 public enum PreconditionUtilities {
 	;
 
 	public static void checkArgumentTypes(Class<?>[] types, Object... args) {
 		int typesLength = types.length;
-		checkElementIndex(typesLength - 1, args.length);
-		for (int i = 0; i < typesLength; ++i) {
-			@Nullable Object arg = args[i];
-			checkArgument(arg == null || types[i].isInstance(arg));
-		}
+		Preconditions.checkElementIndex(typesLength - 1, args.length);
+		LoopUtilities.doNTimes(typesLength, index -> {
+			@Nullable Object arg = args[index];
+			Preconditions.checkArgument(arg == null || types[index].isInstance(arg));
+		});
 	}
 
 	public static void checkArrayContentType(Class<?> type, Object... array) {
-		for (@Nullable Object o : array)
-			checkArgument(o == null || type.isInstance(o));
+		Arrays.stream(array).unordered()
+				.map(o -> o == null || type.isInstance(o))
+				.forEach(Preconditions::checkArgument);
 	}
 }

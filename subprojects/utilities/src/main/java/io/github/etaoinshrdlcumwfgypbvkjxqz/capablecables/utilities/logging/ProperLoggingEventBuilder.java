@@ -13,10 +13,7 @@ import org.slf4j.event.LoggingEvent;
 import org.slf4j.spi.LoggingEventBuilder;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.function.Supplier;
 
 // TODO remove when not needed
@@ -84,8 +81,8 @@ public class ProperLoggingEventBuilder
 
 	@Override
 	public void log(String message, Object... args) {
-		for (Object arg : args)
-			addArgument(arg);
+		Arrays.stream(args).sequential()
+				.forEachOrdered(this::addArgument);
 		log(message);
 	}
 

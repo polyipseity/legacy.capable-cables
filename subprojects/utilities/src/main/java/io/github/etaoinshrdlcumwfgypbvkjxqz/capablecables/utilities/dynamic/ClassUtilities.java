@@ -94,31 +94,31 @@ public enum ClassUtilities {
 	}
 
 	public static Optional<Field> getAnyField(Class<?> clazz, String name) {
-		@Nullable Field ret = null;
-		find:
-		for (ImmutableSet<Class<?>> hierarchy : ClassUtilities.getThisAndSuperclassesAndInterfaces(clazz)) {
-			for (Class<?> class2 : hierarchy) {
-				try {
-					ret = class2.getDeclaredField(name);
-					break find;
-				} catch (NoSuchFieldException ignored) {}
-			}
-		}
-		return Optional.ofNullable(ret);
+		return ClassUtilities.getThisAndSuperclassesAndInterfaces(clazz).stream().sequential()
+				.flatMap(Collection::stream)
+				.map(clazz1 -> {
+					try {
+						return clazz.getDeclaredField(name);
+					} catch (NoSuchFieldException e) {
+						return null;
+					}
+				})
+				.filter(Objects::nonNull)
+				.findFirst();
 	}
 
 	public static Optional<Method> getAnyMethod(Class<?> clazz, String name, Class<?>... parameterTypes) {
-		@Nullable Method ret = null;
-		find:
-		for (ImmutableSet<Class<?>> hierarchy : ClassUtilities.getThisAndSuperclassesAndInterfaces(clazz)) {
-			for (Class<?> class2 : hierarchy) {
-				try {
-					ret = class2.getDeclaredMethod(name, parameterTypes);
-					break find;
-				} catch (NoSuchMethodException ignored) {}
-			}
-		}
-		return Optional.ofNullable(ret);
+		return ClassUtilities.getThisAndSuperclassesAndInterfaces(clazz).stream().sequential()
+				.flatMap(Collection::stream)
+				.map(clazz1 -> {
+					try {
+						return clazz.getDeclaredMethod(name, parameterTypes);
+					} catch (NoSuchMethodException e) {
+						return null;
+					}
+				})
+				.filter(Objects::nonNull)
+				.findFirst();
 	}
 
 	@SuppressWarnings("UnstableApiUsage")

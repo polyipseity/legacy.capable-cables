@@ -6,6 +6,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.NoSuchBindingTransformerException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingBiFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingConsumer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IValue;
@@ -20,6 +21,7 @@ import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public class FieldBindings
@@ -67,20 +69,21 @@ public class FieldBindings
 	                                                                              Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>> transformers,
 	                                                                              AtomicBoolean isSource) {
 		return new LoggingDisposableObserver<>(new DefaultDisposableObserver<IValue<T>>() {
+			@SuppressWarnings("UnstableApiUsage")
 			@Override
 			public void onNext(@Nonnull IValue<T> t) {
 				if (isSource.getAndSet(false)) {
-					for (IBindingField<?> k : to) {
-						if (!k.equals(from)) {
-							try {
-								k.setValue(CastUtilities.castUncheckedNullable(
-										transform(transformers, t.getValue().orElse(null), from.getGenericClass(), k.getGenericClass()))); // COMMENT should be of the correct type
-							} catch (NoSuchBindingTransformerException ex) {
-								isSource.set(true);
-								onError(ex);
-								break;
-							}
-						}
+					try {
+						Streams.stream(to).unordered()
+								.filter(FunctionUtilities.notPredicate(Predicate.isEqual(from)))
+								.forEach(IThrowingConsumer.executeNow(destination -> {
+									AssertionUtilities.assertNonnull(destination).setValue(CastUtilities.castUncheckedNullable(
+											transform(transformers, t.getValue().orElse(null), from.getGenericClass(), destination.getGenericClass()))); // COMMENT should be of the correct type
+								}));
+					} catch (NoSuchBindingTransformerException e) {
+						isSource.set(true);
+						onError(e);
+						return;
 					}
 					isSource.set(true);
 				}

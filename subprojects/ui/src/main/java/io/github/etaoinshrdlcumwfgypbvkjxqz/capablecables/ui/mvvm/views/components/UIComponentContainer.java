@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
@@ -22,15 +23,31 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.Co
 import javax.annotation.Nullable;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class UIComponentContainer
 		extends UIComponent
 		implements IUIComponentContainer {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
+
+	protected final List<IUIComponent> children = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+
+	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__NAME__SHAPE_DESCRIPTOR)
+	public UIComponentContainer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String name, IShapeDescriptor<?> shapeDescriptor) { super(mappings, name, shapeDescriptor); }
+
+	@Override
+	public void transformChildren(AffineTransform transform) {
+		Rectangle2D bounds = getShapeDescriptor().getShapeOutput().getBounds2D();
+		transform.translate(bounds.getX(), bounds.getY());
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	@Override
+	public boolean addChildren(Iterable<? extends IUIComponent> components) {
+		return Streams.stream(components).sequential()
+				.map(component -> !getChildren().contains(component) && addChildAt(getChildren().size(), component))
+				.reduce(false, Boolean::logicalOr);
+	}
 
 	@Override
 	public boolean addChildAt(int index, IUIComponent component) {
@@ -48,9 +65,12 @@ public class UIComponentContainer
 				.ifPresent(p -> p.removeChildren(ImmutableList.of(component)));
 		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 					getChildren().add(index, component);
-					List<IUIComponent> childrenMoved = getChildren().subList(index + 1, getChildren().size());
-					for (int i = 0; i < childrenMoved.size(); i++)
-						AssertionUtilities.assertNonnull(childrenMoved.get(i)).onIndexMove(index + i, index + i + 1);
+					List<IUIComponent> movedChildren = getChildren().subList(index + 1, getChildren().size());
+					for (ListIterator<IUIComponent> listIterator = movedChildren.listIterator(); listIterator.hasNext(); ) {
+						int nextIndex = listIterator.nextIndex();
+						IUIComponent movedChild = listIterator.next();
+						AssertionUtilities.assertNonnull(movedChild).onIndexMove(index + nextIndex, index + nextIndex + 1);
+					}
 					component.onParentChange(null, this);
 				},
 				new UIComponentHierarchyChangedBusEvent.Parent(EnumHookStage.PRE, component, null, this),
@@ -59,46 +79,31 @@ public class UIComponentContainer
 		return true;
 	}
 
-	protected final List<IUIComponent> children = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
-
-	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__NAME__SHAPE_DESCRIPTOR)
-	public UIComponentContainer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String name, IShapeDescriptor<?> shapeDescriptor) { super(mappings, name, shapeDescriptor); }
-
-	@Override
-	public void transformChildren(AffineTransform transform) {
-		Rectangle2D bounds = getShapeDescriptor().getShapeOutput().getBounds2D();
-		transform.translate(bounds.getX(), bounds.getY());
-	}
-
-	@Override
-	public boolean addChildren(Iterable<? extends IUIComponent> components) {
-		boolean ret = false;
-		for (IUIComponent component : components)
-			ret |= !getChildren().contains(component) && addChildAt(getChildren().size(), component);
-		return ret;
-	}
-
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
-	@SuppressWarnings({"ObjectAllocationInLoop"})
 	@Override
 	public boolean removeChildren(Iterable<? extends IUIComponent> components) {
-		boolean ret = false;
-		for (IUIComponent component : components) {
-			int index = getChildren().indexOf(component);
-			if (index != -1) {
-				EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
-							getChildren().remove(component);
-							List<IUIComponent> childrenMoved = getChildren().subList(index, getChildren().size());
-							for (int i = 0; i < childrenMoved.size(); i++)
-								AssertionUtilities.assertNonnull(childrenMoved.get(i)).onIndexMove(index + i + 1, index + i);
-							component.onParentChange(this, null);
-						},
-						new UIComponentHierarchyChangedBusEvent.Parent(EnumHookStage.PRE, component, this, null),
-						new UIComponentHierarchyChangedBusEvent.Parent(EnumHookStage.POST, component, this, null));
-				ret = true;
-			}
-		}
+		@SuppressWarnings("UnstableApiUsage") boolean ret = Streams.stream(components)
+				.map(component -> {
+					int index = getChildren().indexOf(component);
+					if (index != -1) {
+						EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
+									getChildren().remove(component);
+									List<IUIComponent> movedChildren = getChildren().subList(index, getChildren().size());
+									for (ListIterator<IUIComponent> listIterator = movedChildren.listIterator(); listIterator.hasNext(); ) {
+										int nextIndex = listIterator.nextIndex();
+										IUIComponent movedChild = listIterator.next();
+										AssertionUtilities.assertNonnull(movedChild).onIndexMove(index + nextIndex + 1, index + nextIndex);
+									}
+									component.onParentChange(this, null);
+								},
+								new UIComponentHierarchyChangedBusEvent.Parent(EnumHookStage.PRE, component, this, null),
+								new UIComponentHierarchyChangedBusEvent.Parent(EnumHookStage.POST, component, this, null));
+						return true;
+					}
+					return false;
+				})
+				.reduce(false, Boolean::logicalOr);
 		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh);
 		return ret;
 	}
@@ -111,15 +116,21 @@ public class UIComponentContainer
 		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 					getChildren().remove(previous);
 					getChildren().add(index, component); // COMMENT cast is always safe
-					List<IUIComponent> childrenMoved;
+					List<IUIComponent> movedChildren;
 					if (index > previous) {
-						childrenMoved = getChildren().subList(previous, index);
-						for (int i = 0; i < childrenMoved.size(); i++)
-							AssertionUtilities.assertNonnull(childrenMoved.get(i)).onIndexMove(previous + i + 1, previous + i);
+						movedChildren = getChildren().subList(previous, index);
+						for (ListIterator<IUIComponent> listIterator = movedChildren.listIterator(); listIterator.hasNext(); ) {
+							int nextIndex = listIterator.nextIndex();
+							IUIComponent movedChild = listIterator.next();
+							AssertionUtilities.assertNonnull(movedChild).onIndexMove(index + nextIndex + 1, index + nextIndex);
+						}
 					} else {
-						childrenMoved = getChildren().subList(index + 1, previous + 1);
-						for (int i = 0; i < childrenMoved.size(); i++)
-							AssertionUtilities.assertNonnull(childrenMoved.get(i)).onIndexMove(index + i, index + i + 1);
+						movedChildren = getChildren().subList(index + 1, previous + 1);
+						for (ListIterator<IUIComponent> listIterator = movedChildren.listIterator(); listIterator.hasNext(); ) {
+							int nextIndex = listIterator.nextIndex();
+							IUIComponent movedChild = listIterator.next();
+							AssertionUtilities.assertNonnull(movedChild).onIndexMove(index + nextIndex, index + nextIndex + 1);
+						}
 					}
 					component.onIndexMove(previous, index);
 				},

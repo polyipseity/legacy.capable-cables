@@ -2,12 +2,17 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.processor
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Unmodifiable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import org.slf4j.Marker;
 
 import javax.annotation.Nullable;
-import javax.lang.model.element.*;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.lang.annotation.Annotation;
@@ -96,27 +101,21 @@ public enum ProcessorUtilities {
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
-	public static <A extends Annotation> A[] getEffectiveAnnotationsWithInheritingConsidered(Class<A> annotationType, ExecutableElement executable, Elements elements, Types types) {
-		A[] r = executable.getAnnotationsByType(annotationType);
-		if (r.length != 0) return r;
-
-		TypeElement type = (TypeElement) executable.getEnclosingElement();
-		sss:
-		for (ImmutableSet<TypeElement> ss : getSuperclassesAndInterfaces(type, types)) {
-			for (TypeElement s : ss) {
-				for (Element m : s.getEnclosedElements()) {
-					if (m.getKind() == ElementKind.METHOD) {
-						ExecutableElement m1 = (ExecutableElement) m;
-						if (elements.overrides(executable, m1, type)) {
-							r = m1.getAnnotationsByType(annotationType);
-							break;
-						}
-					}
-				}
-				if (r.length != 0) break sss;
-			}
-		}
-
-		return r;
+	/**
+	 * Same as {@see #getThisAndSuperclasses(Types, TypeElement)}, but an additional set consisting of the specified
+	 * TypeElement is prepended to the result.
+	 *
+	 * @param types the Types utilities
+	 * @param type  the lower bound, inclusive
+	 *
+	 * @return the superclasses and superinterfaces of the specified TypeElement
+	 *
+	 * @see #getThisAndSuperclasses(Types, TypeElement)
+	 * @since 0.0.1
+	 */
+	@Unmodifiable
+	@Immutable
+	public static List<Set<TypeElement>> getThisAndSuperclassesAndInterfaces(Types types, TypeElement type) {
+		return ImmutableList.<Set<TypeElement>>builder().add(ImmutableSet.of(type)).addAll(getSuperclassesAndInterfaces(types, type)).build();
 	}
 }

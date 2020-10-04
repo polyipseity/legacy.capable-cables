@@ -30,7 +30,7 @@ public interface IUIDataKeyboardKeyPress
 		private static final ImmutableList<Function<? super IUIDataKeyboardKeyPress, ?>> OBJECT_VARIABLES = ImmutableList.of(
 				IUIDataKeyboardKeyPress::getKey, IUIDataKeyboardKeyPress::getScanCode, IUIDataKeyboardKeyPress::getModifiers, IUIDataKeyboardKeyPress::getTimestampMills);
 		@NonNls
-		private static final ImmutableMap<String, Function<? super IUIDataKeyboardKeyPress, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.stitchKeysValues(getObjectVariables().size(),
+		private static final ImmutableMap<String, Function<? super IUIDataKeyboardKeyPress, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.zipKeysValues(
 				ImmutableList.of("key", "scanCode", "modifiers", "timestampMills"),
 				getObjectVariables()));
 
