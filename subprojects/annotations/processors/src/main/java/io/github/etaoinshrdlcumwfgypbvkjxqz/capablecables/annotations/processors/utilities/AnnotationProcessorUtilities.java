@@ -3,7 +3,6 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.processor
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Unmodifiable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import org.slf4j.Marker;
@@ -15,6 +14,7 @@ import javax.lang.model.util.Types;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.BaseStream;
 
 /**
  * Contains utilities that can be used for annotation processing.
@@ -141,43 +141,50 @@ public enum AnnotationProcessorUtilities {
 	 * @since 0.0.1
 	 */
 	@SuppressWarnings({"UnstableApiUsage", "ObjectAllocationInLoop"})
-	@Unmodifiable
 	@Immutable
 	public static List<Set<TypeElement>> getSuperclassesAndInterfaces(Types types, TypeElement type) {
 		List<Set<TypeElement>> ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 
-		@Unmodifiable @Immutable List<TypeElement> superclasses = getSuperclasses(type, types);
+		@Immutable List<TypeElement> superclasses = getSuperclasses(type, types);
 		ret.add(ImmutableSet.copyOf(superclasses));
-		@SuppressWarnings("UnstableApiUsage") AtomicReference<List<TypeElement>> currentLayerInterfaces = new AtomicReference<>(type.getInterfaces().stream().sequential()
-				.map(types::asElement)
-				.map(TypeElement.class::cast)
-				.collect(ImmutableList.toImmutableList()));
-		superclasses.forEach(superclass -> {
-			@SuppressWarnings("UnstableApiUsage") @Unmodifiable @Immutable List<TypeElement> nextLayerClassInterfaces = superclass.getInterfaces().stream().sequential()
-					.map(types::asElement)
-					.map(TypeElement.class::cast)
-					.collect(ImmutableList.toImmutableList());
-			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(currentLayerInterfaces.getAndUpdate(currentLayerInterfaces2 -> {
-				ImmutableList.Builder<TypeElement> nextLayerInterfaces = ImmutableList.builder();
-				nextLayerInterfaces.addAll(nextLayerClassInterfaces);
-				currentLayerInterfaces2.forEach(currentLayerInterface ->
-						nextLayerInterfaces.addAll(currentLayerInterface.getInterfaces().stream().sequential()
+		@SuppressWarnings("UnstableApiUsage") AtomicReference<Set<TypeElement>> currentLayerInterfaces =
+				new AtomicReference<>(
+						type.getInterfaces().stream().sequential()
 								.map(types::asElement)
 								.map(TypeElement.class::cast)
-								.collect(ImmutableList.toImmutableList())));
-				return nextLayerInterfaces.build();
-			}))));
-		});
-		while (!AssertionUtilities.assertNonnull(currentLayerInterfaces.get()).isEmpty()) {
-			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(currentLayerInterfaces.getAndUpdate(currentLayerInterfaces2 -> {
-				@SuppressWarnings("ObjectAllocationInLoop") ImmutableList.Builder<TypeElement> nextLayerInterfaces = ImmutableList.builder();
-				currentLayerInterfaces2.forEach(currentLayerInterface ->
-						nextLayerInterfaces.addAll(currentLayerInterface.getInterfaces().stream().sequential()
+								.collect(ImmutableSet.toImmutableSet()));
+		superclasses.stream().sequential()
+				.map(TypeElement::getInterfaces)
+				.map(Collection::stream)
+				.map(BaseStream::sequential)
+				.map(superclassInterfacesStream ->
+						superclassInterfacesStream
 								.map(types::asElement)
 								.map(TypeElement.class::cast)
-								.collect(ImmutableList.toImmutableList())));
-				return nextLayerInterfaces.build();
-			}))));
+								.collect(ImmutableSet.toImmutableSet()))
+				.forEachOrdered(superclassInterfaces ->
+						ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(
+								currentLayerInterfaces.getAndUpdate(currentLayerInterfaces2 -> {
+									ImmutableSet.Builder<TypeElement> nextLayerInterfaces = ImmutableSet.builder();
+									nextLayerInterfaces.addAll(superclassInterfaces);
+									currentLayerInterfaces2.stream().sequential()
+											.map(TypeElement::getInterfaces)
+											.flatMap(Collection::stream)
+											.map(types::asElement)
+											.map(TypeElement.class::cast)
+											.forEachOrdered(nextLayerInterfaces::add);
+									return nextLayerInterfaces.build();
+								})))));
+		while (!AssertionUtilities.assertNonnull(currentLayerInterfaces.get())
+				.isEmpty()) {
+			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(
+					currentLayerInterfaces.getAndUpdate(currentLayerInterfaces2 ->
+							currentLayerInterfaces2.stream().sequential()
+									.map(TypeElement::getInterfaces)
+									.flatMap(Collection::stream)
+									.map(types::asElement)
+									.map(TypeElement.class::cast)
+									.collect(ImmutableSet.toImmutableSet())))));
 		}
 
 		ret.removeIf(Collection::isEmpty);
@@ -196,7 +203,6 @@ public enum AnnotationProcessorUtilities {
 	 * @see #getIntermediateSuperclasses(TypeElement, TypeElement, Types)
 	 * @since 0.0.1
 	 */
-	@Unmodifiable
 	@Immutable
 	public static List<TypeElement> getSuperclasses(TypeElement type, Types types) { return getIntermediateSuperclasses(type, null, types); }
 
@@ -214,7 +220,6 @@ public enum AnnotationProcessorUtilities {
 	 * @see #getLowerAndIntermediateSuperclasses(Types, TypeElement, TypeElement)
 	 * @since 0.0.1
 	 */
-	@Unmodifiable
 	@Immutable
 	public static List<TypeElement> getIntermediateSuperclasses(TypeElement lower, @Nullable TypeElement upper, Types types) { return getLowerAndIntermediateSuperclasses(types, (TypeElement) types.asElement(lower.getSuperclass()), upper); }
 
@@ -231,7 +236,6 @@ public enum AnnotationProcessorUtilities {
 	 * @see TypeElement
 	 * @since 0.0.1
 	 */
-	@Unmodifiable
 	@Immutable
 	public static List<TypeElement> getLowerAndIntermediateSuperclasses(Types types, @Nullable TypeElement lower, @Nullable TypeElement upper) {
 		ImmutableList.Builder<TypeElement> ret = ImmutableList.builder();
@@ -279,7 +283,6 @@ public enum AnnotationProcessorUtilities {
 	 * @see TypeElement
 	 * @since 0.0.1
 	 */
-	@Unmodifiable
 	@Immutable
 	public static List<TypeElement> getThisAndSuperclasses(Types types, TypeElement type) { return getLowerAndIntermediateSuperclasses(types, type, null); }
 
@@ -295,7 +298,6 @@ public enum AnnotationProcessorUtilities {
 	 * @see #getThisAndSuperclasses(Types, TypeElement)
 	 * @since 0.0.1
 	 */
-	@Unmodifiable
 	@Immutable
 	public static List<Set<TypeElement>> getThisAndSuperclassesAndInterfaces(Types types, TypeElement type) {
 		return ImmutableList.<Set<TypeElement>>builder().add(ImmutableSet.of(type)).addAll(getSuperclassesAndInterfaces(types, type)).build();

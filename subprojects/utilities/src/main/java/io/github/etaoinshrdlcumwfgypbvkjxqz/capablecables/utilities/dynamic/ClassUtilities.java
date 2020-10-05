@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
@@ -15,8 +16,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
 public enum ClassUtilities {
 	;
@@ -32,11 +31,13 @@ public enum ClassUtilities {
 		}
 	}
 
-	public static <U> ImmutableSet<Class<? extends U>> getThisAndSuperclasses(Class<? extends U> clazz) { return getLowerAndIntermediateSuperclasses(clazz, null); }
+	public static <U> List<Class<? extends U>> getThisAndSuperclasses(Class<? extends U> clazz) { return getLowerAndIntermediateSuperclasses(clazz, null); }
 
-	public static <U> ImmutableSet<Class<? extends U>> getLowerAndIntermediateSuperclasses(@Nullable Class<? extends U> lower, @Nullable Class<U> upper) {
-		ImmutableSet.Builder<Class<? extends U>> r = new ImmutableSet.Builder<>();
-		for (@Nullable Class<?> i = lower; !Objects.equals(i, upper) && i != null; i = i.getSuperclass())
+	public static <U> List<Class<? extends U>> getLowerAndIntermediateSuperclasses(@Nullable Class<? extends U> lower, @Nullable Class<U> upper) {
+		ImmutableList.Builder<Class<? extends U>> r = ImmutableList.builder();
+		for (@Nullable Class<?> i = lower;
+		     !Objects.equals(i, upper) && i != null;
+		     i = i.getSuperclass())
 			r.add(CastUtilities.<Class<? extends U>>castUnchecked(i));
 		return r.build();
 	}
@@ -50,42 +51,48 @@ public enum ClassUtilities {
 				.collect(ImmutableSet.toImmutableSet());
 	}
 
-	public static ImmutableSet<ImmutableSet<Class<?>>> getThisAndSuperclassesAndInterfaces(Class<?> type) { return new ImmutableSet.Builder<ImmutableSet<Class<?>>>().add(ImmutableSet.of(type)).addAll(getSuperclassesAndInterfaces(type)).build(); }
+	public static List<Set<Class<?>>> getThisAndSuperclassesAndInterfaces(Class<?> type) { return ImmutableList.<Set<Class<?>>>builder().add(ImmutableSet.of(type)).addAll(getSuperclassesAndInterfaces(type)).build(); }
 
-	@SuppressWarnings("ObjectAllocationInLoop")
-	public static ImmutableSet<ImmutableSet<Class<?>>> getSuperclassesAndInterfaces(Class<?> clazz) {
-		Set<ImmutableSet<Class<?>>> ret = new LinkedHashSet<>(INITIAL_CAPACITY_SMALL);
+	@SuppressWarnings({"ObjectAllocationInLoop", "UnstableApiUsage"})
+	public static List<Set<Class<?>>> getSuperclassesAndInterfaces(Class<?> clazz) {
+		List<Set<Class<?>>> ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 
-		ImmutableSet<Class<?>> scs = getSuperclasses(clazz);
-		ret.add(scs);
-		AtomicReference<List<Class<?>>> cur = new AtomicReference<>(Arrays.asList(clazz.getInterfaces()));
-		scs.forEach(sc -> {
-			List<Class<?>> next = ImmutableList.copyOf(sc.getInterfaces());
-			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(cur.getAndUpdate(c -> {
-				List<Class<?>> n = new ArrayList<>(next.size() + c.size() * CapacityUtilities.INITIAL_CAPACITY_TINY);
-				n.addAll(next);
-				c.forEach(t ->
-						Collections.addAll(n, t.getInterfaces()));
-				return n;
-			}))));
-		});
-		while (!AssertionUtilities.assertNonnull(cur.get()).isEmpty()) {
-			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(cur.getAndUpdate(s -> {
-				List<Class<?>> n = new ArrayList<>(s.size() * CapacityUtilities.INITIAL_CAPACITY_TINY);
-				s.forEach(t ->
-						Collections.addAll(n, t.getInterfaces()));
-				return n;
-			}))));
+		@Immutable List<Class<?>> superclasses = getSuperclasses(clazz);
+		ret.add(ImmutableSet.copyOf(superclasses));
+		AtomicReference<Set<Class<?>>> currentLayerInterfaces =
+				new AtomicReference<>(ImmutableSet.copyOf(clazz.getInterfaces()));
+		superclasses.stream().sequential()
+				.map(Class::getInterfaces)
+				.map(ImmutableList::copyOf)
+				.forEachOrdered(superclassInterfaces ->
+						ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(
+								currentLayerInterfaces.getAndUpdate(currentLayerInterfaces2 -> {
+									ImmutableSet.Builder<Class<?>> nextLayerInterfaces = ImmutableSet.builder();
+									nextLayerInterfaces.addAll(superclassInterfaces);
+									currentLayerInterfaces2.stream().sequential()
+											.map(Class::getInterfaces)
+											.flatMap(Arrays::stream)
+											.forEachOrdered(nextLayerInterfaces::add);
+									return nextLayerInterfaces.build();
+								})))));
+		while (!AssertionUtilities.assertNonnull(currentLayerInterfaces.get())
+				.isEmpty()) {
+			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(
+					currentLayerInterfaces.getAndUpdate(currentLayerInterfaces2 ->
+							currentLayerInterfaces2.stream().sequential()
+									.map(Class::getInterfaces)
+									.flatMap(Arrays::stream)
+									.collect(ImmutableSet.toImmutableSet())))));
 		}
 
 		ret.removeIf(Collection::isEmpty);
-		return ImmutableSet.copyOf(ret);
+		return ImmutableList.copyOf(ret);
 	}
 
-	public static <U> ImmutableSet<Class<? extends U>> getSuperclasses(@Nullable Class<? extends U> clazz) { return getIntermediateSuperclasses(clazz, null); }
+	public static <U> List<Class<? extends U>> getSuperclasses(@Nullable Class<? extends U> clazz) { return getIntermediateSuperclasses(clazz, null); }
 
-	public static <U> ImmutableSet<Class<? extends U>> getIntermediateSuperclasses(@Nullable Class<? extends U> lower,
-	                                                                               @Nullable Class<U> upper) {
+	public static <U> List<Class<? extends U>> getIntermediateSuperclasses(@Nullable Class<? extends U> lower,
+	                                                                       @Nullable Class<U> upper) {
 		return getLowerAndIntermediateSuperclasses(
 				CastUtilities.castUncheckedNullable(
 						Optional.ofNullable(lower)

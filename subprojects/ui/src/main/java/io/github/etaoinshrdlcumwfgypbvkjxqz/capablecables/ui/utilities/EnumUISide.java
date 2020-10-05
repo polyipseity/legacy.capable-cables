@@ -2,7 +2,6 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities;
 
 import com.google.common.collect.Sets;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Unmodifiable;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.RectangularShape;
@@ -125,7 +124,6 @@ public enum EnumUISide {
 	};
 
 	@SuppressWarnings("UnstableApiUsage")
-	@Unmodifiable
 	@Immutable
 	public static Set<EnumUISide> getSidesMouseOver(RectangularShape rectangular, Point2D mouse) {
 		return Arrays.stream(EnumUISide.values()).unordered()
