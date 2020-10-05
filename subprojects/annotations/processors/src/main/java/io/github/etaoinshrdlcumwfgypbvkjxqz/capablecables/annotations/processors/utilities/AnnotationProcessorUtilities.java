@@ -9,28 +9,62 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.Co
 import org.slf4j.Marker;
 
 import javax.annotation.Nullable;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.*;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-public enum ProcessorUtilities {
+/**
+ * Contains utilities that can be used for annotation processing.
+ *
+ * @author William So
+ * @since 0.0.1
+ */
+public enum AnnotationProcessorUtilities {
 	;
 
+	/**
+	 * The marker for this class.
+	 *
+	 * @see Marker
+	 * @since 0.0.1
+	 */
 	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker();
+
+	/**
+	 * The resource bundle for this class.
+	 *
+	 * @see ResourceBundle
+	 * @since 0.0.1
+	 */
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 
-	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Class<A> annotationType, ExecutableElement executable, Elements elements, Types types) throws IllegalArgumentException {
-		A[] r = getEffectiveAnnotationsWithInheritingConsidered(annotationType, executable, elements, types);
+	/**
+	 * Same as {@link #getEffectiveAnnotationsWithInheritingConsidered(Elements, Types, Class, ExecutableElement)}, but
+	 * an IllegalArgumentException is thrown if not only one annotation is found.
+	 *
+	 * @param <A>            type of Annotation
+	 * @param elements       the Elements utilities
+	 * @param types          the Types utilities
+	 * @param annotationType type of Annotation to be searched for
+	 * @param executable     executable to be searched first
+	 *
+	 * @return the Annotations found for the specified ExecutableElement, with inheritance considered
+	 *
+	 * @throws IllegalArgumentException if not only one annotation is found
+	 * @see #getEffectiveAnnotationsWithInheritingConsidered(Elements, Types, Class, ExecutableElement)
+	 * @see Annotation
+	 * @since 0.0.1
+	 */
+	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Elements elements, Types types, Class<A> annotationType, ExecutableElement executable)
+			throws IllegalArgumentException {
+		A[] r = getEffectiveAnnotationsWithInheritingConsidered(elements, types, annotationType, executable);
 		if (r.length != 1)
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
-							.addMarkers(ProcessorUtilities::getClassMarker)
+							.addMarkers(AnnotationProcessorUtilities::getClassMarker)
 							.addKeyValue("annotationType", annotationType).addKeyValue("executable", executable).addKeyValue("elements", elements).addKeyValue("types", types)
 							.addMessages(() -> getResourceBundle().getString("annotations.get.plural.fail"))
 							.build()
@@ -38,68 +72,216 @@ public enum ProcessorUtilities {
 		return r[0];
 	}
 
-	public static Marker getClassMarker() { return CLASS_MARKER; }
-
-	public static boolean isElementAbstract(Element element) { return element.getModifiers().contains(Modifier.ABSTRACT) || element.getKind().isInterface(); }
-
-	public static boolean isElementFinal(Element element) { return element.getModifiers().contains(Modifier.FINAL); }
-
-	public static ImmutableSet<TypeElement> getThisAndSuperclasses(TypeElement type, Types types) { return getLowerAndIntermediateSuperclasses(type, null, types); }
-
-	public static ImmutableSet<TypeElement> getLowerAndIntermediateSuperclasses(@Nullable TypeElement lower, @Nullable TypeElement upper, Types types) {
-		ImmutableSet.Builder<TypeElement> r = new ImmutableSet.Builder<>();
-		for (@Nullable TypeElement i = lower; !Objects.equals(i, upper) && i != null; i =
-				(TypeElement) types.asElement(i.getSuperclass()))
-			r.add(i);
-		return r.build();
+	/**
+	 * Gets the Annotations for the specified {@link ExecutableElement}.  If the specified Annotations are not found on
+	 * the specified ExecutableElement, then super ExecutableElements are searched.
+	 *
+	 * @param <A>            type of Annotation
+	 * @param elements       the Elements utilities
+	 * @param types          the Types utilities
+	 * @param annotationType type of Annotation to be searched for
+	 * @param executable     executable to be searched first
+	 *
+	 * @return the Annotations found for the specified ExecutableElement, with inheritance considered
+	 *
+	 * @see #getEffectiveAnnotationWithInheritingConsidered(Elements, Types, Class, ExecutableElement)
+	 * @see Annotation
+	 * @since 0.0.1
+	 */
+	public static <A extends Annotation> A[] getEffectiveAnnotationsWithInheritingConsidered(Elements elements, Types types, Class<A> annotationType, ExecutableElement executable) {
+		A[] ret = executable.getAnnotationsByType(annotationType);
+		if (ret.length != 0)
+			return ret;
+		TypeElement type = (TypeElement) executable.getEnclosingElement();
+		return getSuperclassesAndInterfaces(types, type).stream().sequential()
+				.flatMap(Collection::stream)
+				.map(TypeElement::getEnclosedElements)
+				.flatMap(Collection::stream)
+				.filter(enclosedElements -> enclosedElements.getKind() == ElementKind.METHOD)
+				.map(ExecutableElement.class::cast)
+				.filter(executableElement -> elements.overrides(executable, executableElement, type))
+				.map(executableElement -> executableElement.getAnnotationsByType(annotationType))
+				.filter(annotations -> annotations.length != 0)
+				.findFirst()
+				.orElse(ret);
 	}
 
-	public static ImmutableSet<ImmutableSet<TypeElement>> getThisAndSuperclassesAndInterfaces(TypeElement type, Types types) { return new ImmutableSet.Builder<ImmutableSet<TypeElement>>().add(ImmutableSet.of(type)).addAll(getSuperclassesAndInterfaces(type, types)).build(); }
+	/**
+	 * Returns the marker for this class.
+	 *
+	 * @return the marker for this class
+	 *
+	 * @see Marker
+	 * @since 0.0.1
+	 */
+	public static Marker getClassMarker() { return CLASS_MARKER; }
 
+	/**
+	 * Returns the resource bundle for this class.
+	 *
+	 * @return the resource bundle for this class
+	 *
+	 * @see ResourceBundle
+	 * @since 0.0.1
+	 */
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
+
+	/**
+	 * Returns the superclasses and superinterfaces of the specified TypeElement.
+	 * <p>
+	 * The list contains an ordered set of superclasses as its first element.
+	 * The rest of the elements contains an unordered set of interfaces.
+	 * The sets of interfaces are ordered in ascending type distance from the specified TypeElement.
+	 *
+	 * @param types the Types utilities
+	 * @param type  the lower bound, exclusive
+	 *
+	 * @return the superclasses and superinterfaces of the specified TypeElement
+	 *
+	 * @since 0.0.1
+	 */
 	@SuppressWarnings({"UnstableApiUsage", "ObjectAllocationInLoop"})
-	public static ImmutableSet<ImmutableSet<TypeElement>> getSuperclassesAndInterfaces(TypeElement type, Types types) {
-		LinkedHashSet<ImmutableSet<TypeElement>> ret = new LinkedHashSet<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+	@Unmodifiable
+	@Immutable
+	public static List<Set<TypeElement>> getSuperclassesAndInterfaces(Types types, TypeElement type) {
+		List<Set<TypeElement>> ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 
-		ImmutableSet<TypeElement> scs = getSuperclasses(type, types);
-		ret.add(scs);
-		AtomicReference<List<TypeElement>> cur = new AtomicReference<>(type.getInterfaces().stream().sequential().map(m -> (TypeElement) types.asElement(m)).collect(ImmutableList.toImmutableList()));
-		scs.forEach(sc -> {
-			List<TypeElement> next = sc.getInterfaces().stream().sequential()
+		@Unmodifiable @Immutable List<TypeElement> superclasses = getSuperclasses(type, types);
+		ret.add(ImmutableSet.copyOf(superclasses));
+		@SuppressWarnings("UnstableApiUsage") AtomicReference<List<TypeElement>> currentLayerInterfaces = new AtomicReference<>(type.getInterfaces().stream().sequential()
+				.map(types::asElement)
+				.map(TypeElement.class::cast)
+				.collect(ImmutableList.toImmutableList()));
+		superclasses.forEach(superclass -> {
+			@SuppressWarnings("UnstableApiUsage") @Unmodifiable @Immutable List<TypeElement> nextLayerClassInterfaces = superclass.getInterfaces().stream().sequential()
 					.map(types::asElement)
 					.map(TypeElement.class::cast)
 					.collect(ImmutableList.toImmutableList());
-			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(cur.getAndUpdate(c -> {
-				List<TypeElement> n = new ArrayList<>(next.size() + c.size() * CapacityUtilities.INITIAL_CAPACITY_TINY);
-				n.addAll(next);
-				c.forEach(t ->
-						n.addAll(t.getInterfaces().stream().sequential()
+			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(currentLayerInterfaces.getAndUpdate(currentLayerInterfaces2 -> {
+				ImmutableList.Builder<TypeElement> nextLayerInterfaces = ImmutableList.builder();
+				nextLayerInterfaces.addAll(nextLayerClassInterfaces);
+				currentLayerInterfaces2.forEach(currentLayerInterface ->
+						nextLayerInterfaces.addAll(currentLayerInterface.getInterfaces().stream().sequential()
 								.map(types::asElement)
 								.map(TypeElement.class::cast)
 								.collect(ImmutableList.toImmutableList())));
-				return n;
+				return nextLayerInterfaces.build();
 			}))));
 		});
-		while (!AssertionUtilities.assertNonnull(cur.get()).isEmpty()) {
-			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(cur.getAndUpdate(s -> {
-				List<TypeElement> n = new ArrayList<>(s.size() * CapacityUtilities.INITIAL_CAPACITY_TINY);
-				s.forEach(t ->
-						n.addAll(t.getInterfaces().stream().sequential()
+		while (!AssertionUtilities.assertNonnull(currentLayerInterfaces.get()).isEmpty()) {
+			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(currentLayerInterfaces.getAndUpdate(currentLayerInterfaces2 -> {
+				@SuppressWarnings("ObjectAllocationInLoop") ImmutableList.Builder<TypeElement> nextLayerInterfaces = ImmutableList.builder();
+				currentLayerInterfaces2.forEach(currentLayerInterface ->
+						nextLayerInterfaces.addAll(currentLayerInterface.getInterfaces().stream().sequential()
 								.map(types::asElement)
 								.map(TypeElement.class::cast)
 								.collect(ImmutableList.toImmutableList())));
-				return n;
+				return nextLayerInterfaces.build();
 			}))));
 		}
 
 		ret.removeIf(Collection::isEmpty);
-		return ImmutableSet.copyOf(ret);
+		return ImmutableList.copyOf(ret);
 	}
 
-	public static ImmutableSet<TypeElement> getSuperclasses(TypeElement type, Types types) { return getIntermediateSuperclasses(type, null, types); }
+	/**
+	 * Same as {@link #getIntermediateSuperclasses(TypeElement, TypeElement, Types)}, but the upper bound is unbounded.
+	 *
+	 * @param types the Types utilities
+	 * @param type  lower bound, exclusive
+	 *
+	 * @return a List of TypeElements that satisfy the lower bound
+	 *
+	 * @see TypeElement
+	 * @see #getIntermediateSuperclasses(TypeElement, TypeElement, Types)
+	 * @since 0.0.1
+	 */
+	@Unmodifiable
+	@Immutable
+	public static List<TypeElement> getSuperclasses(TypeElement type, Types types) { return getIntermediateSuperclasses(type, null, types); }
 
-	public static ImmutableSet<TypeElement> getIntermediateSuperclasses(TypeElement lower, @Nullable TypeElement upper, Types types) { return getLowerAndIntermediateSuperclasses((TypeElement) types.asElement(lower.getSuperclass()), upper, types); }
+	/**
+	 * Same as {@link #getLowerAndIntermediateSuperclasses(Types, TypeElement, TypeElement)}, but the lower bound is
+	 * exclusive.
+	 *
+	 * @param types the Types utilities
+	 * @param lower lower bound, exclusive
+	 * @param upper upper bound, exclusive
+	 *
+	 * @return a List of TypeElements that satisfy the lower and upper bound
+	 *
+	 * @see TypeElement
+	 * @see #getLowerAndIntermediateSuperclasses(Types, TypeElement, TypeElement)
+	 * @since 0.0.1
+	 */
+	@Unmodifiable
+	@Immutable
+	public static List<TypeElement> getIntermediateSuperclasses(TypeElement lower, @Nullable TypeElement upper, Types types) { return getLowerAndIntermediateSuperclasses(types, (TypeElement) types.asElement(lower.getSuperclass()), upper); }
 
-	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
+	/**
+	 * Returns a List of TypeElements that are a supertype (inclusive) of {@code lower} and a subtype (exclusive) of
+	 * {@code upper}.  The List returned is ordered from {@code lower} to {@code upper}.
+	 *
+	 * @param types the Types utilities
+	 * @param lower lower bound, inclusive
+	 * @param upper upper bound, exclusive
+	 *
+	 * @return a List of TypeElements that satisfy the lower and upper bound
+	 *
+	 * @see TypeElement
+	 * @since 0.0.1
+	 */
+	@Unmodifiable
+	@Immutable
+	public static List<TypeElement> getLowerAndIntermediateSuperclasses(Types types, @Nullable TypeElement lower, @Nullable TypeElement upper) {
+		ImmutableList.Builder<TypeElement> ret = ImmutableList.builder();
+		for (@Nullable TypeElement current = lower;
+		     !Objects.equals(current, upper) && current != null;
+		     current = (TypeElement) types.asElement(current.getSuperclass()))
+			ret.add(current);
+		return ret.build();
+	}
+
+	/**
+	 * Determines whether the provided Element is {@code abstract}.
+	 *
+	 * @param element the Element to be queried
+	 *
+	 * @return whether element is {@code abstract}
+	 *
+	 * @see Element
+	 * @since 0.0.1
+	 */
+	public static boolean isElementAbstract(Element element) { return element.getModifiers().contains(Modifier.ABSTRACT) || element.getKind().isInterface(); }
+
+	/**
+	 * Determines whether the provided Element is {@code final}.
+	 *
+	 * @param element the Element to be queried
+	 *
+	 * @return whether element is {@code final}
+	 *
+	 * @see Element
+	 * @since 0.0.1
+	 */
+	public static boolean isElementFinal(Element element) { return element.getModifiers().contains(Modifier.FINAL); }
+
+	/**
+	 * Same as {@link #getLowerAndIntermediateSuperclasses(Types, TypeElement, TypeElement)}, but the upper bound is
+	 * unbounded.
+	 *
+	 * @param types the Types utilities
+	 * @param type  lower bound, inclusive
+	 *
+	 * @return a List of TypeElements that satisfy the lower bound
+	 *
+	 * @see #getLowerAndIntermediateSuperclasses(Types, TypeElement, TypeElement)
+	 * @see TypeElement
+	 * @since 0.0.1
+	 */
+	@Unmodifiable
+	@Immutable
+	public static List<TypeElement> getThisAndSuperclasses(Types types, TypeElement type) { return getLowerAndIntermediateSuperclasses(types, type, null); }
 
 	/**
 	 * Same as {@see #getThisAndSuperclasses(Types, TypeElement)}, but an additional set consisting of the specified

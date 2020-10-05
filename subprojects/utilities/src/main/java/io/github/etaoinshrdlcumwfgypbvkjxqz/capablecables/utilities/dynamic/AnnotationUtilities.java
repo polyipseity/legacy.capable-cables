@@ -31,7 +31,6 @@ public enum AnnotationUtilities {
 		return r[0];
 	}
 
-	@SuppressWarnings("ObjectAllocationInLoop")
 	static <A extends Annotation> A[] getEffectiveAnnotationsWithInheritingConsidered(Class<A> annotationType, Method method) {
 		A[] ret = method.getDeclaredAnnotationsByType(annotationType);
 		if (ret.length != 0)

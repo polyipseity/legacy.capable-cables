@@ -1,3 +1,8 @@
+/**
+ * Contains annotation processors.
+ *
+ * @since 0.0.1
+ */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault

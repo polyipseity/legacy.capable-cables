@@ -3,13 +3,12 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations;
 import javax.annotation.Nullable;
 import javax.annotation.meta.TypeQualifierDefault;
 import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
-
-import static java.lang.annotation.ElementType.LOCAL_VARIABLE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.RetentionPolicy;
 
 @Documented
 @Nullable
-@TypeQualifierDefault(LOCAL_VARIABLE)
-@Retention(RUNTIME)
+@TypeQualifierDefault(ElementType.LOCAL_VARIABLE)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface LocalVariablesAreNullableByDefault {}

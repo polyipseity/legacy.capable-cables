@@ -13,6 +13,12 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
+/**
+ * An annotation processor that does nothing.
+ *
+ * @author William So
+ * @since 0.0.1
+ */
 public final class UselessAnnotationProcessor
 		extends AbstractProcessor {
 	static {

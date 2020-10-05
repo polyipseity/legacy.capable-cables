@@ -1,3 +1,8 @@
+/**
+ * Contains utilities that can be used for annotation processing.
+ *
+ * @since 0.0.1
+ */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
