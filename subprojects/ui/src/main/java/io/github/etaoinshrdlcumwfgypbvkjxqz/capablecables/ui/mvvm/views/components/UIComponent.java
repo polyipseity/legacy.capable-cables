@@ -144,9 +144,6 @@ public class UIComponent
 	public void setVisible(boolean visible) { getVisible().setValue(visible); }
 
 	@Override
-	public void onIndexMove(int previous, int next) {}
-
-	@Override
 	public void onParentChange(@Nullable IUIComponentContainer previous, @Nullable IUIComponentContainer next) { setParent(next); }
 
 	protected void setParent(@Nullable IUIComponentContainer parent) { this.parent = new OptionalWeakReference<>(parent); }

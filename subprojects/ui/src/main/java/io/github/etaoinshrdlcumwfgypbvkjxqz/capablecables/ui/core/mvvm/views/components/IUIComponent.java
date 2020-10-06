@@ -57,9 +57,6 @@ public interface IUIComponent
 
 	void setVisible(boolean visible);
 
-	@SuppressWarnings("EmptyMethod")
-	void onIndexMove(int previous, int next);
-
 	void onParentChange(@Nullable IUIComponentContainer previous, @Nullable IUIComponentContainer next);
 
 	void setActive(boolean active);

@@ -12,7 +12,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.compon
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIComponentHierarchyChangedBusEvent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EnumHookStage;
@@ -23,7 +22,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.Co
 import javax.annotation.Nullable;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 public class UIComponentContainer
 		extends UIComponent
@@ -65,12 +67,6 @@ public class UIComponentContainer
 				.ifPresent(p -> p.removeChildren(ImmutableList.of(component)));
 		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 					getChildren().add(index, component);
-					List<IUIComponent> movedChildren = getChildren().subList(index + 1, getChildren().size());
-					for (ListIterator<IUIComponent> listIterator = movedChildren.listIterator(); listIterator.hasNext(); ) {
-						int nextIndex = listIterator.nextIndex();
-						IUIComponent movedChild = listIterator.next();
-						AssertionUtilities.assertNonnull(movedChild).onIndexMove(index + nextIndex, index + nextIndex + 1);
-					}
 					component.onParentChange(null, this);
 				},
 				new UIComponentHierarchyChangedBusEvent.Parent(EnumHookStage.PRE, component, null, this),
@@ -89,12 +85,6 @@ public class UIComponentContainer
 					if (index != -1) {
 						EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 									getChildren().remove(component);
-									List<IUIComponent> movedChildren = getChildren().subList(index, getChildren().size());
-									for (ListIterator<IUIComponent> listIterator = movedChildren.listIterator(); listIterator.hasNext(); ) {
-										int nextIndex = listIterator.nextIndex();
-										IUIComponent movedChild = listIterator.next();
-										AssertionUtilities.assertNonnull(movedChild).onIndexMove(index + nextIndex + 1, index + nextIndex);
-									}
 									component.onParentChange(this, null);
 								},
 								new UIComponentHierarchyChangedBusEvent.Parent(EnumHookStage.PRE, component, this, null),
@@ -113,29 +103,8 @@ public class UIComponentContainer
 		int previous = getChildren().indexOf(component);
 		if (previous == index || previous == -1)
 			return false;
-		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
-					getChildren().remove(previous);
-					getChildren().add(index, component); // COMMENT cast is always safe
-					List<IUIComponent> movedChildren;
-					if (index > previous) {
-						movedChildren = getChildren().subList(previous, index);
-						for (ListIterator<IUIComponent> listIterator = movedChildren.listIterator(); listIterator.hasNext(); ) {
-							int nextIndex = listIterator.nextIndex();
-							IUIComponent movedChild = listIterator.next();
-							AssertionUtilities.assertNonnull(movedChild).onIndexMove(index + nextIndex + 1, index + nextIndex);
-						}
-					} else {
-						movedChildren = getChildren().subList(index + 1, previous + 1);
-						for (ListIterator<IUIComponent> listIterator = movedChildren.listIterator(); listIterator.hasNext(); ) {
-							int nextIndex = listIterator.nextIndex();
-							IUIComponent movedChild = listIterator.next();
-							AssertionUtilities.assertNonnull(movedChild).onIndexMove(index + nextIndex, index + nextIndex + 1);
-						}
-					}
-					component.onIndexMove(previous, index);
-				},
-				new UIComponentHierarchyChangedBusEvent.Index(EnumHookStage.PRE, this, previous, index),
-				new UIComponentHierarchyChangedBusEvent.Index(EnumHookStage.POST, this, previous, index));
+		getChildren().remove(previous);
+		getChildren().add(index, component);
 		return true;
 	}
 

@@ -14,6 +14,7 @@ public abstract class UIViewMinecraftBusEvent
 		super(stage, view);
 	}
 
+	// TODO replace this
 	@OnlyIn(Dist.CLIENT)
 	public static class Render extends UIViewMinecraftBusEvent {
 		private final IUIViewContext context;

@@ -24,11 +24,4 @@ public abstract class UIComponentHierarchyChangedBusEvent<T> extends UIComponent
 			super(stage, component, Optional.ofNullable(previous), Optional.ofNullable(next));
 		}
 	}
-
-	public static class Index extends UIComponentChangedBusEvent<Integer> {
-		public Index(EnumHookStage stage, IUIComponent component,
-		             int previous, int current) {
-			super(stage, component, previous, current);
-		}
-	}
 }
