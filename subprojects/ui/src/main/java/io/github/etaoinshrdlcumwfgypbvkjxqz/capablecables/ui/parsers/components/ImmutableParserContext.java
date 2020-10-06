@@ -1,12 +1,12 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components;
 
+import com.google.common.collect.ImmutableMap;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.IParserContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.IUIComponentParser;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer3;
-import com.google.common.collect.ImmutableMap;
 
-import javax.annotation.concurrent.Immutable;
 import java.util.Map;
 
 @Immutable
@@ -29,8 +29,8 @@ public class ImmutableParserContext
 	public IUIComponentParser.EnumHandlerType getHandlingType() { return handlingType; }
 
 	@Override
-	public Map<String, Class<?>> getAliases() { return aliases; }
+	public @Immutable Map<String, Class<?>> getAliasesView() { return aliases; }
 
 	@Override
-	public Map<IUIComponentParser.EnumHandlerType, ? extends Map<Class<?>, IConsumer3<? super IParserContext, ?, ?, ?>>> getHandlers() { return handlers; }
+	public @Immutable Map<IUIComponentParser.EnumHandlerType, ? extends Map<Class<?>, IConsumer3<? super IParserContext, ?, ?, ?>>> getHandlersView() { return handlers; }
 }

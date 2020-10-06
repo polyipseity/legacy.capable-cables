@@ -206,7 +206,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 	@SuppressWarnings("SwitchStatementWithTooFewBranches")
 	public static IUIViewComponent<?, ?> createView(IParserContext context, View view)
 			throws Throwable {
-		Class<?> vc = AssertionUtilities.assertNonnull(context.getAliases().get(view.getClazz()));
+		Class<?> vc = AssertionUtilities.assertNonnull(context.getAliasesView().get(view.getClazz()));
 		UIViewComponentConstructor.EnumConstructorType ct = IConstructorType.StaticHolder.getConstructorType(vc, UIViewComponentConstructor.class, UIViewComponentConstructor::type);
 		MethodHandle mh = InvokeUtilities.IMPL_LOOKUP.findConstructor(vc, ct.getMethodType());
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(view.getProperty());
@@ -236,7 +236,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 			throws Throwable {
 		return TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, component,
 				IThrowingFunction.executeNow(n -> {
-					Class<?> cc = AssertionUtilities.assertNonnull(context.getAliases().get(n.getClazz()));
+					Class<?> cc = AssertionUtilities.assertNonnull(context.getAliasesView().get(n.getClazz()));
 					UIComponentConstructor.EnumConstructorType ct = IConstructorType.StaticHolder.getConstructorType(cc, UIComponentConstructor.class, UIComponentConstructor::type);
 					Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(n.getProperty());
 					// COMMENT attributes
@@ -396,7 +396,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 
 		IShapeDescriptorBuilder<?> sdb = ShapeDescriptorBuilderFactoryRegistry.getDefaultFactory()
 				.createBuilder(
-						CastUtilities.castUnchecked(AssertionUtilities.assertNonnull(context.getAliases().get(shape.getClazz()))) // COMMENT should not throw
+						CastUtilities.castUnchecked(AssertionUtilities.assertNonnull(context.getAliasesView().get(shape.getClazz()))) // COMMENT should not throw
 				);
 
 		shape.getProperty().stream().unordered()

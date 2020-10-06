@@ -15,12 +15,12 @@ import java.awt.geom.Point2D;
 public abstract class AbstractUIComponentPathResolver
 		implements IUIComponentPathResolver {
 	@Override
-	public IUIComponentPathResolverResult resolvePath(IUIComponentContext context, Point2D point) {
+	public IUIComponentPathResolverResult resolvePath(IUIComponentContext componentContext, Point2D point) {
 		IUIComponentPathResolverResult result = ImmutableUIComponentPathResolverResult.getEmpty();
 		do {
-			IUIComponentPathResolverResult next = resolveDirectChild(context, (Point2D) point.clone());
+			IUIComponentPathResolverResult next = resolveDirectChild(componentContext, (Point2D) point.clone());
 			if (!next.isPresent()) // COMMENT no next
-				return !result.isPresent() ? getResult(context, point) : result;
+				return !result.isPresent() ? getResult(componentContext, point) : result;
 			result = next;
 			if (result.isVirtual()) // COMMENT result exists and is virtual
 				return result;
@@ -28,35 +28,35 @@ public abstract class AbstractUIComponentPathResolver
 	}
 
 	@Override
-	public IUIComponentPathResolverResult resolveDirectChild(IUIComponentContext context, Point2D point) {
-		IUIComponentPathResolverResult result = context.getPath().getPathEnd()
+	public IUIComponentPathResolverResult resolveDirectChild(IUIComponentContext componentContext, Point2D point) {
+		IUIComponentPathResolverResult result = IUIComponentContext.StaticHolder.getCurrentComponent(componentContext)
 				.flatMap(pathEnd -> CastUtilities.castChecked(IUIComponentContainer.class, pathEnd))
 				.map(IUIComponentContainer::getChildrenView)
 				.map(Lists::reverse)
 				.orElseGet(ImmutableList::of)
 				.stream().sequential()
 				.map(child -> {
-					try (IUIComponentContext ctx = context.copy()) {
-						ctx.getMutator().push(ctx, child);
-						return getResult(ctx, (Point2D) point.clone());
+					try (IUIComponentContext componentContextCopy = componentContext.copy()) {
+						componentContextCopy.getMutator().push(componentContextCopy.getStackRef(), child);
+						return getResult(componentContextCopy, (Point2D) point.clone());
 					}
 				})
 				.filter(IUIComponentPathResolverResult::isPresent)
 				.findFirst()
 				.orElseGet(ImmutableUIComponentPathResolverResult::getEmpty);
 		result.getConcreteComponent()
-				.ifPresent(child -> context.getMutator().push(context, child));
+				.ifPresent(child -> componentContext.getMutator().push(componentContext.getStackRef(), child));
 		return result;
 	}
 
 	@Override
-	public IUIComponentPathResolverResult getResult(IUIComponentContext context, Point2D point) {
-		return context.getPath().getPathEnd()
+	public IUIComponentPathResolverResult getResult(IUIComponentContext componentContext, Point2D point) {
+		return IUIComponentContext.StaticHolder.getCurrentComponent(componentContext)
 				.map(pathEnd -> {
-					ImmutableList<IUIVirtualComponent> virtualComponents = IUIVirtualComponent.findVirtualComponents(context, pathEnd, point);
+					ImmutableList<IUIVirtualComponent> virtualComponents = IUIVirtualComponent.findVirtualComponents(componentContext, pathEnd, point);
 					if (!virtualComponents.isEmpty()) // COMMENT hits virtual component
 						return ImmutableUIComponentPathResolverResult.of(Iterables.getLast(virtualComponents), virtualComponents);
-					else if (pathEnd.containsPoint(context, point)) // COMMENT hits component
+					else if (pathEnd.containsPoint(componentContext, point)) // COMMENT hits component
 						return ImmutableUIComponentPathResolverResult.of(pathEnd, virtualComponents);
 					return null;
 				})

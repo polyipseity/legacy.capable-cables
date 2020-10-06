@@ -46,7 +46,7 @@ public interface IAffineTransformStack
 	Deque<AffineTransform> getData();
 
 	default Runnable createCleaner() {
-		return () -> StaticHolder.popMultiple(this, getData().size() - 1);
+		return () -> StaticHolder.popNTimes(this, getData().size() - 1);
 	}
 
 	default AffineTransform element() { return AssertionUtilities.assertNonnull(getData().element()); }
@@ -63,7 +63,7 @@ public interface IAffineTransformStack
 				ImmutableList.of("data"),
 				getObjectVariables()));
 
-		public static void popMultiple(IAffineTransformStack stack, int times) {
+		public static void popNTimes(IAffineTransformStack stack, int times) {
 			LoopUtilities.doNTimes(times, stack::pop);
 		}
 

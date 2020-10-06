@@ -21,7 +21,7 @@ public abstract class AbstractUIComponentUserResizableExtensionPreviewingRelocat
 	public final void render(IUIComponentContext context, IUIComponentUserResizableExtension.IResizeData data) {
 		context.getViewContext().getInputDevices().getPointerDevice()
 				.ifPresent(pointerDevice -> {
-					IUIComponent container = context.getPath().getPathEnd().orElseThrow(AssertionError::new);
+					IUIComponent container = IUIComponentContext.StaticHolder.getCurrentComponent(context).orElseThrow(AssertionError::new);
 					Point2D currentCursorPosition = pointerDevice.getPositionView();
 					Rectangle2D resultRectangle = container.getShapeDescriptor().getShapeOutput().getBounds2D();
 					UIObjectUtilities.acceptRectangularShape(

@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.inputs.core;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.inputs.IInputDevices;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.inputs.IInputPointerDevice;
 
@@ -18,7 +19,7 @@ public final class ImmutableInputDevices
 	private static ImmutableInputDevices of(@Nullable IInputPointerDevice pointerDevice) { return new ImmutableInputDevices(pointerDevice); }
 
 	@Override
-	public Optional<? extends IInputPointerDevice> getPointerDevice() {
+	public @Immutable Optional<? extends IInputPointerDevice> getPointerDevice() {
 		return Optional.ofNullable(pointerDevice);
 	}
 
@@ -32,7 +33,7 @@ public final class ImmutableInputDevices
 			this.pointerDevice = source.getPointerDevice().orElse(null);
 		}
 
-		public Builder strongImmutability() {
+		public Builder snapshot() {
 			getPointerDevice()
 					.map(ImmutableInputPointerDevice::of)
 					.ifPresent(this::setPointerDevice);

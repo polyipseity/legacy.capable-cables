@@ -23,7 +23,7 @@ public class UIComponentUserResizableMinecraftExtensionPreviewingRelocatingRende
 
 	@Override
 	public void render0(IUIComponentContext context, Rectangle2D rectangle) {
-		MinecraftDrawingUtilities.drawRectangle(context.getTransformStack().element(),
+		MinecraftDrawingUtilities.drawRectangle(IUIComponentContext.StaticHolder.getCurrentTransform(context),
 				rectangle,
 				Color.DARK_GRAY.getRGB(),
 				0); // TODO customize

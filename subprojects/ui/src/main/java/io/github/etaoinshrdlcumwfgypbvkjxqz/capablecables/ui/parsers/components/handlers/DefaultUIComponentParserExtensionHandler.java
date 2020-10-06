@@ -30,7 +30,7 @@ public class DefaultUIComponentParserExtensionHandler
 			throws Throwable {
 		if (!(container instanceof IExtensionContainer))
 			return;
-		Class<?> oc = AssertionUtilities.assertNonnull(context.getAliases().get(object.getClazz()));
+		Class<?> oc = AssertionUtilities.assertNonnull(context.getAliasesView().get(object.getClazz()));
 		UIExtensionConstructor.EnumConstructorType ct = IConstructorType.StaticHolder.getConstructorType(oc, UIExtensionConstructor.class, UIExtensionConstructor::type);
 		MethodHandle mh = InvokeUtilities.IMPL_LOOKUP.findConstructor(oc, ct.getMethodType());
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = DefaultUIComponentParser.createMappings(object.getProperty());

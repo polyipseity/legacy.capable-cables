@@ -70,8 +70,9 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 
 	@Override
 	public IUIEventTarget getTargetAtPoint(IUIViewContext context, Point2D point) {
-		try (IUIComponentContext cCtx = IUIViewComponent.StaticHolder.createComponentContextWithManager(this, context).orElseThrow(IllegalStateException::new)) {
-			return getPathResolver().resolvePath(cCtx, (Point2D) point.clone()).getComponent().orElseThrow(AssertionError::new);
+		try (IUIComponentContext componentContext = IUIViewComponent.StaticHolder.createComponentContextWithManager(this, context)
+				.orElseThrow(IllegalStateException::new)) {
+			return getPathResolver().resolvePath(componentContext, (Point2D) point.clone()).getComponent().orElseThrow(AssertionError::new);
 		}
 	}
 
@@ -123,12 +124,11 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 
 	@Override
 	public IUIComponentContext createComponentContext(IUIViewContext viewContext) {
-		return new DefaultUIComponentContext(
+		return new ImmutableUIComponentContext(
+				viewContext,
 				this,
-				new DefaultUIComponentContextMutator(),
-				new FunctionalPath<>(ImmutableList.of(), Lists::newArrayList),
-				new ArrayAffineTransformStack(),
-				viewContext
+				new DefaultUIComponentContextStackMutator(),
+				new ImmutableUIComponentContextStack(new FunctionalPath<>(ImmutableList.of(), Lists::newArrayList), new ArrayAffineTransformStack(CapacityUtilities.INITIAL_CAPACITY_MEDIUM))
 		);
 	}
 

@@ -35,21 +35,22 @@ public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent
 					IInputPointerDevice pointerDevice = values.getValue2Nonnull();
 					return IUIViewComponent.StaticHolder.createComponentContextWithManager(view, context)
 							.flatMap(componentContext -> {
-								try (IUIComponentContext cCtx = componentContext) {
+								try (IUIComponentContext safeComponentContext = componentContext) {
 									Optional<Long> ret = Optional.empty();
-									view.getPathResolver().resolvePath(cCtx, pointerDevice.getPositionView());
-									while (!cCtx.getPath().isEmpty()) {
-										IUIComponent component = cCtx.getPath().getPathEnd().orElseThrow(AssertionError::new);
+									view.getPathResolver().resolvePath(safeComponentContext, pointerDevice.getPositionView());
+									while (!safeComponentContext.getStackRef().getPathRef().isEmpty()) {
+										IUIComponent component = IUIComponentContext.StaticHolder.getCurrentComponent(safeComponentContext)
+												.orElseThrow(AssertionError::new);
 										IUIComponentCursorHandleProviderModifier componentAsModifier =
 												CastUtilities.castChecked(IUIComponentCursorHandleProviderModifier.class, component)
 														.orElseGet(NullUIComponentCursorHandleProviderModifier::getInstance);
 										ret = IUIComponentCursorHandleProviderModifier.StaticHolder
 												.handleComponentModifiers(componentAsModifier,
 														component.getModifiersView(),
-														cCtx);
+														safeComponentContext);
 										if (ret.isPresent())
 											break;
-										cCtx.getMutator().pop(cCtx);
+										safeComponentContext.getMutator().pop(safeComponentContext.getStackRef());
 									}
 									return ret;
 								}

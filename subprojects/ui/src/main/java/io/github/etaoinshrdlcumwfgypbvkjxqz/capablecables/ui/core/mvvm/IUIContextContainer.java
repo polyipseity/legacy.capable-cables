@@ -1,15 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.viewmodels.IUIViewModelContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICopyable;
 
-public interface IUIInfrastructureContext
-		extends ICopyable {
+public interface IUIContextContainer {
+	@Immutable
 	IUIViewContext getViewContext();
 
+	@Immutable
 	IUIViewModelContext getViewModelContext();
-
-	@Override
-	IUIInfrastructureContext copy();
 }

@@ -28,7 +28,7 @@ public class DefaultUIComponentParserRendererHandler
 			return;
 		IUIRendererContainer<?> rendererContainer = ((IUIRendererContainer<?>) container);
 		Class<?> oc = Optional.ofNullable(object.getClazz())
-				.<Class<?>>map(classAlias -> AssertionUtilities.assertNonnull(context.getAliases().get(classAlias)))
+				.<Class<?>>map(classAlias -> AssertionUtilities.assertNonnull(context.getAliasesView().get(classAlias)))
 				.orElseGet(rendererContainer::getDefaultRendererClass);
 		UIRendererConstructor.EnumConstructorType ct = IConstructorType.StaticHolder.getConstructorType(oc, UIRendererConstructor.class, UIRendererConstructor::type);
 		MethodHandle mh = InvokeUtilities.IMPL_LOOKUP.findConstructor(oc, ct.getMethodType());

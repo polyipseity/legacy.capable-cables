@@ -17,13 +17,13 @@ public abstract class AbstractUIComponentUserRelocatableExtensionPreviewingReloc
 	}
 
 	@Override
-	public final void render(IUIComponentContext context, IUIComponentUserRelocatableExtension.IRelocateData data) {
-		context.getViewContext().getInputDevices().getPointerDevice()
+	public final void render(IUIComponentContext componentContext, IUIComponentUserRelocatableExtension.IRelocateData data) {
+		componentContext.getViewContext().getInputDevices().getPointerDevice()
 				.ifPresent(pointerDevice -> {
-					IUIComponent container = context.getPath().getPathEnd().orElseThrow(AssertionError::new);
+					IUIComponent container = IUIComponentContext.StaticHolder.getCurrentComponent(componentContext).orElseThrow(AssertionError::new);
 					Point2D currentCursorPosition = pointerDevice.getPositionView();
 					Rectangle2D resultRectangle = container.getShapeDescriptor().getShapeOutput().getBounds2D();
-					render0(context, data.handle((Point2D) currentCursorPosition.clone(), resultRectangle, resultRectangle));
+					render0(componentContext, data.handle((Point2D) currentCursorPosition.clone(), resultRectangle, resultRectangle));
 				});
 	}
 

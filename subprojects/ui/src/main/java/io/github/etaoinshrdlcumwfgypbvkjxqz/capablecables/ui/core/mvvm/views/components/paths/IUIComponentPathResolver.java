@@ -6,9 +6,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUI
 import java.awt.geom.Point2D;
 
 public interface IUIComponentPathResolver {
-	IUIComponentPathResolverResult resolvePath(IUIComponentContext context, Point2D point);
+	IUIComponentPathResolverResult resolvePath(IUIComponentContext componentContext, Point2D point);
 
-	IUIComponentPathResolverResult resolveDirectChild(IUIComponentContext context, Point2D point);
+	IUIComponentPathResolverResult resolveDirectChild(IUIComponentContext componentContext, Point2D point);
 
-	IUIComponentPathResolverResult getResult(IUIComponentContext context, Point2D point);
+	IUIComponentPathResolverResult getResult(IUIComponentContext componentContext, Point2D point);
 }

@@ -22,11 +22,11 @@ public abstract class UIViewMinecraftBusEvent
 
 		public Render(EnumHookStage stage, IUIView<?> view, IUIViewContext context, double partialTicks) {
 			super(stage, view);
-			this.context = context.copy();
+			this.context = context;
 			this.partialTicks = partialTicks;
 		}
 
-		public IUIViewContext getContextView() { return getContext().copy(); }
+		public IUIViewContext getContextView() { return getContext(); }
 
 		protected IUIViewContext getContext() { return context; }
 

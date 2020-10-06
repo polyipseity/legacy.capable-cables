@@ -1,39 +1,44 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IAffineTransformStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICopyable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.IPath;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.util.Optional;
 
 public interface IUIComponentContext
-		extends ICopyable, AutoCloseable {
+		extends AutoCloseable, ICopyable {
 	IUIViewComponent<?, ?> getView();
 
-	IUIComponentContextMutator getMutator();
+	@Immutable
+	IUIComponentContextStackMutator getMutator();
+
+	IUIComponentContextStack getStackRef();
+
+	@Immutable
+	IUIViewContext getViewContext();
+
+	@Override
+	void close();
 
 	@Override
 	IUIComponentContext copy();
-
-	@Override
-	default void close() {
-		IPath<IUIComponent> path = getPath();
-		path.parentPath(path.size());
-		getTransformStack().close();
-	}
-
-	IPath<IUIComponent> getPath();
-
-	IAffineTransformStack getTransformStack();
-
-	IUIViewContext getViewContext();
 
 	enum StaticHolder {
 		;
 
 		public static Shape createContextualShape(IUIComponentContext context, Shape shape) {
-			return context.getTransformStack().element().createTransformedShape(shape);
+			return getCurrentTransform(context).createTransformedShape(shape);
+		}
+
+		public static AffineTransform getCurrentTransform(IUIComponentContext context) {
+			return context.getStackRef().getTransformStackRef().element();
+		}
+
+		public static Optional<? extends IUIComponent> getCurrentComponent(IUIComponentContext context) {
+			return context.getStackRef().getPathRef().getPathEnd();
 		}
 	}
 }

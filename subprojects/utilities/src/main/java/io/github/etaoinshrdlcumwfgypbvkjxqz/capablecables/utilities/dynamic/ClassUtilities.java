@@ -105,7 +105,7 @@ public enum ClassUtilities {
 				.flatMap(Collection::stream)
 				.map(clazz1 -> {
 					try {
-						return clazz.getDeclaredField(name);
+						return clazz1.getDeclaredField(name);
 					} catch (NoSuchFieldException e) {
 						return null;
 					}
@@ -119,7 +119,7 @@ public enum ClassUtilities {
 				.flatMap(Collection::stream)
 				.map(clazz1 -> {
 					try {
-						return clazz.getDeclaredMethod(name, parameterTypes);
+						return clazz1.getDeclaredMethod(name, parameterTypes);
 					} catch (NoSuchMethodException e) {
 						return null;
 					}

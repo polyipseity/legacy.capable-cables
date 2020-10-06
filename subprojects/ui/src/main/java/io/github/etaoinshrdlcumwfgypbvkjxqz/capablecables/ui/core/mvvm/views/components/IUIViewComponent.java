@@ -46,7 +46,7 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 			return view.getManager()
 					.map(manager -> {
 						IUIComponentContext context = view.createComponentContext(viewContext);
-						context.getMutator().push(context, manager);
+						context.getMutator().push(context.getStackRef(), manager);
 						return context;
 					});
 		}
@@ -66,7 +66,7 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 			TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, root,
 					component -> {
 						if (predicate.test(component)) {
-							pre.accept(context, context.getMutator().push(context, component));
+							pre.accept(context, context.getMutator().push(context.getStackRef(), component));
 						}
 						return component;
 					},
@@ -76,9 +76,10 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 							.orElseGet(ImmutableList::of),
 					IThrowingBiFunction.executeNow((parent, children) -> {
 						if (predicate.test(parent)) {
-							IUIComponentContext contextCopy = context.copy();
-							post.accept(context, contextCopy.getMutator().pop(contextCopy), children);
-							context.getMutator().pop(context);
+							try (IUIComponentContextStack contextStackCopy = context.getStackRef().copy()) {
+								post.accept(context, context.getMutator().pop(contextStackCopy), children);
+							}
+							context.getMutator().pop(context.getStackRef());
 						}
 						return parent;
 					}),

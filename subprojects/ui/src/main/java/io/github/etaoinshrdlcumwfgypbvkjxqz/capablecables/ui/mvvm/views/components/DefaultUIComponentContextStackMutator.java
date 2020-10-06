@@ -9,12 +9,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import java.awt.geom.AffineTransform;
 import java.util.Optional;
 
-public class DefaultUIComponentContextMutator
-		implements IUIComponentContextMutator {
+public class DefaultUIComponentContextStackMutator
+		implements IUIComponentContextStackMutator {
 	@Override
-	public IUIComponentContextMutatorResult push(IUIComponentContext context, IUIComponent element) {
-		IPath<IUIComponent> path = context.getPath();
-		IAffineTransformStack transformStack = context.getTransformStack();
+	public IUIComponentContextMutatorResult push(IUIComponentContextStack contextStack, IUIComponent element) {
+		IPath<IUIComponent> path = contextStack.getPathRef();
+		IAffineTransformStack transformStack = contextStack.getTransformStackRef();
 
 		Optional<? extends IUIComponent> pathEnd = path.getPathEnd();
 
@@ -34,9 +34,9 @@ public class DefaultUIComponentContextMutator
 	}
 
 	@Override
-	public IUIComponentContextMutatorResult pop(IUIComponentContext context) {
-		IPath<IUIComponent> path = context.getPath();
-		IAffineTransformStack transformStack = context.getTransformStack();
+	public IUIComponentContextMutatorResult pop(IUIComponentContextStack contextStack) {
+		IPath<IUIComponent> path = contextStack.getPathRef();
+		IAffineTransformStack transformStack = contextStack.getTransformStackRef();
 
 		Optional<? extends IUIComponent> pathEnd = path.getPathEnd();
 		path.parentPath(1);

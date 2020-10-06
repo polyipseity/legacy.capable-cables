@@ -22,7 +22,7 @@ public class UIEvent implements IUIEvent {
 		this.type = type;
 		this.canBubble = canBubble;
 		this.cancelable = cancelable;
-		this.viewContext = viewContext.copy();
+		this.viewContext = viewContext;
 		this.target = target;
 	}
 
@@ -65,7 +65,7 @@ public class UIEvent implements IUIEvent {
 	public boolean preventDefault() { return isCancelable() && !getDefaultPrevented().getAndSet(true); }
 
 	@Override
-	public IUIViewContext getViewContextView() { return viewContext.copy(); }
+	public IUIViewContext getViewContextView() { return viewContext; }
 
 	protected void setPropagationStopped(boolean propagationStopped) { this.propagationStopped = propagationStopped; }
 
