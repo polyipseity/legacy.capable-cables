@@ -232,10 +232,8 @@ public class UIScreenAdapter
 	@Deprecated
 	public void setSize(int width, int height) {
 		super.setSize(width, height);
-		getInfrastructure().getView().reshape(s -> {
-			s.bound(new Rectangle2D.Double(0, 0, width, height));
-			return true;
-		});
+		getInfrastructure().getView().reshape(s ->
+				s.adapt(new Rectangle2D.Double(0, 0, width, height)));
 	}
 
 	@Override

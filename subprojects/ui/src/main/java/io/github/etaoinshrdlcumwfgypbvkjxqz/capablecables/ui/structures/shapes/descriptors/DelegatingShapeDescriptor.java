@@ -32,7 +32,10 @@ public class DelegatingShapeDescriptor<S extends Shape>
 	public boolean modify(BooleanSupplier action) throws ConcurrentModificationException { return getDelegate().modify(action); }
 
 	@Override
-	public boolean bound(Rectangle2D bounds) throws IllegalStateException { return getDelegate().bound(bounds); }
+	public boolean crop(Rectangle2D bounds) throws IllegalStateException { return getDelegate().crop(bounds); }
+
+	@Override
+	public boolean adapt(Rectangle2D frame) throws IllegalStateException { return getDelegate().adapt(frame); }
 
 	@Override
 	public boolean transform(AffineTransform transform) throws IllegalStateException { return getDelegate().transform(transform); }

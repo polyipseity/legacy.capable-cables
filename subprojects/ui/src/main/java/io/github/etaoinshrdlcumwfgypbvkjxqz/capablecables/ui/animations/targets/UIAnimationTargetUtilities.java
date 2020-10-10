@@ -60,7 +60,7 @@ public enum UIAnimationTargetUtilities {
 		}
 
 		public static DoubleConsumer translateY(IShapeDescriptorProvider provider) {
-			return transform(provider, 0, (previousY, y) -> AffineTransform.getTranslateInstance(y - previousY, 0));
+			return transform(provider, 0, (previousY, y) -> AffineTransform.getTranslateInstance(0, y - previousY));
 		}
 
 		public static DoubleConsumer rotate(IShapeDescriptorProvider provider) {

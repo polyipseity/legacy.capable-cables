@@ -25,10 +25,20 @@ public class RectangularShapeDescriptor<S extends RectangularShape>
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public boolean bound(Rectangle2D bounds)
+	public boolean crop(Rectangle2D bounds)
 			throws IllegalStateException {
-		super.bound(bounds);
-		getShape().setFrame(bounds);
+		super.crop(bounds);
+		Rectangle2D currentBounds = getShape().getBounds2D();
+		Rectangle2D.intersect(currentBounds, bounds, currentBounds);
+		getShape().setFrame(currentBounds);
+		return true;
+	}
+
+	@Override
+	public boolean adapt(Rectangle2D frame)
+			throws IllegalStateException {
+		super.adapt(frame);
+		getShape().setFrame(frame);
 		return true;
 	}
 

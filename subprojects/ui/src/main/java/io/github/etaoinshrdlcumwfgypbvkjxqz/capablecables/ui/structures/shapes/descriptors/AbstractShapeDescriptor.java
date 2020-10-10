@@ -64,7 +64,7 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 		boolean ret = action.getAsBoolean();
 		if (ret) {
 			Rectangle2D bounds = getShapeOutput().getBounds2D();
-			bound(StaticHolder.constrain(getConstraints(), bounds, bounds));
+			adapt(StaticHolder.constrain(getConstraints(), bounds, bounds));
 		}
 		return ret;
 	}
@@ -77,8 +77,15 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public boolean bound(Rectangle2D bounds)
+	public boolean crop(Rectangle2D bounds)
 			throws IllegalStateException {
+		StaticHolder.checkIsBeingModified(this);
+		return false;
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public boolean adapt(Rectangle2D frame) throws IllegalStateException {
 		StaticHolder.checkIsBeingModified(this);
 		return false;
 	}

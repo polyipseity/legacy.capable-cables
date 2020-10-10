@@ -33,7 +33,10 @@ public interface IShapeDescriptor<S extends Shape> {
 	boolean modify(BooleanSupplier action)
 			throws ConcurrentModificationException;
 
-	boolean bound(Rectangle2D bounds)
+	boolean crop(Rectangle2D bounds)
+			throws IllegalStateException;
+
+	boolean adapt(Rectangle2D frame)
 			throws IllegalStateException;
 
 	boolean transform(AffineTransform transform)

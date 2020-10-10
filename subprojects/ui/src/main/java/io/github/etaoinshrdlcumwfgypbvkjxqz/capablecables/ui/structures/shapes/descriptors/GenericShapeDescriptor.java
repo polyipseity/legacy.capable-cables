@@ -24,10 +24,19 @@ public class GenericShapeDescriptor extends AbstractShapeDescriptor<Shape> {
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public boolean bound(Rectangle2D bounds)
+	public boolean crop(Rectangle2D bounds)
 			throws IllegalStateException {
-		super.bound(bounds);
-		setShape(AffineTransformUtilities.getTransformFromTo(getShape().getBounds2D(), bounds).createTransformedShape(getShape()));
+		super.crop(bounds);
+		Rectangle2D currentBounds = getShape().getBounds2D();
+		Rectangle2D.intersect(currentBounds, bounds, currentBounds);
+		setShape(AffineTransformUtilities.getTransformFromTo(getShape().getBounds2D(), currentBounds).createTransformedShape(getShape()));
+		return true;
+	}
+
+	@Override
+	public boolean adapt(Rectangle2D frame) throws IllegalStateException {
+		super.adapt(frame);
+		setShape(AffineTransformUtilities.getTransformFromTo(getShape().getBounds2D(), frame).createTransformedShape(getShape()));
 		return true;
 	}
 

@@ -164,7 +164,7 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 						synchronized (getLockObject()) {
 							if (!owner.getRelocateData().isPresent())
 								return false;
-							ret = container.reshape(s -> s.bound(resultRectangle));
+							ret = container.reshape(s -> s.adapt(resultRectangle));
 							owner.setRelocateData(null);
 						}
 						return ret;

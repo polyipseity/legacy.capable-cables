@@ -20,6 +20,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.eve
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.IUIResourceParser;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.UIParserCheckedException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIRendererConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.IUIViewComponentMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.adapters.AbstractContainerScreenAdapter;
@@ -83,10 +85,12 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
@@ -187,13 +191,18 @@ public enum UIDebugMinecraft {
 
 		@SuppressWarnings("unused")
 		private static final class CustomWindowRenderer<C extends UIComponentWindowMinecraft>
-				extends UIComponentWindowMinecraft.DefaultRenderer<C> {
+				extends UIComponentWindowMinecraft.DefaultRenderer<C>
+				implements IShapeDescriptorProvider {
 			private static final int CURSOR_SHAPE_RADIUS = 10;
 
 			private Color cursorHighlighterColor = Color.WHITE;
-			private final IUIAnimationControl cursorHighlighterColorAnimation =
+			@SuppressWarnings("ThisEscapedInObjectConstruction")
+			private final IUIAnimationControl animations =
 					UIStandardAnimationControlFactory.createSimple(UIStandardAnimationControlFactory.EnumDirection.ALTERNATE,
-							UIAnimationTargetUtilities.range(rgb -> setCursorHighlighterColor(new Color((int) rgb)), 0, 0xFFFFFFL, EnumCommonUIAnimationEasing.LINEAR),
+							UIAnimationTargetUtilities.compose(
+									UIAnimationTargetUtilities.range(rgb -> setCursorHighlighterColor(new Color((int) rgb)), 0, 0xFFFFFFL, EnumCommonUIAnimationEasing.LINEAR),
+									UIAnimationTargetUtilities.range(UIAnimationTargetUtilities.ShapeDescriptors.translateY(this), 0, 100, EnumCommonUIAnimationEasing.IN_OUT_BOUNCE)
+							),
 							ITicker.StaticHolder.getSystemTicker(),
 							true,
 							TimeUnit.SECONDS.toNanos(5),
@@ -208,13 +217,15 @@ public enum UIDebugMinecraft {
 			@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 			public void onRendererAdded(C container) {
 				super.onRendererAdded(container);
-				getCursorHighlighterColorAnimation().reset();
+				getAnimations().reset();
 				getContainer()
 						.flatMap(IUIComponent::getManager)
 						.flatMap(IUIComponentManager::getView)
 						.ifPresent(view ->
-								view.getAnimationController().add(getCursorHighlighterColorAnimation()));
+								view.getAnimationController().add(getAnimations()));
 			}
+
+			protected IUIAnimationControl getAnimations() { return animations; }
 
 			@Override
 			@SuppressWarnings({"rawtypes", "RedundantSuppression"})
@@ -223,12 +234,10 @@ public enum UIDebugMinecraft {
 						.flatMap(IUIComponent::getManager)
 						.flatMap(IUIComponentManager::getView)
 						.ifPresent(view ->
-								view.getAnimationController().remove(getCursorHighlighterColorAnimation()));
-				getCursorHighlighterColorAnimation().reset();
+								view.getAnimationController().remove(getAnimations()));
+				getAnimations().reset();
 				super.onRendererRemoved();
 			}
-
-			protected IUIAnimationControl getCursorHighlighterColorAnimation() { return cursorHighlighterColorAnimation; }
 
 			@Override
 			public void render(IUIComponentContext context, C container, EnumRenderStage stage, double partialTicks) {
@@ -251,6 +260,21 @@ public enum UIDebugMinecraft {
 			protected Color getCursorHighlighterColor() { return cursorHighlighterColor; }
 
 			protected void setCursorHighlighterColor(Color cursorHighlighterColor) { this.cursorHighlighterColor = cursorHighlighterColor; }
+
+			@Override
+			public IShapeDescriptor<?> getShapeDescriptor() {
+				return getContainer().orElseThrow(AssertionError::new).getShapeDescriptor();
+			}
+
+			@Override
+			public boolean modifyShape(BooleanSupplier action) throws ConcurrentModificationException {
+				return getContainer().orElseThrow(AssertionError::new).modifyShape(action);
+			}
+
+			@Override
+			public boolean isModifyingShape() {
+				return getContainer().orElseThrow(AssertionError::new).isModifyingShape();
+			}
 		}
 
 		@OnlyIn(Dist.CLIENT)

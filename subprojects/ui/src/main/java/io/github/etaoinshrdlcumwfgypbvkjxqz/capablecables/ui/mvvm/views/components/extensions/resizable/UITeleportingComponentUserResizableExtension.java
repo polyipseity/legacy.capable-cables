@@ -217,7 +217,7 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 				synchronized (getLockObject()) {
 					if (!owner.getResizeData().isPresent())
 						return false;
-					ret = container.reshape(s -> s.bound(relativeShape));
+					ret = container.reshape(s -> s.adapt(relativeShape));
 					owner.setResizeData(null);
 				}
 				return ret;

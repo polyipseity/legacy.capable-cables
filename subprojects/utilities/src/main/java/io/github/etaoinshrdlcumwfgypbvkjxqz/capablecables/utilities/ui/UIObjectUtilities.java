@@ -12,6 +12,7 @@ import java.awt.geom.RectangularShape;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities.assertNonnull;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -28,12 +29,22 @@ public enum UIObjectUtilities {
 	}
 
 	public static <R extends Dimension2D> R floorDimension(Dimension2D source, R destination) {
-		acceptDimension(source, (x, y) -> destination.setSize(Math.floor(x), Math.floor(y)));
+		acceptDimension(source, (x, y) -> {
+			assert x != null;
+			assert y != null;
+			destination.setSize(Math.floor(x), Math.floor(y));
+		});
 		return destination;
 	}
 
 	public static <R extends RectangularShape> R floorRectangularShape(RectangularShape source, R destination) {
-		acceptRectangularShape(source, (x, y, w, h) -> destination.setFrame(Math.floor(x), Math.floor(y), Math.floor(w), Math.floor(h)));
+		acceptRectangularShape(source, (x, y, w, h) -> {
+			assert x != null;
+			assert y != null;
+			assert w != null;
+			assert h != null;
+			destination.setFrame(Math.floor(x), Math.floor(y), Math.floor(w), Math.floor(h));
+		});
 		return destination;
 	}
 
@@ -45,17 +56,33 @@ public enum UIObjectUtilities {
 	public static void acceptDimension(Dimension2D dimension, BiConsumer<? super Double, ? super Double> action) { action.accept(dimension.getWidth(), dimension.getHeight()); }
 
 	public static <R extends Point2D> R floorPoint(Point2D source, R destination) {
-		acceptPoint(source, (x, y) -> destination.setLocation(Math.floor(x), Math.floor(y)));
+		acceptPoint(source, (x, y) -> {
+			assert x != null;
+			assert y != null;
+			destination.setLocation(Math.floor(x), Math.floor(y));
+		});
 		return destination;
 	}
 
 	public static <R extends Point2D> R minPoint(Point2D a, Point2D b, R destination) {
-		acceptPoint(a, (ax, ay) -> acceptPoint(b, (bx, by) -> destination.setLocation(min(ax, bx), min(ay, by))));
+		acceptPoint(a, (ax, ay) -> acceptPoint(b, (bx, by) -> {
+			assert ax != null;
+			assert ay != null;
+			assert bx != null;
+			assert by != null;
+			destination.setLocation(min(ax, bx), min(ay, by));
+		}));
 		return destination;
 	}
 
 	public static <R extends Point2D> R maxPoint(Point2D a, Point2D b, R destination) {
-		acceptPoint(a, (ax, ay) -> acceptPoint(b, (bx, by) -> destination.setLocation(max(ax, bx), max(ay, by))));
+		acceptPoint(a, (ax, ay) -> acceptPoint(b, (bx, by) -> {
+			assert ax != null;
+			assert ay != null;
+			assert bx != null;
+			assert by != null;
+			destination.setLocation(max(ax, bx), max(ay, by));
+		}));
 		return destination;
 	}
 
@@ -63,15 +90,21 @@ public enum UIObjectUtilities {
 
 	public static <T> T applyDimension(Dimension2D dimension, BiFunction<? super Double, ? super Double, ? extends T> action) { return action.apply(dimension.getWidth(), dimension.getHeight()); }
 
+	@SuppressWarnings("UnusedReturnValue")
 	public static <R extends RectangularShape> R transformRectangularShape(AffineTransform transform,
 	                                                                       RectangularShape rectangular,
 	                                                                       R destination) {
-		UIObjectUtilities.acceptRectangularShape(rectangular, (x, y, h, w) ->
-				destination.setFrameFromDiagonal(x + transform.getTranslateX(), y + transform.getTranslateY(),
-						w * transform.getScaleX(), h * transform.getScaleY()));
+		UIObjectUtilities.acceptRectangularShape(rectangular, (x, y, w, h) -> {
+			assert x != null;
+			assert y != null;
+			assert w != null;
+			assert h != null;
+			destination.setFrame(x + transform.getTranslateX(), y + transform.getTranslateY(),
+					w * transform.getScaleX(), h * transform.getScaleY());
+		});
 		return destination;
 	}
 
 	public static <T, TH extends Throwable> T applyRectangularShape(RectangularShape rectangular, IFunction4<? super Double, ? super Double, ? super Double, ? super Double, ? extends T, ? extends TH> action)
-			throws TH { return action.apply(rectangular.getX(), rectangular.getY(), rectangular.getWidth(), rectangular.getHeight()); }
+			throws TH { return assertNonnull(action.apply(rectangular.getX(), rectangular.getY(), rectangular.getWidth(), rectangular.getHeight())); }
 }

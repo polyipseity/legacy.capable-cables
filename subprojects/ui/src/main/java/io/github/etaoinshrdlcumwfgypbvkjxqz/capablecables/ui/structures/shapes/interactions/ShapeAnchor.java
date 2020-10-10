@@ -54,23 +54,25 @@ public final class ShapeAnchor implements IShapeAnchor {
 	@Override
 	public void anchor(IShapeDescriptorProvider from)
 			throws ConcurrentModificationException {
-		getTarget().ifPresent(t -> {
+		getTarget().ifPresent(target -> {
+			// TODO not context aware, fix
 			Rectangle2D bounds = from.getShapeDescriptor().getShapeOutput().getBounds2D();
-			Double targetValue =
-					getOriginSide().getApplyBorder().apply(
-							getTargetSide().getGetter().apply(t.getShapeDescriptor().getShapeOutput().getBounds2D()),
+			double targetValue =
+					getOriginSide().getApplyBorder().applyAsDouble(
+							getTargetSide().getGetter().applyAsDouble(target.getShapeDescriptor().getShapeOutput().getBounds2D()),
 							getBorderThickness());
 			getOriginSide().getOpposite() // COMMENT set opposite side, avoid overshooting
-					.ifPresent(so -> {
-						Double oppositeTargetValue = getOriginSide().getApplyBorder().apply(targetValue, 1d);
-						oppositeTargetValue = oppositeTargetValue < targetValue ?
-								Math.min(oppositeTargetValue, so.getGetter().apply(bounds)) // COMMENT lesser means larger area
-								: Math.max(oppositeTargetValue, so.getGetter().apply(bounds)); // COMMENT greater means larger area
-						so.getSetter().accept(bounds, oppositeTargetValue);
+					.ifPresent(oppositeOriginSide -> {
+						double oppositeOriginSideCurrentValue = oppositeOriginSide.getGetter().applyAsDouble(bounds);
+						double oppositeOriginSideTargetValue = getOriginSide().getApplyBorder().applyAsDouble(targetValue, 1d);
+						oppositeOriginSideTargetValue = oppositeOriginSideTargetValue < targetValue ?
+								Math.min(oppositeOriginSideTargetValue, oppositeOriginSideCurrentValue) // COMMENT lesser means larger area
+								: Math.max(oppositeOriginSideTargetValue, oppositeOriginSideCurrentValue); // COMMENT greater means larger area
+						oppositeOriginSide.getSetter().accept(bounds, oppositeOriginSideTargetValue);
 					});
 			getOriginSide().getSetter().accept(bounds, targetValue);
 			from.modifyShape(() ->
-					from.getShapeDescriptor().bound(bounds));
+					from.getShapeDescriptor().adapt(bounds));
 		});
 	}
 
