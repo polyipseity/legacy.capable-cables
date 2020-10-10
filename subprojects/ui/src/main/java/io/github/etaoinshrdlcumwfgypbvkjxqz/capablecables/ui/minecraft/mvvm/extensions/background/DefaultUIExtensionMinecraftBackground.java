@@ -40,7 +40,8 @@ public class DefaultUIExtensionMinecraftBackground<E extends IUIViewComponentMin
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final AutoCloseableRotator<RenderObserver, RuntimeException> renderObserverRotator =
 			new AutoCloseableRotator<>(() -> new RenderObserver(this, UIConfiguration.getInstance().getLogger()), Disposable::dispose);
-	private final IUIRendererContainer<IBackgroundRenderer> rendererContainer = new DefaultUIRendererContainer<>(new UIExtensionMinecraftBackgroundNullBackgroundRenderer(ImmutableMap.of()));
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
+	private final IUIRendererContainer<IBackgroundRenderer> rendererContainer = new DefaultUIRendererContainer<>(this, new UIExtensionMinecraftBackgroundNullBackgroundRenderer(ImmutableMap.of()));
 
 	@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.CONTAINER_CLASS)
 	public DefaultUIExtensionMinecraftBackground(Class<E> containerClass) {
@@ -61,7 +62,7 @@ public class DefaultUIExtensionMinecraftBackground<E extends IUIViewComponentMin
 	@Override
 	@Deprecated
 	public void setRenderer(@Nullable IBackgroundRenderer renderer) {
-		IUIRendererContainer.StaticHolder.setRendererImpl(this, renderer, getRendererContainer()::setRenderer);
+		getRendererContainer().setRenderer(renderer);
 	}
 
 	@Override

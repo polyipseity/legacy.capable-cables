@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.controls;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationTarget;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationTime;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.MathUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IFunction3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.time.ITicker;
@@ -23,7 +24,7 @@ public class ReversedMonoDirectionalUIStandardAnimationControl
 	protected double getProgressForTarget(IUIAnimationTarget target, int index, int size) {
 		long currentProgress = getCurrentProgress(this, index);
 		long loop = assertNonnull(getLoops().get(index));
-		if (loop != getInfiniteLoop()) {
+		if (loop != UIStandardAnimationControlFactory.getInfiniteLoop()) {
 			double currentLoop = getCurrentLoop(this, index);
 			if (currentLoop >= loop)
 				currentProgress = 0;
@@ -51,7 +52,7 @@ public class ReversedMonoDirectionalUIStandardAnimationControl
 	}
 
 	@Override
-	protected long calculateTotalDuration() {
+	protected IUIAnimationTime calculateTotalDuration() {
 		return calculateTotalDuration(this, ReversedMonoDirectionalUIStandardAnimationControl::getTotalDuration);
 	}
 }

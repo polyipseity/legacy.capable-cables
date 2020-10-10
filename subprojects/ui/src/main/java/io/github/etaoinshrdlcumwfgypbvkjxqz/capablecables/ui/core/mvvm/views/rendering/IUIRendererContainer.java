@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.re
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.traits.IHasBinding;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
@@ -28,7 +29,10 @@ public interface IUIRendererContainer<R extends IUIRenderer<?>>
 
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
-		public static <R extends IUIRenderer<?>> void setRendererImpl(Object container, @Nullable R renderer, Consumer<? super R> setter) {
+		public static <R extends IUIRenderer<?>> void setRendererImpl(Object container,
+		                                                              @Nullable R renderer,
+		                                                              Consumer<? super R> setter,
+		                                                              @Nullable IUIRenderer<?> previousRenderer) {
 			if (!(renderer == null || renderer.getGenericClass().isInstance(container)))
 				throw new IllegalArgumentException(
 						new LogMessageBuilder()
@@ -37,7 +41,11 @@ public interface IUIRendererContainer<R extends IUIRenderer<?>>
 								.addMessages(() -> getResourceBundle().getString("renderer.set.impl.instance_of.fail"))
 								.build()
 				);
+			if (previousRenderer != null)
+				previousRenderer.onRendererRemoved();
 			setter.accept(renderer);
+			if (renderer != null)
+				renderer.onRendererAdded(CastUtilities.castUnchecked(container));
 		}
 
 		protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }

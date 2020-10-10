@@ -6,6 +6,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.I
 
 public interface IUIRenderer<C>
 		extends IHasBinding, IHasBindingMap, IHasGenericClass<C> {
+	void onRendererAdded(C container);
+
+	void onRendererRemoved();
+
 	/* TODO
 		class RegRenderer<R extends IUIComponentRenderer<?>>
 			extends Registry<INamespacePrefixedString, Class<? extends R>>

@@ -1,16 +1,15 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.controllers;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationControllable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationController;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 
 import java.util.Collections;
 import java.util.Set;
 
 public class DefaultUIAnimationController
-		implements IUIAnimationController {
+		extends AbstractUIAnimationController {
 	private final Set<IUIAnimationControllable> controllable = Collections.newSetFromMap(
 			MapBuilderUtilities.newMapMakerNormalThreaded().makeMap()
 	);

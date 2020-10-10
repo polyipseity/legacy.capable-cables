@@ -14,7 +14,7 @@ public interface IUIAnimationControl
 
 	void seek(long progress);
 
-	long getDuration();
+	IUIAnimationTime getDuration();
 
 	void onEnd(Consumer<? super IUIAnimationControl> action);
 }

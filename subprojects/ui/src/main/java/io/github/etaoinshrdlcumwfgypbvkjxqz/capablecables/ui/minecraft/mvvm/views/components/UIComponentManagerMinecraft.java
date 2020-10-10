@@ -23,8 +23,9 @@ import java.util.Optional;
 public class UIComponentManagerMinecraft
 		extends UIComponentManager<Rectangle2D>
 		implements IUIComponentMinecraft {
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	protected final IUIRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
-			new DefaultUIRendererContainer<>(new NullUIComponentRendererMinecraft<>(UIComponentManagerMinecraft.class));
+			new DefaultUIRendererContainer<>(this, new NullUIComponentRendererMinecraft<>(UIComponentManagerMinecraft.class));
 
 	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__NAME__SHAPE_DESCRIPTOR)
 	public UIComponentManagerMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String name, IShapeDescriptor<Rectangle2D> shapeDescriptor) {
@@ -37,7 +38,7 @@ public class UIComponentManagerMinecraft
 	@Override
 	@Deprecated
 	public void setRenderer(@Nullable IUIComponentRendererMinecraft<?> renderer) {
-		IUIRendererContainer.StaticHolder.setRendererImpl(this, renderer, getRendererContainer()::setRenderer);
+		getRendererContainer().setRenderer(renderer);
 	}
 
 	@Override

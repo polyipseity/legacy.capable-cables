@@ -2,6 +2,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.compone
 
 import com.google.common.collect.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.controllers.DefaultUIAnimationController;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationController;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.*;
@@ -56,6 +58,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
 	private final IUIComponentPathResolver pathResolver = new DefaultUIComponentPathResolver();
 	private final IUIComponentShapeAnchorController shapeAnchorController = new DefaultUIComponentShapeAnchorController();
+	private final IUIAnimationController animationController = new DefaultUIAnimationController();
 	@Nullable
 	private M manager;
 
@@ -90,6 +93,9 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	}
 
 	@Override
+	public IUIAnimationController getAnimationController() { return animationController; }
+
+	@Override
 	public Optional<? extends M> getManager() { return Optional.ofNullable(manager); }
 
 	@Override
@@ -111,11 +117,14 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		getManager().ifPresent(manager ->
 				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext(context),
 						manager,
-						(componentContext, result) ->
-								IUIComponentLifecycleModifier.StaticHolder.handleComponentModifiers(result.getComponent(),
-										result.getModifiersView(),
-										componentContext,
-										IUIComponentLifecycleModifier::initialize),
+						(componentContext, result) -> {
+							assert componentContext != null;
+							assert result != null;
+							IUIComponentLifecycleModifier.StaticHolder.handleComponentModifiers(result.getComponent(),
+									result.getModifiersView(),
+									componentContext,
+									IUIComponentLifecycleModifier::initialize);
+						},
 						IConsumer3.StaticHolder.getEmpty()));
 	}
 
@@ -185,11 +194,14 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		getManager().ifPresent(manager ->
 				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext(context),
 						manager,
-						(componentContext, result) ->
-								IUIComponentLifecycleModifier.StaticHolder.handleComponentModifiers(result.getComponent(),
-										result.getModifiersView(),
-										componentContext,
-										IUIComponentLifecycleModifier::removed),
+						(componentContext, result) -> {
+							assert componentContext != null;
+							assert result != null;
+							IUIComponentLifecycleModifier.StaticHolder.handleComponentModifiers(result.getComponent(),
+									result.getModifiersView(),
+									componentContext,
+									IUIComponentLifecycleModifier::removed);
+						},
 						IConsumer3.StaticHolder.getEmpty()));
 	}
 

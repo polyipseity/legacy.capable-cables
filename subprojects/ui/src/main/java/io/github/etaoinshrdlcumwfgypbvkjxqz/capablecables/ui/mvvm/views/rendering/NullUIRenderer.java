@@ -9,16 +9,20 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.compon
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.subjects.Subject;
 import io.reactivex.rxjava3.subjects.UnicastSubject;
 
+import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Optional;
 
 public class NullUIRenderer<C>
 		extends IHasGenericClass.Impl<C>
 		implements IUIRenderer<C> {
+	protected OptionalWeakReference<C> container = new OptionalWeakReference<>(null);
 	protected final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
 	protected final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 
@@ -40,4 +44,18 @@ public class NullUIRenderer<C>
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappings() { return mappings; }
+
+	@Override
+	public void onRendererAdded(C container) {
+		setContainer(container);
+	}
+
+	@Override
+	public void onRendererRemoved() {
+		setContainer(null);
+	}
+
+	public Optional<? extends C> getContainer() { return container.getOptional(); }
+
+	public void setContainer(@Nullable C container) { this.container = new OptionalWeakReference<>(container); }
 }

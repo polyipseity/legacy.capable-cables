@@ -40,8 +40,9 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 	private final int relocateBorderThickness = RELOCATE_BORDER_THICKNESS_DEFAULT; // TODO make this a property and strategy or something like that
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final Modifier modifier = new Modifier(this);
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final IUIRendererContainer<IRelocatingRenderer> rendererContainer =
-			new DefaultUIRendererContainer<>(new UIComponentUserRelocatableExtensionNullRelocatingRenderer(ImmutableMap.of()));
+			new DefaultUIRendererContainer<>(this, new UIComponentUserRelocatableExtensionNullRelocatingRenderer(ImmutableMap.of()));
 	@Nullable
 	protected IRelocateData relocateData;
 
@@ -60,7 +61,7 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 	@Override
 	@Deprecated
 	public void setRenderer(@Nullable IRelocatingRenderer renderer) {
-		StaticHolder.setRendererImpl(this, renderer, getRendererContainer()::setRenderer);
+		getRendererContainer().setRenderer(renderer);
 	}
 
 	@Override

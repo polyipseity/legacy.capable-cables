@@ -4,9 +4,15 @@ import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Ui;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIFacade;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.controls.UIStandardAnimationControlFactory;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.easings.EnumCommonUIAnimationEasing;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.targets.UIAnimationTargetUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationControl;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.viewmodels.IUIViewModelContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventKeyboard;
@@ -43,6 +49,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.cl
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.time.ITicker;
 import jakarta.xml.bind.JAXBException;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -79,6 +86,7 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
@@ -153,8 +161,10 @@ public enum UIDebugMinecraft {
 		private static AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> createUI(DebugContainer container) {
 			IBinder binder = new Binder();
 			// COMMENT Color <-> Integer
-			binder.addTransformer(EnumBindingType.FIELD, (Color color) -> Optional.ofNullable(color).map(Color::getRGB).orElse(null));
-			binder.addTransformer(EnumBindingType.FIELD, (Integer t) -> Optional.ofNullable(t).map(i -> new Color(i, true)).orElse(null));
+			binder.addTransformer(EnumBindingType.FIELD, (Color color) ->
+					Optional.ofNullable(color).map(Color::getRGB).orElse(null));
+			binder.addTransformer(EnumBindingType.FIELD, (Integer t) ->
+					Optional.ofNullable(t).map(i -> new Color(i, true)).orElse(null));
 
 			AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> ret;
 			try {
@@ -178,12 +188,47 @@ public enum UIDebugMinecraft {
 		@SuppressWarnings("unused")
 		private static final class CustomWindowRenderer<C extends UIComponentWindowMinecraft>
 				extends UIComponentWindowMinecraft.DefaultRenderer<C> {
-			public static final int CURSOR_SHAPE_RADIUS = 10;
+			private static final int CURSOR_SHAPE_RADIUS = 10;
 
-			protected final Random random = new Random();
+			private Color cursorHighlighterColor = Color.WHITE;
+			private final IUIAnimationControl cursorHighlighterColorAnimation =
+					UIStandardAnimationControlFactory.createSimple(UIStandardAnimationControlFactory.EnumDirection.ALTERNATE,
+							UIAnimationTargetUtilities.range(rgb -> setCursorHighlighterColor(new Color((int) rgb)), 0, 0xFFFFFFL, EnumCommonUIAnimationEasing.LINEAR),
+							ITicker.StaticHolder.getSystemTicker(),
+							true,
+							TimeUnit.SECONDS.toNanos(5),
+							TimeUnit.SECONDS.toNanos(1),
+							TimeUnit.SECONDS.toNanos(2),
+							UIStandardAnimationControlFactory.getInfiniteLoop());
 
 			@UIRendererConstructor(type = UIRendererConstructor.EnumConstructorType.MAPPINGS__CONTAINER_CLASS)
 			public CustomWindowRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, Class<C> containerClass) { super(mappings, containerClass); }
+
+			@Override
+			@SuppressWarnings({"rawtypes", "RedundantSuppression"})
+			public void onRendererAdded(C container) {
+				super.onRendererAdded(container);
+				getCursorHighlighterColorAnimation().reset();
+				getContainer()
+						.flatMap(IUIComponent::getManager)
+						.flatMap(IUIComponentManager::getView)
+						.ifPresent(view ->
+								view.getAnimationController().add(getCursorHighlighterColorAnimation()));
+			}
+
+			@Override
+			@SuppressWarnings({"rawtypes", "RedundantSuppression"})
+			public void onRendererRemoved() {
+				getContainer()
+						.flatMap(IUIComponent::getManager)
+						.flatMap(IUIComponentManager::getView)
+						.ifPresent(view ->
+								view.getAnimationController().remove(getCursorHighlighterColorAnimation()));
+				getCursorHighlighterColorAnimation().reset();
+				super.onRendererRemoved();
+			}
+
+			protected IUIAnimationControl getCursorHighlighterColorAnimation() { return cursorHighlighterColorAnimation; }
 
 			@Override
 			public void render(IUIComponentContext context, C container, EnumRenderStage stage, double partialTicks) {
@@ -198,12 +243,14 @@ public enum UIDebugMinecraft {
 												pointerPosition.getX() - CURSOR_SHAPE_RADIUS, pointerPosition.getY() - CURSOR_SHAPE_RADIUS,
 												CURSOR_SHAPE_RADIUS << 1, CURSOR_SHAPE_RADIUS << 1)
 								);
-								MinecraftDrawingUtilities.drawShape(transformed, true, new Color(getRandom().nextInt(), true), 0);
+								MinecraftDrawingUtilities.drawShape(transformed, true, getCursorHighlighterColor(), 0);
 							});
 				}
 			}
 
-			protected Random getRandom() { return random; }
+			protected Color getCursorHighlighterColor() { return cursorHighlighterColor; }
+
+			protected void setCursorHighlighterColor(Color cursorHighlighterColor) { this.cursorHighlighterColor = cursorHighlighterColor; }
 		}
 
 		@OnlyIn(Dist.CLIENT)

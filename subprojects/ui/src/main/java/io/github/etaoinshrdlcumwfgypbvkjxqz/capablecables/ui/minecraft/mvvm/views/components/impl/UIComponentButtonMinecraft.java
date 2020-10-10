@@ -31,8 +31,9 @@ import java.util.Optional;
 public class UIComponentButtonMinecraft
 		extends UIComponentButton
 		implements IUIComponentMinecraft {
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	protected final IUIRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
-			new DefaultUIRendererContainer<>(new DefaultRenderer<>(ImmutableMap.of(), UIComponentButtonMinecraft.class));
+			new DefaultUIRendererContainer<>(this, new DefaultRenderer<>(ImmutableMap.of(), UIComponentButtonMinecraft.class));
 
 	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__NAME__SHAPE_DESCRIPTOR)
 	public UIComponentButtonMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String name, IShapeDescriptor<?> shapeDescriptor) { super(mappings, name, shapeDescriptor); }
@@ -43,7 +44,7 @@ public class UIComponentButtonMinecraft
 	@Override
 	@Deprecated
 	public void setRenderer(@Nullable IUIComponentRendererMinecraft<?> renderer) {
-		IUIRendererContainer.StaticHolder.setRendererImpl(this, renderer, getRendererContainer()::setRenderer);
+		getRendererContainer().setRenderer(renderer);
 	}
 
 	@Override

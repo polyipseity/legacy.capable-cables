@@ -49,8 +49,9 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 	private final Modifier modifier = new Modifier(this);
 	@Nullable
 	private IResizeData resizeData;
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final IUIRendererContainer<IResizingRenderer> rendererContainer =
-			new DefaultUIRendererContainer<>(new UIComponentUserResizeableExtensionNullRelocatingRenderer(ImmutableMap.of()));
+			new DefaultUIRendererContainer<>(this, new UIComponentUserResizeableExtensionNullRelocatingRenderer(ImmutableMap.of()));
 
 	protected static Optional<ICursor> getCursor(Set<? extends EnumUISide> sides) {
 		@Nullable ICursor cursor = null;
@@ -92,9 +93,14 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 	public Optional<? extends Shape> getResizeShape() {
 		return getContainer().map(c -> {
 			Rectangle2D spb = c.getShapeDescriptor().getShapeOutput().getBounds2D();
-			Area ret = new Area(UIObjectUtilities.applyRectangularShape(spb, (x, y, w, h) ->
-					new Rectangle2D.Double(x - getResizeBorderThickness(), y - getResizeBorderThickness(),
-							w + (getResizeBorderThickness() << 1), h + (getResizeBorderThickness() << 1))));
+			Area ret = new Area(UIObjectUtilities.applyRectangularShape(spb, (x, y, w, h) -> {
+				assert x != null;
+				assert y != null;
+				assert w != null;
+				assert h != null;
+				return new Rectangle2D.Double(x - getResizeBorderThickness(), y - getResizeBorderThickness(),
+						w + (getResizeBorderThickness() << 1), h + (getResizeBorderThickness() << 1));
+			}));
 			ret.subtract(new Area(spb));
 			return ret;
 		});
@@ -115,7 +121,7 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 	@Override
 	@Deprecated
 	public void setRenderer(@Nullable IResizingRenderer renderer) {
-		StaticHolder.setRendererImpl(this, renderer, getRendererContainer()::setRenderer);
+		getRendererContainer().setRenderer(renderer);
 	}
 
 	@Override

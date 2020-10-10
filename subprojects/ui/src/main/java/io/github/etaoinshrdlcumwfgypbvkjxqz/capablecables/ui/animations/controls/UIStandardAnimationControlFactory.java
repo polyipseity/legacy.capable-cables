@@ -7,6 +7,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.time.ITicker
 public enum UIStandardAnimationControlFactory {
 	;
 
+	private static final int INFINITE_LOOP = -1;
+
 	public static AbstractUIStandardAnimationControl createSimple(EnumDirection direction,
 	                                                              IUIAnimationTarget target,
 	                                                              ITicker ticker,
@@ -82,6 +84,8 @@ public enum UIStandardAnimationControlFactory {
 				throw new AssertionError();
 		}
 	}
+
+	public static int getInfiniteLoop() { return INFINITE_LOOP; }
 
 	public enum EnumDirection {
 		NORMAL,

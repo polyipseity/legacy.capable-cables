@@ -1,27 +1,26 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.controls;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.UIImmutableAnimationTime;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationTarget;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationTime;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IFunction3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.time.ITicker;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalLong;
 import java.util.function.ToLongBiFunction;
 import java.util.stream.IntStream;
 
 public abstract class AbstractUIStandardAnimationControl
 		extends AbstractUIAnimationControl {
-	private static final int INFINITE_LOOP = -1;
-
 	private final boolean autoPlay;
 	private final List<Long> localDurations;
 	private final List<Long> startDelays;
 	private final List<Long> endDelays;
 	private final List<Long> loops;
 	@Nullable
-	private Long totalDuration = null;
+	private IUIAnimationTime totalDuration = null;
 
 	public AbstractUIStandardAnimationControl(Iterable<? extends IUIAnimationTarget> targets,
 	                                          ITicker ticker,
@@ -38,19 +37,25 @@ public abstract class AbstractUIStandardAnimationControl
 		this.loops = generateListFromFunction(targets, loopFunction);
 	}
 
-	public static int getInfiniteLoop() { return INFINITE_LOOP; }
-
-	protected static <T extends AbstractUIStandardAnimationControl> long calculateTotalDuration(T self, ToLongBiFunction<? super T, ? super Integer> calculateTotalDurationFunction) {
-		return IntStream.range(0, self.getTargets().size()).sequential()
-				.mapToLong(index -> calculateTotalDurationFunction.applyAsLong(self, index))
-				.max()
-				.orElse(0);
+	protected static <T extends AbstractUIStandardAnimationControl> IUIAnimationTime calculateTotalDuration(T self, ToLongBiFunction<? super T, ? super Integer> calculateTotalDurationFunction) {
+		if (IntStream.range(0, self.getTargets().size()).sequential()
+				.mapToLong(index -> self.getLoops().get(index))
+				.filter(loop -> loop == UIStandardAnimationControlFactory.getInfiniteLoop())
+				.findAny()
+				.isPresent())
+			return UIImmutableAnimationTime.infinite();
+		return UIImmutableAnimationTime.of(
+				IntStream.range(0, self.getTargets().size()).sequential()
+						.mapToLong(index -> calculateTotalDurationFunction.applyAsLong(self, index))
+						.max()
+						.orElse(0)
+		);
 	}
 
 	@Override
 	public EnumUpdateResult update() {
 		long currentTime = getTicker().read();
-		if (isAutoPlay()) {
+		if (!isPlaying() && isAutoPlay()) {
 			setPlaying(true);
 			setLastUpdateTime(currentTime);
 		}
@@ -77,26 +82,30 @@ public abstract class AbstractUIStandardAnimationControl
 
 	@Override
 	protected EnumUpdateResult getResult() {
-		return getElapsed() < getDuration() && getElapsed() >= 0
-				? EnumUpdateResult.NORMAL
-				: EnumUpdateResult.END;
+		IUIAnimationTime duration = getDuration();
+		if (duration.isFinite())
+			return getElapsed() < duration.get() && getElapsed() >= 0
+					? EnumUpdateResult.NORMAL
+					: EnumUpdateResult.END;
+		else
+			return EnumUpdateResult.NORMAL;
 	}
 
 	@Override
-	public long getDuration() {
-		OptionalLong totalDuration = getTotalDuration();
+	public IUIAnimationTime getDuration() {
+		Optional<? extends IUIAnimationTime> totalDuration = getTotalDuration();
 		if (!totalDuration.isPresent()) {
 			// COMMENT no need to concern ourselves with concurrency
 			setTotalDuration(calculateTotalDuration());
 			totalDuration = getTotalDuration();
 			assert totalDuration.isPresent();
 		}
-		return 0;
+		return totalDuration.get();
 	}
 
-	protected OptionalLong getTotalDuration() { return Optional.ofNullable(totalDuration).map(OptionalLong::of).orElseGet(OptionalLong::empty); }
+	protected Optional<? extends IUIAnimationTime> getTotalDuration() { return Optional.ofNullable(totalDuration); }
 
-	protected abstract long calculateTotalDuration();
+	protected abstract IUIAnimationTime calculateTotalDuration();
 
-	protected void setTotalDuration(Long totalDuration) { this.totalDuration = totalDuration; }
+	protected void setTotalDuration(IUIAnimationTime totalDuration) { this.totalDuration = totalDuration; }
 }

@@ -45,6 +45,7 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 
 	@Override
 	public void render(IUIViewContext context, double partialTicks) {
+		getAnimationController().update();
 		getManager()
 				.ifPresent(manager ->
 						EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {

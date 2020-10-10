@@ -32,8 +32,9 @@ import java.util.Optional;
 public class UIComponentWindowMinecraft
 		extends UIComponentWindow
 		implements IUIComponentMinecraft {
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	protected final IUIRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
-			new DefaultUIRendererContainer<>(new DefaultRenderer<>(ImmutableMap.of(), UIComponentWindowMinecraft.class));
+			new DefaultUIRendererContainer<>(this, new DefaultRenderer<>(ImmutableMap.of(), UIComponentWindowMinecraft.class));
 
 	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__NAME__SHAPE_DESCRIPTOR)
 	public UIComponentWindowMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String name, IShapeDescriptor<RectangularShape> shapeDescriptor) { super(mappings, name, shapeDescriptor); }
@@ -44,7 +45,7 @@ public class UIComponentWindowMinecraft
 	@Override
 	@Deprecated
 	public void setRenderer(@Nullable IUIComponentRendererMinecraft<?> renderer) {
-		IUIRendererContainer.StaticHolder.setRendererImpl(this, renderer, getRendererContainer()::setRenderer);
+		getRendererContainer().setRenderer(renderer);
 	}
 
 	@Override

@@ -2,34 +2,42 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.timelin
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.UIImmutableAnimationTime;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.AlreadyInfiniteUIAnimationTimelineException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationControl;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationTime;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.time.ITicker;
 
 import java.util.function.LongUnaryOperator;
 
-public class DefaultUIAnimationTimeline
+public class UIDefaultAnimationTimeline
 		extends AbstractUIAnimationTimeline {
 	private final boolean autoPlay;
 	@SuppressWarnings("UnstableApiUsage")
 	private final Multimap<Long, IUIAnimationControl> keyframes =
 			MultimapBuilder.hashKeys(CapacityUtilities.INITIAL_CAPACITY_SMALL).hashSetValues(CapacityUtilities.INITIAL_CAPACITY_TINY).build();
-	private long offset = 0;
-	private long duration = 0;
+	private IUIAnimationTime offset = UIImmutableAnimationTime.of(0);
+	private IUIAnimationTime duration = UIImmutableAnimationTime.of(0);
 
-	public DefaultUIAnimationTimeline(ITicker ticker, boolean autoPlay) {
+	public UIDefaultAnimationTimeline(ITicker ticker, boolean autoPlay) {
 		super(ticker);
 		this.autoPlay = autoPlay;
 	}
 
 	@Override
-	public boolean append(IUIAnimationControl control, LongUnaryOperator offsetFunction) {
-		long start = offsetFunction.applyAsLong(offset);
-		long end = start + control.getDuration();
+	public boolean append(IUIAnimationControl control, LongUnaryOperator offsetFunction)
+			throws AlreadyInfiniteUIAnimationTimelineException {
+		IUIAnimationTime offset = getOffset();
+		if (offset.isInfinite())
+			throw new AlreadyInfiniteUIAnimationTimelineException();
+		long start = offsetFunction.applyAsLong(offset.get());
+		IUIAnimationTime duration = control.getDuration();
+		IUIAnimationTime end = IUIAnimationTime.max(UIImmutableAnimationTime.of(start), duration);
 		boolean ret = getKeyframes().put(start, control);
 		if (ret) {
 			setOffset(end);
-			setDuration(Math.max(getDuration(), end));
+			setDuration(IUIAnimationTime.max(getDuration(), end));
 			return true;
 		} else {
 			return false;
@@ -41,18 +49,26 @@ public class DefaultUIAnimationTimeline
 		return keyframes;
 	}
 
-	protected long getDuration() {
+	protected IUIAnimationTime getOffset() {
+		return offset;
+	}
+
+	protected IUIAnimationTime getDuration() {
 		return duration;
 	}
 
-	protected void setDuration(long duration) {
+	protected void setDuration(IUIAnimationTime duration) {
 		this.duration = duration;
+	}
+
+	protected void setOffset(IUIAnimationTime offset) {
+		this.offset = offset;
 	}
 
 	@Override
 	public EnumUpdateResult update() {
 		long currentTime = getTicker().read();
-		if (isAutoPlay()) {
+		if (!isPlaying() && isAutoPlay()) {
 			setPlaying(true);
 			setLastUpdateTime(currentTime);
 		}
@@ -75,20 +91,16 @@ public class DefaultUIAnimationTimeline
 			getKeyframes().removeAll(key)
 					.forEach(IUIAnimationControl::play);
 		}
-		return getElapsed() < getDuration()
-				? EnumUpdateResult.NORMAL
-				: EnumUpdateResult.END;
+		IUIAnimationTime duration = getDuration();
+		if (duration.isFinite())
+			return getElapsed() < duration.get()
+					? EnumUpdateResult.NORMAL
+					: EnumUpdateResult.END;
+		else
+			return EnumUpdateResult.NORMAL;
 	}
 
 	protected boolean isAutoPlay() {
 		return autoPlay;
-	}
-
-	protected long getOffset() {
-		return offset;
-	}
-
-	protected void setOffset(long offset) {
-		this.offset = offset;
 	}
 }
