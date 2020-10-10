@@ -9,7 +9,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.ConcurrentModificationException;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 public class DelegatingShapeDescriptor<S extends Shape>
 		extends AbstractDelegatingObject<IShapeDescriptor<S>>
@@ -29,7 +29,7 @@ public class DelegatingShapeDescriptor<S extends Shape>
 	public List<IShapeConstraint> getConstraintsRef() throws IllegalStateException { return getDelegate().getConstraintsRef(); }
 
 	@Override
-	public boolean modify(Supplier<? extends Boolean> action) throws ConcurrentModificationException { return getDelegate().modify(action); }
+	public boolean modify(BooleanSupplier action) throws ConcurrentModificationException { return getDelegate().modify(action); }
 
 	@Override
 	public boolean bound(Rectangle2D bounds) throws IllegalStateException { return getDelegate().bound(bounds); }

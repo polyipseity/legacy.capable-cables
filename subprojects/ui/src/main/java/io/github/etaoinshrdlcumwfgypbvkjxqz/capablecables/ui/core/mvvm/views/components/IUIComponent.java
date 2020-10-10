@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 /*
-TODO auto resizing based on min size and preferred size
+ * TODO auto resizing based on min size and preferred size
  */
 public interface IUIComponent
 		extends INode, IShapeDescriptorProvider, IHasBinding, IHasBindingMap, IUIEventTarget, IExtensionContainer<INamespacePrefixedString>,

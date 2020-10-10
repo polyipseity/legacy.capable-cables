@@ -44,7 +44,7 @@ import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
@@ -97,7 +97,7 @@ public class UIComponent
 	public static INamespacePrefixedString getPropertyActiveLocation() { return PROPERTY_ACTIVE_LOCATION; }
 
 	@Override
-	public boolean modifyShape(Supplier<? extends Boolean> action) throws ConcurrentModificationException {
+	public boolean modifyShape(BooleanSupplier action) throws ConcurrentModificationException {
 		getModifyingShape().compareAndSet(false, true);
 		boolean ret = EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () ->
 						getShapeDescriptor().modify(action),

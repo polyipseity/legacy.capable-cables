@@ -16,7 +16,7 @@ import java.awt.geom.RectangularShape;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 // TODO needs better design, but I cannot think of one
 public interface IShapeDescriptor<S extends Shape> {
@@ -30,7 +30,7 @@ public interface IShapeDescriptor<S extends Shape> {
 	List<IShapeConstraint> getConstraintsRef()
 			throws IllegalStateException;
 
-	boolean modify(Supplier<? extends Boolean> action)
+	boolean modify(BooleanSupplier action)
 			throws ConcurrentModificationException;
 
 	boolean bound(Rectangle2D bounds)

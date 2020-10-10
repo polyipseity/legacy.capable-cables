@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 public abstract class AbstractShapeDescriptor<S extends Shape>
 		implements IShapeDescriptor<S> {
@@ -25,7 +25,7 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public boolean modify(Supplier<? extends Boolean> action)
+	public boolean modify(BooleanSupplier action)
 			throws ConcurrentModificationException {
 		if (isBeingModified())
 			throw new ConcurrentModificationException(
@@ -60,8 +60,8 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 
 	protected void setBeingModified(boolean beingModified) { this.beingModified = beingModified; }
 
-	protected boolean modify0(Supplier<? extends Boolean> action) {
-		boolean ret = action.get();
+	protected boolean modify0(BooleanSupplier action) {
+		boolean ret = action.getAsBoolean();
 		if (ret) {
 			Rectangle2D bounds = getShapeOutput().getBounds2D();
 			bound(StaticHolder.constrain(getConstraints(), bounds, bounds));

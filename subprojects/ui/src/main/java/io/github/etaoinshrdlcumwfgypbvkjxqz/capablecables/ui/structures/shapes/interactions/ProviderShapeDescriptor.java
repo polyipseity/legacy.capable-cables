@@ -13,7 +13,7 @@ import java.awt.*;
 import java.util.ConcurrentModificationException;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 public class ProviderShapeDescriptor<S extends Shape>
 		extends DelegatingShapeDescriptor<S> {
@@ -26,7 +26,7 @@ public class ProviderShapeDescriptor<S extends Shape>
 	}
 
 	@Override
-	public boolean modify(Supplier<? extends Boolean> action)
+	public boolean modify(BooleanSupplier action)
 			throws ConcurrentModificationException {
 		if (!getOwner().map(IShapeDescriptorProvider::isModifyingShape).orElse(true))
 			throw new IllegalStateException(

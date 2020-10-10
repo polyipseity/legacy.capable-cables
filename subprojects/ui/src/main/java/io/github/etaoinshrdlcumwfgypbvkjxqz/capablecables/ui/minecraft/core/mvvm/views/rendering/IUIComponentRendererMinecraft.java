@@ -8,6 +8,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.utilities.EnumCropMethod;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.utilities.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.caches.UICacheExtension;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.MathUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftOpenGLUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.EnumMinecraftUICoordinateSystem;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.CoordinateSystemUtilities;
@@ -36,7 +37,10 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUICompo
 			case STENCIL_BUFFER:
 				switch (stage) {
 					case CROP:
-						int stencilRef = Math.floorMod(UICacheExtension.CacheUniversal.Z.getValue().get(container).orElseThrow(InternalError::new), (int) Math.pow(2, MinecraftOpenGLUtilities.State.getInteger(GL11.GL_STENCIL_BITS)));
+						int stencilRef = Math.floorMod(
+								UICacheExtension.CacheUniversal.Z.getValue().get(container).orElseThrow(InternalError::new),
+								MathUtilities.pow2Int(MinecraftOpenGLUtilities.State.getInteger(GL11.GL_STENCIL_BITS))
+						);
 
 						MinecraftOpenGLUtilities.Stacks.push("stencilFunc",
 								() -> RenderSystem.stencilFunc(GL11.GL_EQUAL, stencilRef, MinecraftOpenGLUtilities.GL_MASK_ALL_BITS), MinecraftOpenGLUtilities.Stacks.STENCIL_FUNC_FALLBACK);
@@ -89,8 +93,17 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUICompo
 										EnumMinecraftUICoordinateSystem.SCALED, EnumMinecraftUICoordinateSystem.NATIVE
 								).createIntersection(new Rectangle2D.Double(oldBounds[0], oldBounds[1], oldBounds[2], oldBounds[3])),
 								(x, y, w, h) -> MinecraftOpenGLUtilities.Stacks.push("glScissor",
-										() -> MinecraftOpenGLUtilities.State.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{x.intValue(), y.intValue(), w.intValue(), h.intValue()},
-												(i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3])), MinecraftOpenGLUtilities.Stacks.GL_SCISSOR_FALLBACK));
+										() -> {
+											assert x != null;
+											assert y != null;
+											assert w != null;
+											assert h != null;
+											MinecraftOpenGLUtilities.State.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{x.intValue(), y.intValue(), w.intValue(), h.intValue()},
+													(i, v) -> {
+														assert v != null;
+														GL11.glScissor(v[0], v[1], v[2], v[3]);
+													});
+										}, MinecraftOpenGLUtilities.Stacks.GL_SCISSOR_FALLBACK));
 						break;
 					case UN_CROP:
 						MinecraftOpenGLUtilities.Stacks.pop("glScissor");

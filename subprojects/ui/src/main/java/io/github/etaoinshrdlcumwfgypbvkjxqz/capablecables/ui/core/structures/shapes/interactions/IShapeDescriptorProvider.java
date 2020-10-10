@@ -3,12 +3,12 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.sh
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 
 import java.util.ConcurrentModificationException;
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 public interface IShapeDescriptorProvider {
 	IShapeDescriptor<?> getShapeDescriptor();
 
-	boolean modifyShape(Supplier<? extends Boolean> action)
+	boolean modifyShape(BooleanSupplier action)
 			throws ConcurrentModificationException;
 
 	boolean isModifyingShape();
