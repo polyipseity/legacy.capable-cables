@@ -104,7 +104,7 @@ public enum UIEventUtilities {
 			UIEventRegistry.getInstance().register(EnumUIEventDOMType.MOUSE_UP.getEventType(), IUIEventMouse.class);// COMMENT mouseup: context menu
 			UIEventRegistry.getInstance().register(EnumUIEventDOMType.WHEEL.getEventType(), IUIEventMouseWheel.class); // COMMENT wheel: scroll or zoom, cancelability varies
 			// COMMENT beforeinput
-			// COMMENT inputs
+			// COMMENT input
 			UIEventRegistry.getInstance().register(EnumUIEventDOMType.KEY_DOWN.getEventType(), IUIEventKeyboard.class); // COMMENT keydown: focus, keypress, and/or activate
 			UIEventRegistry.getInstance().register(EnumUIEventDOMType.KEY_UP.getEventType(), IUIEventKeyboard.class); // COMMENT keyup: may have default
 			// COMMENT compositionstart
@@ -117,7 +117,7 @@ public enum UIEventUtilities {
 
 		public static IUIEventKeyboard generateSyntheticEventKeyboardOpposite(IUIEventKeyboard event) {
 			if (EnumUIEventDOMType.KEY_DOWN.getEventType().equals(event.getType()))
-				return createEventKeyUp(event.getViewContextView(), event.getTarget(), event.getData().recreate());
+				return createEventKeyUp(event.getViewContext(), event.getTarget(), event.getData().recreate());
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
 							.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)
@@ -162,11 +162,11 @@ public enum UIEventUtilities {
 		public static IUIEventMouse generateSyntheticEventMouseOpposite(IUIEventMouse event, Point2D cursorPosition) {
 			UIDataMouseButtonClick data = new UIDataMouseButtonClick(cursorPosition, event.getData().getButton());
 			if (EnumUIEventDOMType.MOUSE_DOWN.getEventType().equals(event.getType()))
-				return createEventMouseUp(event.getViewContextView(), event.getTarget(), data);
+				return createEventMouseUp(event.getViewContext(), event.getTarget(), data);
 			else if (EnumUIEventDOMType.MOUSE_ENTER.getEventType().equals(event.getType()))
-				return createEventMouseLeave(event.getViewContextView(), event.getTarget(), data, event.getRelatedTarget().orElse(null));
+				return createEventMouseLeave(event.getViewContext(), event.getTarget(), data, event.getRelatedTarget().orElse(null));
 			else if (EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType().equals(event.getType()))
-				return createEventMouseLeaveSelf(event.getViewContextView(), event.getTarget(), data, event.getRelatedTarget().orElse(null));
+				return createEventMouseLeaveSelf(event.getViewContext(), event.getTarget(), data, event.getRelatedTarget().orElse(null));
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
 							.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)

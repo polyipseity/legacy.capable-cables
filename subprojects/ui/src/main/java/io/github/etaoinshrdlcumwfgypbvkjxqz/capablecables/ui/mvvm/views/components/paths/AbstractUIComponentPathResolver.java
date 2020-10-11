@@ -16,11 +16,11 @@ public abstract class AbstractUIComponentPathResolver
 		implements IUIComponentPathResolver {
 	@Override
 	public IUIComponentPathResolverResult resolvePath(IUIComponentContext componentContext, Point2D point) {
-		IUIComponentPathResolverResult result = ImmutableUIComponentPathResolverResult.getEmpty();
+		IUIComponentPathResolverResult result = getResult(componentContext, (Point2D) point.clone());
 		do {
 			IUIComponentPathResolverResult next = resolveDirectChild(componentContext, (Point2D) point.clone());
 			if (!next.isPresent()) // COMMENT no next
-				return !result.isPresent() ? getResult(componentContext, point) : result;
+				return result;
 			result = next;
 			if (result.isVirtual()) // COMMENT result exists and is virtual
 				return result;

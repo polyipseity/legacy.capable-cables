@@ -1,7 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths;
 
 public class EmptyPathException
-		extends RuntimeException {
+		extends IllegalStateException {
 	private static final long serialVersionUID = 760193064178512586L;
 
 	public EmptyPathException() {}

@@ -1,6 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.traits.IHasBindingMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentLifecycleModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentModifier;
@@ -8,17 +10,21 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.eve
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.caches.UICacheExtension;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.traits.IHasBinding;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.INode;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.IPath;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.ImmutablePath;
 
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.ConcurrentModificationException;
 import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 /*
@@ -28,17 +34,44 @@ public interface IUIComponent
 		extends INode, IShapeDescriptorProvider, IHasBinding, IHasBindingMap, IUIEventTarget, IExtensionContainer<INamespacePrefixedString>,
 		IUIComponentLifecycleModifier {
 	static <T> Optional<T> getYoungestParentInstanceOf(IUIComponent self, Class<T> clazz) {
-		Optional<? extends IUIComponentContainer> parent = self.getParent();
-		Optional<T> ret = Optional.empty();
-		while (parent.isPresent()) {
-			IUIComponentContainer p = parent.get();
-			if (clazz.isInstance(p)) {
-				ret = Optional.of(clazz.cast(p));
-				break;
-			}
-			parent = p.getParent();
+		for (Iterator<IUIComponentContainer> iterator = new ParentIterator(self.getParent().orElse(null));
+		     iterator.hasNext(); ) {
+			IUIComponentContainer element = iterator.next();
+			if (clazz.isInstance(element))
+				return Optional.of(clazz.cast(element));
 		}
-		return ret;
+		return Optional.empty();
+	}
+
+	enum StaticHolder {
+		;
+
+		public static Shape getContextualShape(IUIComponentContext context, IUIComponent component) { return IUIComponentContext.StaticHolder.createContextualShape(context, getShape(component)); }
+
+		public static Shape getShape(IUIComponent component) { return component.getShapeDescriptor().getShapeOutput(); }
+
+		@Immutable
+		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
+		public static IUIComponentContext getContext(IUIComponent component) {
+			IUIComponentContext context =
+					component
+							.getManager()
+							.flatMap(IUIComponentManager::getView)
+							.flatMap(IUIViewComponent::createComponentContext)
+							.orElseThrow(IllegalStateException::new);
+			getPath(component).asList()
+					.forEach(element -> context.getMutator().push(context.getStackRef(), element));
+			return context;
+		}
+
+		@Immutable
+		public static IPath<IUIComponent> getPath(IUIComponent component) {
+			List<IUIComponent> path = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+			path.add(component);
+			new ParentIterator(component.getParent().orElse(null))
+					.forEachRemaining(path::add);
+			return new ImmutablePath<>(Lists.reverse(path));
+		}
 	}
 
 	static <S extends Shape> boolean reshapeComponent(IUIComponent self, IShapeDescriptor<? super S> shapeDescriptor, Predicate<? super IShapeDescriptor<? super S>> action)
@@ -86,11 +119,28 @@ public interface IUIComponent
 
 	boolean containsPoint(IUIComponentContext context, Point2D point);
 
-	enum StaticHolder {
-		;
+	class ParentIterator
+			implements Iterator<IUIComponentContainer> {
+		private final AtomicReference<IUIComponentContainer> current;
 
-		public static Shape getContextualShape(IUIComponentContext context, IUIComponent component) { return IUIComponentContext.StaticHolder.createContextualShape(context, getShape(component)); }
+		public ParentIterator(@Nullable IUIComponentContainer current) {
+			this.current = new AtomicReference<>(current);
+		}
 
-		public static Shape getShape(IUIComponent component) { return component.getShapeDescriptor().getShapeOutput(); }
+		@Override
+		public boolean hasNext() {
+			return getCurrent().get() != null;
+		}
+
+		@Override
+		public IUIComponentContainer next() {
+			return AssertionUtilities.assertNonnull(getCurrent().getAndUpdate(cur -> {
+				if (cur == null)
+					throw new NoSuchElementException();
+				return cur.getParent().orElse(null);
+			}));
+		}
+
+		protected AtomicReference<IUIComponentContainer> getCurrent() { return current; }
 	}
 }

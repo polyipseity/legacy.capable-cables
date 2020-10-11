@@ -125,7 +125,7 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 			this.owner = new OptionalWeakReference<>(owner);
 
 			addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new FunctionalUIEventListener<IUIEventMouse>(evt -> {
-				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && startRelocateMaybe(evt.getViewContextView(), evt.getData().getCursorPositionView())) { // todo custom
+				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && startRelocateMaybe(evt.getViewContext(), evt.getData().getCursorPositionView())) { // todo custom
 					getOwner()
 							.flatMap(owner2 -> owner2.getContainer()) // TODO Java 9 - IllegalAccessError now, make method ref
 							.ifPresent(c -> {
@@ -136,7 +136,7 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 				}
 			}), false);
 			addEventListener(EnumUIEventDOMType.MOUSE_UP.getEventType(), new FunctionalUIEventListener<IUIEventMouse>(evt -> {
-				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && finishRelocateMaybe(evt.getViewContextView(), evt.getData().getCursorPositionView()))
+				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && finishRelocateMaybe(evt.getViewContext(), evt.getData().getCursorPositionView()))
 					evt.stopPropagation();
 			}), false);
 		}

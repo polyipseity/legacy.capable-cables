@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 
@@ -28,7 +29,8 @@ public interface IUIEvent {
 	@SuppressWarnings("UnusedReturnValue")
 	boolean preventDefault();
 
-	IUIViewContext getViewContextView();
+	@Immutable
+	IUIViewContext getViewContext();
 
 	enum EnumPhase {
 		NONE {

@@ -8,7 +8,11 @@ public interface IUISubInfrastructure<C extends IUISubInfrastructureContext> {
 
 	void setInfrastructure(@Nullable IUIInfrastructure<?, ?, ?> infrastructure);
 
-	void initialize(C context);
+	void initialize();
 
-	void removed(C context);
+	void removed();
+
+	Optional<? extends C> getContext();
+
+	void setContext(@Nullable C context);
 }

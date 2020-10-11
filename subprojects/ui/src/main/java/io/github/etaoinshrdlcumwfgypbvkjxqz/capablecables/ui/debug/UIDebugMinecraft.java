@@ -9,7 +9,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.easings.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.targets.UIAnimationTargetUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationControl;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.viewmodels.IUIViewModelContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
@@ -275,6 +274,9 @@ public enum UIDebugMinecraft {
 			public boolean isModifyingShape() {
 				return getContainer().orElseThrow(AssertionError::new).isModifyingShape();
 			}
+
+			@Override
+			public Shape getAbsoluteShape() throws IllegalStateException { return getContainer().orElseThrow(AssertionError::new).getAbsoluteShape(); }
 		}
 
 		@OnlyIn(Dist.CLIENT)
@@ -297,7 +299,7 @@ public enum UIDebugMinecraft {
 			private ViewModel() { super(new Model()); }
 
 			@Override
-			public void tick(IUIViewModelContext context) {
+			public void tick() {
 				if (isAnchoredWindowFlickering())
 					getAnchoredWindowBorderColor().setValue(getRandom().nextInt());
 			}

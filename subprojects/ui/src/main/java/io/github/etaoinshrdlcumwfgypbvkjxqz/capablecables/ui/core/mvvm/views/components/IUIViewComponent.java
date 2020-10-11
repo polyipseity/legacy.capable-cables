@@ -6,7 +6,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationController;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.traits.IHasBindingMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
@@ -15,6 +14,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingBiFunction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.optionals.Optional2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 
 import javax.annotation.Nullable;
@@ -31,7 +31,8 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 
 	void setManager(@Nullable M manager);
 
-	IUIComponentContext createComponentContext(IUIViewContext viewContext);
+	Optional<? extends IUIComponentContext> createComponentContext()
+			throws IllegalStateException;
 
 	List<IUIComponent> getChildrenFlatView();
 
@@ -43,12 +44,14 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 
 	enum StaticHolder {
 		;
+
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
-		public static Optional<IUIComponentContext> createComponentContextWithManager(IUIViewComponent<?, ?> view, IUIViewContext viewContext) {
-			return view.getManager()
-					.map(manager -> {
-						IUIComponentContext context = view.createComponentContext(viewContext);
+		public static Optional<IUIComponentContext> createComponentContextWithManager(IUIViewComponent<?, ?> view) {
+			return Optional2.of(view.createComponentContext().orElse(null), view.getManager().orElse(null))
+					.map(values -> {
+						IUIComponentContext context = values.getValue1Nonnull();
+						IUIComponentManager<?> manager = values.getValue2Nonnull();
 						context.getMutator().push(context.getStackRef(), manager);
 						return context;
 					});

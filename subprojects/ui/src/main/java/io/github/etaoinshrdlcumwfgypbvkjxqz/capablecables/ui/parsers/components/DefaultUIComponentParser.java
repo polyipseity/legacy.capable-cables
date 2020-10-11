@@ -81,7 +81,10 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 		try {
 			getAliases().putAll(
 					resource.getUsing().stream().unordered()
-							.map(IThrowingFunction.executeNow(u -> Maps.immutableEntry(u.getAlias(), Class.forName(u.getTarget()))))
+							.map(IThrowingFunction.executeNow(u -> {
+								assert u != null;
+								return Maps.immutableEntry(u.getAlias(), Class.forName(u.getTarget()));
+							}))
 							.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
 		} catch (ClassNotFoundException e) {
 			throw ThrowableUtilities.propagate(e, UIParserCheckedException::new, UIParserUncheckedException::new);
@@ -114,6 +117,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 		try {
 			return getRoot()
 					.map(IThrowingFunction.executeNow(root -> {
+						assert root != null;
 						IParserContext viewContext = new ImmutableParserContext(EnumHandlerType.VIEW_HANDLER, getAliases(), getHandlers().asMap());
 						IParserContext componentContext = new ImmutableParserContext(EnumHandlerType.COMPONENT_HANDLER, getAliases(), getHandlers().asMap());
 						View viewRaw = root.getView();
@@ -127,17 +131,24 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 								viewRaw.getAnyContainer()
 										.map(AnyContainer::getAny)
 										.orElseGet(ImmutableList::of))
-								.forEach(IThrowingConsumer.executeNow(any -> IParserContext.StaticHolder.findHandler(viewContext, any)
-										.ifPresent(IThrowingConsumer.executeNow(handler -> handler.accept(
-												viewContext,
-												CastUtilities.castUnchecked(view), // COMMENT may throw
-												CastUtilities.castUnchecked(any) // COMMENT should not throw
-										)))
+								.forEach(IThrowingConsumer.executeNow(any -> {
+											assert any != null;
+											IParserContext.StaticHolder.findHandler(viewContext, any)
+													.ifPresent(IThrowingConsumer.executeNow(handler -> {
+														assert handler != null;
+														handler.accept(
+																viewContext,
+																CastUtilities.castUnchecked(view), // COMMENT may throw
+																CastUtilities.castUnchecked(any) // COMMENT should not throw
+														);
+													}));
+										}
 								));
 						final IUIComponent[] cc = {view.getManager()
 								.orElseThrow(AssertionError::new)};
 						TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, componentRaw,
 								IThrowingFunction.executeNow(n -> {
+									assert n != null;
 									IUIComponent component = componentRaw.equals(n)
 											? cc[0]
 											: CastUtilities.castChecked(IUIComponentContainer.class, cc[0])
@@ -153,12 +164,18 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 											n.getAnyContainer()
 													.map(AnyContainer::getAny)
 													.orElseGet(ImmutableList::of))
-											.forEach(IThrowingConsumer.executeNow(any -> IParserContext.StaticHolder.findHandler(componentContext, any)
-													.ifPresent(IThrowingConsumer.executeNow(handler -> handler.accept(
-															componentContext,
-															CastUtilities.castUnchecked(component), // COMMENT may throw
-															CastUtilities.castUnchecked(any) // COMMENT should not throw
-													)))));
+											.forEach(IThrowingConsumer.executeNow(any -> {
+												assert any != null;
+												IParserContext.StaticHolder.findHandler(componentContext, any)
+														.ifPresent(IThrowingConsumer.executeNow(handler -> {
+															assert handler != null;
+															handler.accept(
+																	componentContext,
+																	CastUtilities.castUnchecked(component), // COMMENT may throw
+																	CastUtilities.castUnchecked(any) // COMMENT should not throw
+															);
+														}));
+											}));
 									return n;
 								}),
 								n -> {
@@ -236,6 +253,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 			throws Throwable {
 		return TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, component,
 				IThrowingFunction.executeNow(n -> {
+					assert n != null;
 					Class<?> cc = AssertionUtilities.assertNonnull(context.getAliasesView().get(n.getClazz()));
 					UIComponentConstructor.EnumConstructorType ct = IConstructorType.StaticHolder.getConstructorType(cc, UIComponentConstructor.class, UIComponentConstructor::type);
 					Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(n.getProperty());
@@ -305,10 +323,10 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 						attributes.put(EnumUIEventDOMType.WHEEL.getEventType(),
 								new UIPropertyMappingValue(null,
 										Optional.ofNullable(component.getWheel()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
-						attributes.put(EnumUIEventDOMType.UPDATE_PRE.getEventType(),
+						attributes.put(EnumUIEventDOMType.INPUT_PRE.getEventType(),
 								new UIPropertyMappingValue(null,
 										Optional.ofNullable(component.getBeforeinput()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
-						attributes.put(EnumUIEventDOMType.UPDATE_POST.getEventType(),
+						attributes.put(EnumUIEventDOMType.INPUT_POST.getEventType(),
 								new UIPropertyMappingValue(null,
 										Optional.ofNullable(component.getInput()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.KEY_DOWN.getEventType(),
@@ -377,9 +395,11 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 		AffineTransform transform = new AffineTransform();
 		shape.getAffineTransformDefiner()
 				.ifPresent(IThrowingConsumer.executeNow(atd -> {
+					assert atd != null;
 					atd.getAffineTransform()
 							.ifPresent(at -> transform.setTransform(at.getScaleX(), at.getShearY(), at.getShearX(), at.getScaleY(), at.getTranslateX(), at.getTranslateY()));
 					atd.getMethod().forEach(IThrowingConsumer.executeNow(m -> {
+						assert m != null;
 						Double[] args = Arrays.stream(
 								AssertionUtilities.assertNonnull(m.getValue()).split(Pattern.quote(m.getDelimiter()))).sequential()
 								.map(Double::parseDouble)

@@ -43,18 +43,22 @@ public abstract class AbstractUIAnimationControl
 	}
 
 	@Override
-	protected long updateElapsed(long previousElapsed, long difference) {
-		return getElapsed() + (isReversed() ? -1 : 1) * difference;
-	}
-
-	@Override
-	public EnumUpdateResult update0() {
+	public void render() {
 		int[] index = {0};
 		int size = getTargets().size();
 		getTargets().forEach(target -> {
 			target.accept(getProgressForTarget(target, index[0], size));
 			++index[0];
 		});
+	}
+
+	@Override
+	protected long updateElapsed(long previousElapsed, long difference) {
+		return getElapsed() + (isReversed() ? -1 : 1) * difference;
+	}
+
+	@Override
+	public EnumUpdateResult update0() {
 		EnumUpdateResult result = getResult();
 		if (result == EnumUpdateResult.END)
 			getEndActions().forEach(action -> action.accept(this));

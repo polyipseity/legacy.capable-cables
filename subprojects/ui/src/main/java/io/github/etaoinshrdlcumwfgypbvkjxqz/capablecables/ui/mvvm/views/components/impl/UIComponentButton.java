@@ -132,7 +132,7 @@ public class UIComponentButton
 			protected final IUIEvent cause;
 
 			public Impl(IUIEventTarget target, IUIEvent cause) {
-				super(TYPE, false, true, cause.getViewContextView(), target);
+				super(TYPE, false, true, cause.getViewContext(), target);
 				this.cause = cause;
 			}
 

@@ -16,7 +16,7 @@ import java.util.Optional;
  */
 public interface IUIView<S extends Shape>
 		extends IUISubInfrastructure<IUIViewContext>, IUIReshapeExplicitly<S>, IHasBinding, IExtensionContainer<INamespacePrefixedString> {
-	IUIEventTarget getTargetAtPoint(IUIViewContext context, Point2D point);
+	IUIEventTarget getTargetAtPoint(Point2D point);
 
-	Optional<? extends IUIEventTarget> changeFocus(IUIViewContext context, @Nullable IUIEventTarget currentFocus, boolean next);
+	Optional<? extends IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next);
 }

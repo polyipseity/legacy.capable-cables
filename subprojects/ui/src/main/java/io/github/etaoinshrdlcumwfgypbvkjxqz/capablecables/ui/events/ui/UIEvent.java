@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventTarget;
@@ -65,7 +66,7 @@ public class UIEvent implements IUIEvent {
 	public boolean preventDefault() { return isCancelable() && !getDefaultPrevented().getAndSet(true); }
 
 	@Override
-	public IUIViewContext getViewContextView() { return viewContext; }
+	public @Immutable IUIViewContext getViewContext() { return viewContext; }
 
 	protected void setPropagationStopped(boolean propagationStopped) { this.propagationStopped = propagationStopped; }
 

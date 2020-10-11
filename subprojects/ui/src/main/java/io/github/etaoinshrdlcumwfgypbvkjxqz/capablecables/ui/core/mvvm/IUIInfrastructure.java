@@ -27,7 +27,7 @@ public interface IUIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel
 
 	void setBinder(B binder);
 
-	void bind()
+	void bind(IUIContextContainer contextContainer)
 			throws NoSuchBindingTransformerException;
 
 	void unbind();
@@ -40,10 +40,10 @@ public interface IUIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
 		@SuppressWarnings("UnusedReturnValue")
-		public static boolean bindSafe(IUIInfrastructure<?, ?, ?> infrastructure)
+		public static boolean bindSafe(IUIInfrastructure<?, ?, ?> infrastructure, IUIContextContainer contextContainer)
 				throws NoSuchBindingTransformerException {
 			if (!infrastructure.isBound()) {
-				infrastructure.bind();
+				infrastructure.bind(contextContainer);
 				return true;
 			}
 			return false;

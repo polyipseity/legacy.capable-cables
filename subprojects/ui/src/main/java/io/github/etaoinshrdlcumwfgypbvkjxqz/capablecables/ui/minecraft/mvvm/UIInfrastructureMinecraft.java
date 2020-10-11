@@ -1,6 +1,5 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIContextContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.IUIViewModelMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.IUIViewMinecraft;
@@ -16,20 +15,20 @@ public class UIInfrastructureMinecraft<V extends IUIViewMinecraft<?>, VM extends
 	public UIInfrastructureMinecraft(V view, VM viewModel, B binder) { super(view, viewModel, binder); }
 
 	@Override
-	public void initialize(IUIContextContainer context) {
-		getViewModel().initialize(context.getViewModelContext());
-		getView().initialize(context.getViewContext());
+	public void initialize() {
+		getViewModel().initialize();
+		getView().initialize();
 	}
 
 	@Override
-	public void tick(IUIContextContainer context) {
-		getViewModel().tick(context.getViewModelContext());
-		getView().tick(context.getViewContext());
+	public void tick() {
+		getViewModel().tick();
+		getView().tick();
 	}
 
 	@Override
-	public void removed(IUIContextContainer context) {
-		getViewModel().removed(context.getViewModelContext());
-		getView().removed(context.getViewContext());
+	public void removed() {
+		getViewModel().removed();
+		getView().removed();
 	}
 }

@@ -50,6 +50,7 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
@@ -61,6 +62,8 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	private final IUIAnimationController animationController = new DefaultUIAnimationController();
 	@Nullable
 	private M manager;
+	@Nullable
+	private IUIViewContext viewContext;
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	@UIViewComponentConstructor(type = UIViewComponentConstructor.EnumConstructorType.MAPPINGS)
@@ -72,15 +75,19 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	}
 
 	@Override
-	public IUIEventTarget getTargetAtPoint(IUIViewContext context, Point2D point) {
-		try (IUIComponentContext componentContext = IUIViewComponent.StaticHolder.createComponentContextWithManager(this, context)
+	public IUIEventTarget getTargetAtPoint(Point2D point) {
+		try (IUIComponentContext componentContext = IUIViewComponent.StaticHolder.createComponentContextWithManager(this)
 				.orElseThrow(IllegalStateException::new)) {
-			return getPathResolver().resolvePath(componentContext, (Point2D) point.clone()).getComponent().orElseThrow(AssertionError::new);
+			// COMMENT returning null means the point is outside the window, so in that case, just return the manager
+			return getPathResolver().resolvePath(componentContext, (Point2D) point.clone()).getComponent()
+					.map(Function.<IUIComponent>identity())
+					.orElseGet(() ->
+							getManager().orElseThrow(IllegalStateException::new));
 		}
 	}
 
 	@Override
-	public Optional<? extends IUIEventTarget> changeFocus(IUIViewContext context, @Nullable IUIEventTarget currentFocus, boolean next) {
+	public Optional<? extends IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) {
 		@Nullable Optional<? extends IUIEventTarget> ret = CastUtilities.castChecked(IUIComponent.class, currentFocus)
 				.flatMap(cf ->
 						CacheViewComponent.CHILDREN_FLAT_FOCUSABLE.getValue().get(this)
@@ -113,9 +120,10 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 
 	@SuppressWarnings("RedundantTypeArguments")
 	@Override
-	public void initialize(IUIViewContext context) {
+	public void initialize() {
 		getManager().ifPresent(manager ->
-				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext(context),
+				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext()
+								.orElseThrow(IllegalStateException::new),
 						manager,
 						(componentContext, result) -> {
 							assert componentContext != null;
@@ -132,13 +140,16 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	public IUIComponentShapeAnchorController getShapeAnchorController() { return shapeAnchorController; }
 
 	@Override
-	public IUIComponentContext createComponentContext(IUIViewContext viewContext) {
-		return new ImmutableUIComponentContext(
-				viewContext,
-				this,
-				new DefaultUIComponentContextStackMutator(),
-				new ImmutableUIComponentContextStack(new FunctionalPath<>(ImmutableList.of(), Lists::newArrayList), new ArrayAffineTransformStack(CapacityUtilities.INITIAL_CAPACITY_MEDIUM))
-		);
+	public Optional<? extends IUIComponentContext> createComponentContext() throws IllegalStateException {
+		return getContext()
+				.map(context ->
+						new ImmutableUIComponentContext(
+								context,
+								this,
+								new DefaultUIComponentContextStackMutator(),
+								new ImmutableUIComponentContextStack(new FunctionalPath<>(ImmutableList.of(), Lists::newArrayList), new ArrayAffineTransformStack(CapacityUtilities.INITIAL_CAPACITY_MEDIUM))
+						)
+				);
 	}
 
 	@Override
@@ -190,9 +201,9 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 
 	@SuppressWarnings("RedundantTypeArguments")
 	@Override
-	public void removed(IUIViewContext context) {
+	public void removed() {
 		getManager().ifPresent(manager ->
-				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext(context),
+				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext().orElseThrow(IllegalStateException::new),
 						manager,
 						(componentContext, result) -> {
 							assert componentContext != null;
@@ -308,5 +319,12 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 						});
 
 		private static INamespacePrefixedString generateKey(@SuppressWarnings("SameParameterValue") @NonNls String name) { return new ImmutableNamespacePrefixedString(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, CacheViewComponent.class.getName() + '.' + name); /* TODO extract this method */ }
+	}
+
+	@Override
+	public void setContext(@Nullable IUIViewContext context) {
+		super.setContext(context);
+		if (getContext().isPresent())
+			getShapeAnchorController().anchor();
 	}
 }

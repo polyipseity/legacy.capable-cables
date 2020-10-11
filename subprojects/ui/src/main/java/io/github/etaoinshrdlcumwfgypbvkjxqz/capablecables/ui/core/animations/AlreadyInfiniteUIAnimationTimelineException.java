@@ -1,7 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations;
 
 public class AlreadyInfiniteUIAnimationTimelineException
-		extends RuntimeException {
+		extends IllegalStateException {
 	private static final long serialVersionUID = -2624098572570732061L;
 
 	public AlreadyInfiniteUIAnimationTimelineException() {}

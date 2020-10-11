@@ -1,8 +1,9 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations;
 
-@FunctionalInterface
 public interface IUIAnimationControllable {
-	IUIAnimationControl.EnumUpdateResult update();
+	EnumUpdateResult update();
+
+	void render();
 
 	enum EnumUpdateResult {
 		NORMAL,

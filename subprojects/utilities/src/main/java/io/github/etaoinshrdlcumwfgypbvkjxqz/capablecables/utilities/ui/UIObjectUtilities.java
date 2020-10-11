@@ -99,7 +99,7 @@ public enum UIObjectUtilities {
 			assert y != null;
 			assert w != null;
 			assert h != null;
-			destination.setFrame(x + transform.getTranslateX(), y + transform.getTranslateY(),
+			destination.setFrame(x * transform.getScaleX() + transform.getTranslateX(), y * transform.getScaleY() + transform.getTranslateY(),
 					w * transform.getScaleX(), h * transform.getScaleY());
 		});
 		return destination;

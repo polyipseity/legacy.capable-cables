@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.compone
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Iterators;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
@@ -31,8 +32,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import net.minecraftforge.eventbus.api.EventPriority;
 import org.jetbrains.annotations.NonNls;
 import sun.misc.Cleaner;
-
-import java.util.Optional;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
@@ -127,12 +126,8 @@ public class UICacheExtension
 
 							@Override
 							protected Integer load(IUIComponent container) {
-								int ret = -1;
-								for (Optional<? extends IUIComponent> parent = Optional.of(container);
-								     parent.isPresent();
-								     parent = parent.flatMap(IUIComponent::getParent))
-									++ret;
-								return ret;
+								// COMMENT 0 counts container already
+								return Iterators.size(new IUIComponent.ParentIterator(container.getParent().orElse(null)));
 							}
 						});
 

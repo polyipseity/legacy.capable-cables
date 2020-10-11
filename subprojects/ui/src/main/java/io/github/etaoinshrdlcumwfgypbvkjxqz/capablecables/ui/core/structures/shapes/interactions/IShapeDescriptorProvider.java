@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.sh
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 
+import java.awt.*;
 import java.util.ConcurrentModificationException;
 import java.util.function.BooleanSupplier;
 
@@ -12,4 +13,7 @@ public interface IShapeDescriptorProvider {
 			throws ConcurrentModificationException;
 
 	boolean isModifyingShape();
+
+	Shape getAbsoluteShape()
+			throws IllegalStateException;
 }

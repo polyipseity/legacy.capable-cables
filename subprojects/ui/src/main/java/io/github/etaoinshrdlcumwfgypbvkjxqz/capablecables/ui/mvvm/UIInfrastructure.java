@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIContextContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.viewmodels.IUIViewModel;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
@@ -111,21 +112,14 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 		return d;
 	}
 
-	@Override
-	public void unbind() {
-		StaticHolder.checkBoundState(isBound(), true);
-
-		getBinderDisposables().clear();
-		getBinder().unbindAll();
-
-		setBound(false);
-	}
-
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public void bind()
+	public void bind(IUIContextContainer contextContainer)
 			throws NoSuchBindingTransformerException {
 		StaticHolder.checkBoundState(isBound(), false);
+
+		getView().setContext(contextContainer.getViewContext());
+		getViewModel().setContext(contextContainer.getViewModelContext());
 
 		// COMMENT must bind the bindings of view first
 		getBinder().bind(Iterables.concat(
@@ -140,6 +134,19 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 						n.subscribe(createBinderActionObserver()));
 
 		setBound(true);
+	}
+
+	@Override
+	public void unbind() {
+		StaticHolder.checkBoundState(isBound(), true);
+
+		getView().setContext(null);
+		getViewModel().setContext(null);
+
+		getBinderDisposables().clear();
+		getBinder().unbindAll();
+
+		setBound(false);
 	}
 
 	@Override

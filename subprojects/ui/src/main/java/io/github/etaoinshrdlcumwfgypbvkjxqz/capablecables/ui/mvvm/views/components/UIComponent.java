@@ -40,7 +40,9 @@ import io.reactivex.rxjava3.subjects.UnicastSubject;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
+import java.awt.*;
 import java.awt.geom.Point2D;
+import java.util.List;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -111,6 +113,14 @@ public class UIComponent
 
 	@Override
 	public boolean isModifyingShape() { return getModifyingShape().get(); }
+
+	@Override
+	public Shape getAbsoluteShape()
+			throws IllegalStateException {
+		try (IUIComponentContext context = IUIComponent.StaticHolder.getContext(this)) {
+			return IUIComponent.StaticHolder.getContextualShape(context, this);
+		}
+	}
 
 	@Override
 	public Optional<? extends String> getName() { return Optional.ofNullable(name); }

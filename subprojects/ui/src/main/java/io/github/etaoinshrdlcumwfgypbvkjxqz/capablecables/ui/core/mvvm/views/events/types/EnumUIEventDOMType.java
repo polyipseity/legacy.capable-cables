@@ -38,8 +38,8 @@ public enum EnumUIEventDOMType
 	MOUSE_UP(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "mouseup"),
 	WHEEL(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "wheel"),
 	@SuppressWarnings("SpellCheckingInspection")
-	UPDATE_PRE(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "beforeinput"),
-	UPDATE_POST(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "inputs"),
+	INPUT_PRE(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "beforeinput"),
+	INPUT_POST(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "input"),
 	@SuppressWarnings("SpellCheckingInspection")
 	KEY_DOWN(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "keydown"),
 	@SuppressWarnings("SpellCheckingInspection")

@@ -7,8 +7,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.Alr
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationControl;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationTime;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.time.ITicker;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
 import java.util.function.LongUnaryOperator;
 
 public class UIDefaultAnimationTimeline
@@ -17,6 +21,10 @@ public class UIDefaultAnimationTimeline
 	@SuppressWarnings("UnstableApiUsage")
 	private final Multimap<Long, IUIAnimationControl> keyframes =
 			MultimapBuilder.hashKeys(CapacityUtilities.INITIAL_CAPACITY_SMALL).hashSetValues(CapacityUtilities.INITIAL_CAPACITY_TINY).build();
+	private final Set<IUIAnimationControl> playingKeyframes =
+			Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap());
+	private final Set<IUIAnimationControl> endingKeyframes =
+			Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap());
 	private IUIAnimationTime offset = UIImmutableAnimationTime.of(0);
 	private IUIAnimationTime duration = UIImmutableAnimationTime.of(0);
 
@@ -76,20 +84,40 @@ public class UIDefaultAnimationTimeline
 	}
 
 	@Override
+	public void render() {
+		getPlayingKeyframes()
+				.forEach(IUIAnimationControl::render);
+	}
+
+	@Override
 	protected long updateElapsed(long previousElapsed, long difference) {
 		return previousElapsed + difference;
 	}
 
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected Set<IUIAnimationControl> getPlayingKeyframes() { return playingKeyframes; }
+
+	protected boolean isAutoPlay() {
+		return autoPlay;
+	}
+
 	@Override
 	protected EnumUpdateResult update0() {
+		{
+			getPlayingKeyframes().removeAll(getEndingKeyframes());
+			getEndingKeyframes().clear();
+			getPlayingKeyframes().stream().unordered()
+					.filter(animation -> animation.update() == EnumUpdateResult.END)
+					.forEach(getEndingKeyframes()::add);
+		}
 		long elapsed = getElapsed();
-		long[] keys = getKeyframes().keySet().stream().unordered()
+		for (long key : getKeyframes().keySet().stream().unordered()
 				.mapToLong(key -> key)
 				.filter(key -> key >= elapsed)
-				.toArray();
-		for (long key : keys) {
-			getKeyframes().removeAll(key)
-					.forEach(IUIAnimationControl::play);
+				.toArray()) {
+			Collection<IUIAnimationControl> keyframes = getKeyframes().removeAll(key);
+			getPlayingKeyframes().addAll(keyframes);
+			keyframes.forEach(IUIAnimationControl::play);
 		}
 		IUIAnimationTime duration = getDuration();
 		if (duration.isFinite())
@@ -100,7 +128,6 @@ public class UIDefaultAnimationTimeline
 			return EnumUpdateResult.NORMAL;
 	}
 
-	protected boolean isAutoPlay() {
-		return autoPlay;
-	}
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected Set<IUIAnimationControl> getEndingKeyframes() { return endingKeyframes; }
 }

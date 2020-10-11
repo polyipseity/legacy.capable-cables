@@ -152,7 +152,7 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 			addEventListener(EnumUIEventDOMType.MOUSE_ENTER.getEventType(), new FunctionalUIEventListener<IUIEventMouse>(evt -> setBeingHovered(true)), false);
 			addEventListener(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(), new FunctionalUIEventListener<IUIEventMouse>(evt -> setBeingHovered(false)), false);
 			addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new FunctionalUIEventListener<IUIEventMouse>(evt -> {
-				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && startResizeMaybe(evt.getViewContextView(), evt.getData().getCursorPositionView())) { // todo custom
+				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && startResizeMaybe(evt.getViewContext(), evt.getData().getCursorPositionView())) { // todo custom
 					getOwner()
 							.flatMap(owner2 -> owner2.getContainer()) // TODO Java 9 - IllegalAccessError now, make method ref
 							.ifPresent(c -> {
@@ -164,17 +164,17 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 				}
 			}), false);
 			addEventListener(EnumUIEventDOMType.MOUSE_UP.getEventType(), new FunctionalUIEventListener<IUIEventMouse>(evt -> {
-				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && finishResizeMaybe(evt.getViewContextView(), evt.getData().getCursorPositionView()))
+				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && finishResizeMaybe(evt.getViewContext(), evt.getData().getCursorPositionView()))
 					evt.stopPropagation();
 			}), false);
 		}
 
 		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
-		protected boolean startResizeMaybe(IUIViewContext viewContext, Point2D point) {
+		protected boolean startResizeMaybe(@SuppressWarnings("unused") IUIViewContext viewContext, Point2D point) {
 			return getOwner().flatMap(owner ->
 					owner.getContainer().flatMap(container -> container.getManager()
 							.flatMap(IUIComponentManager::getView)
-							.flatMap(view -> IUIViewComponent.StaticHolder.createComponentContextWithManager(view, viewContext)
+							.flatMap(view -> IUIViewComponent.StaticHolder.createComponentContextWithManager(view)
 									.map(context -> {
 										try (IUIComponentContext ctx = context) {
 											view.getPathResolver().resolvePath(ctx, (Point2D) point.clone());

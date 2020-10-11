@@ -44,7 +44,7 @@ public class DefaultResizeData implements IUIComponentUserResizableExtension.IRe
 		Point2D previousPoint = getPreviousPoint();
 		getSides().forEach(side -> {
 			EnumUIAxis axis = side.getAxis();
-			side.getSetter().accept(destination, AssertionUtilities.assertNonnull(side.getGetter().apply(source))
+			side.getSetter().accept(destination, AssertionUtilities.assertNonnull(side.getGetter().applyAsDouble(source))
 					+ (axis.getCoordinate(point) - axis.getCoordinate(previousPoint)));
 		});
 		return destination;

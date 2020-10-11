@@ -8,5 +8,5 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public interface IUISubInfrastructureMinecraft<C extends IUISubInfrastructureContext>
 		extends IUISubInfrastructure<C> {
-	void tick(C context);
+	void tick();
 }

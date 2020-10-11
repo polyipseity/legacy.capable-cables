@@ -46,12 +46,14 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 	@Override
 	public void render(IUIViewContext context, double partialTicks) {
 		getAnimationController().update();
+		getAnimationController().render();
 		getManager()
 				.ifPresent(manager ->
 						EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 									EnumCropMethod cropMethod = EnumCropMethod.getBestMethod();
 									cropMethod.enable();
-									IUIViewComponent.StaticHolder.traverseComponentTreeDefault(createComponentContext(context),
+									IUIViewComponent.StaticHolder.traverseComponentTreeDefault(createComponentContext()
+													.orElseThrow(IllegalStateException::new),
 											manager,
 											(componentContext, result) -> {
 												assert result != null;
@@ -103,9 +105,10 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 
 	@SuppressWarnings("RedundantTypeArguments")
 	@Override
-	public void tick(IUIViewContext context) {
+	public void tick() {
 		getManager()
-				.ifPresent(manager -> IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext(context),
+				.ifPresent(manager -> IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext()
+								.orElseThrow(IllegalStateException::new),
 						manager,
 						(componentContext, result) -> {
 							assert componentContext != null;

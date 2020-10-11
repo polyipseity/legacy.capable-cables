@@ -12,6 +12,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.componen
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.inputs.IInputDevices;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.inputs.IInputPointerDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.optionals.Optional2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -28,34 +29,37 @@ public class UIExtensionCursorHandleProviderComponent<E extends IUIViewComponent
 	}
 
 	@Override
-	public Optional<Long> getCursorHandle(IUIViewContext context) {
-		return Optional2.of(getContainer().orElse(null), context.getInputDevices().getPointerDevice().orElse(null))
-				.flatMap(values -> {
-					E view = values.getValue1Nonnull();
-					IInputPointerDevice pointerDevice = values.getValue2Nonnull();
-					return IUIViewComponent.StaticHolder.createComponentContextWithManager(view, context)
-							.flatMap(componentContext -> {
-								try (IUIComponentContext safeComponentContext = componentContext) {
-									Optional<Long> ret = Optional.empty();
-									view.getPathResolver().resolvePath(safeComponentContext, pointerDevice.getPositionView());
-									while (!safeComponentContext.getStackRef().getPathRef().isEmpty()) {
-										IUIComponent component = IUIComponentContext.StaticHolder.getCurrentComponent(safeComponentContext)
-												.orElseThrow(AssertionError::new);
-										IUIComponentCursorHandleProviderModifier componentAsModifier =
-												CastUtilities.castChecked(IUIComponentCursorHandleProviderModifier.class, component)
-														.orElseGet(NullUIComponentCursorHandleProviderModifier::getInstance);
-										ret = IUIComponentCursorHandleProviderModifier.StaticHolder
-												.handleComponentModifiers(componentAsModifier,
-														component.getModifiersView(),
-														safeComponentContext);
-										if (ret.isPresent())
-											break;
-										safeComponentContext.getMutator().pop(safeComponentContext.getStackRef());
+	public Optional<Long> getCursorHandle() {
+		return getContainer()
+				.flatMap(view ->
+						Optional2.of(IUIViewComponent.StaticHolder.createComponentContextWithManager(view)
+								.orElse(null), view.getContext()
+								.map(IUIViewContext::getInputDevices)
+								.flatMap(IInputDevices::getPointerDevice)
+								.orElse(null))
+								.flatMap(values -> {
+									IUIComponentContext componentContext = values.getValue1Nonnull();
+									IInputPointerDevice pointerDevice = values.getValue2Nonnull();
+									try (IUIComponentContext safeComponentContext = componentContext) {
+										Optional<Long> ret = Optional.empty();
+										view.getPathResolver().resolvePath(safeComponentContext, pointerDevice.getPositionView());
+										while (!safeComponentContext.getStackRef().getPathRef().isEmpty()) {
+											IUIComponent component = IUIComponentContext.StaticHolder.getCurrentComponent(safeComponentContext)
+													.orElseThrow(AssertionError::new);
+											IUIComponentCursorHandleProviderModifier componentAsModifier =
+													CastUtilities.castChecked(IUIComponentCursorHandleProviderModifier.class, component)
+															.orElseGet(NullUIComponentCursorHandleProviderModifier::getInstance);
+											ret = IUIComponentCursorHandleProviderModifier.StaticHolder
+													.handleComponentModifiers(componentAsModifier,
+															component.getModifiersView(),
+															safeComponentContext);
+											if (ret.isPresent())
+												break;
+											safeComponentContext.getMutator().pop(safeComponentContext.getStackRef());
+										}
+										return ret;
 									}
-									return ret;
-								}
-							});
-				});
+								}));
 	}
 
 	@Override

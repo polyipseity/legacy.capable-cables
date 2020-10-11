@@ -122,7 +122,7 @@ public class UIScreenAdapter
 		IUIExtensionCursorHandleProvider.TYPE.getValue().find(getInfrastructure().getView()).ifPresent(ext ->
 				GLFW.glfwSetCursor(
 						MinecraftOpenGLUtilities.getWindowHandle(),
-						ext.getCursorHandle(context.getViewContext()).orElse(MemoryUtil.NULL)
+						ext.getCursorHandle().orElse(MemoryUtil.NULL)
 				)
 		);
 	}
@@ -244,12 +244,12 @@ public class UIScreenAdapter
 	@Deprecated
 	protected void init() {
 		try {
-			IUIInfrastructure.StaticHolder.bindSafe(getInfrastructure());
+			IUIInfrastructure.StaticHolder.bindSafe(getInfrastructure(), getContextContainer());
 		} catch (NoSuchBindingTransformerException e) {
 			throw ThrowableUtilities.propagate(e);
 		}
 		setSize(width, height);
-		getInfrastructure().initialize(getContextContainer());
+		getInfrastructure().initialize();
 	}
 
 	@Override
@@ -258,7 +258,7 @@ public class UIScreenAdapter
 
 	@Override
 	@Deprecated
-	public void tick() { getInfrastructure().tick(getContextContainer()); }
+	public void tick() { getInfrastructure().tick(); }
 
 	protected static Optional<IUIEventKeyboard> removeEventKeyboard(UIScreenAdapter<?, ?> self, int key) { return Optional.ofNullable(self.getKeyboardKeysBeingPressed().remove(key)); }
 
@@ -293,7 +293,7 @@ public class UIScreenAdapter
 			setLastMouseClickData(context, null, null);
 			setFocus(context, null);
 		}
-		getInfrastructure().removed(context);
+		getInfrastructure().removed();
 		IUIInfrastructure.StaticHolder.unbindSafe(getInfrastructure());
 	}
 
@@ -331,7 +331,7 @@ public class UIScreenAdapter
 		IUIContextContainer context = getContextContainer();
 		Point2D cp = new Point2D.Double(mouseX, mouseY);
 		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
-		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(context.getViewContext(), (Point2D) cp.clone());
+		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone());
 		if (UIEventUtilities.dispatchEvent(addEventMouse(this, UIEventUtilities.Factory.createEventMouseDown(context.getViewContext(), t, d)))) {
 			// TODO select
 			// TODO drag or drop perhaps
@@ -347,7 +347,7 @@ public class UIScreenAdapter
 		IUIContextContainer context = getContextContainer();
 		Point2D cp = new Point2D.Double(mouseX, mouseY);
 		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
-		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint(context.getViewContext(), (Point2D) cp.clone());
+		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone());
 		removeEventMouse(this, button).ifPresent(e -> {
 			if (UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e, cp)))
 				; // TODO context menu
@@ -365,7 +365,7 @@ public class UIScreenAdapter
 	public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
 		IUIContextContainer context = getContextContainer();
 		Point2D cp = new Point2D.Double(mouseX, mouseY);
-		IUIEventTarget target = getInfrastructure().getView().getTargetAtPoint(context.getViewContext(), (Point2D) cp.clone());
+		IUIEventTarget target = getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone());
 		UIEventUtilities.dispatchEvent(
 				UIEventUtilities.Factory.createEventWheel(false, context.getViewContext(), target, new UIDataMouseButtonClick(cp), target, delta)); // COMMENT nothing to be scrolled
 		return true;
@@ -495,7 +495,7 @@ public class UIScreenAdapter
 	@Deprecated
 	public boolean changeFocus(boolean next) {
 		IUIContextContainer context = getContextContainer();
-		return setFocus(context, getInfrastructure().getView().changeFocus(context.getViewContext(), getFocus().orElse(null), next).orElse(null));
+		return setFocus(context, getInfrastructure().getView().changeFocus(getFocus().orElse(null), next).orElse(null));
 	}
 
 	protected void setLastMouseClickData(IUIContextContainer context, @Nullable UIDataMouseButtonClick newMouseClickData, @Nullable IUIEventTarget target) {
@@ -517,8 +517,8 @@ public class UIScreenAdapter
 		Point2D cp = new Point2D.Double(mouseX, mouseY);
 		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp);
 		UIEventUtilities.dispatchEvent(
-				UIEventUtilities.Factory.createEventMouseMove(context.getViewContext(), getInfrastructure().getView().getTargetAtPoint(context.getViewContext(), (Point2D) cp.clone()), d));
-		setTargetBeingHoveredByMouse(context, getInfrastructure().getView().getTargetAtPoint(context.getViewContext(), (Point2D) cp.clone()), d);
+				UIEventUtilities.Factory.createEventMouseMove(context.getViewContext(), getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone()), d));
+		setTargetBeingHoveredByMouse(context, getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone()), d);
 	}
 
 	protected void setTargetBeingHoveredByMouse(IUIContextContainer context, @Nullable IUIEventTarget targetBeingHoveredByMouse, IUIDataMouseButtonClick data) {

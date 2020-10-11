@@ -8,7 +8,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.sha
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeAnchorController;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeAnchorSet;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.ManualLoadingCache;
@@ -21,6 +20,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities.assertNonnull;
+
 public class DefaultShapeAnchorController<T extends IShapeDescriptorProvider>
 		implements IShapeAnchorController<T> {
 	protected final LoadingCache<T, IShapeAnchorSet> anchorSets =
@@ -28,7 +29,7 @@ public class DefaultShapeAnchorController<T extends IShapeDescriptorProvider>
 							.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)
 							.weakKeys()
 							.build(CacheLoader.from(ShapeAnchorSet::new)),
-					e -> AssertionUtilities.assertNonnull(e.getValue()).isEmpty());
+					e -> assertNonnull(e.getValue()).isEmpty());
 	protected final LoadingCache<IShapeDescriptorProvider, Set<IShapeAnchor>> subscribersMap =
 			ManualLoadingCache.newNestedLoadingCacheCollection(CacheUtilities.newCacheBuilderSingleThreaded()
 					.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)
@@ -48,7 +49,6 @@ public class DefaultShapeAnchorController<T extends IShapeDescriptorProvider>
 				.forEach(a ->
 						a.getTarget().ifPresent(t ->
 								getSubscribersMap().getUnchecked(t).add(a)));
-		as.anchor(origin);
 		return ret;
 	}
 
@@ -66,6 +66,12 @@ public class DefaultShapeAnchorController<T extends IShapeDescriptorProvider>
 		if (ret)
 			getSubscribersMap().cleanUp();
 		return ret;
+	}
+
+	@Override
+	public void anchor() {
+		getAnchorSets().asMap().entrySet().stream().unordered()
+				.forEach(entry -> assertNonnull(entry.getValue()).anchor(assertNonnull(entry.getKey())));
 	}
 
 	protected LoadingCache<IShapeDescriptorProvider, Set<IShapeAnchor>> getSubscribersMap() { return subscribersMap; }

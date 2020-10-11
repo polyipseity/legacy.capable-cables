@@ -8,7 +8,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.cl
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.UIObjectUtilities;
 import net.minecraft.client.renderer.Matrix4f;
-import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.Vector4f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -39,7 +38,7 @@ public enum MinecraftMatrixUtilities {
 		double scaleX = to.getWidth() / from.getWidth(),
 				scaleY = to.getHeight() / from.getHeight();
 		Matrix4f ret = createIdentityMatrix();
-		ret.translate(new Vector3f(((float) (from.getX() * scaleX - to.getX())), (float) (from.getY() * scaleY - to.getY()), 0));
+		ret.mul(Matrix4f.makeTranslate((float) (to.getX() - from.getX() * scaleX), (float) (to.getY() - from.getY() * scaleY), 0));
 		ret.mul(Matrix4f.makeScale((float) scaleX, (float) scaleY, 1));
 		return ret;
 	}
