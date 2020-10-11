@@ -1,24 +1,21 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.extensions.resizable;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.utilities.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.resizable.AbstractUIComponentUserResizableExtensionPreviewingRelocatingRenderer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
 public class UIComponentUserResizableMinecraftExtensionPreviewingRelocatingRenderer
 		extends AbstractUIComponentUserResizableExtensionPreviewingRelocatingRenderer {
-	@UIRendererConstructor(type = UIRendererConstructor.EnumConstructorType.MAPPINGS)
-	public UIComponentUserResizableMinecraftExtensionPreviewingRelocatingRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings) {
-		super(mappings);
+	@UIRendererConstructor
+	public UIComponentUserResizableMinecraftExtensionPreviewingRelocatingRenderer(UIRendererConstructor.IArguments arguments) {
+		super(arguments);
 	}
 
 	@Override

@@ -16,12 +16,14 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.eve
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.UIParserCheckedException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.UIParserUncheckedException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.JAXBAdapterRegistries;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.*;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.IParserContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.IUIComponentParser;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIComponentConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIViewComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.DefaultUIComponentParserAnchorHandler;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.DefaultUIComponentParserExtensionHandler;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.DefaultUIComponentParserRendererHandler;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.UIDefaultComponentParserAnchorHandler;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.UIDefaultComponentParserExtensionHandler;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.UIDefaultComponentParserRendererHandler;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.descriptors.ShapeDescriptorBuilderFactoryRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.interactions.ShapeConstraint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
@@ -29,6 +31,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.ManualLoadingCache;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.AnnotationUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
@@ -41,6 +44,7 @@ import javax.annotation.Nullable;
 import java.awt.geom.AffineTransform;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
@@ -66,9 +70,9 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 	}
 
 	public static <T extends IUIComponentParser<?, ?>> T makeParserStandard(T instance) {
-		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, Anchor.class, new DefaultUIComponentParserAnchorHandler<>());
-		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, Renderer.class, new DefaultUIComponentParserRendererHandler());
-		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, Extension.class, new DefaultUIComponentParserExtensionHandler());
+		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, Anchor.class, new UIDefaultComponentParserAnchorHandler<>());
+		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, Renderer.class, new UIDefaultComponentParserRendererHandler());
+		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, Extension.class, new UIDefaultComponentParserExtensionHandler());
 		return instance;
 	}
 
@@ -157,9 +161,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 											.orElseThrow(AssertionError::new);
 									Iterables.concat(
 											n.getAnchor(),
-											n.getRenderer()
-													.map(ImmutableSet::of)
-													.orElseGet(ImmutableSet::of),
+											ImmutableSet.of(n.getRenderer()),
 											n.getExtension(),
 											n.getAnyContainer()
 													.map(AnyContainer::getAny)
@@ -220,19 +222,16 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 
 	protected LoadingCache<EnumHandlerType, ConcurrentMap<Class<?>, IConsumer3<? super IParserContext, ?, ?, ?>>> getHandlers() { return handlers; }
 
-	@SuppressWarnings("SwitchStatementWithTooFewBranches")
 	public static IUIViewComponent<?, ?> createView(IParserContext context, View view)
 			throws Throwable {
-		Class<?> vc = AssertionUtilities.assertNonnull(context.getAliasesView().get(view.getClazz()));
-		UIViewComponentConstructor.EnumConstructorType ct = IConstructorType.StaticHolder.getConstructorType(vc, UIViewComponentConstructor.class, UIViewComponentConstructor::type);
-		MethodHandle mh = InvokeUtilities.IMPL_LOOKUP.findConstructor(vc, ct.getMethodType());
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(view.getProperty());
-		switch (ct) {
-			case MAPPINGS:
-				return (IUIViewComponent<?, ?>) mh.invoke(mappings);
-			default:
-				throw new AssertionError();
-		}
+		UIViewComponentConstructor.IArguments argument = new UIViewComponentConstructor.ImmutableArguments(mappings);
+
+		Class<?> clazz = AssertionUtilities.assertNonnull(context.getAliasesView().get(view.getClazz()));
+		Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIViewComponentConstructor.class, Arrays.asList(clazz.getDeclaredConstructors()));
+		MethodHandle constructorHandle = InvokeUtilities.IMPL_LOOKUP.unreflectConstructor(constructor);
+
+		return (IUIViewComponent<?, ?>) constructorHandle.invoke(argument);
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
@@ -248,15 +247,12 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
-	@SuppressWarnings("SwitchStatementWithTooFewBranches")
 	public static IUIComponent createComponent(IParserContext context, Component component)
 			throws Throwable {
 		return TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, component,
-				IThrowingFunction.executeNow(n -> {
-					assert n != null;
-					Class<?> cc = AssertionUtilities.assertNonnull(context.getAliasesView().get(n.getClazz()));
-					UIComponentConstructor.EnumConstructorType ct = IConstructorType.StaticHolder.getConstructorType(cc, UIComponentConstructor.class, UIComponentConstructor::type);
-					Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(n.getProperty());
+				IThrowingFunction.executeNow(node -> {
+					assert node != null;
+					Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(node.getProperty());
 					// COMMENT attributes
 					{
 						Map<INamespacePrefixedString, IUIPropertyMappingValue> attributes = new HashMap<>(
@@ -265,99 +261,102 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 
 						attributes.put(EnumUIEventDOMType.LOAD.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getLoad()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getLoad()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.UNLOAD.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getUnload()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getUnload()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.ABORT.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getAbort()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getAbort()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.ERROR.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getError()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getError()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.SELECT.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getSelect()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getSelect()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.FOCUS_OUT_POST.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getBlur()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getBlur()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getFocus()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getFocus()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.FOCUS_IN_PRE.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getFocusin()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getFocusin()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.FOCUS_OUT_PRE.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getFocusout()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getFocusout()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.CLICK_AUXILIARY.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getAuxclick()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getAuxclick()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.CLICK.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getClick()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getClick()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.CLICK_DOUBLE.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getDblclick()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getDblclick()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.MOUSE_DOWN.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getMousedown()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getMousedown()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.MOUSE_ENTER.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getMouseenter()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getMouseenter()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getMouseleave()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getMouseleave()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.MOUSE_MOVE.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getMousemove()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getMousemove()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getMouseout()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getMouseout()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getMouseover()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getMouseover()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.MOUSE_UP.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getMouseup()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getMouseup()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.WHEEL.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getWheel()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getWheel()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.INPUT_PRE.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getBeforeinput()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getBeforeinput()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.INPUT_POST.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getInput()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getInput()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.KEY_DOWN.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getKeydown()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getKeydown()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.KEY_UP.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getKeyup()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getKeyup()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.COMPOSITION_START.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getCompositionstart()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getCompositionstart()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.COMPOSITION_UPDATE.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getCompositionupdate()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getCompositionupdate()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventDOMType.COMPOSITION_END.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getCompositionend()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getCompositionend()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 						attributes.put(EnumUIEventComponentType.CHAR_TYPED.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(component.getCharTyped()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getCharTyped()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
 
 						mappings = MapUtilities.concatMaps(mappings, attributes);
 					}
-					IShapeDescriptor<?> sd = createShapeDescriptor(context, n.getShape());
-					MethodHandle mh = InvokeUtilities.IMPL_LOOKUP.findConstructor(cc, ct.getMethodType());
-					switch (ct) {
-						case MAPPINGS__NAME__SHAPE_DESCRIPTOR:
-							return (IUIComponent) mh.invoke(mappings, n.getName(), sd);
-						default:
-							throw new AssertionError();
-					}
+					IShapeDescriptorBuilder<?> shapeDescriptorBuilder = createShapeDescriptorBuilder(context, node.getShape());
+					UIComponentConstructor.IArguments argument = new UIComponentConstructor.ImmutableArguments(node.getName(),
+							mappings,
+							shapeDescriptorBuilder.build());
+
+					Class<?> clazz = AssertionUtilities.assertNonnull(context.getAliasesView().get(node.getClazz()));
+					Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIComponentConstructor.class,
+							Arrays.asList(clazz.getDeclaredConstructors()));
+					MethodHandle constructorHandle = InvokeUtilities.IMPL_LOOKUP.unreflectConstructor(constructor);
+
+					return (IUIComponent) constructorHandle.invoke(argument);
 				}),
 				Component::getComponent,
 				(p, c) -> {
@@ -390,7 +389,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 	protected ConcurrentMap<String, Class<?>> getAliases() { return aliases; }
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static IShapeDescriptor<?> createShapeDescriptor(IParserContext context, Shape shape)
+	public static IShapeDescriptorBuilder<?> createShapeDescriptorBuilder(IParserContext context, Shape shape)
 			throws Throwable {
 		AffineTransform transform = new AffineTransform();
 		shape.getAffineTransformDefiner()
@@ -431,8 +430,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 				.transformConcatenate(transform)
 				.constrain(shape.getConstraint().stream().sequential()
 						.map(c -> new ShapeConstraint(c.getMinX(), c.getMinY(), c.getMaxX(), c.getMaxY(), c.getMinWidth(), c.getMinHeight(), c.getMaxWidth(), c.getMaxHeight()))
-						.collect(ImmutableList.toImmutableList()))
-				.build();
+						.collect(ImmutableList.toImmutableList()));
 	}
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }

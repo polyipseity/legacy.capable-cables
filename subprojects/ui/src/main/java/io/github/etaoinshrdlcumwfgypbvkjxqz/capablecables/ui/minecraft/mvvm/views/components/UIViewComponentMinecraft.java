@@ -1,6 +1,5 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
@@ -24,12 +23,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EnumH
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EventBusUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer3;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.awt.*;
-import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
 public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentManager<S>>
@@ -37,10 +34,11 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 		implements IUIViewComponentMinecraft<S, M> {
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	@UIViewComponentConstructor(type = UIViewComponentConstructor.EnumConstructorType.MAPPINGS)
-	public UIViewComponentMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> manager) {
-		super(manager);
-		IExtensionContainer.StaticHolder.addExtensionExtendedChecked(this, new DefaultUIExtensionMinecraftBackground<>(IUIViewComponentMinecraft.class)); // COMMENT to ensure that 'GuiScreenEvent.BackgroundDrawnEvent' is fired
+	@UIViewComponentConstructor
+	public UIViewComponentMinecraft(UIViewComponentConstructor.IArguments arguments) {
+		super(arguments);
+
+		IExtensionContainer.StaticHolder.addExtensionExtendedChecked(this, new DefaultUIExtensionMinecraftBackground()); // COMMENT to ensure that 'GuiScreenEvent.BackgroundDrawnEvent' is fired
 	}
 
 	@Override

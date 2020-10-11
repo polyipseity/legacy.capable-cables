@@ -1,6 +1,5 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.impl;
 
-import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
@@ -8,13 +7,13 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.binding.UIProperty;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIRendererConstructor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.rendering.IUIComponentRendererMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.rendering.NullUIComponentRendererMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.utilities.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.impl.UIComponentButton;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.DefaultUIRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -33,10 +32,10 @@ public class UIComponentButtonMinecraft
 		implements IUIComponentMinecraft {
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	protected final IUIRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
-			new DefaultUIRendererContainer<>(this, new DefaultRenderer<>(ImmutableMap.of(), UIComponentButtonMinecraft.class));
+			new DefaultUIRendererContainer<>(this, CastUtilities.castUnchecked(DefaultRenderer.class));
 
-	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__NAME__SHAPE_DESCRIPTOR)
-	public UIComponentButtonMinecraft(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String name, IShapeDescriptor<?> shapeDescriptor) { super(mappings, name, shapeDescriptor); }
+	@UIComponentConstructor
+	public UIComponentButtonMinecraft(UIComponentConstructor.IArguments arguments) { super(arguments); }
 
 	@Override
 	public Optional<? extends IUIComponentRendererMinecraft<?>> getRenderer() { return getRendererContainer().getRenderer(); }
@@ -91,22 +90,23 @@ public class UIComponentButtonMinecraft
 		@UIProperty(PROPERTY_COLOR_PRESSED_BORDER)
 		protected final IBindingField<Color> colorPressedBorder;
 
-		@UIRendererConstructor(type = UIRendererConstructor.EnumConstructorType.MAPPINGS__CONTAINER_CLASS)
-		public DefaultRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, Class<C> containerClass) {
-			super(mappings, containerClass);
+		@UIRendererConstructor
+		public DefaultRenderer(UIRendererConstructor.IArguments arguments) {
+			super(arguments);
 
+			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 			this.colorBase = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY,
-					this.mappings.get(PROPERTY_COLOR_BASE_LOCATION));
+					mappings.get(PROPERTY_COLOR_BASE_LOCATION));
 			this.colorBaseBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY,
-					this.mappings.get(PROPERTY_COLOR_BASE_BORDER_LOCATION));
+					mappings.get(PROPERTY_COLOR_BASE_BORDER_LOCATION));
 			this.colorHovering = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.GRAY,
-					this.mappings.get(PROPERTY_COLOR_HOVERING_LOCATION));
+					mappings.get(PROPERTY_COLOR_HOVERING_LOCATION));
 			this.colorHoveringBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.GRAY,
-					this.mappings.get(PROPERTY_COLOR_HOVERING_BORDER_LOCATION));
+					mappings.get(PROPERTY_COLOR_HOVERING_BORDER_LOCATION));
 			this.colorPressed = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.LIGHT_GRAY,
-					this.mappings.get(PROPERTY_COLOR_PRESSED_LOCATION));
+					mappings.get(PROPERTY_COLOR_PRESSED_LOCATION));
 			this.colorPressedBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.LIGHT_GRAY,
-					this.mappings.get(PROPERTY_COLOR_PRESSED_BORDER_LOCATION));
+					mappings.get(PROPERTY_COLOR_PRESSED_BORDER_LOCATION));
 		}
 
 		@Override

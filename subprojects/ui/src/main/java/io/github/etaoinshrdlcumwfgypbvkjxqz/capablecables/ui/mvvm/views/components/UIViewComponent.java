@@ -66,8 +66,9 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	private IUIViewContext viewContext;
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	@UIViewComponentConstructor(type = UIViewComponentConstructor.EnumConstructorType.MAPPINGS)
-	public UIViewComponent(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings) {
+	@UIViewComponentConstructor
+	public UIViewComponent(UIViewComponentConstructor.IArguments arguments) {
+		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.mappings = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
 

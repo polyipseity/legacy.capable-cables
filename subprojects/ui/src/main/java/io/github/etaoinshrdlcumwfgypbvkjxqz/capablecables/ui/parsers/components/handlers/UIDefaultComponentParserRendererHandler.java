@@ -4,52 +4,41 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.co
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.IConstructorType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.IParserContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.DefaultUIComponentParser;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.AnnotationUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 
 import java.lang.invoke.MethodHandle;
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
-public class DefaultUIComponentParserRendererHandler
-		implements IConsumer3<IParserContext, Object, Renderer, Throwable> {
+public class UIDefaultComponentParserRendererHandler
+		extends UIAbstractComponentParserHandler<Object, Renderer, Throwable> {
 	@Override
 	@SuppressWarnings("deprecation")
-	public void accept(IParserContext context, Object container, Renderer object)
+	public void accept0(IParserContext context, Object container, Renderer object)
 			throws Throwable {
 		if (!(container instanceof IUIRendererContainer))
 			return;
 		IUIRendererContainer<?> rendererContainer = ((IUIRendererContainer<?>) container);
-		Class<?> oc = Optional.ofNullable(object.getClazz())
+		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = DefaultUIComponentParser.createMappings(object.getProperty());
+		UIRendererConstructor.IArguments argument = new UIRendererConstructor.ImmutableArguments(object.getName(), mappings, rendererContainer.getClass());
+
+		Class<?> clazz = Optional.ofNullable(object.getClazz())
 				.<Class<?>>map(classAlias -> AssertionUtilities.assertNonnull(context.getAliasesView().get(classAlias)))
 				.orElseGet(rendererContainer::getDefaultRendererClass);
-		UIRendererConstructor.EnumConstructorType ct = IConstructorType.StaticHolder.getConstructorType(oc, UIRendererConstructor.class, UIRendererConstructor::type);
-		MethodHandle mh = InvokeUtilities.IMPL_LOOKUP.findConstructor(oc, ct.getMethodType());
-		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = DefaultUIComponentParser.createMappings(object.getProperty());
-		IUIRenderer<?> ret;
-		switch (ct) {
-			case MAPPINGS__CONTAINER_CLASS:
-				ret = (IUIRenderer<?>) mh.invoke(mappings, container.getClass());
-				break;
-			case MAPPINGS:
-				ret = (IUIRenderer<?>) mh.invoke(mappings);
-				break;
-			case CONTAINER_CLASS:
-				ret = (IUIRenderer<?>) mh.invoke(container.getClass());
-				break;
-			case NO_ARGS:
-				ret = (IUIRenderer<?>) mh.invoke();
-				break;
-			default:
-				throw new AssertionError();
-		}
+		Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIRendererConstructor.class, Arrays.asList(clazz.getDeclaredConstructors()));
+		MethodHandle constructorHandle = InvokeUtilities.IMPL_LOOKUP.unreflectConstructor(constructor);
+
+		IUIRenderer<?> ret = (IUIRenderer<?>) constructorHandle.invoke(argument);
+
 		rendererContainer.setRenderer(CastUtilities.castUnchecked(ret)); // COMMENT setRenderer should check
 	}
 }

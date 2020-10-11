@@ -1,18 +1,14 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.relocatable;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.IUIComponentUserRelocatableExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIRendererConstructor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
-
-import java.util.Map;
 
 public class UIComponentUserRelocatableExtensionNullRelocatingRenderer
 		extends AbstractUIComponentUserRelocatableExtensionRelocatingRenderer {
-	@UIRendererConstructor(type = UIRendererConstructor.EnumConstructorType.MAPPINGS)
-	public UIComponentUserRelocatableExtensionNullRelocatingRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings) {
-		super(mappings);
+	@UIRendererConstructor
+	public UIComponentUserRelocatableExtensionNullRelocatingRenderer(UIRendererConstructor.IArguments arguments) {
+		super(arguments);
 	}
 
 	@Override

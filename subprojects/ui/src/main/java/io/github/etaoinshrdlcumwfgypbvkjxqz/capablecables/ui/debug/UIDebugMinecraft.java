@@ -8,11 +8,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.controls
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.easings.EnumCommonUIAnimationEasing;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.targets.UIAnimationTargetUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationControl;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventKeyboard;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventMouse;
@@ -48,7 +46,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.inputs.IInpu
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftClientUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTextComponentUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.time.ITicker;
 import jakarta.xml.bind.JAXBException;
@@ -85,7 +82,6 @@ import java.awt.geom.Ellipse2D;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ConcurrentModificationException;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -183,7 +179,7 @@ public enum UIDebugMinecraft {
 				throw ThrowableUtilities.propagate(e);
 			}
 			IExtensionContainer.StaticHolder.addExtensionChecked(ret.getInfrastructure().getView(),
-					new UIExtensionCursorHandleProviderComponent<>(IUIViewComponent.class));
+					new UIExtensionCursorHandleProviderComponent());
 
 			return ret;
 		}
@@ -209,8 +205,8 @@ public enum UIDebugMinecraft {
 							TimeUnit.SECONDS.toNanos(2),
 							UIStandardAnimationControlFactory.getInfiniteLoop());
 
-			@UIRendererConstructor(type = UIRendererConstructor.EnumConstructorType.MAPPINGS__CONTAINER_CLASS)
-			public CustomWindowRenderer(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, Class<C> containerClass) { super(mappings, containerClass); }
+			@UIRendererConstructor
+			public CustomWindowRenderer(UIRendererConstructor.IArguments arguments) { super(arguments); }
 
 			@Override
 			@SuppressWarnings({"rawtypes", "RedundantSuppression"})

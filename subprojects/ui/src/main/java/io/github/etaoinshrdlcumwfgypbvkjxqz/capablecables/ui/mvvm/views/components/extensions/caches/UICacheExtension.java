@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.compone
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterators;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
@@ -43,11 +44,16 @@ public class UICacheExtension
 					.initialCapacity(INITIAL_CAPACITY_SMALL)
 					.expireAfterAccess(CacheUtilities.CACHE_EXPIRATION_ACCESS_DURATION, CacheUtilities.CACHE_EXPIRATION_ACCESS_TIME_UNIT)
 					.concurrencyLevel(ConcurrencyUtilities.SINGLE_THREAD_THREAD_COUNT).build();
+	private static final UIExtensionConstructor.IArguments DEFAULT_ARGUMENTS = new UIExtensionConstructor.ImmutableArguments(ImmutableMap.of(), IExtensionContainer.class);
 
-	@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.NO_ARGS)
-	public UICacheExtension() {
+	public UICacheExtension() { this(getDefaultArguments()); }
+
+	@UIExtensionConstructor
+	public UICacheExtension(@SuppressWarnings("unused") UIExtensionConstructor.IArguments arguments) {
 		super(CastUtilities.castUnchecked(IExtensionContainer.class), CastUtilities.castUnchecked(IExtensionContainer.class)); // COMMENT should not matter in this case
 	}
+
+	protected static UIExtensionConstructor.IArguments getDefaultArguments() { return DEFAULT_ARGUMENTS; }
 
 	@Override
 	public void onExtensionRemoved() {

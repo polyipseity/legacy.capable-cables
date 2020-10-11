@@ -1,28 +1,40 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components;
 
+import com.google.common.collect.ImmutableMap;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+
 import java.lang.annotation.*;
-import java.lang.invoke.MethodType;
 import java.util.Map;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.CONSTRUCTOR)
 public @interface UIExtensionConstructor {
-	EnumConstructorType type();
+	interface IArguments {
+		@Immutable
+		Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView();
 
-	enum EnumConstructorType
-			implements IConstructorType {
-		MAPPINGS__CONTAINER_CLASS(MethodType.methodType(void.class, Map.class, Class.class)),
-		MAPPINGS(MethodType.methodType(void.class, Map.class)),
-		CONTAINER_CLASS(MethodType.methodType(void.class, Class.class)),
-		NO_ARGS(MethodType.methodType(void.class)),
-		;
+		Class<?> getContainerClass();
+	}
 
-		protected final MethodType methodType;
+	@Immutable
+	class ImmutableArguments
+			implements IArguments {
+		private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
+		private final Class<?> containerClass;
 
-		EnumConstructorType(MethodType methodType) { this.methodType = methodType; }
+		public ImmutableArguments(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings,
+		                          Class<?> containerClass) {
+			this.mappings = ImmutableMap.copyOf(mappings);
+			this.containerClass = containerClass;
+		}
 
 		@Override
-		public MethodType getMethodType() { return methodType; }
+		public @Immutable Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(mappings); }
+
+		@Override
+		public Class<?> getContainerClass() { return containerClass; }
 	}
 }

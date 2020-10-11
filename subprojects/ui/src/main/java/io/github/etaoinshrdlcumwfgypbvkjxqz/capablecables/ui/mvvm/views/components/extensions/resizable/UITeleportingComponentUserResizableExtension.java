@@ -1,6 +1,5 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.resizable;
 
-import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.cursors.ICursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
@@ -51,7 +50,7 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 	private IResizeData resizeData;
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final IUIRendererContainer<IResizingRenderer> rendererContainer =
-			new DefaultUIRendererContainer<>(this, new UIComponentUserResizeableExtensionNullRelocatingRenderer(ImmutableMap.of()));
+			new DefaultUIRendererContainer<>(this, UIComponentUserResizeableExtensionNullRelocatingRenderer.class);
 
 	protected static Optional<ICursor> getCursor(Set<? extends EnumUISide> sides) {
 		@Nullable ICursor cursor = null;
@@ -68,9 +67,10 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 		return Optional.ofNullable(cursor);
 	}
 
-	@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.CONTAINER_CLASS)
-	public UITeleportingComponentUserResizableExtension(Class<E> containerClass) {
-		super(IUIComponent.class, containerClass);
+	@SuppressWarnings("unchecked")
+	@UIExtensionConstructor
+	public UITeleportingComponentUserResizableExtension(UIExtensionConstructor.IArguments arguments) {
+		super(IUIComponent.class, (Class<E>) arguments.getContainerClass());
 	}
 
 	@Override

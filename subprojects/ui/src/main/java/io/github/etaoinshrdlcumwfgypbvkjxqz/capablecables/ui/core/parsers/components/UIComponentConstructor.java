@@ -1,27 +1,51 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components;
 
+import com.google.common.collect.ImmutableMap;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 
+import javax.annotation.Nullable;
 import java.lang.annotation.*;
-import java.lang.invoke.MethodType;
 import java.util.Map;
+import java.util.Optional;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.CONSTRUCTOR)
 public @interface UIComponentConstructor {
-	EnumConstructorType type();
+	interface IArguments {
+		Optional<? extends String> getName();
 
-	enum EnumConstructorType
-			implements IConstructorType {
-		MAPPINGS__NAME__SHAPE_DESCRIPTOR(MethodType.methodType(void.class, Map.class, String.class, IShapeDescriptor.class)),
-		;
+		@Immutable
+		Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView();
 
-		protected final MethodType methodType;
+		IShapeDescriptor<?> getShapeDescriptor();
+	}
 
-		EnumConstructorType(MethodType methodType) { this.methodType = methodType; }
+	class ImmutableArguments
+			implements IArguments {
+		@Nullable
+		private final String name;
+		private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
+		private final IShapeDescriptor<?> shapeDescriptor;
+
+		public ImmutableArguments(@Nullable String name,
+		                          Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings,
+		                          IShapeDescriptor<?> shapeDescriptor) {
+			this.name = name;
+			this.mappings = ImmutableMap.copyOf(mappings);
+			this.shapeDescriptor = shapeDescriptor;
+		}
 
 		@Override
-		public MethodType getMethodType() { return methodType; }
+		public Optional<? extends String> getName() { return Optional.ofNullable(name); }
+
+		@Override
+		public @Immutable Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(mappings); }
+
+		@Override
+		public IShapeDescriptor<?> getShapeDescriptor() { return shapeDescriptor; }
 	}
 }

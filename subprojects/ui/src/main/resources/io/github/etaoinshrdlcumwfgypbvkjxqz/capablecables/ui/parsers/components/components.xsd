@@ -25,6 +25,11 @@
 			<xs:selector xpath=".//ui:anchor"/>
 			<xs:field xpath="@target"/>
 		</xs:keyref>
+		<!-- COMMENT renderer id -->
+		<xs:key name="rendererID">
+			<xs:selector xpath=".//ui:renderer"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
 		<!-- COMMENT using id -->
 		<xs:key name="usingID">
 			<xs:selector xpath="ui:using"/>
@@ -70,6 +75,7 @@
 			<xs:sequence>
 				<xs:group ref="ui:propertyContainerGroup"/>
 			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required"/>
 			<xs:attributeGroup ref="ui:classBasedOptionalAttributeGroup"/>
 		</xs:complexType>
 	</xs:element>
@@ -79,7 +85,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:group ref="ui:propertyContainerGroup"/>
-				<xs:element ref="ui:renderer" minOccurs="0"/>
+				<xs:element ref="ui:renderer"/>
 				<xs:element ref="ui:anyContainer" minOccurs="0"/>
 			</xs:sequence>
 			<xs:attributeGroup ref="ui:classBasedAttributeGroup"/>
@@ -105,7 +111,7 @@
 				<xs:group ref="ui:propertyContainerGroup"/>
 				<xs:element ref="ui:shape"/>
 				<xs:element ref="ui:anchor" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element ref="ui:renderer" minOccurs="0"/>
+				<xs:element ref="ui:renderer"/>
 				<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="ui:anyContainer" minOccurs="0"/>

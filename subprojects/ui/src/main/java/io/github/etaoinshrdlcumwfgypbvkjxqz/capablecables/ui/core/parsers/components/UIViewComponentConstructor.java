@@ -1,25 +1,32 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components;
 
+import com.google.common.collect.ImmutableMap;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+
 import java.lang.annotation.*;
-import java.lang.invoke.MethodType;
 import java.util.Map;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.CONSTRUCTOR)
 public @interface UIViewComponentConstructor {
-	EnumConstructorType type();
+	@SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
+	interface IArguments {
+		@Immutable
+		Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView();
+	}
 
-	enum EnumConstructorType
-			implements IConstructorType {
-		MAPPINGS(MethodType.methodType(void.class, Map.class)),
-		;
+	class ImmutableArguments
+			implements IArguments {
+		private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
 
-		protected final MethodType methodType;
-
-		EnumConstructorType(MethodType methodType) { this.methodType = methodType; }
+		public ImmutableArguments(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings) {
+			this.mappings = ImmutableMap.copyOf(mappings);
+		}
 
 		@Override
-		public MethodType getMethodType() { return methodType; }
+		public @Immutable Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(mappings); }
 	}
 }

@@ -5,6 +5,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.EnumModifyStage;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIVirtualComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.UIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
@@ -21,7 +22,7 @@ public abstract class AbstractUIVirtualComponent
 	private OptionalWeakReference<IUIComponent> targetComponent = new OptionalWeakReference<>(null);
 
 	public AbstractUIVirtualComponent(IShapeDescriptor<?> shapeDescriptor) {
-		super(ImmutableMap.of(), null, shapeDescriptor);
+		super(new UIComponentConstructor.ImmutableArguments(null, ImmutableMap.of(), shapeDescriptor));
 	}
 
 	@Override

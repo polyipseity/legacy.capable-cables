@@ -79,12 +79,15 @@ public class UIComponent
 	private OptionalWeakReference<IUIComponentContainer> parent = new OptionalWeakReference<>(null);
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	@UIComponentConstructor(type = UIComponentConstructor.EnumConstructorType.MAPPINGS__NAME__SHAPE_DESCRIPTOR)
-	public UIComponent(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings, @Nullable String name, IShapeDescriptor<?> shapeDescriptor) {
+	@UIComponentConstructor
+	public UIComponent(UIComponentConstructor.IArguments arguments) {
+		this.name = arguments.getName().orElse(null);
+
+		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.mappings = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
-		this.name = name;
-		this.shapeDescriptor = new ProviderShapeDescriptor<>(this, shapeDescriptor);
+
+		this.shapeDescriptor = new ProviderShapeDescriptor<>(this, arguments.getShapeDescriptor());
 
 		this.visible = IUIPropertyMappingValue.createBindingField(Boolean.class, false, true,
 				this.mappings.get(getPropertyVisibleLocation()));

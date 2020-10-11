@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
@@ -49,7 +48,7 @@ public enum ObjectUtilities {
 	public static <T> int hashCode(T self, @Nullable IntSupplier superMethod, Iterable<? extends Function<? super T, ?>> variables) {
 		final int[] result = {Optional.ofNullable(superMethod).orElse(HASH_CODE_SUPER_METHOD_DEFAULT).getAsInt()};
 		Streams.stream(variables).sequential()
-				.map(FunctionUtilities.applyToFunction(self))
+				.map(variable -> variable.apply(self))
 				.mapToInt(Objects::hashCode)
 				.forEachOrdered(variableHashCode -> {
 					result[0] *= 31;

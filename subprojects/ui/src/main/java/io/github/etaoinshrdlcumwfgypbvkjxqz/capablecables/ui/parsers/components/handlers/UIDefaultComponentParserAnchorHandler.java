@@ -7,13 +7,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.IParserContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.interactions.ShapeAnchor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer3;
 
-public class DefaultUIComponentParserAnchorHandler<TH extends Throwable>
-		implements IConsumer3<IParserContext, Object, Anchor, TH> {
+public class UIDefaultComponentParserAnchorHandler<TH extends Throwable>
+		extends UIAbstractComponentParserHandler<Object, Anchor, TH> {
 	@Override
-	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
-	public void accept(@SuppressWarnings("unused") IParserContext context, Object container, Anchor object)
+	@SuppressWarnings({"rawtypes", "RedundantSuppression", "RedundantThrows"})
+	public void accept0(@SuppressWarnings("unused") IParserContext context, Object container, Anchor object)
 			throws TH {
 		if (!(container instanceof IUIComponent))
 			return;

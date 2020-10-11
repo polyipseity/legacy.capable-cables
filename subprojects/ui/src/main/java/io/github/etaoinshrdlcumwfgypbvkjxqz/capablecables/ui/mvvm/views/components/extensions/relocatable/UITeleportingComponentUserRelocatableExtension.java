@@ -1,6 +1,5 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.relocatable;
 
-import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
@@ -42,13 +41,14 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 	private final Modifier modifier = new Modifier(this);
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final IUIRendererContainer<IRelocatingRenderer> rendererContainer =
-			new DefaultUIRendererContainer<>(this, new UIComponentUserRelocatableExtensionNullRelocatingRenderer(ImmutableMap.of()));
+			new DefaultUIRendererContainer<>(this, UIComponentUserRelocatableExtensionNullRelocatingRenderer.class);
 	@Nullable
 	protected IRelocateData relocateData;
 
-	@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.CONTAINER_CLASS)
-	public UITeleportingComponentUserRelocatableExtension(Class<E> containerClass) {
-		super(IUIComponent.class, containerClass);
+	@SuppressWarnings("unchecked")
+	@UIExtensionConstructor
+	public UITeleportingComponentUserRelocatableExtension(UIExtensionConstructor.IArguments arguments) {
+		super(IUIComponent.class, (Class<E>) arguments.getContainerClass());
 	}
 
 	@Override

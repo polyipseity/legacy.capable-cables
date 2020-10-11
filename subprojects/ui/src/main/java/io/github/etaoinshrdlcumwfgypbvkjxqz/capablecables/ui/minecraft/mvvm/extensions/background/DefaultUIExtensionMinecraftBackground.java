@@ -34,20 +34,26 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 @OnlyIn(Dist.CLIENT)
-public class DefaultUIExtensionMinecraftBackground<E extends IUIViewComponentMinecraft<?, ?>>
-		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIViewComponentMinecraft<?, ?>, E>
+public class DefaultUIExtensionMinecraftBackground
+		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIViewComponentMinecraft<?, ?>, IUIViewComponentMinecraft<?, ?>>
 		implements IUIExtensionMinecraftBackground {
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final AutoCloseableRotator<RenderObserver, RuntimeException> renderObserverRotator =
 			new AutoCloseableRotator<>(() -> new RenderObserver(this, UIConfiguration.getInstance().getLogger()), Disposable::dispose);
+	private static final UIExtensionConstructor.IArguments DEFAULT_ARGUMENTS =
+			new UIExtensionConstructor.ImmutableArguments(ImmutableMap.of(), IUIViewComponentMinecraft.class);
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	private final IUIRendererContainer<IBackgroundRenderer> rendererContainer = new DefaultUIRendererContainer<>(this, new UIExtensionMinecraftBackgroundNullBackgroundRenderer(ImmutableMap.of()));
+	private final IUIRendererContainer<IBackgroundRenderer> rendererContainer = new DefaultUIRendererContainer<>(this, UIExtensionMinecraftBackgroundNullBackgroundRenderer.class);
 
-	@UIExtensionConstructor(type = UIExtensionConstructor.EnumConstructorType.CONTAINER_CLASS)
-	public DefaultUIExtensionMinecraftBackground(Class<E> containerClass) {
-		super(CastUtilities.castUnchecked(IUIViewComponentMinecraft.class), // COMMENT the generics should not matter here
-				containerClass);
+	public DefaultUIExtensionMinecraftBackground() { this(getDefaultArguments()); }
+
+	@UIExtensionConstructor
+	public DefaultUIExtensionMinecraftBackground(@SuppressWarnings("unused") UIExtensionConstructor.IArguments arguments) {
+		super(CastUtilities.castUnchecked(IUIViewComponentMinecraft.class),
+				CastUtilities.castUnchecked(IUIViewComponentMinecraft.class));
 	}
+
+	protected static UIExtensionConstructor.IArguments getDefaultArguments() { return DEFAULT_ARGUMENTS; }
 
 	@Override
 	public IExtensionType<INamespacePrefixedString, ?, IUIViewComponentMinecraft<?, ?>> getType() { return IUIExtensionMinecraftBackground.TYPE.getValue(); }
@@ -87,9 +93,9 @@ public class DefaultUIExtensionMinecraftBackground<E extends IUIViewComponentMin
 	@OnlyIn(Dist.CLIENT)
 	public static class RenderObserver
 			extends LoggingDisposableObserver<UIViewMinecraftBusEvent.Render> {
-		private final OptionalWeakReference<DefaultUIExtensionMinecraftBackground<?>> owner;
+		private final OptionalWeakReference<DefaultUIExtensionMinecraftBackground> owner;
 
-		public RenderObserver(DefaultUIExtensionMinecraftBackground<?> owner, Logger logger) {
+		public RenderObserver(DefaultUIExtensionMinecraftBackground owner, Logger logger) {
 			super(logger);
 			this.owner = new OptionalWeakReference<>(owner);
 		}
@@ -101,7 +107,7 @@ public class DefaultUIExtensionMinecraftBackground<E extends IUIViewComponentMin
 			if (event.getStage().isPre())
 				Optional2.of(getOwner().orElse(null), event.getContextView().getInputDevices().getPointerDevice().orElse(null))
 						.ifPresent(values -> {
-							DefaultUIExtensionMinecraftBackground<?> owner = values.getValue1Nonnull();
+							DefaultUIExtensionMinecraftBackground owner = values.getValue1Nonnull();
 							IInputPointerDevice pointerDevice = values.getValue2Nonnull();
 							owner.getRenderer().ifPresent(renderer ->
 									CastUtilities.castChecked(CastUtilities.<Class<IUIViewComponentMinecraft<?, ?>>>castUnchecked(IUIViewComponent.class), event.getView())
@@ -114,6 +120,6 @@ public class DefaultUIExtensionMinecraftBackground<E extends IUIViewComponentMin
 						});
 		}
 
-		protected Optional<? extends DefaultUIExtensionMinecraftBackground<?>> getOwner() { return owner.getOptional(); }
+		protected Optional<? extends DefaultUIExtensionMinecraftBackground> getOwner() { return owner.getOptional(); }
 	}
 }

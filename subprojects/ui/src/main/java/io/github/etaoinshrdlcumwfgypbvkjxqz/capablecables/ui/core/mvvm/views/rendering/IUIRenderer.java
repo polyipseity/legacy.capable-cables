@@ -4,8 +4,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.traits
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.traits.IHasBinding;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
 
+import java.util.Optional;
+
 public interface IUIRenderer<C>
 		extends IHasBinding, IHasBindingMap, IHasGenericClass<C> {
+	Optional<? extends String> getName();
+
 	void onRendererAdded(C container);
 
 	void onRendererRemoved();
