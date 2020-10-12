@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<theme xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:val="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values"
+       xmlns="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
+       xsi:schemaLocation="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values ../parsers/components/components_values.xsd"
+       xml:lang="EN">
+	<!-- SECTION using -->
+	<!-- COMMENT renderers -->
+	<using alias="renderer.component.window.debug.custom"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIDebugMinecraft$DebugUI$CustomWindowRenderer"/>
+	<using alias="renderer.extension.user_relocatable.previewing.minecraft"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.extensions.relocatable.UIComponentUserRelocatableMinecraftExtensionPreviewingRelocatingRenderer"/>
+	<using alias="renderer.extension.user_resizable.previewing.minecraft"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.extensions.resizable.UIComponentUserResizableMinecraftExtensionPreviewingRelocatingRenderer"/>
+
+	<!-- SECTION renderers -->
+	<renderer name="ViewBackgroundRenderer" class="extension.minecraft.background.renderer.default"/>
+
+	<renderer name="Window1Renderer" class="renderer.component.window.debug.custom">
+		<property key="window.colors.border">
+			<val:color green="128"/>
+		</property>
+	</renderer>
+
+	<renderer name="Window1ExtensionRelocatableRenderer"
+	          class="renderer.extension.user_relocatable.previewing.minecraft">
+	</renderer>
+
+	<renderer name="Window1ExtensionResizableRenderer"
+	          class="renderer.extension.user_resizable.previewing.minecraft"/>
+
+	<renderer name="WindowAnchoredRenderer">
+		<property key="window.colors.border" bindingKey="anchoredWindowBorderColor"/>
+	</renderer>
+
+	<renderer name="WindowAnchoredExtensionRelocatableRenderer"
+	          class="renderer.extension.user_relocatable.previewing.minecraft"/>
+
+	<renderer name="WindowAnchoredExtensionResizableRenderer"
+	          class="renderer.extension.user_resizable.previewing.minecraft"/>
+
+	<renderer name="Button1Renderer">
+		<property key="button.colors.hovering">
+			<val:color xsi:nil="true"/>
+		</property>
+	</renderer>
+</theme>

@@ -42,7 +42,7 @@ public class UIDefaultComponentParserExtensionHandler
 		((IExtensionContainer<?>) container).addExtension(CastUtilities.castUnchecked(ret)); // COMMENT addExtension should check
 		// COMMENT add other stuff after adding the extension
 		Iterables.concat(
-				ImmutableSet.of(object.getRenderer()),
+				ImmutableSet.of(object.getRendererPlaceholder()),
 				object.getAnyContainer()
 						.<Iterable<Object>>map(AnyContainer::getAny)
 						.orElseGet(ImmutableSet::of))

@@ -185,6 +185,7 @@ public enum UIDebugMinecraft {
 		}
 
 		@SuppressWarnings("unused")
+		@OnlyIn(Dist.CLIENT)
 		private static final class CustomWindowRenderer<C extends UIComponentWindowMinecraft>
 				extends UIComponentWindowMinecraft.DefaultRenderer<C>
 				implements IShapeDescriptorProvider {

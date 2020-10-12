@@ -23,7 +23,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.compon
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.UIDefaultComponentParserAnchorHandler;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.UIDefaultComponentParserExtensionHandler;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.UIDefaultComponentParserRendererHandler;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.UIDefaultComponentParserRendererPlaceholderHandler;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.descriptors.ShapeDescriptorBuilderFactoryRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.interactions.ShapeConstraint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
@@ -71,7 +71,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 
 	public static <T extends IUIComponentParser<?, ?>> T makeParserStandard(T instance) {
 		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, Anchor.class, new UIDefaultComponentParserAnchorHandler<>());
-		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, Renderer.class, new UIDefaultComponentParserRendererHandler());
+		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, RendererPlaceholder.class, new UIDefaultComponentParserRendererPlaceholderHandler());
 		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, Extension.class, new UIDefaultComponentParserExtensionHandler());
 		return instance;
 	}
@@ -161,7 +161,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 											.orElseThrow(AssertionError::new);
 									Iterables.concat(
 											n.getAnchor(),
-											ImmutableSet.of(n.getRenderer()),
+											ImmutableSet.of(n.getRendererPlaceholder()),
 											n.getExtension(),
 											n.getAnyContainer()
 													.map(AnyContainer::getAny)

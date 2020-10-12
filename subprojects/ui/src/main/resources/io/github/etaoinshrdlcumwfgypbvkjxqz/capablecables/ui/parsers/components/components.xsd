@@ -7,7 +7,7 @@
 	<!-- SECTION ================================================== components ================================================== -->
 
 	<!-- COMMENT ui -->
-	<xs:element name="ui" id="ui">
+	<xs:element name="ui">
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="ui:using" minOccurs="0" maxOccurs="unbounded"/>
@@ -16,26 +16,26 @@
 			</xs:sequence>
 			<xs:anyAttribute namespace="##other" processContents="lax"/>
 		</xs:complexType>
-		<!-- COMMENT component id -->
-		<xs:key name="componentID">
+		<!-- COMMENT component name -->
+		<xs:key name="uiComponentName">
 			<xs:selector xpath=".//ui:component"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
-		<xs:keyref name="componentIDRef" refer="ui:componentID">
+		<xs:keyref name="uiComponentIDRef" refer="ui:uiComponentName">
 			<xs:selector xpath=".//ui:anchor"/>
 			<xs:field xpath="@target"/>
 		</xs:keyref>
-		<!-- COMMENT renderer id -->
-		<xs:key name="rendererID">
-			<xs:selector xpath=".//ui:renderer"/>
+		<!-- COMMENT renderer placeholder name -->
+		<xs:key name="uiRendererPlaceholderName">
+			<xs:selector xpath=".//ui:renderer-placeholder"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<!-- COMMENT using id -->
-		<xs:key name="usingID">
+		<xs:key name="uiUsingID">
 			<xs:selector xpath="ui:using"/>
 			<xs:field xpath="@alias"/>
 		</xs:key>
-		<xs:keyref name="usingIDRef" refer="ui:usingID">
+		<xs:keyref name="uiUsingIDRef" refer="ui:uiUsingID">
 			<xs:selector xpath=".//ui:*"/><!-- TODO no idea why './/ui:*' does not work -->
 			<xs:field xpath="@class"/>
 		</xs:keyref>
@@ -44,7 +44,7 @@
 	<!-- SECTION top -->
 
 	<!-- COMMENT using -->
-	<xs:element name="using" id="using">
+	<xs:element name="using">
 		<xs:complexType>
 			<xs:attribute name="alias" type="xs:string" use="required"/>
 			<xs:attribute name="target" type="xs:string" use="required"/>
@@ -54,7 +54,7 @@
 	<!-- SECTION components -->
 
 	<!-- COMMENT shape -->
-	<xs:element name="shape" id="shape">
+	<xs:element name="shape">
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="ui:affineTransformDefiner" minOccurs="0"/>
@@ -69,14 +69,10 @@
 		</xs:complexType>
 	</xs:element>
 
-	<!-- COMMENT renderer -->
-	<xs:element name="renderer">
+	<!-- COMMENT renderer placeholder -->
+	<xs:element name="renderer-placeholder">
 		<xs:complexType>
-			<xs:sequence>
-				<xs:group ref="ui:propertyContainerGroup"/>
-			</xs:sequence>
 			<xs:attribute name="name" type="xs:string" use="required"/>
-			<xs:attributeGroup ref="ui:classBasedOptionalAttributeGroup"/>
 		</xs:complexType>
 	</xs:element>
 
@@ -85,7 +81,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:group ref="ui:propertyContainerGroup"/>
-				<xs:element ref="ui:renderer"/>
+				<xs:element ref="ui:renderer-placeholder"/>
 				<xs:element ref="ui:anyContainer" minOccurs="0"/>
 			</xs:sequence>
 			<xs:attributeGroup ref="ui:classBasedAttributeGroup"/>
@@ -111,7 +107,7 @@
 				<xs:group ref="ui:propertyContainerGroup"/>
 				<xs:element ref="ui:shape"/>
 				<xs:element ref="ui:anchor" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element ref="ui:renderer"/>
+				<xs:element ref="ui:renderer-placeholder"/>
 				<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="ui:anyContainer" minOccurs="0"/>
@@ -278,4 +274,41 @@
 			<xs:pattern value=".*:?.*"/><!-- COMMENT the pattern is useless -->
 		</xs:restriction>
 	</xs:simpleType>
+
+	<!-- SECTION ================================================== theme ================================================== -->
+
+	<xs:element name="theme">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ui:using" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:renderer" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:anyAttribute namespace="##other" processContents="lax"/>
+		</xs:complexType>
+		<!-- COMMENT renderer id -->
+		<xs:key name="themeRendererID">
+			<xs:selector xpath=".//ui:renderer"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		<!-- COMMENT using id -->
+		<xs:key name="themeUsingID">
+			<xs:selector xpath="ui:using"/>
+			<xs:field xpath="@alias"/>
+		</xs:key>
+		<xs:keyref name="themeUsingIDRef" refer="ui:themeUsingID">
+			<xs:selector xpath=".//ui:*"/><!-- TODO no idea why './/ui:*' does not work -->
+			<xs:field xpath="@class"/>
+		</xs:keyref>
+	</xs:element>
+
+	<!-- COMMENT renderer -->
+	<xs:element name="renderer">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="ui:propertyContainerGroup"/>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attributeGroup ref="ui:classBasedOptionalAttributeGroup"/>
+		</xs:complexType>
+	</xs:element>
 </xs:schema>
