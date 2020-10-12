@@ -11,7 +11,7 @@ public final class ImmutableUIComponentContextStack
 	private final IAffineTransformStack transformStack;
 
 	public ImmutableUIComponentContextStack(IPath<IUIComponent> path, IAffineTransformStack transformStack) {
-		assert transformStack.getData().size() - path.size() == 1;
+		assert transformStack.size() - path.size() == 1;
 		this.path = path.copy();
 		this.transformStack = transformStack.copy();
 	}
