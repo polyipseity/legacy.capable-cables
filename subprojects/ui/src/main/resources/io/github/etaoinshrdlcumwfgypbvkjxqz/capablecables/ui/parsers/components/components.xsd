@@ -25,9 +25,9 @@
 			<xs:selector xpath=".//ui:anchor"/>
 			<xs:field xpath="@target"/>
 		</xs:keyref>
-		<!-- COMMENT renderer placeholder name -->
-		<xs:key name="uiRendererPlaceholderName">
-			<xs:selector xpath=".//ui:renderer-placeholder"/>
+		<!-- COMMENT renderer container name -->
+		<xs:key name="uiRendererContainerName">
+			<xs:selector xpath=".//ui:renderer-container"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<!-- COMMENT using id -->
@@ -69,8 +69,8 @@
 		</xs:complexType>
 	</xs:element>
 
-	<!-- COMMENT renderer placeholder -->
-	<xs:element name="renderer-placeholder">
+	<!-- COMMENT renderer container -->
+	<xs:element name="renderer-container">
 		<xs:complexType>
 			<xs:attribute name="name" type="xs:string" use="required"/>
 		</xs:complexType>
@@ -81,7 +81,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:group ref="ui:propertyContainerGroup"/>
-				<xs:element ref="ui:renderer-placeholder"/>
+				<xs:element ref="ui:renderer-container"/>
 				<xs:element ref="ui:anyContainer" minOccurs="0"/>
 			</xs:sequence>
 			<xs:attributeGroup ref="ui:classBasedAttributeGroup"/>
@@ -107,7 +107,7 @@
 				<xs:group ref="ui:propertyContainerGroup"/>
 				<xs:element ref="ui:shape"/>
 				<xs:element ref="ui:anchor" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element ref="ui:renderer-placeholder"/>
+				<xs:element ref="ui:renderer-container"/>
 				<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="ui:anyContainer" minOccurs="0"/>

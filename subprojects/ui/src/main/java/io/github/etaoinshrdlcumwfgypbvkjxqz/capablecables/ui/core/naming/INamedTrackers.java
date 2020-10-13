@@ -14,9 +14,12 @@ public interface INamedTrackers {
 	<E extends INamed> boolean addAll(Class<E> clazz, Iterable<? extends E> elements)
 			throws DuplicateNameException;
 
+	@SuppressWarnings("UnusedReturnValue")
 	<E extends INamed> boolean removeAll(Class<E> clazz, Iterable<? extends E> elements);
 
 	<E extends INamed> Optional<? extends E> get(Class<E> clazz, CharSequence element);
+
+	<E extends INamed> INamedTracker<E> getTracker(Class<E> clazz);
 
 	long size();
 

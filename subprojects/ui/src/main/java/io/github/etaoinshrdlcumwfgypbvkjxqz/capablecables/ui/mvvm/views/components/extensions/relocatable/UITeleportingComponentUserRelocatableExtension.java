@@ -14,7 +14,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.compon
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.FunctionalUIEventListener;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.modifiers.AbstractUIVirtualComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.DefaultUIRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.UIDefaultRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.optionals.Optional2;
@@ -59,7 +59,7 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 	public void initializeRendererContainer(String name)
 			throws IllegalStateException {
 		if (!getRendererContainerReference().compareAndSet(null,
-				new DefaultUIRendererContainer<>(name, this, UIComponentUserRelocatableExtensionNullRelocatingRenderer.class)))
+				new UIDefaultRendererContainer<>(name, this, UIComponentUserRelocatableExtensionNullRelocatingRenderer.class)))
 			throw new IllegalStateException();
 	}
 

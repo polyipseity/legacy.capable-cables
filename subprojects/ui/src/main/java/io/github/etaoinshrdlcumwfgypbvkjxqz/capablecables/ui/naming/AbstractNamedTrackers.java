@@ -17,32 +17,36 @@ public abstract class AbstractNamedTrackers
 		implements INamedTrackers {
 	@Override
 	public <E extends INamed> boolean add(Class<E> clazz, E element) throws DuplicateNameException {
-		return getTracker(this, clazz).add(element);
+		return getTracker(clazz).add(element);
 	}
 
 	@Override
 	public <E extends INamed> boolean remove(Class<E> clazz, E element) {
-		boolean result = getTracker(this, clazz).remove(element);
+		boolean result = getTracker(clazz).remove(element);
 		getData().cleanUp();
 		return result;
 	}
 
 	@Override
 	public <E extends INamed> boolean addAll(Class<E> clazz, Iterable<? extends E> elements) throws DuplicateNameException {
-		return getTracker(this, clazz).addAll(elements);
+		return getTracker(clazz).addAll(elements);
 	}
 
 	@Override
 	public <E extends INamed> boolean removeAll(Class<E> clazz, Iterable<? extends E> elements) {
-		boolean result = getTracker(this, clazz).removeAll(elements);
+		boolean result = getTracker(clazz).removeAll(elements);
 		getData().cleanUp();
 		return result;
 	}
 
 	@Override
 	public <E extends INamed> Optional<? extends E> get(Class<E> clazz, CharSequence element) {
-		return getTracker(this, clazz).get(element);
+		return getTracker(clazz).get(element);
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <E extends INamed> INamedTracker<E> getTracker(Class<E> clazz) { return (INamedTracker<E>) getData().getUnchecked(clazz); }
 
 	@Override
 	public long size() { return getData().size(); }
@@ -52,11 +56,6 @@ public abstract class AbstractNamedTrackers
 
 	@Override
 	public @Immutable Map<Class<? extends INamed>, INamedTracker<?>> asMapView() { return ImmutableMap.copyOf(getData().asMap()); }
-
-	@SuppressWarnings("unchecked")
-	protected static <E extends INamed> INamedTracker<E> getTracker(AbstractNamedTrackers trackers, Class<E> clazz) {
-		return (INamedTracker<E>) trackers.getData().getUnchecked(clazz);
-	}
 
 	protected abstract LoadingCache<Class<? extends INamed>, INamedTracker<?>> getData();
 }

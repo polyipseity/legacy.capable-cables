@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug;
 
 import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Theme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Ui;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIFacade;
@@ -14,23 +15,26 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventKeyboard;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventMouse;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.IUIResourceParser;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.IUIParser;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.UIParserCheckedException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming.IUITheme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.IUIViewComponentMinecraft;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.IUIViewMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.adapters.AbstractContainerScreenAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.viewmodels.UIViewModelMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.impl.UIComponentWindowMinecraft;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.parsers.DefaultMinecraftUIComponentParser;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.parsers.UIDefaultMinecraftComponentParser;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.utilities.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.models.UIModel;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.UIExtensionCursorHandleProviderComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.impl.UIComponentButton;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.DefaultUIComponentParser;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.DefaultUIComponentSchemaHolder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.UIDefaultComponentParser;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.UIDefaultComponentSchemaHolder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.UIDefaultComponentThemeParser;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.Binder;
@@ -125,37 +129,60 @@ public enum UIDebugMinecraft {
 		INSTANCE,
 		;
 
-		@NonNls
-		public static final String COMPONENT_TEST_XML_PATH = "components_test.xml";
-		private static final IUIResourceParser<IUIViewComponentMinecraft<?, ?>, Ui> PARSER =
-				DefaultMinecraftUIComponentParser.makeParserMinecraft(
-						DefaultUIComponentParser.makeParserStandard(
-								new DefaultMinecraftUIComponentParser<>(
+		private static final @NonNls String COMPONENT_TEST_XML_PATH = "components_test.xml";
+		private static final @NonNls String COMPONENT_TEST_THEME_XML_PATH = "components_test_theme.xml";
+		private static final IUIParser<IUIViewComponentMinecraft<?, ?>, Ui> VIEW_PARSER =
+				UIDefaultMinecraftComponentParser.makeParserMinecraft(
+						UIDefaultComponentParser.makeParserStandard(
+								new UIDefaultMinecraftComponentParser<>(
 										CastUtilities.castUnchecked(IUIViewComponentMinecraft.class) // COMMENT should not matter
 								)));
+		private static final IUIParser<IUITheme, Theme> THEME_PARSER =
+				UIDefaultComponentThemeParser.makeParserStandard(
+						new UIDefaultComponentThemeParser()
+				);
 
 		static {
-			InputStream is = AssertionUtilities.assertNonnull(DebugUI.class.getResourceAsStream(COMPONENT_TEST_XML_PATH));
-			try {
+			{
+				// COMMENT view parser
+				InputStream is = AssertionUtilities.assertNonnull(DebugUI.class.getResourceAsStream(getComponentTestXmlPath()));
 				try {
-					PARSER.parse((Ui) DefaultUIComponentSchemaHolder.getContext().createUnmarshaller().unmarshal(is));
-				} catch (UIParserCheckedException | JAXBException e) {
-					throw ThrowableUtilities.propagate(e);
+					try {
+						getViewParser().parse((Ui) UIDefaultComponentSchemaHolder.getContext().createUnmarshaller().unmarshal(is));
+					} catch (UIParserCheckedException | JAXBException e) {
+						throw ThrowableUtilities.propagate(e);
+					}
+				} finally {
+					ThrowableUtilities.runQuietly(is::close, IOException.class, UIConfiguration.getInstance().getThrowableHandler());
 				}
-			} finally {
-				ThrowableUtilities.runQuietly(is::close, IOException.class, UIConfiguration.getInstance().getThrowableHandler());
 			}
+			{
+				// COMMENT theme parser
+				InputStream is = AssertionUtilities.assertNonnull(DebugUI.class.getResourceAsStream(getComponentTestThemeXmlPath()));
+				try {
+					try {
+						getThemeParser().parse((Theme) UIDefaultComponentSchemaHolder.getContext().createUnmarshaller().unmarshal(is));
+					} catch (UIParserCheckedException | JAXBException e) {
+						throw ThrowableUtilities.propagate(e);
+					}
+				} finally {
+					ThrowableUtilities.runQuietly(is::close, IOException.class, UIConfiguration.getInstance().getThrowableHandler());
+				}
+			}
+
 			try {
-				PARSER.construct(); // COMMENT early check
+				// COMMENT early check
+				IUIViewComponentMinecraft<?, ?> view = getViewParser().construct();
+				IUITheme theme = getThemeParser().construct();
+				view.getThemeStack().push(theme);
 			} catch (UIParserCheckedException e) {
 				throw ThrowableUtilities.propagate(e);
 			}
 		}
 
-		@Override
-		public AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> create(DebugContainer container, PlayerInventory inv, ITextComponent title) {
-			return createUI(container);
-		}
+		private static String getComponentTestXmlPath() { return COMPONENT_TEST_XML_PATH; }
+
+		private static String getComponentTestThemeXmlPath() { return COMPONENT_TEST_THEME_XML_PATH; }
 
 		private static AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> createUI(DebugContainer container) {
 			IBinder binder = new Binder();
@@ -165,24 +192,37 @@ public enum UIDebugMinecraft {
 			binder.addTransformer(EnumBindingType.FIELD, (Integer t) ->
 					Optional.ofNullable(t).map(i -> new Color(i, true)).orElse(null));
 
-			AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> ret;
+			AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> screen;
+			IUITheme theme;
 			try {
-				ret = UIFacade.Minecraft.createScreen(
+				screen = UIFacade.Minecraft.createScreen(
 						getDisplayName(),
 						UIFacade.Minecraft.createInfrastructure(
-								PARSER.construct(),
+								getViewParser().construct(),
 								new ViewModel(),
 								binder
 						),
 						container);
+				theme = getThemeParser().construct();
 			} catch (UIParserCheckedException e) {
 				throw ThrowableUtilities.propagate(e);
 			}
-			IExtensionContainer.StaticHolder.addExtensionChecked(ret.getInfrastructure().getView(),
-					new UIExtensionCursorHandleProviderComponent());
 
-			return ret;
+			IUIViewMinecraft<?> view = screen.getInfrastructure().getView();
+			IExtensionContainer.StaticHolder.addExtensionChecked(view, new UIExtensionCursorHandleProviderComponent());
+			view.getThemeStack().push(theme);
+
+			return screen;
 		}
+
+		private static IUIParser<IUIViewComponentMinecraft<?, ?>, Ui> getViewParser() { return VIEW_PARSER; }
+
+		@Override
+		public AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, DebugContainer> create(DebugContainer container, PlayerInventory inv, ITextComponent title) {
+			return createUI(container);
+		}
+
+		private static IUIParser<IUITheme, Theme> getThemeParser() { return THEME_PARSER; }
 
 		@SuppressWarnings("unused")
 		@OnlyIn(Dist.CLIENT)

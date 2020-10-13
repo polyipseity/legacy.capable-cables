@@ -8,13 +8,15 @@
 	<!-- COMMENT renderers -->
 	<using alias="renderer.component.window.debug.custom"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIDebugMinecraft$DebugUI$CustomWindowRenderer"/>
+	<using alias="renderer.extension.minecraft.background.default"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.background.UIExtensionMinecraftBackgroundDefaultBackgroundRenderer"/>
 	<using alias="renderer.extension.user_relocatable.previewing.minecraft"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.extensions.relocatable.UIComponentUserRelocatableMinecraftExtensionPreviewingRelocatingRenderer"/>
 	<using alias="renderer.extension.user_resizable.previewing.minecraft"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.extensions.resizable.UIComponentUserResizableMinecraftExtensionPreviewingRelocatingRenderer"/>
 
 	<!-- SECTION renderers -->
-	<renderer name="ViewBackgroundRenderer" class="extension.minecraft.background.renderer.default"/>
+	<renderer name="ViewBackgroundRenderer" class="renderer.extension.minecraft.background.default"/>
 
 	<renderer name="Window1Renderer" class="renderer.component.window.debug.custom">
 		<property key="window.colors.border">

@@ -1,7 +1,5 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components;
 
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
@@ -16,8 +14,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.eve
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.UIParserCheckedException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.UIParserUncheckedException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.JAXBAdapterRegistries;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.IParserContext;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.IUIComponentParser;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIViewComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilder;
@@ -29,47 +25,35 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.UIDefaultDefaultComponentParserRendererContainerHandler;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.descriptors.ShapeDescriptorBuilderFactoryRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.interactions.ShapeConstraint;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.ManualLoadingCache;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.TreeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.AnnotationUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingConsumer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 
-import javax.annotation.Nullable;
 import java.awt.geom.AffineTransform;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.util.*;
-import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Pattern;
 
-public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
-		extends IHasGenericClass.Impl<T>
-		implements IUIComponentParser<T, Ui> {
+public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
+		extends UIAbstractDefaultComponentParser<T, Ui, Ui, IUIDefaultComponentParserContext>
+		implements IHasGenericClass<T> {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
-	private final ConcurrentMap<String, Class<?>> aliases = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
-	private final LoadingCache<EnumHandlerType, ConcurrentMap<Class<?>, IConsumer3<? super IParserContext, ?, ?, ?>>> handlers =
-			ManualLoadingCache.newNestedLoadingCacheMap(
-					CacheUtilities.newCacheBuilderSingleThreaded()
-							.initialCapacity(EnumHandlerType.values().length)
-							.build(CacheLoader.from(
-									new MappableSupplier<>(
-											ConstantSupplier.of(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM))
-									).map(MapMaker::makeMap))));
-	@Nullable
-	private Ui root;
+	private final Class<T> genericClass;
 
-	public DefaultUIComponentParser(Class<T> genericClass) {
-		super(genericClass);
+	public UIDefaultComponentParser(Class<T> genericClass) {
+		this.genericClass = genericClass;
 	}
 
 	public static <T extends UIDefaultComponentParser<?>> T makeParserStandard(T instance) {
@@ -79,153 +63,100 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 		return instance;
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
+	@SuppressWarnings("RedundantThrows")
 	@Override
-	public void parse(Ui resource)
-			throws UIParserCheckedException, UIParserUncheckedException {
-		reset();
+	protected Iterable<? extends Using> getRawAliases(Ui resource)
+			throws UIParserCheckedException, UIParserUncheckedException { return resource.getUsing(); }
 
-		try {
-			getAliases().putAll(
-					resource.getUsing().stream().unordered()
-							.map(IThrowingFunction.executeNow(u -> {
-								assert u != null;
-								return Maps.immutableEntry(u.getAlias(), Class.forName(u.getTarget()));
-							}))
-							.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
-		} catch (ClassNotFoundException e) {
-			throw ThrowableUtilities.propagate(e, UIParserCheckedException::new, UIParserUncheckedException::new);
-		}
+	@SuppressWarnings("RedundantThrows")
+	@Override
+	public Ui parse1(Ui resource)
+			throws Throwable {
+		Class<?> viewClass = AssertionUtilities.assertNonnull(getAliases().get(resource.getView().getClazz()));
+		if (!getGenericClass().isAssignableFrom(viewClass))
+			throw new IllegalArgumentException(
+					new LogMessageBuilder()
+							.addMarkers(UIMarkers.getInstance()::getMarkerParser)
+							.addKeyValue("viewClass", viewClass).addKeyValue("this::getGenericClass", this::getGenericClass)
+							.addMessages(() -> getResourceBundle().getString("construct.view.instance_of.fail"))
+							.build()
+			);
 
-		{
-			Class<?> viewClass = AssertionUtilities.assertNonnull(getAliases().get(resource.getView().getClazz()));
-			if (!getGenericClass().isAssignableFrom(viewClass))
-				throw new IllegalArgumentException(
-						new LogMessageBuilder()
-								.addMarkers(UIMarkers.getInstance()::getMarkerParser)
-								.addKeyValue("viewClass", viewClass).addKeyValue("this::getGenericClass", this::getGenericClass)
-								.addMessages(() -> getResourceBundle().getString("construct.view.instance_of.fail"))
-								.build()
+		return resource;
+	}
+
+	@Override
+	public Class<T> getGenericClass() { return genericClass; }
+
+	@Override
+	protected T construct0(Ui parsed)
+			throws Throwable {
+		// COMMENT raw
+		View rawView = parsed.getView();
+		Component rawComponent = parsed.getComponent();
+
+		// COMMENT create hierarchy
+		@SuppressWarnings("unchecked") T view = (T) createView(new UIImmutableDefaultComponentParserContext(getAliases(), getHandlers(), null, null), rawView); // COMMENT should be checked
+		IUIDefaultComponentParserContext viewContext = new UIImmutableDefaultComponentParserContext(getAliases(), getHandlers(), view, view);
+		view.setManager(
+				CastUtilities.castUnchecked(createComponent(viewContext, rawComponent)) // COMMENT may throw
+		);
+
+		// COMMENT configure view
+		Iterables.concat(
+				rawView.getExtension(),
+				rawView.getAnyContainer()
+						.map(AnyContainer::getAny)
+						.orElseGet(ImmutableList::of))
+				.forEach(any -> {
+							assert any != null;
+							IUIAbstractDefaultComponentParserContext.StaticHolder.findHandler(viewContext, any)
+									.ifPresent(handler -> handler.acceptNonnull(
+											viewContext,
+											CastUtilities.castUnchecked(any) // COMMENT should not throw
+									));
+						}
 				);
-		}
 
-		setRoot(resource);
-	}
-
-	@Override
-	public void reset() {
-		setRoot(null);
-		getAliases().clear();
-	}
-
-	@Override
-	public T construct()
-			throws UIParserCheckedException, UIParserUncheckedException {
-		try {
-			return getRoot()
-					.map(IThrowingFunction.executeNow(root -> {
-						assert root != null;
-						IParserContext viewContext = new ImmutableParserContext(EnumHandlerType.VIEW_HANDLER, getAliases(), getHandlers().asMap());
-						IParserContext componentContext = new ImmutableParserContext(EnumHandlerType.COMPONENT_HANDLER, getAliases(), getHandlers().asMap());
-						View viewRaw = root.getView();
-						Component componentRaw = root.getComponent();
-						@SuppressWarnings("unchecked") T view = (T) createView(viewContext, viewRaw); // COMMENT should be checked
-						view.setManager(
-								CastUtilities.castUnchecked(createComponent(viewContext, componentRaw)) // COMMENT may throw
-						);
-						Iterables.concat(
-								viewRaw.getExtension(),
-								viewRaw.getAnyContainer()
-										.map(AnyContainer::getAny)
-										.orElseGet(ImmutableList::of))
-								.forEach(IThrowingConsumer.executeNow(any -> {
-											assert any != null;
-											IParserContext.StaticHolder.findHandler(viewContext, any)
-													.ifPresent(IThrowingConsumer.executeNow(handler -> {
-														assert handler != null;
-														handler.accept(
-																viewContext,
-																CastUtilities.castUnchecked(view), // COMMENT may throw
-																CastUtilities.castUnchecked(any) // COMMENT should not throw
-														);
-													}));
-										}
-								));
-						final IUIComponent[] cc = {view.getManager()
-								.orElseThrow(AssertionError::new)};
-						TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, componentRaw,
-								IThrowingFunction.executeNow(n -> {
-									assert n != null;
-									IUIComponent component = componentRaw.equals(n)
-											? cc[0]
-											: CastUtilities.castChecked(IUIComponentContainer.class, cc[0])
-											.map(IUIComponentContainer::getNamedChildrenMapView)
-											.map(children -> children.get(n.getName()))
-											.orElseThrow(AssertionError::new);
-									Iterables.concat(
-											n.getAnchor(),
-											ImmutableSet.of(n.getRendererPlaceholder()),
-											n.getExtension(),
-											n.getAnyContainer()
-													.map(AnyContainer::getAny)
-													.orElseGet(ImmutableList::of))
-											.forEach(IThrowingConsumer.executeNow(any -> {
-												assert any != null;
-												IParserContext.StaticHolder.findHandler(componentContext, any)
-														.ifPresent(IThrowingConsumer.executeNow(handler -> {
-															assert handler != null;
-															handler.accept(
-																	componentContext,
-																	CastUtilities.castUnchecked(component), // COMMENT may throw
-																	CastUtilities.castUnchecked(any) // COMMENT should not throw
-															);
-														}));
-											}));
-									return n;
-								}),
-								n -> {
-									if (!componentRaw.equals(n))
-										cc[0] = CastUtilities.castChecked(IUIComponentContainer.class, cc[0])
-												.map(IUIComponentContainer::getNamedChildrenMapView)
-												.map(m -> AssertionUtilities.assertNonnull(m.get(n.getName())))
-												.orElseGet(() -> cc[0]);
-									return n.getComponent();
-								},
-								(p, ch) -> {
-									if (!componentRaw.equals(p))
-										cc[0] = cc[0].getParent()
-												.orElseThrow(AssertionError::new);
-									return p;
-								},
-								n -> {
-									throw new IllegalArgumentException(
-											new LogMessageBuilder()
-													.addMarkers(UIMarkers.getInstance()::getMarkerParser)
-													.addKeyValue("n", n).addKeyValue("componentRaw", componentRaw)
-													.addMessages(() -> getResourceBundle().getString("construct.view.tree.cyclic"))
-													.build()
-									);
-								});
-						return view;
-					}))
-					.orElseThrow(() -> new IllegalStateException(
+		// COMMENT configure components
+		TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, rawComponent,
+				node -> {
+					assert node != null;
+					IUIComponent component = view.getNamedTrackers().get(IUIComponent.class, node.getName())
+							.orElseThrow(AssertionError::new);
+					IUIDefaultComponentParserContext componentContext = new UIImmutableDefaultComponentParserContext(getAliases(), getHandlers(), view, component);
+					Iterables.concat(
+							node.getAnchor(),
+							ImmutableSet.of(node.getRendererContainer()),
+							node.getExtension(),
+							node.getAnyContainer()
+									.map(AnyContainer::getAny)
+									.orElseGet(ImmutableList::of))
+							.forEach(any -> {
+								assert any != null;
+								IUIAbstractDefaultComponentParserContext.StaticHolder.findHandler(componentContext, any)
+										.ifPresent(handler -> handler.acceptNonnull(
+												componentContext,
+												CastUtilities.castUnchecked(any) // COMMENT should not throw
+										));
+							});
+					return node;
+				},
+				Component::getComponent,
+				null,
+				node -> {
+					throw new IllegalArgumentException(
 							new LogMessageBuilder()
 									.addMarkers(UIMarkers.getInstance()::getMarkerParser)
-									.addMessages(() -> getResourceBundle().getString("construct.parsed.missing"))
+									.addKeyValue("node", node).addKeyValue("rawComponent", rawComponent)
+									.addMessages(() -> getResourceBundle().getString("construct.view.tree.cyclic"))
 									.build()
-					));
-		} catch (Throwable throwable) {
-			throw ThrowableUtilities.propagate(throwable, UIParserCheckedException::new, UIParserUncheckedException::new);
-		}
+					);
+				});
+		return view;
 	}
 
-	protected Optional<? extends Ui> getRoot() { return Optional.ofNullable(root); }
-
-	protected void setRoot(@Nullable Ui root) { this.root = root; }
-
-	protected LoadingCache<EnumHandlerType, ConcurrentMap<Class<?>, IConsumer3<? super IParserContext, ?, ?, ?>>> getHandlers() { return handlers; }
-
-	public static IUIViewComponent<?, ?> createView(IParserContext context, View view)
+	public static IUIViewComponent<?, ?> createView(IUIDefaultComponentParserContext context, View view)
 			throws Throwable {
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(view.getProperty());
 		UIViewComponentConstructor.IArguments argument = new UIViewComponentConstructor.ImmutableArguments(mappings);
@@ -250,7 +181,7 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
-	public static IUIComponent createComponent(IParserContext context, Component component)
+	public static IUIComponent createComponent(IUIDefaultComponentParserContext context, Component component)
 			throws Throwable {
 		return TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, component,
 				IThrowingFunction.executeNow(node -> {
@@ -388,11 +319,8 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 				.orElseThrow(AssertionError::new);
 	}
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<String, Class<?>> getAliases() { return aliases; }
-
 	@SuppressWarnings("UnstableApiUsage")
-	public static IShapeDescriptorBuilder<?> createShapeDescriptorBuilder(IParserContext context, Shape shape)
+	public static IShapeDescriptorBuilder<?> createShapeDescriptorBuilder(IUIDefaultComponentParserContext context, Shape shape)
 			throws Throwable {
 		AffineTransform transform = new AffineTransform();
 		shape.getAffineTransformDefiner()
@@ -437,10 +365,4 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 	}
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
-
-	@Override
-	public <H> void addHandler(Set<EnumHandlerType> types, Class<H> clazz, IConsumer3<? super IParserContext, ?, ? super H, ?> handler) {
-		types.forEach(type ->
-				getHandlers().getUnchecked(type).put(clazz, handler));
-	}
 }

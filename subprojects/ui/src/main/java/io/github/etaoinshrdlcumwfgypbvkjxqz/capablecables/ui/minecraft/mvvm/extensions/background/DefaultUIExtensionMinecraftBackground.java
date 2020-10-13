@@ -11,7 +11,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.extensions.IUIExtensionMinecraftScreenProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.IUIViewComponentMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.events.bus.UIViewMinecraftBusEvent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.DefaultUIRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.UIDefaultRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.AbstractContainerAwareExtension;
@@ -53,7 +53,7 @@ public class DefaultUIExtensionMinecraftBackground
 	public void initializeRendererContainer(String name)
 			throws IllegalStateException {
 		if (!getRendererContainerReference().compareAndSet(null,
-				new DefaultUIRendererContainer<>(name, this, UIExtensionMinecraftBackgroundNullBackgroundRenderer.class)))
+				new UIDefaultRendererContainer<>(name, this, UIExtensionMinecraftBackgroundNullBackgroundRenderer.class)))
 			throw new IllegalStateException();
 	}
 
@@ -109,7 +109,7 @@ public class DefaultUIExtensionMinecraftBackground
 							IInputPointerDevice pointerDevice = values.getValue2Nonnull();
 							owner.getRendererContainer().getRenderer().ifPresent(renderer ->
 									CastUtilities.castChecked(CastUtilities.<Class<IUIViewComponentMinecraft<?, ?>>>castUnchecked(IUIViewComponent.class), event.getView())
-											.filter(evc -> owner.getContainer().filter(Predicate.isEqual(evc.getManager())).isPresent())
+											.filter(evc -> owner.getContainer().filter(Predicate.isEqual(evc)).isPresent())
 											.flatMap(IUISubInfrastructure::getInfrastructure)
 											.flatMap(IUIExtensionMinecraftScreenProvider.TYPE.getValue()::find)
 											.flatMap(IUIExtensionMinecraftScreenProvider::getScreen)

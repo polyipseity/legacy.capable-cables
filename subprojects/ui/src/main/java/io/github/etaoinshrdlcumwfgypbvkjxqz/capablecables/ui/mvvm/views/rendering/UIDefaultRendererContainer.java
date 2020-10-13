@@ -2,21 +2,22 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.renderi
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.naming.AbstractNamed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class DefaultUIRendererContainer<C, R extends IUIRenderer<?>>
+public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 		extends AbstractNamed
 		implements IUIRendererContainer<R> {
-	private final OptionalWeakReference<C> container;
+	private final OptionalWeakReference<IUIRendererContainerContainer<?>> container;
 	private final Class<? extends R> defaultRendererClass;
 	@Nullable
 	private R renderer;
 
-	public DefaultUIRendererContainer(String name, C container, Class<? extends R> defaultRendererClass) {
+	public UIDefaultRendererContainer(String name, IUIRendererContainerContainer<?> container, Class<? extends R> defaultRendererClass) {
 		super(name);
 		this.container = new OptionalWeakReference<>(container);
 		this.defaultRendererClass = defaultRendererClass;
@@ -28,7 +29,7 @@ public class DefaultUIRendererContainer<C, R extends IUIRenderer<?>>
 	@Override
 	@Deprecated
 	public void setRenderer(@Nullable R renderer) {
-		IUIRendererContainer.StaticHolder.setRendererImpl(getContainer().getOptional().orElseThrow(IllegalStateException::new),
+		IUIRendererContainer.StaticHolder.setRendererImpl(getContainer().orElseThrow(IllegalStateException::new),
 				renderer,
 				renderer2 -> this.renderer = renderer2,
 				this.renderer);
@@ -37,5 +38,6 @@ public class DefaultUIRendererContainer<C, R extends IUIRenderer<?>>
 	@Override
 	public Class<? extends R> getDefaultRendererClass() { return defaultRendererClass; }
 
-	protected OptionalWeakReference<C> getContainer() { return container; }
+	@Override
+	public Optional<? extends IUIRendererContainerContainer<?>> getContainer() { return container.getOptional(); }
 }

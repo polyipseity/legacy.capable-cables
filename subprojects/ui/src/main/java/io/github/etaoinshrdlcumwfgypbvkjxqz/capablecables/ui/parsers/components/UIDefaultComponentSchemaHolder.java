@@ -19,7 +19,7 @@ import javax.xml.validation.SchemaFactory;
 import java.io.IOException;
 import java.io.InputStream;
 
-public enum DefaultUIComponentSchemaHolder {
+public enum UIDefaultComponentSchemaHolder {
 	;
 
 	@NonNls
@@ -32,7 +32,7 @@ public enum DefaultUIComponentSchemaHolder {
 	private static final JAXBContext CONTEXT;
 
 	static {
-		InputStream res = AssertionUtilities.assertNonnull(DefaultUIComponentSchemaHolder.class.getResourceAsStream(getSchemaLocation()));
+		InputStream res = AssertionUtilities.assertNonnull(UIDefaultComponentSchemaHolder.class.getResourceAsStream(getSchemaLocation()));
 		try {
 			SCHEMA = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new StreamSource(res));
 		} catch (SAXException e) {

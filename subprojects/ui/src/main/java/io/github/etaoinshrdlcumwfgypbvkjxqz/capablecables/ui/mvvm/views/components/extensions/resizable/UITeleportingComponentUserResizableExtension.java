@@ -18,7 +18,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.sha
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.cursors.EnumGLFWCursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.FunctionalUIEventListener;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.modifiers.AbstractUIVirtualComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.DefaultUIRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.UIDefaultRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
@@ -38,6 +38,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class UITeleportingComponentUserResizableExtension<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, E>
@@ -48,9 +49,22 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 	private final Modifier modifier = new Modifier(this);
 	@Nullable
 	private IResizeData resizeData;
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	private final IUIRendererContainer<IResizingRenderer> rendererContainer =
-			new DefaultUIRendererContainer<>(this, UIComponentUserResizeableExtensionNullRelocatingRenderer.class);
+
+	private final AtomicReference<IUIRendererContainer<IResizingRenderer>> rendererContainerReference = new AtomicReference<>();
+
+	@Override
+	public IUIRendererContainer<IResizingRenderer> getRendererContainer()
+			throws IllegalStateException { return Optional.ofNullable(getRendererContainerReference().get()).orElseThrow(IllegalStateException::new); }
+
+	@Override
+	public void initializeRendererContainer(String name)
+			throws IllegalStateException {
+		if (!getRendererContainerReference().compareAndSet(null,
+				new UIDefaultRendererContainer<>(name, this, UIComponentUserResizeableExtensionNullRelocatingRenderer.class)))
+			throw new IllegalStateException();
+	}
+
+	protected AtomicReference<IUIRendererContainer<IResizingRenderer>> getRendererContainerReference() { return rendererContainerReference; }
 
 	protected static Optional<ICursor> getCursor(Set<? extends EnumUISide> sides) {
 		@Nullable ICursor cursor = null;
@@ -110,24 +124,6 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 	public Optional<? extends IResizeData> getResizeData() { return Optional.ofNullable(resizeData); }
 
 	public int getResizeBorderThickness() { return resizeBorderThickness; }
-
-	@Override
-	public Optional<? extends IResizingRenderer> getRenderer() {
-		return getRendererContainer().getRenderer();
-	}
-
-	protected IUIRendererContainer<IResizingRenderer> getRendererContainer() { return rendererContainer; }
-
-	@Override
-	@Deprecated
-	public void setRenderer(@Nullable IResizingRenderer renderer) {
-		getRendererContainer().setRenderer(renderer);
-	}
-
-	@Override
-	public Class<? extends IResizingRenderer> getDefaultRendererClass() {
-		return getRendererContainer().getDefaultRendererClass();
-	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -287,7 +283,7 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 		public void invokeRenderer(IUIComponentContext context) {
 			if (getModifyStage().isPost()) {
 				getOwner().ifPresent(owner ->
-						Optional2.of(owner.getRenderer().orElse(null), owner.getResizeData().orElse(null))
+						Optional2.of(owner.getRendererContainer().getRenderer().orElse(null), owner.getResizeData().orElse(null))
 								.ifPresent(values -> {
 									IResizingRenderer renderer = values.getValue1Nonnull();
 									IResizeData data = values.getValue2Nonnull();

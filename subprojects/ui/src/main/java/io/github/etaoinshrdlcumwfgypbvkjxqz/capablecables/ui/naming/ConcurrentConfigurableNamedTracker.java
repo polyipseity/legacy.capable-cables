@@ -2,7 +2,6 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.naming;
 
 import com.google.common.collect.MapMaker;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamed;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.ConcurrentMap;
@@ -14,7 +13,7 @@ public class ConcurrentConfigurableNamedTracker<E extends INamed>
 	private final ConcurrentMap<String, E> data;
 
 	public ConcurrentConfigurableNamedTracker(Consumer<? super MapMaker> configuration) {
-		MapMaker dataBuilder = MapBuilderUtilities.newMapMakerSingleThreaded();
+		MapMaker dataBuilder = new MapMaker();
 		configuration.accept(dataBuilder);
 		this.data = dataBuilder.makeMap();
 	}

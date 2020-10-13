@@ -1,7 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CleanerUtilities;
 import sun.misc.Cleaner;
 
@@ -12,9 +11,6 @@ import java.util.Deque;
 public class ArrayAffineTransformStack
 		extends AbstractAffineTransformStack {
 	private final Deque<AffineTransform> data;
-
-	@SuppressWarnings("unused")
-	public ArrayAffineTransformStack() { this(CapacityUtilities.INITIAL_CAPACITY_MEDIUM); }
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public ArrayAffineTransformStack(int initialCapacity) {

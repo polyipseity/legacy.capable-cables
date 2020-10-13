@@ -18,7 +18,6 @@ public class UIExtensionMinecraftBackgroundNullBackgroundRenderer
 	@UIRendererConstructor
 	public UIExtensionMinecraftBackgroundNullBackgroundRenderer(UIRendererConstructor.IArguments arguments) { super(arguments); }
 
-
 	@Override
 	public void render(Screen screen, Point2D mouse, double partialTicks) { UIMinecraftBackgrounds.notifyBackgroundDrawn(screen); }
 }

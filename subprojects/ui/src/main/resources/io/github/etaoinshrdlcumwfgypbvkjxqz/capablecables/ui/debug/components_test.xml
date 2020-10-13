@@ -21,8 +21,6 @@
 	<!-- COMMENT extensions -->
 	<using alias="extension.minecraft.background.default"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.background.DefaultUIExtensionMinecraftBackground"/>
-	<using alias="extension.minecraft.background.renderer.default"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.background.UIExtensionMinecraftBackgroundDefaultBackgroundRenderer"/>
 	<using alias="extension.user_relocatable"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.relocatable.UITeleportingComponentUserRelocatableExtension"/>
 	<using alias="extension.user_resizable"
@@ -31,7 +29,7 @@
 	<!-- SECTION view -->
 	<view class="view.minecraft">
 		<extension class="extension.minecraft.background.default">
-			<renderer-placeholder name="ViewBackgroundRenderer"/>
+			<renderer-container name="ViewBackgroundRenderer"/>
 		</extension>
 	</view>
 
@@ -39,19 +37,19 @@
 	<component class="component.manager" name="Root">
 		<shape class="shape.rectangle"/>
 
-		<renderer-placeholder name="RootRenderer"/>
+		<renderer-container name="RootRenderer"/>
 
 		<component class="component.window" name="Window1">
 			<shape class="shape.rectangle" x="10" y="10" width="100" height="100"/>
 			<anchor target="WindowAnchored" originSide="LEFT" targetSide="RIGHT" borderThickness="5"/>
 
-			<renderer-placeholder name="Window1Renderer"/>
+			<renderer-container name="Window1Renderer"/>
 
 			<extension class="extension.user_relocatable">
-				<renderer-placeholder name="Window1ExtensionRelocatableRenderer"/>
+				<renderer-container name="Window1ExtensionRelocatableRenderer"/>
 			</extension>
 			<extension class="extension.user_resizable">
-				<renderer-placeholder name="Window1ExtensionResizableRenderer"/>
+				<renderer-container name="Window1ExtensionResizableRenderer"/>
 			</extension>
 		</component>
 
@@ -60,13 +58,13 @@
 				<constraint minX="20"/>
 			</shape>
 
-			<renderer-placeholder name="WindowAnchoredRenderer"/>
+			<renderer-container name="WindowAnchoredRenderer"/>
 
 			<extension class="extension.user_relocatable">
-				<renderer-placeholder name="WindowAnchoredExtensionRelocatableRenderer"/>
+				<renderer-container name="WindowAnchoredExtensionRelocatableRenderer"/>
 			</extension>
 			<extension class="extension.user_resizable">
-				<renderer-placeholder name="WindowAnchoredExtensionResizableRenderer"/>
+				<renderer-container name="WindowAnchoredExtensionResizableRenderer"/>
 			</extension>
 
 			<component class="component.button" name="Button1">
@@ -80,7 +78,7 @@
 					</affineTransformDefiner>
 				</shape>
 
-				<renderer-placeholder name="Button1Renderer"/>
+				<renderer-container name="Button1Renderer"/>
 			</component>
 		</component>
 	</component>
