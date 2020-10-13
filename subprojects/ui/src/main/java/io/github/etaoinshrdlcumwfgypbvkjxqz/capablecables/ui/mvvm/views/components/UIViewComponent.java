@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components;
 
+import com.google.common.cache.CacheLoader;
 import com.google.common.collect.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.controllers.DefaultUIAnimationController;
@@ -12,6 +13,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentLifecycleModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventTarget;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamedTrackers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIViewComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventBusEntryPoint;
@@ -20,11 +22,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.componen
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.caches.UICacheExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.paths.DefaultUIComponentPathResolver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIComponentHierarchyChangedBusEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.naming.ConcurrentConfigurableNamedTracker;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.naming.LoadingNamedTrackers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.ArrayAffineTransformStack;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CleanerUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.TreeUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.methods.IBindingMethod;
@@ -60,10 +61,13 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	private final IUIComponentPathResolver pathResolver = new DefaultUIComponentPathResolver();
 	private final IUIComponentShapeAnchorController shapeAnchorController = new DefaultUIComponentShapeAnchorController();
 	private final IUIAnimationController animationController = new DefaultUIAnimationController();
+	private final INamedTrackers namedTrackers = new LoadingNamedTrackers(CacheLoader.from(() ->
+			new ConcurrentConfigurableNamedTracker<>(builder ->
+					builder.weakValues() // COMMENT use weak values - the trackers do not own OUR components
+							.concurrencyLevel(ConcurrencyUtilities.NORMAL_THREAD_THREAD_COUNT)
+							.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_LARGE))));
 	@Nullable
 	private M manager;
-	@Nullable
-	private IUIViewContext viewContext;
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	@UIViewComponentConstructor
@@ -104,20 +108,29 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	public IUIAnimationController getAnimationController() { return animationController; }
 
 	@Override
-	public Optional<? extends M> getManager() { return Optional.ofNullable(manager); }
-
-	@Override
 	public void setManager(@Nullable M manager) {
 		getManager().ifPresent(previousManager -> EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(),
-				() -> previousManager.setView(null),
+				() -> {
+					previousManager.setView(null);
+					getNamedTrackers().removeAll(IUIComponent.class, getChildrenFlatView());
+				},
 				new UIComponentHierarchyChangedBusEvent.View(EnumHookStage.PRE, previousManager, this, null),
 				new UIComponentHierarchyChangedBusEvent.View(EnumHookStage.POST, previousManager, this, null)));
 		this.manager = manager;
 		Optional.ofNullable(manager).ifPresent(nextManager -> EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(),
-				() -> nextManager.setView(this),
-				new UIComponentHierarchyChangedBusEvent.View(EnumHookStage.PRE, nextManager, this, null),
-				new UIComponentHierarchyChangedBusEvent.View(EnumHookStage.POST, nextManager, this, null)));
+				() -> {
+					nextManager.setView(this);
+					getNamedTrackers().addAll(IUIComponent.class, getChildrenFlatView());
+				},
+				new UIComponentHierarchyChangedBusEvent.View(EnumHookStage.PRE, nextManager, null, this),
+				new UIComponentHierarchyChangedBusEvent.View(EnumHookStage.POST, nextManager, null, this)));
 	}
+
+	@Override
+	public Optional<? extends M> getManager() { return Optional.ofNullable(manager); }
+
+	@Override
+	public INamedTrackers getNamedTrackers() { return namedTrackers; }
 
 	@SuppressWarnings("RedundantTypeArguments")
 	@Override

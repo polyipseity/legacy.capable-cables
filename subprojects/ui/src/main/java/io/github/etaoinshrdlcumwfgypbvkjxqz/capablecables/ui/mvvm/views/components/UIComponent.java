@@ -4,9 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.binding.UIProperty;
@@ -157,7 +155,19 @@ public class UIComponent
 	public void setVisible(boolean visible) { getVisible().setValue(visible); }
 
 	@Override
-	public void onParentChange(@Nullable IUIComponentContainer previous, @Nullable IUIComponentContainer next) { setParent(next); }
+	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
+	public void onParentChange(@Nullable IUIComponentContainer previous, @Nullable IUIComponentContainer next) {
+		// COMMENT no need to concern that the view is not present yet as setting the manager of the view adds all components automatically
+		getManager()
+				.flatMap(IUIComponentManager::getView)
+				.map(IUIViewComponent::getNamedTrackers)
+				.ifPresent(trackers -> trackers.remove(IUIComponent.class, this));
+		setParent(next);
+		getManager()
+				.flatMap(IUIComponentManager::getView)
+				.map(IUIViewComponent::getNamedTrackers)
+				.ifPresent(trackers -> trackers.add(IUIComponent.class, this));
+	}
 
 	protected void setParent(@Nullable IUIComponentContainer parent) { this.parent = new OptionalWeakReference<>(parent); }
 

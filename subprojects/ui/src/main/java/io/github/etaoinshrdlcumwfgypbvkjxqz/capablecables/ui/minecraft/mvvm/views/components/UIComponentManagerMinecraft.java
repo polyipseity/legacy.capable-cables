@@ -12,36 +12,34 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilitie
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import javax.annotation.Nullable;
 import java.awt.geom.Rectangle2D;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @OnlyIn(Dist.CLIENT)
 public class UIComponentManagerMinecraft
 		extends UIComponentManager<Rectangle2D>
 		implements IUIComponentMinecraft {
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	protected final IUIRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer =
-			new DefaultUIRendererContainer<>(this, CastUtilities.castUnchecked(NullUIComponentRendererMinecraft.class));
-
 	@UIComponentConstructor
 	public UIComponentManagerMinecraft(UIComponentConstructor.IArguments arguments) {
 		super(arguments);
 	}
 
-	@Override
-	public Optional<? extends IUIComponentRendererMinecraft<?>> getRenderer() { return getRendererContainer().getRenderer(); }
+	private final AtomicReference<IUIRendererContainer<IUIComponentRendererMinecraft<?>>> rendererContainerReference = new AtomicReference<>();
 
 	@Override
-	@Deprecated
-	public void setRenderer(@Nullable IUIComponentRendererMinecraft<?> renderer) {
-		getRendererContainer().setRenderer(renderer);
+	public IUIRendererContainer<? extends IUIComponentRendererMinecraft<?>> getRendererContainer()
+			throws IllegalStateException { return Optional.ofNullable(getRendererContainerReference().get()).orElseThrow(IllegalStateException::new); }
+
+	@Override
+	public void initializeRendererContainer(String name)
+			throws IllegalStateException {
+		if (!getRendererContainerReference().compareAndSet(null,
+				new DefaultUIRendererContainer<>(name, this, CastUtilities.castUnchecked(NullUIComponentRendererMinecraft.class))))
+			throw new IllegalStateException();
 	}
 
-	@Override
-	public Class<? extends IUIComponentRendererMinecraft<?>> getDefaultRendererClass() { return getRendererContainer().getDefaultRendererClass(); }
-
-	protected IUIRendererContainer<IUIComponentRendererMinecraft<?>> getRendererContainer() { return rendererContainer; }
+	protected AtomicReference<IUIRendererContainer<IUIComponentRendererMinecraft<?>>> getRendererContainerReference() { return rendererContainerReference; }
 
 	@Override
 	public void tick(IUIComponentContext context) {}

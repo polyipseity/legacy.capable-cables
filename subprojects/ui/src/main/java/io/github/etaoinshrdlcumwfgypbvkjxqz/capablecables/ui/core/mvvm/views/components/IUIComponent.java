@@ -7,6 +7,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.traits
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentLifecycleModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventTarget;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.caches.UICacheExtension;
@@ -31,7 +32,7 @@ import java.util.function.Predicate;
  * TODO auto resizing based on min size and preferred size
  */
 public interface IUIComponent
-		extends INode, IShapeDescriptorProvider, IHasBinding, IHasBindingMap, IUIEventTarget, IExtensionContainer<INamespacePrefixedString>,
+		extends INamed, INode, IShapeDescriptorProvider, IHasBinding, IHasBindingMap, IUIEventTarget, IExtensionContainer<INamespacePrefixedString>,
 		IUIComponentLifecycleModifier {
 	static <T> Optional<T> getYoungestParentInstanceOf(IUIComponent self, Class<T> clazz) {
 		for (Iterator<IUIComponentContainer> iterator = new ParentIterator(self.getParent().orElse(null));
@@ -80,8 +81,6 @@ public interface IUIComponent
 				action.test(shapeDescriptor));
 	}
 
-	Optional<? extends String> getName();
-
 	Optional<? extends IUIComponentContainer> getParent();
 
 	default Optional<? extends IUIComponentManager<?>> getManager() { return UICacheExtension.CacheUniversal.MANAGER.getValue().get(this); }
@@ -105,10 +104,12 @@ public interface IUIComponent
 
 	List<? extends IUIComponentModifier> getModifiersView();
 
+	@SuppressWarnings("UnusedReturnValue")
 	boolean addModifier(IUIComponentModifier modifier);
 
 	boolean removeModifier(IUIComponentModifier modifier);
 
+	@SuppressWarnings("UnusedReturnValue")
 	boolean moveModifierToTop(IUIComponentModifier modifier);
 
 	@Override

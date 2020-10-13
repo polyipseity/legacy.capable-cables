@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvv
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.extensions.IUIExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRenderer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.IUIViewComponentMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.extensions.UIExtensionRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.DefaultExtensionType;
@@ -19,7 +19,7 @@ import java.util.Optional;
 
 @OnlyIn(Dist.CLIENT)
 public interface IUIExtensionMinecraftBackground
-		extends IUIExtension<INamespacePrefixedString, IUIViewComponentMinecraft<?, ?>>, IUIRendererContainer<IUIExtensionMinecraftBackground.IBackgroundRenderer> {
+		extends IUIExtension<INamespacePrefixedString, IUIViewComponentMinecraft<?, ?>>, IUIRendererContainerContainer<IUIExtensionMinecraftBackground.IBackgroundRenderer> {
 	INamespacePrefixedString KEY = new ImmutableNamespacePrefixedString(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, "background");
 	@SuppressWarnings("unchecked")
 	Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIExtensionMinecraftBackground, IUIViewComponentMinecraft<?, ?>>> TYPE =

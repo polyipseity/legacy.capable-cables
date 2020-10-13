@@ -28,9 +28,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.slf4j.Logger;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 @OnlyIn(Dist.CLIENT)
@@ -42,8 +42,22 @@ public class DefaultUIExtensionMinecraftBackground
 			new AutoCloseableRotator<>(() -> new RenderObserver(this, UIConfiguration.getInstance().getLogger()), Disposable::dispose);
 	private static final UIExtensionConstructor.IArguments DEFAULT_ARGUMENTS =
 			new UIExtensionConstructor.ImmutableArguments(ImmutableMap.of(), IUIViewComponentMinecraft.class);
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	private final IUIRendererContainer<IBackgroundRenderer> rendererContainer = new DefaultUIRendererContainer<>(this, UIExtensionMinecraftBackgroundNullBackgroundRenderer.class);
+
+	private final AtomicReference<IUIRendererContainer<IBackgroundRenderer>> rendererContainerReference = new AtomicReference<>();
+
+	@Override
+	public IUIRendererContainer<? extends IBackgroundRenderer> getRendererContainer()
+			throws IllegalStateException { return Optional.ofNullable(getRendererContainerReference().get()).orElseThrow(IllegalStateException::new); }
+
+	@Override
+	public void initializeRendererContainer(String name)
+			throws IllegalStateException {
+		if (!getRendererContainerReference().compareAndSet(null,
+				new DefaultUIRendererContainer<>(name, this, UIExtensionMinecraftBackgroundNullBackgroundRenderer.class)))
+			throw new IllegalStateException();
+	}
+
+	protected AtomicReference<IUIRendererContainer<IBackgroundRenderer>> getRendererContainerReference() { return rendererContainerReference; }
 
 	public DefaultUIExtensionMinecraftBackground() { this(getDefaultArguments()); }
 
@@ -57,22 +71,6 @@ public class DefaultUIExtensionMinecraftBackground
 
 	@Override
 	public IExtensionType<INamespacePrefixedString, ?, IUIViewComponentMinecraft<?, ?>> getType() { return IUIExtensionMinecraftBackground.TYPE.getValue(); }
-
-	@Override
-	public Optional<? extends IBackgroundRenderer> getRenderer() {
-		return getRendererContainer().getRenderer();
-	}
-
-	protected IUIRendererContainer<IBackgroundRenderer> getRendererContainer() { return rendererContainer; }
-
-	@Override
-	@Deprecated
-	public void setRenderer(@Nullable IBackgroundRenderer renderer) {
-		getRendererContainer().setRenderer(renderer);
-	}
-
-	@Override
-	public Class<? extends IBackgroundRenderer> getDefaultRendererClass() { return getRendererContainer().getDefaultRendererClass(); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -109,7 +107,7 @@ public class DefaultUIExtensionMinecraftBackground
 						.ifPresent(values -> {
 							DefaultUIExtensionMinecraftBackground owner = values.getValue1Nonnull();
 							IInputPointerDevice pointerDevice = values.getValue2Nonnull();
-							owner.getRenderer().ifPresent(renderer ->
+							owner.getRendererContainer().getRenderer().ifPresent(renderer ->
 									CastUtilities.castChecked(CastUtilities.<Class<IUIViewComponentMinecraft<?, ?>>>castUnchecked(IUIViewComponent.class), event.getView())
 											.filter(evc -> owner.getContainer().filter(Predicate.isEqual(evc.getManager())).isPresent())
 											.flatMap(IUISubInfrastructure::getInfrastructure)

@@ -1,27 +1,23 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components;
 
 import com.google.common.collect.ImmutableList;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationController;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.traits.IHasBindingMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamedTrackers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.TreeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.traits.IHasBinding;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingBiFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.optionals.Optional2;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.List;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
@@ -42,10 +38,10 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 
 	IUIAnimationController getAnimationController();
 
+	INamedTrackers getNamedTrackers();
+
 	enum StaticHolder {
 		;
-
-		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
 		public static Optional<IUIComponentContext> createComponentContextWithManager(IUIViewComponent<?, ?> view) {
 			return Optional2.of(view.createComponentContext().orElse(null), view.getManager().orElse(null))
@@ -91,25 +87,5 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 					}),
 					repeated -> { throw new AssertionError(); });
 		}
-
-		public static IUIComponent getComponentByName(IUIViewComponent<?, ?> view, String name) {
-			return findComponentByName(view, name)
-					.orElseThrow(() ->
-							new IllegalArgumentException(
-									new LogMessageBuilder()
-											.addMarkers(UIMarkers.getInstance()::getMarkerUIView)
-											.addKeyValue("view", view).addKeyValue("name", name)
-											.addMessages(() -> getResourceBundle().getString("component.get.id.fail"))
-											.build()
-							));
-		}
-
-		public static Optional<IUIComponent> findComponentByName(IUIViewComponent<?, ?> view, String name) {
-			return view.getChildrenFlatView().stream().sequential()
-					.filter(child -> child.getName().filter(Predicate.isEqual(name)).isPresent())
-					.findFirst();
-		}
-
-		protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 	}
 }

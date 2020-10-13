@@ -22,8 +22,6 @@ import java.util.Optional;
 public class NullUIRenderer<C>
 		extends IHasGenericClass.Impl<C>
 		implements IUIRenderer<C> {
-	@Nullable
-	private final String name;
 	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
 	private final Subject<IBinderAction> binderNotifierSubject = UnicastSubject.create();
 	private OptionalWeakReference<C> container = new OptionalWeakReference<>(null);
@@ -32,7 +30,6 @@ public class NullUIRenderer<C>
 	@UIRendererConstructor
 	public NullUIRenderer(UIRendererConstructor.IArguments arguments) {
 		super((Class<C>) arguments.getContainerClass());
-		this.name = arguments.getName().orElse(null);
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.mappings = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
@@ -49,9 +46,6 @@ public class NullUIRenderer<C>
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappings() { return mappings; }
-
-	@Override
-	public Optional<? extends String> getName() { return Optional.ofNullable(name); }
 
 	@Override
 	public void onRendererAdded(C container) {

@@ -1,0 +1,68 @@
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.naming;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Streams;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.DuplicateNameException;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamed;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamedTracker;
+import org.apache.http.annotation.NotThreadSafe;
+
+import java.util.Map;
+import java.util.Optional;
+
+@NotThreadSafe
+public abstract class AbstractNamedTracker<E extends INamed>
+		implements INamedTracker<E> {
+	protected abstract Map<String, E> getData();
+
+	@Override
+	public boolean add(E element)
+			throws DuplicateNameException {
+		return element.getName()
+				.map(name -> {
+					if (getData().put(name, element) != null)
+						throw new DuplicateNameException();
+					return true;
+				})
+				.orElse(false);
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	@Override
+	public boolean addAll(Iterable<? extends E> elements)
+			throws DuplicateNameException {
+		return Streams.stream(elements).unordered()
+				.map(this::add)
+				.reduce(false, Boolean::logicalOr);
+	}
+
+	@Override
+	public boolean remove(E element) {
+		return element.getName()
+				.map(getData()::remove)
+				.isPresent();
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	@Override
+	public boolean removeAll(Iterable<? extends E> elements) {
+		return Streams.stream(elements).unordered()
+				.map(this::remove)
+				.reduce(false, Boolean::logicalOr);
+	}
+
+	@Override
+	public Optional<? extends E> get(CharSequence name) {
+		return Optional.ofNullable(getData().get(name.toString()));
+	}
+
+	@Override
+	public long size() { return getData().size(); }
+
+	@Override
+	public boolean isEmpty() { return size() == 0; }
+
+	@Override
+	public @Immutable Map<String, E> asMapView() { return ImmutableMap.copyOf(getData()); }
+}

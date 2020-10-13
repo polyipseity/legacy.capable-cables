@@ -65,7 +65,7 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 															modifier.getValue().invokeRenderer(componentContext); // COMMENT pre
 															modifier.getKey().resetModifyStage();
 														});
-												component.getRenderer()
+												component.getRendererContainer().getRenderer()
 														.ifPresent(renderer -> {
 															renderer.crop(componentContext, CastUtilities.castUnchecked(component),
 																	EnumCropStage.CROP, cropMethod, partialTicks);
@@ -77,7 +77,7 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 												assert result != null;
 												assert componentContext != null;
 												IUIComponentMinecraft component = (IUIComponentMinecraft) result.getComponent();
-												component.getRenderer().ifPresent(renderer -> {
+												component.getRendererContainer().getRenderer().ifPresent(renderer -> {
 													renderer.render(componentContext, CastUtilities.castUnchecked(component),
 															EnumRenderStage.POST_CHILDREN, partialTicks);
 													renderer.crop(componentContext, CastUtilities.castUnchecked(component),

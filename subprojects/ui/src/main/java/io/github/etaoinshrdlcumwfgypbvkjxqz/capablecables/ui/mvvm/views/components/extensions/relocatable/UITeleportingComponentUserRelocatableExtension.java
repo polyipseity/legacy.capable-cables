@@ -31,6 +31,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class UITeleportingComponentUserRelocatableExtension<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, E>
@@ -39,9 +40,6 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 	private final int relocateBorderThickness = RELOCATE_BORDER_THICKNESS_DEFAULT; // TODO make this a property and strategy or something like that
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final Modifier modifier = new Modifier(this);
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	private final IUIRendererContainer<IRelocatingRenderer> rendererContainer =
-			new DefaultUIRendererContainer<>(this, UIComponentUserRelocatableExtensionNullRelocatingRenderer.class);
 	@Nullable
 	protected IRelocateData relocateData;
 
@@ -51,23 +49,21 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 		super(IUIComponent.class, (Class<E>) arguments.getContainerClass());
 	}
 
-	@Override
-	public Optional<? extends IRelocatingRenderer> getRenderer() {
-		return getRendererContainer().getRenderer();
-	}
-
-	protected IUIRendererContainer<IRelocatingRenderer> getRendererContainer() { return rendererContainer; }
+	private final AtomicReference<IUIRendererContainer<IRelocatingRenderer>> rendererContainerReference = new AtomicReference<>();
 
 	@Override
-	@Deprecated
-	public void setRenderer(@Nullable IRelocatingRenderer renderer) {
-		getRendererContainer().setRenderer(renderer);
-	}
+	public IUIRendererContainer<IRelocatingRenderer> getRendererContainer()
+			throws IllegalStateException { return Optional.ofNullable(getRendererContainerReference().get()).orElseThrow(IllegalStateException::new); }
 
 	@Override
-	public Class<? extends IRelocatingRenderer> getDefaultRendererClass() {
-		return getRendererContainer().getDefaultRendererClass();
+	public void initializeRendererContainer(String name)
+			throws IllegalStateException {
+		if (!getRendererContainerReference().compareAndSet(null,
+				new DefaultUIRendererContainer<>(name, this, UIComponentUserRelocatableExtensionNullRelocatingRenderer.class)))
+			throw new IllegalStateException();
 	}
+
+	protected AtomicReference<IUIRendererContainer<IRelocatingRenderer>> getRendererContainerReference() { return rendererContainerReference; }
 
 	@Override
 	public IExtensionType<INamespacePrefixedString, ?, IUIComponent> getType() { return TYPE.getValue(); }
@@ -200,7 +196,7 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 		public void invokeRenderer(IUIComponentContext context) {
 			if (getModifyStage().isPost()) {
 				getOwner().ifPresent(owner ->
-						Optional2.of(owner.getRenderer().orElse(null), owner.getRelocateData().orElse(null))
+						Optional2.of(owner.getRendererContainer().getRenderer().orElse(null), owner.getRelocateData().orElse(null))
 								.ifPresent(values -> {
 									IRelocatingRenderer renderer = values.getValue1Nonnull();
 									IRelocateData data = values.getValue2Nonnull();

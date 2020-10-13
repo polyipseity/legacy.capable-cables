@@ -21,9 +21,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.compon
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIViewComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptorBuilder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.UIDefaultComponentParserAnchorHandler;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.UIDefaultComponentParserExtensionHandler;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.UIDefaultComponentParserRendererPlaceholderHandler;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.contexts.IUIAbstractDefaultComponentParserContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.contexts.IUIDefaultComponentParserContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.contexts.UIImmutableDefaultComponentParserContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.UIDefaultDefaultComponentParserAnchorHandler;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.UIDefaultDefaultComponentParserExtensionHandler;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.handlers.UIDefaultDefaultComponentParserRendererContainerHandler;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.descriptors.ShapeDescriptorBuilderFactoryRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.interactions.ShapeConstraint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
@@ -69,10 +72,10 @@ public class DefaultUIComponentParser<T extends IUIViewComponent<?, ?>>
 		super(genericClass);
 	}
 
-	public static <T extends IUIComponentParser<?, ?>> T makeParserStandard(T instance) {
-		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, Anchor.class, new UIDefaultComponentParserAnchorHandler<>());
-		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, RendererPlaceholder.class, new UIDefaultComponentParserRendererPlaceholderHandler());
-		instance.addHandler(EnumHandlerType.OBJECTS_ONLY, Extension.class, new UIDefaultComponentParserExtensionHandler());
+	public static <T extends UIDefaultComponentParser<?>> T makeParserStandard(T instance) {
+		instance.addObjectHandler(Anchor.class, new UIDefaultDefaultComponentParserAnchorHandler());
+		instance.addObjectHandler(RendererContainer.class, new UIDefaultDefaultComponentParserRendererContainerHandler());
+		instance.addObjectHandler(Extension.class, new UIDefaultDefaultComponentParserExtensionHandler());
 		return instance;
 	}
 
