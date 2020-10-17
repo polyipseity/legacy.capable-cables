@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components;
 
 import com.google.common.collect.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
@@ -9,6 +10,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPro
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventComponentType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.UIParserCheckedException;
@@ -44,6 +46,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
@@ -168,6 +171,37 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		return (IUIViewComponent<?, ?>) constructorHandle.invoke(argument);
 	}
 
+	private static final @Immutable Map<IUIEventType, Function<Component, String>> EVENT_TYPE_FUNCTION_MAP = ImmutableMap.<IUIEventType, Function<Component, String>>builder()
+			.put(EnumUIEventDOMType.LOAD, Component::getLoad)
+			.put(EnumUIEventDOMType.UNLOAD, Component::getUnload)
+			.put(EnumUIEventDOMType.ABORT, Component::getAbort)
+			.put(EnumUIEventDOMType.ERROR, Component::getError)
+			.put(EnumUIEventDOMType.SELECT, Component::getSelect)
+			.put(EnumUIEventDOMType.FOCUS_OUT_POST, Component::getBlur)
+			.put(EnumUIEventDOMType.FOCUS_IN_POST, Component::getFocus)
+			.put(EnumUIEventDOMType.FOCUS_IN_PRE, Component::getFocusin)
+			.put(EnumUIEventDOMType.FOCUS_OUT_PRE, Component::getFocusout)
+			.put(EnumUIEventDOMType.CLICK_AUXILIARY, Component::getAuxclick)
+			.put(EnumUIEventDOMType.CLICK, Component::getClick)
+			.put(EnumUIEventDOMType.CLICK_DOUBLE, Component::getDblclick)
+			.put(EnumUIEventDOMType.MOUSE_DOWN, Component::getMousedown)
+			.put(EnumUIEventDOMType.MOUSE_ENTER, Component::getMouseenter)
+			.put(EnumUIEventDOMType.MOUSE_LEAVE, Component::getMouseleave)
+			.put(EnumUIEventDOMType.MOUSE_MOVE, Component::getMousemove)
+			.put(EnumUIEventDOMType.MOUSE_LEAVE_SELF, Component::getMouseout)
+			.put(EnumUIEventDOMType.MOUSE_ENTER_SELF, Component::getMouseover)
+			.put(EnumUIEventDOMType.MOUSE_UP, Component::getMouseup)
+			.put(EnumUIEventDOMType.WHEEL, Component::getWheel)
+			.put(EnumUIEventDOMType.INPUT_PRE, Component::getBeforeinput)
+			.put(EnumUIEventDOMType.INPUT_POST, Component::getInput)
+			.put(EnumUIEventDOMType.KEY_DOWN, Component::getKeydown)
+			.put(EnumUIEventDOMType.KEY_UP, Component::getKeyup)
+			.put(EnumUIEventDOMType.COMPOSITION_START, Component::getCompositionstart)
+			.put(EnumUIEventDOMType.COMPOSITION_UPDATE, Component::getCompositionupdate)
+			.put(EnumUIEventDOMType.COMPOSITION_END, Component::getCompositionend)
+			.put(EnumUIEventComponentType.CHAR_TYPED, Component::getCharTyped)
+			.build();
+
 	public static IUIComponent createComponent(IUIDefaultComponentParserContext context, Component component)
 			throws Throwable {
 		return TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, component,
@@ -176,95 +210,16 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 					Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(node.getProperty());
 					// COMMENT attributes
 					{
-						Map<INamespacePrefixedString, IUIPropertyMappingValue> attributes = new HashMap<>(
-								EnumUIEventDOMType.values().length + EnumUIEventComponentType.values().length
-						);
+						Map<INamespacePrefixedString, IUIPropertyMappingValue> attributes = new HashMap<>(getEventTypeFunctionMap().size());
 
-						// TODO use a map or something like that
-						attributes.put(EnumUIEventDOMType.LOAD.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getLoad()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.UNLOAD.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getUnload()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.ABORT.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getAbort()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.ERROR.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getError()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.SELECT.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getSelect()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.FOCUS_OUT_POST.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getBlur()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getFocus()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.FOCUS_IN_PRE.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getFocusin()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.FOCUS_OUT_PRE.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getFocusout()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.CLICK_AUXILIARY.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getAuxclick()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.CLICK.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getClick()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.CLICK_DOUBLE.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getDblclick()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.MOUSE_DOWN.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getMousedown()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.MOUSE_ENTER.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getMouseenter()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getMouseleave()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.MOUSE_MOVE.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getMousemove()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getMouseout()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getMouseover()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.MOUSE_UP.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getMouseup()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.WHEEL.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getWheel()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.INPUT_PRE.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getBeforeinput()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.INPUT_POST.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getInput()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.KEY_DOWN.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getKeydown()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.KEY_UP.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getKeyup()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.COMPOSITION_START.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getCompositionstart()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.COMPOSITION_UPDATE.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getCompositionupdate()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventDOMType.COMPOSITION_END.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getCompositionend()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
-						attributes.put(EnumUIEventComponentType.CHAR_TYPED.getEventType(),
-								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getCharTyped()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
+						getEventTypeFunctionMap()
+								.forEach((key, value) -> {
+									assert key != null;
+									assert value != null;
+									attributes.put(key.getEventType(),
+											new UIPropertyMappingValue(null,
+													Optional.ofNullable(value.apply(node)).map(ImmutableNamespacePrefixedString::of).orElse(null)));
+								});
 
 						mappings = MapUtilities.concatMaps(mappings, attributes);
 					}
@@ -306,6 +261,8 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 				})
 				.orElseThrow(AssertionError::new);
 	}
+
+	public static Map<IUIEventType, Function<Component, String>> getEventTypeFunctionMap() { return EVENT_TYPE_FUNCTION_MAP; }
 
 	@SuppressWarnings("UnstableApiUsage")
 	public static Map<INamespacePrefixedString, IUIPropertyMappingValue> createMappings(Iterable<? extends Property> properties) {
