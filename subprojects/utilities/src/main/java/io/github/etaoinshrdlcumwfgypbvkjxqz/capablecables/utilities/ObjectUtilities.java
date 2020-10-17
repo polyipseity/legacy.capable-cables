@@ -59,15 +59,16 @@ public enum ObjectUtilities {
 
 	public static <T> String toString(T self, @Nullable Supplier<? extends String> superMethod, Map<? extends String, ? extends Function<? super T, ?>> variables) {
 		StringBuilder ret = new StringBuilder(CapacityUtilities.INITIAL_CAPACITY_LARGE);
-		ret.append(self.getClass().getSimpleName());
+		ret.append(self.getClass().getSimpleName()).append('{');
 		final boolean[] comma = {false};
-		variables.forEach((key, value) -> {
+		variables.forEach((key, valueFunction) -> {
 			if (comma[0])
 				ret.append(',');
 			else
 				comma[0] = true;
-			ret.append(key).append('=').append(value);
+			ret.append(key).append('=').append(AssertionUtilities.assertNonnull(valueFunction).apply(self));
 		});
+		ret.append('}');
 		if (superMethod != null)
 			ret.append(superMethod.get());
 		return ret.toString();
