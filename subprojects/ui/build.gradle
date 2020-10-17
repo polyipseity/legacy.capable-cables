@@ -21,7 +21,7 @@ dependencies {
 	jaxb files('libs/nullsafe-1.2-SNAPSHOT.jar')
 }
 File xjcMainComponentsGeneratedDir = file "${getGeneratedDirectory.call 'main'}${separator}xjc_components"
-String xjcMainComponentsContextPath = "${jaxbPackagePrefix}.components"
+CharSequence xjcMainComponentsContextPath = "${jaxbPackagePrefix}.components"
 sourceSets.main.java.srcDir xjcMainComponentsGeneratedDir
 def xjcMainComponents = createJaxbXJCTask.call('xjcMainComponents',
 		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/components*.xsd' }.files },

@@ -9,7 +9,7 @@ project.ext.createNewFile = { File f ->
 	f.createNewFile()
 }
 
-project.ext.createNewFileFromPath = { String s ->
+project.ext.createNewFileFromPath = { CharSequence s ->
 	File f = file s
 	createNewFile.call f
 	f
@@ -25,18 +25,18 @@ project.ext.clearDirectory = { File f ->
 	}
 }
 
-project.ext.download = { String url, File dest ->
+project.ext.download = { CharSequence url, File dest ->
 	createNewFile.call dest
 	long r = 0
 	FileOutputStream fos = new FileOutputStream(dest)
 	try {
-		r = fos.channel.transferFrom(Channels.newChannel(new URL(url).openStream()), 0, Long.MAX_VALUE)
+		r = fos.channel.transferFrom(Channels.newChannel(new URL(url.toString()).openStream()), 0, Long.MAX_VALUE)
 	} finally {
 		fos.close()
 	}
 	r
 }
 
-project.ext.convertToCanonicalPath = { String p ->
+project.ext.convertToCanonicalPath = { CharSequence p ->
 	file(p).canonicalPath
 }

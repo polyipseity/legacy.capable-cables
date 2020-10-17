@@ -30,8 +30,8 @@ tasks.register('javadocJar', Jar) {
 }
 
 afterEvaluate {
-	stringToStringList(artifactTaskNames).each { String taskName ->
-		def task = tasks.named taskName
+	stringToStringList(artifactTaskNames).each { CharSequence taskName ->
+		def task = tasks.named taskName.toString()
 
 		task.configure {
 			manifest {

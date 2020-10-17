@@ -9,12 +9,14 @@ checkApply.call(['evaluateGStringString'])
 
 project.ext.makeResourcesTasks = { Closure c ->
 	afterEvaluate {
-		tasks.names.findAll { it.startsWith('process') && it.endsWith('Resources') }.each { String taskName ->
-			// COMMENT Avoid messing around internal tasks.
-			if (taskName.contains('_')) return
+		tasks.names.findAll { it.startsWith('process') && it.endsWith('Resources') }.each { CharSequence taskName ->
+			String taskName2 = taskName.toString()
 
-			def task = tasks.named taskName
-			String taskSourceSetName = taskName.replace('process', '').replace('Resources', ''),
+			// COMMENT Avoid messing around internal tasks.
+			if (taskName2.contains('_')) return
+
+			def task = tasks.named taskName2
+			String taskSourceSetName = taskName2.replace('process', '').replace('Resources', ''),
 			       sourceSetName = (taskSourceSetName.empty ? 'main' : taskSourceSetName).uncapitalize()
 
 			task.configure {

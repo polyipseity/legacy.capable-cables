@@ -2,6 +2,6 @@
 // TITLE Strings
 //////////////////////////////////////////////////
 
-project.ext.evaluateGString = { String s, Binding b = (new Binding(project.properties)) -> new GroovyShell(b).evaluate s }
+project.ext.evaluateGString = { CharSequence s, Binding b = (new Binding(project.properties)) -> new GroovyShell(b).evaluate s.toString() }
 
-project.ext.evaluateGStringString = { String s, Binding b = (new Binding(project.properties)) -> ext.evaluateGString "\"\"\"$s\"\"\"", b }
+project.ext.evaluateGStringString = { CharSequence s, Binding b = (new Binding(project.properties)) -> ext.evaluateGString "\"\"\"$s\"\"\"", b }

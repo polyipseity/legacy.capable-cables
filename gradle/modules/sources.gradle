@@ -9,15 +9,17 @@ checkApply.call(['evaluateGStringString', 'createNewFile'])
 
 project.ext.makeSourcesTasks = { Closure c ->
 	afterEvaluate {
-		tasks.names.findAll { it.startsWith 'compile' }.each { String taskName ->
-			// COMMENT Avoid messing around internal tasks.
-			if (taskName.contains('_')) return
+		tasks.names.findAll { it.startsWith 'compile' }.each { CharSequence taskName ->
+			String taskName2 = taskName.toString()
 
-			def task = tasks.named taskName
-			String taskSourceSetName = taskName.replace('compile', ''),
+			// COMMENT Avoid messing around internal tasks.
+			if (taskName2.contains('_')) return
+
+			def task = tasks.named taskName2
+			String taskSourceSetName = taskName2.replace('compile', ''),
 			       sourceSetName = taskSourceSetName.uncapitalize()
 			sourceSetName = sourceSets.find { sourceSetName.startsWith it.name }?.name
-			String language = taskName.replace "compile", ''
+			String language = taskName2.replace "compile", ''
 			if (sourceSetName == null)
 				sourceSetName = 'main'
 			else
@@ -25,7 +27,7 @@ project.ext.makeSourcesTasks = { Closure c ->
 
 			Set<File> sourceSet = sourceSets."$sourceSetName"."${language.uncapitalize()}".srcDirs
 
-			def pre = tasks.register("preProcess${taskName.capitalize()}", Sync) {
+			def pre = tasks.register("preProcess${taskName2.capitalize()}", Sync) {
 				group task.get().group
 				description "Prepare sources for processing $sourceSetName $language."
 
@@ -33,7 +35,7 @@ project.ext.makeSourcesTasks = { Closure c ->
 				into temporaryDir
 			}
 
-			def process = tasks.register("process${taskName.capitalize()}", Sync) {
+			def process = tasks.register("process${taskName2.capitalize()}", Sync) {
 				group task.get().group
 				description "Process $sourceSetName $language."
 				dependsOn pre

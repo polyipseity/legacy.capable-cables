@@ -28,10 +28,11 @@ publishing {
 			from components.java
 
 			afterEvaluate {
-				stringToStringList(publishedArtifactTaskNames).each { String taskName ->
+				stringToStringList(publishedArtifactTaskNames).each { CharSequence taskName ->
+					String taskName2 = taskName.toString()
 					// COMMENT jar is included by the component already, including it again will make the task fail
-					if (taskName != 'jar')
-						artifact tasks[taskName] // COMMENT cannot use Provider
+					if (taskName2 != 'jar')
+						artifact tasks[taskName2] // COMMENT cannot use Provider
 				}
 			}
 		}

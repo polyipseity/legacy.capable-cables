@@ -7,9 +7,9 @@ import static java.io.File.separator
 apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['caughtThrowable'])
 
-project.ext.findNamedTask = { String name ->
+project.ext.findNamedTask = { CharSequence name ->
 	try {
-		project.tasks.named name
+		project.tasks.named name.toString()
 	} catch (UnknownTaskException ex) {
 		caughtThrowable ex
 		null
