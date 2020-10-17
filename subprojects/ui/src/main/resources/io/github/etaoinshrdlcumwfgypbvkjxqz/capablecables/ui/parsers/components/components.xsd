@@ -183,7 +183,7 @@
 			<xs:sequence>
 				<xs:any minOccurs="0"/>
 			</xs:sequence>
-			<xs:attribute name="key" type="xs:string" use="required"/>
+			<xs:attribute name="key" type="ui:NSPrefixedString" use="required"/>
 			<xs:attribute name="bindingKey" type="ui:NSPrefixedString"/>
 		</xs:complexType>
 	</xs:element>
@@ -271,7 +271,7 @@
 	<!-- COMMENT INamespacePrefixedString -->
 	<xs:simpleType name="NSPrefixedString">
 		<xs:restriction base="xs:string">
-			<xs:pattern value=".*:?.*"/><!-- COMMENT the pattern is useless -->
+			<xs:pattern value=".*:.*"/>
 		</xs:restriction>
 	</xs:simpleType>
 

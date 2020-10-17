@@ -8,4 +8,15 @@ public interface IUIEventType {
 	String getEventTypeString();
 
 	INamespacePrefixedString getEventType();
+
+	enum StaticHolder {
+		;
+
+		public static final @NonNls String DEFAULT_NAMESPACE = "default";
+		public static final @NonNls String DEFAULT_PREFIX = DEFAULT_NAMESPACE + INamespacePrefixedString.StaticHolder.SEPARATOR;
+
+		public static @NonNls String getDefaultNamespace() { return DEFAULT_NAMESPACE; }
+
+		public static @NonNls String getDefaultPrefix() { return DEFAULT_PREFIX; }
+	}
 }

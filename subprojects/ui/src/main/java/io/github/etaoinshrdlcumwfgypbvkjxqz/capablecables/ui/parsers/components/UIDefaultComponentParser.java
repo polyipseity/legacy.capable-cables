@@ -218,7 +218,10 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 									assert value != null;
 									attributes.put(key.getEventType(),
 											new UIPropertyMappingValue(null,
-													Optional.ofNullable(value.apply(node)).map(ImmutableNamespacePrefixedString::of).orElse(null)));
+													Optional.ofNullable(value.apply(node))
+															.map(IUIEventType.StaticHolder.getDefaultPrefix()::concat)
+															.map(ImmutableNamespacePrefixedString::of)
+															.orElse(null)));
 								});
 
 						mappings = MapUtilities.concatMaps(mappings, attributes);

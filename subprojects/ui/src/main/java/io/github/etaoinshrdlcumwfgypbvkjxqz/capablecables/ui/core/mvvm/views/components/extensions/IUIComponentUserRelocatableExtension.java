@@ -22,7 +22,7 @@ import java.util.Optional;
 
 public interface IUIComponentUserRelocatableExtension<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
 		extends IUIExtension<INamespacePrefixedString, IUIComponent>, IHasGenericClass.Extended<IUIComponent, E>, IUIRendererContainerContainer<IUIComponentUserRelocatableExtension.IRelocatingRenderer> {
-	INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, "component.user_relocatable");
+	INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(StaticHolder.getDefaultNamespace(), "component.user_relocatable");
 	@SuppressWarnings("unchecked")
 	Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIComponentUserRelocatableExtension<?>, IUIComponent>> TYPE =
 			UIExtensionRegistry.getInstance().registerApply(KEY, k -> new DefaultExtensionType<>(k, (t, i) -> (Optional<? extends IUIComponentUserRelocatableExtension<?>>) i.getExtension(t.getKey())));

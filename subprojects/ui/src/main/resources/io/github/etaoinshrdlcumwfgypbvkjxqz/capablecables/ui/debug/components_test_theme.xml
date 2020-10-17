@@ -19,7 +19,7 @@
 	<renderer name="ViewBackgroundRenderer" class="renderer.extension.minecraft.background.default"/>
 
 	<renderer name="Window1Renderer" class="renderer.component.window.debug.custom">
-		<property key="window.colors.border">
+		<property key="default:window.colors.border">
 			<val:color green="128"/>
 		</property>
 	</renderer>
@@ -32,7 +32,7 @@
 	          class="renderer.extension.user_resizable.previewing.minecraft"/>
 
 	<renderer name="WindowAnchoredRenderer">
-		<property key="window.colors.border" bindingKey="anchoredWindowBorderColor"/>
+		<property key="default:window.colors.border" bindingKey="default:anchoredWindowBorderColor"/>
 	</renderer>
 
 	<renderer name="WindowAnchoredExtensionRelocatableRenderer"
@@ -42,7 +42,7 @@
 	          class="renderer.extension.user_resizable.previewing.minecraft"/>
 
 	<renderer name="Button1Renderer">
-		<property key="button.colors.hovering">
+		<property key="default:button.colors.hovering">
 			<val:color xsi:nil="true"/>
 		</property>
 	</renderer>

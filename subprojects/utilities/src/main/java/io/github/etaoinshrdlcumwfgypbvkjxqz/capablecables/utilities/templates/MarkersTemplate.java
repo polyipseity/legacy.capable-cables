@@ -18,24 +18,27 @@ public abstract class MarkersTemplate {
 	private static final String SEPARATOR = "-";
 	private static final CacheBuilder<Object, Object> MARKERS_BUILDER = CacheUtilities.newCacheBuilderNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_LARGE).weakKeys();
 	@NonNls
-	protected final Marker markerUnmarked = getMarker("unmarked");
+	protected final Marker markerUnmarked;
 	@NonNls
-	protected final Marker markerClass = getMarker("class");
+	protected final Marker markerClass;
 
 	protected final String namespace;
 	@NonNls
-	protected final Marker markerStructure = getMarker("structure");
-	protected final LoadingCache<Class<?>, Marker> classMarkers =
-			getMarkersBuilder().build(CacheLoader.from(clazz -> {
-				assert clazz != null;
-				return addReferences(getMarker(clazz.getSimpleName() + '@' + Integer.toHexString(clazz.getName().hashCode())),
-						getMarkerClass());
-			}));
+	protected final Marker markerStructure;
+	protected final LoadingCache<Class<?>, Marker> classMarkers;
 
 	protected static CacheBuilder<Object, Object> getMarkersBuilder() { return MARKERS_BUILDER; }
 
 	protected MarkersTemplate(CharSequence namespace) {
 		this.namespace = namespace.toString();
+		this.markerUnmarked = getMarker("unmarked");
+		this.markerClass = getMarker("class");
+		this.markerStructure = getMarker("structure");
+		this.classMarkers = getMarkersBuilder().build(CacheLoader.from(clazz -> {
+			assert clazz != null;
+			return addReferences(getMarker(clazz.getSimpleName() + '@' + Integer.toHexString(clazz.getName().hashCode())),
+					getMarkerClass());
+		}));
 	}
 
 	public final Marker getMarker(@NonNls CharSequence string) { return MarkerFactory.getMarker(getNamespacePrefixedString(string)); }

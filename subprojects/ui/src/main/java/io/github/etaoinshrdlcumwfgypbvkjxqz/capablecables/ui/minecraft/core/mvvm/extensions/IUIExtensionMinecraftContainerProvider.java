@@ -17,7 +17,7 @@ import java.util.Optional;
 @OnlyIn(Dist.CLIENT)
 public interface IUIExtensionMinecraftContainerProvider
 		extends IUIExtension<INamespacePrefixedString, IUIInfrastructure<?, ?, ?>> {
-	INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, "container");
+	INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(StaticHolder.getDefaultNamespace(), "container");
 	@SuppressWarnings("unchecked")
 	Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIExtensionMinecraftContainerProvider, IUIInfrastructure<?, ?, ?>>> TYPE =
 			UIExtensionRegistry.getInstance().registerApply(KEY, k -> new DefaultExtensionType<>(k, (t, i) -> (Optional<? extends IUIExtensionMinecraftContainerProvider>) i.getExtension(t.getKey())));

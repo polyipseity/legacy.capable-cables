@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NonNls;
 
 public enum EnumUIEventComponentType
 		implements IUIEventType {
-	CHAR_TYPED(INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "char_typed"),
+	CHAR_TYPED(StaticHolder.getDefaultPrefix() + "char_typed"),
 	;
 
 	@NonNls

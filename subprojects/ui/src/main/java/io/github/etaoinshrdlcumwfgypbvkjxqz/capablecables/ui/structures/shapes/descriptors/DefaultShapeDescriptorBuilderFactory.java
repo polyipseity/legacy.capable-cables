@@ -21,7 +21,7 @@ import java.util.function.Supplier;
 public class DefaultShapeDescriptorBuilderFactory
 		extends RegistryWithDefaults<Class<? extends Shape>, Supplier<? extends IShapeDescriptorBuilder<?>>>
 		implements IShapeDescriptorBuilderFactory {
-	private static final INamespacePrefixedString DEFAULT_FACTORY_KEY = ImmutableNamespacePrefixedString.of(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, "default");
+	private static final INamespacePrefixedString DEFAULT_FACTORY_KEY = ImmutableNamespacePrefixedString.of(StaticHolder.getDefaultNamespace(), "default");
 	private static final ImmutableMap<Class<? extends Shape>, Supplier<RegistryObject<Supplier<? extends IShapeDescriptorBuilder<?>>>>> DEFAULTS_SUPPLIER =
 			ImmutableMap.<Class<? extends Shape>, Supplier<RegistryObject<Supplier<? extends IShapeDescriptorBuilder<?>>>>>builder()
 					.put(Rectangle2D.class, () -> new RegistryObject<>(RectangularShapeDescriptorBuilder.Rectangle2DSD::new))

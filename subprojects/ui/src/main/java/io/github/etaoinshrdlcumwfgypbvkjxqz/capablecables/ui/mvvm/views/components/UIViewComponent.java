@@ -37,12 +37,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IC
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.registering.Registry;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.FunctionalPath;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.eventbus.api.EventPriority;
-import org.jetbrains.annotations.NonNls;
 import sun.misc.Cleaner;
 
 import javax.annotation.Nullable;
@@ -223,7 +221,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 
 		@SuppressWarnings({"ThisEscapedInObjectConstruction", "rawtypes", "RedundantSuppression", "unchecked", "AnonymousInnerClassMayBeStatic"})
 		public static final Registry.RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
-				UICacheRegistry.getInstance().registerApply(generateKey("children_flat"),
+				UICacheRegistry.getInstance().registerApply(IUICacheType.generateKey("children_flat"),
 						key -> new AbstractUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
 							{
 								OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
@@ -271,7 +269,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 						});
 		@SuppressWarnings({"UnstableApiUsage", "ThisEscapedInObjectConstruction", "rawtypes", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
 		public static final Registry.RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
-				UICacheRegistry.getInstance().registerApply(generateKey("children_flat.focusable"),
+				UICacheRegistry.getInstance().registerApply(IUICacheType.generateKey("children_flat.focusable"),
 						key -> new AbstractUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
 							{
 								OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
@@ -313,8 +311,6 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 										.collect(ImmutableList.toImmutableList());
 							}
 						});
-
-		private static INamespacePrefixedString generateKey(@SuppressWarnings("SameParameterValue") @NonNls CharSequence name) { return ImmutableNamespacePrefixedString.of(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, CacheViewComponent.class.getName() + '.' + name); /* TODO extract this method */ }
 	}
 
 	@Override

@@ -16,13 +16,12 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 public interface INamespacePrefixedString {
+	@SuppressWarnings("SwitchStatementWithTooFewBranches")
 	static String[] decompose(CharSequence string) {
 		String[] ss = string.toString().split(Pattern.quote(StaticHolder.SEPARATOR), 2);
 		switch (ss.length) {
 			case 2:
 				return ss;
-			case 1:
-				return new String[]{StaticHolder.DEFAULT_NAMESPACE, ss[0]};
 			default:
 				throw new IllegalArgumentException(
 						new LogMessageBuilder()
@@ -46,12 +45,7 @@ public interface INamespacePrefixedString {
 		;
 
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
-		@NonNls
-		public static final String SEPARATOR = ":";
-		@NonNls
-		public static final String DEFAULT_NAMESPACE = "minecraft"; // TODO remove this
-		@NonNls
-		public static final String DEFAULT_PREFIX = DEFAULT_NAMESPACE + SEPARATOR;
+		public static final @NonNls String SEPARATOR = ":";
 		private static final Marker CLASS_MARKER =
 				MarkersTemplate.addReferences(UtilitiesMarkers.getInstance().getClassMarker(),
 						UtilitiesMarkers.getInstance().getMarkerStructure());

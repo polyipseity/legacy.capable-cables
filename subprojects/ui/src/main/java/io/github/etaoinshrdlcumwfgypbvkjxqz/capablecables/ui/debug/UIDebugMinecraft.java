@@ -45,6 +45,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinding.EnumBindingType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.methods.IBindingMethodDestination;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.fields.BindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.fields.ObservableField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.methods.BindingMethodDestination;
@@ -325,17 +326,17 @@ public enum UIDebugMinecraft {
 		private static final class ViewModel
 				extends UIViewModelMinecraft<Model> {
 			protected final IBindingField<Integer> anchoredWindowBorderColor = new BindingField<>(
-					ImmutableNamespacePrefixedString.of("anchoredWindowBorderColor"),
+					ImmutableNamespacePrefixedString.of(IHasBindingKey.StaticHolder.getDefaultNamespace(), "anchoredWindowBorderColor"),
 					new ObservableField<>(Integer.class, null));
 			protected final IBindingMethodDestination<UIComponentButton.IUIEventActivate> buttonOnActivate = new BindingMethodDestination<>(
 					UIComponentButton.IUIEventActivate.class,
-					ImmutableNamespacePrefixedString.of("buttonOnActivate"),
+					ImmutableNamespacePrefixedString.of(IHasBindingKey.StaticHolder.getDefaultNamespace(), "buttonOnActivate"),
 					this::onButtonActivate);
 			protected boolean anchoredWindowFlickering = false;
 			protected final Random random = new Random();
 			protected final IBindingMethodDestination<IUIEvent> buttonOnActivated = new BindingMethodDestination<>(
 					IUIEvent.class,
-					ImmutableNamespacePrefixedString.of("buttonOnActivated"),
+					ImmutableNamespacePrefixedString.of(IHasBindingKey.StaticHolder.getDefaultNamespace(), "buttonOnActivated"),
 					this::onButtonActivated);
 
 			private ViewModel() { super(new Model()); }

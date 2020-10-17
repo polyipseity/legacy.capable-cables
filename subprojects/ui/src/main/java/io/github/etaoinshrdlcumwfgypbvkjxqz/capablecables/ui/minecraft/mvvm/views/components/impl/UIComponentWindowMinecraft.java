@@ -18,6 +18,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.Bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.ImmutableBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.reactivex.rxjava3.observers.DisposableObserver;
@@ -71,9 +72,9 @@ public class UIComponentWindowMinecraft
 	public static class DefaultRenderer<C extends UIComponentWindowMinecraft>
 			extends NullUIComponentRendererMinecraft<C> {
 		@NonNls
-		public static final String PROPERTY_COLOR_BACKGROUND = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "window.colors.background";
+		public static final String PROPERTY_COLOR_BACKGROUND = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "window.colors.background";
 		@NonNls
-		public static final String PROPERTY_COLOR_BORDER = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "window.colors.border";
+		public static final String PROPERTY_COLOR_BORDER = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "window.colors.border";
 
 		public static final INamespacePrefixedString PROPERTY_COLOR_BACKGROUND_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_BACKGROUND);
 		public static final INamespacePrefixedString PROPERTY_COLOR_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_BORDER);

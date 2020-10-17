@@ -28,10 +28,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.registering.Registry;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import net.minecraftforge.eventbus.api.EventPriority;
-import org.jetbrains.annotations.NonNls;
 import sun.misc.Cleaner;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
@@ -72,7 +70,7 @@ public class UICacheExtension
 
 		@SuppressWarnings({"ThisEscapedInObjectConstruction", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
 		public static final Registry.RegistryObject<IUICacheType<IUIComponentManager<?>, IUIComponent>> MANAGER =
-				UICacheRegistry.getInstance().registerApply(generateKey("manager"),
+				UICacheRegistry.getInstance().registerApply(IUICacheType.generateKey("manager"),
 						key -> new AbstractUICacheType<IUIComponentManager<?>, IUIComponent>(key) {
 							{
 								OptionalWeakReference<? extends IUICacheType<?, IUIComponent>> thisRef =
@@ -102,7 +100,7 @@ public class UICacheExtension
 						});
 		@SuppressWarnings({"ThisEscapedInObjectConstruction", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
 		public static final Registry.RegistryObject<IUICacheType<Integer, IUIComponent>> Z =
-				UICacheRegistry.getInstance().registerApply(generateKey("z"),
+				UICacheRegistry.getInstance().registerApply(IUICacheType.generateKey("z"),
 						key -> new AbstractUICacheType<Integer, IUIComponent>(key) {
 							{
 								OptionalWeakReference<? extends IUICacheType<?, IUIComponent>> thisRef =
@@ -136,7 +134,5 @@ public class UICacheExtension
 								return Iterators.size(new IUIComponent.ParentIterator(container.getParent().orElse(null)));
 							}
 						});
-
-		private static INamespacePrefixedString generateKey(@NonNls CharSequence name) { return ImmutableNamespacePrefixedString.of(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, CacheUniversal.class.getName() + '.' + name); /* TODO make this a utility method perhaps */ }
 	}
 }
