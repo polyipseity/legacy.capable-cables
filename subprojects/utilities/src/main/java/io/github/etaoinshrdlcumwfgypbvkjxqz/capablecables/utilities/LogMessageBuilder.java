@@ -14,10 +14,10 @@ public class LogMessageBuilder {
 	private final List<Supplier<?>> arguments = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 	private final Map<String, Supplier<?>> keyValuePairs = new HashMap<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
 
-	public LogMessageBuilder addKeyValue(@NonNls String key, @Nullable Object value) { return addKeyValue(key, ConstantSupplier.ofNullable(value)); }
+	public LogMessageBuilder addKeyValue(@NonNls CharSequence key, @Nullable Object value) { return addKeyValue(key, ConstantSupplier.ofNullable(value)); }
 
-	public LogMessageBuilder addKeyValue(@NonNls String key, Supplier<?> value) {
-		getKeyValuePairs().put(key, value);
+	public LogMessageBuilder addKeyValue(@NonNls CharSequence key, Supplier<?> value) {
+		getKeyValuePairs().put(key.toString(), value);
 		return this;
 	}
 
@@ -79,7 +79,7 @@ public class LogMessageBuilder {
 		if (hasMarkers[0])
 			ret.append(' ');
 		getKeyValuePairs().forEach((key, value) ->
-				ret.append(key).append('=').append(value.get()).append(' '));
+				ret.append(key).append('=').append(AssertionUtilities.assertNonnull(value).get()).append(' '));
 		ret.append(FormattingUtilities.formatSimpleParameterized(
 				getMessages().stream().sequential()
 						.map(Supplier::get)

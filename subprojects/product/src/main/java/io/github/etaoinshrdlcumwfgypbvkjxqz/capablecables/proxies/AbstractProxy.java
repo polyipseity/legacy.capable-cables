@@ -36,7 +36,7 @@ public abstract class AbstractProxy<T extends ModLifecycleEvent> implements IPro
 	}
 
 	@SuppressWarnings("SameReturnValue")
-	protected static <E extends ModLifecycleEvent> boolean processEvent(String name, E event, Consumer<? super E> processor) {
+	protected static <E extends ModLifecycleEvent> boolean processEvent(CharSequence name, E event, Consumer<? super E> processor) {
 		ModConfiguration.getInstance().getLogger()
 				.atInfo()
 				.addMarker(ModMarkers.getInstance().getMarkerModLifecycle())

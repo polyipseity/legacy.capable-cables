@@ -42,25 +42,26 @@ public enum RegistrableUtilities {
 	public enum NBTUtilities {
 		;
 
-		public static boolean setTagIfNotEmpty(CompoundNBT p, @NonNls String k, CompoundNBT v) {
+		public static boolean setTagIfNotEmpty(CompoundNBT p, @NonNls CharSequence k, CompoundNBT v) {
 			if (v.isEmpty())
 				return false;
-			p.put(k, v);
+			p.put(k.toString(), v);
 			return true;
 		}
 
 		@SuppressWarnings("UnusedReturnValue")
-		public static <T> boolean setChildIfNotNull(CompoundNBT p, @NonNls String k, @Nullable T v, TriConsumer<CompoundNBT, String, ? super T> c) {
+		public static <T> boolean setChildIfNotNull(CompoundNBT p, @NonNls CharSequence k, @Nullable T v, TriConsumer<? super CompoundNBT, ? super String, ? super T> c) {
 			if (v == null) return false;
-			c.accept(p, k, v);
+			c.accept(p, k.toString(), v);
 			return true;
 		}
 
-		public static <T> Optional<T> readChildIfHasKey(@Nullable CompoundNBT p, @NonNls String key, Supplier<? extends INBT> type,
-		                                                BiFunction<CompoundNBT, String, T> f) {
+		public static <T> Optional<T> readChildIfHasKey(@Nullable CompoundNBT p, @NonNls CharSequence key, Supplier<? extends INBT> type,
+		                                                BiFunction<? super CompoundNBT, ? super String, ? extends T> f) {
+			String key2 = key.toString();
 			return Optional.ofNullable(p)
-					.filter(pt -> pt.contains(key, AssertionUtilities.assertNonnull(type.get()).getId()))
-					.map(pt -> f.apply(pt, key));
+					.filter(pt -> pt.contains(key2, AssertionUtilities.assertNonnull(type.get()).getId()))
+					.map(pt -> f.apply(pt, key2));
 		}
 
 		public static Optional<CompoundNBT> returnTagIfNotEmpty(CompoundNBT p) { return Optional.of(p).filter(t -> !t.isEmpty()); }

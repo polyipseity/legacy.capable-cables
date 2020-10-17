@@ -47,8 +47,8 @@ public interface INamespacePrefixedString {
 
 		public static ImmutableMap<String, Function<? super INamespacePrefixedString, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
 
-		public static String[] decompose(String string) {
-			String[] ss = string.split(Pattern.quote(SEPARATOR), 2);
+		public static String[] decompose(CharSequence string) {
+			String[] ss = string.toString().split(Pattern.quote(SEPARATOR), 2);
 			switch (ss.length) {
 				case 2:
 					return ss;

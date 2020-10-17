@@ -13,11 +13,11 @@ public enum NumberUtilities {
 		return (doubleToLongBits(vd) & 0b1000000000000000000000000000000000000000000000000000000000000000L) != 0L && !Double.isNaN(vd);
 	}
 
-	public static boolean isDouble(String string) { return tryParseDouble(string).isPresent(); }
+	public static boolean isDouble(CharSequence string) { return tryParseDouble(string).isPresent(); }
 
-	public static Optional<Double> tryParseDouble(String string) {
+	public static Optional<Double> tryParseDouble(CharSequence string) {
 		try {
-			return Optional.of(Double.parseDouble(string));
+			return Optional.of(Double.parseDouble(string.toString()));
 		} catch (NumberFormatException ex) {
 			return Optional.empty();
 		}

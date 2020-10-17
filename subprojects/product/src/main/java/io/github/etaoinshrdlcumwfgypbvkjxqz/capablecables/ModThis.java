@@ -65,9 +65,9 @@ public final class ModThis {
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
-	public static ResourceLocation createResourceLocation(@NonNls String path) { return new ResourceLocation(ModConstants.MOD_ID, path); }
+	public static ResourceLocation createResourceLocation(@NonNls CharSequence path) { return new ResourceLocation(ModConstants.MOD_ID, path.toString()); }
 
-	public static String getNamespacePrefixedString(@NonNls String separator, @NonNls String string) { return NamespaceUtilities.getNamespacePrefixedString(separator, ModConstants.MOD_ID, string); }
+	public static String getNamespacePrefixedString(@NonNls CharSequence separator, @NonNls String string) { return NamespaceUtilities.getNamespacePrefixedString(separator, ModConstants.MOD_ID, string); }
 
 	public IProxy<?> getProxy() { return proxy; }
 

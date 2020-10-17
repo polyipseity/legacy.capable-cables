@@ -71,8 +71,8 @@ public class ChangingLocaleResourceBundle
 
 		public ChangingLocaleResourceBundle build() { return getBundle(getBaseName(), getLoader(), getLocaleSupplier()); }
 
-		public static ChangingLocaleResourceBundle getBundle(String baseName, BiFunction<? super String, ? super Locale, ? extends ResourceBundle> loader, Supplier<? extends Locale> localeSupplier) {
-			return BASE_NAME_BUNDLE_MAP.computeIfAbsent(baseName, key ->
+		public static ChangingLocaleResourceBundle getBundle(CharSequence baseName, BiFunction<? super String, ? super Locale, ? extends ResourceBundle> loader, Supplier<? extends Locale> localeSupplier) {
+			return BASE_NAME_BUNDLE_MAP.computeIfAbsent(baseName.toString(), key ->
 					new ChangingLocaleResourceBundle(CacheLoader.from(locale ->
 							loader.apply(key, locale)),
 							localeSupplier));

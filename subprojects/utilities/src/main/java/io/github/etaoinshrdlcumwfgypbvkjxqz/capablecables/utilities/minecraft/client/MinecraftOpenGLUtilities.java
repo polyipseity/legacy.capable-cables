@@ -34,8 +34,32 @@ public enum MinecraftOpenGLUtilities {
 
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 
-		public static void clear(@NonNls String name) {
-			Optional.ofNullable(STACKS.getIfPresent(name))
+		public static final Runnable GL_SCISSOR_FALLBACK = () -> {
+			MainWindow window = MinecraftClientUtilities.getMinecraftNonnull().getMainWindow();
+			State.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{0, 0, window.getFramebufferWidth(), window.getFramebufferHeight()}, (i, v) -> {
+				assert v != null;
+				GL11.glScissor(v[0], v[1], v[2], v[3]);
+			});
+		},
+				STENCIL_MASK_FALLBACK = () -> RenderSystem.stencilMask(MinecraftOpenGLUtilities.GL_MASK_ALL_BITS),
+				STENCIL_FUNC_FALLBACK = () -> RenderSystem.stencilFunc(GL11.GL_ALWAYS, 0, MinecraftOpenGLUtilities.GL_MASK_ALL_BITS),
+				STENCIL_OP_FALLBACK = () -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP),
+				COLOR_MASK_FALLBACK = () -> RenderSystem.colorMask(true, true, true, true);
+
+		public static void clearAll() {
+			STACKS.asMap().keySet().stream().unordered()
+					.forEach(Stacks::clear);
+			assert STACKS.asMap().isEmpty();
+		}
+
+		private static final LoadingCache<String, Deque<GLCall>> STACKS =
+				ManualLoadingCache.newNestedLoadingCacheCollection(
+						CacheUtilities.newCacheBuilderSingleThreaded()
+								.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)
+								.build(CacheLoader.from(k -> new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM))));
+
+		public static void clear(@NonNls CharSequence name) {
+			Optional.ofNullable(STACKS.getIfPresent(name.toString()))
 					.filter(s -> !s.isEmpty())
 					.ifPresent(s -> {
 						UtilitiesConfiguration.getInstance().getLogger()
@@ -49,36 +73,10 @@ public enum MinecraftOpenGLUtilities {
 					});
 		}
 
-		public static final Runnable GL_SCISSOR_FALLBACK = () -> {
-			MainWindow window = MinecraftClientUtilities.getMinecraftNonnull().getMainWindow();
-			State.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{0, 0, window.getFramebufferWidth(), window.getFramebufferHeight()}, (i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3]));
-		},
-				STENCIL_MASK_FALLBACK = () -> RenderSystem.stencilMask(MinecraftOpenGLUtilities.GL_MASK_ALL_BITS),
-				STENCIL_FUNC_FALLBACK = () -> RenderSystem.stencilFunc(GL11.GL_ALWAYS, 0, MinecraftOpenGLUtilities.GL_MASK_ALL_BITS),
-				STENCIL_OP_FALLBACK = () -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP),
-				COLOR_MASK_FALLBACK = () -> RenderSystem.colorMask(true, true, true, true);
-
-		private static final LoadingCache<String, Deque<GLCall>> STACKS =
-				ManualLoadingCache.newNestedLoadingCacheCollection(
-						CacheUtilities.newCacheBuilderSingleThreaded()
-								.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)
-								.build(CacheLoader.from(k -> new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM))));
-
-		public static void push(@NonNls String name, Runnable action, Runnable fallback) {
-			STACKS.getUnchecked(name).push(new GLCall(action, fallback));
-			action.run();
-		}
-
-		public static void clearAll() {
-			STACKS.asMap().keySet().stream().unordered()
-					.forEach(Stacks::clear);
-			assert STACKS.asMap().isEmpty();
-		}
-
 		protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
-		public static void pop(@NonNls String name) {
-			@Nullable Deque<GLCall> s = STACKS.getIfPresent(name);
+		public static void pop(@NonNls CharSequence name) {
+			@Nullable Deque<GLCall> s = STACKS.getIfPresent(name.toString());
 			if (s == null)
 				throw new NoSuchElementException(
 						new LogMessageBuilder()
@@ -90,6 +88,11 @@ public enum MinecraftOpenGLUtilities {
 			Runnable fb = s.pop().getFallback();
 			(s.isEmpty() ? fb : AssertionUtilities.assertNonnull(s.element())).run();
 			STACKS.cleanUp();
+		}
+
+		public static void push(@NonNls CharSequence name, Runnable action, Runnable fallback) {
+			STACKS.getUnchecked(name.toString()).push(new GLCall(action, fallback));
+			action.run();
 		}
 
 		@OnlyIn(Dist.CLIENT)

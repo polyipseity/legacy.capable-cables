@@ -7,18 +7,23 @@ import org.jetbrains.annotations.NonNls;
 import javax.annotation.concurrent.Immutable;
 
 @Immutable
-public class ImmutableNamespacePrefixedString
+public final class ImmutableNamespacePrefixedString
 		implements INamespacePrefixedString {
 	protected final String namespace;
 	protected final String path;
 
-	public ImmutableNamespacePrefixedString(@NonNls String string) { this(StaticHolder.decompose(string)); }
+	private ImmutableNamespacePrefixedString(@NonNls CharSequence namespace, @NonNls CharSequence path) {
+		this.namespace = namespace.toString();
+		this.path = path.toString();
+	}
 
-	protected ImmutableNamespacePrefixedString(String[] parts) { this(parts[0], parts[1]); }
+	public static ImmutableNamespacePrefixedString of(@NonNls CharSequence string) {
+		String[] decomposed = StaticHolder.decompose(string);
+		return of(decomposed[0], decomposed[1]);
+	}
 
-	public ImmutableNamespacePrefixedString(@NonNls String namespace, @NonNls String path) {
-		this.namespace = namespace;
-		this.path = path;
+	public static ImmutableNamespacePrefixedString of(@NonNls CharSequence namespace, @NonNls CharSequence path) {
+		return new ImmutableNamespacePrefixedString(namespace, path);
 	}
 
 	@Override

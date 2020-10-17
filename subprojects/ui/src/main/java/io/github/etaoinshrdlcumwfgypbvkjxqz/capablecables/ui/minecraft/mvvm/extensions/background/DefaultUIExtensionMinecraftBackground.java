@@ -27,6 +27,7 @@ import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 
 import javax.annotation.Nonnull;
@@ -53,7 +54,7 @@ public class DefaultUIExtensionMinecraftBackground
 			throws IllegalStateException { return Optional.ofNullable(getRendererContainerReference().get()).orElseThrow(IllegalStateException::new); }
 
 	@Override
-	public void initializeRendererContainer(String name)
+	public void initializeRendererContainer(@NonNls CharSequence name)
 			throws IllegalStateException {
 		if (!getRendererContainerReference().compareAndSet(null,
 				new UIDefaultRendererContainer<>(name, this, UIExtensionMinecraftBackgroundNullBackgroundRenderer.class)))

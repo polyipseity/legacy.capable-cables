@@ -314,7 +314,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 							}
 						});
 
-		private static INamespacePrefixedString generateKey(@SuppressWarnings("SameParameterValue") @NonNls String name) { return new ImmutableNamespacePrefixedString(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, CacheViewComponent.class.getName() + '.' + name); /* TODO extract this method */ }
+		private static INamespacePrefixedString generateKey(@SuppressWarnings("SameParameterValue") @NonNls CharSequence name) { return ImmutableNamespacePrefixedString.of(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, CacheViewComponent.class.getName() + '.' + name); /* TODO extract this method */ }
 	}
 
 	@Override

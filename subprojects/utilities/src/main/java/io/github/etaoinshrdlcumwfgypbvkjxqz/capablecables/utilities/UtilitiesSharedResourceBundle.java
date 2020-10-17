@@ -33,7 +33,7 @@ public final class UtilitiesSharedResourceBundle
 		@PropertyKey(resourceBundle = RESOURCE_BUNDLE_PATH)
 		private final String key;
 
-		EnumKey(@PropertyKey(resourceBundle = RESOURCE_BUNDLE_PATH) String key) { this.key = key; }
+		EnumKey(@PropertyKey(resourceBundle = RESOURCE_BUNDLE_PATH) CharSequence key) { this.key = key.toString(); }
 
 		public static String getResourceBundlePath() { return RESOURCE_BUNDLE_PATH; }
 

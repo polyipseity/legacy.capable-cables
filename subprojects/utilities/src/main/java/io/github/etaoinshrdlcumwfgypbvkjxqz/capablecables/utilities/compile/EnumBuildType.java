@@ -8,9 +8,9 @@ public enum EnumBuildType {
 	RELEASE,
 	;
 
-	public static EnumBuildType valueOfSafe(String name) {
+	public static EnumBuildType valueOfSafe(CharSequence name) {
 		return ThrowableUtilities.getQuietly(() ->
-				valueOf(name), IllegalArgumentException.class, UtilitiesConfiguration.getInstance().getThrowableHandler())
+				valueOf(name.toString()), IllegalArgumentException.class, UtilitiesConfiguration.getInstance().getThrowableHandler())
 				.orElse(DEBUG); // COMMENT default value in case the string did not get replaced
 	}
 

@@ -34,18 +34,18 @@ public abstract class MarkersTemplate {
 
 	protected static CacheBuilder<Object, Object> getMarkersBuilder() { return MARKERS_BUILDER; }
 
-	protected String getNamespacePrefixedString(String string) { return NamespaceUtilities.getNamespacePrefixedString(getSeparator(), getNamespace(), string); }
-
-	protected MarkersTemplate(String namespace) {
-		this.namespace = namespace;
+	protected MarkersTemplate(CharSequence namespace) {
+		this.namespace = namespace.toString();
 	}
+
+	public final Marker getMarker(@NonNls CharSequence string) { return MarkerFactory.getMarker(getNamespacePrefixedString(string)); }
 
 	public static Marker addReferences(Marker marker, Marker... references) {
 		Arrays.stream(references).sequential().forEachOrdered(marker::add);
 		return marker;
 	}
 
-	public final Marker getMarker(@NonNls String string) { return MarkerFactory.getMarker(getNamespacePrefixedString(string)); }
+	protected String getNamespacePrefixedString(CharSequence string) { return NamespaceUtilities.getNamespacePrefixedString(getSeparator(), getNamespace(), string); }
 
 	public static String getSeparator() { return SEPARATOR; }
 

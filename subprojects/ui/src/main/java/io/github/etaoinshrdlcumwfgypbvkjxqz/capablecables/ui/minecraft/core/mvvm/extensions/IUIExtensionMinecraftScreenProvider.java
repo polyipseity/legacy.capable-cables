@@ -19,7 +19,7 @@ import java.util.Set;
 @OnlyIn(Dist.CLIENT)
 public interface IUIExtensionMinecraftScreenProvider
 		extends IUIExtension<INamespacePrefixedString, IUIInfrastructure<?, ?, ?>> {
-	INamespacePrefixedString KEY = new ImmutableNamespacePrefixedString(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, "screen");
+	INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, "screen");
 	@SuppressWarnings("unchecked")
 	Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIExtensionMinecraftScreenProvider, IUIInfrastructure<?, ?, ?>>> TYPE =
 			UIExtensionRegistry.getInstance().registerApply(KEY, k -> new DefaultExtensionType<>(k, (t, i) -> (Optional<? extends IUIExtensionMinecraftScreenProvider>) i.getExtension(t.getKey())));

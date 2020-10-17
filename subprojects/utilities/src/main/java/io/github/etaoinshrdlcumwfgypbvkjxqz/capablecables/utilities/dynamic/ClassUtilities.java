@@ -100,12 +100,13 @@ public enum ClassUtilities {
 								.orElse(null)), upper);
 	}
 
-	public static Optional<Field> getAnyField(Class<?> clazz, String name) {
+	public static Optional<Field> getAnyField(Class<?> clazz, CharSequence name) {
+		String name2 = name.toString();
 		return ClassUtilities.getThisAndSuperclassesAndInterfaces(clazz).stream().sequential()
 				.flatMap(Collection::stream)
 				.map(clazz1 -> {
 					try {
-						return clazz1.getDeclaredField(name);
+						return clazz1.getDeclaredField(name2);
 					} catch (NoSuchFieldException e) {
 						return null;
 					}
@@ -114,12 +115,13 @@ public enum ClassUtilities {
 				.findFirst();
 	}
 
-	public static Optional<Method> getAnyMethod(Class<?> clazz, String name, Class<?>... parameterTypes) {
+	public static Optional<Method> getAnyMethod(Class<?> clazz, CharSequence name, Class<?>... parameterTypes) {
+		String name2 = name.toString();
 		return ClassUtilities.getThisAndSuperclassesAndInterfaces(clazz).stream().sequential()
 				.flatMap(Collection::stream)
 				.map(clazz1 -> {
 					try {
-						return clazz1.getDeclaredMethod(name, parameterTypes);
+						return clazz1.getDeclaredMethod(name2, parameterTypes);
 					} catch (NoSuchMethodException e) {
 						return null;
 					}
@@ -137,10 +139,10 @@ public enum ClassUtilities {
 				.collect(ImmutableSet.toImmutableSet());
 	}
 
-	public static Class<?> defineClass(ClassLoader classLoader, String name, byte[] data) {
+	public static Class<?> defineClass(ClassLoader classLoader, CharSequence name, byte[] data) {
 		// TODO Java 9 - use Lookup.defineClass
 		try {
-			return (Class<?>) DEFINE_CLASS_METHOD_HANDLE.invokeExact(classLoader, name, data, 0, data.length);
+			return (Class<?>) DEFINE_CLASS_METHOD_HANDLE.invokeExact(classLoader, name.toString(), data, 0, data.length);
 		} catch (Throwable throwable) {
 			throw ThrowableUtilities.propagate(throwable);
 		}

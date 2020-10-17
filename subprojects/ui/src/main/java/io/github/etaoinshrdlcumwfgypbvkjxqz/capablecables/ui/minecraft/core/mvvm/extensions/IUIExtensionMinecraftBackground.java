@@ -20,7 +20,7 @@ import java.util.Optional;
 @OnlyIn(Dist.CLIENT)
 public interface IUIExtensionMinecraftBackground
 		extends IUIExtension<INamespacePrefixedString, IUIViewComponentMinecraft<?, ?>>, IUIRendererContainerContainer<IUIExtensionMinecraftBackground.IBackgroundRenderer> {
-	INamespacePrefixedString KEY = new ImmutableNamespacePrefixedString(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, "background");
+	INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, "background");
 	@SuppressWarnings("unchecked")
 	Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIExtensionMinecraftBackground, IUIViewComponentMinecraft<?, ?>>> TYPE =
 			UIExtensionRegistry.getInstance().registerApply(KEY, k -> new DefaultExtensionType<>(k, (t, i) -> (Optional<? extends IUIExtensionMinecraftBackground>) i.getExtension(t.getKey())));

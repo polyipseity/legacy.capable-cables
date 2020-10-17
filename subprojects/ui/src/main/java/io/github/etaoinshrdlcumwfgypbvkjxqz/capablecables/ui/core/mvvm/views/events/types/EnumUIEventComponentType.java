@@ -14,9 +14,10 @@ public enum EnumUIEventComponentType
 	protected final String eventTypeString;
 	protected final INamespacePrefixedString eventType;
 
-	EnumUIEventComponentType(@SuppressWarnings("SameParameterValue") @NonNls String eventTypeString) {
-		this.eventTypeString = eventTypeString;
-		this.eventType = new ImmutableNamespacePrefixedString(this.eventTypeString);
+	EnumUIEventComponentType(@SuppressWarnings("SameParameterValue") @NonNls CharSequence eventTypeString) {
+		String eventTypeString2 = eventTypeString.toString();
+		this.eventTypeString = eventTypeString2;
+		this.eventType = ImmutableNamespacePrefixedString.of(eventTypeString2);
 	}
 
 	@Override

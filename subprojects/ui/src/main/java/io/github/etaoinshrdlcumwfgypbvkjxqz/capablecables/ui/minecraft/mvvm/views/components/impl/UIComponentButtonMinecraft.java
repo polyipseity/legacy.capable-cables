@@ -46,7 +46,7 @@ public class UIComponentButtonMinecraft
 			throws IllegalStateException { return Optional.ofNullable(getRendererContainerReference().get()).orElseThrow(IllegalStateException::new); }
 
 	@Override
-	public void initializeRendererContainer(String name)
+	public void initializeRendererContainer(@NonNls CharSequence name)
 			throws IllegalStateException {
 		IUIRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer = new UIDefaultRendererContainer<>(name, this, CastUtilities.castUnchecked(DefaultRenderer.class));
 		if (!getRendererContainerReference().compareAndSet(null, rendererContainer))
@@ -83,12 +83,12 @@ public class UIComponentButtonMinecraft
 		@NonNls
 		public static final String PROPERTY_COLOR_PRESSED_BORDER = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "button.colors.pressed.border";
 
-		public static final INamespacePrefixedString PROPERTY_COLOR_BASE_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_COLOR_BASE);
-		public static final INamespacePrefixedString PROPERTY_COLOR_BASE_BORDER_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_COLOR_BASE_BORDER);
-		public static final INamespacePrefixedString PROPERTY_COLOR_HOVERING_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_COLOR_HOVERING);
-		public static final INamespacePrefixedString PROPERTY_COLOR_HOVERING_BORDER_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_COLOR_HOVERING_BORDER);
-		public static final INamespacePrefixedString PROPERTY_COLOR_PRESSED_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_COLOR_PRESSED);
-		public static final INamespacePrefixedString PROPERTY_COLOR_PRESSED_BORDER_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_COLOR_PRESSED_BORDER);
+		public static final INamespacePrefixedString PROPERTY_COLOR_BASE_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_BASE);
+		public static final INamespacePrefixedString PROPERTY_COLOR_BASE_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_BASE_BORDER);
+		public static final INamespacePrefixedString PROPERTY_COLOR_HOVERING_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_HOVERING);
+		public static final INamespacePrefixedString PROPERTY_COLOR_HOVERING_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_HOVERING_BORDER);
+		public static final INamespacePrefixedString PROPERTY_COLOR_PRESSED_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_PRESSED);
+		public static final INamespacePrefixedString PROPERTY_COLOR_PRESSED_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_PRESSED_BORDER);
 
 		@UIProperty(PROPERTY_COLOR_BASE)
 		protected final IBindingField<Color> colorBase;

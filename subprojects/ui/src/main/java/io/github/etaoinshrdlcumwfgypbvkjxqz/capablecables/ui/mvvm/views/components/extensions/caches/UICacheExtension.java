@@ -137,6 +137,6 @@ public class UICacheExtension
 							}
 						});
 
-		private static INamespacePrefixedString generateKey(@NonNls String name) { return new ImmutableNamespacePrefixedString(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, CacheUniversal.class.getName() + '.' + name); /* TODO make this a utility method perhaps */ }
+		private static INamespacePrefixedString generateKey(@NonNls CharSequence name) { return ImmutableNamespacePrefixedString.of(INamespacePrefixedString.StaticHolder.DEFAULT_NAMESPACE, CacheUniversal.class.getName() + '.' + name); /* TODO make this a utility method perhaps */ }
 	}
 }

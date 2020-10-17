@@ -265,7 +265,7 @@ public enum MathUtilities {
 		}
 
 		public static BigDecimal valueOfDouble(BigDecimal self) {
-			return new BigDecimal(String.valueOf(self), MathContext.DECIMAL64);
+			return new BigDecimal(self.toString(), MathContext.DECIMAL64);
 		}
 
 		public static float floatValueExact(BigDecimal self)
@@ -282,7 +282,7 @@ public enum MathUtilities {
 		}
 
 		public static BigDecimal valueOfFloat(BigDecimal self) {
-			return new BigDecimal(String.valueOf(self), MathContext.DECIMAL32);
+			return new BigDecimal(self.toString(), MathContext.DECIMAL32);
 		}
 	}
 }

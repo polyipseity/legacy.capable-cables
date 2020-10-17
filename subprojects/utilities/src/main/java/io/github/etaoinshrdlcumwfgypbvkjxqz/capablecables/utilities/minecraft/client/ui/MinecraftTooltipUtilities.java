@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -40,35 +41,48 @@ public enum MinecraftTooltipUtilities {
 	/**
 	 * @see Screen#renderTooltip(String, int, int)
 	 */
-	public static void renderTooltip(int width, int height, FontRenderer font, ItemRenderer itemRenderer, String tooltip, int mouseX, int mouseY) {
+	public static void renderTooltip(int width, int height, FontRenderer font, ItemRenderer itemRenderer, CharSequence tooltip, int mouseX, int mouseY) {
 		MinecraftScreenUtility.getInstance()
 				.setWidth_(width)
 				.setHeight_(height)
 				.setFont_(font)
 				.setItemRenderer_(itemRenderer)
-				.renderTooltip(tooltip, mouseX, mouseY);
+				.renderTooltip(tooltip.toString(), mouseX, mouseY);
 	}
 
 	/**
 	 * @see Screen#renderTooltip(List, int, int)
 	 */
-	public static void renderTooltip(int width, int height, FontRenderer font, ItemRenderer itemRenderer, List<String> tooltip, int mouseX, int mouseY) {
+	@SuppressWarnings("UnstableApiUsage")
+	public static void renderTooltip(int width, int height, FontRenderer font, ItemRenderer itemRenderer, List<? extends CharSequence> tooltip, int mouseX, int mouseY) {
 		MinecraftScreenUtility.getInstance()
 				.setWidth_(width)
 				.setHeight_(height)
 				.setFont_(font)
 				.setItemRenderer_(itemRenderer)
-				.renderTooltip(tooltip, mouseX, mouseY);
+				.renderTooltip(
+						tooltip.stream().sequential()
+								.map(CharSequence::toString)
+								.collect(ImmutableList.toImmutableList()),
+						mouseX, mouseY
+				);
 	}
 
 	/**
 	 * @see Screen#renderTooltip(List, int, int, FontRenderer)
 	 */
-	public static void renderTooltip(int width, int height, ItemRenderer itemRenderer, List<String> tooltip, int mouseX, int mouseY, FontRenderer font) {
+	@SuppressWarnings("UnstableApiUsage")
+	public static void renderTooltip(int width, int height, ItemRenderer itemRenderer, List<? extends CharSequence> tooltip, int mouseX, int mouseY, FontRenderer font) {
 		MinecraftScreenUtility.getInstance()
 				.setWidth_(width)
 				.setHeight_(height)
 				.setItemRenderer_(itemRenderer)
-				.renderTooltip(tooltip, mouseX, mouseY, font);
+				.renderTooltip(
+						tooltip.stream().sequential()
+								.map(CharSequence::toString)
+								.collect(ImmutableList.toImmutableList()),
+						mouseX, mouseY,
+						font
+				);
 	}
 }

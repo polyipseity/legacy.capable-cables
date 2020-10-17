@@ -1,8 +1,9 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors;
 
+import com.google.common.collect.Iterables;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeConstraint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
-import com.google.common.collect.Iterables;
+import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -18,7 +19,7 @@ public interface IShapeDescriptorBuilder<S extends Shape>
 		});
 	}
 
-	IShapeDescriptorBuilder<S> setProperty(String key, @Nullable Object value)
+	IShapeDescriptorBuilder<S> setProperty(@NonNls CharSequence key, @Nullable Object value)
 			throws IllegalArgumentException;
 
 	IShapeDescriptorBuilder<S> transformConcatenate(AffineTransform transform);

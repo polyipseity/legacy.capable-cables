@@ -46,7 +46,7 @@ public class UIComponentWindowMinecraft
 			throws IllegalStateException { return Optional.ofNullable(getRendererContainerReference().get()).orElseThrow(IllegalStateException::new); }
 
 	@Override
-	public void initializeRendererContainer(String name)
+	public void initializeRendererContainer(@NonNls CharSequence name)
 			throws IllegalStateException {
 		IUIRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer = new UIDefaultRendererContainer<>(name, this, CastUtilities.castUnchecked(DefaultRenderer.class));
 		if (!getRendererContainerReference().compareAndSet(null, rendererContainer))
@@ -75,8 +75,8 @@ public class UIComponentWindowMinecraft
 		@NonNls
 		public static final String PROPERTY_COLOR_BORDER = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "window.colors.border";
 
-		public static final INamespacePrefixedString PROPERTY_COLOR_BACKGROUND_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_COLOR_BACKGROUND);
-		public static final INamespacePrefixedString PROPERTY_COLOR_BORDER_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_COLOR_BORDER);
+		public static final INamespacePrefixedString PROPERTY_COLOR_BACKGROUND_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_BACKGROUND);
+		public static final INamespacePrefixedString PROPERTY_COLOR_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_BORDER);
 
 		@UIProperty(PROPERTY_COLOR_BACKGROUND)
 		protected final IBindingField<Color> colorBackground;

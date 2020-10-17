@@ -7,6 +7,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.naming.AbstractName
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.reactivex.rxjava3.observers.DisposableObserver;
+import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
@@ -21,7 +22,7 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 	@Nullable
 	private R renderer;
 
-	public UIDefaultRendererContainer(String name, IUIRendererContainerContainer<?> container, Class<? extends R> defaultRendererClass) {
+	public UIDefaultRendererContainer(@NonNls CharSequence name, IUIRendererContainerContainer<?> container, Class<? extends R> defaultRendererClass) {
 		super(name);
 		this.container = new OptionalWeakReference<>(container);
 		this.defaultRendererClass = defaultRendererClass;

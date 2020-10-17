@@ -77,31 +77,31 @@ public enum MinecraftDrawingUtilities {
 	/**
 	 * @see AbstractGui#drawCenteredString(FontRenderer, String, int, int, int)
 	 */
-	public static void drawCenteredString(AffineTransform transform, FontRenderer font, String string, Point2D p, int color) {
+	public static void drawCenteredString(AffineTransform transform, FontRenderer font, CharSequence string, Point2D p, int color) {
 		Point2D xyF = new Point2D.Double();
 		UIObjectUtilities.floorPoint(transformPoint(transform, p, xyF), xyF);
 		MinecraftScreenUtility.getInstance()
-				.drawCenteredString(font, string, (int) xyF.getX(), (int) xyF.getY(), color);
+				.drawCenteredString(font, string.toString(), (int) xyF.getX(), (int) xyF.getY(), color);
 	}
 
 	/**
 	 * @see AbstractGui#drawRightAlignedString(FontRenderer, String, int, int, int)
 	 */
-	public static void drawRightAlignedString(AffineTransform transform, FontRenderer font, String string, Point2D p, int color) {
+	public static void drawRightAlignedString(AffineTransform transform, FontRenderer font, CharSequence string, Point2D p, int color) {
 		Point2D xyF = new Point2D.Double();
 		UIObjectUtilities.floorPoint(transformPoint(transform, p, xyF), xyF);
 		MinecraftScreenUtility.getInstance()
-				.drawRightAlignedString(font, string, (int) xyF.getX(), (int) xyF.getY(), color);
+				.drawRightAlignedString(font, string.toString(), (int) xyF.getX(), (int) xyF.getY(), color);
 	}
 
 	/**
 	 * @see AbstractGui#drawString(FontRenderer, String, int, int, int)
 	 */
-	public static void drawString(AffineTransform transform, FontRenderer font, String string, Point2D p, int color) {
+	public static void drawString(AffineTransform transform, FontRenderer font, CharSequence string, Point2D p, int color) {
 		Point2D xyF = new Point2D.Double();
 		UIObjectUtilities.floorPoint(transformPoint(transform, p, xyF), xyF);
 		MinecraftScreenUtility.getInstance()
-				.drawString(font, string, (int) xyF.getX(), (int) xyF.getY(), color);
+				.drawString(font, string.toString(), (int) xyF.getX(), (int) xyF.getY(), color);
 	}
 
 	/**

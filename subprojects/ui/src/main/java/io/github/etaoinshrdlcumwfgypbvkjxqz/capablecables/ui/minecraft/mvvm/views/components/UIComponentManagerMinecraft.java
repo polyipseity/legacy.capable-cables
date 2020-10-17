@@ -13,6 +13,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.geom.Rectangle2D;
@@ -36,7 +37,7 @@ public class UIComponentManagerMinecraft
 			throws IllegalStateException { return Optional.ofNullable(getRendererContainerReference().get()).orElseThrow(IllegalStateException::new); }
 
 	@Override
-	public void initializeRendererContainer(String name)
+	public void initializeRendererContainer(@NonNls CharSequence name)
 			throws IllegalStateException {
 		IUIRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer = new UIDefaultRendererContainer<>(name, this, CastUtilities.castUnchecked(NullUIComponentRendererMinecraft.class));
 		if (!getRendererContainerReference().compareAndSet(null, rendererContainer))

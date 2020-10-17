@@ -32,7 +32,7 @@ public class ObserverToEventBusListenerAdapter<T extends Event, O>
 	private final MethodHandle methodHandle;
 
 	@SuppressWarnings({"unchecked"})
-	public ObserverToEventBusListenerAdapter(O delegated, Class<? super O> superClass, @NonNls String methodName)
+	public ObserverToEventBusListenerAdapter(O delegated, Class<? super O> superClass, @NonNls CharSequence methodName)
 			throws NoSuchMethodException {
 		super(delegated);
 		Class<?> delegatedClazz = delegated.getClass();

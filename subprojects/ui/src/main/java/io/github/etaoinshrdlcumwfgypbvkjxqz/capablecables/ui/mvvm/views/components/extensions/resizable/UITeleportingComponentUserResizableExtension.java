@@ -30,6 +30,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.O
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.UIObjectUtilities;
 import io.reactivex.rxjava3.observers.DisposableObserver;
+import org.jetbrains.annotations.NonNls;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
@@ -64,7 +65,7 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 	private Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier;
 
 	@Override
-	public void initializeRendererContainer(String name)
+	public void initializeRendererContainer(@NonNls CharSequence name)
 			throws IllegalStateException {
 		IUIRendererContainer<IResizingRenderer> rendererContainer = new UIDefaultRendererContainer<>(name, this, CastUtilities.castUnchecked(UIComponentUserResizeableExtensionNullRelocatingRenderer.class));
 		if (!getRendererContainerReference().compareAndSet(null, rendererContainer))
