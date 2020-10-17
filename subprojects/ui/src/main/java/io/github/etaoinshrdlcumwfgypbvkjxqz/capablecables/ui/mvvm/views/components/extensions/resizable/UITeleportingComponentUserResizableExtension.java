@@ -20,6 +20,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.Functiona
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.modifiers.AbstractUIVirtualComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.UIDefaultRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.EnumUISide;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.inputs.IInputPointerDevice;
@@ -27,6 +29,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.optionals.Op
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.UIObjectUtilities;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
@@ -39,6 +42,7 @@ import java.awt.geom.RectangularShape;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 public class UITeleportingComponentUserResizableExtension<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, E>
@@ -56,12 +60,28 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 	public IUIRendererContainer<IResizingRenderer> getRendererContainer()
 			throws IllegalStateException { return Optional.ofNullable(getRendererContainerReference().get()).orElseThrow(IllegalStateException::new); }
 
+	@Nullable
+	private Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier;
+
 	@Override
 	public void initializeRendererContainer(String name)
 			throws IllegalStateException {
-		if (!getRendererContainerReference().compareAndSet(null,
-				new UIDefaultRendererContainer<>(name, this, UIComponentUserResizeableExtensionNullRelocatingRenderer.class)))
+		IUIRendererContainer<IResizingRenderer> rendererContainer = new UIDefaultRendererContainer<>(name, this, CastUtilities.castUnchecked(UIComponentUserResizeableExtensionNullRelocatingRenderer.class));
+		if (!getRendererContainerReference().compareAndSet(null, rendererContainer))
 			throw new IllegalStateException();
+		getBinderObserverSupplier().ifPresent(rendererContainer::initializeBindings);
+	}
+
+	protected Optional<? extends Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>>> getBinderObserverSupplier() { return Optional.ofNullable(binderObserverSupplier); }
+
+	protected void setBinderObserverSupplier(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) { this.binderObserverSupplier = binderObserverSupplier; }
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		setBinderObserverSupplier(binderObserverSupplier);
+		Optional.ofNullable(getRendererContainerReference().get())
+				.ifPresent(rendererContainer -> rendererContainer.initializeBindings(binderObserverSupplier));
 	}
 
 	protected AtomicReference<IUIRendererContainer<IResizingRenderer>> getRendererContainerReference() { return rendererContainerReference; }

@@ -21,6 +21,7 @@ import org.slf4j.Marker;
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -38,7 +39,9 @@ public enum MapUtilities {
 
 	@SafeVarargs
 	@SuppressWarnings("varargs")
-	public static <K, V> ImmutableMap<K, V> concatMaps(Map<? extends K, ? extends V>... maps) { return concatMaps(ImmutableList.copyOf(maps)); }
+	public static <K, V> ImmutableMap<K, V> concatMaps(Map<? extends K, ? extends V>... maps) {
+		return concatMaps(Arrays.asList(maps)); // COMMENT reuse the array
+	}
 
 	public static <K, V> ImmutableMap<K, V> concatMaps(Iterable<? extends Map<? extends K, ? extends V>> maps) {
 		ImmutableList.Builder<Iterable<? extends K>> keys = ImmutableList.builder();

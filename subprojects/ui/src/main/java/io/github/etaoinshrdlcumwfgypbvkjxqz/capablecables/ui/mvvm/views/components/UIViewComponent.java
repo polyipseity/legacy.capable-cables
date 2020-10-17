@@ -1,6 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
@@ -27,9 +29,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilitie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CleanerUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.TreeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinderAction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.methods.IBindingMethod;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.traits.IHasBinding;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
@@ -41,18 +40,20 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.registering.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths.FunctionalPath;
-import io.reactivex.rxjava3.core.ObservableSource;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.eventbus.api.EventPriority;
 import org.jetbrains.annotations.NonNls;
 import sun.misc.Cleaner;
 
 import javax.annotation.Nullable;
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		extends UIView<S>
@@ -63,6 +64,13 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	private final IUIThemeStack themeStack;
 	@Nullable
 	private M manager;
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		super.initializeBindings(binderObserverSupplier);
+		getManager().ifPresent(manager -> manager.initializeBindings(binderObserverSupplier));
+	}
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	@UIViewComponentConstructor
@@ -127,6 +135,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		Optional.ofNullable(manager).ifPresent(nextManager -> EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(),
 				() -> {
 					nextManager.setView(this);
+					getBinderObserverSupplier().ifPresent(nextManager::initializeBindings);
 					getNamedTrackers().addAll(IUIComponent.class, getChildrenFlatView());
 				},
 				new UIComponentHierarchyChangedBusEvent.View(EnumHookStage.PRE, nextManager, null, this),
@@ -174,37 +183,6 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	public List<IUIComponent> getChildrenFlatView() {
 		return CacheViewComponent.CHILDREN_FLAT.getValue().get(this)
 				.orElseThrow(AssertionError::new);
-	}
-
-	@SuppressWarnings("UnstableApiUsage")
-	@Override
-	public Iterable<? extends ObservableSource<IBinderAction>> getBinderNotifiers() {
-		return Iterables.concat(getChildrenFlatView().stream().unordered()
-						.flatMap(c -> Streams.stream(c.getBinderNotifiers()))
-						.collect(ImmutableSet.toImmutableSet()),
-				super.getBinderNotifiers());
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Iterable<? extends IBindingField<?>> getBindingFields() {
-		return Iterables.concat(Lists.asList(
-				super.getBindingFields(),
-				(Iterable<IBindingField<?>>[]) // COMMENT should be safe
-						getChildrenFlatView().stream().unordered()
-								.map(IHasBinding::getBindingFields)
-								.toArray(Iterable[]::new)));
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public Iterable<? extends IBindingMethod<?>> getBindingMethods() {
-		return Iterables.concat(Lists.asList(
-				super.getBindingMethods(),
-				(Iterable<IBindingMethod<?>>[]) // COMMENT should be safe
-						getChildrenFlatView().stream().unordered()
-								.map(IHasBinding::getBindingMethods)
-								.toArray(Iterable[]::new)));
 	}
 
 	@Override

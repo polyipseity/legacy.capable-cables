@@ -5,6 +5,9 @@
 	<item name='com.google.common.collect.ForwardingMap V put(K, V) 1'>
 		<annotation name='javax.annotation.Nullable'/>
 	</item>
+	<item name='com.google.common.collect.ImmutableBiMap.Builder Builder()'>
+		<annotation name='java.lang.Deprecated'/>
+	</item>
 	<item name='com.google.common.collect.ImmutableList.Builder Builder()'>
 		<annotation name='java.lang.Deprecated'/>
 	</item>

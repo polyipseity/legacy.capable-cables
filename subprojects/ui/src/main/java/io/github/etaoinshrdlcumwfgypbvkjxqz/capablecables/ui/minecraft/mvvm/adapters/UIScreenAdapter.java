@@ -27,7 +27,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIInputUt
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.NoSuchBindingTransformerException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
@@ -41,7 +40,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.O
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.DoubleDimension2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.INode;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.IGuiEventListener;
@@ -243,11 +241,7 @@ public class UIScreenAdapter
 	@Override
 	@Deprecated
 	protected void init() {
-		try {
-			IUIInfrastructure.StaticHolder.bindSafe(getInfrastructure(), getContextContainer());
-		} catch (NoSuchBindingTransformerException e) {
-			throw ThrowableUtilities.propagate(e);
-		}
+		IUIInfrastructure.StaticHolder.bindSafe(getInfrastructure(), getContextContainer());
 		setSize(width, height);
 		getInfrastructure().initialize();
 	}

@@ -14,17 +14,23 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.utilities
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.impl.UIComponentButton;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.UIDefaultRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.BindingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.ImmutableBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NonNls;
 
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
 public class UIComponentButtonMinecraft
@@ -42,12 +48,21 @@ public class UIComponentButtonMinecraft
 	@Override
 	public void initializeRendererContainer(String name)
 			throws IllegalStateException {
-		if (!getRendererContainerReference().compareAndSet(null,
-				new UIDefaultRendererContainer<>(name, this, CastUtilities.castUnchecked(DefaultRenderer.class))))
+		IUIRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer = new UIDefaultRendererContainer<>(name, this, CastUtilities.castUnchecked(DefaultRenderer.class));
+		if (!getRendererContainerReference().compareAndSet(null, rendererContainer))
 			throw new IllegalStateException();
+		getBinderObserverSupplier().ifPresent(rendererContainer::initializeBindings);
 	}
 
 	protected AtomicReference<IUIRendererContainer<IUIComponentRendererMinecraft<?>>> getRendererContainerReference() { return rendererContainerReference; }
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		super.initializeBindings(binderObserverSupplier);
+		Optional.ofNullable(getRendererContainerReference().get())
+				.ifPresent(rendererContainer -> rendererContainer.initializeBindings(binderObserverSupplier));
+	}
 
 	@Override
 	public void tick(IUIComponentContext context) {}
@@ -87,6 +102,18 @@ public class UIComponentButtonMinecraft
 		protected final IBindingField<Color> colorPressed;
 		@UIProperty(PROPERTY_COLOR_PRESSED_BORDER)
 		protected final IBindingField<Color> colorPressedBorder;
+
+		@Override
+		@OverridingMethodsMustInvokeSuper
+		public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+			super.initializeBindings(binderObserverSupplier);
+			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+					() -> ImmutableBinderAction.bind(
+							getColorBase(), getColorBaseBorder(),
+							getColorHovering(), getColorHoveringBorder(),
+							getColorPressed(), getColorPressedBorder()
+					));
+		}
 
 		@UIRendererConstructor
 		public DefaultRenderer(UIRendererConstructor.IArguments arguments) {

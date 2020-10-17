@@ -14,17 +14,23 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.utilities
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.impl.UIComponentWindow;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.UIDefaultRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.BindingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.ImmutableBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NonNls;
 
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
 public class UIComponentWindowMinecraft
@@ -42,9 +48,18 @@ public class UIComponentWindowMinecraft
 	@Override
 	public void initializeRendererContainer(String name)
 			throws IllegalStateException {
-		if (!getRendererContainerReference().compareAndSet(null,
-				new UIDefaultRendererContainer<>(name, this, CastUtilities.castUnchecked(DefaultRenderer.class))))
+		IUIRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer = new UIDefaultRendererContainer<>(name, this, CastUtilities.castUnchecked(DefaultRenderer.class));
+		if (!getRendererContainerReference().compareAndSet(null, rendererContainer))
 			throw new IllegalStateException();
+		getBinderObserverSupplier().ifPresent(rendererContainer::initializeBindings);
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		super.initializeBindings(binderObserverSupplier);
+		Optional.ofNullable(getRendererContainerReference().get())
+				.ifPresent(rendererContainer -> rendererContainer.initializeBindings(binderObserverSupplier));
 	}
 
 	protected AtomicReference<IUIRendererContainer<IUIComponentRendererMinecraft<?>>> getRendererContainerReference() { return rendererContainerReference; }
@@ -67,6 +82,14 @@ public class UIComponentWindowMinecraft
 		protected final IBindingField<Color> colorBackground;
 		@UIProperty(PROPERTY_COLOR_BORDER)
 		protected final IBindingField<Color> colorBorder;
+
+		@Override
+		@OverridingMethodsMustInvokeSuper
+		public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+			super.initializeBindings(binderObserverSupplier);
+			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+					() -> ImmutableBinderAction.bind(getColorBackground(), getColorBorder()));
+		}
 
 		@UIRendererConstructor
 		public DefaultRenderer(UIRendererConstructor.IArguments arguments) {

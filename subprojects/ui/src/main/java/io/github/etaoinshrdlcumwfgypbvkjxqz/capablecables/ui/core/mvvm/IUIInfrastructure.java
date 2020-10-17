@@ -6,7 +6,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.viewmodel
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.NoSuchBindingTransformerException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
@@ -27,8 +26,7 @@ public interface IUIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel
 
 	void setBinder(B binder);
 
-	void bind(IUIContextContainer contextContainer)
-			throws NoSuchBindingTransformerException;
+	void bind(IUIContextContainer contextContainer);
 
 	void unbind();
 
@@ -40,8 +38,7 @@ public interface IUIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
 		@SuppressWarnings("UnusedReturnValue")
-		public static boolean bindSafe(IUIInfrastructure<?, ?, ?> infrastructure, IUIContextContainer contextContainer)
-				throws NoSuchBindingTransformerException {
+		public static boolean bindSafe(IUIInfrastructure<?, ?, ?> infrastructure, IUIContextContainer contextContainer) {
 			if (!infrastructure.isBound()) {
 				infrastructure.bind(contextContainer);
 				return true;

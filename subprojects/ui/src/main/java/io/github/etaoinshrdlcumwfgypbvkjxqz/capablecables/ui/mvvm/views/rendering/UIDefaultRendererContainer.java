@@ -4,10 +4,14 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.naming.AbstractNamed;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 
 import javax.annotation.Nullable;
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 		extends AbstractNamed
@@ -26,12 +30,19 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 	@Override
 	public Optional<? extends R> getRenderer() { return Optional.ofNullable(renderer); }
 
+	@Nullable
+	private Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier;
+
 	@Override
 	@Deprecated
 	public void setRenderer(@Nullable R renderer) {
 		IUIRendererContainer.StaticHolder.setRendererImpl(getContainer().orElseThrow(IllegalStateException::new),
 				renderer,
-				renderer2 -> this.renderer = renderer2,
+				renderer2 -> {
+					this.renderer = renderer2;
+					if (renderer2 != null)
+						getBinderObserverSupplier().ifPresent(renderer2::initializeBindings);
+				},
 				this.renderer);
 	}
 
@@ -40,4 +51,19 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 
 	@Override
 	public Optional<? extends IUIRendererContainerContainer<?>> getContainer() { return container.getOptional(); }
+
+	protected Optional<? extends Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>>> getBinderObserverSupplier() {
+		return Optional.ofNullable(binderObserverSupplier);
+	}
+
+	protected void setBinderObserverSupplier(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		this.binderObserverSupplier = binderObserverSupplier;
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		setBinderObserverSupplier(binderObserverSupplier);
+		getRenderer().ifPresent(renderer -> renderer.initializeBindings(binderObserverSupplier));
+	}
 }

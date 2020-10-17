@@ -38,7 +38,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.Binder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.BindingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.ImmutableBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinding.EnumBindingType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.methods.IBindingMethodDestination;
@@ -52,6 +55,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.cl
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThrowableUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.time.ITicker;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 import jakarta.xml.bind.JAXBException;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -81,6 +85,7 @@ import net.minecraftforge.fml.network.NetworkHooks;
 import org.jetbrains.annotations.NonNls;
 import org.lwjgl.glfw.GLFW;
 
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.io.IOException;
@@ -372,6 +377,14 @@ public enum UIDebugMinecraft {
 			protected IBindingField<Integer> getAnchoredWindowBorderColor() { return anchoredWindowBorderColor; }
 
 			protected Random getRandom() { return random; }
+
+			@Override
+			@OverridingMethodsMustInvokeSuper
+			public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+				super.initializeBindings(binderObserverSupplier);
+				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+						() -> ImmutableBinderAction.bind(getAnchoredWindowBorderColor(), getButtonOnActivate(), getButtonOnActivated()));
+			}
 		}
 
 		@OnlyIn(Dist.CLIENT)

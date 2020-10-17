@@ -1,8 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIContextContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIInfrastructure;
@@ -17,6 +15,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.DefaultDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
@@ -25,6 +24,7 @@ import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Supplier;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
 
@@ -112,26 +112,18 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 		return d;
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public void bind(IUIContextContainer contextContainer)
-			throws NoSuchBindingTransformerException {
+	public void bind(IUIContextContainer contextContainer) {
 		StaticHolder.checkBoundState(isBound(), false);
 
 		getView().setContext(contextContainer.getViewContext());
 		getViewModel().setContext(contextContainer.getViewModelContext());
 
-		// COMMENT must bind the bindings of view first
-		getBinder().bind(Iterables.concat(
-				// COMMENT fields
-				getView().getBindingFields(), getView().getBindingMethods(),
-				// COMMENT methods
-				getViewModel().getBindingFields(), getViewModel().getBindingMethods()));
-
-		Streams.stream(
-				Iterables.concat(getView().getBinderNotifiers(), getViewModel().getBinderNotifiers())).unordered().distinct()
-				.forEach(n ->
-						n.subscribe(createBinderActionObserver()));
+		OptionalWeakReference<UIInfrastructure<V, VM, B>> thisWeakReference = new OptionalWeakReference<>(this);
+		@SuppressWarnings("RedundantTypeArguments") Supplier<Optional<DisposableObserver<IBinderAction>>> supplier = () -> thisWeakReference.getOptional().map(UIInfrastructure<V, VM, B>::createBinderActionObserver);
+		// COMMENT must bind the bindings of view first to ensure that the default values are from the view
+		getView().initializeBindings(supplier);
+		getViewModel().initializeBindings(supplier);
 
 		setBound(true);
 	}

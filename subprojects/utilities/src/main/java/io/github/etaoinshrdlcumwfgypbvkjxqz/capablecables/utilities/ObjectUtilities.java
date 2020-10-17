@@ -73,7 +73,9 @@ public enum ObjectUtilities {
 		return ret.toString();
 	}
 
-	public static <T> ImmutableList<Function<? super T, ?>> extendsObjectVariables(Iterable<? extends Function<? super T, ?>> extended, Iterable<? extends Function<? super T, ?>> self) { return ImmutableList.copyOf(Iterables.concat(extended, self)); }
+	public static <T> ImmutableList<Function<? super T, ?>> extendsObjectVariables(Iterable<? extends Function<? super T, ?>> extended, Iterable<? extends Function<? super T, ?>> self) {
+		return ImmutableList.copyOf(Iterables.concat(extended, self));
+	}
 
 	public static <T> @NonNls ImmutableMap<String, Function<? super T, ?>> extendsObjectVariablesMap(Collection<? extends Function<? super T, ?>> variables, Map<? extends String, ? extends Function<? super T, ?>> extended, Iterable<? extends String> self) {
 		return ImmutableMap.copyOf(

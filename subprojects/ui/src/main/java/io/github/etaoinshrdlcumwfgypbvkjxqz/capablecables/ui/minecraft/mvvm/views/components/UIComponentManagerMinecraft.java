@@ -9,12 +9,16 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.view
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.UIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.UIDefaultRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinderAction;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.geom.Rectangle2D;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
 public class UIComponentManagerMinecraft
@@ -34,9 +38,18 @@ public class UIComponentManagerMinecraft
 	@Override
 	public void initializeRendererContainer(String name)
 			throws IllegalStateException {
-		if (!getRendererContainerReference().compareAndSet(null,
-				new UIDefaultRendererContainer<>(name, this, CastUtilities.castUnchecked(NullUIComponentRendererMinecraft.class))))
+		IUIRendererContainer<IUIComponentRendererMinecraft<?>> rendererContainer = new UIDefaultRendererContainer<>(name, this, CastUtilities.castUnchecked(NullUIComponentRendererMinecraft.class));
+		if (!getRendererContainerReference().compareAndSet(null, rendererContainer))
 			throw new IllegalStateException();
+		getBinderObserverSupplier().ifPresent(rendererContainer::initializeBindings);
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		super.initializeBindings(binderObserverSupplier);
+		Optional.ofNullable(getRendererContainerReference().get())
+				.ifPresent(rendererContainer -> rendererContainer.initializeBindings(binderObserverSupplier));
 	}
 
 	protected AtomicReference<IUIRendererContainer<IUIComponentRendererMinecraft<?>>> getRendererContainerReference() { return rendererContainerReference; }
