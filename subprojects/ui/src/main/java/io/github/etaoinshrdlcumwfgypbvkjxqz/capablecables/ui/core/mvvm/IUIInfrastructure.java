@@ -14,6 +14,41 @@ import java.util.ResourceBundle;
 
 public interface IUIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, B extends IBinder>
 		extends IExtensionContainer<INamespacePrefixedString> {
+	@SuppressWarnings("UnusedReturnValue")
+	static boolean bindSafe(IUIInfrastructure<?, ?, ?> infrastructure, IUIContextContainer contextContainer) {
+		if (!infrastructure.isBound()) {
+			infrastructure.bind(contextContainer);
+			return true;
+		}
+		return false;
+	}
+
+	boolean isBound();
+
+	void bind(IUIContextContainer contextContainer);
+
+	@SuppressWarnings("UnusedReturnValue")
+	static boolean unbindSafe(IUIInfrastructure<?, ?, ?> infrastructure) {
+		if (infrastructure.isBound()) {
+			infrastructure.unbind();
+			return true;
+		}
+		return false;
+	}
+
+	void unbind();
+
+	static void checkBoundState(boolean bound, boolean expected)
+			throws IllegalStateException {
+		if (bound != expected)
+			throw new IllegalStateException(
+					new LogMessageBuilder()
+							.addMarkers(UIMarkers.getInstance()::getMarkerUIInfrastructure)
+							.addKeyValue("bound", bound).addKeyValue("expected", expected)
+							.addMessages(() -> StaticHolder.getResourceBundle().getString(bound ? "check.bound.true" : "check.bound.false"))
+							.build());
+	}
+
 	V getView();
 
 	void setView(V view);
@@ -26,45 +61,10 @@ public interface IUIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel
 
 	void setBinder(B binder);
 
-	void bind(IUIContextContainer contextContainer);
-
-	void unbind();
-
-	boolean isBound();
-
 	enum StaticHolder {
 		;
 
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
-
-		@SuppressWarnings("UnusedReturnValue")
-		public static boolean bindSafe(IUIInfrastructure<?, ?, ?> infrastructure, IUIContextContainer contextContainer) {
-			if (!infrastructure.isBound()) {
-				infrastructure.bind(contextContainer);
-				return true;
-			}
-			return false;
-		}
-
-		@SuppressWarnings("UnusedReturnValue")
-		public static boolean unbindSafe(IUIInfrastructure<?, ?, ?> infrastructure) {
-			if (infrastructure.isBound()) {
-				infrastructure.unbind();
-				return true;
-			}
-			return false;
-		}
-
-		public static void checkBoundState(boolean bound, boolean expected)
-				throws IllegalStateException {
-			if (bound != expected)
-				throw new IllegalStateException(
-						new LogMessageBuilder()
-								.addMarkers(UIMarkers.getInstance()::getMarkerUIInfrastructure)
-								.addKeyValue("bound", bound).addKeyValue("expected", expected)
-								.addMessages(() -> getResourceBundle().getString(bound ? "check.bound.true" : "check.bound.false"))
-								.build());
-		}
 
 		protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 	}

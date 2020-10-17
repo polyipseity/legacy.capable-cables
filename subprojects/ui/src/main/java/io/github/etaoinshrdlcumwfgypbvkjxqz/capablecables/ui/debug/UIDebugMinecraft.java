@@ -214,7 +214,7 @@ public enum UIDebugMinecraft {
 			}
 
 			IUIViewMinecraft<?> view = screen.getInfrastructure().getView();
-			IExtensionContainer.StaticHolder.addExtensionChecked(view, new UIExtensionCursorHandleProviderComponent());
+			IExtensionContainer.addExtensionChecked(view, new UIExtensionCursorHandleProviderComponent());
 			view.getThemeStack().push(theme);
 
 			return screen;
@@ -287,7 +287,7 @@ public enum UIDebugMinecraft {
 					context.getViewContext().getInputDevices().getPointerDevice()
 							.map(IInputPointerDevice::getPositionView)
 							.ifPresent(pointerPosition -> {
-								Shape transformed = IUIComponentContext.StaticHolder.createContextualShape(
+								Shape transformed = IUIComponentContext.createContextualShape(
 										context,
 										new Ellipse2D.Double(
 												pointerPosition.getX() - CURSOR_SHAPE_RADIUS, pointerPosition.getY() - CURSOR_SHAPE_RADIUS,
@@ -325,17 +325,17 @@ public enum UIDebugMinecraft {
 		private static final class ViewModel
 				extends UIViewModelMinecraft<Model> {
 			protected final IBindingField<Integer> anchoredWindowBorderColor = new BindingField<>(
-					new ImmutableNamespacePrefixedString("anchoredWindowBorderColor"),
+					ImmutableNamespacePrefixedString.of("anchoredWindowBorderColor"),
 					new ObservableField<>(Integer.class, null));
 			protected final IBindingMethodDestination<UIComponentButton.IUIEventActivate> buttonOnActivate = new BindingMethodDestination<>(
 					UIComponentButton.IUIEventActivate.class,
-					new ImmutableNamespacePrefixedString("buttonOnActivate"),
+					ImmutableNamespacePrefixedString.of("buttonOnActivate"),
 					this::onButtonActivate);
 			protected boolean anchoredWindowFlickering = false;
 			protected final Random random = new Random();
 			protected final IBindingMethodDestination<IUIEvent> buttonOnActivated = new BindingMethodDestination<>(
 					IUIEvent.class,
-					new ImmutableNamespacePrefixedString("buttonOnActivated"),
+					ImmutableNamespacePrefixedString.of("buttonOnActivated"),
 					this::onButtonActivated);
 
 			private ViewModel() { super(new Model()); }

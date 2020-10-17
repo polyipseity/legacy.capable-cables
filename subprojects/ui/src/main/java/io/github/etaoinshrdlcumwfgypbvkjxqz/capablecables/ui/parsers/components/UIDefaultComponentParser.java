@@ -110,7 +110,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 						.orElseGet(ImmutableList::of))
 				.forEach(any -> {
 							assert any != null;
-							IUIAbstractDefaultComponentParserContext.StaticHolder.findHandler(viewContext, any)
+							IUIAbstractDefaultComponentParserContext.findHandler(viewContext, any)
 									.ifPresent(handler -> handler.acceptNonnull(
 											viewContext,
 											CastUtilities.castUnchecked(any) // COMMENT should not throw
@@ -134,7 +134,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 									.orElseGet(ImmutableList::of))
 							.forEach(any -> {
 								assert any != null;
-								IUIAbstractDefaultComponentParserContext.StaticHolder.findHandler(componentContext, any)
+								IUIAbstractDefaultComponentParserContext.findHandler(componentContext, any)
 										.ifPresent(handler -> handler.acceptNonnull(
 												componentContext,
 												CastUtilities.castUnchecked(any) // COMMENT should not throw
@@ -168,19 +168,6 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		return (IUIViewComponent<?, ?>) constructorHandle.invoke(argument);
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
-	public static Map<INamespacePrefixedString, IUIPropertyMappingValue> createMappings(Iterable<? extends Property> properties) {
-		return Streams.stream(properties).unordered()
-				.map(p -> Maps.immutableEntry(new ImmutableNamespacePrefixedString(p.getKey()),
-						new UIPropertyMappingValue(p.getAny()
-								.map(value -> JAXBAdapterRegistries.getAdapter(value).leftToRight(value))
-								.orElse(null),
-								Optional.ofNullable(p.getBindingKey())
-										.map(ImmutableNamespacePrefixedString::new)
-										.orElse(null))))
-				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-	}
-
 	public static IUIComponent createComponent(IUIDefaultComponentParserContext context, Component component)
 			throws Throwable {
 		return TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, component,
@@ -193,90 +180,91 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 								EnumUIEventDOMType.values().length + EnumUIEventComponentType.values().length
 						);
 
+						// TODO use a map or something like that
 						attributes.put(EnumUIEventDOMType.LOAD.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getLoad()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getLoad()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.UNLOAD.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getUnload()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getUnload()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.ABORT.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getAbort()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getAbort()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.ERROR.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getError()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getError()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.SELECT.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getSelect()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getSelect()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.FOCUS_OUT_POST.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getBlur()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getBlur()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getFocus()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getFocus()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.FOCUS_IN_PRE.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getFocusin()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getFocusin()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.FOCUS_OUT_PRE.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getFocusout()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getFocusout()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.CLICK_AUXILIARY.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getAuxclick()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getAuxclick()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.CLICK.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getClick()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getClick()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.CLICK_DOUBLE.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getDblclick()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getDblclick()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.MOUSE_DOWN.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getMousedown()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getMousedown()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.MOUSE_ENTER.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getMouseenter()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getMouseenter()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getMouseleave()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getMouseleave()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.MOUSE_MOVE.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getMousemove()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getMousemove()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getMouseout()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getMouseout()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getMouseover()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getMouseover()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.MOUSE_UP.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getMouseup()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getMouseup()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.WHEEL.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getWheel()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getWheel()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.INPUT_PRE.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getBeforeinput()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getBeforeinput()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.INPUT_POST.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getInput()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getInput()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.KEY_DOWN.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getKeydown()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getKeydown()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.KEY_UP.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getKeyup()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getKeyup()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.COMPOSITION_START.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getCompositionstart()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getCompositionstart()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.COMPOSITION_UPDATE.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getCompositionupdate()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getCompositionupdate()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventDOMType.COMPOSITION_END.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getCompositionend()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getCompositionend()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 						attributes.put(EnumUIEventComponentType.CHAR_TYPED.getEventType(),
 								new UIPropertyMappingValue(null,
-										Optional.ofNullable(node.getCharTyped()).map(ImmutableNamespacePrefixedString::new).orElse(null)));
+										Optional.ofNullable(node.getCharTyped()).map(ImmutableNamespacePrefixedString::of).orElse(null)));
 
 						mappings = MapUtilities.concatMaps(mappings, attributes);
 					}
@@ -317,6 +305,19 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 					);
 				})
 				.orElseThrow(AssertionError::new);
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	public static Map<INamespacePrefixedString, IUIPropertyMappingValue> createMappings(Iterable<? extends Property> properties) {
+		return Streams.stream(properties).unordered()
+				.map(p -> Maps.immutableEntry(ImmutableNamespacePrefixedString.of(p.getKey()),
+						new UIPropertyMappingValue(p.getAny()
+								.map(value -> JAXBAdapterRegistries.getAdapter(value).leftToRight(value))
+								.orElse(null),
+								Optional.ofNullable(p.getBindingKey())
+										.map(ImmutableNamespacePrefixedString::of)
+										.orElse(null))))
+				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
 	@SuppressWarnings("UnstableApiUsage")

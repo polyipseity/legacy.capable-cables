@@ -25,10 +25,10 @@ public abstract class AbstractAffineTransformStack
 	public void close() { createCleaner().run(); }
 
 	@Override
-	public boolean isClean() { return IAffineTransformStack.StaticHolder.isClean(getData()); }
+	public boolean isClean() { return IAffineTransformStack.isClean(getData()); }
 
 	@Override
-	public Runnable createCleaner() { return () -> StaticHolder.popNTimes(this, getData().size() - 1); }
+	public Runnable createCleaner() { return () -> IAffineTransformStack.popNTimes(this, getData().size() - 1); }
 
 	@Override
 	protected AffineTransform copyElement(AffineTransform object) { return (AffineTransform) object.clone(); }

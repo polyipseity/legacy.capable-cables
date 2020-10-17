@@ -208,7 +208,7 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 					.flatMap(owner -> owner.isRelocating() ?
 							Optional.of(true) :
 							owner.getRelocateShape()
-									.map(shape -> IUIComponentContext.StaticHolder.createContextualShape(context, shape))
+									.map(shape -> IUIComponentContext.createContextualShape(context, shape))
 									.map(shape -> shape.contains(point)))
 					.orElse(false);
 		}

@@ -9,24 +9,20 @@ import java.util.Optional;
 
 @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface IUIComponentCursorHandleProviderModifier {
-	Optional<Long> getCursorHandle(IUIComponentContext context);
-
-	enum StaticHolder {
-		;
-
-		@SuppressWarnings({"UnstableApiUsage", "RedundantTypeArguments"})
-		public static Optional<Long> handleComponentModifiers(IUIComponentCursorHandleProviderModifier component,
-		                                                      Iterable<? extends IUIComponentModifier> modifiers,
-		                                                      IUIComponentContext context) {
-			return IUIComponentModifier.StaticHolder.handleComponentModifiers(component,
-					Lists.reverse(ImmutableList.copyOf(modifiers)),
-					IUIComponentCursorHandleProviderModifier.class,
-					modifier -> modifier.getCursorHandle(context),
-					cursors -> Streams.stream(cursors).sequential()
-							.filter(Optional<Long>::isPresent)
-							.map(Optional<Long>::get)
-							.findFirst()
-							.orElse(null));
-		}
+	@SuppressWarnings({"UnstableApiUsage", "RedundantTypeArguments"})
+	static Optional<Long> handleComponentModifiers(IUIComponentCursorHandleProviderModifier component,
+	                                               Iterable<? extends IUIComponentModifier> modifiers,
+	                                               IUIComponentContext context) {
+		return IUIComponentModifier.handleComponentModifiers(component,
+				Lists.reverse(ImmutableList.copyOf(modifiers)),
+				IUIComponentCursorHandleProviderModifier.class,
+				modifier -> modifier.getCursorHandle(context),
+				cursors -> Streams.stream(cursors).sequential()
+						.filter(Optional<Long>::isPresent)
+						.map(Optional<Long>::get)
+						.findFirst()
+						.orElse(null));
 	}
+
+	Optional<Long> getCursorHandle(IUIComponentContext context);
 }

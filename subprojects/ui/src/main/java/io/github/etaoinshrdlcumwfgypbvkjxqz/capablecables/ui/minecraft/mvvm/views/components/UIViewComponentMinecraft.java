@@ -38,7 +38,7 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 	public UIViewComponentMinecraft(UIViewComponentConstructor.IArguments arguments) {
 		super(arguments);
 
-		IExtensionContainer.StaticHolder.addExtensionExtendedChecked(this, new DefaultUIExtensionMinecraftBackground()); // COMMENT to ensure that 'GuiScreenEvent.BackgroundDrawnEvent' is fired
+		IExtensionContainer.addExtensionExtendedChecked(this, new DefaultUIExtensionMinecraftBackground()); // COMMENT to ensure that 'GuiScreenEvent.BackgroundDrawnEvent' is fired
 	}
 
 	@Override
@@ -50,14 +50,14 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 						EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 									EnumCropMethod cropMethod = EnumCropMethod.getBestMethod();
 									cropMethod.enable();
-									IUIViewComponent.StaticHolder.traverseComponentTreeDefault(createComponentContext()
+									IUIViewComponent.traverseComponentTreeDefault(createComponentContext()
 													.orElseThrow(IllegalStateException::new),
 											manager,
 											(componentContext, result) -> {
 												assert result != null;
 												assert componentContext != null;
 												IUIComponentMinecraft component = (IUIComponentMinecraft) result.getComponent();
-												IUIComponentModifier.StaticHolder.streamSpecificModifiersUnion(result.getModifiersView(), IUIComponentRendererInvokerModifier.class)
+												IUIComponentModifier.streamSpecificModifiersUnion(result.getModifiersView(), IUIComponentRendererInvokerModifier.class)
 														.forEachOrdered(modifier -> {
 															assert modifier.getKey() != null;
 															assert modifier.getValue() != null;
@@ -83,7 +83,7 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 													renderer.crop(componentContext, CastUtilities.castUnchecked(component),
 															EnumCropStage.UN_CROP, cropMethod, partialTicks);
 												});
-												IUIComponentModifier.StaticHolder.streamSpecificModifiersUnion(result.getModifiersView(), IUIComponentRendererInvokerModifier.class)
+												IUIComponentModifier.streamSpecificModifiersUnion(result.getModifiersView(), IUIComponentRendererInvokerModifier.class)
 														.forEachOrdered(modifier -> {
 															assert modifier.getKey() != null;
 															assert modifier.getValue() != null;
@@ -105,7 +105,7 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 	@Override
 	public void tick() {
 		getManager()
-				.ifPresent(manager -> IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext()
+				.ifPresent(manager -> IUIViewComponent.<RuntimeException>traverseComponentTreeDefault(createComponentContext()
 								.orElseThrow(IllegalStateException::new),
 						manager,
 						(componentContext, result) -> {
@@ -113,7 +113,7 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 							assert result != null;
 							CastUtilities.castChecked(IUIComponentMinecraft.class, result.getComponent())
 									.ifPresent(cc ->
-											IUIComponentMinecraftLifecycleModifier.StaticHolder.handleComponentModifiers(cc,
+											IUIComponentMinecraftLifecycleModifier.handleComponentModifiers(cc,
 													result.getModifiersView(),
 													componentContext,
 													IUIComponentMinecraftLifecycleModifier::tick)

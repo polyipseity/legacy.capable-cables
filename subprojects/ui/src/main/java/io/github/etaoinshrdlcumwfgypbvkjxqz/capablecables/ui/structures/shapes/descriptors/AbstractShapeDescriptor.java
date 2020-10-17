@@ -50,43 +50,31 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 	public List<IShapeConstraint> getConstraintsView() { return ImmutableList.copyOf(getConstraints()); }
 
 	@Override
-	public List<IShapeConstraint> getConstraintsRef()
-			throws IllegalStateException {
-		StaticHolder.checkIsBeingModified(this);
-		return getConstraints();
-	}
+	public boolean isBeingModified() { return beingModified; }
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	protected void setBeingModified(boolean beingModified) { this.beingModified = beingModified; }
 
-	protected boolean modify0(BooleanSupplier action) {
-		boolean ret = action.getAsBoolean();
-		if (ret) {
-			Rectangle2D bounds = getShapeOutput().getBounds2D();
-			adapt(StaticHolder.constrain(getConstraints(), bounds, bounds));
-		}
-		return ret;
-	}
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected List<IShapeConstraint> getConstraints() { return constraints; }
-
 	@Override
-	public boolean isBeingModified() { return beingModified; }
+	public List<IShapeConstraint> getConstraintsRef()
+			throws IllegalStateException {
+		IShapeDescriptor.checkIsBeingModified(this);
+		return getConstraints();
+	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public boolean crop(Rectangle2D bounds)
 			throws IllegalStateException {
-		StaticHolder.checkIsBeingModified(this);
+		IShapeDescriptor.checkIsBeingModified(this);
 		return false;
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public boolean adapt(Rectangle2D frame) throws IllegalStateException {
-		StaticHolder.checkIsBeingModified(this);
+		IShapeDescriptor.checkIsBeingModified(this);
 		return false;
 	}
 
@@ -94,7 +82,19 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 	@OverridingMethodsMustInvokeSuper
 	public boolean transform(AffineTransform transform)
 			throws IllegalStateException {
-		StaticHolder.checkIsBeingModified(this);
+		IShapeDescriptor.checkIsBeingModified(this);
 		return false;
+	}
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected List<IShapeConstraint> getConstraints() { return constraints; }
+
+	protected boolean modify0(BooleanSupplier action) {
+		boolean ret = action.getAsBoolean();
+		if (ret) {
+			Rectangle2D bounds = getShapeOutput().getBounds2D();
+			adapt(IShapeDescriptor.constrain(getConstraints(), bounds, bounds));
+		}
+		return ret;
 	}
 }

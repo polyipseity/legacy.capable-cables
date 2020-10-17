@@ -41,8 +41,8 @@ public class UIComponentButton
 	@NonNls
 	public static final String METHOD_ON_ACTIVATED = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "button.methods.activated";
 
-	public static final INamespacePrefixedString METHOD_ON_ACTIVATE_LOCATION = new ImmutableNamespacePrefixedString(METHOD_ON_ACTIVATE);
-	public static final INamespacePrefixedString METHOD_ON_ACTIVATED_LOCATION = new ImmutableNamespacePrefixedString(METHOD_ON_ACTIVATED);
+	public static final INamespacePrefixedString METHOD_ON_ACTIVATE_LOCATION = ImmutableNamespacePrefixedString.of(METHOD_ON_ACTIVATE);
+	public static final INamespacePrefixedString METHOD_ON_ACTIVATED_LOCATION = ImmutableNamespacePrefixedString.of(METHOD_ON_ACTIVATED);
 
 	@UIMethod(METHOD_ON_ACTIVATE)
 	private final IBindingMethodSource<IUIEventActivate> methodOnActivate;
@@ -124,7 +124,7 @@ public class UIComponentButton
 
 	public interface IUIEventActivate extends IUIEvent {
 		@NonNls String TYPE_STRING = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "button.activated";
-		INamespacePrefixedString TYPE = new ImmutableNamespacePrefixedString(TYPE_STRING);
+		INamespacePrefixedString TYPE = ImmutableNamespacePrefixedString.of(TYPE_STRING);
 
 		static boolean shouldActivate(UIComponentButton self, IUIEvent event) {
 			return UIEventUtilities.dispatchEvent(new IUIEventActivate.Impl((IUIEventTarget.Functional) e -> {

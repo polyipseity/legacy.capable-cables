@@ -39,7 +39,7 @@ public class UIExtensionCursorHandleProviderComponent
 	public Optional<Long> getCursorHandle() {
 		return getContainer()
 				.flatMap(view ->
-						Optional2.of(IUIViewComponent.StaticHolder.createComponentContextWithManager(view)
+						Optional2.of(IUIViewComponent.createComponentContextWithManager(view)
 								.orElse(null), view.getContext()
 								.map(IUIViewContext::getInputDevices)
 								.flatMap(IInputDevices::getPointerDevice)
@@ -51,12 +51,12 @@ public class UIExtensionCursorHandleProviderComponent
 										Optional<Long> ret = Optional.empty();
 										view.getPathResolver().resolvePath(safeComponentContext, pointerDevice.getPositionView());
 										while (!safeComponentContext.getStackRef().getPathRef().isEmpty()) {
-											IUIComponent component = IUIComponentContext.StaticHolder.getCurrentComponent(safeComponentContext)
+											IUIComponent component = IUIComponentContext.getCurrentComponent(safeComponentContext)
 													.orElseThrow(AssertionError::new);
 											IUIComponentCursorHandleProviderModifier componentAsModifier =
 													CastUtilities.castChecked(IUIComponentCursorHandleProviderModifier.class, component)
 															.orElseGet(NullUIComponentCursorHandleProviderModifier::getInstance);
-											ret = IUIComponentCursorHandleProviderModifier.StaticHolder
+											ret = IUIComponentCursorHandleProviderModifier
 													.handleComponentModifiers(componentAsModifier,
 															component.getModifiersView(),
 															safeComponentContext);

@@ -137,7 +137,7 @@ public class UIComponentButtonMinecraft
 		@Override
 		public void render(IUIComponentContext context, C container, EnumRenderStage stage, double partialTicks) {
 			if (stage.isPreChildren()) {
-				Shape transformed = IUIComponent.StaticHolder.getContextualShape(context, container);
+				Shape transformed = IUIComponent.getContextualShape(context, container);
 				if (container.getButtonStates().contains(IButtonState.PRESSING)) {
 					getColorPressed().getValue().ifPresent(c ->
 							MinecraftDrawingUtilities.drawShape(transformed, true, c, 0));

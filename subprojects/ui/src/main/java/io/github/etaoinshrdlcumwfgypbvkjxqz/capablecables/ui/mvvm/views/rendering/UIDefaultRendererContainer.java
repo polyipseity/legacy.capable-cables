@@ -37,7 +37,7 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 	@Override
 	@Deprecated
 	public void setRenderer(@Nullable R renderer) {
-		IUIRendererContainer.StaticHolder.setRendererImpl(getContainer().orElseThrow(IllegalStateException::new),
+		IUIRendererContainer.setRendererImpl(getContainer().orElseThrow(IllegalStateException::new),
 				renderer,
 				renderer2 -> {
 					this.renderer = renderer2;

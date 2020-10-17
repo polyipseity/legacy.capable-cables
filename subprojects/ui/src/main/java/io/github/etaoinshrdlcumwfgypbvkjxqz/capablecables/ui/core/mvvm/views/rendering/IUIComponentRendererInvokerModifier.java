@@ -5,18 +5,14 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 
 @FunctionalInterface
 public interface IUIComponentRendererInvokerModifier {
-	void invokeRenderer(IUIComponentContext context);
-
-	enum StaticHolder {
-		;
-
-		public static <R extends IUIRenderer<?>> void handleComponentModifiers(IUIComponentRendererInvokerModifier component,
-		                                                                       Iterable<? extends IUIComponentModifier> modifiers,
-		                                                                       IUIComponentContext context) {
-			IUIComponentModifier.StaticHolder.handleComponentModifiers(component,
-					modifiers,
-					IUIComponentRendererInvokerModifier.class,
-					modifier -> modifier.invokeRenderer(context));
-		}
+	static <R extends IUIRenderer<?>> void handleComponentModifiers(IUIComponentRendererInvokerModifier component,
+	                                                                Iterable<? extends IUIComponentModifier> modifiers,
+	                                                                IUIComponentContext context) {
+		IUIComponentModifier.handleComponentModifiers(component,
+				modifiers,
+				IUIComponentRendererInvokerModifier.class,
+				modifier -> modifier.invokeRenderer(context));
 	}
+
+	void invokeRenderer(IUIComponentContext context);
 }

@@ -18,7 +18,7 @@ public final class ImmutableNamespacePrefixedString
 	}
 
 	public static ImmutableNamespacePrefixedString of(@NonNls CharSequence string) {
-		String[] decomposed = StaticHolder.decompose(string);
+		String[] decomposed = INamespacePrefixedString.decompose(string);
 		return of(decomposed[0], decomposed[1]);
 	}
 

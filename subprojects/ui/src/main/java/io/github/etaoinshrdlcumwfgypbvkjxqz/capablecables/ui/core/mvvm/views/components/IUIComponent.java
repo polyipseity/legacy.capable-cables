@@ -44,35 +44,31 @@ public interface IUIComponent
 		return Optional.empty();
 	}
 
-	enum StaticHolder {
-		;
+	static Shape getContextualShape(IUIComponentContext context, IUIComponent component) { return IUIComponentContext.createContextualShape(context, getShape(component)); }
 
-		public static Shape getContextualShape(IUIComponentContext context, IUIComponent component) { return IUIComponentContext.StaticHolder.createContextualShape(context, getShape(component)); }
+	static Shape getShape(IUIComponent component) { return component.getShapeDescriptor().getShapeOutput(); }
 
-		public static Shape getShape(IUIComponent component) { return component.getShapeDescriptor().getShapeOutput(); }
+	@Immutable
+	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
+	static IUIComponentContext getContext(IUIComponent component) {
+		IUIComponentContext context =
+				component
+						.getManager()
+						.flatMap(IUIComponentManager::getView)
+						.flatMap(IUIViewComponent::createComponentContext)
+						.orElseThrow(IllegalStateException::new);
+		getPath(component).asList()
+				.forEach(element -> context.getMutator().push(context.getStackRef(), element));
+		return context;
+	}
 
-		@Immutable
-		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
-		public static IUIComponentContext getContext(IUIComponent component) {
-			IUIComponentContext context =
-					component
-							.getManager()
-							.flatMap(IUIComponentManager::getView)
-							.flatMap(IUIViewComponent::createComponentContext)
-							.orElseThrow(IllegalStateException::new);
-			getPath(component).asList()
-					.forEach(element -> context.getMutator().push(context.getStackRef(), element));
-			return context;
-		}
-
-		@Immutable
-		public static IPath<IUIComponent> getPath(IUIComponent component) {
-			List<IUIComponent> path = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
-			path.add(component);
-			new ParentIterator(component.getParent().orElse(null))
-					.forEachRemaining(path::add);
-			return new ImmutablePath<>(Lists.reverse(path));
-		}
+	@Immutable
+	static IPath<IUIComponent> getPath(IUIComponent component) {
+		List<IUIComponent> path = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+		path.add(component);
+		new ParentIterator(component.getParent().orElse(null))
+				.forEachRemaining(path::add);
+		return new ImmutablePath<>(Lists.reverse(path));
 	}
 
 	static <S extends Shape> boolean reshapeComponent(IUIComponent self, IShapeDescriptor<? super S> shapeDescriptor, Predicate<? super IShapeDescriptor<? super S>> action)

@@ -92,9 +92,9 @@ public class UIScreenAdapter
 		this.changeFocusKeys = Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(changeFocusKeys.size()).makeMap());
 		this.changeFocusKeys.addAll(changeFocusKeys);
 
-		IExtensionContainer.StaticHolder.addExtensionChecked(this.infrastructure, new UIExtensionMinecraftScreenProvider(this));
+		IExtensionContainer.addExtensionChecked(this.infrastructure, new UIExtensionMinecraftScreenProvider(this));
 		if (containerObject != null)
-			IExtensionContainer.StaticHolder.addExtensionChecked(this.infrastructure, new UIExtensionMinecraftContainerProvider(this.containerObject));
+			IExtensionContainer.addExtensionChecked(this.infrastructure, new UIExtensionMinecraftContainerProvider(this.containerObject));
 	}
 
 	private final IUIContextContainer contextContainer =
@@ -241,7 +241,7 @@ public class UIScreenAdapter
 	@Override
 	@Deprecated
 	protected void init() {
-		IUIInfrastructure.StaticHolder.bindSafe(getInfrastructure(), getContextContainer());
+		IUIInfrastructure.bindSafe(getInfrastructure(), getContextContainer());
 		setSize(width, height);
 		getInfrastructure().initialize();
 	}
@@ -288,7 +288,7 @@ public class UIScreenAdapter
 			setFocus(context, null);
 		}
 		getInfrastructure().removed();
-		IUIInfrastructure.StaticHolder.unbindSafe(getInfrastructure());
+		IUIInfrastructure.unbindSafe(getInfrastructure());
 	}
 
 	@Override

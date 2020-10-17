@@ -21,65 +21,61 @@ import java.util.function.Predicate;
 
 public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager<?>>
 		extends IHasBinding, IHasBindingMap, IUIView<S> {
+	static Optional<IUIComponentContext> createComponentContextWithManager(IUIViewComponent<?, ?> view) {
+		return Optional2.of(view.createComponentContext().orElse(null), view.getManager().orElse(null))
+				.map(values -> {
+					IUIComponentContext context = values.getValue1Nonnull();
+					IUIComponentManager<?> manager = values.getValue2Nonnull();
+					context.getMutator().push(context.getStackRef(), manager);
+					return context;
+				});
+	}
+
+	Optional<? extends IUIComponentContext> createComponentContext()
+			throws IllegalStateException;
+
 	Optional<? extends M> getManager();
 
 	void setManager(@Nullable M manager);
 
-	Optional<? extends IUIComponentContext> createComponentContext()
-			throws IllegalStateException;
+	static <T extends Throwable> void traverseComponentTreeDefault(IUIComponentContext context,
+	                                                               IUIComponent root,
+	                                                               BiConsumer<? super IUIComponentContext, ? super IUIComponentContextMutatorResult> pre,
+	                                                               IConsumer3<? super IUIComponentContext, ? super IUIComponentContextMutatorResult, ? super Iterable<? super IUIComponent>, ? extends T> post) throws T {
+		traverseComponentTreeDefault(context, root, pre, post, FunctionUtilities.alwaysTruePredicate());
+	}
+
+	static <T extends Throwable> void traverseComponentTreeDefault(IUIComponentContext context,
+	                                                               IUIComponent root,
+	                                                               BiConsumer<? super IUIComponentContext, ? super IUIComponentContextMutatorResult> pre,
+	                                                               IConsumer3<? super IUIComponentContext, ? super IUIComponentContextMutatorResult, ? super Iterable<? super IUIComponent>, ? extends T> post,
+	                                                               Predicate<? super IUIComponent> predicate) throws T {
+		TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, root,
+				component -> {
+					if (predicate.test(component)) {
+						pre.accept(context, context.getMutator().push(context.getStackRef(), component));
+					}
+					return component;
+				},
+				component -> CastUtilities.castChecked(IUIComponentContainer.class, component)
+						.filter(predicate)
+						.map(IUIComponentContainer::getChildrenView)
+						.orElseGet(ImmutableList::of),
+				IThrowingBiFunction.executeNow((parent, children) -> {
+					if (predicate.test(parent)) {
+						try (IUIComponentContextStack contextStackCopy = context.getStackRef().copy()) {
+							post.accept(context, context.getMutator().pop(contextStackCopy), children);
+						}
+						context.getMutator().pop(context.getStackRef());
+					}
+					return parent;
+				}),
+				repeated -> { throw new AssertionError(); });
+	}
 
 	List<IUIComponent> getChildrenFlatView();
 
 	IUIComponentPathResolver getPathResolver();
 
 	IUIComponentShapeAnchorController getShapeAnchorController();
-
-	enum StaticHolder {
-		;
-
-		public static Optional<IUIComponentContext> createComponentContextWithManager(IUIViewComponent<?, ?> view) {
-			return Optional2.of(view.createComponentContext().orElse(null), view.getManager().orElse(null))
-					.map(values -> {
-						IUIComponentContext context = values.getValue1Nonnull();
-						IUIComponentManager<?> manager = values.getValue2Nonnull();
-						context.getMutator().push(context.getStackRef(), manager);
-						return context;
-					});
-		}
-
-		public static <T extends Throwable> void traverseComponentTreeDefault(IUIComponentContext context,
-		                                                                      IUIComponent root,
-		                                                                      BiConsumer<? super IUIComponentContext, ? super IUIComponentContextMutatorResult> pre,
-		                                                                      IConsumer3<? super IUIComponentContext, ? super IUIComponentContextMutatorResult, ? super Iterable<? super IUIComponent>, ? extends T> post) throws T {
-			traverseComponentTreeDefault(context, root, pre, post, FunctionUtilities.alwaysTruePredicate());
-		}
-
-		public static <T extends Throwable> void traverseComponentTreeDefault(IUIComponentContext context,
-		                                                                      IUIComponent root,
-		                                                                      BiConsumer<? super IUIComponentContext, ? super IUIComponentContextMutatorResult> pre,
-		                                                                      IConsumer3<? super IUIComponentContext, ? super IUIComponentContextMutatorResult, ? super Iterable<? super IUIComponent>, ? extends T> post,
-		                                                                      Predicate<? super IUIComponent> predicate) throws T {
-			TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, root,
-					component -> {
-						if (predicate.test(component)) {
-							pre.accept(context, context.getMutator().push(context.getStackRef(), component));
-						}
-						return component;
-					},
-					component -> CastUtilities.castChecked(IUIComponentContainer.class, component)
-							.filter(predicate)
-							.map(IUIComponentContainer::getChildrenView)
-							.orElseGet(ImmutableList::of),
-					IThrowingBiFunction.executeNow((parent, children) -> {
-						if (predicate.test(parent)) {
-							try (IUIComponentContextStack contextStackCopy = context.getStackRef().copy()) {
-								post.accept(context, context.getMutator().pop(contextStackCopy), children);
-							}
-							context.getMutator().pop(context.getStackRef());
-						}
-						return parent;
-					}),
-					repeated -> { throw new AssertionError(); });
-		}
-	}
 }

@@ -6,18 +6,14 @@ import java.awt.geom.AffineTransform;
 
 @FunctionalInterface
 public interface IUIComponentTransformChildrenModifier {
-	void transformChildren(AffineTransform transform);
-
-	enum StaticHolder {
-		;
-
-		public static void handleComponentModifiers(IUIComponentContainer component,
-		                                            Iterable<? extends IUIComponentModifier> modifiers,
-		                                            AffineTransform transform) {
-			IUIComponentModifier.StaticHolder.handleComponentModifiers(component,
-					modifiers,
-					IUIComponentTransformChildrenModifier.class,
-					modifier -> modifier.transformChildren(transform));
-		}
+	static void handleComponentModifiers(IUIComponentContainer component,
+	                                     Iterable<? extends IUIComponentModifier> modifiers,
+	                                     AffineTransform transform) {
+		IUIComponentModifier.handleComponentModifiers(component,
+				modifiers,
+				IUIComponentTransformChildrenModifier.class,
+				modifier -> modifier.transformChildren(transform));
 	}
+
+	void transformChildren(AffineTransform transform);
 }

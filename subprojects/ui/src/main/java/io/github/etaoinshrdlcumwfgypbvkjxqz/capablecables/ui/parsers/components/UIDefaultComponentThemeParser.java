@@ -35,7 +35,7 @@ public class UIDefaultComponentThemeParser
 		Iterables.concat(
 				resource.getRenderer()
 		).forEach(element ->
-				IUIAbstractDefaultComponentParserContext.StaticHolder.findHandler(context, element)
+				IUIAbstractDefaultComponentParserContext.findHandler(context, element)
 						.ifPresent(handler ->
 								handler.acceptNonnull(context,
 										CastUtilities.castUnchecked(element)))

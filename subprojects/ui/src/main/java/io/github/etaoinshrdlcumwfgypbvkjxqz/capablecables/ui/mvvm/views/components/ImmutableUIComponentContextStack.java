@@ -33,6 +33,6 @@ public final class ImmutableUIComponentContextStack
 	public void close() {
 		int size = getPath().size();
 		getPath().parentPath(size);
-		IAffineTransformStack.StaticHolder.popNTimes(getTransformStack(), size);
+		IAffineTransformStack.popNTimes(getTransformStack(), size);
 	}
 }

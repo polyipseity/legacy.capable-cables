@@ -21,7 +21,7 @@ public class DefaultUIComponentContextStackMutator
 		AffineTransform transform = transformStack.push();
 		pathEnd.ifPresent(presentPathEnd -> {
 			if (presentPathEnd instanceof IUIComponentContainer)
-				IUIComponentTransformChildrenModifier.StaticHolder.handleComponentModifiers((IUIComponentContainer) presentPathEnd,
+				IUIComponentTransformChildrenModifier.handleComponentModifiers((IUIComponentContainer) presentPathEnd,
 						presentPathEnd.getModifiersView(),
 						transform);
 			else

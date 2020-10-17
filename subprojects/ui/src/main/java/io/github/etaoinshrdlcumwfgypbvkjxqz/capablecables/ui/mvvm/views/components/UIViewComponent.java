@@ -91,7 +91,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		);
 		this.themeStack.push(new UIDefaultViewComponentTheme());
 
-		IExtensionContainer.StaticHolder.addExtensionChecked(this, new UICacheExtension());
+		IExtensionContainer.addExtensionChecked(this, new UICacheExtension());
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 
 	@Override
 	public IUIEventTarget getTargetAtPoint(Point2D point) {
-		try (IUIComponentContext componentContext = IUIViewComponent.StaticHolder.createComponentContextWithManager(this)
+		try (IUIComponentContext componentContext = IUIViewComponent.createComponentContextWithManager(this)
 				.orElseThrow(IllegalStateException::new)) {
 			// COMMENT returning null means the point is outside the window, so in that case, just return the manager
 			return getPathResolver().resolvePath(componentContext, (Point2D) point.clone()).getComponent()
@@ -149,13 +149,13 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	@Override
 	public void initialize() {
 		getManager().ifPresent(manager ->
-				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext()
+				IUIViewComponent.<RuntimeException>traverseComponentTreeDefault(createComponentContext()
 								.orElseThrow(IllegalStateException::new),
 						manager,
 						(componentContext, result) -> {
 							assert componentContext != null;
 							assert result != null;
-							IUIComponentLifecycleModifier.StaticHolder.handleComponentModifiers(result.getComponent(),
+							IUIComponentLifecycleModifier.handleComponentModifiers(result.getComponent(),
 									result.getModifiersView(),
 									componentContext,
 									IUIComponentLifecycleModifier::initialize);
@@ -199,12 +199,12 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	@Override
 	public void removed() {
 		getManager().ifPresent(manager ->
-				IUIViewComponent.StaticHolder.<RuntimeException>traverseComponentTreeDefault(createComponentContext().orElseThrow(IllegalStateException::new),
+				IUIViewComponent.<RuntimeException>traverseComponentTreeDefault(createComponentContext().orElseThrow(IllegalStateException::new),
 						manager,
 						(componentContext, result) -> {
 							assert componentContext != null;
 							assert result != null;
-							IUIComponentLifecycleModifier.StaticHolder.handleComponentModifiers(result.getComponent(),
+							IUIComponentLifecycleModifier.handleComponentModifiers(result.getComponent(),
 									result.getModifiersView(),
 									componentContext,
 									IUIComponentLifecycleModifier::removed);

@@ -29,7 +29,7 @@ public abstract class AbstractUIComponentPathResolver
 
 	@Override
 	public IUIComponentPathResolverResult resolveDirectChild(IUIComponentContext componentContext, Point2D point) {
-		IUIComponentPathResolverResult result = IUIComponentContext.StaticHolder.getCurrentComponent(componentContext)
+		IUIComponentPathResolverResult result = IUIComponentContext.getCurrentComponent(componentContext)
 				.flatMap(pathEnd -> CastUtilities.castChecked(IUIComponentContainer.class, pathEnd))
 				.map(IUIComponentContainer::getChildrenView)
 				.map(Lists::reverse)
@@ -51,7 +51,7 @@ public abstract class AbstractUIComponentPathResolver
 
 	@Override
 	public IUIComponentPathResolverResult getResult(IUIComponentContext componentContext, Point2D point) {
-		return IUIComponentContext.StaticHolder.getCurrentComponent(componentContext)
+		return IUIComponentContext.getCurrentComponent(componentContext)
 				.map(pathEnd -> {
 					ImmutableList<IUIVirtualComponent> virtualComponents = IUIVirtualComponent.findVirtualComponents(componentContext, pathEnd, point);
 					if (!virtualComponents.isEmpty()) // COMMENT hits virtual component

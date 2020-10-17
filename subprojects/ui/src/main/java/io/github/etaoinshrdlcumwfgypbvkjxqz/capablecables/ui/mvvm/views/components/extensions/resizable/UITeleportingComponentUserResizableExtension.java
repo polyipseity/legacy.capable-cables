@@ -191,12 +191,12 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 			return getOwner().flatMap(owner ->
 					owner.getContainer().flatMap(container -> container.getManager()
 							.flatMap(IUIComponentManager::getView)
-							.flatMap(view -> IUIViewComponent.StaticHolder.createComponentContextWithManager(view)
+							.flatMap(view -> IUIViewComponent.createComponentContextWithManager(view)
 									.map(context -> {
 										try (IUIComponentContext ctx = context) {
 											view.getPathResolver().resolvePath(ctx, (Point2D) point.clone());
 
-											Rectangle2D contextualShape = IUIComponent.StaticHolder.getContextualShape(ctx, container).getBounds2D();
+											Rectangle2D contextualShape = IUIComponent.getContextualShape(ctx, container).getBounds2D();
 											Set<EnumUISide> sides = EnumUISide.getSidesMouseOver(contextualShape, point);
 
 											@Nullable Point2D base = null;
@@ -249,7 +249,7 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 					.flatMap(owner -> owner.isResizing() ?
 							Optional.of(true) :
 							owner.getResizeShape()
-									.map(shape -> IUIComponentContext.StaticHolder.createContextualShape(context, shape))
+									.map(shape -> IUIComponentContext.createContextualShape(context, shape))
 									.map(shape -> shape.contains(point)))
 					.orElse(false);
 		}
@@ -286,7 +286,7 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 										.flatMap(c ->
 												getCursor(
 														EnumUISide.getSidesMouseOver(
-																IUIComponent.StaticHolder.getContextualShape(context, c).getBounds2D(),
+																IUIComponent.getContextualShape(context, c).getBounds2D(),
 																cursorPosition)
 												)
 														.map(ICursor::getHandle));

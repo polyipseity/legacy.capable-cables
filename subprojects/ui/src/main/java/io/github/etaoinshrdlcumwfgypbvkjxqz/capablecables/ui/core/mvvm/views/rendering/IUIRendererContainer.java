@@ -22,6 +22,25 @@ import java.util.function.Consumer;
 
 public interface IUIRendererContainer<R extends IUIRenderer<?>>
 		extends INamed, IHasBinding {
+	static <R extends IUIRenderer<?>> void setRendererImpl(Object container,
+	                                                       @Nullable R renderer,
+	                                                       Consumer<? super R> setter,
+	                                                       @Nullable IUIRenderer<?> previousRenderer) {
+		if (!(renderer == null || renderer.getGenericClass().isInstance(container)))
+			throw new IllegalArgumentException(
+					new LogMessageBuilder()
+							.addMarkers(UIMarkers.getInstance()::getMarkerUIComponentRenderer)
+							.addKeyValue("container", container).addKeyValue("renderer", renderer).addKeyValue("setter", setter)
+							.addMessages(() -> StaticHolder.getResourceBundle().getString("renderer.set.impl.instance_of.fail"))
+							.build()
+			);
+		if (previousRenderer != null)
+			previousRenderer.onRendererRemoved();
+		setter.accept(renderer);
+		if (renderer != null)
+			renderer.onRendererAdded(CastUtilities.castUnchecked(container));
+	}
+
 	Optional<? extends R> getRenderer();
 
 	@Deprecated
@@ -53,25 +72,6 @@ public interface IUIRendererContainer<R extends IUIRenderer<?>>
 		;
 
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
-
-		public static <R extends IUIRenderer<?>> void setRendererImpl(Object container,
-		                                                              @Nullable R renderer,
-		                                                              Consumer<? super R> setter,
-		                                                              @Nullable IUIRenderer<?> previousRenderer) {
-			if (!(renderer == null || renderer.getGenericClass().isInstance(container)))
-				throw new IllegalArgumentException(
-						new LogMessageBuilder()
-								.addMarkers(UIMarkers.getInstance()::getMarkerUIComponentRenderer)
-								.addKeyValue("container", container).addKeyValue("renderer", renderer).addKeyValue("setter", setter)
-								.addMessages(() -> getResourceBundle().getString("renderer.set.impl.instance_of.fail"))
-								.build()
-				);
-			if (previousRenderer != null)
-				previousRenderer.onRendererRemoved();
-			setter.accept(renderer);
-			if (renderer != null)
-				renderer.onRendererAdded(CastUtilities.castUnchecked(container));
-		}
 
 		protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 	}

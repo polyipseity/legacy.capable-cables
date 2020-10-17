@@ -16,7 +16,7 @@ public abstract class AbstractUICacheType<V, C extends IExtensionContainer<IName
 	public AbstractUICacheType(INamespacePrefixedString key) { this.key = key; }
 
 	@Override
-	public void invalidate(C container) { StaticHolder.invalidateImpl(container, getKey()); }
+	public void invalidate(C container) { IUICacheType.invalidateImpl(container, getKey()); }
 
 	@Override
 	public INamespacePrefixedString getKey() { return key; }

@@ -9,6 +9,16 @@ import java.lang.invoke.MethodType;
 @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface ICloneable
 		extends Cloneable {
+	@SuppressWarnings("unchecked")
+	static <T extends Cloneable> T cloneUnchecked(T obj) {
+		// TODO Java 9 - use LambdaMetaFactory
+		try {
+			return (T) StaticHolder.getCloneMethodHandle().invoke(obj);
+		} catch (Throwable throwable) {
+			throw ThrowableUtilities.propagate(throwable);
+		}
+	}
+
 	@SuppressWarnings("override")
 	ICloneable clone() throws CloneNotSupportedException;
 
@@ -22,16 +32,6 @@ public interface ICloneable
 				CLONE_METHOD_HANDLE = InvokeUtilities.IMPL_LOOKUP.findVirtual(Object.class, "clone", MethodType.methodType(Object.class));
 			} catch (NoSuchMethodException | IllegalAccessException e) {
 				throw ThrowableUtilities.propagate(e);
-			}
-		}
-
-		@SuppressWarnings("unchecked")
-		static <T extends Cloneable> T cloneUnchecked(T obj) {
-			// TODO Java 9 - use LambdaMetaFactory
-			try {
-				return (T) getCloneMethodHandle().invoke(obj);
-			} catch (Throwable throwable) {
-				throw ThrowableUtilities.propagate(throwable);
 			}
 		}
 

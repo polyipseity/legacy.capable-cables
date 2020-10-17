@@ -57,25 +57,40 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 	public B getBinder() { return binder; }
 
 	@Override
+	public void bind(IUIContextContainer contextContainer) {
+		IUIInfrastructure.checkBoundState(isBound(), false);
+
+		getView().setContext(contextContainer.getViewContext());
+		getViewModel().setContext(contextContainer.getViewModelContext());
+
+		OptionalWeakReference<UIInfrastructure<V, VM, B>> thisWeakReference = new OptionalWeakReference<>(this);
+		@SuppressWarnings("RedundantTypeArguments") Supplier<Optional<DisposableObserver<IBinderAction>>> supplier = () -> thisWeakReference.getOptional().map(UIInfrastructure<V, VM, B>::createBinderActionObserver);
+		// COMMENT must bind the bindings of view first to ensure that the default values are from the view
+		getView().initializeBindings(supplier);
+		getViewModel().initializeBindings(supplier);
+
+		setBound(true);
+	}
+
+	@Override
+	public void unbind() {
+		IUIInfrastructure.checkBoundState(isBound(), true);
+
+		getView().setContext(null);
+		getViewModel().setContext(null);
+
+		getBinderDisposables().clear();
+		getBinder().unbindAll();
+
+		setBound(false);
+	}
+
+	@Override
 	public void setView(V view) {
-		StaticHolder.checkBoundState(isBound(), false);
+		IUIInfrastructure.checkBoundState(isBound(), false);
 		getView().setInfrastructure(null);
 		this.view = view;
 		getView().setInfrastructure(this);
-	}
-
-	@Override
-	public void setViewModel(VM viewModel) {
-		StaticHolder.checkBoundState(isBound(), false);
-		getViewModel().setInfrastructure(null);
-		this.viewModel = viewModel;
-		getViewModel().setInfrastructure(this);
-	}
-
-	@Override
-	public void setBinder(B binder) {
-		StaticHolder.checkBoundState(isBound(), false);
-		this.binder = binder;
 	}
 
 	@Override
@@ -113,39 +128,28 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 	}
 
 	@Override
-	public void bind(IUIContextContainer contextContainer) {
-		StaticHolder.checkBoundState(isBound(), false);
-
-		getView().setContext(contextContainer.getViewContext());
-		getViewModel().setContext(contextContainer.getViewModelContext());
-
-		OptionalWeakReference<UIInfrastructure<V, VM, B>> thisWeakReference = new OptionalWeakReference<>(this);
-		@SuppressWarnings("RedundantTypeArguments") Supplier<Optional<DisposableObserver<IBinderAction>>> supplier = () -> thisWeakReference.getOptional().map(UIInfrastructure<V, VM, B>::createBinderActionObserver);
-		// COMMENT must bind the bindings of view first to ensure that the default values are from the view
-		getView().initializeBindings(supplier);
-		getViewModel().initializeBindings(supplier);
-
-		setBound(true);
+	public void setViewModel(VM viewModel) {
+		IUIInfrastructure.checkBoundState(isBound(), false);
+		getViewModel().setInfrastructure(null);
+		this.viewModel = viewModel;
+		getViewModel().setInfrastructure(this);
 	}
 
 	@Override
-	public void unbind() {
-		StaticHolder.checkBoundState(isBound(), true);
-
-		getView().setContext(null);
-		getViewModel().setContext(null);
-
-		getBinderDisposables().clear();
-		getBinder().unbindAll();
-
-		setBound(false);
+	public void setBinder(B binder) {
+		IUIInfrastructure.checkBoundState(isBound(), false);
+		this.binder = binder;
 	}
 
 	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.StaticHolder.removeExtensionImpl(getExtensions(), key); }
+	@Deprecated
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
+		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
+		return IExtensionContainer.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension);
+	}
 
 	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return IExtensionContainer.StaticHolder.getExtensionImpl(getExtensions(), key); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtensionImpl(getExtensions(), key); }
 
 	@Override
 	public Map<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
@@ -154,11 +158,7 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() { return extensions; }
 
 	@Override
-	@Deprecated
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
-		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
-		return IExtensionContainer.StaticHolder.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension);
-	}
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return IExtensionContainer.getExtensionImpl(getExtensions(), key); }
 
 	protected CompositeDisposable getBinderDisposables() { return binderDisposables; }
 }

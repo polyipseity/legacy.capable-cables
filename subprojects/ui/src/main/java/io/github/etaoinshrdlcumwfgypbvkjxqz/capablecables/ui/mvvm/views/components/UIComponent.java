@@ -57,8 +57,8 @@ public class UIComponent
 	@NonNls
 	public static final String PROPERTY_ACTIVE = INamespacePrefixedString.StaticHolder.DEFAULT_PREFIX + "component.active";
 
-	private static final INamespacePrefixedString PROPERTY_VISIBLE_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_VISIBLE);
-	private static final INamespacePrefixedString PROPERTY_ACTIVE_LOCATION = new ImmutableNamespacePrefixedString(PROPERTY_ACTIVE);
+	private static final INamespacePrefixedString PROPERTY_VISIBLE_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_VISIBLE);
+	private static final INamespacePrefixedString PROPERTY_ACTIVE_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_ACTIVE);
 
 	@Nullable
 	private final String name;
@@ -92,7 +92,7 @@ public class UIComponent
 		this.active = IUIPropertyMappingValue.createBindingField(Boolean.class, false, true,
 				this.mappings.get(getPropertyActiveLocation()));
 
-		IExtensionContainer.StaticHolder.addExtensionChecked(this, new UICacheExtension());
+		IExtensionContainer.addExtensionChecked(this, new UICacheExtension());
 	}
 
 	public static INamespacePrefixedString getPropertyVisibleLocation() { return PROPERTY_VISIBLE_LOCATION; }
@@ -118,8 +118,8 @@ public class UIComponent
 	@Override
 	public Shape getAbsoluteShape()
 			throws IllegalStateException {
-		try (IUIComponentContext context = IUIComponent.StaticHolder.getContext(this)) {
-			return IUIComponent.StaticHolder.getContextualShape(context, this);
+		try (IUIComponentContext context = IUIComponent.getContext(this)) {
+			return IUIComponent.getContextualShape(context, this);
 		}
 	}
 
@@ -147,7 +147,7 @@ public class UIComponent
 	public IShapeDescriptor<?> getShapeDescriptor() { return shapeDescriptor; }
 
 	@Override
-	public boolean isVisible() { return IField.StaticHolder.getValueNonnull(getVisible()); }
+	public boolean isVisible() { return IField.getValueNonnull(getVisible()); }
 
 	public IBindingField<Boolean> getVisible() { return visible; }
 
@@ -178,17 +178,19 @@ public class UIComponent
 	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappings() { return mappings; }
 
 	@Override
-	@Deprecated
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
-		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
-		return IExtensionContainer.StaticHolder.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension);
+	public boolean containsPoint(IUIComponentContext context, Point2D point) {
+		return IUIComponent.getContextualShape(context, this).contains(point);
 	}
 
 	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.StaticHolder.removeExtensionImpl(getExtensions(), key); }
+	@Deprecated
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
+		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
+		return IExtensionContainer.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension);
+	}
 
 	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return IExtensionContainer.StaticHolder.getExtensionImpl(getExtensions(), key); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtensionImpl(getExtensions(), key); }
 
 	@Nullable
 	private Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier;
@@ -207,7 +209,7 @@ public class UIComponent
 	}
 
 	@Override
-	public boolean isActive() { return IField.StaticHolder.getValueNonnull(getActive()); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return IExtensionContainer.getExtensionImpl(getExtensions(), key); }
 
 	public IBindingField<Boolean> getActive() { return active; }
 
@@ -265,9 +267,7 @@ public class UIComponent
 	public void removed(IUIComponentContext context) {}
 
 	@Override
-	public boolean containsPoint(IUIComponentContext context, Point2D point) {
-		return StaticHolder.getContextualShape(context, this).contains(point);
-	}
+	public boolean isActive() { return IField.getValueNonnull(getActive()); }
 
 	protected static void assertModifierUnique(UIComponent self, IUIComponentModifier modifier) {
 		assert self.getModifiers().indexOf(modifier) == self.getModifiers().lastIndexOf(modifier);

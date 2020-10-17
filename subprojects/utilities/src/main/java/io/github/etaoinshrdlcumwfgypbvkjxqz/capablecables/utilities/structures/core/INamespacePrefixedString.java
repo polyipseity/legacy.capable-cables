@@ -16,6 +16,24 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 public interface INamespacePrefixedString {
+	static String[] decompose(CharSequence string) {
+		String[] ss = string.toString().split(Pattern.quote(StaticHolder.SEPARATOR), 2);
+		switch (ss.length) {
+			case 2:
+				return ss;
+			case 1:
+				return new String[]{StaticHolder.DEFAULT_NAMESPACE, ss[0]};
+			default:
+				throw new IllegalArgumentException(
+						new LogMessageBuilder()
+								.addMarkers(StaticHolder::getClassMarker)
+								.addKeyValue("string", string)
+								.addMessages(() -> StaticHolder.getResourceBundle().getString("decompose.fail"))
+								.build()
+				);
+		}
+	}
+
 	default String asString() { return getNamespace() + StaticHolder.SEPARATOR + getPath(); }
 
 	@NonNls
@@ -31,7 +49,7 @@ public interface INamespacePrefixedString {
 		@NonNls
 		public static final String SEPARATOR = ":";
 		@NonNls
-		public static final String DEFAULT_NAMESPACE = "minecraft";
+		public static final String DEFAULT_NAMESPACE = "minecraft"; // TODO remove this
 		@NonNls
 		public static final String DEFAULT_PREFIX = DEFAULT_NAMESPACE + SEPARATOR;
 		private static final Marker CLASS_MARKER =
@@ -46,24 +64,6 @@ public interface INamespacePrefixedString {
 		public static ImmutableList<Function<? super INamespacePrefixedString, ?>> getObjectVariables() { return OBJECT_VARIABLES; }
 
 		public static ImmutableMap<String, Function<? super INamespacePrefixedString, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
-
-		public static String[] decompose(CharSequence string) {
-			String[] ss = string.toString().split(Pattern.quote(SEPARATOR), 2);
-			switch (ss.length) {
-				case 2:
-					return ss;
-				case 1:
-					return new String[]{DEFAULT_NAMESPACE, ss[0]};
-				default:
-					throw new IllegalArgumentException(
-							new LogMessageBuilder()
-									.addMarkers(StaticHolder::getClassMarker)
-									.addKeyValue("string", string)
-									.addMessages(() -> getResourceBundle().getString("decompose.fail"))
-									.build()
-					);
-			}
-		}
 
 		public static Marker getClassMarker() { return CLASS_MARKER; }
 

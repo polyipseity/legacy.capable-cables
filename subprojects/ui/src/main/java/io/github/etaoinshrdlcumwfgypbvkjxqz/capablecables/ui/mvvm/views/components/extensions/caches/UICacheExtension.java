@@ -127,7 +127,7 @@ public class UICacheExtension
 							public void invalidate(IUIComponent container) {
 								super.invalidate(container);
 								if (container instanceof IUIComponentContainer)
-									StaticHolder.invalidateChildrenImpl((IUIComponentContainer) container, this);
+									IUICacheType.invalidateChildrenImpl((IUIComponentContainer) container, this);
 							}
 
 							@Override

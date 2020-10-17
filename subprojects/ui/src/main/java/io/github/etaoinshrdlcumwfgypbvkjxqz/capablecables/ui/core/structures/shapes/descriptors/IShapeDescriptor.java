@@ -21,6 +21,24 @@ import java.util.function.BooleanSupplier;
 // TODO needs better design, but I cannot think of one
 public interface IShapeDescriptor<S extends Shape> {
 
+	static void checkIsBeingModified(IShapeDescriptor<?> shapeDescriptor) throws IllegalStateException {
+		if (!shapeDescriptor.isBeingModified())
+			throw new IllegalStateException(
+					new LogMessageBuilder()
+							.addMarkers(UIMarkers.getInstance()::getMarkerShape)
+							.addKeyValue("shapeDescriptor", shapeDescriptor)
+							.addMessages(() -> StaticHolder.getResourceBundle().getString("modifying.check.fail"))
+							.build()
+			);
+	}
+
+	@SuppressWarnings({"UnstableApiUsage", "unchecked"})
+	static <R extends RectangularShape> R constrain(Iterable<? extends IShapeConstraint> constraints, RectangularShape source, R destination) {
+		return Streams.stream((Iterable<IShapeConstraint>) constraints).unordered() // COMMENT should be safe
+				.reduce(StaticHolder.getConstraintMinimum(), IShapeConstraint::createIntersection)
+				.constrain(source, destination);
+	}
+
 	boolean isBeingModified();
 
 	S getShapeOutput();
@@ -48,29 +66,11 @@ public interface IShapeDescriptor<S extends Shape> {
 		private static final IShapeConstraint CONSTRAINT_MINIMUM = new ShapeConstraint(null, null, null, null, 1d, 1d, null, null);
 		private static final Rectangle2D SHAPE_PLACEHOLDER = new Rectangle2D.Double(0, 0, 1, 1);
 
-		public static void checkIsBeingModified(IShapeDescriptor<?> shapeDescriptor) throws IllegalStateException {
-			if (!shapeDescriptor.isBeingModified())
-				throw new IllegalStateException(
-						new LogMessageBuilder()
-								.addMarkers(UIMarkers.getInstance()::getMarkerShape)
-								.addKeyValue("shapeDescriptor", shapeDescriptor)
-								.addMessages(() -> getResourceBundle().getString("modifying.check.fail"))
-								.build()
-				);
-		}
-
 		protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 		public static IShapeDescriptor<?> getShapeDescriptorPlaceholder() { return new GenericShapeDescriptor(getShapePlaceholder()); }
 
 		public static Rectangle2D getShapePlaceholder() { return (Rectangle2D) SHAPE_PLACEHOLDER.clone(); }
-
-		@SuppressWarnings({"UnstableApiUsage", "unchecked"})
-		public static <R extends RectangularShape> R constrain(Iterable<? extends IShapeConstraint> constraints, RectangularShape source, R destination) {
-			return Streams.stream((Iterable<IShapeConstraint>) constraints).unordered() // COMMENT should be safe
-					.reduce(getConstraintMinimum(), IShapeConstraint::createIntersection)
-					.constrain(source, destination);
-		}
 
 		public static IShapeConstraint getConstraintMinimum() { return CONSTRAINT_MINIMUM; }
 	}

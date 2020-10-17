@@ -32,7 +32,7 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUICompo
 	}
 
 	static void cropImpl(IUIComponentContext componentContext, final IUIComponent container, EnumCropStage stage, EnumCropMethod method, @SuppressWarnings("unused") double partialTicks) {
-		AffineTransform transform = IUIComponentContext.StaticHolder.getCurrentTransform(componentContext);
+		AffineTransform transform = IUIComponentContext.getCurrentTransform(componentContext);
 		switch (method) {
 			case STENCIL_BUFFER:
 				switch (stage) {
@@ -85,7 +85,7 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUICompo
 					case CROP:
 						int[] oldBounds = new int[4];
 						MinecraftOpenGLUtilities.State.getIntegerValue(GL11.GL_SCISSOR_BOX, oldBounds);
-						Rectangle2D newBounds = IUIComponent.StaticHolder.getContextualShape(componentContext, container).getBounds2D();
+						Rectangle2D newBounds = IUIComponent.getContextualShape(componentContext, container).getBounds2D();
 						UIObjectUtilities.acceptRectangularShape(
 								CoordinateSystemUtilities.convertRectangularShape(
 										UIObjectUtilities.floorRectangularShape(newBounds, newBounds),

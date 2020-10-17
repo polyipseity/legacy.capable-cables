@@ -105,7 +105,7 @@ public class UIComponentWindowMinecraft
 		@Override
 		public void render(IUIComponentContext context, C container, EnumRenderStage stage, double partialTicks) {
 			if (stage.isPreChildren()) {
-				Shape transformed = IUIComponent.StaticHolder.getContextualShape(context, container);
+				Shape transformed = IUIComponent.getContextualShape(context, container);
 				getColorBackground().getValue().ifPresent(c ->
 						MinecraftDrawingUtilities.drawShape(transformed, true, c, 0));
 				getColorBorder().getValue().ifPresent(c ->

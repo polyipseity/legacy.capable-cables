@@ -6,21 +6,17 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import java.util.function.BiConsumer;
 
 public interface IUIComponentLifecycleModifier {
+	static void handleComponentModifiers(IUIComponent component,
+	                                     Iterable<? extends IUIComponentModifier> modifiers,
+	                                     IUIComponentContext context,
+	                                     BiConsumer<? super IUIComponentLifecycleModifier, ? super IUIComponentContext> action) {
+		IUIComponentModifier.handleComponentModifiers(component,
+				modifiers,
+				IUIComponentLifecycleModifier.class,
+				modifier -> action.accept(modifier, context));
+	}
+
 	void initialize(IUIComponentContext context);
 
 	void removed(IUIComponentContext context);
-
-	enum StaticHolder {
-		;
-
-		public static void handleComponentModifiers(IUIComponent component,
-		                                            Iterable<? extends IUIComponentModifier> modifiers,
-		                                            IUIComponentContext context,
-		                                            BiConsumer<? super IUIComponentLifecycleModifier, ? super IUIComponentContext> action) {
-			IUIComponentModifier.StaticHolder.handleComponentModifiers(component,
-					modifiers,
-					IUIComponentLifecycleModifier.class,
-					modifier -> action.accept(modifier, context));
-		}
-	}
 }

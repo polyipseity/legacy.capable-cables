@@ -10,6 +10,18 @@ import java.util.Optional;
 
 public interface IUIComponentContext
 		extends AutoCloseable, ICopyable {
+	static Shape createContextualShape(IUIComponentContext context, Shape shape) {
+		return getCurrentTransform(context).createTransformedShape(shape);
+	}
+
+	static AffineTransform getCurrentTransform(IUIComponentContext context) {
+		return context.getStackRef().getTransformStackRef().element();
+	}
+
+	static Optional<? extends IUIComponent> getCurrentComponent(IUIComponentContext context) {
+		return context.getStackRef().getPathRef().getPathEnd();
+	}
+
 	IUIViewComponent<?, ?> getView();
 
 	@Immutable
@@ -25,20 +37,4 @@ public interface IUIComponentContext
 
 	@Override
 	IUIComponentContext copy();
-
-	enum StaticHolder {
-		;
-
-		public static Shape createContextualShape(IUIComponentContext context, Shape shape) {
-			return getCurrentTransform(context).createTransformedShape(shape);
-		}
-
-		public static AffineTransform getCurrentTransform(IUIComponentContext context) {
-			return context.getStackRef().getTransformStackRef().element();
-		}
-
-		public static Optional<? extends IUIComponent> getCurrentComponent(IUIComponentContext context) {
-			return context.getStackRef().getPathRef().getPathEnd();
-		}
-	}
 }

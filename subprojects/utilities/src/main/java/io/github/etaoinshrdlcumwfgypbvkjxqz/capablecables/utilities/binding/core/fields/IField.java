@@ -12,6 +12,17 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 public interface IField<T> {
+	static <T> T getValueNonnull(IField<? extends T> field) {
+		return field.getValue()
+				.orElseThrow(() -> new IllegalArgumentException(
+						new LogMessageBuilder()
+								.addMarkers(StaticHolder::getClassMarker)
+								.addKeyValue("field", field)
+								.addMessages(() -> StaticHolder.getResourceBundle().getString("value.get.null"))
+								.build()
+				));
+	}
+
 	Optional<? extends T> getValue();
 
 	void setValue(@Nullable T value);
@@ -23,17 +34,6 @@ public interface IField<T> {
 				MarkersTemplate.addReferences(UtilitiesMarkers.getInstance().getClassMarker(),
 						UtilitiesMarkers.getInstance().getMarkerStructure());
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
-
-		public static <T> T getValueNonnull(IField<? extends T> field) {
-			return field.getValue()
-					.orElseThrow(() -> new IllegalArgumentException(
-							new LogMessageBuilder()
-									.addMarkers(StaticHolder::getClassMarker)
-									.addKeyValue("field", field)
-									.addMessages(() -> getResourceBundle().getString("value.get.null"))
-									.build()
-					));
-		}
 
 		public static Marker getClassMarker() { return CLASS_MARKER; }
 

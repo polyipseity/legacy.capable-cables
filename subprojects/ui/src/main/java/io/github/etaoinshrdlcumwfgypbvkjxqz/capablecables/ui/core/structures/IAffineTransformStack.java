@@ -20,6 +20,14 @@ import java.util.ResourceBundle;
 
 public interface IAffineTransformStack
 		extends IObjectStack.ICopyPushable<AffineTransform>, ICopyable, AutoCloseable {
+	static void popNTimes(IAffineTransformStack stack, int times) {
+		LoopUtilities.doNTimes(times, stack::pop);
+	}
+
+	static boolean isClean(Deque<AffineTransform> data) {
+		return Optional.ofNullable(data.peek()).filter(AffineTransform::isIdentity).isPresent();
+	}
+
 	@Override
 	IAffineTransformStack copy();
 
@@ -35,14 +43,6 @@ public interface IAffineTransformStack
 
 		private static final Marker CLASS_MARKER = MarkersTemplate.addReferences(UIMarkers.getInstance().getClassMarker(),
 				UIMarkers.getInstance().getMarkerStructure());
-
-		public static void popNTimes(IAffineTransformStack stack, int times) {
-			LoopUtilities.doNTimes(times, stack::pop);
-		}
-
-		public static boolean isClean(Deque<AffineTransform> data) {
-			return Optional.ofNullable(data.peek()).filter(AffineTransform::isIdentity).isPresent();
-		}
 
 		public static Marker getClassMarker() {
 			return CLASS_MARKER;
@@ -60,7 +60,7 @@ public interface IAffineTransformStack
 
 		@Override
 		public void run() {
-			if (!StaticHolder.isClean(getData()))
+			if (!isClean(getData()))
 				getLogger().atWarn()
 						.addMarker(StaticHolder.getClassMarker())
 						.addArgument(this::getData)

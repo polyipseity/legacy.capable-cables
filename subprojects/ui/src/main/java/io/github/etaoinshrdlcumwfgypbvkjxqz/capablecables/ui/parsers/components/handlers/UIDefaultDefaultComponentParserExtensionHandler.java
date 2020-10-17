@@ -63,7 +63,7 @@ public class UIDefaultDefaultComponentParserExtensionHandler
 							.orElseGet(ImmutableSet::of))
 					.forEach(IThrowingConsumer.executeNow(any -> {
 						assert any != null;
-						IUIAbstractDefaultComponentParserContext.StaticHolder.findHandler(extensionContext, any)
+						IUIAbstractDefaultComponentParserContext.findHandler(extensionContext, any)
 								.ifPresent(IThrowingConsumer.executeNow(handler -> {
 									assert handler != null;
 									handler.accept(

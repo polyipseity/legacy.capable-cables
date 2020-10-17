@@ -11,20 +11,15 @@ import java.util.function.BiConsumer;
 @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 @OnlyIn(Dist.CLIENT)
 public interface IUIComponentMinecraftLifecycleModifier {
-	void tick(IUIComponentContext context);
-
-	@OnlyIn(Dist.CLIENT)
-	enum StaticHolder {
-		;
-
-		public static void handleComponentModifiers(IUIComponentMinecraft component,
-		                                            Iterable<? extends IUIComponentModifier> modifiers,
-		                                            IUIComponentContext context,
-		                                            BiConsumer<? super IUIComponentMinecraftLifecycleModifier, ? super IUIComponentContext> action) {
-			IUIComponentModifier.StaticHolder.handleComponentModifiers(component,
-					modifiers,
-					IUIComponentMinecraftLifecycleModifier.class,
-					modifier -> action.accept(modifier, context));
-		}
+	static void handleComponentModifiers(IUIComponentMinecraft component,
+	                                     Iterable<? extends IUIComponentModifier> modifiers,
+	                                     IUIComponentContext context,
+	                                     BiConsumer<? super IUIComponentMinecraftLifecycleModifier, ? super IUIComponentContext> action) {
+		IUIComponentModifier.handleComponentModifiers(component,
+				modifiers,
+				IUIComponentMinecraftLifecycleModifier.class,
+				modifier -> action.accept(modifier, context));
 	}
+
+	void tick(IUIComponentContext context);
 }
