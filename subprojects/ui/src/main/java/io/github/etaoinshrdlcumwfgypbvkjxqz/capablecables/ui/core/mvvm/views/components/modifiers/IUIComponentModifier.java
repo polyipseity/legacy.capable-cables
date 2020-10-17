@@ -46,7 +46,6 @@ public interface IUIComponentModifier {
 	                                                           Class<M> modifierClass,
 	                                                           Function<? super M, ? extends RInter> action,
 	                                                           Function<? super Iterable<? extends RInter>, ? extends R> combiner) {
-		// todo return
 		return EnumModifyStage.handleModifiers(() -> action.apply(component),
 				modifiers,
 				modifiers2 -> streamSpecificModifiers(modifiers2, modifierClass)
@@ -55,7 +54,11 @@ public interface IUIComponentModifier {
 				(self, pre, post) -> {
 					assert pre != null;
 					assert post != null;
-					return combiner.apply(Iterables.concat(pre, Collections.singleton(self), post));
+					return combiner.apply(Iterables.concat(
+							pre,
+							Collections.singleton(self), // COMMENT need to allow 'null'
+							post
+					));
 				});
 	}
 

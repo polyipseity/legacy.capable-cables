@@ -10,11 +10,10 @@ public interface IUIRenderer<C>
 
 	void onRendererRemoved();
 
-	/* TODO
+	/* TODO this class does nothing for now, useful for user custom theming later
 		class RegRenderer<R extends IUIComponentRenderer<?>>
 			extends Registry<INamespacePrefixedString, Class<? extends R>>
 			implements IHasGenericClass<R> {
-		// TODO this class does nothing for now, useful for user custom theming later
 		public static final INamespacePrefixedString DEFAULT_KEY = new ImmutableNamespacePrefixedString("default");
 		protected static final ConcurrentMap<Class<? extends IUIComponent>, RegRenderer<?>> INSTANCES =
 				MapUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();

@@ -337,7 +337,6 @@ public class UIScreenAdapter
 	@Override
 	@Deprecated
 	public boolean mouseReleased(double mouseX, double mouseY, int button) {
-		// TODO test if release works when multiple buttons are clicked
 		IUIContextContainer context = getContextContainer();
 		Point2D cp = new Point2D.Double(mouseX, mouseY);
 		UIDataMouseButtonClick d = new UIDataMouseButtonClick(cp, button);
