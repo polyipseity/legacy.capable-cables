@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 @Immutable
 public final class UIImmutableAnimationTime
 		extends UIAbstractAnimationTime {
-	private static final Supplier<UIImmutableAnimationTime> INFINITE = Suppliers.memoize(() -> new UIImmutableAnimationTime(true, 0));
+	private static final Supplier<UIImmutableAnimationTime> INFINITY = Suppliers.memoize(() -> new UIImmutableAnimationTime(true, 0));
 	private static final Supplier<UIImmutableAnimationTime> ZERO = Suppliers.memoize(() -> new UIImmutableAnimationTime(false, 1));
 
 	private final boolean infinite;
@@ -20,11 +20,7 @@ public final class UIImmutableAnimationTime
 		this.value = value;
 	}
 
-	public static UIImmutableAnimationTime infinite() {
-		return getInfinite();
-	}
-
-	private static UIImmutableAnimationTime getInfinite() { return AssertionUtilities.assertNonnull(INFINITE.get()); }
+	public static UIImmutableAnimationTime getInfinity() { return AssertionUtilities.assertNonnull(INFINITY.get()); }
 
 	public static UIImmutableAnimationTime of(long value) {
 		if (value == 0)

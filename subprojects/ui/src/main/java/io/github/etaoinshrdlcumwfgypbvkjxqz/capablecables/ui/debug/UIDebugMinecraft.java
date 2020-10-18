@@ -46,9 +46,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.methods.IBindingMethodDestination;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.traits.IHasBindingKey;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.fields.BindingField;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.fields.ImmutableBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.fields.ObservableField;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.methods.BindingMethodDestination;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.methods.ImmutableBindingMethodDestination;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.inputs.IInputPointerDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftClientUtilities;
@@ -104,7 +104,7 @@ public enum UIDebugMinecraft {
 	;
 
 	@NonNls
-	private static final String PATH = "debug_ui";
+	public static final String PATH = "debug_ui";
 	private static final ITextComponent DISPLAY_NAME = MinecraftTextComponentUtilities.getEmpty();
 
 	public static Block getBlockEntry() { return DebugBlock.getInstance(); }
@@ -135,8 +135,8 @@ public enum UIDebugMinecraft {
 		INSTANCE,
 		;
 
-		private static final @NonNls String COMPONENT_TEST_XML_PATH = "components_test.xml";
-		private static final @NonNls String COMPONENT_TEST_THEME_XML_PATH = "components_test_theme.xml";
+		public static final @NonNls String COMPONENT_TEST_XML_PATH = "components_test.xml";
+		public static final @NonNls String COMPONENT_TEST_THEME_XML_PATH = "components_test_theme.xml";
 		private static final IUIParser<IUIViewComponentMinecraft<?, ?>, Ui> VIEW_PARSER =
 				UIDefaultMinecraftComponentParser.makeParserMinecraft(
 						UIDefaultComponentParser.makeParserStandard(
@@ -235,13 +235,13 @@ public enum UIDebugMinecraft {
 		private static final class CustomWindowRenderer<C extends UIComponentWindowMinecraft>
 				extends UIComponentWindowMinecraft.DefaultRenderer<C>
 				implements IShapeDescriptorProvider {
-			private static final int CURSOR_SHAPE_RADIUS = 10;
+			public static final int CURSOR_SHAPE_RADIUS = 10;
 
 			private Color cursorHighlighterColor = Color.WHITE;
 			@SuppressWarnings("ThisEscapedInObjectConstruction")
 			private final IUIAnimationControl animations =
 					UIStandardAnimationControlFactory.createSimple(UIStandardAnimationControlFactory.EnumDirection.ALTERNATE,
-							UIAnimationTargetUtilities.compose(
+							UIAnimationTargetUtilities.andThen(
 									UIAnimationTargetUtilities.range(rgb -> setCursorHighlighterColor(new Color((int) rgb)), 0, 0xFFFFFFL, EnumCommonUIAnimationEasing.LINEAR),
 									UIAnimationTargetUtilities.range(UIAnimationTargetUtilities.ShapeDescriptors.translateY(this), 0, 100, EnumCommonUIAnimationEasing.IN_OUT_BOUNCE)
 							),
@@ -325,16 +325,16 @@ public enum UIDebugMinecraft {
 		@OnlyIn(Dist.CLIENT)
 		private static final class ViewModel
 				extends UIViewModelMinecraft<Model> {
-			protected final IBindingField<Integer> anchoredWindowBorderColor = new BindingField<>(
+			protected final IBindingField<Integer> anchoredWindowBorderColor = new ImmutableBindingField<>(
 					ImmutableNamespacePrefixedString.of(IHasBindingKey.StaticHolder.getDefaultNamespace(), "anchoredWindowBorderColor"),
 					new ObservableField<>(Integer.class, null));
-			protected final IBindingMethodDestination<UIComponentButton.IUIEventActivate> buttonOnActivate = new BindingMethodDestination<>(
+			protected final IBindingMethodDestination<UIComponentButton.IUIEventActivate> buttonOnActivate = new ImmutableBindingMethodDestination<>(
 					UIComponentButton.IUIEventActivate.class,
 					ImmutableNamespacePrefixedString.of(IHasBindingKey.StaticHolder.getDefaultNamespace(), "buttonOnActivate"),
 					this::onButtonActivate);
 			protected boolean anchoredWindowFlickering = false;
 			protected final Random random = new Random();
-			protected final IBindingMethodDestination<IUIEvent> buttonOnActivated = new BindingMethodDestination<>(
+			protected final IBindingMethodDestination<IUIEvent> buttonOnActivated = new ImmutableBindingMethodDestination<>(
 					IUIEvent.class,
 					ImmutableNamespacePrefixedString.of(IHasBindingKey.StaticHolder.getDefaultNamespace(), "buttonOnActivated"),
 					this::onButtonActivated);

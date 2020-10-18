@@ -5,7 +5,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.binding.UIPropertyMappingValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.binding.UIImmutablePropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
@@ -166,7 +166,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 
 		Class<?> clazz = AssertionUtilities.assertNonnull(context.getAliasesView().get(view.getClazz()));
 		Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIViewComponentConstructor.class, Arrays.asList(clazz.getDeclaredConstructors()));
-		MethodHandle constructorHandle = InvokeUtilities.IMPL_LOOKUP.unreflectConstructor(constructor);
+		MethodHandle constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
 
 		return (IUIViewComponent<?, ?>) constructorHandle.invoke(argument);
 	}
@@ -202,6 +202,19 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 			.put(EnumUIEventComponentType.CHAR_TYPED, Component::getCharTyped)
 			.build();
 
+	@SuppressWarnings("UnstableApiUsage")
+	public static Map<INamespacePrefixedString, IUIPropertyMappingValue> createMappings(Iterable<? extends Property> properties) {
+		return Streams.stream(properties).unordered()
+				.map(p -> Maps.immutableEntry(ImmutableNamespacePrefixedString.of(p.getKey()),
+						new UIImmutablePropertyMappingValue(p.getAny()
+								.map(value -> JAXBAdapterRegistries.getAdapter(value).leftToRight(value))
+								.orElse(null),
+								p.getBindingKey()
+										.map(ImmutableNamespacePrefixedString::of)
+										.orElse(null))))
+				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+	}
+
 	public static IUIComponent createComponent(IUIDefaultComponentParserContext context, Component component)
 			throws Throwable {
 		return TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, component,
@@ -217,7 +230,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 									assert key != null;
 									assert value != null;
 									attributes.put(key.getEventType(),
-											new UIPropertyMappingValue(null,
+											new UIImmutablePropertyMappingValue(null,
 													AssertionUtilities.assertNonnull(value.apply(node))
 															.map(IUIEventType.StaticHolder.getDefaultPrefix()::concat)
 															.map(ImmutableNamespacePrefixedString::of)
@@ -234,7 +247,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 					Class<?> clazz = AssertionUtilities.assertNonnull(context.getAliasesView().get(node.getClazz()));
 					Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIComponentConstructor.class,
 							Arrays.asList(clazz.getDeclaredConstructors()));
-					MethodHandle constructorHandle = InvokeUtilities.IMPL_LOOKUP.unreflectConstructor(constructor);
+					MethodHandle constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
 
 					return (IUIComponent) constructorHandle.invoke(argument);
 				}),
@@ -265,19 +278,6 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 				.orElseThrow(AssertionError::new);
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
-	public static Map<INamespacePrefixedString, IUIPropertyMappingValue> createMappings(Iterable<? extends Property> properties) {
-		return Streams.stream(properties).unordered()
-				.map(p -> Maps.immutableEntry(ImmutableNamespacePrefixedString.of(p.getKey()),
-						new UIPropertyMappingValue(p.getAny()
-								.map(value -> JAXBAdapterRegistries.getAdapter(value).leftToRight(value))
-								.orElse(null),
-								p.getBindingKey()
-										.map(ImmutableNamespacePrefixedString::of)
-										.orElse(null))))
-				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-	}
-
 	public static @Immutable Map<IUIEventType, Function<Component, Optional<String>>> getEventTypeFunctionMap() { return EVENT_TYPE_FUNCTION_MAP; }
 
 	@SuppressWarnings("UnstableApiUsage")
@@ -296,7 +296,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 								.map(Double::parseDouble)
 								.toArray(Double[]::new);
 
-						InvokeUtilities.PUBLIC_LOOKUP.findVirtual(
+						InvokeUtilities.getPublicLookup().findVirtual(
 								AffineTransform.class,
 								m.getName(),
 								MethodType.methodType(void.class, Collections.nCopies(args.length, double.class)))

@@ -14,6 +14,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIAbstractComponentHierarchyChangeBusEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CleanerUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ConcurrencyUtilities;
@@ -32,16 +33,14 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import net.minecraftforge.eventbus.api.EventPriority;
 import sun.misc.Cleaner;
 
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
-
 public class UICacheExtension
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IExtensionContainer<INamespacePrefixedString>, IExtensionContainer<INamespacePrefixedString>>
 		implements IUICacheExtension {
-	protected final Cache<INamespacePrefixedString, Object> cache =
+	private final Cache<INamespacePrefixedString, Object> cache =
 			CacheBuilder.newBuilder()
-					.initialCapacity(INITIAL_CAPACITY_SMALL)
-					.expireAfterAccess(CacheUtilities.CACHE_EXPIRATION_ACCESS_DURATION, CacheUtilities.CACHE_EXPIRATION_ACCESS_TIME_UNIT)
-					.concurrencyLevel(ConcurrencyUtilities.SINGLE_THREAD_THREAD_COUNT).build();
+					.initialCapacity(CapacityUtilities.getInitialCapacitySmall())
+					.expireAfterAccess(CacheUtilities.getCacheExpirationAccessDuration(), CacheUtilities.getCacheExpirationAccessTimeUnit())
+					.concurrencyLevel(ConcurrencyUtilities.getSingleThreadThreadCount()).build();
 	private static final UIExtensionConstructor.IArguments DEFAULT_ARGUMENTS = new UIExtensionConstructor.ImmutableArguments(ImmutableMap.of(), IExtensionContainer.class);
 
 	public UICacheExtension() { this(getDefaultArguments()); }
@@ -56,20 +55,20 @@ public class UICacheExtension
 	@Override
 	public void onExtensionRemoved() {
 		super.onExtensionRemoved();
-		getDelegated().invalidateAll();
+		getDelegate().invalidateAll();
 	}
 
 	@Override
-	public Cache<INamespacePrefixedString, Object> getDelegated() { return cache; }
+	public Cache<INamespacePrefixedString, Object> getDelegate() { return cache; }
 
 	@Override
-	public IExtensionType<INamespacePrefixedString, ?, IExtensionContainer<INamespacePrefixedString>> getType() { return IUICacheExtension.TYPE.getValue(); }
+	public IExtensionType<INamespacePrefixedString, ?, IExtensionContainer<INamespacePrefixedString>> getType() { return StaticHolder.getType().getValue(); }
 
 	public enum CacheUniversal {
 		;
 
 		@SuppressWarnings({"ThisEscapedInObjectConstruction", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
-		public static final Registry.RegistryObject<IUICacheType<IUIComponentManager<?>, IUIComponent>> MANAGER =
+		private static final Registry.RegistryObject<IUICacheType<IUIComponentManager<?>, IUIComponent>> MANAGER =
 				UICacheRegistry.getInstance().registerApply(IUICacheType.generateKey("manager"),
 						key -> new AbstractUICacheType<IUIComponentManager<?>, IUIComponent>(key) {
 							{
@@ -99,7 +98,7 @@ public class UICacheExtension
 							}
 						});
 		@SuppressWarnings({"ThisEscapedInObjectConstruction", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
-		public static final Registry.RegistryObject<IUICacheType<Integer, IUIComponent>> Z =
+		private static final Registry.RegistryObject<IUICacheType<Integer, IUIComponent>> Z =
 				UICacheRegistry.getInstance().registerApply(IUICacheType.generateKey("z"),
 						key -> new AbstractUICacheType<Integer, IUIComponent>(key) {
 							{
@@ -134,5 +133,13 @@ public class UICacheExtension
 								return Iterators.size(new IUIComponent.ParentIterator(container.getParent().orElse(null)));
 							}
 						});
+
+		public static Registry.RegistryObject<IUICacheType<IUIComponentManager<?>, IUIComponent>> getManager() {
+			return MANAGER;
+		}
+
+		public static Registry.RegistryObject<IUICacheType<Integer, IUIComponent>> getZ() {
+			return Z;
+		}
 	}
 }

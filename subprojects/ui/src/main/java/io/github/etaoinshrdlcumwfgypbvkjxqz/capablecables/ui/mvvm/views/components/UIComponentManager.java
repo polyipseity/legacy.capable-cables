@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 public class UIComponentManager<S extends Shape>
 		extends UIComponentContainer
 		implements IUIComponentManager<S> {
-	protected OptionalWeakReference<IUIViewComponent<?, ?>> view = new OptionalWeakReference<>(null);
+	private OptionalWeakReference<IUIViewComponent<?, ?>> view = new OptionalWeakReference<>(null);
 
 	@UIComponentConstructor
 	public UIComponentManager(UIComponentConstructor.IArguments arguments) { super(arguments); }

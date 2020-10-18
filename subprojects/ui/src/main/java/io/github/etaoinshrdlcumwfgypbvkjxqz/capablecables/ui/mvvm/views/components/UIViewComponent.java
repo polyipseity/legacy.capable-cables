@@ -85,7 +85,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 										.asMapView()
 										.values()
 						),
-				CapacityUtilities.INITIAL_CAPACITY_SMALL
+				CapacityUtilities.getInitialCapacitySmall()
 		);
 		this.themeStack.push(new UIDefaultViewComponentTheme());
 
@@ -111,7 +111,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 	public Optional<? extends IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) {
 		@Nullable Optional<? extends IUIEventTarget> ret = CastUtilities.castChecked(IUIComponent.class, currentFocus)
 				.flatMap(cf ->
-						CacheViewComponent.CHILDREN_FLAT_FOCUSABLE.getValue().get(this)
+						CacheViewComponent.getChildrenFlatFocusable().getValue().get(this)
 								.filter(FunctionUtilities.notPredicate(Collection<IUIComponent>::isEmpty))
 								.map(f -> f.get(Math.floorMod(
 										Math.max(f.indexOf(cf), 0) + (next ? 1 : -1), f.size()))));
@@ -172,14 +172,14 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 								context,
 								this,
 								new DefaultUIComponentContextStackMutator(),
-								new ImmutableUIComponentContextStack(new FunctionalPath<>(ImmutableList.of(), Lists::newArrayList), new ArrayAffineTransformStack(CapacityUtilities.INITIAL_CAPACITY_MEDIUM))
+								new ImmutableUIComponentContextStack(new FunctionalPath<>(ImmutableList.of(), Lists::newArrayList), new ArrayAffineTransformStack(CapacityUtilities.getInitialCapacityMedium()))
 						)
 				);
 	}
 
 	@Override
 	public List<IUIComponent> getChildrenFlatView() {
-		return CacheViewComponent.CHILDREN_FLAT.getValue().get(this)
+		return CacheViewComponent.getChildrenFlat().getValue().get(this)
 				.orElseThrow(AssertionError::new);
 	}
 
@@ -220,7 +220,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		;
 
 		@SuppressWarnings({"ThisEscapedInObjectConstruction", "rawtypes", "RedundantSuppression", "unchecked", "AnonymousInnerClassMayBeStatic"})
-		public static final Registry.RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
+		private static final Registry.RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
 				UICacheRegistry.getInstance().registerApply(IUICacheType.generateKey("children_flat"),
 						key -> new AbstractUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
 							{
@@ -258,7 +258,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 
 							@Override
 							protected List<IUIComponent> load(IUIViewComponent<?, ?> container) {
-								List<IUIComponent> ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
+								List<IUIComponent> ret = new ArrayList<>(CapacityUtilities.getInitialCapacityLarge());
 								container.getManager()
 										.ifPresent(manager ->
 												TreeUtilities.<IUIComponent, Object>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, manager,
@@ -268,7 +268,7 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 							}
 						});
 		@SuppressWarnings({"UnstableApiUsage", "ThisEscapedInObjectConstruction", "rawtypes", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
-		public static final Registry.RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
+		private static final Registry.RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
 				UICacheRegistry.getInstance().registerApply(IUICacheType.generateKey("children_flat.focusable"),
 						key -> new AbstractUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
 							{
@@ -311,6 +311,14 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 										.collect(ImmutableList.toImmutableList());
 							}
 						});
+
+		public static Registry.RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> getChildrenFlat() {
+			return CHILDREN_FLAT;
+		}
+
+		public static Registry.RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> getChildrenFlatFocusable() {
+			return CHILDREN_FLAT_FOCUSABLE;
+		}
 	}
 
 	@Override

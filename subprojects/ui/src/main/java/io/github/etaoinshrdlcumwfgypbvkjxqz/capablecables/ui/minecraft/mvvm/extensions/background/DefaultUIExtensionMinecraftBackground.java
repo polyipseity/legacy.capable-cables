@@ -77,7 +77,7 @@ public class DefaultUIExtensionMinecraftBackground
 	protected static UIExtensionConstructor.IArguments getDefaultArguments() { return DEFAULT_ARGUMENTS; }
 
 	@Override
-	public IExtensionType<INamespacePrefixedString, ?, IUIViewComponentMinecraft<?, ?>> getType() { return IUIExtensionMinecraftBackground.TYPE.getValue(); }
+	public IExtensionType<INamespacePrefixedString, ?, IUIViewComponentMinecraft<?, ?>> getType() { return StaticHolder.getType().getValue(); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -129,7 +129,7 @@ public class DefaultUIExtensionMinecraftBackground
 									CastUtilities.castChecked(CastUtilities.<Class<IUIViewComponentMinecraft<?, ?>>>castUnchecked(IUIViewComponent.class), event.getView())
 											.filter(evc -> owner.getContainer().filter(Predicate.isEqual(evc)).isPresent())
 											.flatMap(IUISubInfrastructure::getInfrastructure)
-											.flatMap(IUIExtensionMinecraftScreenProvider.TYPE.getValue()::find)
+											.flatMap(IUIExtensionMinecraftScreenProvider.StaticHolder.getType().getValue()::find)
 											.flatMap(IUIExtensionMinecraftScreenProvider::getScreen)
 											.ifPresent(screen -> renderer.render(screen, pointerDevice.getPositionView(), renderExtension.getPartialTicks()))
 							);

@@ -3,7 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.extensio
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.extensions.IUIExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.extensions.UIExtensionRegistry;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.DefaultExtensionType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.ImmutableExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.registering.Registry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.ImmutableNamespacePrefixedString;
@@ -13,8 +13,21 @@ import java.util.Optional;
 
 public interface IUIExtensionCursorHandleProvider
 		extends IUIExtension<INamespacePrefixedString, IUIView<?>>, ICursorHandleProvider {
-	INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(StaticHolder.getDefaultNamespace(), "cursor_custom");
-	@SuppressWarnings("unchecked")
-	Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIExtensionCursorHandleProvider, IUIView<?>>> TYPE =
-			UIExtensionRegistry.getInstance().registerApply(KEY, k -> new DefaultExtensionType<>(k, (t, i) -> (Optional<? extends IUIExtensionCursorHandleProvider>) i.getExtension(t.getKey())));
+	enum StaticHolder {
+		;
+
+		private static final INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(IUIExtension.StaticHolder.getDefaultNamespace(), "cursor_custom");
+		@SuppressWarnings("unchecked")
+		private static final
+		Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIExtensionCursorHandleProvider, IUIView<?>>> TYPE =
+				UIExtensionRegistry.getInstance().registerApply(getKey(), k -> new ImmutableExtensionType<>(k, (t, i) -> (Optional<? extends IUIExtensionCursorHandleProvider>) i.getExtension(t.getKey())));
+
+		public static INamespacePrefixedString getKey() {
+			return KEY;
+		}
+
+		public static Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIExtensionCursorHandleProvider, IUIView<?>>> getType() {
+			return TYPE;
+		}
+	}
 }

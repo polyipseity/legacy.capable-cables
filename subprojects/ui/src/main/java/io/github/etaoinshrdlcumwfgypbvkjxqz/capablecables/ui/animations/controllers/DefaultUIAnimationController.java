@@ -12,21 +12,19 @@ import java.util.Set;
 public class DefaultUIAnimationController
 		extends AbstractUIAnimationController {
 	private final Set<IUIAnimationControllable> controllable = Collections.newSetFromMap(
-			MapBuilderUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap()
+			MapBuilderUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.getInitialCapacityMedium()).makeMap()
 	);
 	private final Set<IUIAnimationControllable> endingControllable = Collections.newSetFromMap(
-			MapBuilderUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap()
+			MapBuilderUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.getInitialCapacityMedium()).makeMap()
 	);
 
 	@Override
 	public void update() {
-		{
-			getControllable().removeAll(getEndingControllable());
-			getEndingControllable().clear();
-			getControllable().stream().unordered()
-					.filter(animation -> animation.update() == IUIAnimationControllable.EnumUpdateResult.END)
-					.forEach(getEndingControllable()::add);
-		}
+		getControllable().removeAll(getEndingControllable());
+		getEndingControllable().clear();
+		getControllable().stream().unordered()
+				.filter(animation -> animation.update() == IUIAnimationControllable.EnumUpdateResult.END)
+				.forEach(getEndingControllable()::add);
 	}
 
 	@Override

@@ -1,9 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftVectorUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.UIObjectUtilities;
@@ -26,6 +23,9 @@ public enum MinecraftMatrixUtilities {
 	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker();
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 
+	public static final int MATRIX_ARRAY_LENGTH = 16;
+	private static final Matrix4f IDENTITY = MiscellaneousUtilities.act(new Matrix4f(), Matrix4f::setIdentity);
+
 	public static Matrix4f getTransformFromTo(RectangularShape from, RectangularShape to) {
 		if (from.getWidth() == 0 || from.getHeight() == 0)
 			throw new IllegalArgumentException(
@@ -37,22 +37,13 @@ public enum MinecraftMatrixUtilities {
 			);
 		double scaleX = to.getWidth() / from.getWidth(),
 				scaleY = to.getHeight() / from.getHeight();
-		Matrix4f ret = createIdentityMatrix();
+		Matrix4f ret = getIdentity();
 		ret.mul(Matrix4f.makeTranslate((float) (to.getX() - from.getX() * scaleX), (float) (to.getY() - from.getY() * scaleY), 0));
 		ret.mul(Matrix4f.makeScale((float) scaleX, (float) scaleY, 1));
 		return ret;
 	}
 
 	public static Marker getClassMarker() { return CLASS_MARKER; }
-
-	public static final int MATRIX_ARRAY_LENGTH = 16;
-	private static final Matrix4f IDENTITY = new Matrix4f();
-
-	static {
-		IDENTITY.setIdentity();
-	}
-
-	public static Matrix4f createIdentityMatrix() { return IDENTITY.copy(); }
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
@@ -77,14 +68,22 @@ public enum MinecraftMatrixUtilities {
 		return destination;
 	}
 
+	public static Matrix4f getIdentity() {
+		return IDENTITY.copy();
+	}
+
 	public static AffineTransform toAffineTransform(Matrix4f matrix) {
 		// COMMENT not all matrix data are converted
-		FloatBuffer buf = FloatBuffer.allocate(MATRIX_ARRAY_LENGTH);
+		FloatBuffer buf = FloatBuffer.allocate(getMatrixArrayLength());
 		matrix.write(buf);
 		return new AffineTransform(
 				buf.get(AffineTransformUtilities.toMatrix4x4ArrayIndex(0, 0)), buf.get(AffineTransformUtilities.toMatrix4x4ArrayIndex(1, 0)),
 				buf.get(AffineTransformUtilities.toMatrix4x4ArrayIndex(0, 1)), buf.get(AffineTransformUtilities.toMatrix4x4ArrayIndex(1, 1)),
 				buf.get(AffineTransformUtilities.toMatrix4x4ArrayIndex(0, 3)), buf.get(AffineTransformUtilities.toMatrix4x4ArrayIndex(1, 3))
 		);
+	}
+
+	public static int getMatrixArrayLength() {
+		return MATRIX_ARRAY_LENGTH;
 	}
 }

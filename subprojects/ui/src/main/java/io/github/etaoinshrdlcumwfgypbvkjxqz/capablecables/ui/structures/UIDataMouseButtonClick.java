@@ -16,7 +16,7 @@ public final class UIDataMouseButtonClick implements IUIDataMouseButtonClick {
 
 	public UIDataMouseButtonClick(Point2D cursorPosition, int button) { this(cursorPosition, button, System.currentTimeMillis()); }
 
-	protected UIDataMouseButtonClick(Point2D cursorPosition, int button, long timestamp) {
+	private UIDataMouseButtonClick(Point2D cursorPosition, int button, long timestamp) {
 		this.cursorPosition = (Point2D) cursorPosition.clone();
 		this.button = button;
 		this.timestamp = timestamp;

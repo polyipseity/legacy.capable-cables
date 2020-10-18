@@ -42,7 +42,7 @@ public final class UIMarkers extends MarkersTemplate {
 		markerUIComponentRenderer = addReferences(getMarker("renderer"), getMarkerUIComponent());
 	}
 
-	private UIMarkers() { super(UIConstants.MODULE_NAME); }
+	private UIMarkers() { super(UIConstants.getModuleName()); }
 
 	public static UIMarkers getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 

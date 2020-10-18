@@ -20,11 +20,11 @@ public class UIDefaultAnimationTimeline
 	private final boolean autoPlay;
 	@SuppressWarnings("UnstableApiUsage")
 	private final Multimap<Long, IUIAnimationControl> keyframes =
-			MultimapBuilder.hashKeys(CapacityUtilities.INITIAL_CAPACITY_SMALL).hashSetValues(CapacityUtilities.INITIAL_CAPACITY_TINY).build();
+			MultimapBuilder.hashKeys(CapacityUtilities.getInitialCapacitySmall()).hashSetValues(CapacityUtilities.getInitialCapacityTiny()).build();
 	private final Set<IUIAnimationControl> playingKeyframes =
-			Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap());
+			Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap());
 	private final Set<IUIAnimationControl> endingKeyframes =
-			Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap());
+			Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap());
 	private IUIAnimationTime offset = UIImmutableAnimationTime.of(0);
 	private IUIAnimationTime duration = UIImmutableAnimationTime.of(0);
 

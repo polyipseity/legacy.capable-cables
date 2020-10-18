@@ -96,10 +96,10 @@ public enum EnumGLFWCursor
 
 		@SuppressWarnings("HardcodedFileSeparator")
 		@NonNls
-		private static final String EXTENSION_RESIZE_NW_SE_CURSOR_PATH = "aero_nwse/32x32.png";
+		public static final String EXTENSION_RESIZE_NW_SE_CURSOR_PATH = "aero_nwse/32x32.png";
 		@SuppressWarnings("HardcodedFileSeparator")
 		@NonNls
-		private static final String EXTENSION_RESIZE_NE_SW_CURSOR_PATH = "aero_nesw/32x32.png";
+		public static final String EXTENSION_RESIZE_NE_SW_CURSOR_PATH = "aero_nesw/32x32.png";
 
 		public static String getExtensionResizeNwSeCursorPath() { return EXTENSION_RESIZE_NW_SE_CURSOR_PATH; }
 

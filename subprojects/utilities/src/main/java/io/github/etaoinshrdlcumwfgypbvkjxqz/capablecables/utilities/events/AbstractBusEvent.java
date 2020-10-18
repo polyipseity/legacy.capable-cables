@@ -18,7 +18,7 @@ public abstract class AbstractBusEvent<T>
 		implements IExtensionContainer<Class<?>> {
 	private final ConcurrentMap<Class<?>, IExtension<? extends Class<?>, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded()
 			.weakKeys()
-			.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_TINY)
+			.initialCapacity(CapacityUtilities.getInitialCapacityTiny())
 			.makeMap();
 	private final boolean hasGenericType;
 

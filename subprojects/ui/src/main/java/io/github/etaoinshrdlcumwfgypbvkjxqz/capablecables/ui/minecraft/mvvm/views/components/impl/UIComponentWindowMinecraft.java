@@ -76,21 +76,13 @@ public class UIComponentWindowMinecraft
 		@NonNls
 		public static final String PROPERTY_COLOR_BORDER = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "window.colors.border";
 
-		public static final INamespacePrefixedString PROPERTY_COLOR_BACKGROUND_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_BACKGROUND);
-		public static final INamespacePrefixedString PROPERTY_COLOR_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_BORDER);
+		private static final INamespacePrefixedString PROPERTY_COLOR_BACKGROUND_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorBackground());
+		private static final INamespacePrefixedString PROPERTY_COLOR_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorBorder());
 
 		@UIProperty(PROPERTY_COLOR_BACKGROUND)
 		protected final IBindingField<Color> colorBackground;
 		@UIProperty(PROPERTY_COLOR_BORDER)
 		protected final IBindingField<Color> colorBorder;
-
-		@Override
-		@OverridingMethodsMustInvokeSuper
-		public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-			super.initializeBindings(binderObserverSupplier);
-			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-					() -> ImmutableBinderAction.bind(getColorBackground(), getColorBorder()));
-		}
 
 		@UIRendererConstructor
 		public DefaultRenderer(UIRendererConstructor.IArguments arguments) {
@@ -98,9 +90,33 @@ public class UIComponentWindowMinecraft
 
 			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 			this.colorBackground = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.BLACK,
-					mappings.get(PROPERTY_COLOR_BACKGROUND_LOCATION));
+					mappings.get(getPropertyColorBackgroundLocation()));
 			this.colorBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.WHITE,
-					mappings.get(PROPERTY_COLOR_BORDER_LOCATION));
+					mappings.get(getPropertyColorBorderLocation()));
+		}
+
+		public static INamespacePrefixedString getPropertyColorBackgroundLocation() {
+			return PROPERTY_COLOR_BACKGROUND_LOCATION;
+		}
+
+		public static INamespacePrefixedString getPropertyColorBorderLocation() {
+			return PROPERTY_COLOR_BORDER_LOCATION;
+		}
+
+		public static String getPropertyColorBackground() {
+			return PROPERTY_COLOR_BACKGROUND;
+		}
+
+		public static String getPropertyColorBorder() {
+			return PROPERTY_COLOR_BORDER;
+		}
+
+		@Override
+		@OverridingMethodsMustInvokeSuper
+		public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+			super.initializeBindings(binderObserverSupplier);
+			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+					() -> ImmutableBinderAction.bind(getColorBackground(), getColorBorder()));
 		}
 
 		@Override

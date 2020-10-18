@@ -35,9 +35,8 @@ public class UIComponentWindow
 		implements IUIReshapeExplicitly<RectangularShape> {
 	// TODO make window scroll bars, maybe create a new component, and embed into this
 	// TODO make value not hardcoded through themes
-	public static final int
-			WINDOW_DRAG_BAR_THICKNESS = 10, // COMMENT internal top
-			WINDOW_VISIBLE_MINIMUM = 10;
+	public static final int WINDOW_DRAG_BAR_THICKNESS = 10; // COMMENT internal top
+	public static final int WINDOW_VISIBLE_MINIMUM = 10;
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final AutoCloseableRotator<ModifyShapeDescriptorObserver, RuntimeException> modifyShapeDescriptorObserver =
@@ -59,7 +58,7 @@ public class UIComponentWindow
 							.map(IShapeDescriptor::getShapeOutput)
 							.map(Shape::getBounds2D)
 							.map(RectangularShape::getMaxX)
-							.map(n -> n - WINDOW_VISIBLE_MINIMUM)
+							.map(n -> n - getWindowVisibleMinimum())
 							.orElse(null),
 					() -> selfRef.getOptional()
 							.flatMap(IUIComponent::getManager)
@@ -67,15 +66,25 @@ public class UIComponentWindow
 							.map(IShapeDescriptor::getShapeOutput)
 							.map(Shape::getBounds2D)
 							.map(RectangularShape::getMaxY)
-							.map(n -> n - WINDOW_VISIBLE_MINIMUM)
+							.map(n -> n - getWindowVisibleMinimum())
 							.orElse(null),
-					ConstantSupplier.of((double) WINDOW_VISIBLE_MINIMUM), ConstantSupplier.of((double) WINDOW_VISIBLE_MINIMUM),
+					ConstantSupplier.of((double) getWindowVisibleMinimum()), ConstantSupplier.of((double) getWindowVisibleMinimum()),
 					ConstantSupplier.empty(), ConstantSupplier.empty()));
 			return false;
 		});
 
 		addEventListener(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(), new FunctionalUIEventListener<IUIEventFocus>(e ->
 				getParent().orElseThrow(InternalError::new).moveChildToTop(this)), true);
+	}
+
+	public static int getWindowVisibleMinimum() {
+		return WINDOW_VISIBLE_MINIMUM;
+	}
+
+	@Override
+	public void transformChildren(AffineTransform transform) {
+		super.transformChildren(transform);
+		transform.translate(0, getWindowDragBarThickness()); // TODO move
 	}
 
 	@SuppressWarnings("unchecked")
@@ -99,10 +108,8 @@ public class UIComponentWindow
 
 	protected AutoCloseableRotator<ModifyShapeDescriptorObserver, RuntimeException> getModifyShapeDescriptorObserver() { return modifyShapeDescriptorObserver; }
 
-	@Override
-	public void transformChildren(AffineTransform transform) {
-		super.transformChildren(transform);
-		transform.translate(0, WINDOW_DRAG_BAR_THICKNESS); // TODO move
+	public static int getWindowDragBarThickness() {
+		return WINDOW_DRAG_BAR_THICKNESS;
 	}
 
 	@Override

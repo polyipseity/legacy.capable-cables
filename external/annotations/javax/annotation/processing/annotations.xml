@@ -1,0 +1,5 @@
+<root>
+	<item name='javax.annotation.processing.AbstractProcessor processingEnv'>
+		<annotation name='java.lang.Deprecated'/>
+	</item>
+</root>

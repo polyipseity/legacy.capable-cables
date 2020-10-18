@@ -42,7 +42,7 @@ public class UIDefaultDefaultComponentThemeParserRendererHandler
 											Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIRendererConstructor.class, Arrays.asList(clazz.getDeclaredConstructors()));
 											MethodHandle constructorHandle;
 											try {
-												constructorHandle = InvokeUtilities.IMPL_LOOKUP.unreflectConstructor(constructor);
+												constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
 											} catch (IllegalAccessException e) {
 												throw ThrowableUtilities.propagate(e);
 											}

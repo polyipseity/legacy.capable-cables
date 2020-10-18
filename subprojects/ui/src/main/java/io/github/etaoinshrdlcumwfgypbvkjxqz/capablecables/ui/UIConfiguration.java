@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 
 public final class UIConfiguration
 		extends CommonConfigurationTemplate<UIConfiguration.ConfigurationData> {
-	private static final Logger BOOTSTRAP_LOGGER = LoggerFactory.getLogger(UIConstants.MODULE_NAME);
+	private static final Logger BOOTSTRAP_LOGGER = LoggerFactory.getLogger(UIConstants.getModuleName());
 	private static final Supplier<UIConfiguration> INSTANCE = Suppliers.memoize(UIConfiguration::new);
 
 	private UIConfiguration() {}

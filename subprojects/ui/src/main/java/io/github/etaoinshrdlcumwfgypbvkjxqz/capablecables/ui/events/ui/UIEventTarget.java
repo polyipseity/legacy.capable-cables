@@ -28,8 +28,8 @@ public class UIEventTarget
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	@SuppressWarnings("UnstableApiUsage")
 	private final SetMultimap<INamespacePrefixedString, IUIEventListenerWithParameters> eventTargetListeners = MultimapBuilder
-			.hashKeys(CapacityUtilities.INITIAL_CAPACITY_SMALL)
-			.linkedHashSetValues(CapacityUtilities.INITIAL_CAPACITY_SMALL)
+			.hashKeys(CapacityUtilities.getInitialCapacitySmall())
+			.linkedHashSetValues(CapacityUtilities.getInitialCapacitySmall())
 			.build();
 
 	@Override
@@ -44,7 +44,7 @@ public class UIEventTarget
 				shouldHandle = IUIEventListenerWithParameters::isUseCapture;
 				break;
 			case AT_TARGET:
-				shouldHandle = FunctionUtilities.alwaysTruePredicate();
+				shouldHandle = FunctionUtilities.getAlwaysTruePredicate();
 				break;
 			case BUBBLING_PHASE:
 				shouldHandle = l -> !l.isUseCapture();

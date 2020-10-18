@@ -25,12 +25,12 @@ public abstract class UIView<S extends Shape>
 	private final INamedTrackers namedTrackers = new LoadingNamedTrackers(CacheLoader.from(() ->
 			new ConcurrentConfigurableNamedTracker<>(builder ->
 					builder.weakValues() // COMMENT use weak values - the trackers do not own OUR objects
-							.concurrencyLevel(ConcurrencyUtilities.NORMAL_THREAD_THREAD_COUNT)
-							.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_LARGE))));
+							.concurrencyLevel(ConcurrencyUtilities.getNormalThreadThreadCount())
+							.initialCapacity(CapacityUtilities.getInitialCapacityLarge()))));
 	private final IUIThemeStack themeStack;
 
 	public UIView() {
-		this.themeStack = new UIArrayThemeStack(FunctionUtilities.getEmptyConsumer(), CapacityUtilities.INITIAL_CAPACITY_SMALL);
+		this.themeStack = new UIArrayThemeStack(FunctionUtilities.getEmptyConsumer(), CapacityUtilities.getInitialCapacitySmall());
 		this.themeStack.push(UINullTheme.getInstance());
 	}
 

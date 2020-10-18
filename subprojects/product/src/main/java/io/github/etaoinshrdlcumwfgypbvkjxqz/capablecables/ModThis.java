@@ -1,6 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.client.ModClientProxy;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.blocks.BlocksThis;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.inventory.ContainersThis;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items.ItemsThis;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.tileentities.TileEntityTypesThis;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.IProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.server.ModServerProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
@@ -22,11 +26,6 @@ import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
 import java.util.ResourceBundle;
-
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.blocks.BlocksThis.BLOCKS;
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.inventory.ContainersThis.CONTAINERS;
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items.ItemsThis.ITEMS;
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.tileentities.TileEntityTypesThis.TILE_ENTITIES;
 
 @Mod(ModConstants.MOD_ID)
 public final class ModThis {
@@ -55,19 +54,19 @@ public final class ModThis {
 		// COMMENT entry point
 		IEventBus eventBusMod = AssertionUtilities.assertNonnull(Bus.MOD.bus().get());
 		eventBusMod.register(this);
-		BLOCKS.register(eventBusMod);
-		ITEMS.register(eventBusMod);
-		TILE_ENTITIES.register(eventBusMod);
-		CONTAINERS.register(eventBusMod);
+		BlocksThis.getRegister().register(eventBusMod);
+		ItemsThis.getRegister().register(eventBusMod);
+		TileEntityTypesThis.getRegister().register(eventBusMod);
+		ContainersThis.getRegister().register(eventBusMod);
 
 		setInstance(this); // COMMENT would really love to have a way to specify an alternative way to provide the instance
 	}
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
-	public static ResourceLocation createResourceLocation(@NonNls CharSequence path) { return new ResourceLocation(ModConstants.MOD_ID, path.toString()); }
+	public static ResourceLocation createResourceLocation(@NonNls CharSequence path) { return new ResourceLocation(ModConstants.getModId(), path.toString()); }
 
-	public static String getNamespacePrefixedString(@NonNls CharSequence separator, @NonNls String string) { return NamespaceUtilities.getNamespacePrefixedString(separator, ModConstants.MOD_ID, string); }
+	public static String getNamespacePrefixedString(@NonNls CharSequence separator, @NonNls String string) { return NamespaceUtilities.getNamespacePrefixedString(separator, ModConstants.getModId(), string); }
 
 	public IProxy<?> getProxy() { return proxy; }
 

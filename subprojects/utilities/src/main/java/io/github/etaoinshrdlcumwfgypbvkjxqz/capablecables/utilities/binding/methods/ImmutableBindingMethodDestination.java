@@ -8,14 +8,14 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class BindingMethodDestination<T>
+public final class ImmutableBindingMethodDestination<T>
 		extends IHasGenericClass.Impl<T>
 		implements IBindingMethodDestination<T> {
 	@Nullable
 	protected final INamespacePrefixedString bindingKey;
 	protected final Consumer<T> action;
 
-	public BindingMethodDestination(Class<T> genericClass, @Nullable INamespacePrefixedString bindingKey, Consumer<T> action) {
+	public ImmutableBindingMethodDestination(Class<T> genericClass, @Nullable INamespacePrefixedString bindingKey, Consumer<T> action) {
 		super(genericClass);
 		this.bindingKey = bindingKey;
 		this.action = action;

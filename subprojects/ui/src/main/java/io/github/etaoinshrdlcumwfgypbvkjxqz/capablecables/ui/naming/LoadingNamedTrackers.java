@@ -19,7 +19,7 @@ public class LoadingNamedTrackers
 		this.data = new ManualLoadingCache<>(
 				CacheUtilities.newCacheBuilderNormalThreaded()
 						.weakKeys()
-						.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL)
+						.initialCapacity(CapacityUtilities.getInitialCapacitySmall())
 						.build(loader),
 				cache -> cache.asMap().values()
 						.removeIf(INamedTracker::isEmpty)

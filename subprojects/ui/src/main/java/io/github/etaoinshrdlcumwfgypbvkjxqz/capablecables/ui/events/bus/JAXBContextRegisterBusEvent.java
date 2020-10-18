@@ -13,7 +13,7 @@ import java.util.Set;
 public class JAXBContextRegisterBusEvent
 		extends AbstractBusEvent<Void> {
 	private final Set<Class<?>> classesToBeBound = Collections.newSetFromMap(
-			MapBuilderUtilities.newMapMakerNormalThreaded().weakKeys().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap());
+			MapBuilderUtilities.newMapMakerNormalThreaded().weakKeys().initialCapacity(CapacityUtilities.getInitialCapacityMedium()).makeMap());
 
 	public JAXBContextRegisterBusEvent() {
 		super(Void.class);

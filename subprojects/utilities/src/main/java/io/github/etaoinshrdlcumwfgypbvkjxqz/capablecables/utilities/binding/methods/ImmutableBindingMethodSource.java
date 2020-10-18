@@ -10,14 +10,14 @@ import io.reactivex.rxjava3.subjects.Subject;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class BindingMethodSource<T>
+public final class ImmutableBindingMethodSource<T>
 		extends IHasGenericClass.Impl<T>
 		implements IBindingMethodSource<T> {
 	@Nullable
-	protected final INamespacePrefixedString bindingKey;
-	protected final Subject<T> notifierSubject = PublishSubject.create();
+	private final INamespacePrefixedString bindingKey;
+	private final Subject<T> notifierSubject = PublishSubject.create();
 
-	public BindingMethodSource(Class<T> genericClass, @Nullable INamespacePrefixedString bindingKey) {
+	public ImmutableBindingMethodSource(Class<T> genericClass, @Nullable INamespacePrefixedString bindingKey) {
 		super(genericClass);
 		this.bindingKey = bindingKey;
 	}

@@ -19,7 +19,7 @@ public abstract class AbstractUIAnimationControl
 		extends AbstractUIAnimationPlayable
 		implements IUIAnimationControl {
 	private final List<IUIAnimationTarget> targets;
-	private final List<Consumer<? super IUIAnimationControl>> endActions = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+	private final List<Consumer<? super IUIAnimationControl>> endActions = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 	private boolean reversed = false;
 
 	public AbstractUIAnimationControl(Iterable<? extends IUIAnimationTarget> targets, ITicker ticker) {

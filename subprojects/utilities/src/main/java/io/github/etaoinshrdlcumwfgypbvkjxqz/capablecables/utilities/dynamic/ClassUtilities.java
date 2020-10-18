@@ -24,7 +24,7 @@ public enum ClassUtilities {
 
 	static {
 		try {
-			DEFINE_CLASS_METHOD_HANDLE = InvokeUtilities.IMPL_LOOKUP.findVirtual(ClassLoader.class, "defineClass",
+			DEFINE_CLASS_METHOD_HANDLE = InvokeUtilities.getImplLookup().findVirtual(ClassLoader.class, "defineClass",
 					MethodType.methodType(Class.class, String.class, byte[].class, int.class, int.class));
 		} catch (NoSuchMethodException | IllegalAccessException e) {
 			throw ThrowableUtilities.propagate(e);
@@ -55,7 +55,7 @@ public enum ClassUtilities {
 
 	@SuppressWarnings({"ObjectAllocationInLoop", "UnstableApiUsage"})
 	public static List<Set<Class<?>>> getSuperclassesAndInterfaces(Class<?> clazz) {
-		List<Set<Class<?>>> ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+		List<Set<Class<?>>> ret = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 
 		@Immutable List<Class<?>> superclasses = getSuperclasses(clazz);
 		ret.add(ImmutableSet.copyOf(superclasses));
@@ -142,7 +142,7 @@ public enum ClassUtilities {
 	public static Class<?> defineClass(ClassLoader classLoader, CharSequence name, byte[] data) {
 		// TODO Java 9 - use Lookup.defineClass
 		try {
-			return (Class<?>) DEFINE_CLASS_METHOD_HANDLE.invokeExact(classLoader, name.toString(), data, 0, data.length);
+			return (Class<?>) getDefineClassMethodHandle().invokeExact(classLoader, name.toString(), data, 0, data.length);
 		} catch (Throwable throwable) {
 			throw ThrowableUtilities.propagate(throwable);
 		}
@@ -155,4 +155,8 @@ public enum ClassUtilities {
 	}
 
 	public static boolean isClassAbstract(Class<?> clazz) { return clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()); }
+
+	private static MethodHandle getDefineClassMethodHandle() {
+		return DEFINE_CLASS_METHOD_HANDLE;
+	}
 }

@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 
 public final class ModConfiguration
 		extends CommonConfigurationTemplate<ModConfiguration.ConfigurationData> {
-	private static final Logger BOOTSTRAP_LOGGER = LoggerFactory.getLogger(ModConstants.MOD_ID);
+	private static final Logger BOOTSTRAP_LOGGER = LoggerFactory.getLogger(ModConstants.getModId());
 	private static final Supplier<ModConfiguration> INSTANCE = Suppliers.memoize(ModConfiguration::new);
 
 	private ModConfiguration() {}

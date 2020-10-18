@@ -10,9 +10,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UIEvent implements IUIEvent {
 	private final INamespacePrefixedString type;
-	private final boolean
-			canBubble,
-			cancelable;
+	private final boolean canBubble;
+	private final boolean cancelable;
 	private final IUIViewContext viewContext;
 	private final IUIEventTarget target;
 	private final AtomicBoolean defaultPrevented = new AtomicBoolean();

@@ -18,16 +18,16 @@ public enum FunctionUtilities {
 	public static <T> Predicate<T> notPredicate(Predicate<T> function) { return function.negate(); }
 
 	@SuppressWarnings("unchecked") // COMMENT always safe as it accepts any 'Object'
-	public static <T> Predicate<T> alwaysTruePredicate() { return (Predicate<T>) ALWAYS_TRUE_PREDICATE; }
+	public static <T> Predicate<T> getAlwaysTruePredicate() { return (Predicate<T>) ALWAYS_TRUE_PREDICATE; }
 
 	@SuppressWarnings("unchecked") // COMMENT always safe as it accepts any 'Object'
-	public static <T> Predicate<T> alwaysFalsePredicate() { return (Predicate<T>) ALWAYS_FALSE_PREDICATE; }
+	public static <T> Predicate<T> getAlwaysFalsePredicate() { return (Predicate<T>) ALWAYS_FALSE_PREDICATE; }
 
 	@SuppressWarnings("unchecked") // COMMENT always safe as it accepts any 'Object'
-	public static <T, U> BiPredicate<T, U> alwaysTrueBiPredicate() { return (BiPredicate<T, U>) ALWAYS_TRUE_BI_PREDICATE; }
+	public static <T, U> BiPredicate<T, U> getAlwaysTrueBiPredicate() { return (BiPredicate<T, U>) ALWAYS_TRUE_BI_PREDICATE; }
 
 	@SuppressWarnings("unchecked") // COMMENT always safe as it accepts any 'Object'
-	public static <T, U> BiPredicate<T, U> alwaysFalseBiPredicate() { return (BiPredicate<T, U>) ALWAYS_FALSE_BI_PREDICATE; }
+	public static <T, U> BiPredicate<T, U> getAlwaysFalseBiPredicate() { return (BiPredicate<T, U>) ALWAYS_FALSE_BI_PREDICATE; }
 
 	public static Supplier<Void> asVoidSupplier(Runnable function) {
 		return () -> {

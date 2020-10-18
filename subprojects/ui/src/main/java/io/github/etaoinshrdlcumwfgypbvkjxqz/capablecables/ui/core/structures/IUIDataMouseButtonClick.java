@@ -25,7 +25,7 @@ public interface IUIDataMouseButtonClick
 	enum StaticHolder {
 		;
 
-		private static final int MOUSE_BUTTON_NULL = -1;
+		public static final int MOUSE_BUTTON_NULL = -1;
 		private static final ImmutableList<Function<? super IUIDataMouseButtonClick, ?>> OBJECT_VARIABLES = ImmutableList.of(
 				IUIDataMouseButtonClick::getCursorPositionView, IUIDataMouseButtonClick::getButton, IUIDataMouseButtonClick::getTimestampMills);
 		@NonNls

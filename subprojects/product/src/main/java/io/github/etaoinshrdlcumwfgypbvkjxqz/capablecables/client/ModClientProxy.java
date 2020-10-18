@@ -26,9 +26,7 @@ public final class ModClientProxy
 	public static ModClientProxy getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
 	@Override
-	public void onFingerprintViolation(FMLFingerprintViolationEvent event) {
-
-	}
+	public void onFingerprintViolation(FMLFingerprintViolationEvent event) {}
 
 	@Override
 	public void onSetup(FMLCommonSetupEvent event) {
@@ -42,7 +40,7 @@ public final class ModClientProxy
 
 	@Override
 	public void onSetupSided(FMLClientSetupEvent event) {
-		if (UIConstants.BUILD_TYPE.isDebug())
+		if (UIConstants.getBuildType().isDebug())
 			UIDebugMinecraft.registerUIFactory();
 	}
 

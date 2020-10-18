@@ -16,17 +16,37 @@ import javax.annotation.Nullable;
 public enum ItemsThis {
 	;
 
-	public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ModConstants.MOD_ID);
+	private static final DeferredRegister<Item> REGISTER = DeferredRegister.create(ForgeRegistries.ITEMS, ModConstants.getModId());
 
-	public static final RegistryObject<Item> WRENCH = ITEMS.register("wrench", ItemWrench::new);
+	private static final RegistryObject<Item> WRENCH = getRegister().register("wrench", ItemWrench::new);
 
-	public static final RegistryObject<Item> CABLE = ITEMS.register(BlocksThis.CABLE.getId().getPath(), () -> new BlockItem(BlocksThis.CABLE.orElseThrow(InternalError::new), new Item.Properties().group(ItemGroupsThis.DEFAULT)));
+	private static final RegistryObject<Item> CABLE = getRegister().register(BlocksThis.getCable().getId().getPath(), () -> new BlockItem(BlocksThis.getCable().orElseThrow(InternalError::new), new Item.Properties().group(ItemGroupsThis.getDefault())));
 
 	@SuppressWarnings("unused")
 	@Nullable
 	private static final RegistryObject<Item> DEBUG_UI;
 
 	static {
-		DEBUG_UI = UIConstants.BUILD_TYPE.isDebug() ? ITEMS.register(UIDebugMinecraft.getPath(), () -> new BlockItem(UIDebugMinecraft.getBlockEntry(), new Item.Properties().group(ItemGroupsThis.DEFAULT))) : null;
+		DEBUG_UI = UIConstants.getBuildType().isDebug()
+				? getRegister().register(UIDebugMinecraft.getPath(), () -> new BlockItem(UIDebugMinecraft.getBlockEntry(), new Item.Properties().group(ItemGroupsThis.getDefault())))
+				: null;
+	}
+
+	public static DeferredRegister<Item> getRegister() {
+		return REGISTER;
+	}
+
+	public static RegistryObject<Item> getWrench() {
+		return WRENCH;
+	}
+
+	public static RegistryObject<Item> getCable() {
+		return CABLE;
+	}
+
+	@SuppressWarnings("unused")
+	@Nullable
+	private static RegistryObject<Item> getDebugUI() {
+		return DEBUG_UI;
 	}
 }

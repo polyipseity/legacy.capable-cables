@@ -7,6 +7,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.sha
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeAnchorSet;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.EnumUISide;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 
 import java.util.Map;
@@ -33,8 +34,7 @@ public class ShapeAnchorSet
 	public boolean addAnchors(Iterable<? extends IShapeAnchor> anchors) {
 		return Streams.stream(anchors)
 				.map(anchor -> {
-					removeSides(Optional.ofNullable(EXCLUSIVE_SIDES_MAP.get(anchor.getOriginSide()))
-							.orElseThrow(InternalError::new));
+					removeSides(AssertionUtilities.assertNonnull(StaticHolder.getExclusiveSidesMap().get(anchor.getOriginSide())));
 					getAnchors().put(anchor.getOriginSide(), anchor);
 					anchor.onContainerAdded(this);
 					return true;

@@ -72,5 +72,5 @@ public class UIExtensionCursorHandleProviderComponent
 	}
 
 	@Override
-	public IExtensionType<INamespacePrefixedString, ?, IUIView<?>> getType() { return TYPE.getValue(); }
+	public IExtensionType<INamespacePrefixedString, ?, IUIView<?>> getType() { return StaticHolder.getType().getValue(); }
 }

@@ -23,12 +23,12 @@ public enum UIDefaultComponentSchemaHolder {
 	;
 
 	@NonNls
-	private static final String CONTEXT_PATH = UIConstants.Local.XJC_MAIN_COMPONENTS_CONTEXT_PATH;
+	public static final String CONTEXT_PATH = UIConstants.Local.XJC_MAIN_COMPONENTS_CONTEXT_PATH;
 	@NonNls
-	private static final String SCHEMA_LOCATION = "components.xsd";
+	public static final String SCHEMA_LOCATION = "components.xsd";
 	private static final Schema SCHEMA;
 	@NonNls
-	private static final String SCHEMA_NAMESPACE_URI = "https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components";
+	public static final String SCHEMA_NAMESPACE_URI = "https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components";
 	private static final JAXBContext CONTEXT;
 
 	static {
@@ -56,7 +56,11 @@ public enum UIDefaultComponentSchemaHolder {
 
 	public static Schema getSchema() { return SCHEMA; }
 
-	public static String getSchemaNamespaceURI() { return SCHEMA_NAMESPACE_URI; }
+	public static String getSchemaNamespaceURI() { return getSchemaNamespaceUri(); }
 
 	public static JAXBContext getContext() { return CONTEXT; }
+
+	public static String getSchemaNamespaceUri() {
+		return SCHEMA_NAMESPACE_URI;
+	}
 }

@@ -31,7 +31,7 @@ public class UILambdaTheme
 	protected List<Consumer<? super Map<String, ? extends IUIRendererContainer<?>>>> getRendererContainerAppliers() { return rendererContainerAppliers; }
 
 	public static class Builder {
-		private final List<Consumer<? super @Immutable Map<String, ? extends IUIRendererContainer<?>>>> rendererContainerAppliers = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM);
+		private final List<Consumer<? super @Immutable Map<String, ? extends IUIRendererContainer<?>>>> rendererContainerAppliers = new ArrayList<>(CapacityUtilities.getInitialCapacityMedium());
 
 		@SuppressWarnings("UnusedReturnValue")
 		public Builder addRendererContainerAppliers(Iterable<? extends Consumer<? super Map<String, ? extends IUIRendererContainer<?>>>> appliers) {

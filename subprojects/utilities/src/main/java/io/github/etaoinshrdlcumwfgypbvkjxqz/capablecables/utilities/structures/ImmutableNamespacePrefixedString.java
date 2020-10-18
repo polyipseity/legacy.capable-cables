@@ -9,8 +9,8 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public final class ImmutableNamespacePrefixedString
 		implements INamespacePrefixedString {
-	protected final String namespace;
-	protected final String path;
+	private final String namespace;
+	private final String path;
 
 	private ImmutableNamespacePrefixedString(@NonNls CharSequence namespace, @NonNls CharSequence path) {
 		this.namespace = namespace.toString();

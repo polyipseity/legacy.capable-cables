@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 public class FieldBindings
 		extends AbstractBindings<IBindingField<?>> {
 	protected final Map<IBindingField<?>, Disposable> fields =
-			MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_TINY).makeMap();
+			MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacityTiny()).makeMap();
 	protected final AtomicBoolean isSource = new AtomicBoolean(true);
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
@@ -46,14 +46,17 @@ public class FieldBindings
 		return Streams.stream(fields).sequential() // COMMENT sequential, field binding order matters
 				.filter(key -> !getFields().containsKey(key))
 				.reduce(false, IThrowingBiFunction.executeNow((r, f) -> {
+					assert f != null;
 					getFields().keySet().stream().unordered()
 							.findAny()
-							.ifPresent(IThrowingConsumer.executeNow(fc ->
-									f.setValue(CastUtilities.castUncheckedNullable( // COMMENT should be of the right type
-											transform(getTransformers(),
-													CastUtilities.castUncheckedNullable(fc.getValue().orElse(null)), // COMMENT should be always safe
-													fc.getGenericClass(),
-													f.getGenericClass())))));
+							.ifPresent(IThrowingConsumer.executeNow(fc -> {
+								assert fc != null;
+								f.setValue(CastUtilities.castUncheckedNullable( // COMMENT should be of the right type
+										transform(getTransformers(),
+												CastUtilities.castUncheckedNullable(fc.getValue().orElse(null)), // COMMENT should be always safe
+												fc.getGenericClass(),
+												f.getGenericClass())));
+							}));
 					DisposableObserver<? extends IValue<?>> d = createSynchronizationObserver(f, getFields().keySet(), getTransformers(), getIsSource());
 					getFields().put(f, d);
 					f.getField().getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type

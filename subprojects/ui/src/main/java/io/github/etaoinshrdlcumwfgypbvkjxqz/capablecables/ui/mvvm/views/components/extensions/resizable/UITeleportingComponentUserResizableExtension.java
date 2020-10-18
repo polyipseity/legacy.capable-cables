@@ -49,13 +49,17 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, E>
 		implements IUIComponentUserResizableExtension<E> {
 	public static final int RESIZE_BORDER_THICKNESS_DEFAULT = 10;
-	private final int resizeBorderThickness = RESIZE_BORDER_THICKNESS_DEFAULT; // TODO make this a property and strategy or something like that
+	private final int resizeBorderThickness = getResizeBorderThicknessDefault(); // TODO make this a property and strategy or something like that
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final Modifier modifier = new Modifier(this);
 	@Nullable
 	private IResizeData resizeData;
 
 	private final AtomicReference<IUIRendererContainer<IResizingRenderer>> rendererContainerReference = new AtomicReference<>();
+
+	public static int getResizeBorderThicknessDefault() {
+		return RESIZE_BORDER_THICKNESS_DEFAULT;
+	}
 
 	@Override
 	public IUIRendererContainer<IResizingRenderer> getRendererContainer()
@@ -109,7 +113,7 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 	}
 
 	@Override
-	public IExtensionType<INamespacePrefixedString, ?, IUIComponent> getType() { return TYPE.getValue(); }
+	public IExtensionType<INamespacePrefixedString, ?, IUIComponent> getType() { return StaticHolder.getType().getValue(); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper

@@ -6,7 +6,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ConcurrencyU
 public enum MapBuilderUtilities {
 	;
 
-	public static MapMaker newMapMakerSingleThreaded() { return new MapMaker().concurrencyLevel(ConcurrencyUtilities.SINGLE_THREAD_THREAD_COUNT); }
+	public static MapMaker newMapMakerSingleThreaded() { return new MapMaker().concurrencyLevel(ConcurrencyUtilities.getSingleThreadThreadCount()); }
 
-	public static MapMaker newMapMakerNormalThreaded() { return new MapMaker().concurrencyLevel(ConcurrencyUtilities.NORMAL_THREAD_THREAD_COUNT); }
+	public static MapMaker newMapMakerNormalThreaded() { return new MapMaker().concurrencyLevel(ConcurrencyUtilities.getNormalThreadThreadCount()); }
 }

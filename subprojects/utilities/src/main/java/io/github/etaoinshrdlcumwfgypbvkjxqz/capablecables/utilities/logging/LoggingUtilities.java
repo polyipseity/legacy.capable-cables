@@ -1,10 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.logging;
 
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import org.slf4j.Logger;
 import org.slf4j.ext.XLogger;
 
@@ -12,7 +12,7 @@ public enum LoggingUtilities {
 	;
 
 	private static final LoadingCache<Logger, XLogger> X_LOGGERS =
-			CacheUtilities.newCacheBuilderNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).weakKeys()
+			CacheUtilities.newCacheBuilderNormalThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).weakKeys()
 					.build(CacheLoader.from(XLogger::new));
 
 	public static XLogger getXLogger(Logger logger) {

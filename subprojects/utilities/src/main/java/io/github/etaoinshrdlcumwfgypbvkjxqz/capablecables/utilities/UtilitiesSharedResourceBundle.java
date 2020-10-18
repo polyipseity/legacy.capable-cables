@@ -29,7 +29,7 @@ public final class UtilitiesSharedResourceBundle
 		INVOKE_HANDLE_INVOKE_FAIL("invoke.handle.invoke.fail"),
 		;
 
-		private static final @NonNls String RESOURCE_BUNDLE_PATH = "io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesSharedResourceBundle";
+		public static final @NonNls String RESOURCE_BUNDLE_PATH = "io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesSharedResourceBundle";
 		@PropertyKey(resourceBundle = RESOURCE_BUNDLE_PATH)
 		private final String key;
 

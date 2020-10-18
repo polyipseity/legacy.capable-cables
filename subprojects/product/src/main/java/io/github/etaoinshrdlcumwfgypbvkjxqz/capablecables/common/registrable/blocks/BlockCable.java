@@ -5,6 +5,6 @@ import net.minecraft.block.Block;
 
 public class BlockCable extends Block {
 	protected BlockCable() {
-		super(Properties.create(Materials.PETRIFIED_SKY));
+		super(Properties.create(Materials.getPetrifiedSky()));
 	}
 }

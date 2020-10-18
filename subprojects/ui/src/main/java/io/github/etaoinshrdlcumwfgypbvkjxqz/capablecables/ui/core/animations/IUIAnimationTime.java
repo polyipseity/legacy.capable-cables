@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 public interface IUIAnimationTime {
 	static IUIAnimationTime sum(IUIAnimationTime a, IUIAnimationTime b) {
-		return a.isFinite() && b.isFinite() ? UIImmutableAnimationTime.of(a.get() + b.get()) : UIImmutableAnimationTime.infinite();
+		return a.isFinite() && b.isFinite() ? UIImmutableAnimationTime.of(a.get() + b.get()) : UIImmutableAnimationTime.getInfinity();
 	}
 
 	boolean isFinite();

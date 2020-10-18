@@ -20,10 +20,10 @@ import java.util.Optional;
 
 @Immutable
 public final class ShapeAnchor implements IShapeAnchor {
-	protected final OptionalWeakReference<IShapeDescriptorProvider> target;
-	protected final EnumUISide originSide, targetSide;
-	protected final double borderThickness;
-	protected OptionalWeakReference<IShapeAnchorSet> container = new OptionalWeakReference<>(null);
+	private final OptionalWeakReference<IShapeDescriptorProvider> target;
+	private final EnumUISide originSide, targetSide;
+	private final double borderThickness;
+	private OptionalWeakReference<IShapeAnchorSet> container = new OptionalWeakReference<>(null);
 
 	public ShapeAnchor(IShapeDescriptorProvider target, EnumUISide originSide, EnumUISide targetSide) { this(target, originSide, targetSide, 0); }
 

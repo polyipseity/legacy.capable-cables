@@ -35,13 +35,13 @@ public enum TreeUtilities {
 	                                                       @Nullable BiFunction<? super R, ? super Iterable<R>, ? extends R> combiner,
 	                                                       @Nullable Consumer<? super T> repeater) {
 		boolean shouldCombine = combiner != null;
-		Deque<Iterator<? extends T>> stackSplitter = new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
-		@Nullable Deque<Deque<R>> stackCombiner = shouldCombine ? new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_SMALL) : null;
-		Set<T> visited = new HashSet<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
+		Deque<Iterator<? extends T>> stackSplitter = new ArrayDeque<>(CapacityUtilities.getInitialCapacitySmall());
+		@Nullable Deque<Deque<R>> stackCombiner = shouldCombine ? new ArrayDeque<>(CapacityUtilities.getInitialCapacitySmall()) : null;
+		Set<T> visited = new HashSet<>(CapacityUtilities.getInitialCapacityLarge());
 
 		stackSplitter.push(Iterators.forArray(obj));
 		if (shouldCombine)
-			stackCombiner.push(new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_SMALL));
+			stackCombiner.push(new ArrayDeque<>(CapacityUtilities.getInitialCapacitySmall()));
 
 		while (!stackSplitter.isEmpty()) {
 			Iterator<? extends T> frameSplitter = AssertionUtilities.assertNonnull(stackSplitter.element());
@@ -52,12 +52,12 @@ public enum TreeUtilities {
 					if (repeater != null)
 						repeater.accept(current);
 				} else {
-					R currentRet = function.apply(current);
+					R currentRet = AssertionUtilities.assertNonnull(function.apply(current));
 					if (shouldCombine) {
 						frameCombiner.add(currentRet);
-						stackCombiner.push(new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM));
+						stackCombiner.push(new ArrayDeque<>(CapacityUtilities.getInitialCapacityMedium()));
 					}
-					stackSplitter.push(splitter.apply(current).iterator());
+					stackSplitter.push(AssertionUtilities.assertNonnull(splitter.apply(current)).iterator());
 				}
 			} else {
 				stackSplitter.pop();
@@ -85,22 +85,22 @@ public enum TreeUtilities {
 	                                                         @Nullable Consumer<? super T> repeater) {
 		boolean shouldCombine = combiner != null;
 		List<T>
-				frameSplitter = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM),
-				frameSplitterNext = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM);
-		@Nullable Deque<List<R>> stackCombiner = shouldCombine ? new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_SMALL) : null;
-		Set<T> visited = new HashSet<>(CapacityUtilities.INITIAL_CAPACITY_LARGE);
+				frameSplitter = new ArrayList<>(CapacityUtilities.getInitialCapacityMedium()),
+				frameSplitterNext = new ArrayList<>(CapacityUtilities.getInitialCapacityMedium());
+		@Nullable Deque<List<R>> stackCombiner = shouldCombine ? new ArrayDeque<>(CapacityUtilities.getInitialCapacitySmall()) : null;
+		Set<T> visited = new HashSet<>(CapacityUtilities.getInitialCapacityLarge());
 		@Nullable List<Runnable>
-				combinerActions = shouldCombine ? new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE) : null,
-				frameCombinerActions = shouldCombine ? new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_LARGE) : null;
+				combinerActions = shouldCombine ? new ArrayList<>(CapacityUtilities.getInitialCapacityLarge()) : null,
+				frameCombinerActions = shouldCombine ? new ArrayList<>(CapacityUtilities.getInitialCapacityLarge()) : null;
 
 		frameSplitter.add(obj);
 		if (shouldCombine)
-			stackCombiner.push(new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM));
+			stackCombiner.push(new ArrayList<>(CapacityUtilities.getInitialCapacityMedium()));
 
 		while (!frameSplitter.isEmpty()) {
 			@Nullable List<R> frameCombiner = shouldCombine ? stackCombiner.element() : null;
 			if (shouldCombine)
-				stackCombiner.push(new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM));
+				stackCombiner.push(new ArrayList<>(CapacityUtilities.getInitialCapacityMedium()));
 			final int[] nodeIndex = {0};
 			final int[] childrenFlatIndex = {0};
 			List<T> finalFrameSplitterNext = frameSplitterNext;

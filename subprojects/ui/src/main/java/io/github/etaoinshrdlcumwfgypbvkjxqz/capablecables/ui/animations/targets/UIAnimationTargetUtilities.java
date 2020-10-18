@@ -9,6 +9,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.sha
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -17,9 +18,9 @@ import java.util.function.DoubleConsumer;
 public enum UIAnimationTargetUtilities {
 	;
 
-	public static IUIAnimationTarget compose(IUIAnimationTarget... targets) { return compose(ImmutableList.copyOf(targets)); }
+	public static IUIAnimationTarget andThen(IUIAnimationTarget... targets) { return andThen(Arrays.asList(targets)); }
 
-	public static IUIAnimationTarget compose(Iterable<? extends IUIAnimationTarget> targets) {
+	public static IUIAnimationTarget andThen(Iterable<? extends IUIAnimationTarget> targets) {
 		@Immutable List<IUIAnimationTarget> targetsCopy = ImmutableList.copyOf(targets);
 		return progress ->
 				targetsCopy.forEach(target ->

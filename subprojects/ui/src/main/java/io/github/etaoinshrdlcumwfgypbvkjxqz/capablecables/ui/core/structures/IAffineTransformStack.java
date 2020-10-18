@@ -72,7 +72,7 @@ public interface IAffineTransformStack
 		public LeakNotifier(Deque<AffineTransform> data, Logger logger) {
 			this.data = data;
 			this.logger = logger;
-			this.throwable = UIConstants.BUILD_TYPE.isDebug() ? ThrowableUtilities.create() : null;
+			this.throwable = UIConstants.getBuildType().isDebug() ? ThrowableUtilities.create() : null;
 		}
 
 		protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }

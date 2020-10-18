@@ -24,7 +24,7 @@ public abstract class UIAbstractDefaultComponentParser<T, R, P, C extends IUIAbs
 		extends UIAbstractExtensibleJAXBParser<T, R, P, C> {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
-	private final ConcurrentMap<String, Class<?>> aliases = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
+	private final ConcurrentMap<String, Class<?>> aliases = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacityMedium()).makeMap();
 
 	@SuppressWarnings("UnstableApiUsage")
 	@Override

@@ -34,7 +34,7 @@ public enum EventBusUtilities {
 
 	static {
 		try {
-			BUS_ID_GETTER_METHOD_HANDLE = InvokeUtilities.IMPL_LOOKUP.findGetter(EventBus.class, "busID", int.class);
+			BUS_ID_GETTER_METHOD_HANDLE = InvokeUtilities.getImplLookup().findGetter(EventBus.class, "busID", int.class);
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			throw ThrowableUtilities.propagate(e);
 		}
@@ -69,7 +69,7 @@ public enum EventBusUtilities {
 	}
 
 	public static <E extends Event> void cleanListenersCache(IEventBus bus, Class<E> eventType) {
-		if (UtilitiesConstants.BUILD_TYPE.isDebug()) {
+		if (UtilitiesConstants.getBuildType().isDebug()) {
 			/* COMMENT
 			Only clean up while debugging as
 			- Rarely useful in production. The extra memory used is not large enough that it deserves such a fix.
@@ -79,9 +79,13 @@ public enum EventBusUtilities {
 			  The exact nature of this race condition is unknown to us at this time.
 			 */
 			ThrowableUtilities.getQuietly(() ->
-					(int) BUS_ID_GETTER_METHOD_HANDLE.invokeExact((EventBus) bus), Throwable.class, UtilitiesConfiguration.getInstance().getThrowableHandler())
+					(int) getBusIdGetterMethodHandle().invokeExact((EventBus) bus), Throwable.class, UtilitiesConfiguration.getInstance().getThrowableHandler())
 					.ifPresent(id ->
 							EventListenerHelper.getListenerList(eventType).getListeners(id));
 		}
+	}
+
+	private static MethodHandle getBusIdGetterMethodHandle() {
+		return BUS_ID_GETTER_METHOD_HANDLE;
 	}
 }

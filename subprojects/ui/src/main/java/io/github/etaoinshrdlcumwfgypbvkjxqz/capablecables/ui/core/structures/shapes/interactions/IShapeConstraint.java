@@ -1,6 +1,5 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.interactions.ShapeConstraint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICloneable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICopyable;
 
@@ -9,8 +8,6 @@ import java.util.Optional;
 
 public interface IShapeConstraint
 		extends ICopyable, ICloneable {
-	IShapeConstraint CONSTRAINT_NULL = new ShapeConstraint(null, null, null, null, null, null, null, null);
-
 	default <R extends RectangularShape> R constrain(RectangularShape source, R destination) {
 		final double[]
 				x = new double[]{source.getX()},

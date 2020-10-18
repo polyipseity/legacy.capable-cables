@@ -18,8 +18,10 @@ public final class ConstantSupplier<T>
 
 	@SuppressWarnings("unchecked")
 	public static <T> ConstantSupplier<T> empty() {
-		return (ConstantSupplier<T>) EMPTY; // COMMENT always safe, returns null
+		return (ConstantSupplier<T>) getEmpty(); // COMMENT always safe, returns null
 	}
+
+	private static ConstantSupplier<?> getEmpty() { return EMPTY; }
 
 	public static <T> ConstantSupplier<T> of(T constant) { return new ConstantSupplier<>(constant); }
 

@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 public enum ObjectUtilities {
 	;
 
-	public static final IntSupplier HASH_CODE_SUPER_METHOD_DEFAULT = () -> 1;
+	private static final IntSupplier HASH_CODE_SUPER_METHOD_DEFAULT = () -> 1;
 
 	@SuppressWarnings({"ObjectEquality", "UnstableApiUsage"})
 	public static <T> boolean equals(T self, @Nullable Object other, boolean acceptSubclasses, @Nullable Predicate<? super Object> superMethod, Iterable<? extends Function<? super T, ?>> variables) {
@@ -46,7 +46,7 @@ public enum ObjectUtilities {
 	 */
 	@SuppressWarnings({"MagicNumber", "UnstableApiUsage"})
 	public static <T> int hashCode(T self, @Nullable IntSupplier superMethod, Iterable<? extends Function<? super T, ?>> variables) {
-		final int[] result = {Optional.ofNullable(superMethod).orElse(HASH_CODE_SUPER_METHOD_DEFAULT).getAsInt()};
+		final int[] result = {Optional.ofNullable(superMethod).orElse(getHashCodeSuperMethodDefault()).getAsInt()};
 		Streams.stream(variables).sequential()
 				.map(variable -> variable.apply(self))
 				.mapToInt(Objects::hashCode)
@@ -57,8 +57,21 @@ public enum ObjectUtilities {
 		return result[0];
 	}
 
+	public static IntSupplier getHashCodeSuperMethodDefault() {
+		return HASH_CODE_SUPER_METHOD_DEFAULT;
+	}
+
+	public static <T> ImmutableList<Function<? super T, ?>> extendsObjectVariables(Iterable<? extends Function<? super T, ?>> extended, Iterable<? extends Function<? super T, ?>> self) {
+		return ImmutableList.copyOf(Iterables.concat(extended, self));
+	}
+
+	public static <T> @NonNls ImmutableMap<String, Function<? super T, ?>> extendsObjectVariablesMap(Collection<? extends Function<? super T, ?>> variables, Map<? extends String, ? extends Function<? super T, ?>> extended, Iterable<? extends String> self) {
+		return ImmutableMap.copyOf(
+				MapUtilities.zipKeysValues(Iterables.concat(extended.keySet(), self), variables));
+	}
+
 	public static <T> String toString(T self, @Nullable Supplier<? extends String> superMethod, Map<? extends String, ? extends Function<? super T, ?>> variables) {
-		StringBuilder ret = new StringBuilder(CapacityUtilities.INITIAL_CAPACITY_LARGE);
+		StringBuilder ret = new StringBuilder(CapacityUtilities.getInitialCapacityLarge());
 		ret.append(self.getClass().getSimpleName()).append('{');
 		final boolean[] comma = {false};
 		variables.forEach((key, valueFunction) -> {
@@ -72,14 +85,5 @@ public enum ObjectUtilities {
 		if (superMethod != null)
 			ret.append(superMethod.get());
 		return ret.toString();
-	}
-
-	public static <T> ImmutableList<Function<? super T, ?>> extendsObjectVariables(Iterable<? extends Function<? super T, ?>> extended, Iterable<? extends Function<? super T, ?>> self) {
-		return ImmutableList.copyOf(Iterables.concat(extended, self));
-	}
-
-	public static <T> @NonNls ImmutableMap<String, Function<? super T, ?>> extendsObjectVariablesMap(Collection<? extends Function<? super T, ?>> variables, Map<? extends String, ? extends Function<? super T, ?>> extended, Iterable<? extends String> self) {
-		return ImmutableMap.copyOf(
-				MapUtilities.zipKeysValues(Iterables.concat(extended.keySet(), self), variables));
 	}
 }

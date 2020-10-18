@@ -118,10 +118,10 @@ public enum UIAnimationControlUtilities {
 	public enum StaggerOptions {
 		;
 
-		private static final @NonNls String OPTION_START_KEY = "start";
-		private static final @NonNls String OPTION_STARTING_POSITION_KEY = "from";
-		private static final @NonNls String OPTION_DIRECTION_KEY = "direction";
-		private static final @NonNls String OPTION_EASING_KEY = "easing";
+		public static final @NonNls String OPTION_START_KEY = "start";
+		public static final @NonNls String OPTION_STARTING_POSITION_KEY = "from";
+		public static final @NonNls String OPTION_DIRECTION_KEY = "direction";
+		public static final @NonNls String OPTION_EASING_KEY = "easing";
 
 		private static double parseStart(Map<String, Object> options)
 				throws IllegalArgumentException {

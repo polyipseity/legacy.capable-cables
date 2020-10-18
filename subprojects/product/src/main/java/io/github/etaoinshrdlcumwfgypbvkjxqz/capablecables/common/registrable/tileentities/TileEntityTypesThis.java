@@ -13,13 +13,23 @@ import javax.annotation.Nullable;
 public enum TileEntityTypesThis {
 	;
 
-	public static final DeferredRegister<TileEntityType<?>> TILE_ENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, ModConstants.MOD_ID);
+	private static final DeferredRegister<TileEntityType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, ModConstants.getModId());
 
 	@SuppressWarnings("unused")
 	@Nullable
 	private static final RegistryObject<TileEntityType<?>> DEBUG_UI;
 
 	static {
-		DEBUG_UI = UIConstants.BUILD_TYPE.isDebug() ? TILE_ENTITIES.register(UIDebugMinecraft.getPath(), UIDebugMinecraft::getTileEntityEntry) : null;
+		DEBUG_UI = UIConstants.getBuildType().isDebug() ? getRegister().register(UIDebugMinecraft.getPath(), UIDebugMinecraft::getTileEntityEntry) : null;
+	}
+
+	public static DeferredRegister<TileEntityType<?>> getRegister() {
+		return REGISTER;
+	}
+
+	@SuppressWarnings("unused")
+	@Nullable
+	private static RegistryObject<TileEntityType<?>> getDebugUI() {
+		return DEBUG_UI;
 	}
 }

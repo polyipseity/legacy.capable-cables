@@ -38,15 +38,19 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ItemWrench extends Item {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(ModConfiguration.getInstance());
 
+	protected ItemWrench() {
+		super(new Item.Properties().group(ItemGroupsThis.getDefault()).maxStackSize(1));
+	}
+
 	protected static boolean use(ItemStack stack, World world, RayTraceResult target) {
 		Tag tag = new Tag(stack.getTag());
 		switch (target.getType()) {
 			case BLOCK:
 				BlockRayTraceResult targetBlock = (BlockRayTraceResult) target;
-				if (tag.pickedUpBlock != null) {
+				if (tag.getPickedUpBlock() != null) {
 					BlockPos pos = RegistrableUtilities.BlockUtilities.getPlacePosition(targetBlock);
-					assert tag.pickedUpBlockState != null;
-					BlockState state = Block.getStateById(tag.pickedUpBlockState);
+					assert tag.getPickedUpBlockState() != null;
+					BlockState state = Block.getStateById(tag.getPickedUpBlockState());
 					if (!world.setBlockState(pos, state)) {
 						// COMMENT only a warning, since placing it outside the build height triggers this
 						ModConfiguration.getInstance().getLogger()
@@ -55,7 +59,7 @@ public class ItemWrench extends Item {
 								.addKeyValue("pos", pos).addKeyValue("state", state)
 								.log(() -> getResourceBundle().getString("use.place.block.fail"));
 						return false;
-					} else if (tag.pickedUpBlockTile != null) {
+					} else if (tag.getPickedUpBlockTile() != null) {
 						@Nullable TileEntity tile = state.getBlock().createTileEntity(state, world);
 						if (tile == null) {
 							ModConfiguration.getInstance().getLogger()
@@ -65,27 +69,27 @@ public class ItemWrench extends Item {
 									.log(() -> getResourceBundle().getString("use.place.block.entity.fail"));
 							return false;
 						}
-						tile.deserializeNBT(tag.pickedUpBlockTile);
+						tile.deserializeNBT(tag.getPickedUpBlockTile());
 						world.setTileEntity(pos, tile);
-						tag.pickedUpBlockTile = null;
+						tag.setPickedUpBlockTile(null);
 					}
-					tag.pickedUpBlockState = null;
+					tag.setPickedUpBlockState(null);
 					stack.setTag(tag.serializeNBT());
-				} else if (tag.pickedUpEntity != null) {
-					Optional<LivingEntity> entity = EntityType.loadEntityUnchecked(tag.pickedUpEntity, world)
+				} else if (tag.getPickedUpEntity() != null) {
+					Optional<LivingEntity> entity = EntityType.loadEntityUnchecked(tag.getPickedUpEntity(), world)
 							.filter(LivingEntity.class::isInstance)
 							.map(LivingEntity.class::cast);
 					if (!entity.filter(e -> {
 						BlockPos targetPos = RegistrableUtilities.BlockUtilities.getPlacePosition(targetBlock);
 						e.setPosition(targetPos.getX(), targetPos.getY(), targetPos.getZ());
 						world.addEntity(e);
-						tag.pickedUpEntity = null;
+						tag.setPickedUpEntity(null);
 						return true;
 					}).isPresent()) {
 						ModConfiguration.getInstance().getLogger()
 								.atError()
 								.addMarker(ModMarkers.getInstance().getRegistryEntryMarker(stack.getItem()))
-								.addKeyValue("tag.pickedUpEntity", tag.pickedUpEntity)
+								.addKeyValue("tag.pickedUpEntity", tag.getPickedUpEntity())
 								.log(() -> getResourceBundle().getString("use.place.entity.fail"));
 						return false;
 					}
@@ -93,9 +97,9 @@ public class ItemWrench extends Item {
 					BlockPos pos = targetBlock.getPos();
 					BlockState state = world.getBlockState(pos);
 					@Nullable TileEntity tile = state.getBlock().hasTileEntity(state) ? world.getTileEntity(pos) : null;
-					tag.pickedUpBlockState = Block.getStateId(state);
+					tag.setPickedUpBlockState(Block.getStateId(state));
 					if (tile != null) {
-						tag.pickedUpBlockTile = tile.serializeNBT();
+						tag.setPickedUpBlockTile(tile.serializeNBT());
 						world.removeTileEntity(pos);
 					}
 					stack.setTag(tag.serializeNBT());
@@ -106,7 +110,7 @@ public class ItemWrench extends Item {
 			case ENTITY:
 				EntityRayTraceResult targetEntity = (EntityRayTraceResult) target;
 				LivingEntity entity = (LivingEntity) targetEntity.getEntity();
-				tag.pickedUpEntity = entity.serializeNBT();
+				tag.setPickedUpEntity(entity.serializeNBT());
 				stack.setTag(tag.serializeNBT());
 				entity.remove(false);
 				break;
@@ -114,10 +118,6 @@ public class ItemWrench extends Item {
 				throw new InternalError();
 		}
 		return true;
-	}
-
-	protected ItemWrench() {
-		super(new Item.Properties().group(ItemGroupsThis.DEFAULT).maxStackSize(1));
 	}
 
 	@Override
@@ -135,9 +135,9 @@ public class ItemWrench extends Item {
 			case BLOCK:
 				BlockRayTraceResult targetBlock = (BlockRayTraceResult) target;
 				if (user != null && user.isSneaking()) {
-					if (tag.pickedUpBlock != null) {
+					if (tag.getPickedUpBlock() != null) {
 						BlockPos targetPos = RegistrableUtilities.BlockUtilities.getPlacePosition(targetBlock);
-						BlockState state = Block.getStateById(AssertionUtilities.assertNonnull(tag.pickedUpBlockState));
+						BlockState state = Block.getStateById(AssertionUtilities.assertNonnull(tag.getPickedUpBlockState()));
 						// todo blacklist and whitelist system
 						return state.isValidPosition(world, targetPos) && RegistrableUtilities.BlockUtilities.checkNoEntityCollision(state, world, targetPos);
 					}
@@ -146,7 +146,7 @@ public class ItemWrench extends Item {
 				break;
 			case ENTITY:
 				EntityRayTraceResult targetEntity = (EntityRayTraceResult) target;
-				return user != null && user.isSneaking() && tag.pickedUpEntity == null && tag.pickedUpBlock == null && targetEntity.getEntity() instanceof LivingEntity;
+				return user != null && user.isSneaking() && tag.getPickedUpEntity() == null && tag.getPickedUpBlock() == null && targetEntity.getEntity() instanceof LivingEntity;
 			default:
 				throw new InternalError();
 		}
@@ -185,13 +185,13 @@ public class ItemWrench extends Item {
 
 	protected static class Tag implements INBTSerializable<CompoundNBT> {
 		@Nullable
-		public CompoundNBT
-				pickedUpBlock,
-				pickedUpBlockTile,
-				pickedUpEntity;
+		private CompoundNBT pickedUpBlock;
 		@Nullable
-		public Integer
-				pickedUpBlockState;
+		private CompoundNBT pickedUpBlockTile;
+		@Nullable
+		private CompoundNBT pickedUpEntity;
+		@Nullable
+		private Integer pickedUpBlockState;
 
 		@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 		protected Tag(@Nullable CompoundNBT tag) { deserializeNBT(tag); }
@@ -204,12 +204,12 @@ public class ItemWrench extends Item {
 				CompoundNBT pickup = new CompoundNBT();
 				{
 					CompoundNBT pickedUpBlock = new CompoundNBT();
-					RegistrableUtilities.NBTUtilities.setChildIfNotNull(pickedUpBlock, "state", pickedUpBlockState, CompoundNBT::putInt);
-					RegistrableUtilities.NBTUtilities.setChildIfNotNull(pickedUpBlock, "tile", pickedUpBlockTile, CompoundNBT::put);
+					RegistrableUtilities.NBTUtilities.setChildIfNotNull(pickedUpBlock, "state", getPickedUpBlockState(), CompoundNBT::putInt);
+					RegistrableUtilities.NBTUtilities.setChildIfNotNull(pickedUpBlock, "tile", getPickedUpBlockTile(), CompoundNBT::put);
 					if (RegistrableUtilities.NBTUtilities.setTagIfNotEmpty(pickup, "block", pickedUpBlock))
-						this.pickedUpBlock = pickedUpBlock;
+						this.setPickedUpBlock(pickedUpBlock);
 				}
-				RegistrableUtilities.NBTUtilities.setChildIfNotNull(pickup, "entity", pickedUpEntity, CompoundNBT::put);
+				RegistrableUtilities.NBTUtilities.setChildIfNotNull(pickup, "entity", getPickedUpEntity(), CompoundNBT::put);
 				RegistrableUtilities.NBTUtilities.setTagIfNotEmpty(tag, "pickup", pickup);
 			}
 			return RegistrableUtilities.NBTUtilities.returnTagIfNotEmpty(tag).orElse(null);
@@ -221,12 +221,48 @@ public class ItemWrench extends Item {
 				AtomicReference<CompoundNBT> pickup = new AtomicReference<>();
 				RegistrableUtilities.NBTUtilities.readChildIfHasKey(tag, "pickup", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(pickup::set);
 				{
-					RegistrableUtilities.NBTUtilities.readChildIfHasKey(pickup.get(), "block", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(t -> pickedUpBlock = t);
-					RegistrableUtilities.NBTUtilities.readChildIfHasKey(pickedUpBlock, "state", () -> IntNBT.valueOf(0), CompoundNBT::getInt).ifPresent(t -> pickedUpBlockState = t);
-					RegistrableUtilities.NBTUtilities.readChildIfHasKey(pickedUpBlock, "tile", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(t -> pickedUpBlockTile = t);
+					RegistrableUtilities.NBTUtilities.readChildIfHasKey(pickup.get(), "block", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(this::setPickedUpBlock);
+					RegistrableUtilities.NBTUtilities.readChildIfHasKey(getPickedUpBlock(), "state", () -> IntNBT.valueOf(0), CompoundNBT::getInt).ifPresent(this::setPickedUpBlockState);
+					RegistrableUtilities.NBTUtilities.readChildIfHasKey(getPickedUpBlock(), "tile", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(this::setPickedUpBlockTile);
 				}
-				RegistrableUtilities.NBTUtilities.readChildIfHasKey(pickup.get(), "entity", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(t -> pickedUpEntity = t);
+				RegistrableUtilities.NBTUtilities.readChildIfHasKey(pickup.get(), "entity", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(this::setPickedUpEntity);
 			}
+		}
+
+		@Nullable
+		public CompoundNBT getPickedUpBlock() {
+			return pickedUpBlock;
+		}
+
+		public void setPickedUpBlock(@Nullable CompoundNBT pickedUpBlock) {
+			this.pickedUpBlock = pickedUpBlock;
+		}
+
+		@Nullable
+		public Integer getPickedUpBlockState() {
+			return pickedUpBlockState;
+		}
+
+		@Nullable
+		public CompoundNBT getPickedUpBlockTile() {
+			return pickedUpBlockTile;
+		}
+
+		public void setPickedUpBlockTile(@Nullable CompoundNBT pickedUpBlockTile) {
+			this.pickedUpBlockTile = pickedUpBlockTile;
+		}
+
+		@Nullable
+		public CompoundNBT getPickedUpEntity() {
+			return pickedUpEntity;
+		}
+
+		public void setPickedUpEntity(@Nullable CompoundNBT pickedUpEntity) {
+			this.pickedUpEntity = pickedUpEntity;
+		}
+
+		public void setPickedUpBlockState(@Nullable Integer pickedUpBlockState) {
+			this.pickedUpBlockState = pickedUpBlockState;
 		}
 	}
 }

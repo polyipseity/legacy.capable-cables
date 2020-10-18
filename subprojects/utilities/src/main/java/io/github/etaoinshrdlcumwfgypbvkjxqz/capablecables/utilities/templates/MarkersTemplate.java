@@ -15,8 +15,8 @@ import java.util.Arrays;
 
 public abstract class MarkersTemplate {
 	@NonNls
-	private static final String SEPARATOR = "-";
-	private static final CacheBuilder<Object, Object> MARKERS_BUILDER = CacheUtilities.newCacheBuilderNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_LARGE).weakKeys();
+	public static final String SEPARATOR = "-";
+	private static final CacheBuilder<Object, Object> MARKERS_BUILDER = CacheUtilities.newCacheBuilderNormalThreaded().initialCapacity(CapacityUtilities.getInitialCapacityLarge()).weakKeys();
 	@NonNls
 	protected final Marker markerUnmarked;
 	@NonNls

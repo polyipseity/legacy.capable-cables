@@ -25,7 +25,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.methods.IBindingMethodSource;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.traits.IHasBindingKey;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.methods.BindingMethodSource;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.methods.ImmutableBindingMethodSource;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EnumHookStage;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EventBusUtilities;
@@ -48,8 +48,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
-
 public class UIComponent
 		extends UIEventTarget
 		implements IUIComponent {
@@ -58,21 +56,21 @@ public class UIComponent
 	@NonNls
 	public static final String PROPERTY_ACTIVE = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.active";
 
-	private static final INamespacePrefixedString PROPERTY_VISIBLE_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_VISIBLE);
-	private static final INamespacePrefixedString PROPERTY_ACTIVE_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_ACTIVE);
+	private static final INamespacePrefixedString PROPERTY_VISIBLE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyVisible());
+	private static final INamespacePrefixedString PROPERTY_ACTIVE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyActive());
 
 	@Nullable
 	private final String name;
 	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
-	private final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
-	private final ConcurrentMap<INamespacePrefixedString, IBindingMethodSource<? extends IUIEvent>> eventTargetBindingMethods = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+	private final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
+	private final ConcurrentMap<INamespacePrefixedString, IBindingMethodSource<? extends IUIEvent>> eventTargetBindingMethods = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
 	private final IShapeDescriptor<?> shapeDescriptor;
 	@UIProperty(PROPERTY_VISIBLE)
 	private final IBindingField<Boolean> visible;
 	@UIProperty(PROPERTY_ACTIVE)
 	private final IBindingField<Boolean> active;
 	private final AtomicBoolean modifyingShape = new AtomicBoolean();
-	private final List<IUIComponentModifier> modifiers = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+	private final List<IUIComponentModifier> modifiers = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 	private OptionalWeakReference<IUIComponentContainer> parent = new OptionalWeakReference<>(null);
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
@@ -97,6 +95,14 @@ public class UIComponent
 	public static INamespacePrefixedString getPropertyVisibleLocation() { return PROPERTY_VISIBLE_LOCATION; }
 
 	public static INamespacePrefixedString getPropertyActiveLocation() { return PROPERTY_ACTIVE_LOCATION; }
+
+	public static String getPropertyVisible() {
+		return PROPERTY_VISIBLE;
+	}
+
+	public static String getPropertyActive() {
+		return PROPERTY_ACTIVE;
+	}
 
 	@Override
 	public boolean modifyShape(BooleanSupplier action) throws ConcurrentModificationException {
@@ -134,7 +140,7 @@ public class UIComponent
 		INamespacePrefixedString type = event.getType();
 		@Nullable IBindingMethodSource<? extends IUIEvent> method = getEventTargetBindingMethods().get(type);
 		if (method == null) {
-			method = new BindingMethodSource<>(event.getClass(),
+			method = new ImmutableBindingMethodSource<>(event.getClass(),
 					Optional.ofNullable(getMappings().get(type)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 			getEventTargetBindingMethods().put(type, method);
 		}

@@ -7,5 +7,9 @@ import net.minecraft.block.material.PushReaction;
 public enum Materials {
 	;
 
-	public static final Material PETRIFIED_SKY = new Material(MaterialColor.PURPLE, false, true, true, true, false, false, false, PushReaction.NORMAL);
+	private static final Material PETRIFIED_SKY = new Material(MaterialColor.PURPLE, false, true, true, true, false, false, false, PushReaction.NORMAL);
+
+	public static Material getPetrifiedSky() {
+		return PETRIFIED_SKY;
+	}
 }

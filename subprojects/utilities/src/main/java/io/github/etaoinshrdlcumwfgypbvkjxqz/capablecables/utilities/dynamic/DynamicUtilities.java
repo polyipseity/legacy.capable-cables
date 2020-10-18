@@ -12,20 +12,24 @@ import java.util.function.Predicate;
 public enum DynamicUtilities {
 	;
 
-	public static final Unsafe UNSAFE;
+	private static final Unsafe UNSAFE;
 
 	static {
 		UNSAFE = Arrays.stream(Unsafe.class.getDeclaredFields()).unordered()
 				.filter(f -> Unsafe.class.equals(f.getType()))
 				.map(f -> {
 					try {
-						return (Unsafe) InvokeUtilities.IMPL_LOOKUP.unreflectGetter(f).invokeExact();
+						return (Unsafe) InvokeUtilities.getImplLookup().unreflectGetter(f).invokeExact();
 					} catch (Throwable throwable) {
 						throw ThrowableUtilities.propagate(throwable);
 					}
 				})
 				.findAny()
 				.orElseThrow(() -> ThrowableUtilities.propagate(new NoSuchFieldException()));
+	}
+
+	public static Unsafe getUnsafe() {
+		return UNSAFE;
 	}
 
 	public enum Extensions {

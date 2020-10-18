@@ -43,7 +43,7 @@ public abstract class AbstractUIStandardAnimationControl
 				.filter(loop -> loop == UIStandardAnimationControlFactory.getInfiniteLoop())
 				.findAny()
 				.isPresent())
-			return UIImmutableAnimationTime.infinite();
+			return UIImmutableAnimationTime.getInfinity();
 		return UIImmutableAnimationTime.of(
 				IntStream.range(0, self.getTargets().size()).sequential()
 						.mapToLong(index -> calculateTotalDurationFunction.applyAsLong(self, index))

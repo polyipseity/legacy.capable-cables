@@ -1,14 +1,14 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 
 public enum CleanerUtilities {
 	;
 
 	private static final LoadingCache<Object, Object> CLEANER_REFERENT_MAP =
-			CacheUtilities.newCacheBuilderNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_ENORMOUS).weakKeys()
+			CacheUtilities.newCacheBuilderNormalThreaded().initialCapacity(CapacityUtilities.getInitialCapacityEnormous()).weakKeys()
 					.build(CacheLoader.from(Object::new));
 
 	public static Object getCleanerReferent(Object object) { return getCleanerReferentMap().getUnchecked(object); }

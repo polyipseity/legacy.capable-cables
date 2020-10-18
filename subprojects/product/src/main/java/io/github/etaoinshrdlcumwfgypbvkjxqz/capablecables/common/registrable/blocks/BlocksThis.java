@@ -13,15 +13,31 @@ import javax.annotation.Nullable;
 public enum BlocksThis {
 	;
 
-	public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, ModConstants.MOD_ID);
+	private static final DeferredRegister<Block> REGISTER = DeferredRegister.create(ForgeRegistries.BLOCKS, ModConstants.getModId());
 
-	public static final RegistryObject<Block> CABLE = BLOCKS.register("cable", BlockCable::new);
+	private static final RegistryObject<Block> CABLE = getRegister().register("cable", BlockCable::new);
 
 	@SuppressWarnings("unused")
 	@Nullable
 	private static final RegistryObject<Block> DEBUG_UI;
 
 	static {
-		DEBUG_UI = UIConstants.BUILD_TYPE.isDebug() ? BLOCKS.register(UIDebugMinecraft.getPath(), UIDebugMinecraft::getBlockEntry) : null;
+		DEBUG_UI = UIConstants.getBuildType().isDebug()
+				? getRegister().register(UIDebugMinecraft.getPath(), UIDebugMinecraft::getBlockEntry)
+				: null;
+	}
+
+	public static DeferredRegister<Block> getRegister() {
+		return REGISTER;
+	}
+
+	public static RegistryObject<Block> getCable() {
+		return CABLE;
+	}
+
+	@SuppressWarnings("unused")
+	@Nullable
+	private static RegistryObject<Block> getDebugUI() {
+		return DEBUG_UI;
 	}
 }

@@ -10,7 +10,7 @@ import java.util.Locale;
 import java.util.function.Supplier;
 
 public final class UtilitiesConfiguration extends CommonConfigurationTemplate<UtilitiesConfiguration.ConfigurationData> {
-	private static final Logger BOOTSTRAP_LOGGER = LoggerFactory.getLogger(UtilitiesConstants.MODULE_NAME);
+	private static final Logger BOOTSTRAP_LOGGER = LoggerFactory.getLogger(UtilitiesConstants.getModuleName());
 	private static final Supplier<UtilitiesConfiguration> INSTANCE = Suppliers.memoize(UtilitiesConfiguration::new);
 
 	private UtilitiesConfiguration() {}

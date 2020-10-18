@@ -1,17 +1,19 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.paths;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
 public class FunctionalConcurrentPath<T>
 		extends AbstractConcurrentPath<T> {
-	protected final List<T> data;
-	protected final Function<? super Iterable<? extends T>, ? extends List<T>> generator;
+	private final List<T> data;
+	private final Function<? super Iterable<? extends T>, ? extends List<T>> generator;
 
 	public FunctionalConcurrentPath(Iterable<? extends T> data, Function<? super Iterable<? extends T>, ? extends List<T>> generator) {
 		this.generator = generator;
-		this.data = this.generator.apply(data);
+		this.data = AssertionUtilities.assertNonnull(generator.apply(data));
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")

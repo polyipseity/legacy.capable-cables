@@ -42,7 +42,7 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, E>
 		implements IUIComponentUserRelocatableExtension<E> {
 	public static final int RELOCATE_BORDER_THICKNESS_DEFAULT = 10;
-	private final int relocateBorderThickness = RELOCATE_BORDER_THICKNESS_DEFAULT; // TODO make this a property and strategy or something like that
+	private final int relocateBorderThickness = getRelocateBorderThicknessDefault(); // TODO make this a property and strategy or something like that
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final Modifier modifier = new Modifier(this);
 	@Nullable
@@ -55,6 +55,10 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 	}
 
 	private final AtomicReference<IUIRendererContainer<IRelocatingRenderer>> rendererContainerReference = new AtomicReference<>();
+
+	public static int getRelocateBorderThicknessDefault() {
+		return RELOCATE_BORDER_THICKNESS_DEFAULT;
+	}
 
 	@Override
 	public IUIRendererContainer<IRelocatingRenderer> getRendererContainer()
@@ -87,7 +91,7 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 	protected AtomicReference<IUIRendererContainer<IRelocatingRenderer>> getRendererContainerReference() { return rendererContainerReference; }
 
 	@Override
-	public IExtensionType<INamespacePrefixedString, ?, IUIComponent> getType() { return TYPE.getValue(); }
+	public IExtensionType<INamespacePrefixedString, ?, IUIComponent> getType() { return StaticHolder.getTYPE().getValue(); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper

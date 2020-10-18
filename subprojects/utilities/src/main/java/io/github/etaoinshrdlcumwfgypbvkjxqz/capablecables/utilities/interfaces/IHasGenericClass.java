@@ -12,23 +12,13 @@ public interface IHasGenericClass<T> {
 				.orElseGet(obj::getGenericClass);
 	}
 
-	class Impl<T>
-			implements IHasGenericClass<T> {
-		protected final Class<T> genericClass;
-
-		public Impl(Class<T> genericClass) { this.genericClass = genericClass; }
-
-		@Override
-		public Class<T> getGenericClass() { return genericClass; }
-	}
-
 	interface Extended<T, E extends T> extends IHasGenericClass<T> {
 		Class<E> getExtendedClass();
 
 		class Impl<T, E extends T>
 				extends IHasGenericClass.Impl<T>
 				implements Extended<T, E> {
-			protected final Class<E> extendedClass;
+			private final Class<E> extendedClass;
 
 			public Impl(Class<T> genericClass, Class<E> extendedClass) {
 				super(genericClass);
@@ -38,5 +28,15 @@ public interface IHasGenericClass<T> {
 			@Override
 			public Class<E> getExtendedClass() { return extendedClass; }
 		}
+	}
+
+	class Impl<T>
+			implements IHasGenericClass<T> {
+		private final Class<T> genericClass;
+
+		public Impl(Class<T> genericClass) { this.genericClass = genericClass; }
+
+		@Override
+		public Class<T> getGenericClass() { return genericClass; }
 	}
 }

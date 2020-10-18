@@ -10,7 +10,7 @@ public abstract class UIAbstractExtensibleParser<T, R, P, H, HD>
 		extends UIAbstractParser<T, R, P>
 		implements IUIExtensibleParser<T, R, H, HD> {
 	private final ConcurrentMap<HD, H> handlers =
-			MapBuilderUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL).makeMap();
+			MapBuilderUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
 
 	@Override
 	public void addHandler(HD discriminator, H handler) { getHandlers().put(discriminator, handler); }

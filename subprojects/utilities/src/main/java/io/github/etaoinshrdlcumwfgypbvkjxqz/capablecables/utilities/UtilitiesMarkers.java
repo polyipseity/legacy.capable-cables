@@ -27,7 +27,7 @@ public final class UtilitiesMarkers extends MarkersTemplate {
 		markerExtension = getMarker("extension");
 	}
 
-	private UtilitiesMarkers() { super(UtilitiesConstants.MODULE_NAME); }
+	private UtilitiesMarkers() { super(UtilitiesConstants.getModuleName()); }
 
 	public static UtilitiesMarkers getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 

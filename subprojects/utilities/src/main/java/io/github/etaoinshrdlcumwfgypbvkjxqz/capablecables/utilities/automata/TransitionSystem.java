@@ -15,18 +15,18 @@ import java.util.function.Function;
 
 public class TransitionSystem<S extends IState<D>, E, D>
 		implements ITransitionSystem<S, E, D> {
-	protected static final ITransitionSystem<IState<Object>, Object, Object> UNINITIALIZED = new TransitionSystem<>(new IState<Object>() {
+	private static final ITransitionSystem<IState<Object>, Object, Object> UNINITIALIZED = new TransitionSystem<>(new IState<Object>() {
 		@Override
 		public void transitFromThis(Object argument) { throw new UnsupportedOperationException(); }
 
 		@Override
 		public void transitToThis(Object argument) { throw new UnsupportedOperationException(); }
 	}, null, ImmutableMap
-			.of(FunctionUtilities.alwaysTrueBiPredicate(), d -> { throw new UnsupportedOperationException(); }));
-	protected final Map<BiPredicate<? super ITransitionSystem<S, E, D>, ? super D>, Function<? super D, ? extends S>> transitionsView;
-	protected S state;
+			.of(FunctionUtilities.getAlwaysTrueBiPredicate(), d -> { throw new UnsupportedOperationException(); }));
+	private final Map<BiPredicate<? super ITransitionSystem<S, E, D>, ? super D>, Function<? super D, ? extends S>> transitionsView;
+	private S state;
 	@Nullable
-	protected E input;
+	private E input;
 
 	public TransitionSystem(S state, @Nullable E input, Map<? extends BiPredicate<? super ITransitionSystem<S, E, D>, ? super D>, ? extends Function<? super D, ? extends S>> transitions) {
 		this.state = state;

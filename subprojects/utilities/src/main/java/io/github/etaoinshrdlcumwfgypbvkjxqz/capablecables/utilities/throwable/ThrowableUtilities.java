@@ -1,9 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.DynamicUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingSupplier;
@@ -54,13 +51,13 @@ public enum ThrowableUtilities {
 			throws RC, RU, RuntimeException, Error {
 		throwIfCritical(throwable);
 		if (isUnchecked(throwable))
-			throw uncheckedWrapper.apply(throwable);
+			throw AssertionUtilities.assertNonnull(uncheckedWrapper.apply(throwable));
 		else
-			throw checkedWrapper.apply(throwable);
+			throw AssertionUtilities.assertNonnull(checkedWrapper.apply(throwable));
 	}
 
 	public static RuntimeException propagateUnverified(Throwable throwable) {
-		DynamicUtilities.UNSAFE.throwException(throwable);
+		DynamicUtilities.getUnsafe().throwException(throwable);
 		throw new AssertionError();
 	}
 

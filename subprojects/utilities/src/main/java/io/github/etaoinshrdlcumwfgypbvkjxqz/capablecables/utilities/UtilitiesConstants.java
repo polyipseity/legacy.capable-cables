@@ -10,5 +10,17 @@ public enum UtilitiesConstants {
 	public static final String MODULE_NAME = "${moduleName}";
 	@NonNls
 	public static final String BUILD_TYPE_STRING = "${buildType}";
-	public static final EnumBuildType BUILD_TYPE = EnumBuildType.valueOfSafe(BUILD_TYPE_STRING);
+	private static final EnumBuildType BUILD_TYPE = EnumBuildType.valueOfSafe(getBuildTypeString());
+
+	public static String getModuleName() {
+		return MODULE_NAME;
+	}
+
+	public static String getBuildTypeString() {
+		return BUILD_TYPE_STRING;
+	}
+
+	public static EnumBuildType getBuildType() {
+		return BUILD_TYPE;
+	}
 }

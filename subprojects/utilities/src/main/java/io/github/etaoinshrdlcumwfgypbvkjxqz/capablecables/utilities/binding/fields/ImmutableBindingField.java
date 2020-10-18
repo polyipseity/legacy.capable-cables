@@ -7,12 +7,13 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class BindingField<T> implements IBindingField<T> {
+public final class ImmutableBindingField<T>
+		implements IBindingField<T> {
 	@Nullable
-	protected final INamespacePrefixedString bindingKey;
-	protected final IObservableField<T> field;
+	private final INamespacePrefixedString bindingKey;
+	private final IObservableField<T> field;
 
-	public BindingField(@Nullable INamespacePrefixedString bindingKey, IObservableField<T> field) {
+	public ImmutableBindingField(@Nullable INamespacePrefixedString bindingKey, IObservableField<T> field) {
 		this.bindingKey = bindingKey;
 		this.field = field;
 	}

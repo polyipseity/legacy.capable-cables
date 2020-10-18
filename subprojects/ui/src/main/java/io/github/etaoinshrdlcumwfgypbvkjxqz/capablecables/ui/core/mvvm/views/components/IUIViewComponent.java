@@ -44,7 +44,7 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 	                                                               IUIComponent root,
 	                                                               BiConsumer<? super IUIComponentContext, ? super IUIComponentContextMutatorResult> pre,
 	                                                               IConsumer3<? super IUIComponentContext, ? super IUIComponentContextMutatorResult, ? super Iterable<? super IUIComponent>, ? extends T> post) throws T {
-		traverseComponentTreeDefault(context, root, pre, post, FunctionUtilities.alwaysTruePredicate());
+		traverseComponentTreeDefault(context, root, pre, post, FunctionUtilities.getAlwaysTruePredicate());
 	}
 
 	static <T extends Throwable> void traverseComponentTreeDefault(IUIComponentContext context,

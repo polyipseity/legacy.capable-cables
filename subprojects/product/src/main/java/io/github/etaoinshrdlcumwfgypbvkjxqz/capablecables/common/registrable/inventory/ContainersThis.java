@@ -13,13 +13,25 @@ import javax.annotation.Nullable;
 public enum ContainersThis {
 	;
 
-	public static final DeferredRegister<ContainerType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.CONTAINERS, ModConstants.MOD_ID);
+	private static final DeferredRegister<ContainerType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.CONTAINERS, ModConstants.getModId());
 
 	@SuppressWarnings("unused")
 	@Nullable
 	private static final RegistryObject<ContainerType<?>> DEBUG_UI;
 
 	static {
-		DEBUG_UI = UIConstants.BUILD_TYPE.isDebug() ? CONTAINERS.register(UIDebugMinecraft.getPath(), UIDebugMinecraft::getContainerEntry) : null;
+		DEBUG_UI = UIConstants.getBuildType().isDebug()
+				? getRegister().register(UIDebugMinecraft.getPath(), UIDebugMinecraft::getContainerEntry)
+				: null;
+	}
+
+	public static DeferredRegister<ContainerType<?>> getRegister() {
+		return REGISTER;
+	}
+
+	@SuppressWarnings("unused")
+	@Nullable
+	private static RegistryObject<ContainerType<?>> getDebugUI() {
+		return DEBUG_UI;
 	}
 }

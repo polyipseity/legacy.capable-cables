@@ -65,7 +65,7 @@ public class EventBusListenerAdapter<T extends Event, O>
 		}
 		try {
 			// TODO Java 9 - use LambdaMetaFactory
-			this.methodHandle = InvokeUtilities.IMPL_LOOKUP.unreflect(m);
+			this.methodHandle = InvokeUtilities.getImplLookup().unreflect(m);
 		} catch (IllegalAccessException e) {
 			throw ThrowableUtilities.propagate(e);
 		}
@@ -111,12 +111,12 @@ public class EventBusListenerAdapter<T extends Event, O>
 		if (!getGenericClassFilter().filter(gcf -> {
 			bus.addGenericListener(
 					CastUtilities.castUnchecked(gcf),
-					getPriority(), shouldReceiveCancelled(),
+					getPriority(), isReceiveCancelled(),
 					CastUtilities.castUnchecked(getEventType()),
 					CastUtilities.castUnchecked(this));
 			return true;
 		}).isPresent()) {
-			bus.addListener(getPriority(), shouldReceiveCancelled(),
+			bus.addListener(getPriority(), isReceiveCancelled(),
 					getEventType(),
 					this);
 		}
@@ -126,7 +126,7 @@ public class EventBusListenerAdapter<T extends Event, O>
 
 	protected EventPriority getPriority() { return priority; }
 
-	protected boolean shouldReceiveCancelled() { return receiveCancelled; }
+	protected boolean isReceiveCancelled() { return receiveCancelled; }
 
 	protected Class<T> getEventType() { return eventType; }
 }

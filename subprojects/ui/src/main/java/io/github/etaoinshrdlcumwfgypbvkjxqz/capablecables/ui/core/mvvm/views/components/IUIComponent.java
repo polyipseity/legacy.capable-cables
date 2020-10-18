@@ -64,7 +64,7 @@ public interface IUIComponent
 
 	@Immutable
 	static IPath<IUIComponent> getPath(IUIComponent component) {
-		List<IUIComponent> path = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+		List<IUIComponent> path = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 		path.add(component);
 		new ParentIterator(component.getParent().orElse(null))
 				.forEachRemaining(path::add);
@@ -79,7 +79,7 @@ public interface IUIComponent
 
 	Optional<? extends IUIComponentContainer> getParent();
 
-	default Optional<? extends IUIComponentManager<?>> getManager() { return UICacheExtension.CacheUniversal.MANAGER.getValue().get(this); }
+	default Optional<? extends IUIComponentManager<?>> getManager() { return UICacheExtension.CacheUniversal.getManager().getValue().get(this); }
 
 	boolean isVisible();
 

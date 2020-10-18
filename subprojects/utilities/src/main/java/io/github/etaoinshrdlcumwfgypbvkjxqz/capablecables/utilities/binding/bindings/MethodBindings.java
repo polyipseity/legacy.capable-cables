@@ -27,9 +27,9 @@ import java.util.function.Supplier;
 public class MethodBindings
 		extends AbstractBindings<IBindingMethod<?>> {
 	protected final Map<IBindingMethodSource<?>, Disposable> sources =
-			MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_TINY).makeMap();
+			MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacityTiny()).makeMap();
 	protected final Set<IBindingMethodDestination<?>> destinations =
-			Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_TINY).makeMap());
+			Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacityTiny()).makeMap());
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public MethodBindings(INamespacePrefixedString bindingKey,

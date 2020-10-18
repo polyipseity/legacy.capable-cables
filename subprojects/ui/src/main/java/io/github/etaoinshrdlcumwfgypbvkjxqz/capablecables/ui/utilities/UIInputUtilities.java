@@ -11,6 +11,10 @@ public enum UIInputUtilities {
 		// TODO add accessibility setting to set double click interval
 		return current.getButton() == previous.getButton()
 				&& current.getCursorPositionView().equals(previous.getCursorPositionView())
-				&& current.getTimestampMills() - previous.getTimestampMills() <= DOUBLE_CLICK_INTERVAL_MAX;
+				&& current.getTimestampMills() - previous.getTimestampMills() <= getDoubleClickIntervalMax();
+	}
+
+	public static long getDoubleClickIntervalMax() {
+		return DOUBLE_CLICK_INTERVAL_MAX;
 	}
 }

@@ -9,7 +9,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.extensions.UIExtensionRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.EnumUISide;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.DefaultExtensionType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.ImmutableExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.registering.Registry;
@@ -24,10 +24,6 @@ import java.util.Set;
 
 public interface IUIComponentUserResizableExtension<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
 		extends IUIExtension<INamespacePrefixedString, IUIComponent>, IHasGenericClass.Extended<IUIComponent, E>, IUIRendererContainerContainer<IUIComponentUserResizableExtension.IResizingRenderer> {
-	INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(StaticHolder.getDefaultNamespace(), "component.user_resizable");
-	@SuppressWarnings("unchecked")
-	Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIComponentUserResizableExtension<?>, IUIComponent>> TYPE =
-			UIExtensionRegistry.getInstance().registerApply(KEY, k -> new DefaultExtensionType<>(k, (t, i) -> (Optional<? extends IUIComponentUserResizableExtension<?>>) i.getExtension(t.getKey())));
 
 	Optional<? extends Shape> getResizeShape();
 
@@ -52,5 +48,23 @@ public interface IUIComponentUserResizableExtension<E extends IUIComponent & IUI
 	interface IResizingRenderer
 			extends IUIRenderer<IUIComponentUserResizableExtension<?>> {
 		void render(IUIComponentContext context, IResizeData data);
+	}
+
+	enum StaticHolder {
+		;
+
+		private static final INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(IUIExtension.StaticHolder.getDefaultNamespace(), "component.user_resizable");
+		@SuppressWarnings("unchecked")
+		private static final
+		Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIComponentUserResizableExtension<?>, IUIComponent>> TYPE =
+				UIExtensionRegistry.getInstance().registerApply(getKey(), k -> new ImmutableExtensionType<>(k, (t, i) -> (Optional<? extends IUIComponentUserResizableExtension<?>>) i.getExtension(t.getKey())));
+
+		public static INamespacePrefixedString getKey() {
+			return KEY;
+		}
+
+		public static Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIComponentUserResizableExtension<?>, IUIComponent>> getType() {
+			return TYPE;
+		}
 	}
 }

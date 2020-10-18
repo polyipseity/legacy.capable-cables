@@ -8,12 +8,12 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class DefaultExtensionType<K, V extends IExtension<K, C>, C extends IExtensionContainer<? super K>>
+public final class ImmutableExtensionType<K, V extends IExtension<K, C>, C extends IExtensionContainer<? super K>>
 		implements IExtensionType<K, V, C> {
-	protected final K key;
-	protected final BiFunction<? super IExtensionType<K, V, C>, ? super C, ? extends Optional<? extends V>> getter;
+	private final K key;
+	private final BiFunction<? super IExtensionType<K, V, C>, ? super C, ? extends Optional<? extends V>> getter;
 
-	public DefaultExtensionType(K key, BiFunction<? super IExtensionType<K, V, C>, ? super C, ? extends Optional<? extends V>> getter) {
+	public ImmutableExtensionType(K key, BiFunction<? super IExtensionType<K, V, C>, ? super C, ? extends Optional<? extends V>> getter) {
 		this.key = key;
 		this.getter = getter;
 	}

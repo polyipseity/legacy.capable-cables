@@ -5,7 +5,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.templates.Co
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.LoggingThrowableHandler;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.ThreadLocalThrowableHandler;
 
-import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
@@ -20,7 +19,7 @@ import java.util.Set;
  * @since Capable Cables 0.0.1
  */
 public final class UselessAnnotationProcessor
-		extends AbstractProcessor {
+		extends AbstractAnnotationProcessor {
 	static {
 		CommonConfigurationTemplate.configureSafe(UtilitiesConfiguration.getInstance(),
 				() -> new UtilitiesConfiguration.ConfigurationData(UtilitiesConfiguration.getBootstrapLogger(),
@@ -29,9 +28,7 @@ public final class UselessAnnotationProcessor
 	}
 
 	@Override
-	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-		return true;
-	}
+	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) { return true; }
 
 	@Override
 	public Set<String> getSupportedAnnotationTypes() { return Collections.emptySet(); }

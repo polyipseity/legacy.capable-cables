@@ -41,7 +41,7 @@ public class UIDefaultDefaultComponentParserExtensionHandler
 					Arrays.asList(clazz.getDeclaredConstructors()));
 			MethodHandle constructorHandle;
 			try {
-				constructorHandle = InvokeUtilities.IMPL_LOOKUP.unreflectConstructor(constructor);
+				constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
 			} catch (IllegalAccessException e) {
 				throw ThrowableUtilities.propagate(e);
 			}

@@ -8,7 +8,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.UIAbstractSubI
 public class UIViewModel<M extends IUIModel>
 		extends UIAbstractSubInfrastructure<IUIViewModelContext>
 		implements IUIViewModel<M> {
-	protected M model;
+	private M model;
 
 	public UIViewModel(M model) { this.model = model; }
 

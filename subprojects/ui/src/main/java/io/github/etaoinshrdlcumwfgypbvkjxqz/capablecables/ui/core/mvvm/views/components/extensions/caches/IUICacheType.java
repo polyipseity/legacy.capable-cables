@@ -12,8 +12,8 @@ import java.util.Optional;
 
 public interface IUICacheType<V, C extends IExtensionContainer<INamespacePrefixedString>> {
 	static void invalidateImpl(IExtensionContainer<INamespacePrefixedString> container, INamespacePrefixedString key) {
-		IUICacheExtension.TYPE.getValue().find(container)
-				.map(IUICacheExtension::getDelegated)
+		IUICacheExtension.StaticHolder.getType().getValue().find(container)
+				.map(IUICacheExtension::getDelegate)
 				.ifPresent(cache -> cache.invalidate(key));
 	}
 

@@ -55,7 +55,7 @@ public interface IUIRendererContainer<R extends IUIRenderer<?>>
 			throws Throwable {
 		Class<?> clazz = rendererContainer.getDefaultRendererClass();
 		Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIRendererConstructor.class, Arrays.asList(clazz.getDeclaredConstructors()));
-		MethodHandle constructorHandle = InvokeUtilities.IMPL_LOOKUP.unreflectConstructor(constructor);
+		MethodHandle constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
 
 		UIRendererConstructor.IArguments argument = new UIRendererConstructor.ImmutableArguments(
 				ImmutableMap.of(),

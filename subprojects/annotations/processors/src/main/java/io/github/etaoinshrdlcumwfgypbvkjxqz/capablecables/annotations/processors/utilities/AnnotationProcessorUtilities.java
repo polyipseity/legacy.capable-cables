@@ -143,7 +143,7 @@ public enum AnnotationProcessorUtilities {
 	@SuppressWarnings({"UnstableApiUsage", "ObjectAllocationInLoop"})
 	@Immutable
 	public static List<Set<TypeElement>> getSuperclassesAndInterfaces(Types types, TypeElement type) {
-		List<Set<TypeElement>> ret = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+		List<Set<TypeElement>> ret = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 
 		@Immutable List<TypeElement> superclasses = getSuperclasses(type, types);
 		ret.add(ImmutableSet.copyOf(superclasses));

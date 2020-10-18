@@ -84,12 +84,12 @@ public class UIComponentButtonMinecraft
 		@NonNls
 		public static final String PROPERTY_COLOR_PRESSED_BORDER = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "button.colors.pressed.border";
 
-		public static final INamespacePrefixedString PROPERTY_COLOR_BASE_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_BASE);
-		public static final INamespacePrefixedString PROPERTY_COLOR_BASE_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_BASE_BORDER);
-		public static final INamespacePrefixedString PROPERTY_COLOR_HOVERING_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_HOVERING);
-		public static final INamespacePrefixedString PROPERTY_COLOR_HOVERING_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_HOVERING_BORDER);
-		public static final INamespacePrefixedString PROPERTY_COLOR_PRESSED_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_PRESSED);
-		public static final INamespacePrefixedString PROPERTY_COLOR_PRESSED_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(PROPERTY_COLOR_PRESSED_BORDER);
+		private static final INamespacePrefixedString PROPERTY_COLOR_BASE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorBase());
+		private static final INamespacePrefixedString PROPERTY_COLOR_BASE_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorBaseBorder());
+		private static final INamespacePrefixedString PROPERTY_COLOR_HOVERING_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorHovering());
+		private static final INamespacePrefixedString PROPERTY_COLOR_HOVERING_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorHoveringBorder());
+		private static final INamespacePrefixedString PROPERTY_COLOR_PRESSED_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorPressed());
+		private static final INamespacePrefixedString PROPERTY_COLOR_PRESSED_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorPressedBorder());
 
 		@UIProperty(PROPERTY_COLOR_BASE)
 		protected final IBindingField<Color> colorBase;
@@ -104,6 +104,73 @@ public class UIComponentButtonMinecraft
 		@UIProperty(PROPERTY_COLOR_PRESSED_BORDER)
 		protected final IBindingField<Color> colorPressedBorder;
 
+		@UIRendererConstructor
+		public DefaultRenderer(UIRendererConstructor.IArguments arguments) {
+			super(arguments);
+
+			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
+			this.colorBase = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY,
+					mappings.get(getPropertyColorBaseLocation()));
+			this.colorBaseBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY,
+					mappings.get(getPropertyColorBaseBorderLocation()));
+			this.colorHovering = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.GRAY,
+					mappings.get(getPropertyColorHoveringLocation()));
+			this.colorHoveringBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.GRAY,
+					mappings.get(getPropertyColorHoveringBorderLocation()));
+			this.colorPressed = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.LIGHT_GRAY,
+					mappings.get(getPropertyColorPressedLocation()));
+			this.colorPressedBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.LIGHT_GRAY,
+					mappings.get(getPropertyColorPressedBorderLocation()));
+		}
+
+		public static INamespacePrefixedString getPropertyColorBaseLocation() {
+			return PROPERTY_COLOR_BASE_LOCATION;
+		}
+
+		public static INamespacePrefixedString getPropertyColorBaseBorderLocation() {
+			return PROPERTY_COLOR_BASE_BORDER_LOCATION;
+		}
+
+		public static INamespacePrefixedString getPropertyColorHoveringLocation() {
+			return PROPERTY_COLOR_HOVERING_LOCATION;
+		}
+
+		public static INamespacePrefixedString getPropertyColorHoveringBorderLocation() {
+			return PROPERTY_COLOR_HOVERING_BORDER_LOCATION;
+		}
+
+		public static INamespacePrefixedString getPropertyColorPressedLocation() {
+			return PROPERTY_COLOR_PRESSED_LOCATION;
+		}
+
+		public static INamespacePrefixedString getPropertyColorPressedBorderLocation() {
+			return PROPERTY_COLOR_PRESSED_BORDER_LOCATION;
+		}
+
+		public static String getPropertyColorBase() {
+			return PROPERTY_COLOR_BASE;
+		}
+
+		public static String getPropertyColorBaseBorder() {
+			return PROPERTY_COLOR_BASE_BORDER;
+		}
+
+		public static String getPropertyColorHovering() {
+			return PROPERTY_COLOR_HOVERING;
+		}
+
+		public static String getPropertyColorHoveringBorder() {
+			return PROPERTY_COLOR_HOVERING_BORDER;
+		}
+
+		public static String getPropertyColorPressed() {
+			return PROPERTY_COLOR_PRESSED;
+		}
+
+		public static String getPropertyColorPressedBorder() {
+			return PROPERTY_COLOR_PRESSED_BORDER;
+		}
+
 		@Override
 		@OverridingMethodsMustInvokeSuper
 		public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
@@ -114,25 +181,6 @@ public class UIComponentButtonMinecraft
 							getColorHovering(), getColorHoveringBorder(),
 							getColorPressed(), getColorPressedBorder()
 					));
-		}
-
-		@UIRendererConstructor
-		public DefaultRenderer(UIRendererConstructor.IArguments arguments) {
-			super(arguments);
-
-			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-			this.colorBase = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY,
-					mappings.get(PROPERTY_COLOR_BASE_LOCATION));
-			this.colorBaseBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY,
-					mappings.get(PROPERTY_COLOR_BASE_BORDER_LOCATION));
-			this.colorHovering = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.GRAY,
-					mappings.get(PROPERTY_COLOR_HOVERING_LOCATION));
-			this.colorHoveringBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.GRAY,
-					mappings.get(PROPERTY_COLOR_HOVERING_BORDER_LOCATION));
-			this.colorPressed = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.LIGHT_GRAY,
-					mappings.get(PROPERTY_COLOR_PRESSED_LOCATION));
-			this.colorPressedBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.LIGHT_GRAY,
-					mappings.get(PROPERTY_COLOR_PRESSED_BORDER_LOCATION));
 		}
 
 		@Override

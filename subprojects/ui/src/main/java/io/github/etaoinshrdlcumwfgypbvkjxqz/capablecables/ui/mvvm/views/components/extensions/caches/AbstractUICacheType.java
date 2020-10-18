@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.caches;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches.IUICacheExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches.IUICacheType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheLoaderLoadedNullException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
@@ -24,10 +25,10 @@ public abstract class AbstractUICacheType<V, C extends IExtensionContainer<IName
 	@SuppressWarnings("unchecked")
 	@Override
 	public Optional<? extends V> get(C container) {
-		return UICacheExtension.TYPE.getValue().find(container)
+		return IUICacheExtension.StaticHolder.getType().getValue().find(container)
 				.map(cache -> {
 					try {
-						return (V) cache.getDelegated()
+						return (V) cache.getDelegate()
 								.get(getKey(), () -> load(container));
 					} catch (ExecutionException e) {
 						if (e.getCause() instanceof CacheLoaderLoadedNullException)

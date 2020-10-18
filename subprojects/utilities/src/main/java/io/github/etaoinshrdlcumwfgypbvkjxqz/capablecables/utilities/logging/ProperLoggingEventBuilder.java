@@ -108,7 +108,7 @@ public class ProperLoggingEventBuilder
 		}
 
 		// COMMENT key-value pairs
-		StringBuilder messageBuilder = new StringBuilder(CapacityUtilities.INITIAL_CAPACITY_LARGE);
+		StringBuilder messageBuilder = new StringBuilder(CapacityUtilities.getInitialCapacityLarge());
 		List<Object> argumentsList = Optional.ofNullable(loggingEvent.getArguments()).orElseGet(ArrayList::new);
 		Optional.ofNullable(loggingEvent.getKeyValuePairs())
 				.ifPresent(pairs -> pairs.forEach(pair -> {

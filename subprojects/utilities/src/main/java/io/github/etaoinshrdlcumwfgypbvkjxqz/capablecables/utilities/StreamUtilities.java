@@ -22,5 +22,9 @@ public enum StreamUtilities {
 
 	// COMMENT from http://gee.cs.oswego.edu/dl/html/StreamParallelGuidance.html
 	public static <T extends Stream<?>> T streamSmart(int size, int cost, Supplier<? extends T> sequential, Supplier<?
-			extends T> parallel) { return AssertionUtilities.assertNonnull(size * cost >= THRESHOLD_PARALLEL ? parallel.get() : sequential.get()); }
+			extends T> parallel) { return AssertionUtilities.assertNonnull(size * cost >= getThresholdParallel() ? parallel.get() : sequential.get()); }
+
+	public static int getThresholdParallel() {
+		return THRESHOLD_PARALLEL;
+	}
 }

@@ -8,7 +8,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.extensions.UIExtensionRegistry;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.DefaultExtensionType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.ImmutableExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.registering.Registry;
@@ -22,10 +22,6 @@ import java.util.Optional;
 
 public interface IUIComponentUserRelocatableExtension<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
 		extends IUIExtension<INamespacePrefixedString, IUIComponent>, IHasGenericClass.Extended<IUIComponent, E>, IUIRendererContainerContainer<IUIComponentUserRelocatableExtension.IRelocatingRenderer> {
-	INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(StaticHolder.getDefaultNamespace(), "component.user_relocatable");
-	@SuppressWarnings("unchecked")
-	Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIComponentUserRelocatableExtension<?>, IUIComponent>> TYPE =
-			UIExtensionRegistry.getInstance().registerApply(KEY, k -> new DefaultExtensionType<>(k, (t, i) -> (Optional<? extends IUIComponentUserRelocatableExtension<?>>) i.getExtension(t.getKey())));
 
 	Optional<? extends Shape> getRelocateShape();
 
@@ -44,5 +40,23 @@ public interface IUIComponentUserRelocatableExtension<E extends IUIComponent & I
 	interface IRelocatingRenderer
 			extends IUIRenderer<IUIComponentUserRelocatableExtension<?>> {
 		void render(IUIComponentContext context, IRelocateData data);
+	}
+
+	enum StaticHolder {
+		;
+
+		private static final INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(IUIExtension.StaticHolder.getDefaultNamespace(), "component.user_relocatable");
+		@SuppressWarnings("unchecked")
+		private static final
+		Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIComponentUserRelocatableExtension<?>, IUIComponent>> TYPE =
+				UIExtensionRegistry.getInstance().registerApply(getKEY(), k -> new ImmutableExtensionType<>(k, (t, i) -> (Optional<? extends IUIComponentUserRelocatableExtension<?>>) i.getExtension(t.getKey())));
+
+		public static INamespacePrefixedString getKEY() {
+			return KEY;
+		}
+
+		public static Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUIComponentUserRelocatableExtension<?>, IUIComponent>> getTYPE() {
+			return TYPE;
+		}
 	}
 }

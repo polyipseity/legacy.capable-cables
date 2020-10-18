@@ -16,7 +16,7 @@ public class ObservableField<T>
 		implements IObservableField<T> {
 	protected final Subject<IValue<T>> notifierSubject = PublishSubject.create();
 	@Nullable
-	protected T value;
+	private T value;
 
 	public ObservableField(Class<T> genericClass, @Nullable T value) {
 		super(genericClass);

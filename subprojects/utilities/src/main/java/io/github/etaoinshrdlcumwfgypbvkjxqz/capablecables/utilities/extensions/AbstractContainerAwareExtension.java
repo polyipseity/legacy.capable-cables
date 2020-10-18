@@ -20,7 +20,7 @@ public abstract class AbstractContainerAwareExtension<K, C extends IExtensionCon
 		implements IExtension<K, C> {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 
-	protected OptionalWeakReference<E> container = new OptionalWeakReference<>(null);
+	private OptionalWeakReference<E> container = new OptionalWeakReference<>(null);
 
 	public AbstractContainerAwareExtension(Class<C> genericClass, Class<E> containerClass) { super(genericClass, containerClass); }
 

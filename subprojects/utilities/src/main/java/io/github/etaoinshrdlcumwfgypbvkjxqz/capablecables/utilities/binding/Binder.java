@@ -21,17 +21,18 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import java.util.*;
 import java.util.function.Function;
 
-public class Binder implements IBinder {
+public class Binder
+		implements IBinder {
 	@SuppressWarnings("UnstableApiUsage")
 	private static final MultimapBuilder.SetMultimapBuilder<Object, Object> BINDINGS_MULTI_MAP_BUILDER = MultimapBuilder
-			.linkedHashKeys(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)
-			.linkedHashSetValues(CapacityUtilities.INITIAL_CAPACITY_TINY); // COMMENT order is important
+			.linkedHashKeys(CapacityUtilities.getInitialCapacityMedium())
+			.linkedHashSetValues(CapacityUtilities.getInitialCapacityTiny()); // COMMENT order is important
 	protected final LoadingCache<IBinding.EnumBindingType, LoadingCache<INamespacePrefixedString, IBindings<?>>> bindings;
 	protected final LoadingCache<IBinding.EnumBindingType, LoadingCache<Class<?>, Cache<Class<?>, Function<?, ?>>>> transformers;
 
 	{
 		CacheBuilder<Object, Object> cb = CacheUtilities.newCacheBuilderSingleThreaded()
-				.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+				.initialCapacity(CapacityUtilities.getInitialCapacitySmall());
 		this.bindings = ManualLoadingCache.newNestedLoadingCacheCache(
 				CacheUtilities.newCacheBuilderSingleThreaded()
 						.initialCapacity(IBinding.EnumBindingType.values().length)
@@ -46,10 +47,8 @@ public class Binder implements IBinder {
 						.initialCapacity(IBinding.EnumBindingType.values().length)
 						.build(CacheLoader.from(() ->
 								ManualLoadingCache.newNestedLoadingCacheCache(
-										cb.build(CacheUtilities.newCacheBuilderSingleThreadedLoader(CapacityUtilities.INITIAL_CAPACITY_SMALL))))));
+										cb.build(CacheUtilities.newCacheBuilderSingleThreadedLoader(CapacityUtilities.getInitialCapacitySmall()))))));
 	}
-
-	protected LoadingCache<IBinding.EnumBindingType, LoadingCache<Class<?>, Cache<Class<?>, Function<?, ?>>>> getTransformers() { return transformers; }
 
 	@Override
 	public boolean bind(Iterable<? extends IBinding<?>> bindings)
@@ -57,19 +56,39 @@ public class Binder implements IBinder {
 		return sortAndTrimBindings(bindings).entrySet().stream().unordered()
 				.reduce(false,
 						IThrowingBiFunction.executeNow((r, e) -> {
+							assert e != null;
 							LoadingCache<INamespacePrefixedString, IBindings<?>> bs = getBindings().getUnchecked(AssertionUtilities.assertNonnull(e.getKey()));
 							return AssertionUtilities.assertNonnull(e.getValue()).asMap().entrySet().stream().sequential() // COMMENT sequential, field binding order matters
 									.reduce(false,
 											IThrowingBiFunction.
 													<Boolean, Map.Entry<INamespacePrefixedString, ? extends Collection<? extends IBinding<?>>>, Boolean,
 															NoSuchBindingTransformerException>
-															executeNow((r2, e2) ->
-															bs.getUnchecked(AssertionUtilities.assertNonnull(e2.getKey()))
-																	.add(CastUtilities.castUnchecked( // COMMENT should be of the right type
-																			AssertionUtilities.assertNonnull(e2.getValue()))) || r2),
+															executeNow((r2, e2) -> {
+														assert r2 != null;
+														assert e2 != null;
+														return bs.getUnchecked(AssertionUtilities.assertNonnull(e2.getKey()))
+																.add(CastUtilities.castUnchecked( // COMMENT should be of the right type
+																		AssertionUtilities.assertNonnull(e2.getValue()))) || r2;
+													}),
 											Boolean::logicalOr);
 						}),
 						Boolean::logicalOr);
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	public static <B extends IBinding<?>> Map<IBinding.EnumBindingType, Multimap<INamespacePrefixedString, B>> sortAndTrimBindings(Iterable<B> bindings) {
+		Map<IBinding.EnumBindingType, Multimap<INamespacePrefixedString, B>> ret =
+				new EnumMap<>(IBinding.EnumBindingType.class);
+		bindings.forEach(b ->
+				b.getBindingKey()
+						.ifPresent(bk ->
+								ret.computeIfAbsent(b.getBindingType(), k -> getBindingsMultiMapBuilder().build()).put(bk, b)));
+		return ret;
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	protected static MultimapBuilder.SetMultimapBuilder<Object, Object> getBindingsMultiMapBuilder() {
+		return BINDINGS_MULTI_MAP_BUILDER;
 	}
 
 	@Override
@@ -133,16 +152,7 @@ public class Binder implements IBinder {
 		return ret;
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
-	public static <B extends IBinding<?>> Map<IBinding.EnumBindingType, Multimap<INamespacePrefixedString, B>> sortAndTrimBindings(Iterable<B> bindings) {
-		Map<IBinding.EnumBindingType, Multimap<INamespacePrefixedString, B>> ret =
-				new EnumMap<>(IBinding.EnumBindingType.class);
-		bindings.forEach(b ->
-				b.getBindingKey()
-						.ifPresent(bk ->
-								ret.computeIfAbsent(b.getBindingType(), k -> BINDINGS_MULTI_MAP_BUILDER.build()).put(bk, b)));
-		return ret;
-	}
+	protected LoadingCache<IBinding.EnumBindingType, LoadingCache<Class<?>, Cache<Class<?>, Function<?, ?>>>> getTransformers() { return transformers; }
 
 	protected LoadingCache<IBinding.EnumBindingType, LoadingCache<INamespacePrefixedString, IBindings<?>>> getBindings() { return bindings; }
 }

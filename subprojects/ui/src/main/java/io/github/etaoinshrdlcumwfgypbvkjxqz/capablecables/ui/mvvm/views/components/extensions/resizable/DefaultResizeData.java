@@ -14,11 +14,11 @@ import java.util.Optional;
 import java.util.Set;
 
 public class DefaultResizeData implements IUIComponentUserResizableExtension.IResizeData {
-	protected final Point2D previousPoint;
-	protected final Set<EnumUISide> sides;
+	private final Point2D previousPoint;
+	private final Set<EnumUISide> sides;
 	@Nullable
-	protected final Point2D base;
-	protected final long initialCursorHandle;
+	private final Point2D base;
+	private final long initialCursorHandle;
 
 	public DefaultResizeData(Point2D previousPoint, Set<EnumUISide> sides, @Nullable Point2D base, long initialCursorHandle) {
 		this.previousPoint = (Point2D) previousPoint.clone();

@@ -1,19 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions;
 
 import com.google.common.collect.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.EnumUISide;
 
 import java.util.EnumSet;
 import java.util.Map;
 
 public interface IShapeAnchorSet {
-	ImmutableMap<EnumUISide, ImmutableSet<EnumUISide>> EXCLUSIVE_SIDES_MAP = ImmutableMap.<EnumUISide, ImmutableSet<EnumUISide>>builder()
-			.put(EnumUISide.UP, Sets.immutableEnumSet(EnumUISide.VERTICAL))
-			.put(EnumUISide.DOWN, Sets.immutableEnumSet(EnumUISide.VERTICAL))
-			.put(EnumUISide.VERTICAL, Sets.immutableEnumSet(EnumUISide.UP, EnumUISide.DOWN))
-			.put(EnumUISide.LEFT, Sets.immutableEnumSet(EnumUISide.HORIZONTAL))
-			.put(EnumUISide.RIGHT, Sets.immutableEnumSet(EnumUISide.HORIZONTAL))
-			.put(EnumUISide.HORIZONTAL, Sets.immutableEnumSet(EnumUISide.LEFT, EnumUISide.RIGHT)).build();
 
 	boolean addAnchors(Iterable<? extends IShapeAnchor> anchors);
 
@@ -35,4 +29,20 @@ public interface IShapeAnchorSet {
 	default boolean isEmpty() { return getAnchorsView().isEmpty(); }
 
 	default boolean clear() { return removeSides(EnumSet.allOf(EnumUISide.class)); }
+
+	enum StaticHolder {
+		;
+
+		private static final @Immutable Map<EnumUISide, ImmutableSet<EnumUISide>> EXCLUSIVE_SIDES_MAP = ImmutableMap.<EnumUISide, ImmutableSet<EnumUISide>>builder()
+				.put(EnumUISide.UP, Sets.immutableEnumSet(EnumUISide.VERTICAL))
+				.put(EnumUISide.DOWN, Sets.immutableEnumSet(EnumUISide.VERTICAL))
+				.put(EnumUISide.VERTICAL, Sets.immutableEnumSet(EnumUISide.UP, EnumUISide.DOWN))
+				.put(EnumUISide.LEFT, Sets.immutableEnumSet(EnumUISide.HORIZONTAL))
+				.put(EnumUISide.RIGHT, Sets.immutableEnumSet(EnumUISide.HORIZONTAL))
+				.put(EnumUISide.HORIZONTAL, Sets.immutableEnumSet(EnumUISide.LEFT, EnumUISide.RIGHT)).build();
+
+		public static @Immutable Map<EnumUISide, ImmutableSet<EnumUISide>> getExclusiveSidesMap() {
+			return EXCLUSIVE_SIDES_MAP;
+		}
+	}
 }

@@ -42,7 +42,7 @@ public class DefaultUIComponentShapeAnchorController
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
 		protected final OptionalWeakReference<DefaultUIComponentShapeAnchorController> owner;
-		protected final Deque<IShapeAnchor> anchoringAnchors = new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM);
+		protected final Deque<IShapeAnchor> anchoringAnchors = new ArrayDeque<>(CapacityUtilities.getInitialCapacityMedium());
 		protected boolean anchoringSelf = false;
 
 		protected ModifyShapeDescriptorObserver(DefaultUIComponentShapeAnchorController owner, Logger logger) {

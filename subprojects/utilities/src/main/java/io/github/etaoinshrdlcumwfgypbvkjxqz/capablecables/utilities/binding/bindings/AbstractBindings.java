@@ -25,8 +25,8 @@ public abstract class AbstractBindings<B extends IBinding<?>>
 				.apply(value);
 	}
 
-	protected final INamespacePrefixedString bindingKey;
-	protected final Supplier<? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>>> transformersSupplier;
+	private final INamespacePrefixedString bindingKey;
+	private final Supplier<? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>>> transformersSupplier;
 
 	protected AbstractBindings(INamespacePrefixedString bindingKey,
 	                           Supplier<? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>>> transformersSupplier) {

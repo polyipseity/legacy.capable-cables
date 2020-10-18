@@ -16,9 +16,9 @@ public enum InvokeUtilities {
 	;
 
 
-	public static final MethodHandles.Lookup PUBLIC_LOOKUP = MethodHandles.publicLookup();
-	public static final MethodHandles.Lookup IMPL_LOOKUP;
-	private static final int TRUSTED_LOOKUP_MODES = 15;
+	public static final int TRUSTED_LOOKUP_MODES = 15;
+	private static final MethodHandles.Lookup PUBLIC_LOOKUP = MethodHandles.publicLookup();
+	private static final MethodHandles.Lookup IMPL_LOOKUP;
 
 	static {
 		IMPL_LOOKUP = Arrays.stream(MethodHandles.Lookup.class.getDeclaredFields()).unordered()
@@ -27,14 +27,14 @@ public enum InvokeUtilities {
 					f.setAccessible(true);
 					MethodHandles.Lookup ret;
 					try {
-						ret = (MethodHandles.Lookup) PUBLIC_LOOKUP.unreflectGetter(f).invokeExact();
+						ret = (MethodHandles.Lookup) getPublicLookup().unreflectGetter(f).invokeExact();
 					} catch (Throwable throwable) {
 						throw ThrowableUtilities.propagate(throwable);
 					}
 					f.setAccessible(false);
 					return ret;
 				})
-				.filter(lookup -> lookup.lookupModes() == TRUSTED_LOOKUP_MODES)
+				.filter(lookup -> lookup.lookupModes() == getTrustedLookupModes())
 				.findAny()
 				.orElseThrow(() -> ThrowableUtilities.propagate(new NoSuchFieldException()));
 	}
@@ -89,5 +89,17 @@ public enum InvokeUtilities {
 				MethodType.methodType(returnType, inputType1, inputType2))
 				.getTarget()
 				.invokeExact();
+	}
+
+	public static MethodHandles.Lookup getPublicLookup() {
+		return PUBLIC_LOOKUP;
+	}
+
+	public static MethodHandles.Lookup getImplLookup() {
+		return IMPL_LOOKUP;
+	}
+
+	private static int getTrustedLookupModes() {
+		return TRUSTED_LOOKUP_MODES;
 	}
 }

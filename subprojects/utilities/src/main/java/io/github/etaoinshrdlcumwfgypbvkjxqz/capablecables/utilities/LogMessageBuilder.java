@@ -9,10 +9,10 @@ import java.util.*;
 import java.util.function.Supplier;
 
 public class LogMessageBuilder {
-	private final Set<Supplier<?>> markers = new LinkedHashSet<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
-	private final List<Supplier<?>> messages = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_TINY);
-	private final List<Supplier<?>> arguments = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
-	private final Map<String, Supplier<?>> keyValuePairs = new HashMap<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+	private final Set<Supplier<?>> markers = new LinkedHashSet<>(CapacityUtilities.getInitialCapacitySmall());
+	private final List<Supplier<?>> messages = new ArrayList<>(CapacityUtilities.getInitialCapacityTiny());
+	private final List<Supplier<?>> arguments = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
+	private final Map<String, Supplier<?>> keyValuePairs = new HashMap<>(CapacityUtilities.getInitialCapacitySmall());
 
 	public LogMessageBuilder addKeyValue(@NonNls CharSequence key, @Nullable Object value) { return addKeyValue(key, ConstantSupplier.ofNullable(value)); }
 
@@ -70,7 +70,7 @@ public class LogMessageBuilder {
 	}
 
 	public String build() {
-		StringBuilder ret = new StringBuilder(CapacityUtilities.INITIAL_CAPACITY_LARGE);
+		StringBuilder ret = new StringBuilder(CapacityUtilities.getInitialCapacityLarge());
 		boolean[] hasMarkers = {false};
 		getMarkers().forEach(marker -> {
 			ret.append('[').append(marker.get()).append(']');

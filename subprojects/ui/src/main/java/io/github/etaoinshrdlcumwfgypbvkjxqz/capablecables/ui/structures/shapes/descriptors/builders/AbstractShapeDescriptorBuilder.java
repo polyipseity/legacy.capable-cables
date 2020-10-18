@@ -31,7 +31,7 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	private final AffineTransform transform = new AffineTransform();
 	private final Rectangle2D bounds = IShapeDescriptor.StaticHolder.getShapePlaceholder();
-	private final List<IShapeConstraint> constraints = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+	private final List<IShapeConstraint> constraints = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 	private final ConcurrentMap<String, Consumer<?>> properties =
 			MapBuilderUtilities.newMapMakerSingleThreaded().makeMap();
 

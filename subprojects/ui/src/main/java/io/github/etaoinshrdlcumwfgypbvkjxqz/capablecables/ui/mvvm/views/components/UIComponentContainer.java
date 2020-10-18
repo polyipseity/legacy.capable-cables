@@ -33,7 +33,7 @@ public class UIComponentContainer
 		implements IUIComponentContainer {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
-	protected final List<IUIComponent> children = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+	protected final List<IUIComponent> children = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 
 	@UIComponentConstructor
 	public UIComponentContainer(UIComponentConstructor.IArguments arguments) { super(arguments); }

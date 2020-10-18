@@ -26,6 +26,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.UIDataMo
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.UIInputUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
@@ -58,8 +59,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities.INITIAL_CAPACITY_SMALL;
-
 @OnlyIn(Dist.CLIENT)
 public class UIScreenAdapter
 		<I extends IUIInfrastructureMinecraft<?, ?, ?>, C extends Container>
@@ -77,9 +76,9 @@ public class UIScreenAdapter
 	private IUIEventTarget focus;
 
 	private final ConcurrentMap<Integer, IUIEventKeyboard>
-			keyboardKeysBeingPressed = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+			keyboardKeysBeingPressed = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
 	private final ConcurrentMap<Integer, IUIEventMouse>
-			mouseButtonsBeingPressed = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
+			mouseButtonsBeingPressed = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	protected UIScreenAdapter(ITextComponent title, I infrastructure, @Nullable C containerObject, Set<Integer> closeKeys, Set<Integer> changeFocusKeys) {
@@ -112,18 +111,8 @@ public class UIScreenAdapter
 
 	public void setTitle(ITextComponent title) { this.title = title; }
 
-	@Override
-	@Deprecated
-	public void render(int mouseX, int mouseY, float partialTicks) {
-		IUIContextContainer context = getContextContainer();
-		getInfrastructure().getView().render(context.getViewContext(), partialTicks);
-		IUIExtensionCursorHandleProvider.TYPE.getValue().find(getInfrastructure().getView()).ifPresent(ext ->
-				GLFW.glfwSetCursor(
-						MinecraftOpenGLUtilities.getWindowHandle(),
-						ext.getCursorHandle().orElse(MemoryUtil.NULL)
-				)
-		);
-	}
+	@Nullable
+	private UIDataMouseButtonClick lastMouseClickData = null;
 
 	protected IUIContextContainer getContextContainer() { return contextContainer; }
 
@@ -168,8 +157,18 @@ public class UIScreenAdapter
 	@Override
 	public I getInfrastructure() { return infrastructure; }
 
-	@Nullable
-	protected UIDataMouseButtonClick lastMouseClickData = null;
+	@Override
+	@Deprecated
+	public void render(int mouseX, int mouseY, float partialTicks) {
+		IUIContextContainer context = getContextContainer();
+		getInfrastructure().getView().render(context.getViewContext(), partialTicks);
+		IUIExtensionCursorHandleProvider.StaticHolder.getType().getValue().find(getInfrastructure().getView()).ifPresent(ext ->
+				GLFW.glfwSetCursor(
+						MinecraftOpenGLUtilities.getWindowHandle(),
+						ext.getCursorHandle().orElse(MemoryUtil.NULL)
+				)
+		);
+	}
 
 	protected static <E extends IUIEventKeyboard> E addEventKeyboard(UIScreenAdapter<?, ?> self, E event) {
 		self.getKeyboardKeysBeingPressed().put(event.getData().getKey(), event);
@@ -637,6 +636,6 @@ public class UIScreenAdapter
 		}
 
 		@Override
-		public IExtensionType<INamespacePrefixedString, ?, IUIInfrastructure<?, ?, ?>> getType() { return IUIExtensionMinecraftScreenProvider.TYPE.getValue(); }
+		public IExtensionType<INamespacePrefixedString, ?, IUIInfrastructure<?, ?, ?>> getType() { return StaticHolder.getType().getValue(); }
 	}
 }

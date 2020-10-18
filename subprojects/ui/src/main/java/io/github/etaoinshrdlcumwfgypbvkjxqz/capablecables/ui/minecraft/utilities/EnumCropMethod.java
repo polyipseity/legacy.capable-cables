@@ -28,7 +28,7 @@ public enum EnumCropMethod {
 			MinecraftOpenGLUtilities.Stacks.push("GL_STENCIL_TEST",
 					() -> GL11.glEnable(GL11.GL_STENCIL_TEST), () -> GL11.glDisable(GL11.GL_STENCIL_TEST));
 			MinecraftOpenGLUtilities.Stacks.push("stencilMask",
-					() -> RenderSystem.stencilMask(MinecraftOpenGLUtilities.GL_MASK_ALL_BITS), MinecraftOpenGLUtilities.Stacks.STENCIL_MASK_FALLBACK);
+					() -> RenderSystem.stencilMask(MinecraftOpenGLUtilities.getGlMaskAllBits()), MinecraftOpenGLUtilities.Stacks.getStencilMaskFallback());
 		}
 
 		@Override

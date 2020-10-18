@@ -14,11 +14,11 @@ public enum CacheUtilities {
 	;
 
 	public static final long CACHE_EXPIRATION_ACCESS_DURATION = 15;
-	public static final TimeUnit CACHE_EXPIRATION_ACCESS_TIME_UNIT = TimeUnit.MINUTES;
+	private static final TimeUnit CACHE_EXPIRATION_ACCESS_TIME_UNIT = TimeUnit.MINUTES;
 
-	public static CacheBuilder<Object, Object> newCacheBuilderSingleThreaded() { return CacheBuilder.newBuilder().concurrencyLevel(ConcurrencyUtilities.SINGLE_THREAD_THREAD_COUNT); }
+	public static CacheBuilder<Object, Object> newCacheBuilderSingleThreaded() { return CacheBuilder.newBuilder().concurrencyLevel(ConcurrencyUtilities.getSingleThreadThreadCount()); }
 
-	public static CacheBuilder<Object, Object> newCacheBuilderNormalThreaded() { return CacheBuilder.newBuilder().concurrencyLevel(ConcurrencyUtilities.NORMAL_THREAD_THREAD_COUNT); }
+	public static CacheBuilder<Object, Object> newCacheBuilderNormalThreaded() { return CacheBuilder.newBuilder().concurrencyLevel(ConcurrencyUtilities.getNormalThreadThreadCount()); }
 
 	public static <K, V> CacheLoader<Object, Cache<K, V>> newCacheBuilderSingleThreadedLoader(int initialCapacity) {
 		return CacheLoader.from((Supplier<Cache<K, V>>) newCacheBuilderSingleThreaded().initialCapacity(initialCapacity)::build);
@@ -34,5 +34,13 @@ public enum CacheUtilities {
 		@Nullable V ret = instance.getIfPresent(key);
 		instance.put(key, value);
 		return Optional.ofNullable(ret);
+	}
+
+	public static long getCacheExpirationAccessDuration() {
+		return CACHE_EXPIRATION_ACCESS_DURATION;
+	}
+
+	public static TimeUnit getCacheExpirationAccessTimeUnit() {
+		return CACHE_EXPIRATION_ACCESS_TIME_UNIT;
 	}
 }

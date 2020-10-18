@@ -25,5 +25,5 @@ public class UIExtensionMinecraftContainerProvider
 	public Container getContainer() { return container; }
 
 	@Override
-	public IExtensionType<INamespacePrefixedString, ?, IUIInfrastructure<?, ?, ?>> getType() { return IUIExtensionMinecraftContainerProvider.TYPE.getValue(); }
+	public IExtensionType<INamespacePrefixedString, ?, IUIInfrastructure<?, ?, ?>> getType() { return StaticHolder.getType().getValue(); }
 }

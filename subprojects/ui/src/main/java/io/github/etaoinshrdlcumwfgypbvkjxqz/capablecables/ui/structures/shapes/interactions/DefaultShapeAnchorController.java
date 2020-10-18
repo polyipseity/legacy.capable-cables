@@ -24,18 +24,18 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Asser
 
 public class DefaultShapeAnchorController<T extends IShapeDescriptorProvider>
 		implements IShapeAnchorController<T> {
-	protected final LoadingCache<T, IShapeAnchorSet> anchorSets =
+	private final LoadingCache<T, IShapeAnchorSet> anchorSets =
 			ManualLoadingCache.newNestedLoadingCache(CacheUtilities.newCacheBuilderSingleThreaded()
-							.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)
+							.initialCapacity(CapacityUtilities.getInitialCapacityMedium())
 							.weakKeys()
 							.build(CacheLoader.from(ShapeAnchorSet::new)),
 					e -> assertNonnull(e.getValue()).isEmpty());
-	protected final LoadingCache<IShapeDescriptorProvider, Set<IShapeAnchor>> subscribersMap =
+	private final LoadingCache<IShapeDescriptorProvider, Set<IShapeAnchor>> subscribersMap =
 			ManualLoadingCache.newNestedLoadingCacheCollection(CacheUtilities.newCacheBuilderSingleThreaded()
-					.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM)
+					.initialCapacity(CapacityUtilities.getInitialCapacityMedium())
 					.weakKeys()
 					.build(CacheLoader.from(
-							new MappableSupplier<>(ConstantSupplier.of(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL)))
+							new MappableSupplier<>(ConstantSupplier.of(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall())))
 									.map(t -> Collections.newSetFromMap(t.makeMap())))));
 
 	@Override

@@ -13,6 +13,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.throwable.Th
 import org.jetbrains.annotations.NonNls;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.signature.SignatureVisitor;
 import org.objectweb.asm.signature.SignatureWriter;
@@ -28,8 +29,6 @@ import java.util.ResourceBundle;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.objectweb.asm.Opcodes.*;
 
 public enum MapUtilities {
 	;
@@ -93,7 +92,7 @@ public enum MapUtilities {
 
 	@SuppressWarnings("unchecked")
 	public static <K, V> BiMap<K, V> newBiMap(Map<K, V> forward, Map<V, K> backward) {
-		return (BiMap<K, V>) PublicAbstractBiMapHolder.CONSTRUCTOR.apply(forward, backward); // COMMENT should be safe
+		return (BiMap<K, V>) PublicAbstractBiMapHolder.getConstructor().apply(forward, backward); // COMMENT should be safe
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
@@ -110,27 +109,27 @@ public enum MapUtilities {
 		;
 
 		private static final long serialVersionUID = 3864726593737949225L; // COMMENT should not affect Enum serialization
-		private static final String SUPERCLASS_NAME = "com.google.common.collect.AbstractBiMap";
-		private static final @NonNls String CLASS_SIMPLE_NAME = "AbstractBiMap_" + serialVersionUID; // COMMENT hopefully they will not name a new class like so...
+		public static final String SUPERCLASS_NAME = "com.google.common.collect.AbstractBiMap";
+		public static final @NonNls String CLASS_SIMPLE_NAME = "AbstractBiMap_" + serialVersionUID; // COMMENT hopefully they will not name a new class like so...
 		private static final Pattern LITERAL_SUPERCLASS_SIMPLE_NAME = Pattern.compile("AbstractBiMap", Pattern.LITERAL);
-		private static final @NonNls String SOURCE_DEBUG = "ASM";
-		private static final Class<?> CLASS;
+		public static final @NonNls String SOURCE_DEBUG = "ASM";
+		private static final Class<?> CLAZZ;
 		private static final BiFunction<Map<?, ?>, Map<?, ?>, ? extends BiMap<?, ?>> CONSTRUCTOR;
 
 		static {
 			{
 				Class<?> superclass;
 				try {
-					superclass = Class.forName(SUPERCLASS_NAME);
+					superclass = Class.forName(getSuperclassName());
 				} catch (ClassNotFoundException e) {
 					throw ThrowableUtilities.propagate(e);
 				}
-				String name = LITERAL_SUPERCLASS_SIMPLE_NAME
+				String name = getLiteralSuperclassSimpleName()
 						.matcher(superclass.getName())
-						.replaceAll(Matcher.quoteReplacement(CLASS_SIMPLE_NAME));
-				String internalName = LITERAL_SUPERCLASS_SIMPLE_NAME
+						.replaceAll(Matcher.quoteReplacement(getClassSimpleName()));
+				String internalName = getLiteralSuperclassSimpleName()
 						.matcher(Type.getInternalName(superclass))
-						.replaceAll(Matcher.quoteReplacement(CLASS_SIMPLE_NAME));
+						.replaceAll(Matcher.quoteReplacement(getClassSimpleName()));
 
 				ClassWriter cw = new ClassWriter(0);
 				// COMMENT class
@@ -162,22 +161,22 @@ public enum MapUtilities {
 
 					// CODE package ...;
 					// CODE public class ...
-					cw.visit(V1_6,
-							ACC_PUBLIC | ACC_SUPER, internalName,
+					cw.visit(Opcodes.V1_6,
+							Opcodes.ACC_PUBLIC | Opcodes.ACC_SUPER, internalName,
 							sw.toString(),
 							Type.getInternalName(superclass),
 							null);
 					cw.visitSource(StackTraceUtilities.getCurrentStackTraceElement()
 							.map(StackTraceElement::getFileName)
-							.orElse(null), SOURCE_DEBUG);
+							.orElse(null), getSourceDebug());
 				}
 				// COMMENT field serialVersionUID
 				{
 					// CODE private static final long serialVersionUID = ...;
-					cw.visitField(ACC_PRIVATE | ACC_STATIC | ACC_FINAL, "serialVersionUID",
+					cw.visitField(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, "serialVersionUID",
 							Type.LONG_TYPE.getDescriptor(),
 							null,
-							serialVersionUID)
+							getSerialVersionUID())
 							.visitEnd();
 				}
 				// COMMENT method <init>
@@ -203,46 +202,74 @@ public enum MapUtilities {
 						}
 
 						// CODE public <init>
-						mv = cw.visitMethod(ACC_PUBLIC, "<init>",
+						mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>",
 								Type.getMethodDescriptor(Type.getType(void.class), Type.getType(Map.class), Type.getType(Map.class)),
 								sw.toString(),
 								null);
 					}
 					mv.visitCode();
-					mv.visitVarInsn(ALOAD, 0); // CODE this
-					mv.visitVarInsn(ALOAD, 1); // CODE forward
-					mv.visitVarInsn(ALOAD, 2); // CODE backward
+					mv.visitVarInsn(Opcodes.ALOAD, 0); // CODE this
+					mv.visitVarInsn(Opcodes.ALOAD, 1); // CODE forward
+					mv.visitVarInsn(Opcodes.ALOAD, 2); // CODE backward
 					// CODE super(forward, backward);
-					mv.visitMethodInsn(INVOKESPECIAL,
+					mv.visitMethodInsn(Opcodes.INVOKESPECIAL,
 							Type.getInternalName(superclass),
 							"<init>",
 							Type.getMethodDescriptor(Type.getType(void.class), Type.getType(Map.class), Type.getType(Map.class)),
 							false);
-					mv.visitInsn(RETURN);
+					mv.visitInsn(Opcodes.RETURN);
 					mv.visitMaxs(3, 3);
 					mv.visitEnd();
 				}
 				cw.visitEnd();
 
-				CLASS = ClassUtilities.defineClass(superclass.getClassLoader(), name, cw.toByteArray());
+				CLAZZ = ClassUtilities.defineClass(superclass.getClassLoader(), name, cw.toByteArray());
 			}
 
 			{
-				MethodHandle constructor;
+				MethodHandle invokeHandle;
 				try {
-					constructor = InvokeUtilities.IMPL_LOOKUP.findConstructor(CLASS, MethodType.methodType(void.class, Map.class, Map.class));
+					invokeHandle = InvokeUtilities.getImplLookup().findConstructor(getClazz(), MethodType.methodType(void.class, Map.class, Map.class));
 				} catch (NoSuchMethodException | IllegalAccessException e) {
 					throw ThrowableUtilities.propagate(e);
 				}
 				// TODO Java 9 - use LambdaMetaFactory
 				CONSTRUCTOR = (forward, backward) -> {
 					try {
-						return (BiMap<?, ?>) constructor.invoke(forward, backward);
+						return (BiMap<?, ?>) invokeHandle.invoke(forward, backward);
 					} catch (Throwable throwable) {
 						throw ThrowableUtilities.propagate(throwable);
 					}
 				};
 			}
+		}
+
+		public static String getSuperclassName() {
+			return SUPERCLASS_NAME;
+		}
+
+		public static String getClassSimpleName() {
+			return CLASS_SIMPLE_NAME;
+		}
+
+		private static Pattern getLiteralSuperclassSimpleName() {
+			return LITERAL_SUPERCLASS_SIMPLE_NAME;
+		}
+
+		public static String getSourceDebug() {
+			return SOURCE_DEBUG;
+		}
+
+		private static Class<?> getClazz() {
+			return CLAZZ;
+		}
+
+		private static BiFunction<Map<?, ?>, Map<?, ?>, ? extends BiMap<?, ?>> getConstructor() {
+			return CONSTRUCTOR;
+		}
+
+		private static long getSerialVersionUID() {
+			return serialVersionUID;
 		}
 	}
 }

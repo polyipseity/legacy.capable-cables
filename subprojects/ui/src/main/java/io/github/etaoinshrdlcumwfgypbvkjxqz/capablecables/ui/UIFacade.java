@@ -66,6 +66,8 @@ public enum UIFacade {
 			}
 		}
 
-		public static Document parseDocumentInput(InputSource is) throws IOException, SAXException { return DOCUMENT_BUILDER.parse(is); }
+		public static Document parseDocumentInput(InputSource is) throws IOException, SAXException { return getDocumentBuilder().parse(is); }
+
+		private static DocumentBuilder getDocumentBuilder() { return DOCUMENT_BUILDER; }
 	}
 }

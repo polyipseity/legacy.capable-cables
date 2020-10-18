@@ -8,11 +8,11 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public final class UIDataKeyboardKeyPress implements IUIDataKeyboardKeyPress, Cloneable {
 	protected final int key, scanCode, modifiers;
-	protected final long timestamp;
+	private final long timestamp;
 
 	public UIDataKeyboardKeyPress(int key, int scanCode, int modifiers) { this(key, scanCode, modifiers, System.currentTimeMillis()); }
 
-	protected UIDataKeyboardKeyPress(int key, int scanCode, int modifiers, long timestamp) {
+	private UIDataKeyboardKeyPress(int key, int scanCode, int modifiers, long timestamp) {
 		this.key = key;
 		this.scanCode = scanCode;
 		this.modifiers = modifiers;

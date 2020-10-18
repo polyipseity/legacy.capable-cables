@@ -20,14 +20,18 @@ import java.util.function.Supplier;
 public class ChangingLocaleResourceBundle
 		extends ResourceBundle {
 	private static final CacheBuilder<Object, Object> BUNDLE_MAP_BUILDER = CacheUtilities.newCacheBuilderSingleThreaded()
-			.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL)
-			.expireAfterAccess(CacheUtilities.CACHE_EXPIRATION_ACCESS_DURATION, CacheUtilities.CACHE_EXPIRATION_ACCESS_TIME_UNIT);
+			.initialCapacity(CapacityUtilities.getInitialCapacitySmall())
+			.expireAfterAccess(CacheUtilities.getCacheExpirationAccessDuration(), CacheUtilities.getCacheExpirationAccessTimeUnit());
 	protected final LoadingCache<Locale, ResourceBundle> bundleMap;
 	protected final Supplier<? extends Locale> localeSupplier;
 
 	public ChangingLocaleResourceBundle(CacheLoader<? super Locale, ResourceBundle> loader, Supplier<? extends Locale> localeSupplier) {
-		this.bundleMap = BUNDLE_MAP_BUILDER.build(loader);
+		this.bundleMap = getBundleMapBuilder().build(loader);
 		this.localeSupplier = localeSupplier;
+	}
+
+	protected static CacheBuilder<Object, Object> getBundleMapBuilder() {
+		return BUNDLE_MAP_BUILDER;
 	}
 
 	@Override
@@ -60,7 +64,7 @@ public class ChangingLocaleResourceBundle
 	public static class Builder {
 		private static final ConcurrentMap<String, ChangingLocaleResourceBundle> BASE_NAME_BUNDLE_MAP =
 				MapBuilderUtilities.newMapMakerNormalThreaded()
-						.initialCapacity(CapacityUtilities.INITIAL_CAPACITY_SMALL)
+						.initialCapacity(CapacityUtilities.getInitialCapacitySmall())
 						.weakValues()
 						.makeMap();
 		protected String baseName;

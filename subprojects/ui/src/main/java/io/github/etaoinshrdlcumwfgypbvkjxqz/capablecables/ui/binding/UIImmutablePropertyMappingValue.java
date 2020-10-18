@@ -6,13 +6,13 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class UIPropertyMappingValue implements IUIPropertyMappingValue {
+public final class UIImmutablePropertyMappingValue implements IUIPropertyMappingValue {
 	@Nullable
-	protected final Object defaultValue;
+	private final Object defaultValue;
 	@Nullable
-	protected final INamespacePrefixedString bindingKey;
+	private final INamespacePrefixedString bindingKey;
 
-	public UIPropertyMappingValue(@Nullable Object defaultValue, @Nullable INamespacePrefixedString bindingKey) {
+	public UIImmutablePropertyMappingValue(@Nullable Object defaultValue, @Nullable INamespacePrefixedString bindingKey) {
 		this.defaultValue = defaultValue;
 		this.bindingKey = bindingKey;
 	}

@@ -38,16 +38,16 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUICompo
 				switch (stage) {
 					case CROP:
 						int stencilRef = Math.floorMod(
-								UICacheExtension.CacheUniversal.Z.getValue().get(container).orElseThrow(InternalError::new),
+								UICacheExtension.CacheUniversal.getZ().getValue().get(container).orElseThrow(InternalError::new),
 								MathUtilities.pow2Int(MinecraftOpenGLUtilities.State.getInteger(GL11.GL_STENCIL_BITS))
 						);
 
 						MinecraftOpenGLUtilities.Stacks.push("stencilFunc",
-								() -> RenderSystem.stencilFunc(GL11.GL_EQUAL, stencilRef, MinecraftOpenGLUtilities.GL_MASK_ALL_BITS), MinecraftOpenGLUtilities.Stacks.STENCIL_FUNC_FALLBACK);
+								() -> RenderSystem.stencilFunc(GL11.GL_EQUAL, stencilRef, MinecraftOpenGLUtilities.getGlMaskAllBits()), MinecraftOpenGLUtilities.Stacks.getStencilFuncFallback());
 						MinecraftOpenGLUtilities.Stacks.push("stencilOp",
-								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL14.GL_INCR_WRAP, GL14.GL_INCR_WRAP), MinecraftOpenGLUtilities.Stacks.STENCIL_OP_FALLBACK);
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL14.GL_INCR_WRAP, GL14.GL_INCR_WRAP), MinecraftOpenGLUtilities.Stacks.getStencilOpFallback());
 						MinecraftOpenGLUtilities.Stacks.push("colorMask",
-								() -> RenderSystem.colorMask(false, false, false, false), MinecraftOpenGLUtilities.Stacks.COLOR_MASK_FALLBACK);
+								() -> RenderSystem.colorMask(false, false, false, false), MinecraftOpenGLUtilities.Stacks.getColorMaskFallback());
 
 						MinecraftDrawingUtilities.drawShape(transform, container.getShapeDescriptor().getShapeOutput(), true, Color.WHITE, 0);
 
@@ -56,18 +56,18 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUICompo
 						MinecraftOpenGLUtilities.Stacks.pop("stencilFunc");
 
 						MinecraftOpenGLUtilities.Stacks.push("stencilFunc",
-								() -> RenderSystem.stencilFunc(GL11.GL_LESS, stencilRef, MinecraftOpenGLUtilities.GL_MASK_ALL_BITS), MinecraftOpenGLUtilities.Stacks.STENCIL_FUNC_FALLBACK);
+								() -> RenderSystem.stencilFunc(GL11.GL_LESS, stencilRef, MinecraftOpenGLUtilities.getGlMaskAllBits()), MinecraftOpenGLUtilities.Stacks.getStencilFuncFallback());
 
 						MinecraftOpenGLUtilities.Stacks.push("stencilOp",
-								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP), MinecraftOpenGLUtilities.Stacks.STENCIL_OP_FALLBACK);
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP), MinecraftOpenGLUtilities.Stacks.getStencilOpFallback());
 						break;
 					case UN_CROP:
 						MinecraftOpenGLUtilities.Stacks.pop("stencilOp");
 
 						MinecraftOpenGLUtilities.Stacks.push("stencilOp",
-								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_REPLACE, GL11.GL_REPLACE), MinecraftOpenGLUtilities.Stacks.STENCIL_OP_FALLBACK);
+								() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_REPLACE, GL11.GL_REPLACE), MinecraftOpenGLUtilities.Stacks.getStencilOpFallback());
 						MinecraftOpenGLUtilities.Stacks.push("colorMask",
-								() -> RenderSystem.colorMask(false, false, false, false), MinecraftOpenGLUtilities.Stacks.COLOR_MASK_FALLBACK);
+								() -> RenderSystem.colorMask(false, false, false, false), MinecraftOpenGLUtilities.Stacks.getColorMaskFallback());
 
 						MinecraftDrawingUtilities.drawShape(transform, container.getShapeDescriptor().getShapeOutput().getBounds2D(), true, Color.BLACK, 0);
 
@@ -103,7 +103,7 @@ public interface IUIComponentRendererMinecraft<C extends IUIComponent & IUICompo
 														assert v != null;
 														GL11.glScissor(v[0], v[1], v[2], v[3]);
 													});
-										}, MinecraftOpenGLUtilities.Stacks.GL_SCISSOR_FALLBACK));
+										}, MinecraftOpenGLUtilities.Stacks.getGlScissorFallback()));
 						break;
 					case UN_CROP:
 						MinecraftOpenGLUtilities.Stacks.pop("glScissor");

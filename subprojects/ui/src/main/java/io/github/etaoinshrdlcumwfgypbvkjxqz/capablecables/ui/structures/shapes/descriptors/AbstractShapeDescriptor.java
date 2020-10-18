@@ -41,7 +41,7 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 		return ret;
 	}
 
-	protected final List<IShapeConstraint> constraints = new ArrayList<>(CapacityUtilities.INITIAL_CAPACITY_SMALL);
+	protected final List<IShapeConstraint> constraints = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 	protected boolean beingModified = false;
 
 	protected AbstractShapeDescriptor() {}
