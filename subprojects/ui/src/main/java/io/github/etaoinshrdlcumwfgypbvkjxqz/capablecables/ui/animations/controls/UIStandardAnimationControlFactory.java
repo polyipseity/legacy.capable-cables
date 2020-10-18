@@ -9,7 +9,7 @@ public enum UIStandardAnimationControlFactory {
 
 	public static final int INFINITE_LOOP = -1;
 
-	public static AbstractUIStandardAnimationControl createSimple(EnumDirection direction,
+	public static UIAbstractStandardAnimationControl createSimple(EnumDirection direction,
 	                                                              IUIAnimationTarget target,
 	                                                              ITicker ticker,
 	                                                              boolean autoPlay,
@@ -19,7 +19,7 @@ public enum UIStandardAnimationControlFactory {
 	                                                              long loop) {
 		switch (direction) {
 			case NORMAL:
-				return new MonoDirectionalSimpleUIStandardAnimationControl(target,
+				return new UIMonoDirectionalSimpleStandardAnimationControl(target,
 						ticker,
 						autoPlay,
 						duration,
@@ -27,7 +27,7 @@ public enum UIStandardAnimationControlFactory {
 						endDelay,
 						loop);
 			case REVERSE:
-				return new ReversedMonoDirectionalSimpleUIStandardAnimationControl(target,
+				return new UIReversedMonoDirectionalSimpleStandardAnimationControl(target,
 						ticker,
 						autoPlay,
 						duration,
@@ -35,7 +35,7 @@ public enum UIStandardAnimationControlFactory {
 						endDelay,
 						loop);
 			case ALTERNATE:
-				return new BiDirectionalSimpleUIStandardAnimationControl(target,
+				return new UIBiDirectionalSimpleStandardAnimationControl(target,
 						ticker,
 						autoPlay,
 						duration,
@@ -47,7 +47,7 @@ public enum UIStandardAnimationControlFactory {
 		}
 	}
 
-	public static AbstractUIStandardAnimationControl create(EnumDirection direction,
+	public static UIAbstractStandardAnimationControl create(EnumDirection direction,
 	                                                        Iterable<? extends IUIAnimationTarget> targets,
 	                                                        ITicker ticker,
 	                                                        boolean autoPlay,
@@ -57,7 +57,7 @@ public enum UIStandardAnimationControlFactory {
 	                                                        IFunction3<? super IUIAnimationTarget, ? super Integer, ? super Integer, ? extends Long, ? extends RuntimeException> loopFunction) {
 		switch (direction) {
 			case NORMAL:
-				return new MonoDirectionalUIStandardAnimationControl(targets,
+				return new UIMonoDirectionalStandardAnimationControl(targets,
 						ticker,
 						autoPlay,
 						durationFunction,
@@ -65,7 +65,7 @@ public enum UIStandardAnimationControlFactory {
 						endDelayFunction,
 						loopFunction);
 			case REVERSE:
-				return new ReversedMonoDirectionalUIStandardAnimationControl(targets,
+				return new UIReversedMonoDirectionalStandardAnimationControl(targets,
 						ticker,
 						autoPlay,
 						durationFunction,
@@ -73,7 +73,7 @@ public enum UIStandardAnimationControlFactory {
 						endDelayFunction,
 						loopFunction);
 			case ALTERNATE:
-				return new BiDirectionalUIStandardAnimationControl(targets,
+				return new UIBiDirectionalStandardAnimationControl(targets,
 						ticker,
 						autoPlay,
 						durationFunction,

@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.bl
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIDebugMinecraft;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIMinecraftDebug;
 import net.minecraft.block.Block;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
@@ -23,7 +23,7 @@ public enum ModBlocks {
 
 	static {
 		DEBUG_UI = UIConstants.getBuildType().isDebug()
-				? getRegister().register(UIDebugMinecraft.getPath(), UIDebugMinecraft::getBlockEntry)
+				? getRegister().register(UIMinecraftDebug.getPath(), UIMinecraftDebug::getBlockEntry)
 				: null;
 	}
 

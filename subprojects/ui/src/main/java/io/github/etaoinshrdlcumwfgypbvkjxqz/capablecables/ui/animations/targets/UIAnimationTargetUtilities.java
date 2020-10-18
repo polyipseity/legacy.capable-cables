@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.targets
 
 import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.easings.EnumCommonUIAnimationEasing;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.easings.EnumUICommonAnimationEasing;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationEasing;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
@@ -28,7 +28,7 @@ public enum UIAnimationTargetUtilities {
 	}
 
 	public static IUIAnimationTarget range(DoubleConsumer action, double from, double to) {
-		return range(action, from, to, EnumCommonUIAnimationEasing.LINEAR);
+		return range(action, from, to, EnumUICommonAnimationEasing.LINEAR);
 	}
 
 	public static IUIAnimationTarget range(DoubleConsumer action, double from, double to, IUIAnimationEasing easing) {
@@ -40,7 +40,7 @@ public enum UIAnimationTargetUtilities {
 	}
 
 	public static IUIAnimationTarget diff(DoubleConsumer action, double from, double diff) {
-		return diff(action, from, diff, EnumCommonUIAnimationEasing.LINEAR);
+		return diff(action, from, diff, EnumUICommonAnimationEasing.LINEAR);
 	}
 
 	public enum ShapeDescriptors {

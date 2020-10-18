@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.in
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIDebugMinecraft;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIMinecraftDebug;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
@@ -21,7 +21,7 @@ public enum ModContainerTypes {
 
 	static {
 		DEBUG_UI = UIConstants.getBuildType().isDebug()
-				? getRegister().register(UIDebugMinecraft.getPath(), UIDebugMinecraft::getContainerEntry)
+				? getRegister().register(UIMinecraftDebug.getPath(), UIMinecraftDebug::getContainerEntry)
 				: null;
 	}
 

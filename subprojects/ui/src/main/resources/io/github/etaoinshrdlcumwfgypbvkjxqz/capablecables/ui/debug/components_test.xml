@@ -10,17 +10,17 @@
 	<using alias="shape.ellipse" target="java.awt.geom.Ellipse2D"/>
 	<!-- COMMENT views -->
 	<using alias="view.minecraft"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.UIViewComponentMinecraft"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.UIDefaultMinecraftViewComponent"/>
 	<!-- COMMENT components -->
 	<using alias="component.manager"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.UIComponentManagerMinecraft"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.UIDefaultMinecraftComponentManager"/>
 	<using alias="component.window"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.impl.UIComponentWindowMinecraft"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.impl.UIMinecraftWindowComponent"/>
 	<using alias="component.button"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.impl.UIComponentButtonMinecraft"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.impl.UIMinecraftButtonComponent"/>
 	<!-- COMMENT extensions -->
 	<using alias="extension.minecraft.background.default"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.background.DefaultUIExtensionMinecraftBackground"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.background.UIDefaultMinecraftBackgroundExtension"/>
 	<using alias="extension.user_relocatable"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.relocatable.UITeleportingComponentUserRelocatableExtension"/>
 	<using alias="extension.user_resizable"

@@ -3,9 +3,9 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.timelin
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.UIImmutableAnimationTime;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.AlreadyInfiniteUIAnimationTimelineException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationControl;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationTime;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.UIAlreadyInfiniteAnimationTimelineException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.time.ITicker;
@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.function.LongUnaryOperator;
 
 public class UIDefaultAnimationTimeline
-		extends AbstractUIAnimationTimeline {
+		extends UIAbstractAnimationTimeline {
 	private final boolean autoPlay;
 	@SuppressWarnings("UnstableApiUsage")
 	private final Multimap<Long, IUIAnimationControl> keyframes =
@@ -35,10 +35,10 @@ public class UIDefaultAnimationTimeline
 
 	@Override
 	public boolean append(IUIAnimationControl control, LongUnaryOperator offsetFunction)
-			throws AlreadyInfiniteUIAnimationTimelineException {
+			throws UIAlreadyInfiniteAnimationTimelineException {
 		IUIAnimationTime offset = getOffset();
 		if (offset.isInfinite())
-			throw new AlreadyInfiniteUIAnimationTimelineException();
+			throw new UIAlreadyInfiniteAnimationTimelineException();
 		long start = offsetFunction.applyAsLong(offset.get());
 		IUIAnimationTime duration = control.getDuration();
 		IUIAnimationTime end = IUIAnimationTime.max(UIImmutableAnimationTime.of(start), duration);

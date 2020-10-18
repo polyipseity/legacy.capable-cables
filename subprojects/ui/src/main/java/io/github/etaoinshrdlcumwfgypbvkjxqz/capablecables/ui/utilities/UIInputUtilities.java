@@ -1,13 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIDataMouseButtonClick;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIMouseButtonClickData;
 
 public enum UIInputUtilities {
 	;
 
 	public static final long DOUBLE_CLICK_INTERVAL_MAX = 250L;
 
-	public static boolean isDoubleClick(IUIDataMouseButtonClick previous, IUIDataMouseButtonClick current) {
+	public static boolean isDoubleClick(IUIMouseButtonClickData previous, IUIMouseButtonClickData current) {
 		// TODO add accessibility setting to set double click interval
 		return current.getButton() == previous.getButton()
 				&& current.getCursorPositionView().equals(previous.getCursorPositionView())

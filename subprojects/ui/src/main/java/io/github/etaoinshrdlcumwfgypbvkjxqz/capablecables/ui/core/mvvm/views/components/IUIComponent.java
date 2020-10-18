@@ -10,7 +10,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.eve
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeDescriptorProvider;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.caches.UICacheExtension;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.caches.UIDefaultCacheExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.traits.IHasBinding;
@@ -79,7 +79,7 @@ public interface IUIComponent
 
 	Optional<? extends IUIComponentContainer> getParent();
 
-	default Optional<? extends IUIComponentManager<?>> getManager() { return UICacheExtension.CacheUniversal.getManager().getValue().get(this); }
+	default Optional<? extends IUIComponentManager<?>> getManager() { return UIDefaultCacheExtension.CacheUniversal.getManager().getValue().get(this); }
 
 	boolean isVisible();
 

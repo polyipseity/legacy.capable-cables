@@ -12,8 +12,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.FunctionalUIEventListener;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.modifiers.AbstractUIVirtualComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.UIFunctionalEventListener;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.modifiers.UIAbstractVirtualComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.UIDefaultRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinderAction;
@@ -70,7 +70,7 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 	@Override
 	public void initializeRendererContainer(@NonNls CharSequence name)
 			throws IllegalStateException {
-		IUIRendererContainer<IRelocatingRenderer> rendererContainer = new UIDefaultRendererContainer<>(name, this, CastUtilities.castUnchecked(UIComponentUserRelocatableExtensionNullRelocatingRenderer.class));
+		IUIRendererContainer<IRelocatingRenderer> rendererContainer = new UIDefaultRendererContainer<>(name, this, CastUtilities.castUnchecked(UIComponentUserRelocatableExtensionEmptyRelocatingRenderer.class));
 		if (!getRendererContainerReference().compareAndSet(null, rendererContainer))
 			throw new IllegalStateException();
 		getBinderObserverSupplier().ifPresent(rendererContainer::initializeBindings);
@@ -135,7 +135,7 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 	public int getRelocateBorderThickness() { return relocateBorderThickness; }
 
 	public static class Modifier
-			extends AbstractUIVirtualComponent
+			extends UIAbstractVirtualComponent
 			implements IUIComponentCursorHandleProviderModifier, IUIComponentRendererInvokerModifier {
 		private final OptionalWeakReference<UITeleportingComponentUserRelocatableExtension<?>> owner;
 		private final Object lockObject = new Object();
@@ -145,7 +145,7 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 			super(IShapeDescriptor.StaticHolder.getShapeDescriptorPlaceholder());
 			this.owner = new OptionalWeakReference<>(owner);
 
-			addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new FunctionalUIEventListener<IUIEventMouse>(evt -> {
+			addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> {
 				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && startRelocateMaybe(evt.getViewContext(), evt.getData().getCursorPositionView())) { // todo custom
 					getOwner()
 							.flatMap(owner2 -> owner2.getContainer()) // TODO Java 9 - IllegalAccessError now, make method ref
@@ -156,7 +156,7 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 							});
 				}
 			}), false);
-			addEventListener(EnumUIEventDOMType.MOUSE_UP.getEventType(), new FunctionalUIEventListener<IUIEventMouse>(evt -> {
+			addEventListener(EnumUIEventDOMType.MOUSE_UP.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> {
 				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && finishRelocateMaybe(evt.getViewContext(), evt.getData().getCursorPositionView()))
 					evt.stopPropagation();
 			}), false);
@@ -164,7 +164,7 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 
 		protected boolean startRelocateMaybe(@SuppressWarnings("unused") IUIViewContext viewContext, Point2D point) {
 			return getOwner().map(owner -> {
-				IRelocateData d = new DefaultRelocateData(point);
+				IRelocateData d = new ImmutableRelocateData(point);
 				synchronized (getLockObject()) {
 					if (owner.getRelocateData().isPresent())
 						return false;

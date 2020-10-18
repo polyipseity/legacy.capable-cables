@@ -3,7 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.vie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.utilities.MinecraftDrawingUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.resizable.AbstractUIComponentUserResizableExtensionPreviewingRelocatingRenderer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.resizable.UIAbstractComponentUserResizableExtensionPreviewingRelocatingRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -12,7 +12,7 @@ import java.awt.geom.Rectangle2D;
 
 @OnlyIn(Dist.CLIENT)
 public class UIComponentUserResizableMinecraftExtensionPreviewingRelocatingRenderer
-		extends AbstractUIComponentUserResizableExtensionPreviewingRelocatingRenderer {
+		extends UIAbstractComponentUserResizableExtensionPreviewingRelocatingRenderer {
 	@UIRendererConstructor
 	public UIComponentUserResizableMinecraftExtensionPreviewingRelocatingRenderer(UIRendererConstructor.IArguments arguments) {
 		super(arguments);

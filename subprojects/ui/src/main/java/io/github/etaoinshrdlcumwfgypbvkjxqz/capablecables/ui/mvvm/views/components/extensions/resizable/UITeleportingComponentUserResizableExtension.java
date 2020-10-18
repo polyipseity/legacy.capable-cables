@@ -16,8 +16,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.cursors.EnumGLFWCursor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.FunctionalUIEventListener;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.modifiers.AbstractUIVirtualComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.UIFunctionalEventListener;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.modifiers.UIAbstractVirtualComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.UIDefaultRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
@@ -71,7 +71,7 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 	@Override
 	public void initializeRendererContainer(@NonNls CharSequence name)
 			throws IllegalStateException {
-		IUIRendererContainer<IResizingRenderer> rendererContainer = new UIDefaultRendererContainer<>(name, this, CastUtilities.castUnchecked(UIComponentUserResizeableExtensionNullRelocatingRenderer.class));
+		IUIRendererContainer<IResizingRenderer> rendererContainer = new UIDefaultRendererContainer<>(name, this, CastUtilities.castUnchecked(UIComponentUserResizeableExtensionEmptyRelocatingRenderer.class));
 		if (!getRendererContainerReference().compareAndSet(null, rendererContainer))
 			throw new IllegalStateException();
 		getBinderObserverSupplier().ifPresent(rendererContainer::initializeBindings);
@@ -159,7 +159,7 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 	}
 
 	public static class Modifier
-			extends AbstractUIVirtualComponent
+			extends UIAbstractVirtualComponent
 			implements IUIComponentCursorHandleProviderModifier, IUIComponentRendererInvokerModifier {
 		private final OptionalWeakReference<UITeleportingComponentUserResizableExtension<?>> owner;
 		private final Object lockObject = new Object();
@@ -170,9 +170,9 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 			super(IShapeDescriptor.StaticHolder.getShapeDescriptorPlaceholder());
 			this.owner = new OptionalWeakReference<>(owner);
 
-			addEventListener(EnumUIEventDOMType.MOUSE_ENTER.getEventType(), new FunctionalUIEventListener<IUIEventMouse>(evt -> setBeingHovered(true)), false);
-			addEventListener(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(), new FunctionalUIEventListener<IUIEventMouse>(evt -> setBeingHovered(false)), false);
-			addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new FunctionalUIEventListener<IUIEventMouse>(evt -> {
+			addEventListener(EnumUIEventDOMType.MOUSE_ENTER.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> setBeingHovered(true)), false);
+			addEventListener(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> setBeingHovered(false)), false);
+			addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> {
 				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && startResizeMaybe(evt.getViewContext(), evt.getData().getCursorPositionView())) { // todo custom
 					getOwner()
 							.flatMap(owner2 -> owner2.getContainer()) // TODO Java 9 - IllegalAccessError now, make method ref
@@ -184,7 +184,7 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 					evt.stopPropagation();
 				}
 			}), false);
-			addEventListener(EnumUIEventDOMType.MOUSE_UP.getEventType(), new FunctionalUIEventListener<IUIEventMouse>(evt -> {
+			addEventListener(EnumUIEventDOMType.MOUSE_UP.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> {
 				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && finishResizeMaybe(evt.getViewContext(), evt.getData().getCursorPositionView()))
 					evt.stopPropagation();
 			}), false);
@@ -213,7 +213,7 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 											else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
 												base = new Point2D.Double(contextualShape.getMaxX(), contextualShape.getY());
 
-											IResizeData d = new DefaultResizeData(point, sides, base, getCursor(sides).orElseThrow(InternalError::new).getHandle());
+											IResizeData d = new ImmutableResizeData(point, sides, base, getCursor(sides).orElseThrow(InternalError::new).getHandle());
 											synchronized (getLockObject()) {
 												if (owner.getResizeData().isPresent())
 													return false;

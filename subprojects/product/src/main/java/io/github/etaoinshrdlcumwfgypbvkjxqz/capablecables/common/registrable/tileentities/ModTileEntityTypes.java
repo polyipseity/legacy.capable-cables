@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.ti
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIDebugMinecraft;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIMinecraftDebug;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
@@ -20,7 +20,7 @@ public enum ModTileEntityTypes {
 	private static final RegistryObject<TileEntityType<?>> DEBUG_UI;
 
 	static {
-		DEBUG_UI = UIConstants.getBuildType().isDebug() ? getRegister().register(UIDebugMinecraft.getPath(), UIDebugMinecraft::getTileEntityEntry) : null;
+		DEBUG_UI = UIConstants.getBuildType().isDebug() ? getRegister().register(UIMinecraftDebug.getPath(), UIMinecraftDebug::getTileEntityEntry) : null;
 	}
 
 	public static DeferredRegister<TileEntityType<?>> getRegister() {

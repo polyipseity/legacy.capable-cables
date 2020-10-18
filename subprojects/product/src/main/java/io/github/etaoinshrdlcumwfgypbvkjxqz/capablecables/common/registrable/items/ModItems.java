@@ -4,7 +4,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.blocks.ModBlocks;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items.groups.ModItemGroups;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIDebugMinecraft;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIMinecraftDebug;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.RegistryObject;
@@ -28,7 +28,7 @@ public enum ModItems {
 
 	static {
 		DEBUG_UI = UIConstants.getBuildType().isDebug()
-				? getRegister().register(UIDebugMinecraft.getPath(), () -> new BlockItem(UIDebugMinecraft.getBlockEntry(), new Item.Properties().group(ModItemGroups.getDefault())))
+				? getRegister().register(UIMinecraftDebug.getPath(), () -> new BlockItem(UIMinecraftDebug.getBlockEntry(), new Item.Properties().group(ModItemGroups.getDefault())))
 				: null;
 	}
 

@@ -1,7 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.controls;
 
 import com.google.common.collect.Maps;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.easings.EnumCommonUIAnimationEasing;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.animations.easings.EnumUICommonAnimationEasing;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationEasing;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IFunction3;
@@ -167,7 +167,7 @@ public enum UIAnimationControlUtilities {
 				throws IllegalArgumentException {
 			@Nullable Object value = options.get(getOptionEasingKey());
 			if (value == null)
-				return EnumCommonUIAnimationEasing.LINEAR;
+				return EnumUICommonAnimationEasing.LINEAR;
 			else if (value instanceof IUIAnimationEasing)
 				return (IUIAnimationEasing) value;
 			throw new IllegalArgumentException();

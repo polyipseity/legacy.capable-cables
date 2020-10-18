@@ -5,13 +5,13 @@ import java.util.function.LongUnaryOperator;
 public interface IUIAnimationTimeline
 		extends IUIAnimationControllable {
 	boolean append(IUIAnimationControl control)
-			throws AlreadyInfiniteUIAnimationTimelineException;
+			throws UIAlreadyInfiniteAnimationTimelineException;
 
 	boolean append(IUIAnimationControl control, long offset)
-			throws AlreadyInfiniteUIAnimationTimelineException;
+			throws UIAlreadyInfiniteAnimationTimelineException;
 
 	boolean append(IUIAnimationControl control, LongUnaryOperator offsetFunction)
-			throws AlreadyInfiniteUIAnimationTimelineException;
+			throws UIAlreadyInfiniteAnimationTimelineException;
 
 	void play();
 }

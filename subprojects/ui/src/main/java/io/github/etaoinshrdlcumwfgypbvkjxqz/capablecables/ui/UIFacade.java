@@ -1,12 +1,12 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.IUIInfrastructureMinecraft;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.IUIViewModelMinecraft;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.IUIViewMinecraft;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.UIInfrastructureMinecraft;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.IUIMinecraftInfrastructure;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.IUIMinecraftViewModel;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.IUIMinecraftView;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.UIDefaultMinecraftInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.adapters.AbstractContainerScreenAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.adapters.AbstractScreenAdapter;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.adapters.UIScreenAdapter;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.adapters.UIMinecraftScreenAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftResourceUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -32,16 +32,16 @@ public enum UIFacade {
 	public enum Minecraft {
 		;
 
-		public static <C extends Container> AbstractContainerScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>, C> createScreen(ITextComponent title, IUIInfrastructureMinecraft<?, ?, ?> infrastructure, C container) {
-			return new UIScreenAdapter.Builder.WithChildren<>(title, infrastructure, container).build();
+		public static <C extends Container> AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, C> createScreen(ITextComponent title, IUIMinecraftInfrastructure<?, ?, ?> infrastructure, C container) {
+			return new UIMinecraftScreenAdapter.Builder.WithChildren<>(title, infrastructure, container).build();
 		}
 
-		public static AbstractScreenAdapter<? extends IUIInfrastructureMinecraft<?, ?, ?>> createScreen(ITextComponent title, IUIInfrastructureMinecraft<?, ?, ?> infrastructure) {
-			return new UIScreenAdapter.Builder<>(title, infrastructure).build();
+		public static AbstractScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>> createScreen(ITextComponent title, IUIMinecraftInfrastructure<?, ?, ?> infrastructure) {
+			return new UIMinecraftScreenAdapter.Builder<>(title, infrastructure).build();
 		}
 
-		public static IUIInfrastructureMinecraft<?, ?, ?> createInfrastructure(IUIViewMinecraft<?> view, IUIViewModelMinecraft<?> viewModel, IBinder binder) {
-			return new UIInfrastructureMinecraft<>(view, viewModel, binder);
+		public static IUIMinecraftInfrastructure<?, ?, ?> createInfrastructure(IUIMinecraftView<?> view, IUIMinecraftViewModel<?> viewModel, IBinder binder) {
+			return new UIDefaultMinecraftInfrastructure<>(view, viewModel, binder);
 		}
 
 		public static Document parseResource(INamespacePrefixedString location) throws IOException, SAXException {
