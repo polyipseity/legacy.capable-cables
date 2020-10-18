@@ -8,7 +8,7 @@ import java.lang.annotation.*;
  * Immutable means that the annotated element's exposed state cannot be modified here or elsewhere.
  *
  * @author William So
- * @since 0.0.1
+ * @since Capable Cables 0.0.1
  */
 @Documented
 @Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER, ElementType.LOCAL_VARIABLE, ElementType.TYPE_PARAMETER, ElementType.TYPE_USE})

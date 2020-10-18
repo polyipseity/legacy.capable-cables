@@ -11,7 +11,7 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Primi
  * See each method's description for more details.
  *
  * @author William So
- * @since 0.0.1
+ * @since Capable Cables 0.0.1
  */
 public enum MiscellaneousUtilities {
 	;
@@ -37,7 +37,7 @@ public enum MiscellaneousUtilities {
 	 *
 	 * @return parameter {@code x}
 	 *
-	 * @since 0.0.1
+	 * @since Capable Cables 0.0.1
 	 */
 	public static <T> T k(T x, @SuppressWarnings("unused") Object... y) { return x; }
 

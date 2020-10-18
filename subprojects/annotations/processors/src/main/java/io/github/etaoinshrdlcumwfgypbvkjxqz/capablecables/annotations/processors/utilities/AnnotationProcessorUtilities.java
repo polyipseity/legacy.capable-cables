@@ -20,7 +20,7 @@ import java.util.stream.BaseStream;
  * Contains utilities that can be used for annotation processing.
  *
  * @author William So
- * @since 0.0.1
+ * @since Capable Cables 0.0.1
  */
 public enum AnnotationProcessorUtilities {
 	;
@@ -29,7 +29,7 @@ public enum AnnotationProcessorUtilities {
 	 * The marker for this class.
 	 *
 	 * @see Marker
-	 * @since 0.0.1
+	 * @since Capable Cables 0.0.1
 	 */
 	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker();
 
@@ -37,7 +37,7 @@ public enum AnnotationProcessorUtilities {
 	 * The resource bundle for this class.
 	 *
 	 * @see ResourceBundle
-	 * @since 0.0.1
+	 * @since Capable Cables 0.0.1
 	 */
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 
@@ -56,7 +56,7 @@ public enum AnnotationProcessorUtilities {
 	 * @throws IllegalArgumentException if not only one annotation is found
 	 * @see #getEffectiveAnnotationsWithInheritingConsidered(Elements, Types, Class, ExecutableElement)
 	 * @see Annotation
-	 * @since 0.0.1
+	 * @since Capable Cables 0.0.1
 	 */
 	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Elements elements, Types types, Class<A> annotationType, ExecutableElement executable)
 			throws IllegalArgumentException {
@@ -86,7 +86,7 @@ public enum AnnotationProcessorUtilities {
 	 *
 	 * @see #getEffectiveAnnotationWithInheritingConsidered(Elements, Types, Class, ExecutableElement)
 	 * @see Annotation
-	 * @since 0.0.1
+	 * @since Capable Cables 0.0.1
 	 */
 	public static <A extends Annotation> A[] getEffectiveAnnotationsWithInheritingConsidered(Elements elements, Types types, Class<A> annotationType, ExecutableElement executable) {
 		A[] ret = executable.getAnnotationsByType(annotationType);
@@ -112,7 +112,7 @@ public enum AnnotationProcessorUtilities {
 	 * @return the marker for this class
 	 *
 	 * @see Marker
-	 * @since 0.0.1
+	 * @since Capable Cables 0.0.1
 	 */
 	public static Marker getClassMarker() { return CLASS_MARKER; }
 
@@ -122,7 +122,7 @@ public enum AnnotationProcessorUtilities {
 	 * @return the resource bundle for this class
 	 *
 	 * @see ResourceBundle
-	 * @since 0.0.1
+	 * @since Capable Cables 0.0.1
 	 */
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
@@ -138,7 +138,7 @@ public enum AnnotationProcessorUtilities {
 	 *
 	 * @return the superclasses and superinterfaces of the specified TypeElement
 	 *
-	 * @since 0.0.1
+	 * @since Capable Cables 0.0.1
 	 */
 	@SuppressWarnings({"UnstableApiUsage", "ObjectAllocationInLoop"})
 	@Immutable
@@ -201,7 +201,7 @@ public enum AnnotationProcessorUtilities {
 	 *
 	 * @see TypeElement
 	 * @see #getIntermediateSuperclasses(TypeElement, TypeElement, Types)
-	 * @since 0.0.1
+	 * @since Capable Cables 0.0.1
 	 */
 	@Immutable
 	public static List<TypeElement> getSuperclasses(TypeElement type, Types types) { return getIntermediateSuperclasses(type, null, types); }
@@ -218,7 +218,7 @@ public enum AnnotationProcessorUtilities {
 	 *
 	 * @see TypeElement
 	 * @see #getLowerAndIntermediateSuperclasses(Types, TypeElement, TypeElement)
-	 * @since 0.0.1
+	 * @since Capable Cables 0.0.1
 	 */
 	@Immutable
 	public static List<TypeElement> getIntermediateSuperclasses(TypeElement lower, @Nullable TypeElement upper, Types types) { return getLowerAndIntermediateSuperclasses(types, (TypeElement) types.asElement(lower.getSuperclass()), upper); }
@@ -234,7 +234,7 @@ public enum AnnotationProcessorUtilities {
 	 * @return a List of TypeElements that satisfy the lower and upper bound
 	 *
 	 * @see TypeElement
-	 * @since 0.0.1
+	 * @since Capable Cables 0.0.1
 	 */
 	@Immutable
 	public static List<TypeElement> getLowerAndIntermediateSuperclasses(Types types, @Nullable TypeElement lower, @Nullable TypeElement upper) {
@@ -254,7 +254,7 @@ public enum AnnotationProcessorUtilities {
 	 * @return whether element is {@code abstract}
 	 *
 	 * @see Element
-	 * @since 0.0.1
+	 * @since Capable Cables 0.0.1
 	 */
 	public static boolean isElementAbstract(Element element) { return element.getModifiers().contains(Modifier.ABSTRACT) || element.getKind().isInterface(); }
 
@@ -266,7 +266,7 @@ public enum AnnotationProcessorUtilities {
 	 * @return whether element is {@code final}
 	 *
 	 * @see Element
-	 * @since 0.0.1
+	 * @since Capable Cables 0.0.1
 	 */
 	public static boolean isElementFinal(Element element) { return element.getModifiers().contains(Modifier.FINAL); }
 
@@ -281,7 +281,7 @@ public enum AnnotationProcessorUtilities {
 	 *
 	 * @see #getLowerAndIntermediateSuperclasses(Types, TypeElement, TypeElement)
 	 * @see TypeElement
-	 * @since 0.0.1
+	 * @since Capable Cables 0.0.1
 	 */
 	@Immutable
 	public static List<TypeElement> getThisAndSuperclasses(Types types, TypeElement type) { return getLowerAndIntermediateSuperclasses(types, type, null); }
@@ -296,7 +296,7 @@ public enum AnnotationProcessorUtilities {
 	 * @return the superclasses and superinterfaces of the specified TypeElement
 	 *
 	 * @see #getThisAndSuperclasses(Types, TypeElement)
-	 * @since 0.0.1
+	 * @since Capable Cables 0.0.1
 	 */
 	@Immutable
 	public static List<Set<TypeElement>> getThisAndSuperclassesAndInterfaces(Types types, TypeElement type) {
