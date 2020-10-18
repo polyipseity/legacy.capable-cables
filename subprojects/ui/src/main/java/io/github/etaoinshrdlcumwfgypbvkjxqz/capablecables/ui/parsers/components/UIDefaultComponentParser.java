@@ -171,7 +171,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		return (IUIViewComponent<?, ?>) constructorHandle.invoke(argument);
 	}
 
-	private static final @Immutable Map<IUIEventType, Function<Component, String>> EVENT_TYPE_FUNCTION_MAP = ImmutableMap.<IUIEventType, Function<Component, String>>builder()
+	private static final @Immutable Map<IUIEventType, Function<Component, Optional<String>>> EVENT_TYPE_FUNCTION_MAP = ImmutableMap.<IUIEventType, Function<Component, Optional<String>>>builder()
 			.put(EnumUIEventDOMType.LOAD, Component::getLoad)
 			.put(EnumUIEventDOMType.UNLOAD, Component::getUnload)
 			.put(EnumUIEventDOMType.ABORT, Component::getAbort)
@@ -218,7 +218,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 									assert value != null;
 									attributes.put(key.getEventType(),
 											new UIPropertyMappingValue(null,
-													Optional.ofNullable(value.apply(node))
+													AssertionUtilities.assertNonnull(value.apply(node))
 															.map(IUIEventType.StaticHolder.getDefaultPrefix()::concat)
 															.map(ImmutableNamespacePrefixedString::of)
 															.orElse(null)));
@@ -265,8 +265,6 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 				.orElseThrow(AssertionError::new);
 	}
 
-	public static Map<IUIEventType, Function<Component, String>> getEventTypeFunctionMap() { return EVENT_TYPE_FUNCTION_MAP; }
-
 	@SuppressWarnings("UnstableApiUsage")
 	public static Map<INamespacePrefixedString, IUIPropertyMappingValue> createMappings(Iterable<? extends Property> properties) {
 		return Streams.stream(properties).unordered()
@@ -274,11 +272,13 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 						new UIPropertyMappingValue(p.getAny()
 								.map(value -> JAXBAdapterRegistries.getAdapter(value).leftToRight(value))
 								.orElse(null),
-								Optional.ofNullable(p.getBindingKey())
+								p.getBindingKey()
 										.map(ImmutableNamespacePrefixedString::of)
 										.orElse(null))))
 				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
+
+	public static @Immutable Map<IUIEventType, Function<Component, Optional<String>>> getEventTypeFunctionMap() { return EVENT_TYPE_FUNCTION_MAP; }
 
 	@SuppressWarnings("UnstableApiUsage")
 	public static IShapeDescriptorBuilder<?> createShapeDescriptorBuilder(IUIDefaultComponentParserContext context, Shape shape)
@@ -312,7 +312,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 
 		shape.getProperty().stream().unordered()
 				.forEach(p -> {
-					assert p.getBindingKey() == null;
+					assert !p.getBindingKey().isPresent();
 					sdb.setProperty(p.getKey(), p.getAny()
 							.map(value -> JAXBAdapterRegistries.getAdapter(value).leftToRight(value))
 							.orElse(null));
@@ -321,7 +321,16 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		return sdb.setX(shape.getX()).setY(shape.getY()).setWidth(shape.getWidth()).setHeight(shape.getHeight())
 				.transformConcatenate(transform)
 				.constrain(shape.getConstraint().stream().sequential()
-						.map(c -> new ShapeConstraint(c.getMinX(), c.getMinY(), c.getMaxX(), c.getMaxY(), c.getMinWidth(), c.getMinHeight(), c.getMaxWidth(), c.getMaxHeight()))
+						.map(c -> new ShapeConstraint(
+								c.getMinX().orElse(null),
+								c.getMinY().orElse(null),
+								c.getMaxX().orElse(null),
+								c.getMaxY().orElse(null),
+								c.getMinWidth().orElse(null),
+								c.getMinHeight().orElse(null),
+								c.getMaxWidth().orElse(null),
+								c.getMaxHeight().orElse(null)
+						))
 						.collect(ImmutableList.toImmutableList()));
 	}
 

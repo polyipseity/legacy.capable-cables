@@ -29,7 +29,7 @@ public class UIDefaultDefaultComponentThemeParserRendererHandler
 
 		// COMMENT we should try to prepare as much as possible beforehand
 		String name = object.getName();
-		Optional<Class<?>> rawClass = Optional.ofNullable(object.getClazz()) // TODO fix this, getClazz should return optional, probably broken because of attribute groups
+		Optional<Class<?>> rawClass = object.getClazz()
 				.map(classAlias -> AssertionUtilities.assertNonnull(context.getAliasesView().get(classAlias)));
 
 		context.getBuilder()
