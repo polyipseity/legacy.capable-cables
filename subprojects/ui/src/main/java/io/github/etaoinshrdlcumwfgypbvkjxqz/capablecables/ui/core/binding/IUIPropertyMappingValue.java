@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.fields.ImmutableBindingField;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.fields.ObservableField;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.fields.MemoryObservableField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.ConstantSupplier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 
@@ -27,7 +27,7 @@ public interface IUIPropertyMappingValue {
 				Optional.ofNullable(mapping)
 						.flatMap(IUIPropertyMappingValue::getBindingKey)
 						.orElse(null),
-				new ObservableField<>(clazz,
+				new MemoryObservableField<>(clazz,
 						m.isPresent()
 								? m // COMMENT has mapping
 								.flatMap(IUIPropertyMappingValue::getDefaultValue)

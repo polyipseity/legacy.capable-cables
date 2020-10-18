@@ -11,14 +11,14 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
 
-public class ObservableField<T>
+public class MemoryObservableField<T>
 		extends IHasGenericClass.Impl<T>
 		implements IObservableField<T> {
 	private final Subject<IValue<T>> notifierSubject = PublishSubject.create();
 	@Nullable
 	private T value;
 
-	public ObservableField(Class<T> genericClass, @Nullable T value) {
+	public MemoryObservableField(Class<T> genericClass, @Nullable T value) {
 		super(genericClass);
 		this.value = value;
 	}

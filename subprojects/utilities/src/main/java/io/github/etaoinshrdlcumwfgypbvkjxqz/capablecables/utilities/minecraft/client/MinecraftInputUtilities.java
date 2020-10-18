@@ -1,7 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.EnumMinecraftUICoordinateSystem;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.CommonUICoordinateSystem;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.CommonCoordinateSystem;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.CoordinateSystemUtilities;
 import net.minecraft.client.MouseHelper;
 import net.minecraftforge.api.distmarker.Dist;
@@ -16,7 +16,7 @@ public enum MinecraftInputUtilities {
 	public static Point2D getScaledCursorPosition() {
 		Point2D ret = getUnscaledCursorPosition();
 		return CoordinateSystemUtilities.convertPoint(ret, ret,
-				CommonUICoordinateSystem.INSTANCE, EnumMinecraftUICoordinateSystem.SCALED);
+				CommonCoordinateSystem.INSTANCE, EnumMinecraftUICoordinateSystem.SCALED);
 	}
 
 	public static Point2D getUnscaledCursorPosition() {

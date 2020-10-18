@@ -37,8 +37,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.parsers.components.UIDefaultComponentThemeParser;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.Binder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.BindingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.DefaultBinder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.ImmutableBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinderAction;
@@ -47,7 +47,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.methods.IBindingMethodDestination;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.fields.ImmutableBindingField;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.fields.ObservableField;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.fields.MemoryObservableField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.methods.ImmutableBindingMethodDestination;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.inputs.IInputPointerDevice;
@@ -196,7 +196,7 @@ public enum UIMinecraftDebug {
 		}
 
 		private static AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> createUI(DebugContainer container) {
-			IBinder binder = new Binder();
+			IBinder binder = new DefaultBinder();
 			// COMMENT Color <-> Integer
 			binder.addTransformer(EnumBindingType.FIELD, (Color color) ->
 					Optional.ofNullable(color).map(Color::getRGB).orElse(null));
@@ -327,7 +327,7 @@ public enum UIMinecraftDebug {
 				extends UIDefaultMinecraftViewModel<Model> {
 			private final IBindingField<Integer> anchoredWindowBorderColor = new ImmutableBindingField<>(
 					ImmutableNamespacePrefixedString.of(IHasBindingKey.StaticHolder.getDefaultNamespace(), "anchoredWindowBorderColor"),
-					new ObservableField<>(Integer.class, null));
+					new MemoryObservableField<>(Integer.class, null));
 			private final IBindingMethodDestination<UIButtonComponent.IUIEventActivate> buttonOnActivate = new ImmutableBindingMethodDestination<>(
 					UIButtonComponent.IUIEventActivate.class,
 					ImmutableNamespacePrefixedString.of(IHasBindingKey.StaticHolder.getDefaultNamespace(), "buttonOnActivate"),

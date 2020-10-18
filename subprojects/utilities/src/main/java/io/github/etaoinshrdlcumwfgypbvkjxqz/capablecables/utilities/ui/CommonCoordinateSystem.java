@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui;
 
 import java.awt.geom.Point2D;
 
-public enum CommonUICoordinateSystem
+public enum CommonCoordinateSystem
 		implements ICoordinateSystem {
 	INSTANCE,
 	;

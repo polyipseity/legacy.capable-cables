@@ -7,22 +7,23 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
+import java.util.function.Predicate;
 
-public class WeakReferenceValueIdentity<T>
+public class EqualsWeakReference<T>
 		extends OptionalWeakReference<T> {
-	public WeakReferenceValueIdentity(@Nullable T referent) { super(referent); }
+	public EqualsWeakReference(@Nullable T referent) { super(referent); }
 
-	public WeakReferenceValueIdentity(@Nullable T referent, @Nullable ReferenceQueue<? super T> queue) { super(referent, queue); }
+	public EqualsWeakReference(@Nullable T referent, @Nullable ReferenceQueue<? super T> queue) { super(referent, queue); }
 
 	@Override
 	public int hashCode() { return Objects.hashCode(get()); }
 
-	@SuppressWarnings({"ObjectEquality", "EqualsWhichDoesntCheckParameterClass"})
+	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	public boolean equals(@Nullable Object obj) {
 		return CastUtilities.castChecked(WeakReference.class, obj)
 				.map(Reference<Object>::get)
-				.filter(oc -> get() == oc)
+				.filter(Predicate.isEqual(get()))
 				.isPresent();
 	}
 }

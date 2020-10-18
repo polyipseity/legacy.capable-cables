@@ -21,7 +21,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import java.util.*;
 import java.util.function.Function;
 
-public class Binder
+public class DefaultBinder
 		implements IBinder {
 	@SuppressWarnings("UnstableApiUsage")
 	private static final MultimapBuilder.SetMultimapBuilder<Object, Object> BINDINGS_MULTI_MAP_BUILDER = MultimapBuilder
