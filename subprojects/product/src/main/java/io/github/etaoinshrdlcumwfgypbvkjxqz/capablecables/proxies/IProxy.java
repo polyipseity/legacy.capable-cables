@@ -1,24 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies;
 
-import net.minecraftforge.fml.event.lifecycle.*;
+import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
 
-public interface IProxy<T extends ModLifecycleEvent> {
-	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
-	boolean onModLifecycle(ModLifecycleEvent event);
+import javax.annotation.Nullable;
 
-	void onFingerprintViolation(FMLFingerprintViolationEvent event);
-
-	void onSetup(FMLCommonSetupEvent event);
-
-	void onSetupSided(T event);
-
-	void onInterModEnqueue(InterModEnqueueEvent event);
-
-	void onInterModProcess(InterModProcessEvent event);
-
-	void onLoadComplete(FMLLoadCompleteEvent event);
-
-	void onGatherData(GatherDataEvent event);
-
-	void onModIdMapping(FMLModIdMappingEvent event);
+@FunctionalInterface
+public interface IProxy {
+	boolean onModLifecycle(@Nullable ModLifecycleEvent event);
 }

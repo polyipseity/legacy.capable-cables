@@ -8,8 +8,8 @@ import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nullable;
 
-public class ContainerWrench<T extends ContainerWrench<T>> extends Container {
-	protected ContainerWrench(@Nullable ContainerType<?> type, int id) {
+public class WrenchContainer<T extends WrenchContainer<T>> extends Container {
+	protected WrenchContainer(@Nullable ContainerType<?> type, int id) {
 		super(type, id);
 	}
 

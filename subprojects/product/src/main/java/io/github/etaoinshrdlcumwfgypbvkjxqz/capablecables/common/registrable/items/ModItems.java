@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModConstants;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.blocks.BlocksThis;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items.groups.ItemGroupsThis;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.blocks.ModBlocks;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items.groups.ModItemGroups;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIDebugMinecraft;
 import net.minecraft.item.BlockItem;
@@ -13,14 +13,14 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 
-public enum ItemsThis {
+public enum ModItems {
 	;
 
 	private static final DeferredRegister<Item> REGISTER = DeferredRegister.create(ForgeRegistries.ITEMS, ModConstants.getModId());
 
-	private static final RegistryObject<Item> WRENCH = getRegister().register("wrench", ItemWrench::new);
+	private static final RegistryObject<Item> WRENCH = getRegister().register("wrench", WrenchItem::new);
 
-	private static final RegistryObject<Item> CABLE = getRegister().register(BlocksThis.getCable().getId().getPath(), () -> new BlockItem(BlocksThis.getCable().orElseThrow(InternalError::new), new Item.Properties().group(ItemGroupsThis.getDefault())));
+	private static final RegistryObject<Item> CABLE = getRegister().register(ModBlocks.getCable().getId().getPath(), () -> new BlockItem(ModBlocks.getCable().orElseThrow(InternalError::new), new Item.Properties().group(ModItemGroups.getDefault())));
 
 	@SuppressWarnings("unused")
 	@Nullable
@@ -28,7 +28,7 @@ public enum ItemsThis {
 
 	static {
 		DEBUG_UI = UIConstants.getBuildType().isDebug()
-				? getRegister().register(UIDebugMinecraft.getPath(), () -> new BlockItem(UIDebugMinecraft.getBlockEntry(), new Item.Properties().group(ItemGroupsThis.getDefault())))
+				? getRegister().register(UIDebugMinecraft.getPath(), () -> new BlockItem(UIDebugMinecraft.getBlockEntry(), new Item.Properties().group(ModItemGroups.getDefault())))
 				: null;
 	}
 

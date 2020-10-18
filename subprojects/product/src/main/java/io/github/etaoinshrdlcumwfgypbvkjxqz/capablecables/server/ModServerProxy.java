@@ -1,6 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.server;
 
 import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.ModCommonProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.AbstractServerProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import net.minecraftforge.api.distmarker.Dist;
@@ -10,51 +12,59 @@ import net.minecraftforge.fml.event.lifecycle.*;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.DEDICATED_SERVER)
+@Immutable
 public final class ModServerProxy
 		extends AbstractServerProxy {
 	private static final Supplier<ModServerProxy> INSTANCE = Suppliers.memoize(ModServerProxy::new);
 
-	private ModServerProxy() {}
+	private ModServerProxy() {
+		super(ModCommonProxy.getInstance());
+	}
 
 	public static ModServerProxy getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
 	@Override
-	public void onFingerprintViolation(FMLFingerprintViolationEvent event) {
+	protected void onConstruction() {
 
 	}
 
 	@Override
-	public void onSetup(FMLCommonSetupEvent event) {
+	protected void onFingerprintViolation(FMLFingerprintViolationEvent event) {
 
 	}
 
 	@Override
-	public void onSetupSided(FMLDedicatedServerSetupEvent event) {
+	protected void onSetup(FMLCommonSetupEvent event) {
 
 	}
 
 	@Override
-	public void onInterModEnqueue(InterModEnqueueEvent event) {
+	protected void onInterModEnqueue(InterModEnqueueEvent event) {
 
 	}
 
 	@Override
-	public void onInterModProcess(InterModProcessEvent event) {
+	protected void onInterModProcess(InterModProcessEvent event) {
 
 	}
 
 	@Override
-	public void onLoadComplete(FMLLoadCompleteEvent event) {
+	protected void onLoadComplete(FMLLoadCompleteEvent event) {
 
 	}
 
 	@Override
-	public void onGatherData(GatherDataEvent event) {
+	protected void onModIdMapping(FMLModIdMappingEvent event) {
 
 	}
 
 	@Override
-	public void onModIdMapping(FMLModIdMappingEvent event) {
+	protected void onGatherData(GatherDataEvent event) {
+
+	}
+
+	@Override
+	protected void onSetupSided(FMLDedicatedServerSetupEvent event) {
 
 	}
 }

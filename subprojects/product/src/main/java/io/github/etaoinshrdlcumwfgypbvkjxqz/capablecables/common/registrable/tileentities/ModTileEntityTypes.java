@@ -10,7 +10,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 
-public enum TileEntityTypesThis {
+public enum ModTileEntityTypes {
 	;
 
 	private static final DeferredRegister<TileEntityType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, ModConstants.getModId());

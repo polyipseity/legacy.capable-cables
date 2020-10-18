@@ -10,7 +10,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 
-public enum ContainersThis {
+public enum ModContainerTypes {
 	;
 
 	private static final DeferredRegister<ContainerType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.CONTAINERS, ModConstants.getModId());

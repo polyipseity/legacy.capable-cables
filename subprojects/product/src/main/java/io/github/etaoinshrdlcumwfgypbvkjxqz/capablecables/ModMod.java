@@ -1,10 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.client.ModClientProxy;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.blocks.BlocksThis;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.inventory.ContainersThis;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items.ItemsThis;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.tileentities.TileEntityTypesThis;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.IProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.server.ModServerProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
@@ -28,9 +24,9 @@ import javax.annotation.Nullable;
 import java.util.ResourceBundle;
 
 @Mod(ModConstants.MOD_ID)
-public final class ModThis {
+public final class ModMod {
 	@Nullable
-	private static volatile ModThis instance = null;
+	private static volatile ModMod instance = null;
 	private static final ResourceBundle RESOURCE_BUNDLE;
 
 	static {
@@ -45,21 +41,19 @@ public final class ModThis {
 		RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(ModConfiguration.getInstance());
 	}
 
-	private final IProxy<?> proxy = DistExecutor.unsafeRunForDist(
+	private final IProxy proxy = DistExecutor.unsafeRunForDist(
 			() -> DistLambdaHolder.Client::getProxyClient,
 			() -> DistLambdaHolder.Server::getProxyServer);
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	public ModThis() {
+	public ModMod() {
 		// COMMENT entry point
-		IEventBus eventBusMod = AssertionUtilities.assertNonnull(Bus.MOD.bus().get());
-		eventBusMod.register(this);
-		BlocksThis.getRegister().register(eventBusMod);
-		ItemsThis.getRegister().register(eventBusMod);
-		TileEntityTypesThis.getRegister().register(eventBusMod);
-		ContainersThis.getRegister().register(eventBusMod);
-
 		setInstance(this); // COMMENT would really love to have a way to specify an alternative way to provide the instance
+
+		// COMMENT events
+		IEventBus modEventBus = AssertionUtilities.assertNonnull(Bus.MOD.bus().get());
+		modEventBus.register(getInstance());
+		onModLifecycleEvent(null); // COMMENT emulate construction event
 	}
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
@@ -68,14 +62,12 @@ public final class ModThis {
 
 	public static String getNamespacePrefixedString(@NonNls CharSequence separator, @NonNls String string) { return NamespaceUtilities.getNamespacePrefixedString(separator, ModConstants.getModId(), string); }
 
-	public IProxy<?> getProxy() { return proxy; }
+	public static ModMod getInstance() { return AssertionUtilities.assertNonnull(instance); }
 
-	public static ModThis getInstance() { return AssertionUtilities.assertNonnull(instance); }
-
-	private static void setInstance(@Nullable ModThis instance) { ModThis.instance = instance; }
+	private static void setInstance(ModMod instance) { ModMod.instance = instance; }
 
 	@SubscribeEvent
-	protected void onModLifecycleEvent(ModLifecycleEvent event) {
+	protected void onModLifecycleEvent(@Nullable ModLifecycleEvent event) {
 		if (!getProxy().onModLifecycle(event))
 			ModConfiguration.getInstance().getLogger()
 					.atInfo()
@@ -84,19 +76,21 @@ public final class ModThis {
 					.log(() -> getResourceBundle().getString("event.lifecycle.unhandled"));
 	}
 
+	public IProxy getProxy() { return proxy; }
+
 	private enum DistLambdaHolder {
 		;
 
 		private enum Client {
 			;
 
-			private static IProxy<?> getProxyClient() { return ModClientProxy.getInstance(); }
+			private static IProxy getProxyClient() { return ModClientProxy.getInstance(); }
 		}
 
 		private enum Server {
 			;
 
-			private static IProxy<?> getProxyServer() { return ModServerProxy.getInstance(); }
+			private static IProxy getProxyServer() { return ModServerProxy.getInstance(); }
 		}
 	}
 }

@@ -1,6 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.client;
 
 import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.ModCommonProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.AbstractClientProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
@@ -17,19 +19,27 @@ import net.minecraftforge.fml.event.lifecycle.*;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
+@Immutable
 public final class ModClientProxy
 		extends AbstractClientProxy {
 	private static final Supplier<ModClientProxy> INSTANCE = Suppliers.memoize(ModClientProxy::new);
 
-	private ModClientProxy() {}
+	private ModClientProxy() {
+		super(ModCommonProxy.getInstance());
+	}
 
 	public static ModClientProxy getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
 	@Override
-	public void onFingerprintViolation(FMLFingerprintViolationEvent event) {}
+	protected void onConstruction() {
+
+	}
 
 	@Override
-	public void onSetup(FMLCommonSetupEvent event) {
+	protected void onFingerprintViolation(FMLFingerprintViolationEvent event) {}
+
+	@Override
+	protected void onSetup(FMLCommonSetupEvent event) {
 		// COMMENT sneak the configuring in effectively-client common setup
 		// COMMENT there may be a better solution though...  suggestions welcome
 		ConfigurationTemplate.configureSafe(UIConfiguration.getInstance(),
@@ -39,33 +49,33 @@ public final class ModClientProxy
 	}
 
 	@Override
-	public void onSetupSided(FMLClientSetupEvent event) {
-		if (UIConstants.getBuildType().isDebug())
-			UIDebugMinecraft.registerUIFactory();
-	}
-
-	@Override
-	public void onInterModEnqueue(InterModEnqueueEvent event) {
+	protected void onInterModEnqueue(InterModEnqueueEvent event) {
 
 	}
 
 	@Override
-	public void onInterModProcess(InterModProcessEvent event) {
+	protected void onInterModProcess(InterModProcessEvent event) {
 
 	}
 
 	@Override
-	public void onLoadComplete(FMLLoadCompleteEvent event) {
+	protected void onLoadComplete(FMLLoadCompleteEvent event) {
 		UIConfiguration.MinecraftSpecific.loadComplete();
 	}
 
 	@Override
-	public void onGatherData(GatherDataEvent event) {
+	protected void onModIdMapping(FMLModIdMappingEvent event) {
 
 	}
 
 	@Override
-	public void onModIdMapping(FMLModIdMappingEvent event) {
+	protected void onGatherData(GatherDataEvent event) {
 
+	}
+
+	@Override
+	protected void onSetupSided(FMLClientSetupEvent event) {
+		if (UIConstants.getBuildType().isDebug())
+			UIDebugMinecraft.registerUIFactory();
 	}
 }

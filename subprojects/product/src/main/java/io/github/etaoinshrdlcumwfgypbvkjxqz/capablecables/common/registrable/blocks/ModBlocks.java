@@ -10,12 +10,12 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 
-public enum BlocksThis {
+public enum ModBlocks {
 	;
 
 	private static final DeferredRegister<Block> REGISTER = DeferredRegister.create(ForgeRegistries.BLOCKS, ModConstants.getModId());
 
-	private static final RegistryObject<Block> CABLE = getRegister().register("cable", BlockCable::new);
+	private static final RegistryObject<Block> CABLE = getRegister().register("cable", CableBlock::new);
 
 	@SuppressWarnings("unused")
 	@Nullable

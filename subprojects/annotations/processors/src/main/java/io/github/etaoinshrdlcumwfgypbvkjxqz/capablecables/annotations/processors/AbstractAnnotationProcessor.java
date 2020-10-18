@@ -11,6 +11,14 @@ import javax.annotation.processing.ProcessingEnvironment;
  */
 public abstract class AbstractAnnotationProcessor
 		extends AbstractProcessor {
-	@SuppressWarnings("deprecation")
+	/**
+	 * Returns the processing environment provided by the tool framework.
+	 *
+	 * @return the processing environment provided by the tool framework.
+	 *
+	 * @see ProcessingEnvironment
+	 * @since Capable Cables 0.0.1
+	 */
+	@SuppressWarnings({"deprecation", "unused"})
 	protected ProcessingEnvironment getProcessingEnv() { return processingEnv; }
 }
