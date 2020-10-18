@@ -66,8 +66,6 @@ public class UIComponent
 	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
 	private final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
 	private final ConcurrentMap<INamespacePrefixedString, IBindingMethodSource<? extends IUIEvent>> eventTargetBindingMethods = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(INITIAL_CAPACITY_SMALL).makeMap();
-	// todo add animation system
-	// todo cache transform
 	private final IShapeDescriptor<?> shapeDescriptor;
 	@UIProperty(PROPERTY_VISIBLE)
 	private final IBindingField<Boolean> visible;

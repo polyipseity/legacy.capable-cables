@@ -49,9 +49,9 @@ public class EventBusSubject
 	protected void subscribeActual(@Nonnull Observer<? super Event> observer) {
 		@SuppressWarnings("unchecked") Observer<? extends Event> oa =
 				(Observer<? extends Event>) observer; // COMMENT consider parameter 'observer' 'Observer<? extends Event>' instead, this works due to type erasure
-		ObserverToEventBusListenerAdapter<? extends Event, Observer<? extends Event>> oc;
+		EventBusListenerAdapter<? extends Event, Observer<? extends Event>> oc;
 		try {
-			oc = new ObserverToEventBusListenerAdapter<>(oa, Observer.class, "onNext");
+			oc = new EventBusListenerAdapter<>(oa, Observer.class, "onNext");
 		} catch (NoSuchMethodException e) {
 			onError(e);
 			return;
