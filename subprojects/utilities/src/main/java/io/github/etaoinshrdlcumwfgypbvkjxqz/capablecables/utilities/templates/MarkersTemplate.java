@@ -18,14 +18,14 @@ public abstract class MarkersTemplate {
 	public static final String SEPARATOR = "-";
 	private static final CacheBuilder<Object, Object> MARKERS_BUILDER = CacheUtilities.newCacheBuilderNormalThreaded().initialCapacity(CapacityUtilities.getInitialCapacityLarge()).weakKeys();
 	@NonNls
-	protected final Marker markerUnmarked;
+	private final Marker markerUnmarked;
 	@NonNls
-	protected final Marker markerClass;
+	private final Marker markerClass;
 
-	protected final String namespace;
+	private final String namespace;
 	@NonNls
-	protected final Marker markerStructure;
-	protected final LoadingCache<Class<?>, Marker> classMarkers;
+	private final Marker markerStructure;
+	private final LoadingCache<Class<?>, Marker> classMarkers;
 
 	protected static CacheBuilder<Object, Object> getMarkersBuilder() { return MARKERS_BUILDER; }
 

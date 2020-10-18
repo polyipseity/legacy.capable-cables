@@ -30,8 +30,8 @@ public enum EnumJAXBElementPresetAdapter
 			(Color right) -> UIJAXBObjectFactories.getDefaultComponentObjectFactory().createColor(io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Color.fromJava(right)))),
 	;
 
-	protected final Class<?> key;
-	protected final Registry.RegistryObject<IDuplexFunction<JAXBElement<?>, ?>> value;
+	private final Class<?> key;
+	private final Registry.RegistryObject<IDuplexFunction<JAXBElement<?>, ?>> value;
 
 	<L, V extends IDuplexFunction<JAXBElement<L>, ?> & Serializable> EnumJAXBElementPresetAdapter(Class<L> key, V value) {
 		this.key = key;

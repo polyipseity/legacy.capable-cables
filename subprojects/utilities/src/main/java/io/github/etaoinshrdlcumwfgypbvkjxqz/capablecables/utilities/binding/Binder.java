@@ -27,8 +27,8 @@ public class Binder
 	private static final MultimapBuilder.SetMultimapBuilder<Object, Object> BINDINGS_MULTI_MAP_BUILDER = MultimapBuilder
 			.linkedHashKeys(CapacityUtilities.getInitialCapacityMedium())
 			.linkedHashSetValues(CapacityUtilities.getInitialCapacityTiny()); // COMMENT order is important
-	protected final LoadingCache<IBinding.EnumBindingType, LoadingCache<INamespacePrefixedString, IBindings<?>>> bindings;
-	protected final LoadingCache<IBinding.EnumBindingType, LoadingCache<Class<?>, Cache<Class<?>, Function<?, ?>>>> transformers;
+	private final LoadingCache<IBinding.EnumBindingType, LoadingCache<INamespacePrefixedString, IBindings<?>>> bindings;
+	private final LoadingCache<IBinding.EnumBindingType, LoadingCache<Class<?>, Cache<Class<?>, Function<?, ?>>>> transformers;
 
 	{
 		CacheBuilder<Object, Object> cb = CacheUtilities.newCacheBuilderSingleThreaded()

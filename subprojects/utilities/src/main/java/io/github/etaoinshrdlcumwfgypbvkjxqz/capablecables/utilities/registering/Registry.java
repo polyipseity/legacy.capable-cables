@@ -56,7 +56,7 @@ public abstract class Registry<K, V> {
 		this.logger = logger;
 	}
 
-	public <VL extends V> RegistryObject<VL> registerApply(K key, Function<? super K, ? extends VL> value) { return register(key, value.apply(key)); }
+	public <VL extends V> RegistryObject<VL> registerApply(K key, Function<? super K, ? extends VL> value) { return register(key, AssertionUtilities.assertNonnull(value.apply(key))); }
 
 	public Marker getMarker() { return marker; }
 
@@ -84,7 +84,7 @@ public abstract class Registry<K, V> {
 			implements Serializable, Supplier<V> {
 		private static final long serialVersionUID = -7426757514591663232L;
 		@SuppressWarnings("NonSerializableFieldInSerializableClass")
-		protected V value;
+		private V value;
 
 		public RegistryObject(V value) { this.value = value;}
 

@@ -7,8 +7,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.UIEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 
 public class UIEventChar extends UIEvent implements IUIEventChar {
-	protected final char codePoint;
-	protected final int modifiers;
+	private final char codePoint;
+	private final int modifiers;
 
 	public UIEventChar(INamespacePrefixedString type, boolean canBubble, boolean cancelable, IUIViewContext viewContext, IUIEventTarget target, char codePoint, int modifiers) {
 		super(type, canBubble, cancelable, viewContext, target);

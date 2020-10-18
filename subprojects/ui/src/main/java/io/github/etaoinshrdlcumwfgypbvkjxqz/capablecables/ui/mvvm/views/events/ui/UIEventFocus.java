@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class UIEventFocus extends UIEvent implements IUIEventFocus {
 	@Nullable
-	protected final IUIEventTarget relatedTarget;
+	private final IUIEventTarget relatedTarget;
 
 	public UIEventFocus(INamespacePrefixedString type, boolean canBubble, boolean cancelable, IUIViewContext viewContext, IUIEventTarget target, @Nullable IUIEventTarget relatedTarget) {
 		super(type, canBubble, cancelable, viewContext, target);

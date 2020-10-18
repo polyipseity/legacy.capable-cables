@@ -8,14 +8,14 @@ import java.util.function.Supplier;
 
 public class ShapeConstraintSupplier
 		implements IShapeConstraint {
-	protected final Supplier<? extends Double> minXSupplier;
-	protected final Supplier<? extends Double> minYSupplier;
-	protected final Supplier<? extends Double> maxXSupplier;
-	protected final Supplier<? extends Double> maxYSupplier;
-	protected final Supplier<? extends Double> minWidthSupplier;
-	protected final Supplier<? extends Double> minHeightSupplier;
-	protected final Supplier<? extends Double> maxWidthSupplier;
-	protected final Supplier<? extends Double> maxHeightSupplier;
+	private final Supplier<? extends Double> minXSupplier;
+	private final Supplier<? extends Double> minYSupplier;
+	private final Supplier<? extends Double> maxXSupplier;
+	private final Supplier<? extends Double> maxYSupplier;
+	private final Supplier<? extends Double> minWidthSupplier;
+	private final Supplier<? extends Double> minHeightSupplier;
+	private final Supplier<? extends Double> maxWidthSupplier;
+	private final Supplier<? extends Double> maxHeightSupplier;
 
 	public ShapeConstraintSupplier(Supplier<? extends Double> minXSupplier, Supplier<? extends Double> minYSupplier, Supplier<? extends Double> maxXSupplier, Supplier<? extends Double> maxYSupplier, Supplier<? extends Double> minWidthSupplier, Supplier<? extends Double> minHeightSupplier, Supplier<? extends Double> maxWidthSupplier, Supplier<? extends Double> maxHeightSupplier) {
 		this.minXSupplier = minXSupplier;

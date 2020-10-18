@@ -6,7 +6,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.RectangularShape;
 
 public class DefaultRelocateData implements IUIComponentUserRelocatableExtension.IRelocateData {
-	protected final Point2D previousPoint;
+	private final Point2D previousPoint;
 
 	public DefaultRelocateData(Point2D previousPoint) {
 		this.previousPoint = (Point2D) previousPoint.clone();

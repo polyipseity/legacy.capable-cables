@@ -5,7 +5,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.eve
 
 public abstract class AbstractUIEventListener<E extends IUIEvent>
 		implements IUIEventListener<E> {
-	protected boolean removed = false;
+	private boolean removed = false;
 
 	@Override
 	public void markAsRemoved() { setRemoved(true); }

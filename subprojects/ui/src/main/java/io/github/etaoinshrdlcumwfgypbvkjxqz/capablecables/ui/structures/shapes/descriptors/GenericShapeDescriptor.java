@@ -9,7 +9,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
 public class GenericShapeDescriptor extends AbstractShapeDescriptor<Shape> {
-	protected Shape shape;
+	private Shape shape;
 
 	public GenericShapeDescriptor(Shape shape) {
 		this.shape = shape;

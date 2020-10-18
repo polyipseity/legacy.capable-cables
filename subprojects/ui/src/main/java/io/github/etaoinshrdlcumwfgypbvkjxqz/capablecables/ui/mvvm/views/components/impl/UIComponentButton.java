@@ -156,7 +156,7 @@ public class UIComponentButton
 				UIEventRegistry.getInstance().register(TYPE, IUIEventActivate.class); // COMMENT custom: button will be activated
 			}
 
-			protected final IUIEvent cause;
+			private final IUIEvent cause;
 
 			public Impl(IUIEventTarget target, IUIEvent cause) {
 				super(TYPE, false, true, cause.getViewContext(), target);

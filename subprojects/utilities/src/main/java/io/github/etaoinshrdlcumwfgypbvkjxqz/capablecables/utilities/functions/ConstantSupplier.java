@@ -8,7 +8,7 @@ public final class ConstantSupplier<T>
 		implements Supplier<T> {
 	private static final ConstantSupplier<?> EMPTY = new ConstantSupplier<>();
 	@Nullable
-	protected final T constant;
+	private final T constant;
 
 	protected ConstantSupplier() { this.constant = null; }
 

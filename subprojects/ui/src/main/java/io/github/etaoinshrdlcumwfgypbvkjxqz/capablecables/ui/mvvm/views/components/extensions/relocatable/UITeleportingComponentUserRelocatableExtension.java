@@ -46,7 +46,7 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final Modifier modifier = new Modifier(this);
 	@Nullable
-	protected IRelocateData relocateData;
+	private IRelocateData relocateData;
 
 	@SuppressWarnings("unchecked")
 	@UIExtensionConstructor

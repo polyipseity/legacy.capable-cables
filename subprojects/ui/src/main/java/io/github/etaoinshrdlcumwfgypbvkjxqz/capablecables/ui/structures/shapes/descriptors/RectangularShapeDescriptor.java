@@ -9,7 +9,7 @@ import java.awt.geom.RectangularShape;
 
 public class RectangularShapeDescriptor<S extends RectangularShape>
 		extends AbstractShapeDescriptor<S> {
-	protected S shape;
+	private S shape;
 
 	public RectangularShapeDescriptor(S shape) { this.shape = shape; }
 

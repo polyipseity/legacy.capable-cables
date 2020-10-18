@@ -22,8 +22,8 @@ public class ChangingLocaleResourceBundle
 	private static final CacheBuilder<Object, Object> BUNDLE_MAP_BUILDER = CacheUtilities.newCacheBuilderSingleThreaded()
 			.initialCapacity(CapacityUtilities.getInitialCapacitySmall())
 			.expireAfterAccess(CacheUtilities.getCacheExpirationAccessDuration(), CacheUtilities.getCacheExpirationAccessTimeUnit());
-	protected final LoadingCache<Locale, ResourceBundle> bundleMap;
-	protected final Supplier<? extends Locale> localeSupplier;
+	private final LoadingCache<Locale, ResourceBundle> bundleMap;
+	private final Supplier<? extends Locale> localeSupplier;
 
 	public ChangingLocaleResourceBundle(CacheLoader<? super Locale, ResourceBundle> loader, Supplier<? extends Locale> localeSupplier) {
 		this.bundleMap = getBundleMapBuilder().build(loader);
@@ -67,9 +67,9 @@ public class ChangingLocaleResourceBundle
 						.initialCapacity(CapacityUtilities.getInitialCapacitySmall())
 						.weakValues()
 						.makeMap();
-		protected String baseName;
-		protected BiFunction<? super String, ? super Locale, ? extends ResourceBundle> loader = ResourceBundle::getBundle;
-		protected Supplier<? extends Locale> localeSupplier = Locale::getDefault;
+		private String baseName;
+		private BiFunction<? super String, ? super Locale, ? extends ResourceBundle> loader = ResourceBundle::getBundle;
+		private Supplier<? extends Locale> localeSupplier = Locale::getDefault;
 
 		public Builder() { this.baseName = StackTraceUtilities.getCallerClass().getName(); }
 

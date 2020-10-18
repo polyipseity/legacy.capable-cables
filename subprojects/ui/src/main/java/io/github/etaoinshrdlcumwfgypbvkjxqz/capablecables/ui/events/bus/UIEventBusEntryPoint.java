@@ -6,7 +6,7 @@ import io.reactivex.rxjava3.subjects.Subject;
 public enum UIEventBusEntryPoint {
 	;
 
-	protected static volatile Subject<?> eventBus = EventBusSubject.getUIEventBus();
+	private static volatile Subject<?> eventBus = EventBusSubject.getUIEventBus();
 
 	@SuppressWarnings("unchecked")
 	public static <T> Subject<T> getEventBus() {

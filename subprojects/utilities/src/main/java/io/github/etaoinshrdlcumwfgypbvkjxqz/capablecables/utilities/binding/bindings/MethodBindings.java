@@ -26,9 +26,9 @@ import java.util.function.Supplier;
 
 public class MethodBindings
 		extends AbstractBindings<IBindingMethod<?>> {
-	protected final Map<IBindingMethodSource<?>, Disposable> sources =
+	private final Map<IBindingMethodSource<?>, Disposable> sources =
 			MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacityTiny()).makeMap();
-	protected final Set<IBindingMethodDestination<?>> destinations =
+	private final Set<IBindingMethodDestination<?>> destinations =
 			Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacityTiny()).makeMap());
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")

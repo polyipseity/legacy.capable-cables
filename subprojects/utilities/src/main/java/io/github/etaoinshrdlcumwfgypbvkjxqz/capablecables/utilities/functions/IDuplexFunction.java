@@ -34,8 +34,8 @@ public interface IDuplexFunction<L, R> {
 	class Functional<L, R>
 			implements IDuplexFunction<L, R>, Serializable {
 		private static final long serialVersionUID = -7487772309945154280L;
-		protected final Function<? super L, ? extends R> leftToRightFunction;
-		protected final Function<? super R, ? extends L> rightToLeftFunction;
+		private final Function<? super L, ? extends R> leftToRightFunction;
+		private final Function<? super R, ? extends L> rightToLeftFunction;
 
 		public Functional(Function<? super L, ? extends R> leftToRightFunction, Function<? super R, ? extends L> rightToLeftFunction) {
 			this.leftToRightFunction = leftToRightFunction;
@@ -49,10 +49,12 @@ public interface IDuplexFunction<L, R> {
 		public Function<R, L> asRightToLeftFunction() { return getRightToLeftFunction()::apply; }
 
 		@Override
-		public R leftToRight(L left) { return getLeftToRightFunction().apply(left); }
+		@Nullable
+		public R leftToRight(@Nullable L left) { return getLeftToRightFunction().apply(left); }
 
 		@Override
-		public L rightToLeft(R right) { return getRightToLeftFunction().apply(right); }
+		@Nullable
+		public L rightToLeft(@Nullable R right) { return getRightToLeftFunction().apply(right); }
 
 		protected Function<? super R, ? extends L> getRightToLeftFunction() { return rightToLeftFunction; }
 
@@ -62,7 +64,7 @@ public interface IDuplexFunction<L, R> {
 	class Reverse<L, R>
 			implements IDuplexFunction<L, R>, Serializable {
 		private static final long serialVersionUID = 8742593880687842971L;
-		protected final IDuplexFunction<R, L> reverse;
+		private final IDuplexFunction<R, L> reverse;
 
 		protected Reverse(IDuplexFunction<R, L> reverse) {
 			this.reverse = reverse;
@@ -77,10 +79,12 @@ public interface IDuplexFunction<L, R> {
 		protected IDuplexFunction<R, L> getReverse() { return reverse; }
 
 		@Override
-		public R leftToRight(L left) { return getReverse().rightToLeft(left); }
+		@Nullable
+		public R leftToRight(@Nullable L left) { return getReverse().rightToLeft(left); }
 
 		@Override
-		public L rightToLeft(R right) { return getReverse().leftToRight(right); }
+		@Nullable
+		public L rightToLeft(@Nullable R right) { return getReverse().leftToRight(right); }
 
 		@Override
 		public IDuplexFunction<R, L> reverse() { return getReverse(); }

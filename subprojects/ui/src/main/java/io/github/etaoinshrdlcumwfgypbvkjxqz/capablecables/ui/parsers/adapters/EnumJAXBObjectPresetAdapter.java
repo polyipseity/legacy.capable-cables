@@ -14,8 +14,8 @@ public enum EnumJAXBObjectPresetAdapter
 		implements Map.Entry<Class<?>, Registry.RegistryObject<IDuplexFunction<?, ?>>> {
 	;
 
-	protected final Class<?> key;
-	protected final Registry.RegistryObject<IDuplexFunction<?, ?>> value;
+	private final Class<?> key;
+	private final Registry.RegistryObject<IDuplexFunction<?, ?>> value;
 
 	<L, V extends IDuplexFunction<L, ?> & Serializable> EnumJAXBObjectPresetAdapter(Class<L> key, V value) {
 		this.key = key;

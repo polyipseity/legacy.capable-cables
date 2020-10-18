@@ -14,7 +14,7 @@ import java.util.Optional;
 public class ObservableField<T>
 		extends IHasGenericClass.Impl<T>
 		implements IObservableField<T> {
-	protected final Subject<IValue<T>> notifierSubject = PublishSubject.create();
+	private final Subject<IValue<T>> notifierSubject = PublishSubject.create();
 	@Nullable
 	private T value;
 

@@ -17,7 +17,7 @@ public interface IUIRenderer<C>
 		public static final INamespacePrefixedString DEFAULT_KEY = new ImmutableNamespacePrefixedString("default");
 		protected static final ConcurrentMap<Class<? extends IUIComponent>, RegRenderer<?>> INSTANCES =
 				MapUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap();
-		protected final Class<R> variant;
+		private final Class<R> variant;
 
 		protected RegRenderer(Class<R> variant, Class<? extends R> defaultValue, Logger logger) {
 			super(true, logger);

@@ -82,10 +82,10 @@ public class EventBusSubject
 
 	protected static class EventBusForgeDisposable
 			implements Disposable {
-		protected final AtomicBoolean disposed = new AtomicBoolean();
-		protected final IEventBus owner;
-		protected final Class<? extends Event> eventType;
-		protected final Consumer<? extends Event> downstream;
+		private final AtomicBoolean disposed = new AtomicBoolean();
+		private final IEventBus owner;
+		private final Class<? extends Event> eventType;
+		private final Consumer<? extends Event> downstream;
 
 		public EventBusForgeDisposable(IEventBus owner, Class<? extends Event> eventType, Consumer<? extends Event> downstream) {
 			this.owner = owner;

@@ -11,8 +11,8 @@ public enum EnumUIEventComponentType
 	;
 
 	@NonNls
-	protected final String eventTypeString;
-	protected final INamespacePrefixedString eventType;
+	private final String eventTypeString;
+	private final INamespacePrefixedString eventType;
 
 	EnumUIEventComponentType(@SuppressWarnings("SameParameterValue") @NonNls CharSequence eventTypeString) {
 		String eventTypeString2 = eventTypeString.toString();

@@ -26,9 +26,9 @@ import java.util.function.Supplier;
 
 public class FieldBindings
 		extends AbstractBindings<IBindingField<?>> {
-	protected final Map<IBindingField<?>, Disposable> fields =
+	private final Map<IBindingField<?>, Disposable> fields =
 			MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacityTiny()).makeMap();
-	protected final AtomicBoolean isSource = new AtomicBoolean(true);
+	private final AtomicBoolean isSource = new AtomicBoolean(true);
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public FieldBindings(INamespacePrefixedString bindingKey,

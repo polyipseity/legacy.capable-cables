@@ -41,9 +41,9 @@ public class DefaultUIComponentShapeAnchorController
 			extends LoggingDisposableObserver<UIComponentModifyShapeDescriptorBusEvent> {
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
-		protected final OptionalWeakReference<DefaultUIComponentShapeAnchorController> owner;
-		protected final Deque<IShapeAnchor> anchoringAnchors = new ArrayDeque<>(CapacityUtilities.getInitialCapacityMedium());
-		protected boolean anchoringSelf = false;
+		private final OptionalWeakReference<DefaultUIComponentShapeAnchorController> owner;
+		private final Deque<IShapeAnchor> anchoringAnchors = new ArrayDeque<>(CapacityUtilities.getInitialCapacityMedium());
+		private boolean anchoringSelf = false;
 
 		protected ModifyShapeDescriptorObserver(DefaultUIComponentShapeAnchorController owner, Logger logger) {
 			super(logger);

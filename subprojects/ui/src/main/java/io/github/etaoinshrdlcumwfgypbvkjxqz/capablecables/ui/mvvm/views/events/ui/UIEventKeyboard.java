@@ -8,7 +8,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.UIEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 
 public class UIEventKeyboard extends UIEvent implements IUIEventKeyboard {
-	protected final IUIDataKeyboardKeyPress data;
+	private final IUIDataKeyboardKeyPress data;
 
 	public UIEventKeyboard(INamespacePrefixedString type, boolean canBubble, boolean cancelable, IUIViewContext viewContext, IUIEventTarget target, IUIDataKeyboardKeyPress data) {
 		super(type, canBubble, cancelable, viewContext, target);

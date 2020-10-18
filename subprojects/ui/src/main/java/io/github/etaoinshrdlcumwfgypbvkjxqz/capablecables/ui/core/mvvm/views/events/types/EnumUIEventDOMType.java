@@ -53,8 +53,8 @@ public enum EnumUIEventDOMType
 	;
 
 	@NonNls
-	protected final String eventTypeString;
-	protected final INamespacePrefixedString eventType;
+	private final String eventTypeString;
+	private final INamespacePrefixedString eventType;
 
 	EnumUIEventDOMType(@NonNls CharSequence eventTypeString) {
 		String eventTypeString2 = eventTypeString.toString();

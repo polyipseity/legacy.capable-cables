@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 
 public class FunctionalUIEventListener<E extends IUIEvent>
 		extends AbstractUIEventListener<E> {
-	protected final Consumer<E> action;
+	private final Consumer<E> action;
 
 	public FunctionalUIEventListener(Consumer<E> action) { this.action = action; }
 

@@ -92,17 +92,17 @@ public class UIComponentButtonMinecraft
 		private static final INamespacePrefixedString PROPERTY_COLOR_PRESSED_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorPressedBorder());
 
 		@UIProperty(PROPERTY_COLOR_BASE)
-		protected final IBindingField<Color> colorBase;
+		private final IBindingField<Color> colorBase;
 		@UIProperty(PROPERTY_COLOR_BASE_BORDER)
-		protected final IBindingField<Color> colorBaseBorder;
+		private final IBindingField<Color> colorBaseBorder;
 		@UIProperty(PROPERTY_COLOR_HOVERING)
-		protected final IBindingField<Color> colorHovering;
+		private final IBindingField<Color> colorHovering;
 		@UIProperty(PROPERTY_COLOR_HOVERING_BORDER)
-		protected final IBindingField<Color> colorHoveringBorder;
+		private final IBindingField<Color> colorHoveringBorder;
 		@UIProperty(PROPERTY_COLOR_PRESSED)
-		protected final IBindingField<Color> colorPressed;
+		private final IBindingField<Color> colorPressed;
 		@UIProperty(PROPERTY_COLOR_PRESSED_BORDER)
-		protected final IBindingField<Color> colorPressedBorder;
+		private final IBindingField<Color> colorPressedBorder;
 
 		@UIRendererConstructor
 		public DefaultRenderer(UIRendererConstructor.IArguments arguments) {

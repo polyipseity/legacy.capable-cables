@@ -1,9 +1,9 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dom;
 
+import com.google.common.collect.ImmutableSet;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AbstractDelegatingObject;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import com.google.common.collect.ImmutableSet;
 import org.jetbrains.annotations.NonNls;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 public class NamedNodeMapMap
 		extends AbstractDelegatingObject<NamedNodeMap>
 		implements Map<String, Node> {
-	protected final NodeListList asList;
+	private final NodeListList asList;
 
 	public NamedNodeMapMap(NamedNodeMap delegate) {
 		super(delegate);
@@ -29,9 +29,9 @@ public class NamedNodeMapMap
 
 	protected static class EntryThis
 			implements Entry<String, Node> {
-		protected final Map<String, Node> parent;
+		private final Map<String, Node> parent;
 		@Nullable
-		protected final String key;
+		private final String key;
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 		public EntryThis(Map<String, Node> parent, @Nullable String key) {

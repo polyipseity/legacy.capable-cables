@@ -7,7 +7,7 @@ import java.util.AbstractList;
 
 public class NodeListList
 		extends AbstractList<Node> {
-	protected final NodeList delegate;
+	private final NodeList delegate;
 
 	public NodeListList(NodeList delegate) { this.delegate = delegate; }
 

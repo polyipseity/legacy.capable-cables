@@ -12,8 +12,8 @@ public final class ImmutableBindingMethodDestination<T>
 		extends IHasGenericClass.Impl<T>
 		implements IBindingMethodDestination<T> {
 	@Nullable
-	protected final INamespacePrefixedString bindingKey;
-	protected final Consumer<T> action;
+	private final INamespacePrefixedString bindingKey;
+	private final Consumer<T> action;
 
 	public ImmutableBindingMethodDestination(Class<T> genericClass, @Nullable INamespacePrefixedString bindingKey, Consumer<T> action) {
 		super(genericClass);

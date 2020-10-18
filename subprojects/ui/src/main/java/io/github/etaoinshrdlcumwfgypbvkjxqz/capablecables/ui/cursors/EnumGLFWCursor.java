@@ -55,7 +55,7 @@ public enum EnumGLFWCursor
 	}),
 	;
 
-	protected final long handle;
+	private final long handle;
 
 	EnumGLFWCursor(LongSupplier handle) { this.handle = handle.getAsLong(); }
 

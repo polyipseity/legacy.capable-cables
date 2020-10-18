@@ -80,9 +80,9 @@ public class UIComponentWindowMinecraft
 		private static final INamespacePrefixedString PROPERTY_COLOR_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorBorder());
 
 		@UIProperty(PROPERTY_COLOR_BACKGROUND)
-		protected final IBindingField<Color> colorBackground;
+		private final IBindingField<Color> colorBackground;
 		@UIProperty(PROPERTY_COLOR_BORDER)
-		protected final IBindingField<Color> colorBorder;
+		private final IBindingField<Color> colorBorder;
 
 		@UIRendererConstructor
 		public DefaultRenderer(UIRendererConstructor.IArguments arguments) {

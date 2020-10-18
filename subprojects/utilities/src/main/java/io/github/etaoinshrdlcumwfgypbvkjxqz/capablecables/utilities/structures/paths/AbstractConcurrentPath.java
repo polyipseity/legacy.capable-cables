@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public abstract class AbstractConcurrentPath<T>
 		extends AbstractPath<T>
 		implements IConcurrentPath<T> {
-	protected final ReadWriteLock lock = new ReentrantReadWriteLock();
+	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
 	@Override
 	public int size() {

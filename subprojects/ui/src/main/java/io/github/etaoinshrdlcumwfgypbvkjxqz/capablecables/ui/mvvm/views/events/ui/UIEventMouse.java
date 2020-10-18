@@ -11,9 +11,9 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class UIEventMouse extends UIEvent implements IUIEventMouse {
-	protected final IUIDataMouseButtonClick data;
+	private final IUIDataMouseButtonClick data;
 	@Nullable
-	protected final IUIEventTarget relatedTarget;
+	private final IUIEventTarget relatedTarget;
 
 	public UIEventMouse(INamespacePrefixedString type, boolean canBubble, boolean cancelable, IUIViewContext viewContext, IUIEventTarget target, IUIDataMouseButtonClick data, @Nullable IUIEventTarget relatedTarget) {
 		super(type, canBubble, cancelable, viewContext, target);

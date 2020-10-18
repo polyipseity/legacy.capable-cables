@@ -14,7 +14,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class UIExtensionMinecraftContainerProvider
 		extends IHasGenericClass.Impl<IUIInfrastructure<?, ?, ?>>
 		implements IUIExtensionMinecraftContainerProvider {
-	protected final Container container;
+	private final Container container;
 
 	public UIExtensionMinecraftContainerProvider(Container container) {
 		super(CastUtilities.castUnchecked(IUIInfrastructure.class)); // COMMENT class should not care about it

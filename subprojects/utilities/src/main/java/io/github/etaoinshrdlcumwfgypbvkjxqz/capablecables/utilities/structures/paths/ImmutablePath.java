@@ -6,7 +6,7 @@ import java.util.List;
 
 public class ImmutablePath<T>
 		extends AbstractPath<T> {
-	protected final List<T> data;
+	private final List<T> data;
 
 	public ImmutablePath(Iterable<? extends T> data) {
 		this.data = ImmutableList.copyOf(data);

@@ -416,10 +416,10 @@ public class UIScreenAdapter
 
 	@OnlyIn(Dist.CLIENT)
 	public static class Builder<I extends IUIInfrastructureMinecraft<?, ?, ?>, C extends Container> {
-		protected final ITextComponent title;
-		protected final I infrastructure;
-		protected Set<Integer> closeKeys = ImmutableSet.of(GLFW.GLFW_KEY_ESCAPE);
-		protected Set<Integer> changeFocusKeys = ImmutableSet.of(GLFW.GLFW_KEY_TAB);
+		private final ITextComponent title;
+		private final I infrastructure;
+		private Set<Integer> closeKeys = ImmutableSet.of(GLFW.GLFW_KEY_ESCAPE);
+		private Set<Integer> changeFocusKeys = ImmutableSet.of(GLFW.GLFW_KEY_TAB);
 
 		public Builder(ITextComponent title, I infrastructure) {
 			this.title = title;
@@ -458,7 +458,7 @@ public class UIScreenAdapter
 		@OnlyIn(Dist.CLIENT)
 		public static class WithChildren<I extends IUIInfrastructureMinecraft<?, ?, ?>, C extends Container>
 				extends Builder<I, C> {
-			protected final C containerObject;
+			private final C containerObject;
 
 			public WithChildren(ITextComponent titleIn, I infrastructure, C containerObject) {
 				super(titleIn, infrastructure);

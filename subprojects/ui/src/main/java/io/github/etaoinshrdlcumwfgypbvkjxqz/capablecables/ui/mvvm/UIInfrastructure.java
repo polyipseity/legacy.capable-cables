@@ -29,12 +29,12 @@ import java.util.function.Supplier;
 
 public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, B extends IBinder>
 		implements IUIInfrastructure<V, VM, B> {
-	protected final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
-	protected final CompositeDisposable binderDisposables = new CompositeDisposable();
-	protected V view;
-	protected VM viewModel;
-	protected B binder;
-	protected boolean bound = false;
+	private final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
+	private final CompositeDisposable binderDisposables = new CompositeDisposable();
+	private V view;
+	private VM viewModel;
+	private B binder;
+	private boolean bound = false;
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public UIInfrastructure(V view, VM viewModel, B binder) {
