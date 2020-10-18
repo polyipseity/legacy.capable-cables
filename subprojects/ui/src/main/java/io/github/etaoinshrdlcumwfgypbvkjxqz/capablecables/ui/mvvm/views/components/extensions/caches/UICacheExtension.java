@@ -13,7 +13,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches.UICacheRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventBusEntryPoint;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIComponentHierarchyChangedBusEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIAbstractComponentHierarchyChangeBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CleanerUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ConcurrencyUtilities;
@@ -21,7 +21,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.AutoSubscribingCompositeDisposable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.FunctionalEventBusDisposableObserver;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.SubscribeEventObject;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.ImmutableSubscribeEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
@@ -77,9 +77,9 @@ public class UICacheExtension
 										new OptionalWeakReference<>(this);
 								Cleaner.create(CleanerUtilities.getCleanerReferent(this),
 										new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
-												new LoggingDisposableObserver<UIComponentHierarchyChangedBusEvent.Parent>(
+												new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
 														new FunctionalEventBusDisposableObserver<>(
-																new SubscribeEventObject(EventPriority.LOWEST, true),
+																new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
 																event -> {
 																	if (event.getStage().isPost())
 																		thisRef.getOptional().ifPresent(t ->
@@ -107,9 +107,9 @@ public class UICacheExtension
 										new OptionalWeakReference<>(this);
 								Cleaner.create(CleanerUtilities.getCleanerReferent(this),
 										new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
-												new LoggingDisposableObserver<UIComponentHierarchyChangedBusEvent.Parent>(
+												new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
 														new FunctionalEventBusDisposableObserver<>(
-																new SubscribeEventObject(EventPriority.LOWEST, true),
+																new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
 																event -> {
 																	if (event.getStage().isPost())
 																		thisRef.getOptional().ifPresent(t ->

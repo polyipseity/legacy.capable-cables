@@ -39,11 +39,13 @@ public class UIExtensionCursorHandleProviderComponent
 	public Optional<Long> getCursorHandle() {
 		return getContainer()
 				.flatMap(view ->
-						Optional2.of(IUIViewComponent.createComponentContextWithManager(view)
-								.orElse(null), view.getContext()
-								.map(IUIViewContext::getInputDevices)
-								.flatMap(IInputDevices::getPointerDevice)
-								.orElse(null))
+						Optional2.of(
+								() -> IUIViewComponent.createComponentContextWithManager(view)
+										.orElse(null),
+								() -> view.getContext()
+										.map(IUIViewContext::getInputDevices)
+										.flatMap(IInputDevices::getPointerDevice)
+										.orElse(null))
 								.flatMap(values -> {
 									IUIComponentContext componentContext = values.getValue1Nonnull();
 									IInputPointerDevice pointerDevice = values.getValue2Nonnull();

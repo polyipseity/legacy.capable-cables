@@ -9,7 +9,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventBusEntryPoint;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIComponentHierarchyChangedBusEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIAbstractComponentHierarchyChangeBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.BindingUtilities;
@@ -70,8 +70,8 @@ public class UIComponentContainer
 					getChildren().add(index, component);
 					component.onParentChange(null, this);
 				},
-				new UIComponentHierarchyChangedBusEvent.Parent(EnumHookStage.PRE, component, null, this),
-				new UIComponentHierarchyChangedBusEvent.Parent(EnumHookStage.POST, component, null, this));
+				new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.PRE, component, null, this),
+				new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.POST, component, null, this));
 		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh);
 		return true;
 	}
@@ -88,8 +88,8 @@ public class UIComponentContainer
 									getChildren().remove(component);
 									component.onParentChange(this, null);
 								},
-								new UIComponentHierarchyChangedBusEvent.Parent(EnumHookStage.PRE, component, this, null),
-								new UIComponentHierarchyChangedBusEvent.Parent(EnumHookStage.POST, component, this, null));
+								new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.PRE, component, this, null),
+								new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.POST, component, this, null));
 						return true;
 					}
 					return false;

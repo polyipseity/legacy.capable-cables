@@ -19,8 +19,13 @@ public final class Optional2<V1, V2>
 		this.values = new Values<>(null, null);
 	}
 
-	public static <V1, V2> Optional2<V1, V2> of(@Nullable V1 value1, @Nullable V2 value2) {
-		return value1 == null || value2 == null ? getEmpty() : new Optional2<>(value1, value2);
+	public static <V1, V2> Optional2<V1, V2> of(Supplier<? extends V1> value1Supplier,
+	                                            Supplier<? extends V2> value2Supplier) {
+		@Nullable V1 value1;
+		@Nullable V2 value2;
+		return (value1 = value1Supplier.get()) == null || (value2 = value2Supplier.get()) == null
+				? getEmpty()
+				: new Optional2<>(value1, value2);
 	}
 
 	@SuppressWarnings("unchecked")

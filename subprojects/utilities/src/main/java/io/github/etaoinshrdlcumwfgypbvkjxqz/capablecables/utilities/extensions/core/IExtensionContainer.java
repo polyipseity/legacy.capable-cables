@@ -24,15 +24,16 @@ public interface IExtensionContainer<K> {
 
 	static <K> Optional<? extends IExtension<? extends K, ?>> getExtensionImpl(Map<K, ? extends IExtension<? extends K, ?>> extensions, K key) { return Optional.ofNullable(extensions.get(key)); }
 
-	static <K> Optional<? extends IExtension<? extends K, ?>> addExtensionImpl(IExtensionContainer<K> container, Map<K, ? super IExtension<? extends K, ?>> extensions, K key, IExtension<? extends K, ?> extension) {
+	static <K> Optional<? extends IExtension<? extends K, ?>> addExtensionImpl(IExtensionContainer<K> container, Map<K, ? super IExtension<? extends K, ?>> extensions, IExtension<? extends K, ?> extension) {
 		if (!extension.getGenericClass().isInstance(container))
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
 							.addMarkers(UtilitiesMarkers.getInstance()::getMarkerExtension)
-							.addKeyValue("container", container).addKeyValue("extensions", extensions).addKeyValue("key", key).addKeyValue("extension", extension)
+							.addKeyValue("container", container).addKeyValue("extensions", extensions).addKeyValue("extension", extension)
 							.addMessages(() -> StaticHolder.getResourceBundle().getString("extension.add.impl.container.instance_of.fail"))
 							.build()
 			);
+		K key = extension.getType().getKey();
 		Optional<? extends IExtension<? extends K, ?>> ret = container.removeExtension(key);
 		extensions.put(key, extension);
 		extension.onExtensionAdded(CastUtilities.castUnchecked(container)); // COMMENT type checked above

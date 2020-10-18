@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.PrimitiveUtilities.PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP;
 
@@ -42,4 +43,9 @@ public enum MiscellaneousUtilities {
 
 	@Nullable
 	public static <T> T kNullable(@Nullable T x, @SuppressWarnings("unused") Object... y) { return x; }
+
+	public static <T> T act(T t, Consumer<? super T> action) {
+		action.accept(t);
+		return t;
+	}
 }

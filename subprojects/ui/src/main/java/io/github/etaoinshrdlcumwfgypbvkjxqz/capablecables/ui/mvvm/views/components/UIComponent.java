@@ -13,7 +13,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventB
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.UIEventTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.extensions.UIExtensionRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.caches.UICacheExtension;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIComponentBusEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIComponentModifyShapeDescriptorBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.interactions.ProviderShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
@@ -105,8 +105,8 @@ public class UIComponent
 		getModifyingShape().compareAndSet(false, true);
 		boolean ret = EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () ->
 						getShapeDescriptor().modify(action),
-				new UIComponentBusEvent.ModifyShapeDescriptor(EnumHookStage.PRE, this),
-				new UIComponentBusEvent.ModifyShapeDescriptor(EnumHookStage.POST, this));
+				new UIComponentModifyShapeDescriptorBusEvent(EnumHookStage.PRE, this),
+				new UIComponentModifyShapeDescriptorBusEvent(EnumHookStage.POST, this));
 		getModifyingShape().compareAndSet(true, false);
 		return ret;
 	}
@@ -187,7 +187,7 @@ public class UIComponent
 	@Deprecated
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
 		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
-		return IExtensionContainer.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension);
+		return IExtensionContainer.addExtensionImpl(this, getExtensions(), extension);
 	}
 
 	@Override

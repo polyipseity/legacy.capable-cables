@@ -257,7 +257,9 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 		@Override
 		public Optional<Long> getCursorHandle(IUIComponentContext context) {
 			if (getModifyStage().isPre())
-				return Optional2.of(getOwner().orElse(null), context.getViewContext().getInputDevices().getPointerDevice().orElse(null))
+				return Optional2.of(
+						() -> getOwner().orElse(null),
+						() -> context.getViewContext().getInputDevices().getPointerDevice().orElse(null))
 						.flatMap(values -> {
 							UITeleportingComponentUserResizableExtension<?> owner = values.getValue1Nonnull();
 							IInputPointerDevice pointerDevice = values.getValue2Nonnull();
@@ -304,7 +306,9 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 		public void invokeRenderer(IUIComponentContext context) {
 			if (getModifyStage().isPost()) {
 				getOwner().ifPresent(owner ->
-						Optional2.of(owner.getRendererContainer().getRenderer().orElse(null), owner.getResizeData().orElse(null))
+						Optional2.of(
+								() -> owner.getRendererContainer().getRenderer().orElse(null),
+								() -> owner.getResizeData().orElse(null))
 								.ifPresent(values -> {
 									IResizingRenderer renderer = values.getValue1Nonnull();
 									IResizeData data = values.getValue2Nonnull();

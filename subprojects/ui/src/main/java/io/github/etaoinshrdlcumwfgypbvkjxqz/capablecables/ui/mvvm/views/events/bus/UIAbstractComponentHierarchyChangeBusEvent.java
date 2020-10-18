@@ -8,20 +8,25 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EnumH
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public abstract class UIComponentHierarchyChangedBusEvent<T> extends UIComponentChangedBusEvent<T> {
-	protected UIComponentHierarchyChangedBusEvent(EnumHookStage stage, IUIComponent component, T previous, T next) { super(stage, component, previous, next); }
+public abstract class UIAbstractComponentHierarchyChangeBusEvent<T, V>
+		extends UIAbstractComponentChangeBusEvent<T, V> {
+	protected UIAbstractComponentHierarchyChangeBusEvent(Class<T> genericType, EnumHookStage stage, IUIComponent component, V previous, V next) {
+		super(genericType, stage, component, previous, next);
+	}
 
-	public static class Parent extends UIComponentChangedBusEvent<Optional<IUIComponentContainer>> {
+	public static class Parent
+			extends UIAbstractComponentChangeBusEvent<Void, Optional<IUIComponentContainer>> {
 		public Parent(EnumHookStage stage, IUIComponent component,
 		              @Nullable IUIComponentContainer previous, @Nullable IUIComponentContainer current) {
-			super(stage, component, Optional.ofNullable(previous), Optional.ofNullable(current));
+			super(Void.class, stage, component, Optional.ofNullable(previous), Optional.ofNullable(current));
 		}
 	}
 
-	public static class View extends UIComponentChangedBusEvent<Optional<IUIViewComponent<?, ?>>> {
+	public static class View
+			extends UIAbstractComponentChangeBusEvent<Void, Optional<IUIViewComponent<?, ?>>> {
 		public View(EnumHookStage stage, IUIComponent component,
 		            @Nullable IUIViewComponent<?, ?> previous, @Nullable IUIViewComponent<?, ?> next) {
-			super(stage, component, Optional.ofNullable(previous), Optional.ofNullable(next));
+			super(Void.class, stage, component, Optional.ofNullable(previous), Optional.ofNullable(next));
 		}
 	}
 }

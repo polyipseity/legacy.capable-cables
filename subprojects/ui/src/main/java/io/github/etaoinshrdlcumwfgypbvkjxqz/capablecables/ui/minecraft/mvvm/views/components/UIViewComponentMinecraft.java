@@ -14,11 +14,13 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.components.modifiers.IUIComponentMinecraftLifecycleModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.rendering.IUIComponentRendererMinecraft.EnumCropStage;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.rendering.IUIComponentRendererMinecraft.EnumRenderStage;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.events.bus.UIViewMinecraftBusEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.events.bus.UIImmutableMinecraftRenderEventExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.background.DefaultUIExtensionMinecraftBackground;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.utilities.EnumCropMethod;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.UIViewComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIAbstractViewBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.MiscellaneousUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EnumHookStage;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EventBusUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionContainer;
@@ -96,8 +98,12 @@ public class UIViewComponentMinecraft<S extends Shape, M extends IUIComponentMan
 									cropMethod.disable();
 									return true;
 								},
-								new UIViewMinecraftBusEvent.Render(EnumHookStage.PRE, this, context, partialTicks),
-								new UIViewMinecraftBusEvent.Render(EnumHookStage.POST, this, context, partialTicks))
+								MiscellaneousUtilities.act(new UIAbstractViewBusEvent.Render(EnumHookStage.PRE, this),
+										event -> IExtensionContainer.addExtensionChecked(event,
+												UIImmutableMinecraftRenderEventExtension.of(partialTicks))),
+								MiscellaneousUtilities.act(new UIAbstractViewBusEvent.Render(EnumHookStage.POST, this),
+										event -> IExtensionContainer.addExtensionChecked(event,
+												UIImmutableMinecraftRenderEventExtension.of(partialTicks))))
 				);
 	}
 

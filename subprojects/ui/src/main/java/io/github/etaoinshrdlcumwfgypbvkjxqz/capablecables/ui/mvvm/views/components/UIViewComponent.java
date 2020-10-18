@@ -21,7 +21,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.UIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.caches.AbstractUICacheType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.extensions.caches.UICacheExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.paths.DefaultUIComponentPathResolver;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIComponentHierarchyChangedBusEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIAbstractComponentHierarchyChangeBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.ArrayAffineTransformStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.theming.UIArrayThemeStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
@@ -127,8 +127,8 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 					previousManager.setView(null);
 					getNamedTrackers().removeAll(IUIComponent.class, getChildrenFlatView());
 				},
-				new UIComponentHierarchyChangedBusEvent.View(EnumHookStage.PRE, previousManager, this, null),
-				new UIComponentHierarchyChangedBusEvent.View(EnumHookStage.POST, previousManager, this, null)));
+				new UIAbstractComponentHierarchyChangeBusEvent.View(EnumHookStage.PRE, previousManager, this, null),
+				new UIAbstractComponentHierarchyChangeBusEvent.View(EnumHookStage.POST, previousManager, this, null)));
 		this.manager = manager;
 		Optional.ofNullable(manager).ifPresent(nextManager -> EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(),
 				() -> {
@@ -136,8 +136,8 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 					getBinderObserverSupplier().ifPresent(nextManager::initializeBindings);
 					getNamedTrackers().addAll(IUIComponent.class, getChildrenFlatView());
 				},
-				new UIComponentHierarchyChangedBusEvent.View(EnumHookStage.PRE, nextManager, null, this),
-				new UIComponentHierarchyChangedBusEvent.View(EnumHookStage.POST, nextManager, null, this)));
+				new UIAbstractComponentHierarchyChangeBusEvent.View(EnumHookStage.PRE, nextManager, null, this),
+				new UIAbstractComponentHierarchyChangeBusEvent.View(EnumHookStage.POST, nextManager, null, this)));
 	}
 
 	@Override
@@ -229,9 +229,9 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 								Cleaner.create(CleanerUtilities.getCleanerReferent(this),
 										new AutoSubscribingCompositeDisposable<>(
 												UIEventBusEntryPoint.getEventBus(),
-												new LoggingDisposableObserver<UIComponentHierarchyChangedBusEvent.Parent>(
+												new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
 														new FunctionalEventBusDisposableObserver<>(
-																new SubscribeEventObject(EventPriority.LOWEST, true),
+																new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
 																event -> {
 																	if (event.getStage().isPost())
 																		thisRef.getOptional()
@@ -241,9 +241,9 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 																}),
 														UIConfiguration.getInstance().getLogger()
 												) {},
-												new LoggingDisposableObserver<UIComponentHierarchyChangedBusEvent.View>(
+												new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.View>(
 														new FunctionalEventBusDisposableObserver<>(
-																new SubscribeEventObject(EventPriority.LOWEST, true),
+																new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
 																event -> {
 																	if (event.getStage().isPost())
 																		thisRef.getOptional()
@@ -277,9 +277,9 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 								Cleaner.create(CleanerUtilities.getCleanerReferent(this),
 										new AutoSubscribingCompositeDisposable<>(
 												UIEventBusEntryPoint.getEventBus(),
-												new LoggingDisposableObserver<UIComponentHierarchyChangedBusEvent.Parent>(
+												new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
 														new FunctionalEventBusDisposableObserver<>(
-																new SubscribeEventObject(EventPriority.LOWEST, true),
+																new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
 																event -> {
 																	if (event.getStage().isPost())
 																		thisRef.getOptional()
@@ -289,9 +289,9 @@ public class UIViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 																}),
 														UIConfiguration.getInstance().getLogger()
 												) {},
-												new LoggingDisposableObserver<UIComponentHierarchyChangedBusEvent.View>(
+												new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.View>(
 														new FunctionalEventBusDisposableObserver<>(
-																new SubscribeEventObject(EventPriority.LOWEST, true),
+																new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
 																event -> {
 																	if (event.getStage().isPost())
 																		thisRef.getOptional()

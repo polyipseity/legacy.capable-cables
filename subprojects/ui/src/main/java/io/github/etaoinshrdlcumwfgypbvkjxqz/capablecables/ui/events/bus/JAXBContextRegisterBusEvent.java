@@ -5,15 +5,19 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
-import net.minecraftforge.eventbus.api.Event;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.AbstractBusEvent;
 
 import java.util.Collections;
 import java.util.Set;
 
-public class JAXBContextRegisterEvent
-		extends Event {
+public class JAXBContextRegisterBusEvent
+		extends AbstractBusEvent<Void> {
 	private final Set<Class<?>> classesToBeBound = Collections.newSetFromMap(
 			MapBuilderUtilities.newMapMakerNormalThreaded().weakKeys().initialCapacity(CapacityUtilities.INITIAL_CAPACITY_MEDIUM).makeMap());
+
+	public JAXBContextRegisterBusEvent() {
+		super(Void.class);
+	}
 
 	public boolean addClassesToBeBound(Class<?>... classes) { return addClassesToBeBound(ImmutableList.copyOf(classes)); }
 

@@ -217,7 +217,9 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 		public void invokeRenderer(IUIComponentContext context) {
 			if (getModifyStage().isPost()) {
 				getOwner().ifPresent(owner ->
-						Optional2.of(owner.getRendererContainer().getRenderer().orElse(null), owner.getRelocateData().orElse(null))
+						Optional2.of(
+								() -> owner.getRendererContainer().getRenderer().orElse(null),
+								() -> owner.getRelocateData().orElse(null))
 								.ifPresent(values -> {
 									IRelocatingRenderer renderer = values.getValue1Nonnull();
 									IRelocateData data = values.getValue2Nonnull();

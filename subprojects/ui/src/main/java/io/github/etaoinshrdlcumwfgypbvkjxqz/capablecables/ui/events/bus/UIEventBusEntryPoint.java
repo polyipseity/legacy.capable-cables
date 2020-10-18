@@ -1,12 +1,12 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EventBusForge;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events.EventBusSubject;
 import io.reactivex.rxjava3.subjects.Subject;
 
 public enum UIEventBusEntryPoint {
 	;
 
-	protected static volatile Subject<?> eventBus = EventBusForge.getUIEventBus();
+	protected static volatile Subject<?> eventBus = EventBusSubject.getUIEventBus();
 
 	@SuppressWarnings("unchecked")
 	public static <T> Subject<T> getEventBus() {

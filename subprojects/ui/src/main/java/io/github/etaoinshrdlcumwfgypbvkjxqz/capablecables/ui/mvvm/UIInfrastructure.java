@@ -145,7 +145,7 @@ public class UIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, 
 	@Deprecated
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
 		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
-		return IExtensionContainer.addExtensionImpl(this, getExtensions(), extension.getType().getKey(), extension);
+		return IExtensionContainer.addExtensionImpl(this, getExtensions(), extension);
 	}
 
 	@Override

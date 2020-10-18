@@ -76,14 +76,22 @@ public class ObserverToEventBusListenerAdapter<T extends Event, O>
 		this.priority = se.map(SubscribeEvent::priority).orElse(EventPriority.NORMAL);
 		this.receiveCancelled = se.filter(SubscribeEvent::receiveCanceled).isPresent();
 
+		@Nullable Class<?> genericClassFilter1;
 		if (IGenericEvent.class.isAssignableFrom(this.eventType)) {
-			genericClassFilter = DynamicUtilities.Extensions.wrapTypeResolverResult(
-					TypeResolver.resolveRawArgument(
-							m.getGenericParameterTypes()[0],
-							IGenericEvent.class))
-					.orElse(Object.class);
+			try {
+				genericClassFilter1 = DynamicUtilities.Extensions.wrapTypeResolverResult(
+						TypeResolver.resolveRawArgument(
+								m.getGenericParameterTypes()[0],
+								IGenericEvent.class))
+						.orElse(Object.class);
+			} catch (IllegalArgumentException e) {
+				// COMMENT this means that the event does not care about the generic type
+				// CODE extends IGenericEvent<Void>
+				genericClassFilter1 = null;
+			}
 		} else
-			genericClassFilter = null;
+			genericClassFilter1 = null;
+		this.genericClassFilter = genericClassFilter1;
 	}
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }

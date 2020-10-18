@@ -12,7 +12,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.sha
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.ui.FunctionalUIEventListener;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.components.UIComponentContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIComponentBusEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIComponentModifyShapeDescriptorBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.interactions.ShapeConstraintSupplier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.ConstantSupplier;
@@ -92,7 +92,7 @@ public class UIComponentWindow
 
 	@Override
 	public void initialize(IUIComponentContext context) {
-		UIEventBusEntryPoint.<UIComponentBusEvent.ModifyShapeDescriptor>getEventBus()
+		UIEventBusEntryPoint.<UIComponentModifyShapeDescriptorBusEvent>getEventBus()
 				.subscribe(getModifyShapeDescriptorObserver().get());
 		IUIReshapeExplicitly.refresh(this);
 	}
@@ -111,7 +111,7 @@ public class UIComponentWindow
 	}
 
 	protected static class ModifyShapeDescriptorObserver
-			extends LoggingDisposableObserver<UIComponentBusEvent.ModifyShapeDescriptor> {
+			extends LoggingDisposableObserver<UIComponentModifyShapeDescriptorBusEvent> {
 		private final OptionalWeakReference<UIComponentWindow> owner;
 
 		public ModifyShapeDescriptorObserver(UIComponentWindow owner, Logger logger) {
@@ -121,7 +121,7 @@ public class UIComponentWindow
 
 		@Override
 		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-		public void onNext(UIComponentBusEvent.ModifyShapeDescriptor event) {
+		public void onNext(UIComponentModifyShapeDescriptorBusEvent event) {
 			super.onNext(event);
 			if (event.getStage().isPost())
 				getOwner()

@@ -15,12 +15,12 @@ import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-public class EventBusForge
+public class EventBusSubject
 		extends Subject<Event> {
-	private static final Subject<Event> FORGE_EVENT_BUS = new EventBusForge(AssertionUtilities.assertNonnull(Bus.FORGE.bus().get()));
+	private static final Subject<Event> FORGE_EVENT_BUS = new EventBusSubject(AssertionUtilities.assertNonnull(Bus.FORGE.bus().get()));
 	private static final ThreadLocal<Subject<Event>> MOD_EVENT_BUS = ThreadLocal.withInitial(() ->
-			new EventBusForge(AssertionUtilities.assertNonnull(Bus.MOD.bus().get())));
-	private static final Subject<Event> UI_EVENT_BUS = new EventBusForge(new BusBuilder().build());
+			new EventBusSubject(AssertionUtilities.assertNonnull(Bus.MOD.bus().get())));
+	private static final Subject<Event> UI_EVENT_BUS = new EventBusSubject(new BusBuilder().build());
 
 	public static Subject<Event> getModEventBus() { return AssertionUtilities.assertNonnull(MOD_EVENT_BUS.get()); }
 
@@ -30,7 +30,7 @@ public class EventBusForge
 
 	private final IEventBus delegate;
 
-	public EventBusForge(IEventBus delegate) { this.delegate = delegate; }
+	public EventBusSubject(IEventBus delegate) { this.delegate = delegate; }
 
 	@Override
 	public boolean hasObservers() { return true; }

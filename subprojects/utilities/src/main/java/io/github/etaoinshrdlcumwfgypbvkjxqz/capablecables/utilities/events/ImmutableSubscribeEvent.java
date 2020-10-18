@@ -1,17 +1,19 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.events;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.lang.annotation.Annotation;
 
 @SuppressWarnings("ClassExplicitlyAnnotation")
-public class SubscribeEventObject
+@Immutable
+public final class ImmutableSubscribeEvent
 		implements SubscribeEvent {
 	private final EventPriority priority;
 	private final boolean receiveCanceled;
 
-	public SubscribeEventObject(EventPriority priority, boolean receiveCanceled) {
+	public ImmutableSubscribeEvent(EventPriority priority, boolean receiveCanceled) {
 		this.priority = priority;
 		this.receiveCanceled = receiveCanceled;
 	}

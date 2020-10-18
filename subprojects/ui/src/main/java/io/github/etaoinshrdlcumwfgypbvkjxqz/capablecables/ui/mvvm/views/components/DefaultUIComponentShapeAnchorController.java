@@ -7,7 +7,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeAnchor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.shapes.interactions.IShapeAnchorSet;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventBusEntryPoint;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIComponentBusEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIComponentModifyShapeDescriptorBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.structures.shapes.interactions.DefaultShapeAnchorController;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CleanerUtilities;
@@ -38,10 +38,42 @@ public class DefaultUIComponentShapeAnchorController
 	}
 
 	protected static class ModifyShapeDescriptorObserver
-			extends LoggingDisposableObserver<UIComponentBusEvent.ModifyShapeDescriptor> {
+			extends LoggingDisposableObserver<UIComponentModifyShapeDescriptorBusEvent> {
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
-		protected void anchorOthers(UIComponentBusEvent.ModifyShapeDescriptor event, DefaultUIComponentShapeAnchorController controller) {
+		protected final OptionalWeakReference<DefaultUIComponentShapeAnchorController> owner;
+		protected final Deque<IShapeAnchor> anchoringAnchors = new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM);
+		protected boolean anchoringSelf = false;
+
+		protected ModifyShapeDescriptorObserver(DefaultUIComponentShapeAnchorController owner, Logger logger) {
+			super(logger);
+			this.owner = new OptionalWeakReference<>(owner);
+		}
+
+		@Override
+		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+		public void onNext(UIComponentModifyShapeDescriptorBusEvent event) {
+			super.onNext(event);
+			if (event.getStage().isPost() && !isAnchoringSelf())
+				getOwner()
+						.ifPresent(ctr -> {
+							setAnchoringSelf(true);
+							anchorSelf(event, ctr);
+							setAnchoringSelf(false);
+							anchorOthers(event, ctr);
+						});
+		}
+
+		protected boolean isAnchoringSelf() { return anchoringSelf; }
+
+		protected Optional<? extends DefaultUIComponentShapeAnchorController> getOwner() { return owner.getOptional(); }
+
+		protected void anchorSelf(UIComponentModifyShapeDescriptorBusEvent event, DefaultUIComponentShapeAnchorController controller) {
+			Optional.ofNullable(controller.getAnchorSets().getIfPresent(event.getComponent()))
+					.ifPresent(as -> as.anchor(event.getComponent()));
+		}
+
+		protected void anchorOthers(UIComponentModifyShapeDescriptorBusEvent event, DefaultUIComponentShapeAnchorController controller) {
 			Optional.ofNullable(controller.getSubscribersMap().getIfPresent(event.getComponent()))
 					.map(Collection::stream)
 					.map(BaseStream::unordered)
@@ -65,40 +97,8 @@ public class DefaultUIComponentShapeAnchorController
 					});
 		}
 
-		protected final OptionalWeakReference<DefaultUIComponentShapeAnchorController> owner;
-		protected final Deque<IShapeAnchor> anchoringAnchors = new ArrayDeque<>(CapacityUtilities.INITIAL_CAPACITY_MEDIUM);
-		protected boolean anchoringSelf = false;
-
-		protected ModifyShapeDescriptorObserver(DefaultUIComponentShapeAnchorController owner, Logger logger) {
-			super(logger);
-			this.owner = new OptionalWeakReference<>(owner);
-		}
-
-		@Override
-		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-		public void onNext(UIComponentBusEvent.ModifyShapeDescriptor event) {
-			super.onNext(event);
-			if (event.getStage().isPost() && !isAnchoringSelf())
-				getOwner()
-						.ifPresent(ctr -> {
-							setAnchoringSelf(true);
-							anchorSelf(event, ctr);
-							setAnchoringSelf(false);
-							anchorOthers(event, ctr);
-						});
-		}
-
-		protected boolean isAnchoringSelf() { return anchoringSelf; }
-
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 		protected Deque<IShapeAnchor> getAnchoringAnchors() { return anchoringAnchors; }
-
-		protected Optional<? extends DefaultUIComponentShapeAnchorController> getOwner() { return owner.getOptional(); }
-
-		protected void anchorSelf(UIComponentBusEvent.ModifyShapeDescriptor event, DefaultUIComponentShapeAnchorController controller) {
-			Optional.ofNullable(controller.getAnchorSets().getIfPresent(event.getComponent()))
-					.ifPresent(as -> as.anchor(event.getComponent()));
-		}
 
 		protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 

@@ -3,22 +3,25 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.ext
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUISubInfrastructure;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.events.bus.UIEventBusEntryPoint;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.events.bus.IUIMinecraftRenderEventExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.extensions.IUIExtensionMinecraftBackground;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.extensions.IUIExtensionMinecraftScreenProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.IUIViewComponentMinecraft;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.events.bus.UIViewMinecraftBusEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.events.bus.UIAbstractViewBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.mvvm.views.rendering.UIDefaultRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.extensions.core.IExtensionType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.inputs.IInputDevices;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.inputs.IInputPointerDevice;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.optionals.Optional2;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.optionals.Optional3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -80,7 +83,7 @@ public class DefaultUIExtensionMinecraftBackground
 	@OverridingMethodsMustInvokeSuper
 	public void onExtensionAdded(IUIViewComponentMinecraft<?, ?> container) {
 		super.onExtensionAdded(container);
-		UIEventBusEntryPoint.<UIViewMinecraftBusEvent.Render>getEventBus().subscribe(getRenderObserverRotator().get());
+		UIEventBusEntryPoint.<UIAbstractViewBusEvent.Render>getEventBus().subscribe(getRenderObserverRotator().get());
 	}
 
 	protected AutoCloseableRotator<RenderObserver, RuntimeException> getRenderObserverRotator() { return renderObserverRotator; }
@@ -98,7 +101,7 @@ public class DefaultUIExtensionMinecraftBackground
 
 	@OnlyIn(Dist.CLIENT)
 	public static class RenderObserver
-			extends LoggingDisposableObserver<UIViewMinecraftBusEvent.Render> {
+			extends LoggingDisposableObserver<UIAbstractViewBusEvent.Render> {
 		private final OptionalWeakReference<DefaultUIExtensionMinecraftBackground> owner;
 
 		public RenderObserver(DefaultUIExtensionMinecraftBackground owner, Logger logger) {
@@ -108,20 +111,27 @@ public class DefaultUIExtensionMinecraftBackground
 
 		@Override
 		@SubscribeEvent
-		public void onNext(@Nonnull UIViewMinecraftBusEvent.Render event) {
+		public void onNext(@Nonnull UIAbstractViewBusEvent.Render event) {
 			super.onNext(event);
 			if (event.getStage().isPre())
-				Optional2.of(getOwner().orElse(null), event.getContextView().getInputDevices().getPointerDevice().orElse(null))
+				Optional3.of(
+						() -> getOwner().orElse(null),
+						() -> IUIMinecraftRenderEventExtension.StaticHolder.getType().find(event).orElse(null),
+						() -> event.getView().getContext()
+								.map(IUIViewContext::getInputDevices)
+								.flatMap(IInputDevices::getPointerDevice)
+								.orElse(null))
 						.ifPresent(values -> {
 							DefaultUIExtensionMinecraftBackground owner = values.getValue1Nonnull();
-							IInputPointerDevice pointerDevice = values.getValue2Nonnull();
+							IUIMinecraftRenderEventExtension renderExtension = values.getValue2Nonnull();
+							IInputPointerDevice pointerDevice = values.getValue3Nonnull();
 							owner.getRendererContainer().getRenderer().ifPresent(renderer ->
 									CastUtilities.castChecked(CastUtilities.<Class<IUIViewComponentMinecraft<?, ?>>>castUnchecked(IUIViewComponent.class), event.getView())
 											.filter(evc -> owner.getContainer().filter(Predicate.isEqual(evc)).isPresent())
 											.flatMap(IUISubInfrastructure::getInfrastructure)
 											.flatMap(IUIExtensionMinecraftScreenProvider.TYPE.getValue()::find)
 											.flatMap(IUIExtensionMinecraftScreenProvider::getScreen)
-											.ifPresent(screen -> renderer.render(screen, pointerDevice.getPositionView(), event.getPartialTicks()))
+											.ifPresent(screen -> renderer.render(screen, pointerDevice.getPositionView(), renderExtension.getPartialTicks()))
 							);
 						});
 		}

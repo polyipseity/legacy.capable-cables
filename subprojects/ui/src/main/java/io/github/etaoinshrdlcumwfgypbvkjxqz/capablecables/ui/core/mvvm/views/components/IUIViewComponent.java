@@ -22,7 +22,9 @@ import java.util.function.Predicate;
 public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager<?>>
 		extends IHasBinding, IHasBindingMap, IUIView<S> {
 	static Optional<IUIComponentContext> createComponentContextWithManager(IUIViewComponent<?, ?> view) {
-		return Optional2.of(view.createComponentContext().orElse(null), view.getManager().orElse(null))
+		return Optional2.of(
+				() -> view.createComponentContext().orElse(null),
+				() -> view.getManager().orElse(null))
 				.map(values -> {
 					IUIComponentContext context = values.getValue1Nonnull();
 					IUIComponentManager<?> manager = values.getValue2Nonnull();
