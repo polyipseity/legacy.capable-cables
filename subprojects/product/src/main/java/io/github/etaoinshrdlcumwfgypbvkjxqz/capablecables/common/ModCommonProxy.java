@@ -6,7 +6,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.blo
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.inventory.ModContainerTypes;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items.ModItems;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.tileentities.ModTileEntityTypes;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.AbstractProxy;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.impl.AbstractProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;

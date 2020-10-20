@@ -1,7 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftClientUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ui.ICoordinateSystem;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.core.ICoordinateSystem;
 
 import java.awt.geom.Point2D;
 

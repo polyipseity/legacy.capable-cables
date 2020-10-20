@@ -1,11 +1,11 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.structures.IUIMouseButtonClickData;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IMouseButtonClickData;
 
 import java.util.Optional;
 
 public interface IUIEventMouse extends IUIEvent {
-	IUIMouseButtonClickData getData();
+	IMouseButtonClickData getData();
 
 	Optional<? extends IUIEventTarget> getRelatedTarget();
 }

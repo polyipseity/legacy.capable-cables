@@ -3,7 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.server;
 import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.ModCommonProxy;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.AbstractServerProxy;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.impl.AbstractServerProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;

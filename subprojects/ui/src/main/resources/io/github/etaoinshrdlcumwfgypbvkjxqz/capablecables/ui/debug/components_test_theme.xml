@@ -2,18 +2,18 @@
 <theme xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:val="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values"
        xmlns="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
-       xsi:schemaLocation="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values ../parsers/components/components_values.xsd"
+       xsi:schemaLocation="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values ../impl/parsers/components/components_values.xsd"
        xml:lang="EN">
 	<!-- SECTION using -->
 	<!-- COMMENT renderers -->
 	<using alias="renderer.component.window.debug.custom"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIMinecraftDebug$DebugUI$CustomWindowMinecraftComponentRenderer"/>
 	<using alias="renderer.extension.minecraft.background.default"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.extensions.background.UIMinecraftBackgroundExtensionDefaultBackgroundRenderer"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.extensions.background.UIMinecraftBackgroundExtensionDefaultBackgroundRenderer"/>
 	<using alias="renderer.extension.user_relocatable.previewing.minecraft"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.extensions.relocatable.UIComponentUserRelocatableMinecraftExtensionPreviewingRelocatingRenderer"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.extensions.relocatable.UIComponentUserRelocatableMinecraftExtensionPreviewingRelocatingRenderer"/>
 	<using alias="renderer.extension.user_resizable.previewing.minecraft"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.mvvm.views.components.extensions.resizable.UIComponentUserResizableMinecraftExtensionPreviewingRelocatingRenderer"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.extensions.resizable.UIComponentUserResizableMinecraftExtensionPreviewingRelocatingRenderer"/>
 
 	<!-- SECTION renderers -->
 	<renderer name="ViewBackgroundRenderer" class="renderer.extension.minecraft.background.default"/>
