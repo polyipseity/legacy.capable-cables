@@ -7,9 +7,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descrip
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptorBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeConstraint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl.UIObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
@@ -22,8 +20,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.concurrent.ConcurrentMap;
-import java.util.function.Consumer;
 
 public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 		extends IHasGenericClass.Impl<S>
@@ -32,25 +28,18 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 	private final AffineTransform transform = new AffineTransform();
 	private final Rectangle2D bounds = IShapeDescriptor.StaticHolder.getShapePlaceholder();
 	private final List<IShapeConstraint> constraints = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
-	private final ConcurrentMap<String, Consumer<?>> properties =
-			MapBuilderUtilities.newMapMakerSingleThreaded().makeMap();
 
 	protected AbstractShapeDescriptorBuilder(Class<S> genericClass) { super(genericClass); }
 
 	@Override
 	public AbstractShapeDescriptorBuilder<S> setProperty(@NonNls CharSequence key, @Nullable Object value) throws IllegalArgumentException {
-		@Nullable Consumer<?> c = getProperties().get(key.toString());
-		if (c == null)
-			throw new IllegalStateException(
-					new LogMessageBuilder()
-							.addMarkers(UIMarkers.getInstance()::getMarkerShape)
-							.addKeyValue("key", key).addKeyValue("value", value)
-							.addMessages(() -> getResourceBundle().getString("property.key.missing"))
-							.build()
-			);
-
-		c.accept(CastUtilities.castUncheckedNullable(value)); // COMMENT ClassCastException may be thrown
-		return this;
+		throw new IllegalStateException(
+				new LogMessageBuilder()
+						.addMarkers(UIMarkers.getInstance()::getMarkerShape)
+						.addKeyValue("key", key).addKeyValue("value", value)
+						.addMessages(() -> getResourceBundle().getString("property.key.missing"))
+						.build()
+		);
 	}
 
 	@Override
@@ -121,9 +110,6 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 	protected Rectangle2D getBounds() { return bounds; }
 
 	protected AffineTransform getTransform() { return transform; }
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<String, Consumer<?>> getProperties() { return properties; }
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 }

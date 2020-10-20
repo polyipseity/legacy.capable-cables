@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 public enum ModItems {
 	;
 
-	private static final DeferredRegister<Item> REGISTER = DeferredRegister.create(ForgeRegistries.ITEMS, ModConstants.getModId());
+	private static final DeferredRegister<Item> REGISTER = DeferredRegister.create(ForgeRegistries.ITEMS, ModConstants.getModID());
 
 	private static final RegistryObject<Item> WRENCH = getRegister().register("wrench", WrenchItem::new);
 

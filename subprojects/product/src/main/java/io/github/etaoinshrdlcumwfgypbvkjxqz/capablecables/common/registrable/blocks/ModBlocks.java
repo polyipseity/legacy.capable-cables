@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 public enum ModBlocks {
 	;
 
-	private static final DeferredRegister<Block> REGISTER = DeferredRegister.create(ForgeRegistries.BLOCKS, ModConstants.getModId());
+	private static final DeferredRegister<Block> REGISTER = DeferredRegister.create(ForgeRegistries.BLOCKS, ModConstants.getModID());
 
 	private static final RegistryObject<Block> CABLE = getRegister().register("cable", CableBlock::new);
 

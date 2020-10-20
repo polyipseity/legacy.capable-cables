@@ -22,8 +22,7 @@ public interface IUICacheExtension
 
 		private static final INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(IUIExtension.StaticHolder.getDefaultNamespace(), "cache");
 		@SuppressWarnings("unchecked")
-		private static final
-		Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUICacheExtension, IExtensionContainer<INamespacePrefixedString>>> TYPE =
+		private static final Registry.RegistryObject<IExtensionType<INamespacePrefixedString, IUICacheExtension, IExtensionContainer<INamespacePrefixedString>>> TYPE =
 				UIExtensionRegistry.getInstance().registerApply(getKey(), k -> new ImmutableExtensionType<>(k, (t, i) -> (Optional<? extends IUICacheExtension>) i.getExtension(t.getKey())));
 
 		public static INamespacePrefixedString getKey() {

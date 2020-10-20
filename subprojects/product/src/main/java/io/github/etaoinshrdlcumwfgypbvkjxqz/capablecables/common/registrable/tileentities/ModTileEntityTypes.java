@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 public enum ModTileEntityTypes {
 	;
 
-	private static final DeferredRegister<TileEntityType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, ModConstants.getModId());
+	private static final DeferredRegister<TileEntityType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, ModConstants.getModID());
 
 	@SuppressWarnings("unused")
 	@Nullable

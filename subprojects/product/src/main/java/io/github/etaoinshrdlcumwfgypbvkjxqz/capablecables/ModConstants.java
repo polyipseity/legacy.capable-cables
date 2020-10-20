@@ -12,7 +12,7 @@ public enum ModConstants {
 	public static final String BUILD_TYPE_STRING = "${buildType}";
 	private static final EnumBuildType BUILD_TYPE = EnumBuildType.valueOfSafe(getBuildTypeString());
 
-	public static String getModId() {
+	public static String getModID() {
 		return MOD_ID;
 	}
 

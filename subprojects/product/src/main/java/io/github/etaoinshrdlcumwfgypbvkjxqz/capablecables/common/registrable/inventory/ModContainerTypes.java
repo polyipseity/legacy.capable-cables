@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 public enum ModContainerTypes {
 	;
 
-	private static final DeferredRegister<ContainerType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.CONTAINERS, ModConstants.getModId());
+	private static final DeferredRegister<ContainerType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.CONTAINERS, ModConstants.getModID());
 
 	@SuppressWarnings("unused")
 	@Nullable

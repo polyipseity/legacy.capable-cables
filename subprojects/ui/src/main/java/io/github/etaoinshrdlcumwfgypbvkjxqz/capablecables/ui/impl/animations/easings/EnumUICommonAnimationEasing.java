@@ -2,9 +2,9 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.ea
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationEasing;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.function.DoubleUnaryOperator;
 
 import static java.lang.Math.*;
@@ -158,6 +158,6 @@ public enum EnumUICommonAnimationEasing
 	public double applyAsDouble(double x) { return getDelegate().applyAsDouble(x); }
 
 	protected IUIAnimationEasing getDelegate() {
-		return Objects.requireNonNull(delegate);
+		return AssertionUtilities.assertNonnull(delegate);
 	}
 }

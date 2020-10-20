@@ -13,6 +13,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIEv
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIEventUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIFunctionalEventListener;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultComponentContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
@@ -25,7 +26,7 @@ import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
-import java.util.EnumSet;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -47,7 +48,9 @@ public class UIButtonComponent
 	@UIMethod(METHOD_ON_ACTIVATED)
 	private final IBindingMethodSource<IUIEvent> onActivated;
 
-	private final Set<IButtonState> buttonStates = EnumSet.noneOf(IButtonState.class);
+	private final Set<IButtonState> buttonStates = Collections.newSetFromMap(
+			MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(IButtonState.values().length).makeMap()
+	);
 
 	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 	@UIComponentConstructor

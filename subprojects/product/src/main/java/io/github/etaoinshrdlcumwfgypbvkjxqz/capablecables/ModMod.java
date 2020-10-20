@@ -58,9 +58,9 @@ public final class ModMod {
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
-	public static ResourceLocation createResourceLocation(@NonNls CharSequence path) { return new ResourceLocation(ModConstants.getModId(), path.toString()); }
+	public static ResourceLocation createResourceLocation(@NonNls CharSequence path) { return new ResourceLocation(ModConstants.getModID(), path.toString()); }
 
-	public static String getNamespacePrefixedString(@NonNls CharSequence separator, @NonNls String string) { return NamespaceUtilities.getNamespacePrefixedString(separator, ModConstants.getModId(), string); }
+	public static String getNamespacePrefixedString(@NonNls CharSequence separator, @NonNls String string) { return NamespaceUtilities.getNamespacePrefixedString(separator, ModConstants.getModID(), string); }
 
 	public static ModMod getInstance() { return AssertionUtilities.assertNonnull(instance); }
 

@@ -19,7 +19,7 @@ public abstract class AbstractProxy<S>
 		implements IProxy {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(ModConfiguration.getInstance());
 	@Nullable
-	private final IProxy parent;
+	private final IProxy parent; // COMMENT we own the parent
 
 	protected AbstractProxy(@Nullable IProxy parent) {
 		this.parent = parent;
@@ -42,7 +42,7 @@ public abstract class AbstractProxy<S>
 		else if (event instanceof FMLLoadCompleteEvent)
 			ret |= processEvent(getResourceBundle().getString("event.load_complete.name"), (FMLLoadCompleteEvent) event, this::onLoadComplete);
 		else if (event instanceof FMLModIdMappingEvent)
-			ret |= processEvent(getResourceBundle().getString("event.mod_id_mapping.name"), (FMLModIdMappingEvent) event, this::onModIdMapping);
+			ret |= processEvent(getResourceBundle().getString("event.mod_id_mapping.name"), (FMLModIdMappingEvent) event, this::onModIDMapping);
 		else if (event instanceof GatherDataEvent)
 			ret |= processEvent(getResourceBundle().getString("event.gather_data.name"), (GatherDataEvent) event, this::onGatherData);
 		return ret;
@@ -84,7 +84,7 @@ public abstract class AbstractProxy<S>
 
 	protected abstract void onLoadComplete(FMLLoadCompleteEvent event);
 
-	protected abstract void onModIdMapping(FMLModIdMappingEvent event);
+	protected abstract void onModIDMapping(FMLModIdMappingEvent event);
 
 	protected abstract void onGatherData(GatherDataEvent event);
 

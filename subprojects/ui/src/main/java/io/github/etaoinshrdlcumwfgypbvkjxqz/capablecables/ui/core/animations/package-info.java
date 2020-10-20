@@ -1,4 +1,3 @@
-// TODO Core API based on animejs.com
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault

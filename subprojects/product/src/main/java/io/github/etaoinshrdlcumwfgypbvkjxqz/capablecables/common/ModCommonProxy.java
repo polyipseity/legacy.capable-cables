@@ -62,7 +62,7 @@ public final class ModCommonProxy
 	}
 
 	@Override
-	protected void onModIdMapping(FMLModIdMappingEvent event) {
+	protected void onModIDMapping(FMLModIdMappingEvent event) {
 
 	}
 

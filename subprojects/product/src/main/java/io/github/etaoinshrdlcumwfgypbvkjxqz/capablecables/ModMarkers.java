@@ -29,7 +29,7 @@ public final class ModMarkers extends MarkersTemplate {
 						getRegistryMarker(GameRegistry.findRegistry(CastUtilities.castUnchecked(registryEntry.getRegistryType()))));
 			}));
 
-	private ModMarkers() { super(ModConstants.getModId()); }
+	private ModMarkers() { super(ModConstants.getModID()); }
 
 	public static ModMarkers getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
