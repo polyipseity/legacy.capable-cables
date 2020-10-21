@@ -32,7 +32,9 @@
 						return new java.awt.Color(thisObj.getRed(), thisObj.getGreen(), thisObj.getBlue(), thisObj.getAlpha());
 					}
 
-					public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Color fromJava(java.awt.Color obj) {
+					public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Color fromJava(@javax.annotation.Nullable java.awt.Color obj) {
+						if (obj == null)
+							return null;
 						io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Color ret = new Color();
 						ret.setRed((short) obj.getRed());
 						ret.setGreen((short) obj.getGreen());

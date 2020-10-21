@@ -35,8 +35,6 @@ public enum JAXBAdapterRegistries {
 						));
 	}
 
-	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
-
 	@SuppressWarnings({"unchecked", "rawtypes", "RedundantSuppression"})
 	public static <L> Optional<? extends IDuplexFunction<L, ?>> findFromRawAdapter(L rawObject) {
 		if (rawObject instanceof JAXBElement)

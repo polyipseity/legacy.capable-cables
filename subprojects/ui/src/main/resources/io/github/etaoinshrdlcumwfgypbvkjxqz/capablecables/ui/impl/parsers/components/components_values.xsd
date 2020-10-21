@@ -34,4 +34,24 @@
 			<xs:attribute name="alpha" type="xs:unsignedByte" default="255"/>
 		</xs:complexType>
 	</xs:element>
+
+	<!-- SECTION collections -->
+
+	<!-- COMMENT Set -->
+	<xs:element name="set" nillable="true">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:any minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- COMMENT list -->
+	<xs:element name="list" nillable="true">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:any minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 </xs:schema>
