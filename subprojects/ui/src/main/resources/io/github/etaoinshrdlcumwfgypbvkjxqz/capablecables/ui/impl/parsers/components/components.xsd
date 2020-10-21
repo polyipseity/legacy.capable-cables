@@ -2,7 +2,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:ui="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
            targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
-           version="2.3.0"
+           version="2.4.0"
            xml:lang="EN">
 	<!-- SECTION ================================================== components ================================================== -->
 
