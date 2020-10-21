@@ -24,7 +24,7 @@ public final class ImmutableKeyboardKeyPressData implements IKeyboardKeyPressDat
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
-	public boolean equals(Object obj) { return ObjectUtilities.equals(this, obj, false, null, StaticHolder.getObjectVariables()); }
+	public boolean equals(Object obj) { return ObjectUtilities.equals(this, IKeyboardKeyPressData.class, obj, false, null, StaticHolder.getObjectVariables()); }
 
 	@Override
 	public ImmutableKeyboardKeyPressData clone() throws CloneNotSupportedException { return (ImmutableKeyboardKeyPressData) super.clone(); }

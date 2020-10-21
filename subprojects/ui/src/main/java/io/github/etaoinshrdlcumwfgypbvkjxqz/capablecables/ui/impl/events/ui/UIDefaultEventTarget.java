@@ -27,17 +27,17 @@ public class UIDefaultEventTarget
 		implements IUIEventTarget {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	@SuppressWarnings("UnstableApiUsage")
-	private final SetMultimap<INamespacePrefixedString, IUIEventListenerWithParameters> eventTargetListeners = MultimapBuilder
+	private final SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> eventTargetListeners = MultimapBuilder
 			.hashKeys(CapacityUtilities.getInitialCapacitySmall())
 			.linkedHashSetValues(CapacityUtilities.getInitialCapacitySmall())
 			.build();
 
 	@Override
-	public boolean addEventListener(INamespacePrefixedString type, IUIEventListener<?> listener, boolean useCapture) { return getEventTargetListeners().put(type, new IUIEventListenerWithParameters(listener, useCapture)); }
+	public boolean addEventListener(INamespacePrefixedString type, IUIEventListener<?> listener, boolean useCapture) { return getEventTargetListeners().put(type, new UIEventListenerWithParameters(listener, useCapture)); }
 
 	@Override
 	public boolean removeEventListener(INamespacePrefixedString type, IUIEventListener<?> listener, boolean useCapture) {
-		if (getEventTargetListeners().remove(type, new IUIEventListenerWithParameters(listener, useCapture))) {
+		if (getEventTargetListeners().remove(type, new UIEventListenerWithParameters(listener, useCapture))) {
 			listener.markAsRemoved();
 			return true;
 		} else
@@ -48,12 +48,12 @@ public class UIDefaultEventTarget
 	public boolean dispatchEvent(IUIEvent event) {
 		if (event.isPropagationStopped())
 			return false;
-		ImmutableList<IUIEventListenerWithParameters> listeners = ImmutableList.copyOf(getEventTargetListeners().get(event.getType()));
+		ImmutableList<UIEventListenerWithParameters> listeners = ImmutableList.copyOf(getEventTargetListeners().get(event.getType()));
 
-		Predicate<IUIEventListenerWithParameters> shouldHandle;
+		Predicate<UIEventListenerWithParameters> shouldHandle;
 		switch (event.getPhase()) {
 			case CAPTURING_PHASE:
-				shouldHandle = IUIEventListenerWithParameters::isUseCapture;
+				shouldHandle = UIEventListenerWithParameters::isUseCapture;
 				break;
 			case AT_TARGET:
 				shouldHandle = FunctionUtilities.getAlwaysTruePredicate();
@@ -73,7 +73,7 @@ public class UIDefaultEventTarget
 
 		return listeners.stream().sequential()
 				.filter(shouldHandle)
-				.map(IUIEventListenerWithParameters::getListener)
+				.map(UIEventListenerWithParameters::getListener)
 				.map(listener -> {
 					listener.accept(CastUtilities.castUnchecked(event));
 					return true;
@@ -90,19 +90,19 @@ public class UIDefaultEventTarget
 	public boolean isFocusable() { return false; }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected SetMultimap<INamespacePrefixedString, IUIEventListenerWithParameters> getEventTargetListeners() { return eventTargetListeners; }
+	protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() { return eventTargetListeners; }
 
-	public static class IUIEventListenerWithParameters {
-		private static final ImmutableList<Function<? super IUIEventListenerWithParameters, ?>> OBJECT_VARIABLES = ImmutableList.of(
-				IUIEventListenerWithParameters::getListener, IUIEventListenerWithParameters::isUseCapture);
+	public static class UIEventListenerWithParameters {
+		private static final ImmutableList<Function<? super UIEventListenerWithParameters, ?>> OBJECT_VARIABLES = ImmutableList.of(
+				UIEventListenerWithParameters::getListener, UIEventListenerWithParameters::isUseCapture);
 		@NonNls
-		private static final ImmutableMap<String, Function<? super IUIEventListenerWithParameters, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.zipKeysValues(
+		private static final ImmutableMap<String, Function<? super UIEventListenerWithParameters, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.zipKeysValues(
 				ImmutableList.of("listener", "useCapture"),
 				getObjectVariables()));
 		private final IUIEventListener<?> listener;
 		private final boolean useCapture;
 
-		public IUIEventListenerWithParameters(IUIEventListener<?> listener, boolean useCapture) {
+		public UIEventListenerWithParameters(IUIEventListener<?> listener, boolean useCapture) {
 			this.listener = listener;
 			this.useCapture = useCapture;
 		}
@@ -110,7 +110,7 @@ public class UIDefaultEventTarget
 		@Override
 		public int hashCode() { return ObjectUtilities.hashCode(this, null, getObjectVariables()); }
 
-		public static ImmutableList<Function<? super IUIEventListenerWithParameters, ?>> getObjectVariables() { return OBJECT_VARIABLES; }
+		public static ImmutableList<Function<? super UIEventListenerWithParameters, ?>> getObjectVariables() { return OBJECT_VARIABLES; }
 
 		@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 		@Override
@@ -119,7 +119,7 @@ public class UIDefaultEventTarget
 		@Override
 		public String toString() { return ObjectUtilities.toString(this, super::toString, getObjectVariablesMap()); }
 
-		public static ImmutableMap<String, Function<? super IUIEventListenerWithParameters, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
+		public static ImmutableMap<String, Function<? super UIEventListenerWithParameters, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
 
 		public IUIEventListener<?> getListener() { return listener; }
 

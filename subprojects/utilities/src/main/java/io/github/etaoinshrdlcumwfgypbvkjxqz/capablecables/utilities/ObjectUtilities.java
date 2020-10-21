@@ -22,15 +22,20 @@ public enum ObjectUtilities {
 
 	private static final IntSupplier HASH_CODE_SUPER_METHOD_DEFAULT = () -> 1;
 
-	@SuppressWarnings({"ObjectEquality", "UnstableApiUsage"})
+	@SuppressWarnings("unchecked")
 	public static <T> boolean equals(T self, @Nullable Object other, boolean acceptSubclasses, @Nullable Predicate<? super Object> superMethod, Iterable<? extends Function<? super T, ?>> variables) {
+		return equals(self, ((Class<T>) self.getClass()), other, acceptSubclasses, superMethod, variables);
+	}
+
+	@SuppressWarnings({"ObjectEquality", "UnstableApiUsage"})
+	public static <T> boolean equals(T self, Class<T> referenceClazz, @Nullable Object other, boolean acceptSubclasses, @Nullable Predicate<? super Object> superMethod, Iterable<? extends Function<? super T, ?>> variables) {
 		if (self == other)
 			return true;
 		if (acceptSubclasses) {
-			if (!self.getClass().isInstance(other))
+			if (!referenceClazz.isInstance(other))
 				return false;
 		} else {
-			if (other == null || !self.getClass().equals(other.getClass()))
+			if (other == null || !referenceClazz.equals(other.getClass()))
 				return false;
 		}
 		if (superMethod != null && !superMethod.test(other))

@@ -37,7 +37,7 @@ public final class ImmutableNamespacePrefixedString
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
-	public boolean equals(Object obj) { return ObjectUtilities.equals(this, obj, false, null, StaticHolder.getObjectVariables()); }
+	public boolean equals(Object obj) { return ObjectUtilities.equals(this, INamespacePrefixedString.class, obj, false, null, StaticHolder.getObjectVariables()); }
 
 	@Override
 	public String toString() { return ObjectUtilities.toString(this, super::toString, StaticHolder.getObjectVariablesMap()); }

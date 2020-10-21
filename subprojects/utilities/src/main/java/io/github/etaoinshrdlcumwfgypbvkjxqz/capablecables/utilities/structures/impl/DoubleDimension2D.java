@@ -12,10 +12,10 @@ import java.io.Serializable;
 import java.util.function.Function;
 
 public class DoubleDimension2D extends Dimension2D implements Serializable {
-	private static final ImmutableList<Function<? super DoubleDimension2D, ?>> OBJECT_VARIABLES = ImmutableList.of(
-			DoubleDimension2D::getWidth, DoubleDimension2D::getHeight);
+	private static final ImmutableList<Function<? super Dimension2D, ?>> OBJECT_VARIABLES = ImmutableList.of(
+			Dimension2D::getWidth, Dimension2D::getHeight);
 	@NonNls
-	private static final ImmutableMap<String, Function<? super DoubleDimension2D, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.zipKeysValues(
+	private static final ImmutableMap<String, Function<? super Dimension2D, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.zipKeysValues(
 			ImmutableList.of("width", "height"),
 			getObjectVariables()));
 	private static final long serialVersionUID = 4432299344969417136L;
@@ -33,7 +33,7 @@ public class DoubleDimension2D extends Dimension2D implements Serializable {
 		return ObjectUtilities.hashCode(this, null, getObjectVariables());
 	}
 
-	public static ImmutableList<Function<? super DoubleDimension2D, ?>> getObjectVariables() { return OBJECT_VARIABLES; }
+	public static ImmutableMap<String, Function<? super Dimension2D, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
 
 	@Override
 	public double getWidth() { return width; }
@@ -47,11 +47,11 @@ public class DoubleDimension2D extends Dimension2D implements Serializable {
 		this.height = height;
 	}
 
-	public static ImmutableMap<String, Function<? super DoubleDimension2D, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
-
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
-	public boolean equals(Object obj) { return ObjectUtilities.equals(this, obj, true, null, getObjectVariables()); }
+	public boolean equals(Object obj) { return ObjectUtilities.equals(this, Dimension2D.class, obj, true, null, getObjectVariables()); }
+
+	public static ImmutableList<Function<? super Dimension2D, ?>> getObjectVariables() { return OBJECT_VARIABLES; }
 
 	@Override
 	public String toString() { return ObjectUtilities.toString(this, super::toString, getObjectVariablesMap()); }
