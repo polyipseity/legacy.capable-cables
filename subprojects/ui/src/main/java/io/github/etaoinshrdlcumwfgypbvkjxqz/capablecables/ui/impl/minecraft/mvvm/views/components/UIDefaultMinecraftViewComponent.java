@@ -22,6 +22,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.eve
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.MiscellaneousUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer3;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftOpenGLUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EventBusUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
@@ -105,6 +106,7 @@ public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUICompo
 										event -> IExtensionContainer.addExtensionChecked(event,
 												UIImmutableMinecraftRenderEventExtension.of(partialTicks))))
 				);
+		MinecraftOpenGLUtilities.Stacks.clearAll();
 	}
 
 	@SuppressWarnings("RedundantTypeArguments")
