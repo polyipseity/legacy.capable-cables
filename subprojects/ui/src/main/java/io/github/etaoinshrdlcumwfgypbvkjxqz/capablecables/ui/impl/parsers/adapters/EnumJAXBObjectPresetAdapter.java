@@ -3,38 +3,42 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapt
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.JAXBAdapterRegistries;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IDuplexFunction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableTuple2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.Registry;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.Serializable;
-import java.util.Map;
 
 public enum EnumJAXBObjectPresetAdapter
-		implements Map.Entry<Class<?>, Registry.RegistryObject<IDuplexFunction<?, ?>>> {
+		implements ITuple2<Class<?>, Registry.RegistryObject<IDuplexFunction<?, ?>>> {
 	;
 
-	private final Class<?> key;
-	private final Registry.RegistryObject<IDuplexFunction<?, ?>> value;
+	private final ITuple2<Class<?>, Registry.RegistryObject<IDuplexFunction<?, ?>>> delegate;
 
 	<L, V extends IDuplexFunction<L, ?> & Serializable> EnumJAXBObjectPresetAdapter(Class<L> key, V value) {
-		this.key = key;
-		this.value = CastUtilities.castUnchecked(JAXBAdapterRegistries.Object.getInstance().registerSafe(key, value));
+		Registry.RegistryObject<IDuplexFunction<?, ?>> value2 = CastUtilities.castUnchecked(JAXBAdapterRegistries.Object.getInstance().registerSafe(key, value));
+		this.delegate = ImmutableTuple2.of(key, value2);
 	}
 
 	@SuppressWarnings("EmptyMethod")
 	public static void initializeClass() {}
 
-	@Nonnull
 	@Override
-	public Class<?> getKey() { return key; }
+	public Class<?> getLeft() {
+		return getDelegate().getLeft();
+	}
 
-	@Nonnull
-	@Override
-	public Registry.RegistryObject<IDuplexFunction<?, ?>> getValue() { return value; }
+	protected ITuple2<Class<?>, Registry.RegistryObject<IDuplexFunction<?, ?>>> getDelegate() {
+		return delegate;
+	}
 
-	@Nullable
 	@Override
-	public Registry.RegistryObject<IDuplexFunction<?, ?>> setValue(Registry.RegistryObject<IDuplexFunction<?, ?>> value)
-			throws UnsupportedOperationException { throw new UnsupportedOperationException(); }
+	public Registry.RegistryObject<IDuplexFunction<?, ?>> getRight() {
+		return getDelegate().getRight();
+	}
+
+	@Override
+	public Object get(int index) throws IndexOutOfBoundsException {
+		return getDelegate().get(index);
+	}
 }

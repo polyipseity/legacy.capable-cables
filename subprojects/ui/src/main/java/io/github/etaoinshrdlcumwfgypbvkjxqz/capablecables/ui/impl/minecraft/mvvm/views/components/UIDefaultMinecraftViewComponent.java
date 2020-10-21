@@ -62,11 +62,11 @@ public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUICompo
 												IUIComponentMinecraft component = (IUIComponentMinecraft) result.getComponent();
 												IUIComponentModifier.streamSpecificModifiersUnion(result.getModifiersView(), IUIComponentRendererInvokerModifier.class)
 														.forEachOrdered(modifier -> {
-															assert modifier.getKey() != null;
-															assert modifier.getValue() != null;
-															EnumModifyStage.PRE.advanceModifyStage(modifier.getKey());
-															modifier.getValue().invokeRenderer(componentContext); // COMMENT pre
-															modifier.getKey().resetModifyStage();
+															IUIComponentModifier left = modifier.getLeft();
+															IUIComponentRendererInvokerModifier right = modifier.getRight();
+															EnumModifyStage.PRE.advanceModifyStage(left);
+															right.invokeRenderer(componentContext); // COMMENT pre
+															left.resetModifyStage();
 														});
 												component.getRendererContainer().getRenderer()
 														.ifPresent(renderer -> {
@@ -88,11 +88,11 @@ public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUICompo
 												});
 												IUIComponentModifier.streamSpecificModifiersUnion(result.getModifiersView(), IUIComponentRendererInvokerModifier.class)
 														.forEachOrdered(modifier -> {
-															assert modifier.getKey() != null;
-															assert modifier.getValue() != null;
-															EnumModifyStage.POST.advanceModifyStage(modifier.getKey());
-															modifier.getValue().invokeRenderer(componentContext); // COMMENT post
-															modifier.getKey().resetModifyStage();
+															IUIComponentModifier left = modifier.getLeft();
+															IUIComponentRendererInvokerModifier right = modifier.getRight();
+															EnumModifyStage.POST.advanceModifyStage(left);
+															right.invokeRenderer(componentContext); // COMMENT post
+															left.resetModifyStage();
 														});
 											},
 											component -> component.isVisible() && component instanceof IUIComponentMinecraft);

@@ -1,10 +1,11 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.controls;
 
-import com.google.common.collect.Maps;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationEasing;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.easings.EnumUICommonAnimationEasing;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IFunction3;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableTuple2;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
@@ -29,7 +30,7 @@ public enum UIAnimationControlUtilities {
 	}
 
 	public static IFunction3<IUIAnimationTarget, Integer, Integer, Double, RuntimeException> stagger(double from, double to, Map<String, Object> options) {
-		return stagger(Maps.immutableEntry(from, to), options);
+		return stagger(ImmutableTuple2.of(from, to), options);
 	}
 
 	private static IFunction3<IUIAnimationTarget, Integer, Integer, Double, RuntimeException> stagger(Object value, Map<String, Object> options)
@@ -98,10 +99,10 @@ public enum UIAnimationControlUtilities {
 			double interval;
 			if (value instanceof Number) {
 				interval = ((Number) value).doubleValue();
-			} else if (value instanceof Map.Entry) {
-				Map.Entry<?, ?> tuple = (Map.Entry<?, ?>) value;
-				double from = assertNonnull((Double) tuple.getKey());
-				double to = assertNonnull((Double) tuple.getValue());
+			} else if (value instanceof ITuple2) {
+				ITuple2<?, ?> tuple = (ITuple2<?, ?>) value;
+				double from = assertNonnull((Double) tuple.getLeft());
+				double to = assertNonnull((Double) tuple.getRight());
 				interval = (to - from) / maxDiff;
 			} else
 				throw new IllegalArgumentException();

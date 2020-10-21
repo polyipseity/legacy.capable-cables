@@ -11,7 +11,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtil
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.ManualLoadingCache;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingBiFunction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinding;
@@ -54,25 +54,20 @@ public class DefaultBinder
 	public boolean bind(Iterable<? extends IBinding<?>> bindings)
 			throws NoSuchBindingTransformerException {
 		return sortAndTrimBindings(bindings).entrySet().stream().unordered()
-				.reduce(false,
-						IThrowingBiFunction.executeNow((r, e) -> {
-							assert e != null;
-							LoadingCache<INamespacePrefixedString, IBindings<?>> bs = getBindings().getUnchecked(AssertionUtilities.assertNonnull(e.getKey()));
-							return AssertionUtilities.assertNonnull(e.getValue()).asMap().entrySet().stream().sequential() // COMMENT sequential, field binding order matters
-									.reduce(false,
-											IThrowingBiFunction.
-													<Boolean, Map.Entry<INamespacePrefixedString, ? extends Collection<? extends IBinding<?>>>, Boolean,
-															NoSuchBindingTransformerException>
-															executeNow((r2, e2) -> {
-														assert r2 != null;
-														assert e2 != null;
-														return bs.getUnchecked(AssertionUtilities.assertNonnull(e2.getKey()))
-																.add(CastUtilities.castUnchecked( // COMMENT should be of the right type
-																		AssertionUtilities.assertNonnull(e2.getValue()))) || r2;
-													}),
-											Boolean::logicalOr);
-						}),
-						Boolean::logicalOr);
+				.map(IThrowingFunction.executeNow(typeEntry -> {
+					assert typeEntry != null;
+					LoadingCache<INamespacePrefixedString, IBindings<?>> typeBindings = getBindings().getUnchecked(AssertionUtilities.assertNonnull(typeEntry.getKey()));
+					return AssertionUtilities.assertNonnull(typeEntry.getValue()).asMap().entrySet().stream().sequential() // COMMENT sequential, field binding order matters
+							.map(IThrowingFunction.<Map.Entry<INamespacePrefixedString, ? extends Collection<? extends IBinding<?>>>, Boolean,
+									NoSuchBindingTransformerException>executeNow(entry -> {
+								assert entry != null;
+								return typeBindings.getUnchecked(AssertionUtilities.assertNonnull(entry.getKey()))
+										.add(CastUtilities.castUnchecked( // COMMENT should be of the right type
+												AssertionUtilities.assertNonnull(entry.getValue())));
+							}))
+							.reduce(false, Boolean::logicalOr);
+				}))
+				.reduce(false, Boolean::logicalOr);
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
@@ -94,17 +89,16 @@ public class DefaultBinder
 	@Override
 	public boolean unbind(Iterable<? extends IBinding<?>> bindings) {
 		boolean ret = sortAndTrimBindings(bindings).entrySet().stream().unordered()
-				.reduce(false,
-						(r, e) -> {
-							LoadingCache<INamespacePrefixedString, IBindings<?>> bs = getBindings().getUnchecked(AssertionUtilities.assertNonnull(e.getKey()));
-							return AssertionUtilities.assertNonnull(e.getValue()).asMap().entrySet().stream().sequential() // COMMENT sequential, field binding order matters
-									.reduce(false,
-											(r2, e2) -> bs.getUnchecked(AssertionUtilities.assertNonnull(e2.getKey()))
-													.remove(CastUtilities.castUnchecked( // COMMENT should be of the right type
-															AssertionUtilities.assertNonnull(e2.getValue()))) || r2,
-											Boolean::logicalOr);
-						},
-						Boolean::logicalOr);
+				.map(typeEntry -> {
+					LoadingCache<INamespacePrefixedString, IBindings<?>> typeBindings = getBindings().getUnchecked(AssertionUtilities.assertNonnull(typeEntry.getKey()));
+					return AssertionUtilities.assertNonnull(typeEntry.getValue()).asMap().entrySet().stream().sequential() // COMMENT sequential, field binding order matters
+							.map(entry ->
+									typeBindings.getUnchecked(AssertionUtilities.assertNonnull(entry.getKey()))
+											.remove(CastUtilities.castUnchecked( // COMMENT should be of the right type
+													AssertionUtilities.assertNonnull(entry.getValue()))))
+							.reduce(false, Boolean::logicalOr);
+				})
+				.reduce(false, Boolean::logicalOr);
 		if (ret)
 			getBindings().cleanUp();
 		return ret;
@@ -133,20 +127,17 @@ public class DefaultBinder
 	@Override
 	public boolean unbindAll(Set<IBinding.EnumBindingType> types) {
 		boolean ret = types.stream().unordered()
-				.reduce(false,
-						(r, t) -> Optional.ofNullable(getBindings().getIfPresent(t))
-								.filter(bs -> !bs.asMap().isEmpty())
-								.filter(bs -> {
-									boolean ret2 = bs.asMap().values().stream().unordered()
-											.reduce(false,
-													(r2, b) -> b.removeAll() || r,
-													Boolean::logicalOr);
-									bs.invalidateAll();
-									return ret2;
-								})
-								.isPresent()
-								|| r,
-						Boolean::logicalOr);
+				.map(getBindings()::getIfPresent)
+				.filter(Objects::nonNull)
+				.filter(typeBindings -> !typeBindings.asMap().isEmpty())
+				.map(typeBindings -> {
+					boolean ret2 = typeBindings.asMap().values().stream().unordered()
+							.map(IBindings::removeAll)
+							.reduce(false, Boolean::logicalOr);
+					typeBindings.invalidateAll();
+					return ret2;
+				})
+				.reduce(false, Boolean::logicalOr);
 		if (ret)
 			getBindings().cleanUp();
 		return ret;
