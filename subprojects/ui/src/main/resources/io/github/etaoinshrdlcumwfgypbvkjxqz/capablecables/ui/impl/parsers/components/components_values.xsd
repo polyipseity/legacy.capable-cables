@@ -46,7 +46,7 @@
 		</xs:complexType>
 	</xs:element>
 
-	<!-- COMMENT list -->
+	<!-- COMMENT List -->
 	<xs:element name="list" nillable="true">
 		<xs:complexType>
 			<xs:sequence>

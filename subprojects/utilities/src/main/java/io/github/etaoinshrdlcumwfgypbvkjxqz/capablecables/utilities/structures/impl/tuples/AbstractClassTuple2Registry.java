@@ -30,6 +30,7 @@ public abstract class AbstractClassTuple2Registry<V>
 	public <VL extends V> RegistryObject<VL> register(ITuple2<Class<?>, Class<?>> key, VL value) {
 		RegistryObject<VL> ret = super.register(key, value);
 		// COMMENT it will throw if it is not replaceable
+		// TODO what if it is repeated
 		getLeftMap().put(key.getLeft(), key);
 		getRightMap().put(key.getRight(), key);
 		return ret;

@@ -1,5 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.resizable;
 
+import com.google.common.collect.ImmutableSet;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.cursors.ICursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
@@ -13,6 +15,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.eve
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIComponentRendererInvokerModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.binding.UIProperty;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.cursors.EnumGLFWCursor;
@@ -23,7 +26,11 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.Enum
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IField;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl.UIObjectUtilities;
@@ -40,14 +47,36 @@ import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public class UITeleportingComponentUserResizableExtension<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, E>
 		implements IUIComponentUserResizableExtension<E> {
+	@NonNls
+	public static final String PROPERTY_ACTIVATION_MOUSE_BUTTONS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.extension.user_resizable.activation.mouse";
+	private static final INamespacePrefixedString PROPERTY_ACTIVATION_MOUSE_BUTTONS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyActivationMouseButtons());
+	@UIProperty(PROPERTY_ACTIVATION_MOUSE_BUTTONS)
+	private final IBindingField<Set<Integer>> activationMouseButtons;
+
+	@SuppressWarnings("unchecked")
+	@UIExtensionConstructor
+	public UITeleportingComponentUserResizableExtension(UIExtensionConstructor.IArguments arguments) {
+		super(IUIComponent.class, (Class<E>) arguments.getContainerClass());
+
+		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
+		this.activationMouseButtons = IUIPropertyMappingValue.createBindingField(CastUtilities.castUnchecked(Set.class), false,
+				ImmutableSet.of(GLFW.GLFW_MOUSE_BUTTON_LEFT), mappings.get(getPropertyActivationMouseButtonsLocation()));
+	}
+
+	public static INamespacePrefixedString getPropertyActivationMouseButtonsLocation() {
+		return PROPERTY_ACTIVATION_MOUSE_BUTTONS_LOCATION;
+	}
+
 	public static final int RESIZE_BORDER_THICKNESS_DEFAULT = 10;
 	private final int resizeBorderThickness = getResizeBorderThicknessDefault(); // TODO make this a property and strategy or something like that
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
@@ -58,10 +87,12 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 	@Nullable
 	private Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier;
 
-	@SuppressWarnings("unchecked")
-	@UIExtensionConstructor
-	public UITeleportingComponentUserResizableExtension(UIExtensionConstructor.IArguments arguments) {
-		super(IUIComponent.class, (Class<E>) arguments.getContainerClass());
+	public static String getPropertyActivationMouseButtons() {
+		return PROPERTY_ACTIVATION_MOUSE_BUTTONS;
+	}
+
+	protected IBindingField<Set<Integer>> getActivationMouseButtons() {
+		return activationMouseButtons;
 	}
 
 	public static int getResizeBorderThicknessDefault() {
@@ -163,6 +194,9 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 		private final Object lockObject = new Object();
 		private boolean beingHovered = false;
 
+		@Nullable
+		private Integer activeMouseButton;
+
 		@SuppressWarnings({"OverridableMethodCallDuringObjectConstruction", "rawtypes", "RedundantSuppression"})
 		protected Modifier(UITeleportingComponentUserResizableExtension<?> owner) {
 			super(IShapeDescriptor.StaticHolder.getShapeDescriptorPlaceholder());
@@ -171,21 +205,36 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 			addEventListener(EnumUIEventDOMType.MOUSE_ENTER.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> setBeingHovered(true)), false);
 			addEventListener(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> setBeingHovered(false)), false);
 			addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> {
-				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && startResizeMaybe(evt.getViewContext(), evt.getData().getCursorPositionView())) { // todo custom
+				if (!getActiveMouseButton().isPresent()) {
+					int button = evt.getData().getButton();
 					getOwner()
+							.filter(owner2 -> IField.getValueNonnull(owner2.getActivationMouseButtons()).contains(button))
+							.filter(owner2 -> startResizeMaybe(evt.getViewContext(), evt.getData().getCursorPositionView()))
 							.flatMap(owner2 -> owner2.getContainer()) // TODO Java 9 - IllegalAccessError now, make method ref
 							.ifPresent(c -> {
-								c.getParent()
-										.ifPresent(p -> p.moveChildToTop(c));
+								c.getParent().ifPresent(p ->
+										p.moveChildToTop(c));
 								c.moveModifierToTop(this);
+								setActiveMouseButton(button);
+								evt.stopPropagation();
 							});
-					evt.stopPropagation();
 				}
 			}), false);
 			addEventListener(EnumUIEventDOMType.MOUSE_UP.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> {
-				if (evt.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT && finishResizeMaybe(evt.getViewContext(), evt.getData().getCursorPositionView()))
+				if (getActiveMouseButton().filter(Predicate.isEqual(evt.getData().getButton())).isPresent()
+						&& finishResizeMaybe(evt.getViewContext(), evt.getData().getCursorPositionView())) {
 					evt.stopPropagation();
+					setActiveMouseButton(null);
+				}
 			}), false);
+		}
+
+		protected Optional<Integer> getActiveMouseButton() {
+			return Optional.ofNullable(activeMouseButton);
+		}
+
+		protected void setActiveMouseButton(@Nullable Integer activeMouseButton) {
+			this.activeMouseButton = activeMouseButton;
 		}
 
 		@SuppressWarnings({"rawtypes", "RedundantSuppression"})

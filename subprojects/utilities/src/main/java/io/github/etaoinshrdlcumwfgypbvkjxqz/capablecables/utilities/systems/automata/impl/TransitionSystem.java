@@ -72,7 +72,7 @@ public class TransitionSystem<S extends IState<D>, E, D>
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
-	public boolean equals(Object obj) { return ObjectUtilities.equals(this, CastUtilities.<Class<ITransitionSystem<?, ?, ?>>>castUnchecked(ITransitionSystem.class), obj, false, null, StaticHolder.getObjectVariables()); }
+	public boolean equals(Object obj) { return ObjectUtilities.equals(this, CastUtilities.<Class<ITransitionSystem<?, ?, ?>>>castUnchecked(ITransitionSystem.class), obj, true, null, StaticHolder.getObjectVariables()); }
 
 	@Override
 	public String toString() { return ObjectUtilities.toString(this, super::toString, StaticHolder.getObjectVariablesMap()); }

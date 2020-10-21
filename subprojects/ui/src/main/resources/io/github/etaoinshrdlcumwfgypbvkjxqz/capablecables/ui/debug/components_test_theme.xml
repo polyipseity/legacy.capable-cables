@@ -2,7 +2,6 @@
 <theme xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:val="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values"
        xmlns="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
-       xsi:schemaLocation="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values ../impl/parsers/components/components_values.xsd"
        xml:lang="EN">
 	<!-- SECTION using -->
 	<!-- COMMENT renderers -->

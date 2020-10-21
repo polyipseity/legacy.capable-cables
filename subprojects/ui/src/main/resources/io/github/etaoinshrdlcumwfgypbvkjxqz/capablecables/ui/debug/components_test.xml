@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <ui xmlns="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation=""
+    xmlns:val="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values"
     xml:lang="EN">
 	<!-- SECTION using -->
 
@@ -46,6 +45,12 @@
 			<renderer-container name="Window1Renderer"/>
 
 			<extension class="extension.user_relocatable">
+				<property key="default:component.extension.user_relocatable.activation.mouse">
+					<val:set>
+						<val:int>1</val:int><!-- COMMENT right -->
+						<val:int>2</val:int><!-- COMMENT middle -->
+					</val:set>
+				</property>
 				<renderer-container name="Window1ExtensionRelocatableRenderer"/>
 			</extension>
 			<extension class="extension.user_resizable">

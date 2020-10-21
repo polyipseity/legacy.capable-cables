@@ -5,7 +5,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.ID
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableTuple2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.RegistryObject;
-import jakarta.xml.bind.JAXBElement;
 
 import java.io.Serializable;
 
@@ -16,8 +15,8 @@ public enum EnumJAXBObjectPresetAdapter
 
 	private final ITuple2<ITuple2<? extends Class<?>, ? extends Class<?>>, RegistryObject<? extends IDuplexFunction<?, ?>>> delegate;
 
-	<L, R, V extends IDuplexFunction<JAXBElement<L>, R> & Serializable> EnumJAXBObjectPresetAdapter(ITuple2<? extends Class<L>, ? extends Class<R>> key, V value) {
-		RegistryObject<V> value2 = JAXBAdapterRegistries.Element.getInstance().registerChecked(ITuple2.upcast(key), value);
+	<L, R, V extends IDuplexFunction<L, R> & Serializable> EnumJAXBObjectPresetAdapter(ITuple2<? extends Class<L>, ? extends Class<R>> key, V value) {
+		RegistryObject<V> value2 = JAXBAdapterRegistries.Object.getInstance().registerChecked(ITuple2.upcast(key), value);
 		this.delegate = ImmutableTuple2.of(key, value2);
 	}
 
