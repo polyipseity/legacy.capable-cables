@@ -13,26 +13,29 @@
 	<using alias="renderer.extension.user_relocatable.previewing.minecraft"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.extensions.relocatable.UIComponentUserRelocatableMinecraftExtensionPreviewingRelocatingRenderer"/>
 	<using alias="renderer.extension.user_resizable.previewing.minecraft"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.extensions.resizable.UIComponentUserResizableMinecraftExtensionPreviewingRelocatingRenderer"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.extensions.resizable.UIComponentUserResizableMinecraftExtensionPreviewingResizingRenderer"/>
 
 	<!-- SECTION renderers -->
 	<renderer name="ViewBackgroundRenderer" class="renderer.extension.minecraft.background.default"/>
 
 	<renderer name="Window1Renderer" class="renderer.component.window.debug.custom">
-		<property key="default:window.colors.border">
+		<property key="default:component.window.color.border">
 			<val:color green="128"/>
 		</property>
 	</renderer>
 
 	<renderer name="Window1ExtensionRelocatableRenderer"
 	          class="renderer.extension.user_relocatable.previewing.minecraft">
+		<property key="default:component.extension.user_relocatable.renderer.previewing.color.preview">
+			<val:color green="128"/>
+		</property>
 	</renderer>
 
 	<renderer name="Window1ExtensionResizableRenderer"
 	          class="renderer.extension.user_resizable.previewing.minecraft"/>
 
 	<renderer name="WindowAnchoredRenderer">
-		<property key="default:window.colors.border" bindingKey="default:anchoredWindowBorderColor"/>
+		<property key="default:component.window.color.border" bindingKey="default:anchoredWindowBorderColor"/>
 	</renderer>
 
 	<renderer name="WindowAnchoredExtensionRelocatableRenderer"
@@ -42,7 +45,7 @@
 	          class="renderer.extension.user_resizable.previewing.minecraft"/>
 
 	<renderer name="Button1Renderer">
-		<property key="default:button.colors.hovering">
+		<property key="default:component.button.color.hovering">
 			<val:color xsi:nil="true"/>
 		</property>
 	</renderer>

@@ -72,17 +72,17 @@ public class UIMinecraftButtonComponent
 	public static class DefaultRenderer<C extends UIMinecraftButtonComponent>
 			extends UIDefaultMinecraftComponentRenderer<C> {
 		@NonNls
-		public static final String PROPERTY_COLOR_BASE = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "button.colors.base";
+		public static final String PROPERTY_COLOR_BASE = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.button.color.base";
 		@NonNls
-		public static final String PROPERTY_COLOR_BASE_BORDER = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "button.colors.base.border";
+		public static final String PROPERTY_COLOR_BASE_BORDER = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.button.color.base.border";
 		@NonNls
-		public static final String PROPERTY_COLOR_HOVERING = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "button.colors.hovering";
+		public static final String PROPERTY_COLOR_HOVERING = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.button.color.hovering";
 		@NonNls
-		public static final String PROPERTY_COLOR_HOVERING_BORDER = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "button.colors.hovering.border";
+		public static final String PROPERTY_COLOR_HOVERING_BORDER = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.button.color.hovering.border";
 		@NonNls
-		public static final String PROPERTY_COLOR_PRESSED = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "button.colors.pressed";
+		public static final String PROPERTY_COLOR_PRESSED = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.button.color.pressed";
 		@NonNls
-		public static final String PROPERTY_COLOR_PRESSED_BORDER = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "button.colors.pressed.border";
+		public static final String PROPERTY_COLOR_PRESSED_BORDER = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.button.color.pressed.border";
 
 		private static final INamespacePrefixedString PROPERTY_COLOR_BASE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorBase());
 		private static final INamespacePrefixedString PROPERTY_COLOR_BASE_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorBaseBorder());

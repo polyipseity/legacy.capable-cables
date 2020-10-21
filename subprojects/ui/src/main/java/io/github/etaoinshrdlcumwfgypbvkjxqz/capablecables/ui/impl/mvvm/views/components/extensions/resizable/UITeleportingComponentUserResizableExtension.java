@@ -90,7 +90,7 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 	@Override
 	public void initializeRendererContainer(@NonNls CharSequence name)
 			throws IllegalStateException {
-		IUIRendererContainer<IResizingRenderer> rendererContainer = new UIDefaultRendererContainer<>(name, this, CastUtilities.castUnchecked(UIComponentUserResizeableExtensionEmptyRelocatingRenderer.class));
+		IUIRendererContainer<IResizingRenderer> rendererContainer = new UIDefaultRendererContainer<>(name, this, CastUtilities.castUnchecked(UIComponentUserResizeableExtensionEmptyResizingRenderer.class));
 		if (!getRendererContainerReference().compareAndSet(null, rendererContainer))
 			throw new IllegalStateException();
 		getBinderObserverSupplier().ifPresent(rendererContainer::initializeBindings);

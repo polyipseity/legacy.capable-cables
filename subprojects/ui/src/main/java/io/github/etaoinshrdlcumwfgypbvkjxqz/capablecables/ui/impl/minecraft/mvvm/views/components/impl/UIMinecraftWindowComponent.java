@@ -72,9 +72,9 @@ public class UIMinecraftWindowComponent
 	public static class DefaultRenderer<C extends UIMinecraftWindowComponent>
 			extends UIDefaultMinecraftComponentRenderer<C> {
 		@NonNls
-		public static final String PROPERTY_COLOR_BACKGROUND = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "window.colors.background";
+		public static final String PROPERTY_COLOR_BACKGROUND = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.window.color.background";
 		@NonNls
-		public static final String PROPERTY_COLOR_BORDER = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "window.colors.border";
+		public static final String PROPERTY_COLOR_BORDER = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.window.color.border";
 
 		private static final INamespacePrefixedString PROPERTY_COLOR_BACKGROUND_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorBackground());
 		private static final INamespacePrefixedString PROPERTY_COLOR_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorBorder());

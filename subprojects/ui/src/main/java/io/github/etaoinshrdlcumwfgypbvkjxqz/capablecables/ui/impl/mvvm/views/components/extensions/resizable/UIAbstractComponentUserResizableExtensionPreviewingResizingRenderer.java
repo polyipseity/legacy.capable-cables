@@ -9,9 +9,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.grap
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-public abstract class UIAbstractComponentUserResizableExtensionPreviewingRelocatingRenderer
-		extends UIAbstractComponentUserResizeableExtensionRelocatingRenderer {
-	public UIAbstractComponentUserResizableExtensionPreviewingRelocatingRenderer(UIRendererConstructor.IArguments arguments) {
+public abstract class UIAbstractComponentUserResizableExtensionPreviewingResizingRenderer
+		extends UIAbstractComponentUserResizeableExtensionResizingRenderer {
+	public UIAbstractComponentUserResizableExtensionPreviewingResizingRenderer(UIRendererConstructor.IArguments arguments) {
 		super(arguments);
 	}
 

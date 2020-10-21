@@ -1,7 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 public final class ConstantSupplier<T>
@@ -12,18 +13,14 @@ public final class ConstantSupplier<T>
 
 	protected ConstantSupplier() { this.constant = null; }
 
-	protected ConstantSupplier(T constant) { this.constant = Objects.requireNonNull(constant); }
+	protected ConstantSupplier(T constant) { this.constant = AssertionUtilities.assertNonnull(constant); }
 
-	public static <T> ConstantSupplier<T> ofNullable(@Nullable T constant) { return constant == null ? empty() : of(constant); }
+	public static <T> ConstantSupplier<T> of(@Nullable T constant) { return constant == null ? getEmpty() : new ConstantSupplier<>(constant); }
 
 	@SuppressWarnings("unchecked")
-	public static <T> ConstantSupplier<T> empty() {
-		return (ConstantSupplier<T>) getEmpty(); // COMMENT always safe, returns null
+	public static <T> ConstantSupplier<T> getEmpty() {
+		return (ConstantSupplier<T>) EMPTY; // COMMENT always safe, returns null
 	}
-
-	private static ConstantSupplier<?> getEmpty() { return EMPTY; }
-
-	public static <T> ConstantSupplier<T> of(T constant) { return new ConstantSupplier<>(constant); }
 
 	@Override
 	@Nullable

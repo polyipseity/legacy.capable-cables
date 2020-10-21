@@ -1,11 +1,11 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.extensions.relocatable;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.extensions.resizable;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.binding.UIProperty;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.utilities.MinecraftDrawingUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.relocatable.UIAbstractComponentUserRelocatableExtensionPreviewingRelocatingRenderer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.resizable.UIAbstractComponentUserResizableExtensionPreviewingResizingRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
@@ -19,21 +19,22 @@ import java.awt.geom.Rectangle2D;
 import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
-public class UIComponentUserRelocatableMinecraftExtensionPreviewingRelocatingRenderer
-		extends UIAbstractComponentUserRelocatableExtensionPreviewingRelocatingRenderer {
+public class UIComponentUserResizableMinecraftExtensionPreviewingResizingRenderer
+		extends UIAbstractComponentUserResizableExtensionPreviewingResizingRenderer {
 	@NonNls
-	public static final String PROPERTY_PREVIEW_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.extension.user_relocatable.renderer.previewing.color.preview";
+	public static final String PROPERTY_PREVIEW_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.extension.user_resizable.renderer.previewing.color.preview";
 	private static final INamespacePrefixedString PROPERTY_PREVIEW_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyPreviewColor());
 
 	@UIProperty(PROPERTY_PREVIEW_COLOR)
 	private final IBindingField<Color> previewColor;
 
 	@UIRendererConstructor
-	public UIComponentUserRelocatableMinecraftExtensionPreviewingRelocatingRenderer(UIRendererConstructor.IArguments arguments) {
+	public UIComponentUserResizableMinecraftExtensionPreviewingResizingRenderer(UIRendererConstructor.IArguments arguments) {
 		super(arguments);
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-		this.previewColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY, mappings.get(getPropertyPreviewColorLocation()));
+		this.previewColor =
+				IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY, mappings.get(getPropertyPreviewColorLocation()));
 	}
 
 	public static INamespacePrefixedString getPropertyPreviewColorLocation() { return PROPERTY_PREVIEW_COLOR_LOCATION; }

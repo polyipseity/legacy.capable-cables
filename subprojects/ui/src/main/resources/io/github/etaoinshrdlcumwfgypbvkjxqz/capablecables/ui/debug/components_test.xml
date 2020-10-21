@@ -68,8 +68,8 @@
 			</extension>
 
 			<component class="component.button" name="Button1">
-				<property key="default:button.methods.activate" bindingKey="default:buttonOnActivate"/>
-				<property key="default:button.methods.activated" bindingKey="default:buttonOnActivated"/>
+				<property key="default:component.button.methods.activate" bindingKey="default:buttonOnActivate"/>
+				<property key="default:component.button.methods.activated" bindingKey="default:buttonOnActivated"/>
 
 				<shape class="shape.ellipse" width="100" height="100">
 					<affineTransformDefiner>

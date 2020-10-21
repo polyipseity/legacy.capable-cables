@@ -4,10 +4,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRenderer;
 
-public abstract class UIAbstractComponentUserResizeableExtensionRelocatingRenderer
+public abstract class UIAbstractComponentUserResizeableExtensionResizingRenderer
 		extends UIDefaultRenderer<IUIComponentUserResizableExtension<?>>
 		implements IUIComponentUserResizableExtension.IResizingRenderer {
-	public UIAbstractComponentUserResizeableExtensionRelocatingRenderer(UIRendererConstructor.IArguments arguments) {
+	public UIAbstractComponentUserResizeableExtensionResizingRenderer(UIRendererConstructor.IArguments arguments) {
 		super(arguments);
 	}
 }

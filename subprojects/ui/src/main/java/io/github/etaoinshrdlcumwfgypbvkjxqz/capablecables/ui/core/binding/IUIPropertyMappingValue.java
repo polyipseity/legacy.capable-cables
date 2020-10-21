@@ -15,7 +15,7 @@ public interface IUIPropertyMappingValue {
 	                                               boolean nullable,
 	                                               @Nullable T defaultValue,
 	                                               @Nullable IUIPropertyMappingValue mapping) {
-		return createBindingField(clazz, nullable, ConstantSupplier.ofNullable(defaultValue), mapping);
+		return createBindingField(clazz, nullable, ConstantSupplier.of(defaultValue), mapping);
 	}
 
 	static <T> IBindingField<T> createBindingField(Class<T> clazz,
@@ -32,7 +32,7 @@ public interface IUIPropertyMappingValue {
 								? m // COMMENT has mapping
 								.flatMap(IUIPropertyMappingValue::getDefaultValue)
 								.map(clazz::cast)
-								.orElseGet(nullable ? ConstantSupplier.empty() : defaultValue)
+								.orElseGet(nullable ? ConstantSupplier.getEmpty() : defaultValue)
 								: defaultValue.get()));
 	}
 

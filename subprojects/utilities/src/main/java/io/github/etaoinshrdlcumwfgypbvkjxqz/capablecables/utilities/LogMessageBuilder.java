@@ -14,7 +14,7 @@ public class LogMessageBuilder {
 	private final List<Supplier<?>> arguments = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 	private final Map<String, Supplier<?>> keyValuePairs = new HashMap<>(CapacityUtilities.getInitialCapacitySmall());
 
-	public LogMessageBuilder addKeyValue(@NonNls CharSequence key, @Nullable Object value) { return addKeyValue(key, ConstantSupplier.ofNullable(value)); }
+	public LogMessageBuilder addKeyValue(@NonNls CharSequence key, @Nullable Object value) { return addKeyValue(key, ConstantSupplier.of(value)); }
 
 	public LogMessageBuilder addKeyValue(@NonNls CharSequence key, Supplier<?> value) {
 		getKeyValuePairs().put(key.toString(), value);
@@ -27,7 +27,7 @@ public class LogMessageBuilder {
 	public LogMessageBuilder addMarkers(Object... markers) {
 		return addMarkers(
 				Arrays.stream(markers).sequential()
-						.map(ConstantSupplier::ofNullable)
+						.map(ConstantSupplier::of)
 						.toArray(Supplier[]::new));
 	}
 
@@ -42,7 +42,7 @@ public class LogMessageBuilder {
 	public LogMessageBuilder addMessages(Object... messages) {
 		return addMessages(
 				Arrays.stream(messages).sequential()
-						.map(ConstantSupplier::ofNullable)
+						.map(ConstantSupplier::of)
 						.toArray(Supplier[]::new));
 	}
 
@@ -60,7 +60,7 @@ public class LogMessageBuilder {
 	public LogMessageBuilder addArguments(Object... arguments) {
 		return addArguments(
 				Arrays.stream(arguments).sequential()
-						.map(ConstantSupplier::ofNullable)
+						.map(ConstantSupplier::of)
 						.toArray(Supplier[]::new));
 	}
 
