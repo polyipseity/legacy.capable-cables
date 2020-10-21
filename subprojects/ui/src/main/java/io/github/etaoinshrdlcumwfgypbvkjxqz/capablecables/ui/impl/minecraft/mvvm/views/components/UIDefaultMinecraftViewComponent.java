@@ -20,7 +20,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.util
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIAbstractViewBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.MiscellaneousUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftOpenGLUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
@@ -99,10 +99,10 @@ public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUICompo
 									cropMethod.disable();
 									return true;
 								},
-								MiscellaneousUtilities.act(new UIAbstractViewBusEvent.Render(EnumHookStage.PRE, this),
+								FunctionUtilities.accept(new UIAbstractViewBusEvent.Render(EnumHookStage.PRE, this),
 										event -> IExtensionContainer.addExtensionChecked(event,
 												UIImmutableMinecraftRenderEventExtension.of(partialTicks))),
-								MiscellaneousUtilities.act(new UIAbstractViewBusEvent.Render(EnumHookStage.POST, this),
+								FunctionUtilities.accept(new UIAbstractViewBusEvent.Render(EnumHookStage.POST, this),
 										event -> IExtensionContainer.addExtensionChecked(event,
 												UIImmutableMinecraftRenderEventExtension.of(partialTicks))))
 				);

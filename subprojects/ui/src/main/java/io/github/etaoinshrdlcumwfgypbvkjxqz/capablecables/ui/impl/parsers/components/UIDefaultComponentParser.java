@@ -271,7 +271,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		return Streams.stream(properties).unordered()
 				.map(p -> Maps.immutableEntry(ImmutableNamespacePrefixedString.of(p.getKey()),
 						new UIImmutablePropertyMappingValue(p.getAny()
-								.map(value -> JAXBAdapterRegistries.getAdapter(value).leftToRight(value))
+								.map(value -> JAXBAdapterRegistries.getFromRawAdapter(value).leftToRight(value))
 								.orElse(null),
 								p.getBindingKey()
 										.map(ImmutableNamespacePrefixedString::of)
@@ -315,7 +315,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 				.forEach(p -> {
 					assert !p.getBindingKey().isPresent();
 					sdb.setProperty(p.getKey(), p.getAny()
-							.map(value -> JAXBAdapterRegistries.getAdapter(value).leftToRight(value))
+							.map(value -> JAXBAdapterRegistries.getFromRawAdapter(value).leftToRight(value))
 							.orElse(null));
 				});
 

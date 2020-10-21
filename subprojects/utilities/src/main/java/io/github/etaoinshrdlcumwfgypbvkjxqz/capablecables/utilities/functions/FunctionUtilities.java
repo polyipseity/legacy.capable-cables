@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions;
 
+import javax.annotation.Nullable;
 import java.util.function.*;
 
 public enum FunctionUtilities {
@@ -44,4 +45,14 @@ public enum FunctionUtilities {
 	}
 
 	public static Predicate<Boolean> getPredicateIdentity() { return PREDICATE_IDENTITY; }
+
+	public static <T> T accept(T t, Consumer<? super T> action) {
+		action.accept(t);
+		return t;
+	}
+
+	@Nullable
+	public static <T, R> R apply(T t, Function<? super T, ? extends R> action) {
+		return action.apply(t);
+	}
 }

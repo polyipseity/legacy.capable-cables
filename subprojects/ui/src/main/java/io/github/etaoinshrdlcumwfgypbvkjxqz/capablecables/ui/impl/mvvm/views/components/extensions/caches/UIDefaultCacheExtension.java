@@ -14,12 +14,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIAbstractComponentHierarchyChangeBusEvent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CleanerUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ConcurrencyUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheLoaderLoadedNullException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -29,7 +27,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.even
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.Registry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.RegistryObject;
 import net.minecraftforge.eventbus.api.EventPriority;
 import sun.misc.Cleaner;
 
@@ -68,49 +66,51 @@ public class UIDefaultCacheExtension
 		;
 
 		@SuppressWarnings({"ThisEscapedInObjectConstruction", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
-		private static final Registry.RegistryObject<IUICacheType<IUIComponentManager<?>, IUIComponent>> MANAGER =
-				UICacheRegistry.getInstance().registerApply(IUICacheType.generateKey("manager"),
-						key -> new UIAbstractCacheType<IUIComponentManager<?>, IUIComponent>(key) {
-							{
-								OptionalWeakReference<? extends IUICacheType<?, IUIComponent>> thisRef =
-										new OptionalWeakReference<>(this);
-								Cleaner.create(CleanerUtilities.getCleanerReferent(this),
-										new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
-												new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
-														new FunctionalEventBusDisposableObserver<>(
-																new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
-																event -> {
-																	if (event.getStage().isPost())
+		private static final RegistryObject<IUICacheType<IUIComponentManager<?>, IUIComponent>> MANAGER =
+				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("manager"),
+						key -> UICacheRegistry.getInstance().register(key,
+								new UIAbstractCacheType<IUIComponentManager<?>, IUIComponent>(key) {
+									{
+										OptionalWeakReference<? extends IUICacheType<?, IUIComponent>> thisRef =
+												new OptionalWeakReference<>(this);
+										Cleaner.create(CleanerUtilities.getCleanerReferent(this),
+												new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
+														new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
+																new FunctionalEventBusDisposableObserver<>(
+																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
+																		event -> {
+																			if (event.getStage().isPost())
 																		thisRef.getOptional().ifPresent(t ->
 																				t.invalidate(event.getComponent()));
 																}
 														),
 														UIConfiguration.getInstance().getLogger()
-												) {}
-										)::dispose);
-							}
+														) {}
+												)::dispose);
+									}
 
-							@Override
-							protected IUIComponentManager<?> load(IUIComponent container)
-									throws CacheLoaderLoadedNullException {
-								return IUIComponent.getYoungestParentInstanceOf(container, IUIComponentManager.class)
-										.orElseThrow(CacheLoaderLoadedNullException::new);
-							}
-						});
+									@Override
+									protected IUIComponentManager<?> load(IUIComponent container)
+											throws CacheLoaderLoadedNullException {
+										return IUIComponent.getYoungestParentInstanceOf(container, IUIComponentManager.class)
+												.orElseThrow(CacheLoaderLoadedNullException::new);
+									}
+								})));
 		@SuppressWarnings({"ThisEscapedInObjectConstruction", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
-		private static final Registry.RegistryObject<IUICacheType<Integer, IUIComponent>> Z =
-				UICacheRegistry.getInstance().registerApply(IUICacheType.generateKey("z"),
-						key -> new UIAbstractCacheType<Integer, IUIComponent>(key) {
-							{
-								OptionalWeakReference<? extends IUICacheType<?, IUIComponent>> thisRef =
-										new OptionalWeakReference<>(this);
-								Cleaner.create(CleanerUtilities.getCleanerReferent(this),
-										new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
-												new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
-														new FunctionalEventBusDisposableObserver<>(
-																new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
-																event -> {
-																	if (event.getStage().isPost())
+		private static final RegistryObject<IUICacheType<Integer, IUIComponent>> Z =
+				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("z"),
+						key -> UICacheRegistry.getInstance().register(key,
+								new UIAbstractCacheType<Integer, IUIComponent>(key) {
+									{
+										OptionalWeakReference<? extends IUICacheType<?, IUIComponent>> thisRef =
+												new OptionalWeakReference<>(this);
+										Cleaner.create(CleanerUtilities.getCleanerReferent(this),
+												new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
+														new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
+																new FunctionalEventBusDisposableObserver<>(
+																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
+																		event -> {
+																			if (event.getStage().isPost())
 																		thisRef.getOptional().ifPresent(t ->
 																				t.invalidate(event.getComponent()));
 																}
@@ -127,18 +127,18 @@ public class UIDefaultCacheExtension
 									IUICacheType.invalidateChildrenImpl((IUIComponentContainer) container, this);
 							}
 
-							@Override
-							protected Integer load(IUIComponent container) {
-								// COMMENT 0 counts container already
-								return Iterators.size(new IUIComponent.ParentIterator(container.getParent().orElse(null)));
-							}
-						});
+									@Override
+									protected Integer load(IUIComponent container) {
+										// COMMENT 0 counts container already
+										return Iterators.size(new IUIComponent.ParentIterator(container.getParent().orElse(null)));
+									}
+								})));
 
-		public static Registry.RegistryObject<IUICacheType<IUIComponentManager<?>, IUIComponent>> getManager() {
+		public static RegistryObject<IUICacheType<IUIComponentManager<?>, IUIComponent>> getManager() {
 			return MANAGER;
 		}
 
-		public static Registry.RegistryObject<IUICacheType<Integer, IUIComponent>> getZ() {
+		public static RegistryObject<IUICacheType<Integer, IUIComponent>> getZ() {
 			return Z;
 		}
 	}

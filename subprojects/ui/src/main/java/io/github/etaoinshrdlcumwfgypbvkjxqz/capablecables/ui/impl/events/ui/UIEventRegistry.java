@@ -5,21 +5,28 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ConcurrencyUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.Registry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.AbstractRegistry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.RegistryObject;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
-public final class UIEventRegistry extends Registry<INamespacePrefixedString, Class<? extends IUIEvent>> {
+public final class UIEventRegistry extends AbstractRegistry<INamespacePrefixedString, Class<? extends IUIEvent>> {
 	private static final Supplier<UIEventRegistry> INSTANCE = Suppliers.memoize(UIEventRegistry::new);
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
+	private static final long serialVersionUID = 321572769828882690L;
 
 	protected UIEventRegistry() {
-		super(false, UIConfiguration.getInstance().getLogger());
+		super(false, UIConfiguration.getInstance().getLogger(),
+				builder -> builder
+						.concurrencyLevel(ConcurrencyUtilities.getNormalThreadThreadCount())
+						.initialCapacity(CapacityUtilities.getInitialCapacityMedium()));
 	}
 
 	public static void checkEvent(IUIEvent event)

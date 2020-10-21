@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.naming;
 
 import com.google.common.collect.MapMaker;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamed;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.ConcurrentMap;
@@ -13,9 +14,7 @@ public class ConcurrentConfigurableNamedTracker<E extends INamed>
 	private final ConcurrentMap<String, E> data;
 
 	public ConcurrentConfigurableNamedTracker(Consumer<? super MapMaker> configuration) {
-		MapMaker dataBuilder = new MapMaker();
-		configuration.accept(dataBuilder);
-		this.data = dataBuilder.makeMap();
+		this.data = FunctionUtilities.accept(new MapMaker(), configuration).makeMap();
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")

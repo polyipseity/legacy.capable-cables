@@ -9,14 +9,15 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.regi
 
 import java.io.Serializable;
 
+@SuppressWarnings("unused")
 public enum EnumJAXBObjectPresetAdapter
-		implements ITuple2<Class<?>, Registry.RegistryObject<IDuplexFunction<?, ?>>> {
+		implements ITuple2<ITuple2<? extends Class<?>, ? extends Class<?>>, RegistryObject<? extends IDuplexFunction<?, ?>>> {
 	;
 
-	private final ITuple2<Class<?>, Registry.RegistryObject<IDuplexFunction<?, ?>>> delegate;
+	private final ITuple2<ITuple2<? extends Class<?>, ? extends Class<?>>, RegistryObject<? extends IDuplexFunction<?, ?>>> delegate;
 
-	<L, V extends IDuplexFunction<L, ?> & Serializable> EnumJAXBObjectPresetAdapter(Class<L> key, V value) {
-		Registry.RegistryObject<IDuplexFunction<?, ?>> value2 = CastUtilities.castUnchecked(JAXBAdapterRegistries.Object.getInstance().registerSafe(key, value));
+	<L, R, V extends IDuplexFunction<JAXBElement<L>, R> & Serializable> EnumJAXBObjectPresetAdapter(ITuple2<? extends Class<L>, ? extends Class<R>> key, V value) {
+		RegistryObject<V> value2 = JAXBAdapterRegistries.Element.getInstance().registerChecked(ITuple2.upcast(key), value);
 		this.delegate = ImmutableTuple2.of(key, value2);
 	}
 
@@ -24,16 +25,16 @@ public enum EnumJAXBObjectPresetAdapter
 	public static void initializeClass() {}
 
 	@Override
-	public Class<?> getLeft() {
+	public ITuple2<? extends Class<?>, ? extends Class<?>> getLeft() {
 		return getDelegate().getLeft();
 	}
 
-	protected ITuple2<Class<?>, Registry.RegistryObject<IDuplexFunction<?, ?>>> getDelegate() {
+	protected ITuple2<? extends ITuple2<? extends Class<?>, ? extends Class<?>>, ? extends RegistryObject<? extends IDuplexFunction<?, ?>>> getDelegate() {
 		return delegate;
 	}
 
 	@Override
-	public Registry.RegistryObject<IDuplexFunction<?, ?>> getRight() {
+	public RegistryObject<? extends IDuplexFunction<?, ?>> getRight() {
 		return getDelegate().getRight();
 	}
 

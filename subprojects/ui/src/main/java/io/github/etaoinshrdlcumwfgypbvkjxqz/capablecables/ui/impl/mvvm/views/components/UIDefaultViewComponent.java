@@ -24,10 +24,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.paths.UIDefaultComponentPathResolver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIAbstractComponentHierarchyChangeBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.theming.UIArrayThemeStack;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CleanerUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.TreeUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer3;
@@ -38,7 +35,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.i
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.Registry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.RegistryObject;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.eventbus.api.EventPriority;
 import sun.misc.Cleaner;
@@ -227,19 +224,20 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 		;
 
 		@SuppressWarnings({"ThisEscapedInObjectConstruction", "rawtypes", "RedundantSuppression", "unchecked", "AnonymousInnerClassMayBeStatic"})
-		private static final Registry.RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
-				UICacheRegistry.getInstance().registerApply(IUICacheType.generateKey("children_flat"),
-						key -> new UIAbstractCacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
-							{
-								OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
-										new OptionalWeakReference<>(this);
-								Cleaner.create(CleanerUtilities.getCleanerReferent(this),
-										new AutoSubscribingCompositeDisposable<>(
-												UIEventBusEntryPoint.getEventBus(),
-												new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
-														new FunctionalEventBusDisposableObserver<>(
-																new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
-																event -> {
+		private static final RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
+				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("children_flat"),
+						key -> UICacheRegistry.getInstance().register(key,
+								new UIAbstractCacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
+									{
+										OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
+												new OptionalWeakReference<>(this);
+										Cleaner.create(CleanerUtilities.getCleanerReferent(this),
+												new AutoSubscribingCompositeDisposable<>(
+														UIEventBusEntryPoint.getEventBus(),
+														new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
+																new FunctionalEventBusDisposableObserver<>(
+																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
+																		event -> {
 																	if (event.getStage().isPost())
 																		thisRef.getOptional()
 																				.ifPresent(t -> event.getComponent().getManager()
@@ -263,31 +261,32 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 										)::dispose);
 							}
 
-							@Override
-							protected List<IUIComponent> load(IUIViewComponent<?, ?> container) {
-								List<IUIComponent> ret = new ArrayList<>(CapacityUtilities.getInitialCapacityLarge());
-								container.getManager()
-										.ifPresent(manager ->
-												TreeUtilities.<IUIComponent, Object>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, manager,
-														ret::add,
-														IUIComponent::getChildNodes, null, null));
-								return ImmutableList.copyOf(ret);
-							}
-						});
+									@Override
+									protected List<IUIComponent> load(IUIViewComponent<?, ?> container) {
+										List<IUIComponent> ret = new ArrayList<>(CapacityUtilities.getInitialCapacityLarge());
+										container.getManager()
+												.ifPresent(manager ->
+														TreeUtilities.<IUIComponent, Object>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, manager,
+																ret::add,
+																IUIComponent::getChildNodes, null, null));
+										return ImmutableList.copyOf(ret);
+									}
+								})));
 		@SuppressWarnings({"UnstableApiUsage", "ThisEscapedInObjectConstruction", "rawtypes", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
-		private static final Registry.RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
-				UICacheRegistry.getInstance().registerApply(IUICacheType.generateKey("children_flat.focusable"),
-						key -> new UIAbstractCacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
-							{
-								OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
-										new OptionalWeakReference<>(this);
-								Cleaner.create(CleanerUtilities.getCleanerReferent(this),
-										new AutoSubscribingCompositeDisposable<>(
-												UIEventBusEntryPoint.getEventBus(),
-												new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
-														new FunctionalEventBusDisposableObserver<>(
-																new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
-																event -> {
+		private static final RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
+				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("children_flat.focusable"),
+						key -> UICacheRegistry.getInstance().register(key,
+								new UIAbstractCacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
+									{
+										OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
+												new OptionalWeakReference<>(this);
+										Cleaner.create(CleanerUtilities.getCleanerReferent(this),
+												new AutoSubscribingCompositeDisposable<>(
+														UIEventBusEntryPoint.getEventBus(),
+														new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
+																new FunctionalEventBusDisposableObserver<>(
+																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
+																		event -> {
 																	if (event.getStage().isPost())
 																		thisRef.getOptional()
 																				.ifPresent(t -> event.getComponent().getManager()
@@ -308,22 +307,22 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 																}),
 														UIConfiguration.getInstance().getLogger()
 												) {}
-										)::dispose);
-							}
+												)::dispose);
+									}
 
-							@Override
-							protected List<IUIComponent> load(IUIViewComponent<?, ?> container) {
-								return container.getChildrenFlatView().stream().sequential()
-										.filter(IUIComponent::isFocusable)
-										.collect(ImmutableList.toImmutableList());
-							}
-						});
+									@Override
+									protected List<IUIComponent> load(IUIViewComponent<?, ?> container) {
+										return container.getChildrenFlatView().stream().sequential()
+												.filter(IUIComponent::isFocusable)
+												.collect(ImmutableList.toImmutableList());
+									}
+								})));
 
-		public static Registry.RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> getChildrenFlat() {
+		public static RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> getChildrenFlat() {
 			return CHILDREN_FLAT;
 		}
 
-		public static Registry.RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> getChildrenFlatFocusable() {
+		public static RegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> getChildrenFlatFocusable() {
 			return CHILDREN_FLAT_FOCUSABLE;
 		}
 	}

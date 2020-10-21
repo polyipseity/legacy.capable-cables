@@ -7,9 +7,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptorBuilderFactory;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ConcurrencyUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.RegistryWithDefaults;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.AbstractRegistryWithDefaults;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.RegistryObject;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 
 import java.util.Map;
@@ -17,18 +20,22 @@ import java.util.ResourceBundle;
 import java.util.function.Supplier;
 
 public final class ShapeDescriptorBuilderFactoryRegistry
-		extends RegistryWithDefaults<INamespacePrefixedString, IShapeDescriptorBuilderFactory> {
+		extends AbstractRegistryWithDefaults<INamespacePrefixedString, IShapeDescriptorBuilderFactory> {
 	private static final Supplier<ShapeDescriptorBuilderFactoryRegistry> INSTANCE = Suppliers.memoize(ShapeDescriptorBuilderFactoryRegistry::new);
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	private static final ImmutableMap<INamespacePrefixedString, Supplier<RegistryObject<? extends IShapeDescriptorBuilderFactory>>> DEFAULTS_SUPPLIER = ImmutableMap.<INamespacePrefixedString, Supplier<RegistryObject<? extends IShapeDescriptorBuilderFactory>>>builder()
 			.put(DefaultShapeDescriptorBuilderFactory.getDefaultFactoryKey(), () -> new RegistryObject<>(new DefaultShapeDescriptorBuilderFactory()))
 			.build();
+	private static final long serialVersionUID = 6379579158201410218L;
 
 	private final Map<INamespacePrefixedString, RegistryObject<? extends IShapeDescriptorBuilderFactory>> defaults =
 			ImmutableMap.copyOf(Maps.transformValues(getDefaultsSupplier(), Supplier::get));
 
 	private ShapeDescriptorBuilderFactoryRegistry() {
-		super(true, UIConfiguration.getInstance().getLogger());
+		super(true, UIConfiguration.getInstance().getLogger(),
+				builder -> builder
+						.concurrencyLevel(ConcurrencyUtilities.getNormalThreadThreadCount())
+						.initialCapacity(CapacityUtilities.getInitialCapacitySmall()));
 	}
 
 	public static DefaultShapeDescriptorBuilderFactory getDefaultFactory() {

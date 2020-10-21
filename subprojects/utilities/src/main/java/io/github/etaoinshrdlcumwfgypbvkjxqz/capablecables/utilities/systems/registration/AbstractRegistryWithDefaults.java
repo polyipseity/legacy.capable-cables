@@ -1,13 +1,19 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration;
 
+import com.google.common.collect.MapMaker;
 import org.slf4j.Logger;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
-public abstract class RegistryWithDefaults<K, V>
-		extends Registry<K, V> {
-	protected RegistryWithDefaults(@SuppressWarnings("SameParameterValue") boolean overrideable, Logger logger) { super(overrideable, logger); }
+public abstract class AbstractRegistryWithDefaults<K, V>
+		extends AbstractRegistry<K, V> {
+	private static final long serialVersionUID = -7624033031861891802L;
+
+	protected AbstractRegistryWithDefaults(@SuppressWarnings("SameParameterValue") boolean overrideable, Logger logger, Consumer<? super MapMaker> configuration) {
+		super(overrideable, logger, configuration);
+	}
 
 	@Override
 	public Optional<? extends RegistryObject<? extends V>> get(K key) {

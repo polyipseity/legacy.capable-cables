@@ -8,9 +8,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descrip
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.NoSuchShapeDescriptorBuilderException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.descriptors.builders.RectangularShapeDescriptorBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ConcurrencyUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.RegistryWithDefaults;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.AbstractRegistryWithDefaults;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.RegistryObject;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
@@ -19,7 +22,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class DefaultShapeDescriptorBuilderFactory
-		extends RegistryWithDefaults<Class<? extends Shape>, Supplier<? extends IShapeDescriptorBuilder<?>>>
+		extends AbstractRegistryWithDefaults<Class<? extends Shape>, Supplier<? extends IShapeDescriptorBuilder<?>>>
 		implements IShapeDescriptorBuilderFactory {
 	private static final INamespacePrefixedString DEFAULT_FACTORY_KEY = ImmutableNamespacePrefixedString.of(StaticHolder.getDefaultNamespace(), "default");
 	private static final ImmutableMap<Class<? extends Shape>, Supplier<RegistryObject<Supplier<? extends IShapeDescriptorBuilder<?>>>>> DEFAULTS_SUPPLIER =
@@ -27,10 +30,16 @@ public class DefaultShapeDescriptorBuilderFactory
 					.put(Rectangle2D.class, () -> new RegistryObject<>(RectangularShapeDescriptorBuilder.Rectangle2DSD::new))
 					.put(Ellipse2D.class, () -> new RegistryObject<>(RectangularShapeDescriptorBuilder.Ellipse2DSD::new))
 					.build();
+	private static final long serialVersionUID = -7885480361684661050L;
 	private final ImmutableMap<Class<? extends Shape>, RegistryObject<? extends Supplier<? extends IShapeDescriptorBuilder<?>>>> defaults =
 			ImmutableMap.copyOf(Maps.transformValues(getDefaultsSupplier(), Supplier::get));
 
-	public DefaultShapeDescriptorBuilderFactory() { super(true, UIConfiguration.getInstance().getLogger()); }
+	public DefaultShapeDescriptorBuilderFactory() {
+		super(true, UIConfiguration.getInstance().getLogger(),
+				builder -> builder
+						.concurrencyLevel(ConcurrencyUtilities.getNormalThreadThreadCount())
+						.initialCapacity(CapacityUtilities.getInitialCapacityMedium()));
+	}
 
 	protected static ImmutableMap<Class<? extends Shape>, Supplier<RegistryObject<Supplier<? extends IShapeDescriptorBuilder<?>>>>> getDefaultsSupplier() { return DEFAULTS_SUPPLIER; }
 

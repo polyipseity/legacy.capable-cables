@@ -1,10 +1,11 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration;
 
+import com.google.common.collect.MapMaker;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
@@ -14,12 +15,13 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
-public abstract class Registry<K, V> {
+public abstract class AbstractRegistry<K, V>
+		implements Serializable {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
+	private static final long serialVersionUID = 8593887271997933205L;
 	private final Marker marker = UtilitiesMarkers.getInstance().getClassMarker(getClass());
 
 	public <VL extends V> RegistryObject<VL> register(K key, VL value) {
@@ -47,16 +49,15 @@ public abstract class Registry<K, V> {
 		return AssertionUtilities.assertNonnull(retRef.get());
 	}
 
-	private final ConcurrentMap<K, RegistryObject<? extends V>> data = MapBuilderUtilities.newMapMakerNormalThreaded().makeMap();
+	private final ConcurrentMap<K, RegistryObject<? extends V>> data;
 	private final boolean overridable;
 	private final Logger logger;
 
-	protected Registry(boolean overridable, Logger logger) {
+	protected AbstractRegistry(boolean overridable, Logger logger, Consumer<? super MapMaker> configuration) {
 		this.overridable = overridable;
 		this.logger = logger;
+		this.data = FunctionUtilities.accept(new MapMaker(), configuration).makeMap();
 	}
-
-	public <VL extends V> RegistryObject<VL> registerApply(K key, Function<? super K, ? extends VL> value) { return register(key, AssertionUtilities.assertNonnull(value.apply(key))); }
 
 	public Marker getMarker() { return marker; }
 
@@ -78,21 +79,5 @@ public abstract class Registry<K, V> {
 		return getData().values().stream().unordered()
 				.map(RegistryObject::getValue)
 				.anyMatch(Predicate.isEqual(value));
-	}
-
-	public static final class RegistryObject<V>
-			implements Serializable, Supplier<V> {
-		private static final long serialVersionUID = -7426757514591663232L;
-		@SuppressWarnings("NonSerializableFieldInSerializableClass")
-		private V value;
-
-		public RegistryObject(V value) { this.value = value;}
-
-		public V getValue() { return value; }
-
-		protected void setValue(V value) { this.value = value; }
-
-		@Override
-		public V get() { return getValue(); }
 	}
 }
