@@ -33,13 +33,17 @@ public interface IShapeAnchorSet {
 	enum StaticHolder {
 		;
 
-		private static final @Immutable Map<EnumUISide, ImmutableSet<EnumUISide>> EXCLUSIVE_SIDES_MAP = ImmutableMap.<EnumUISide, ImmutableSet<EnumUISide>>builder()
-				.put(EnumUISide.UP, Sets.immutableEnumSet(EnumUISide.VERTICAL))
-				.put(EnumUISide.DOWN, Sets.immutableEnumSet(EnumUISide.VERTICAL))
-				.put(EnumUISide.VERTICAL, Sets.immutableEnumSet(EnumUISide.UP, EnumUISide.DOWN))
-				.put(EnumUISide.LEFT, Sets.immutableEnumSet(EnumUISide.HORIZONTAL))
-				.put(EnumUISide.RIGHT, Sets.immutableEnumSet(EnumUISide.HORIZONTAL))
-				.put(EnumUISide.HORIZONTAL, Sets.immutableEnumSet(EnumUISide.LEFT, EnumUISide.RIGHT)).build();
+		@SuppressWarnings("UnstableApiUsage")
+		private static final @Immutable Map<EnumUISide, ImmutableSet<EnumUISide>> EXCLUSIVE_SIDES_MAP = Maps.immutableEnumMap(
+				ImmutableMap.<EnumUISide, ImmutableSet<EnumUISide>>builder()
+						.put(EnumUISide.UP, Sets.immutableEnumSet(EnumUISide.VERTICAL))
+						.put(EnumUISide.DOWN, Sets.immutableEnumSet(EnumUISide.VERTICAL))
+						.put(EnumUISide.VERTICAL, Sets.immutableEnumSet(EnumUISide.UP, EnumUISide.DOWN))
+						.put(EnumUISide.LEFT, Sets.immutableEnumSet(EnumUISide.HORIZONTAL))
+						.put(EnumUISide.RIGHT, Sets.immutableEnumSet(EnumUISide.HORIZONTAL))
+						.put(EnumUISide.HORIZONTAL, Sets.immutableEnumSet(EnumUISide.LEFT, EnumUISide.RIGHT))
+						.build()
+		);
 
 		public static @Immutable Map<EnumUISide, ImmutableSet<EnumUISide>> getExclusiveSidesMap() {
 			return EXCLUSIVE_SIDES_MAP;

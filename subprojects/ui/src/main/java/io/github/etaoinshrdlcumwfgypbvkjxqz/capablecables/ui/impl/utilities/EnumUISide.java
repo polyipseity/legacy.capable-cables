@@ -14,6 +14,7 @@ import java.util.function.ToDoubleFunction;
 
 @Immutable
 public enum EnumUISide {
+	// COMMENT 'setFrameFromDiagonal' has a useful side effect of ensuring that width and height are always non-negative
 	UP {
 		@Override
 		public EnumUIAxis getAxis() { return EnumUIAxis.Y; }
@@ -31,7 +32,7 @@ public enum EnumUISide {
 		public ObjDoubleConsumer<RectangularShape> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), i, r.getMaxX(), r.getMaxY()); }
 
 		@Override
-		public DoubleBinaryOperator getApplyBorder() { return Double::sum; }
+		public DoubleBinaryOperator getInwardOperator() { return Double::sum; }
 	},
 	DOWN {
 		@Override
@@ -50,7 +51,7 @@ public enum EnumUISide {
 		public ObjDoubleConsumer<RectangularShape> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), r.getY(), r.getMaxX(), i); }
 
 		@Override
-		public DoubleBinaryOperator getApplyBorder() { return (i, b) -> i - b; }
+		public DoubleBinaryOperator getInwardOperator() { return (i, b) -> i - b; }
 	},
 	LEFT {
 		@Override
@@ -69,7 +70,7 @@ public enum EnumUISide {
 		public ObjDoubleConsumer<RectangularShape> getSetter() { return (r, i) -> r.setFrameFromDiagonal(i, r.getY(), r.getMaxX(), r.getMaxY()); }
 
 		@Override
-		public DoubleBinaryOperator getApplyBorder() { return Double::sum; }
+		public DoubleBinaryOperator getInwardOperator() { return Double::sum; }
 	},
 	RIGHT {
 		@Override
@@ -88,7 +89,7 @@ public enum EnumUISide {
 		public ObjDoubleConsumer<RectangularShape> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), r.getY(), i, r.getMaxY()); }
 
 		@Override
-		public DoubleBinaryOperator getApplyBorder() { return (i, b) -> i - b; }
+		public DoubleBinaryOperator getInwardOperator() { return (i, b) -> i - b; }
 	},
 	HORIZONTAL {
 		@Override
@@ -104,7 +105,7 @@ public enum EnumUISide {
 		public ObjDoubleConsumer<RectangularShape> getSetter() { return (r, i) -> r.setFrameFromCenter(i, r.getCenterY(), r.getX() + i - r.getCenterX(), r.getY()); }
 
 		@Override
-		public DoubleBinaryOperator getApplyBorder() { return (i, b) -> i; }
+		public DoubleBinaryOperator getInwardOperator() { return (i, b) -> i; }
 	},
 	VERTICAL {
 		@Override
@@ -120,7 +121,7 @@ public enum EnumUISide {
 		public ObjDoubleConsumer<RectangularShape> getSetter() { return (r, i) -> r.setFrameFromCenter(i, r.getCenterY(), r.getX() + i - r.getCenterX(), r.getY()); }
 
 		@Override
-		public DoubleBinaryOperator getApplyBorder() { return (i, b) -> i; }
+		public DoubleBinaryOperator getInwardOperator() { return (i, b) -> i; }
 	};
 
 	@SuppressWarnings("UnstableApiUsage")
@@ -129,6 +130,12 @@ public enum EnumUISide {
 		return Arrays.stream(EnumUISide.values()).unordered()
 				.filter(side -> side.isMouseOver(rectangular, mouse))
 				.collect(Sets.toImmutableEnumSet());
+	}
+
+	private static final @Immutable Set<EnumUISide> EDGES = Sets.immutableEnumSet(UP, DOWN, LEFT, RIGHT);
+
+	public static @Immutable Set<EnumUISide> getEdges() {
+		return EDGES;
 	}
 
 	public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return false; }
@@ -141,5 +148,5 @@ public enum EnumUISide {
 
 	public abstract ObjDoubleConsumer<RectangularShape> getSetter();
 
-	public abstract DoubleBinaryOperator getApplyBorder();
+	public abstract DoubleBinaryOperator getInwardOperator();
 }

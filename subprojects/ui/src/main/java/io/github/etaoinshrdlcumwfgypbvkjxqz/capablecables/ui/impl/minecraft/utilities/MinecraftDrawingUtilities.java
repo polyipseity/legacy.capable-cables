@@ -202,7 +202,6 @@ public enum MinecraftDrawingUtilities {
 		}
 		tessellator.draw();
 
-		// TODO: Wait for a better system for such
 		RenderSystem.shadeModel(GL11.GL_SMOOTH);
 		RenderSystem.disableBlend();
 		RenderSystem.enableAlphaTest();

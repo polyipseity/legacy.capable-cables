@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.resizable;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.cursors.ICursor;
@@ -33,7 +34,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl.UIObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputPointerDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional2;
 import io.reactivex.rxjava3.observers.DisposableObserver;
@@ -59,9 +59,19 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 		implements IUIComponentUserResizableExtension<E> {
 	@NonNls
 	public static final String PROPERTY_ACTIVATION_MOUSE_BUTTONS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.extension.user_resizable.activation.mouse";
+	@NonNls
+	public static final String PROPERTY_RESIZE_BORDERS_DEFAULT_THICKNESS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.extension.user_resizable.resize_borders.default_thickness";
+	@NonNls
+	public static final String PROPERTY_RESIZE_BORDERS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.extension.user_resizable.resize_borders";
 	private static final INamespacePrefixedString PROPERTY_ACTIVATION_MOUSE_BUTTONS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyActivationMouseButtons());
+	private static final INamespacePrefixedString PROPERTY_RESIZE_BORDERS_DEFAULT_THICKNESS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyResizeBordersDefaultThickness());
+	private static final INamespacePrefixedString PROPERTY_RESIZE_BORDERS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyResizeBorders());
 	@UIProperty(PROPERTY_ACTIVATION_MOUSE_BUTTONS)
 	private final IBindingField<Set<Integer>> activationMouseButtons;
+	@UIProperty(PROPERTY_RESIZE_BORDERS)
+	private final IBindingField<Double> resizeBorderDefaultThickness;
+	@UIProperty(PROPERTY_RESIZE_BORDERS_DEFAULT_THICKNESS)
+	private final IBindingField<Map<EnumUISide, Double>> resizeBorders;
 
 	@SuppressWarnings("unchecked")
 	@UIExtensionConstructor
@@ -69,16 +79,28 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 		super(IUIComponent.class, (Class<E>) arguments.getContainerClass());
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-		this.activationMouseButtons = IUIPropertyMappingValue.createBindingField(CastUtilities.castUnchecked(Set.class), false,
-				ImmutableSet.of(GLFW.GLFW_MOUSE_BUTTON_LEFT), mappings.get(getPropertyActivationMouseButtonsLocation()));
+		this.activationMouseButtons = IUIPropertyMappingValue.<Set<Integer>>createBindingField(CastUtilities.castUnchecked(Set.class), false,
+				() -> ImmutableSet.of(GLFW.GLFW_MOUSE_BUTTON_LEFT),
+				mappings.get(getPropertyActivationMouseButtonsLocation()));
+		this.resizeBorderDefaultThickness = IUIPropertyMappingValue.createBindingField(Double.class, false, 10D,
+				mappings.get(getPropertyResizeBordersDefaultThicknessLocation()));
+		this.resizeBorders = IUIPropertyMappingValue.<Map<EnumUISide, Double>>createBindingField(CastUtilities.castUnchecked(Map.class), false,
+				ImmutableMap::of,
+				mappings.get(getPropertyResizeBordersLocation()));
 	}
 
 	public static INamespacePrefixedString getPropertyActivationMouseButtonsLocation() {
 		return PROPERTY_ACTIVATION_MOUSE_BUTTONS_LOCATION;
 	}
 
-	public static final int RESIZE_BORDER_THICKNESS_DEFAULT = 10;
-	private final int resizeBorderThickness = getResizeBorderThicknessDefault(); // TODO make this a property and strategy or something like that
+	public static INamespacePrefixedString getPropertyResizeBordersDefaultThicknessLocation() {
+		return PROPERTY_RESIZE_BORDERS_DEFAULT_THICKNESS_LOCATION;
+	}
+
+	public static INamespacePrefixedString getPropertyResizeBordersLocation() {
+		return PROPERTY_RESIZE_BORDERS_LOCATION;
+	}
+
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final Modifier modifier = new Modifier(this);
 	private final AtomicReference<IUIRendererContainer<IResizingRenderer>> rendererContainerReference = new AtomicReference<>();
@@ -91,12 +113,48 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 		return PROPERTY_ACTIVATION_MOUSE_BUTTONS;
 	}
 
-	protected IBindingField<Set<Integer>> getActivationMouseButtons() {
-		return activationMouseButtons;
+	public static String getPropertyResizeBordersDefaultThickness() {
+		return PROPERTY_RESIZE_BORDERS_DEFAULT_THICKNESS;
 	}
 
-	public static int getResizeBorderThicknessDefault() {
-		return RESIZE_BORDER_THICKNESS_DEFAULT;
+	public static String getPropertyResizeBorders() {
+		return PROPERTY_RESIZE_BORDERS;
+	}
+
+	@Override
+	public Optional<? extends Shape> getResizeShape() {
+		return getContainer()
+				.map(IUIComponent::getShape)
+				.map(Shape::getBounds2D)
+				.map(containerShapeBounds -> {
+					double defaultThickness = IField.getValueNonnull(getResizeBorderDefaultThickness());
+					Map<EnumUISide, Double> borders = IField.getValueNonnull(getResizeBorders());
+					Area resizeShape = new Area(
+							EnumUISide.getEdges().stream().unordered()
+									.map(side -> {
+										EnumUISide oppositeSide = side.getOpposite().orElseThrow(AssertionError::new);
+										Rectangle2D border = (Rectangle2D) containerShapeBounds.clone();
+
+										// COMMENT we drag the opposite side to a given offset from our side, ignoring other sides
+										oppositeSide.getSetter().accept(border,
+												side.getInwardOperator().applyAsDouble(side.getGetter().applyAsDouble(border),
+														-borders.getOrDefault(side, defaultThickness)));
+
+										return border;
+									})
+									.reduce(new Rectangle2D.Double(), Rectangle2D::createUnion)
+					);
+					resizeShape.subtract(new Area(containerShapeBounds));
+					return resizeShape;
+				});
+	}
+
+	protected IBindingField<Double> getResizeBorderDefaultThickness() {
+		return resizeBorderDefaultThickness;
+	}
+
+	protected IBindingField<Set<Integer>> getActivationMouseButtons() {
+		return activationMouseButtons;
 	}
 
 	protected static Optional<ICursor> getCursor(Set<? extends EnumUISide> sides) {
@@ -163,29 +221,14 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 				.ifPresent(c -> c.removeModifier(getModifier()));
 	}
 
-	@Override
-	public Optional<? extends Shape> getResizeShape() {
-		return getContainer().map(c -> {
-			Rectangle2D spb = c.getShapeDescriptor().getShapeOutput().getBounds2D();
-			Area ret = new Area(UIObjectUtilities.applyRectangularShape(spb, (x, y, w, h) -> {
-				assert x != null;
-				assert y != null;
-				assert w != null;
-				assert h != null;
-				return new Rectangle2D.Double(x - getResizeBorderThickness(), y - getResizeBorderThickness(),
-						w + (getResizeBorderThickness() << 1), h + (getResizeBorderThickness() << 1));
-			}));
-			ret.subtract(new Area(spb));
-			return ret;
-		});
+	protected IBindingField<Map<EnumUISide, Double>> getResizeBorders() {
+		return resizeBorders;
 	}
 
 	@Override
 	public Optional<? extends IResizeData> getResizeData() { return Optional.ofNullable(resizeData); }
 
 	protected void setResizeData(@Nullable IResizeData resizeData) { this.resizeData = resizeData; }
-
-	public int getResizeBorderThickness() { return resizeBorderThickness; }
 
 	public static class Modifier
 			extends UIAbstractVirtualComponent

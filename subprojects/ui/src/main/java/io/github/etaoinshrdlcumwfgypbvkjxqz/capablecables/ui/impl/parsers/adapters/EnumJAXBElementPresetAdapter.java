@@ -1,10 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters;
 
 import com.google.common.collect.*;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.CollectionType;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.RelationsType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.JAXBAdapterRegistries;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIJAXBUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.JAXBUtilities;
@@ -16,7 +16,7 @@ import jakarta.xml.bind.JAXBElement;
 
 import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
-import java.awt.*;
+import java.awt.Color;
 import java.io.Serializable;
 import java.util.List;
 import java.util.*;
@@ -49,6 +49,15 @@ public enum EnumJAXBElementPresetAdapter
 					(@Nullable Color right) ->
 							UIJAXBUtilities.ObjectFactories.getDefaultComponentObjectFactory()
 									.createColor(io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Color.fromJava(right)))),
+	UI_SIDE(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultComponentObjectFactory()::createSide), EnumUISide.class),
+			new IDuplexFunction.Functional<>(
+					left -> JAXBUtilities.getActualValueOptional(left)
+							.orElseThrow(AssertionError::new)
+							.toJava(),
+					(@Nullable EnumUISide right) ->
+							UIJAXBUtilities.ObjectFactories.getDefaultComponentObjectFactory()
+									.createSide(SideType.fromJava(AssertionUtilities.assertNonnull(right)))
+			)),
 	@SuppressWarnings("UnstableApiUsage") SET(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultComponentObjectFactory()::createSet), CastUtilities.<Class<Set<?>>>castUnchecked(Set.class)),
 			new IDuplexFunction.Functional<>(
 					left -> processCollectionType(JAXBUtilities.getActualValueOptional(left).orElse(null))
@@ -89,7 +98,7 @@ public enum EnumJAXBElementPresetAdapter
 													.orElse(null)
 									).orElse(null))
 			)),
-	@SuppressWarnings("UnstableApiUsage") RELATIONS_LIST(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultComponentObjectFactory()::createRelationsSet), CastUtilities.<Class<ListMultimap<?, ?>>>castUnchecked(ListMultimap.class)),
+	@SuppressWarnings("UnstableApiUsage") RELATIONS_LIST(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultComponentObjectFactory()::createRelationsList), CastUtilities.<Class<ListMultimap<?, ?>>>castUnchecked(ListMultimap.class)),
 			new IDuplexFunction.Functional<>(
 					left -> processRelationsType(JAXBUtilities.getActualValueOptional(left).orElse(null))
 							.map(leftStream -> leftStream.collect(ImmutableListMultimap.toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)))
@@ -164,8 +173,8 @@ public enum EnumJAXBElementPresetAdapter
 				.map(RelationsType::getEntry)
 				.map(Collection::stream)
 				.map(leftStream -> leftStream.map(leftEntry -> {
-					Object key = leftEntry.getKey().getAny();
-					Object value = leftEntry.getValue().getAny();
+					Object key = AssertionUtilities.assertNonnull(leftEntry.getAny().get(0)).getAny();
+					Object value = AssertionUtilities.assertNonnull(leftEntry.getAny().get(1)).getAny();
 					return Maps.immutableEntry(
 							JAXBAdapterRegistries.getFromRawAdapter(key).leftToRight(key),
 							JAXBAdapterRegistries.getFromRawAdapter(value).leftToRight(value)
@@ -180,19 +189,19 @@ public enum EnumJAXBElementPresetAdapter
 					Object rightKey = AssertionUtilities.assertNonnull(rightEntry.getKey());
 					Object rightValue = AssertionUtilities.assertNonnull(rightEntry.getValue());
 
-					RelationsType.Entry.Key leftKey =
-							UIJAXBUtilities.ObjectFactories.getDefaultComponentObjectFactory().createRelationsTypeEntryKey();
-					RelationsType.Entry.Value leftValue =
-							UIJAXBUtilities.ObjectFactories.getDefaultComponentObjectFactory().createRelationsTypeEntryValue();
+					AnyType leftKey =
+							UIJAXBUtilities.ObjectFactories.getDefaultComponentObjectFactory().createAnyType();
+					AnyType leftValue =
+							UIJAXBUtilities.ObjectFactories.getDefaultComponentObjectFactory().createAnyType();
 
-					RelationsType.Entry leftEntry =
-							UIJAXBUtilities.ObjectFactories.getDefaultComponentObjectFactory().createRelationsTypeEntry();
+					Tuple2Type leftEntry =
+							UIJAXBUtilities.ObjectFactories.getDefaultComponentObjectFactory().createTuple2Type();
 
 					leftKey.setAny(JAXBAdapterRegistries.getToRawAdapter(rightKey).rightToLeft(rightKey));
 					leftValue.setAny(JAXBAdapterRegistries.getToRawAdapter(rightValue).rightToLeft(rightValue));
 
-					leftEntry.setKey(leftKey);
-					leftEntry.setValue(leftValue);
+					leftEntry.getAny().set(0, leftKey);
+					leftEntry.getAny().set(1, leftValue);
 
 					return leftEntry;
 				}))

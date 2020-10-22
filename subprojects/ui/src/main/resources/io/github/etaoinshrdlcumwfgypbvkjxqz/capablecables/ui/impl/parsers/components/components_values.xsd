@@ -2,8 +2,10 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:val="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values"
            targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values"
-           version="1.3.0"
+           version="1.4.0"
            xml:lang="EN">
+	<!-- TODO change some global elements to local elements, JAXB seems to dislike local elements -->
+
 	<!-- SECTION primitives -->
 
 	<!-- COMMENT boolean -->
@@ -55,6 +57,14 @@
 
 	<!-- SECTION types -->
 
+	<!-- COMMENT any type -->
+	<xs:complexType name="anyType">
+		<xs:sequence>
+			<xs:any/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="any" type="val:anyType"/>
+
 	<!-- COMMENT collection type -->
 	<xs:complexType name="collectionType">
 		<xs:sequence>
@@ -65,26 +75,15 @@
 	<!-- COMMENT relations type -->
 	<xs:complexType name="relationsType">
 		<xs:sequence>
-			<xs:element name="entry" minOccurs="0" maxOccurs="unbounded">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="key">
-							<xs:complexType>
-								<xs:sequence>
-									<xs:any/>
-								</xs:sequence>
-							</xs:complexType>
-						</xs:element>
-						<xs:element name="value">
-							<xs:complexType>
-								<xs:sequence>
-									<xs:any/>
-								</xs:sequence>
-							</xs:complexType>
-						</xs:element>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
+			<xs:element ref="val:entry" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="entry" type="val:tuple2Type"/>
+
+	<!-- COMMENT tuple 2 type -->
+	<xs:complexType name="tuple2Type">
+		<xs:sequence>
+			<xs:element ref="val:any" minOccurs="2" maxOccurs="2"/>
 		</xs:sequence>
 	</xs:complexType>
 </xs:schema>

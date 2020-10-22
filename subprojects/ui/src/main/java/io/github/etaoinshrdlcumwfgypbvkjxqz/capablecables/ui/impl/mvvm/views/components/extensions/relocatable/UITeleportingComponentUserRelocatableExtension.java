@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.relocatable;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
@@ -18,6 +19,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descrip
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIFunctionalEventListener;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.modifiers.UIAbstractVirtualComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -28,7 +31,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl.UIObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional2;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.jetbrains.annotations.NonNls;
@@ -38,6 +40,7 @@ import org.lwjgl.system.MemoryUtil;
 import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
+import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
@@ -53,9 +56,15 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 		implements IUIComponentUserRelocatableExtension<E> {
 	@NonNls
 	public static final String PROPERTY_ACTIVATION_MOUSE_BUTTONS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.extension.user_relocatable.activation.mouse";
+	@NonNls
+	public static final String PROPERTY_RELOCATE_BORDERS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.extension.user_relocatable.relocate_borders";
 	private static final INamespacePrefixedString PROPERTY_ACTIVATION_MOUSE_BUTTONS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyActivationMouseButtons());
+	private static final INamespacePrefixedString PROPERTY_RELOCATE_BORDERS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyRelocateBorders());
+
 	@UIProperty(PROPERTY_ACTIVATION_MOUSE_BUTTONS)
 	private final IBindingField<Set<Integer>> activationMouseButtons;
+	@UIProperty(PROPERTY_ACTIVATION_MOUSE_BUTTONS)
+	private final IBindingField<Map<EnumUISide, Double>> relocateBorders;
 
 	@SuppressWarnings("unchecked")
 	@UIExtensionConstructor
@@ -63,16 +72,26 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 		super(IUIComponent.class, (Class<E>) arguments.getContainerClass());
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-		this.activationMouseButtons = IUIPropertyMappingValue.createBindingField(CastUtilities.castUnchecked(Set.class), false,
-				ImmutableSet.of(GLFW.GLFW_MOUSE_BUTTON_LEFT), mappings.get(getPropertyActivationMouseButtonsLocation()));
+		this.activationMouseButtons = IUIPropertyMappingValue.<Set<Integer>>createBindingField(CastUtilities.castUnchecked(Set.class), false,
+				() -> ImmutableSet.of(GLFW.GLFW_MOUSE_BUTTON_LEFT),
+				mappings.get(getPropertyActivationMouseButtonsLocation()));
+		this.relocateBorders = IUIPropertyMappingValue.<Map<EnumUISide, Double>>createBindingField(CastUtilities.castUnchecked(Map.class), false,
+				() -> ImmutableMap.of(EnumUISide.UP, 10D),
+				mappings.get(getPropertyRelocateBordersLocation()));
+	}
+
+	public static INamespacePrefixedString getPropertyRelocateBordersLocation() {
+		return PROPERTY_RELOCATE_BORDERS_LOCATION;
 	}
 
 	public static INamespacePrefixedString getPropertyActivationMouseButtonsLocation() {
 		return PROPERTY_ACTIVATION_MOUSE_BUTTONS_LOCATION;
 	}
 
-	public static final int RELOCATE_BORDER_THICKNESS_DEFAULT = 10;
-	private final int relocateBorderThickness = getRelocateBorderThicknessDefault(); // TODO make this a property and strategy or something like that
+	public static String getPropertyRelocateBorders() {
+		return PROPERTY_RELOCATE_BORDERS;
+	}
+
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final Modifier modifier = new Modifier(this);
 	private final AtomicReference<IUIRendererContainer<IRelocatingRenderer>> rendererContainerReference = new AtomicReference<>();
@@ -87,10 +106,6 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 
 	protected IBindingField<Set<Integer>> getActivationMouseButtons() {
 		return activationMouseButtons;
-	}
-
-	public static int getRelocateBorderThicknessDefault() {
-		return RELOCATE_BORDER_THICKNESS_DEFAULT;
 	}
 
 	@Override
@@ -144,14 +159,30 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 
 	@Override
 	public Optional<? extends Shape> getRelocateShape() {
-		return getContainer().map(c ->
-				UIObjectUtilities.applyRectangularShape(c.getShapeDescriptor().getShapeOutput().getBounds2D(),
-						(x, y, w, h) -> {
-							assert x != null;
-							assert y != null;
-							assert w != null;
-							return new Rectangle2D.Double(x, y, w, getRelocateBorderThickness());
-						})); // TODO custom
+		return getContainer()
+				.map(IUIComponent::getShape)
+				.map(Shape::getBounds2D)
+				.map(containerShapeBounds ->
+						IField.getValueNonnull(getRelocateBorders()).entrySet().stream().unordered()
+								.map(entry -> {
+									EnumUISide side = AssertionUtilities.assertNonnull(entry.getKey());
+									double thickness = AssertionUtilities.assertNonnull(entry.getValue());
+
+									EnumUISide oppositeSide = side.getOpposite().orElseThrow(AssertionError::new);
+									Rectangle2D border = (Rectangle2D) containerShapeBounds.clone();
+
+									// COMMENT we drag the opposite side to a given offset from our side, ignoring other sides
+									oppositeSide.getSetter().accept(border, side.getInwardOperator().applyAsDouble(side.getGetter().applyAsDouble(border), thickness));
+
+									return border;
+								})
+								.map(Area::new)
+								.reduce(new Area(), (area1, area2) -> {
+									Area area3 = (Area) area1.clone();
+									area3.add(area2);
+									return area3;
+								})
+				);
 	}
 
 	@Override
@@ -162,7 +193,9 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 
 	protected void setRelocateData(@Nullable IRelocateData relocateData) { this.relocateData = relocateData; }
 
-	public int getRelocateBorderThickness() { return relocateBorderThickness; }
+	protected IBindingField<Map<EnumUISide, Double>> getRelocateBorders() {
+		return relocateBorders;
+	}
 
 	public static class Modifier
 			extends UIAbstractVirtualComponent

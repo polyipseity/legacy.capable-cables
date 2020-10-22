@@ -34,7 +34,8 @@ public class UIComponentUserResizableMinecraftExtensionPreviewingResizingRendere
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.previewColor =
-				IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY, mappings.get(getPropertyPreviewColorLocation()));
+				IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY,
+						mappings.get(getPropertyPreviewColorLocation()));
 	}
 
 	public static INamespacePrefixedString getPropertyPreviewColorLocation() { return PROPERTY_PREVIEW_COLOR_LOCATION; }

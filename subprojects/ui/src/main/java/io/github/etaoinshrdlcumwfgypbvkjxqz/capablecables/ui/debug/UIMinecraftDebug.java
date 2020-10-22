@@ -29,7 +29,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.impl.UIMinecraftWindowComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.parsers.UIDefaultMinecraftComponentParser;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.utilities.MinecraftDrawingUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.models.UIModel;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.models.UIAbstractModel;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.UIComponentCursorHandleProviderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIButtonComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.components.UIDefaultComponentParser;
@@ -390,7 +390,7 @@ public enum UIMinecraftDebug {
 
 		@OnlyIn(Dist.CLIENT)
 		private static final class Model
-				extends UIModel {}
+				extends UIAbstractModel {}
 	}
 
 	private static final class DebugContainer extends Container {

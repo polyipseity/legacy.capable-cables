@@ -66,13 +66,13 @@ public final class ShapeAnchor implements IShapeAnchor {
 				Rectangle2D bounds = from.getAbsoluteShape().getBounds2D();
 				Rectangle2D newBounds = (Rectangle2D) bounds.clone();
 				double targetValue =
-						getOriginSide().getApplyBorder().applyAsDouble(
+						getOriginSide().getInwardOperator().applyAsDouble(
 								getTargetSide().getGetter().applyAsDouble(target.getAbsoluteShape().getBounds2D()),
 								getBorderThickness());
 				getOriginSide().getOpposite() // COMMENT set opposite side, avoid overshooting
 						.ifPresent(oppositeOriginSide -> {
 							double oppositeOriginSideCurrentValue = oppositeOriginSide.getGetter().applyAsDouble(newBounds);
-							double oppositeOriginSideTargetValue = getOriginSide().getApplyBorder().applyAsDouble(targetValue, 1d);
+							double oppositeOriginSideTargetValue = getOriginSide().getInwardOperator().applyAsDouble(targetValue, 1d);
 							oppositeOriginSideTargetValue = oppositeOriginSideTargetValue < targetValue ?
 									Math.min(oppositeOriginSideTargetValue, oppositeOriginSideCurrentValue) // COMMENT lesser means larger area
 									: Math.max(oppositeOriginSideTargetValue, oppositeOriginSideCurrentValue); // COMMENT greater means larger area

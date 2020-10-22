@@ -51,9 +51,49 @@
 						<val:int>2</val:int><!-- COMMENT middle -->
 					</val:set>
 				</property>
+				<property key="default:component.extension.user_relocatable.relocate_borders">
+					<val:map>
+						<val:entry>
+							<val:any>
+								<side>RIGHT</side>
+							</val:any>
+							<val:any>
+								<val:double>20</val:double>
+							</val:any>
+						</val:entry>
+						<val:entry>
+							<val:any>
+								<side>DOWN</side>
+							</val:any>
+							<val:any>
+								<val:double>50</val:double>
+							</val:any>
+						</val:entry>
+					</val:map>
+				</property>
 				<renderer-container name="Window1ExtensionRelocatableRenderer"/>
 			</extension>
 			<extension class="extension.user_resizable">
+				<property key="default:component.extension.user_resizable.resize_borders">
+					<val:map>
+						<val:entry>
+							<val:any>
+								<side>RIGHT</side>
+							</val:any>
+							<val:any>
+								<val:double>20</val:double>
+							</val:any>
+						</val:entry>
+						<val:entry>
+							<val:any>
+								<side>DOWN</side>
+							</val:any>
+							<val:any>
+								<val:double>50</val:double>
+							</val:any>
+						</val:entry>
+					</val:map>
+				</property>
 				<renderer-container name="Window1ExtensionResizableRenderer"/>
 			</extension>
 		</component>
