@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.compo
 
 import com.google.common.collect.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;

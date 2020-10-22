@@ -20,14 +20,14 @@ dependencies {
 	// TODO jaxb 'codes.rafael.xjc:nullsafe:1.1'
 	jaxb files('libs/nullsafe-1.2-SNAPSHOT.jar')
 }
-File xjcMainComponentsGeneratedDir = file "${getGeneratedDirectory.call 'main'}${separator}xjc_components"
-CharSequence xjcMainComponentsContextPath = "${jaxbPackagePrefix}.components"
-sourceSets.main.java.srcDir xjcMainComponentsGeneratedDir
-def xjcMainComponents = createJaxbXJCTask.call('xjcMainComponents',
-		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/components*.xsd' }.files },
-		xjcMainComponentsGeneratedDir,
+File xjcMainUIGeneratedDir = file "${getGeneratedDirectory.call 'main'}${separator}xjc_ui"
+CharSequence xjcMainUIContextPath = "${jaxbPackagePrefix}.ui"
+sourceSets.main.java.srcDir xjcMainUIGeneratedDir
+def xjcMainUI = createJaxbXJCTask.call('xjcMainUI',
+		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/ui-*.xsd' }.files },
+		xjcMainUIGeneratedDir,
 		['-extension',
-		 '-p', xjcMainComponentsContextPath,
+		 '-p', xjcMainUIContextPath,
 		 '-readOnly',
 		 '-encoding', 'UTF-8',
 		 '-enableIntrospection',
@@ -40,15 +40,15 @@ def xjcMainComponents = createJaxbXJCTask.call('xjcMainComponents',
 		 // COMMENT -Xpropertyaccessors broken
 		 '-Xnullsafegetters'
 		],
-		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/components*.xjb' }.files })
-compileJava.configure { dependsOn xjcMainComponents }
+		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/ui-*.xjb' }.files })
+compileJava.configure { dependsOn xjcMainUI }
 
 makeSourcesTasks.call { Task it ->
 	it.inputs.properties([
-			expand$pattern                     : '**/*Constants.*',
-			expand_moduleName                  : moduleName,
-			expand_buildType                   : buildType,
-			expand_xjcMainComponentsContextPath: xjcMainComponentsContextPath,
+			expand$pattern             : '**/*Constants.*',
+			expand_moduleName          : moduleName,
+			expand_buildType           : buildType,
+			expand_xjcMainUIContextPath: xjcMainUIContextPath,
 	])
 }
 

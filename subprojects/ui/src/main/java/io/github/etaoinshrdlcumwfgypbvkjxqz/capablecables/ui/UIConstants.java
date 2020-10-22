@@ -28,10 +28,10 @@ public enum UIConstants {
 		;
 
 		@NonNls
-		public static final String XJC_MAIN_COMPONENTS_CONTEXT_PATH = "${xjcMainComponentsContextPath}";
+		public static final String XJC_MAIN_UI_CONTEXT_PATH = "${xjcMainUIContextPath}";
 
-		public static String getXJCMainComponentsContextPath() {
-			return XJC_MAIN_COMPONENTS_CONTEXT_PATH;
+		public static String getXJCMainUIContextPath() {
+			return XJC_MAIN_UI_CONTEXT_PATH;
 		}
 	}
 }

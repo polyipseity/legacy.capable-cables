@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.ObjectFactory;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.ObjectFactory;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import jakarta.xml.bind.JAXBElement;
 
@@ -17,8 +17,8 @@ public enum UIJAXBUtilities {
 	public enum ObjectFactories {
 		;
 
-		private static final ObjectFactory DEFAULT_COMPONENT_OBJECT_FACTORY = new ObjectFactory();
+		private static final ObjectFactory DEFAULT_UI_OBJECT_FACTORY = new ObjectFactory();
 
-		public static ObjectFactory getDefaultComponentObjectFactory() { return DEFAULT_COMPONENT_OBJECT_FACTORY; }
+		public static ObjectFactory getDefaultUIObjectFactory() { return DEFAULT_UI_OBJECT_FACTORY; }
 	}
 }

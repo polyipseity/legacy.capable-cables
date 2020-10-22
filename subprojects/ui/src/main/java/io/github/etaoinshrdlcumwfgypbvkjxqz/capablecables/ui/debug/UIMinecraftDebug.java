@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug;
 
 import com.google.common.base.Suppliers;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Theme;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Ui;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Theme;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Ui;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIFacade;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationControl;
@@ -135,8 +135,8 @@ public enum UIMinecraftDebug {
 		INSTANCE,
 		;
 
-		public static final @NonNls String COMPONENT_TEST_XML_PATH = "components_test.xml";
-		public static final @NonNls String COMPONENT_TEST_THEME_XML_PATH = "components_test_theme.xml";
+		public static final @NonNls String COMPONENT_TEST_XML_PATH = "components-test.xml";
+		public static final @NonNls String COMPONENT_TEST_THEME_XML_PATH = "components-test-theme.xml";
 		private static final IUIParser<IUIMinecraftViewComponent<?, ?>, Ui> VIEW_PARSER =
 				UIDefaultMinecraftComponentParser.makeParserMinecraft(
 						UIDefaultComponentParser.makeParserStandard(

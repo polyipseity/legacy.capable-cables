@@ -60,7 +60,7 @@ public final class ModMod {
 
 	public static ResourceLocation createResourceLocation(@NonNls CharSequence path) { return new ResourceLocation(ModConstants.getModID(), path.toString()); }
 
-	public static String getNamespacePrefixedString(@NonNls CharSequence separator, @NonNls String string) { return NamespaceUtilities.getNamespacePrefixedString(separator, ModConstants.getModID(), string); }
+	public static String getNamespacePrefixedString(@NonNls CharSequence separator, @NonNls CharSequence string) { return NamespaceUtilities.getNamespacePrefixedString(separator, ModConstants.getModID(), string); }
 
 	public static ModMod getInstance() { return AssertionUtilities.assertNonnull(instance); }
 

@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.compo
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.config.UISchemas;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.JAXBContextRegisterBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIJAXBUtilities;
@@ -23,16 +24,14 @@ public enum UIDefaultComponentSchemaHolder {
 	;
 
 	@NonNls
-	public static final String CONTEXT_PATH = UIConstants.Local.XJC_MAIN_COMPONENTS_CONTEXT_PATH;
-	@NonNls
-	public static final String SCHEMA_LOCATION = "components.xsd";
+	public static final String CONTEXT_PATH = UIConstants.Local.XJC_MAIN_UI_CONTEXT_PATH;
 	@NonNls
 	public static final String SCHEMA_NAMESPACE_URI = "https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components";
 	private static final Schema SCHEMA;
 	private static final JAXBContext CONTEXT;
 
 	static {
-		InputStream res = AssertionUtilities.assertNonnull(UIDefaultComponentSchemaHolder.class.getResourceAsStream(getSchemaLocation()));
+		InputStream res = AssertionUtilities.assertNonnull(UIDefaultComponentSchemaHolder.class.getResourceAsStream(UISchemas.getSchemaLocation(getSchemaNamespaceURI())));
 		try {
 			SCHEMA = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new StreamSource(res));
 		} catch (SAXException e) {
@@ -42,7 +41,7 @@ public enum UIDefaultComponentSchemaHolder {
 		}
 		try {
 			JAXBContextRegisterBusEvent registerEvent = new JAXBContextRegisterBusEvent();
-			registerEvent.addClassesToBeBound(UIJAXBUtilities.ObjectFactories.getDefaultComponentObjectFactory().getClass());
+			registerEvent.addClassesToBeBound(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().getClass());
 			UIEventBusEntryPoint.getEventBus().onNext(registerEvent);
 			CONTEXT = JAXBContext.newInstance(registerEvent.getClassesToBeBoundView().toArray(new Class<?>[0]));
 		} catch (JAXBException e) {
@@ -52,15 +51,9 @@ public enum UIDefaultComponentSchemaHolder {
 
 	public static String getContextPath() { return CONTEXT_PATH; }
 
-	public static String getSchemaLocation() { return SCHEMA_LOCATION; }
-
 	public static Schema getSchema() { return SCHEMA; }
 
-	public static String getSchemaNamespaceURI() { return getSchemaNamespaceUri(); }
-
-	public static String getSchemaNamespaceUri() {
-		return SCHEMA_NAMESPACE_URI;
-	}
+	public static String getSchemaNamespaceURI() { return SCHEMA_NAMESPACE_URI; }
 
 	public static JAXBContext getContext() { return CONTEXT; }
 }

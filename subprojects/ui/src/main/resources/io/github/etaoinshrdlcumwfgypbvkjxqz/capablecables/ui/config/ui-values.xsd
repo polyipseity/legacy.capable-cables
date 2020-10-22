@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:val="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values"
-           targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components/values"
+           xmlns:val="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/values"
+           targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/values"
            version="1.4.0"
            xml:lang="EN">
 	<!-- TODO change some global elements to local elements, JAXB seems to dislike local elements -->

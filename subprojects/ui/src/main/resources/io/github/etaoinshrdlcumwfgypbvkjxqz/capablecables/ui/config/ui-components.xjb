@@ -3,39 +3,39 @@
           xmlns:ci="http://jaxb.dev.java.net/plugin/code-injector"
           xmlns="http://java.sun.com/xml/ns/jaxb"
           version="1.0">
-	<bindings schemaLocation="components.xsd">
+	<bindings schemaLocation="ui-components.xsd">
 		<!-- COMMENT sideType -->
 		<bindings node="/xs:schema/xs:simpleType[@name='sideType']">
 			<ci:code>
 				<![CDATA[
-					private final io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.SideType thisObj = this;
+					private final io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.SideType thisObj = this;
 
 					public io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide toJava() {
 						return io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide.valueOf(thisObj.name());
 					}
 
-					public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.SideType fromJava(io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide obj) {
-						return io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.SideType.valueOf(obj.name());
+					public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.SideType fromJava(io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide obj) {
+						return io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.SideType.valueOf(obj.name());
 					}
 				]]>
 			</ci:code>
 		</bindings>
 	</bindings>
-	<bindings schemaLocation="components_values.xsd">
+	<bindings schemaLocation="ui-values.xsd">
 		<!-- COMMENT color -->
 		<bindings node="/xs:schema/xs:element[@name='color']/xs:complexType">
 			<ci:code>
 				<![CDATA[
-					private final io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Color thisObj = this;
+					private final io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color thisObj = this;
 
 					public java.awt.Color toJava() {
 						return new java.awt.Color(thisObj.getRed(), thisObj.getGreen(), thisObj.getBlue(), thisObj.getAlpha());
 					}
 
-					public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Color fromJava(@javax.annotation.Nullable java.awt.Color obj) {
+					public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color fromJava(@javax.annotation.Nullable java.awt.Color obj) {
 						if (obj == null)
 							return null;
-						io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.components.Color ret = new Color();
+						io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color ret = new Color();
 						ret.setRed((short) obj.getRed());
 						ret.setGreen((short) obj.getGreen());
 						ret.setBlue((short) obj.getBlue());
