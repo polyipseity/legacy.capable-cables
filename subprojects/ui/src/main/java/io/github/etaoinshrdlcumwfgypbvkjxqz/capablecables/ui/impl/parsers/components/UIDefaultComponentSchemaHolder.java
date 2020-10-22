@@ -4,7 +4,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.JAXBContextRegisterBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIJAXBObjectFactories;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIJAXBUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 import jakarta.xml.bind.JAXBContext;
@@ -42,7 +42,7 @@ public enum UIDefaultComponentSchemaHolder {
 		}
 		try {
 			JAXBContextRegisterBusEvent registerEvent = new JAXBContextRegisterBusEvent();
-			registerEvent.addClassesToBeBound(UIJAXBObjectFactories.getDefaultComponentObjectFactory().getClass());
+			registerEvent.addClassesToBeBound(UIJAXBUtilities.ObjectFactories.getDefaultComponentObjectFactory().getClass());
 			UIEventBusEntryPoint.getEventBus().onNext(registerEvent);
 			CONTEXT = JAXBContext.newInstance(registerEvent.getClassesToBeBoundView().toArray(new Class<?>[0]));
 		} catch (JAXBException e) {

@@ -11,15 +11,15 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 
-public abstract class AbstractClassTuple2Registry<V>
-		extends AbstractRegistry<ITuple2<Class<?>, Class<?>>, V> {
+public abstract class AbstractTuple2Registry<KL, KR, V>
+		extends AbstractRegistry<ITuple2<KL, KR>, V> {
 	private static final long serialVersionUID = -1642550116959273162L;
-	private final ConcurrentMap<Class<?>, ITuple2<Class<?>, Class<?>>> leftMap;
-	private final ConcurrentMap<Class<?>, ITuple2<Class<?>, Class<?>>> rightMap;
+	private final ConcurrentMap<KL, ITuple2<KL, KR>> leftMap;
+	private final ConcurrentMap<KR, ITuple2<KL, KR>> rightMap;
 
-	public AbstractClassTuple2Registry(@SuppressWarnings("SameParameterValue") boolean overridable,
-	                                   Logger logger,
-	                                   Consumer<? super MapMaker> configuration) {
+	public AbstractTuple2Registry(@SuppressWarnings("SameParameterValue") boolean overridable,
+	                              Logger logger,
+	                              Consumer<? super MapMaker> configuration) {
 		super(overridable, logger, configuration);
 		MapMaker dataBuilder = FunctionUtilities.accept(new MapMaker(), configuration);
 		this.leftMap = dataBuilder.makeMap();
@@ -27,7 +27,7 @@ public abstract class AbstractClassTuple2Registry<V>
 	}
 
 	@Override
-	public <VL extends V> RegistryObject<VL> register(ITuple2<Class<?>, Class<?>> key, VL value) {
+	public <VL extends V> RegistryObject<VL> register(ITuple2<KL, KR> key, VL value) {
 		RegistryObject<VL> ret = super.register(key, value);
 		// COMMENT it will throw if it is not replaceable
 		// TODO what if it is repeated
@@ -37,21 +37,21 @@ public abstract class AbstractClassTuple2Registry<V>
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<Class<?>, ITuple2<Class<?>, Class<?>>> getLeftMap() {
+	protected ConcurrentMap<KL, ITuple2<KL, KR>> getLeftMap() {
 		return leftMap;
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<Class<?>, ITuple2<Class<?>, Class<?>>> getRightMap() {
+	protected ConcurrentMap<KR, ITuple2<KL, KR>> getRightMap() {
 		return rightMap;
 	}
 
-	public Optional<? extends RegistryObject<? extends V>> getWithLeft(Class<?> key) {
+	public Optional<? extends RegistryObject<? extends V>> getWithLeft(KL key) {
 		return Optional.ofNullable(getLeftMap().get(key))
 				.flatMap(this::get);
 	}
 
-	public Optional<? extends RegistryObject<? extends V>> getWithRight(Class<?> key) {
+	public Optional<? extends RegistryObject<? extends V>> getWithRight(KR key) {
 		return Optional.ofNullable(getRightMap().get(key))
 				.flatMap(this::get);
 	}

@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions;
 
 import com.google.common.collect.MapMaker;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.AbstractClassTuple2Registry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.AbstractTuple2Registry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.RegistryObject;
 import org.slf4j.Logger;
 
@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public abstract class AbstractDuplexFunctionRegistry
-		extends AbstractClassTuple2Registry<IDuplexFunction<?, ?>> {
+		extends AbstractTuple2Registry<Class<?>, Class<?>, IDuplexFunction<?, ?>> {
 	private static final long serialVersionUID = 7632764233866904218L;
 
 	public AbstractDuplexFunctionRegistry(@SuppressWarnings("SameParameterValue") boolean overridable, Logger logger, Consumer<? super MapMaker> configuration) {

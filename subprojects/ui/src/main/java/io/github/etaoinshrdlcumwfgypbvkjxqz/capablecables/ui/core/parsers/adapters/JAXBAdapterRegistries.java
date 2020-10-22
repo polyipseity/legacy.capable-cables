@@ -7,11 +7,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.AbstractDuplexFunctionRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IDuplexFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.AbstractClassTuple2Registry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.AbstractTuple2Registry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.RegistryObject;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import jakarta.xml.bind.JAXBElement;
 
+import javax.xml.namespace.QName;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentMap;
@@ -39,7 +40,7 @@ public enum JAXBAdapterRegistries {
 	public static <L> Optional<? extends IDuplexFunction<L, ?>> findFromRawAdapter(L rawObject) {
 		if (rawObject instanceof JAXBElement)
 			return (Optional<? extends IDuplexFunction<L, ?>>) // COMMENT should be safe
-					Element.getInstance().getWithLeftChecked(((JAXBElement<?>) rawObject).getDeclaredType())
+					Element.getInstance().getWithLeftChecked(((JAXBElement<?>) rawObject).getName())
 							.map(RegistryObject::getValue);
 		return (Optional<? extends IDuplexFunction<L, ?>>) // COMMENT should be safe
 				Object.getInstance().getWithLeftChecked(rawObject.getClass())
@@ -99,7 +100,7 @@ public enum JAXBAdapterRegistries {
 	}
 
 	public static final class Element
-			extends AbstractClassTuple2Registry<IDuplexFunction<JAXBElement<?>, ?>> {
+			extends AbstractTuple2Registry<QName, Class<?>, IDuplexFunction<JAXBElement<?>, ?>> {
 		private static final Supplier<Element> INSTANCE = Suppliers.memoize(Element::new);
 		private static final long serialVersionUID = -1898139702002928271L;
 
@@ -112,28 +113,28 @@ public enum JAXBAdapterRegistries {
 
 		public static Element getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
-		public <L, R, VL extends IDuplexFunction<JAXBElement<L>, R>> RegistryObject<VL> registerChecked(ITuple2<Class<L>, Class<R>> key, VL value) {
+		public <L, R, VL extends IDuplexFunction<JAXBElement<L>, R>> RegistryObject<VL> registerChecked(ITuple2<QName, Class<R>> key, VL value) {
 			return CastUtilities.castUnchecked(register(ITuple2.upcast(key), CastUtilities.castUnchecked(value)));
 		}
 
 		@Override
 		@Deprecated
-		public <VL extends IDuplexFunction<JAXBElement<?>, ?>> RegistryObject<VL> register(ITuple2<Class<?>, Class<?>> key, VL value) {
+		public <VL extends IDuplexFunction<JAXBElement<?>, ?>> RegistryObject<VL> register(ITuple2<QName, Class<?>> key, VL value) {
 			return super.register(key, value);
 		}
 
 		@Override
 		@Deprecated
-		public Optional<? extends RegistryObject<? extends IDuplexFunction<JAXBElement<?>, ?>>> getWithLeft(Class<?> key) {
+		public Optional<? extends RegistryObject<? extends IDuplexFunction<JAXBElement<?>, ?>>> getWithLeft(QName key) {
 			return super.getWithLeft(key);
 		}
 
-		public <L, R> Optional<? extends RegistryObject<? extends IDuplexFunction<JAXBElement<L>, R>>> getChecked(ITuple2<Class<L>, Class<R>> key) {
-			return CastUtilities.castUnchecked(get(ITuple2.upcast(key)));
+		public Optional<? extends RegistryObject<? extends IDuplexFunction<JAXBElement<?>, ?>>> getWithLeftChecked(QName key) {
+			return getWithLeft(key);
 		}
 
-		public <L> Optional<? extends RegistryObject<? extends IDuplexFunction<JAXBElement<L>, ?>>> getWithLeftChecked(Class<L> key) {
-			return CastUtilities.castUnchecked(getWithLeft(key));
+		public <L, R> Optional<? extends RegistryObject<? extends IDuplexFunction<JAXBElement<L>, R>>> getChecked(ITuple2<QName, Class<R>> key) {
+			return CastUtilities.castUnchecked(get(ITuple2.upcast(key)));
 		}
 
 		@SuppressWarnings("unchecked")
@@ -143,13 +144,13 @@ public enum JAXBAdapterRegistries {
 
 		@Override
 		@Deprecated
-		protected ConcurrentMap<ITuple2<Class<?>, Class<?>>, RegistryObject<? extends IDuplexFunction<JAXBElement<?>, ?>>> getData() {
+		protected ConcurrentMap<ITuple2<QName, Class<?>>, RegistryObject<? extends IDuplexFunction<JAXBElement<?>, ?>>> getData() {
 			return super.getData();
 		}
 
 		@Override
 		@Deprecated
-		public Optional<? extends RegistryObject<? extends IDuplexFunction<JAXBElement<?>, ?>>> get(ITuple2<Class<?>, Class<?>> key) {
+		public Optional<? extends RegistryObject<? extends IDuplexFunction<JAXBElement<?>, ?>>> get(ITuple2<QName, Class<?>> key) {
 			return super.get(key);
 		}
 	}
