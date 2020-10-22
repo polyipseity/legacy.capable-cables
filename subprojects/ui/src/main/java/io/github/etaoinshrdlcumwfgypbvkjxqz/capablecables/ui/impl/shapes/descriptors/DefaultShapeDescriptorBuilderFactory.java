@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.descri
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptorBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptorBuilderFactory;
@@ -9,39 +10,41 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descrip
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.descriptors.builders.RectangularShapeDescriptorBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ConcurrencyUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.AbstractRegistryWithDefaults;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.RegistryObject;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObjectInternal;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.impl.AbstractRegistry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.impl.DefaultRegistryObject;
+import org.slf4j.Logger;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
 public class DefaultShapeDescriptorBuilderFactory
-		extends AbstractRegistryWithDefaults<Class<? extends Shape>, Supplier<? extends IShapeDescriptorBuilder<?>>>
+		extends AbstractRegistry<Class<? extends Shape>, Supplier<? extends IShapeDescriptorBuilder<?>>>
 		implements IShapeDescriptorBuilderFactory {
 	private static final INamespacePrefixedString DEFAULT_FACTORY_KEY = ImmutableNamespacePrefixedString.of(StaticHolder.getDefaultNamespace(), "default");
-	private static final ImmutableMap<Class<? extends Shape>, Supplier<RegistryObject<Supplier<? extends IShapeDescriptorBuilder<?>>>>> DEFAULTS_SUPPLIER =
-			ImmutableMap.<Class<? extends Shape>, Supplier<RegistryObject<Supplier<? extends IShapeDescriptorBuilder<?>>>>>builder()
-					.put(Rectangle2D.class, () -> new RegistryObject<>(RectangularShapeDescriptorBuilder.Rectangle2DSD::new))
-					.put(Ellipse2D.class, () -> new RegistryObject<>(RectangularShapeDescriptorBuilder.Ellipse2DSD::new))
+	private static final @Immutable Map<Class<? extends Shape>, Supplier<IRegistryObjectInternal<Supplier<? extends IShapeDescriptorBuilder<?>>>>> DEFAULTS_SUPPLIER =
+			ImmutableMap.<Class<? extends Shape>, Supplier<IRegistryObjectInternal<Supplier<? extends IShapeDescriptorBuilder<?>>>>>builder()
+					.put(Rectangle2D.class, () -> new DefaultRegistryObject<>(RectangularShapeDescriptorBuilder.Rectangle2DSD::new))
+					.put(Ellipse2D.class, () -> new DefaultRegistryObject<>(RectangularShapeDescriptorBuilder.Ellipse2DSD::new))
 					.build();
 	private static final long serialVersionUID = -7885480361684661050L;
-	private final ImmutableMap<Class<? extends Shape>, RegistryObject<? extends Supplier<? extends IShapeDescriptorBuilder<?>>>> defaults =
-			ImmutableMap.copyOf(Maps.transformValues(getDefaultsSupplier(), Supplier::get));
+
+	private final ConcurrentMap<Class<? extends Shape>, IRegistryObjectInternal<? extends Supplier<? extends IShapeDescriptorBuilder<?>>>> data;
 
 	public DefaultShapeDescriptorBuilderFactory() {
-		super(true, UIConfiguration.getInstance().getLogger(),
-				builder -> builder
-						.concurrencyLevel(ConcurrencyUtilities.getNormalThreadThreadCount())
-						.initialCapacity(CapacityUtilities.getInitialCapacityMedium()));
+		super(true);
+		this.data = MapBuilderUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.getInitialCapacityMedium()).makeMap();
+		this.data.putAll(Maps.transformValues(getDefaultsSupplier(), Supplier::get));
 	}
 
-	protected static ImmutableMap<Class<? extends Shape>, Supplier<RegistryObject<Supplier<? extends IShapeDescriptorBuilder<?>>>>> getDefaultsSupplier() { return DEFAULTS_SUPPLIER; }
+	protected static @Immutable Map<Class<? extends Shape>, Supplier<IRegistryObjectInternal<Supplier<? extends IShapeDescriptorBuilder<?>>>>> getDefaultsSupplier() { return DEFAULTS_SUPPLIER; }
 
 	public static INamespacePrefixedString getDefaultFactoryKey() { return DEFAULT_FACTORY_KEY; }
 
@@ -57,6 +60,14 @@ public class DefaultShapeDescriptorBuilderFactory
 								.get()); // COMMENT responsibility goes to the registerer
 	}
 
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	@Override
-	protected Map<Class<? extends Shape>, RegistryObject<? extends Supplier<? extends IShapeDescriptorBuilder<?>>>> getDefaults() { return defaults; }
+	protected Map<Class<? extends Shape>, IRegistryObjectInternal<? extends Supplier<? extends IShapeDescriptorBuilder<?>>>> getData() {
+		return data;
+	}
+
+	@Override
+	protected Logger getLogger() {
+		return UIConfiguration.getInstance().getLogger();
+	}
 }

@@ -16,11 +16,6 @@ public interface ITuple2<L, R>
 
 	R getRight();
 
-	@SuppressWarnings("unchecked")
-	static <L, R> ITuple2<L, R> upcast(ITuple2<? extends L, ? extends R> instance) {
-		return (ITuple2<L, R>) instance;
-	}
-
 	enum StaticHolder {
 		;
 

@@ -11,7 +11,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.JAXBUtilitie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IDuplexFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableTuple2;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.RegistryObject;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
 import jakarta.xml.bind.JAXBElement;
 
 import javax.annotation.Nullable;
@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
 public enum EnumJAXBElementPresetAdapter
-		implements ITuple2<ITuple2<? extends QName, ? extends Class<?>>, RegistryObject<? extends IDuplexFunction<? extends JAXBElement<?>, ?>>> {
+		implements ITuple2<ITuple2<? extends QName, ? extends Class<?>>, IRegistryObject<? extends IDuplexFunction<? extends JAXBElement<?>, ?>>> {
 	BOOLEAN(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultComponentObjectFactory()::createBoolean), Boolean.class),
 			new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBUtilities.ObjectFactories.getDefaultComponentObjectFactory()::createBoolean)),
 	BYTE(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultComponentObjectFactory()::createByte), Byte.class),
@@ -119,10 +119,10 @@ public enum EnumJAXBElementPresetAdapter
 			)),
 	;
 
-	private final ITuple2<ITuple2<? extends QName, ? extends Class<?>>, RegistryObject<? extends IDuplexFunction<? extends JAXBElement<?>, ?>>> delegate;
+	private final ITuple2<ITuple2<? extends QName, ? extends Class<?>>, IRegistryObject<? extends IDuplexFunction<? extends JAXBElement<?>, ?>>> delegate;
 
 	<L, R, V extends IDuplexFunction<JAXBElement<L>, R> & Serializable> EnumJAXBElementPresetAdapter(ITuple2<? extends QName, ? extends Class<R>> key, V value) {
-		RegistryObject<V> value2 = JAXBAdapterRegistries.Element.getInstance().registerChecked(ITuple2.upcast(key), value);
+		IRegistryObject<V> value2 = JAXBAdapterRegistries.Element.getInstance().registerChecked(key, value);
 		this.delegate = ImmutableTuple2.of(key, value2);
 	}
 
@@ -150,7 +150,7 @@ public enum EnumJAXBElementPresetAdapter
 	}
 
 	@Override
-	public RegistryObject<? extends IDuplexFunction<? extends JAXBElement<?>, ?>> getRight() {
+	public IRegistryObject<? extends IDuplexFunction<? extends JAXBElement<?>, ?>> getRight() {
 		return getDelegate().getRight();
 	}
 
@@ -210,7 +210,7 @@ public enum EnumJAXBElementPresetAdapter
 		return getDelegate().getLeft();
 	}
 
-	protected ITuple2<? extends ITuple2<? extends QName, ? extends Class<?>>, ? extends RegistryObject<? extends IDuplexFunction<? extends JAXBElement<?>, ?>>> getDelegate() {
+	protected ITuple2<? extends ITuple2<? extends QName, ? extends Class<?>>, ? extends IRegistryObject<? extends IDuplexFunction<? extends JAXBElement<?>, ?>>> getDelegate() {
 		return delegate;
 	}
 }

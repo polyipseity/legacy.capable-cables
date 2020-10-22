@@ -9,7 +9,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.ImmutableExtensionType;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.RegistryObject;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -28,14 +28,14 @@ public interface IUIMinecraftBackgroundExtension
 		private static final INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(IUIExtension.StaticHolder.getDefaultNamespace(), "background");
 		@SuppressWarnings("unchecked")
 		private static final
-		RegistryObject<IExtensionType<INamespacePrefixedString, IUIMinecraftBackgroundExtension, IUIMinecraftViewComponent<?, ?>>> TYPE =
+		IRegistryObject<IExtensionType<INamespacePrefixedString, IUIMinecraftBackgroundExtension, IUIMinecraftViewComponent<?, ?>>> TYPE =
 				UIExtensionRegistry.getInstance().register(getKey(), new ImmutableExtensionType<>(getKey(), (t, i) -> (Optional<? extends IUIMinecraftBackgroundExtension>) i.getExtension(t.getKey())));
 
 		public static INamespacePrefixedString getKey() {
 			return KEY;
 		}
 
-		public static RegistryObject<IExtensionType<INamespacePrefixedString, IUIMinecraftBackgroundExtension, IUIMinecraftViewComponent<?, ?>>> getType() {
+		public static IRegistryObject<IExtensionType<INamespacePrefixedString, IUIMinecraftBackgroundExtension, IUIMinecraftViewComponent<?, ?>>> getType() {
 			return TYPE;
 		}
 	}

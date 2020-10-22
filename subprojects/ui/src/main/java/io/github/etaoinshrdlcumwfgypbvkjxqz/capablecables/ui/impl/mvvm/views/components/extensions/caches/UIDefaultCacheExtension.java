@@ -27,7 +27,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.even
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.RegistryObject;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
 import net.minecraftforge.eventbus.api.EventPriority;
 import sun.misc.Cleaner;
 
@@ -66,7 +66,7 @@ public class UIDefaultCacheExtension
 		;
 
 		@SuppressWarnings({"ThisEscapedInObjectConstruction", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
-		private static final RegistryObject<IUICacheType<IUIComponentManager<?>, IUIComponent>> MANAGER =
+		private static final IRegistryObject<IUICacheType<IUIComponentManager<?>, IUIComponent>> MANAGER =
 				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("manager"),
 						key -> UICacheRegistry.getInstance().register(key,
 								new UIAbstractCacheType<IUIComponentManager<?>, IUIComponent>(key) {
@@ -97,7 +97,7 @@ public class UIDefaultCacheExtension
 									}
 								})));
 		@SuppressWarnings({"ThisEscapedInObjectConstruction", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
-		private static final RegistryObject<IUICacheType<Integer, IUIComponent>> Z =
+		private static final IRegistryObject<IUICacheType<Integer, IUIComponent>> Z =
 				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("z"),
 						key -> UICacheRegistry.getInstance().register(key,
 								new UIAbstractCacheType<Integer, IUIComponent>(key) {
@@ -134,11 +134,11 @@ public class UIDefaultCacheExtension
 									}
 								})));
 
-		public static RegistryObject<IUICacheType<IUIComponentManager<?>, IUIComponent>> getManager() {
+		public static IRegistryObject<IUICacheType<IUIComponentManager<?>, IUIComponent>> getManager() {
 			return MANAGER;
 		}
 
-		public static RegistryObject<IUICacheType<Integer, IUIComponent>> getZ() {
+		public static IRegistryObject<IUICacheType<Integer, IUIComponent>> getZ() {
 			return Z;
 		}
 	}

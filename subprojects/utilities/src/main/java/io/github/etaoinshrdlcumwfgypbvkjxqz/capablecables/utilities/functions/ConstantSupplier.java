@@ -3,10 +3,9 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 
 import javax.annotation.Nullable;
-import java.util.function.Supplier;
 
 public final class ConstantSupplier<T>
-		implements Supplier<T> {
+		implements ICompatibilitySupplier<T> {
 	private static final ConstantSupplier<?> EMPTY = new ConstantSupplier<>();
 	@Nullable
 	private final T constant;
