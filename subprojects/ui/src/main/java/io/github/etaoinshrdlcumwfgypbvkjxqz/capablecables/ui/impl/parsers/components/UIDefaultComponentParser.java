@@ -293,7 +293,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 					atd.getMethod().forEach(IThrowingConsumer.executeNow(m -> {
 						assert m != null;
 						Double[] args = Arrays.stream(
-								AssertionUtilities.assertNonnull(m.getValue()).split(Pattern.quote(m.getDelimiter()))).sequential()
+								AssertionUtilities.assertNonnull(m.getValue()).split(Pattern.quote(m.getDelimiter())))
 								.map(Double::parseDouble)
 								.toArray(Double[]::new);
 
@@ -321,7 +321,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 
 		return sdb.setX(shape.getX()).setY(shape.getY()).setWidth(shape.getWidth()).setHeight(shape.getHeight())
 				.transformConcatenate(transform)
-				.constrain(shape.getConstraint().stream().sequential()
+				.constrain(shape.getConstraint().stream()
 						.map(c -> new ShapeConstraint(
 								c.getMinX().orElse(null),
 								c.getMinY().orElse(null),

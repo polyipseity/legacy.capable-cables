@@ -61,7 +61,7 @@ public enum MinecraftTooltipUtilities {
 				.setFont_(font)
 				.setItemRenderer_(itemRenderer)
 				.renderTooltip(
-						tooltip.stream().sequential()
+						tooltip.stream()
 								.map(CharSequence::toString)
 								.collect(ImmutableList.toImmutableList()),
 						mouseX, mouseY
@@ -78,7 +78,7 @@ public enum MinecraftTooltipUtilities {
 				.setHeight_(height)
 				.setItemRenderer_(itemRenderer)
 				.renderTooltip(
-						tooltip.stream().sequential()
+						tooltip.stream()
 								.map(CharSequence::toString)
 								.collect(ImmutableList.toImmutableList()),
 						mouseX, mouseY,

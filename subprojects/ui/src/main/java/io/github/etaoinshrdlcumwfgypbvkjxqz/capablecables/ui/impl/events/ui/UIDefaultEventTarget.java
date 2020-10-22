@@ -71,7 +71,7 @@ public class UIDefaultEventTarget
 				);
 		}
 
-		return listeners.stream().sequential()
+		return listeners.stream()
 				.filter(shouldHandle)
 				.map(UIEventListenerWithParameters::getListener)
 				.map(listener -> {

@@ -34,7 +34,7 @@ public abstract class UIAbstractComponentPathResolver
 				.map(IUIComponentContainer::getChildrenView)
 				.map(Lists::reverse)
 				.orElseGet(ImmutableList::of)
-				.stream().sequential()
+				.stream()
 				.map(child -> {
 					try (IUIComponentContext componentContextCopy = componentContext.copy()) {
 						componentContextCopy.getMutator().push(componentContextCopy.getStackRef(), child);

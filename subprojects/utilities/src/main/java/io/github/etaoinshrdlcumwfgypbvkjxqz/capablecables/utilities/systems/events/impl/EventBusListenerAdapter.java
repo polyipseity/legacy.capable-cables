@@ -54,7 +54,7 @@ public class EventBusListenerAdapter<T extends Event, O>
 			Optional<Method> methodTemporary = ClassUtilities.getAnyMethod(delegatedClazz, methodName, eventType); // COMMENT quick search
 			if (!methodTemporary.isPresent()) {
 				// COMMENT extensive search
-				methodTemporary = ClassUtilities.getThisAndSuperclassesAndInterfaces(eventType).stream().sequential()
+				methodTemporary = ClassUtilities.getThisAndSuperclassesAndInterfaces(eventType).stream()
 						.flatMap(Collection::stream)
 						.map(otherEventType -> ClassUtilities.getAnyMethod(delegatedClazz, methodName, otherEventType))
 						.filter(Optional::isPresent)

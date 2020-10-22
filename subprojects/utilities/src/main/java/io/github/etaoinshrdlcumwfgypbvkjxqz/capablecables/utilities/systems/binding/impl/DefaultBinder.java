@@ -57,7 +57,7 @@ public class DefaultBinder
 				.map(IThrowingFunction.executeNow(typeEntry -> {
 					assert typeEntry != null;
 					LoadingCache<INamespacePrefixedString, IBindings<?>> typeBindings = getBindings().getUnchecked(AssertionUtilities.assertNonnull(typeEntry.getKey()));
-					return AssertionUtilities.assertNonnull(typeEntry.getValue()).asMap().entrySet().stream().sequential() // COMMENT sequential, field binding order matters
+					return AssertionUtilities.assertNonnull(typeEntry.getValue()).asMap().entrySet().stream() // COMMENT sequential, field binding order matters
 							.map(IThrowingFunction.<Map.Entry<INamespacePrefixedString, ? extends Collection<? extends IBinding<?>>>, Boolean,
 									NoSuchBindingTransformerException>executeNow(entry -> {
 								assert entry != null;
@@ -91,7 +91,7 @@ public class DefaultBinder
 		boolean ret = sortAndTrimBindings(bindings).entrySet().stream().unordered()
 				.map(typeEntry -> {
 					LoadingCache<INamespacePrefixedString, IBindings<?>> typeBindings = getBindings().getUnchecked(AssertionUtilities.assertNonnull(typeEntry.getKey()));
-					return AssertionUtilities.assertNonnull(typeEntry.getValue()).asMap().entrySet().stream().sequential() // COMMENT sequential, field binding order matters
+					return AssertionUtilities.assertNonnull(typeEntry.getValue()).asMap().entrySet().stream() // COMMENT sequential, field binding order matters
 							.map(entry ->
 									typeBindings.getUnchecked(AssertionUtilities.assertNonnull(entry.getKey()))
 											.remove(CastUtilities.castUnchecked( // COMMENT should be of the right type

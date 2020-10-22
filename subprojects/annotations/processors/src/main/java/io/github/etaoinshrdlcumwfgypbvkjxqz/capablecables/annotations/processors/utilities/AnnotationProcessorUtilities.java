@@ -14,7 +14,6 @@ import javax.lang.model.util.Types;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.BaseStream;
 
 /**
  * Contains utilities that can be used for annotation processing.
@@ -93,7 +92,7 @@ public enum AnnotationProcessorUtilities {
 		if (ret.length != 0)
 			return ret;
 		TypeElement type = (TypeElement) executable.getEnclosingElement();
-		return getSuperclassesAndInterfaces(types, type).stream().sequential()
+		return getSuperclassesAndInterfaces(types, type).stream()
 				.flatMap(Collection::stream)
 				.map(TypeElement::getEnclosedElements)
 				.flatMap(Collection::stream)
@@ -149,14 +148,13 @@ public enum AnnotationProcessorUtilities {
 		ret.add(ImmutableSet.copyOf(superclasses));
 		@SuppressWarnings("UnstableApiUsage") AtomicReference<Set<TypeElement>> currentLayerInterfaces =
 				new AtomicReference<>(
-						type.getInterfaces().stream().sequential()
+						type.getInterfaces().stream()
 								.map(types::asElement)
 								.map(TypeElement.class::cast)
 								.collect(ImmutableSet.toImmutableSet()));
-		superclasses.stream().sequential()
+		superclasses.stream()
 				.map(TypeElement::getInterfaces)
 				.map(Collection::stream)
-				.map(BaseStream::sequential)
 				.map(superclassInterfacesStream ->
 						superclassInterfacesStream
 								.map(types::asElement)
@@ -167,7 +165,7 @@ public enum AnnotationProcessorUtilities {
 								currentLayerInterfaces.getAndUpdate(currentLayerInterfaces2 -> {
 									ImmutableSet.Builder<TypeElement> nextLayerInterfaces = ImmutableSet.builder();
 									nextLayerInterfaces.addAll(superclassInterfaces);
-									currentLayerInterfaces2.stream().sequential()
+									currentLayerInterfaces2.stream()
 											.map(TypeElement::getInterfaces)
 											.flatMap(Collection::stream)
 											.map(types::asElement)
@@ -179,7 +177,7 @@ public enum AnnotationProcessorUtilities {
 				.isEmpty()) {
 			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(
 					currentLayerInterfaces.getAndUpdate(currentLayerInterfaces2 ->
-							currentLayerInterfaces2.stream().sequential()
+							currentLayerInterfaces2.stream()
 									.map(TypeElement::getInterfaces)
 									.flatMap(Collection::stream)
 									.map(types::asElement)

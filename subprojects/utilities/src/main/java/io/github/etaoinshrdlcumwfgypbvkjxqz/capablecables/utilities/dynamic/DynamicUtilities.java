@@ -37,7 +37,7 @@ public enum DynamicUtilities {
 
 		@SuppressWarnings("unchecked")
 		public static Optional<Class<?>>[] wrapTypeResolverResults(Class<?>... results) {
-			return Arrays.stream(results).sequential()
+			return Arrays.stream(results)
 					.map(Extensions::wrapTypeResolverResult)
 					.toArray(Optional[]::new);
 		}

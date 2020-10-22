@@ -18,7 +18,7 @@ public interface IUIComponentModifier {
 	@SuppressWarnings("UnstableApiUsage")
 	static <M> Stream<ITuple2<IUIComponentModifier, M>> streamSpecificModifiersUnion(Iterable<? extends IUIComponentModifier> modifiers,
 	                                                                                 Class<M> modifierClass) {
-		return Streams.stream(modifiers).sequential()
+		return Streams.stream(modifiers)
 				.filter(modifierClass::isInstance)
 				.map(modifier -> ImmutableTuple2.of(modifier, modifierClass.cast(modifier)));
 	}
@@ -36,7 +36,7 @@ public interface IUIComponentModifier {
 	@SuppressWarnings("UnstableApiUsage")
 	static <M> Stream<M> streamSpecificModifiers(Iterable<? extends IUIComponentModifier> modifiers,
 	                                             Class<M> modifierClass) {
-		return Streams.stream(modifiers).sequential()
+		return Streams.stream(modifiers)
 				.filter(modifierClass::isInstance)
 				.map(modifierClass::cast);
 	}

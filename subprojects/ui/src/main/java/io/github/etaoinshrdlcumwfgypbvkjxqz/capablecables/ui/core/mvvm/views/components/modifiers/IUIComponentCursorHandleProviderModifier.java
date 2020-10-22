@@ -17,7 +17,7 @@ public interface IUIComponentCursorHandleProviderModifier {
 				Lists.reverse(ImmutableList.copyOf(modifiers)),
 				IUIComponentCursorHandleProviderModifier.class,
 				modifier -> modifier.getCursorHandle(context),
-				cursors -> Streams.stream(cursors).sequential()
+				cursors -> Streams.stream(cursors)
 						.filter(Optional<Long>::isPresent)
 						.map(Optional<Long>::get)
 						.findFirst()

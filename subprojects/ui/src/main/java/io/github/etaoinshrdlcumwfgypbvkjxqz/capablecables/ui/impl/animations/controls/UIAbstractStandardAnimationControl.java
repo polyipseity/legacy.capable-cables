@@ -38,14 +38,14 @@ public abstract class UIAbstractStandardAnimationControl
 	}
 
 	protected static <T extends UIAbstractStandardAnimationControl> IUIAnimationTime calculateTotalDuration(T self, ToLongBiFunction<? super T, ? super Integer> calculateTotalDurationFunction) {
-		if (IntStream.range(0, self.getTargets().size()).sequential()
+		if (IntStream.range(0, self.getTargets().size())
 				.mapToLong(index -> self.getLoops().get(index))
 				.filter(loop -> loop == UIStandardAnimationControlFactory.getInfiniteLoop())
 				.findAny()
 				.isPresent())
 			return UIImmutableAnimationTime.getInfinity();
 		return UIImmutableAnimationTime.of(
-				IntStream.range(0, self.getTargets().size()).sequential()
+				IntStream.range(0, self.getTargets().size())
 						.mapToLong(index -> calculateTotalDurationFunction.applyAsLong(self, index))
 						.max()
 						.orElse(0)

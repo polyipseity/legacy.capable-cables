@@ -47,7 +47,7 @@ public class UIDefaultComponentContainer
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public boolean addChildren(Iterable<? extends IUIComponent> components) {
-		return Streams.stream(components).sequential()
+		return Streams.stream(components)
 				.map(component -> !getChildren().contains(component) && addChildAt(getChildren().size(), component))
 				.reduce(false, Boolean::logicalOr);
 	}

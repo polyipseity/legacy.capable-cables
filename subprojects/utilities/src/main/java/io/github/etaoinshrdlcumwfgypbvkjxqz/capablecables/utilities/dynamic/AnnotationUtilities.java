@@ -54,7 +54,7 @@ public enum AnnotationUtilities {
 
 		String mName = method.getName();
 		Class<?>[] mArgs = method.getParameterTypes();
-		return ClassUtilities.getSuperclassesAndInterfaces(method.getDeclaringClass()).stream().sequential()
+		return ClassUtilities.getSuperclassesAndInterfaces(method.getDeclaringClass()).stream()
 				.flatMap(Collection::stream)
 				.map(clazz -> {
 					try {

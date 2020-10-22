@@ -12,7 +12,7 @@ public interface IUIVirtualComponent
 	@SuppressWarnings("UnstableApiUsage")
 	static ImmutableList<IUIVirtualComponent> findVirtualComponents(IUIComponentContext context, IUIComponent component, Point2D point) {
 		return component.getModifiersView()
-				.stream().sequential()
+				.stream()
 				.filter(IUIVirtualComponent.class::isInstance)
 				.map(IUIVirtualComponent.class::cast)
 				.filter(modifier -> modifier.containsPoint(context, point))

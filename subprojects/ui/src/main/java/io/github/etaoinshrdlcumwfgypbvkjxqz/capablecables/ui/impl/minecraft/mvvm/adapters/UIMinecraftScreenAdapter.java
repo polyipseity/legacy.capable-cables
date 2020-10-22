@@ -460,8 +460,7 @@ public class UIMinecraftScreenAdapter
 							.orElseGet(ImmutableList::of);
 			int equalParents = 0;
 			for (@SuppressWarnings("UnstableApiUsage") Iterator<Boolean> iterator =
-			     Streams.zip(op.stream().sequential(), np.stream().sequential(), Object::equals).sequential()
-					     .iterator();
+			     Streams.zip(op.stream(), np.stream(), Object::equals).iterator();
 			     iterator.hasNext(); ) {
 				if (!iterator.next())
 					break;

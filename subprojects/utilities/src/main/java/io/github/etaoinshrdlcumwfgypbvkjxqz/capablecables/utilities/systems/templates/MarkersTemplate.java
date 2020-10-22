@@ -44,7 +44,7 @@ public abstract class MarkersTemplate {
 	public final Marker getMarker(@NonNls CharSequence string) { return MarkerFactory.getMarker(getNamespacePrefixedString(string)); }
 
 	public static Marker addReferences(Marker marker, Marker... references) {
-		Arrays.stream(references).sequential().forEachOrdered(marker::add);
+		Arrays.stream(references).forEachOrdered(marker::add);
 		return marker;
 	}
 

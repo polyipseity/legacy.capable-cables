@@ -86,7 +86,7 @@ public enum MapUtilities {
 	@SuppressWarnings("UnstableApiUsage")
 	public static <K, V> ImmutableMap<V, K> inverse(Map<K, V> instance)
 			throws IllegalArgumentException {
-		return instance.entrySet().stream().sequential()
+		return instance.entrySet().stream()
 				.collect(ImmutableMap.toImmutableMap(Map.Entry::getValue, Map.Entry::getKey));
 	}
 
@@ -97,7 +97,7 @@ public enum MapUtilities {
 
 	@SuppressWarnings("UnstableApiUsage")
 	public static <K> ImmutableMap<K, ?> immutableDeepCopyOf(Map<K, ?> instance) {
-		return instance.entrySet().stream().sequential()
+		return instance.entrySet().stream()
 				.map(entry -> {
 					@Nullable Object value = entry.getValue();
 					return Maps.immutableEntry(entry.getKey(), value instanceof Map ? immutableDeepCopyOf(((Map<?, ?>) value)) : value);

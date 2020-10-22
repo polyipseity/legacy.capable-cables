@@ -14,7 +14,7 @@ public interface IShapeAnchorSet {
 	@SuppressWarnings("UnstableApiUsage")
 	default boolean removeAnchors(Iterable<? extends IShapeAnchor> anchors) {
 		Map<? extends EnumUISide, ? extends IShapeAnchor> as = getAnchorsView();
-		return removeSides(Streams.stream(anchors).sequential()
+		return removeSides(Streams.stream(anchors)
 				.filter(as::containsValue)
 				.map(IShapeAnchor::getOriginSide)
 				.collect(ImmutableList.toImmutableList()));

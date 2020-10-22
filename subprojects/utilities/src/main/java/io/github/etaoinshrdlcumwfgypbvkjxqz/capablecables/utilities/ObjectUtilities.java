@@ -52,7 +52,7 @@ public enum ObjectUtilities {
 	@SuppressWarnings({"MagicNumber", "UnstableApiUsage"})
 	public static <T> int hashCode(T self, @Nullable IntSupplier superMethod, Iterable<? extends Function<? super T, ?>> variables) {
 		final int[] result = {Optional.ofNullable(superMethod).orElse(getHashCodeSuperMethodDefault()).getAsInt()};
-		Streams.stream(variables).sequential()
+		Streams.stream(variables)
 				.map(variable -> variable.apply(self))
 				.mapToInt(Objects::hashCode)
 				.forEachOrdered(variableHashCode -> {

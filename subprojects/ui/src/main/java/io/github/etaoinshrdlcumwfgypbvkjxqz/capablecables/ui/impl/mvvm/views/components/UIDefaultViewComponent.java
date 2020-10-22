@@ -312,7 +312,7 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 
 									@Override
 									protected List<IUIComponent> load(IUIViewComponent<?, ?> container) {
-										return container.getChildrenFlatView().stream().sequential()
+										return container.getChildrenFlatView().stream()
 												.filter(IUIComponent::isFocusable)
 												.collect(ImmutableList.toImmutableList());
 									}

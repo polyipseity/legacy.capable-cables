@@ -32,7 +32,7 @@ public enum UIEventUtilities {
 			ImmutableList<INode> path = computeNodePath((INode) et);
 
 			event.advancePhase();
-			path.subList(0, path.size() - 1).stream().sequential()
+			path.subList(0, path.size() - 1).stream()
 					.filter(IUIEventTarget.class::isInstance)
 					.map(IUIEventTarget.class::cast)
 					.filter(IUIEventTarget::isActive)
@@ -44,7 +44,7 @@ public enum UIEventUtilities {
 
 			if (!event.isPropagationStopped() && event.canBubble()) {
 				event.advancePhase();
-				path.subList(0, path.size() - 1).reverse().stream().sequential()
+				path.subList(0, path.size() - 1).reverse().stream()
 						.filter(IUIEventTarget.class::isInstance)
 						.map(IUIEventTarget.class::cast)
 						.filter(IUIEventTarget::isActive)

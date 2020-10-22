@@ -81,7 +81,7 @@ public class ProperLoggingEventBuilder
 
 	@Override
 	public void log(String message, Object... args) {
-		Arrays.stream(args).sequential()
+		Arrays.stream(args)
 				.forEachOrdered(this::addArgument);
 		log(message);
 	}

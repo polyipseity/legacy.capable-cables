@@ -26,7 +26,7 @@ public class LogMessageBuilder {
 
 	public LogMessageBuilder addMarkers(Object... markers) {
 		return addMarkers(
-				Arrays.stream(markers).sequential()
+				Arrays.stream(markers)
 						.map(ConstantSupplier::of)
 						.toArray(Supplier[]::new));
 	}
@@ -41,7 +41,7 @@ public class LogMessageBuilder {
 
 	public LogMessageBuilder addMessages(Object... messages) {
 		return addMessages(
-				Arrays.stream(messages).sequential()
+				Arrays.stream(messages)
 						.map(ConstantSupplier::of)
 						.toArray(Supplier[]::new));
 	}
@@ -59,7 +59,7 @@ public class LogMessageBuilder {
 
 	public LogMessageBuilder addArguments(Object... arguments) {
 		return addArguments(
-				Arrays.stream(arguments).sequential()
+				Arrays.stream(arguments)
 						.map(ConstantSupplier::of)
 						.toArray(Supplier[]::new));
 	}
@@ -81,11 +81,11 @@ public class LogMessageBuilder {
 		getKeyValuePairs().forEach((key, value) ->
 				ret.append(key).append('=').append(AssertionUtilities.assertNonnull(value).get()).append(' '));
 		ret.append(FormattingUtilities.formatSimpleParameterized(
-				getMessages().stream().sequential()
+				getMessages().stream()
 						.map(Supplier::get)
 						.map(Objects::toString)
 						.reduce("", String::concat, String::concat),
-				getArguments().stream().sequential()
+				getArguments().stream()
 						.map(Supplier::get)
 						.toArray()));
 		return ret.toString();

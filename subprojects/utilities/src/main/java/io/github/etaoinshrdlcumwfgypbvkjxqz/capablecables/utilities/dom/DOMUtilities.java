@@ -16,7 +16,7 @@ public enum DOMUtilities {
 	@SuppressWarnings({"UnstableApiUsage", "CallToSuspiciousStringMethod"})
 	public static List<Node> getChildrenByTagName(Node node, CharSequence name) {
 		String name2 = name.toString();
-		return new NodeListList(node.getChildNodes()).stream().sequential()
+		return new NodeListList(node.getChildNodes()).stream()
 				.filter(n -> name2.equals(n.getLocalName()))
 				.collect(ImmutableList.toImmutableList());
 	}
@@ -27,7 +27,7 @@ public enum DOMUtilities {
 	public static List<Node> getChildrenByTagNameNS(Node node, @Nullable CharSequence namespaceURI, CharSequence name) {
 		@Nullable String namespaceURI2 = Optional.ofNullable(namespaceURI).map(CharSequence::toString).orElse(null);
 		String name2 = name.toString();
-		return new NodeListList(node.getChildNodes()).stream().sequential()
+		return new NodeListList(node.getChildNodes()).stream()
 				.filter(n -> Objects.equals(n.getNamespaceURI(), namespaceURI2)
 						&& name2.equals(n.getLocalName()))
 				.collect(ImmutableList.toImmutableList());

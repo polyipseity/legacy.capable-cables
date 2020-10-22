@@ -44,7 +44,7 @@ public enum ClassUtilities {
 
 	@SuppressWarnings("UnstableApiUsage")
 	public static Set<Field> getAllFields(Class<?> clazz) {
-		return getThisAndSuperclassesAndInterfaces(clazz).stream().sequential()
+		return getThisAndSuperclassesAndInterfaces(clazz).stream()
 				.flatMap(Collection::stream)
 				.map(Class::getDeclaredFields)
 				.flatMap(Arrays::stream)
@@ -61,7 +61,7 @@ public enum ClassUtilities {
 		ret.add(ImmutableSet.copyOf(superclasses));
 		AtomicReference<Set<Class<?>>> currentLayerInterfaces =
 				new AtomicReference<>(ImmutableSet.copyOf(clazz.getInterfaces()));
-		superclasses.stream().sequential()
+		superclasses.stream()
 				.map(Class::getInterfaces)
 				.map(ImmutableList::copyOf)
 				.forEachOrdered(superclassInterfaces ->
@@ -69,7 +69,7 @@ public enum ClassUtilities {
 								currentLayerInterfaces.getAndUpdate(currentLayerInterfaces2 -> {
 									ImmutableSet.Builder<Class<?>> nextLayerInterfaces = ImmutableSet.builder();
 									nextLayerInterfaces.addAll(superclassInterfaces);
-									currentLayerInterfaces2.stream().sequential()
+									currentLayerInterfaces2.stream()
 											.map(Class::getInterfaces)
 											.flatMap(Arrays::stream)
 											.forEachOrdered(nextLayerInterfaces::add);
@@ -79,7 +79,7 @@ public enum ClassUtilities {
 				.isEmpty()) {
 			ret.add(ImmutableSet.copyOf(AssertionUtilities.assertNonnull(
 					currentLayerInterfaces.getAndUpdate(currentLayerInterfaces2 ->
-							currentLayerInterfaces2.stream().sequential()
+							currentLayerInterfaces2.stream()
 									.map(Class::getInterfaces)
 									.flatMap(Arrays::stream)
 									.collect(ImmutableSet.toImmutableSet())))));
@@ -102,7 +102,7 @@ public enum ClassUtilities {
 
 	public static Optional<Field> getAnyField(Class<?> clazz, CharSequence name) {
 		String name2 = name.toString();
-		return ClassUtilities.getThisAndSuperclassesAndInterfaces(clazz).stream().sequential()
+		return ClassUtilities.getThisAndSuperclassesAndInterfaces(clazz).stream()
 				.flatMap(Collection::stream)
 				.map(clazz1 -> {
 					try {
@@ -117,7 +117,7 @@ public enum ClassUtilities {
 
 	public static Optional<Method> getAnyMethod(Class<?> clazz, CharSequence name, Class<?>... parameterTypes) {
 		String name2 = name.toString();
-		return ClassUtilities.getThisAndSuperclassesAndInterfaces(clazz).stream().sequential()
+		return ClassUtilities.getThisAndSuperclassesAndInterfaces(clazz).stream()
 				.flatMap(Collection::stream)
 				.map(clazz1 -> {
 					try {
@@ -132,7 +132,7 @@ public enum ClassUtilities {
 
 	@SuppressWarnings("UnstableApiUsage")
 	public static Set<Method> getAllMethods(Class<?> clazz) {
-		return getThisAndSuperclassesAndInterfaces(clazz).stream().sequential()
+		return getThisAndSuperclassesAndInterfaces(clazz).stream()
 				.flatMap(Collection::stream)
 				.map(Class::getDeclaredMethods)
 				.flatMap(Arrays::stream)

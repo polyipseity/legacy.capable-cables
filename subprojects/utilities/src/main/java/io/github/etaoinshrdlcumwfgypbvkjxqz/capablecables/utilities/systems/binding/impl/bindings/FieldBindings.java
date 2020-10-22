@@ -43,7 +43,7 @@ public class FieldBindings
 	@SuppressWarnings("UnstableApiUsage")
 	public boolean add(Iterable<? extends IBindingField<?>> fields)
 			throws NoSuchBindingTransformerException {
-		return Streams.stream(fields).sequential() // COMMENT sequential, field binding order matters
+		return Streams.stream(fields) // COMMENT sequential, field binding order matters
 				.filter(key -> !getFields().containsKey(key))
 				.reduce(false, IThrowingBiFunction.executeNow((r, f) -> {
 					assert f != null;

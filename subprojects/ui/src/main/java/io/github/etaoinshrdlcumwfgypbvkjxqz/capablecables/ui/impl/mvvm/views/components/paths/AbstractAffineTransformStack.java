@@ -12,7 +12,7 @@ public abstract class AbstractAffineTransformStack
 	public AbstractAffineTransformStack copy() {
 		AbstractAffineTransformStack ret = newInstanceForCopying();
 		ret.getData().clear();
-		getData().stream().sequential()
+		getData().stream()
 				.map(AffineTransform::clone)
 				.map(AffineTransform.class::cast)
 				.forEachOrdered(ret.getData()::add);
