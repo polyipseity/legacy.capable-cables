@@ -61,9 +61,9 @@ public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUICompo
 												assert componentContext != null;
 												IUIComponentMinecraft component = (IUIComponentMinecraft) result.getComponent();
 												IUIComponentModifier.streamSpecificModifiersUnion(result.getModifiersView(), IUIComponentRendererInvokerModifier.class)
-														.forEachOrdered(modifier -> {
-															IUIComponentModifier left = modifier.getLeft();
-															IUIComponentRendererInvokerModifier right = modifier.getRight();
+														.forEachOrdered(modifierIntersection -> {
+															IUIComponentModifier left = modifierIntersection.getLeft();
+															IUIComponentRendererInvokerModifier right = modifierIntersection.getRight();
 															EnumModifyStage.PRE.advanceModifyStage(left);
 															right.invokeRenderer(componentContext); // COMMENT pre
 															left.resetModifyStage();
@@ -87,9 +87,9 @@ public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUICompo
 															EnumCropStage.UN_CROP, cropMethod, partialTicks);
 												});
 												IUIComponentModifier.streamSpecificModifiersUnion(result.getModifiersView(), IUIComponentRendererInvokerModifier.class)
-														.forEachOrdered(modifier -> {
-															IUIComponentModifier left = modifier.getLeft();
-															IUIComponentRendererInvokerModifier right = modifier.getRight();
+														.forEachOrdered(modifierIntersection -> {
+															IUIComponentModifier left = modifierIntersection.getLeft();
+															IUIComponentRendererInvokerModifier right = modifierIntersection.getRight();
 															EnumModifyStage.POST.advanceModifyStage(left);
 															right.invokeRenderer(componentContext); // COMMENT post
 															left.resetModifyStage();

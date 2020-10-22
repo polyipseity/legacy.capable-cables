@@ -3,8 +3,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.co
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableTuple2;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.IIntersection;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableIntersection;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -16,11 +16,11 @@ import java.util.stream.Stream;
 
 public interface IUIComponentModifier {
 	@SuppressWarnings("UnstableApiUsage")
-	static <M> Stream<ITuple2<IUIComponentModifier, M>> streamSpecificModifiersUnion(Iterable<? extends IUIComponentModifier> modifiers,
-	                                                                                 Class<M> modifierClass) {
+	static <M> Stream<IIntersection<IUIComponentModifier, M>> streamSpecificModifiersUnion(Iterable<? extends IUIComponentModifier> modifiers,
+	                                                                                       Class<M> modifierClass) {
 		return Streams.stream(modifiers)
 				.filter(modifierClass::isInstance)
-				.map(modifier -> ImmutableTuple2.of(modifier, modifierClass.cast(modifier)));
+				.map(modifier -> ImmutableIntersection.of(modifier, modifierClass.cast(modifier)));
 	}
 
 	static <M> void handleComponentModifiers(M component,

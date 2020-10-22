@@ -36,7 +36,7 @@ public final class ImmutableTuple2<L, R>
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	public boolean equals(Object o) {
-		return ObjectUtilities.equals(this, CastUtilities.<Class<ImmutableTuple2<?, ?>>>castUnchecked(ITuple2.class), o, true, null, StaticHolder.getObjectVariables());
+		return ObjectUtilities.equals(this, CastUtilities.<Class<ITuple2<?, ?>>>castUnchecked(ITuple2.class), o, true, null, StaticHolder.getObjectVariables());
 	}
 
 	@Override
