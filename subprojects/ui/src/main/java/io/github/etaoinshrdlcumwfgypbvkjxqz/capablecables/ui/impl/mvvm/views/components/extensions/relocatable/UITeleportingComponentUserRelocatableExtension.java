@@ -54,9 +54,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class UITeleportingComponentUserRelocatableExtension<E extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
-		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, E>
-		implements IUIComponentUserRelocatableExtension<E> {
+public class UITeleportingComponentUserRelocatableExtension<C extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
+		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, C>
+		implements IUIComponentUserRelocatableExtension<C> {
 	@NonNls
 	public static final String PROPERTY_ACTIVATION_MOUSE_BUTTONS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.extension.user_relocatable.activation.mouse";
 	@NonNls
@@ -72,7 +72,7 @@ public class UITeleportingComponentUserRelocatableExtension<E extends IUICompone
 	@SuppressWarnings("unchecked")
 	@UIExtensionConstructor
 	public UITeleportingComponentUserRelocatableExtension(UIExtensionConstructor.IArguments arguments) {
-		super(IUIComponent.class, (Class<E>) arguments.getContainerClass());
+		super((Class<C>) arguments.getContainerClass());
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.activationMouseButtons = IUIPropertyMappingValue.<Set<Integer>>createBindingField(CastUtilities.castUnchecked(Set.class), false,

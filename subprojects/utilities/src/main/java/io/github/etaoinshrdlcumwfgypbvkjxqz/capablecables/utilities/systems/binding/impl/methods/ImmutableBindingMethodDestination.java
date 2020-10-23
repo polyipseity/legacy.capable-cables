@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.methods;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
+import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.methods.IBindingMethodDestination;
 
@@ -9,14 +9,16 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public final class ImmutableBindingMethodDestination<T>
-		extends IHasGenericClass.Impl<T>
 		implements IBindingMethodDestination<T> {
+	@SuppressWarnings("UnstableApiUsage")
+	private final TypeToken<T> typeToken;
 	@Nullable
 	private final INamespacePrefixedString bindingKey;
 	private final Consumer<T> action;
 
-	public ImmutableBindingMethodDestination(Class<T> genericClass, @Nullable INamespacePrefixedString bindingKey, Consumer<T> action) {
-		super(genericClass);
+	@SuppressWarnings("UnstableApiUsage")
+	public ImmutableBindingMethodDestination(Class<T> type, @Nullable INamespacePrefixedString bindingKey, Consumer<T> action) {
+		this.typeToken = TypeToken.of(type);
 		this.bindingKey = bindingKey;
 		this.action = action;
 	}
@@ -26,4 +28,10 @@ public final class ImmutableBindingMethodDestination<T>
 
 	@Override
 	public void accept(T argument) { action.accept(argument); }
+
+	@SuppressWarnings("UnstableApiUsage")
+	@Override
+	public TypeToken<T> getTypeToken() {
+		return typeToken;
+	}
 }

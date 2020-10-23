@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.events.bus;
 
+import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.events.bus.IUIMinecraftRenderEventExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIAbstractViewBusEvent;
@@ -13,6 +14,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public final class UIImmutableMinecraftRenderEventExtension
 		implements IUIMinecraftRenderEventExtension {
 	private final double partialTicks;
+	@SuppressWarnings("UnstableApiUsage")
+	private final TypeToken<UIAbstractViewBusEvent<?>> typeToken = TypeToken.of(CastUtilities.castUnchecked(UIAbstractViewBusEvent.class));
 
 	private UIImmutableMinecraftRenderEventExtension(double partialTicks) {
 		this.partialTicks = partialTicks;
@@ -27,9 +30,10 @@ public final class UIImmutableMinecraftRenderEventExtension
 		return IUIMinecraftRenderEventExtension.StaticHolder.getType();
 	}
 
+	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public Class<UIAbstractViewBusEvent<?>> getGenericClass() {
-		return CastUtilities.castUnchecked(UIAbstractViewBusEvent.class);
+	public TypeToken<? extends UIAbstractViewBusEvent<?>> getTypeToken() {
+		return typeToken;
 	}
 
 	@Override

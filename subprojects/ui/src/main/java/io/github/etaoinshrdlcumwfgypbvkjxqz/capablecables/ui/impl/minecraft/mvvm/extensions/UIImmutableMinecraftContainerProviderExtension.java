@@ -1,9 +1,9 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.extensions;
 
+import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.extensions.IUIMinecraftContainerProviderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import net.minecraft.inventory.container.Container;
@@ -12,13 +12,19 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class UIImmutableMinecraftContainerProviderExtension
-		extends IHasGenericClass.Impl<IUIInfrastructure<?, ?, ?>>
 		implements IUIMinecraftContainerProviderExtension {
+	@SuppressWarnings("UnstableApiUsage")
+	private final TypeToken<IUIInfrastructure<?, ?, ?>> typeToken = TypeToken.of(CastUtilities.castUnchecked(IUIInfrastructure.class));
 	private final Container container;
 
 	public UIImmutableMinecraftContainerProviderExtension(Container container) {
-		super(CastUtilities.castUnchecked(IUIInfrastructure.class)); // COMMENT class should not care about it
 		this.container = container;
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	@Override
+	public TypeToken<IUIInfrastructure<?, ?, ?>> getTypeToken() {
+		return typeToken;
 	}
 
 	@Override

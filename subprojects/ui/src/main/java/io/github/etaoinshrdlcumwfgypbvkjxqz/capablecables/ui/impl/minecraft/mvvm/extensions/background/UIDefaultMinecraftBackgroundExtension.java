@@ -55,8 +55,7 @@ public class UIDefaultMinecraftBackgroundExtension
 
 	@UIExtensionConstructor
 	public UIDefaultMinecraftBackgroundExtension(@SuppressWarnings("unused") UIExtensionConstructor.IArguments arguments) {
-		super(CastUtilities.castUnchecked(IUIMinecraftViewComponent.class),
-				CastUtilities.castUnchecked(IUIMinecraftViewComponent.class));
+		super(CastUtilities.castUnchecked(IUIMinecraftViewComponent.class));
 	}
 
 	protected static UIExtensionConstructor.IArguments getDefaultArguments() { return DEFAULT_ARGUMENTS; }

@@ -1,8 +1,9 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors;
 
 import com.google.common.collect.Iterables;
+import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeConstraint;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ITypeCapture;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
@@ -11,13 +12,17 @@ import java.awt.geom.AffineTransform;
 
 @SuppressWarnings("UnusedReturnValue")
 public interface IShapeDescriptorBuilder<S extends Shape>
-		extends IHasGenericClass<S> {
+		extends ITypeCapture {
 	static void addUIObjects(IShapeDescriptor<?> shapeDescriptor, Iterable<? extends IShapeConstraint> constraints) {
 		shapeDescriptor.modify(() -> {
 			Iterables.addAll(shapeDescriptor.getConstraintsRef(), constraints);
 			return false;
 		});
 	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	@Override
+	TypeToken<S> getTypeToken();
 
 	IShapeDescriptorBuilder<S> setProperty(@NonNls CharSequence key, @Nullable Object value)
 			throws IllegalArgumentException;

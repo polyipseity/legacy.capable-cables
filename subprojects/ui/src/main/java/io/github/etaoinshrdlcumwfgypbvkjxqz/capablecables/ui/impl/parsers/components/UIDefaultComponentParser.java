@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.components;
 
 import com.google.common.collect.*;
+import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
@@ -36,7 +37,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.Anno
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingConsumer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingFunction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ITypeCapture;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
@@ -51,7 +52,7 @@ import java.util.regex.Pattern;
 
 public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		extends UIAbstractDefaultComponentParser<T, Ui, Ui, IUIDefaultComponentParserContext>
-		implements IHasGenericClass<T> {
+		implements ITypeCapture {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	private static final @Immutable Map<IUIEventType, Function<Component, Optional<String>>> EVENT_TYPE_FUNCTION_MAP = ImmutableMap.<IUIEventType, Function<Component, Optional<String>>>builder()
 			.put(EnumUIEventDOMType.LOAD, Component::getLoad)
@@ -83,10 +84,12 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 			.put(EnumUIEventDOMType.COMPOSITION_END, Component::getCompositionend)
 			.put(EnumUIEventComponentType.CHAR_TYPED, Component::getCharTyped)
 			.build();
-	private final Class<T> genericClass;
+	@SuppressWarnings("UnstableApiUsage")
+	private final TypeToken<T> typeToken;
 
-	public UIDefaultComponentParser(Class<T> genericClass) {
-		this.genericClass = genericClass;
+	@SuppressWarnings("UnstableApiUsage")
+	public UIDefaultComponentParser(Class<T> type) {
+		this.typeToken = TypeToken.of(type);
 	}
 
 	public static <T extends UIDefaultComponentParser<?>> T makeParserStandard(T instance) {
@@ -101,16 +104,16 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 	protected Iterable<? extends Using> getRawAliases(Ui resource)
 			throws UIParserCheckedException, UIParserUncheckedException { return resource.getUsing(); }
 
-	@SuppressWarnings("RedundantThrows")
+	@SuppressWarnings({"RedundantThrows", "UnstableApiUsage"})
 	@Override
 	public Ui parse1(Ui resource)
 			throws Throwable {
 		Class<?> viewClass = AssertionUtilities.assertNonnull(getAliases().get(resource.getView().getClazz()));
-		if (!getGenericClass().isAssignableFrom(viewClass))
+		if (!getTypeToken().getRawType().isAssignableFrom(viewClass))
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
 							.addMarkers(UIMarkers.getInstance()::getMarkerParser)
-							.addKeyValue("viewClass", viewClass).addKeyValue("this::getGenericClass", this::getGenericClass)
+							.addKeyValue("viewClass", viewClass).addKeyValue("this::getGenericClass", this::getTypeToken)
 							.addMessages(() -> getResourceBundle().getString("construct.view.instance_of.fail"))
 							.build()
 			);
@@ -118,8 +121,9 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		return resource;
 	}
 
+	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public Class<T> getGenericClass() { return genericClass; }
+	public TypeToken<? extends T> getTypeToken() { return typeToken; }
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 

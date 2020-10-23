@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields;
 
+import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinding;
 
 import javax.annotation.Nullable;
@@ -10,8 +11,9 @@ public interface IBindingField<T>
 	@Override
 	default EnumBindingType getBindingType() { return EnumBindingType.FIELD; }
 
+	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	default Class<T> getGenericClass() { return getField().getGenericClass(); }
+	default TypeToken<T> getTypeToken() { return getField().getTypeToken(); }
 
 	IObservableField<T> getField();
 

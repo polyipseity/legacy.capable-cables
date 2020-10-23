@@ -22,11 +22,12 @@ import java.util.function.Consumer;
 
 public interface IUIRendererContainer<R extends IUIRenderer<?>>
 		extends INamed, IHasBinding {
+	@SuppressWarnings("UnstableApiUsage")
 	static <R extends IUIRenderer<?>> void setRendererImpl(Object container,
 	                                                       @Nullable R renderer,
 	                                                       Consumer<? super R> setter,
 	                                                       @Nullable IUIRenderer<?> previousRenderer) {
-		if (!(renderer == null || renderer.getGenericClass().isInstance(container)))
+		if (!(renderer == null || renderer.getTypeToken().getRawType().isInstance(container)))
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
 							.addMarkers(UIMarkers.getInstance()::getMarkerUIComponentRenderer)

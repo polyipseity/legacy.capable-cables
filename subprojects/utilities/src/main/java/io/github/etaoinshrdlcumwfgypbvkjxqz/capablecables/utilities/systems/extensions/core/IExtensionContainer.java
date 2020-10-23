@@ -4,7 +4,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilitie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 
 import java.util.Map;
@@ -19,13 +18,11 @@ public interface IExtensionContainer<K> {
 		// COMMENT use one of the checked version
 	Optional<? extends IExtension<? extends K, ?>> addExtension(IExtension<? extends K, ?> extension);
 
-	@SuppressWarnings("UnusedReturnValue")
-	static <K, V extends IExtension<? extends K, C> & IHasGenericClass.Extended<C, ? super E>, C extends IExtensionContainer<K>, E extends C> Optional<? extends IExtension<? extends K, ?>> addExtensionExtendedChecked(E container, V extension) { return container.addExtension(extension); }
-
 	static <K> Optional<? extends IExtension<? extends K, ?>> getExtensionImpl(Map<K, ? extends IExtension<? extends K, ?>> extensions, K key) { return Optional.ofNullable(extensions.get(key)); }
 
+	@SuppressWarnings("UnstableApiUsage")
 	static <K> Optional<? extends IExtension<? extends K, ?>> addExtensionImpl(IExtensionContainer<K> container, Map<K, ? super IExtension<? extends K, ?>> extensions, IExtension<? extends K, ?> extension) {
-		if (!extension.getGenericClass().isInstance(container))
+		if (!extension.getTypeToken().getRawType().isInstance(container))
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
 							.addMarkers(UtilitiesMarkers.getInstance()::getMarkerExtension)

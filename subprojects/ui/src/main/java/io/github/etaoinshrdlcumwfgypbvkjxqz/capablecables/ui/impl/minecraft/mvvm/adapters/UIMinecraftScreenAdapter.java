@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Streams;
+import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIContextContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.adapters.IUIAdapter;
@@ -26,7 +27,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftOpenGLUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTextComponentUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTooltipUtilities;
@@ -587,13 +587,19 @@ public class UIMinecraftScreenAdapter
 
 	@OnlyIn(Dist.CLIENT)
 	public static class UIDefaultMinecraftScreenProviderExtension
-			extends IHasGenericClass.Impl<IUIInfrastructure<?, ?, ?>>
 			implements IUIMinecraftScreenProviderExtension {
+		@SuppressWarnings("UnstableApiUsage")
+		private final TypeToken<IUIInfrastructure<?, ?, ?>> typeToken = TypeToken.of(CastUtilities.castUnchecked(IUIInfrastructure.class));
 		private final OptionalWeakReference<UIMinecraftScreenAdapter<?, ?>> owner;
 
 		public UIDefaultMinecraftScreenProviderExtension(UIMinecraftScreenAdapter<?, ?> owner) {
-			super(CastUtilities.castUnchecked(IUIInfrastructure.class)); // COMMENT class should not care about it
 			this.owner = new OptionalWeakReference<>(owner);
+		}
+
+		@SuppressWarnings("UnstableApiUsage")
+		@Override
+		public TypeToken<? extends IUIInfrastructure<?, ?, ?>> getTypeToken() {
+			return typeToken;
 		}
 
 		@Override

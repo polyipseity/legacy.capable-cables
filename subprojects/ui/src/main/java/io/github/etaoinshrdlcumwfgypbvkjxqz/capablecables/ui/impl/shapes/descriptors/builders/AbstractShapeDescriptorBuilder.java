@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.descriptors.builders;
 
 import com.google.common.collect.Iterables;
+import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptor;
@@ -8,7 +9,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descrip
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeConstraint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl.UIObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import org.jetbrains.annotations.NonNls;
@@ -22,14 +22,24 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
-		extends IHasGenericClass.Impl<S>
 		implements IShapeDescriptorBuilder<S> {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	private final AffineTransform transform = new AffineTransform();
 	private final Rectangle2D bounds = IShapeDescriptor.StaticHolder.getShapePlaceholder();
 	private final List<IShapeConstraint> constraints = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
+	@SuppressWarnings({"FieldCanBeLocal", "UnstableApiUsage"})
+	private final TypeToken<S> typeToken;
 
-	protected AbstractShapeDescriptorBuilder(Class<S> genericClass) { super(genericClass); }
+	@SuppressWarnings("UnstableApiUsage")
+	protected AbstractShapeDescriptorBuilder(Class<S> type) {
+		this.typeToken = TypeToken.of(type);
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	@Override
+	public TypeToken<S> getTypeToken() {
+		return typeToken;
+	}
 
 	@Override
 	public AbstractShapeDescriptorBuilder<S> setProperty(@NonNls CharSequence key, @Nullable Object value) throws IllegalArgumentException {

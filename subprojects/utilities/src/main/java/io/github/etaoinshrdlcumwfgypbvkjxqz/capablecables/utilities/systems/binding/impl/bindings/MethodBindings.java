@@ -70,12 +70,16 @@ public class MethodBindings
 	                                                                 Iterable<? extends IBindingMethodDestination<?>> destinations,
 	                                                                 Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>> transformers) {
 		return new LoggingDisposableObserver<>(new DefaultDisposableObserver<T>() {
+			@SuppressWarnings("UnstableApiUsage")
 			@Override
 			public void onNext(@Nonnull T t) {
 				try {
 					destinations.forEach(IThrowingConsumer.executeNow(destination -> {
 						AssertionUtilities.assertNonnull(destination).accept(CastUtilities.castUncheckedNullable(
-								transform(transformers, t, source.getGenericClass(), destination.getGenericClass()))); // COMMENT should be of the correct type
+								transform(transformers,
+										t,
+										source.getTypeToken().getRawType(),
+										destination.getTypeToken().getRawType()))); // COMMENT should be of the correct type
 					}));
 				} catch (NoSuchBindingTransformerException ex) {
 					onError(ex);

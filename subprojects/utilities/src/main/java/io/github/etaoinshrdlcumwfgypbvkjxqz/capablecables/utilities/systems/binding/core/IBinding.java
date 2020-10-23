@@ -1,7 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core;
 
 import com.google.common.cache.Cache;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
+import com.google.common.reflect.TypeToken;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ITypeCapture;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.bindings.IBindings;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
@@ -11,8 +12,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public interface IBinding<T> extends IHasGenericClass<T>, IHasBindingKey {
+public interface IBinding<T> extends ITypeCapture, IHasBindingKey {
 	EnumBindingType getBindingType();
+
+	@SuppressWarnings("UnstableApiUsage")
+	@Override
+	TypeToken<T> getTypeToken();
 
 	enum EnumBindingType {
 		FIELD {

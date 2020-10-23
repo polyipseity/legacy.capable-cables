@@ -29,8 +29,7 @@ public class UIComponentCursorHandleProviderExtension
 
 	@UIExtensionConstructor
 	public UIComponentCursorHandleProviderExtension(@SuppressWarnings("unused") UIExtensionConstructor.IArguments arguments) {
-		super(CastUtilities.castUnchecked(IUIView.class),
-				CastUtilities.castUnchecked(IUIViewComponent.class));
+		super(CastUtilities.castUnchecked(IUIViewComponent.class));
 	}
 
 	protected static UIExtensionConstructor.IArguments getDefaultArguments() { return DEFAULT_ARGUMENTS; }

@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.methods;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
+import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.methods.IBindingMethodSource;
 import io.reactivex.rxjava3.core.ObservableSource;
@@ -11,14 +11,16 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 public final class ImmutableBindingMethodSource<T>
-		extends IHasGenericClass.Impl<T>
 		implements IBindingMethodSource<T> {
+	@SuppressWarnings("UnstableApiUsage")
+	private final TypeToken<T> typeToken;
 	@Nullable
 	private final INamespacePrefixedString bindingKey;
 	private final Subject<T> notifierSubject = PublishSubject.create();
 
-	public ImmutableBindingMethodSource(Class<T> genericClass, @Nullable INamespacePrefixedString bindingKey) {
-		super(genericClass);
+	@SuppressWarnings("UnstableApiUsage")
+	public ImmutableBindingMethodSource(Class<T> type, @Nullable INamespacePrefixedString bindingKey) {
+		this.typeToken = TypeToken.of(type);
 		this.bindingKey = bindingKey;
 	}
 
@@ -32,4 +34,10 @@ public final class ImmutableBindingMethodSource<T>
 
 	@Override
 	public Optional<? extends INamespacePrefixedString> getBindingKey() { return Optional.ofNullable(bindingKey); }
+
+	@SuppressWarnings("UnstableApiUsage")
+	@Override
+	public TypeToken<T> getTypeToken() {
+		return typeToken;
+	}
 }

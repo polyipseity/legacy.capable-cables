@@ -45,7 +45,7 @@ public class UIDefaultCacheExtension
 
 	@UIExtensionConstructor
 	public UIDefaultCacheExtension(@SuppressWarnings("unused") UIExtensionConstructor.IArguments arguments) {
-		super(CastUtilities.castUnchecked(IExtensionContainer.class), CastUtilities.castUnchecked(IExtensionContainer.class)); // COMMENT should not matter in this case
+		super(CastUtilities.castUnchecked(IExtensionContainer.class)); // COMMENT should not matter in this case
 	}
 
 	protected static UIExtensionConstructor.IArguments getDefaultArguments() { return DEFAULT_ARGUMENTS; }

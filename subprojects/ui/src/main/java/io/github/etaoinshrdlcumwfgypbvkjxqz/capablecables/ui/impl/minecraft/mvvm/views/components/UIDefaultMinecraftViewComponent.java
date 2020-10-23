@@ -41,7 +41,7 @@ public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUICompo
 	public UIDefaultMinecraftViewComponent(UIViewComponentConstructor.IArguments arguments) {
 		super(arguments);
 
-		IExtensionContainer.addExtensionExtendedChecked(this, new UIDefaultMinecraftBackgroundExtension()); // COMMENT to ensure that 'GuiScreenEvent.BackgroundDrawnEvent' is fired
+		IExtensionContainer.addExtensionChecked(this, new UIDefaultMinecraftBackgroundExtension()); // COMMENT to ensure that 'GuiScreenEvent.BackgroundDrawnEvent' is fired
 	}
 
 	@Override
