@@ -113,7 +113,7 @@ public class UIWindowComponent
 	@Override
 	public boolean reshape(Predicate<? super IShapeDescriptor<? super RectangularShape>> action) throws ConcurrentModificationException {
 		return IUIComponent.reshapeComponent(this, getShapeDescriptor(), action);
-		// TODO resizing logic
+		// TODO resizing based on min size and preferred size
 	}
 
 	protected static class ModifyShapeDescriptorObserver

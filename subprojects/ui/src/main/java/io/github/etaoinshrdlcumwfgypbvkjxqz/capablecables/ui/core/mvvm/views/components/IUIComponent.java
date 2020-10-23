@@ -28,9 +28,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
-/*
- * TODO auto resizing based on min size and preferred size
- */
 public interface IUIComponent
 		extends INamed, INode, IShapeDescriptorProvider, IHasBinding, IHasBindingMap, IUIEventTarget, IExtensionContainer<INamespacePrefixedString>,
 		IUIComponentLifecycleModifier {
