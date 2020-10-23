@@ -13,7 +13,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtil
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
@@ -93,12 +92,12 @@ public class UIDefaultEventTarget
 	protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() { return eventTargetListeners; }
 
 	public static class UIEventListenerWithParameters {
-		private static final ImmutableList<Function<? super UIEventListenerWithParameters, ?>> OBJECT_VARIABLES = ImmutableList.of(
-				UIEventListenerWithParameters::getListener, UIEventListenerWithParameters::isUseCapture);
 		@NonNls
-		private static final ImmutableMap<String, Function<? super UIEventListenerWithParameters, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.zipKeysValues(
-				ImmutableList.of("listener", "useCapture"),
-				getObjectVariables()));
+		private static final ImmutableMap<String, Function<UIEventListenerWithParameters, ?>> OBJECT_VARIABLES_MAP =
+				ImmutableMap.<String, Function<UIEventListenerWithParameters, ?>>builder()
+						.put("listeners", UIEventListenerWithParameters::getListener)
+						.put("useCapture", UIEventListenerWithParameters::isUseCapture)
+						.build();
 		private final IUIEventListener<?> listener;
 		private final boolean useCapture;
 
@@ -108,18 +107,16 @@ public class UIDefaultEventTarget
 		}
 
 		@Override
-		public int hashCode() { return ObjectUtilities.hashCode(this, null, getObjectVariables()); }
-
-		public static ImmutableList<Function<? super UIEventListenerWithParameters, ?>> getObjectVariables() { return OBJECT_VARIABLES; }
+		public int hashCode() { return ObjectUtilities.hashCodeImpl(this, getObjectVariablesMap().values()); }
 
 		@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 		@Override
-		public boolean equals(Object obj) { return ObjectUtilities.equals(this, obj, false, null, getObjectVariables()); }
+		public boolean equals(Object obj) { return ObjectUtilities.equalsImpl(this, obj, UIEventListenerWithParameters.class, false, getObjectVariablesMap().values()); }
 
 		@Override
-		public String toString() { return ObjectUtilities.toString(this, super::toString, getObjectVariablesMap()); }
+		public String toString() { return ObjectUtilities.toStringImpl(this, getObjectVariablesMap()); }
 
-		public static ImmutableMap<String, Function<? super UIEventListenerWithParameters, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
+		public static ImmutableMap<String, Function<UIEventListenerWithParameters, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
 
 		public IUIEventListener<?> getListener() { return listener; }
 

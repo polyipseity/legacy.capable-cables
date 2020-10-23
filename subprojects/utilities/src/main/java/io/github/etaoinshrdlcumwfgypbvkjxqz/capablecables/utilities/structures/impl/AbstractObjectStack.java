@@ -1,15 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IObjectStack;
 import org.jetbrains.annotations.NonNls;
 
 import java.util.Deque;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
@@ -18,12 +16,11 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Asser
 
 public abstract class AbstractObjectStack<T>
 		implements IObjectStack<T> {
-	private static final @Immutable List<Function<? super AbstractObjectStack<?>, ?>> OBJECT_VARIABLES = ImmutableList.of(
-			AbstractObjectStack::getData);
 	@NonNls
-	private static final @Immutable Map<String, Function<? super AbstractObjectStack<?>, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.zipKeysValues(
-			ImmutableList.of("data"),
-			getObjectVariables()));
+	private static final @Immutable Map<String, Function<? super AbstractObjectStack<?>, ?>> OBJECT_VARIABLES_MAP =
+			ImmutableMap.<String, Function<? super AbstractObjectStack<?>, ?>>builder()
+					.put("data", AbstractObjectStack::getData)
+					.build();
 
 	@Override
 	public T push(T element) {
@@ -44,18 +41,18 @@ public abstract class AbstractObjectStack<T>
 	protected abstract Deque<T> getData();
 
 	@Override
-	public int hashCode() { return ObjectUtilities.hashCode(this, null, getObjectVariables()); }
-
-	public static @Immutable List<Function<? super AbstractObjectStack<?>, ?>> getObjectVariables() {
-		return OBJECT_VARIABLES;
+	public int hashCode() {
+		return ObjectUtilities.hashCodeImpl(this, getObjectVariablesMap().values());
 	}
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
-	public boolean equals(Object obj) { return ObjectUtilities.equals(this, obj, false, null, getObjectVariables()); }
+	public boolean equals(Object obj) {
+		return ObjectUtilities.equalsImpl(this, obj, CastUtilities.<Class<AbstractObjectStack<?>>>castUnchecked(AbstractObjectStack.class), false, getObjectVariablesMap().values());
+	}
 
 	@Override
-	public String toString() { return ObjectUtilities.toString(this, super::toString, getObjectVariablesMap()); }
+	public String toString() { return ObjectUtilities.toStringImpl(this, getObjectVariablesMap()); }
 
 	public static @NonNls @Immutable Map<String, Function<? super AbstractObjectStack<?>, ?>> getObjectVariablesMap() {
 		return OBJECT_VARIABLES_MAP;

@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
-public class ShapeAnchorSet
+public class DefaultShapeAnchorSet
 		implements IShapeAnchorSet {
 	private final ConcurrentMap<EnumUISide, IShapeAnchor> anchors = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(EnumUISide.values().length).makeMap();
 
@@ -23,10 +23,10 @@ public class ShapeAnchorSet
 
 	public static Set<IShapeAnchor> getAnchorsToMatch(IShapeDescriptorProvider target, double borderThickness) {
 		return Sets.newHashSet(
-				new ShapeAnchor(target, EnumUISide.UP, EnumUISide.DOWN, borderThickness),
-				new ShapeAnchor(target, EnumUISide.DOWN, EnumUISide.UP, borderThickness),
-				new ShapeAnchor(target, EnumUISide.LEFT, EnumUISide.RIGHT, borderThickness),
-				new ShapeAnchor(target, EnumUISide.RIGHT, EnumUISide.LEFT, borderThickness));
+				new DefaultShapeAnchor(target, EnumUISide.UP, EnumUISide.DOWN, borderThickness),
+				new DefaultShapeAnchor(target, EnumUISide.DOWN, EnumUISide.UP, borderThickness),
+				new DefaultShapeAnchor(target, EnumUISide.LEFT, EnumUISide.RIGHT, borderThickness),
+				new DefaultShapeAnchor(target, EnumUISide.RIGHT, EnumUISide.LEFT, borderThickness));
 	}
 
 	@SuppressWarnings("UnstableApiUsage")

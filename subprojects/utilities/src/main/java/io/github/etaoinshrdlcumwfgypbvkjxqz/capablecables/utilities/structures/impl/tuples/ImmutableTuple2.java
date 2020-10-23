@@ -30,17 +30,17 @@ public final class ImmutableTuple2<L, R>
 
 	@Override
 	public int hashCode() {
-		return ObjectUtilities.hashCode(this, null, StaticHolder.getObjectVariables());
+		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariablesMap().values());
 	}
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	public boolean equals(Object o) {
-		return ObjectUtilities.equals(this, CastUtilities.<Class<ITuple2<?, ?>>>castUnchecked(ITuple2.class), o, true, null, StaticHolder.getObjectVariables());
+		return ObjectUtilities.equalsImpl(this, o, CastUtilities.<Class<ITuple2<?, ?>>>castUnchecked(ITuple2.class), true, StaticHolder.getObjectVariablesMap().values());
 	}
 
 	@Override
 	public String toString() {
-		return ObjectUtilities.toString(this, super::toString, StaticHolder.getObjectVariablesMap());
+		return ObjectUtilities.toStringImpl(this, StaticHolder.getObjectVariablesMap());
 	}
 }

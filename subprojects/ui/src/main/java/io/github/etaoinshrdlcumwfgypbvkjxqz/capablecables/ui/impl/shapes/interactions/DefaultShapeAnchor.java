@@ -19,15 +19,15 @@ import java.util.ConcurrentModificationException;
 import java.util.Optional;
 
 @Immutable
-public final class ShapeAnchor implements IShapeAnchor {
+public final class DefaultShapeAnchor implements IShapeAnchor {
 	private final OptionalWeakReference<IShapeDescriptorProvider> target;
 	private final EnumUISide originSide, targetSide;
 	private final double borderThickness;
 	private OptionalWeakReference<IShapeAnchorSet> container = new OptionalWeakReference<>(null);
 
-	public ShapeAnchor(IShapeDescriptorProvider target, EnumUISide originSide, EnumUISide targetSide) { this(target, originSide, targetSide, 0); }
+	public DefaultShapeAnchor(IShapeDescriptorProvider target, EnumUISide originSide, EnumUISide targetSide) { this(target, originSide, targetSide, 0); }
 
-	public ShapeAnchor(IShapeDescriptorProvider target, EnumUISide originSide, EnumUISide targetSide, double borderThickness) {
+	public DefaultShapeAnchor(IShapeDescriptorProvider target, EnumUISide originSide, EnumUISide targetSide, double borderThickness) {
 		this.target = new OptionalWeakReference<>(target);
 		this.originSide = originSide;
 		this.targetSide = targetSide;
@@ -38,7 +38,7 @@ public final class ShapeAnchor implements IShapeAnchor {
 	}
 
 	@Override
-	public String toString() { return ObjectUtilities.toString(this, super::toString, StaticHolder.getObjectVariablesMap()); }
+	public String toString() { return ObjectUtilities.toStringImpl(this, StaticHolder.getObjectVariablesMap()); }
 
 	@Override
 	public Optional<? extends IShapeDescriptorProvider> getTarget() { return target.getOptional(); }

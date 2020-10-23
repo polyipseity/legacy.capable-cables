@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.DynamicUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICloneable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.ITimestampedInputData;
@@ -48,5 +49,21 @@ public abstract class AbstractTimestampedInputData
 
 	protected static long getTimestampFieldOffset() {
 		return TIMESTAMP_FIELD_OFFSET;
+	}
+
+	@Override
+	public int hashCode() {
+		return ObjectUtilities.hashCodeImpl(this, ITimestampedInputData.StaticHolder.getObjectVariablesMap().values());
+	}
+
+	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+	@Override
+	public boolean equals(Object obj) {
+		return ObjectUtilities.equalsImpl(this, obj, ITimestampedInputData.class, true, ITimestampedInputData.StaticHolder.getObjectVariablesMap().values());
+	}
+
+	@Override
+	public String toString() {
+		return ObjectUtilities.toStringImpl(this, ITimestampedInputData.StaticHolder.getObjectVariablesMap());
 	}
 }

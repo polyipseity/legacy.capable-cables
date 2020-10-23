@@ -1,44 +1,110 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Streams;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
-import org.jetbrains.annotations.NonNls;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodType;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
-import java.util.function.IntSupplier;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.ToIntFunction;
 
 public enum ObjectUtilities {
 	;
 
-	private static final IntSupplier HASH_CODE_SUPER_METHOD_DEFAULT = () -> 1;
-
-	@SuppressWarnings("unchecked")
-	public static <T> boolean equals(T self, @Nullable Object other, boolean acceptSubclasses, @Nullable Predicate<? super Object> superMethod, Iterable<? extends Function<? super T, ?>> variables) {
-		return equals(self, ((Class<T>) self.getClass()), other, acceptSubclasses, superMethod, variables);
-	}
+	private static final ToIntFunction<?> HASH_CODE_SUPER_INVOKER_DEFAULT = (self) -> 1;
+	private static final LoadingCache<Class<?>, BiPredicate<?, ? super Object>> EQUALS_SUPER_INVOKERS_MAP =
+			CacheUtilities.newCacheBuilderNormalThreaded()
+					.weakKeys()
+					.initialCapacity(CapacityUtilities.getInitialCapacityEnormous())
+					.build(CacheLoader.from(clazz -> {
+						assert clazz != null;
+						MethodHandle methodHandle;
+						try {
+							// TODO Java 9 - LambdaMetaFactory
+							methodHandle = InvokeUtilities.getImplLookup().findSpecial(Object.class, "equals", MethodType.methodType(boolean.class, Object.class), clazz);
+						} catch (NoSuchMethodException | IllegalAccessException e) {
+							throw ThrowableUtilities.propagate(e);
+						}
+						if (Object.class.equals(InvokeUtilities.revealDeclaringClass(methodHandle))) // COMMENT 'super' calls the 'Object' impl, replace it with 'true'
+							return FunctionUtilities.getAlwaysTrueBiPredicate();
+						return (self, other) -> {
+							try {
+								return (boolean) methodHandle.invoke(self, other);
+							} catch (Throwable throwable) {
+								throw ThrowableUtilities.propagate(throwable);
+							}
+						};
+					}));
+	private static final LoadingCache<Class<?>, ToIntFunction<?>> HASH_CODE_SUPER_INVOKERS_MAP =
+			CacheUtilities.newCacheBuilderNormalThreaded()
+					.weakKeys()
+					.initialCapacity(CapacityUtilities.getInitialCapacityEnormous())
+					.build(CacheLoader.from(clazz -> {
+						assert clazz != null;
+						MethodHandle methodHandle;
+						try {
+							// TODO Java 9 - LambdaMetaFactory
+							methodHandle = InvokeUtilities.getImplLookup().findSpecial(Object.class, "hashCode", MethodType.methodType(int.class), clazz);
+						} catch (NoSuchMethodException | IllegalAccessException e) {
+							throw ThrowableUtilities.propagate(e);
+						}
+						if (Object.class.equals(InvokeUtilities.revealDeclaringClass(methodHandle))) // COMMENT 'super' calls the 'Object' impl, replace it with 'true'
+							return getHashCodeSuperInvokerDefault();
+						return (self) -> {
+							try {
+								return (int) methodHandle.invoke(self);
+							} catch (Throwable throwable) {
+								throw ThrowableUtilities.propagate(throwable);
+							}
+						};
+					}));
+	private static final LoadingCache<Class<?>, Function<?, ? extends String>> TO_STRING_SUPER_INVOKERS_MAP =
+			CacheUtilities.newCacheBuilderNormalThreaded()
+					.weakKeys()
+					.initialCapacity(CapacityUtilities.getInitialCapacityEnormous())
+					.build(CacheLoader.from(clazz -> {
+						assert clazz != null;
+						MethodHandle methodHandle;
+						try {
+							// TODO Java 9 - LambdaMetaFactory
+							methodHandle = InvokeUtilities.getImplLookup().findSpecial(Object.class, "toString", MethodType.methodType(String.class), clazz);
+						} catch (NoSuchMethodException | IllegalAccessException e) {
+							throw ThrowableUtilities.propagate(e);
+						}
+						return (self) -> {
+							try {
+								return (String) methodHandle.invoke(self);
+							} catch (Throwable throwable) {
+								throw ThrowableUtilities.propagate(throwable);
+							}
+						};
+					}));
 
 	@SuppressWarnings({"ObjectEquality", "UnstableApiUsage"})
-	public static <T> boolean equals(T self, Class<T> referenceClazz, @Nullable Object other, boolean acceptSubclasses, @Nullable Predicate<? super Object> superMethod, Iterable<? extends Function<? super T, ?>> variables) {
+	public static <T> boolean equalsImpl(T self,
+	                                     @Nullable Object other,
+	                                     Class<T> referenceClass,
+	                                     boolean acceptSubclasses,
+	                                     Iterable<? extends Function<? super T, ?>> variables) {
 		if (self == other)
 			return true;
 		if (acceptSubclasses) {
-			if (!referenceClazz.isInstance(other))
+			if (!referenceClass.isInstance(other))
 				return false;
 		} else {
-			if (other == null || !referenceClazz.equals(other.getClass()))
+			if (other == null || !referenceClass.equals(other.getClass()))
 				return false;
 		}
-		if (superMethod != null && !superMethod.test(other))
+		if (!getEqualsSuperInvokersMap().getUnchecked(self.getClass()).test(CastUtilities.castUnchecked(self), other))
 			return false;
 
 		@SuppressWarnings("unchecked") T that = (T) other;
@@ -46,12 +112,16 @@ public enum ObjectUtilities {
 				.allMatch(variable -> Objects.equals(variable.apply(self), variable.apply(that)));
 	}
 
+	private static LoadingCache<Class<?>, BiPredicate<?, ? super Object>> getEqualsSuperInvokersMap() {
+		return EQUALS_SUPER_INVOKERS_MAP;
+	}
+
 	/**
 	 * @see java.util.Arrays#hashCode(Object[])
 	 */
 	@SuppressWarnings({"MagicNumber", "UnstableApiUsage"})
-	public static <T> int hashCode(T self, @Nullable IntSupplier superMethod, Iterable<? extends Function<? super T, ?>> variables) {
-		final int[] result = {Optional.ofNullable(superMethod).orElse(getHashCodeSuperMethodDefault()).getAsInt()};
+	public static <T> int hashCodeImpl(T self, Iterable<? extends Function<? super T, ?>> variables) {
+		final int[] result = {getHashCodeSuperInvokersMap().getUnchecked(self.getClass()).applyAsInt(CastUtilities.castUnchecked(self))};
 		Streams.stream(variables)
 				.map(variable -> variable.apply(self))
 				.mapToInt(Objects::hashCode)
@@ -62,20 +132,15 @@ public enum ObjectUtilities {
 		return result[0];
 	}
 
-	public static IntSupplier getHashCodeSuperMethodDefault() {
-		return HASH_CODE_SUPER_METHOD_DEFAULT;
+	private static LoadingCache<Class<?>, ToIntFunction<?>> getHashCodeSuperInvokersMap() {
+		return HASH_CODE_SUPER_INVOKERS_MAP;
 	}
 
-	public static <T> ImmutableList<Function<? super T, ?>> extendsObjectVariables(Iterable<? extends Function<? super T, ?>> extended, Iterable<? extends Function<? super T, ?>> self) {
-		return ImmutableList.copyOf(Iterables.concat(extended, self));
+	private static ToIntFunction<?> getHashCodeSuperInvokerDefault() {
+		return HASH_CODE_SUPER_INVOKER_DEFAULT;
 	}
 
-	public static <T> @NonNls ImmutableMap<String, Function<? super T, ?>> extendsObjectVariablesMap(Collection<? extends Function<? super T, ?>> variables, Map<? extends String, ? extends Function<? super T, ?>> extended, Iterable<? extends String> self) {
-		return ImmutableMap.copyOf(
-				MapUtilities.zipKeysValues(Iterables.concat(extended.keySet(), self), variables));
-	}
-
-	public static <T> String toString(T self, @Nullable Supplier<? extends String> superMethod, Map<? extends String, ? extends Function<? super T, ?>> variables) {
+	public static <T> String toStringImpl(T self, Map<? extends String, ? extends Function<? super T, ?>> variables) {
 		StringBuilder ret = new StringBuilder(CapacityUtilities.getInitialCapacityLarge());
 		ret.append(self.getClass().getSimpleName()).append('{');
 		final boolean[] comma = {false};
@@ -87,8 +152,11 @@ public enum ObjectUtilities {
 			ret.append(key).append('=').append(AssertionUtilities.assertNonnull(valueFunction).apply(self));
 		});
 		ret.append('}');
-		if (superMethod != null)
-			ret.append(superMethod.get());
+		ret.append(getToStringSuperInvokersMap().getUnchecked(self.getClass()).apply(CastUtilities.castUnchecked(self)));
 		return ret.toString();
+	}
+
+	private static LoadingCache<Class<?>, Function<?, ? extends String>> getToStringSuperInvokersMap() {
+		return TO_STRING_SUPER_INVOKERS_MAP;
 	}
 }

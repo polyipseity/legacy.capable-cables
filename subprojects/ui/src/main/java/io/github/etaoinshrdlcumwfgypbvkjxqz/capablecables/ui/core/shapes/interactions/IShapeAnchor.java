@@ -1,9 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import org.jetbrains.annotations.NonNls;
 
 import java.util.ConcurrentModificationException;
@@ -33,14 +31,16 @@ public interface IShapeAnchor {
 	enum StaticHolder {
 		;
 
-		private static final ImmutableList<Function<? super IShapeAnchor, ?>> OBJECT_VARIABLES = ImmutableList.of(
-				IShapeAnchor::getTarget, IShapeAnchor::getOriginSide, IShapeAnchor::getTargetSide, IShapeAnchor::getBorderThickness, IShapeAnchor::getContainer);
 		@NonNls
-		private static final ImmutableMap<String, Function<? super IShapeAnchor, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.zipKeysValues(
-				ImmutableList.of("target", "originSide", "targetSide", "borderThickness", "container"), getObjectVariables()));
+		private static final ImmutableMap<String, Function<IShapeAnchor, ?>> OBJECT_VARIABLES_MAP =
+				ImmutableMap.<String, Function<IShapeAnchor, ?>>builder()
+						.put("target", IShapeAnchor::getTarget)
+						.put("originSide", IShapeAnchor::getOriginSide)
+						.put("targetSide", IShapeAnchor::getTargetSide)
+						.put("borderThickness", IShapeAnchor::getBorderThickness)
+						.put("container", IShapeAnchor::getContainer)
+						.build();
 
-		public static ImmutableList<Function<? super IShapeAnchor, ?>> getObjectVariables() { return OBJECT_VARIABLES; }
-
-		public static ImmutableMap<String, Function<? super IShapeAnchor, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
+		public static ImmutableMap<String, Function<IShapeAnchor, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
 	}
 }

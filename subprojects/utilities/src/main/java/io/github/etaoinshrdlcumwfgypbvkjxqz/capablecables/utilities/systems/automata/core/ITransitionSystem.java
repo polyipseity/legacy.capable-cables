@@ -1,8 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.automata.core;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
@@ -26,16 +25,13 @@ public interface ITransitionSystem<S extends IState<D>, E, D> {
 	enum StaticHolder {
 		;
 
-		private static final ImmutableList<Function<? super ITransitionSystem<?, ?, ?>, ?>> OBJECT_VARIABLES = ImmutableList.of(
-				ITransitionSystem::getState, ITransitionSystem::getInput, ITransitionSystem::getTransitionsView);
-		@NonNls
-		private static final
-		ImmutableMap<String, Function<? super ITransitionSystem<?, ?, ?>, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.zipKeysValues(
-				ImmutableList.of("state", "input", "transitionsView"),
-				getObjectVariables()));
+		private static final @Immutable @NonNls Map<String, Function<ITransitionSystem<?, ?, ?>, ?>> OBJECT_VARIABLES_MAP =
+				ImmutableMap.<String, Function<ITransitionSystem<?, ?, ?>, ?>>builder()
+						.put("state", ITransitionSystem::getState)
+						.put("input", ITransitionSystem::getInput)
+						.put("transitionsView", ITransitionSystem::getTransitionsView)
+						.build();
 
-		public static ImmutableList<Function<? super ITransitionSystem<?, ?, ?>, ?>> getObjectVariables() { return OBJECT_VARIABLES; }
-
-		public static ImmutableMap<String, Function<? super ITransitionSystem<?, ?, ?>, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
+		public static @Immutable Map<String, Function<ITransitionSystem<?, ?, ?>, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
 	}
 }

@@ -1,8 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICloneable;
 import org.jetbrains.annotations.NonNls;
 
@@ -27,15 +25,14 @@ public interface IKeyboardKeyPressData
 	enum StaticHolder {
 		;
 
-		private static final ImmutableList<Function<? super IKeyboardKeyPressData, ?>> OBJECT_VARIABLES = ImmutableList.of(
-				IKeyboardKeyPressData::getKey, IKeyboardKeyPressData::getScanCode, IKeyboardKeyPressData::getModifiers, IKeyboardKeyPressData::getTimestamp);
 		@NonNls
-		private static final ImmutableMap<String, Function<? super IKeyboardKeyPressData, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.zipKeysValues(
-				ImmutableList.of("key", "scanCode", "modifiers", "timestampMills"),
-				getObjectVariables()));
+		private static final ImmutableMap<String, Function<IKeyboardKeyPressData, ?>> OBJECT_VARIABLES_MAP =
+				ImmutableMap.<String, Function<IKeyboardKeyPressData, ?>>builder()
+						.put("key", IKeyboardKeyPressData::getKey)
+						.put("scanCode", IKeyboardKeyPressData::getScanCode)
+						.put("modifiers", IKeyboardKeyPressData::getModifiers)
+						.build();
 
-		public static ImmutableList<Function<? super IKeyboardKeyPressData, ?>> getObjectVariables() { return OBJECT_VARIABLES; }
-
-		public static ImmutableMap<String, Function<? super IKeyboardKeyPressData, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
+		public static ImmutableMap<String, Function<IKeyboardKeyPressData, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
 	}
 }

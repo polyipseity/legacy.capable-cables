@@ -28,7 +28,7 @@ public class DefaultShapeAnchorController<T extends IShapeDescriptorProvider>
 			ManualLoadingCache.newNestedLoadingCache(CacheUtilities.newCacheBuilderSingleThreaded()
 							.initialCapacity(CapacityUtilities.getInitialCapacityMedium())
 							.weakKeys()
-							.build(CacheLoader.from(ShapeAnchorSet::new)),
+							.build(CacheLoader.from(DefaultShapeAnchorSet::new)),
 					e -> assertNonnull(e.getValue()).isEmpty());
 	private final LoadingCache<IShapeDescriptorProvider, Set<IShapeAnchor>> subscribersMap =
 			ManualLoadingCache.newNestedLoadingCacheCollection(CacheUtilities.newCacheBuilderSingleThreaded()

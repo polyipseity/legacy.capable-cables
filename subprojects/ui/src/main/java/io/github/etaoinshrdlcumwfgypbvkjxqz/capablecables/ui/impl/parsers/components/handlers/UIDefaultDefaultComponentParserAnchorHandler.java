@@ -5,7 +5,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.components.contexts.IUIDefaultComponentParserContext;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interactions.ShapeAnchor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interactions.DefaultShapeAnchor;
 
 public class UIDefaultDefaultComponentParserAnchorHandler
 		extends UIAbstractDefaultParserObjectHandler<IUIDefaultComponentParserContext, Anchor> {
@@ -20,7 +20,7 @@ public class UIDefaultDefaultComponentParserAnchorHandler
 					.flatMap(IUIComponentManager::getView)
 					.ifPresent(view ->
 							view.getShapeAnchorController().addAnchors(component,
-									ImmutableList.of(new ShapeAnchor(
+									ImmutableList.of(new DefaultShapeAnchor(
 											view.getNamedTrackers().get(IUIComponent.class, object.getTarget())
 													.orElseThrow(AssertionError::new),
 											object.getOriginSide().toJava(),

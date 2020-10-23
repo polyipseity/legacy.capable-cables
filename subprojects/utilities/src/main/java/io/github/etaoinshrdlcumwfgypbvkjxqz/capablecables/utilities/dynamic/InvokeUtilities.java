@@ -14,7 +14,7 @@ import java.util.function.Function;
 
 public enum InvokeUtilities {
 	;
-
+	// TODO see https://stackoverflow.com/a/60156848 for the reason of not using LambdaMetaFactory
 
 	public static final int TRUSTED_LOOKUP_MODES = 15;
 	private static final MethodHandles.Lookup PUBLIC_LOOKUP = MethodHandles.publicLookup();
@@ -101,5 +101,9 @@ public enum InvokeUtilities {
 
 	private static int getTrustedLookupModes() {
 		return TRUSTED_LOOKUP_MODES;
+	}
+
+	public static Class<?> revealDeclaringClass(MethodHandle methodHandle) {
+		return getImplLookup().revealDirect(methodHandle).getDeclaringClass();
 	}
 }

@@ -33,12 +33,12 @@ public final class ImmutableNamespacePrefixedString
 	public @NonNls String getPath() { return path; }
 
 	@Override
-	public int hashCode() { return ObjectUtilities.hashCode(this, null, StaticHolder.getObjectVariables()); }
+	public int hashCode() { return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariablesMap().values()); }
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
-	public boolean equals(Object obj) { return ObjectUtilities.equals(this, INamespacePrefixedString.class, obj, true, null, StaticHolder.getObjectVariables()); }
+	public boolean equals(Object obj) { return ObjectUtilities.equalsImpl(this, obj, INamespacePrefixedString.class, true, StaticHolder.getObjectVariablesMap().values()); }
 
 	@Override
-	public String toString() { return ObjectUtilities.toString(this, super::toString, StaticHolder.getObjectVariablesMap()); }
+	public String toString() { return ObjectUtilities.toStringImpl(this, StaticHolder.getObjectVariablesMap()); }
 }
