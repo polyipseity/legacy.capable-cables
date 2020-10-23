@@ -27,7 +27,7 @@ public class FunctionalPath<T>
 
 	static {
 		try {
-			DATA_FIELD_OFFSET = DynamicUtilities.getUnsafe().objectFieldOffset(FunctionalConcurrentPath.class.getDeclaredField("data"));
+			DATA_FIELD_OFFSET = DynamicUtilities.getUnsafe().objectFieldOffset(FunctionalPath.class.getDeclaredField("data"));
 		} catch (NoSuchFieldException e) {
 			throw ThrowableUtilities.propagate(e);
 		}
