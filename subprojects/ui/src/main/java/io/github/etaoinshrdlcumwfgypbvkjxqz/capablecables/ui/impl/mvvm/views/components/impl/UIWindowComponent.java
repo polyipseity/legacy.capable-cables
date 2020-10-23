@@ -15,9 +15,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIComponentModifyShapeDescriptorBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interactions.ShapeConstraintSupplier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.ConstantSupplier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.reactivex.rxjava3.disposables.Disposable;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -34,7 +34,6 @@ public class UIWindowComponent
 		extends UIDefaultComponentContainer
 		implements IUIReshapeExplicitly<RectangularShape> {
 	// TODO make window scroll bars, maybe create a new component, and embed into this
-	// TODO make value not hardcoded through themes
 	public static final int WINDOW_DRAG_BAR_THICKNESS = 10; // COMMENT internal top
 	public static final int WINDOW_VISIBLE_MINIMUM = 10;
 
@@ -51,7 +50,7 @@ public class UIWindowComponent
 		modifyShape(() -> {
 			OptionalWeakReference<IUIComponent> selfRef = new OptionalWeakReference<>(this);
 			sd.getConstraintsRef().add(new ShapeConstraintSupplier(
-					ConstantSupplier.of(0d), ConstantSupplier.of(0d),
+					ConstantValue.of(0d), ConstantValue.of(0d),
 					() -> selfRef.getOptional()
 							.flatMap(IUIComponent::getManager)
 							.map(IUIComponentManager::getShapeDescriptor)
@@ -68,8 +67,8 @@ public class UIWindowComponent
 							.map(RectangularShape::getMaxY)
 							.map(n -> n - getWindowVisibleMinimum())
 							.orElse(null),
-					ConstantSupplier.of((double) getWindowVisibleMinimum()), ConstantSupplier.of((double) getWindowVisibleMinimum()),
-					ConstantSupplier.getEmpty(), ConstantSupplier.getEmpty()));
+					ConstantValue.of((double) getWindowVisibleMinimum()), ConstantValue.of((double) getWindowVisibleMinimum()),
+					ConstantValue.getEmpty(), ConstantValue.getEmpty()));
 			return false;
 		});
 

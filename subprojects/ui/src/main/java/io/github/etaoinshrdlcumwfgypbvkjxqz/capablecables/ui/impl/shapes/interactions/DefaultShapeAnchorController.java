@@ -12,8 +12,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtil
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.ManualLoadingCache;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.ConstantSupplier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.MappableSupplier;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -35,7 +35,7 @@ public class DefaultShapeAnchorController<T extends IShapeDescriptorProvider>
 					.initialCapacity(CapacityUtilities.getInitialCapacityMedium())
 					.weakKeys()
 					.build(CacheLoader.from(
-							new MappableSupplier<>(ConstantSupplier.of(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall())))
+							new MappableSupplier<>(ConstantValue.of(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall())))
 									.map(t -> Collections.newSetFromMap(t.makeMap())))));
 
 	@Override

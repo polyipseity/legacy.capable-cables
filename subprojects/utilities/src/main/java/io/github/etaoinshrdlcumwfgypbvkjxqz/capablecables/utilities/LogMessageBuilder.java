@@ -1,7 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.ConstantSupplier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.logging.FormattingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.Nullable;
@@ -14,7 +14,7 @@ public class LogMessageBuilder {
 	private final List<Supplier<?>> arguments = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 	private final Map<String, Supplier<?>> keyValuePairs = new HashMap<>(CapacityUtilities.getInitialCapacitySmall());
 
-	public LogMessageBuilder addKeyValue(@NonNls CharSequence key, @Nullable Object value) { return addKeyValue(key, ConstantSupplier.of(value)); }
+	public LogMessageBuilder addKeyValue(@NonNls CharSequence key, @Nullable Object value) { return addKeyValue(key, ConstantValue.of(value)); }
 
 	public LogMessageBuilder addKeyValue(@NonNls CharSequence key, Supplier<?> value) {
 		getKeyValuePairs().put(key.toString(), value);
@@ -27,7 +27,7 @@ public class LogMessageBuilder {
 	public LogMessageBuilder addMarkers(Object... markers) {
 		return addMarkers(
 				Arrays.stream(markers)
-						.map(ConstantSupplier::of)
+						.map(ConstantValue::of)
 						.toArray(Supplier[]::new));
 	}
 
@@ -42,7 +42,7 @@ public class LogMessageBuilder {
 	public LogMessageBuilder addMessages(Object... messages) {
 		return addMessages(
 				Arrays.stream(messages)
-						.map(ConstantSupplier::of)
+						.map(ConstantValue::of)
 						.toArray(Supplier[]::new));
 	}
 
@@ -60,7 +60,7 @@ public class LogMessageBuilder {
 	public LogMessageBuilder addArguments(Object... arguments) {
 		return addArguments(
 				Arrays.stream(arguments)
-						.map(ConstantSupplier::of)
+						.map(ConstantValue::of)
 						.toArray(Supplier[]::new));
 	}
 

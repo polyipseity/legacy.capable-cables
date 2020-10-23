@@ -1,7 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.ConstantSupplier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.fields.ImmutableBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.fields.MemoryObservableField;
@@ -15,7 +15,7 @@ public interface IUIPropertyMappingValue {
 	                                               boolean nullable,
 	                                               @Nullable T defaultValue,
 	                                               @Nullable IUIPropertyMappingValue mapping) {
-		return createBindingField(clazz, nullable, ConstantSupplier.of(defaultValue), mapping);
+		return createBindingField(clazz, nullable, ConstantValue.of(defaultValue), mapping);
 	}
 
 	static <T> IBindingField<T> createBindingField(Class<T> clazz,
@@ -32,7 +32,7 @@ public interface IUIPropertyMappingValue {
 								? m // COMMENT has mapping
 								.flatMap(IUIPropertyMappingValue::getDefaultValue)
 								.map(clazz::cast)
-								.orElseGet(nullable ? ConstantSupplier.getEmpty() : defaultValue)
+								.orElseGet(nullable ? ConstantValue.getEmpty() : defaultValue)
 								: defaultValue.get()));
 	}
 

@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces;
 
 import java.util.Iterator;
 
-public interface IIteratorReversible<E>
+public interface IReversibleIterator<E>
 		extends Iterator<E> {
 	boolean hasPrevious();
 

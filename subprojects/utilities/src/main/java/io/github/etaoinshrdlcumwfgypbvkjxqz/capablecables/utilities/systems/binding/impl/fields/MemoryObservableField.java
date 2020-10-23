@@ -1,7 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.fields;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IHasGenericClass;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IObservableField;
 import io.reactivex.rxjava3.core.ObservableSource;
 import io.reactivex.rxjava3.subjects.PublishSubject;
@@ -32,7 +33,7 @@ public class MemoryObservableField<T>
 	public void setValue(@Nullable T value) {
 		if (!Objects.equals(getValue().orElse(null), value)) {
 			this.value = value;
-			getNotifierSubject().onNext(IValue.of(value));
+			getNotifierSubject().onNext(ConstantValue.of(value));
 		}
 	}
 
