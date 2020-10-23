@@ -327,9 +327,7 @@ public class UIMinecraftScreenAdapter
 		ImmutableMouseButtonClickData d = new ImmutableMouseButtonClickData(cp, button);
 		IUIEventTarget t = getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone());
 		if (UIEventUtilities.dispatchEvent(addEventMouse(this, UIEventUtilities.Factory.createEventMouseDown(context.getViewContext(), t, d)))) {
-			// TODO select
-			// TODO drag or drop perhaps
-			// TODO scroll/pan
+			// TODO select, drag or drop perhaps, scroll/pan
 		}
 		return true;
 	}
