@@ -69,6 +69,8 @@ public class UIDefaultComponentContainer
 		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 					getChildren().add(index, component);
 					component.onParentChange(null, this);
+					getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
+							BindingUtilities.initializeBindings(ImmutableList.of(component), binderObserverSupplier));
 				},
 				new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.PRE, component, null, this),
 				new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.POST, component, null, this));
@@ -85,6 +87,8 @@ public class UIDefaultComponentContainer
 						EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 									getChildren().remove(component);
 									component.onParentChange(this, null);
+									getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
+											BindingUtilities.cleanupBindings(ImmutableList.of(component), binderObserverSupplier));
 								},
 								new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.PRE, component, this, null),
 								new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.POST, component, this, null));
@@ -123,5 +127,12 @@ public class UIDefaultComponentContainer
 	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		super.initializeBindings(binderObserverSupplier);
 		BindingUtilities.initializeBindings(getChildren(), binderObserverSupplier);
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		super.cleanupBindings(binderObserverSupplier);
+		BindingUtilities.cleanupBindings(getChildren(), binderObserverSupplier);
 	}
 }

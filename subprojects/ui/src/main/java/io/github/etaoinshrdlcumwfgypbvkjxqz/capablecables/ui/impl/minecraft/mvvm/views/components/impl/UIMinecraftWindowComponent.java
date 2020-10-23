@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.impl;
 
+import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
@@ -61,8 +62,20 @@ public class UIMinecraftWindowComponent
 	@OverridingMethodsMustInvokeSuper
 	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		super.initializeBindings(binderObserverSupplier);
-		Optional.ofNullable(getRendererContainerReference().get())
-				.ifPresent(rendererContainer -> rendererContainer.initializeBindings(binderObserverSupplier));
+		BindingUtilities.initializeBindings(
+				Optional.ofNullable(getRendererContainerReference().get()).map(ImmutableList::of).orElseGet(ImmutableList::of),
+				binderObserverSupplier
+		);
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		super.cleanupBindings(binderObserverSupplier);
+		BindingUtilities.cleanupBindings(
+				Optional.ofNullable(getRendererContainerReference().get()).map(ImmutableList::of).orElseGet(ImmutableList::of),
+				binderObserverSupplier
+		);
 	}
 
 	@Override
@@ -116,7 +129,21 @@ public class UIMinecraftWindowComponent
 		public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 			super.initializeBindings(binderObserverSupplier);
 			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-					() -> ImmutableBinderAction.bind(getColorBackground(), getColorBorder()));
+					() -> ImmutableBinderAction.bind(
+							getColorBackground(), getColorBorder()
+					)
+			);
+		}
+
+		@Override
+		@OverridingMethodsMustInvokeSuper
+		public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+			super.cleanupBindings(binderObserverSupplier);
+			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+					() -> ImmutableBinderAction.unbind(
+							getColorBackground(), getColorBorder()
+					)
+			);
 		}
 
 		public IBindingField<Color> getColorBackground() { return colorBackground; }

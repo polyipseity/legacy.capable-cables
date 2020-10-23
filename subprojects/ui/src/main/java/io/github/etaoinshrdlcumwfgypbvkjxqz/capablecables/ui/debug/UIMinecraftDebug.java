@@ -381,10 +381,26 @@ public enum UIMinecraftDebug {
 
 			@Override
 			@OverridingMethodsMustInvokeSuper
+			public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+				super.cleanupBindings(binderObserverSupplier);
+				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+						() -> ImmutableBinderAction.unbind(
+								getAnchoredWindowBorderColor(),
+								getButtonOnActivate(), getButtonOnActivated()
+						)
+				);
+			}
+
+			@Override
+			@OverridingMethodsMustInvokeSuper
 			public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 				super.initializeBindings(binderObserverSupplier);
 				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-						() -> ImmutableBinderAction.bind(getAnchoredWindowBorderColor(), getButtonOnActivate(), getButtonOnActivated()));
+						() -> ImmutableBinderAction.bind(
+								getAnchoredWindowBorderColor(),
+								getButtonOnActivate(), getButtonOnActivated()
+						)
+				);
 			}
 		}
 

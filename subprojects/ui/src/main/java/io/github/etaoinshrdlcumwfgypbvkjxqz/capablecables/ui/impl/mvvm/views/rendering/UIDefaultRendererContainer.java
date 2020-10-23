@@ -1,11 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering;
 
+import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.naming.AbstractNamed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.jetbrains.annotations.NonNls;
 
@@ -34,23 +36,27 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 	@OverridingMethodsMustInvokeSuper
 	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		setBinderObserverSupplier(binderObserverSupplier);
-		getRenderer().ifPresent(renderer -> renderer.initializeBindings(binderObserverSupplier));
+		BindingUtilities.initializeBindings(
+				getRenderer().map(ImmutableList::of).orElseGet(ImmutableList::of),
+				binderObserverSupplier
+		);
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		setBinderObserverSupplier(null);
+		BindingUtilities.cleanupBindings(
+				getRenderer().map(ImmutableList::of).orElseGet(ImmutableList::of),
+				binderObserverSupplier
+		);
 	}
 
 	@Override
 	public Optional<? extends R> getRenderer() { return Optional.ofNullable(renderer); }
 
-	@Override
-	@Deprecated
-	public void setRenderer(@Nullable R renderer) {
-		IUIRendererContainer.setRendererImpl(getContainer().orElseThrow(IllegalStateException::new),
-				renderer,
-				renderer2 -> {
-					this.renderer = renderer2;
-					if (renderer2 != null)
-						getBinderObserverSupplier().ifPresent(renderer2::initializeBindings);
-				},
-				this.renderer);
+	protected void setBinderObserverSupplier(@Nullable Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		this.binderObserverSupplier = binderObserverSupplier;
 	}
 
 	@Override
@@ -63,7 +69,19 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 		return Optional.ofNullable(binderObserverSupplier);
 	}
 
-	protected void setBinderObserverSupplier(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		this.binderObserverSupplier = binderObserverSupplier;
+	@Override
+	@Deprecated
+	public void setRenderer(@Nullable R renderer) {
+		IUIRendererContainer.setRendererImpl(getContainer().orElseThrow(IllegalStateException::new),
+				renderer,
+				nextRenderer -> {
+					@Nullable R previousRenderer = this.renderer;
+					this.renderer = nextRenderer;
+					if (previousRenderer != null)
+						getBinderObserverSupplier().ifPresent(previousRenderer::cleanupBindings);
+					if (nextRenderer != null)
+						getBinderObserverSupplier().ifPresent(nextRenderer::initializeBindings);
+				},
+				this.renderer);
 	}
 }

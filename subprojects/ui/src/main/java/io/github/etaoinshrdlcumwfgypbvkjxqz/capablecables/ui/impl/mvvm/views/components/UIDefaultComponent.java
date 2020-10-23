@@ -262,11 +262,19 @@ public class UIDefaultComponent
 	@Deprecated
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
 		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
-		return IExtensionContainer.addExtensionImpl(this, getExtensions(), extension);
+		Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> result = IExtensionContainer.addExtensionImpl(this, getExtensions(), extension);
+		getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
+				BindingUtilities.findAndInitializeBindings(ImmutableList.of(extension), binderObserverSupplier));
+		return result;
 	}
 
 	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtensionImpl(getExtensions(), key); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) {
+		Optional<IExtension<? extends INamespacePrefixedString, ?>> result = IExtensionContainer.removeExtensionImpl(getExtensions(), key);
+		getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
+				BindingUtilities.findAndCleanupBindings(result.map(ImmutableList::of).orElseGet(ImmutableList::of), binderObserverSupplier));
+		return result;
+	}
 
 	@Override
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return IExtensionContainer.getExtensionImpl(getExtensions(), key); }
@@ -279,7 +287,14 @@ public class UIDefaultComponent
 
 	protected Optional<? extends Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>>> getBinderObserverSupplier() { return Optional.ofNullable(binderObserverSupplier); }
 
-	protected void setBinderObserverSupplier(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) { this.binderObserverSupplier = binderObserverSupplier; }
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		setBinderObserverSupplier(null);
+		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+				() -> ImmutableBinderAction.unbind(getActive(), getVisible()));
+		BindingUtilities.findAndCleanupBindings(getExtensions().values(), binderObserverSupplier);
+	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -289,6 +304,8 @@ public class UIDefaultComponent
 				() -> ImmutableBinderAction.bind(getActive(), getVisible()));
 		BindingUtilities.findAndInitializeBindings(getExtensions().values(), binderObserverSupplier);
 	}
+
+	protected void setBinderObserverSupplier(@Nullable Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) { this.binderObserverSupplier = binderObserverSupplier; }
 
 	@Override
 	public Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(getMappings()); }

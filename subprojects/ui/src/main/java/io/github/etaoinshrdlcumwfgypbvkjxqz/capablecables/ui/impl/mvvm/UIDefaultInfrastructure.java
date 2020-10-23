@@ -10,6 +10,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.extension
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.DefaultDisposableObserver;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.DelegatingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -22,6 +23,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 
 import javax.annotation.Nonnull;
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
@@ -36,15 +38,7 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 	private B binder;
 	private boolean bound = false;
 
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	public UIDefaultInfrastructure(V view, VM viewModel, B binder) {
-		this.view = view;
-		this.viewModel = viewModel;
-		this.binder = binder;
-
-		view.setInfrastructure(this);
-		viewModel.setInfrastructure(this);
-	}
+	private final Supplier<Optional<DisposableObserver<IBinderAction>>> binderObserverSupplier;
 
 	@Override
 	@Deprecated
@@ -74,6 +68,22 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 	@Override
 	public B getBinder() { return binder; }
 
+	@SuppressWarnings({"ThisEscapedInObjectConstruction", "RedundantTypeArguments"})
+	public UIDefaultInfrastructure(V view, VM viewModel, B binder) {
+		this.view = view;
+		this.viewModel = viewModel;
+		this.binder = binder;
+
+		view.setInfrastructure(this);
+		viewModel.setInfrastructure(this);
+
+		OptionalWeakReference<UIDefaultInfrastructure<V, VM, B>> thisWeakReference = new OptionalWeakReference<>(this);
+		this.binderObserverSupplier = () -> thisWeakReference.getOptional().map(UIDefaultInfrastructure<V, VM, B>::createBinderActionObserver);
+	}
+
+	protected DisposableObserver<IBinderAction> createBinderActionObserver() {
+		return new BinderActionDelegatingDisposableObserver(createBinderActionObserver(getBinder()), getBinderDisposables());
+	}
 
 	@Override
 	public void bind(IUIContextContainer contextContainer) {
@@ -82,27 +92,15 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 		getView().setContext(contextContainer.getViewContext());
 		getViewModel().setContext(contextContainer.getViewModelContext());
 
-		OptionalWeakReference<UIDefaultInfrastructure<V, VM, B>> thisWeakReference = new OptionalWeakReference<>(this);
-		@SuppressWarnings("RedundantTypeArguments") Supplier<Optional<DisposableObserver<IBinderAction>>> supplier = () -> thisWeakReference.getOptional().map(UIDefaultInfrastructure<V, VM, B>::createBinderActionObserver);
 		// COMMENT must bind the bindings of view first to ensure that the default values are from the view
-		getView().initializeBindings(supplier);
-		getViewModel().initializeBindings(supplier);
+		getView().initializeBindings(getBinderObserverSupplier());
+		getViewModel().initializeBindings(getBinderObserverSupplier());
 
 		setBound(true);
 	}
 
-
-	@Override
-	public void unbind() {
-		IUIInfrastructure.checkBoundState(isBound(), true);
-
-		getView().setContext(null);
-		getViewModel().setContext(null);
-
-		getBinderDisposables().clear();
-		getBinder().unbindAll();
-
-		setBound(false);
+	protected Supplier<Optional<DisposableObserver<IBinderAction>>> getBinderObserverSupplier() {
+		return binderObserverSupplier;
 	}
 
 	@Override
@@ -141,10 +139,20 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 		}, UIConfiguration.getInstance().getLogger());
 	}
 
-	protected DisposableObserver<IBinderAction> createBinderActionObserver() {
-		DisposableObserver<IBinderAction> d = createBinderActionObserver(getBinder());
-		getBinderDisposables().add(d);
-		return d;
+	@Override
+	public void unbind() {
+		IUIInfrastructure.checkBoundState(isBound(), true);
+
+		getViewModel().cleanupBindings(getBinderObserverSupplier());
+		getView().cleanupBindings(getBinderObserverSupplier());
+
+		getViewModel().setContext(null);
+		getView().setContext(null);
+
+		getBinderDisposables().clear();
+		getBinder().unbindAll();
+
+		setBound(false);
 	}
 
 	@Override
@@ -161,6 +169,26 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 		this.binder = binder;
 	}
 
-
 	protected CompositeDisposable getBinderDisposables() { return binderDisposables; }
+
+	protected static final class BinderActionDelegatingDisposableObserver
+			extends DelegatingDisposableObserver<IBinderAction> {
+		private final CompositeDisposable binderDisposables;
+
+		public BinderActionDelegatingDisposableObserver(DisposableObserver<? super IBinderAction> delegate, CompositeDisposable binderDisposables) {
+			super(delegate);
+			this.binderDisposables = binderDisposables;
+		}
+
+		@Override
+		@OverridingMethodsMustInvokeSuper
+		protected void onStart() {
+			super.onStart();
+			getBinderDisposables().add(this);
+		}
+
+		protected CompositeDisposable getBinderDisposables() {
+			return binderDisposables;
+		}
+	}
 }

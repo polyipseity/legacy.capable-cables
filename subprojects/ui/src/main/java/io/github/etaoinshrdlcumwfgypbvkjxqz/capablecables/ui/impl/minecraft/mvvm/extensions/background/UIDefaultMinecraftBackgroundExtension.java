@@ -98,6 +98,10 @@ public class UIDefaultMinecraftBackgroundExtension
 	@OverridingMethodsMustInvokeSuper
 	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {}
 
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {}
+
 	@OnlyIn(Dist.CLIENT)
 	public static class RenderObserver
 			extends LoggingDisposableObserver<UIAbstractViewBusEvent.Render> {

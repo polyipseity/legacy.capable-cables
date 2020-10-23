@@ -34,4 +34,20 @@ public enum BindingUtilities {
 		Streams.stream(bindings).unordered()
 				.forEach(binding -> binding.initializeBindings(binderObserverSupplier));
 	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	public static void findAndCleanupBindings(Iterable<?> objects, Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		cleanupBindings(
+				Streams.stream(objects).unordered()
+						.filter(IHasBinding.class::isInstance)
+						.map(IHasBinding.class::cast)
+						.collect(ImmutableSet.toImmutableSet()),
+				binderObserverSupplier);
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	public static void cleanupBindings(Iterable<? extends IHasBinding> bindings, Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		Streams.stream(bindings).unordered()
+				.forEach(binding -> binding.cleanupBindings(binderObserverSupplier));
+	}
 }

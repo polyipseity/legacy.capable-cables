@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUISubInfrastructure;
@@ -55,11 +56,19 @@ public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructure
 	@Deprecated
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
 		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
-		return IExtensionContainer.addExtensionImpl(this, getExtensions(), extension);
+		Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> result = IExtensionContainer.addExtensionImpl(this, getExtensions(), extension);
+		getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
+				BindingUtilities.findAndInitializeBindings(ImmutableList.of(extension), binderObserverSupplier));
+		return result;
 	}
 
 	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtensionImpl(getExtensions(), key); }
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) {
+		Optional<IExtension<? extends INamespacePrefixedString, ?>> result = IExtensionContainer.removeExtensionImpl(getExtensions(), key);
+		getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
+				BindingUtilities.findAndCleanupBindings(result.map(ImmutableList::of).orElseGet(ImmutableList::of), binderObserverSupplier));
+		return result;
+	}
 
 	@Override
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return IExtensionContainer.getExtensionImpl(getExtensions(), key); }
@@ -74,8 +83,11 @@ public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructure
 		return Optional.ofNullable(binderObserverSupplier);
 	}
 
-	protected void setBinderObserverSupplier(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		this.binderObserverSupplier = binderObserverSupplier;
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		setBinderObserverSupplier(null);
+		BindingUtilities.findAndCleanupBindings(getExtensions().values(), binderObserverSupplier);
 	}
 
 	@Override
@@ -83,5 +95,9 @@ public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructure
 	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		setBinderObserverSupplier(binderObserverSupplier);
 		BindingUtilities.findAndInitializeBindings(getExtensions().values(), binderObserverSupplier);
+	}
+
+	protected void setBinderObserverSupplier(@Nullable Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		this.binderObserverSupplier = binderObserverSupplier;
 	}
 }

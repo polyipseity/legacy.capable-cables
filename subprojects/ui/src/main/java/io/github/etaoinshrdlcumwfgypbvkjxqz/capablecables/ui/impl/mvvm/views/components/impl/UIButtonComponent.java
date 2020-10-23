@@ -122,6 +122,14 @@ public class UIButtonComponent
 				() -> ImmutableBinderAction.bind(getOnActivate(), getOnActivated()));
 	}
 
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		super.cleanupBindings(binderObserverSupplier);
+		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+				() -> ImmutableBinderAction.unbind(getOnActivate(), getOnActivated()));
+	}
+
 	protected IBindingMethodSource<IUIEventActivate> getOnActivate() { return onActivate; }
 
 	@Override

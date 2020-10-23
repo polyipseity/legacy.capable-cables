@@ -33,6 +33,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.O
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.paths.FunctionalPath;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
@@ -149,6 +150,7 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 		getManager().ifPresent(previousManager -> EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(),
 				() -> {
 					previousManager.setView(null);
+					getBinderObserverSupplier().ifPresent(previousManager::cleanupBindings);
 					getNamedTrackers().removeAll(IUIComponent.class, getChildrenFlatView());
 				},
 				new UIAbstractComponentHierarchyChangeBusEvent.View(EnumHookStage.PRE, previousManager, this, null),
@@ -215,9 +217,22 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
+	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		super.cleanupBindings(binderObserverSupplier);
+		BindingUtilities.cleanupBindings(
+				getManager().map(ImmutableList::of).orElseGet(ImmutableList::of),
+				binderObserverSupplier
+		);
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
 	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		super.initializeBindings(binderObserverSupplier);
-		getManager().ifPresent(manager -> manager.initializeBindings(binderObserverSupplier));
+		BindingUtilities.initializeBindings(
+				getManager().map(ImmutableList::of).orElseGet(ImmutableList::of),
+				binderObserverSupplier
+		);
 	}
 
 	public enum CacheViewComponent {
