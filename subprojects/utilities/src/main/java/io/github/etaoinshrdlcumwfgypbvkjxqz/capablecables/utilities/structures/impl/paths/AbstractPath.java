@@ -39,8 +39,11 @@ public abstract class AbstractPath<T>
 	@Override
 	public boolean isEmpty() { return size() == 0; }
 
-	@Override
-	public abstract AbstractPath<T> copy();
-
 	protected abstract List<T> getData();
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public AbstractPath<T> clone() throws CloneNotSupportedException {
+		return (AbstractPath<T>) super.clone();
+	}
 }

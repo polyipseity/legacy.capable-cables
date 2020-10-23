@@ -1,11 +1,12 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICopyable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICloneable;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface IPath<T> extends ICopyable {
+public interface IPath<T>
+		extends ICloneable {
 	int size();
 
 	default boolean isRoot() { return size() == 1; }
@@ -23,8 +24,8 @@ public interface IPath<T> extends ICopyable {
 	void parentPath(int amount)
 			throws EmptyPathException;
 
-	@Override
-	IPath<T> copy();
-
 	boolean isEmpty();
+
+	@Override
+	IPath<T> clone() throws CloneNotSupportedException;
 }

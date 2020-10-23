@@ -1,13 +1,15 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICloneable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICopyable;
 
 import java.awt.geom.RectangularShape;
 import java.util.Optional;
 
 public interface IShapeConstraint
-		extends ICopyable, ICloneable {
+		extends ICloneable {
+	@Override
+	IShapeConstraint clone();
+
 	default <R extends RectangularShape> R constrain(RectangularShape source, R destination) {
 		final double[]
 				x = new double[]{source.getX()},
@@ -43,10 +45,4 @@ public interface IShapeConstraint
 	Optional<? extends Double> getMaxHeight();
 
 	IShapeConstraint createIntersection(IShapeConstraint constraint);
-
-	@Override
-	IShapeConstraint copy();
-
-	@SuppressWarnings("override")
-	IShapeConstraint clone() throws CloneNotSupportedException;
 }

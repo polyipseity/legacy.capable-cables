@@ -1,7 +1,9 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.paths;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.DynamicUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.EmptyPathException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.IConcurrentPath;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,6 +62,24 @@ public abstract class AbstractConcurrentPath<T>
 		writeLock.unlock();
 	}
 
+	private static final long LOCK_FIELD_OFFSET;
+
+	static {
+		try {
+			LOCK_FIELD_OFFSET = DynamicUtilities.getUnsafe().objectFieldOffset(AbstractConcurrentPath.class.getDeclaredField("lock"));
+		} catch (NoSuchFieldException e) {
+			throw ThrowableUtilities.propagate(e);
+		}
+	}
+
 	@Override
-	public abstract AbstractConcurrentPath<T> copy();
+	public AbstractConcurrentPath<T> clone() throws CloneNotSupportedException {
+		AbstractConcurrentPath<T> result = (AbstractConcurrentPath<T>) super.clone();
+		DynamicUtilities.getUnsafe().putObjectVolatile(result, getLockFieldOffset(), new ReentrantReadWriteLock());
+		return result;
+	}
+
+	protected static long getLockFieldOffset() {
+		return LOCK_FIELD_OFFSET;
+	}
 }

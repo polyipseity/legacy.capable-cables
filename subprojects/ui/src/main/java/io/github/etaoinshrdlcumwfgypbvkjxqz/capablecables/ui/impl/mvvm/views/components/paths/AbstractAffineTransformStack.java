@@ -2,25 +2,13 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.co
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.paths.IAffineTransformStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.AbstractObjectStack;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 
 import java.awt.geom.AffineTransform;
 
 public abstract class AbstractAffineTransformStack
 		extends AbstractObjectStack.CopyPushable<AffineTransform>
 		implements IAffineTransformStack {
-	@Override
-	public AbstractAffineTransformStack copy() {
-		AbstractAffineTransformStack ret = newInstanceForCopying();
-		ret.getData().clear();
-		getData().stream()
-				.map(AffineTransform::clone)
-				.map(AffineTransform.class::cast)
-				.forEachOrdered(ret.getData()::add);
-		return ret;
-	}
-
-	protected abstract AbstractAffineTransformStack newInstanceForCopying();
-
 	@Override
 	public void close() { createCleaner().run(); }
 
@@ -32,4 +20,13 @@ public abstract class AbstractAffineTransformStack
 
 	@Override
 	protected AffineTransform copyElement(AffineTransform object) { return (AffineTransform) object.clone(); }
+
+	@Override
+	public AbstractAffineTransformStack clone() {
+		try {
+			return (AbstractAffineTransformStack) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw ThrowableUtilities.propagate(e);
+		}
+	}
 }

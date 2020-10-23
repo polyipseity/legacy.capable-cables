@@ -10,7 +10,7 @@ import java.lang.invoke.MethodType;
 public interface ICloneable
 		extends Cloneable {
 	@SuppressWarnings("unchecked")
-	static <T extends Cloneable> T cloneUnchecked(T obj) {
+	static <T extends Cloneable> T clone(T obj) {
 		// TODO Java 9 - use LambdaMetaFactory
 		try {
 			return (T) StaticHolder.getCloneMethodHandle().invoke(obj);
@@ -19,7 +19,6 @@ public interface ICloneable
 		}
 	}
 
-	@SuppressWarnings("override")
 	ICloneable clone() throws CloneNotSupportedException;
 
 	enum StaticHolder {

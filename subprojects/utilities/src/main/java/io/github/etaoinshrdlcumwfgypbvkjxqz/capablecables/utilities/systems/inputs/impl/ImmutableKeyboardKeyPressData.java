@@ -2,38 +2,40 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inp
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IKeyboardKeyPressData;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import javax.annotation.concurrent.Immutable;
 
 @Immutable
-public final class ImmutableKeyboardKeyPressData implements IKeyboardKeyPressData, Cloneable {
-	private final int key, scanCode, modifiers;
-	private final long timestamp;
+public final class ImmutableKeyboardKeyPressData
+		extends AbstractTimestampedInputData
+		implements IKeyboardKeyPressData, Cloneable {
+	private final int key;
+	private final int scanCode;
+	private final int modifiers;
 
-	public ImmutableKeyboardKeyPressData(int key, int scanCode, int modifiers) { this(key, scanCode, modifiers, System.currentTimeMillis()); }
-
-	private ImmutableKeyboardKeyPressData(int key, int scanCode, int modifiers, long timestamp) {
+	public ImmutableKeyboardKeyPressData(int key, int scanCode, int modifiers) {
 		this.key = key;
 		this.scanCode = scanCode;
 		this.modifiers = modifiers;
-		this.timestamp = timestamp;
 	}
 
 	@Override
-	public int hashCode() { return ObjectUtilities.hashCode(this, null, StaticHolder.getObjectVariables()); }
+	public int hashCode() { return ObjectUtilities.hashCode(this, null, IKeyboardKeyPressData.StaticHolder.getObjectVariables()); }
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
-	public boolean equals(Object obj) { return ObjectUtilities.equals(this, IKeyboardKeyPressData.class, obj, true, null, StaticHolder.getObjectVariables()); }
+	public boolean equals(Object obj) { return ObjectUtilities.equals(this, IKeyboardKeyPressData.class, obj, true, null, IKeyboardKeyPressData.StaticHolder.getObjectVariables()); }
 
 	@Override
-	public ImmutableKeyboardKeyPressData clone() throws CloneNotSupportedException { return (ImmutableKeyboardKeyPressData) super.clone(); }
+	public String toString() { return ObjectUtilities.toString(this, super::toString, IKeyboardKeyPressData.StaticHolder.getObjectVariablesMap()); }
 
 	@Override
-	public String toString() { return ObjectUtilities.toString(this, super::toString, StaticHolder.getObjectVariablesMap()); }
-
-	@Override
-	public ImmutableKeyboardKeyPressData copy() { return new ImmutableKeyboardKeyPressData(getKey(), getScanCode(), getModifiers(), getTimestampMills()); }
+	@OverridingMethodsMustInvokeSuper
+	public ImmutableKeyboardKeyPressData recreate() {
+		return (ImmutableKeyboardKeyPressData) super.recreate();
+	}
 
 	@Override
 	public int getKey() { return key; }
@@ -45,11 +47,11 @@ public final class ImmutableKeyboardKeyPressData implements IKeyboardKeyPressDat
 	public int getModifiers() { return modifiers; }
 
 	@Override
-	public long getTimestampMills() { return timestamp; }
-
-
-	@Override
-	public IKeyboardKeyPressData recreate() { return new ImmutableKeyboardKeyPressData(getKey(), getScanCode(), getModifiers()); }
-
-
+	public ImmutableKeyboardKeyPressData clone() {
+		try {
+			return (ImmutableKeyboardKeyPressData) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw ThrowableUtilities.propagate(e);
+		}
+	}
 }

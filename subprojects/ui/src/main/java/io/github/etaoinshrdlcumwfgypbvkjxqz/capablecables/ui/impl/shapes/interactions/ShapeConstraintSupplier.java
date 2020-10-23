@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.intera
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeConstraint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.MathUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -17,7 +18,14 @@ public class ShapeConstraintSupplier
 	private final Supplier<? extends Double> maxWidthSupplier;
 	private final Supplier<? extends Double> maxHeightSupplier;
 
-	public ShapeConstraintSupplier(Supplier<? extends Double> minXSupplier, Supplier<? extends Double> minYSupplier, Supplier<? extends Double> maxXSupplier, Supplier<? extends Double> maxYSupplier, Supplier<? extends Double> minWidthSupplier, Supplier<? extends Double> minHeightSupplier, Supplier<? extends Double> maxWidthSupplier, Supplier<? extends Double> maxHeightSupplier) {
+	public ShapeConstraintSupplier(Supplier<? extends Double> minXSupplier,
+	                               Supplier<? extends Double> minYSupplier,
+	                               Supplier<? extends Double> maxXSupplier,
+	                               Supplier<? extends Double> maxYSupplier,
+	                               Supplier<? extends Double> minWidthSupplier,
+	                               Supplier<? extends Double> minHeightSupplier,
+	                               Supplier<? extends Double> maxWidthSupplier,
+	                               Supplier<? extends Double> maxHeightSupplier) {
 		this.minXSupplier = minXSupplier;
 		this.minYSupplier = minYSupplier;
 		this.maxXSupplier = maxXSupplier;
@@ -29,7 +37,14 @@ public class ShapeConstraintSupplier
 	}
 
 	@Override
-	public ShapeConstraintSupplier clone() throws CloneNotSupportedException { return (ShapeConstraintSupplier) super.clone(); }
+	public ShapeConstraintSupplier clone() {
+		try {
+			// COMMENT makes no sense to clone suppliers - the behavior is the thing to be cloned, which can be achieved by simply not cloning them
+			return (ShapeConstraintSupplier) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw ThrowableUtilities.propagate(e);
+		}
+	}
 
 	@Override
 	public IShapeConstraint createIntersection(IShapeConstraint constraint) {
@@ -67,19 +82,6 @@ public class ShapeConstraintSupplier
 
 	@Override
 	public Optional<? extends Double> getMaxHeight() { return Optional.ofNullable(getMaxHeightSupplier().get()); }
-
-	@Override
-	public ShapeConstraintSupplier copy() {
-		return new ShapeConstraintSupplier(
-				getMinXSupplier(),
-				getMinYSupplier(),
-				getMaxXSupplier(),
-				getMaxYSupplier(),
-				getMinWidthSupplier(),
-				getMinHeightSupplier(),
-				getMaxWidthSupplier(),
-				getMaxHeightSupplier());
-	}
 
 	protected Supplier<? extends Double> getMinXSupplier() { return minXSupplier; }
 

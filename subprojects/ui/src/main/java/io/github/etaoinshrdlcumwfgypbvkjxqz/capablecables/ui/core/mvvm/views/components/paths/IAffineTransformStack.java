@@ -4,7 +4,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LoopUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICopyable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICloneable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IObjectStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.MarkersTemplate;
@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 public interface IAffineTransformStack
-		extends IObjectStack.ICopyPushable<AffineTransform>, ICopyable, AutoCloseable {
+		extends ICloneable, IObjectStack.ICopyPushable<AffineTransform>, AutoCloseable {
 	static void popNTimes(IAffineTransformStack stack, int times) {
 		LoopUtilities.doNTimes(times, stack::pop);
 	}
@@ -29,7 +29,7 @@ public interface IAffineTransformStack
 	}
 
 	@Override
-	IAffineTransformStack copy();
+	IAffineTransformStack clone();
 
 	@Override
 	void close();

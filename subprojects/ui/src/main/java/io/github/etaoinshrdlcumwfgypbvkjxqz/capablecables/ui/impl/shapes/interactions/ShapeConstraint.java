@@ -8,7 +8,7 @@ import javax.annotation.concurrent.Immutable;
 import java.util.Optional;
 
 @Immutable
-public final class ShapeConstraint
+public class ShapeConstraint
 		extends ShapeConstraintSupplier {
 	public ShapeConstraint(@Nullable Double minX, @Nullable Double minY, @Nullable Double maxX, @Nullable Double maxY, @Nullable Double minWidth, @Nullable Double minHeight, @Nullable Double maxWidth, @Nullable Double maxHeight) {
 		super(
@@ -23,18 +23,7 @@ public final class ShapeConstraint
 	}
 
 	@Override
-	public ShapeConstraint clone() throws CloneNotSupportedException { return (ShapeConstraint) super.clone(); }
-
-	@Override
-	public ShapeConstraint copy() {
-		return new ShapeConstraint(
-				getMinX().orElse(null),
-				getMinY().orElse(null),
-				getMaxX().orElse(null),
-				getMaxY().orElse(null),
-				getMinWidth().orElse(null),
-				getMinHeight().orElse(null),
-				getMaxWidth().orElse(null),
-				getMaxHeight().orElse(null));
+	public ShapeConstraint clone() {
+		return (ShapeConstraint) super.clone();
 	}
 }

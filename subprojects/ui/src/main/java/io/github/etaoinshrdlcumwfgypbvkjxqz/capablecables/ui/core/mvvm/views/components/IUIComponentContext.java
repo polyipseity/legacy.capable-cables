@@ -2,14 +2,17 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.co
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICopyable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICloneable;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.Optional;
 
 public interface IUIComponentContext
-		extends AutoCloseable, ICopyable {
+		extends ICloneable, AutoCloseable {
+	@Override
+	IUIComponentContext clone();
+
 	static Shape createContextualShape(IUIComponentContext context, Shape shape) {
 		return getCurrentTransform(context).createTransformedShape(shape);
 	}
@@ -34,7 +37,4 @@ public interface IUIComponentContext
 
 	@Override
 	void close();
-
-	@Override
-	IUIComponentContext copy();
 }

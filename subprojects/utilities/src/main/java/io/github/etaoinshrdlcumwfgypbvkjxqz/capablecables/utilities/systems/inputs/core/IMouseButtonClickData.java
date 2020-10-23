@@ -3,7 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inp
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICopyable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICloneable;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.concurrent.Immutable;
@@ -12,22 +12,23 @@ import java.util.function.Function;
 
 @Immutable
 public interface IMouseButtonClickData
-		extends ICopyable {
-
+		extends ICloneable, ITimestampedInputData {
 	Point2D getCursorPositionView();
 
 	int getButton();
 
-	long getTimestampMills();
-
+	@Override
 	IMouseButtonClickData recreate();
+
+	@Override
+	IMouseButtonClickData clone();
 
 	enum StaticHolder {
 		;
 
 		public static final int MOUSE_BUTTON_NULL = -1;
 		private static final ImmutableList<Function<? super IMouseButtonClickData, ?>> OBJECT_VARIABLES = ImmutableList.of(
-				IMouseButtonClickData::getCursorPositionView, IMouseButtonClickData::getButton, IMouseButtonClickData::getTimestampMills);
+				IMouseButtonClickData::getCursorPositionView, IMouseButtonClickData::getButton, IMouseButtonClickData::getTimestamp);
 		@NonNls
 		private static final ImmutableMap<String, Function<? super IMouseButtonClickData, ?>> OBJECT_VARIABLES_MAP = ImmutableMap.copyOf(MapUtilities.zipKeysValues(
 				ImmutableList.of("cursorPositionView", "button", "timestampMills"),

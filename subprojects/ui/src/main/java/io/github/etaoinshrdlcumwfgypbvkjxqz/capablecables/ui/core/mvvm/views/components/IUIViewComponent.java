@@ -65,7 +65,7 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 						.orElseGet(ImmutableList::of),
 				IThrowingBiFunction.executeNow((parent, children) -> {
 					if (predicate.test(parent)) {
-						try (IUIComponentContextStack contextStackCopy = context.getStackRef().copy()) {
+						try (IUIComponentContextStack contextStackCopy = context.getStackRef().clone()) {
 							post.accept(context, context.getMutator().pop(contextStackCopy), children);
 						}
 						context.getMutator().pop(context.getStackRef());

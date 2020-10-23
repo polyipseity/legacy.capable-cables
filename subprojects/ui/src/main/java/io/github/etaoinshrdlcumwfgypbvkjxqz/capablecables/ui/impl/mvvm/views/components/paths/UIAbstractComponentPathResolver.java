@@ -36,7 +36,7 @@ public abstract class UIAbstractComponentPathResolver
 				.orElseGet(ImmutableList::of)
 				.stream()
 				.map(child -> {
-					try (IUIComponentContext componentContextCopy = componentContext.copy()) {
+					try (IUIComponentContext componentContextCopy = componentContext.clone()) {
 						componentContextCopy.getMutator().push(componentContextCopy.getStackRef(), child);
 						return getResult(componentContextCopy, (Point2D) point.clone());
 					}

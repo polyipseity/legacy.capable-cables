@@ -2,13 +2,11 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.co
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIVirtualComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICopyable;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface IUIComponentPathResolverResult
-		extends ICopyable {
+public interface IUIComponentPathResolverResult {
 	Optional<? extends IUIComponent> getComponent();
 
 	Optional<? extends IUIComponent> getConcreteComponent();
@@ -18,7 +16,4 @@ public interface IUIComponentPathResolverResult
 	boolean isPresent();
 
 	boolean isVirtual();
-
-	@Override
-	IUIComponentPathResolverResult copy();
 }

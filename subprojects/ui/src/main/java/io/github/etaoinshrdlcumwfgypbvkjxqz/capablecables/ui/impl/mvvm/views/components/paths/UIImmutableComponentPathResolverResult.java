@@ -62,9 +62,4 @@ public final class UIImmutableComponentPathResolverResult
 
 	@Override
 	public boolean isVirtual() { return getComponent().map(IUIVirtualComponent.class::isInstance).orElse(false); }
-
-	@Override
-	public UIImmutableComponentPathResolverResult copy() {
-		return of(getComponent().orElse(null), getVirtualComponents());
-	}
 }

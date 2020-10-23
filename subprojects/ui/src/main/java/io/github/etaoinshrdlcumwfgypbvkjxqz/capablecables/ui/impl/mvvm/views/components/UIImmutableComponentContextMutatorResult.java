@@ -22,12 +22,6 @@ public final class UIImmutableComponentContextMutatorResult
 	}
 
 	@Override
-	public UIImmutableComponentContextMutatorResult copy() {
-		return of(getComponent(), getModifiers());
-	}
-
-
-	@Override
 	public IUIComponent getComponent() { return component; }
 
 	@Override

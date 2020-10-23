@@ -13,7 +13,9 @@ public class ImmutablePath<T>
 	}
 
 	@Override
-	public ImmutablePath<T> copy() { return new ImmutablePath<>(getData()); }
+	public ImmutablePath<T> clone() throws CloneNotSupportedException {
+		return (ImmutablePath<T>) super.clone();
+	}
 
 	@Override
 	protected List<T> getData() { return data; }
