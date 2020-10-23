@@ -32,6 +32,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputPointerDevice;
@@ -195,6 +197,11 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 	@OverridingMethodsMustInvokeSuper
 	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		setBinderObserverSupplier(binderObserverSupplier);
+		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+				() -> ImmutableBinderAction.bind(
+						getActivationMouseButtons(),
+						getResizeBorders(), getResizeBorderDefaultThickness()
+				));
 		Optional.ofNullable(getRendererContainerReference().get())
 				.ifPresent(rendererContainer -> rendererContainer.initializeBindings(binderObserverSupplier));
 	}
@@ -207,8 +214,7 @@ public class UITeleportingComponentUserResizableExtension<E extends IUIComponent
 	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 	public void onExtensionAdded(IUIComponent container) {
 		super.onExtensionAdded(container);
-		getContainer()
-				.ifPresent(c -> c.addModifier(getModifier()));
+		getContainer().ifPresent(c -> c.addModifier(getModifier()));
 	}
 
 	protected Modifier getModifier() { return modifier; }

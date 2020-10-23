@@ -8,15 +8,22 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.util
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.resizable.UIAbstractComponentUserResizableExtensionPreviewingResizingRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NonNls;
 
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
 public class UIComponentUserResizableMinecraftExtensionPreviewingResizingRenderer
@@ -50,6 +57,16 @@ public class UIComponentUserResizableMinecraftExtensionPreviewingResizingRendere
 								rectangle,
 								previewColor.getRGB(),
 								0));
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		super.initializeBindings(binderObserverSupplier);
+		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+				() -> ImmutableBinderAction.unbind(
+						getPreviewColor()
+				));
 	}
 
 	protected IBindingField<Color> getPreviewColor() { return previewColor; }
