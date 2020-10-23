@@ -246,7 +246,6 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 							.ifPresent(c -> {
 								c.getParent().ifPresent(p ->
 										p.moveChildToTop(c));
-								c.moveModifierToTop(this);
 								setActiveMouseButton(button);
 								evt.stopPropagation();
 							});

@@ -145,7 +145,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 
 										return border;
 									})
-									.reduce(new Rectangle2D.Double(), Rectangle2D::createUnion)
+									.reduce(containerShapeBounds, Rectangle2D::createUnion)
 					);
 					resizeShape.subtract(new Area(containerShapeBounds));
 					return resizeShape;
@@ -281,7 +281,6 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 							.ifPresent(c -> {
 								c.getParent().ifPresent(p ->
 										p.moveChildToTop(c));
-								c.moveModifierToTop(this);
 								setActiveMouseButton(button);
 								evt.stopPropagation();
 							});
