@@ -16,7 +16,6 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
 
-// TODO remove when not needed
 public class ProperLoggingEventBuilder
 		implements LoggingEventBuilder {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
