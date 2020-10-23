@@ -1,20 +1,23 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
+
 public class DuplicateNameException
 		extends IllegalStateException {
 	private static final long serialVersionUID = 8045556356079069945L;
 
 	public DuplicateNameException() {}
 
-	public DuplicateNameException(String s) {
-		super(s);
+	public DuplicateNameException(@Nullable CharSequence message) {
+		super(Optional.ofNullable(message).map(CharSequence::toString).orElse(null));
 	}
 
-	public DuplicateNameException(String message, Throwable cause) {
-		super(message, cause);
+	public DuplicateNameException(@Nullable CharSequence message, @Nullable Throwable cause) {
+		super(Optional.ofNullable(message).map(CharSequence::toString).orElse(null), cause);
 	}
 
-	public DuplicateNameException(Throwable cause) {
+	public DuplicateNameException(@Nullable Throwable cause) {
 		super(cause);
 	}
 }

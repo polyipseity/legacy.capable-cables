@@ -15,32 +15,32 @@ import java.util.function.Consumer;
 
 public class UILambdaTheme
 		implements IUITheme {
-	private final List<Consumer<? super @Immutable Map<String, ? extends IUIRendererContainer<?>>>> rendererContainerAppliers;
+	private final List<Consumer<? super @Immutable Map<? super String, ? extends IUIRendererContainer<?>>>> rendererContainerAppliers;
 
-	public UILambdaTheme(List<Consumer<? super @Immutable Map<String, ? extends IUIRendererContainer<?>>>> rendererContainerAppliers) {
+	protected UILambdaTheme(List<Consumer<? super @Immutable Map<? super String, ? extends IUIRendererContainer<?>>>> rendererContainerAppliers) {
 		this.rendererContainerAppliers = ImmutableList.copyOf(rendererContainerAppliers);
 	}
 
 	@Override
 	public void apply(Iterable<? extends IUIRendererContainer<?>> rendererContainers) {
-		@Immutable Map<String, ? extends IUIRendererContainer<?>> rendererContainerMap = INamed.toNamedMap(rendererContainers);
+		@Immutable Map<String, IUIRendererContainer<?>> rendererContainerMap = INamed.toNamedMap(rendererContainers);
 		getRendererContainerAppliers()
 				.forEach(applier -> applier.accept(rendererContainerMap));
 	}
 
-	protected List<Consumer<? super Map<String, ? extends IUIRendererContainer<?>>>> getRendererContainerAppliers() { return rendererContainerAppliers; }
+	protected List<Consumer<? super Map<? super String, ? extends IUIRendererContainer<?>>>> getRendererContainerAppliers() { return rendererContainerAppliers; }
 
 	public static class Builder {
-		private final List<Consumer<? super @Immutable Map<String, ? extends IUIRendererContainer<?>>>> rendererContainerAppliers = new ArrayList<>(CapacityUtilities.getInitialCapacityMedium());
+		private final List<Consumer<? super @Immutable Map<? super String, ? extends IUIRendererContainer<?>>>> rendererContainerAppliers = new ArrayList<>(CapacityUtilities.getInitialCapacityMedium());
 
 		@SuppressWarnings("UnusedReturnValue")
-		public Builder addRendererContainerAppliers(Iterable<? extends Consumer<? super Map<String, ? extends IUIRendererContainer<?>>>> appliers) {
+		public Builder addRendererContainerAppliers(Iterable<? extends Consumer<? super Map<? super String, ? extends IUIRendererContainer<?>>>> appliers) {
 			Iterables.addAll(getRendererContainerAppliers(), appliers);
 			return this;
 		}
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-		protected List<Consumer<? super Map<String, ? extends IUIRendererContainer<?>>>> getRendererContainerAppliers() { return rendererContainerAppliers; }
+		protected List<Consumer<? super Map<? super String, ? extends IUIRendererContainer<?>>>> getRendererContainerAppliers() { return rendererContainerAppliers; }
 
 		public UILambdaTheme build() { return new UILambdaTheme(ImmutableList.copyOf(getRendererContainerAppliers())); }
 	}

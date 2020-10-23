@@ -145,12 +145,13 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 	@Override
 	public Optional<? extends M> getManager() { return Optional.ofNullable(manager); }
 
+	@SuppressWarnings("Convert2MethodRef")
 	@Override
 	public void setManager(@Nullable M manager) {
 		getManager().ifPresent(previousManager -> EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(),
 				() -> {
 					previousManager.setView(null);
-					getBinderObserverSupplier().ifPresent(previousManager::cleanupBindings);
+					getBinderObserverSupplier().ifPresent(binderObserverSupplier -> previousManager.cleanupBindings(binderObserverSupplier)); // TODO javac bug - replace with method reference if fixed
 					getNamedTrackers().removeAll(IUIComponent.class, getChildrenFlatView());
 				},
 				new UIAbstractComponentHierarchyChangeBusEvent.View(EnumHookStage.PRE, previousManager, this, null),
