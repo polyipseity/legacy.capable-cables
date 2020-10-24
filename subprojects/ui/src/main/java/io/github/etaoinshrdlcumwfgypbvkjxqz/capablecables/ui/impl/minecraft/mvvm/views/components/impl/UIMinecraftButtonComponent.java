@@ -105,34 +105,34 @@ public class UIMinecraftButtonComponent
 		private static final INamespacePrefixedString PROPERTY_PRESSED_BORDER_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyPressedBorderColor());
 
 		@UIProperty(PROPERTY_BASE_COLOR)
-		private final IBindingField<Color> colorBase;
+		private final IBindingField<Color> baseColor;
 		@UIProperty(PROPERTY_BASE_BORDER_COLOR)
-		private final IBindingField<Color> colorBaseBorder;
+		private final IBindingField<Color> baseBorderColor;
 		@UIProperty(PROPERTY_HOVERING_COLOR)
-		private final IBindingField<Color> colorHovering;
+		private final IBindingField<Color> hoveringColor;
 		@UIProperty(PROPERTY_HOVERING_BORDER_COLOR)
-		private final IBindingField<Color> colorHoveringBorder;
+		private final IBindingField<Color> hoveringBorderColor;
 		@UIProperty(PROPERTY_PRESSED_COLOR)
-		private final IBindingField<Color> colorPressed;
+		private final IBindingField<Color> pressedColor;
 		@UIProperty(PROPERTY_PRESSED_BORDER_COLOR)
-		private final IBindingField<Color> colorPressedBorder;
+		private final IBindingField<Color> pressedBorderColor;
 
 		@UIRendererConstructor
 		public DefaultRenderer(UIRendererConstructor.IArguments arguments) {
 			super(arguments);
 
 			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-			this.colorBase = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY,
+			this.baseColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY,
 					mappings.get(getPropertyBaseColorLocation()));
-			this.colorBaseBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY,
+			this.baseBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY,
 					mappings.get(getPropertyBaseBorderColorLocation()));
-			this.colorHovering = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.GRAY,
+			this.hoveringColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.GRAY,
 					mappings.get(getPropertyHoveringColorLocation()));
-			this.colorHoveringBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.GRAY,
+			this.hoveringBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.GRAY,
 					mappings.get(getPropertyHoveringBorderColorLocation()));
-			this.colorPressed = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.LIGHT_GRAY,
+			this.pressedColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.LIGHT_GRAY,
 					mappings.get(getPropertyPressedColorLocation()));
-			this.colorPressedBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.LIGHT_GRAY,
+			this.pressedBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.LIGHT_GRAY,
 					mappings.get(getPropertyPressedBorderColorLocation()));
 		}
 
@@ -190,9 +190,9 @@ public class UIMinecraftButtonComponent
 			super.initializeBindings(binderObserverSupplier);
 			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 					() -> ImmutableBinderAction.bind(
-							getColorBase(), getColorBaseBorder(),
-							getColorHovering(), getColorHoveringBorder(),
-							getColorPressed(), getColorPressedBorder()
+							getBaseColor(), getBaseBorderColor(),
+							getHoveringColor(), getHoveringBorderColor(),
+							getPressedColor(), getPressedBorderColor()
 					));
 		}
 
@@ -202,32 +202,32 @@ public class UIMinecraftButtonComponent
 			super.cleanupBindings(binderObserverSupplier);
 			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 					() -> ImmutableBinderAction.unbind(
-							getColorBase(), getColorBaseBorder(),
-							getColorHovering(), getColorHoveringBorder(),
-							getColorPressed(), getColorPressedBorder()
+							getBaseColor(), getBaseBorderColor(),
+							getHoveringColor(), getHoveringBorderColor(),
+							getPressedColor(), getPressedBorderColor()
 					));
 		}
 
-		protected IBindingField<Color> getColorBase() {
-			return colorBase;
+		protected IBindingField<Color> getBaseColor() {
+			return baseColor;
 		}
 
-		protected IBindingField<Color> getColorBaseBorder() {
-			return colorBaseBorder;
+		protected IBindingField<Color> getBaseBorderColor() {
+			return baseBorderColor;
 		}
 
-		protected IBindingField<Color> getColorHovering() {
-			return colorHovering;
+		protected IBindingField<Color> getHoveringColor() {
+			return hoveringColor;
 		}
 
-		protected IBindingField<Color> getColorHoveringBorder() {
-			return colorHoveringBorder;
+		protected IBindingField<Color> getHoveringBorderColor() {
+			return hoveringBorderColor;
 		}
 
-		protected IBindingField<Color> getColorPressed() { return colorPressed; }
+		protected IBindingField<Color> getPressedColor() { return pressedColor; }
 
-		protected IBindingField<Color> getColorPressedBorder() {
-			return colorPressedBorder;
+		protected IBindingField<Color> getPressedBorderColor() {
+			return pressedBorderColor;
 		}
 
 		@Override
@@ -235,19 +235,19 @@ public class UIMinecraftButtonComponent
 			if (stage.isPreChildren()) {
 				Shape transformed = IUIComponent.getContextualShape(context, container);
 				if (container.getButtonStates().contains(IButtonState.PRESSING)) {
-					getColorPressed().getValue().ifPresent(c ->
+					getPressedColor().getValue().ifPresent(c ->
 							MinecraftDrawingUtilities.drawShape(transformed, true, c, 0));
-					getColorPressedBorder().getValue().ifPresent(c ->
+					getPressedBorderColor().getValue().ifPresent(c ->
 							MinecraftDrawingUtilities.drawShape(transformed, false, c, 0));
 				} else if (container.getButtonStates().contains(IButtonState.HOVERING)) {
-					getColorHovering().getValue().ifPresent(c ->
+					getHoveringColor().getValue().ifPresent(c ->
 							MinecraftDrawingUtilities.drawShape(transformed, true, c, 0));
-					getColorHoveringBorder().getValue().ifPresent(c ->
+					getHoveringBorderColor().getValue().ifPresent(c ->
 							MinecraftDrawingUtilities.drawShape(transformed, false, c, 0));
 				} else {
-					getColorBase().getValue().ifPresent(c ->
+					getBaseColor().getValue().ifPresent(c ->
 							MinecraftDrawingUtilities.drawShape(transformed, true, c, 0));
-					getColorBaseBorder().getValue().ifPresent(c ->
+					getBaseBorderColor().getValue().ifPresent(c ->
 							MinecraftDrawingUtilities.drawShape(transformed, false, c, 0));
 				}
 			}

@@ -93,18 +93,18 @@ public class UIMinecraftWindowComponent
 		private static final INamespacePrefixedString PROPERTY_BORDER_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyBorderColor());
 
 		@UIProperty(PROPERTY_BACKGROUND_COLOR)
-		private final IBindingField<Color> colorBackground;
+		private final IBindingField<Color> backgroundColor;
 		@UIProperty(PROPERTY_BORDER_COLOR)
-		private final IBindingField<Color> colorBorder;
+		private final IBindingField<Color> borderColor;
 
 		@UIRendererConstructor
 		public DefaultRenderer(UIRendererConstructor.IArguments arguments) {
 			super(arguments);
 
 			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-			this.colorBackground = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.BLACK,
+			this.backgroundColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.BLACK,
 					mappings.get(getPropertyBackgroundColorLocation()));
-			this.colorBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.WHITE,
+			this.borderColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.WHITE,
 					mappings.get(getPropertyBorderColorLocation()));
 		}
 
@@ -130,7 +130,7 @@ public class UIMinecraftWindowComponent
 			super.initializeBindings(binderObserverSupplier);
 			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 					() -> ImmutableBinderAction.bind(
-							getColorBackground(), getColorBorder()
+							getBackgroundColor(), getBorderColor()
 					)
 			);
 		}
@@ -141,22 +141,22 @@ public class UIMinecraftWindowComponent
 			super.cleanupBindings(binderObserverSupplier);
 			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 					() -> ImmutableBinderAction.unbind(
-							getColorBackground(), getColorBorder()
+							getBackgroundColor(), getBorderColor()
 					)
 			);
 		}
 
-		public IBindingField<Color> getColorBackground() { return colorBackground; }
+		public IBindingField<Color> getBackgroundColor() { return backgroundColor; }
 
-		public IBindingField<Color> getColorBorder() { return colorBorder; }
+		public IBindingField<Color> getBorderColor() { return borderColor; }
 
 		@Override
 		public void render(IUIComponentContext context, C container, EnumRenderStage stage, double partialTicks) {
 			if (stage.isPreChildren()) {
 				Shape transformed = IUIComponent.getContextualShape(context, container);
-				getColorBackground().getValue().ifPresent(c ->
+				getBackgroundColor().getValue().ifPresent(c ->
 						MinecraftDrawingUtilities.drawShape(transformed, true, c, 0));
-				getColorBorder().getValue().ifPresent(c ->
+				getBorderColor().getValue().ifPresent(c ->
 						MinecraftDrawingUtilities.drawShape(transformed, true, c, 0));
 			}
 		}
