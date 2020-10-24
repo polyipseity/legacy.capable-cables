@@ -129,6 +129,7 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		IUIComponentUserRelocatableExtension.super.initializeBindings(binderObserverSupplier);
 		setBinderObserverSupplier(binderObserverSupplier);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 				() -> ImmutableBinderAction.bind(
@@ -148,6 +149,7 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		IUIComponentUserRelocatableExtension.super.cleanupBindings(binderObserverSupplier);
 		setBinderObserverSupplier(null);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 				() -> ImmutableBinderAction.unbind(

@@ -9,8 +9,12 @@ import java.util.function.Supplier;
 
 public interface IHasBinding {
 	@OverridingMethodsMustInvokeSuper
-	void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier);
+	default void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		// COMMENT for 'OverridingMethodsMustInvokeSuper'
+	}
 
 	@OverridingMethodsMustInvokeSuper
-	void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier);
+	default void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		// COMMENT for 'OverridingMethodsMustInvokeSuper'
+	}
 }

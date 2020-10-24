@@ -85,16 +85,18 @@ public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructure
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		setBinderObserverSupplier(null);
-		BindingUtilities.findAndCleanupBindings(getExtensions().values(), binderObserverSupplier);
+	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		IUISubInfrastructure.super.initializeBindings(binderObserverSupplier);
+		setBinderObserverSupplier(binderObserverSupplier);
+		BindingUtilities.findAndInitializeBindings(getExtensions().values(), binderObserverSupplier);
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		setBinderObserverSupplier(binderObserverSupplier);
-		BindingUtilities.findAndInitializeBindings(getExtensions().values(), binderObserverSupplier);
+	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		IUISubInfrastructure.super.cleanupBindings(binderObserverSupplier);
+		setBinderObserverSupplier(null);
+		BindingUtilities.findAndCleanupBindings(getExtensions().values(), binderObserverSupplier);
 	}
 
 	protected void setBinderObserverSupplier(@Nullable Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {

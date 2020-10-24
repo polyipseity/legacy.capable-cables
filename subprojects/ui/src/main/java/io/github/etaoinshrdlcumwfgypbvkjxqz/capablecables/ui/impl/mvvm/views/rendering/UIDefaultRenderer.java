@@ -8,14 +8,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.compon
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
-import io.reactivex.rxjava3.observers.DisposableObserver;
 
 import javax.annotation.Nullable;
-import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class UIDefaultRenderer<C>
 		implements IUIRenderer<C> {
@@ -59,12 +55,4 @@ public class UIDefaultRenderer<C>
 	public Optional<? extends C> getContainer() { return container.getOptional(); }
 
 	public void setContainer(@Nullable C container) { this.container = new OptionalWeakReference<>(container); }
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {}
 }

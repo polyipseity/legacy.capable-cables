@@ -35,6 +35,7 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		IUIRendererContainer.super.initializeBindings(binderObserverSupplier);
 		setBinderObserverSupplier(binderObserverSupplier);
 		BindingUtilities.initializeBindings(
 				getRenderer().map(ImmutableList::of).orElseGet(ImmutableList::of),
@@ -45,6 +46,7 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		IUIRendererContainer.super.cleanupBindings(binderObserverSupplier);
 		setBinderObserverSupplier(null);
 		BindingUtilities.cleanupBindings(
 				getRenderer().map(ImmutableList::of).orElseGet(ImmutableList::of),
