@@ -9,6 +9,8 @@ import java.io.Serializable;
 @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface IRegistryObject<V>
 		extends ICompatibilitySupplier<V>, Serializable, ISealedClassCandidate {
+	long serialVersionUID = 7285998289519574757L;
+
 	@Nonnull
 	@Override
 	default V get() { return getValue(); }

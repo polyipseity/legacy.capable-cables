@@ -2,7 +2,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:val="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/values"
            targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/values"
-           version="1.4.0"
+           version="1.5.0"
            xml:lang="EN">
 	<!-- TODO change some global elements to local elements, JAXB seems to dislike local elements -->
 
@@ -22,6 +22,11 @@
 	<xs:element name="float" type="xs:float" nillable="true"/>
 	<!-- COMMENT double -->
 	<xs:element name="double" type="xs:double" nillable="true"/>
+
+	<!-- SECTION structures -->
+
+	<!-- COMMENT ITuple2 -->
+	<xs:element name="tuple2" type="val:tuple2Type" nillable="true"/>
 
 	<!-- SECTION objects -->
 
@@ -46,13 +51,13 @@
 	<!-- COMMENT List -->
 	<xs:element name="list" type="val:collectionType" nillable="true"/>
 
-	<!-- COMMENT relations (set multi-map) -->
+	<!-- COMMENT SetMulti-map -->
 	<xs:element name="relations-set" type="val:relationsType" nillable="true"/>
 
-	<!-- COMMENT relations (list multi-map) -->
+	<!-- COMMENT ListMulti-map -->
 	<xs:element name="relations-list" type="val:relationsType" nillable="true"/>
 
-	<!-- COMMENT map -->
+	<!-- COMMENT Map -->
 	<xs:element name="map" type="val:relationsType" nillable="true"/>
 
 	<!-- SECTION types -->

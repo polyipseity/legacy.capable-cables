@@ -1,7 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters;
 
 import com.google.common.collect.*;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.CollectionType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.RelationsType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.SideType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Tuple2Type;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.JAXBAdapterRegistries;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIJAXBUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
@@ -16,7 +19,7 @@ import jakarta.xml.bind.JAXBElement;
 
 import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
-import java.awt.Color;
+import java.awt.*;
 import java.io.Serializable;
 import java.util.List;
 import java.util.*;
@@ -41,6 +44,29 @@ public enum EnumJAXBElementPresetAdapter
 			new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createDouble)),
 	STRING(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createString), String.class),
 			new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createString)),
+	TUPLE_2(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createTuple2), CastUtilities.<Class<ITuple2<?, ?>>>castUnchecked(ITuple2.class)),
+			new IDuplexFunction.Functional<>(
+					left -> JAXBUtilities.getActualValueOptional(left)
+							.map(left2 -> {
+								Object rightLeft = left2.getLeft();
+								Object rightRight = left2.getRight();
+								return ImmutableTuple2.of(
+										AssertionUtilities.assertNonnull(JAXBAdapterRegistries.getFromRawAdapter(rightLeft).leftToRight(rightLeft)),
+										AssertionUtilities.assertNonnull(JAXBAdapterRegistries.getFromRawAdapter(rightRight).leftToRight(rightRight))
+								);
+							})
+							.orElse(null),
+					(@Nullable ITuple2<?, ?> right) ->
+							UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().createTuple2(Optional.ofNullable(right)
+									.map(right2 -> {
+										Object rightLeft = right.getLeft();
+										Object rightRight = right.getRight();
+										return Tuple2Type.of(
+												JAXBAdapterRegistries.getToRawAdapter(rightLeft).rightToLeft(rightLeft),
+												JAXBAdapterRegistries.getToRawAdapter(rightRight).rightToLeft(rightRight)
+										);
+									}).orElse(null))
+			)),
 	COLOR(ImmutableTuple2.of(UIJAXBUtilities.<io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color>getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createColor), Color.class),
 			new IDuplexFunction.Functional<>(
 					left -> JAXBUtilities.getActualValueOptional(left)
@@ -49,18 +75,9 @@ public enum EnumJAXBElementPresetAdapter
 					(@Nullable Color right) ->
 							UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()
 									.createColor(io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color.fromJava(right)))),
-	UI_SIDE(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createSide), EnumUISide.class),
-			new IDuplexFunction.Functional<>(
-					left -> JAXBUtilities.getActualValueOptional(left)
-							.orElseThrow(AssertionError::new)
-							.toJava(),
-					(@Nullable EnumUISide right) ->
-							UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()
-									.createSide(SideType.fromJava(AssertionUtilities.assertNonnull(right)))
-			)),
 	@SuppressWarnings("UnstableApiUsage") SET(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createSet), CastUtilities.<Class<Set<?>>>castUnchecked(Set.class)),
 			new IDuplexFunction.Functional<>(
-					left -> processCollectionType(JAXBUtilities.getActualValueOptional(left).orElse(null))
+					left -> processCollectionType(JAXBUtilities.getActualValue(left))
 							.map(leftStream -> leftStream.collect(ImmutableSet.toImmutableSet()))
 							.orElse(null),
 					(@Nullable Set<?> right) ->
@@ -73,7 +90,7 @@ public enum EnumJAXBElementPresetAdapter
 			)),
 	@SuppressWarnings("UnstableApiUsage") LIST(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createList), CastUtilities.<Class<List<?>>>castUnchecked(List.class)),
 			new IDuplexFunction.Functional<>(
-					left -> processCollectionType(JAXBUtilities.getActualValueOptional(left).orElse(null))
+					left -> processCollectionType(JAXBUtilities.getActualValue(left))
 							.map(leftStream -> leftStream.collect(ImmutableList.toImmutableList()))
 							.orElse(null),
 					(@Nullable List<?> right) ->
@@ -86,7 +103,7 @@ public enum EnumJAXBElementPresetAdapter
 			)),
 	@SuppressWarnings("UnstableApiUsage") RELATIONS_SET(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createRelationsSet), CastUtilities.<Class<SetMultimap<?, ?>>>castUnchecked(SetMultimap.class)),
 			new IDuplexFunction.Functional<>(
-					left -> processRelationsType(JAXBUtilities.getActualValueOptional(left).orElse(null))
+					left -> processRelationsType(JAXBUtilities.getActualValue(left))
 							.map(leftStream -> leftStream.collect(ImmutableSetMultimap.toImmutableSetMultimap(Map.Entry::getKey, Map.Entry::getValue)))
 							.orElse(null),
 					(@Nullable SetMultimap<?, ?> right) ->
@@ -100,7 +117,7 @@ public enum EnumJAXBElementPresetAdapter
 			)),
 	@SuppressWarnings("UnstableApiUsage") RELATIONS_LIST(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createRelationsList), CastUtilities.<Class<ListMultimap<?, ?>>>castUnchecked(ListMultimap.class)),
 			new IDuplexFunction.Functional<>(
-					left -> processRelationsType(JAXBUtilities.getActualValueOptional(left).orElse(null))
+					left -> processRelationsType(JAXBUtilities.getActualValue(left))
 							.map(leftStream -> leftStream.collect(ImmutableListMultimap.toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)))
 							.orElse(null),
 					(@Nullable ListMultimap<?, ?> right) ->
@@ -114,7 +131,7 @@ public enum EnumJAXBElementPresetAdapter
 			)),
 	@SuppressWarnings("UnstableApiUsage") MAP(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createMap), CastUtilities.<Class<Map<?, ?>>>castUnchecked(Map.class)),
 			new IDuplexFunction.Functional<>(
-					left -> processRelationsType(JAXBUtilities.getActualValueOptional(left).orElse(null))
+					left -> processRelationsType(JAXBUtilities.getActualValue(left))
 							.map(leftStream -> leftStream.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)))
 							.orElse(null),
 					(@Nullable Map<?, ?> right) ->
@@ -125,6 +142,13 @@ public enum EnumJAXBElementPresetAdapter
 													.map(Collection::stream)
 													.orElse(null)
 									).orElse(null))
+			)),
+	UI_SIDE(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createSide), EnumUISide.class),
+			new IDuplexFunction.Functional<>(
+					left -> AssertionUtilities.assertNonnull(JAXBUtilities.getActualValue(left)).toJava(),
+					(@Nullable EnumUISide right) ->
+							UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()
+									.createSide(SideType.fromJava(AssertionUtilities.assertNonnull(right)))
 			)),
 	;
 
@@ -173,8 +197,8 @@ public enum EnumJAXBElementPresetAdapter
 				.map(RelationsType::getEntry)
 				.map(Collection::stream)
 				.map(leftStream -> leftStream.map(leftEntry -> {
-					Object key = AssertionUtilities.assertNonnull(leftEntry.getAny().get(0)).getAny();
-					Object value = AssertionUtilities.assertNonnull(leftEntry.getAny().get(1)).getAny();
+					Object key = leftEntry.getLeft();
+					Object value = leftEntry.getRight();
 					return Maps.immutableEntry(
 							JAXBAdapterRegistries.getFromRawAdapter(key).leftToRight(key),
 							JAXBAdapterRegistries.getFromRawAdapter(value).leftToRight(value)
@@ -188,22 +212,10 @@ public enum EnumJAXBElementPresetAdapter
 				.map(rightStream -> rightStream.map(rightEntry -> {
 					Object rightKey = AssertionUtilities.assertNonnull(rightEntry.getKey());
 					Object rightValue = AssertionUtilities.assertNonnull(rightEntry.getValue());
-
-					AnyType leftKey =
-							UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().createAnyType();
-					AnyType leftValue =
-							UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().createAnyType();
-
-					Tuple2Type leftEntry =
-							UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().createTuple2Type();
-
-					leftKey.setAny(JAXBAdapterRegistries.getToRawAdapter(rightKey).rightToLeft(rightKey));
-					leftValue.setAny(JAXBAdapterRegistries.getToRawAdapter(rightValue).rightToLeft(rightValue));
-
-					leftEntry.getAny().set(0, leftKey);
-					leftEntry.getAny().set(1, leftValue);
-
-					return leftEntry;
+					return Tuple2Type.of(
+							JAXBAdapterRegistries.getToRawAdapter(rightKey).rightToLeft(rightKey),
+							JAXBAdapterRegistries.getToRawAdapter(rightValue).rightToLeft(rightValue)
+					);
 				}))
 				.map(intermediateStream -> intermediateStream.collect(ImmutableList.toImmutableList()))
 				.map(intermediate -> {

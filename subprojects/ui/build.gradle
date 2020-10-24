@@ -40,7 +40,7 @@ def xjcMainUI = createJaxbXJCTask.call('xjcMainUI',
 		 // COMMENT -Xpropertyaccessors broken
 		 '-Xnullsafegetters'
 		],
-		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/ui-*.xjb' }.files })
+		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/ui.xjb' }.files })
 compileJava.configure { dependsOn xjcMainUI }
 
 makeSourcesTasks.call { Task it ->
