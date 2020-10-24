@@ -66,19 +66,32 @@ public final class DefaultShapeAnchor implements IShapeAnchor {
 				Rectangle2D bounds = from.getAbsoluteShape().getBounds2D();
 				Rectangle2D newBounds = (Rectangle2D) bounds.clone();
 				double targetValue =
-						getOriginSide().getInwardOperator().applyAsDouble(
-								getTargetSide().getGetter().applyAsDouble(target.getAbsoluteShape().getBounds2D()),
-								getBorderThickness());
+						getTargetSide().getValue(target.getAbsoluteShape().getBounds2D())
+								+ getTargetSide().outwardsBy(getBorderThickness())
+								.orElse(0);
 				getOriginSide().getOpposite() // COMMENT set opposite side, avoid overshooting
 						.ifPresent(oppositeOriginSide -> {
-							double oppositeOriginSideCurrentValue = oppositeOriginSide.getGetter().applyAsDouble(newBounds);
-							double oppositeOriginSideTargetValue = getOriginSide().getInwardOperator().applyAsDouble(targetValue, 1d);
-							oppositeOriginSideTargetValue = oppositeOriginSideTargetValue < targetValue ?
-									Math.min(oppositeOriginSideTargetValue, oppositeOriginSideCurrentValue) // COMMENT lesser means larger area
-									: Math.max(oppositeOriginSideTargetValue, oppositeOriginSideCurrentValue); // COMMENT greater means larger area
-							oppositeOriginSide.getSetter().accept(newBounds, oppositeOriginSideTargetValue);
+							double oppositeOriginSideCurrentValue = oppositeOriginSide.getValue(newBounds);
+							boolean overshoots;
+							switch (oppositeOriginSide.getType()) {
+								case LOCATION:
+									// COMMENT smaller means larger area
+									overshoots = targetValue <= oppositeOriginSideCurrentValue;
+									break;
+								case SIZE:
+									// COMMENT larger means larger area
+									overshoots = targetValue >= oppositeOriginSideCurrentValue;
+									break;
+								default:
+									throw new AssertionError();
+							}
+							if (overshoots) {
+								oppositeOriginSide.setValue(newBounds,
+										targetValue
+												+ oppositeOriginSide.outwardsBy(1).orElseThrow(AssertionError::new));
+							}
 						});
-				getOriginSide().getSetter().accept(newBounds, targetValue);
+				getOriginSide().setValue(newBounds, targetValue);
 				transform = AffineTransformUtilities.getTransformFromTo(bounds, newBounds);
 			}
 			Rectangle2D relativeBounds = from.getShapeDescriptor().getShapeOutput().getBounds2D();

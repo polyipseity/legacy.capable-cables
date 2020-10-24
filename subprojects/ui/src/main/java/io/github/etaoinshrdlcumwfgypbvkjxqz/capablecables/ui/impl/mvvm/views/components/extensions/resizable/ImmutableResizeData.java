@@ -5,7 +5,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.IUIComponentUserResizableExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUIAxis;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 
 import javax.annotation.Nullable;
@@ -46,8 +45,9 @@ public class ImmutableResizeData implements IUIComponentUserResizableExtension.I
 		Point2D previousPoint = getPreviousPoint();
 		getSides().forEach(side -> {
 			EnumUIAxis axis = side.getAxis();
-			side.getSetter().accept(destination, AssertionUtilities.assertNonnull(side.getGetter().applyAsDouble(source))
-					+ (axis.getCoordinate(point) - axis.getCoordinate(previousPoint)));
+			side.setValue(destination,
+					side.getValue(source)
+							+ (axis.getCoordinate(point) - axis.getCoordinate(previousPoint)));
 		});
 		return destination;
 	}

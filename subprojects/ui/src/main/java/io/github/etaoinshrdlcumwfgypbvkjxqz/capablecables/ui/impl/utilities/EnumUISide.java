@@ -7,10 +7,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.RectangularShape;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.Set;
-import java.util.function.DoubleBinaryOperator;
-import java.util.function.ObjDoubleConsumer;
-import java.util.function.ToDoubleFunction;
 
 @Immutable
 public enum EnumUISide {
@@ -26,13 +24,29 @@ public enum EnumUISide {
 		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return mouse.getY() < rectangular.getY(); }
 
 		@Override
-		public ToDoubleFunction<RectangularShape> getGetter() { return RectangularShape::getY; }
+		public double getValue(RectangularShape shape) {
+			return shape.getY();
+		}
 
 		@Override
-		public ObjDoubleConsumer<RectangularShape> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), i, r.getMaxX(), r.getMaxY()); }
+		public void setValue(RectangularShape shape, double value) {
+			shape.setFrameFromDiagonal(shape.getX(), value, shape.getMaxX(), shape.getMaxY());
+		}
 
 		@Override
-		public DoubleBinaryOperator getInwardOperator() { return Double::sum; }
+		public OptionalDouble inwardsBy(double value) {
+			return OptionalDouble.of(value);
+		}
+
+		@Override
+		public OptionalDouble outwardsBy(double value) {
+			return OptionalDouble.of(-value);
+		}
+
+		@Override
+		public EnumUISideType getType() {
+			return EnumUISideType.LOCATION;
+		}
 	},
 	DOWN {
 		@Override
@@ -45,13 +59,29 @@ public enum EnumUISide {
 		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return mouse.getY() >= rectangular.getMaxY(); }
 
 		@Override
-		public ToDoubleFunction<RectangularShape> getGetter() { return RectangularShape::getMaxY; }
+		public double getValue(RectangularShape shape) {
+			return shape.getMaxY();
+		}
 
 		@Override
-		public ObjDoubleConsumer<RectangularShape> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), r.getY(), r.getMaxX(), i); }
+		public void setValue(RectangularShape shape, double value) {
+			shape.setFrameFromDiagonal(shape.getX(), shape.getY(), shape.getMaxX(), value);
+		}
 
 		@Override
-		public DoubleBinaryOperator getInwardOperator() { return (i, b) -> i - b; }
+		public OptionalDouble inwardsBy(double value) {
+			return OptionalDouble.of(-value);
+		}
+
+		@Override
+		public OptionalDouble outwardsBy(double value) {
+			return OptionalDouble.of(value);
+		}
+
+		@Override
+		public EnumUISideType getType() {
+			return EnumUISideType.SIZE;
+		}
 	},
 	LEFT {
 		@Override
@@ -64,13 +94,29 @@ public enum EnumUISide {
 		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return mouse.getX() < rectangular.getX(); }
 
 		@Override
-		public ToDoubleFunction<RectangularShape> getGetter() { return RectangularShape::getX; }
+		public double getValue(RectangularShape shape) {
+			return shape.getX();
+		}
 
 		@Override
-		public ObjDoubleConsumer<RectangularShape> getSetter() { return (r, i) -> r.setFrameFromDiagonal(i, r.getY(), r.getMaxX(), r.getMaxY()); }
+		public void setValue(RectangularShape shape, double value) {
+			shape.setFrameFromDiagonal(value, shape.getY(), shape.getMaxX(), shape.getMaxY());
+		}
 
 		@Override
-		public DoubleBinaryOperator getInwardOperator() { return Double::sum; }
+		public OptionalDouble inwardsBy(double value) {
+			return OptionalDouble.of(value);
+		}
+
+		@Override
+		public OptionalDouble outwardsBy(double value) {
+			return OptionalDouble.of(-value);
+		}
+
+		@Override
+		public EnumUISideType getType() {
+			return EnumUISideType.LOCATION;
+		}
 	},
 	RIGHT {
 		@Override
@@ -83,15 +129,36 @@ public enum EnumUISide {
 		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return mouse.getX() >= rectangular.getMaxX(); }
 
 		@Override
-		public ToDoubleFunction<RectangularShape> getGetter() { return RectangularShape::getMaxX; }
+		public double getValue(RectangularShape shape) {
+			return shape.getMaxX();
+		}
 
 		@Override
-		public ObjDoubleConsumer<RectangularShape> getSetter() { return (r, i) -> r.setFrameFromDiagonal(r.getX(), r.getY(), i, r.getMaxY()); }
+		public void setValue(RectangularShape shape, double value) {
+			shape.setFrameFromDiagonal(shape.getX(), shape.getY(), value, shape.getMaxY());
+		}
 
 		@Override
-		public DoubleBinaryOperator getInwardOperator() { return (i, b) -> i - b; }
+		public OptionalDouble inwardsBy(double value) {
+			return OptionalDouble.of(-value);
+		}
+
+		@Override
+		public OptionalDouble outwardsBy(double value) {
+			return OptionalDouble.of(value);
+		}
+
+		@Override
+		public EnumUISideType getType() {
+			return EnumUISideType.SIZE;
+		}
 	},
 	HORIZONTAL {
+		@Override
+		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) {
+			return false;
+		}
+
 		@Override
 		public EnumUIAxis getAxis() { return EnumUIAxis.X; }
 
@@ -99,15 +166,36 @@ public enum EnumUISide {
 		public Optional<? extends EnumUISide> getOpposite() { return Optional.empty(); }
 
 		@Override
-		public ToDoubleFunction<RectangularShape> getGetter() { return RectangularShape::getCenterX; }
+		public double getValue(RectangularShape shape) {
+			return shape.getCenterX();
+		}
 
 		@Override
-		public ObjDoubleConsumer<RectangularShape> getSetter() { return (r, i) -> r.setFrameFromCenter(i, r.getCenterY(), r.getX() + i - r.getCenterX(), r.getY()); }
+		public void setValue(RectangularShape shape, double value) {
+			shape.setFrameFromCenter(value, shape.getCenterY(), shape.getX() + value - shape.getCenterX(), shape.getY());
+		}
 
 		@Override
-		public DoubleBinaryOperator getInwardOperator() { return (i, b) -> i; }
+		public OptionalDouble inwardsBy(double value) {
+			return OptionalDouble.empty();
+		}
+
+		@Override
+		public OptionalDouble outwardsBy(double value) {
+			return OptionalDouble.empty();
+		}
+
+		@Override
+		public EnumUISideType getType() {
+			return EnumUISideType.CENTER;
+		}
 	},
 	VERTICAL {
+		@Override
+		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) {
+			return false;
+		}
+
 		@Override
 		public EnumUIAxis getAxis() { return EnumUIAxis.Y; }
 
@@ -115,13 +203,29 @@ public enum EnumUISide {
 		public Optional<? extends EnumUISide> getOpposite() { return Optional.empty(); }
 
 		@Override
-		public ToDoubleFunction<RectangularShape> getGetter() { return RectangularShape::getCenterY; }
+		public double getValue(RectangularShape shape) {
+			return shape.getCenterY();
+		}
 
 		@Override
-		public ObjDoubleConsumer<RectangularShape> getSetter() { return (r, i) -> r.setFrameFromCenter(i, r.getCenterY(), r.getX() + i - r.getCenterX(), r.getY()); }
+		public void setValue(RectangularShape shape, double value) {
+			shape.setFrameFromCenter(value, shape.getCenterY(), shape.getX() + value - shape.getCenterX(), shape.getY());
+		}
 
 		@Override
-		public DoubleBinaryOperator getInwardOperator() { return (i, b) -> i; }
+		public OptionalDouble inwardsBy(double value) {
+			return OptionalDouble.empty();
+		}
+
+		@Override
+		public OptionalDouble outwardsBy(double value) {
+			return OptionalDouble.empty();
+		}
+
+		@Override
+		public EnumUISideType getType() {
+			return EnumUISideType.CENTER;
+		}
 	};
 
 	@SuppressWarnings("UnstableApiUsage")
@@ -138,15 +242,19 @@ public enum EnumUISide {
 		return EDGES;
 	}
 
-	public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return false; }
+	public abstract boolean isMouseOver(RectangularShape rectangular, Point2D mouse);
 
 	public abstract EnumUIAxis getAxis();
 
 	public abstract Optional<? extends EnumUISide> getOpposite();
 
-	public abstract ToDoubleFunction<RectangularShape> getGetter();
+	public abstract double getValue(RectangularShape shape);
 
-	public abstract ObjDoubleConsumer<RectangularShape> getSetter();
+	public abstract void setValue(RectangularShape shape, double value);
 
-	public abstract DoubleBinaryOperator getInwardOperator();
+	public abstract OptionalDouble inwardsBy(double value);
+
+	public abstract OptionalDouble outwardsBy(double value);
+
+	public abstract EnumUISideType getType();
 }

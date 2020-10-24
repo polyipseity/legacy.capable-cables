@@ -195,11 +195,12 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 									EnumUISide side = AssertionUtilities.assertNonnull(entry.getKey());
 									double thickness = AssertionUtilities.assertNonnull(entry.getValue());
 
-									EnumUISide oppositeSide = side.getOpposite().orElseThrow(AssertionError::new);
+									EnumUISide oppositeSide = side.getOpposite().orElseThrow(IllegalStateException::new);
 									Rectangle2D border = (Rectangle2D) containerShapeBounds.clone();
 
 									// COMMENT we drag the opposite side to a given offset from our side, ignoring other sides
-									oppositeSide.getSetter().accept(border, side.getInwardOperator().applyAsDouble(side.getGetter().applyAsDouble(border), thickness));
+									oppositeSide.setValue(border,
+											side.getValue(border) + side.inwardsBy(thickness).orElseThrow(IllegalStateException::new));
 
 									return border;
 								})

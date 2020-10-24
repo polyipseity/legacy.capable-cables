@@ -139,9 +139,9 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 										Rectangle2D border = (Rectangle2D) containerShapeBounds.clone();
 
 										// COMMENT we drag the opposite side to a given offset from our side, ignoring other sides
-										oppositeSide.getSetter().accept(border,
-												side.getInwardOperator().applyAsDouble(side.getGetter().applyAsDouble(border),
-														-borders.getOrDefault(side, defaultThickness)));
+										oppositeSide.setValue(border,
+												side.getValue(border)
+														+ side.outwardsBy(borders.getOrDefault(side, defaultThickness)).orElseThrow(AssertionError::new));
 
 										return border;
 									})
