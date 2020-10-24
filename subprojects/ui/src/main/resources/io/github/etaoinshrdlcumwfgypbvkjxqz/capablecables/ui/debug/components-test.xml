@@ -45,13 +45,13 @@
 			<renderer-container name="Window1Renderer"/>
 
 			<extension class="extension.user_relocatable">
-				<property key="default:component.extension.user_relocatable.activation.mouse">
+				<property key="default:property.teleporting.activation.mouse">
 					<val:set>
 						<val:int>1</val:int><!-- COMMENT right -->
 						<val:int>2</val:int><!-- COMMENT middle -->
 					</val:set>
 				</property>
-				<property key="default:component.extension.user_relocatable.relocate_borders">
+				<property key="default:property.teleporting.relocate_borders">
 					<val:map>
 						<val:entry>
 							<val:any>
@@ -74,7 +74,7 @@
 				<renderer-container name="Window1ExtensionRelocatableRenderer"/>
 			</extension>
 			<extension class="extension.user_resizable">
-				<property key="default:component.extension.user_resizable.resize_borders">
+				<property key="default:property.teleporting.resize_borders">
 					<val:map>
 						<val:entry>
 							<val:any>
@@ -113,8 +113,8 @@
 			</extension>
 
 			<component class="component.button" name="Button1">
-				<property key="default:component.button.methods.activate" bindingKey="default:buttonOnActivate"/>
-				<property key="default:component.button.methods.activated" bindingKey="default:buttonOnActivated"/>
+				<property key="default:method.button.activate" bindingKey="default:buttonOnActivate"/>
+				<property key="default:method.button.activated" bindingKey="default:buttonOnActivated"/>
 
 				<shape class="shape.ellipse" width="100" height="100">
 					<affineTransformDefiner>

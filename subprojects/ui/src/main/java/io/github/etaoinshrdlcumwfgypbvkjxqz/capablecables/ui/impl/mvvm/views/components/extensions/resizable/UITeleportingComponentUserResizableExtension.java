@@ -61,11 +61,11 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, C>
 		implements IUIComponentUserResizableExtension<C> {
 	@NonNls
-	public static final String PROPERTY_ACTIVATION_MOUSE_BUTTONS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.extension.user_resizable.activation.mouse";
+	public static final String PROPERTY_ACTIVATION_MOUSE_BUTTONS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.teleporting.activation.mouse";
 	@NonNls
-	public static final String PROPERTY_RESIZE_BORDERS_DEFAULT_THICKNESS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.extension.user_resizable.resize_borders.default_thickness";
+	public static final String PROPERTY_RESIZE_BORDERS_DEFAULT_THICKNESS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.teleporting.resize_borders.default_thickness";
 	@NonNls
-	public static final String PROPERTY_RESIZE_BORDERS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.extension.user_resizable.resize_borders";
+	public static final String PROPERTY_RESIZE_BORDERS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.teleporting.resize_borders";
 	private static final INamespacePrefixedString PROPERTY_ACTIVATION_MOUSE_BUTTONS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyActivationMouseButtons());
 	private static final INamespacePrefixedString PROPERTY_RESIZE_BORDERS_DEFAULT_THICKNESS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyResizeBordersDefaultThickness());
 	private static final INamespacePrefixedString PROPERTY_RESIZE_BORDERS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyResizeBorders());

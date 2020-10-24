@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 public class UIComponentUserResizableMinecraftExtensionPreviewingResizingRenderer
 		extends UIAbstractComponentUserResizableExtensionPreviewingResizingRenderer {
 	@NonNls
-	public static final String PROPERTY_PREVIEW_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.extension.user_resizable.renderer.previewing.color.preview";
+	public static final String PROPERTY_PREVIEW_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.previewing.preview.color";
 	private static final INamespacePrefixedString PROPERTY_PREVIEW_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyPreviewColor());
 
 	@UIProperty(PROPERTY_PREVIEW_COLOR)

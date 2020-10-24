@@ -85,36 +85,36 @@ public class UIMinecraftButtonComponent
 	public static class DefaultRenderer<C extends UIMinecraftButtonComponent>
 			extends UIDefaultMinecraftComponentRenderer<C> {
 		@NonNls
-		public static final String PROPERTY_COLOR_BASE = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.button.color.base";
+		public static final String PROPERTY_BASE_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.button.base.color";
 		@NonNls
-		public static final String PROPERTY_COLOR_BASE_BORDER = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.button.color.base.border";
+		public static final String PROPERTY_BASE_BORDER_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.button.base.border.color";
 		@NonNls
-		public static final String PROPERTY_COLOR_HOVERING = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.button.color.hovering";
+		public static final String PROPERTY_HOVERING_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.button.hovering.color";
 		@NonNls
-		public static final String PROPERTY_COLOR_HOVERING_BORDER = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.button.color.hovering.border";
+		public static final String PROPERTY_HOVERING_BORDER_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.button.hovering.border.color";
 		@NonNls
-		public static final String PROPERTY_COLOR_PRESSED = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.button.color.pressed";
+		public static final String PROPERTY_PRESSED_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.button.pressed.color";
 		@NonNls
-		public static final String PROPERTY_COLOR_PRESSED_BORDER = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.button.color.pressed.border";
+		public static final String PROPERTY_PRESSED_BORDER_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.button.pressed.border.color";
 
-		private static final INamespacePrefixedString PROPERTY_COLOR_BASE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorBase());
-		private static final INamespacePrefixedString PROPERTY_COLOR_BASE_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorBaseBorder());
-		private static final INamespacePrefixedString PROPERTY_COLOR_HOVERING_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorHovering());
-		private static final INamespacePrefixedString PROPERTY_COLOR_HOVERING_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorHoveringBorder());
-		private static final INamespacePrefixedString PROPERTY_COLOR_PRESSED_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorPressed());
-		private static final INamespacePrefixedString PROPERTY_COLOR_PRESSED_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorPressedBorder());
+		private static final INamespacePrefixedString PROPERTY_BASE_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyBaseColor());
+		private static final INamespacePrefixedString PROPERTY_BASE_BORDER_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyBaseBorderColor());
+		private static final INamespacePrefixedString PROPERTY_HOVERING_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyHoveringColor());
+		private static final INamespacePrefixedString PROPERTY_HOVERING_BORDER_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyHoveringBorderColor());
+		private static final INamespacePrefixedString PROPERTY_PRESSED_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyPressedColor());
+		private static final INamespacePrefixedString PROPERTY_PRESSED_BORDER_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyPressedBorderColor());
 
-		@UIProperty(PROPERTY_COLOR_BASE)
+		@UIProperty(PROPERTY_BASE_COLOR)
 		private final IBindingField<Color> colorBase;
-		@UIProperty(PROPERTY_COLOR_BASE_BORDER)
+		@UIProperty(PROPERTY_BASE_BORDER_COLOR)
 		private final IBindingField<Color> colorBaseBorder;
-		@UIProperty(PROPERTY_COLOR_HOVERING)
+		@UIProperty(PROPERTY_HOVERING_COLOR)
 		private final IBindingField<Color> colorHovering;
-		@UIProperty(PROPERTY_COLOR_HOVERING_BORDER)
+		@UIProperty(PROPERTY_HOVERING_BORDER_COLOR)
 		private final IBindingField<Color> colorHoveringBorder;
-		@UIProperty(PROPERTY_COLOR_PRESSED)
+		@UIProperty(PROPERTY_PRESSED_COLOR)
 		private final IBindingField<Color> colorPressed;
-		@UIProperty(PROPERTY_COLOR_PRESSED_BORDER)
+		@UIProperty(PROPERTY_PRESSED_BORDER_COLOR)
 		private final IBindingField<Color> colorPressedBorder;
 
 		@UIRendererConstructor
@@ -123,65 +123,65 @@ public class UIMinecraftButtonComponent
 
 			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 			this.colorBase = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY,
-					mappings.get(getPropertyColorBaseLocation()));
+					mappings.get(getPropertyBaseColorLocation()));
 			this.colorBaseBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY,
-					mappings.get(getPropertyColorBaseBorderLocation()));
+					mappings.get(getPropertyBaseBorderColorLocation()));
 			this.colorHovering = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.GRAY,
-					mappings.get(getPropertyColorHoveringLocation()));
+					mappings.get(getPropertyHoveringColorLocation()));
 			this.colorHoveringBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.GRAY,
-					mappings.get(getPropertyColorHoveringBorderLocation()));
+					mappings.get(getPropertyHoveringBorderColorLocation()));
 			this.colorPressed = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.LIGHT_GRAY,
-					mappings.get(getPropertyColorPressedLocation()));
+					mappings.get(getPropertyPressedColorLocation()));
 			this.colorPressedBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.LIGHT_GRAY,
-					mappings.get(getPropertyColorPressedBorderLocation()));
+					mappings.get(getPropertyPressedBorderColorLocation()));
 		}
 
-		public static INamespacePrefixedString getPropertyColorBaseLocation() {
-			return PROPERTY_COLOR_BASE_LOCATION;
+		public static INamespacePrefixedString getPropertyBaseColorLocation() {
+			return PROPERTY_BASE_COLOR_LOCATION;
 		}
 
-		public static INamespacePrefixedString getPropertyColorBaseBorderLocation() {
-			return PROPERTY_COLOR_BASE_BORDER_LOCATION;
+		public static INamespacePrefixedString getPropertyBaseBorderColorLocation() {
+			return PROPERTY_BASE_BORDER_COLOR_LOCATION;
 		}
 
-		public static INamespacePrefixedString getPropertyColorHoveringLocation() {
-			return PROPERTY_COLOR_HOVERING_LOCATION;
+		public static INamespacePrefixedString getPropertyHoveringColorLocation() {
+			return PROPERTY_HOVERING_COLOR_LOCATION;
 		}
 
-		public static INamespacePrefixedString getPropertyColorHoveringBorderLocation() {
-			return PROPERTY_COLOR_HOVERING_BORDER_LOCATION;
+		public static INamespacePrefixedString getPropertyHoveringBorderColorLocation() {
+			return PROPERTY_HOVERING_BORDER_COLOR_LOCATION;
 		}
 
-		public static INamespacePrefixedString getPropertyColorPressedLocation() {
-			return PROPERTY_COLOR_PRESSED_LOCATION;
+		public static INamespacePrefixedString getPropertyPressedColorLocation() {
+			return PROPERTY_PRESSED_COLOR_LOCATION;
 		}
 
-		public static INamespacePrefixedString getPropertyColorPressedBorderLocation() {
-			return PROPERTY_COLOR_PRESSED_BORDER_LOCATION;
+		public static INamespacePrefixedString getPropertyPressedBorderColorLocation() {
+			return PROPERTY_PRESSED_BORDER_COLOR_LOCATION;
 		}
 
-		public static String getPropertyColorBase() {
-			return PROPERTY_COLOR_BASE;
+		public static String getPropertyBaseColor() {
+			return PROPERTY_BASE_COLOR;
 		}
 
-		public static String getPropertyColorBaseBorder() {
-			return PROPERTY_COLOR_BASE_BORDER;
+		public static String getPropertyBaseBorderColor() {
+			return PROPERTY_BASE_BORDER_COLOR;
 		}
 
-		public static String getPropertyColorHovering() {
-			return PROPERTY_COLOR_HOVERING;
+		public static String getPropertyHoveringColor() {
+			return PROPERTY_HOVERING_COLOR;
 		}
 
-		public static String getPropertyColorHoveringBorder() {
-			return PROPERTY_COLOR_HOVERING_BORDER;
+		public static String getPropertyHoveringBorderColor() {
+			return PROPERTY_HOVERING_BORDER_COLOR;
 		}
 
-		public static String getPropertyColorPressed() {
-			return PROPERTY_COLOR_PRESSED;
+		public static String getPropertyPressedColor() {
+			return PROPERTY_PRESSED_COLOR;
 		}
 
-		public static String getPropertyColorPressedBorder() {
-			return PROPERTY_COLOR_PRESSED_BORDER;
+		public static String getPropertyPressedBorderColor() {
+			return PROPERTY_PRESSED_BORDER_COLOR;
 		}
 
 		@Override

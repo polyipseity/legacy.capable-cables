@@ -85,16 +85,16 @@ public class UIMinecraftWindowComponent
 	public static class DefaultRenderer<C extends UIMinecraftWindowComponent>
 			extends UIDefaultMinecraftComponentRenderer<C> {
 		@NonNls
-		public static final String PROPERTY_COLOR_BACKGROUND = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.window.color.background";
+		public static final String PROPERTY_BACKGROUND_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.background.color";
 		@NonNls
-		public static final String PROPERTY_COLOR_BORDER = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "component.window.color.border";
+		public static final String PROPERTY_BORDER_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.border.color";
 
-		private static final INamespacePrefixedString PROPERTY_COLOR_BACKGROUND_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorBackground());
-		private static final INamespacePrefixedString PROPERTY_COLOR_BORDER_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyColorBorder());
+		private static final INamespacePrefixedString PROPERTY_BACKGROUND_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyBackgroundColor());
+		private static final INamespacePrefixedString PROPERTY_BORDER_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyBorderColor());
 
-		@UIProperty(PROPERTY_COLOR_BACKGROUND)
+		@UIProperty(PROPERTY_BACKGROUND_COLOR)
 		private final IBindingField<Color> colorBackground;
-		@UIProperty(PROPERTY_COLOR_BORDER)
+		@UIProperty(PROPERTY_BORDER_COLOR)
 		private final IBindingField<Color> colorBorder;
 
 		@UIRendererConstructor
@@ -103,25 +103,25 @@ public class UIMinecraftWindowComponent
 
 			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 			this.colorBackground = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.BLACK,
-					mappings.get(getPropertyColorBackgroundLocation()));
+					mappings.get(getPropertyBackgroundColorLocation()));
 			this.colorBorder = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.WHITE,
-					mappings.get(getPropertyColorBorderLocation()));
+					mappings.get(getPropertyBorderColorLocation()));
 		}
 
-		public static INamespacePrefixedString getPropertyColorBackgroundLocation() {
-			return PROPERTY_COLOR_BACKGROUND_LOCATION;
+		public static INamespacePrefixedString getPropertyBackgroundColorLocation() {
+			return PROPERTY_BACKGROUND_COLOR_LOCATION;
 		}
 
-		public static INamespacePrefixedString getPropertyColorBorderLocation() {
-			return PROPERTY_COLOR_BORDER_LOCATION;
+		public static INamespacePrefixedString getPropertyBorderColorLocation() {
+			return PROPERTY_BORDER_COLOR_LOCATION;
 		}
 
-		public static String getPropertyColorBackground() {
-			return PROPERTY_COLOR_BACKGROUND;
+		public static String getPropertyBackgroundColor() {
+			return PROPERTY_BACKGROUND_COLOR;
 		}
 
-		public static String getPropertyColorBorder() {
-			return PROPERTY_COLOR_BORDER;
+		public static String getPropertyBorderColor() {
+			return PROPERTY_BORDER_COLOR;
 		}
 
 		@Override
