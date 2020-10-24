@@ -14,14 +14,17 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.utilities.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIWindowComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional2;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -29,6 +32,7 @@ import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -154,10 +158,27 @@ public class UIMinecraftWindowComponent
 		public void render(IUIComponentContext context, C container, EnumRenderStage stage, double partialTicks) {
 			if (stage.isPreChildren()) {
 				Shape transformed = IUIComponent.getContextualShape(context, container);
-				getBackgroundColor().getValue().ifPresent(c ->
-						MinecraftDrawingUtilities.drawShape(transformed, true, c, 0));
-				getBorderColor().getValue().ifPresent(c ->
-						MinecraftDrawingUtilities.drawShape(transformed, true, c, 0));
+				getBackgroundColor().getValue().ifPresent(color ->
+						MinecraftDrawingUtilities.drawShape(transformed, true, color, 0));
+			} else if (stage.isPostChildren()) {
+				Optional2.of(
+						() -> getBorderColor().getValue().orElse(null),
+						() -> container.getControlBarSide().getValue().orElse(null))
+						.ifPresent(values -> {
+							Color borderColor = values.getValue1Nonnull();
+							EnumUISide borderSide = values.getValue2Nonnull();
+
+							Rectangle2D containerShapeBounds = IUIComponent.getShape(container).getBounds2D();
+							EnumUISide oppositeBorderSide = borderSide.getOpposite().orElseThrow(IllegalStateException::new);
+							oppositeBorderSide.setValue(containerShapeBounds,
+									borderSide.getValue(containerShapeBounds)
+											+ borderSide.inwardsBy(IField.getValueNonnull(container.getControlBarThickness()))
+											.orElseThrow(IllegalStateException::new));
+
+							MinecraftDrawingUtilities.drawShape(IUIComponentContext.getCurrentTransform(context),
+									containerShapeBounds,
+									true, borderColor, 0);
+						});
 			}
 		}
 	}

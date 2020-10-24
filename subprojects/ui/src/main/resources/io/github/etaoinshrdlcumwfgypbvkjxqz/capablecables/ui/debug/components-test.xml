@@ -44,6 +44,12 @@
 
 			<renderer-container name="Window1Renderer"/>
 
+			<property key="default:property.window.control_bar.side">
+				<side>DOWN</side>
+			</property>
+			<property key="default:property.window.minimum_visible_thickness"
+			          bindingKey="default:window1MinimumVisibleThickness"/>
+
 			<extension class="extension.user_relocatable">
 				<property key="default:property.teleporting.activation.mouse">
 					<val:set>
@@ -113,9 +119,6 @@
 			</extension>
 
 			<component class="component.button" name="Button1">
-				<property key="default:method.button.activate" bindingKey="default:buttonOnActivate"/>
-				<property key="default:method.button.activated" bindingKey="default:buttonOnActivated"/>
-
 				<shape class="shape.ellipse" width="100" height="100">
 					<affineTransformDefiner>
 						<method name="rotate">1,1</method>
@@ -124,6 +127,9 @@
 				</shape>
 
 				<renderer-container name="Button1Renderer"/>
+
+				<property key="default:method.button.activate" bindingKey="default:buttonOnActivate"/>
+				<property key="default:method.button.activated" bindingKey="default:buttonOnActivated"/>
 			</component>
 		</component>
 	</component>
