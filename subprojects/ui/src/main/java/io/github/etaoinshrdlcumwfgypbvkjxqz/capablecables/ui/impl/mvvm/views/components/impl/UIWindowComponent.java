@@ -14,14 +14,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIE
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIFunctionalEventListener;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultComponentContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIComponentModifyShapeDescriptorBusEvent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interactions.ShapeConstraintSupplier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISideType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
@@ -29,7 +27,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.fields.DelegatingBindingField;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -37,8 +34,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
-import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.RectangularShape;
@@ -55,70 +50,26 @@ public class UIWindowComponent
 
 	public static final @NonNls String PROPERTY_CONTROL_BAR_SIDE = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.control_bar.side";
 	public static final @NonNls String PROPERTY_CONTROL_BAR_THICKNESS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.control_bar.thickness";
-	public static final @NonNls String PROPERTY_MINIMUM_VISIBLE_THICKNESS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.minimum_visible_thickness";
 	private static final INamespacePrefixedString PROPERTY_CONTROL_BAR_SIDE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyControlBarSide());
 	private static final INamespacePrefixedString PROPERTY_CONTROL_BAR_THICKNESS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyControlBarThickness());
-	private static final INamespacePrefixedString PROPERTY_MINIMUM_VISIBLE_THICKNESS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyMinimumVisibleThickness());
 	@UIProperty(PROPERTY_CONTROL_BAR_SIDE)
 	private final IBindingField<EnumUISide> controlBarSide;
 	@UIProperty(PROPERTY_CONTROL_BAR_THICKNESS)
 	private final IBindingField<Double> controlBarThickness;
-	@UIProperty(PROPERTY_MINIMUM_VISIBLE_THICKNESS)
-	private final IBindingField<Double> minimumVisibleThickness;
 
 	@SuppressWarnings({"OverridableMethodCallDuringObjectConstruction", "rawtypes", "RedundantSuppression", "ThisEscapedInObjectConstruction"})
 	@UIComponentConstructor
 	public UIWindowComponent(UIComponentConstructor.IArguments arguments) {
 		super(arguments);
 
-		@SuppressWarnings("ThisEscapedInObjectConstruction") OptionalWeakReference<UIWindowComponent> weakThis = new OptionalWeakReference<>(this);
-		IShapeDescriptor<?> sd = getShapeDescriptor();
-		modifyShape(() -> {
-			sd.getConstraintsRef().add(new ShapeConstraintSupplier(
-					ConstantValue.of(0D), ConstantValue.of(0D),
-					() -> weakThis.getOptional()
-							.flatMap(thisObj -> thisObj.getManager()
-									.map(IUIComponent::getShape)
-									.map(Shape::getBounds2D)
-									.map(RectangularShape::getMaxX)
-									.map(n -> n - thisObj.getMinimumVisibleThickness().getValue()
-											.orElseThrow(IllegalStateException::new)))
-							.orElse(null),
-					() -> weakThis.getOptional()
-							.flatMap(thisObj -> thisObj.getManager()
-									.map(IUIComponent::getShape)
-									.map(Shape::getBounds2D)
-									.map(RectangularShape::getMaxY)
-									.map(n -> n - thisObj.getMinimumVisibleThickness().getValue()
-											.orElseThrow(IllegalStateException::new)))
-							.orElse(null),
-					() -> weakThis.getOptional()
-							.map(UIWindowComponent::getMinimumVisibleThickness)
-							.flatMap(IBindingField::getValue)
-							.orElse(null),
-					() -> weakThis.getOptional()
-							.map(UIWindowComponent::getMinimumVisibleThickness)
-							.flatMap(IBindingField::getValue)
-							.orElse(null),
-					ConstantValue.getEmpty(), ConstantValue.getEmpty()));
-			return false;
-		});
-
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.controlBarSide = IUIPropertyMappingValue.createBindingField(EnumUISide.class, true,
 				EnumUISide.UP, mappings.get(getPropertyControlBarSideLocation()));
 		this.controlBarThickness = IUIPropertyMappingValue.createBindingField(Double.class, false,
 				10D, mappings.get(getPropertyControlBarThicknessLocation()));
-		this.minimumVisibleThickness = new MinimumVisibleThicknessBindingField(this,
-				IUIPropertyMappingValue.createBindingField(Double.class, false,
-						10D, mappings.get(UIWindowComponent.getPropertyMinimumVisibleThicknessLocation())));
 
 		addEventListener(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(), new UIFunctionalEventListener<IUIEventFocus>(e ->
 				getParent().orElseThrow(InternalError::new).moveChildToTop(this)), true);
-	}
-
-	protected IBindingField<Double> getMinimumVisibleThickness() {
-		return minimumVisibleThickness;
 	}
 
 	public static INamespacePrefixedString getPropertyControlBarSideLocation() {
@@ -127,14 +78,6 @@ public class UIWindowComponent
 
 	public static INamespacePrefixedString getPropertyControlBarThicknessLocation() {
 		return PROPERTY_CONTROL_BAR_THICKNESS_LOCATION;
-	}
-
-	public static INamespacePrefixedString getPropertyMinimumVisibleThicknessLocation() {
-		return PROPERTY_MINIMUM_VISIBLE_THICKNESS_LOCATION;
-	}
-
-	public static String getPropertyMinimumVisibleThickness() {
-		return PROPERTY_MINIMUM_VISIBLE_THICKNESS;
 	}
 
 	public static String getPropertyControlBarSide() {
@@ -225,8 +168,7 @@ public class UIWindowComponent
 		super.initializeBindings(binderObserverSupplier);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 				() -> ImmutableBinderAction.bind(
-						getControlBarSide(), getControlBarThickness(),
-						getMinimumVisibleThickness()
+						getControlBarSide(), getControlBarThickness()
 				));
 	}
 
@@ -235,27 +177,7 @@ public class UIWindowComponent
 		super.cleanupBindings(binderObserverSupplier);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 				() -> ImmutableBinderAction.unbind(
-						getControlBarSide(), getControlBarThickness(),
-						getMinimumVisibleThickness()
+						getControlBarSide(), getControlBarThickness()
 				));
-	}
-
-	protected static class MinimumVisibleThicknessBindingField extends DelegatingBindingField<Double> {
-		private final OptionalWeakReference<UIWindowComponent> owner;
-
-		public MinimumVisibleThicknessBindingField(UIWindowComponent owner, IBindingField<Double> delegate) {
-			super(delegate);
-			this.owner = new OptionalWeakReference<>(owner);
-		}
-
-		@Override
-		public void setValue(@Nullable Double value) {
-			super.setValue(value);
-			getOwner().ifPresent(IUIReshapeExplicitly::refresh);
-		}
-
-		public Optional<? extends UIWindowComponent> getOwner() {
-			return owner.getOptional();
-		}
 	}
 }

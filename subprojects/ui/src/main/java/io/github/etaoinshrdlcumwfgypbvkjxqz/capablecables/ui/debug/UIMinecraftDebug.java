@@ -325,9 +325,6 @@ public enum UIMinecraftDebug {
 		@OnlyIn(Dist.CLIENT)
 		private static final class ViewModel
 				extends UIDefaultMinecraftViewModel<Model> {
-			private final IBindingField<Double> window1MinimumVisibleThickness = new ImmutableBindingField<>(
-					ImmutableNamespacePrefixedString.of(IHasBindingKey.StaticHolder.getDefaultNamespace(), "window1MinimumVisibleThickness"),
-					new MemoryObservableField<>(Double.class, null));
 			private final IBindingField<Integer> anchoredWindowBorderColor = new ImmutableBindingField<>(
 					ImmutableNamespacePrefixedString.of(IHasBindingKey.StaticHolder.getDefaultNamespace(), "anchoredWindowBorderColor"),
 					new MemoryObservableField<>(Integer.class, null));
@@ -342,22 +339,13 @@ public enum UIMinecraftDebug {
 					ImmutableNamespacePrefixedString.of(IHasBindingKey.StaticHolder.getDefaultNamespace(), "buttonOnActivated"),
 					this::onButtonActivated);
 
-			@SuppressWarnings("MagicNumber")
 			@Override
 			public void tick() {
 				if (isAnchoredWindowFlickering())
 					getAnchoredWindowBorderColor().setValue(getRandom().nextInt());
-				{
-					double thickness = getWindow1MinimumVisibleThickness().getValue().orElseThrow(IllegalStateException::new);
-					getWindow1MinimumVisibleThickness().setValue((thickness + 0.1D) % 10D);
-				}
 			}
 
 			private ViewModel() { super(new Model()); }
-
-			protected IBindingField<Double> getWindow1MinimumVisibleThickness() {
-				return window1MinimumVisibleThickness;
-			}
 
 			protected boolean isAnchoredWindowFlickering() { return anchoredWindowFlickering; }
 
@@ -398,8 +386,7 @@ public enum UIMinecraftDebug {
 				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 						() -> ImmutableBinderAction.bind(
 								getAnchoredWindowBorderColor(),
-								getButtonOnActivate(), getButtonOnActivated(),
-								getWindow1MinimumVisibleThickness()
+								getButtonOnActivate(), getButtonOnActivated()
 						)
 				);
 			}
@@ -411,8 +398,7 @@ public enum UIMinecraftDebug {
 				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 						() -> ImmutableBinderAction.unbind(
 								getAnchoredWindowBorderColor(),
-								getButtonOnActivate(), getButtonOnActivated(),
-								getWindow1MinimumVisibleThickness()
+								getButtonOnActivate(), getButtonOnActivated()
 						)
 				);
 			}

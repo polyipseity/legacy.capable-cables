@@ -47,8 +47,6 @@
 			<property key="default:property.window.control_bar.side">
 				<side>DOWN</side>
 			</property>
-			<property key="default:property.window.minimum_visible_thickness"
-			          bindingKey="default:window1MinimumVisibleThickness"/>
 
 			<extension class="extension.user_relocatable">
 				<property key="default:property.teleporting.activation.mouse">
