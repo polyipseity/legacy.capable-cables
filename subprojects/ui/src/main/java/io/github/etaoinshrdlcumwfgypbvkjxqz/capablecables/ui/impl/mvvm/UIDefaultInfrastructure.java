@@ -191,4 +191,16 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 			return binderDisposables;
 		}
 	}
+
+	@Override
+	public void initialize() {
+		getViewModel().initialize();
+		getView().initialize();
+	}
+
+	@Override
+	public void removed() {
+		getViewModel().removed();
+		getView().removed();
+	}
 }

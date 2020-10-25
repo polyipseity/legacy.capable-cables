@@ -15,20 +15,8 @@ public class UIDefaultMinecraftInfrastructure<V extends IUIMinecraftView<?>, VM 
 	public UIDefaultMinecraftInfrastructure(V view, VM viewModel, B binder) { super(view, viewModel, binder); }
 
 	@Override
-	public void initialize() {
-		getViewModel().initialize();
-		getView().initialize();
-	}
-
-	@Override
 	public void tick() {
 		getViewModel().tick();
 		getView().tick();
-	}
-
-	@Override
-	public void removed() {
-		getViewModel().removed();
-		getView().removed();
 	}
 }

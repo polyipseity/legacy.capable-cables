@@ -14,27 +14,9 @@ import java.util.ResourceBundle;
 
 public interface IUIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, B extends IBinder>
 		extends IExtensionContainer<INamespacePrefixedString> {
-	@SuppressWarnings("UnusedReturnValue")
-	static boolean bindSafe(IUIInfrastructure<?, ?, ?> infrastructure, IUIContextContainer contextContainer) {
-		if (!infrastructure.isBound()) {
-			infrastructure.bind(contextContainer);
-			return true;
-		}
-		return false;
-	}
-
 	boolean isBound();
 
 	void bind(IUIContextContainer contextContainer);
-
-	@SuppressWarnings("UnusedReturnValue")
-	static boolean unbindSafe(IUIInfrastructure<?, ?, ?> infrastructure) {
-		if (infrastructure.isBound()) {
-			infrastructure.unbind();
-			return true;
-		}
-		return false;
-	}
 
 	void unbind();
 
@@ -45,9 +27,15 @@ public interface IUIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel
 					new LogMessageBuilder()
 							.addMarkers(UIMarkers.getInstance()::getMarkerUIInfrastructure)
 							.addKeyValue("bound", bound).addKeyValue("expected", expected)
-							.addMessages(() -> StaticHolder.getResourceBundle().getString(bound ? "check.bound.true" : "check.bound.false"))
+							.addMessages(bound
+									? () -> StaticHolder.getResourceBundle().getString("check.bound.true")
+									: () -> StaticHolder.getResourceBundle().getString("check.bound.false"))
 							.build());
 	}
+
+	void initialize();
+
+	void removed();
 
 	V getView();
 
