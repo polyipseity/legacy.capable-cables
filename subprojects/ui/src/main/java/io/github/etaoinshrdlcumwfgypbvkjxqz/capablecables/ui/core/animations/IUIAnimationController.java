@@ -1,6 +1,9 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations;
 
-public interface IUIAnimationController {
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewCoordinator;
+
+public interface IUIAnimationController
+		extends IUIViewCoordinator {
 	void update();
 
 	void render();

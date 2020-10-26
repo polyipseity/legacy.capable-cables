@@ -2,8 +2,10 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.compo
 
 import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Anchor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.components.contexts.IUIDefaultComponentParserContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interactions.DefaultShapeAnchor;
 
@@ -19,9 +21,9 @@ public class UIDefaultDefaultComponentParserAnchorHandler
 			component.getManager()
 					.flatMap(IUIComponentManager::getView)
 					.ifPresent(view ->
-							view.getShapeAnchorController().addAnchors(component,
+							IUIViewComponent.getShapeAnchorController(view).addAnchors(component,
 									ImmutableList.of(new DefaultShapeAnchor(
-											view.getNamedTrackers().get(IUIComponent.class, object.getTarget())
+											IUIView.getNamedTrackers(view).get(IUIComponent.class, object.getTarget())
 													.orElseThrow(AssertionError::new),
 											object.getOriginSide().toJava(),
 											object.getTargetSide().toJava(),

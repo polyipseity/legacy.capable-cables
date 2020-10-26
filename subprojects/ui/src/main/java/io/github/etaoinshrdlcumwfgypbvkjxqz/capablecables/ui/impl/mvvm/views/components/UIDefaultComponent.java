@@ -3,7 +3,11 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.co
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.binding.UIProperty;
@@ -142,12 +146,12 @@ public class UIDefaultComponent
 		// COMMENT no need to concern that the view is not present yet as setting the manager of the view adds all components automatically
 		getManager()
 				.flatMap(IUIComponentManager::getView)
-				.map(IUIViewComponent::getNamedTrackers)
+				.map(IUIView::getNamedTrackers)
 				.ifPresent(trackers -> trackers.remove(IUIComponent.class, this));
 		setParent(next);
 		getManager()
 				.flatMap(IUIComponentManager::getView)
-				.map(IUIViewComponent::getNamedTrackers)
+				.map(IUIView::getNamedTrackers)
 				.ifPresent(trackers -> trackers.add(IUIComponent.class, this));
 	}
 

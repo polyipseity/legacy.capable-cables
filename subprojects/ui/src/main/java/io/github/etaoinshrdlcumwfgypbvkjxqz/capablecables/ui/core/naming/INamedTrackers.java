@@ -1,11 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewCoordinator;
 
 import java.util.Map;
 import java.util.Optional;
 
-public interface INamedTrackers {
+public interface INamedTrackers
+		extends IUIViewCoordinator {
 	<E extends INamed> boolean add(Class<E> clazz, E element)
 			throws DuplicateNameException;
 

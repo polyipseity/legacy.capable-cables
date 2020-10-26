@@ -6,6 +6,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIFacade;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationControl;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
@@ -180,7 +181,7 @@ public enum UIMinecraftDebug {
 				// COMMENT early check
 				IUIMinecraftViewComponent<?, ?> view = getViewParser().construct();
 				IUITheme theme = getThemeParser().construct();
-				view.getThemeStack().push(theme);
+				IUIView.getThemeStack(view).push(theme);
 			} catch (UIParserCheckedException e) {
 				throw ThrowableUtilities.propagate(e);
 			}
@@ -221,7 +222,7 @@ public enum UIMinecraftDebug {
 
 			IUIMinecraftView<?> view = screen.getInfrastructure().getView();
 			IExtensionContainer.addExtensionChecked(view, new UIComponentCursorHandleProviderExtension());
-			view.getThemeStack().push(theme);
+			IUIView.getThemeStack(view).push(theme);
 
 			return screen;
 		}
@@ -263,8 +264,9 @@ public enum UIMinecraftDebug {
 				getContainer()
 						.flatMap(IUIComponent::getManager)
 						.flatMap(IUIComponentManager::getView)
-						.ifPresent(view ->
-								view.getAnimationController().add(getAnimations()));
+						.map(IUIView::getAnimationController)
+						.ifPresent(animationController ->
+								animationController.add(getAnimations()));
 			}
 
 			protected IUIAnimationControl getAnimations() { return animations; }
@@ -275,8 +277,9 @@ public enum UIMinecraftDebug {
 				getContainer()
 						.flatMap(IUIComponent::getManager)
 						.flatMap(IUIComponentManager::getView)
-						.ifPresent(view ->
-								view.getAnimationController().remove(getAnimations()));
+						.map(IUIView::getAnimationController)
+						.ifPresent(animationController ->
+								animationController.remove(getAnimations()));
 				getAnimations().reset();
 				super.onRendererRemoved();
 			}

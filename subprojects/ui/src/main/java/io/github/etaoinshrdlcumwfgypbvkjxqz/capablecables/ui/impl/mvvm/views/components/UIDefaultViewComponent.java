@@ -5,7 +5,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewCoordinator;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches.IUICacheType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches.UICacheRegistry;
@@ -47,6 +49,7 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -55,9 +58,8 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 		extends UIAbstractView<S>
 		implements IUIViewComponent<S, M> {
 	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
-	private final IUIComponentPathResolver pathResolver = new UIDefaultComponentPathResolver();
-	private final IUIComponentShapeAnchorController shapeAnchorController = new UIDefaultComponentShapeAnchorController();
-	private final IUIThemeStack themeStack;
+	private final ConcurrentMap<Class<?>, IUIViewCoordinator> coordinatorMap =
+			MapBuilderUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
 	@Nullable
 	private M manager;
 
@@ -68,30 +70,31 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 		this.mappings = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
 
-		this.themeStack = new UIArrayThemeStack(
+		IUIThemeStack themeStack = new UIArrayThemeStack(
 				theme ->
 						theme.apply(
-								getNamedTrackers()
+								IUIView.getNamedTrackers(this)
 										.getTracker(CastUtilities.<Class<IUIRendererContainer<?>>>castUnchecked(IUIRendererContainer.class))
 										.asMapView()
 										.values()
 						),
 				CapacityUtilities.getInitialCapacitySmall()
 		);
-		this.themeStack.push(new UIDefaultViewComponentTheme());
+		themeStack.push(new UIDefaultViewComponentTheme());
+
+		this.coordinatorMap.put(IUIComponentPathResolver.class, new UIDefaultComponentPathResolver());
+		this.coordinatorMap.put(IUIComponentShapeAnchorController.class, new UIDefaultComponentShapeAnchorController());
+		this.coordinatorMap.put(IUIThemeStack.class, themeStack);
 
 		IExtensionContainer.addExtensionChecked(this, new UIDefaultCacheExtension());
 	}
-
-	@Override
-	public IUIThemeStack getThemeStack() { return themeStack; }
 
 	@Override
 	public IUIEventTarget getTargetAtPoint(Point2D point) {
 		try (IUIComponentContext componentContext = IUIViewComponent.createComponentContextWithManager(this)
 				.orElseThrow(IllegalStateException::new)) {
 			// COMMENT returning null means the point is outside the window, so in that case, just return the manager
-			return getPathResolver().resolvePath(componentContext, (Point2D) point.clone()).getComponent()
+			return IUIViewComponent.getPathResolver(this).resolvePath(componentContext, (Point2D) point.clone()).getComponent()
 					.map(Function.<IUIComponent>identity())
 					.orElseGet(() ->
 							getManager().orElseThrow(IllegalStateException::new));
@@ -152,7 +155,7 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 				() -> {
 					previousManager.setView(null);
 					getBinderObserverSupplier().ifPresent(binderObserverSupplier -> previousManager.cleanupBindings(binderObserverSupplier)); // TODO javac bug - replace with method reference if fixed
-					getNamedTrackers().removeAll(IUIComponent.class, getChildrenFlatView());
+					IUIView.getNamedTrackers(this).removeAll(IUIComponent.class, getChildrenFlatView());
 				},
 				new UIAbstractComponentHierarchyChangeBusEvent.View(EnumHookStage.PRE, previousManager, this, null),
 				new UIAbstractComponentHierarchyChangeBusEvent.View(EnumHookStage.POST, previousManager, this, null)));
@@ -161,7 +164,7 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 				() -> {
 					nextManager.setView(this);
 					getBinderObserverSupplier().ifPresent(nextManager::initializeBindings);
-					getNamedTrackers().addAll(IUIComponent.class, getChildrenFlatView());
+					IUIView.getNamedTrackers(this).addAll(IUIComponent.class, getChildrenFlatView());
 				},
 				new UIAbstractComponentHierarchyChangeBusEvent.View(EnumHookStage.PRE, nextManager, null, this),
 				new UIAbstractComponentHierarchyChangeBusEvent.View(EnumHookStage.POST, nextManager, null, this)));
@@ -172,12 +175,6 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 		return CacheViewComponent.getChildrenFlat().getValue().get(this)
 				.orElseThrow(AssertionError::new);
 	}
-
-	@Override
-	public IUIComponentPathResolver getPathResolver() { return pathResolver; }
-
-	@Override
-	public IUIComponentShapeAnchorController getShapeAnchorController() { return shapeAnchorController; }
 
 	@SuppressWarnings("RedundantTypeArguments")
 	@Override
@@ -213,7 +210,7 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 	public void setContext(@Nullable IUIViewContext context) {
 		super.setContext(context);
 		if (getContext().isPresent())
-			getShapeAnchorController().anchor();
+			IUIViewComponent.getShapeAnchorController(this).anchor();
 	}
 
 	@Override
@@ -341,5 +338,17 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 		public static IRegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> getChildrenFlatFocusable() {
 			return CHILDREN_FLAT_FOCUSABLE;
 		}
+	}
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	@Override
+	protected ConcurrentMap<Class<?>, IUIViewCoordinator> getCoordinatorMap() {
+		for (Iterator<Map.Entry<Class<?>, IUIViewCoordinator>> iterator = super.getCoordinatorMap().entrySet().iterator();
+		     iterator.hasNext(); ) {
+			Map.Entry<Class<?>, IUIViewCoordinator> entry = iterator.next();
+			iterator.remove();
+			coordinatorMap.putIfAbsent(AssertionUtilities.assertNonnull(entry.getKey()), entry.getValue());
+		}
+		return coordinatorMap;
 	}
 }

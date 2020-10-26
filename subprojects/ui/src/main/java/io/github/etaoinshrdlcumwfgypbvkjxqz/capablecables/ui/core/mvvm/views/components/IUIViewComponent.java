@@ -21,10 +21,10 @@ import java.util.function.Predicate;
 
 public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager<?>>
 		extends IHasBinding, IHasBindingMap, IUIView<S> {
-	static Optional<IUIComponentContext> createComponentContextWithManager(IUIViewComponent<?, ?> view) {
+	static Optional<IUIComponentContext> createComponentContextWithManager(IUIViewComponent<?, ?> instance) {
 		return Optional2.of(
-				() -> view.createComponentContext().orElse(null),
-				() -> view.getManager().orElse(null))
+				() -> instance.createComponentContext().orElse(null),
+				() -> instance.getManager().orElse(null))
 				.map(values -> {
 					IUIComponentContext context = values.getValue1Nonnull();
 					IUIComponentManager<?> manager = values.getValue2Nonnull();
@@ -77,7 +77,11 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 
 	List<IUIComponent> getChildrenFlatView();
 
-	IUIComponentPathResolver getPathResolver();
+	static IUIComponentPathResolver getPathResolver(IUIViewComponent<?, ?> instance) {
+		return instance.getCoordinator(IUIComponentPathResolver.class).orElseThrow(AssertionError::new);
+	}
 
-	IUIComponentShapeAnchorController getShapeAnchorController();
+	static IUIComponentShapeAnchorController getShapeAnchorController(IUIViewComponent<?, ?> instance) {
+		return instance.getCoordinator(IUIComponentShapeAnchorController.class).orElseThrow(AssertionError::new);
+	}
 }

@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
@@ -46,8 +47,8 @@ public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUICompo
 
 	@Override
 	public void render(IUIViewContext context, double partialTicks) {
-		getAnimationController().update();
-		getAnimationController().render();
+		IUIView.getAnimationController(this).update();
+		IUIView.getAnimationController(this).render();
 		getManager()
 				.ifPresent(manager ->
 						EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {

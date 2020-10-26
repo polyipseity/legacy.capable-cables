@@ -313,7 +313,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 							.flatMap(view -> IUIViewComponent.createComponentContextWithManager(view)
 									.map(context -> {
 										try (IUIComponentContext ctx = context) {
-											view.getPathResolver().resolvePath(ctx, (Point2D) point.clone());
+											IUIViewComponent.getPathResolver(view).resolvePath(ctx, (Point2D) point.clone());
 
 											Rectangle2D contextualShape = IUIComponent.getContextualShape(ctx, container).getBounds2D();
 											Set<EnumUISide> sides = EnumUISide.getSidesMouseOver(contextualShape, point);

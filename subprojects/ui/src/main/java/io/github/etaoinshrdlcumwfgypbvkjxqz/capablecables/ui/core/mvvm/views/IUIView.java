@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationController;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUISubInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventTarget;
@@ -9,6 +10,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming.IUIThe
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -20,9 +22,19 @@ public interface IUIView<S extends Shape>
 
 	Optional<? extends IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next);
 
-	IUIAnimationController getAnimationController();
+	static IUIAnimationController getAnimationController(IUIView<?> instance) {
+		return instance.getCoordinator(IUIAnimationController.class).orElseThrow(AssertionError::new);
+	}
 
-	INamedTrackers getNamedTrackers();
+	<C extends IUIViewCoordinator> Optional<? extends C> getCoordinator(Class<C> key);
 
-	IUIThemeStack getThemeStack();
+	static INamedTrackers getNamedTrackers(IUIView<?> instance) {
+		return instance.getCoordinator(INamedTrackers.class).orElseThrow(AssertionError::new);
+	}
+
+	static IUIThemeStack getThemeStack(IUIView<?> instance) {
+		return instance.getCoordinator(IUIThemeStack.class).orElseThrow(AssertionError::new);
+	}
+
+	@Immutable Map<Class<?>, IUIViewCoordinator> getCoordinatorMapView();
 }

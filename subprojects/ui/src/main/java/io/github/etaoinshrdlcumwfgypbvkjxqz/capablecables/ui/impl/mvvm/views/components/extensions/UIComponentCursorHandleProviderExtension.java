@@ -50,7 +50,7 @@ public class UIComponentCursorHandleProviderExtension
 									IInputPointerDevice pointerDevice = values.getValue2Nonnull();
 									try (IUIComponentContext safeComponentContext = componentContext) {
 										Optional<Long> ret = Optional.empty();
-										view.getPathResolver().resolvePath(safeComponentContext, pointerDevice.getPositionView());
+										IUIViewComponent.getPathResolver(view).resolvePath(safeComponentContext, pointerDevice.getPositionView());
 										while (!safeComponentContext.getStackRef().getPathRef().isEmpty()) {
 											IUIComponent component = IUIComponentContext.getCurrentComponent(safeComponentContext)
 													.orElseThrow(AssertionError::new);
