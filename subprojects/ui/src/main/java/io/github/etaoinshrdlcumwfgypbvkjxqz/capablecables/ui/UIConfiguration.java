@@ -2,10 +2,12 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui;
 
 import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.cursors.EnumGLFWCursor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.EnumJAXBElementPresetAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.EnumJAXBObjectPresetAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftClientUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EventBusSubject;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.core.IThrowableHandler;
 import net.minecraftforge.api.distmarker.Dist;
@@ -42,8 +44,21 @@ public final class UIConfiguration
 	public enum MinecraftSpecific {
 		;
 
+		public static void onConstruction() {
+			/* COMMENT
+			Mac is sus,
+			so let us chop AWT such that it is headless,
+			because Mac is immutable.
+
+			See https://github.com/LWJGL/lwjgl3/issues/306#issuecomment-300481571.
+			 */
+			System.setProperty("java.awt.headless", "true");
+
+			UIEventBusEntryPoint.setEventBus(EventBusSubject.getUIEventBus());
+		}
+
 		@SuppressWarnings("deprecation")
-		public static void loadComplete() {
+		public static void onLoadComplete() {
 			DeferredWorkQueue.runLater(MinecraftClientUtilities.getMinecraftNonnull().getFramebuffer()::enableStencil);
 		}
 	}

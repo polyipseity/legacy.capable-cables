@@ -32,7 +32,7 @@ public final class ModClientProxy
 
 	@Override
 	protected void onConstruction() {
-
+		UIConfiguration.MinecraftSpecific.onConstruction();
 	}
 
 	@Override
@@ -40,8 +40,10 @@ public final class ModClientProxy
 
 	@Override
 	protected void onSetup(FMLCommonSetupEvent event) {
-		// COMMENT sneak the configuring in effectively-client common setup
-		// COMMENT there may be a better solution though...  suggestions welcome
+		/* COMMENT
+		 * Sneak the configuring in effectively-client common setup.
+		 * There may be a better solution though...  suggestions welcome.
+		 */
 		ConfigurationTemplate.configureSafe(UIConfiguration.getInstance(),
 				() -> new UIConfiguration.ConfigurationData(UIConfiguration.getBootstrapLogger(),
 						new LoggingThrowableHandler<>(new ThreadLocalThrowableHandler<>(), UIConfiguration.getBootstrapLogger()),
@@ -60,7 +62,7 @@ public final class ModClientProxy
 
 	@Override
 	protected void onLoadComplete(FMLLoadCompleteEvent event) {
-		UIConfiguration.MinecraftSpecific.loadComplete();
+		UIConfiguration.MinecraftSpecific.onLoadComplete();
 	}
 
 	@Override

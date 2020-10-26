@@ -52,7 +52,7 @@ public final class ModMod {
 
 		// COMMENT events
 		IEventBus modEventBus = AssertionUtilities.assertNonnull(Bus.MOD.bus().get());
-		modEventBus.register(getInstance());
+		modEventBus.addListener(getInstance()::onModLifecycleEvent);
 		onModLifecycleEvent(null); // COMMENT emulate construction event
 	}
 
@@ -66,8 +66,8 @@ public final class ModMod {
 
 	private static void setInstance(ModMod instance) { ModMod.instance = instance; }
 
-	@SubscribeEvent
-	protected void onModLifecycleEvent(@Nullable ModLifecycleEvent event) {
+	@SubscribeEvent // COMMENT used as an marker, serves no purpose
+	private void onModLifecycleEvent(@Nullable ModLifecycleEvent event) {
 		if (!getProxy().onModLifecycle(event))
 			ModConfiguration.getInstance().getLogger()
 					.atInfo()
