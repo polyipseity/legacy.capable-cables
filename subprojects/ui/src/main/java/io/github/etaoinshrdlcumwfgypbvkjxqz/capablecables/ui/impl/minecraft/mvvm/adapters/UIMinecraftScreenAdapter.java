@@ -191,7 +191,7 @@ public class UIMinecraftScreenAdapter
 	@Override
 	@Deprecated
 	protected void init() {
-		getInfrastructure().bind(getContextContainer());
+		IUIInfrastructure.bindSafe(getInfrastructure(), getContextContainer());
 		setSize(width, height);
 		getInfrastructure().initialize();
 	}
@@ -223,7 +223,7 @@ public class UIMinecraftScreenAdapter
 			setFocus(context, null);
 		}
 		getInfrastructure().removed();
-		getInfrastructure().unbind();
+		IUIInfrastructure.unbindSafe(getInfrastructure());
 	}
 
 	@Override

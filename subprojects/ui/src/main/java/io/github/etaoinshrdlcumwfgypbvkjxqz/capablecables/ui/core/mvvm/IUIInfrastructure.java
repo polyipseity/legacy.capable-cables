@@ -14,9 +14,27 @@ import java.util.ResourceBundle;
 
 public interface IUIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, B extends IBinder>
 		extends IExtensionContainer<INamespacePrefixedString> {
+	@SuppressWarnings("UnusedReturnValue")
+	static boolean bindSafe(IUIInfrastructure<?, ?, ?> infrastructure, IUIContextContainer contextContainer) {
+		if (!infrastructure.isBound()) {
+			infrastructure.bind(contextContainer);
+			return true;
+		}
+		return false;
+	}
+
 	boolean isBound();
 
 	void bind(IUIContextContainer contextContainer);
+
+	@SuppressWarnings("UnusedReturnValue")
+	static boolean unbindSafe(IUIInfrastructure<?, ?, ?> infrastructure) {
+		if (infrastructure.isBound()) {
+			infrastructure.unbind();
+			return true;
+		}
+		return false;
+	}
 
 	void unbind();
 
