@@ -13,7 +13,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.thro
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThreadLocalThrowableHandler;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -66,7 +65,6 @@ public final class ModMod {
 
 	private static void setInstance(ModMod instance) { ModMod.instance = instance; }
 
-	@SubscribeEvent // COMMENT used as an marker, serves no purpose
 	private void onModLifecycleEvent(@Nullable ModLifecycleEvent event) {
 		if (!getProxy().onModLifecycle(event))
 			ModConfiguration.getInstance().getLogger()
