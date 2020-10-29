@@ -8,10 +8,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.binding.UIProperty;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIRendererConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.rendering.IUIMinecraftComponentRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.rendering.UIDefaultMinecraftComponentRenderer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.utilities.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIButtonComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
@@ -231,25 +231,32 @@ public class UIMinecraftButtonComponent
 		}
 
 		@Override
-		public void render(IUIComponentContext context, C container, EnumRenderStage stage, double partialTicks) {
+		public void render(IUIComponentContext context, EnumRenderStage stage, C component, double partialTicks) {
 			if (stage.isPreChildren()) {
-				Shape transformed = IUIComponent.getContextualShape(context, container);
-				if (container.getButtonStates().contains(IButtonState.PRESSING)) {
-					getPressedColor().getValue().ifPresent(c ->
-							MinecraftDrawingUtilities.drawShape(transformed, true, c, 0));
-					getPressedBorderColor().getValue().ifPresent(c ->
-							MinecraftDrawingUtilities.drawShape(transformed, false, c, 0));
-				} else if (container.getButtonStates().contains(IButtonState.HOVERING)) {
-					getHoveringColor().getValue().ifPresent(c ->
-							MinecraftDrawingUtilities.drawShape(transformed, true, c, 0));
-					getHoveringBorderColor().getValue().ifPresent(c ->
-							MinecraftDrawingUtilities.drawShape(transformed, false, c, 0));
+				Shape relativeShape = IUIComponent.getShape(component);
+				Optional<? extends Color> filled, border;
+				if (component.getButtonStates().contains(IButtonState.PRESSING)) {
+					filled = getPressedColor().getValue();
+					border = getPressedBorderColor().getValue();
+				} else if (component.getButtonStates().contains(IButtonState.HOVERING)) {
+					filled = getHoveringColor().getValue();
+					border = getHoveringBorderColor().getValue();
 				} else {
-					getBaseColor().getValue().ifPresent(c ->
-							MinecraftDrawingUtilities.drawShape(transformed, true, c, 0));
-					getBaseBorderColor().getValue().ifPresent(c ->
-							MinecraftDrawingUtilities.drawShape(transformed, false, c, 0));
+					filled = getBaseColor().getValue();
+					border = getBaseBorderColor().getValue();
 				}
+				filled.ifPresent(color -> {
+					try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
+						graphics.setColor(color);
+						graphics.fill(relativeShape);
+					}
+				});
+				border.ifPresent(color -> {
+					try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
+						graphics.setColor(color);
+						graphics.draw(relativeShape);
+					}
+				});
 			}
 		}
 	}

@@ -8,12 +8,13 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.binding.UIProperty;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIRendererConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.rendering.IUIMinecraftComponentRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.rendering.UIDefaultMinecraftComponentRenderer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.utilities.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIWindowComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUIRotation;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -24,7 +25,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional2;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -155,29 +155,35 @@ public class UIMinecraftWindowComponent
 		public IBindingField<Color> getBorderColor() { return borderColor; }
 
 		@Override
-		public void render(IUIComponentContext context, C container, EnumRenderStage stage, double partialTicks) {
+		public void render(IUIComponentContext context, EnumRenderStage stage, C component, double partialTicks) {
 			if (stage.isPreChildren()) {
-				Shape transformed = IUIComponent.getContextualShape(context, container);
-				getBackgroundColor().getValue().ifPresent(color ->
-						MinecraftDrawingUtilities.drawShape(transformed, true, color, 0));
+				Shape relativeShape = IUIComponent.getShape(component);
+				getBackgroundColor().getValue().ifPresent(color -> {
+					try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
+						graphics.setColor(color);
+						graphics.fill(relativeShape);
+					}
+				});
 			} else if (stage.isPostChildren()) {
-				Optional2.of(
-						() -> getBorderColor().getValue().orElse(null),
-						() -> container.getControlBarSide().getValue().orElse(null))
-						.ifPresent(values -> {
-							Color borderColor = values.getValue1Nonnull();
-							EnumUISide borderSide = values.getValue2Nonnull();
+				// COMMENT renders the control bar
+				component.getControlBarSide().getValue()
+						.ifPresent(controlBarSide -> {
+							getBorderColor().getValue()
+									.ifPresent(controlBarColor -> {
+										Rectangle2D containerShapeBounds = IUIComponent.getShape(component).getBounds2D();
+										EnumUISide oppositeBorderSide = controlBarSide.getOpposite().orElseThrow(IllegalStateException::new);
+										oppositeBorderSide.setValue(containerShapeBounds,
+												controlBarSide.getValue(containerShapeBounds)
+														+ controlBarSide.inwardsBy(IField.getValueNonnull(component.getControlBarThickness()))
+														.orElseThrow(IllegalStateException::new));
 
-							Rectangle2D containerShapeBounds = IUIComponent.getShape(container).getBounds2D();
-							EnumUISide oppositeBorderSide = borderSide.getOpposite().orElseThrow(IllegalStateException::new);
-							oppositeBorderSide.setValue(containerShapeBounds,
-									borderSide.getValue(containerShapeBounds)
-											+ borderSide.inwardsBy(IField.getValueNonnull(container.getControlBarThickness()))
-											.orElseThrow(IllegalStateException::new));
-
-							MinecraftDrawingUtilities.drawShape(IUIComponentContext.getCurrentTransform(context),
-									containerShapeBounds,
-									true, borderColor, 0);
+										try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
+											graphics.setColor(controlBarColor);
+											graphics.fill(containerShapeBounds);
+										}
+									});
+							// TODO
+							EnumUIRotation controlBarDirection = IField.getValueNonnull(component.getControlBarDirection());
 						});
 			}
 		}

@@ -10,9 +10,9 @@
 	<using alias="renderer.extension.minecraft.background.default"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.extensions.background.UIMinecraftBackgroundExtensionDefaultBackgroundRenderer"/>
 	<using alias="renderer.extension.user_relocatable.previewing.minecraft"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.extensions.relocatable.UIComponentUserRelocatableMinecraftExtensionPreviewingRelocatingRenderer"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.relocatable.UIDefaultComponentUserRelocatableExtensionPreviewingRelocatingRenderer"/>
 	<using alias="renderer.extension.user_resizable.previewing.minecraft"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.extensions.resizable.UIComponentUserResizableMinecraftExtensionPreviewingResizingRenderer"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.resizable.UIDefaultComponentUserResizableExtensionPreviewingResizingRenderer"/>
 
 	<!-- SECTION renderers -->
 	<renderer name="ViewBackgroundRenderer" class="renderer.extension.minecraft.background.default"/>

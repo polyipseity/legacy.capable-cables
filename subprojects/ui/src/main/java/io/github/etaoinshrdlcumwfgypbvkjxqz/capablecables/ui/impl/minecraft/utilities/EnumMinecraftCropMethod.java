@@ -15,8 +15,9 @@ import org.lwjgl.opengl.GL14;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
+// TODO remove the use of this in IUIComponent but keep the class
 @OnlyIn(Dist.CLIENT)
-public enum EnumCropMethod {
+public enum EnumMinecraftCropMethod {
 	GL_SCISSOR {
 		@Override
 		public void enable() {
@@ -128,10 +129,10 @@ public enum EnumCropMethod {
 	},
 	;
 
-	public static EnumCropMethod getBestMethod() {
+	public static EnumMinecraftCropMethod getBestMethod() {
 		return MinecraftClientUtilities.getMinecraftNonnull().getFramebuffer().isStencilEnabled()
-				? EnumCropMethod.STENCIL_BUFFER
-				: EnumCropMethod.GL_SCISSOR;
+				? EnumMinecraftCropMethod.STENCIL_BUFFER
+				: EnumMinecraftCropMethod.GL_SCISSOR;
 	}
 
 	public abstract void enable();

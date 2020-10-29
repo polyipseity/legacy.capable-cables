@@ -1,0 +1,14 @@
+<root>
+	<item name='java.awt.event.InputEvent ALT_MASK'>
+		<annotation name='java.lang.Deprecated'/>
+	</item>
+	<item name='java.awt.event.InputEvent CTRL_MASK'>
+		<annotation name='java.lang.Deprecated'/>
+	</item>
+	<item name='java.awt.event.InputEvent META_MASK'>
+		<annotation name='java.lang.Deprecated'/>
+	</item>
+	<item name='java.awt.event.InputEvent SHIFT_MASK'>
+		<annotation name='java.lang.Deprecated'/>
+	</item>
+</root>

@@ -1,18 +1,18 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.paths.IAffineTransformStack;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICloneable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.IPath;
 
-public interface IUIComponentContextStack
-		extends ICloneable, AutoCloseable {
-	@Override
-	IUIComponentContextStack clone();
+import java.awt.*;
 
+public interface IUIComponentContextInternal
+		extends IUIComponentContext {
 	IPath<IUIComponent> getPathRef();
 
 	IAffineTransformStack getTransformStackRef();
 
+	Graphics2D getGraphicsRef();
+
 	@Override
-	void close();
+	IUIComponentContextInternal clone();
 }

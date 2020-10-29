@@ -8,6 +8,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import sun.awt.HeadlessToolkit;
 
 import java.awt.*;
+import java.awt.font.TextAttribute;
+import java.awt.im.InputMethodHighlight;
+import java.util.Map;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
@@ -27,5 +30,11 @@ public final class MinecraftToolkit
 	@Override
 	public Dimension getScreenSize() throws HeadlessException {
 		return MinecraftSurfaceData.getInstance().getBounds().getSize();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public Map<TextAttribute, ?> mapInputMethodHighlight(InputMethodHighlight highlight) throws HeadlessException {
+		return super.mapInputMethodHighlight(highlight);
 	}
 }

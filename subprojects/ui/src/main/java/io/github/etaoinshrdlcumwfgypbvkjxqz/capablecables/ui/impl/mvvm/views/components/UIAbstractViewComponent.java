@@ -2,7 +2,6 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.co
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
@@ -22,7 +21,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIE
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.UIAbstractView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.caches.UIAbstractCacheType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.caches.UIDefaultCacheExtension;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.paths.ArrayAffineTransformStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.paths.UIDefaultComponentPathResolver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIAbstractComponentHierarchyChangeBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.theming.UIArrayThemeStack;
@@ -33,7 +31,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IC
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.paths.FunctionalPath;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.*;
@@ -54,7 +51,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManager<S>>
+public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		extends UIAbstractView<S>
 		implements IUIViewComponent<S, M> {
 	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
@@ -65,7 +62,7 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	@UIViewComponentConstructor
-	public UIDefaultViewComponent(UIViewComponentConstructor.IArguments arguments) {
+	public UIAbstractViewComponent(UIViewComponentConstructor.IArguments arguments) {
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.mappings = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
@@ -114,35 +111,23 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 		return ret;
 	}
 
-	@SuppressWarnings("RedundantTypeArguments")
 	@Override
 	public void initialize() {
-		getManager().ifPresent(manager ->
-				IUIViewComponent.<RuntimeException>traverseComponentTreeDefault(createComponentContext()
-								.orElseThrow(IllegalStateException::new),
+		getManager().ifPresent(manager -> {
+			try (IUIComponentContext componentContext = createComponentContext().orElseThrow(IllegalStateException::new)) {
+				IUIViewComponent.<RuntimeException>traverseComponentTreeDefault(componentContext,
 						manager,
-						(componentContext, result) -> {
-							assert componentContext != null;
+						(componentContext2, result) -> {
+							assert componentContext2 != null;
 							assert result != null;
 							IUIComponentLifecycleModifier.handleComponentModifiers(result.getComponent(),
 									result.getModifiersView(),
-									componentContext,
+									componentContext2,
 									IUIComponentLifecycleModifier::initialize);
 						},
-						IConsumer3.StaticHolder.getEmpty()));
-	}
-
-	@Override
-	public Optional<? extends IUIComponentContext> createComponentContext() throws IllegalStateException {
-		return getContext()
-				.map(context ->
-						new UIImmutableComponentContext(
-								context,
-								this,
-								new UIDefaultComponentContextStackMutator(),
-								new UIImmutableComponentContextStack(new FunctionalPath<>(ImmutableList.of(), Lists::newArrayList), new ArrayAffineTransformStack(CapacityUtilities.getInitialCapacityMedium()))
-						)
-				);
+						IConsumer3.StaticHolder.getEmpty());
+			}
+		});
 	}
 
 	@Override
@@ -176,21 +161,23 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 				.orElseThrow(AssertionError::new);
 	}
 
-	@SuppressWarnings("RedundantTypeArguments")
 	@Override
 	public void removed() {
-		getManager().ifPresent(manager ->
-				IUIViewComponent.<RuntimeException>traverseComponentTreeDefault(createComponentContext().orElseThrow(IllegalStateException::new),
+		getManager().ifPresent(manager -> {
+			try (IUIComponentContext componentContext = createComponentContext().orElseThrow(IllegalStateException::new)) {
+				IUIViewComponent.traverseComponentTreeDefault(componentContext,
 						manager,
-						(componentContext, result) -> {
-							assert componentContext != null;
+						(componentContext2, result) -> {
+							assert componentContext2 != null;
 							assert result != null;
 							IUIComponentLifecycleModifier.handleComponentModifiers(result.getComponent(),
 									result.getModifiersView(),
-									componentContext,
+									componentContext2,
 									IUIComponentLifecycleModifier::removed);
 						},
-						IConsumer3.StaticHolder.getEmpty()));
+						IConsumer3.StaticHolder.getEmpty());
+			}
+		});
 	}
 
 	@Override

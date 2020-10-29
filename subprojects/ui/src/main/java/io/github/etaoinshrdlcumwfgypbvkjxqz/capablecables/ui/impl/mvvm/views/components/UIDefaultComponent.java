@@ -160,7 +160,7 @@ public class UIDefaultComponent
 	@Override
 	public Shape getAbsoluteShape()
 			throws IllegalStateException {
-		try (IUIComponentContext context = IUIComponent.getContext(this)) {
+		try (IUIComponentContext context = IUIComponent.createContextTo(this)) {
 			return IUIComponent.getContextualShape(context, this);
 		}
 	}

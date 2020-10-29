@@ -2,7 +2,9 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.co
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.paths.IAffineTransformStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICloneable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.IPath;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -18,22 +20,24 @@ public interface IUIComponentContext
 	}
 
 	static AffineTransform getCurrentTransform(IUIComponentContext context) {
-		return context.getStackRef().getTransformStackRef().element();
+		return ((IUIComponentContextInternal) context).getTransformStackRef().element();
 	}
 
 	static Optional<? extends IUIComponent> getCurrentComponent(IUIComponentContext context) {
-		return context.getStackRef().getPathRef().getPathEnd();
+		return ((IUIComponentContextInternal) context).getPathRef().getPathEnd();
 	}
 
 	IUIViewComponent<?, ?> getView();
 
-	@Immutable
-	IUIComponentContextStackMutator getMutator();
+	IUIComponentContextMutator getMutator();
 
-	IUIComponentContextStack getStackRef();
+	@Immutable IUIViewContext getViewContext();
 
-	@Immutable
-	IUIViewContext getViewContext();
+	@Immutable IPath<IUIComponent> getPathView();
+
+	@Immutable IAffineTransformStack getTransformStackView();
+
+	Graphics2D createGraphics();
 
 	@Override
 	void close();

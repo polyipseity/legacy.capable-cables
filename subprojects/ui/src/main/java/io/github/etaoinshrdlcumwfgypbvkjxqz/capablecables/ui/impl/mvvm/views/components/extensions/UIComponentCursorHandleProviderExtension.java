@@ -51,7 +51,7 @@ public class UIComponentCursorHandleProviderExtension
 									try (IUIComponentContext safeComponentContext = componentContext) {
 										Optional<Long> ret = Optional.empty();
 										IUIViewComponent.getPathResolver(view).resolvePath(safeComponentContext, pointerDevice.getPositionView());
-										while (!safeComponentContext.getStackRef().getPathRef().isEmpty()) {
+										while (!safeComponentContext.getPathView().isEmpty()) {
 											IUIComponent component = IUIComponentContext.getCurrentComponent(safeComponentContext)
 													.orElseThrow(AssertionError::new);
 											IUIComponentCursorHandleProviderModifier componentAsModifier =
@@ -63,7 +63,7 @@ public class UIComponentCursorHandleProviderExtension
 															safeComponentContext);
 											if (ret.isPresent())
 												break;
-											safeComponentContext.getMutator().pop(safeComponentContext.getStackRef());
+											safeComponentContext.getMutator().pop(safeComponentContext);
 										}
 										return ret;
 									}

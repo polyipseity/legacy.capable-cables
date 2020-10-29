@@ -47,7 +47,7 @@ public interface IUIComponent
 
 	@Immutable
 	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
-	static IUIComponentContext getContext(IUIComponent component) {
+	static IUIComponentContext createContextTo(IUIComponent component) {
 		IUIComponentContext context =
 				component
 						.getManager()
@@ -55,7 +55,7 @@ public interface IUIComponent
 						.flatMap(IUIViewComponent::createComponentContext)
 						.orElseThrow(IllegalStateException::new);
 		getPath(component).asList()
-				.forEach(element -> context.getMutator().push(context.getStackRef(), element));
+				.forEach(element -> context.getMutator().push(context, element));
 		return context;
 	}
 

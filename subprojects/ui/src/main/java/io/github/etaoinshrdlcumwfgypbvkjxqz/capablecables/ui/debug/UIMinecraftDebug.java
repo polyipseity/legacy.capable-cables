@@ -22,6 +22,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming.IUIThe
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.controls.UIStandardAnimationControlFactory;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.easings.EnumUICommonAnimationEasing;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.targets.UIAnimationTargetUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.IUIMinecraftInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.IUIMinecraftView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.IUIMinecraftViewComponent;
@@ -29,7 +30,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.viewmodels.UIDefaultMinecraftViewModel;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.impl.UIMinecraftWindowComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.parsers.UIDefaultMinecraftComponentParser;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.utilities.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.models.UIAbstractModel;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.UIComponentCursorHandleProviderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIButtonComponent;
@@ -285,19 +285,19 @@ public enum UIMinecraftDebug {
 			}
 
 			@Override
-			public void render(IUIComponentContext context, C container, EnumRenderStage stage, double partialTicks) {
-				super.render(context, container, stage, partialTicks);
+			public void render(IUIComponentContext context, EnumRenderStage stage, C component, double partialTicks) {
+				super.render(context, stage, component, partialTicks);
 				if (stage.isPreChildren()) {
 					context.getViewContext().getInputDevices().getPointerDevice()
 							.map(IInputPointerDevice::getPositionView)
 							.ifPresent(pointerPosition -> {
-								Shape transformed = IUIComponentContext.createContextualShape(
-										context,
-										new Ellipse2D.Double(
-												pointerPosition.getX() - CURSOR_SHAPE_RADIUS, pointerPosition.getY() - CURSOR_SHAPE_RADIUS,
-												CURSOR_SHAPE_RADIUS << 1, CURSOR_SHAPE_RADIUS << 1)
-								);
-								MinecraftDrawingUtilities.drawShape(transformed, true, getCursorHighlighterColor(), 0);
+								Shape relativeShape = new Ellipse2D.Double(
+										pointerPosition.getX() - CURSOR_SHAPE_RADIUS, pointerPosition.getY() - CURSOR_SHAPE_RADIUS,
+										CURSOR_SHAPE_RADIUS << 1, CURSOR_SHAPE_RADIUS << 1);
+								try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
+									graphics.setColor(getCursorHighlighterColor());
+									graphics.fill(relativeShape);
+								}
 							});
 				}
 			}

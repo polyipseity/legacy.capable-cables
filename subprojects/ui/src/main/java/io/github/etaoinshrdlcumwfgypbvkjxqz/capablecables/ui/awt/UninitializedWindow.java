@@ -26,6 +26,7 @@ import java.util.function.Supplier;
 @Deprecated
 public final class UninitializedWindow
 		extends Window {
+	private static final long serialVersionUID = -2340013652599225354L;
 	private static final Supplier<UninitializedWindow> INSTANCE;
 
 	static {
@@ -55,7 +56,7 @@ public final class UninitializedWindow
 
 	@Override
 	public Graphics getGraphics() {
-		return MinecraftGraphics.getGraphics();
+		return MinecraftGraphics.createGraphics();
 	}
 
 	private static final class Peer
@@ -133,7 +134,7 @@ public final class UninitializedWindow
 
 		@Override
 		public Graphics2D getGraphics() {
-			return MinecraftGraphics.getGraphics();
+			return MinecraftGraphics.createGraphics();
 		}
 
 		@Override

@@ -52,7 +52,7 @@ public enum TreeUtilities {
 					if (repeater != null)
 						repeater.accept(current);
 				} else {
-					R currentRet = AssertionUtilities.assertNonnull(function.apply(current));
+					@Nullable R currentRet = function.apply(current);
 					if (shouldCombine) {
 						frameCombiner.add(currentRet);
 						stackCombiner.push(new ArrayDeque<>(CapacityUtilities.getInitialCapacityMedium()));
@@ -105,7 +105,7 @@ public enum TreeUtilities {
 			final int[] childrenFlatIndex = {0};
 			List<T> finalFrameSplitterNext = frameSplitterNext;
 			frameSplitter.forEach(node -> {
-				R currentRet = AssertionUtilities.assertNonnull(function.apply(node));
+				@Nullable R currentRet = function.apply(node);
 				if (shouldCombine)
 					frameCombiner.add(currentRet);
 				int childrenFlatIndexStart = childrenFlatIndex[0];

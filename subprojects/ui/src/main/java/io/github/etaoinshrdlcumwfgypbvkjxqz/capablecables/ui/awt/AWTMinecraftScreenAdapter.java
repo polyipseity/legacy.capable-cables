@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.awt;
 
 import com.google.common.collect.ImmutableList;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.MinecraftGraphics;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.MinecraftSurfaceData;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.utilities.UIMinecraftBackgrounds;
@@ -30,7 +31,7 @@ public class AWTMinecraftScreenAdapter
 			AWTMinecraftHeadlessHacks.getComponentParentSetter().invokeExact((Component) component, (Container) UninitializedWindow.getInstance());
 			TreeUtilities.<Component, Void>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, component,
 					IThrowingFunction.executeNow(component1 -> {
-						AWTMinecraftHeadlessHacks.getComponentPeerSetter().invokeExact((Component) component1, (ComponentPeer) AWTMinecraftHeadlessHacks.getLightweightPeer());
+						AWTMinecraftHeadlessHacks.getComponentPeerSetter().invokeExact(component1, (ComponentPeer) AWTMinecraftHeadlessHacks.getLightweightPeer());
 						return null;
 					}),
 					component1 -> CastUtilities.castChecked(Container.class, component1)
@@ -46,7 +47,6 @@ public class AWTMinecraftScreenAdapter
 	@Override
 	public void render(int mouseX, int mouseY, float partialTicks) {
 		UIMinecraftBackgrounds.notifyBackgroundDrawn(this);
-		Graphics graphics = MinecraftGraphics.getGraphics(); // COMMENT make sure that initialization takes place in the rendering thread
 		MinecraftSurfaceData.getInstance().clear();
 		TreeUtilities.<Component, Void>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, getComponent(),
 				component -> {
@@ -58,7 +58,9 @@ public class AWTMinecraftScreenAdapter
 						.map(Arrays::asList)
 						.orElseGet(ImmutableList::of),
 				null, null);
-		getComponent().paint(graphics);
+		try (AutoCloseableGraphics2D graphics = MinecraftGraphics.createGraphics()) {
+			getComponent().paint(graphics);
+		}
 		MinecraftSurfaceData.getInstance().draw();
 	}
 

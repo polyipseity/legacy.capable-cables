@@ -17,5 +17,5 @@ public class UIDefaultMinecraftComponentRenderer<C extends IUIComponent & IUICom
 	public UIDefaultMinecraftComponentRenderer(UIRendererConstructor.IArguments arguments) { super(arguments); }
 
 	@Override
-	public void render(IUIComponentContext context, C container, EnumRenderStage stage, double partialTicks) {}
+	public void render(IUIComponentContext context, EnumRenderStage stage, C component, double partialTicks) {}
 }

@@ -37,7 +37,7 @@ public abstract class UIAbstractComponentPathResolver
 				.stream()
 				.map(child -> {
 					try (IUIComponentContext componentContextCopy = componentContext.clone()) {
-						componentContextCopy.getMutator().push(componentContextCopy.getStackRef(), child);
+						componentContextCopy.getMutator().push(componentContextCopy, child);
 						return getResult(componentContextCopy, (Point2D) point.clone());
 					}
 				})
@@ -45,7 +45,7 @@ public abstract class UIAbstractComponentPathResolver
 				.findFirst()
 				.orElseGet(UIImmutableComponentPathResolverResult::getEmpty);
 		result.getConcreteComponent()
-				.ifPresent(child -> componentContext.getMutator().push(componentContext.getStackRef(), child));
+				.ifPresent(child -> componentContext.getMutator().push(componentContext, child));
 		return result;
 	}
 

@@ -1,0 +1,14 @@
+<root>
+	<item name='java.awt.Container java.awt.Component findComponentAt(int, int)'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
+	<item name='java.awt.Container java.awt.Component findComponentAt(java.awt.Point)'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
+	<item name='java.awt.Container java.awt.LayoutManager getLayout()'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
+	<item name='java.awt.Graphics java.awt.Shape getClip()'>
+		<annotation name='javax.annotation.Nullable'/>
+	</item>
+</root>

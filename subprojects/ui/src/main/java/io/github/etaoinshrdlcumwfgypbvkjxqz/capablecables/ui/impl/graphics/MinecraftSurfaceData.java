@@ -55,7 +55,7 @@ public final class MinecraftSurfaceData
 	private MinecraftSurfaceData() {
 		super(StateTrackableDelegate.createInstance(State.STABLE),
 				SurfaceType.Any,
-				MinecraftGraphicsConfiguration.getInstance().getColorModel());
+				MinecraftGraphicsDevice.getInstance().getDefaultConfiguration().getColorModel());
 		/* COMMENT
 		WARNING: This class is very dangerous.
 
@@ -87,6 +87,8 @@ public final class MinecraftSurfaceData
 		setTexture(createTexture(bounds));
 		setNativeImageDataBuffer(new NativeImageDataBuffer(AssertionUtilities.assertNonnull(getTexture().getTextureData())));
 		setFullRaster(createRaster(bounds, getColorModel(), getNativeImageDataBuffer()));
+
+		MinecraftGraphics.recreateGraphics(); // COMMENT resets the clip
 	}
 
 	@Override
@@ -128,7 +130,7 @@ public final class MinecraftSurfaceData
 
 	@Override
 	public GraphicsConfiguration getDeviceConfiguration() {
-		return MinecraftGraphicsConfiguration.getInstance();
+		return MinecraftGraphicsDevice.getInstance().getDefaultConfiguration();
 	}
 
 	@Override
@@ -163,20 +165,19 @@ public final class MinecraftSurfaceData
 		Rectangle bounds = getBounds();
 		DynamicTexture texture = getTexture();
 
-		// COMMENT writes directly to 'NativeImage'
+		// COMMENT we write directly to 'NativeImage'
 		texture.updateDynamicTexture();
 
-		RenderSystem.bindTexture(texture.getGlTextureId());
-
 		RenderSystem.enableBlend();
-		RenderSystem.disableAlphaTest();
 		RenderSystem.defaultBlendFunc();
+		RenderSystem.disableAlphaTest();
+		RenderSystem.bindTexture(texture.getGlTextureId());
 		MinecraftDrawingUtilities.blit(AffineTransformUtilities.getIdentity(),
 				bounds,
 				new Point2D.Double(),
 				new DoubleDimension2D(bounds.getWidth(), bounds.getHeight()));
-		RenderSystem.disableBlend();
 		RenderSystem.enableAlphaTest();
+		RenderSystem.disableBlend();
 	}
 
 	@OnlyIn(Dist.CLIENT)
