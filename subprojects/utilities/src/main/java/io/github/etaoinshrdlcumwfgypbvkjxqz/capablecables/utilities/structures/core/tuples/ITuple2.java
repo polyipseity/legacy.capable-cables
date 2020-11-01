@@ -13,6 +13,17 @@ public interface ITuple2<L, R>
 
 	R getRight();
 
+	ITuple2<R, L> swap();
+
+	@Override
+	int hashCode();
+
+	@Override
+	boolean equals(Object obj);
+
+	@Override
+	String toString();
+
 	enum StaticHolder {
 		;
 

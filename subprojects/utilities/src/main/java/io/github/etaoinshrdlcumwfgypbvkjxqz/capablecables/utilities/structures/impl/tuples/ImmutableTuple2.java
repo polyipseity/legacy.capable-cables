@@ -29,6 +29,11 @@ public final class ImmutableTuple2<L, R>
 	}
 
 	@Override
+	public ITuple2<R, L> swap() {
+		return of(getRight(), getLeft());
+	}
+
+	@Override
 	public int hashCode() {
 		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariablesMap().values());
 	}

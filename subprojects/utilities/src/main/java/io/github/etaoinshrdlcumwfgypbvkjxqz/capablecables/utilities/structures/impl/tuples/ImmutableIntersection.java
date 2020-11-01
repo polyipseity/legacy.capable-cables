@@ -17,6 +17,7 @@ public final class ImmutableIntersection<L, R>
 	private ImmutableIntersection(Object object, @Nullable Class<L> leftClazz, @Nullable Class<R> rightClazz)
 			throws ClassCastException {
 		super(object, object);
+		// COMMENT throws ClassCastException automatically
 		this.left = Optional.ofNullable(leftClazz).map(clazz -> clazz.cast(object)).orElseGet(() -> (L) object);
 		this.right = Optional.ofNullable(rightClazz).map(clazz -> clazz.cast(object)).orElseGet(() -> (R) object);
 	}
@@ -59,5 +60,10 @@ public final class ImmutableIntersection<L, R>
 	@Override
 	public String toString() {
 		return ObjectUtilities.toStringImpl(this, StaticHolder.getObjectVariablesMap());
+	}
+
+	@Override
+	public IIntersection<R, L> swap() {
+		return of(getRight(), getLeft());
 	}
 }
