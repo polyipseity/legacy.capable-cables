@@ -6,11 +6,17 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableTuple2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
 
+import java.awt.*;
 import java.io.Serializable;
 
 @SuppressWarnings("unused")
 public enum EnumJAXBObjectPresetAdapter
 		implements ITuple2<ITuple2<? extends Class<?>, ? extends Class<?>>, IRegistryObject<? extends IDuplexFunction<?, ?>>> {
+	COLOR(ImmutableTuple2.of(io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color.class, Color.class),
+			new IDuplexFunction.Functional<>(
+					io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color::toJava,
+					io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color::fromJava
+			)),
 	;
 
 	private final ITuple2<ITuple2<? extends Class<?>, ? extends Class<?>>, IRegistryObject<? extends IDuplexFunction<?, ?>>> delegate;

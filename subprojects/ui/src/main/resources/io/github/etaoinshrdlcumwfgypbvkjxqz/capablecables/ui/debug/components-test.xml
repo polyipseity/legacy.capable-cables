@@ -44,7 +44,7 @@
 
 			<renderer-container name="Window1Renderer"/>
 
-			<property key="default:property.window.control_bar.side">
+			<property key="default:property.window.controls.side">
 				<side>DOWN</side>
 			</property>
 

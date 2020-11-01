@@ -50,7 +50,8 @@ public class UIDefaultComponentUserRelocatableExtensionPreviewingRelocatingRende
 		super(arguments);
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-		this.previewColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY, mappings.get(getPropertyPreviewColorLocation()));
+		this.previewColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.DARK_GRAY,
+				mappings.get(getPropertyPreviewColorLocation()));
 	}
 
 	public static INamespacePrefixedString getPropertyPreviewColorLocation() { return PROPERTY_PREVIEW_COLOR_LOCATION; }
@@ -58,19 +59,16 @@ public class UIDefaultComponentUserRelocatableExtensionPreviewingRelocatingRende
 	public static String getPropertyPreviewColor() { return PROPERTY_PREVIEW_COLOR; }
 
 	protected void render0(IUIComponentContext context, Rectangle2D rectangle) {
-		getPreviewColor().getValue()
-				.ifPresent(previewColor -> {
-					try (IUIComponentContext contextCopy = context.clone()) {
-						contextCopy.getMutator().pop(contextCopy); // COMMENT draw in the parent context
-						try (AutoCloseableGraphics2D currentGraphics = AutoCloseableGraphics2D.of(context.createGraphics());
-						     AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(contextCopy.createGraphics())) {
-							graphics.setTransform(currentGraphics.getTransform()); // COMMENT but with the current transform
-							graphics.setColor(previewColor);
-							// COMMENT the result is that the clipping is relaxed
-							graphics.draw(rectangle);
-						}
-					}
-				});
+		try (IUIComponentContext contextCopy = context.clone()) {
+			contextCopy.getMutator().pop(contextCopy); // COMMENT draw in the parent context
+			try (AutoCloseableGraphics2D currentGraphics = AutoCloseableGraphics2D.of(context.createGraphics());
+			     AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(contextCopy.createGraphics())) {
+				graphics.setTransform(currentGraphics.getTransform()); // COMMENT but with the current transform
+				graphics.setColor(getPreviewColor().getValue());
+				// COMMENT the result is that the clipping is relaxed
+				graphics.draw(rectangle);
+			}
+		}
 	}
 
 	protected IBindingField<Color> getPreviewColor() { return previewColor; }

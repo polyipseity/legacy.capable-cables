@@ -51,11 +51,15 @@ public class FieldBindings
 							.findAny()
 							.ifPresent(IThrowingConsumer.executeNow(fc -> {
 								assert fc != null;
-								f.setValue(CastUtilities.castUncheckedNullable( // COMMENT should be of the right type
-										transform(getTransformers(),
-												CastUtilities.castUncheckedNullable(fc.getValue().orElse(null)), // COMMENT should be always safe
-												fc.getTypeToken().getRawType(),
-												f.getTypeToken().getRawType())));
+								f.setValue(CastUtilities.castUnchecked( // COMMENT should be of the right type
+										AssertionUtilities.assertNonnull(
+												transform(getTransformers(),
+														CastUtilities.castUnchecked(fc.getValue()), // COMMENT should be always safe
+														fc.getTypeToken().getRawType(),
+														f.getTypeToken().getRawType()
+												)
+										)
+								));
 							}));
 					DisposableObserver<? extends IValue<?>> d = createSynchronizationObserver(f, getFields().keySet(), getTransformers(), getIsSource());
 					getFields().put(f, d);
@@ -77,21 +81,28 @@ public class FieldBindings
 			public void onNext(@Nonnull IValue<T> t) {
 				if (isSource.getAndSet(false)) {
 					try {
+						T value = t.getValue().orElseThrow(IllegalArgumentException::new);
 						Streams.stream(to).unordered()
 								.filter(FunctionUtilities.notPredicate(Predicate.isEqual(from)))
 								.forEach(IThrowingConsumer.executeNow(destination -> {
-									AssertionUtilities.assertNonnull(destination).setValue(CastUtilities.castUncheckedNullable(
-											transform(transformers,
-													t.getValue().orElse(null),
-													from.getTypeToken().getRawType(),
-													destination.getTypeToken().getRawType()))); // COMMENT should be of the correct type
+									assert destination != null;
+									destination.setValue(
+											CastUtilities.castUnchecked( // COMMENT should be of the correct type
+													AssertionUtilities.assertNonnull(
+															transform(transformers,
+																	value,
+																	from.getTypeToken().getRawType(),
+																	destination.getTypeToken().getRawType()
+															)
+													)
+											)
+									);
 								}));
 					} catch (NoSuchBindingTransformerException e) {
-						isSource.set(true);
 						onError(e);
-						return;
+					} finally {
+						isSource.set(true);
 					}
-					isSource.set(true);
 				}
 			}
 		}, UtilitiesConfiguration.getInstance().getLogger());

@@ -31,7 +31,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
@@ -82,12 +81,12 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		super((Class<C>) arguments.getContainerClass());
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-		this.activationMouseButtons = IUIPropertyMappingValue.<Set<Integer>>createBindingField(CastUtilities.castUnchecked(Set.class), false,
+		this.activationMouseButtons = IUIPropertyMappingValue.<Set<Integer>>createBindingField(CastUtilities.castUnchecked(Set.class),
 				() -> ImmutableSet.of(GLFW.GLFW_MOUSE_BUTTON_LEFT),
 				mappings.get(getPropertyActivationMouseButtonsLocation()));
-		this.resizeBorderDefaultThickness = IUIPropertyMappingValue.createBindingField(Double.class, false, 10D,
+		this.resizeBorderDefaultThickness = IUIPropertyMappingValue.createBindingField(Double.class, 10D,
 				mappings.get(getPropertyResizeBordersDefaultThicknessLocation()));
-		this.resizeBorders = IUIPropertyMappingValue.<Map<EnumUISide, Double>>createBindingField(CastUtilities.castUnchecked(Map.class), false,
+		this.resizeBorders = IUIPropertyMappingValue.<Map<EnumUISide, Double>>createBindingField(CastUtilities.castUnchecked(Map.class),
 				ImmutableMap::of,
 				mappings.get(getPropertyResizeBordersLocation()));
 	}
@@ -130,8 +129,8 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 				.map(IUIComponent::getShape)
 				.map(Shape::getBounds2D)
 				.map(containerShapeBounds -> {
-					double defaultThickness = IField.getValueNonnull(getResizeBorderDefaultThickness());
-					Map<EnumUISide, Double> borders = IField.getValueNonnull(getResizeBorders());
+					double defaultThickness = getResizeBorderDefaultThickness().getValue();
+					Map<EnumUISide, Double> borders = getResizeBorders().getValue();
 					Area resizeShape = new Area(
 							EnumUISide.getEdges().stream().unordered()
 									.map(side -> {
@@ -277,7 +276,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 				if (!getActiveMouseButton().isPresent()) {
 					int button = evt.getData().getButton();
 					getOwner()
-							.filter(owner2 -> IField.getValueNonnull(owner2.getActivationMouseButtons()).contains(button))
+							.filter(owner2 -> owner2.getActivationMouseButtons().getValue().contains(button))
 							.filter(owner2 -> startResizeMaybe(evt.getViewContext(), evt.getData().getCursorPositionView()))
 							.flatMap(owner2 -> owner2.getContainer()) // TODO Java 9 - IllegalAccessError now, make method ref
 							.ifPresent(c -> {

@@ -28,7 +28,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
@@ -75,10 +74,10 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 		super((Class<C>) arguments.getContainerClass());
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-		this.activationMouseButtons = IUIPropertyMappingValue.<Set<Integer>>createBindingField(CastUtilities.castUnchecked(Set.class), false,
+		this.activationMouseButtons = IUIPropertyMappingValue.<Set<Integer>>createBindingField(CastUtilities.castUnchecked(Set.class),
 				() -> ImmutableSet.of(GLFW.GLFW_MOUSE_BUTTON_LEFT),
 				mappings.get(getPropertyActivationMouseButtonsLocation()));
-		this.relocateBorders = IUIPropertyMappingValue.<Map<EnumUISide, Double>>createBindingField(CastUtilities.castUnchecked(Map.class), false,
+		this.relocateBorders = IUIPropertyMappingValue.<Map<EnumUISide, Double>>createBindingField(CastUtilities.castUnchecked(Map.class),
 				() -> ImmutableMap.of(EnumUISide.UP, 10D),
 				mappings.get(getPropertyRelocateBordersLocation()));
 	}
@@ -190,7 +189,7 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 				.map(IUIComponent::getShape)
 				.map(Shape::getBounds2D)
 				.map(containerShapeBounds ->
-						IField.getValueNonnull(getRelocateBorders()).entrySet().stream().unordered()
+						getRelocateBorders().getValue().entrySet().stream().unordered()
 								.map(entry -> {
 									EnumUISide side = AssertionUtilities.assertNonnull(entry.getKey());
 									double thickness = AssertionUtilities.assertNonnull(entry.getValue());
@@ -243,7 +242,7 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 				if (!getActiveMouseButton().isPresent()) {
 					int button = evt.getData().getButton();
 					getOwner()
-							.filter(owner2 -> IField.getValueNonnull(owner2.getActivationMouseButtons()).contains(button))
+							.filter(owner2 -> owner2.getActivationMouseButtons().getValue().contains(button))
 							.filter(owner2 -> startRelocateMaybe(evt.getViewContext(), evt.getData().getCursorPositionView()))
 							.flatMap(owner2 -> owner2.getContainer()) // TODO Java 9 - IllegalAccessError now, make method ref
 							.ifPresent(c -> {

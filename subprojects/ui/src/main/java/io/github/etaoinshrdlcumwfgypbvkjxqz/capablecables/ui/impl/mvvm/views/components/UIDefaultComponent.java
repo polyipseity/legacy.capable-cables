@@ -28,7 +28,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.methods.IBindingMethodSource;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
@@ -90,9 +89,9 @@ public class UIDefaultComponent
 
 		this.shapeDescriptor = new ProviderShapeDescriptor<>(this, arguments.getShapeDescriptor());
 
-		this.visible = IUIPropertyMappingValue.createBindingField(Boolean.class, false, true,
+		this.visible = IUIPropertyMappingValue.createBindingField(Boolean.class, false,
 				this.mappings.get(getPropertyVisibleLocation()));
-		this.active = IUIPropertyMappingValue.createBindingField(Boolean.class, false, true,
+		this.active = IUIPropertyMappingValue.createBindingField(Boolean.class, false,
 				this.mappings.get(getPropertyActiveLocation()));
 
 		IExtensionContainer.addExtensionChecked(this, new UIDefaultCacheExtension());
@@ -128,7 +127,7 @@ public class UIDefaultComponent
 	public Optional<? extends IUIComponentContainer> getParent() { return parent.getOptional(); }
 
 	@Override
-	public boolean isVisible() { return IField.getValueNonnull(getVisible()); }
+	public boolean isVisible() { return getVisible().getValue(); }
 
 	protected AtomicBoolean getModifyingShape() { return modifyingShape; }
 
@@ -186,7 +185,7 @@ public class UIDefaultComponent
 	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappings() { return mappings; }
 
 	@Override
-	public boolean isActive() { return IField.getValueNonnull(getActive()); }
+	public boolean isActive() { return getActive().getValue(); }
 
 	public IBindingField<Boolean> getActive() { return active; }
 

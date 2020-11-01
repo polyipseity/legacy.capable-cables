@@ -122,17 +122,17 @@ public class UIMinecraftButtonComponent
 			super(arguments);
 
 			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-			this.baseColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY,
+			this.baseColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.DARK_GRAY,
 					mappings.get(getPropertyBaseColorLocation()));
-			this.baseBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.DARK_GRAY,
+			this.baseBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.DARK_GRAY,
 					mappings.get(getPropertyBaseBorderColorLocation()));
-			this.hoveringColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.GRAY,
+			this.hoveringColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.GRAY,
 					mappings.get(getPropertyHoveringColorLocation()));
-			this.hoveringBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.GRAY,
+			this.hoveringBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.GRAY,
 					mappings.get(getPropertyHoveringBorderColorLocation()));
-			this.pressedColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.LIGHT_GRAY,
+			this.pressedColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.LIGHT_GRAY,
 					mappings.get(getPropertyPressedColorLocation()));
-			this.pressedBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.LIGHT_GRAY,
+			this.pressedBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.LIGHT_GRAY,
 					mappings.get(getPropertyPressedBorderColorLocation()));
 		}
 
@@ -234,7 +234,7 @@ public class UIMinecraftButtonComponent
 		public void render(IUIComponentContext context, EnumRenderStage stage, C component, double partialTicks) {
 			if (stage.isPreChildren()) {
 				Shape relativeShape = IUIComponent.getShape(component);
-				Optional<? extends Color> filled, border;
+				Color filled, border;
 				if (component.getButtonStates().contains(IButtonState.PRESSING)) {
 					filled = getPressedColor().getValue();
 					border = getPressedBorderColor().getValue();
@@ -245,18 +245,13 @@ public class UIMinecraftButtonComponent
 					filled = getBaseColor().getValue();
 					border = getBaseBorderColor().getValue();
 				}
-				filled.ifPresent(color -> {
-					try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
-						graphics.setColor(color);
-						graphics.fill(relativeShape);
-					}
-				});
-				border.ifPresent(color -> {
-					try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
-						graphics.setColor(color);
-						graphics.draw(relativeShape);
-					}
-				});
+				try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
+					graphics.setColor(filled);
+					graphics.fill(relativeShape);
+
+					graphics.setColor(border);
+					graphics.draw(relativeShape);
+				}
 			}
 		}
 	}

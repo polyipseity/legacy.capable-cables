@@ -12,28 +12,25 @@ import java.util.function.Supplier;
 
 public interface IUIPropertyMappingValue {
 	static <T> IBindingField<T> createBindingField(Class<T> clazz,
-	                                               boolean nullable,
-	                                               @Nullable T defaultValue,
+	                                               T defaultValue,
 	                                               @Nullable IUIPropertyMappingValue mapping) {
-		return createBindingField(clazz, nullable, ConstantValue.of(defaultValue), mapping);
+		return createBindingField(clazz, ConstantValue.of(defaultValue), mapping);
 	}
 
 	static <T> IBindingField<T> createBindingField(Class<T> clazz,
-	                                               boolean nullable,
-	                                               Supplier<? extends T> defaultValue,
+	                                               Supplier<? extends T> defaultValueSupplier,
 	                                               @Nullable IUIPropertyMappingValue mapping) {
-		Optional<IUIPropertyMappingValue> m = Optional.ofNullable(mapping);
 		return new ImmutableBindingField<>(
 				Optional.ofNullable(mapping)
 						.flatMap(IUIPropertyMappingValue::getBindingKey)
 						.orElse(null),
 				new MemoryObservableField<>(clazz,
-						m.isPresent()
-								? m // COMMENT has mapping
+						Optional.ofNullable(mapping)
 								.flatMap(IUIPropertyMappingValue::getDefaultValue)
 								.map(clazz::cast)
-								.orElseGet(nullable ? ConstantValue.getEmpty() : defaultValue)
-								: defaultValue.get()));
+								.orElseGet(defaultValueSupplier)
+				)
+		);
 	}
 
 	Optional<?> getDefaultValue();

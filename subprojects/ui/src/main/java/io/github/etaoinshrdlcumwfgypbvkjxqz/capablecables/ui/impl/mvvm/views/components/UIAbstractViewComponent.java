@@ -165,7 +165,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	public void removed() {
 		getManager().ifPresent(manager -> {
 			try (IUIComponentContext componentContext = createComponentContext().orElseThrow(IllegalStateException::new)) {
-				IUIViewComponent.traverseComponentTreeDefault(componentContext,
+				IUIViewComponent.<RuntimeException>traverseComponentTreeDefault(componentContext,
 						manager,
 						(componentContext2, result) -> {
 							assert componentContext2 != null;

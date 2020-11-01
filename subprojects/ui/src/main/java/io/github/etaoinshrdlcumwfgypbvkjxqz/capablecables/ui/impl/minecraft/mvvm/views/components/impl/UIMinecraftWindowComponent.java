@@ -21,7 +21,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
@@ -91,7 +90,7 @@ public class UIMinecraftWindowComponent
 		@NonNls
 		public static final String PROPERTY_BACKGROUND_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.background.color";
 		@NonNls
-		public static final String PROPERTY_BORDER_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.border.color";
+		public static final String PROPERTY_BORDER_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.controls.color";
 
 		private static final INamespacePrefixedString PROPERTY_BACKGROUND_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyBackgroundColor());
 		private static final INamespacePrefixedString PROPERTY_BORDER_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyBorderColor());
@@ -99,16 +98,16 @@ public class UIMinecraftWindowComponent
 		@UIProperty(PROPERTY_BACKGROUND_COLOR)
 		private final IBindingField<Color> backgroundColor;
 		@UIProperty(PROPERTY_BORDER_COLOR)
-		private final IBindingField<Color> borderColor;
+		private final IBindingField<Color> controlsColor;
 
 		@UIRendererConstructor
 		public DefaultRenderer(UIRendererConstructor.IArguments arguments) {
 			super(arguments);
 
 			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-			this.backgroundColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.BLACK,
+			this.backgroundColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.BLACK,
 					mappings.get(getPropertyBackgroundColorLocation()));
-			this.borderColor = IUIPropertyMappingValue.createBindingField(Color.class, true, Color.WHITE,
+			this.controlsColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.WHITE,
 					mappings.get(getPropertyBorderColorLocation()));
 		}
 
@@ -134,7 +133,7 @@ public class UIMinecraftWindowComponent
 			super.initializeBindings(binderObserverSupplier);
 			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 					() -> ImmutableBinderAction.bind(
-							getBackgroundColor(), getBorderColor()
+							getBackgroundColor(), getControlsColor()
 					)
 			);
 		}
@@ -145,46 +144,41 @@ public class UIMinecraftWindowComponent
 			super.cleanupBindings(binderObserverSupplier);
 			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 					() -> ImmutableBinderAction.unbind(
-							getBackgroundColor(), getBorderColor()
+							getBackgroundColor(), getControlsColor()
 					)
 			);
 		}
 
 		public IBindingField<Color> getBackgroundColor() { return backgroundColor; }
 
-		public IBindingField<Color> getBorderColor() { return borderColor; }
+		public IBindingField<Color> getControlsColor() { return controlsColor; }
 
 		@Override
 		public void render(IUIComponentContext context, EnumRenderStage stage, C component, double partialTicks) {
 			if (stage.isPreChildren()) {
 				Shape relativeShape = IUIComponent.getShape(component);
-				getBackgroundColor().getValue().ifPresent(color -> {
-					try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
-						graphics.setColor(color);
-						graphics.fill(relativeShape);
-					}
-				});
+				try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
+					graphics.setColor(getBackgroundColor().getValue());
+					graphics.fill(relativeShape);
+				}
 			} else if (stage.isPostChildren()) {
-				// COMMENT renders the control bar
-				component.getControlBarSide().getValue()
-						.ifPresent(controlBarSide -> {
-							getBorderColor().getValue()
-									.ifPresent(controlBarColor -> {
-										Rectangle2D containerShapeBounds = IUIComponent.getShape(component).getBounds2D();
-										EnumUISide oppositeBorderSide = controlBarSide.getOpposite().orElseThrow(IllegalStateException::new);
-										oppositeBorderSide.setValue(containerShapeBounds,
-												controlBarSide.getValue(containerShapeBounds)
-														+ controlBarSide.inwardsBy(IField.getValueNonnull(component.getControlBarThickness()))
-														.orElseThrow(IllegalStateException::new));
+				// COMMENT renders the controls
+				EnumUISide controlsSide = component.getControlsSide().getValue();
 
-										try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
-											graphics.setColor(controlBarColor);
-											graphics.fill(containerShapeBounds);
-										}
-									});
-							// TODO
-							EnumUIRotation controlBarDirection = IField.getValueNonnull(component.getControlBarDirection());
-						});
+				Rectangle2D containerShapeBounds = IUIComponent.getShape(component).getBounds2D();
+				EnumUISide oppositeBorderSide = controlsSide.getOpposite().orElseThrow(IllegalStateException::new);
+				oppositeBorderSide.setValue(containerShapeBounds,
+						controlsSide.getValue(containerShapeBounds)
+								+ controlsSide.inwardsBy(component.getControlsThickness().getValue())
+								.orElseThrow(IllegalStateException::new));
+
+				try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
+					graphics.setColor(getControlsColor().getValue());
+					graphics.fill(containerShapeBounds);
+				}
+
+				// TODO
+				EnumUIRotation controlsDirection = component.getControlsDirection().getValue();
 			}
 		}
 	}

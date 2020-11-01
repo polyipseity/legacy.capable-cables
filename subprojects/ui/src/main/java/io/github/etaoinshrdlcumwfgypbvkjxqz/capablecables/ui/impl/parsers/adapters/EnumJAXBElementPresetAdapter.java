@@ -19,9 +19,7 @@ import jakarta.xml.bind.JAXBElement;
 
 import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
-import java.awt.*;
 import java.io.Serializable;
-import java.util.List;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -67,14 +65,6 @@ public enum EnumJAXBElementPresetAdapter
 										);
 									}).orElse(null))
 			)),
-	COLOR(ImmutableTuple2.of(UIJAXBUtilities.<io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color>getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createColor), Color.class),
-			new IDuplexFunction.Functional<>(
-					left -> JAXBUtilities.getActualValueOptional(left)
-							.map(io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color::toJava)
-							.orElse(null),
-					(@Nullable Color right) ->
-							UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()
-									.createColor(io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color.fromJava(right)))),
 	@SuppressWarnings("UnstableApiUsage") SET(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createSet), CastUtilities.<Class<Set<?>>>castUnchecked(Set.class)),
 			new IDuplexFunction.Functional<>(
 					left -> processCollectionType(JAXBUtilities.getActualValue(left))

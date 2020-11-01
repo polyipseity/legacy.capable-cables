@@ -42,10 +42,8 @@
 							return new java.awt.Color(thisObj.getRed(), thisObj.getGreen(), thisObj.getBlue(), thisObj.getAlpha());
 						}
 
-						@javax.annotation.Nullable
-						public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color fromJava(@javax.annotation.Nullable java.awt.Color object) {
-							if (object == null)
-								return null;
+						@javax.annotation.Nonnull
+						public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color fromJava(@javax.annotation.Nonnull java.awt.Color object) {
 							@javax.annotation.Nonnull io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color result = new io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color();
 							result.setRed((short) object.getRed());
 							result.setGreen((short) object.getGreen());
@@ -65,7 +63,7 @@
 						private final io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.AnyType thisObj = this;
 
 						@javax.annotation.Nonnull
-						public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.AnyType of(@javax.annotation.Nullable Object value) {
+						public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.AnyType of(@javax.annotation.Nonnull Object value) {
 							@javax.annotation.Nonnull io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.AnyType result = new io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.AnyType();
 							result.setAny(value);
 							return result;
@@ -82,7 +80,7 @@
 						private final io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Tuple2Type thisObj = this;
 
 						@javax.annotation.Nonnull
-						public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Tuple2Type of(@javax.annotation.Nullable Object left, @javax.annotation.Nullable Object right) {
+						public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Tuple2Type of(@javax.annotation.Nonnull Object left, @javax.annotation.Nonnull Object right) {
 							@javax.annotation.Nonnull io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Tuple2Type result = new io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Tuple2Type();
 							result.getAny().set(0, io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.AnyType.of(left));
 							result.getAny().set(1, io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.AnyType.of(right));

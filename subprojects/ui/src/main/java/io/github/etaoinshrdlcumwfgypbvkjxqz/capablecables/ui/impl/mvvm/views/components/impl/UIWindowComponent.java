@@ -14,6 +14,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIE
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIFunctionalEventListener;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultComponentContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIComponentModifyShapeDescriptorBusEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUIRotation;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISideType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
@@ -23,7 +24,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
@@ -34,9 +34,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
-import java.awt.geom.RectangularShape;
+import java.awt.*;
+import java.awt.geom.*;
 import java.util.ConcurrentModificationException;
 import java.util.Map;
 import java.util.Optional;
@@ -48,14 +47,19 @@ public class UIWindowComponent
 		implements IUIReshapeExplicitly<RectangularShape> {
 	// TODO make window scroll bars, maybe create a new component, and embed into this
 
-	public static final @NonNls String PROPERTY_CONTROL_BAR_SIDE = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.control_bar.side";
-	public static final @NonNls String PROPERTY_CONTROL_BAR_THICKNESS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.control_bar.thickness";
-	private static final INamespacePrefixedString PROPERTY_CONTROL_BAR_SIDE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyControlBarSide());
-	private static final INamespacePrefixedString PROPERTY_CONTROL_BAR_THICKNESS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyControlBarThickness());
-	@UIProperty(PROPERTY_CONTROL_BAR_SIDE)
-	private final IBindingField<EnumUISide> controlBarSide;
-	@UIProperty(PROPERTY_CONTROL_BAR_THICKNESS)
-	private final IBindingField<Double> controlBarThickness;
+	public static final @NonNls String PROPERTY_CONTROLS_SIDE = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.controls.side";
+	public static final @NonNls String PROPERTY_CONTROLS_THICKNESS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.controls.thickness";
+	public static final @NonNls String PROPERTY_CONTROLS_DIRECTION = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.controls.direction";
+	private static final INamespacePrefixedString PROPERTY_CONTROLS_SIDE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyControlsSide());
+	private static final INamespacePrefixedString PROPERTY_CONTROLS_THICKNESS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyControlsThickness());
+	private static final INamespacePrefixedString PROPERTY_CONTROLS_DIRECTION_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyControlsDirection());
+
+	@UIProperty(PROPERTY_CONTROLS_SIDE)
+	private final IBindingField<EnumUISide> controlsSide;
+	@UIProperty(PROPERTY_CONTROLS_THICKNESS)
+	private final IBindingField<Double> controlsThickness;
+	@UIProperty(PROPERTY_CONTROLS_DIRECTION)
+	private final IBindingField<EnumUIRotation> controlsDirection;
 
 	@SuppressWarnings({"OverridableMethodCallDuringObjectConstruction", "rawtypes", "RedundantSuppression", "ThisEscapedInObjectConstruction"})
 	@UIComponentConstructor
@@ -63,52 +67,63 @@ public class UIWindowComponent
 		super(arguments);
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-		this.controlBarSide = IUIPropertyMappingValue.createBindingField(EnumUISide.class, true,
-				EnumUISide.UP, mappings.get(getPropertyControlBarSideLocation()));
-		this.controlBarThickness = IUIPropertyMappingValue.createBindingField(Double.class, false,
-				10D, mappings.get(getPropertyControlBarThicknessLocation()));
+		this.controlsSide = IUIPropertyMappingValue.createBindingField(EnumUISide.class, EnumUISide.UP,
+				mappings.get(getPropertyControlsSideLocation()));
+		this.controlsThickness = IUIPropertyMappingValue.createBindingField(Double.class, 10D,
+				mappings.get(getPropertyControlsThicknessLocation()));
+		this.controlsDirection = IUIPropertyMappingValue.createBindingField(EnumUIRotation.class, EnumUIRotation.CLOCKWISE,
+				mappings.get(getPropertyControlsDirectionLocation()));
 
 		addEventListener(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(), new UIFunctionalEventListener<IUIEventFocus>(e ->
 				getParent().orElseThrow(InternalError::new).moveChildToTop(this)), true);
 	}
 
-	public static INamespacePrefixedString getPropertyControlBarSideLocation() {
-		return PROPERTY_CONTROL_BAR_SIDE_LOCATION;
+	public static INamespacePrefixedString getPropertyControlsSideLocation() {
+		return PROPERTY_CONTROLS_SIDE_LOCATION;
 	}
 
-	public static INamespacePrefixedString getPropertyControlBarThicknessLocation() {
-		return PROPERTY_CONTROL_BAR_THICKNESS_LOCATION;
+	public static INamespacePrefixedString getPropertyControlsThicknessLocation() {
+		return PROPERTY_CONTROLS_THICKNESS_LOCATION;
 	}
 
-	public static String getPropertyControlBarSide() {
-		return PROPERTY_CONTROL_BAR_SIDE;
+	public static INamespacePrefixedString getPropertyControlsDirectionLocation() {
+		return PROPERTY_CONTROLS_DIRECTION_LOCATION;
 	}
 
-	public static String getPropertyControlBarThickness() {
-		return PROPERTY_CONTROL_BAR_THICKNESS;
+	public static String getPropertyControlsDirection() {
+		return PROPERTY_CONTROLS_DIRECTION;
+	}
+
+	public static String getPropertyControlsSide() {
+		return PROPERTY_CONTROLS_SIDE;
+	}
+
+	public static String getPropertyControlsThickness() {
+		return PROPERTY_CONTROLS_THICKNESS;
 	}
 
 	@Override
 	public void transformChildren(AffineTransform transform) {
 		super.transformChildren(transform);
-		Point2D translation = getControlBarSide().getValue()
-				.filter(side -> side.getType() == EnumUISideType.LOCATION)
-				.map(side -> {
-					// COMMENT variable-capture-less
-					Point2D translation2 = new Point2D.Double();
-					side.getAxis().setCoordinate(translation2, IField.getValueNonnull(getControlBarThickness()));
-					return translation2;
-				})
-				.orElseGet(Point2D.Double::new);
+		Point2D translation = new Point2D.Double();
+
+		EnumUISide controlsSide = getControlsSide().getValue();
+		if (controlsSide.getType() == EnumUISideType.LOCATION)
+			controlsSide.getAxis().setCoordinate(translation, getControlsThickness().getValue());
+
 		transform.translate(translation.getX(), translation.getY());
+	}
+
+	protected IBindingField<EnumUISide> getControlsSide() {
+		return controlsSide;
 	}
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final AutoCloseableRotator<ModifyShapeDescriptorObserver, RuntimeException> modifyShapeDescriptorObserver =
 			new AutoCloseableRotator<>(() -> new ModifyShapeDescriptorObserver(this, UIConfiguration.getInstance().getLogger()), Disposable::dispose);
 
-	protected IBindingField<EnumUISide> getControlBarSide() {
-		return controlBarSide;
+	protected IBindingField<Double> getControlsThickness() {
+		return controlsThickness;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -131,8 +146,13 @@ public class UIWindowComponent
 		getModifyShapeDescriptorObserver().close();
 	}
 
-	protected IBindingField<Double> getControlBarThickness() {
-		return controlBarThickness;
+	@Override
+	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		super.initializeBindings(binderObserverSupplier);
+		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+				() -> ImmutableBinderAction.bind(
+						getControlsSide(), getControlsThickness(), getControlsDirection()
+				));
 	}
 
 	@Override

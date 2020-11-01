@@ -2,26 +2,26 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:val="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/values"
            targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/values"
-           version="1.5.0"
+           version="2.0.0"
            xml:lang="EN">
 	<!-- TODO change some global elements to local elements, JAXB seems to dislike local elements -->
 
 	<!-- SECTION primitives -->
 
 	<!-- COMMENT boolean -->
-	<xs:element name="boolean" type="xs:boolean" nillable="true"/>
+	<xs:element name="boolean" type="xs:boolean"/>
 	<!-- COMMENT byte -->
-	<xs:element name="byte" type="xs:byte" nillable="true"/>
+	<xs:element name="byte" type="xs:byte"/>
 	<!-- COMMENT short -->
-	<xs:element name="short" type="xs:short" nillable="true"/>
+	<xs:element name="short" type="xs:short"/>
 	<!-- COMMENT int -->
-	<xs:element name="int" type="xs:int" nillable="true"/>
+	<xs:element name="int" type="xs:int"/>
 	<!-- COMMENT long -->
-	<xs:element name="long" type="xs:long" nillable="true"/>
+	<xs:element name="long" type="xs:long"/>
 	<!-- COMMENT float -->
-	<xs:element name="float" type="xs:float" nillable="true"/>
+	<xs:element name="float" type="xs:float"/>
 	<!-- COMMENT double -->
-	<xs:element name="double" type="xs:double" nillable="true"/>
+	<xs:element name="double" type="xs:double"/>
 
 	<!-- SECTION structures -->
 

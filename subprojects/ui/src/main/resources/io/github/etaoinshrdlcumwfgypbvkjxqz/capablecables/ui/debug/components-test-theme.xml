@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<theme xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:val="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/values"
+<theme xmlns:val="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/values"
        xmlns="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
        xml:lang="EN">
 	<!-- SECTION using -->
@@ -18,7 +17,7 @@
 	<renderer name="ViewBackgroundRenderer" class="renderer.extension.minecraft.background.default"/>
 
 	<renderer name="Window1Renderer" class="renderer.component.window.debug.custom">
-		<property key="default:property.window.border.color">
+		<property key="default:property.window.controls.color">
 			<val:color green="128"/>
 		</property>
 	</renderer>
@@ -34,7 +33,7 @@
 	          class="renderer.extension.user_resizable.previewing.minecraft"/>
 
 	<renderer name="WindowAnchoredRenderer">
-		<property key="default:property.window.border.color" bindingKey="default:anchoredWindowBorderColor"/>
+		<property key="default:property.window.controls.color" bindingKey="default:anchoredWindowBorderColor"/>
 	</renderer>
 
 	<renderer name="WindowAnchoredExtensionRelocatableRenderer"
@@ -45,7 +44,7 @@
 
 	<renderer name="Button1Renderer">
 		<property key="default:property.button.hovering.color">
-			<val:color xsi:nil="true"/>
+			<val:color alpha="00"/>
 		</property>
 	</renderer>
 </theme>
