@@ -17,10 +17,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.i
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
 import jakarta.xml.bind.JAXBElement;
 
-import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
 import java.io.Serializable;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
@@ -54,91 +56,46 @@ public enum EnumJAXBElementPresetAdapter
 								);
 							})
 							.orElse(null),
-					(@Nullable ITuple2<?, ?> right) ->
+					(ITuple2<?, ?> right) ->
 							UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().createTuple2(Optional.ofNullable(right)
 									.map(right2 -> {
 										Object rightLeft = right.getLeft();
 										Object rightRight = right.getRight();
 										return Tuple2Type.of(
-												JAXBAdapterRegistries.getToRawAdapter(rightLeft).rightToLeft(rightLeft),
-												JAXBAdapterRegistries.getToRawAdapter(rightRight).rightToLeft(rightRight)
+												AssertionUtilities.assertNonnull(JAXBAdapterRegistries.getToRawAdapter(rightLeft).rightToLeft(rightLeft)),
+												AssertionUtilities.assertNonnull(JAXBAdapterRegistries.getToRawAdapter(rightRight).rightToLeft(rightRight))
 										);
 									}).orElse(null))
 			)),
 	@SuppressWarnings("UnstableApiUsage") SET(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createSet), CastUtilities.<Class<Set<?>>>castUnchecked(Set.class)),
 			new IDuplexFunction.Functional<>(
-					left -> processCollectionType(JAXBUtilities.getActualValue(left))
-							.map(leftStream -> leftStream.collect(ImmutableSet.toImmutableSet()))
-							.orElse(null),
-					(@Nullable Set<?> right) ->
-							UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()
-									.createSet(createCollectionType(
-											Optional.ofNullable(right)
-													.map(Collection::stream)
-													.orElse(null)
-									).orElse(null))
+					left -> processCollectionType(left.getValue()).collect(ImmutableSet.toImmutableSet()),
+					(Set<?> right) -> UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().createSet(createCollectionType(right.stream()))
 			)),
 	@SuppressWarnings("UnstableApiUsage") LIST(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createList), CastUtilities.<Class<List<?>>>castUnchecked(List.class)),
 			new IDuplexFunction.Functional<>(
-					left -> processCollectionType(JAXBUtilities.getActualValue(left))
-							.map(leftStream -> leftStream.collect(ImmutableList.toImmutableList()))
-							.orElse(null),
-					(@Nullable List<?> right) ->
-							UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()
-									.createSet(createCollectionType(
-											Optional.ofNullable(right)
-													.map(Collection::stream)
-													.orElse(null)
-									).orElse(null))
+					left -> processCollectionType(left.getValue()).collect(ImmutableList.toImmutableList()),
+					(List<?> right) -> UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().createSet(createCollectionType(right.stream()))
 			)),
 	@SuppressWarnings("UnstableApiUsage") RELATIONS_SET(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createRelationsSet), CastUtilities.<Class<SetMultimap<?, ?>>>castUnchecked(SetMultimap.class)),
 			new IDuplexFunction.Functional<>(
-					left -> processRelationsType(JAXBUtilities.getActualValue(left))
-							.map(leftStream -> leftStream.collect(ImmutableSetMultimap.toImmutableSetMultimap(Map.Entry::getKey, Map.Entry::getValue)))
-							.orElse(null),
-					(@Nullable SetMultimap<?, ?> right) ->
-							UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()
-									.createRelationsSet(createRelationsType(
-											Optional.ofNullable(right)
-													.map(SetMultimap::entries)
-													.map(Collection::stream)
-													.orElse(null)
-									).orElse(null))
+					left -> processRelationsType(left.getValue()).collect(ImmutableSetMultimap.toImmutableSetMultimap(Map.Entry::getKey, Map.Entry::getValue)),
+					(SetMultimap<?, ?> right) -> UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().createRelationsSet(createRelationsType(right.entries().stream()))
 			)),
 	@SuppressWarnings("UnstableApiUsage") RELATIONS_LIST(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createRelationsList), CastUtilities.<Class<ListMultimap<?, ?>>>castUnchecked(ListMultimap.class)),
 			new IDuplexFunction.Functional<>(
-					left -> processRelationsType(JAXBUtilities.getActualValue(left))
-							.map(leftStream -> leftStream.collect(ImmutableListMultimap.toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)))
-							.orElse(null),
-					(@Nullable ListMultimap<?, ?> right) ->
-							UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()
-									.createRelationsSet(createRelationsType(
-											Optional.ofNullable(right)
-													.map(ListMultimap::entries)
-													.map(Collection::stream)
-													.orElse(null)
-									).orElse(null))
+					left -> processRelationsType(left.getValue()).collect(ImmutableListMultimap.toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)),
+					(ListMultimap<?, ?> right) -> UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().createRelationsSet(createRelationsType(right.entries().stream()))
 			)),
 	@SuppressWarnings("UnstableApiUsage") MAP(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createMap), CastUtilities.<Class<Map<?, ?>>>castUnchecked(Map.class)),
 			new IDuplexFunction.Functional<>(
-					left -> processRelationsType(JAXBUtilities.getActualValue(left))
-							.map(leftStream -> leftStream.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)))
-							.orElse(null),
-					(@Nullable Map<?, ?> right) ->
-							UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()
-									.createRelationsSet(createRelationsType(
-											Optional.ofNullable(right)
-													.map(Map::entrySet)
-													.map(Collection::stream)
-													.orElse(null)
-									).orElse(null))
+					left -> processRelationsType(left.getValue()).collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)),
+					(Map<?, ?> right) -> UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().createRelationsSet(createRelationsType(right.entrySet().stream()))
 			)),
 	UI_SIDE(ImmutableTuple2.of(UIJAXBUtilities.getQName(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()::createSide), EnumUISide.class),
 			new IDuplexFunction.Functional<>(
-					left -> AssertionUtilities.assertNonnull(JAXBUtilities.getActualValue(left)).toJava(),
-					(@Nullable EnumUISide right) ->
-							UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory()
-									.createSide(SideType.fromJava(AssertionUtilities.assertNonnull(right)))
+					left -> left.getValue().toJava(),
+					(EnumUISide right) -> UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().createSide(SideType.fromJava(right))
 			)),
 	;
 
@@ -152,24 +109,19 @@ public enum EnumJAXBElementPresetAdapter
 	@SuppressWarnings("EmptyMethod")
 	public static void initializeClass() {}
 
-	protected static Optional<Stream<?>> processCollectionType(@Nullable CollectionType left) {
-		return Optional.ofNullable(left)
-				.map(CollectionType::getAny)
-				.map(Collection::stream)
-				.map(leftStream -> leftStream.map(leftElement -> JAXBAdapterRegistries.getFromRawAdapter(leftElement).leftToRight(leftElement)));
+	protected static Stream<?> processCollectionType(CollectionType left) {
+		return left.getAny().stream()
+				.map(leftElement -> JAXBAdapterRegistries.getFromRawAdapter(leftElement).leftToRight(leftElement));
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	protected static Optional<CollectionType> createCollectionType(@Nullable Stream<?> right) {
-		return Optional.ofNullable(right)
-				.map(rightStream -> rightStream.map(rightElement -> JAXBAdapterRegistries.getToRawAdapter(rightElement).rightToLeft(rightElement)))
-				.map(intermediateStream -> intermediateStream.collect(ImmutableList.toImmutableList()))
-				.map(intermediate -> {
-					io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.CollectionType left =
-							UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().createCollectionType();
-					left.getAny().addAll(intermediate);
-					return left;
-				});
+	protected static CollectionType createCollectionType(Stream<?> right) {
+		CollectionType left = UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().createCollectionType();
+		left.getAny().addAll(right
+				.map(rightElement -> JAXBAdapterRegistries.getToRawAdapter(rightElement).rightToLeft(rightElement))
+				.collect(ImmutableList.toImmutableList())
+		);
+		return left;
 	}
 
 	@Override
@@ -182,38 +134,33 @@ public enum EnumJAXBElementPresetAdapter
 		return getDelegate().get(index);
 	}
 
-	protected static Optional<Stream<Map.Entry<?, ?>>> processRelationsType(@Nullable RelationsType left) {
-		return Optional.ofNullable(left)
-				.map(RelationsType::getEntry)
-				.map(Collection::stream)
-				.map(leftStream -> leftStream.map(leftEntry -> {
+	protected static Stream<Map.Entry<?, ?>> processRelationsType(RelationsType left) {
+		return left.getEntry().stream()
+				.map(leftEntry -> {
 					Object key = leftEntry.getLeft();
 					Object value = leftEntry.getRight();
 					return Maps.immutableEntry(
 							JAXBAdapterRegistries.getFromRawAdapter(key).leftToRight(key),
 							JAXBAdapterRegistries.getFromRawAdapter(value).leftToRight(value)
 					);
-				}));
+				});
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	protected static Optional<RelationsType> createRelationsType(@Nullable Stream<? extends Map.Entry<?, ?>> right) {
-		return Optional.ofNullable(right)
-				.map(rightStream -> rightStream.map(rightEntry -> {
+	protected static RelationsType createRelationsType(Stream<? extends Map.Entry<?, ?>> right) {
+		RelationsType left = UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().createRelationsType();
+		left.getEntry().addAll(right
+				.map(rightEntry -> {
 					Object rightKey = AssertionUtilities.assertNonnull(rightEntry.getKey());
 					Object rightValue = AssertionUtilities.assertNonnull(rightEntry.getValue());
 					return Tuple2Type.of(
-							JAXBAdapterRegistries.getToRawAdapter(rightKey).rightToLeft(rightKey),
-							JAXBAdapterRegistries.getToRawAdapter(rightValue).rightToLeft(rightValue)
+							AssertionUtilities.assertNonnull(JAXBAdapterRegistries.getToRawAdapter(rightKey).rightToLeft(rightKey)),
+							AssertionUtilities.assertNonnull(JAXBAdapterRegistries.getToRawAdapter(rightValue).rightToLeft(rightValue))
 					);
-				}))
-				.map(intermediateStream -> intermediateStream.collect(ImmutableList.toImmutableList()))
-				.map(intermediate -> {
-					io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.RelationsType left =
-							UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().createRelationsType();
-					left.getEntry().addAll(intermediate);
-					return left;
-				});
+				})
+				.collect(ImmutableList.toImmutableList())
+		);
+		return left;
 	}
 
 	@Override
