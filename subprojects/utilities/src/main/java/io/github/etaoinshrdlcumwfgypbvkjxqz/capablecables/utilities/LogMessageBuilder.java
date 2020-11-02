@@ -3,6 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.logging.FormattingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import org.jetbrains.annotations.NonNls;
+import org.slf4j.Marker;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -71,12 +72,18 @@ public class LogMessageBuilder {
 
 	public String build() {
 		StringBuilder ret = new StringBuilder(CapacityUtilities.getInitialCapacityLarge());
-		boolean[] hasMarkers = {false};
-		getMarkers().forEach(marker -> {
-			ret.append('[').append(marker.get()).append(']');
-			hasMarkers[0] = true;
-		});
-		if (hasMarkers[0])
+		if (getMarkers().stream()
+				.map(Supplier::get)
+				.map(AssertionUtilities::assertNonnull)
+				.map(marker ->
+						CastUtilities.castChecked(Marker.class, marker)
+								.map(Marker::getName)
+								.orElseGet(marker::toString))
+				.map(markerString -> {
+					ret.append('[').append(markerString).append(']');
+					return true;
+				})
+				.reduce(false, Boolean::logicalOr))
 			ret.append(' ');
 		getKeyValuePairs().forEach((key, value) ->
 				ret.append(key).append('=').append(AssertionUtilities.assertNonnull(value).get()).append(' '));
