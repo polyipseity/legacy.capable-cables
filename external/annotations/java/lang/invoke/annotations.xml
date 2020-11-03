@@ -14,6 +14,9 @@
 	<item name='java.lang.invoke.MethodHandles.Lookup java.lang.invoke.MethodHandle findSpecial(java.lang.Class&lt;?&gt;, java.lang.String, java.lang.invoke.MethodType, java.lang.Class&lt;?&gt;) 1'>
 		<annotation name='org.jetbrains.annotations.NonNls'/>
 	</item>
+	<item name='java.lang.invoke.MethodHandles.Lookup java.lang.invoke.MethodHandle findStaticGetter(java.lang.Class&lt;?&gt;, java.lang.String, java.lang.Class&lt;?&gt;) 1'>
+		<annotation name='org.jetbrains.annotations.NonNls'/>
+	</item>
 	<item name='java.lang.invoke.MethodHandles.Lookup java.lang.invoke.MethodHandle findStaticSetter(java.lang.Class&lt;?&gt;, java.lang.String, java.lang.Class&lt;?&gt;) 1'>
 		<annotation name='org.jetbrains.annotations.NonNls'/>
 	</item>

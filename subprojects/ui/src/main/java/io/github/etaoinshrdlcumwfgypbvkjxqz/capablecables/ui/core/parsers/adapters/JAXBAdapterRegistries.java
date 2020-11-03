@@ -44,14 +44,24 @@ public enum JAXBAdapterRegistries {
 						));
 	}
 
+	public static java.lang.Object adaptFromRaw(java.lang.Object rawObject)
+			throws IllegalArgumentException {
+		return AssertionUtilities.assertNonnull(getFromRawAdapter(rawObject).leftToRight(rawObject));
+	}
+
+	public static java.lang.Object adaptToRaw(java.lang.Object object)
+			throws IllegalArgumentException {
+		return AssertionUtilities.assertNonnull(getToRawAdapter(object).rightToLeft(object));
+	}
+
 	@SuppressWarnings({"unchecked", "rawtypes", "RedundantSuppression"})
 	public static <L> Optional<? extends IDuplexFunction<L, ?>> findFromRawAdapter(L rawObject) {
 		if (rawObject instanceof JAXBElement)
 			return (Optional<? extends IDuplexFunction<L, ?>>) // COMMENT should be safe
-					Element.getInstance().getWithLeftChecked(((JAXBElement<?>) rawObject).getName())
+					Elements.getInstance().getWithLeftChecked(((JAXBElement<?>) rawObject).getName())
 							.map(IRegistryObject::getValue);
 		return (Optional<? extends IDuplexFunction<L, ?>>) // COMMENT should be safe
-				Object.getInstance().getWithLeftChecked(rawObject.getClass())
+				Objects.getInstance().getWithLeftChecked(rawObject.getClass())
 						.map(IRegistryObject::getValue);
 	}
 
@@ -75,11 +85,11 @@ public enum JAXBAdapterRegistries {
 			throws IllegalStateException {
 		Optional<? extends IDuplexFunction<?, R>> toRaw =
 				(Optional<? extends IDuplexFunction<?, R>>)
-						Object.getInstance().getWithRightChecked(object.getClass())
+						Objects.getInstance().getWithRightChecked(object.getClass())
 								.map(IRegistryObject::getValue);
 		Optional<? extends IDuplexFunction<JAXBElement<?>, R>> toElement =
 				(Optional<? extends IDuplexFunction<JAXBElement<?>, R>>)
-						Element.getInstance().getWithRightChecked(object.getClass())
+						Elements.getInstance().getWithRightChecked(object.getClass())
 								.map(IRegistryObject::getValue);
 		if (toRaw.isPresent() && toElement.isPresent())
 			throw new IllegalStateException(
@@ -92,16 +102,16 @@ public enum JAXBAdapterRegistries {
 		return toRaw.isPresent() ? toRaw : toElement;
 	}
 
-	public static final class Object
+	public static final class Objects
 			extends AbstractClassBasedDuplexFunctionRegistry {
-		private static final Supplier<Object> INSTANCE = Suppliers.memoize(Object::new);
+		private static final Supplier<Objects> INSTANCE = Suppliers.memoize(Objects::new);
 		private static final long serialVersionUID = 8313852600800208719L;
 		private static final MapMaker DATA_BUILDER = MapBuilderUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.getInitialCapacityMedium());
 		private final ConcurrentMap<ITuple2<? extends Class<?>, ? extends Class<?>>, IRegistryObjectInternal<? extends IDuplexFunction<?, ?>>> data;
 		private final ConcurrentMap<Class<?>, ITuple2<? extends Class<?>, ? extends Class<?>>> leftData;
 		private final ConcurrentMap<Class<?>, ITuple2<? extends Class<?>, ? extends Class<?>>> rightData;
 
-		private Object() {
+		private Objects() {
 			super(true);
 			this.data = getDataBuilder().makeMap();
 			this.leftData = getDataBuilder().makeMap();
@@ -135,19 +145,19 @@ public enum JAXBAdapterRegistries {
 			return rightData;
 		}
 
-		public static Object getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+		public static Objects getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 	}
 
-	public static final class Element
+	public static final class Elements
 			extends AbstractTuple2Registry<QName, Class<?>, IDuplexFunction<JAXBElement<?>, ?>> {
-		private static final Supplier<Element> INSTANCE = Suppliers.memoize(Element::new);
+		private static final Supplier<Elements> INSTANCE = Suppliers.memoize(Elements::new);
 		private static final long serialVersionUID = -1898139702002928271L;
 		private static final MapMaker DATA_BUILDER = MapBuilderUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.getInitialCapacityMedium());
 		private final ConcurrentMap<ITuple2<? extends QName, ? extends Class<?>>, IRegistryObjectInternal<? extends IDuplexFunction<JAXBElement<?>, ?>>> data;
 		private final ConcurrentMap<QName, ITuple2<? extends QName, ? extends Class<?>>> leftData;
 		private final ConcurrentMap<Class<?>, ITuple2<? extends QName, ? extends Class<?>>> rightData;
 
-		private Element() {
+		private Elements() {
 			super(true);
 			this.data = getDataBuilder().makeMap();
 			this.leftData = getDataBuilder().makeMap();
@@ -158,7 +168,7 @@ public enum JAXBAdapterRegistries {
 			return DATA_BUILDER;
 		}
 
-		public static Element getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+		public static Elements getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
 
 		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 		@Override

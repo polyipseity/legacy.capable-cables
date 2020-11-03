@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ColorUtilities;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import sun.java2d.SunGraphics2D;
@@ -10,11 +11,9 @@ import java.awt.*;
 public enum MinecraftGraphics {
 	;
 
-	private static final Color COLORLESS;
 	private static Graphics2D graphics;
 
 	static {
-		COLORLESS = new Color(0, 0, 0, 0);
 		graphics = initializeGraphics();
 	}
 
@@ -24,10 +23,6 @@ public enum MinecraftGraphics {
 
 	private static Graphics2D getGraphics() {
 		return graphics;
-	}
-
-	private static Color getColorless() {
-		return COLORLESS;
 	}
 
 	public static void draw() {
@@ -44,7 +39,7 @@ public enum MinecraftGraphics {
 	}
 
 	private static Graphics2D initializeGraphics() {
-		Graphics2D graphics = new SunGraphics2D(MinecraftSurfaceData.getInstance(), getColorless(), getColorless(), new Font(null));
+		Graphics2D graphics = new SunGraphics2D(MinecraftSurfaceData.getInstance(), ColorUtilities.getColorless(), ColorUtilities.getColorless(), new Font(null));
 		/* COMMENT
 		The default blend func for Minecraft is in RenderSystem.defaultBlendFunc.
 

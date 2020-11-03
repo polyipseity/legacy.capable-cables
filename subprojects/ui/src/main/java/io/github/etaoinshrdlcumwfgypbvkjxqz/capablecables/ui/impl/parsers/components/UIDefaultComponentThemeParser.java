@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.components;
 
 import com.google.common.collect.Iterables;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.ComponentTheme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Renderer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Theme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Using;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.UIParserCheckedException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.UIParserUncheckedException;
@@ -15,7 +15,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.theming.UILamb
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 
 public class UIDefaultComponentThemeParser
-		extends UIAbstractDefaultComponentParser<IUITheme, Theme, UILambdaTheme.Builder, IUIDefaultComponentThemeParserContext> {
+		extends UIAbstractDefaultComponentParser<IUITheme, ComponentTheme, UILambdaTheme.Builder, IUIDefaultComponentThemeParserContext> {
 	public static <T extends UIDefaultComponentThemeParser> T makeParserStandard(T instance) {
 		instance.addObjectHandler(Renderer.class, new UIDefaultDefaultComponentThemeParserRendererHandler());
 		return instance;
@@ -23,12 +23,12 @@ public class UIDefaultComponentThemeParser
 
 	@SuppressWarnings("RedundantThrows")
 	@Override
-	protected Iterable<? extends Using> getRawAliases(Theme resource)
+	protected Iterable<? extends Using> getRawAliases(ComponentTheme resource)
 			throws UIParserCheckedException, UIParserUncheckedException { return resource.getUsing(); }
 
 	@SuppressWarnings({"RedundantThrows", "unchecked"})
 	@Override
-	public UILambdaTheme.Builder parse1(Theme resource)
+	public UILambdaTheme.Builder parse1(ComponentTheme resource)
 			throws Throwable {
 		IUIDefaultComponentThemeParserContext context = new UIImmutableDefaultComponentThemeParserContext(getAliases(), getHandlers(), new UILambdaTheme.Builder());
 

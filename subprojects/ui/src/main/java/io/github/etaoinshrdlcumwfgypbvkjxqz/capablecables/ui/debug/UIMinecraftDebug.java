@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug;
 
 import com.google.common.base.Suppliers;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Theme;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Ui;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.ComponentTheme;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.ComponentUI;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIFacade;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationControl;
@@ -38,6 +38,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.compon
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.components.UIDefaultComponentThemeParser;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ColorUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftClientUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTextComponentUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
@@ -138,13 +139,13 @@ public enum UIMinecraftDebug {
 
 		public static final @NonNls String COMPONENT_TEST_XML_PATH = "components-test.xml";
 		public static final @NonNls String COMPONENT_TEST_THEME_XML_PATH = "components-test-theme.xml";
-		private static final IUIParser<IUIMinecraftViewComponent<?, ?>, Ui> VIEW_PARSER =
+		private static final IUIParser<IUIMinecraftViewComponent<?, ?>, ComponentUI> VIEW_PARSER =
 				UIDefaultMinecraftComponentParser.makeParserMinecraft(
 						UIDefaultComponentParser.makeParserStandard(
 								new UIDefaultMinecraftComponentParser<>(
 										CastUtilities.castUnchecked(IUIMinecraftViewComponent.class) // COMMENT should not matter
 								)));
-		private static final IUIParser<IUITheme, Theme> THEME_PARSER =
+		private static final IUIParser<IUITheme, ComponentTheme> THEME_PARSER =
 				UIDefaultComponentThemeParser.makeParserStandard(
 						new UIDefaultComponentThemeParser()
 				);
@@ -155,7 +156,7 @@ public enum UIMinecraftDebug {
 				InputStream is = AssertionUtilities.assertNonnull(DebugUI.class.getResourceAsStream(getComponentTestXmlPath()));
 				try {
 					try {
-						getViewParser().parse((Ui) UIDefaultComponentSchemaHolder.getContext().createUnmarshaller().unmarshal(is));
+						getViewParser().parse((ComponentUI) UIDefaultComponentSchemaHolder.getContext().createUnmarshaller().unmarshal(is));
 					} catch (UIParserCheckedException | JAXBException e) {
 						throw ThrowableUtilities.propagate(e);
 					}
@@ -168,7 +169,7 @@ public enum UIMinecraftDebug {
 				InputStream is = AssertionUtilities.assertNonnull(DebugUI.class.getResourceAsStream(getComponentTestThemeXmlPath()));
 				try {
 					try {
-						getThemeParser().parse((Theme) UIDefaultComponentSchemaHolder.getContext().createUnmarshaller().unmarshal(is));
+						getThemeParser().parse((ComponentTheme) UIDefaultComponentSchemaHolder.getContext().createUnmarshaller().unmarshal(is));
 					} catch (UIParserCheckedException | JAXBException e) {
 						throw ThrowableUtilities.propagate(e);
 					}
@@ -227,9 +228,9 @@ public enum UIMinecraftDebug {
 			return screen;
 		}
 
-		private static IUIParser<IUIMinecraftViewComponent<?, ?>, Ui> getViewParser() { return VIEW_PARSER; }
+		private static IUIParser<IUIMinecraftViewComponent<?, ?>, ComponentUI> getViewParser() { return VIEW_PARSER; }
 
-		private static IUIParser<IUITheme, Theme> getThemeParser() { return THEME_PARSER; }
+		private static IUIParser<IUITheme, ComponentTheme> getThemeParser() { return THEME_PARSER; }
 
 		@SuppressWarnings("unused")
 		@OnlyIn(Dist.CLIENT)
@@ -330,7 +331,7 @@ public enum UIMinecraftDebug {
 				extends UIDefaultMinecraftViewModel<Model> {
 			private final IBindingField<Integer> anchoredWindowBorderColor = new ImmutableBindingField<>(
 					ImmutableNamespacePrefixedString.of(IHasBindingKey.StaticHolder.getDefaultNamespace(), "anchoredWindowBorderColor"),
-					new MemoryObservableField<>(Integer.class, null));
+					new MemoryObservableField<>(Integer.class, ColorUtilities.getColorless().getRGB()));
 			private final IBindingMethodDestination<UIButtonComponent.IUIEventActivate> buttonOnActivate = new ImmutableBindingMethodDestination<>(
 					UIButtonComponent.IUIEventActivate.class,
 					ImmutableNamespacePrefixedString.of(IHasBindingKey.StaticHolder.getDefaultNamespace(), "buttonOnActivate"),

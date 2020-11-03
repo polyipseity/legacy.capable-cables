@@ -26,26 +26,31 @@ public enum UIDefaultComponentSchemaHolder {
 	@NonNls
 	public static final String CONTEXT_PATH = UIConstants.Local.XJC_MAIN_UI_CONTEXT_PATH;
 	@NonNls
-	public static final String SCHEMA_NAMESPACE_URI = "https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components";
+	public static final String SCHEMA_NAMESPACE_URI = "https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui";
 	private static final Schema SCHEMA;
 	private static final JAXBContext CONTEXT;
 
 	static {
-		InputStream res = AssertionUtilities.assertNonnull(UIDefaultComponentSchemaHolder.class.getResourceAsStream(UISchemas.getSchemaLocation(getSchemaNamespaceURI())));
-		try {
-			SCHEMA = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new StreamSource(res));
-		} catch (SAXException e) {
-			throw ThrowableUtilities.propagate(e);
-		} finally {
-			ThrowableUtilities.runQuietly(res::close, IOException.class, UIConfiguration.getInstance().getThrowableHandler());
+		{
+			InputStream res = AssertionUtilities.assertNonnull(UIDefaultComponentSchemaHolder.class.getResourceAsStream(UISchemas.getSchemaLocation(getSchemaNamespaceURI())));
+			try {
+				SCHEMA = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI).newSchema(new StreamSource(res));
+			} catch (SAXException e) {
+				throw ThrowableUtilities.propagate(e);
+			} finally {
+				ThrowableUtilities.runQuietly(res::close, IOException.class, UIConfiguration.getInstance().getThrowableHandler());
+			}
 		}
-		try {
+
+		{
 			JAXBContextRegisterBusEvent registerEvent = new JAXBContextRegisterBusEvent();
 			registerEvent.addClassesToBeBound(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().getClass());
 			UIEventBusEntryPoint.getEventBus().onNext(registerEvent);
-			CONTEXT = JAXBContext.newInstance(registerEvent.getClassesToBeBoundView().toArray(new Class<?>[0]));
-		} catch (JAXBException e) {
-			throw ThrowableUtilities.propagate(e);
+			try {
+				CONTEXT = JAXBContext.newInstance(registerEvent.getClassesToBeBoundView().toArray(new Class<?>[0]));
+			} catch (JAXBException e) {
+				throw ThrowableUtilities.propagate(e);
+			}
 		}
 	}
 
