@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
+           version="1.0.0"
+           xml:lang="EN">
+	<!-- SECTION includes -->
+
+	<xs:include schemaLocation="ui-values.xsd"/>
+	<xs:include schemaLocation="ui-components.xsd"/>
+</xs:schema>

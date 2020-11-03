@@ -3,57 +3,8 @@
           xmlns:ci="http://jaxb.dev.java.net/plugin/code-injector"
           xmlns="http://java.sun.com/xml/ns/jaxb"
           version="1.0">
-	<bindings schemaLocation="ui-components.xsd">
-		<bindings node="/xs:schema">
-			<!-- COMMENT SideType -->
-			<bindings node="xs:simpleType[@name='sideType']">
-				<ci:code>
-				<![CDATA[
-						@javax.annotation.Nonnull
-						@jakarta.xml.bind.annotation.XmlTransient
-						private final io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.SideType thisObj = this;
-
-						@javax.annotation.Nonnull
-						public io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide toJava() {
-							return io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide.valueOf(thisObj.name());
-						}
-
-						@javax.annotation.Nonnull
-						public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.SideType fromJava(@javax.annotation.Nonnull io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide object) {
-							return io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.SideType.valueOf(object.name());
-						}
-					]]>
-			</ci:code>
-			</bindings>
-		</bindings>
-	</bindings>
 	<bindings schemaLocation="ui-values.xsd">
 		<bindings node="/xs:schema">
-			<!-- COMMENT Color -->
-			<bindings node="xs:element[@name='color']/xs:complexType">
-				<ci:code>
-				<![CDATA[
-						@javax.annotation.Nonnull
-						@jakarta.xml.bind.annotation.XmlTransient
-						private final io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color thisObj = this;
-
-						@javax.annotation.Nonnull
-						public java.awt.Color toJava() {
-							return new java.awt.Color(thisObj.getRed(), thisObj.getGreen(), thisObj.getBlue(), thisObj.getAlpha());
-						}
-
-						@javax.annotation.Nonnull
-						public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color fromJava(@javax.annotation.Nonnull java.awt.Color object) {
-							@javax.annotation.Nonnull io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color result = new io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Color();
-							result.setRed((short) object.getRed());
-							result.setGreen((short) object.getGreen());
-							result.setBlue((short) object.getBlue());
-							result.setAlpha((short) object.getAlpha());
-							return result;
-						}
-					]]>
-			</ci:code>
-			</bindings>
 			<!-- COMMENT AnyType -->
 			<bindings node="xs:complexType[@name='anyType']">
 				<ci:code>

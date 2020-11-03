@@ -24,7 +24,7 @@ File xjcMainUIGeneratedDir = file "${getGeneratedDirectory.call 'main'}${separat
 CharSequence xjcMainUIContextPath = "${jaxbPackagePrefix}.ui"
 sourceSets.main.java.srcDir xjcMainUIGeneratedDir
 def xjcMainUI = createJaxbXJCTask.call('xjcMainUI',
-		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/ui-*.xsd' }.files },
+		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/ui*.xsd' }.files },
 		xjcMainUIGeneratedDir,
 		['-extension',
 		 '-p', xjcMainUIContextPath,
@@ -40,7 +40,7 @@ def xjcMainUI = createJaxbXJCTask.call('xjcMainUI',
 		 // COMMENT -Xpropertyaccessors broken
 		 '-Xnullsafegetters'
 		],
-		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/ui.xjb' }.files })
+		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/ui*.xjb' }.files })
 compileJava.configure { dependsOn xjcMainUI }
 
 makeSourcesTasks.call { Task it ->

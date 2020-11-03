@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:val="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/values"
-           targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/values"
-           version="2.0.0"
+           xmlns:ui="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
+           targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
+           version="3.0.0"
            xml:lang="EN">
 	<!-- TODO change some global elements to local elements, JAXB seems to dislike local elements -->
 
@@ -26,15 +26,15 @@
 	<!-- SECTION structures -->
 
 	<!-- COMMENT ITuple2 -->
-	<xs:element name="tuple2" type="val:tuple2Type" nillable="true"/>
+	<xs:element name="tuple2" type="ui:tuple2Type"/>
 
 	<!-- SECTION objects -->
 
 	<!-- COMMENT String -->
-	<xs:element name="string" type="xs:string" nillable="true"/>
+	<xs:element name="string" type="xs:string"/>
 
 	<!-- COMMENT Color -->
-	<xs:element name="color" nillable="true">
+	<xs:element name="color">
 		<xs:complexType>
 			<xs:attribute name="red" type="xs:unsignedByte" default="00"/>
 			<xs:attribute name="green" type="xs:unsignedByte" default="00"/>
@@ -43,22 +43,87 @@
 		</xs:complexType>
 	</xs:element>
 
+	<!-- COMMENT AttributedCharacterIterator.Attribute -->
+	<xs:element name="textAttribute" type="xs:string"/>
+
+	<!-- COMMENT IAttributedText -->
+	<xs:element name="attributedText">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ui:map">
+					<!-- COMMENT
+					key type: ui:textAttribute
+					value type: xs:any
+					-->
+				</xs:element>
+				<xs:choice maxOccurs="unbounded">
+					<xs:element ref="ui:string"/>
+					<xs:element ref="ui:attributedText"/>
+				</xs:choice>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- COMMENT FontRenderContext -->
+	<xs:element name="fontRenderContext">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ui:affineTransform" minOccurs="0"/>
+				<xs:element ref="ui:textAntiAliasRenderingHint"/>
+				<xs:element ref="ui:fractionalMetricsRenderingHint"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- COMMENT ITextLayout -->
+	<xs:element name="textLayout">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ui:fontRenderContext"/>
+				<xs:element ref="ui:attributedText"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- COMMENT AffineTransform -->
+	<xs:element name="affineTransform">
+		<xs:complexType>
+			<xs:attribute name="translateX" type="xs:double" default="0"/>
+			<xs:attribute name="translateY" type="xs:double" default="0"/>
+			<xs:attribute name="scaleX" type="xs:double" default="1"/>
+			<xs:attribute name="scaleY" type="xs:double" default="1"/>
+			<xs:attribute name="shearX" type="xs:double" default="0"/>
+			<xs:attribute name="shearY" type="xs:double" default="0"/>
+		</xs:complexType>
+	</xs:element>
+
 	<!-- SECTION collections -->
 
 	<!-- COMMENT Set -->
-	<xs:element name="set" type="val:collectionType" nillable="true"/>
+	<xs:element name="set" type="ui:collectionType"/>
 
 	<!-- COMMENT List -->
-	<xs:element name="list" type="val:collectionType" nillable="true"/>
+	<xs:element name="list" type="ui:collectionType"/>
 
 	<!-- COMMENT SetMulti-map -->
-	<xs:element name="relations-set" type="val:relationsType" nillable="true"/>
+	<xs:element name="relationsSet" type="ui:relationsType"/>
 
 	<!-- COMMENT ListMulti-map -->
-	<xs:element name="relations-list" type="val:relationsType" nillable="true"/>
+	<xs:element name="relationsList" type="ui:relationsType"/>
 
 	<!-- COMMENT Map -->
-	<xs:element name="map" type="val:relationsType" nillable="true"/>
+	<xs:element name="map" type="ui:relationsType"/>
+
+	<!-- SECTION enums -->
+
+	<!-- COMMENT EnumUISide -->
+	<xs:element name="uiSide" type="ui:uiSideType"/>
+
+	<!-- COMMENT ITextAntiAliasRenderingHintWrapper -->
+	<xs:element name="textAntiAliasRenderingHint" type="ui:textAntiAliasRenderingHintType"/>
+
+	<!-- COMMENT IFractionalMetricsRenderingHintWrapper -->
+	<xs:element name="fractionalMetricsRenderingHint" type="ui:fractionalMetricsRenderingHintType"/>
 
 	<!-- SECTION types -->
 
@@ -68,7 +133,7 @@
 			<xs:any/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:element name="any" type="val:anyType"/>
+	<xs:element name="any" type="ui:anyType"/>
 
 	<!-- COMMENT collection type -->
 	<xs:complexType name="collectionType">
@@ -80,15 +145,50 @@
 	<!-- COMMENT relations type -->
 	<xs:complexType name="relationsType">
 		<xs:sequence>
-			<xs:element ref="val:entry" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="ui:entry" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:element name="entry" type="val:tuple2Type"/>
+	<xs:element name="entry" type="ui:tuple2Type"/>
 
 	<!-- COMMENT tuple 2 type -->
 	<xs:complexType name="tuple2Type">
 		<xs:sequence>
-			<xs:element ref="val:any" minOccurs="2" maxOccurs="2"/>
+			<xs:element ref="ui:any" minOccurs="2" maxOccurs="2"/>
 		</xs:sequence>
 	</xs:complexType>
+
+	<!-- COMMENT EnumUISide type -->
+	<xs:simpleType name="uiSideType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="UP"/>
+			<xs:enumeration value="DOWN"/>
+			<xs:enumeration value="LEFT"/>
+			<xs:enumeration value="RIGHT"/>
+			<xs:enumeration value="HORIZONTAL"/>
+			<xs:enumeration value="VERTICAL"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- COMMENT ITextAntiAliasRenderingHintWrapper type -->
+	<xs:simpleType name="textAntiAliasRenderingHintType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="DEFAULT"/>
+			<xs:enumeration value="ON"/>
+			<xs:enumeration value="OFF"/>
+			<xs:enumeration value="GASP"/>
+			<xs:enumeration value="LCD_HRGB"/>
+			<xs:enumeration value="LCD_HBGR"/>
+			<xs:enumeration value="LCD_VRGB"/>
+			<xs:enumeration value="LCD_VBGR"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- COMMENT IFractionalMetricsRenderingHintWrapper type -->
+	<xs:simpleType name="fractionalMetricsRenderingHintType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="DEFAULT"/>
+			<xs:enumeration value="ON"/>
+			<xs:enumeration value="OFF"/>
+		</xs:restriction>
+	</xs:simpleType>
 </xs:schema>

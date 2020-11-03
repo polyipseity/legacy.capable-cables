@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<ui xmlns="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
-    xmlns:val="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/values"
-    xml:lang="EN">
+<componentUI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
+             xsi:schemaLocation="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui ../config/ui.xsd"
+             xml:lang="EN">
 	<!-- SECTION using -->
 
 	<!-- COMMENT shapes -->
@@ -28,7 +29,7 @@
 	<!-- SECTION view -->
 	<view class="view.minecraft">
 		<extension class="extension.minecraft.background.default">
-			<renderer-container name="ViewBackgroundRenderer"/>
+			<rendererContainer name="ViewBackgroundRenderer"/>
 		</extension>
 	</view>
 
@@ -36,69 +37,69 @@
 	<component class="component.manager" name="Root">
 		<shape class="shape.rectangle"/>
 
-		<renderer-container name="RootRenderer"/>
+		<rendererContainer name="RootRenderer"/>
 
 		<component class="component.window" name="Window1">
 			<shape class="shape.rectangle" x="10" y="10" width="100" height="100"/>
 			<anchor target="WindowAnchored" originSide="LEFT" targetSide="RIGHT" borderThickness="5"/>
 
-			<renderer-container name="Window1Renderer"/>
+			<rendererContainer name="Window1Renderer"/>
 
 			<property key="default:property.window.controls.side">
-				<side>DOWN</side>
+				<uiSide>DOWN</uiSide>
 			</property>
 
 			<extension class="extension.user_relocatable">
 				<property key="default:property.teleporting.activation.mouse">
-					<val:set>
-						<val:int>1</val:int><!-- COMMENT right -->
-						<val:int>2</val:int><!-- COMMENT middle -->
-					</val:set>
+					<set>
+						<int>1</int><!-- COMMENT right -->
+						<int>2</int><!-- COMMENT middle -->
+					</set>
 				</property>
 				<property key="default:property.teleporting.relocate_borders">
-					<val:map>
-						<val:entry>
-							<val:any>
-								<side>RIGHT</side>
-							</val:any>
-							<val:any>
-								<val:double>20</val:double>
-							</val:any>
-						</val:entry>
-						<val:entry>
-							<val:any>
-								<side>DOWN</side>
-							</val:any>
-							<val:any>
-								<val:double>50</val:double>
-							</val:any>
-						</val:entry>
-					</val:map>
+					<map>
+						<entry>
+							<any>
+								<uiSide>RIGHT</uiSide>
+							</any>
+							<any>
+								<double>20</double>
+							</any>
+						</entry>
+						<entry>
+							<any>
+								<uiSide>DOWN</uiSide>
+							</any>
+							<any>
+								<double>50</double>
+							</any>
+						</entry>
+					</map>
 				</property>
-				<renderer-container name="Window1ExtensionRelocatableRenderer"/>
+				<rendererContainer name="Window1ExtensionRelocatableRenderer"/>
 			</extension>
 			<extension class="extension.user_resizable">
 				<property key="default:property.teleporting.resize_borders">
-					<val:map>
-						<val:entry>
-							<val:any>
-								<side>RIGHT</side>
-							</val:any>
-							<val:any>
-								<val:double>20</val:double>
-							</val:any>
-						</val:entry>
-						<val:entry>
-							<val:any>
-								<side>DOWN</side>
-							</val:any>
-							<val:any>
-								<val:double>50</val:double>
-							</val:any>
-						</val:entry>
-					</val:map>
+					<map>
+						<entry>
+							<any>
+								<uiSide>RIGHT</uiSide>
+							</any>
+							<any>
+								<double>20</double>
+							</any>
+						</entry>
+						<entry>
+							<any>
+								<uiSide>DOWN</uiSide>
+							</any>
+							<any>
+								<double>50</double>
+							</any>
+						</entry>
+					</map>
 				</property>
-				<renderer-container name="Window1ExtensionResizableRenderer"/>
+				<rendererContainer name="Window1ExtensionResizableRenderer"/>
 			</extension>
 		</component>
 
@@ -107,28 +108,29 @@
 				<constraint minX="20"/>
 			</shape>
 
-			<renderer-container name="WindowAnchoredRenderer"/>
+			<rendererContainer name="WindowAnchoredRenderer"/>
 
 			<extension class="extension.user_relocatable">
-				<renderer-container name="WindowAnchoredExtensionRelocatableRenderer"/>
+				<rendererContainer name="WindowAnchoredExtensionRelocatableRenderer"/>
 			</extension>
 			<extension class="extension.user_resizable">
-				<renderer-container name="WindowAnchoredExtensionResizableRenderer"/>
+				<rendererContainer name="WindowAnchoredExtensionResizableRenderer"/>
 			</extension>
 
 			<component class="component.button" name="Button1">
 				<shape class="shape.ellipse" width="100" height="100">
-					<affineTransformDefiner>
-						<method name="rotate">1,1</method>
-						<method name="translate" delimiter=" ">10 10</method>
-					</affineTransformDefiner>
+					<affineTransform scaleX="0.7071067811865475" scaleY="0.7071067811865475"
+					                 shearX="-0.7071067811865475" shearY="0.7071067811865475"/><!-- CODE
+					rotate(1D, 1D);
+					translate(10D, 10D);
+					-->
 				</shape>
 
-				<renderer-container name="Button1Renderer"/>
+				<rendererContainer name="Button1Renderer"/>
 
 				<property key="default:method.button.activate" bindingKey="default:buttonOnActivate"/>
 				<property key="default:method.button.activated" bindingKey="default:buttonOnActivated"/>
 			</component>
 		</component>
 	</component>
-</ui>
+</componentUI>

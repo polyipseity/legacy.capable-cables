@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:ui="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
-           targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui/components"
-           version="2.5.0"
+           xmlns:ui="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
+           targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
+           version="3.0.0"
            xml:lang="EN">
-	<!-- SECTION ================================================== components ================================================== -->
+	<!-- SECTION includes -->
 
-	<!-- COMMENT ui -->
-	<xs:element name="ui">
+	<xs:include schemaLocation="ui-values.xsd"/>
+
+	<!-- SECTION ================================================== UI ================================================== -->
+
+	<!-- COMMENT component UI -->
+	<xs:element name="componentUI">
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="ui:using" minOccurs="0" maxOccurs="unbounded"/>
@@ -17,25 +21,25 @@
 			<xs:anyAttribute namespace="##other" processContents="lax"/>
 		</xs:complexType>
 		<!-- COMMENT component name -->
-		<xs:key name="uiComponentName">
+		<xs:key name="componentUIComponentName">
 			<xs:selector xpath=".//ui:component"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
-		<xs:keyref name="uiComponentIDRef" refer="ui:uiComponentName">
+		<xs:keyref name="componentUIComponentIDRef" refer="ui:componentUIComponentName">
 			<xs:selector xpath=".//ui:anchor"/>
 			<xs:field xpath="@target"/>
 		</xs:keyref>
 		<!-- COMMENT renderer container name -->
-		<xs:key name="uiRendererContainerName">
+		<xs:key name="componentUIRendererContainerName">
 			<xs:selector xpath=".//ui:renderer-container"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<!-- COMMENT using id -->
-		<xs:key name="uiUsingID">
+		<xs:key name="componentUIUsingID">
 			<xs:selector xpath="ui:using"/>
 			<xs:field xpath="@alias"/>
 		</xs:key>
-		<xs:keyref name="uiUsingIDRef" refer="ui:uiUsingID">
+		<xs:keyref name="componentUIUsingIDRef" refer="ui:componentUIUsingID">
 			<xs:selector xpath=".//ui:*"/><!-- TODO no idea why './/ui:*' does not work -->
 			<xs:field xpath="@class"/>
 		</xs:keyref>
@@ -57,7 +61,7 @@
 	<xs:element name="shape">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element ref="ui:affineTransformDefiner" minOccurs="0"/>
+				<xs:element ref="ui:affineTransform" minOccurs="0"/>
 				<xs:element ref="ui:constraint" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:group ref="ui:propertyContainerGroup"/>
 			</xs:sequence>
@@ -70,7 +74,7 @@
 	</xs:element>
 
 	<!-- COMMENT renderer container -->
-	<xs:element name="renderer-container">
+	<xs:element name="rendererContainer">
 		<xs:complexType>
 			<xs:attribute name="name" type="xs:string" use="required"/>
 		</xs:complexType>
@@ -81,7 +85,7 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:group ref="ui:propertyContainerGroup"/>
-				<xs:element ref="ui:renderer-container"/>
+				<xs:element ref="ui:rendererContainer"/>
 				<xs:element ref="ui:anyContainer" minOccurs="0"/>
 			</xs:sequence>
 			<xs:attributeGroup ref="ui:classBasedAttributeGroup"/>
@@ -106,7 +110,7 @@
 			<xs:sequence>
 				<xs:element ref="ui:shape"/>
 				<xs:element ref="ui:anchor" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element ref="ui:renderer-container"/>
+				<xs:element ref="ui:rendererContainer"/>
 				<xs:group ref="ui:propertyContainerGroup"/>
 				<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
@@ -188,18 +192,6 @@
 		</xs:complexType>
 	</xs:element>
 
-	<!-- COMMENT method -->
-	<xs:element name="method">
-		<xs:complexType>
-			<xs:simpleContent>
-				<xs:extension base="xs:string">
-					<xs:attribute name="name" type="xs:string" use="required"/>
-					<xs:attribute name="delimiter" type="xs:string" default=","/>
-				</xs:extension>
-			</xs:simpleContent>
-		</xs:complexType>
-	</xs:element>
-
 	<!-- COMMENT IShapeConstraint -->
 	<xs:element name="constraint">
 		<xs:complexType>
@@ -218,42 +210,9 @@
 	<xs:element name="anchor">
 		<xs:complexType>
 			<xs:attribute name="target" type="xs:string" use="required"/>
-			<xs:attribute name="originSide" type="ui:sideType" use="required"/>
-			<xs:attribute name="targetSide" type="ui:sideType" use="required"/>
+			<xs:attribute name="originSide" type="ui:uiSideType" use="required"/>
+			<xs:attribute name="targetSide" type="ui:uiSideType" use="required"/>
 			<xs:attribute name="borderThickness" type="xs:double" default="0"/>
-		</xs:complexType>
-	</xs:element>
-
-	<!-- COMMENT EnumUISide -->
-	<xs:simpleType name="sideType">
-		<xs:restriction base="xs:NMTOKEN">
-			<xs:enumeration value="UP"/>
-			<xs:enumeration value="DOWN"/>
-			<xs:enumeration value="LEFT"/>
-			<xs:enumeration value="RIGHT"/>
-			<xs:enumeration value="HORIZONTAL"/>
-			<xs:enumeration value="VERTICAL"/>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<!-- COMMENT AffineTransform -->
-	<xs:element name="affineTransformDefiner">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="ui:affineTransform" minOccurs="0"/>
-				<xs:element ref="ui:method" minOccurs="0" maxOccurs="unbounded"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-
-	<xs:element name="affineTransform">
-		<xs:complexType>
-			<xs:attribute name="translateX" type="xs:double" default="0"/>
-			<xs:attribute name="translateY" type="xs:double" default="0"/>
-			<xs:attribute name="scaleX" type="xs:double" default="1"/>
-			<xs:attribute name="scaleY" type="xs:double" default="1"/>
-			<xs:attribute name="shearX" type="xs:double" default="0"/>
-			<xs:attribute name="shearY" type="xs:double" default="0"/>
 		</xs:complexType>
 	</xs:element>
 
@@ -277,7 +236,7 @@
 
 	<!-- SECTION ================================================== theme ================================================== -->
 
-	<xs:element name="theme">
+	<xs:element name="componentTheme">
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="ui:using" minOccurs="0" maxOccurs="unbounded"/>
@@ -286,16 +245,16 @@
 			<xs:anyAttribute namespace="##other" processContents="lax"/>
 		</xs:complexType>
 		<!-- COMMENT renderer id -->
-		<xs:key name="themeRendererID">
+		<xs:key name="componentThemeRendererID">
 			<xs:selector xpath=".//ui:renderer"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
 		<!-- COMMENT using id -->
-		<xs:key name="themeUsingID">
+		<xs:key name="componentThemeUsingID">
 			<xs:selector xpath="ui:using"/>
 			<xs:field xpath="@alias"/>
 		</xs:key>
-		<xs:keyref name="themeUsingIDRef" refer="ui:themeUsingID">
+		<xs:keyref name="componentThemeUsingIDRef" refer="ui:componentThemeUsingID">
 			<xs:selector xpath=".//ui:*"/><!-- TODO no idea why './/ui:*' does not work -->
 			<xs:field xpath="@class"/>
 		</xs:keyref>
@@ -311,8 +270,4 @@
 			<xs:attributeGroup ref="ui:classBasedOptionalAttributeGroup"/>
 		</xs:complexType>
 	</xs:element>
-
-	<!-- SECTION ================================================== values ================================================== -->
-
-	<xs:element name="side" type="ui:sideType"/>
 </xs:schema>
