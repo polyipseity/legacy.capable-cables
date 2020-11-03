@@ -89,9 +89,9 @@ public class UIDefaultComponent
 
 		this.shapeDescriptor = new ProviderShapeDescriptor<>(this, arguments.getShapeDescriptor());
 
-		this.visible = IUIPropertyMappingValue.createBindingField(Boolean.class, false,
+		this.visible = IUIPropertyMappingValue.createBindingField(Boolean.class, true,
 				this.mappings.get(getPropertyVisibleLocation()));
-		this.active = IUIPropertyMappingValue.createBindingField(Boolean.class, false,
+		this.active = IUIPropertyMappingValue.createBindingField(Boolean.class, true,
 				this.mappings.get(getPropertyActiveLocation()));
 
 		IExtensionContainer.addExtensionChecked(this, new UIDefaultCacheExtension());
