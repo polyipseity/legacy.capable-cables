@@ -10,7 +10,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IT
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.DefaultDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.NoSuchBindingTransformerException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -61,7 +60,7 @@ public class FieldBindings
 										)
 								));
 							}));
-					DisposableObserver<? extends IValue<?>> d = createSynchronizationObserver(f, getFields().keySet(), getTransformers(), getIsSource());
+					DisposableObserver<?> d = createSynchronizationObserver(f, getFields().keySet(), getTransformers(), getIsSource());
 					getFields().put(f, d);
 					f.getField().getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
 					return true;
@@ -71,17 +70,16 @@ public class FieldBindings
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	public Map<IBindingField<?>, Disposable> getFields() { return fields; }
 
-	public static <T> DisposableObserver<IValue<T>> createSynchronizationObserver(IBindingField<T> from,
-	                                                                              Iterable<? extends IBindingField<?>> to,
-	                                                                              Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>> transformers,
-	                                                                              AtomicBoolean isSource) {
-		return new LoggingDisposableObserver<>(new DefaultDisposableObserver<IValue<T>>() {
+	public static <T> DisposableObserver<T> createSynchronizationObserver(IBindingField<T> from,
+	                                                                      Iterable<? extends IBindingField<?>> to,
+	                                                                      Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>> transformers,
+	                                                                      AtomicBoolean isSource) {
+		return new LoggingDisposableObserver<>(new DefaultDisposableObserver<T>() {
 			@SuppressWarnings("UnstableApiUsage")
 			@Override
-			public void onNext(@Nonnull IValue<T> t) {
+			public void onNext(@Nonnull T t) {
 				if (isSource.getAndSet(false)) {
 					try {
-						T value = t.getValue().orElseThrow(IllegalArgumentException::new);
 						Streams.stream(to).unordered()
 								.filter(FunctionUtilities.notPredicate(Predicate.isEqual(from)))
 								.forEach(IThrowingConsumer.executeNow(destination -> {
@@ -90,7 +88,7 @@ public class FieldBindings
 											CastUtilities.castUnchecked( // COMMENT should be of the correct type
 													AssertionUtilities.assertNonnull(
 															transform(transformers,
-																	value,
+																	t,
 																	from.getTypeToken().getRawType(),
 																	destination.getTypeToken().getRawType()
 															)

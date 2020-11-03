@@ -8,6 +8,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class ImmutableUnion<L, R>
@@ -34,14 +35,23 @@ public final class ImmutableUnion<L, R>
 		return of(left, null);
 	}
 
-	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-	@Override
-	public boolean equals(Object o) {
-		return ObjectUtilities.equalsImpl(this, o, CastUtilities.<Class<ITuple2<?, ?>>>castUnchecked(IUnion.class), true, StaticHolder.getObjectVariablesMap().values());
+	public static <L, R> ImmutableUnion<L, R> choice(Object object, Class<L> leftClazz, Class<R> rightClazz)
+			throws IllegalArgumentException {
+		if (leftClazz.isInstance(object))
+			return left(leftClazz.cast(object));
+		else if (rightClazz.isInstance(object))
+			return right(rightClazz.cast(object));
+		throw new IllegalArgumentException();
 	}
 
 	public static <L, R> ImmutableUnion<L, R> right(R right) {
 		return of(null, right);
+	}
+
+	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+	@Override
+	public boolean equals(Object o) {
+		return ObjectUtilities.equalsImpl(this, o, CastUtilities.<Class<ITuple2<?, ?>>>castUnchecked(IUnion.class), true, StaticHolder.getObjectVariablesMap().values());
 	}
 
 	@Override
@@ -80,9 +90,14 @@ public final class ImmutableUnion<L, R>
 	}
 
 	@Override
+	public void accept(Consumer<? super L> leftConsumer, Consumer<R> rightConsumer) {
+		// COMMENT at least one of them is present
+		getLeft().ifPresent(leftConsumer);
+		getRight().ifPresent(rightConsumer);
+	}
+
+	@Override
 	public IUnion<R, L> swap() {
 		return map(ImmutableUnion::right, ImmutableUnion::left);
 	}
-
-
 }
