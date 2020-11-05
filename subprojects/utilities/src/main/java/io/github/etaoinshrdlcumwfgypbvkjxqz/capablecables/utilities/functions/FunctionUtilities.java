@@ -7,6 +7,7 @@ public enum FunctionUtilities {
 	;
 
 	private static final Consumer<?> EMPTY_CONSUMER = t -> {};
+	private static final Runnable EMPTY_RUNNABLE = () -> {};
 	private static final Predicate<?> ALWAYS_FALSE_PREDICATE = t -> false;
 	private static final Predicate<?> ALWAYS_TRUE_PREDICATE = t -> true;
 	private static final BiPredicate<?, ?> ALWAYS_FALSE_BI_PREDICATE = (t, u) -> false;
@@ -15,6 +16,10 @@ public enum FunctionUtilities {
 
 	@SuppressWarnings("unchecked") // COMMENT always safe as it accepts any 'Object'
 	public static <T> Consumer<T> getEmptyConsumer() { return (Consumer<T>) EMPTY_CONSUMER; }
+
+	public static Runnable getEmptyRunnable() {
+		return EMPTY_RUNNABLE;
+	}
 
 	public static <T> Predicate<T> notPredicate(Predicate<T> function) { return function.negate(); }
 
