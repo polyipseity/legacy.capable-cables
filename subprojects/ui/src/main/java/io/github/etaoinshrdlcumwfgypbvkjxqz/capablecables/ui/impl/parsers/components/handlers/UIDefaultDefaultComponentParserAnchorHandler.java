@@ -6,8 +6,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUI
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.JAXBAdapterRegistries;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBAdapterRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIJAXBUtilities.ObjectFactories;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.LegacyJAXBAdapterRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.components.contexts.IUIDefaultComponentParserContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interactions.DefaultShapeAnchor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
@@ -28,10 +29,10 @@ public class UIDefaultDefaultComponentParserAnchorHandler
 									ImmutableList.of(new DefaultShapeAnchor(
 											IUIView.getNamedTrackers(view).get(IUIComponent.class, object.getTarget())
 													.orElseThrow(AssertionError::new),
-											(EnumUISide) JAXBAdapterRegistries.adaptFromRaw(
+											(EnumUISide) IJAXBAdapterRegistry.adaptFromJAXB(LegacyJAXBAdapterRegistry.getRegistry(),
 													ObjectFactories.getDefaultUIObjectFactory().createUiSide(object.getOriginSide())
 											),
-											(EnumUISide) JAXBAdapterRegistries.adaptFromRaw(
+											(EnumUISide) IJAXBAdapterRegistry.adaptFromJAXB(LegacyJAXBAdapterRegistry.getRegistry(),
 													ObjectFactories.getDefaultUIObjectFactory().createUiSide(object.getTargetSide())
 											),
 											object.getBorderThickness()))));

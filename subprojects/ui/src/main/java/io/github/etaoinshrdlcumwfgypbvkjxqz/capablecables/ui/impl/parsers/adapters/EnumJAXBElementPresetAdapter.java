@@ -3,123 +3,132 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapt
 import com.google.common.collect.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.*;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IFractionalMetricsRenderingHintWrapper;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ITextAntiAliasRenderingHintWrapper;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.JAXBAdapterRegistries;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IContextIndependentJAXBAdapterFunction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapterContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBElementAdapter;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBAdapterRegistry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.wrappers.IFractionalMetricsRenderingHintWrapper;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.wrappers.ITextAntiAliasRenderingHintWrapper;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIJAXBUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIJAXBUtilities.ObjectFactories;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.wrappers.EnumFractionalMetricsRenderingHintWrapper;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.wrappers.EnumTextAntiAliasRenderingHintWrapper;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.JAXBUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IDuplexFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableTuple2;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 import jakarta.xml.bind.JAXBElement;
 import org.jetbrains.annotations.NonNls;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
 import java.awt.font.TextAttribute;
-import java.io.Serializable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.text.AttributedCharacterIterator;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
-public enum EnumJAXBElementPresetAdapter
-		implements ITuple2<ITuple2<? extends QName, ? extends Class<?>>, IRegistryObject<? extends IDuplexFunction<? extends JAXBElement<?>, ?>>> {
+public enum EnumJAXBElementPresetAdapter {
 	BOOLEAN(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createBoolean), Boolean.class),
-			new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, ObjectFactories.getDefaultUIObjectFactory()::createBoolean)),
+			new DefaultJAXBElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
+					IContextIndependentJAXBAdapterFunction.of(ObjectFactories.getDefaultUIObjectFactory()::createBoolean))),
 	BYTE(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createByte), Byte.class),
-			new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, ObjectFactories.getDefaultUIObjectFactory()::createByte)),
+			new DefaultJAXBElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
+					IContextIndependentJAXBAdapterFunction.of(ObjectFactories.getDefaultUIObjectFactory()::createByte))),
 	SHORT(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createShort), Short.class),
-			new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, ObjectFactories.getDefaultUIObjectFactory()::createShort)),
+			new DefaultJAXBElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
+					IContextIndependentJAXBAdapterFunction.of(ObjectFactories.getDefaultUIObjectFactory()::createShort))),
 	INT(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createInt), Integer.class),
-			new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, ObjectFactories.getDefaultUIObjectFactory()::createInt)),
+			new DefaultJAXBElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
+					IContextIndependentJAXBAdapterFunction.of(ObjectFactories.getDefaultUIObjectFactory()::createInt))),
 	LONG(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createLong), Long.class),
-			new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, ObjectFactories.getDefaultUIObjectFactory()::createLong)),
+			new DefaultJAXBElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
+					IContextIndependentJAXBAdapterFunction.of(ObjectFactories.getDefaultUIObjectFactory()::createLong))),
 	FLOAT(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createFloat), Float.class),
-			new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, ObjectFactories.getDefaultUIObjectFactory()::createFloat)),
+			new DefaultJAXBElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
+					IContextIndependentJAXBAdapterFunction.of(ObjectFactories.getDefaultUIObjectFactory()::createFloat))),
 	DOUBLE(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createDouble), Double.class),
-			new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, ObjectFactories.getDefaultUIObjectFactory()::createDouble)),
+			new DefaultJAXBElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
+					IContextIndependentJAXBAdapterFunction.of(ObjectFactories.getDefaultUIObjectFactory()::createDouble))),
 	STRING(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createString), String.class),
-			new IDuplexFunction.Functional<>(JAXBUtilities::getActualValue, ObjectFactories.getDefaultUIObjectFactory()::createString)),
-	TUPLE_2(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createTuple2), CastUtilities.<Class<ITuple2<?, ?>>>castUnchecked(ITuple2.class)),
-			new IDuplexFunction.Functional<>(
-					(JAXBElement<Tuple2Type> left) -> JAXBUtilities.getActualValueOptional(left)
-							.map(left2 -> {
-								Object rightLeft = left2.getLeft();
-								Object rightRight = left2.getRight();
-								return ImmutableTuple2.of(JAXBAdapterRegistries.adaptFromRaw(rightLeft), JAXBAdapterRegistries.adaptFromRaw(rightRight));
-							})
-							.orElse(null),
-					right ->
-							ObjectFactories.getDefaultUIObjectFactory().createTuple2(Optional.ofNullable(right)
-									.map(right2 -> {
-										Object rightLeft = right.getLeft();
-										Object rightRight = right.getRight();
-										return Tuple2Type.of(JAXBAdapterRegistries.adaptToRaw(rightLeft), JAXBAdapterRegistries.adaptToRaw(rightRight));
-									}).orElse(null))
+			new DefaultJAXBElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
+					IContextIndependentJAXBAdapterFunction.of(ObjectFactories.getDefaultUIObjectFactory()::createString))),
+	TUPLE_2(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createTuple2), CastUtilities.castUnchecked(ITuple2.class)),
+			new DefaultJAXBElementAdapter<Tuple2Type, ITuple2<?, ?>>(
+					(context, left) -> {
+						Tuple2Type left1 = left.getValue();
+						Object rightLeft = left1.getLeft();
+						Object rightRight = left1.getRight();
+						return ImmutableTuple2.of(IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), rightLeft),
+								IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), rightRight));
+					},
+					(context, right) -> {
+						Object rightLeft = right.getLeft();
+						Object rightRight = right.getRight();
+						return ObjectFactories.getDefaultUIObjectFactory().createTuple2(
+								Tuple2Type.of(IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightLeft),
+										IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightRight))
+						);
+					}
 			)),
-	@SuppressWarnings("UnstableApiUsage") SET(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createSet), CastUtilities.<Class<Set<?>>>castUnchecked(Set.class)),
-			new IDuplexFunction.Functional<>(
-					(JAXBElement<CollectionType> left) -> processCollectionType(left.getValue()).collect(ImmutableSet.toImmutableSet()),
-					right -> ObjectFactories.getDefaultUIObjectFactory().createSet(createCollectionType(right.stream()))
+	@SuppressWarnings("UnstableApiUsage") SET(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createSet), CastUtilities.castUnchecked(Set.class)),
+			new DefaultJAXBElementAdapter<CollectionType, Set<?>>(
+					(context, left) -> processCollectionType(context, left.getValue()).collect(ImmutableSet.toImmutableSet()),
+					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createSet(createCollectionType(context, right.stream()))
 			)),
-	@SuppressWarnings("UnstableApiUsage") LIST(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createList), CastUtilities.<Class<List<?>>>castUnchecked(List.class)),
-			new IDuplexFunction.Functional<>(
-					(JAXBElement<CollectionType> left) -> processCollectionType(left.getValue()).collect(ImmutableList.toImmutableList()),
-					right -> ObjectFactories.getDefaultUIObjectFactory().createSet(createCollectionType(right.stream()))
+	@SuppressWarnings("UnstableApiUsage") LIST(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createList), CastUtilities.castUnchecked(List.class)),
+			new DefaultJAXBElementAdapter<CollectionType, List<?>>(
+					(context, left) -> processCollectionType(context, left.getValue()).collect(ImmutableList.toImmutableList()),
+					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createSet(createCollectionType(context, right.stream()))
 			)),
-	@SuppressWarnings("UnstableApiUsage") RELATIONS_SET(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createRelationsSet), CastUtilities.<Class<SetMultimap<?, ?>>>castUnchecked(SetMultimap.class)),
-			new IDuplexFunction.Functional<>(
-					(JAXBElement<RelationsType> left) -> processRelationsType(left.getValue()).collect(ImmutableSetMultimap.toImmutableSetMultimap(Map.Entry::getKey, Map.Entry::getValue)),
-					right -> ObjectFactories.getDefaultUIObjectFactory().createRelationsSet(createRelationsType(right.entries().stream()))
+	@SuppressWarnings("UnstableApiUsage") RELATIONS_SET(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createRelationsSet), CastUtilities.castUnchecked(SetMultimap.class)),
+			new DefaultJAXBElementAdapter<RelationsType, SetMultimap<?, ?>>(
+					(context, left) -> processRelationsType(context, left.getValue()).collect(ImmutableSetMultimap.toImmutableSetMultimap(Map.Entry::getKey, Map.Entry::getValue)),
+					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createRelationsSet(createRelationsType(context, right.entries().stream()))
 			)),
-	@SuppressWarnings("UnstableApiUsage") RELATIONS_LIST(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createRelationsList), CastUtilities.<Class<ListMultimap<?, ?>>>castUnchecked(ListMultimap.class)),
-			new IDuplexFunction.Functional<>(
-					(JAXBElement<RelationsType> left) -> processRelationsType(left.getValue()).collect(ImmutableListMultimap.toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)),
-					right -> ObjectFactories.getDefaultUIObjectFactory().createRelationsSet(createRelationsType(right.entries().stream()))
+	@SuppressWarnings("UnstableApiUsage") RELATIONS_LIST(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createRelationsList), CastUtilities.castUnchecked(ListMultimap.class)),
+			new DefaultJAXBElementAdapter<RelationsType, ListMultimap<?, ?>>(
+					(context, left) -> processRelationsType(context, left.getValue()).collect(ImmutableListMultimap.toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)),
+					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createRelationsSet(createRelationsType(context, right.entries().stream()))
 			)),
-	@SuppressWarnings("UnstableApiUsage") MAP(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createMap), CastUtilities.<Class<Map<?, ?>>>castUnchecked(Map.class)),
-			new IDuplexFunction.Functional<>(
-					(JAXBElement<RelationsType> left) -> processRelationsType(left.getValue()).collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)),
-					right -> ObjectFactories.getDefaultUIObjectFactory().createRelationsSet(createRelationsType(right.entrySet().stream()))
+	@SuppressWarnings("UnstableApiUsage") MAP(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createMap), CastUtilities.castUnchecked(Map.class)),
+			new DefaultJAXBElementAdapter<RelationsType, Map<?, ?>>(
+					(context, left) -> processRelationsType(context, left.getValue()).collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)),
+					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createRelationsSet(createRelationsType(context, right.entrySet().stream()))
 			)),
-	@SuppressWarnings("RedundantLambdaParameterType") UI_SIDE(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createUiSide), EnumUISide.class),
-			new IDuplexFunction.Functional<>(
-					(JAXBElement<UiSideType> left) -> EnumUISide.valueOf(left.getValue().name()),
-					right -> ObjectFactories.getDefaultUIObjectFactory().createUiSide(UiSideType.valueOf(right.name()))
+	@SuppressWarnings("Convert2Diamond") UI_SIDE(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createUiSide), EnumUISide.class),
+			new DefaultJAXBElementAdapter<UiSideType, EnumUISide>(
+					(context, left) -> EnumUISide.valueOf(left.getValue().name()),
+					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createUiSide(UiSideType.valueOf(right.name()))
 			)),
-	TEXT_ANTI_ALIAS_RENDERING_HINT(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createTextAntiAliasRenderingHint), ITextAntiAliasRenderingHintWrapper.class),
-			new IDuplexFunction.Functional<>(
-					(JAXBElement<TextAntiAliasRenderingHintType> left) -> EnumTextAntiAliasRenderingHintWrapper.valueOf(left.getValue().name()),
-					right -> ObjectFactories.getDefaultUIObjectFactory().createTextAntiAliasRenderingHint(
+	@SuppressWarnings("Convert2Diamond") TEXT_ANTI_ALIAS_RENDERING_HINT(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createTextAntiAliasRenderingHint), ITextAntiAliasRenderingHintWrapper.class),
+			new DefaultJAXBElementAdapter<TextAntiAliasRenderingHintType, ITextAntiAliasRenderingHintWrapper>(
+					(context, left) -> EnumTextAntiAliasRenderingHintWrapper.valueOf(left.getValue().name()),
+					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createTextAntiAliasRenderingHint(
 							TextAntiAliasRenderingHintType.valueOf(EnumTextAntiAliasRenderingHintWrapper.valueOfData(right.getData()).name())
 					)
 			)),
-	FRACTIONAL_METRICS_RENDERING_HINT(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createFractionalMetricsRenderingHint), IFractionalMetricsRenderingHintWrapper.class),
-			new IDuplexFunction.Functional<>(
-					(JAXBElement<FractionalMetricsRenderingHintType> left) -> EnumFractionalMetricsRenderingHintWrapper.valueOf(left.getValue().name()),
-					right -> ObjectFactories.getDefaultUIObjectFactory().createFractionalMetricsRenderingHint(
+	@SuppressWarnings("Convert2Diamond") FRACTIONAL_METRICS_RENDERING_HINT(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createFractionalMetricsRenderingHint), IFractionalMetricsRenderingHintWrapper.class),
+			new DefaultJAXBElementAdapter<FractionalMetricsRenderingHintType, IFractionalMetricsRenderingHintWrapper>(
+					(context, left) -> EnumFractionalMetricsRenderingHintWrapper.valueOf(left.getValue().name()),
+					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createFractionalMetricsRenderingHint(
 							FractionalMetricsRenderingHintType.valueOf(EnumFractionalMetricsRenderingHintWrapper.valueOfData(right.getData()).name())
 					)
 			)),
-	@SuppressWarnings("unchecked") TEXT_ATTRIBUTE(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createTextAttribute), AttributedCharacterIterator.Attribute.class),
-			new IDuplexFunction.Functional<>(
-					new Function<JAXBElement<String>, AttributedCharacterIterator.Attribute>() {
+	@SuppressWarnings({"unchecked", "Convert2Diamond"}) TEXT_ATTRIBUTE(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createTextAttribute), AttributedCharacterIterator.Attribute.class),
+			new DefaultJAXBElementAdapter<String, AttributedCharacterIterator.Attribute>(
+					new BiFunction<IJAXBAdapterContext, JAXBElement<String>, AttributedCharacterIterator.Attribute>() {
 						private final @Immutable Map<String, AttributedCharacterIterator.Attribute> stringAttributeMap;
 
 						{
@@ -148,16 +157,15 @@ public enum EnumJAXBElementPresetAdapter
 							return stringAttributeMap;
 						}
 
-						@Nonnull
 						@Override
-						public AttributedCharacterIterator.Attribute apply(JAXBElement<String> left) {
+						public AttributedCharacterIterator.Attribute apply(IJAXBAdapterContext ijaxbAdapterContext, JAXBElement<String> left) {
 							@Nullable AttributedCharacterIterator.Attribute result = getStringAttributeMap().get(left.getValue());
 							if (result == null)
 								throw new IllegalArgumentException();
 							return result;
 						}
 					},
-					new Function<AttributedCharacterIterator.Attribute, JAXBElement<String>>() {
+					new BiFunction<IJAXBAdapterContext, AttributedCharacterIterator.Attribute, JAXBElement<String>>() {
 						private final MethodHandle getNameVirtualMethodHandle;
 
 						{
@@ -172,9 +180,8 @@ public enum EnumJAXBElementPresetAdapter
 							return getNameVirtualMethodHandle;
 						}
 
-						@Nonnull
 						@Override
-						public JAXBElement<String> apply(AttributedCharacterIterator.Attribute right) {
+						public JAXBElement<String> apply(IJAXBAdapterContext ijaxbAdapterContext, AttributedCharacterIterator.Attribute right) {
 							try {
 								return ObjectFactories.getDefaultUIObjectFactory().createTextAttribute((String) getGetNameVirtualMethodHandle().invokeExact(right));
 							} catch (Throwable throwable) {
@@ -185,83 +192,76 @@ public enum EnumJAXBElementPresetAdapter
 			)),
 	;
 
-	private final ITuple2<ITuple2<? extends QName, ? extends Class<?>>, IRegistryObject<? extends IDuplexFunction<? extends JAXBElement<?>, ?>>> delegate;
-
 	@NonNls
 	private static final ImmutableMap<String, Function<EnumJAXBElementPresetAdapter, ?>> OBJECT_VARIABLE_MAP =
 			ImmutableMap.<String, Function<EnumJAXBElementPresetAdapter, ?>>builder()
-					.put("delegate", EnumJAXBElementPresetAdapter::getDelegate)
+					.put("key", EnumJAXBElementPresetAdapter::getKey)
+					.put("value", EnumJAXBElementPresetAdapter::getValue)
 					.build();
+	private final ITuple2<? extends QName, ? extends Class<?>> key;
+	private final IJAXBElementAdapter<?, ?> value;
 
-	@SuppressWarnings("EmptyMethod")
-	public static void initializeClass() {}
-
-	<L, R, V extends IDuplexFunction<JAXBElement<L>, R> & Serializable> EnumJAXBElementPresetAdapter(ITuple2<? extends QName, ? extends Class<R>> key, V value) {
-		IRegistryObject<V> value2 = JAXBAdapterRegistries.Elements.getInstance().registerChecked(key, value);
-		this.delegate = ImmutableTuple2.of(key, value2);
+	<L, R, V extends IJAXBElementAdapter<L, R>> EnumJAXBElementPresetAdapter(ITuple2<? extends QName, ? extends Class<R>> key, V value) {
+		this.key = key;
+		this.value = value;
 	}
 
-	protected static Stream<?> processCollectionType(CollectionType left) {
+	private static Stream<?> processCollectionType(IJAXBAdapterContext context, CollectionType left) {
 		return left.getAny().stream()
-				.map(JAXBAdapterRegistries::adaptFromRaw);
-	}
-
-	@Override
-	public IRegistryObject<? extends IDuplexFunction<? extends JAXBElement<?>, ?>> getRight() {
-		return getDelegate().getRight();
+				.map(leftElement -> IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), leftElement));
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	protected static CollectionType createCollectionType(Stream<?> right) {
+	private static CollectionType createCollectionType(IJAXBAdapterContext context, Stream<?> right) {
 		CollectionType left = ObjectFactories.getDefaultUIObjectFactory().createCollectionType();
 		left.getAny().addAll(right
-				.map(JAXBAdapterRegistries::adaptToRaw)
+				.map(rightElement -> IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightElement))
 				.collect(ImmutableList.toImmutableList())
 		);
 		return left;
 	}
 
-	@Override
-	public Object get(int index) throws IndexOutOfBoundsException {
-		return getDelegate().get(index);
-	}
-
-	protected static Stream<Map.Entry<?, ?>> processRelationsType(RelationsType left) {
+	private static Stream<Map.Entry<?, ?>> processRelationsType(IJAXBAdapterContext context, RelationsType left) {
 		return left.getEntry().stream()
 				.map(leftEntry -> {
 					Object key = leftEntry.getLeft();
 					Object value = leftEntry.getRight();
-					return Maps.immutableEntry(JAXBAdapterRegistries.adaptFromRaw(key), JAXBAdapterRegistries.adaptFromRaw(value));
+					return Maps.immutableEntry(IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), key),
+							IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), value));
 				});
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	protected static RelationsType createRelationsType(Stream<? extends Map.Entry<?, ?>> right) {
+	private static RelationsType createRelationsType(IJAXBAdapterContext context, Stream<? extends Map.Entry<?, ?>> right) {
 		RelationsType left = ObjectFactories.getDefaultUIObjectFactory().createRelationsType();
 		left.getEntry().addAll(right
 				.map(rightEntry -> {
 					Object rightKey = AssertionUtilities.assertNonnull(rightEntry.getKey());
 					Object rightValue = AssertionUtilities.assertNonnull(rightEntry.getValue());
-					return Tuple2Type.of(JAXBAdapterRegistries.adaptToRaw(rightKey), JAXBAdapterRegistries.adaptToRaw(rightValue));
+					return Tuple2Type.of(IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightKey),
+							IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightValue));
 				})
 				.collect(ImmutableList.toImmutableList())
 		);
 		return left;
 	}
 
-	@Override
-	public ITuple2<? extends QName, ? extends Class<?>> getLeft() {
-		return getDelegate().getLeft();
+	public static void registerAll(IJAXBAdapterRegistry registry) {
+		Arrays.stream(values()).unordered()
+				.forEach(adapter -> adapter.register(registry));
 	}
 
-	protected ITuple2<? extends ITuple2<? extends QName, ? extends Class<?>>, ? extends IRegistryObject<? extends IDuplexFunction<? extends JAXBElement<?>, ?>>> getDelegate() {
-		return delegate;
+	@SuppressWarnings("deprecation")
+	public void register(IJAXBAdapterRegistry registry) {
+		registry.getElementRegistry().register(getKey(), getValue()); // COMMENT use deprecated, checked offers no benefits
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public ITuple2<IRegistryObject<? extends IDuplexFunction<? extends JAXBElement<?>, ?>>, ITuple2<? extends QName, ? extends Class<?>>> swap() {
-		return (ITuple2<IRegistryObject<? extends IDuplexFunction<? extends JAXBElement<?>, ?>>, ITuple2<? extends QName, ? extends Class<?>>>) getDelegate().swap(); // COMMENT should not matter
+	public ITuple2<? extends QName, ? extends Class<?>> getKey() {
+		return key;
+	}
+
+	public IJAXBElementAdapter<?, ?> getValue() {
+		return value;
 	}
 
 	@Override

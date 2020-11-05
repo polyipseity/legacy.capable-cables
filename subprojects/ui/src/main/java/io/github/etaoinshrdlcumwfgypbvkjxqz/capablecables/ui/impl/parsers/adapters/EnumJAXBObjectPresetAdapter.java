@@ -3,38 +3,38 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapt
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.*;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IFractionalMetricsRenderingHintWrapper;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ITextAntiAliasRenderingHintWrapper;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.JAXBAdapterRegistries;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBObjectAdapter;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBAdapterRegistry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.wrappers.IFractionalMetricsRenderingHintWrapper;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.wrappers.ITextAntiAliasRenderingHintWrapper;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.text.IAttributedText;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.text.ITextLayout;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIJAXBUtilities.ObjectFactories;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.wrappers.EnumFractionalMetricsRenderingHintWrapper;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.wrappers.EnumTextAntiAliasRenderingHintWrapper;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.text.ImmutableAttributedText;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.text.ImmutableTextLayout;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IDuplexFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.IUnion;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableTuple2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableUnion;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
 import jakarta.xml.bind.JAXBElement;
 import org.jetbrains.annotations.NonNls;
 
-import java.io.Serializable;
 import java.text.AttributedCharacterIterator;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
 @SuppressWarnings("unused")
-public enum EnumJAXBObjectPresetAdapter
-		implements ITuple2<ITuple2<? extends Class<?>, ? extends Class<?>>, IRegistryObject<? extends IDuplexFunction<?, ?>>> {
+public enum EnumJAXBObjectPresetAdapter {
 	COLOR(ImmutableTuple2.of(Color.class, java.awt.Color.class),
-			new IDuplexFunction.Functional<>(
-					left -> new java.awt.Color(left.getRed(), left.getGreen(), left.getBlue(), left.getAlpha()),
-					right -> {
+			new DefaultJAXBObjectAdapter<>(
+					(context, left) -> new java.awt.Color(left.getRed(), left.getGreen(), left.getBlue(), left.getAlpha()),
+					(context, right) -> {
 						Color left = ObjectFactories.getDefaultUIObjectFactory().createColor();
 						left.setRed((short) right.getRed());
 						left.setGreen((short) right.getGreen());
@@ -43,15 +43,15 @@ public enum EnumJAXBObjectPresetAdapter
 						return left;
 					})),
 	AFFINE_TRANSFORM(ImmutableTuple2.of(AffineTransform.class, java.awt.geom.AffineTransform.class),
-			new IDuplexFunction.Functional<>(
-					left -> {
+			new DefaultJAXBObjectAdapter<>(
+					(context, left) -> {
 						return new java.awt.geom.AffineTransform(new double[]{
 								left.getScaleX(), left.getShearY(),
 								left.getShearX(), left.getScaleY(),
 								left.getTranslateX(), left.getTranslateY()
 						});
 					},
-					right -> {
+					(context, right) -> {
 						AffineTransform left = ObjectFactories.getDefaultUIObjectFactory().createAffineTransform();
 						left.setTranslateX(right.getTranslateX());
 						left.setTranslateY(right.getTranslateY());
@@ -63,41 +63,41 @@ public enum EnumJAXBObjectPresetAdapter
 					}
 			)),
 	@SuppressWarnings("UnstableApiUsage") ATTRIBUTED_TEXT(ImmutableTuple2.of(AttributedText.class, IAttributedText.class),
-			new IDuplexFunction.Functional<>(
-					left -> {
+			new DefaultJAXBObjectAdapter<>(
+					(context, left) -> {
 						JAXBElement<RelationsType> leftAttributes = ObjectFactories.getDefaultUIObjectFactory().createMap(left.getMap());
 						List<Object> leftChildren = left.getStringOrAttributedText();
 
 						@SuppressWarnings("unchecked") Map<AttributedCharacterIterator.Attribute, Object> rightAttributes =
-								(Map<AttributedCharacterIterator.Attribute, Object>) JAXBAdapterRegistries.adaptFromRaw(leftAttributes);
+								(Map<AttributedCharacterIterator.Attribute, Object>) IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), leftAttributes);
 						List<IUnion<CharSequence, IAttributedText>> rightChildren = leftChildren.stream()
-								.map(JAXBAdapterRegistries::adaptFromRaw)
+								.map(leftChild -> IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), leftChild))
 								.map(rightChild -> ImmutableUnion.choice(rightChild, CharSequence.class, IAttributedText.class))
 								.collect(ImmutableList.toImmutableList());
 
 						return ImmutableAttributedText.of(rightChildren, rightAttributes);
 					},
-					right -> {
+					(context, right) -> {
 						AttributedText left = ObjectFactories.getDefaultUIObjectFactory().createAttributedText();
 
 						Map<? extends AttributedCharacterIterator.Attribute, ?> rightAttributes = right.getAttributesView();
 						List<? extends IUnion<? extends CharSequence, ? extends IAttributedText>> rightChildren = right.getChildrenView();
 
 						@SuppressWarnings("unchecked") JAXBElement<RelationsType> leftAttributes =
-								(JAXBElement<RelationsType>) JAXBAdapterRegistries.adaptToRaw(rightAttributes);
+								(JAXBElement<RelationsType>) IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightAttributes);
 						List<Object> leftChildren = left.getStringOrAttributedText();
 
 						left.setMap(leftAttributes.getValue());
 						rightChildren.stream()
 								.map(IUnion::get)
-								.map(JAXBAdapterRegistries::adaptToRaw)
+								.map(rightChild -> IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightChild))
 								.forEachOrdered(leftChildren::add);
 						return left;
 					}
 			)),
 	FONT_RENDER_CONTEXT(ImmutableTuple2.of(FontRenderContext.class, java.awt.font.FontRenderContext.class),
-			new IDuplexFunction.Functional<>(
-					left -> {
+			new DefaultJAXBObjectAdapter<>(
+					(context, left) -> {
 						Optional<AffineTransform> leftAffineTransform = left.getAffineTransform();
 						JAXBElement<TextAntiAliasRenderingHintType> leftTextAntiAliasRenderingHint = ObjectFactories.getDefaultUIObjectFactory().createTextAntiAliasRenderingHint(
 								left.getTextAntiAliasRenderingHint()
@@ -107,12 +107,12 @@ public enum EnumJAXBObjectPresetAdapter
 						);
 
 						Optional<java.awt.geom.AffineTransform> rightAffineTransform = leftAffineTransform
-								.map(JAXBAdapterRegistries::adaptFromRaw)
+								.map(leftAffineTransform1 -> IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), leftAffineTransform1))
 								.map(java.awt.geom.AffineTransform.class::cast);
 						ITextAntiAliasRenderingHintWrapper rightTextAntiAliasRenderingHintWrapper = (ITextAntiAliasRenderingHintWrapper)
-								JAXBAdapterRegistries.adaptFromRaw(leftTextAntiAliasRenderingHint);
+								IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), leftTextAntiAliasRenderingHint);
 						IFractionalMetricsRenderingHintWrapper rightFractionalMetricsRenderingHintWrapper = (IFractionalMetricsRenderingHintWrapper)
-								JAXBAdapterRegistries.adaptFromRaw(leftFractionalMetricsRenderingHint);
+								IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), leftFractionalMetricsRenderingHint);
 
 						return new java.awt.font.FontRenderContext(
 								rightAffineTransform.orElse(null),
@@ -120,19 +120,19 @@ public enum EnumJAXBObjectPresetAdapter
 								rightFractionalMetricsRenderingHintWrapper.getData()
 						);
 					},
-					right -> {
+					(context, right) -> {
 						java.awt.geom.AffineTransform rightTransform = right.getTransform();
 						ITextAntiAliasRenderingHintWrapper rightAntiAliasingHint = EnumTextAntiAliasRenderingHintWrapper.valueOfData(right.getAntiAliasingHint());
 						IFractionalMetricsRenderingHintWrapper rightFractionalMetricsHint = EnumFractionalMetricsRenderingHintWrapper.valueOfData(right.getFractionalMetricsHint());
 
 						AffineTransform leftAffineTransform =
-								(AffineTransform) JAXBAdapterRegistries.adaptToRaw(rightTransform);
+								(AffineTransform) IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightTransform);
 						@SuppressWarnings("unchecked")
 						JAXBElement<TextAntiAliasRenderingHintType> leftTextAntiAliasRenderingHint =
-								(JAXBElement<TextAntiAliasRenderingHintType>) JAXBAdapterRegistries.adaptToRaw(rightAntiAliasingHint);
+								(JAXBElement<TextAntiAliasRenderingHintType>) IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightAntiAliasingHint);
 						@SuppressWarnings("unchecked")
 						JAXBElement<FractionalMetricsRenderingHintType> leftFractionalMetricsRenderingHint =
-								(JAXBElement<FractionalMetricsRenderingHintType>) JAXBAdapterRegistries.adaptToRaw(rightFractionalMetricsHint);
+								(JAXBElement<FractionalMetricsRenderingHintType>) IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightFractionalMetricsHint);
 
 						FontRenderContext left = ObjectFactories.getDefaultUIObjectFactory().createFontRenderContext();
 						left.setAffineTransform(leftAffineTransform);
@@ -142,22 +142,22 @@ public enum EnumJAXBObjectPresetAdapter
 					}
 			)),
 	TEXT_LAYOUT(ImmutableTuple2.of(TextLayout.class, ITextLayout.class),
-			new IDuplexFunction.Functional<>(
-					left -> {
+			new DefaultJAXBObjectAdapter<>(
+					(context, left) -> {
 						AttributedText leftAttributedText = left.getAttributedText();
 						FontRenderContext leftFontRenderContext = left.getFontRenderContext();
 
-						IAttributedText rightAttributedText = (IAttributedText) JAXBAdapterRegistries.adaptFromRaw(leftAttributedText);
-						java.awt.font.FontRenderContext rightFontRenderContext = (java.awt.font.FontRenderContext) JAXBAdapterRegistries.adaptFromRaw(leftFontRenderContext);
+						IAttributedText rightAttributedText = (IAttributedText) IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), leftAttributedText);
+						java.awt.font.FontRenderContext rightFontRenderContext = (java.awt.font.FontRenderContext) IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), leftFontRenderContext);
 
 						return ImmutableTextLayout.of(rightAttributedText, rightFontRenderContext);
 					},
-					right -> {
+					(context, right) -> {
 						IAttributedText rightAttributedText = right.getText();
 						java.awt.font.FontRenderContext rightFontRenderContext = right.getFontRenderContext();
 
-						AttributedText leftAttributedText = (AttributedText) JAXBAdapterRegistries.adaptToRaw(rightAttributedText);
-						FontRenderContext leftFontRenderContext = (FontRenderContext) JAXBAdapterRegistries.adaptToRaw(rightFontRenderContext);
+						AttributedText leftAttributedText = (AttributedText) IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightAttributedText);
+						FontRenderContext leftFontRenderContext = (FontRenderContext) IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightFontRenderContext);
 
 						TextLayout left = ObjectFactories.getDefaultUIObjectFactory().createTextLayout();
 						left.setAttributedText(leftAttributedText);
@@ -167,45 +167,28 @@ public enum EnumJAXBObjectPresetAdapter
 			)),
 	;
 
-	private final ITuple2<ITuple2<? extends Class<?>, ? extends Class<?>>, IRegistryObject<? extends IDuplexFunction<?, ?>>> delegate;
-
 	@NonNls
 	private static final ImmutableMap<String, Function<EnumJAXBObjectPresetAdapter, ?>> OBJECT_VARIABLE_MAP =
 			ImmutableMap.<String, Function<EnumJAXBObjectPresetAdapter, ?>>builder()
-					.put("delegate", EnumJAXBObjectPresetAdapter::getDelegate)
+					.put("key", EnumJAXBObjectPresetAdapter::getKey)
+					.put("value", EnumJAXBObjectPresetAdapter::getValue)
 					.build();
+	private final ITuple2<? extends Class<?>, ? extends Class<?>> key;
+	private final IJAXBObjectAdapter<?, ?> value;
 
-	@SuppressWarnings("EmptyMethod")
-	public static void initializeClass() {}
-
-	@Override
-	public ITuple2<? extends Class<?>, ? extends Class<?>> getLeft() {
-		return getDelegate().getLeft();
+	<L, R, V extends IJAXBObjectAdapter<L, R>> EnumJAXBObjectPresetAdapter(ITuple2<? extends Class<L>, ? extends Class<R>> key, V value) {
+		this.key = key;
+		this.value = value;
 	}
 
-	@Override
-	public IRegistryObject<? extends IDuplexFunction<?, ?>> getRight() {
-		return getDelegate().getRight();
+	public static void registerAll(IJAXBAdapterRegistry registry) {
+		Arrays.stream(values()).unordered()
+				.forEach(adapter -> adapter.register(registry));
 	}
 
-	protected ITuple2<? extends ITuple2<? extends Class<?>, ? extends Class<?>>, ? extends IRegistryObject<? extends IDuplexFunction<?, ?>>> getDelegate() {
-		return delegate;
-	}
-
-	<L, R, V extends IDuplexFunction<L, R> & Serializable> EnumJAXBObjectPresetAdapter(ITuple2<? extends Class<L>, ? extends Class<R>> key, V value) {
-		IRegistryObject<V> value2 = JAXBAdapterRegistries.Objects.getInstance().registerChecked(key, value);
-		this.delegate = ImmutableTuple2.of(key, value2);
-	}
-
-	@Override
-	public Object get(int index) throws IndexOutOfBoundsException {
-		return getDelegate().get(index);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public ITuple2<IRegistryObject<? extends IDuplexFunction<?, ?>>, ITuple2<? extends Class<?>, ? extends Class<?>>> swap() {
-		return (ITuple2<IRegistryObject<? extends IDuplexFunction<?, ?>>, ITuple2<? extends Class<?>, ? extends Class<?>>>) getDelegate().swap(); // COMMENT should not matter
+	@SuppressWarnings("deprecation")
+	public void register(IJAXBAdapterRegistry registry) {
+		registry.getObjectRegistry().register(getKey(), getValue()); // COMMENT use deprecated, checked offers no benefits
 	}
 
 	@Override
@@ -214,4 +197,12 @@ public enum EnumJAXBObjectPresetAdapter
 	}
 
 	public static ImmutableMap<String, Function<EnumJAXBObjectPresetAdapter, ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
+
+	public ITuple2<? extends Class<?>, ? extends Class<?>> getKey() {
+		return key;
+	}
+
+	public IJAXBObjectAdapter<?, ?> getValue() {
+		return value;
+	}
 }

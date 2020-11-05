@@ -16,11 +16,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.eve
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.UIParserCheckedException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.UIParserUncheckedException;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.JAXBAdapterRegistries;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBAdapterRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIViewComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptorBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.binding.UIImmutablePropertyMappingValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.LegacyJAXBAdapterRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.components.contexts.IUIAbstractDefaultComponentParserContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.components.contexts.IUIDefaultComponentParserContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.components.contexts.UIImmutableDefaultComponentParserContext;
@@ -102,7 +103,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		return Streams.stream(properties).unordered()
 				.map(p -> Maps.immutableEntry(ImmutableNamespacePrefixedString.of(p.getKey()),
 						new UIImmutablePropertyMappingValue(p.getAny()
-								.map(JAXBAdapterRegistries::adaptFromRaw)
+								.map(any -> IJAXBAdapterRegistry.adaptFromJAXB(LegacyJAXBAdapterRegistry.getRegistry(), any))
 								.orElse(null),
 								p.getBindingKey()
 										.map(ImmutableNamespacePrefixedString::of)
@@ -113,7 +114,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 	@SuppressWarnings("UnstableApiUsage")
 	public static IShapeDescriptorBuilder<?> createShapeDescriptorBuilder(IUIDefaultComponentParserContext context, Shape shape) {
 		AffineTransform transform = shape.getAffineTransform()
-				.map(JAXBAdapterRegistries::adaptFromRaw)
+				.map(transform1 -> IJAXBAdapterRegistry.adaptFromJAXB(LegacyJAXBAdapterRegistry.getRegistry(), transform1))
 				.map(AffineTransform.class::cast)
 				.orElseGet(AffineTransform::new);
 
@@ -126,7 +127,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 				.forEach(p -> {
 					assert !p.getBindingKey().isPresent();
 					sdb.setProperty(p.getKey(), p.getAny()
-							.map(JAXBAdapterRegistries::adaptFromRaw)
+							.map(any -> IJAXBAdapterRegistry.adaptFromJAXB(LegacyJAXBAdapterRegistry.getRegistry(), any))
 							.orElse(null));
 				});
 

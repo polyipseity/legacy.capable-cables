@@ -3,8 +3,6 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui;
 import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.cursors.EnumGLFWCursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.EnumJAXBElementPresetAdapter;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.EnumJAXBObjectPresetAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftClientUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EventBusSubject;
@@ -33,9 +31,6 @@ public final class UIConfiguration
 	@Override
 	protected void configure0(ConfigurationData data) {
 		super.configure0(data);
-		// COMMENT JAXB adapters
-		EnumJAXBElementPresetAdapter.initializeClass();
-		EnumJAXBObjectPresetAdapter.initializeClass();
 		// COMMENT cursors
 		EnumGLFWCursor.initializeClass();
 	}

@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.wrappers;
 
 @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface IFractionalMetricsRenderingHintWrapper {
