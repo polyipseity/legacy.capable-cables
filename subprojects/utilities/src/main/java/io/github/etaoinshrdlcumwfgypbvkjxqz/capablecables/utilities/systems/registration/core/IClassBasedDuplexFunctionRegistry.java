@@ -6,7 +6,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import java.util.Optional;
 
 public interface IClassBasedDuplexFunctionRegistry
-		extends ITuple2Registry<Class<?>, Class<?>, IDuplexFunction<?, ?>> {
+		extends ICheckedTuple2Registry<Class<?>, Class<?>, IDuplexFunction<?, ?>> {
+	long serialVersionUID = -8925960207653959885L;
+
 	<L, R, VL extends IDuplexFunction<L, R>> IRegistryObject<VL> registerChecked(ITuple2<? extends Class<L>, ? extends Class<R>> key, VL value);
 
 	<L, R> Optional<? extends IRegistryObject<? extends IDuplexFunction<L, R>>> getChecked(ITuple2<? extends Class<L>, ? extends Class<R>> key);
@@ -14,20 +16,4 @@ public interface IClassBasedDuplexFunctionRegistry
 	<L> Optional<? extends IRegistryObject<? extends IDuplexFunction<L, ?>>> getWithLeftChecked(Class<L> key);
 
 	<R> Optional<? extends IRegistryObject<? extends IDuplexFunction<?, R>>> getWithRightChecked(Class<R> key);
-
-	@Override
-	@Deprecated
-	Optional<? extends IRegistryObject<? extends IDuplexFunction<?, ?>>> getWithLeft(Class<?> key);
-
-	@Override
-	@Deprecated
-	Optional<? extends IRegistryObject<? extends IDuplexFunction<?, ?>>> getWithRight(Class<?> key);
-
-	@Override
-	@Deprecated
-	<VE extends IDuplexFunction<?, ?>> IRegistryObject<VE> register(ITuple2<? extends Class<?>, ? extends Class<?>> key, VE value);
-
-	@Override
-	@Deprecated
-	Optional<? extends IRegistryObject<? extends IDuplexFunction<?, ?>>> get(ITuple2<? extends Class<?>, ? extends Class<?>> key);
 }
