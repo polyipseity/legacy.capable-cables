@@ -43,17 +43,17 @@ public final class ImmutableMouseButtonClickData
 
 	@Override
 	public int hashCode() {
-		return ObjectUtilities.hashCodeImpl(this, IMouseButtonClickData.StaticHolder.getObjectVariablesMap().values());
+		return ObjectUtilities.hashCodeImpl(this, IMouseButtonClickData.StaticHolder.getObjectVariableMap().values());
 	}
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	public boolean equals(Object obj) {
-		return ObjectUtilities.equalsImpl(this, obj, IMouseButtonClickData.class, true, IMouseButtonClickData.StaticHolder.getObjectVariablesMap().values());
+		return ObjectUtilities.equalsImpl(this, obj, IMouseButtonClickData.class, true, IMouseButtonClickData.StaticHolder.getObjectVariableMap().values());
 	}
 
 	@Override
-	public String toString() { return ObjectUtilities.toStringImpl(this, IMouseButtonClickData.StaticHolder.getObjectVariablesMap()); }
+	public String toString() { return ObjectUtilities.toStringImpl(this, IMouseButtonClickData.StaticHolder.getObjectVariableMap()); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper

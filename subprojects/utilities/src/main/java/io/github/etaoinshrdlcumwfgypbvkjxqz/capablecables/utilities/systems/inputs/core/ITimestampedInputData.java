@@ -14,13 +14,13 @@ public interface ITimestampedInputData {
 		;
 
 		@NonNls
-		private static final ImmutableMap<String, Function<ITimestampedInputData, ?>> OBJECT_VARIABLES_MAP =
+		private static final ImmutableMap<String, Function<ITimestampedInputData, ?>> OBJECT_VARIABLE_MAP =
 				ImmutableMap.<String, Function<ITimestampedInputData, ?>>builder()
 						.put("timestamp", ITimestampedInputData::getTimestamp)
 						.build();
 
-		public static ImmutableMap<String, Function<ITimestampedInputData, ?>> getObjectVariablesMap() {
-			return OBJECT_VARIABLES_MAP;
+		public static ImmutableMap<String, Function<ITimestampedInputData, ?>> getObjectVariableMap() {
+			return OBJECT_VARIABLE_MAP;
 		}
 	}
 }

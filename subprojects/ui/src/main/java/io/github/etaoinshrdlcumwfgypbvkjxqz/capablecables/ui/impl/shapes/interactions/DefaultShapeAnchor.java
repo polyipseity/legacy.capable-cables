@@ -38,7 +38,7 @@ public final class DefaultShapeAnchor implements IShapeAnchor {
 	}
 
 	@Override
-	public String toString() { return ObjectUtilities.toStringImpl(this, StaticHolder.getObjectVariablesMap()); }
+	public String toString() { return ObjectUtilities.toStringImpl(this, StaticHolder.getObjectVariableMap()); }
 
 	@Override
 	public Optional<? extends IShapeDescriptorProvider> getTarget() { return target.getOptional(); }

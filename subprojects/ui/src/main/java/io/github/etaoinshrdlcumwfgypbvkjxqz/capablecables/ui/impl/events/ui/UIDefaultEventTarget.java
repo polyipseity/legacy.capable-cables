@@ -93,7 +93,7 @@ public class UIDefaultEventTarget
 
 	public static class UIEventListenerWithParameters {
 		@NonNls
-		private static final ImmutableMap<String, Function<UIEventListenerWithParameters, ?>> OBJECT_VARIABLES_MAP =
+		private static final ImmutableMap<String, Function<UIEventListenerWithParameters, ?>> OBJECT_VARIABLE_MAP =
 				ImmutableMap.<String, Function<UIEventListenerWithParameters, ?>>builder()
 						.put("listeners", UIEventListenerWithParameters::getListener)
 						.put("useCapture", UIEventListenerWithParameters::isUseCapture)
@@ -107,16 +107,16 @@ public class UIDefaultEventTarget
 		}
 
 		@Override
-		public int hashCode() { return ObjectUtilities.hashCodeImpl(this, getObjectVariablesMap().values()); }
+		public int hashCode() { return ObjectUtilities.hashCodeImpl(this, getObjectVariableMap().values()); }
 
 		@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 		@Override
-		public boolean equals(Object obj) { return ObjectUtilities.equalsImpl(this, obj, UIEventListenerWithParameters.class, false, getObjectVariablesMap().values()); }
+		public boolean equals(Object obj) { return ObjectUtilities.equalsImpl(this, obj, UIEventListenerWithParameters.class, false, getObjectVariableMap().values()); }
 
 		@Override
-		public String toString() { return ObjectUtilities.toStringImpl(this, getObjectVariablesMap()); }
+		public String toString() { return ObjectUtilities.toStringImpl(this, getObjectVariableMap()); }
 
-		public static ImmutableMap<String, Function<UIEventListenerWithParameters, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
+		public static ImmutableMap<String, Function<UIEventListenerWithParameters, ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 
 		public IUIEventListener<?> getListener() { return listener; }
 

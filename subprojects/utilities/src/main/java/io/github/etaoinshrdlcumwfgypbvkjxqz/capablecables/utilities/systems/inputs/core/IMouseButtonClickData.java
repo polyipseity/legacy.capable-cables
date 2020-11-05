@@ -25,7 +25,7 @@ public interface IMouseButtonClickData
 		;
 		public static final int MOUSE_BUTTON_NULL = -1;
 		@NonNls
-		private static final ImmutableMap<String, Function<IMouseButtonClickData, ?>> OBJECT_VARIABLES_MAP =
+		private static final ImmutableMap<String, Function<IMouseButtonClickData, ?>> OBJECT_VARIABLE_MAP =
 				ImmutableMap.<String, Function<IMouseButtonClickData, ?>>builder()
 						.put("cursorPositionView", IMouseButtonClickData::getCursorPositionView)
 						.put("button", IMouseButtonClickData::getButton)
@@ -33,6 +33,6 @@ public interface IMouseButtonClickData
 
 		public static int getMouseButtonNull() { return MOUSE_BUTTON_NULL; }
 
-		public static ImmutableMap<String, Function<IMouseButtonClickData, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
+		public static ImmutableMap<String, Function<IMouseButtonClickData, ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 	}
 }

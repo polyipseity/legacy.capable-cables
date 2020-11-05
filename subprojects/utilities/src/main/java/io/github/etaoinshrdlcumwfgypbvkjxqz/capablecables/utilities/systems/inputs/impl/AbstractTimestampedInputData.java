@@ -53,17 +53,17 @@ public abstract class AbstractTimestampedInputData
 
 	@Override
 	public int hashCode() {
-		return ObjectUtilities.hashCodeImpl(this, ITimestampedInputData.StaticHolder.getObjectVariablesMap().values());
+		return ObjectUtilities.hashCodeImpl(this, ITimestampedInputData.StaticHolder.getObjectVariableMap().values());
 	}
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	public boolean equals(Object obj) {
-		return ObjectUtilities.equalsImpl(this, obj, ITimestampedInputData.class, true, ITimestampedInputData.StaticHolder.getObjectVariablesMap().values());
+		return ObjectUtilities.equalsImpl(this, obj, ITimestampedInputData.class, true, ITimestampedInputData.StaticHolder.getObjectVariableMap().values());
 	}
 
 	@Override
 	public String toString() {
-		return ObjectUtilities.toStringImpl(this, ITimestampedInputData.StaticHolder.getObjectVariablesMap());
+		return ObjectUtilities.toStringImpl(this, ITimestampedInputData.StaticHolder.getObjectVariableMap());
 	}
 }

@@ -26,13 +26,13 @@ public interface IKeyboardKeyPressData
 		;
 
 		@NonNls
-		private static final ImmutableMap<String, Function<IKeyboardKeyPressData, ?>> OBJECT_VARIABLES_MAP =
+		private static final ImmutableMap<String, Function<IKeyboardKeyPressData, ?>> OBJECT_VARIABLE_MAP =
 				ImmutableMap.<String, Function<IKeyboardKeyPressData, ?>>builder()
 						.put("key", IKeyboardKeyPressData::getKey)
 						.put("scanCode", IKeyboardKeyPressData::getScanCode)
 						.put("modifiers", IKeyboardKeyPressData::getModifiers)
 						.build();
 
-		public static ImmutableMap<String, Function<IKeyboardKeyPressData, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
+		public static ImmutableMap<String, Function<IKeyboardKeyPressData, ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 	}
 }

@@ -32,7 +32,7 @@ public interface IShapeAnchor {
 		;
 
 		@NonNls
-		private static final ImmutableMap<String, Function<IShapeAnchor, ?>> OBJECT_VARIABLES_MAP =
+		private static final ImmutableMap<String, Function<IShapeAnchor, ?>> OBJECT_VARIABLE_MAP =
 				ImmutableMap.<String, Function<IShapeAnchor, ?>>builder()
 						.put("target", IShapeAnchor::getTarget)
 						.put("originSide", IShapeAnchor::getOriginSide)
@@ -41,6 +41,6 @@ public interface IShapeAnchor {
 						.put("container", IShapeAnchor::getContainer)
 						.build();
 
-		public static ImmutableMap<String, Function<IShapeAnchor, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
+		public static ImmutableMap<String, Function<IShapeAnchor, ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 	}
 }

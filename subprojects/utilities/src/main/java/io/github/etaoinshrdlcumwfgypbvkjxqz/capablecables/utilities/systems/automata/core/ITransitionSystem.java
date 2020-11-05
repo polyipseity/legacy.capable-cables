@@ -25,13 +25,13 @@ public interface ITransitionSystem<S extends IState<D>, E, D> {
 	enum StaticHolder {
 		;
 
-		private static final @Immutable @NonNls Map<String, Function<ITransitionSystem<?, ?, ?>, ?>> OBJECT_VARIABLES_MAP =
+		private static final @Immutable @NonNls Map<String, Function<ITransitionSystem<?, ?, ?>, ?>> OBJECT_VARIABLE_MAP =
 				ImmutableMap.<String, Function<ITransitionSystem<?, ?, ?>, ?>>builder()
 						.put("state", ITransitionSystem::getState)
 						.put("input", ITransitionSystem::getInput)
 						.put("transitionsView", ITransitionSystem::getTransitionsView)
 						.build();
 
-		public static @Immutable Map<String, Function<ITransitionSystem<?, ?, ?>, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
+		public static @Immutable Map<String, Function<ITransitionSystem<?, ?, ?>, ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 	}
 }

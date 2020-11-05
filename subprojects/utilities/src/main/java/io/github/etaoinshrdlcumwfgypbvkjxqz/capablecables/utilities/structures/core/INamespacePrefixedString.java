@@ -50,13 +50,13 @@ public interface INamespacePrefixedString {
 				MarkersTemplate.addReferences(UtilitiesMarkers.getInstance().getClassMarker(),
 						UtilitiesMarkers.getInstance().getMarkerStructure());
 
-		private static final @Immutable Map<String, Function<INamespacePrefixedString, ?>> OBJECT_VARIABLES_MAP =
+		private static final @Immutable Map<String, Function<INamespacePrefixedString, ?>> OBJECT_VARIABLE_MAP =
 				ImmutableMap.<String, Function<INamespacePrefixedString, ?>>builder()
 						.put("namespace", INamespacePrefixedString::getNamespace)
 						.put("path", INamespacePrefixedString::getPath)
 						.build();
 
-		public static @Immutable Map<String, Function<INamespacePrefixedString, ?>> getObjectVariablesMap() { return OBJECT_VARIABLES_MAP; }
+		public static @Immutable Map<String, Function<INamespacePrefixedString, ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 
 		public static Marker getClassMarker() { return CLASS_MARKER; }
 

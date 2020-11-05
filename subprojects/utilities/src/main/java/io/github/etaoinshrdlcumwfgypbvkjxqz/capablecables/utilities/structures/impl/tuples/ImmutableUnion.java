@@ -28,7 +28,7 @@ public final class ImmutableUnion<L, R>
 
 	@Override
 	public int hashCode() {
-		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariablesMap().values());
+		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariableMap().values());
 	}
 
 	public static <L, R> ImmutableUnion<L, R> left(L left) {
@@ -51,12 +51,12 @@ public final class ImmutableUnion<L, R>
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	public boolean equals(Object o) {
-		return ObjectUtilities.equalsImpl(this, o, CastUtilities.<Class<ITuple2<?, ?>>>castUnchecked(IUnion.class), true, StaticHolder.getObjectVariablesMap().values());
+		return ObjectUtilities.equalsImpl(this, o, CastUtilities.<Class<ITuple2<?, ?>>>castUnchecked(IUnion.class), true, StaticHolder.getObjectVariableMap().values());
 	}
 
 	@Override
 	public String toString() {
-		return ObjectUtilities.toStringImpl(this, StaticHolder.getObjectVariablesMap());
+		return ObjectUtilities.toStringImpl(this, StaticHolder.getObjectVariableMap());
 	}
 
 	private static <L, R> ImmutableUnion<L, R> of(@Nullable L left, @Nullable R right) {

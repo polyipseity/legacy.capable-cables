@@ -48,18 +48,18 @@ public final class ImmutableIntersection<L, R>
 
 	@Override
 	public int hashCode() {
-		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariablesMap().values());
+		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariableMap().values());
 	}
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	public boolean equals(Object o) {
-		return ObjectUtilities.equalsImpl(this, o, CastUtilities.<Class<IIntersection<?, ?>>>castUnchecked(IIntersection.class), true, StaticHolder.getObjectVariablesMap().values());
+		return ObjectUtilities.equalsImpl(this, o, CastUtilities.<Class<IIntersection<?, ?>>>castUnchecked(IIntersection.class), true, StaticHolder.getObjectVariableMap().values());
 	}
 
 	@Override
 	public String toString() {
-		return ObjectUtilities.toStringImpl(this, StaticHolder.getObjectVariablesMap());
+		return ObjectUtilities.toStringImpl(this, StaticHolder.getObjectVariableMap());
 	}
 
 	@Override

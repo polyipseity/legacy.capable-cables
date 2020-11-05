@@ -17,7 +17,7 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Asser
 public abstract class AbstractObjectStack<T>
 		implements IObjectStack<T> {
 	@NonNls
-	private static final @Immutable Map<String, Function<? super AbstractObjectStack<?>, ?>> OBJECT_VARIABLES_MAP =
+	private static final @Immutable Map<String, Function<? super AbstractObjectStack<?>, ?>> OBJECT_VARIABLE_MAP =
 			ImmutableMap.<String, Function<? super AbstractObjectStack<?>, ?>>builder()
 					.put("data", AbstractObjectStack::getData)
 					.build();
@@ -42,20 +42,20 @@ public abstract class AbstractObjectStack<T>
 
 	@Override
 	public int hashCode() {
-		return ObjectUtilities.hashCodeImpl(this, getObjectVariablesMap().values());
+		return ObjectUtilities.hashCodeImpl(this, getObjectVariableMap().values());
 	}
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	public boolean equals(Object obj) {
-		return ObjectUtilities.equalsImpl(this, obj, CastUtilities.<Class<AbstractObjectStack<?>>>castUnchecked(AbstractObjectStack.class), false, getObjectVariablesMap().values());
+		return ObjectUtilities.equalsImpl(this, obj, CastUtilities.<Class<AbstractObjectStack<?>>>castUnchecked(AbstractObjectStack.class), false, getObjectVariableMap().values());
 	}
 
 	@Override
-	public String toString() { return ObjectUtilities.toStringImpl(this, getObjectVariablesMap()); }
+	public String toString() { return ObjectUtilities.toStringImpl(this, getObjectVariableMap()); }
 
-	public static @NonNls @Immutable Map<String, Function<? super AbstractObjectStack<?>, ?>> getObjectVariablesMap() {
-		return OBJECT_VARIABLES_MAP;
+	public static @NonNls @Immutable Map<String, Function<? super AbstractObjectStack<?>, ?>> getObjectVariableMap() {
+		return OBJECT_VARIABLE_MAP;
 	}
 
 	public abstract static class CopyPushable<T>
