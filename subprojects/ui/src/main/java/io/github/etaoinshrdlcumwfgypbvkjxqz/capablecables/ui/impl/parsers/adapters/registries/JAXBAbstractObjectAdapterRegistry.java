@@ -8,12 +8,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.regi
 
 import java.util.Optional;
 
-public abstract class AbstractJAXBObjectAdapterRegistry
+public abstract class JAXBAbstractObjectAdapterRegistry
 		extends AbstractTuple2Registry<Class<?>, Class<?>, IJAXBObjectAdapter<?, ?>>
 		implements IJAXBObjectAdapterRegistry {
 	private static final long serialVersionUID = -3099502144881190092L;
 
-	public AbstractJAXBObjectAdapterRegistry(boolean overridable) {
+	public JAXBAbstractObjectAdapterRegistry(boolean overridable) {
 		super(overridable);
 	}
 

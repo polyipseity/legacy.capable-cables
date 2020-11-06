@@ -9,12 +9,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.regi
 import javax.xml.namespace.QName;
 import java.util.Optional;
 
-public abstract class AbstractJAXBElementAdapterRegistry
+public abstract class JAXBAbstractElementAdapterRegistry
 		extends AbstractTuple2Registry<QName, Class<?>, IJAXBElementAdapter<?, ?>>
 		implements IJAXBElementAdapterRegistry {
 	private static final long serialVersionUID = -3099502144881190092L;
 
-	public AbstractJAXBElementAdapterRegistry(boolean overridable) {
+	public JAXBAbstractElementAdapterRegistry(boolean overridable) {
 		super(overridable);
 	}
 

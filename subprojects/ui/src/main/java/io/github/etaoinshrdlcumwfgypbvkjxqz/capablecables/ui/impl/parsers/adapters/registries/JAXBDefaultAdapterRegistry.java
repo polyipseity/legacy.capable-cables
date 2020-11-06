@@ -14,13 +14,13 @@ import jakarta.xml.bind.JAXBElement;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-public class DefaultJAXBAdapterRegistry
+public class JAXBDefaultAdapterRegistry
 		implements IJAXBAdapterRegistry {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	private final IJAXBObjectAdapterRegistry objectRegistry;
 	private final IJAXBElementAdapterRegistry elementRegistry;
 
-	public DefaultJAXBAdapterRegistry(IJAXBObjectAdapterRegistry objectRegistry, IJAXBElementAdapterRegistry elementRegistry) {
+	public JAXBDefaultAdapterRegistry(IJAXBObjectAdapterRegistry objectRegistry, IJAXBElementAdapterRegistry elementRegistry) {
 		this.objectRegistry = objectRegistry;
 		this.elementRegistry = elementRegistry;
 	}

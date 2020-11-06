@@ -2,27 +2,26 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapt
 
 import com.google.common.collect.MapMaker;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBObjectAdapter;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBObjectAdapterRegistry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBElementAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObjectInternal;
 import org.slf4j.Logger;
 
+import javax.xml.namespace.QName;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
-public class DefaultJAXBObjectAdapterRegistry
-		extends AbstractJAXBObjectAdapterRegistry
-		implements IJAXBObjectAdapterRegistry {
-	private static final long serialVersionUID = 8313852600800208719L;
+public class JAXBDefaultElementAdapterRegistry
+		extends JAXBAbstractElementAdapterRegistry {
 	private static final MapMaker DATA_BUILDER = MapBuilderUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.getInitialCapacityMedium());
-	private final ConcurrentMap<ITuple2<? extends Class<?>, ? extends Class<?>>, IRegistryObjectInternal<? extends IJAXBObjectAdapter<?, ?>>> data;
-	private final ConcurrentMap<Class<?>, ITuple2<? extends Class<?>, ? extends Class<?>>> leftData;
-	private final ConcurrentMap<Class<?>, ITuple2<? extends Class<?>, ? extends Class<?>>> rightData;
+	private static final long serialVersionUID = -7322246695259185454L;
+	private final ConcurrentMap<ITuple2<? extends QName, ? extends Class<?>>, IRegistryObjectInternal<? extends IJAXBElementAdapter<?, ?>>> data;
+	private final ConcurrentMap<QName, ITuple2<? extends QName, ? extends Class<?>>> leftData;
+	private final ConcurrentMap<Class<?>, ITuple2<? extends QName, ? extends Class<?>>> rightData;
 
-	public DefaultJAXBObjectAdapterRegistry() {
+	public JAXBDefaultElementAdapterRegistry() {
 		super(true);
 		this.data = getDataBuilder().makeMap();
 		this.leftData = getDataBuilder().makeMap();
@@ -35,7 +34,7 @@ public class DefaultJAXBObjectAdapterRegistry
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	@Override
-	protected Map<ITuple2<? extends Class<?>, ? extends Class<?>>, IRegistryObjectInternal<? extends IJAXBObjectAdapter<?, ?>>> getData() {
+	protected Map<ITuple2<? extends QName, ? extends Class<?>>, IRegistryObjectInternal<? extends IJAXBElementAdapter<?, ?>>> getData() {
 		return data;
 	}
 
@@ -46,13 +45,13 @@ public class DefaultJAXBObjectAdapterRegistry
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	@Override
-	protected ConcurrentMap<Class<?>, ITuple2<? extends Class<?>, ? extends Class<?>>> getLeftData() {
+	protected Map<QName, ITuple2<? extends QName, ? extends Class<?>>> getLeftData() {
 		return leftData;
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	@Override
-	protected ConcurrentMap<Class<?>, ITuple2<? extends Class<?>, ? extends Class<?>>> getRightData() {
+	protected Map<Class<?>, ITuple2<? extends QName, ? extends Class<?>>> getRightData() {
 		return rightData;
 	}
 }

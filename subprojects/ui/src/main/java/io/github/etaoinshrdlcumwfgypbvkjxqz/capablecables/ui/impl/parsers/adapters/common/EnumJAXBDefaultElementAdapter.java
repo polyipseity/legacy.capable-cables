@@ -13,9 +13,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.wrappe
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.wrappers.ITextAntiAliasRenderingHintWrapper;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIJAXBUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIJAXBUtilities.ObjectFactories;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.wrappers.EnumFractionalMetricsRenderingHintWrapper;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.wrappers.EnumTextAntiAliasRenderingHintWrapper;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.JAXBFunctionalElementAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
@@ -42,28 +40,28 @@ import java.util.stream.Stream;
 @SuppressWarnings("unused")
 public enum EnumJAXBElementPresetAdapter {
 	BOOLEAN(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createBoolean), Boolean.class),
-			new DefaultJAXBElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
+			new JAXBFunctionalElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
 					IContextIndependentJAXBAdapterFunction.of(ObjectFactories.getDefaultUIObjectFactory()::createBoolean))),
 	BYTE(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createByte), Byte.class),
-			new DefaultJAXBElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
+			new JAXBFunctionalElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
 					IContextIndependentJAXBAdapterFunction.of(ObjectFactories.getDefaultUIObjectFactory()::createByte))),
 	SHORT(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createShort), Short.class),
-			new DefaultJAXBElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
+			new JAXBFunctionalElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
 					IContextIndependentJAXBAdapterFunction.of(ObjectFactories.getDefaultUIObjectFactory()::createShort))),
 	INT(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createInt), Integer.class),
-			new DefaultJAXBElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
+			new JAXBFunctionalElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
 					IContextIndependentJAXBAdapterFunction.of(ObjectFactories.getDefaultUIObjectFactory()::createInt))),
 	LONG(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createLong), Long.class),
-			new DefaultJAXBElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
+			new JAXBFunctionalElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
 					IContextIndependentJAXBAdapterFunction.of(ObjectFactories.getDefaultUIObjectFactory()::createLong))),
 	FLOAT(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createFloat), Float.class),
-			new DefaultJAXBElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
+			new JAXBFunctionalElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
 					IContextIndependentJAXBAdapterFunction.of(ObjectFactories.getDefaultUIObjectFactory()::createFloat))),
 	DOUBLE(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createDouble), Double.class),
-			new DefaultJAXBElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
+			new JAXBFunctionalElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
 					IContextIndependentJAXBAdapterFunction.of(ObjectFactories.getDefaultUIObjectFactory()::createDouble))),
 	STRING(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createString), String.class),
-			new DefaultJAXBElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
+			new JAXBFunctionalElementAdapter<>(IContextIndependentJAXBAdapterFunction.of(JAXBElement::getValue),
 					IContextIndependentJAXBAdapterFunction.of(ObjectFactories.getDefaultUIObjectFactory()::createString))),
 	TUPLE_2(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createTuple2), CastUtilities.castUnchecked(ITuple2.class)),
 			new DefaultJAXBElementAdapter<Tuple2Type, ITuple2<?, ?>>(
