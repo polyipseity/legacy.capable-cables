@@ -1,14 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.tileentities;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModConstants;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIMinecraftDebug;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-
-import javax.annotation.Nullable;
 
 public enum ModTileEntityTypes {
 	;

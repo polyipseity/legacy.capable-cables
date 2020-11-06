@@ -2,6 +2,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapt
 
 import com.google.common.collect.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IContextIndependentJAXBAdapterFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapterContext;
@@ -24,7 +26,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.thro
 import jakarta.xml.bind.JAXBElement;
 import org.jetbrains.annotations.NonNls;
 
-import javax.annotation.Nullable;
 import javax.xml.namespace.QName;
 import java.awt.font.TextAttribute;
 import java.lang.invoke.MethodHandle;
@@ -128,7 +129,7 @@ public enum EnumJAXBElementPresetAdapter {
 			)),
 	@SuppressWarnings({"unchecked", "Convert2Diamond"}) TEXT_ATTRIBUTE(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createTextAttribute), AttributedCharacterIterator.Attribute.class),
 			new DefaultJAXBElementAdapter<String, AttributedCharacterIterator.Attribute>(
-					new BiFunction<IJAXBAdapterContext, JAXBElement<String>, AttributedCharacterIterator.Attribute>() {
+					new BiFunction<@Nonnull IJAXBAdapterContext, @Nonnull JAXBElement<String>, AttributedCharacterIterator.@Nonnull Attribute>() {
 						private final @Immutable Map<String, AttributedCharacterIterator.Attribute> stringAttributeMap;
 
 						{
@@ -158,14 +159,15 @@ public enum EnumJAXBElementPresetAdapter {
 						}
 
 						@Override
-						public AttributedCharacterIterator.Attribute apply(IJAXBAdapterContext ijaxbAdapterContext, JAXBElement<String> left) {
+						@Nonnull
+						public AttributedCharacterIterator.Attribute apply(@Nonnull IJAXBAdapterContext context, @Nonnull JAXBElement<String> left) {
 							@Nullable AttributedCharacterIterator.Attribute result = getStringAttributeMap().get(left.getValue());
 							if (result == null)
 								throw new IllegalArgumentException();
 							return result;
 						}
 					},
-					new BiFunction<IJAXBAdapterContext, AttributedCharacterIterator.Attribute, JAXBElement<String>>() {
+					new BiFunction<@Nonnull IJAXBAdapterContext, AttributedCharacterIterator.@Nonnull Attribute, @Nonnull JAXBElement<String>>() {
 						private final MethodHandle getNameVirtualMethodHandle;
 
 						{
@@ -181,7 +183,8 @@ public enum EnumJAXBElementPresetAdapter {
 						}
 
 						@Override
-						public JAXBElement<String> apply(IJAXBAdapterContext ijaxbAdapterContext, AttributedCharacterIterator.Attribute right) {
+						@Nonnull
+						public JAXBElement<String> apply(@Nonnull IJAXBAdapterContext context, @Nonnull AttributedCharacterIterator.Attribute right) {
 							try {
 								return ObjectFactories.getDefaultUIObjectFactory().createTextAttribute((String) getGetNameVirtualMethodHandle().invokeExact(right));
 							} catch (Throwable throwable) {
@@ -193,8 +196,8 @@ public enum EnumJAXBElementPresetAdapter {
 	;
 
 	@NonNls
-	private static final ImmutableMap<String, Function<EnumJAXBElementPresetAdapter, ?>> OBJECT_VARIABLE_MAP =
-			ImmutableMap.<String, Function<EnumJAXBElementPresetAdapter, ?>>builder()
+	private static final ImmutableMap<String, Function<@Nonnull EnumJAXBElementPresetAdapter, @Nullable ?>> OBJECT_VARIABLE_MAP =
+			ImmutableMap.<String, Function<@Nonnull EnumJAXBElementPresetAdapter, @Nullable ?>>builder()
 					.put("key", EnumJAXBElementPresetAdapter::getKey)
 					.put("value", EnumJAXBElementPresetAdapter::getValue)
 					.build();
@@ -269,5 +272,5 @@ public enum EnumJAXBElementPresetAdapter {
 		return ObjectUtilities.toStringImpl(this, getObjectVariableMap());
 	}
 
-	public static ImmutableMap<String, Function<EnumJAXBElementPresetAdapter, ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
+	public static ImmutableMap<String, Function<@Nonnull EnumJAXBElementPresetAdapter, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 }

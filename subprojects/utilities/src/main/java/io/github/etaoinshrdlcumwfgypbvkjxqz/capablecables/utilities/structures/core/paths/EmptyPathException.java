@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths;
 
-import javax.annotation.Nullable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
+
 import java.util.Optional;
 
 public class EmptyPathException

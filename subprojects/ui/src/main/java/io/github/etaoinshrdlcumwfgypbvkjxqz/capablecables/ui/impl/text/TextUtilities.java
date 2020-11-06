@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.text;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 
 import java.awt.*;
@@ -42,7 +43,7 @@ public enum TextUtilities {
 		return String.valueOf(result);
 	}
 
-	public static <T extends AttributedCharacterIterator> void forEachRun(T attributedCharacterIterator, Consumer<? super T> action) {
+	public static <T extends AttributedCharacterIterator> void forEachRun(T attributedCharacterIterator, Consumer<@Nonnull ? super T> action) {
 		while (attributedCharacterIterator.getRunLimit() < attributedCharacterIterator.getEndIndex() /* COMMENT equal means the last run */) {
 			int runLimit = attributedCharacterIterator.getRunLimit(); // COMMENT in case the action changes the index
 			action.accept(attributedCharacterIterator);

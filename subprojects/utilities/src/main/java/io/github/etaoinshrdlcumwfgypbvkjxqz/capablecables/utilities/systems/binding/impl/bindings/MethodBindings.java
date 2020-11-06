@@ -2,6 +2,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bin
 
 import com.google.common.cache.Cache;
 import com.google.common.collect.Streams;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingConsumer;
@@ -16,8 +18,6 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import sun.misc.Cleaner;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -33,7 +33,7 @@ public class MethodBindings
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public MethodBindings(INamespacePrefixedString bindingKey,
-	                      Supplier<? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>>> transformersSupplier) {
+	                      Supplier<@Nonnull ? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>>> transformersSupplier) {
 		super(bindingKey, transformersSupplier);
 		@SuppressWarnings("UnnecessaryLocalVariable") Map<IBindingMethodSource<?>, Disposable> sourcesRef = sources;
 		Cleaner.create(CleanerUtilities.getCleanerReferent(this), () ->
@@ -68,14 +68,14 @@ public class MethodBindings
 
 	public static <T> DisposableObserver<T> createDelegatingObserver(IBindingMethodSource<T> source,
 	                                                                 Iterable<? extends IBindingMethodDestination<?>> destinations,
-	                                                                 Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>> transformers) {
+	                                                                 Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>> transformers) {
 		return new LoggingDisposableObserver<>(new DefaultDisposableObserver<T>() {
 			@SuppressWarnings("UnstableApiUsage")
 			@Override
 			public void onNext(@Nonnull T t) {
 				try {
 					destinations.forEach(IThrowingConsumer.executeNow(destination -> {
-						AssertionUtilities.assertNonnull(destination).accept(CastUtilities.castUncheckedNullable(
+						AssertionUtilities.assertNonnull(destination).accept(CastUtilities.castUnchecked(
 								transform(transformers,
 										t,
 										source.getTypeToken().getRawType(),

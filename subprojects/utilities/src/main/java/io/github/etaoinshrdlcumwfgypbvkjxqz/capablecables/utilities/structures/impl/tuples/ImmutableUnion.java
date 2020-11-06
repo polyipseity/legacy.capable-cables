@@ -1,12 +1,12 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.IUnion;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -74,23 +74,23 @@ public final class ImmutableUnion<L, R>
 	}
 
 	@Override
-	public <T> T map(Function<? super L, ? extends T> leftMapper, Function<? super R, ? extends T> rightMapper) {
-		@Nullable T leftResult = getLeft().map(leftMapper).orElse(null);
-		@Nullable T rightResult = getRight().map(rightMapper).orElse(null);
-		IUnion.assertEither(leftResult, rightResult);
-		return Optional.ofNullable(rightResult).orElseGet(() -> AssertionUtilities.assertNonnull(leftResult));
-	}
-
-	@Override
-	public <L2, R2> IUnion<L2, R2> mapBoth(Function<? super L, ? extends L2> leftMapper, Function<? super R, ? extends R2> rightMapper) throws IllegalArgumentException {
+	public <L2, R2> IUnion<L2, R2> mapBoth(Function<@Nonnull ? super L, @Nonnull ? extends L2> leftMapper, Function<@Nonnull ? super R, @Nonnull ? extends R2> rightMapper) throws IllegalArgumentException {
 		return map(
-				left -> left(AssertionUtilities.assertNonnull(leftMapper.apply(left))),
-				right -> right(AssertionUtilities.assertNonnull(rightMapper.apply(right)))
+				left -> left(leftMapper.apply(left)),
+				right -> right(rightMapper.apply(right))
 		);
 	}
 
 	@Override
-	public void accept(Consumer<? super L> leftConsumer, Consumer<R> rightConsumer) {
+	public <T> T map(Function<@Nonnull ? super L, @Nonnull ? extends T> leftMapper, Function<@Nonnull ? super R, @Nonnull ? extends T> rightMapper) {
+		@Nullable T leftResult = getLeft().map(leftMapper).orElse(null);
+		@Nullable T rightResult = getRight().map(rightMapper).orElse(null);
+		IUnion.assertEither(leftResult, rightResult);
+		return Optional.ofNullable(rightResult).orElse(leftResult);
+	}
+
+	@Override
+	public void accept(Consumer<@Nonnull ? super L> leftConsumer, Consumer<@Nonnull ? super R> rightConsumer) {
 		// COMMENT at least one of them is present
 		getLeft().ifPresent(leftConsumer);
 		getRight().ifPresent(rightConsumer);

@@ -1,6 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.DynamicUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingSupplier;
@@ -28,7 +32,7 @@ public enum ThrowableUtilities {
 
 	@SuppressWarnings({"ThrowCaughtLocally", "RedundantThrows"})
 	public static <T extends Throwable, R extends Throwable> RuntimeException propagate(T throwable,
-	                                                                                    Function<? super T, R> checkedWrapper)
+	                                                                                    Function<@Nonnull ? super T, @Nonnull ? extends R> checkedWrapper)
 			throws R, RuntimeException, Error {
 		try {
 			throw propagate(throwable, checkedWrapper, Function.identity());
@@ -47,14 +51,14 @@ public enum ThrowableUtilities {
 	}
 
 	public static <T extends Throwable, RC extends Throwable, RU extends Throwable> RuntimeException propagate(T throwable,
-	                                                                                                           Function<? super T, RC> checkedWrapper,
-	                                                                                                           Function<? super T, RU> uncheckedWrapper)
+	                                                                                                           Function<@Nonnull ? super T, @Nonnull ? extends RC> checkedWrapper,
+	                                                                                                           Function<@Nonnull ? super T, @Nonnull ? extends RU> uncheckedWrapper)
 			throws RC, RU, RuntimeException, Error {
 		throwIfCritical(throwable);
 		if (isUnchecked(throwable))
-			throw AssertionUtilities.assertNonnull(uncheckedWrapper.apply(throwable));
+			throw uncheckedWrapper.apply(throwable);
 		else
-			throw AssertionUtilities.assertNonnull(checkedWrapper.apply(throwable));
+			throw checkedWrapper.apply(throwable);
 	}
 
 	public static RuntimeException propagateUnverified(Throwable throwable) {

@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.core.IThrowableHandler;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class DefaultThrowableHandler<T extends Throwable>

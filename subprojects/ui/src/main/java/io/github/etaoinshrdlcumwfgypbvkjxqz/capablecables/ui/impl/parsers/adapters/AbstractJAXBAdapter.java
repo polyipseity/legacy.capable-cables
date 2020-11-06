@@ -1,21 +1,22 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.UncheckedAutoCloseable;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
 public abstract class AbstractJAXBAdapter<L, R>
 		implements IJAXBAdapter<L, R> {
-	private final BiFunction<? super IJAXBAdapterContext, ? super L, ? extends R> leftToRightFunction;
-	private final BiFunction<? super IJAXBAdapterContext, ? super R, ? extends L> rightToLeftFunction;
+	private final BiFunction<@Nonnull ? super IJAXBAdapterContext, @Nonnull ? super L, @Nonnull ? extends R> leftToRightFunction;
+	private final BiFunction<@Nonnull ? super IJAXBAdapterContext, @Nonnull ? super R, @Nonnull ? extends L> rightToLeftFunction;
 	private final ThreadLocal<IJAXBAdapterContext> contextThreadLocal = new ThreadLocal<>();
 
-	public AbstractJAXBAdapter(BiFunction<? super IJAXBAdapterContext, ? super L, ? extends R> leftToRightFunction,
-	                           BiFunction<? super IJAXBAdapterContext, ? super R, ? extends L> rightToLeftFunction) {
+	public AbstractJAXBAdapter(BiFunction<@Nonnull ? super IJAXBAdapterContext, @Nonnull ? super L, @Nonnull ? extends R> leftToRightFunction,
+	                           BiFunction<@Nonnull ? super IJAXBAdapterContext, @Nonnull ? super R, @Nonnull ? extends L> rightToLeftFunction) {
 		this.leftToRightFunction = leftToRightFunction;
 		this.rightToLeftFunction = rightToLeftFunction;
 	}
@@ -37,7 +38,7 @@ public abstract class AbstractJAXBAdapter<L, R>
 				.orElseThrow(IllegalStateException::new);
 	}
 
-	protected BiFunction<? super IJAXBAdapterContext, ? super L, ? extends R> getLeftToRightFunction() {
+	protected BiFunction<@Nonnull ? super IJAXBAdapterContext, @Nonnull ? super L, @Nonnull ? extends R> getLeftToRightFunction() {
 		return leftToRightFunction;
 	}
 
@@ -60,7 +61,7 @@ public abstract class AbstractJAXBAdapter<L, R>
 		return Optional.ofNullable(getContextThreadLocal().get());
 	}
 
-	protected BiFunction<? super IJAXBAdapterContext, ? super R, ? extends L> getRightToLeftFunction() {
+	protected BiFunction<@Nonnull ? super IJAXBAdapterContext, @Nonnull ? super R, @Nonnull ? extends L> getRightToLeftFunction() {
 		return rightToLeftFunction;
 	}
 }

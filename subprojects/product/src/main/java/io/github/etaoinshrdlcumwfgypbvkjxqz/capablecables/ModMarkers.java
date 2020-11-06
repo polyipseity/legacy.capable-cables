@@ -3,6 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables;
 import com.google.common.base.Suppliers;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.MarkersTemplate;
@@ -14,7 +15,7 @@ import org.slf4j.Marker;
 import java.util.function.Supplier;
 
 public final class ModMarkers extends MarkersTemplate {
-	private static final Supplier<ModMarkers> INSTANCE = Suppliers.memoize(ModMarkers::new);
+	private static final Supplier<@Nonnull ModMarkers> INSTANCE = Suppliers.memoize(ModMarkers::new);
 
 	private final Marker markerModLifecycle = getMarker("mod lifecycle");
 	private final Marker markerRegistrable = getMarker("registrable");
@@ -31,7 +32,7 @@ public final class ModMarkers extends MarkersTemplate {
 
 	private ModMarkers() { super(ModConstants.getModID()); }
 
-	public static ModMarkers getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+	public static ModMarkers getInstance() { return INSTANCE.get(); }
 
 	public Marker getRegistryMarker(IForgeRegistry<?> key) { return getRegistryMarkers().getUnchecked(key); }
 

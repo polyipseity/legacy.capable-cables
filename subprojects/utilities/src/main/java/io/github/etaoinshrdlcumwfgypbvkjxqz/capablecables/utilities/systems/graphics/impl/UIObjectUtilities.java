@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer4;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IFunction4;
@@ -29,11 +30,7 @@ public enum UIObjectUtilities {
 	}
 
 	public static <R extends Dimension2D> R floorDimension(Dimension2D source, R destination) {
-		acceptDimension(source, (x, y) -> {
-			assert x != null;
-			assert y != null;
-			destination.setSize(Math.floor(x), Math.floor(y));
-		});
+		acceptDimension(source, (x, y) -> destination.setSize(Math.floor(x), Math.floor(y)));
 		return destination;
 	}
 
@@ -51,44 +48,28 @@ public enum UIObjectUtilities {
 	public static <TH extends Throwable> void acceptRectangularShape(RectangularShape rectangular, IConsumer4<? super Double, ? super Double, ? super Double, ? super Double, ? extends TH> action)
 			throws TH { action.accept(rectangular.getX(), rectangular.getY(), rectangular.getWidth(), rectangular.getHeight()); }
 
-	public static void acceptPoint(Point2D point, BiConsumer<? super Double, ? super Double> action) { action.accept(point.getX(), point.getY()); }
-
-	public static void acceptDimension(Dimension2D dimension, BiConsumer<? super Double, ? super Double> action) { action.accept(dimension.getWidth(), dimension.getHeight()); }
+	public static void acceptDimension(Dimension2D dimension, BiConsumer<@Nonnull ? super Double, @Nonnull ? super Double> action) { action.accept(dimension.getWidth(), dimension.getHeight()); }
 
 	public static <R extends Point2D> R floorPoint(Point2D source, R destination) {
-		acceptPoint(source, (x, y) -> {
-			assert x != null;
-			assert y != null;
-			destination.setLocation(Math.floor(x), Math.floor(y));
-		});
+		acceptPoint(source, (x, y) -> destination.setLocation(Math.floor(x), Math.floor(y)));
 		return destination;
 	}
 
+	public static void acceptPoint(Point2D point, BiConsumer<@Nonnull ? super Double, @Nonnull ? super Double> action) { action.accept(point.getX(), point.getY()); }
+
 	public static <R extends Point2D> R minPoint(Point2D a, Point2D b, R destination) {
-		acceptPoint(a, (ax, ay) -> acceptPoint(b, (bx, by) -> {
-			assert ax != null;
-			assert ay != null;
-			assert bx != null;
-			assert by != null;
-			destination.setLocation(min(ax, bx), min(ay, by));
-		}));
+		acceptPoint(a, (ax, ay) -> acceptPoint(b, (bx, by) -> destination.setLocation(min(ax, bx), min(ay, by))));
 		return destination;
 	}
 
 	public static <R extends Point2D> R maxPoint(Point2D a, Point2D b, R destination) {
-		acceptPoint(a, (ax, ay) -> acceptPoint(b, (bx, by) -> {
-			assert ax != null;
-			assert ay != null;
-			assert bx != null;
-			assert by != null;
-			destination.setLocation(max(ax, bx), max(ay, by));
-		}));
+		acceptPoint(a, (ax, ay) -> acceptPoint(b, (bx, by) -> destination.setLocation(max(ax, bx), max(ay, by))));
 		return destination;
 	}
 
-	public static <T> T applyPoint(Point2D point, BiFunction<? super Double, ? super Double, ? extends T> action) { return action.apply(point.getX(), point.getY()); }
+	public static <T> T applyPoint(Point2D point, BiFunction<@Nonnull ? super Double, @Nonnull ? super Double, ? extends T> action) { return action.apply(point.getX(), point.getY()); }
 
-	public static <T> T applyDimension(Dimension2D dimension, BiFunction<? super Double, ? super Double, ? extends T> action) { return action.apply(dimension.getWidth(), dimension.getHeight()); }
+	public static <T> T applyDimension(Dimension2D dimension, BiFunction<@Nonnull ? super Double, @Nonnull ? super Double, ? extends T> action) { return action.apply(dimension.getWidth(), dimension.getHeight()); }
 
 	@SuppressWarnings("UnusedReturnValue")
 	public static <R extends RectangularShape> R transformRectangularShape(AffineTransform transform,

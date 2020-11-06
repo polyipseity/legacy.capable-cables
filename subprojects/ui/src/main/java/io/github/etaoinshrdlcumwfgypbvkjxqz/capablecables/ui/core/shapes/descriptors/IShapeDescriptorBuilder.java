@@ -2,11 +2,11 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descri
 
 import com.google.common.collect.Iterables;
 import com.google.common.reflect.TypeToken;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeConstraint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ITypeCapture;
 import org.jetbrains.annotations.NonNls;
 
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 

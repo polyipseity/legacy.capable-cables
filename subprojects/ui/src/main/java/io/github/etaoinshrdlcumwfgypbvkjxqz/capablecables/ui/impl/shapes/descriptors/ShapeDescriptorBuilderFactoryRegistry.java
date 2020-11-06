@@ -4,10 +4,10 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptorBuilderFactory;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
@@ -26,11 +26,11 @@ import java.util.function.Supplier;
 
 public final class ShapeDescriptorBuilderFactoryRegistry
 		extends AbstractRegistry<INamespacePrefixedString, IShapeDescriptorBuilderFactory> {
-	private static final Supplier<ShapeDescriptorBuilderFactoryRegistry> INSTANCE = Suppliers.memoize(ShapeDescriptorBuilderFactoryRegistry::new);
-	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
-	private static final @Immutable Map<INamespacePrefixedString, Supplier<IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>>> DEFAULTS_SUPPLIER = ImmutableMap.<INamespacePrefixedString, Supplier<IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>>>builder()
+	private static final @Immutable Map<INamespacePrefixedString, Supplier<@Nonnull IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>>> DEFAULTS_SUPPLIER = ImmutableMap.<INamespacePrefixedString, Supplier<@Nonnull IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>>>builder()
 			.put(DefaultShapeDescriptorBuilderFactory.getDefaultFactoryKey(), () -> new DefaultRegistryObject<>(new DefaultShapeDescriptorBuilderFactory()))
 			.build();
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
+	private static final Supplier<@Nonnull ShapeDescriptorBuilderFactoryRegistry> INSTANCE = Suppliers.memoize(ShapeDescriptorBuilderFactoryRegistry::new);
 	private static final long serialVersionUID = 6379579158201410218L;
 
 	private final ConcurrentMap<INamespacePrefixedString, IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>> data;
@@ -41,7 +41,7 @@ public final class ShapeDescriptorBuilderFactoryRegistry
 		this.data.putAll(Maps.transformValues(getDefaultsSupplier(), Supplier::get));
 	}
 
-	protected static @Immutable Map<INamespacePrefixedString, Supplier<IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>>> getDefaultsSupplier() { return DEFAULTS_SUPPLIER; }
+	protected static @Immutable Map<INamespacePrefixedString, Supplier<@Nonnull IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>>> getDefaultsSupplier() { return DEFAULTS_SUPPLIER; }
 
 	public static DefaultShapeDescriptorBuilderFactory getDefaultFactory() {
 		return (DefaultShapeDescriptorBuilderFactory) getInstance()
@@ -50,7 +50,7 @@ public final class ShapeDescriptorBuilderFactoryRegistry
 				.getValue();
 	}
 
-	public static ShapeDescriptorBuilderFactoryRegistry getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+	public static ShapeDescriptorBuilderFactoryRegistry getInstance() { return INSTANCE.get(); }
 
 	@Override
 	public <VL extends IShapeDescriptorBuilderFactory> IRegistryObject<VL> register(INamespacePrefixedString key, VL value) {

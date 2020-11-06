@@ -2,10 +2,11 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.
 
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
 import org.jetbrains.annotations.NonNls;
 
-import javax.annotation.Nullable;
 import java.awt.geom.Dimension2D;
 import java.io.Serializable;
 import java.util.Map;
@@ -16,8 +17,8 @@ public abstract class AbstractDimension2D
 		implements Serializable {
 	private static final long serialVersionUID = -6888542933393503233L;
 	@NonNls
-	private static final @Immutable Map<String, Function<Dimension2D, ?>> OBJECT_VARIABLE_MAP =
-			ImmutableMap.<String, Function<Dimension2D, ?>>builder()
+	private static final @Immutable Map<String, Function<@Nonnull Dimension2D, @Nullable ?>> OBJECT_VARIABLE_MAP =
+			ImmutableMap.<String, Function<@Nonnull Dimension2D, @Nullable ?>>builder()
 					.put("width", Dimension2D::getWidth)
 					.put("height", Dimension2D::getHeight)
 					.build();
@@ -43,7 +44,7 @@ public abstract class AbstractDimension2D
 		return ObjectUtilities.toStringImpl(this, getObjectVariableMap());
 	}
 
-	public static @Immutable Map<String, Function<Dimension2D, ?>> getObjectVariableMap() {
+	public static @Immutable Map<String, Function<@Nonnull Dimension2D, @Nullable ?>> getObjectVariableMap() {
 		return OBJECT_VARIABLE_MAP;
 	}
 }

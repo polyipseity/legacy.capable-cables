@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
 import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.core.IThrowableHandler;
 import org.slf4j.Logger;
@@ -11,11 +12,11 @@ import java.util.function.Supplier;
 
 public final class UtilitiesConfiguration extends CommonConfigurationTemplate<UtilitiesConfiguration.ConfigurationData> {
 	private static final Logger BOOTSTRAP_LOGGER = LoggerFactory.getLogger(UtilitiesConstants.getModuleName());
-	private static final Supplier<UtilitiesConfiguration> INSTANCE = Suppliers.memoize(UtilitiesConfiguration::new);
+	private static final Supplier<@Nonnull UtilitiesConfiguration> INSTANCE = Suppliers.memoize(UtilitiesConfiguration::new);
 
 	private UtilitiesConfiguration() {}
 
-	public static UtilitiesConfiguration getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+	public static UtilitiesConfiguration getInstance() { return INSTANCE.get(); }
 
 	public static Logger getBootstrapLogger() { return BOOTSTRAP_LOGGER; }
 
@@ -23,7 +24,7 @@ public final class UtilitiesConfiguration extends CommonConfigurationTemplate<Ut
 			extends CommonConfigurationTemplate.ConfigurationData {
 		public ConfigurationData(Logger logger,
 		                         IThrowableHandler<Throwable> throwableHandler,
-		                         Supplier<? extends Locale> localeSupplier) {
+		                         Supplier<@Nonnull ? extends Locale> localeSupplier) {
 			super(logger, throwableHandler, localeSupplier);
 		}
 	}

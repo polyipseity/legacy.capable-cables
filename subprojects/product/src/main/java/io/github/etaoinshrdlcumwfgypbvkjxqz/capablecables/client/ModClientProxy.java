@@ -2,12 +2,12 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.client;
 
 import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.ModCommonProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.impl.AbstractClientProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIMinecraftDebug;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.internationalization.MinecraftLocaleUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.ConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.LoggingThrowableHandler;
@@ -22,13 +22,13 @@ import java.util.function.Supplier;
 @Immutable
 public final class ModClientProxy
 		extends AbstractClientProxy {
-	private static final Supplier<ModClientProxy> INSTANCE = Suppliers.memoize(ModClientProxy::new);
+	private static final Supplier<@Nonnull ModClientProxy> INSTANCE = Suppliers.memoize(ModClientProxy::new);
 
 	private ModClientProxy() {
 		super(ModCommonProxy.getInstance());
 	}
 
-	public static ModClientProxy getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+	public static ModClientProxy getInstance() { return INSTANCE.get(); }
 
 	@Override
 	protected void onConstruction() {

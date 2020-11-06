@@ -1,14 +1,15 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.components.contexts;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.NonnullBiConsumer;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 public final class UIImmutableDefaultComponentParserContext
-		extends UIAbstractImmutableAbstractDefaultComponentParserContext<NonnullBiConsumer<? super IUIDefaultComponentParserContext, ?>>
+		extends UIAbstractImmutableAbstractDefaultComponentParserContext<BiConsumer<@Nonnull ? super IUIDefaultComponentParserContext, @Nonnull ?>>
 		implements IUIDefaultComponentParserContext {
 	private final @Nullable
 	IUIViewComponent<?, ?> view;
@@ -16,7 +17,7 @@ public final class UIImmutableDefaultComponentParserContext
 	private final Object container;
 
 	public UIImmutableDefaultComponentParserContext(Map<? extends String, ? extends Class<?>> aliases,
-	                                                Map<? extends Class<?>, ? extends NonnullBiConsumer<? super IUIDefaultComponentParserContext, ?>> handlers,
+	                                                Map<? extends Class<?>, ? extends BiConsumer<@Nonnull ? super IUIDefaultComponentParserContext, @Nonnull ?>> handlers,
 	                                                @Nullable IUIViewComponent<?, ?> view,
 	                                                @Nullable Object container) {
 		super(aliases, handlers);

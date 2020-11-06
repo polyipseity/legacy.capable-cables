@@ -1,10 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.awt;
 
 import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.MinecraftGraphics;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.MinecraftGraphicsConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.MinecraftSurfaceData;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.DynamicUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 import sun.awt.CausedFocusEvent;
@@ -27,7 +27,7 @@ import java.util.function.Supplier;
 public final class UninitializedWindow
 		extends Window {
 	private static final long serialVersionUID = -2340013652599225354L;
-	private static final Supplier<UninitializedWindow> INSTANCE;
+	private static final Supplier<@Nonnull UninitializedWindow> INSTANCE;
 
 	static {
 		INSTANCE = Suppliers.memoize(() -> {
@@ -51,7 +51,7 @@ public final class UninitializedWindow
 	}
 
 	public static UninitializedWindow getInstance() {
-		return AssertionUtilities.assertNonnull(INSTANCE.get());
+		return INSTANCE.get();
 	}
 
 	@Override
@@ -61,10 +61,10 @@ public final class UninitializedWindow
 
 	private static final class Peer
 			implements ComponentPeer {
-		private static final Supplier<Peer> INSTANCE = Suppliers.memoize(Peer::new);
+		private static final Supplier<@Nonnull Peer> INSTANCE = Suppliers.memoize(Peer::new);
 
 		public static Peer getInstance() {
-			return AssertionUtilities.assertNonnull(INSTANCE.get());
+			return INSTANCE.get();
 		}
 
 		@Override

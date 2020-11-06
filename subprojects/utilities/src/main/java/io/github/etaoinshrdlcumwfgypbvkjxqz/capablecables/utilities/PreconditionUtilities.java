@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
 import com.google.common.base.Preconditions;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 
 public enum PreconditionUtilities {

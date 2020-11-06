@@ -1,10 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui;
 
 import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 
 public final class UIEventRegistry
 		extends AbstractRegistry<INamespacePrefixedString, Class<? extends IUIEvent>> {
-	private static final Supplier<UIEventRegistry> INSTANCE = Suppliers.memoize(UIEventRegistry::new);
+	private static final Supplier<@Nonnull UIEventRegistry> INSTANCE = Suppliers.memoize(UIEventRegistry::new);
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	private static final long serialVersionUID = 321572769828882690L;
 
@@ -66,5 +66,5 @@ public final class UIEventRegistry
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
-	public static UIEventRegistry getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+	public static UIEventRegistry getInstance() { return INSTANCE.get(); }
 }

@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.common.collect.SetMultimap;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
@@ -49,7 +51,7 @@ public class UIDefaultEventTarget
 			return false;
 		ImmutableList<UIEventListenerWithParameters> listeners = ImmutableList.copyOf(getEventTargetListeners().get(event.getType()));
 
-		Predicate<UIEventListenerWithParameters> shouldHandle;
+		Predicate<@Nonnull UIEventListenerWithParameters> shouldHandle;
 		switch (event.getPhase()) {
 			case CAPTURING_PHASE:
 				shouldHandle = UIEventListenerWithParameters::isUseCapture;
@@ -93,8 +95,8 @@ public class UIDefaultEventTarget
 
 	public static class UIEventListenerWithParameters {
 		@NonNls
-		private static final ImmutableMap<String, Function<UIEventListenerWithParameters, ?>> OBJECT_VARIABLE_MAP =
-				ImmutableMap.<String, Function<UIEventListenerWithParameters, ?>>builder()
+		private static final ImmutableMap<String, Function<@Nonnull UIEventListenerWithParameters, @Nullable ?>> OBJECT_VARIABLE_MAP =
+				ImmutableMap.<String, Function<@Nonnull UIEventListenerWithParameters, @Nullable ?>>builder()
 						.put("listeners", UIEventListenerWithParameters::getListener)
 						.put("useCapture", UIEventListenerWithParameters::isUseCapture)
 						.build();
@@ -116,7 +118,7 @@ public class UIDefaultEventTarget
 		@Override
 		public String toString() { return ObjectUtilities.toStringImpl(this, getObjectVariableMap()); }
 
-		public static ImmutableMap<String, Function<UIEventListenerWithParameters, ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
+		public static ImmutableMap<String, Function<@Nonnull UIEventListenerWithParameters, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 
 		public IUIEventListener<?> getListener() { return listener; }
 

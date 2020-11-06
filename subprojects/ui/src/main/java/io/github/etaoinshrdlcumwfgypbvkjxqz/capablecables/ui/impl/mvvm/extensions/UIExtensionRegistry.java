@@ -2,8 +2,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.extensio
 
 import com.google.common.base.Suppliers;
 import com.google.common.collect.MapMaker;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 
 public final class UIExtensionRegistry
 		extends AbstractExtensionRegistry<INamespacePrefixedString, IExtensionType<? extends INamespacePrefixedString, ?, ?>> {
-	private static final Supplier<UIExtensionRegistry> INSTANCE = Suppliers.memoize(UIExtensionRegistry::new);
+	private static final Supplier<@Nonnull UIExtensionRegistry> INSTANCE = Suppliers.memoize(UIExtensionRegistry::new);
 	private static final long serialVersionUID = -7931184191525680470L;
 	private static final MapMaker DATA_BUILDER =
 			MapBuilderUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.getInitialCapacityMedium());
@@ -42,5 +42,5 @@ public final class UIExtensionRegistry
 		return UIConfiguration.getInstance().getLogger();
 	}
 
-	public static UIExtensionRegistry getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+	public static UIExtensionRegistry getInstance() { return INSTANCE.get(); }
 }

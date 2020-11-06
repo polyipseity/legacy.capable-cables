@@ -3,8 +3,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 import com.google.common.collect.ImmutableList;
 import com.google.common.math.BigIntegerMath;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.awt.geom.Point2D;
 import java.math.BigDecimal;
 import java.math.MathContext;

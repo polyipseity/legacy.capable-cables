@@ -1,6 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering;
 
 import com.google.common.collect.ImmutableList;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
@@ -11,7 +13,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.jetbrains.annotations.NonNls;
 
-import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -24,7 +25,7 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 	@Nullable
 	private R renderer;
 	@Nullable
-	private Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier;
+	private Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier;
 
 	public UIDefaultRendererContainer(@NonNls CharSequence name, IUIRendererContainerContainer<?> container, Class<? extends R> defaultRendererClass) {
 		super(name);
@@ -34,7 +35,7 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		IUIRendererContainer.super.initializeBindings(binderObserverSupplier);
 		setBinderObserverSupplier(binderObserverSupplier);
 		BindingUtilities.initializeBindings(
@@ -45,7 +46,7 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		IUIRendererContainer.super.cleanupBindings(binderObserverSupplier);
 		setBinderObserverSupplier(null);
 		BindingUtilities.cleanupBindings(
@@ -57,8 +58,8 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 	@Override
 	public Optional<? extends R> getRenderer() { return Optional.ofNullable(renderer); }
 
-	protected void setBinderObserverSupplier(@Nullable Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		this.binderObserverSupplier = binderObserverSupplier;
+	protected Optional<? extends Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>>> getBinderObserverSupplier() {
+		return Optional.ofNullable(binderObserverSupplier);
 	}
 
 	@Override
@@ -67,8 +68,8 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 	@Override
 	public Optional<? extends IUIRendererContainerContainer<?>> getContainer() { return container.getOptional(); }
 
-	protected Optional<? extends Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>>> getBinderObserverSupplier() {
-		return Optional.ofNullable(binderObserverSupplier);
+	protected void setBinderObserverSupplier(@Nullable Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		this.binderObserverSupplier = binderObserverSupplier;
 	}
 
 	@Override

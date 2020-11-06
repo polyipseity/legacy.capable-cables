@@ -1,14 +1,14 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui;
 
 import com.google.common.base.Suppliers;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.MarkersTemplate;
 import org.slf4j.Marker;
 
 import java.util.function.Supplier;
 
 public final class UIMarkers extends MarkersTemplate {
-	private static final Supplier<UIMarkers> INSTANCE = Suppliers.memoize(UIMarkers::new);
+	private static final Supplier<@Nonnull UIMarkers> INSTANCE = Suppliers.memoize(UIMarkers::new);
 
 	private final Marker markerShape;
 	private final Marker markerParser;
@@ -44,7 +44,7 @@ public final class UIMarkers extends MarkersTemplate {
 
 	private UIMarkers() { super(UIConstants.getModuleName()); }
 
-	public static UIMarkers getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+	public static UIMarkers getInstance() { return INSTANCE.get(); }
 
 	public Marker getMarkerShape() { return markerShape; }
 

@@ -1,5 +1,5 @@
 <root>
 	<item name='net.minecraft.client.Minecraft net.minecraft.client.Minecraft getInstance()'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 </root>

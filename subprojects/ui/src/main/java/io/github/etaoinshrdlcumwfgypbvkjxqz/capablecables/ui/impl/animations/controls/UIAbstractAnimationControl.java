@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.co
 
 import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationControl;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.UIAbstractAnimationPlayable;
@@ -19,7 +20,7 @@ public abstract class UIAbstractAnimationControl
 		extends UIAbstractAnimationPlayable
 		implements IUIAnimationControl {
 	private final List<IUIAnimationTarget> targets;
-	private final List<Consumer<? super IUIAnimationControl>> endActions = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
+	private final List<Consumer<@Nonnull ? super IUIAnimationControl>> endActions = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 	private boolean reversed = false;
 
 	public UIAbstractAnimationControl(Iterable<? extends IUIAnimationTarget> targets, ITicker ticker) {
@@ -71,9 +72,9 @@ public abstract class UIAbstractAnimationControl
 
 	protected abstract EnumUpdateResult getResult();
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected List<Consumer<? super IUIAnimationControl>> getEndActions() {
-		return endActions;
+	@Override
+	public void onEnd(Consumer<@Nonnull ? super IUIAnimationControl> action) {
+		getEndActions().add(action);
 	}
 
 	protected boolean isReversed() { return reversed; }
@@ -105,8 +106,8 @@ public abstract class UIAbstractAnimationControl
 		setElapsed(progress);
 	}
 
-	@Override
-	public void onEnd(Consumer<? super IUIAnimationControl> action) {
-		getEndActions().add(action);
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected List<Consumer<@Nonnull ? super IUIAnimationControl>> getEndActions() {
+		return endActions;
 	}
 }

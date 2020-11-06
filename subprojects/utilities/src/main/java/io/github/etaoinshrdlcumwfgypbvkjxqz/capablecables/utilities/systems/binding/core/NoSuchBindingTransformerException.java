@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core;
 
-import javax.annotation.Nullable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
+
 import java.util.Optional;
 
 public class NoSuchBindingTransformerException

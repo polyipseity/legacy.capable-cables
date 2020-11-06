@@ -1,5 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+
 import java.util.function.Consumer;
 
 public interface IUIAnimationControl
@@ -16,5 +18,5 @@ public interface IUIAnimationControl
 
 	IUIAnimationTime getDuration();
 
-	void onEnd(Consumer<? super IUIAnimationControl> action);
+	void onEnd(Consumer<@Nonnull ? super IUIAnimationControl> action);
 }

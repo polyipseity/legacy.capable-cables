@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.theming;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming.IUITheme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming.IUIThemeStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.AbstractObjectStack;
@@ -9,9 +10,9 @@ import java.util.function.Consumer;
 public abstract class UIAbstractThemeStack
 		extends AbstractObjectStack<IUITheme>
 		implements IUIThemeStack {
-	private final Consumer<? super IUITheme> applier;
+	private final Consumer<@Nonnull ? super IUITheme> applier;
 
-	public UIAbstractThemeStack(Consumer<? super IUITheme> applier) {
+	public UIAbstractThemeStack(Consumer<@Nonnull ? super IUITheme> applier) {
 		this.applier = applier;
 	}
 
@@ -29,5 +30,5 @@ public abstract class UIAbstractThemeStack
 		return ret;
 	}
 
-	protected Consumer<? super IUITheme> getApplier() { return applier; }
+	protected Consumer<@Nonnull ? super IUITheme> getApplier() { return applier; }
 }

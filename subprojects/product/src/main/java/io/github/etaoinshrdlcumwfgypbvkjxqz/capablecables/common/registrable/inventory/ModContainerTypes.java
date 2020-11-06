@@ -1,14 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.inventory;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModConstants;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIMinecraftDebug;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-
-import javax.annotation.Nullable;
 
 public enum ModContainerTypes {
 	;

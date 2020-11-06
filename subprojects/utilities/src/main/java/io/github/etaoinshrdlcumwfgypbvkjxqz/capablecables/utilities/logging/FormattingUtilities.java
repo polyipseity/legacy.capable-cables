@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.logging;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import org.slf4j.helpers.MessageFormatter;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 public enum FormattingUtilities {

@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.logging;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
@@ -12,7 +13,6 @@ import org.slf4j.event.Level;
 import org.slf4j.event.LoggingEvent;
 import org.slf4j.spi.LoggingEventBuilder;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -28,7 +28,7 @@ public class ProperLoggingEventBuilder
 	}
 
 	@Override
-	public LoggingEventBuilder setCause(Throwable cause) {
+	public LoggingEventBuilder setCause(@Nullable Throwable cause) {
 		getLoggingEvent().setThrowable(cause);
 		return this;
 	}
@@ -36,57 +36,57 @@ public class ProperLoggingEventBuilder
 	protected DefaultLoggingEvent getLoggingEvent() { return loggingEvent; }
 
 	@Override
-	public LoggingEventBuilder addMarker(Marker marker) {
+	public LoggingEventBuilder addMarker(@Nullable Marker marker) {
 		getLoggingEvent().addMarker(marker);
 		return this;
 	}
 
 	@Override
-	public LoggingEventBuilder addArgument(Object p) {
+	public LoggingEventBuilder addArgument(@Nullable Object p) {
 		getLoggingEvent().addArgument(p);
 		return this;
 	}
 
 	@Override
-	public LoggingEventBuilder addArgument(Supplier<Object> objectSupplier) { return addArgument(objectSupplier.get()); }
+	public LoggingEventBuilder addArgument(Supplier<@Nullable Object> objectSupplier) { return addArgument(objectSupplier.get()); }
 
 	@Override
-	public LoggingEventBuilder addKeyValue(String key, Object value) {
+	public LoggingEventBuilder addKeyValue(@Nullable String key, @Nullable Object value) {
 		getLoggingEvent().addKeyValue(key, value);
 		return this;
 	}
 
 	@Override
-	public LoggingEventBuilder addKeyValue(String key, Supplier<Object> value) { return addKeyValue(key, value.get()); }
+	public LoggingEventBuilder addKeyValue(@Nullable String key, Supplier<@Nullable Object> value) { return addKeyValue(key, value.get()); }
 
 	@Override
-	public void log(String message) {
+	public void log(@Nullable String message) {
 		getLoggingEvent().setMessage(message);
 		log(getLoggingEvent());
 	}
 
 	@Override
-	public void log(String message, Object arg) {
+	public void log(@Nullable String message, Object arg) {
 		addArgument(arg);
 		log(message);
 	}
 
 	@Override
-	public void log(String message, Object arg0, Object arg1) {
+	public void log(@Nullable String message, Object arg0, Object arg1) {
 		addArgument(arg0);
 		addArgument(arg1);
 		log(message);
 	}
 
 	@Override
-	public void log(String message, Object... args) {
+	public void log(@Nullable String message, Object... args) {
 		Arrays.stream(args)
 				.forEachOrdered(this::addArgument);
 		log(message);
 	}
 
 	@Override
-	public void log(Supplier<String> messageSupplier) { log(messageSupplier.get()); }
+	public void log(Supplier<@Nullable String> messageSupplier) { log(messageSupplier.get()); }
 
 	protected void log(LoggingEvent loggingEvent) {
 		// COMMENT marker

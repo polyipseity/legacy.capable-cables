@@ -2,6 +2,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
 import org.jetbrains.annotations.NonNls;
 
@@ -21,8 +23,8 @@ import java.util.function.Function;
 public class DelegatingGraphics2D
 		extends Graphics2D {
 	@NonNls
-	private static final @Immutable Map<String, Function<DelegatingGraphics2D, ?>> OBJECT_VARIABLE_MAP =
-			ImmutableMap.<String, Function<DelegatingGraphics2D, ?>>builder()
+	private static final @Immutable Map<String, Function<@Nonnull DelegatingGraphics2D, @Nullable ?>> OBJECT_VARIABLE_MAP =
+			ImmutableMap.<String, Function<@Nonnull DelegatingGraphics2D, @Nullable ?>>builder()
 					.put("delegate", DelegatingGraphics2D::getDelegate)
 					.build();
 	private final Graphics2D delegate;
@@ -40,17 +42,16 @@ public class DelegatingGraphics2D
 	@Override
 	public void draw(Shape s) {getDelegate().draw(s);}
 
-	@Override
-	public boolean drawImage(Image img, AffineTransform xform, ImageObserver obs) {return getDelegate().drawImage(img, xform, obs);}
+	public static @Immutable Map<String, Function<@Nonnull DelegatingGraphics2D, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 
 	@Override
 	public void drawImage(BufferedImage img, BufferedImageOp op, int x, int y) {getDelegate().drawImage(img, op, x, y);}
 
 	@Override
-	public void drawRenderedImage(RenderedImage img, AffineTransform xform) {getDelegate().drawRenderedImage(img, xform);}
+	public boolean drawImage(Image img, AffineTransform transform, ImageObserver obs) {return getDelegate().drawImage(img, transform, obs);}
 
 	@Override
-	public void drawRenderableImage(RenderableImage img, AffineTransform xform) {getDelegate().drawRenderableImage(img, xform);}
+	public void drawRenderedImage(RenderedImage img, AffineTransform transform) {getDelegate().drawRenderedImage(img, transform);}
 
 	@Override
 	public void drawString(String str, int x, int y) {getDelegate().drawString(str, x, y);}
@@ -258,16 +259,16 @@ public class DelegatingGraphics2D
 	public boolean drawImage(Image img, int x, int y, int width, int height, ImageObserver observer) {return getDelegate().drawImage(img, x, y, width, height, observer);}
 
 	@Override
-	public boolean drawImage(Image img, int x, int y, Color bgcolor, ImageObserver observer) {return getDelegate().drawImage(img, x, y, bgcolor, observer);}
+	public void drawRenderableImage(RenderableImage img, AffineTransform transform) {getDelegate().drawRenderableImage(img, transform);}
 
 	@Override
-	public boolean drawImage(Image img, int x, int y, int width, int height, Color bgcolor, ImageObserver observer) {return getDelegate().drawImage(img, x, y, width, height, bgcolor, observer);}
+	public boolean drawImage(Image img, int x, int y, Color backgroundColor, ImageObserver observer) {return getDelegate().drawImage(img, x, y, backgroundColor, observer);}
 
 	@Override
 	public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, ImageObserver observer) {return getDelegate().drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, observer);}
 
 	@Override
-	public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, Color bgcolor, ImageObserver observer) {return getDelegate().drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, bgcolor, observer);}
+	public boolean drawImage(Image img, int x, int y, int width, int height, Color backgroundColor, ImageObserver observer) {return getDelegate().drawImage(img, x, y, width, height, backgroundColor, observer);}
 
 	@Override
 	public void dispose() {getDelegate().dispose();}
@@ -281,7 +282,8 @@ public class DelegatingGraphics2D
 		return ObjectUtilities.toStringImpl(this, getObjectVariableMap());
 	}
 
-	public static @Immutable Map<String, Function<DelegatingGraphics2D, ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
+	@Override
+	public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, Color backgroundColor, ImageObserver observer) {return getDelegate().drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, backgroundColor, observer);}
 
 	@Override
 	public boolean hitClip(int x, int y, int width, int height) {return getDelegate().hitClip(x, y, width, height);}

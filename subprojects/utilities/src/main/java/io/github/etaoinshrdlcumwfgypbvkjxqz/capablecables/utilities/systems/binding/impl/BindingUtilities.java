@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bin
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBinding;
 import io.reactivex.rxjava3.observers.DisposableObserver;
@@ -13,14 +13,14 @@ import java.util.function.Supplier;
 public enum BindingUtilities {
 	;
 
-	public static void actOnBinderObserverSupplier(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier,
-	                                               Supplier<? extends IBinderAction> action) {
-		AssertionUtilities.assertNonnull(binderObserverSupplier.get())
-				.ifPresent(binderObserver -> binderObserver.onNext(AssertionUtilities.assertNonnull(action.get())));
+	public static void actOnBinderObserverSupplier(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier,
+	                                               Supplier<@Nonnull ? extends IBinderAction> action) {
+		binderObserverSupplier.get()
+				.ifPresent(binderObserver -> binderObserver.onNext(action.get()));
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static void findAndInitializeBindings(Iterable<?> objects, Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public static void findAndInitializeBindings(Iterable<?> objects, Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		initializeBindings(
 				Streams.stream(objects).unordered()
 						.filter(IHasBinding.class::isInstance)
@@ -30,13 +30,13 @@ public enum BindingUtilities {
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static void initializeBindings(Iterable<? extends IHasBinding> bindings, Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public static void initializeBindings(Iterable<? extends IHasBinding> bindings, Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		Streams.stream(bindings).unordered()
 				.forEach(binding -> binding.initializeBindings(binderObserverSupplier));
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static void findAndCleanupBindings(Iterable<?> objects, Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public static void findAndCleanupBindings(Iterable<?> objects, Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		cleanupBindings(
 				Streams.stream(objects).unordered()
 						.filter(IHasBinding.class::isInstance)
@@ -46,7 +46,7 @@ public enum BindingUtilities {
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static void cleanupBindings(Iterable<? extends IHasBinding> bindings, Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public static void cleanupBindings(Iterable<? extends IHasBinding> bindings, Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		Streams.stream(bindings).unordered()
 				.forEach(binding -> binding.cleanupBindings(binderObserverSupplier));
 	}

@@ -1,6 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions;
 
 import com.google.common.collect.ImmutableMap;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import org.jetbrains.annotations.NonNls;
 
@@ -32,8 +34,8 @@ public interface IShapeAnchor {
 		;
 
 		@NonNls
-		private static final ImmutableMap<String, Function<IShapeAnchor, ?>> OBJECT_VARIABLE_MAP =
-				ImmutableMap.<String, Function<IShapeAnchor, ?>>builder()
+		private static final ImmutableMap<String, Function<@Nonnull IShapeAnchor, @Nullable ?>> OBJECT_VARIABLE_MAP =
+				ImmutableMap.<String, Function<@Nonnull IShapeAnchor, @Nullable ?>>builder()
 						.put("target", IShapeAnchor::getTarget)
 						.put("originSide", IShapeAnchor::getOriginSide)
 						.put("targetSide", IShapeAnchor::getTargetSide)
@@ -41,6 +43,6 @@ public interface IShapeAnchor {
 						.put("container", IShapeAnchor::getContainer)
 						.build();
 
-		public static ImmutableMap<String, Function<IShapeAnchor, ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
+		public static ImmutableMap<String, Function<@Nonnull IShapeAnchor, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 	}
 }

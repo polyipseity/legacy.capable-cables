@@ -1,6 +1,9 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.automata.impl;
 
 import com.google.common.collect.ImmutableMap;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
@@ -8,7 +11,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.Fu
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.automata.core.IState;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.automata.core.ITransitionSystem;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
@@ -24,16 +26,19 @@ public class TransitionSystem<S extends IState<D>, E, D>
 		public void transitToThis(Object argument) { throw new UnsupportedOperationException(); }
 	}, null, ImmutableMap
 			.of(FunctionUtilities.getAlwaysTrueBiPredicate(), d -> { throw new UnsupportedOperationException(); }));
-	private final Map<BiPredicate<? super ITransitionSystem<S, E, D>, ? super D>, Function<? super D, ? extends S>> transitionsView;
+	private final @Immutable Map<BiPredicate<@Nonnull ? super ITransitionSystem<S, E, D>, @Nonnull ? super D>, Function<@Nonnull ? super D, @Nonnull ? extends S>> transitions;
 	private S state;
 	@Nullable
 	private E input;
 
-	public TransitionSystem(S state, @Nullable E input, Map<? extends BiPredicate<? super ITransitionSystem<S, E, D>, ? super D>, ? extends Function<? super D, ? extends S>> transitions) {
+	public TransitionSystem(S state, @Nullable E input, Map<BiPredicate<@Nonnull ? super ITransitionSystem<S, E, D>, @Nonnull ? super D>, Function<@Nonnull ? super D, @Nonnull ? extends S>> transitions) {
 		this.state = state;
 		this.input = input;
-		this.transitionsView = ImmutableMap.copyOf(transitions);
+		this.transitions = ImmutableMap.copyOf(transitions);
 	}
+
+	@Override
+	public @Immutable Map<BiPredicate<@Nonnull ? super ITransitionSystem<S, E, D>, @Nonnull ? super D>, Function<@Nonnull ? super D, @Nonnull ? extends S>> getTransitionsView() { return ImmutableMap.copyOf(getTransitions()); }
 
 	@SuppressWarnings("unchecked")
 	public static <S extends IState<D>, E, D> ITransitionSystem<S, E, D> getUninitialized() {
@@ -60,8 +65,9 @@ public class TransitionSystem<S extends IState<D>, E, D>
 	@Override
 	public Optional<? extends E> getInput() { return Optional.ofNullable(input); }
 
-	@Override
-	public Map<BiPredicate<? super ITransitionSystem<S, E, D>, ? super D>, Function<? super D, ? extends S>> getTransitionsView() { return transitionsView; }
+	protected @Immutable Map<BiPredicate<@Nonnull ? super ITransitionSystem<S, E, D>, @Nonnull ? super D>, Function<@Nonnull ? super D, @Nonnull ? extends S>> getTransitions() {
+		return transitions;
+	}
 
 	protected void setInput(@Nullable E input) { this.input = input; }
 

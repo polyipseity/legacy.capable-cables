@@ -2,6 +2,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUISubInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUISubInfrastructureContext;
@@ -16,7 +18,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.exte
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 
-import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Map;
 import java.util.Optional;
@@ -30,7 +31,7 @@ public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructure
 	@Nullable
 	private C context;
 	@Nullable
-	private Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier;
+	private Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier;
 
 	@Override
 	public Optional<? extends IUIInfrastructure<?, ?, ?>> getInfrastructure() {
@@ -79,13 +80,17 @@ public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructure
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() { return extensions; }
 
-	protected Optional<? extends Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>>> getBinderObserverSupplier() {
+	protected Optional<? extends Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>>> getBinderObserverSupplier() {
 		return Optional.ofNullable(binderObserverSupplier);
+	}
+
+	protected void setBinderObserverSupplier(@Nullable Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		this.binderObserverSupplier = binderObserverSupplier;
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		IUISubInfrastructure.super.initializeBindings(binderObserverSupplier);
 		setBinderObserverSupplier(binderObserverSupplier);
 		BindingUtilities.findAndInitializeBindings(getExtensions().values(), binderObserverSupplier);
@@ -93,13 +98,9 @@ public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructure
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		IUISubInfrastructure.super.cleanupBindings(binderObserverSupplier);
 		setBinderObserverSupplier(null);
 		BindingUtilities.findAndCleanupBindings(getExtensions().values(), binderObserverSupplier);
-	}
-
-	protected void setBinderObserverSupplier(@Nullable Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		this.binderObserverSupplier = binderObserverSupplier;
 	}
 }

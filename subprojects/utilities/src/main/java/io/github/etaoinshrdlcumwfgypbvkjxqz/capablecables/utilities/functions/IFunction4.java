@@ -1,8 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
-
-import javax.annotation.Nullable;
 
 @FunctionalInterface
 public interface IFunction4<T1, T2, T3, T4, R, T extends Throwable> {

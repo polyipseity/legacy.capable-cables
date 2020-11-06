@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bin
 
 import com.google.common.cache.Cache;
 import com.google.common.reflect.TypeToken;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ITypeCapture;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.bindings.IBindings;
@@ -23,20 +24,20 @@ public interface IBinding<T> extends ITypeCapture, IHasBindingKey {
 		FIELD {
 			@Override
 			public IBindings<?> createBindings(INamespacePrefixedString bindingKey,
-			                                   Supplier<? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>>> transformersSupplier) {
+			                                   Supplier<@Nonnull ? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>>> transformersSupplier) {
 				return new FieldBindings(bindingKey, transformersSupplier);
 			}
 		},
 		METHOD {
 			@Override
 			public IBindings<?> createBindings(INamespacePrefixedString bindingKey,
-			                                   Supplier<? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>>> transformersSupplier) {
+			                                   Supplier<@Nonnull ? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>>> transformersSupplier) {
 				return new MethodBindings(bindingKey, transformersSupplier);
 			}
 		},
 		;
 
 		public abstract IBindings<?> createBindings(INamespacePrefixedString bindingKey,
-		                                            Supplier<? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>>> transformersSupplier);
+		                                            Supplier<@Nonnull ? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>>> transformersSupplier);
 	}
 }

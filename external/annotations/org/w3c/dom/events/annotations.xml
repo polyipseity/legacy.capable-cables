@@ -1,5 +1,5 @@
 <root>
 	<item name='org.w3c.dom.events.Event java.lang.String getType()'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 </root>

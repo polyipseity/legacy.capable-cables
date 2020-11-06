@@ -4,6 +4,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.ManualLoadingCache;
@@ -15,7 +17,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NonNls;
 import org.lwjgl.opengl.GL11;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
@@ -40,10 +41,8 @@ public enum MinecraftOpenGLUtilities {
 
 		private static final Runnable GL_SCISSOR_FALLBACK = () -> {
 			MainWindow window = MinecraftClientUtilities.getMinecraftNonnull().getMainWindow();
-			State.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{0, 0, window.getFramebufferWidth(), window.getFramebufferHeight()}, (i, v) -> {
-				assert v != null;
-				GL11.glScissor(v[0], v[1], v[2], v[3]);
-			});
+			State.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{0, 0, window.getFramebufferWidth(), window.getFramebufferHeight()},
+					(i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3]));
 		};
 		private static final Runnable STENCIL_MASK_FALLBACK = () -> RenderSystem.stencilMask(MinecraftOpenGLUtilities.getGlMaskAllBits());
 		private static final Runnable STENCIL_FUNC_FALLBACK = () -> RenderSystem.stencilFunc(GL11.GL_ALWAYS, 0, MinecraftOpenGLUtilities.getGlMaskAllBits());
@@ -155,7 +154,7 @@ public enum MinecraftOpenGLUtilities {
 			return STATE;
 		}
 
-		public static void setInteger(int name, int param, BiConsumer<Integer, Integer> setter) {
+		public static void setInteger(int name, int param, BiConsumer<@Nonnull Integer, @Nonnull Integer> setter) {
 			setter.accept(name, param);
 			getState().put(name, param);
 		}
@@ -169,7 +168,7 @@ public enum MinecraftOpenGLUtilities {
 			System.arraycopy(ret, 0, params, 0, params.length);
 		}
 
-		public static void setIntegerValue(int name, int[] params, BiConsumer<Integer, int[]> setter) {
+		public static void setIntegerValue(int name, int[] params, @SuppressWarnings("NullableProblems") BiConsumer<@Nonnull Integer, @Nonnull int[]> setter) {
 			setter.accept(name, params);
 			getState().put(name, params.clone());
 		}

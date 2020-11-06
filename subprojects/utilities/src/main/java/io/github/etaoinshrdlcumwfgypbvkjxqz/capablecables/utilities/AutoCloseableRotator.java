@@ -1,26 +1,26 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingBiFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingConsumer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingSupplier;
 
-import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public class AutoCloseableRotator<T, TH extends Exception>
 		implements AutoCloseable, IThrowingSupplier<T, TH> {
-	private final Supplier<? extends T> supplier;
+	private final Supplier<@Nonnull ? extends T> supplier;
 	private final IThrowingConsumer<? super T, ? extends TH> closer;
 	private final AtomicReference<T> activeReference = new AtomicReference<>(null);
 
-	public AutoCloseableRotator(Supplier<? extends T> supplier, IThrowingConsumer<? super T, ? extends TH> closer) {
+	public AutoCloseableRotator(Supplier<@Nonnull ? extends T> supplier, IThrowingConsumer<? super T, ? extends TH> closer) {
 		this.supplier = supplier;
 		this.closer = closer;
 	}
 
-	public static <T extends AutoCloseable> AutoCloseableRotator<T, Exception> create(Supplier<? extends T> supplier) {
+	public static <T extends AutoCloseable> AutoCloseableRotator<T, Exception> create(Supplier<@Nonnull ? extends T> supplier) {
 		return new AutoCloseableRotator<>(supplier, AutoCloseable::close);
 	}
 
@@ -41,7 +41,7 @@ public class AutoCloseableRotator<T, TH extends Exception>
 		);
 	}
 
-	protected Supplier<? extends T> getSupplier() { return supplier; }
+	protected Supplier<@Nonnull ? extends T> getSupplier() { return supplier; }
 
 	@Override
 	public void close()

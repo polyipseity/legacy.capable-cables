@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches;
 
 import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 
 public final class UICacheRegistry
 		extends AbstractRegistry<INamespacePrefixedString, IUICacheType<?, ?>> {
-	private static final Supplier<UICacheRegistry> INSTANCE = Suppliers.memoize(UICacheRegistry::new);
+	private static final Supplier<@Nonnull UICacheRegistry> INSTANCE = Suppliers.memoize(UICacheRegistry::new);
 	private static final long serialVersionUID = 6387752008636256568L;
 
 	private final ConcurrentMap<INamespacePrefixedString, IRegistryObjectInternal<? extends IUICacheType<?, ?>>> data =
@@ -25,7 +25,7 @@ public final class UICacheRegistry
 		super(true);
 	}
 
-	public static UICacheRegistry getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+	public static UICacheRegistry getInstance() { return INSTANCE.get(); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	@Override

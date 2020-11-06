@@ -2,9 +2,10 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.aut
 
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import org.jetbrains.annotations.NonNls;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
@@ -20,18 +21,18 @@ public interface ITransitionSystem<S extends IState<D>, E, D> {
 
 	Optional<? extends E> getInput();
 
-	Map<BiPredicate<? super ITransitionSystem<S, E, D>, ? super D>, Function<? super D, ? extends S>> getTransitionsView();
+	@Immutable Map<BiPredicate<@Nonnull ? super ITransitionSystem<S, E, D>, @Nonnull ? super D>, Function<@Nonnull ? super D, @Nonnull ? extends S>> getTransitionsView();
 
 	enum StaticHolder {
 		;
 
-		private static final @Immutable @NonNls Map<String, Function<ITransitionSystem<?, ?, ?>, ?>> OBJECT_VARIABLE_MAP =
-				ImmutableMap.<String, Function<ITransitionSystem<?, ?, ?>, ?>>builder()
+		private static final @Immutable @NonNls Map<String, Function<@Nonnull ITransitionSystem<?, ?, ?>, @Nullable ?>> OBJECT_VARIABLE_MAP =
+				ImmutableMap.<String, Function<@Nonnull ITransitionSystem<?, ?, ?>, @Nullable ?>>builder()
 						.put("state", ITransitionSystem::getState)
 						.put("input", ITransitionSystem::getInput)
 						.put("transitionsView", ITransitionSystem::getTransitionsView)
 						.build();
 
-		public static @Immutable Map<String, Function<ITransitionSystem<?, ?, ?>, ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
+		public static @Immutable Map<String, Function<@Nonnull ITransitionSystem<?, ?, ?>, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 	}
 }

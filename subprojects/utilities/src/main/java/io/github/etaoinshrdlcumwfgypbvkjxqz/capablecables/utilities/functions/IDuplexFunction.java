@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions;
 
-import javax.annotation.Nullable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
+
 import java.io.Serializable;
 import java.util.function.Function;
 

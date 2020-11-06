@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm;
 
 import com.google.common.collect.ImmutableMap;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIContextContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIInfrastructure;
@@ -22,7 +23,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.exte
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 
-import javax.annotation.Nonnull;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Map;
 import java.util.Optional;
@@ -38,7 +38,7 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 	private B binder;
 	private boolean bound = false;
 
-	private final Supplier<Optional<DisposableObserver<IBinderAction>>> binderObserverSupplier;
+	private final Supplier<@Nonnull Optional<DisposableObserver<IBinderAction>>> binderObserverSupplier;
 
 	@Override
 	@Deprecated
@@ -99,7 +99,7 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 		setBound(true);
 	}
 
-	protected Supplier<Optional<DisposableObserver<IBinderAction>>> getBinderObserverSupplier() {
+	protected Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> getBinderObserverSupplier() {
 		return binderObserverSupplier;
 	}
 

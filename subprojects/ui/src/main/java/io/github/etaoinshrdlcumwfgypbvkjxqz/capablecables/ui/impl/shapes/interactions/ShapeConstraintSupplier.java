@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interactions;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeConstraint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.MathUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
@@ -9,23 +10,23 @@ import java.util.function.Supplier;
 
 public class ShapeConstraintSupplier
 		implements IShapeConstraint {
-	private final Supplier<? extends Double> minXSupplier;
-	private final Supplier<? extends Double> minYSupplier;
-	private final Supplier<? extends Double> maxXSupplier;
-	private final Supplier<? extends Double> maxYSupplier;
-	private final Supplier<? extends Double> minWidthSupplier;
-	private final Supplier<? extends Double> minHeightSupplier;
-	private final Supplier<? extends Double> maxWidthSupplier;
-	private final Supplier<? extends Double> maxHeightSupplier;
+	private final Supplier<@Nullable ? extends Double> minXSupplier;
+	private final Supplier<@Nullable ? extends Double> minYSupplier;
+	private final Supplier<@Nullable ? extends Double> maxXSupplier;
+	private final Supplier<@Nullable ? extends Double> maxYSupplier;
+	private final Supplier<@Nullable ? extends Double> minWidthSupplier;
+	private final Supplier<@Nullable ? extends Double> minHeightSupplier;
+	private final Supplier<@Nullable ? extends Double> maxWidthSupplier;
+	private final Supplier<@Nullable ? extends Double> maxHeightSupplier;
 
-	public ShapeConstraintSupplier(Supplier<? extends Double> minXSupplier,
-	                               Supplier<? extends Double> minYSupplier,
-	                               Supplier<? extends Double> maxXSupplier,
-	                               Supplier<? extends Double> maxYSupplier,
-	                               Supplier<? extends Double> minWidthSupplier,
-	                               Supplier<? extends Double> minHeightSupplier,
-	                               Supplier<? extends Double> maxWidthSupplier,
-	                               Supplier<? extends Double> maxHeightSupplier) {
+	public ShapeConstraintSupplier(Supplier<@Nullable ? extends Double> minXSupplier,
+	                               Supplier<@Nullable ? extends Double> minYSupplier,
+	                               Supplier<@Nullable ? extends Double> maxXSupplier,
+	                               Supplier<@Nullable ? extends Double> maxYSupplier,
+	                               Supplier<@Nullable ? extends Double> minWidthSupplier,
+	                               Supplier<@Nullable ? extends Double> minHeightSupplier,
+	                               Supplier<@Nullable ? extends Double> maxWidthSupplier,
+	                               Supplier<@Nullable ? extends Double> maxHeightSupplier) {
 		this.minXSupplier = minXSupplier;
 		this.minYSupplier = minYSupplier;
 		this.maxXSupplier = maxXSupplier;
@@ -83,19 +84,19 @@ public class ShapeConstraintSupplier
 	@Override
 	public Optional<? extends Double> getMaxHeight() { return Optional.ofNullable(getMaxHeightSupplier().get()); }
 
-	protected Supplier<? extends Double> getMinXSupplier() { return minXSupplier; }
+	protected Supplier<@Nullable ? extends Double> getMinXSupplier() { return minXSupplier; }
 
-	protected Supplier<? extends Double> getMinYSupplier() { return minYSupplier; }
+	protected Supplier<@Nullable ? extends Double> getMinYSupplier() { return minYSupplier; }
 
-	protected Supplier<? extends Double> getMaxXSupplier() { return maxXSupplier; }
+	protected Supplier<@Nullable ? extends Double> getMaxXSupplier() { return maxXSupplier; }
 
-	protected Supplier<? extends Double> getMaxYSupplier() { return maxYSupplier; }
+	protected Supplier<@Nullable ? extends Double> getMaxYSupplier() { return maxYSupplier; }
 
-	protected Supplier<? extends Double> getMinWidthSupplier() { return minWidthSupplier; }
+	protected Supplier<@Nullable ? extends Double> getMinWidthSupplier() { return minWidthSupplier; }
 
-	protected Supplier<? extends Double> getMinHeightSupplier() { return minHeightSupplier; }
+	protected Supplier<@Nullable ? extends Double> getMinHeightSupplier() { return minHeightSupplier; }
 
-	protected Supplier<? extends Double> getMaxWidthSupplier() { return maxWidthSupplier; }
+	protected Supplier<@Nullable ? extends Double> getMaxWidthSupplier() { return maxWidthSupplier; }
 
-	protected Supplier<? extends Double> getMaxHeightSupplier() { return maxHeightSupplier; }
+	protected Supplier<@Nullable ? extends Double> getMaxHeightSupplier() { return maxHeightSupplier; }
 }

@@ -49,10 +49,7 @@ public enum EnumMinecraftCropMethod {
 								assert w != null;
 								assert h != null;
 								MinecraftOpenGLUtilities.State.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{x.intValue(), y.intValue(), w.intValue(), h.intValue()},
-										(i, v) -> {
-											assert v != null;
-											GL11.glScissor(v[0], v[1], v[2], v[3]);
-										});
+										(i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3]));
 							}, MinecraftOpenGLUtilities.Stacks.getGlScissorFallback()));
 		}
 

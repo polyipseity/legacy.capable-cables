@@ -1,9 +1,9 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui;
 
 import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.cursors.EnumGLFWCursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftClientUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EventBusSubject;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
@@ -20,13 +20,13 @@ import java.util.function.Supplier;
 public final class UIConfiguration
 		extends CommonConfigurationTemplate<UIConfiguration.ConfigurationData> {
 	private static final Logger BOOTSTRAP_LOGGER = LoggerFactory.getLogger(UIConstants.getModuleName());
-	private static final Supplier<UIConfiguration> INSTANCE = Suppliers.memoize(UIConfiguration::new);
+	private static final Supplier<@Nonnull UIConfiguration> INSTANCE = Suppliers.memoize(UIConfiguration::new);
 
 	private UIConfiguration() {}
 
 	public static Logger getBootstrapLogger() { return BOOTSTRAP_LOGGER; }
 
-	public static UIConfiguration getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+	public static UIConfiguration getInstance() { return INSTANCE.get(); }
 
 	@Override
 	protected void configure0(ConfigurationData data) {
@@ -62,7 +62,7 @@ public final class UIConfiguration
 			extends CommonConfigurationTemplate.ConfigurationData {
 		public ConfigurationData(Logger logger,
 		                         IThrowableHandler<Throwable> throwableHandler,
-		                         Supplier<? extends Locale> localeSupplier) {
+		                         Supplier<@Nonnull ? extends Locale> localeSupplier) {
 			super(logger, throwableHandler, localeSupplier);
 		}
 	}

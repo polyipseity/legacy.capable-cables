@@ -1,29 +1,30 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.logging.FormattingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Marker;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
 
 public class LogMessageBuilder {
-	private final Set<Supplier<?>> markers = new LinkedHashSet<>(CapacityUtilities.getInitialCapacitySmall());
-	private final List<Supplier<?>> messages = new ArrayList<>(CapacityUtilities.getInitialCapacityTiny());
-	private final List<Supplier<?>> arguments = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
-	private final Map<String, Supplier<?>> keyValuePairs = new HashMap<>(CapacityUtilities.getInitialCapacitySmall());
+	private final Set<@Nonnull Supplier<?>> markers = new LinkedHashSet<>(CapacityUtilities.getInitialCapacitySmall());
+	private final List<@Nullable Supplier<?>> messages = new ArrayList<>(CapacityUtilities.getInitialCapacityTiny());
+	private final List<@Nullable Supplier<?>> arguments = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
+	private final Map<String, Supplier<@Nullable ?>> keyValuePairs = new HashMap<>(CapacityUtilities.getInitialCapacitySmall());
 
 	public LogMessageBuilder addKeyValue(@NonNls CharSequence key, @Nullable Object value) { return addKeyValue(key, ConstantValue.of(value)); }
 
-	public LogMessageBuilder addKeyValue(@NonNls CharSequence key, Supplier<?> value) {
+	public LogMessageBuilder addKeyValue(@NonNls CharSequence key, Supplier<@Nullable ?> value) {
 		getKeyValuePairs().put(key.toString(), value);
 		return this;
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Map<String, Supplier<?>> getKeyValuePairs() { return keyValuePairs; }
+	protected Map<String, Supplier<@Nullable ?>> getKeyValuePairs() { return keyValuePairs; }
 
 	public LogMessageBuilder addMarkers(Object... markers) {
 		return addMarkers(
@@ -32,13 +33,13 @@ public class LogMessageBuilder {
 						.toArray(Supplier[]::new));
 	}
 
-	public LogMessageBuilder addMarkers(Supplier<?>... markers) {
+	public LogMessageBuilder addMarkers(Supplier<@Nonnull ?>... markers) {
 		Collections.addAll(getMarkers(), markers);
 		return this;
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Set<Supplier<?>> getMarkers() { return markers; }
+	protected Set<Supplier<@Nullable ?>> getMarkers() { return markers; }
 
 	public LogMessageBuilder addMessages(Object... messages) {
 		return addMessages(
@@ -47,7 +48,7 @@ public class LogMessageBuilder {
 						.toArray(Supplier[]::new));
 	}
 
-	public LogMessageBuilder addMessages(Supplier<?>... messages) {
+	public LogMessageBuilder addMessages(Supplier<@Nullable ?>... messages) {
 		Collections.addAll(getMessages(), messages);
 		return this;
 	}
@@ -65,7 +66,7 @@ public class LogMessageBuilder {
 						.toArray(Supplier[]::new));
 	}
 
-	public LogMessageBuilder addArguments(Supplier<?>... arguments) {
+	public LogMessageBuilder addArguments(Supplier<@Nullable ?>... arguments) {
 		Collections.addAll(getArguments(), arguments);
 		return this;
 	}
@@ -74,7 +75,6 @@ public class LogMessageBuilder {
 		StringBuilder ret = new StringBuilder(CapacityUtilities.getInitialCapacityLarge());
 		if (getMarkers().stream()
 				.map(Supplier::get)
-				.map(AssertionUtilities::assertNonnull)
 				.map(marker ->
 						CastUtilities.castChecked(Marker.class, marker)
 								.map(Marker::getName)
@@ -86,7 +86,7 @@ public class LogMessageBuilder {
 				.reduce(false, Boolean::logicalOr))
 			ret.append(' ');
 		getKeyValuePairs().forEach((key, value) ->
-				ret.append(key).append('=').append(AssertionUtilities.assertNonnull(value).get()).append(' '));
+				ret.append(key).append('=').append(value.get()).append(' '));
 		ret.append(FormattingUtilities.formatSimpleParameterized(
 				getMessages().stream()
 						.map(Supplier::get)

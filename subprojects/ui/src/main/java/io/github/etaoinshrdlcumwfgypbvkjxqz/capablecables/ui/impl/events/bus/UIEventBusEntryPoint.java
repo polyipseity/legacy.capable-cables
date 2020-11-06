@@ -1,9 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.reactivex.rxjava3.subjects.Subject;
-
-import javax.annotation.Nullable;
 
 public enum UIEventBusEntryPoint {
 	;

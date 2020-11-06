@@ -3,7 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.internation
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
@@ -23,9 +23,9 @@ public class ChangingLocaleResourceBundle
 			.initialCapacity(CapacityUtilities.getInitialCapacitySmall())
 			.expireAfterAccess(CacheUtilities.getCacheExpirationAccessDuration(), CacheUtilities.getCacheExpirationAccessTimeUnit());
 	private final LoadingCache<Locale, ResourceBundle> bundleMap;
-	private final Supplier<? extends Locale> localeSupplier;
+	private final Supplier<@Nonnull ? extends Locale> localeSupplier;
 
-	public ChangingLocaleResourceBundle(CacheLoader<? super Locale, ResourceBundle> loader, Supplier<? extends Locale> localeSupplier) {
+	public ChangingLocaleResourceBundle(CacheLoader<? super Locale, ResourceBundle> loader, Supplier<@Nonnull ? extends Locale> localeSupplier) {
 		this.bundleMap = getBundleMapBuilder().build(loader);
 		this.localeSupplier = localeSupplier;
 	}
@@ -44,22 +44,22 @@ public class ChangingLocaleResourceBundle
 	protected Object handleGetObject(String key) { return getCurrentBundle(this).getObject(key); }
 
 	@Override
-	public Enumeration<String> getKeys() { return getCurrentBundle(this).getKeys(); }
+	public @Nonnull Enumeration<String> getKeys() { return getCurrentBundle(this).getKeys(); }
 
 	@Override
 	public boolean containsKey(String key) { return getCurrentBundle(this).containsKey(key); }
 
 	@Override
-	public Set<String> keySet() { return getCurrentBundle(this).keySet(); }
+	public @Nonnull Set<String> keySet() { return getCurrentBundle(this).keySet(); }
 
 	@Override
-	protected Set<String> handleKeySet() { return getCurrentBundle(this).keySet(); }
+	protected @Nonnull Set<String> handleKeySet() { return getCurrentBundle(this).keySet(); }
 
-	protected static ResourceBundle getCurrentBundle(ChangingLocaleResourceBundle self) { return self.getBundleMap().getUnchecked(AssertionUtilities.assertNonnull(self.getLocaleSupplier().get())); }
+	protected static ResourceBundle getCurrentBundle(ChangingLocaleResourceBundle self) { return self.getBundleMap().getUnchecked(self.getLocaleSupplier().get()); }
 
 	protected LoadingCache<Locale, ResourceBundle> getBundleMap() { return bundleMap; }
 
-	protected Supplier<? extends Locale> getLocaleSupplier() { return localeSupplier; }
+	protected Supplier<@Nonnull ? extends Locale> getLocaleSupplier() { return localeSupplier; }
 
 	public static class Builder {
 		private static final ConcurrentMap<String, ChangingLocaleResourceBundle> BASE_NAME_BUNDLE_MAP =
@@ -68,14 +68,14 @@ public class ChangingLocaleResourceBundle
 						.weakValues()
 						.makeMap();
 		private String baseName;
-		private BiFunction<? super String, ? super Locale, ? extends ResourceBundle> loader = ResourceBundle::getBundle;
-		private Supplier<? extends Locale> localeSupplier = Locale::getDefault;
+		private BiFunction<@Nonnull ? super String, @Nonnull ? super Locale, @Nonnull ? extends ResourceBundle> loader = ResourceBundle::getBundle;
+		private Supplier<@Nonnull ? extends Locale> localeSupplier = Locale::getDefault;
 
 		public Builder() { this.baseName = StackTraceUtilities.getCallerClass().getName(); }
 
 		public ChangingLocaleResourceBundle build() { return getBundle(getBaseName(), getLoader(), getLocaleSupplier()); }
 
-		public static ChangingLocaleResourceBundle getBundle(CharSequence baseName, BiFunction<? super String, ? super Locale, ? extends ResourceBundle> loader, Supplier<? extends Locale> localeSupplier) {
+		public static ChangingLocaleResourceBundle getBundle(CharSequence baseName, BiFunction<@Nonnull ? super String, @Nonnull ? super Locale, @Nonnull ? extends ResourceBundle> loader, Supplier<@Nonnull ? extends Locale> localeSupplier) {
 			return BASE_NAME_BUNDLE_MAP.computeIfAbsent(baseName.toString(), key ->
 					new ChangingLocaleResourceBundle(CacheLoader.from(locale ->
 							loader.apply(key, locale)),
@@ -92,16 +92,16 @@ public class ChangingLocaleResourceBundle
 			return this;
 		}
 
-		protected BiFunction<? super String, ? super Locale, ? extends ResourceBundle> getLoader() { return loader; }
+		protected BiFunction<@Nonnull ? super String, @Nonnull ? super Locale, @Nonnull ? extends ResourceBundle> getLoader() { return loader; }
 
-		public Builder setLoader(BiFunction<? super String, ? super Locale, ? extends ResourceBundle> loader) {
+		public Builder setLoader(BiFunction<@Nonnull ? super String, @Nonnull ? super Locale, @Nonnull ? extends ResourceBundle> loader) {
 			this.loader = loader;
 			return this;
 		}
 
-		protected Supplier<? extends Locale> getLocaleSupplier() { return localeSupplier; }
+		protected Supplier<@Nonnull ? extends Locale> getLocaleSupplier() { return localeSupplier; }
 
-		public Builder setLocaleSupplier(Supplier<? extends Locale> localeSupplier) {
+		public Builder setLocaleSupplier(Supplier<@Nonnull ? extends Locale> localeSupplier) {
 			this.localeSupplier = localeSupplier;
 			return this;
 		}

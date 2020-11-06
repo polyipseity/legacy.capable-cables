@@ -2,6 +2,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapt
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBObjectAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBAdapterRegistry;
@@ -168,8 +170,8 @@ public enum EnumJAXBObjectPresetAdapter {
 	;
 
 	@NonNls
-	private static final ImmutableMap<String, Function<EnumJAXBObjectPresetAdapter, ?>> OBJECT_VARIABLE_MAP =
-			ImmutableMap.<String, Function<EnumJAXBObjectPresetAdapter, ?>>builder()
+	private static final ImmutableMap<String, Function<@Nonnull EnumJAXBObjectPresetAdapter, @Nullable ?>> OBJECT_VARIABLE_MAP =
+			ImmutableMap.<String, Function<@Nonnull EnumJAXBObjectPresetAdapter, @Nullable ?>>builder()
 					.put("key", EnumJAXBObjectPresetAdapter::getKey)
 					.put("value", EnumJAXBObjectPresetAdapter::getValue)
 					.build();
@@ -196,7 +198,7 @@ public enum EnumJAXBObjectPresetAdapter {
 		return ObjectUtilities.toStringImpl(this, getObjectVariableMap());
 	}
 
-	public static ImmutableMap<String, Function<EnumJAXBObjectPresetAdapter, ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
+	public static ImmutableMap<String, Function<@Nonnull EnumJAXBObjectPresetAdapter, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 
 	public ITuple2<? extends Class<?>, ? extends Class<?>> getKey() {
 		return key;

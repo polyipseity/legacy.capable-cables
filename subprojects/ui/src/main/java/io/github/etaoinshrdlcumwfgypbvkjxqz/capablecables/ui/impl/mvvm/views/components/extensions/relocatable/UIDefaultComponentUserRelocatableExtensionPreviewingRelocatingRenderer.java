@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.relocatable;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
@@ -75,7 +76,7 @@ public class UIDefaultComponentUserRelocatableExtensionPreviewingRelocatingRende
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		super.initializeBindings(binderObserverSupplier);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 				() -> ImmutableBinderAction.bind(
@@ -85,7 +86,7 @@ public class UIDefaultComponentUserRelocatableExtensionPreviewingRelocatingRende
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		super.cleanupBindings(binderObserverSupplier);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 				() -> ImmutableBinderAction.unbind(

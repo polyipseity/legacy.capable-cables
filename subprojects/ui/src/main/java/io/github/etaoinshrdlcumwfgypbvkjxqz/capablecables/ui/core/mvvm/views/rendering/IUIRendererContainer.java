@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering;
 
 import com.google.common.collect.ImmutableMap;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamed;
@@ -12,7 +13,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.Invo
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBinding;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 
-import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
@@ -25,7 +25,7 @@ public interface IUIRendererContainer<R extends IUIRenderer<?>>
 	@SuppressWarnings("UnstableApiUsage")
 	static <R extends IUIRenderer<?>> void setRendererImpl(Object container,
 	                                                       @Nullable R renderer,
-	                                                       Consumer<? super R> setter,
+	                                                       Consumer<@Nullable ? super R> setter,
 	                                                       @Nullable IUIRenderer<?> previousRenderer) {
 		if (!(renderer == null || renderer.getTypeToken().getRawType().isInstance(container)))
 			throw new IllegalArgumentException(

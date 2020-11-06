@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.components.modifiers;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
@@ -14,7 +15,7 @@ public interface IUIComponentMinecraftLifecycleModifier {
 	static void handleComponentModifiers(IUIComponentMinecraft component,
 	                                     Iterable<? extends IUIComponentModifier> modifiers,
 	                                     IUIComponentContext context,
-	                                     BiConsumer<? super IUIComponentMinecraftLifecycleModifier, ? super IUIComponentContext> action) {
+	                                     BiConsumer<@Nonnull ? super IUIComponentMinecraftLifecycleModifier, @Nonnull ? super IUIComponentContext> action) {
 		IUIComponentModifier.handleComponentModifiers(component,
 				modifiers,
 				IUIComponentMinecraftLifecycleModifier.class,

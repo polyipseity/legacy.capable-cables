@@ -1,14 +1,15 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.inventory.bases;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.BiFunction;
 
+@Deprecated
 public enum ContainerBases {
 	;
 

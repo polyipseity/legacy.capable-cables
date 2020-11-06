@@ -1,6 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions;
 
-import javax.annotation.Nullable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
+
 import java.util.function.*;
 
 public enum FunctionUtilities {
@@ -35,14 +37,14 @@ public enum FunctionUtilities {
 	@SuppressWarnings("unchecked") // COMMENT always safe as it accepts any 'Object'
 	public static <T, U> BiPredicate<T, U> getAlwaysFalseBiPredicate() { return (BiPredicate<T, U>) ALWAYS_FALSE_BI_PREDICATE; }
 
-	public static Supplier<Void> asVoidSupplier(Runnable function) {
+	public static Supplier<@Nullable Void> asVoidSupplier(Runnable function) {
 		return () -> {
 			function.run();
 			return null;
 		};
 	}
 
-	public static <T> Function<T, Void> asVoidFunction(Consumer<T> function) {
+	public static <T> Function<T, @Nullable Void> asVoidFunction(Consumer<T> function) {
 		return t -> {
 			function.accept(t);
 			return null;
@@ -51,13 +53,12 @@ public enum FunctionUtilities {
 
 	public static Predicate<Boolean> getPredicateIdentity() { return PREDICATE_IDENTITY; }
 
-	public static <T> T accept(T t, Consumer<? super T> action) {
+	public static <T> T accept(T t, Consumer<@Nonnull ? super T> action) {
 		action.accept(t);
 		return t;
 	}
 
-	@Nullable
-	public static <T, R> R apply(T t, Function<? super T, ? extends R> action) {
+	public static <T, R> R apply(T t, Function<@Nonnull ? super T, ? extends R> action) {
 		return action.apply(t);
 	}
 }

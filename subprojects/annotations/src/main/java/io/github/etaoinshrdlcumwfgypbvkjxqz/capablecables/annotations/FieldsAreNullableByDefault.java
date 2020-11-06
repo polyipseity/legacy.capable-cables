@@ -1,6 +1,5 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations;
 
-import javax.annotation.Nullable;
 import javax.annotation.meta.TypeQualifierDefault;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

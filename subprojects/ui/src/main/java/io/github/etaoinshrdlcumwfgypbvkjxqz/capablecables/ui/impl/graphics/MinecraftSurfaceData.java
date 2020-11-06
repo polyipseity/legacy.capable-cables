@@ -2,6 +2,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics;
 
 import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.systems.RenderSystem;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.utilities.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
@@ -22,7 +24,6 @@ import sun.java2d.StateTrackableDelegate;
 import sun.java2d.SurfaceData;
 import sun.java2d.loops.SurfaceType;
 
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -37,7 +38,7 @@ import java.util.function.Supplier;
 public final class MinecraftSurfaceData
 		extends SurfaceData
 		implements AutoCloseable {
-	private static final Supplier<MinecraftSurfaceData> INSTANCE = Suppliers.memoize(MinecraftSurfaceData::new);
+	private static final Supplier<@Nonnull MinecraftSurfaceData> INSTANCE = Suppliers.memoize(MinecraftSurfaceData::new);
 	private static final MethodHandle NATIVE_IMAGE_IMAGE_POINTER_GETTER;
 
 	static {
@@ -115,7 +116,7 @@ public final class MinecraftSurfaceData
 	}
 
 	public static MinecraftSurfaceData getInstance() {
-		return AssertionUtilities.assertNonnull(INSTANCE.get());
+		return INSTANCE.get();
 	}
 
 	public static MethodHandle getNativeImageImagePointerGetter() {

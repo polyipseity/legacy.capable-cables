@@ -2,11 +2,12 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.co
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.IIntersection;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableIntersection;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -26,7 +27,7 @@ public interface IUIComponentModifier {
 	static <M> void handleComponentModifiers(M component,
 	                                         Iterable<? extends IUIComponentModifier> modifiers,
 	                                         Class<M> modifierClass,
-	                                         Consumer<? super M> action) {
+	                                         Consumer<@Nonnull ? super M> action) {
 		EnumModifyStage.handleModifiers(() -> action.accept(component),
 				modifiers,
 				modifiers2 -> streamSpecificModifiers(modifiers2, modifierClass)
@@ -44,8 +45,8 @@ public interface IUIComponentModifier {
 	static <R, M, RInter> Optional<R> handleComponentModifiers(M component,
 	                                                           Iterable<? extends IUIComponentModifier> modifiers,
 	                                                           Class<M> modifierClass,
-	                                                           Function<? super M, ? extends RInter> action,
-	                                                           Function<? super Iterable<? extends RInter>, ? extends R> combiner) {
+	                                                           Function<@Nonnull ? super M, ? extends RInter> action,
+	                                                           Function<@Nonnull ? super Iterable<? extends RInter>, ? extends R> combiner) {
 		return EnumModifyStage.handleModifiers(() -> action.apply(component),
 				modifiers,
 				modifiers2 -> streamSpecificModifiers(modifiers2, modifierClass)

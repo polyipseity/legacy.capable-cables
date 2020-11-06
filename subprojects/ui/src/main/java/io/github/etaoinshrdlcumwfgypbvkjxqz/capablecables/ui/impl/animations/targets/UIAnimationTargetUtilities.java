@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.ta
 
 import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationEasing;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeDescriptorProvider;
@@ -52,7 +53,7 @@ public enum UIAnimationTargetUtilities {
 
 		public static DoubleConsumer transform(IShapeDescriptorProvider provider,
 		                                       double initialValue,
-		                                       BiFunction<? super Double, ? super Double, ? extends AffineTransform> valueDiffFunction) {
+		                                       BiFunction<@Nonnull ? super Double, @Nonnull ? super Double, @Nonnull ? extends AffineTransform> valueDiffFunction) {
 			return new ChangeAwareDoubleConsumer(initialValue, (previousValue, value) -> provider.modifyShape(() -> {
 				provider.getShapeDescriptor()
 						.transform(valueDiffFunction.apply(previousValue, value));
@@ -91,11 +92,11 @@ public enum UIAnimationTargetUtilities {
 
 		private static class ChangeAwareDoubleConsumer
 				implements DoubleConsumer {
-			private final BiConsumer<? super Double, ? super Double> delegate;
+			private final BiConsumer<@Nonnull ? super Double, @Nonnull ? super Double> delegate;
 			private final Object acceptLockObject = new Object();
 			private double previousValue;
 
-			protected ChangeAwareDoubleConsumer(double initialValue, BiConsumer<? super Double, ? super Double> delegate) {
+			protected ChangeAwareDoubleConsumer(double initialValue, BiConsumer<@Nonnull ? super Double, @Nonnull ? super Double> delegate) {
 				this.previousValue = initialValue;
 				this.delegate = delegate;
 			}
@@ -113,7 +114,9 @@ public enum UIAnimationTargetUtilities {
 
 			protected double getPreviousValue() { return previousValue; }
 
-			protected BiConsumer<? super Double, ? super Double> getDelegate() { return delegate; }
+			protected BiConsumer<@Nonnull ? super Double, @Nonnull ? super Double> getDelegate() {
+				return delegate;
+			}
 
 			protected void setPreviousValue(double previousValue) { this.previousValue = previousValue; }
 		}

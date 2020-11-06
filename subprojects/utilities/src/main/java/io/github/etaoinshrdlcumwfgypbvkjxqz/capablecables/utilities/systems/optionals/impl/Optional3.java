@@ -1,10 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl;
 
 import com.google.common.collect.ImmutableList;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.core.ICompositeOptionalValues;
 
-import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 public final class Optional3<V1, V2, V3>
@@ -27,9 +27,9 @@ public final class Optional3<V1, V2, V3>
 	@SuppressWarnings("unchecked")
 	public static <V1, V2, V3> Optional3<V1, V2, V3> getEmpty() { return (Optional3<V1, V2, V3>) EMPTY; }
 
-	public static <V1, V2, V3> Optional3<V1, V2, V3> of(Supplier<? extends V1> value1Supplier,
-	                                                    Supplier<? extends V2> value2Supplier,
-	                                                    Supplier<? extends V3> value3Supplier) {
+	public static <V1, V2, V3> Optional3<V1, V2, V3> of(Supplier<@Nullable ? extends V1> value1Supplier,
+	                                                    Supplier<@Nullable ? extends V2> value2Supplier,
+	                                                    Supplier<@Nullable ? extends V3> value3Supplier) {
 		@Nullable V1 value1;
 		@Nullable V2 value2;
 		@Nullable V3 value3;
@@ -78,6 +78,6 @@ public final class Optional3<V1, V2, V3>
 		public V3 getValue3() { return value3; }
 
 		@Override
-		public Iterable<? extends Supplier<?>> getSuppliers() { return ImmutableList.of(this::getValue1, this::getValue2, this::getValue3); }
+		public Iterable<? extends Supplier<@Nullable ?>> getSuppliers() { return ImmutableList.of(this::getValue1, this::getValue2, this::getValue3); }
 	}
 }

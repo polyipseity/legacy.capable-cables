@@ -5,6 +5,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Streams;
 import com.google.common.reflect.TypeToken;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIContextContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.adapters.IUIAdapter;
@@ -53,7 +55,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.system.MemoryUtil;
 
-import javax.annotation.Nullable;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
@@ -107,7 +108,7 @@ public class UIMinecraftScreenAdapter
 	}
 
 	@Override
-	public ITextComponent getTitle() { return title; }
+	public @Nonnull ITextComponent getTitle() { return title; }
 
 	public void setTitle(ITextComponent title) { this.title = title; }
 
@@ -154,7 +155,7 @@ public class UIMinecraftScreenAdapter
 
 	@Override
 	@Deprecated
-	public List<String> getTooltipFromItem(ItemStack item) { return MinecraftTooltipUtilities.getTooltipFromItem(getMinecraft(), item); }
+	public @Nonnull List<String> getTooltipFromItem(ItemStack item) { return MinecraftTooltipUtilities.getTooltipFromItem(getMinecraft(), item); }
 
 	@Override
 	@Deprecated
@@ -186,7 +187,7 @@ public class UIMinecraftScreenAdapter
 
 	@Override
 	@Deprecated
-	public List<? extends IGuiEventListener> children() { return ImmutableList.of(); }
+	public @Nonnull List<? extends IGuiEventListener> children() { return ImmutableList.of(); }
 
 	@Override
 	@Deprecated

@@ -1,13 +1,14 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
 import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.MarkersTemplate;
 import org.slf4j.Marker;
 
 import java.util.function.Supplier;
 
 public final class UtilitiesMarkers extends MarkersTemplate {
-	private static final Supplier<UtilitiesMarkers> INSTANCE = Suppliers.memoize(UtilitiesMarkers::new);
+	private static final Supplier<@Nonnull UtilitiesMarkers> INSTANCE = Suppliers.memoize(UtilitiesMarkers::new);
 
 	private final Marker markerLogging;
 	private final Marker markerThrowable;
@@ -29,7 +30,7 @@ public final class UtilitiesMarkers extends MarkersTemplate {
 
 	private UtilitiesMarkers() { super(UtilitiesConstants.getModuleName()); }
 
-	public static UtilitiesMarkers getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+	public static UtilitiesMarkers getInstance() { return INSTANCE.get(); }
 
 	public Marker getMarkerLogging() { return markerLogging; }
 

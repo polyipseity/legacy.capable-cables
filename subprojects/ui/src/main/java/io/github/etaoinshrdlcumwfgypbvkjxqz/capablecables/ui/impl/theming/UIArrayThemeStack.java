@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.theming;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming.IUITheme;
 
 import java.util.ArrayDeque;
@@ -10,7 +11,7 @@ public class UIArrayThemeStack
 		extends UIAbstractThemeStack {
 	private final Deque<IUITheme> data;
 
-	public UIArrayThemeStack(Consumer<? super IUITheme> applier, int initialCapacity) {
+	public UIArrayThemeStack(Consumer<@Nonnull ? super IUITheme> applier, int initialCapacity) {
 		super(applier);
 		this.data = new ArrayDeque<>(initialCapacity);
 	}

@@ -4,8 +4,8 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.text.IAttributedText;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.IUnion;
 
 import java.text.AttributedCharacterIterator;
@@ -18,7 +18,7 @@ public final class ImmutableAttributedText
 		implements IAttributedText {
 	private final @Immutable List<IUnion<? extends CharSequence, ? extends IAttributedText>> children;
 	private final @Immutable Map<AttributedCharacterIterator.Attribute, Object> attributes;
-	private final Supplier<AttributedString> compiler;
+	private final Supplier<@Nonnull AttributedString> compiler;
 
 	private ImmutableAttributedText(List<? extends IUnion<? extends CharSequence, ? extends IAttributedText>> children,
 	                                Map<? extends AttributedCharacterIterator.Attribute, ?> attributes) {
@@ -77,10 +77,10 @@ public final class ImmutableAttributedText
 
 	@Override
 	public AttributedString compile() {
-		return AssertionUtilities.assertNonnull(getCompiler().get());
+		return getCompiler().get();
 	}
 
-	protected Supplier<AttributedString> getCompiler() {
+	protected Supplier<@Nonnull ? extends AttributedString> getCompiler() {
 		return compiler;
 	}
 }

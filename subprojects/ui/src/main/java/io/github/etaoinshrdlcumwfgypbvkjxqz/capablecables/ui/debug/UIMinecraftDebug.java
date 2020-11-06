@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug;
 
 import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.ComponentTheme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.ComponentUI;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
@@ -200,10 +201,8 @@ public enum UIMinecraftDebug {
 		private static AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> createUI(DebugContainer container) {
 			IBinder binder = new DefaultBinder();
 			// COMMENT Color <-> Integer
-			binder.addTransformer(EnumBindingType.FIELD, (Color color) ->
-					Optional.ofNullable(color).map(Color::getRGB).orElse(null));
-			binder.addTransformer(EnumBindingType.FIELD, (Integer t) ->
-					Optional.ofNullable(t).map(i -> new Color(i, true)).orElse(null));
+			binder.addTransformer(EnumBindingType.FIELD, Color::getRGB);
+			binder.addTransformer(EnumBindingType.FIELD, ColorUtilities::ofRGBA);
 
 			AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> screen;
 			IUITheme theme;
@@ -385,7 +384,7 @@ public enum UIMinecraftDebug {
 
 			@Override
 			@OverridingMethodsMustInvokeSuper
-			public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+			public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 				super.initializeBindings(binderObserverSupplier);
 				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 						() -> ImmutableBinderAction.bind(
@@ -397,7 +396,7 @@ public enum UIMinecraftDebug {
 
 			@Override
 			@OverridingMethodsMustInvokeSuper
-			public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+			public void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 				super.cleanupBindings(binderObserverSupplier);
 				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 						() -> ImmutableBinderAction.unbind(
@@ -414,7 +413,7 @@ public enum UIMinecraftDebug {
 	}
 
 	private static final class DebugContainer extends Container {
-		private static final Supplier<ContainerType<DebugContainer>> TYPE_INSTANCE = Suppliers.memoize(() ->
+		private static final Supplier<@Nonnull ContainerType<DebugContainer>> TYPE_INSTANCE = Suppliers.memoize(() ->
 				IForgeContainerType.create((windowId, inv, data) ->
 						new DebugContainer(windowId, AssertionUtilities.assertNonnull(MinecraftClientUtilities.getMinecraftNonnull().world), data.readBlockPos())));
 		private final TileEntity tileEntity;
@@ -433,9 +432,9 @@ public enum UIMinecraftDebug {
 	}
 
 	private static final class DebugBlock extends Block {
-		private static final Supplier<DebugBlock> INSTANCE = Suppliers.memoize(DebugBlock::new);
+		private static final Supplier<@Nonnull DebugBlock> INSTANCE = Suppliers.memoize(DebugBlock::new);
 
-		private static DebugBlock getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+		private static DebugBlock getInstance() { return INSTANCE.get(); }
 
 		private DebugBlock() {
 			super(Properties.from(Blocks.STONE));
@@ -449,7 +448,7 @@ public enum UIMinecraftDebug {
 
 		@SuppressWarnings("deprecation")
 		@Override
-		public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+		public @Nonnull ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 			if (!worldIn.isRemote) {
 				TileEntity tileEntity = requireNonNull(worldIn.getTileEntity(pos));
 				if (tileEntity instanceof INamedContainerProvider)
@@ -462,7 +461,7 @@ public enum UIMinecraftDebug {
 	}
 
 	private static final class DebugTileEntity extends TileEntity implements INamedContainerProvider {
-		private static final Supplier<TileEntityType<DebugTileEntity>> TYPE_INSTANCE = Suppliers.memoize(() ->
+		private static final Supplier<@Nonnull TileEntityType<DebugTileEntity>> TYPE_INSTANCE = Suppliers.memoize(() ->
 				TileEntityType.Builder.create(DebugTileEntity::new, DebugBlock.getInstance()).build(null));
 
 		private DebugTileEntity() { super(requireNonNull(getTypeInstance())); }
@@ -473,6 +472,6 @@ public enum UIMinecraftDebug {
 		public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) { return new DebugContainer(id, requireNonNull(getWorld()), getPos()); }
 
 		@Override
-		public ITextComponent getDisplayName() { return UIMinecraftDebug.getDisplayName(); }
+		public @Nonnull ITextComponent getDisplayName() { return UIMinecraftDebug.getDisplayName(); }
 	}
 }

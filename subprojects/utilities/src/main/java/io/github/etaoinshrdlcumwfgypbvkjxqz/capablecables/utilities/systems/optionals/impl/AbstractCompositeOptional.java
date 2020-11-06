@@ -1,7 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl;
 
 import com.google.common.collect.Streams;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.core.ICompositeOptional;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.core.ICompositeOptionalValues;
 
@@ -23,27 +24,27 @@ public abstract class AbstractCompositeOptional<T extends AbstractCompositeOptio
 	}
 
 	@Override
-	public void ifPresent(Consumer<? super V> consumer) {
+	public void ifPresent(Consumer<@Nonnull ? super V> consumer) {
 		if (isPresent())
 			consumer.accept(getValues());
 	}
 
 	@Override
-	public T filter(Predicate<? super V> predicate) {
+	public T filter(Predicate<@Nonnull ? super V> predicate) {
 		return isPresent() && predicate.test(getValues()) ? getThis() : getStaticEmpty();
 	}
 
 	@Override
-	public <R> Optional<R> map(Function<? super V, ? extends R> mapper) {
+	public <R> Optional<R> map(Function<@Nonnull ? super V, @Nullable ? extends R> mapper) {
 		if (isPresent())
 			return Optional.ofNullable(mapper.apply(getValues()));
 		return Optional.empty();
 	}
 
 	@Override
-	public <R> Optional<R> flatMap(Function<? super V, ? extends Optional<? extends R>> mapper) {
+	public <R> Optional<R> flatMap(Function<@Nonnull ? super V, @Nonnull ? extends Optional<? extends R>> mapper) {
 		if (isPresent())
-			return AssertionUtilities.assertNonnull(mapper.apply(getValues())).map(Function.identity());
+			return OptionalUtilities.upcast(mapper.apply(getValues()));
 		return Optional.empty();
 	}
 

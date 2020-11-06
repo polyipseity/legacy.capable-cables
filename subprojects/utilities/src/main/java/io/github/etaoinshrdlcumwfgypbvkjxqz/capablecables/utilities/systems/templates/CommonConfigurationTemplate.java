@@ -1,5 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.StackTraceUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IRecordCandidate;
@@ -8,7 +10,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.logging.Prop
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.core.IThrowableHandler;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -21,7 +22,7 @@ public abstract class CommonConfigurationTemplate<D extends CommonConfigurationT
 	@Nullable
 	private volatile IThrowableHandler<Throwable> throwableHandler;
 	@Nullable
-	private volatile Supplier<? extends Locale> localeSupplier;
+	private volatile Supplier<@Nonnull ? extends Locale> localeSupplier;
 
 	protected CommonConfigurationTemplate() {}
 
@@ -32,7 +33,7 @@ public abstract class CommonConfigurationTemplate<D extends CommonConfigurationT
 				.build();
 	}
 
-	public Supplier<? extends Locale> getLocaleSupplier() { return AssertionUtilities.assertNonnull(localeSupplier); }
+	public Supplier<@Nonnull ? extends Locale> getLocaleSupplier() { return AssertionUtilities.assertNonnull(localeSupplier); }
 
 	public Logger getLogger() { return AssertionUtilities.assertNonnull(logger); }
 
@@ -50,16 +51,16 @@ public abstract class CommonConfigurationTemplate<D extends CommonConfigurationT
 		setLocaleSupplier(data.getLocaleSupplier());
 	}
 
-	protected void setLocaleSupplier(@Nullable Supplier<? extends Locale> localeSupplier) { this.localeSupplier = localeSupplier; }
+	protected void setLocaleSupplier(@Nullable Supplier<@Nonnull ? extends Locale> localeSupplier) { this.localeSupplier = localeSupplier; }
 
 	public static abstract class ConfigurationData implements IRecordCandidate {
 		private final Logger logger;
 		private final IThrowableHandler<Throwable> throwableHandler;
-		private final Supplier<? extends Locale> localeSupplier;
+		private final Supplier<@Nonnull ? extends Locale> localeSupplier;
 
 		protected ConfigurationData(Logger logger,
 		                            IThrowableHandler<Throwable> throwableHandler,
-		                            Supplier<? extends Locale> localeSupplier) {
+		                            Supplier<@Nonnull ? extends Locale> localeSupplier) {
 			this.logger = logger;
 			this.throwableHandler = throwableHandler;
 			this.localeSupplier = localeSupplier;
@@ -69,6 +70,6 @@ public abstract class CommonConfigurationTemplate<D extends CommonConfigurationT
 
 		protected IThrowableHandler<Throwable> getThrowableHandler() { return throwableHandler; }
 
-		protected Supplier<? extends Locale> getLocaleSupplier() { return localeSupplier; }
+		protected Supplier<@Nonnull ? extends Locale> getLocaleSupplier() { return localeSupplier; }
 	}
 }

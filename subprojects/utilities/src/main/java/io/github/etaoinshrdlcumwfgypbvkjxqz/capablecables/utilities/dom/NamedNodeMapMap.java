@@ -1,6 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dom;
 
 import com.google.common.collect.ImmutableSet;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AbstractDelegatingObject;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
@@ -8,7 +10,6 @@ import org.jetbrains.annotations.NonNls;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -121,18 +122,18 @@ public class NamedNodeMapMap
 
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public Set<String> keySet() {
+	public @Nonnull Set<String> keySet() {
 		return getAsList().stream().unordered()
 				.map(NamedNodeMapMap::constructKey)
 				.collect(ImmutableSet.toImmutableSet());
 	}
 
 	@Override
-	public Collection<Node> values() { return getAsList(); }
+	public @Nonnull Collection<Node> values() { return getAsList(); }
 
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public Set<Entry<String, Node>> entrySet() { return keySet().stream().unordered().map(k -> new EntryThis(this, k)).collect(ImmutableSet.toImmutableSet()); }
+	public @Nonnull Set<Entry<String, Node>> entrySet() { return keySet().stream().unordered().map(k -> new EntryThis(this, k)).collect(ImmutableSet.toImmutableSet()); }
 
 	protected static String[] splitString(String string) { return string.split(Pattern.quote(":")); }
 

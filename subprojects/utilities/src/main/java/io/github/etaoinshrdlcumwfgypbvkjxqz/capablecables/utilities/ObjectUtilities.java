@@ -3,12 +3,13 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Streams;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 
-import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.util.Map;
@@ -21,7 +22,7 @@ public enum ObjectUtilities {
 	;
 
 	private static final ToIntFunction<?> HASH_CODE_SUPER_INVOKER_DEFAULT = (self) -> 1;
-	private static final LoadingCache<Class<?>, BiPredicate<?, ? super Object>> EQUALS_SUPER_INVOKERS_MAP =
+	private static final LoadingCache<Class<?>, BiPredicate<@Nonnull ?, @Nonnull ? super Object>> EQUALS_SUPER_INVOKERS_MAP =
 			CacheUtilities.newCacheBuilderNormalThreaded()
 					.weakKeys()
 					.initialCapacity(CapacityUtilities.getInitialCapacityEnormous())
@@ -67,7 +68,7 @@ public enum ObjectUtilities {
 							}
 						};
 					}));
-	private static final LoadingCache<Class<?>, Function<?, ? extends String>> TO_STRING_SUPER_INVOKERS_MAP =
+	private static final LoadingCache<Class<?>, Function<@Nonnull ?, @Nonnull ? extends String>> TO_STRING_SUPER_INVOKERS_MAP =
 			CacheUtilities.newCacheBuilderNormalThreaded()
 					.weakKeys()
 					.initialCapacity(CapacityUtilities.getInitialCapacityEnormous())
@@ -94,7 +95,7 @@ public enum ObjectUtilities {
 	                                     @Nullable Object other,
 	                                     Class<T> referenceClass,
 	                                     boolean acceptSubclasses,
-	                                     Iterable<? extends Function<? super T, ?>> variables) {
+	                                     Iterable<? extends Function<@Nonnull ? super T, @Nullable ?>> variables) {
 		if (self == other)
 			return true;
 		if (acceptSubclasses) {
@@ -112,7 +113,7 @@ public enum ObjectUtilities {
 				.allMatch(variable -> Objects.equals(variable.apply(self), variable.apply(that)));
 	}
 
-	private static LoadingCache<Class<?>, BiPredicate<?, ? super Object>> getEqualsSuperInvokersMap() {
+	private static LoadingCache<Class<?>, BiPredicate<@Nonnull ?, @Nonnull ? super Object>> getEqualsSuperInvokersMap() {
 		return EQUALS_SUPER_INVOKERS_MAP;
 	}
 
@@ -120,7 +121,7 @@ public enum ObjectUtilities {
 	 * @see java.util.Arrays#hashCode(Object[])
 	 */
 	@SuppressWarnings({"MagicNumber", "UnstableApiUsage"})
-	public static <T> int hashCodeImpl(T self, Iterable<? extends Function<? super T, ?>> variables) {
+	public static <T> int hashCodeImpl(T self, Iterable<? extends Function<@Nonnull ? super T, @Nullable ?>> variables) {
 		final int[] result = {getHashCodeSuperInvokersMap().getUnchecked(self.getClass()).applyAsInt(CastUtilities.castUnchecked(self))};
 		Streams.stream(variables)
 				.map(variable -> variable.apply(self))
@@ -140,7 +141,7 @@ public enum ObjectUtilities {
 		return HASH_CODE_SUPER_INVOKER_DEFAULT;
 	}
 
-	public static <T> String toStringImpl(T self, Map<? extends String, ? extends Function<? super T, ?>> variables) {
+	public static <T> String toStringImpl(T self, Map<? extends String, ? extends Function<@Nonnull ? super T, @Nullable ?>> variables) {
 		StringBuilder ret = new StringBuilder(CapacityUtilities.getInitialCapacityLarge());
 		ret.append(self.getClass().getSimpleName()).append('{');
 		final boolean[] comma = {false};
@@ -156,7 +157,7 @@ public enum ObjectUtilities {
 		return ret.toString();
 	}
 
-	private static LoadingCache<Class<?>, Function<?, ? extends String>> getToStringSuperInvokersMap() {
+	private static LoadingCache<Class<?>, Function<@Nonnull ?, @Nonnull ? extends String>> getToStringSuperInvokersMap() {
 		return TO_STRING_SUPER_INVOKERS_MAP;
 	}
 }

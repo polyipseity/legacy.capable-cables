@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.awt;
 
 import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.MinecraftSurfaceData;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import sun.awt.HeadlessToolkit;
@@ -17,14 +17,14 @@ import java.util.function.Supplier;
 @Deprecated
 public final class MinecraftToolkit
 		extends HeadlessToolkit {
-	private static final Supplier<MinecraftToolkit> INSTANCE = Suppliers.memoize(MinecraftToolkit::new);
+	private static final Supplier<@Nonnull MinecraftToolkit> INSTANCE = Suppliers.memoize(MinecraftToolkit::new);
 
 	private MinecraftToolkit() {
 		super(Toolkit.getDefaultToolkit());
 	}
 
 	public static MinecraftToolkit getInstance() {
-		return AssertionUtilities.assertNonnull(INSTANCE.get());
+		return INSTANCE.get();
 	}
 
 	@Override

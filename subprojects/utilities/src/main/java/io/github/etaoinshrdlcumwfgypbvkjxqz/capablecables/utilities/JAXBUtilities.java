@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import jakarta.xml.bind.JAXBElement;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 public enum JAXBUtilities {

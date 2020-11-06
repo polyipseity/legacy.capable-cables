@@ -1,10 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl;
 
 import com.google.common.collect.ImmutableList;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.core.ICompositeOptionalValues;
 
-import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 public final class Optional2<V1, V2>
@@ -20,8 +20,8 @@ public final class Optional2<V1, V2>
 		this.values = new Values<>(null, null);
 	}
 
-	public static <V1, V2> Optional2<V1, V2> of(Supplier<? extends V1> value1Supplier,
-	                                            Supplier<? extends V2> value2Supplier) {
+	public static <V1, V2> Optional2<V1, V2> of(Supplier<@Nullable ? extends V1> value1Supplier,
+	                                            Supplier<@Nullable ? extends V2> value2Supplier) {
 		@Nullable V1 value1;
 		@Nullable V2 value2;
 		return (value1 = value1Supplier.get()) == null || (value2 = value2Supplier.get()) == null
@@ -64,6 +64,6 @@ public final class Optional2<V1, V2>
 		protected V2 getValue2() { return value2; }
 
 		@Override
-		public Iterable<? extends Supplier<?>> getSuppliers() { return ImmutableList.of(this::getValue1, this::getValue2); }
+		public Iterable<? extends Supplier<@Nullable ?>> getSuppliers() { return ImmutableList.of(this::getValue1, this::getValue2); }
 	}
 }

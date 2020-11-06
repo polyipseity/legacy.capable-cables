@@ -1,6 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components;
 
 import com.google.common.collect.ImmutableList;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.traits.IHasBindingMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
@@ -12,7 +14,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IT
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBinding;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional2;
 
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.List;
 import java.util.Optional;
@@ -42,16 +43,16 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 
 	static <T extends Throwable> void traverseComponentTreeDefault(IUIComponentContext context,
 	                                                               IUIComponent root,
-	                                                               BiConsumer<? super IUIComponentContext, ? super IUIComponentContextMutatorResult> pre,
-	                                                               IConsumer3<? super IUIComponentContext, ? super IUIComponentContextMutatorResult, ? super Iterable<? super IUIComponent>, ? extends T> post) throws T {
+	                                                               BiConsumer<@Nonnull ? super IUIComponentContext, @Nonnull ? super IUIComponentContextMutatorResult> pre,
+	                                                               IConsumer3<@Nonnull ? super IUIComponentContext, @Nonnull ? super IUIComponentContextMutatorResult, @Nonnull ? super Iterable<? super IUIComponent>, @Nonnull ? extends T> post) throws T {
 		traverseComponentTreeDefault(context, root, pre, post, FunctionUtilities.getAlwaysTruePredicate());
 	}
 
 	static <T extends Throwable> void traverseComponentTreeDefault(IUIComponentContext context,
 	                                                               IUIComponent root,
-	                                                               BiConsumer<? super IUIComponentContext, ? super IUIComponentContextMutatorResult> pre,
-	                                                               IConsumer3<? super IUIComponentContext, ? super IUIComponentContextMutatorResult, ? super Iterable<? super IUIComponent>, ? extends T> post,
-	                                                               Predicate<? super IUIComponent> predicate) throws T {
+	                                                               BiConsumer<@Nonnull ? super IUIComponentContext, @Nonnull ? super IUIComponentContextMutatorResult> pre,
+	                                                               IConsumer3<@Nonnull ? super IUIComponentContext, @Nonnull ? super IUIComponentContextMutatorResult, @Nonnull ? super Iterable<? super IUIComponent>, @Nonnull ? extends T> post,
+	                                                               Predicate<@Nonnull ? super IUIComponent> predicate) throws T {
 		TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, root,
 				component -> {
 					if (predicate.test(component)) {

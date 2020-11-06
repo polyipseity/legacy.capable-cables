@@ -2,6 +2,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.
 
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IObjectStack;
@@ -17,8 +19,8 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Asser
 public abstract class AbstractObjectStack<T>
 		implements IObjectStack<T> {
 	@NonNls
-	private static final @Immutable Map<String, Function<? super AbstractObjectStack<?>, ?>> OBJECT_VARIABLE_MAP =
-			ImmutableMap.<String, Function<? super AbstractObjectStack<?>, ?>>builder()
+	private static final @Immutable Map<String, Function<@Nonnull AbstractObjectStack<?>, @Nullable ?>> OBJECT_VARIABLE_MAP =
+			ImmutableMap.<String, Function<@Nonnull AbstractObjectStack<?>, @Nullable ?>>builder()
 					.put("data", AbstractObjectStack::getData)
 					.build();
 
@@ -54,7 +56,7 @@ public abstract class AbstractObjectStack<T>
 	@Override
 	public String toString() { return ObjectUtilities.toStringImpl(this, getObjectVariableMap()); }
 
-	public static @NonNls @Immutable Map<String, Function<? super AbstractObjectStack<?>, ?>> getObjectVariableMap() {
+	public static @NonNls @Immutable Map<String, Function<@Nonnull AbstractObjectStack<?>, @Nullable ?>> getObjectVariableMap() {
 		return OBJECT_VARIABLE_MAP;
 	}
 

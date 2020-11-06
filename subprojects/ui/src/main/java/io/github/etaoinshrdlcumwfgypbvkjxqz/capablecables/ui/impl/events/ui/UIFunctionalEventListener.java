@@ -1,17 +1,18 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
 
 import java.util.function.Consumer;
 
 public class UIFunctionalEventListener<E extends IUIEvent>
 		extends UIAbstractEventListener<E> {
-	private final Consumer<E> action;
+	private final Consumer<@Nonnull E> action;
 
-	public UIFunctionalEventListener(Consumer<E> action) { this.action = action; }
+	public UIFunctionalEventListener(Consumer<@Nonnull E> action) { this.action = action; }
 
 	@Override
 	protected void accept0(E event) { getAction().accept(event); }
 
-	protected Consumer<E> getAction() { return action; }
+	protected Consumer<@Nonnull E> getAction() { return action; }
 }

@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.client.ModClientProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.core.IProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.server.ModServerProxy;
@@ -19,7 +20,6 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.ModLifecycleEvent;
 import org.jetbrains.annotations.NonNls;
 
-import javax.annotation.Nullable;
 import java.util.ResourceBundle;
 
 @Mod(ModConstants.MOD_ID)

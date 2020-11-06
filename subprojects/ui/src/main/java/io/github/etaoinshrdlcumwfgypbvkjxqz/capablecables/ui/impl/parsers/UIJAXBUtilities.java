@@ -1,7 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.ObjectFactory;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import jakarta.xml.bind.JAXBElement;
 
 import javax.xml.namespace.QName;
@@ -10,8 +11,8 @@ import java.util.function.Function;
 public enum UIJAXBUtilities {
 	;
 
-	public static <T> QName getQName(Function<T, ? extends JAXBElement<?>> factory) {
-		return AssertionUtilities.assertNonnull(factory.apply(null)).getName();
+	public static <T> QName getQName(Function<@Nullable T, @Nonnull ? extends JAXBElement<?>> factory) {
+		return factory.apply(null).getName();
 	}
 
 	public enum ObjectFactories {

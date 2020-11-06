@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModConstants;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.blocks.ModBlocks;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items.groups.ModItemGroups;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
@@ -10,8 +11,6 @@ import net.minecraft.item.Item;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-
-import javax.annotation.Nullable;
 
 public enum ModItems {
 	;

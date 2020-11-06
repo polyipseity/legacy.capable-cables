@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.paths;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.DynamicUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
@@ -10,9 +11,9 @@ import java.util.function.Function;
 public class FunctionalConcurrentPath<T>
 		extends AbstractConcurrentPath<T> {
 	private final List<T> data;
-	private final Function<? super Iterable<? extends T>, ? extends List<T>> generator;
+	private final Function<@Nonnull ? super Iterable<? extends T>, @Nonnull ? extends List<T>> generator;
 
-	public FunctionalConcurrentPath(Iterable<? extends T> data, Function<? super Iterable<? extends T>, ? extends List<T>> generator) {
+	public FunctionalConcurrentPath(Iterable<? extends T> data, Function<@Nonnull ? super Iterable<? extends T>, @Nonnull ? extends List<T>> generator) {
 		this.generator = generator;
 		this.data = AssertionUtilities.assertNonnull(generator.apply(data));
 	}
@@ -21,7 +22,7 @@ public class FunctionalConcurrentPath<T>
 	@Override
 	protected List<T> getData() { return data; }
 
-	protected Function<? super Iterable<? extends T>, ? extends List<T>> getGenerator() { return generator; }
+	protected Function<@Nonnull ? super Iterable<? extends T>, @Nonnull ? extends List<T>> getGenerator() { return generator; }
 
 	private static final long DATA_FIELD_OFFSET;
 

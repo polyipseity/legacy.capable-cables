@@ -2,6 +2,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.co
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
@@ -40,7 +42,6 @@ import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.eventbus.api.EventPriority;
 import sun.misc.Cleaner;
 
-import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -92,9 +93,8 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 				.orElseThrow(IllegalStateException::new)) {
 			// COMMENT returning null means the point is outside the window, so in that case, just return the manager
 			return IUIViewComponent.getPathResolver(this).resolvePath(componentContext, (Point2D) point.clone()).getComponent()
-					.map(Function.<IUIComponent>identity())
-					.orElseGet(() ->
-							getManager().orElseThrow(IllegalStateException::new));
+					.<IUIComponent>map(Function.identity())
+					.orElseGet(() -> getManager().orElseThrow(IllegalStateException::new));
 		}
 	}
 
@@ -181,7 +181,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	}
 
 	@Override
-	public boolean reshape(Predicate<? super IShapeDescriptor<? super S>> action) throws ConcurrentModificationException {
+	public boolean reshape(Predicate<@Nonnull ? super IShapeDescriptor<? super S>> action) throws ConcurrentModificationException {
 		return getManager()
 				.filter(manager -> manager.reshape(action))
 				.isPresent();
@@ -202,9 +202,9 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		super.cleanupBindings(binderObserverSupplier);
-		BindingUtilities.cleanupBindings(
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		super.initializeBindings(binderObserverSupplier);
+		BindingUtilities.initializeBindings(
 				getManager().map(ImmutableList::of).orElseGet(ImmutableList::of),
 				binderObserverSupplier
 		);
@@ -212,9 +212,9 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		super.initializeBindings(binderObserverSupplier);
-		BindingUtilities.initializeBindings(
+	public void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		super.cleanupBindings(binderObserverSupplier);
+		BindingUtilities.cleanupBindings(
 				getManager().map(ImmutableList::of).orElseGet(ImmutableList::of),
 				binderObserverSupplier
 		);
@@ -225,7 +225,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 
 		@SuppressWarnings({"ThisEscapedInObjectConstruction", "rawtypes", "RedundantSuppression", "unchecked", "AnonymousInnerClassMayBeStatic"})
 		private static final IRegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
-				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("children_flat"),
+				FunctionUtilities.apply(IUICacheType.generateKey("children_flat"),
 						key -> UICacheRegistry.getInstance().register(key,
 								new UIAbstractCacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
 									{
@@ -238,28 +238,28 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 																new FunctionalEventBusDisposableObserver<>(
 																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
 																		event -> {
-																	if (event.getStage().isPost())
-																		thisRef.getOptional()
-																				.ifPresent(t -> event.getComponent().getManager()
-																						.flatMap(IUIComponentManager::getView)
-																						.ifPresent(view -> t.invalidate(view)));
-																}),
-														UIConfiguration.getInstance().getLogger()
-												) {},
-												new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.View>(
-														new FunctionalEventBusDisposableObserver<>(
-																new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
-																event -> {
-																	if (event.getStage().isPost())
-																		thisRef.getOptional()
-																				.ifPresent(t -> event.getComponent().getManager()
-																						.flatMap(IUIComponentManager::getView)
-																						.ifPresent(view -> t.invalidate(view)));
-																}),
-														UIConfiguration.getInstance().getLogger()
-												) {}
-										)::dispose);
-							}
+																			if (event.getStage().isPost())
+																				thisRef.getOptional()
+																						.ifPresent(t -> event.getComponent().getManager()
+																								.flatMap(IUIComponentManager::getView)
+																								.ifPresent(view -> t.invalidate(view)));
+																		}),
+																UIConfiguration.getInstance().getLogger()
+														) {},
+														new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.View>(
+																new FunctionalEventBusDisposableObserver<>(
+																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
+																		event -> {
+																			if (event.getStage().isPost())
+																				thisRef.getOptional()
+																						.ifPresent(t -> event.getComponent().getManager()
+																								.flatMap(IUIComponentManager::getView)
+																								.ifPresent(view -> t.invalidate(view)));
+																		}),
+																UIConfiguration.getInstance().getLogger()
+														) {}
+												)::dispose);
+									}
 
 									@Override
 									protected List<IUIComponent> load(IUIViewComponent<?, ?> container) {
@@ -271,7 +271,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 																IUIComponent::getChildNodes, null, null));
 										return ImmutableList.copyOf(ret);
 									}
-								})));
+								}));
 		@SuppressWarnings({"UnstableApiUsage", "ThisEscapedInObjectConstruction", "rawtypes", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
 		private static final IRegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
 				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("children_flat.focusable"),

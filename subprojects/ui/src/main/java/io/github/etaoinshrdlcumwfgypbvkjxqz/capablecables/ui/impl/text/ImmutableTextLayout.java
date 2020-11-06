@@ -1,9 +1,9 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.text;
 
 import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.text.IAttributedText;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.text.ITextLayout;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
@@ -13,7 +13,7 @@ public final class ImmutableTextLayout
 		implements ITextLayout {
 	private final IAttributedText text;
 	private final FontRenderContext fontRenderContext;
-	private final Supplier<TextLayout> compiler;
+	private final Supplier<@Nonnull TextLayout> compiler;
 
 	private ImmutableTextLayout(IAttributedText text, FontRenderContext fontRenderContext) {
 		this.text = text;
@@ -33,10 +33,10 @@ public final class ImmutableTextLayout
 
 	@Override
 	public TextLayout compile() {
-		return AssertionUtilities.assertNonnull(getCompiler().get());
+		return getCompiler().get();
 	}
 
-	protected Supplier<TextLayout> getCompiler() {
+	protected Supplier<@Nonnull ? extends TextLayout> getCompiler() {
 		return compiler;
 	}
 

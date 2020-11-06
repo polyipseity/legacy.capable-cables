@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bin
 
 import com.google.common.cache.Cache;
 import com.google.common.collect.Streams;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
@@ -16,7 +17,6 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import sun.misc.Cleaner;
 
-import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
@@ -31,7 +31,7 @@ public class FieldBindings
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public FieldBindings(INamespacePrefixedString bindingKey,
-	                     Supplier<? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>>> transformersSupplier) {
+	                     Supplier<@Nonnull ? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>>> transformersSupplier) {
 		super(bindingKey, transformersSupplier);
 		@SuppressWarnings("UnnecessaryLocalVariable") Map<IBindingField<?>, Disposable> fieldsRef = fields;
 		Cleaner.create(CleanerUtilities.getCleanerReferent(this), () ->
@@ -51,13 +51,11 @@ public class FieldBindings
 							.ifPresent(IThrowingConsumer.executeNow(fc -> {
 								assert fc != null;
 								f.setValue(CastUtilities.castUnchecked( // COMMENT should be of the right type
-										AssertionUtilities.assertNonnull(
 												transform(getTransformers(),
 														CastUtilities.castUnchecked(fc.getValue()), // COMMENT should be always safe
 														fc.getTypeToken().getRawType(),
 														f.getTypeToken().getRawType()
 												)
-										)
 								));
 							}));
 					DisposableObserver<?> d = createSynchronizationObserver(f, getFields().keySet(), getTransformers(), getIsSource());
@@ -72,7 +70,7 @@ public class FieldBindings
 
 	public static <T> DisposableObserver<T> createSynchronizationObserver(IBindingField<T> from,
 	                                                                      Iterable<? extends IBindingField<?>> to,
-	                                                                      Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>> transformers,
+	                                                                      Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>> transformers,
 	                                                                      AtomicBoolean isSource) {
 		return new LoggingDisposableObserver<>(new DefaultDisposableObserver<T>() {
 			@SuppressWarnings("UnstableApiUsage")
@@ -86,13 +84,11 @@ public class FieldBindings
 									assert destination != null;
 									destination.setValue(
 											CastUtilities.castUnchecked( // COMMENT should be of the correct type
-													AssertionUtilities.assertNonnull(
 															transform(transformers,
 																	t,
 																	from.getTypeToken().getRawType(),
 																	destination.getTypeToken().getRawType()
 															)
-													)
 											)
 									);
 								}));

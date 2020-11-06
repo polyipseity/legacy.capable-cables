@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.DynamicUtilities;
 import net.jodah.typetools.TypeResolver;
 
@@ -13,16 +14,18 @@ import java.util.function.Function;
  */
 @SuppressWarnings("UnusedReturnValue")
 public interface IBinder {
-	static Optional<Class<?>>[] resolveFunctionTypes(Function<?, ?> transformer) { return DynamicUtilities.Extensions.wrapTypeResolverResults(TypeResolver.resolveRawArguments(Function.class, transformer.getClass())); }
+	static Optional<Class<?>>[] resolveFunctionTypes(Function<?, ?> transformer) {
+		return DynamicUtilities.Extensions.wrapTypeResolverResults(TypeResolver.resolveRawArguments(Function.class, transformer.getClass()));
+	}
 
 	boolean bind(Iterable<? extends IBinding<?>> bindings)
 			throws NoSuchBindingTransformerException;
 
 	boolean unbind(Iterable<? extends IBinding<?>> bindings);
 
-	<T, R> Optional<? extends Function<T, R>> addTransformer(IBinding.EnumBindingType type, Function<T, R> transformer);
+	<T, R> Optional<? extends Function<@Nonnull T, @Nonnull R>> addTransformer(IBinding.EnumBindingType type, Function<@Nonnull T, @Nonnull R> transformer);
 
-	<T, R> Optional<? extends Function<T, R>> removeTransformer(IBinding.EnumBindingType type, Class<T> from, Class<R> to);
+	<T, R> Optional<? extends Function<@Nonnull T, @Nonnull R>> removeTransformer(IBinding.EnumBindingType type, Class<T> from, Class<R> to);
 
 	default boolean unbindAll() { return unbindAll(EnumSet.allOf(IBinding.EnumBindingType.class)); }
 

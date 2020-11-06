@@ -1,14 +1,2 @@
 <root>
-	<item name='java.util.function.BiConsumer void accept(T, U) 0'>
-		<annotation name='javax.annotation.Nullable'/>
-	</item>
-	<item name='java.util.function.BiConsumer void accept(T, U) 1'>
-		<annotation name='javax.annotation.Nullable'/>
-	</item>
-	<item name='java.util.function.Function R apply(T)'>
-		<annotation name='javax.annotation.Nullable'/>
-	</item>
-	<item name='java.util.function.Supplier T get()'>
-		<annotation name='javax.annotation.Nullable'/>
-	</item>
 </root>

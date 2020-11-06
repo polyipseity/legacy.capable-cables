@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 
@@ -9,12 +10,12 @@ import java.util.function.Supplier;
 
 public interface IHasBinding {
 	@OverridingMethodsMustInvokeSuper
-	default void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	default void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		// COMMENT for 'OverridingMethodsMustInvokeSuper'
 	}
 
 	@OverridingMethodsMustInvokeSuper
-	default void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	default void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		// COMMENT for 'OverridingMethodsMustInvokeSuper'
 	}
 }

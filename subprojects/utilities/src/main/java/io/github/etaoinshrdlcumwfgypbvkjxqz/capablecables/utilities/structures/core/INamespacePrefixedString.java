@@ -2,6 +2,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.
 
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
@@ -50,13 +52,13 @@ public interface INamespacePrefixedString {
 				MarkersTemplate.addReferences(UtilitiesMarkers.getInstance().getClassMarker(),
 						UtilitiesMarkers.getInstance().getMarkerStructure());
 
-		private static final @Immutable Map<String, Function<INamespacePrefixedString, ?>> OBJECT_VARIABLE_MAP =
-				ImmutableMap.<String, Function<INamespacePrefixedString, ?>>builder()
+		private static final @Immutable Map<String, Function<@Nonnull INamespacePrefixedString, @Nullable ?>> OBJECT_VARIABLE_MAP =
+				ImmutableMap.<String, Function<@Nonnull INamespacePrefixedString, @Nullable ?>>builder()
 						.put("namespace", INamespacePrefixedString::getNamespace)
 						.put("path", INamespacePrefixedString::getPath)
 						.build();
 
-		public static @Immutable Map<String, Function<INamespacePrefixedString, ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
+		public static @Immutable Map<String, Function<@Nonnull INamespacePrefixedString, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 
 		public static Marker getClassMarker() { return CLASS_MARKER; }
 

@@ -1,6 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections;
 
 import com.google.common.collect.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LoopUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
@@ -19,7 +21,6 @@ import org.objectweb.asm.signature.SignatureVisitor;
 import org.objectweb.asm.signature.SignatureWriter;
 import org.slf4j.Marker;
 
-import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
 import java.util.Arrays;
@@ -114,7 +115,7 @@ public enum MapUtilities {
 		private static final Pattern LITERAL_SUPERCLASS_SIMPLE_NAME = Pattern.compile("AbstractBiMap", Pattern.LITERAL);
 		public static final @NonNls String SOURCE_DEBUG = "ASM";
 		private static final Class<?> CLAZZ;
-		private static final BiFunction<Map<?, ?>, Map<?, ?>, ? extends BiMap<?, ?>> CONSTRUCTOR;
+		private static final BiFunction<@Nonnull Map<?, ?>, @Nonnull Map<?, ?>, @Nonnull ? extends BiMap<?, ?>> CONSTRUCTOR;
 
 		static {
 			{
@@ -264,7 +265,7 @@ public enum MapUtilities {
 			return CLAZZ;
 		}
 
-		private static BiFunction<Map<?, ?>, Map<?, ?>, ? extends BiMap<?, ?>> getConstructor() {
+		private static BiFunction<@Nonnull Map<?, ?>, @Nonnull Map<?, ?>, @Nonnull ? extends BiMap<?, ?>> getConstructor() {
 			return CONSTRUCTOR;
 		}
 

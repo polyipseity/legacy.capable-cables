@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
 import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.SharedResourceBundleTemplate;
 import org.jetbrains.annotations.NonNls;
@@ -10,13 +11,13 @@ import java.util.function.Supplier;
 
 public final class UtilitiesSharedResourceBundle
 		extends SharedResourceBundleTemplate {
-	private static final Supplier<UtilitiesSharedResourceBundle> INSTANCE = Suppliers.memoize(UtilitiesSharedResourceBundle::new);
+	private static final Supplier<@Nonnull UtilitiesSharedResourceBundle> INSTANCE = Suppliers.memoize(UtilitiesSharedResourceBundle::new);
 
 	private UtilitiesSharedResourceBundle() {
 		super(CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance()));
 	}
 
-	public static UtilitiesSharedResourceBundle getInstance() { return AssertionUtilities.assertNonnull(INSTANCE.get()); }
+	public static UtilitiesSharedResourceBundle getInstance() { return INSTANCE.get(); }
 
 	public enum EnumKey
 			implements IResourceBundleKey {

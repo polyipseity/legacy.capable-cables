@@ -2,8 +2,9 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -14,10 +15,10 @@ public enum TreeUtilities {
 
 	public static <T, R> Optional<R> visitNodes(EnumStrategy strategy,
 	                                            T obj,
-	                                            Function<? super T, ? extends R> function,
-	                                            Function<? super T, ? extends Iterable<? extends T>> splitter,
-	                                            @Nullable BiFunction<? super R, ? super Iterable<R>, ? extends R> combiner,
-	                                            @Nullable Consumer<? super T> repeater) {
+	                                            Function<@Nonnull ? super T, @Nullable ? extends R> function,
+	                                            Function<@Nonnull ? super T, @Nonnull ? extends Iterable<? extends T>> splitter,
+	                                            @Nullable BiFunction<@Nonnull ? super R, @Nonnull ? super Iterable<R>, @Nonnull ? extends R> combiner,
+	                                            @Nullable Consumer<@Nonnull ? super T> repeater) {
 		switch (strategy) {
 			case DEPTH_FIRST:
 				return visitNodesDepthFirst(obj, function, splitter, combiner, repeater);
@@ -30,16 +31,16 @@ public enum TreeUtilities {
 
 	@SuppressWarnings("ObjectAllocationInLoop")
 	private static <T, R> Optional<R> visitNodesDepthFirst(T obj,
-	                                                       Function<? super T, ? extends R> function,
-	                                                       Function<? super T, ? extends Iterable<? extends T>> splitter,
-	                                                       @Nullable BiFunction<? super R, ? super Iterable<R>, ? extends R> combiner,
-	                                                       @Nullable Consumer<? super T> repeater) {
+	                                                       Function<@Nonnull ? super T, @Nullable ? extends R> function,
+	                                                       Function<@Nonnull ? super T, @Nonnull ? extends Iterable<? extends T>> splitter,
+	                                                       @Nullable BiFunction<@Nonnull ? super R, @Nonnull ? super Iterable<R>, @Nonnull ? extends R> combiner,
+	                                                       @Nullable Consumer<@Nonnull ? super T> repeater) {
 		boolean shouldCombine = combiner != null;
 		Deque<Iterator<? extends T>> stackSplitter = new ArrayDeque<>(CapacityUtilities.getInitialCapacitySmall());
 		@Nullable Deque<Deque<R>> stackCombiner = shouldCombine ? new ArrayDeque<>(CapacityUtilities.getInitialCapacitySmall()) : null;
 		Set<T> visited = new HashSet<>(CapacityUtilities.getInitialCapacityLarge());
 
-		stackSplitter.push(Iterators.forArray(obj));
+		stackSplitter.push(Iterators.singletonIterator(obj));
 		if (shouldCombine)
 			stackCombiner.push(new ArrayDeque<>(CapacityUtilities.getInitialCapacitySmall()));
 
@@ -57,7 +58,7 @@ public enum TreeUtilities {
 						frameCombiner.add(currentRet);
 						stackCombiner.push(new ArrayDeque<>(CapacityUtilities.getInitialCapacityMedium()));
 					}
-					stackSplitter.push(AssertionUtilities.assertNonnull(splitter.apply(current)).iterator());
+					stackSplitter.push(splitter.apply(current).iterator());
 				}
 			} else {
 				stackSplitter.pop();
@@ -66,7 +67,7 @@ public enum TreeUtilities {
 					if (stackCombiner.isEmpty())
 						stackCombiner.push(ret);
 					else {
-						Deque<R> frameCombinerParent = AssertionUtilities.assertNonnull(stackCombiner.element());
+						Deque<R> frameCombinerParent = stackCombiner.element();
 						frameCombinerParent.addLast(combiner.apply(frameCombinerParent.removeLast(), frameCombiner));
 					}
 				}
@@ -79,10 +80,10 @@ public enum TreeUtilities {
 
 	@SuppressWarnings("ObjectAllocationInLoop")
 	private static <T, R> Optional<R> visitNodesBreadthFirst(T obj,
-	                                                         Function<? super T, ? extends R> function,
-	                                                         Function<? super T, ? extends Iterable<? extends T>> splitter,
-	                                                         @Nullable BiFunction<? super R, ? super Iterable<R>, ? extends R> combiner,
-	                                                         @Nullable Consumer<? super T> repeater) {
+	                                                         Function<@Nonnull ? super T, @Nullable ? extends R> function,
+	                                                         Function<@Nonnull ? super T, @Nonnull ? extends Iterable<? extends T>> splitter,
+	                                                         @Nullable BiFunction<@Nonnull ? super R, @Nonnull ? super Iterable<R>, @Nonnull ? extends R> combiner,
+	                                                         @Nullable Consumer<@Nonnull ? super T> repeater) {
 		boolean shouldCombine = combiner != null;
 		List<T>
 				frameSplitter = new ArrayList<>(CapacityUtilities.getInitialCapacityMedium()),

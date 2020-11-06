@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common;
 
 import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.blocks.ModBlocks;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.inventory.ModContainerTypes;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items.ModItems;
@@ -17,14 +18,14 @@ import java.util.function.Supplier;
 @Immutable
 public final class ModCommonProxy
 		extends AbstractProxy<Void> {
-	private static final Supplier<ModCommonProxy> INSTANCE = Suppliers.memoize(ModCommonProxy::new);
+	private static final Supplier<@Nonnull ModCommonProxy> INSTANCE = Suppliers.memoize(ModCommonProxy::new);
 
 	private ModCommonProxy() {
 		super(null);
 	}
 
 	public static ModCommonProxy getInstance() {
-		return AssertionUtilities.assertNonnull(INSTANCE.get());
+		return INSTANCE.get();
 	}
 
 	@Override

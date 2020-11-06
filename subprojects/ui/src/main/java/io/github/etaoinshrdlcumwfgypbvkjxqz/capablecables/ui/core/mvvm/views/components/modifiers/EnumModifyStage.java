@@ -1,10 +1,11 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LoopUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IFunction3;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -31,8 +32,8 @@ public enum EnumModifyStage {
 	Optional<R> handleModifiers
 			(Supplier<? extends RSelf> action,
 			 M modifiers,
-			 Function<? super M, ? extends RPrePost> prePostAction,
-			 IFunction3<? super RSelf, ? super RPrePost, ? super RPrePost, ? extends R, ? extends TH> combiner)
+			 Function<@Nonnull ? super M, ? extends RPrePost> prePostAction,
+			 IFunction3<@Nonnull ? super RSelf, ? super RPrePost, ? super RPrePost, @Nullable ? extends R, ? extends TH> combiner)
 			throws TH {
 		return handleModifiers(action, modifiers, prePostAction, prePostAction, combiner);
 	}
@@ -43,9 +44,9 @@ public enum EnumModifyStage {
 	Optional<R> handleModifiers
 			(Supplier<? extends RSelf> action,
 			 M modifiers,
-			 Function<? super M, ? extends RPre> preAction,
-			 Function<? super M, ? extends RPost> postAction,
-			 IFunction3<? super RSelf, ? super RPre, ? super RPost, ? extends R, ? extends TH> combiner)
+			 Function<@Nonnull ? super M, ? extends RPre> preAction,
+			 Function<@Nonnull ? super M, ? extends RPost> postAction,
+			 IFunction3<? super RSelf, ? super RPre, ? super RPost, @Nullable ? extends R, ? extends TH> combiner)
 			throws TH {
 		modifiers.forEach(IUIComponentModifier::advanceModifyStage);
 		@Nullable RPre preRet = preAction.apply(modifiers);
@@ -62,15 +63,15 @@ public enum EnumModifyStage {
 	public static <M extends Iterable<? extends IUIComponentModifier>> void handleModifiers
 			(Runnable action,
 			 M modifiers,
-			 Consumer<? super M> prePostAction) {
+			 Consumer<@Nonnull ? super M> prePostAction) {
 		handleModifiers(action, modifiers, prePostAction, prePostAction);
 	}
 
 	public static <M extends Iterable<? extends IUIComponentModifier>> void handleModifiers
 			(Runnable action,
 			 M modifiers,
-			 Consumer<? super M> preAction,
-			 Consumer<? super M> postAction) {
+			 Consumer<@Nonnull ? super M> preAction,
+			 Consumer<@Nonnull ? super M> postAction) {
 		handleModifiers(FunctionUtilities.asVoidSupplier(action),
 				modifiers,
 				FunctionUtilities.asVoidFunction(preAction),

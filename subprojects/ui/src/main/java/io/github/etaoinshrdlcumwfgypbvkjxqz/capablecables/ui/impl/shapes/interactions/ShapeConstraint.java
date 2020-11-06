@@ -1,16 +1,23 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interactions;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.MathUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import java.util.Optional;
 
 @Immutable
 public class ShapeConstraint
 		extends ShapeConstraintSupplier {
-	public ShapeConstraint(@Nullable Double minX, @Nullable Double minY, @Nullable Double maxX, @Nullable Double maxY, @Nullable Double minWidth, @Nullable Double minHeight, @Nullable Double maxWidth, @Nullable Double maxHeight) {
+	public ShapeConstraint(@Nullable Double minX,
+	                       @Nullable Double minY,
+	                       @Nullable Double maxX,
+	                       @Nullable Double maxY,
+	                       @Nullable Double minWidth,
+	                       @Nullable Double minHeight,
+	                       @Nullable Double maxWidth,
+	                       @Nullable Double maxHeight) {
 		super(
 				ConstantValue.of(Optional.ofNullable(minX).map(x -> MathUtilities.minNullable(x, maxX)).orElse(null)),
 				ConstantValue.of(Optional.ofNullable(minY).map(y -> MathUtilities.minNullable(y, maxY)).orElse(null)),

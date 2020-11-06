@@ -2,6 +2,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.it
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModMarkers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items.groups.ModItemGroups;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.utilities.BlockUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.utilities.NBTUtilities;
@@ -32,7 +34,6 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
@@ -45,7 +46,7 @@ public class WrenchItem extends Item {
 	}
 
 	@Override
-	public ActionResultType onItemUse(ItemUseContext context) {
+	public @Nonnull ActionResultType onItemUse(ItemUseContext context) {
 		BlockRayTraceResult targetBlock = RayTraceResultUtilities.getBlockRayTraceResultFromItemUseContext(context);
 		if (!canUse(context.getItem(), context.getWorld(), context.getPlayer(), targetBlock))
 			return ActionResultType.PASS;
@@ -158,7 +159,7 @@ public class WrenchItem extends Item {
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
+	public @Nonnull ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
 		if (playerIn.isSneaking()) {
 			if (!worldIn.isRemote) ;
 			//NetworkHooks.openGui((ServerPlayerEntity) playerIn, null); //todo

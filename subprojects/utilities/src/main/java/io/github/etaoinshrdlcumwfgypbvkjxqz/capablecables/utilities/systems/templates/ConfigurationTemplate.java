@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates;
 
 import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
@@ -12,16 +13,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
 public abstract class ConfigurationTemplate<D> {
-	private static final Supplier<Marker> CLASS_MARKER = Suppliers.memoize(() -> UtilitiesMarkers.getInstance().getClassMarker(ConfigurationTemplate.class));
+	private static final Supplier<@Nonnull Marker> CLASS_MARKER = Suppliers.memoize(() -> UtilitiesMarkers.getInstance().getClassMarker(ConfigurationTemplate.class));
 	private final AtomicBoolean configured = new AtomicBoolean();
 
 	protected ConfigurationTemplate() {}
 
 	@SuppressWarnings({"SynchronizationOnLocalVariableOrMethodParameter", "UnusedReturnValue"})
-	public static <D> boolean configureSafe(ConfigurationTemplate<D> self, Supplier<? extends D> data) {
+	public static <D> boolean configureSafe(ConfigurationTemplate<D> self, Supplier<@Nonnull ? extends D> data) {
 		synchronized (self) {
 			if (!self.isConfigured()) {
-				self.configure(AssertionUtilities.assertNonnull(data.get()));
+				self.configure(data.get());
 				return true;
 			}
 		}
@@ -53,7 +54,7 @@ public abstract class ConfigurationTemplate<D> {
 	public enum StaticHolder {
 		;
 
-		private static final Supplier<ResourceBundle> RESOURCE_BUNDLE = Suppliers.memoize(() -> CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance()));
+		private static final Supplier<@Nonnull ResourceBundle> RESOURCE_BUNDLE = Suppliers.memoize(() -> CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance()));
 
 		protected static ResourceBundle getResourceBundle() { return AssertionUtilities.assertNonnull(RESOURCE_BUNDLE.get()); }
 	}

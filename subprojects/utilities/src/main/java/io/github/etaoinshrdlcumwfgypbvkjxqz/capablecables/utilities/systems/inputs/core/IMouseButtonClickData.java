@@ -1,6 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core;
 
 import com.google.common.collect.ImmutableMap;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICloneable;
 import org.jetbrains.annotations.NonNls;
 
@@ -25,14 +27,14 @@ public interface IMouseButtonClickData
 		;
 		public static final int MOUSE_BUTTON_NULL = -1;
 		@NonNls
-		private static final ImmutableMap<String, Function<IMouseButtonClickData, ?>> OBJECT_VARIABLE_MAP =
-				ImmutableMap.<String, Function<IMouseButtonClickData, ?>>builder()
+		private static final ImmutableMap<String, Function<@Nonnull IMouseButtonClickData, @Nullable ?>> OBJECT_VARIABLE_MAP =
+				ImmutableMap.<String, Function<@Nonnull IMouseButtonClickData, @Nullable ?>>builder()
 						.put("cursorPositionView", IMouseButtonClickData::getCursorPositionView)
 						.put("button", IMouseButtonClickData::getButton)
 						.build();
 
 		public static int getMouseButtonNull() { return MOUSE_BUTTON_NULL; }
 
-		public static ImmutableMap<String, Function<IMouseButtonClickData, ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
+		public static ImmutableMap<String, Function<@Nonnull IMouseButtonClickData, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 	}
 }

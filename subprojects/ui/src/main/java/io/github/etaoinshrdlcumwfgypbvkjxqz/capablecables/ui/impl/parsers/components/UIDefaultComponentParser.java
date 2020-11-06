@@ -3,6 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.compo
 import com.google.common.collect.*;
 import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
@@ -53,7 +54,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		extends UIAbstractDefaultComponentParser<T, ComponentUI, ComponentUI, IUIDefaultComponentParserContext>
 		implements ITypeCapture {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
-	private static final @Immutable Map<IUIEventType, Function<Component, Optional<String>>> EVENT_TYPE_FUNCTION_MAP = ImmutableMap.<IUIEventType, Function<Component, Optional<String>>>builder()
+	private static final @Immutable Map<IUIEventType, Function<@Nonnull Component, @Nonnull Optional<String>>> EVENT_TYPE_FUNCTION_MAP = ImmutableMap.<IUIEventType, Function<Component, Optional<String>>>builder()
 			.put(EnumUIEventDOMType.LOAD, Component::getLoad)
 			.put(EnumUIEventDOMType.UNLOAD, Component::getUnload)
 			.put(EnumUIEventDOMType.ABORT, Component::getAbort)
@@ -250,7 +251,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		return resource;
 	}
 
-	public static @Immutable Map<IUIEventType, Function<Component, Optional<String>>> getEventTypeFunctionMap() { return EVENT_TYPE_FUNCTION_MAP; }
+	public static @Immutable Map<IUIEventType, Function<@Nonnull Component, @Nonnull Optional<String>>> getEventTypeFunctionMap() { return EVENT_TYPE_FUNCTION_MAP; }
 
 	@Override
 	protected T construct0(ComponentUI parsed)
@@ -275,7 +276,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 				.forEach(any -> {
 							assert any != null;
 							IUIAbstractDefaultComponentParserContext.findHandler(viewContext, any)
-									.ifPresent(handler -> handler.acceptNonnull(
+									.ifPresent(handler -> handler.accept(
 											viewContext,
 											CastUtilities.castUnchecked(any) // COMMENT should not throw
 									));
@@ -299,7 +300,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 							.forEach(any -> {
 								assert any != null;
 								IUIAbstractDefaultComponentParserContext.findHandler(componentContext, any)
-										.ifPresent(handler -> handler.acceptNonnull(
+										.ifPresent(handler -> handler.accept(
 												componentContext,
 												CastUtilities.castUnchecked(any) // COMMENT should not throw
 										));

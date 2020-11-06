@@ -3,6 +3,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.co
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.cursors.ICursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
@@ -42,7 +44,6 @@ import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.jetbrains.annotations.NonNls;
 import org.lwjgl.glfw.GLFW;
 
-import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.awt.geom.Area;
@@ -109,7 +110,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 	@Nullable
 	private IResizeData resizeData;
 	@Nullable
-	private Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier;
+	private Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier;
 
 	public static String getPropertyActivationMouseButtons() {
 		return PROPERTY_ACTIVATION_MOUSE_BUTTONS;
@@ -187,11 +188,13 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		getBinderObserverSupplier().ifPresent(rendererContainer::initializeBindings);
 	}
 
-	protected Optional<? extends Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>>> getBinderObserverSupplier() { return Optional.ofNullable(binderObserverSupplier); }
+	protected Optional<? extends Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>>> getBinderObserverSupplier() { return Optional.ofNullable(binderObserverSupplier); }
+
+	protected void setBinderObserverSupplier(@Nullable Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) { this.binderObserverSupplier = binderObserverSupplier; }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		IUIComponentUserResizableExtension.super.initializeBindings(binderObserverSupplier);
 		setBinderObserverSupplier(binderObserverSupplier);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
@@ -207,11 +210,9 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 
 	protected AtomicReference<IUIRendererContainer<IResizingRenderer>> getRendererContainerReference() { return rendererContainerReference; }
 
-	protected void setBinderObserverSupplier(@Nullable Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) { this.binderObserverSupplier = binderObserverSupplier; }
-
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		IUIComponentUserResizableExtension.super.cleanupBindings(binderObserverSupplier);
 		setBinderObserverSupplier(null);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,

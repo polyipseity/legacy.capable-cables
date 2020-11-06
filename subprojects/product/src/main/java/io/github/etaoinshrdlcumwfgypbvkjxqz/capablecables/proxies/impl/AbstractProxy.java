@@ -3,11 +3,11 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.impl;
 import com.google.common.base.Stopwatch;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModMarkers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.core.IProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import net.minecraftforge.fml.event.lifecycle.*;
 
-import javax.annotation.Nullable;
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Optional;
 import java.util.ResourceBundle;

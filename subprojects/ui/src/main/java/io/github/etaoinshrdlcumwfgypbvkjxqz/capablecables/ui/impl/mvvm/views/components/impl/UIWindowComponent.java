@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
@@ -147,7 +148,7 @@ public class UIWindowComponent
 	}
 
 	@Override
-	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		super.initializeBindings(binderObserverSupplier);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 				() -> ImmutableBinderAction.bind(
@@ -155,10 +156,8 @@ public class UIWindowComponent
 				));
 	}
 
-	@Override
-	public boolean reshape(Predicate<? super IShapeDescriptor<? super RectangularShape>> action) throws ConcurrentModificationException {
-		return IUIComponent.reshapeComponent(this, getShapeDescriptor(), action);
-		// TODO resizing based on min size and preferred size
+	protected IBindingField<EnumUIRotation> getControlsDirection() {
+		return controlsDirection;
 	}
 
 	protected static class ModifyShapeDescriptorObserver
@@ -193,7 +192,7 @@ public class UIWindowComponent
 	}
 
 	@Override
-	public void cleanupBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		super.cleanupBindings(binderObserverSupplier);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 				() -> ImmutableBinderAction.unbind(

@@ -6,6 +6,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
@@ -28,7 +29,7 @@ public class DefaultBinder
 			.linkedHashKeys(CapacityUtilities.getInitialCapacityMedium())
 			.linkedHashSetValues(CapacityUtilities.getInitialCapacityTiny()); // COMMENT order is important
 	private final LoadingCache<IBinding.EnumBindingType, LoadingCache<INamespacePrefixedString, IBindings<?>>> bindings;
-	private final LoadingCache<IBinding.EnumBindingType, LoadingCache<Class<?>, Cache<Class<?>, Function<?, ?>>>> transformers;
+	private final LoadingCache<IBinding.EnumBindingType, LoadingCache<Class<?>, Cache<Class<?>, Function<@Nonnull ?, @Nonnull ?>>>> transformers;
 
 	{
 		CacheBuilder<Object, Object> cb = CacheUtilities.newCacheBuilderSingleThreaded()
@@ -106,19 +107,19 @@ public class DefaultBinder
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T, R> Optional<? extends Function<T, R>> addTransformer(IBinding.EnumBindingType type, Function<T, R> transformer) {
+	public <T, R> Optional<? extends Function<@Nonnull T, @Nonnull R>> addTransformer(IBinding.EnumBindingType type, Function<@Nonnull T, @Nonnull R> transformer) {
 		Optional<Class<?>>[] types = IBinder.resolveFunctionTypes(transformer);
 		if (!types[0].isPresent() || !types[1].isPresent())
 			return Optional.of(transformer);
 		return CacheUtilities.replace(getTransformers().getUnchecked(type).getUnchecked(types[0].get()), types[1].get(), transformer)
-				.map(r -> (Function<T, R>) r);
+				.map(r -> (Function<@Nonnull T, @Nonnull R>) r);
 	}
 
 	@Override
-	public <T, R> Optional<? extends Function<T, R>> removeTransformer(IBinding.EnumBindingType type, Class<T> from, Class<R> to) {
-		@SuppressWarnings("unchecked") Optional<? extends Function<T, R>> ret =
+	public <T, R> Optional<? extends Function<@Nonnull T, @Nonnull R>> removeTransformer(IBinding.EnumBindingType type, Class<T> from, Class<R> to) {
+		@SuppressWarnings("unchecked") Optional<? extends Function<@Nonnull T, @Nonnull R>> ret =
 				CacheUtilities.remove(getTransformers().getUnchecked(type).getUnchecked(from), to)
-						.map(r -> (Function<T, R>) r);
+						.map(r -> (Function<@Nonnull T, @Nonnull R>) r);
 		if (ret.isPresent())
 			getTransformers().cleanUp();
 		return ret;
@@ -143,7 +144,7 @@ public class DefaultBinder
 		return ret;
 	}
 
-	protected LoadingCache<IBinding.EnumBindingType, LoadingCache<Class<?>, Cache<Class<?>, Function<?, ?>>>> getTransformers() { return transformers; }
+	protected LoadingCache<IBinding.EnumBindingType, LoadingCache<Class<?>, Cache<Class<?>, Function<@Nonnull ?, @Nonnull ?>>>> getTransformers() { return transformers; }
 
 	protected LoadingCache<IBinding.EnumBindingType, LoadingCache<INamespacePrefixedString, IBindings<?>>> getBindings() { return bindings; }
 }

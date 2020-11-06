@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations;
 
 import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 
 import java.util.function.Supplier;
@@ -9,8 +10,8 @@ import java.util.function.Supplier;
 @Immutable
 public final class UIImmutableAnimationTime
 		extends UIAbstractAnimationTime {
-	private static final Supplier<UIImmutableAnimationTime> INFINITY = Suppliers.memoize(() -> new UIImmutableAnimationTime(true, 0));
-	private static final Supplier<UIImmutableAnimationTime> ZERO = Suppliers.memoize(() -> new UIImmutableAnimationTime(false, 1));
+	private static final Supplier<@Nonnull UIImmutableAnimationTime> INFINITY = Suppliers.memoize(() -> new UIImmutableAnimationTime(true, 0));
+	private static final Supplier<@Nonnull UIImmutableAnimationTime> ZERO = Suppliers.memoize(() -> new UIImmutableAnimationTime(false, 1));
 
 	private final boolean infinite;
 	private final long value;
