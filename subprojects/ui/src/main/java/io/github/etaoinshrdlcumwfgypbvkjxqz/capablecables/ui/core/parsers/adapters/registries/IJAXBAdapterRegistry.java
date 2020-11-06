@@ -3,7 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapt
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapter;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ImmutableJAXBAdapterContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 
@@ -11,10 +11,10 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 public interface IJAXBAdapterRegistry {
-	static Object adaptFromJAXB(IJAXBAdapterRegistry instance, Object jaxbObject)
+	static Object adaptFromJAXB(IJAXBAdapterContext context, Object jaxbObject)
 			throws IllegalArgumentException {
-		return IJAXBAdapter.leftToRight(getFromJAXBAdapter(instance, jaxbObject),
-				ImmutableJAXBAdapterContext.of(instance), jaxbObject);
+		return IJAXBAdapter.leftToRight(getFromJAXBAdapter(context.getRegistry(), jaxbObject),
+				context, jaxbObject);
 	}
 
 	static <L> IJAXBAdapter<L, ?> getFromJAXBAdapter(IJAXBAdapterRegistry instance, L jaxbObject)
@@ -32,10 +32,10 @@ public interface IJAXBAdapterRegistry {
 
 	<L> Optional<? extends IJAXBAdapter<L, ?>> findFromJAXBAdapter(L jaxbObject);
 
-	static Object adaptToJAXB(IJAXBAdapterRegistry instance, Object object)
+	static Object adaptToJAXB(IJAXBAdapterContext context, Object object)
 			throws IllegalArgumentException {
-		return IJAXBAdapter.rightToLeft(getToJAXBAdapter(instance, object),
-				ImmutableJAXBAdapterContext.of(instance), object);
+		return IJAXBAdapter.rightToLeft(getToJAXBAdapter(context.getRegistry(), object),
+				context, object);
 	}
 
 	static <R> IJAXBAdapter<?, R> getToJAXBAdapter(IJAXBAdapterRegistry instance, R object)
