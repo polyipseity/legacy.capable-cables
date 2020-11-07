@@ -8,7 +8,6 @@ import java.util.EnumSet;
 import java.util.Map;
 
 public interface IShapeAnchorSet {
-
 	boolean addAnchors(Iterable<? extends IShapeAnchor> anchors);
 
 	@SuppressWarnings("UnstableApiUsage")

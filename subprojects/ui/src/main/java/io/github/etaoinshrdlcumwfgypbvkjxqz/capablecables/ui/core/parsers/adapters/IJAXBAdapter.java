@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IDuplexFunction;
@@ -9,8 +10,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.I
 import java.util.Optional;
 
 public interface IJAXBAdapter<L, R>
-		extends IDuplexFunction<L, R>, ISealedClassCandidate {
-	static <L, R> R leftToRight(IJAXBAdapter<L, R> instance, IJAXBAdapterContext context, @Nullable L left)
+		extends IDuplexFunction<@Nonnull L, @Nonnull R>, ISealedClassCandidate {
+	static <L, R> R leftToRight(IJAXBAdapter<L, R> instance, IJAXBAdapterContext context, L left)
 			throws IllegalArgumentException {
 		try (@SuppressWarnings("try") UncheckedAutoCloseable ignored = instance.pushThreadLocalContext(context)) {
 			return AssertionUtilities.assertNonnull(instance.leftToRight(left));
@@ -19,17 +20,17 @@ public interface IJAXBAdapter<L, R>
 
 	UncheckedAutoCloseable pushThreadLocalContext(@Nullable IJAXBAdapterContext context);
 
-	@Nullable
 	@Override
+	@Nonnull
 	@Deprecated
-	R leftToRight(@Nullable L left);
+	R leftToRight(@Nonnull L left);
 
-	@Nullable
 	@Override
+	@Nonnull
 	@Deprecated
-	L rightToLeft(@Nullable R right);
+	L rightToLeft(@Nonnull R right);
 
-	static <L, R> L rightToLeft(IJAXBAdapter<L, R> instance, IJAXBAdapterContext context, @Nullable R right)
+	static <L, R> L rightToLeft(IJAXBAdapter<L, R> instance, IJAXBAdapterContext context, R right)
 			throws IllegalArgumentException {
 		try (@SuppressWarnings("try") UncheckedAutoCloseable ignored = instance.pushThreadLocalContext(context)) {
 			return AssertionUtilities.assertNonnull(instance.rightToLeft(right));

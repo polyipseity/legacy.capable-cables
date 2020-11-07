@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -12,6 +12,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.wrappe
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.text.IAttributedText;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.text.ITextLayout;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIJAXBUtilities.ObjectFactories;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.JAXBFunctionalObjectAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.wrappers.EnumFractionalMetricsRenderingHintWrapper;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.wrappers.EnumTextAntiAliasRenderingHintWrapper;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.text.ImmutableAttributedText;
@@ -32,9 +33,9 @@ import java.util.Optional;
 import java.util.function.Function;
 
 @SuppressWarnings("unused")
-public enum EnumJAXBObjectPresetAdapter {
+public enum EnumJAXBUIDefaultObjectAdapter {
 	COLOR(ImmutableTuple2.of(Color.class, java.awt.Color.class),
-			new DefaultJAXBObjectAdapter<>(
+			new JAXBFunctionalObjectAdapter<>(
 					(context, left) -> new java.awt.Color(left.getRed(), left.getGreen(), left.getBlue(), left.getAlpha()),
 					(context, right) -> {
 						Color left = ObjectFactories.getDefaultUIObjectFactory().createColor();
@@ -45,7 +46,7 @@ public enum EnumJAXBObjectPresetAdapter {
 						return left;
 					})),
 	AFFINE_TRANSFORM(ImmutableTuple2.of(AffineTransform.class, java.awt.geom.AffineTransform.class),
-			new DefaultJAXBObjectAdapter<>(
+			new JAXBFunctionalObjectAdapter<>(
 					(context, left) -> {
 						return new java.awt.geom.AffineTransform(new double[]{
 								left.getScaleX(), left.getShearY(),
@@ -65,7 +66,7 @@ public enum EnumJAXBObjectPresetAdapter {
 					}
 			)),
 	@SuppressWarnings("UnstableApiUsage") ATTRIBUTED_TEXT(ImmutableTuple2.of(AttributedText.class, IAttributedText.class),
-			new DefaultJAXBObjectAdapter<>(
+			new JAXBFunctionalObjectAdapter<>(
 					(context, left) -> {
 						JAXBElement<RelationsType> leftAttributes = ObjectFactories.getDefaultUIObjectFactory().createMap(left.getMap());
 						List<Object> leftChildren = left.getStringOrAttributedText();
@@ -98,7 +99,7 @@ public enum EnumJAXBObjectPresetAdapter {
 					}
 			)),
 	FONT_RENDER_CONTEXT(ImmutableTuple2.of(FontRenderContext.class, java.awt.font.FontRenderContext.class),
-			new DefaultJAXBObjectAdapter<>(
+			new JAXBFunctionalObjectAdapter<>(
 					(context, left) -> {
 						Optional<AffineTransform> leftAffineTransform = left.getAffineTransform();
 						JAXBElement<TextAntiAliasRenderingHintType> leftTextAntiAliasRenderingHint = ObjectFactories.getDefaultUIObjectFactory().createTextAntiAliasRenderingHint(
@@ -144,7 +145,7 @@ public enum EnumJAXBObjectPresetAdapter {
 					}
 			)),
 	TEXT_LAYOUT(ImmutableTuple2.of(TextLayout.class, ITextLayout.class),
-			new DefaultJAXBObjectAdapter<>(
+			new JAXBFunctionalObjectAdapter<>(
 					(context, left) -> {
 						AttributedText leftAttributedText = left.getAttributedText();
 						FontRenderContext leftFontRenderContext = left.getFontRenderContext();
@@ -170,15 +171,15 @@ public enum EnumJAXBObjectPresetAdapter {
 	;
 
 	@NonNls
-	private static final ImmutableMap<String, Function<@Nonnull EnumJAXBObjectPresetAdapter, @Nullable ?>> OBJECT_VARIABLE_MAP =
-			ImmutableMap.<String, Function<@Nonnull EnumJAXBObjectPresetAdapter, @Nullable ?>>builder()
-					.put("key", EnumJAXBObjectPresetAdapter::getKey)
-					.put("value", EnumJAXBObjectPresetAdapter::getValue)
+	private static final ImmutableMap<String, Function<@Nonnull EnumJAXBUIDefaultObjectAdapter, @Nullable ?>> OBJECT_VARIABLE_MAP =
+			ImmutableMap.<String, Function<@Nonnull EnumJAXBUIDefaultObjectAdapter, @Nullable ?>>builder()
+					.put("key", EnumJAXBUIDefaultObjectAdapter::getKey)
+					.put("value", EnumJAXBUIDefaultObjectAdapter::getValue)
 					.build();
 	private final ITuple2<? extends Class<?>, ? extends Class<?>> key;
 	private final IJAXBObjectAdapter<?, ?> value;
 
-	<L, R, V extends IJAXBObjectAdapter<L, R>> EnumJAXBObjectPresetAdapter(ITuple2<? extends Class<L>, ? extends Class<R>> key, V value) {
+	<L, R, V extends IJAXBObjectAdapter<L, R>> EnumJAXBUIDefaultObjectAdapter(ITuple2<? extends Class<L>, ? extends Class<R>> key, V value) {
 		this.key = key;
 		this.value = value;
 	}
@@ -198,7 +199,7 @@ public enum EnumJAXBObjectPresetAdapter {
 		return ObjectUtilities.toStringImpl(this, getObjectVariableMap());
 	}
 
-	public static ImmutableMap<String, Function<@Nonnull EnumJAXBObjectPresetAdapter, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
+	public static ImmutableMap<String, Function<@Nonnull EnumJAXBUIDefaultObjectAdapter, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 
 	public ITuple2<? extends Class<?>, ? extends Class<?>> getKey() {
 		return key;

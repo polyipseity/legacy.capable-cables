@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBAdapterRegistry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 
 import java.util.Map;
 import java.util.Optional;
@@ -20,8 +21,9 @@ public final class JAXBImmutableAdapterContext
 		IJAXBAdapterContext.assertDataIntegrity(this.data);
 	}
 
-	public static JAXBImmutableAdapterContext of(IJAXBAdapterRegistry registry, Map<Class<?>, ?> structures) {
-		return new JAXBImmutableAdapterContext(registry, structures);
+	@Override
+	public IJAXBAdapterContext withData(Map<Class<?>, ?> data) {
+		return of(registry, MapUtilities.concatMaps(getData(), data));
 	}
 
 	@Override
@@ -32,6 +34,10 @@ public final class JAXBImmutableAdapterContext
 	@Override
 	public <T> Optional<? extends T> getDatum(Class<T> key) {
 		return Optional.ofNullable(key.cast(getData().get(key)));
+	}
+
+	public static JAXBImmutableAdapterContext of(IJAXBAdapterRegistry registry, Map<Class<?>, ?> data) {
+		return new JAXBImmutableAdapterContext(registry, data);
 	}
 
 	protected Map<Class<?>, ?> getData() {

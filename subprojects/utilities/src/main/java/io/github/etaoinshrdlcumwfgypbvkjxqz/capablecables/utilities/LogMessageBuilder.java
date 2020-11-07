@@ -71,6 +71,7 @@ public class LogMessageBuilder {
 		return this;
 	}
 
+	@SuppressWarnings("Convert2MethodRef")
 	public String build() {
 		StringBuilder ret = new StringBuilder(CapacityUtilities.getInitialCapacityLarge());
 		if (getMarkers().stream()
@@ -78,7 +79,7 @@ public class LogMessageBuilder {
 				.map(marker ->
 						CastUtilities.castChecked(Marker.class, marker)
 								.map(Marker::getName)
-								.orElseGet(marker::toString))
+								.orElseGet(() -> marker.toString())) // TODO Java compiler bug - method reference
 				.map(markerString -> {
 					ret.append('[').append(markerString).append(']');
 					return true;

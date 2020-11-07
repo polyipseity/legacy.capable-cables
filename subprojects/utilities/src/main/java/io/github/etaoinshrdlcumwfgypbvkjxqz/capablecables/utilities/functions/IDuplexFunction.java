@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.MaybeNullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 
 import java.io.Serializable;
@@ -17,11 +18,11 @@ public interface IDuplexFunction<L, R> {
 
 	default Function<R, L> asRightToLeftFunction() { return this::rightToLeft; }
 
-	@Nullable
-	R leftToRight(@Nullable L left);
+	@MaybeNullable
+	R leftToRight(@MaybeNullable L left);
 
-	@Nullable
-	L rightToLeft(@Nullable R right);
+	@MaybeNullable
+	L rightToLeft(@MaybeNullable R right);
 
 	default <NR> IDuplexFunction<L, NR> chainRight(IDuplexFunction<R, NR> function) {
 		return new Functional<>(
