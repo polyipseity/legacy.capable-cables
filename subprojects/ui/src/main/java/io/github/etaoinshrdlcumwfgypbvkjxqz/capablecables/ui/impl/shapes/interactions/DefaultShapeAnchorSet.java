@@ -23,10 +23,10 @@ public class DefaultShapeAnchorSet
 
 	public static Set<IShapeAnchor> getAnchorsToMatch(IShapeDescriptorProvider target, double borderThickness) {
 		return Sets.newHashSet(
-				new DefaultShapeAnchor(target, EnumUISide.UP, EnumUISide.DOWN, borderThickness),
-				new DefaultShapeAnchor(target, EnumUISide.DOWN, EnumUISide.UP, borderThickness),
-				new DefaultShapeAnchor(target, EnumUISide.LEFT, EnumUISide.RIGHT, borderThickness),
-				new DefaultShapeAnchor(target, EnumUISide.RIGHT, EnumUISide.LEFT, borderThickness));
+				new ImmutableShapeAnchor(target, EnumUISide.UP, EnumUISide.DOWN, borderThickness),
+				new ImmutableShapeAnchor(target, EnumUISide.DOWN, EnumUISide.UP, borderThickness),
+				new ImmutableShapeAnchor(target, EnumUISide.LEFT, EnumUISide.RIGHT, borderThickness),
+				new ImmutableShapeAnchor(target, EnumUISide.RIGHT, EnumUISide.LEFT, borderThickness));
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
