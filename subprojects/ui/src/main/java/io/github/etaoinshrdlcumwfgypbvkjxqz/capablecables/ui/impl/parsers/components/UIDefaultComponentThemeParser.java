@@ -37,7 +37,7 @@ public class UIDefaultComponentThemeParser
 		).forEach(element ->
 				IUIAbstractDefaultComponentParserContext.findHandler(context, element)
 						.ifPresent(handler ->
-								handler.acceptNonnull(context,
+								handler.accept(context,
 										CastUtilities.castUnchecked(element)))
 		);
 

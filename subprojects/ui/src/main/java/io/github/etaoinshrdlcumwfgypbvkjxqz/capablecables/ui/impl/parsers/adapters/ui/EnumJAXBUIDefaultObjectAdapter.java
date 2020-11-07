@@ -72,9 +72,9 @@ public enum EnumJAXBUIDefaultObjectAdapter {
 						List<Object> leftChildren = left.getStringOrAttributedText();
 
 						@SuppressWarnings("unchecked") Map<AttributedCharacterIterator.Attribute, Object> rightAttributes =
-								(Map<AttributedCharacterIterator.Attribute, Object>) IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), leftAttributes);
+								(Map<AttributedCharacterIterator.Attribute, Object>) IJAXBAdapterRegistry.adaptFromJAXB(context, leftAttributes);
 						List<IUnion<CharSequence, IAttributedText>> rightChildren = leftChildren.stream()
-								.map(leftChild -> IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), leftChild))
+								.map(leftChild -> IJAXBAdapterRegistry.adaptFromJAXB(context, leftChild))
 								.map(rightChild -> ImmutableUnion.choice(rightChild, CharSequence.class, IAttributedText.class))
 								.collect(ImmutableList.toImmutableList());
 
@@ -87,13 +87,13 @@ public enum EnumJAXBUIDefaultObjectAdapter {
 						List<? extends IUnion<? extends CharSequence, ? extends IAttributedText>> rightChildren = right.getChildrenView();
 
 						@SuppressWarnings("unchecked") JAXBElement<RelationsType> leftAttributes =
-								(JAXBElement<RelationsType>) IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightAttributes);
+								(JAXBElement<RelationsType>) IJAXBAdapterRegistry.adaptToJAXB(context, rightAttributes);
 						List<Object> leftChildren = left.getStringOrAttributedText();
 
 						left.setMap(leftAttributes.getValue());
 						rightChildren.stream()
 								.map(IUnion::get)
-								.map(rightChild -> IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightChild))
+								.map(rightChild -> IJAXBAdapterRegistry.adaptToJAXB(context, rightChild))
 								.forEachOrdered(leftChildren::add);
 						return left;
 					}
@@ -110,12 +110,12 @@ public enum EnumJAXBUIDefaultObjectAdapter {
 						);
 
 						Optional<java.awt.geom.AffineTransform> rightAffineTransform = leftAffineTransform
-								.map(leftAffineTransform1 -> IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), leftAffineTransform1))
+								.map(leftAffineTransform1 -> IJAXBAdapterRegistry.adaptFromJAXB(context, leftAffineTransform1))
 								.map(java.awt.geom.AffineTransform.class::cast);
 						ITextAntiAliasRenderingHintWrapper rightTextAntiAliasRenderingHintWrapper = (ITextAntiAliasRenderingHintWrapper)
-								IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), leftTextAntiAliasRenderingHint);
+								IJAXBAdapterRegistry.adaptFromJAXB(context, leftTextAntiAliasRenderingHint);
 						IFractionalMetricsRenderingHintWrapper rightFractionalMetricsRenderingHintWrapper = (IFractionalMetricsRenderingHintWrapper)
-								IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), leftFractionalMetricsRenderingHint);
+								IJAXBAdapterRegistry.adaptFromJAXB(context, leftFractionalMetricsRenderingHint);
 
 						return new java.awt.font.FontRenderContext(
 								rightAffineTransform.orElse(null),
@@ -129,13 +129,13 @@ public enum EnumJAXBUIDefaultObjectAdapter {
 						IFractionalMetricsRenderingHintWrapper rightFractionalMetricsHint = EnumFractionalMetricsRenderingHintWrapper.valueOfData(right.getFractionalMetricsHint());
 
 						AffineTransform leftAffineTransform =
-								(AffineTransform) IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightTransform);
+								(AffineTransform) IJAXBAdapterRegistry.adaptToJAXB(context, rightTransform);
 						@SuppressWarnings("unchecked")
 						JAXBElement<TextAntiAliasRenderingHintType> leftTextAntiAliasRenderingHint =
-								(JAXBElement<TextAntiAliasRenderingHintType>) IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightAntiAliasingHint);
+								(JAXBElement<TextAntiAliasRenderingHintType>) IJAXBAdapterRegistry.adaptToJAXB(context, rightAntiAliasingHint);
 						@SuppressWarnings("unchecked")
 						JAXBElement<FractionalMetricsRenderingHintType> leftFractionalMetricsRenderingHint =
-								(JAXBElement<FractionalMetricsRenderingHintType>) IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightFractionalMetricsHint);
+								(JAXBElement<FractionalMetricsRenderingHintType>) IJAXBAdapterRegistry.adaptToJAXB(context, rightFractionalMetricsHint);
 
 						FontRenderContext left = ObjectFactories.getDefaultUIObjectFactory().createFontRenderContext();
 						left.setAffineTransform(leftAffineTransform);
@@ -150,8 +150,8 @@ public enum EnumJAXBUIDefaultObjectAdapter {
 						AttributedText leftAttributedText = left.getAttributedText();
 						FontRenderContext leftFontRenderContext = left.getFontRenderContext();
 
-						IAttributedText rightAttributedText = (IAttributedText) IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), leftAttributedText);
-						java.awt.font.FontRenderContext rightFontRenderContext = (java.awt.font.FontRenderContext) IJAXBAdapterRegistry.adaptFromJAXB(context.getRegistry(), leftFontRenderContext);
+						IAttributedText rightAttributedText = (IAttributedText) IJAXBAdapterRegistry.adaptFromJAXB(context, leftAttributedText);
+						java.awt.font.FontRenderContext rightFontRenderContext = (java.awt.font.FontRenderContext) IJAXBAdapterRegistry.adaptFromJAXB(context, leftFontRenderContext);
 
 						return ImmutableTextLayout.of(rightAttributedText, rightFontRenderContext);
 					},
@@ -159,8 +159,8 @@ public enum EnumJAXBUIDefaultObjectAdapter {
 						IAttributedText rightAttributedText = right.getText();
 						java.awt.font.FontRenderContext rightFontRenderContext = right.getFontRenderContext();
 
-						AttributedText leftAttributedText = (AttributedText) IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightAttributedText);
-						FontRenderContext leftFontRenderContext = (FontRenderContext) IJAXBAdapterRegistry.adaptToJAXB(context.getRegistry(), rightFontRenderContext);
+						AttributedText leftAttributedText = (AttributedText) IJAXBAdapterRegistry.adaptToJAXB(context, rightAttributedText);
+						FontRenderContext leftFontRenderContext = (FontRenderContext) IJAXBAdapterRegistry.adaptToJAXB(context, rightFontRenderContext);
 
 						TextLayout left = ObjectFactories.getDefaultUIObjectFactory().createTextLayout();
 						left.setAttributedText(leftAttributedText);

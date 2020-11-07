@@ -22,6 +22,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.compon
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIViewComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptorBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.binding.UIImmutablePropertyMappingValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.JAXBImmutableAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.LegacyJAXBAdapterRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.components.contexts.IUIAbstractDefaultComponentParserContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.components.contexts.IUIDefaultComponentParserContext;
@@ -104,7 +105,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 		return Streams.stream(properties).unordered()
 				.map(p -> Maps.immutableEntry(ImmutableNamespacePrefixedString.of(p.getKey()),
 						new UIImmutablePropertyMappingValue(p.getAny()
-								.map(any -> IJAXBAdapterRegistry.adaptFromJAXB(LegacyJAXBAdapterRegistry.getRegistry(), any))
+								.map(any -> IJAXBAdapterRegistry.adaptFromJAXB(JAXBImmutableAdapterContext.of(LegacyJAXBAdapterRegistry.getRegistry()), any))
 								.orElse(null),
 								p.getBindingKey()
 										.map(ImmutableNamespacePrefixedString::of)
@@ -115,7 +116,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 	@SuppressWarnings("UnstableApiUsage")
 	public static IShapeDescriptorBuilder<?> createShapeDescriptorBuilder(IUIDefaultComponentParserContext context, Shape shape) {
 		AffineTransform transform = shape.getAffineTransform()
-				.map(transform1 -> IJAXBAdapterRegistry.adaptFromJAXB(LegacyJAXBAdapterRegistry.getRegistry(), transform1))
+				.map(transform1 -> IJAXBAdapterRegistry.adaptFromJAXB(JAXBImmutableAdapterContext.of(LegacyJAXBAdapterRegistry.getRegistry()), transform1))
 				.map(AffineTransform.class::cast)
 				.orElseGet(AffineTransform::new);
 
@@ -128,7 +129,7 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 				.forEach(p -> {
 					assert !p.getBindingKey().isPresent();
 					sdb.setProperty(p.getKey(), p.getAny()
-							.map(any -> IJAXBAdapterRegistry.adaptFromJAXB(LegacyJAXBAdapterRegistry.getRegistry(), any))
+							.map(any -> IJAXBAdapterRegistry.adaptFromJAXB(JAXBImmutableAdapterContext.of(LegacyJAXBAdapterRegistry.getRegistry()), any))
 							.orElse(null));
 				});
 

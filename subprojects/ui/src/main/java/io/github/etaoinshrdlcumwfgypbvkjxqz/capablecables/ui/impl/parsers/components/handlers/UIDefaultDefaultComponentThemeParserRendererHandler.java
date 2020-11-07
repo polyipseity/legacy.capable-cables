@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.components.handlers;
 
 import com.google.common.collect.ImmutableList;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Renderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRenderer;
@@ -22,9 +23,9 @@ import java.util.Optional;
 
 public class UIDefaultDefaultComponentThemeParserRendererHandler
 		extends UIAbstractDefaultParserObjectHandler<IUIDefaultComponentThemeParserContext, Renderer> {
-	@SuppressWarnings("deprecation")
 	@Override
-	public void acceptNonnull(IUIDefaultComponentThemeParserContext context, Renderer object) {
+	@SuppressWarnings("deprecation")
+	public void accept(@Nonnull IUIDefaultComponentThemeParserContext context, @Nonnull Renderer object) {
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = UIDefaultComponentParser.createMappings(object.getProperty());
 
 		// COMMENT we should try to prepare as much as possible beforehand

@@ -40,6 +40,10 @@ public final class JAXBImmutableAdapterContext
 		return new JAXBImmutableAdapterContext(registry, data);
 	}
 
+	public static JAXBImmutableAdapterContext of(IJAXBAdapterRegistry registry) {
+		return of(registry, ImmutableMap.of());
+	}
+
 	protected Map<Class<?>, ?> getData() {
 		return data;
 	}

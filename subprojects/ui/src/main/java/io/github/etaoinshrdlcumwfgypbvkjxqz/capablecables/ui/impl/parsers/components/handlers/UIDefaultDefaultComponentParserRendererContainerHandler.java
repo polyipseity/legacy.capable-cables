@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.components.handlers;
 
 import com.google.common.collect.ImmutableList;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.RendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
@@ -11,7 +12,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.compon
 public class UIDefaultDefaultComponentParserRendererContainerHandler
 		extends UIAbstractDefaultParserObjectHandler<IUIDefaultComponentParserContext, RendererContainer> {
 	@Override
-	public void acceptNonnull(IUIDefaultComponentParserContext context, RendererContainer object) {
+	public void accept(@Nonnull IUIDefaultComponentParserContext context, @Nonnull RendererContainer object) {
 		context.getContainer().ifPresent(container -> {
 			if (!(container instanceof IUIRendererContainerContainer))
 				return;

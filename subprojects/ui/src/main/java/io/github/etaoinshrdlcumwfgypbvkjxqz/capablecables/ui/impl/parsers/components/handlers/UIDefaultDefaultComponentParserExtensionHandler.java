@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.compo
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.AnyContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Extension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
@@ -29,7 +30,7 @@ public class UIDefaultDefaultComponentParserExtensionHandler
 		extends UIAbstractDefaultParserObjectHandler<IUIDefaultComponentParserContext, Extension> {
 	@Override
 	@SuppressWarnings("deprecation")
-	public void acceptNonnull(IUIDefaultComponentParserContext context, Extension object) {
+	public void accept(@Nonnull IUIDefaultComponentParserContext context, @Nonnull Extension object) {
 		context.getContainer().ifPresent(container -> {
 			if (!(container instanceof IExtensionContainer))
 				return;
