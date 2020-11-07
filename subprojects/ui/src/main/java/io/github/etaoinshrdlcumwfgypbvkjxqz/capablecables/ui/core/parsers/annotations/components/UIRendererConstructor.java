@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ui.components;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.components;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
@@ -11,7 +11,7 @@ import java.util.Map;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.CONSTRUCTOR)
-public @interface UIExtensionConstructor {
+public @interface UIRendererConstructor {
 	interface IArguments {
 		@Immutable
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView();

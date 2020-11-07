@@ -18,10 +18,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.eve
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.UIParserCheckedException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.UIParserUncheckedException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBAdapterRegistry;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ui.components.UIComponentConstructor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ui.components.UIViewComponentConstructor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ui.components.contexts.IUIAbstractDefaultComponentParserContext;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ui.components.contexts.IUIDefaultComponentParserContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ui.components.contexts.IJAXBUIComponentBasedParserContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ui.components.contexts.IUIJAXBComponentParserContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.components.UIComponentConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.components.UIViewComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptorBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.binding.UIImmutablePropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.JAXBImmutableAdapterContext;
@@ -120,33 +120,58 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 				.map(AffineTransform.class::cast)
 				.orElseGet(AffineTransform::new);
 
-		IShapeDescriptorBuilder<?> sdb = ShapeDescriptorBuilderFactoryRegistry.getDefaultFactory()
-				.createBuilder(
-						CastUtilities.castUnchecked(AssertionUtilities.assertNonnull(context.getAliasesView().get(shape.getClazz()))) // COMMENT should not throw
+		// COMMENT configure view
+		Iterables.concat(
+				rawView.getExtension(),
+				rawView.getAnyContainer()
+						.map(AnyContainer::getAny)
+						.orElseGet(ImmutableList::of))
+				.forEach(any -> {
+							assert any != null;
+							IJAXBUIComponentBasedParserContext.findHandler(viewContext, any)
+									.ifPresent(handler -> handler.accept(
+											viewContext,
+											CastUtilities.castUnchecked(any) // COMMENT should not throw
+									));
+						}
 				);
 
-		shape.getProperty().stream().unordered()
-				.forEach(p -> {
-					assert !p.getBindingKey().isPresent();
-					sdb.setProperty(p.getKey(), p.getAny()
-							.map(any -> IJAXBAdapterRegistry.adaptFromJAXB(JAXBImmutableAdapterContext.of(LegacyJAXBAdapterRegistry.getRegistry()), any))
-							.orElse(null));
+		// COMMENT configure components
+		TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, rawComponent,
+				node -> {
+					assert node != null;
+					IUIComponent component = IUIView.getNamedTrackers(view).get(IUIComponent.class, node.getName())
+							.orElseThrow(AssertionError::new);
+					IUIJAXBComponentParserContext componentContext = new JAXBUIImmutableComponentParserContext(getAliases(), getHandlers(), view, component);
+					Iterables.concat(
+							node.getAnchor(),
+							ImmutableSet.of(node.getRendererContainer()),
+							node.getExtension(),
+							node.getAnyContainer()
+									.map(AnyContainer::getAny)
+									.orElseGet(ImmutableList::of))
+							.forEach(any -> {
+								assert any != null;
+								IJAXBUIComponentBasedParserContext.findHandler(componentContext, any)
+										.ifPresent(handler -> handler.accept(
+												componentContext,
+												CastUtilities.castUnchecked(any) // COMMENT should not throw
+										));
+							});
+					return node;
+				},
+				Component::getComponent,
+				null,
+				node -> {
+					throw new IllegalArgumentException(
+							new LogMessageBuilder()
+									.addMarkers(UIMarkers.getInstance()::getMarkerParser)
+									.addKeyValue("node", node).addKeyValue("rawComponent", rawComponent)
+									.addMessages(() -> getResourceBundle().getString("construct.view.tree.cyclic"))
+									.build()
+					);
 				});
-
-		return sdb.setX(shape.getX()).setY(shape.getY()).setWidth(shape.getWidth()).setHeight(shape.getHeight())
-				.transformConcatenate(transform)
-				.constrain(shape.getConstraint().stream()
-						.map(c -> new ShapeConstraint(
-								c.getMinX().orElse(null),
-								c.getMinY().orElse(null),
-								c.getMaxX().orElse(null),
-								c.getMaxY().orElse(null),
-								c.getMinWidth().orElse(null),
-								c.getMinHeight().orElse(null),
-								c.getMaxWidth().orElse(null),
-								c.getMaxHeight().orElse(null)
-						))
-						.collect(ImmutableList.toImmutableList()));
+		return view;
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
@@ -254,12 +279,12 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 
 	public static @Immutable Map<IUIEventType, Function<@Nonnull Component, @Nonnull Optional<String>>> getEventTypeFunctionMap() { return EVENT_TYPE_FUNCTION_MAP; }
 
-	@Override
-	protected T construct0(ComponentUI parsed)
-			throws Throwable {
-		// COMMENT raw
-		View rawView = parsed.getView();
-		Component rawComponent = parsed.getComponent();
+	@SuppressWarnings("UnstableApiUsage")
+	public static IShapeDescriptorBuilder<?> createShapeDescriptorBuilder(IUIJAXBComponentParserContext context, Shape shape) {
+		AffineTransform transform = shape.getAffineTransform()
+				.map(transform1 -> IJAXBAdapterRegistry.adaptFromJAXB(JAXBImmutableAdapterContext.of(LegacyJAXBAdapterRegistry.getRegistry()), transform1))
+				.map(AffineTransform.class::cast)
+				.orElseGet(AffineTransform::new);
 
 		// COMMENT create hierarchy
 		@SuppressWarnings("unchecked") T view = (T) createView(new UIImmutableDefaultComponentParserContext(getAliases(), getHandlers(), null, null), rawView); // COMMENT should be checked
