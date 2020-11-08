@@ -19,8 +19,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.eve
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIComponentRendererInvokerModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.binding.UIProperty;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.cursors.EnumGLFWCursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIFunctionalEventListener;
@@ -312,27 +312,27 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 							.flatMap(IUIComponentManager::getView)
 							.flatMap(view -> IUIViewComponent.createComponentContextWithManager(view)
 									.map(context -> {
-										try (IUIComponentContext ctx = context) {
-											IUIViewComponent.getPathResolver(view).resolvePath(ctx, (Point2D) point.clone());
+										try (IUIComponentContext context1 = context) {
+											IUIViewComponent.getPathResolver(view).resolvePath(context1, (Point2D) point.clone());
 
-											Rectangle2D contextualShape = IUIComponent.getContextualShape(ctx, container).getBounds2D();
+											Rectangle2D contextualShape = IUIComponent.getContextualShape(context1, container).getBounds2D();
 											Set<EnumUISide> sides = EnumUISide.getSidesMouseOver(contextualShape, point);
 
-											@Nullable Point2D base = null;
+											Point2D[] base = {null}; // TODO replace it with non-array variable, ASM hates annotations here
 											if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT))
-												base = new Point2D.Double(contextualShape.getMaxX(), contextualShape.getMaxY());
+												base[0] = new Point2D.Double(contextualShape.getMaxX(), contextualShape.getMaxY());
 											else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
-												base = new Point2D.Double(contextualShape.getX(), contextualShape.getY());
+												base[0] = new Point2D.Double(contextualShape.getX(), contextualShape.getY());
 											else if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.RIGHT))
-												base = new Point2D.Double(contextualShape.getX(), contextualShape.getMaxY());
+												base[0] = new Point2D.Double(contextualShape.getX(), contextualShape.getMaxY());
 											else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
-												base = new Point2D.Double(contextualShape.getMaxX(), contextualShape.getY());
+												base[0] = new Point2D.Double(contextualShape.getMaxX(), contextualShape.getY());
 
-											IResizeData d = new ImmutableResizeData(point, sides, base, getCursor(sides).orElseThrow(InternalError::new).getHandle());
+											IResizeData data = new ImmutableResizeData(point, sides, base[0], getCursor(sides).orElseThrow(InternalError::new).getHandle());
 											synchronized (getLockObject()) {
 												if (owner.getResizeData().isPresent())
 													return false;
-												owner.setResizeData(d);
+												owner.setResizeData(data);
 											}
 											return true;
 										}
