@@ -1,12 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections;
 
 import com.google.common.collect.*;
+import com.google.common.primitives.Ints;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LoopUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.ClassUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.StackTraceUtilities;
@@ -23,10 +21,7 @@ import org.slf4j.Marker;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,7 +49,7 @@ public enum MapUtilities {
 	}
 
 	public static <K, V> ImmutableMap<K, V> zipKeysValues(Iterable<? extends K> keys, Iterable<? extends V> values) {
-		ImmutableMap.Builder<K, V> ret = ImmutableMap.builder();
+		Map<K, V> ret = new HashMap<>(Ints.saturatedCast(SpliteratorUtilities.estimateSizeOrElse(keys.spliterator(), CapacityUtilities.getInitialCapacityMedium())));
 
 		Iterator<? extends V> iteratorValues = values.iterator();
 		keys.forEach(k -> {
@@ -77,7 +72,7 @@ public enum MapUtilities {
 							.build()
 			);
 
-		return ret.build();
+		return ImmutableMap.copyOf(ret);
 	}
 
 	public static Marker getClassMarker() { return CLASS_MARKER; }
