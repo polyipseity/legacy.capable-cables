@@ -3,8 +3,14 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.config.UISchemas;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBAdapterRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.JAXBContextRegisterBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.common.JAXBCommonAdapters;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.registries.JAXBDefaultAdapterRegistry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.registries.JAXBDefaultElementAdapterRegistry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.registries.JAXBDefaultObjectAdapterRegistry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.JAXBUIAdapters;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 import jakarta.xml.bind.JAXBContext;
@@ -28,6 +34,7 @@ public enum UIDefaultComponentSchemaHolder {
 	public static final String SCHEMA_NAMESPACE_URI = "https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui";
 	private static final Schema SCHEMA;
 	private static final JAXBContext CONTEXT;
+	private static final IJAXBAdapterRegistry ADAPTER_REGISTRY;
 
 	static {
 		{
@@ -43,7 +50,7 @@ public enum UIDefaultComponentSchemaHolder {
 
 		{
 			JAXBContextRegisterBusEvent registerEvent = new JAXBContextRegisterBusEvent();
-			registerEvent.addClassesToBeBound(UIJAXBUtilities.ObjectFactories.getDefaultUIObjectFactory().getClass());
+			registerEvent.addClassesToBeBound(JAXBUIUtilities.ObjectFactories.getDefaultUIObjectFactory().getClass());
 			UIEventBusEntryPoint.getEventBus().onNext(registerEvent);
 			try {
 				CONTEXT = JAXBContext.newInstance(registerEvent.getClassesToBeBoundView().toArray(new Class<?>[0]));
@@ -51,6 +58,16 @@ public enum UIDefaultComponentSchemaHolder {
 				throw ThrowableUtilities.propagate(e);
 			}
 		}
+
+		{
+			ADAPTER_REGISTRY = new JAXBDefaultAdapterRegistry(new JAXBDefaultObjectAdapterRegistry(), new JAXBDefaultElementAdapterRegistry());
+			JAXBCommonAdapters.registerAll(getAdapterRegistry());
+			JAXBUIAdapters.registerAll(getAdapterRegistry());
+		}
+	}
+
+	public static IJAXBAdapterRegistry getAdapterRegistry() {
+		return ADAPTER_REGISTRY;
 	}
 
 	public static String getContextPath() { return CONTEXT_PATH; }

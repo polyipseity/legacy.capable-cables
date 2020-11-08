@@ -8,7 +8,7 @@ import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import java.util.function.Function;
 
-public enum UIJAXBUtilities {
+public enum JAXBUIUtilities {
 	;
 
 	public static <T> QName getQName(Function<@Nullable T, @Nonnull ? extends JAXBElement<?>> factory) {

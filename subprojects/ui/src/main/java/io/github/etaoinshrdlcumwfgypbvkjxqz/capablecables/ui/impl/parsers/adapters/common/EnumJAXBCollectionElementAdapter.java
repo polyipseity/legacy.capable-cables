@@ -9,8 +9,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBElementAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBAdapterRegistry;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIJAXBUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIJAXBUtilities.ObjectFactories;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.JAXBUIUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.JAXBUIUtilities.ObjectFactories;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.JAXBFunctionalElementAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
@@ -29,27 +29,27 @@ import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
 public enum EnumJAXBCollectionElementAdapter {
-	@SuppressWarnings("UnstableApiUsage") SET(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createSet), CastUtilities.castUnchecked(Set.class)),
+	@SuppressWarnings("UnstableApiUsage") SET(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createSet), CastUtilities.castUnchecked(Set.class)),
 			new JAXBFunctionalElementAdapter<CollectionType, Set<?>>(
 					(context, left) -> processCollectionType(context, left.getValue()).collect(ImmutableSet.toImmutableSet()),
 					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createSet(createCollectionType(context, right.stream()))
 			)),
-	@SuppressWarnings("UnstableApiUsage") LIST(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createList), CastUtilities.castUnchecked(List.class)),
+	@SuppressWarnings("UnstableApiUsage") LIST(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createList), CastUtilities.castUnchecked(List.class)),
 			new JAXBFunctionalElementAdapter<CollectionType, List<?>>(
 					(context, left) -> processCollectionType(context, left.getValue()).collect(ImmutableList.toImmutableList()),
 					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createSet(createCollectionType(context, right.stream()))
 			)),
-	@SuppressWarnings("UnstableApiUsage") RELATIONS_SET(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createRelationsSet), CastUtilities.castUnchecked(SetMultimap.class)),
+	@SuppressWarnings("UnstableApiUsage") RELATIONS_SET(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createRelationsSet), CastUtilities.castUnchecked(SetMultimap.class)),
 			new JAXBFunctionalElementAdapter<RelationsType, SetMultimap<?, ?>>(
 					(context, left) -> processRelationsType(context, left.getValue()).collect(ImmutableSetMultimap.toImmutableSetMultimap(Map.Entry::getKey, Map.Entry::getValue)),
 					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createRelationsSet(createRelationsType(context, right.entries().stream()))
 			)),
-	@SuppressWarnings("UnstableApiUsage") RELATIONS_LIST(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createRelationsList), CastUtilities.castUnchecked(ListMultimap.class)),
+	@SuppressWarnings("UnstableApiUsage") RELATIONS_LIST(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createRelationsList), CastUtilities.castUnchecked(ListMultimap.class)),
 			new JAXBFunctionalElementAdapter<RelationsType, ListMultimap<?, ?>>(
 					(context, left) -> processRelationsType(context, left.getValue()).collect(ImmutableListMultimap.toImmutableListMultimap(Map.Entry::getKey, Map.Entry::getValue)),
 					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createRelationsSet(createRelationsType(context, right.entries().stream()))
 			)),
-	@SuppressWarnings("UnstableApiUsage") MAP(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createMap), CastUtilities.castUnchecked(Map.class)),
+	@SuppressWarnings("UnstableApiUsage") MAP(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createMap), CastUtilities.castUnchecked(Map.class)),
 			new JAXBFunctionalElementAdapter<RelationsType, Map<?, ?>>(
 					(context, left) -> processRelationsType(context, left.getValue()).collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)),
 					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createRelationsSet(createRelationsType(context, right.entrySet().stream()))

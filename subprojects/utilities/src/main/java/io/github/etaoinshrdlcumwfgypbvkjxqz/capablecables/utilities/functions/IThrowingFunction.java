@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.MaybeNullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 
 import java.util.function.Function;
@@ -19,6 +19,6 @@ public interface IThrowingFunction<T, R, TH extends Throwable> {
 		};
 	}
 
-	@Nullable
-	R apply(@Nullable T t) throws TH;
+	@MaybeNullable
+	R apply(@MaybeNullable T t) throws TH;
 }

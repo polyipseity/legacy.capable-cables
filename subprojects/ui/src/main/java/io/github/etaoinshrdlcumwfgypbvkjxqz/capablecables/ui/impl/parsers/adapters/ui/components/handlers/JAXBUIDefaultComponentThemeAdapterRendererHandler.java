@@ -1,13 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.handlers;
 
 import com.google.common.collect.ImmutableList;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Renderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRenderer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ui.components.UIRendererConstructor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ui.components.contexts.IUIDefaultComponentThemeParserContext;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.UIDefaultComponentParser;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapterContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ui.components.contexts.IJAXBUIComponentThemeAdapterContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIRendererConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.JAXBUIDefaultComponentAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.AnnotationUtilities;
@@ -21,19 +21,22 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
-public class UIDefaultDefaultComponentThemeParserRendererHandler
-		extends UIAbstractDefaultParserObjectHandler<IUIDefaultComponentThemeParserContext, Renderer> {
+public class JAXBUIDefaultComponentThemeAdapterRendererHandler
+		extends JAXBUIAbstractSubContextualAdapterHandler<Renderer, IJAXBUIComponentThemeAdapterContext> {
+	public JAXBUIDefaultComponentThemeAdapterRendererHandler() {
+		super(IJAXBUIComponentThemeAdapterContext.class);
+	}
+
 	@Override
 	@SuppressWarnings("deprecation")
-	public void accept(@Nonnull IUIDefaultComponentThemeParserContext context, @Nonnull Renderer object) {
-		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = UIDefaultComponentParser.createMappings(object.getProperty());
-
+	protected void accept0(IJAXBAdapterContext context, IJAXBUIComponentThemeAdapterContext subContext, Renderer left) {
 		// COMMENT we should try to prepare as much as possible beforehand
-		String name = object.getName();
-		Optional<Class<?>> rawClass = object.getClazz()
-				.map(classAlias -> AssertionUtilities.assertNonnull(context.getAliasesView().get(classAlias)));
+		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = JAXBUIDefaultComponentAdapter.createMappings(context, left.getProperty());
+		String name = left.getName();
+		Optional<Class<?>> rawClass = left.getClazz()
+				.map(classAlias -> AssertionUtilities.assertNonnull(subContext.getAliasesView().get(classAlias)));
 
-		context.getBuilder()
+		subContext.getBuilder()
 				.addRendererContainerAppliers(ImmutableList.of(
 						rendererContainerMap ->
 								Optional.ofNullable(rendererContainerMap.get(name))

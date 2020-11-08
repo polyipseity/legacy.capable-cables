@@ -12,8 +12,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapte
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBAdapterRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.wrappers.IFractionalMetricsRenderingHintWrapper;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.wrappers.ITextAntiAliasRenderingHintWrapper;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIJAXBUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIJAXBUtilities.ObjectFactories;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.JAXBUIUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.JAXBUIUtilities.ObjectFactories;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.JAXBFunctionalElementAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.wrappers.EnumFractionalMetricsRenderingHintWrapper;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.wrappers.EnumTextAntiAliasRenderingHintWrapper;
@@ -38,26 +38,26 @@ import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public enum EnumJAXBUIDefaultElementAdapter {
-	@SuppressWarnings("Convert2Diamond") UI_SIDE(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createUiSide), EnumUISide.class),
+	@SuppressWarnings("Convert2Diamond") UI_SIDE(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createUiSide), EnumUISide.class),
 			new JAXBFunctionalElementAdapter<UiSideType, EnumUISide>(
 					(context, left) -> EnumUISide.valueOf(left.getValue().name()),
 					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createUiSide(UiSideType.valueOf(right.name()))
 			)),
-	@SuppressWarnings("Convert2Diamond") TEXT_ANTI_ALIAS_RENDERING_HINT(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createTextAntiAliasRenderingHint), ITextAntiAliasRenderingHintWrapper.class),
+	@SuppressWarnings("Convert2Diamond") TEXT_ANTI_ALIAS_RENDERING_HINT(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createTextAntiAliasRenderingHint), ITextAntiAliasRenderingHintWrapper.class),
 			new JAXBFunctionalElementAdapter<TextAntiAliasRenderingHintType, ITextAntiAliasRenderingHintWrapper>(
 					(context, left) -> EnumTextAntiAliasRenderingHintWrapper.valueOf(left.getValue().name()),
 					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createTextAntiAliasRenderingHint(
 							TextAntiAliasRenderingHintType.valueOf(EnumTextAntiAliasRenderingHintWrapper.valueOfData(right.getData()).name())
 					)
 			)),
-	@SuppressWarnings("Convert2Diamond") FRACTIONAL_METRICS_RENDERING_HINT(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createFractionalMetricsRenderingHint), IFractionalMetricsRenderingHintWrapper.class),
+	@SuppressWarnings("Convert2Diamond") FRACTIONAL_METRICS_RENDERING_HINT(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createFractionalMetricsRenderingHint), IFractionalMetricsRenderingHintWrapper.class),
 			new JAXBFunctionalElementAdapter<FractionalMetricsRenderingHintType, IFractionalMetricsRenderingHintWrapper>(
 					(context, left) -> EnumFractionalMetricsRenderingHintWrapper.valueOf(left.getValue().name()),
 					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createFractionalMetricsRenderingHint(
 							FractionalMetricsRenderingHintType.valueOf(EnumFractionalMetricsRenderingHintWrapper.valueOfData(right.getData()).name())
 					)
 			)),
-	@SuppressWarnings({"unchecked", "Convert2Diamond"}) TEXT_ATTRIBUTE(ImmutableTuple2.of(UIJAXBUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createTextAttribute), AttributedCharacterIterator.Attribute.class),
+	@SuppressWarnings({"unchecked", "Convert2Diamond"}) TEXT_ATTRIBUTE(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createTextAttribute), AttributedCharacterIterator.Attribute.class),
 			new JAXBFunctionalElementAdapter<String, AttributedCharacterIterator.Attribute>(
 					new BiFunction<@Nonnull IJAXBAdapterContext, @Nonnull JAXBElement<String>, AttributedCharacterIterator.@Nonnull Attribute>() {
 						private final @Immutable Map<String, AttributedCharacterIterator.Attribute> stringAttributeMap;

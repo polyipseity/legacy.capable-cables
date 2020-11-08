@@ -1,7 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components;
 
 import com.google.common.collect.*;
-import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.*;
@@ -15,8 +14,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventComponentType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.UIParserCheckedException;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.UIParserUncheckedException;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBAdapterRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ui.components.IJAXBUIComponentAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ui.components.contexts.IJAXBUIComponentAdapterContext;
@@ -25,12 +23,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annota
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIViewComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptorBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.binding.UIImmutablePropertyMappingValue;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.JAXBImmutableAdapterContext;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.LegacyJAXBAdapterRegistry;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.contexts.UIImmutableDefaultComponentParserContext;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.handlers.UIDefaultDefaultComponentParserAnchorHandler;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.handlers.UIDefaultDefaultComponentParserExtensionHandler;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.handlers.UIDefaultDefaultComponentParserRendererContainerHandler;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.contexts.JAXBUIImmutableComponentAdapterContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.handlers.JAXBUIDefaultComponentAdapterAnchorHandler;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.handlers.JAXBUIDefaultComponentAdapterExtensionHandler;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.handlers.JAXBUIDefaultComponentAdapterRendererContainerHandler;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.descriptors.ShapeDescriptorBuilderFactoryRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interactions.ShapeConstraint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
@@ -41,10 +37,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.AnnotationUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingFunction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ITypeCapture;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 
 import java.awt.geom.AffineTransform;
 import java.lang.invoke.MethodHandle;
@@ -52,9 +48,9 @@ import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.function.Function;
 
-public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
-		extends UIAbstractDefaultComponentParser<T, ComponentUI, ComponentUI, IUIDefaultComponentParserContext>
-		implements ITypeCapture {
+public class JAXBUIDefaultComponentAdapter
+		extends JAXBUIAbstractComponentBasedAdapter<ComponentUI, IUIViewComponent<?, ?>>
+		implements IJAXBUIComponentAdapter<ComponentUI, IUIViewComponent<?, ?>> {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	private static final @Immutable Map<IUIEventType, Function<@Nonnull Component, @Nonnull Optional<String>>> EVENT_TYPE_FUNCTION_MAP = ImmutableMap.<IUIEventType, Function<Component, Optional<String>>>builder()
 			.put(EnumUIEventDOMType.LOAD, Component::getLoad)
@@ -86,196 +82,180 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 			.put(EnumUIEventDOMType.COMPOSITION_END, Component::getCompositionend)
 			.put(EnumUIEventComponentType.CHAR_TYPED, Component::getCharTyped)
 			.build();
-	@SuppressWarnings("UnstableApiUsage")
-	private final TypeToken<T> typeToken;
 
-	@SuppressWarnings("UnstableApiUsage")
-	public UIDefaultComponentParser(Class<T> type) {
-		this.typeToken = TypeToken.of(type);
-	}
-
-	public static <T extends UIDefaultComponentParser<?>> T makeParserStandard(T instance) {
-		instance.addObjectHandler(Anchor.class, new UIDefaultDefaultComponentParserAnchorHandler());
-		instance.addObjectHandler(RendererContainer.class, new UIDefaultDefaultComponentParserRendererContainerHandler());
-		instance.addObjectHandler(Extension.class, new UIDefaultDefaultComponentParserExtensionHandler());
+	public static <T extends JAXBUIDefaultComponentAdapter> T makeParserStandard(T instance) {
+		instance.addObjectHandler(Anchor.class, new JAXBUIDefaultComponentAdapterAnchorHandler());
+		instance.addObjectHandler(RendererContainer.class, new JAXBUIDefaultComponentAdapterRendererContainerHandler());
+		instance.addObjectHandler(Extension.class, new JAXBUIDefaultComponentAdapterExtensionHandler());
 		return instance;
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
-	public static Map<INamespacePrefixedString, IUIPropertyMappingValue> createMappings(Iterable<? extends Property> properties) {
-		return Streams.stream(properties).unordered()
-				.map(p -> Maps.immutableEntry(ImmutableNamespacePrefixedString.of(p.getKey()),
-						new UIImmutablePropertyMappingValue(p.getAny()
-								.map(any -> IJAXBAdapterRegistry.adaptFromJAXB(JAXBImmutableAdapterContext.of(LegacyJAXBAdapterRegistry.getRegistry()), any))
-								.orElse(null),
-								p.getBindingKey()
-										.map(ImmutableNamespacePrefixedString::of)
-										.orElse(null))))
-				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-	}
-
-	@SuppressWarnings("UnstableApiUsage")
-	public static IShapeDescriptorBuilder<?> createShapeDescriptorBuilder(IUIDefaultComponentParserContext context, Shape shape) {
-		AffineTransform transform = shape.getAffineTransform()
-				.map(transform1 -> IJAXBAdapterRegistry.adaptFromJAXB(JAXBImmutableAdapterContext.of(LegacyJAXBAdapterRegistry.getRegistry()), transform1))
-				.map(AffineTransform.class::cast)
-				.orElseGet(AffineTransform::new);
-
-		// COMMENT configure view
-		Iterables.concat(
-				rawView.getExtension(),
-				rawView.getAnyContainer()
-						.map(AnyContainer::getAny)
-						.orElseGet(ImmutableList::of))
-				.forEach(any -> {
-							assert any != null;
-							IJAXBUIComponentBasedParserContext.findHandler(viewContext, any)
-									.ifPresent(handler -> handler.accept(
-											viewContext,
-											CastUtilities.castUnchecked(any) // COMMENT should not throw
-									));
-						}
-				);
-
-		// COMMENT configure components
-		TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, rawComponent,
-				node -> {
-					assert node != null;
-					IUIComponent component = IUIView.getNamedTrackers(view).get(IUIComponent.class, node.getName())
-							.orElseThrow(AssertionError::new);
-					IUIJAXBComponentParserContext componentContext = new JAXBUIImmutableComponentParserContext(getAliases(), getHandlers(), view, component);
-					Iterables.concat(
-							node.getAnchor(),
-							ImmutableSet.of(node.getRendererContainer()),
-							node.getExtension(),
-							node.getAnyContainer()
-									.map(AnyContainer::getAny)
-									.orElseGet(ImmutableList::of))
-							.forEach(any -> {
-								assert any != null;
-								IJAXBUIComponentBasedParserContext.findHandler(componentContext, any)
-										.ifPresent(handler -> handler.accept(
-												componentContext,
-												CastUtilities.castUnchecked(any) // COMMENT should not throw
-										));
-							});
-					return node;
-				},
-				Component::getComponent,
-				null,
-				node -> {
-					throw new IllegalArgumentException(
-							new LogMessageBuilder()
-									.addMarkers(UIMarkers.getInstance()::getMarkerParser)
-									.addKeyValue("node", node).addKeyValue("rawComponent", rawComponent)
-									.addMessages(() -> getResourceBundle().getString("construct.view.tree.cyclic"))
-									.build()
-					);
-				});
-		return view;
-	}
-
-	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public TypeToken<? extends T> getTypeToken() { return typeToken; }
+	@Deprecated
+	public @Nonnull IUIViewComponent<?, ?> leftToRight(@Nonnull ComponentUI left) {
+		return getThreadLocalContext()
+				.map(context -> {
+					try {
+						// COMMENT raw
+						@Immutable Map<String, Class<?>> aliases = JAXBUIComponentUtilities.adaptUsingFromJAXB(left.getUsing());
+						View rawView = left.getView();
+						Component rawComponent = left.getComponent();
+
+						// COMMENT create hierarchy
+						IUIViewComponent<?, ?> view = createView(
+								context.withData(ImmutableMap.of(
+										IJAXBUIComponentAdapterContext.class, new JAXBUIImmutableComponentAdapterContext(aliases, getObjectHandlers(), getElementHandlers(), null, null)
+								)),
+								rawView);
+						IJAXBUIComponentAdapterContext viewContext = new JAXBUIImmutableComponentAdapterContext(aliases, getObjectHandlers(), getElementHandlers(), view, view);
+						view.setManager(
+								CastUtilities.castUnchecked(createComponent(
+										context.withData(ImmutableMap.of(IJAXBUIComponentAdapterContext.class, viewContext)),
+										rawComponent)) // COMMENT may throw
+						);
+
+						// COMMENT configure view
+						Iterables.concat(
+								rawView.getExtension(),
+								rawView.getAnyContainer()
+										.map(AnyContainer::getAny)
+										.orElseGet(ImmutableList::of))
+								.forEach(any -> {
+											assert any != null;
+											IJAXBUIComponentBasedAdapterContext.findHandler(viewContext, any)
+													.ifPresent(handler -> handler.accept(
+															context.withData(ImmutableMap.of(IJAXBUIComponentAdapterContext.class, viewContext)),
+															CastUtilities.castUnchecked(any) // COMMENT should not throw
+													));
+										}
+								);
+
+						// COMMENT configure components
+						TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, rawComponent,
+								node -> {
+									assert node != null;
+									IUIComponent component = IUIView.getNamedTrackers(view).get(IUIComponent.class, node.getName())
+											.orElseThrow(AssertionError::new);
+									IJAXBUIComponentAdapterContext componentContext = new JAXBUIImmutableComponentAdapterContext(aliases, getObjectHandlers(), getElementHandlers(), view, component);
+									Iterables.concat(
+											node.getAnchor(),
+											ImmutableSet.of(node.getRendererContainer()),
+											node.getExtension(),
+											node.getAnyContainer()
+													.map(AnyContainer::getAny)
+													.orElseGet(ImmutableList::of))
+											.forEach(any -> {
+												assert any != null;
+												IJAXBUIComponentBasedAdapterContext.findHandler(componentContext, any)
+														.ifPresent(handler -> handler.accept(
+																context.withData(ImmutableMap.of(IJAXBUIComponentAdapterContext.class, componentContext)),
+																CastUtilities.castUnchecked(any) // COMMENT should not throw
+														));
+											});
+									return node;
+								},
+								Component::getComponent,
+								null,
+								node -> {
+									throw new IllegalArgumentException(
+											new LogMessageBuilder()
+													.addMarkers(UIMarkers.getInstance()::getMarkerParser)
+													.addKeyValue("node", node).addKeyValue("rawComponent", rawComponent)
+													.addMessages(() -> getResourceBundle().getString("construct.view.tree.cyclic"))
+													.build()
+									);
+								});
+						return view;
+					} catch (Throwable throwable) {
+						throw ThrowableUtilities.propagate(throwable);
+					}
+				})
+				.orElseThrow(IllegalStateException::new);
+	}
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
-	@SuppressWarnings("RedundantThrows")
-	@Override
-	protected Iterable<? extends Using> getRawAliases(ComponentUI resource)
-			throws UIParserCheckedException, UIParserUncheckedException { return resource.getUsing(); }
-
-	public static IUIViewComponent<?, ?> createView(IUIDefaultComponentParserContext context, View view)
+	public static IUIViewComponent<?, ?> createView(IJAXBAdapterContext context, View view)
 			throws Throwable {
-		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(view.getProperty());
-		UIViewComponentConstructor.IArguments argument = new UIViewComponentConstructor.ImmutableArguments(mappings);
+		return context.getDatum(IJAXBUIComponentAdapterContext.class)
+				.map(IThrowingFunction.executeNow(subContext -> {
+					Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(context, view.getProperty());
+					UIViewComponentConstructor.IArguments argument = new UIViewComponentConstructor.ImmutableArguments(mappings);
 
-		Class<?> clazz = AssertionUtilities.assertNonnull(context.getAliasesView().get(view.getClazz()));
-		Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIViewComponentConstructor.class, Arrays.asList(clazz.getDeclaredConstructors()));
-		MethodHandle constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
-
-		return (IUIViewComponent<?, ?>) constructorHandle.invoke(argument);
-	}
-
-	public static IUIComponent createComponent(IUIDefaultComponentParserContext context, Component component)
-			throws Throwable {
-		return TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, component,
-				IThrowingFunction.executeNow(node -> {
-					assert node != null;
-					Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(node.getProperty());
-					// COMMENT attributes
-					{
-						Map<INamespacePrefixedString, IUIPropertyMappingValue> attributes = new HashMap<>(getEventTypeFunctionMap().size());
-
-						getEventTypeFunctionMap()
-								.forEach((key, value) -> {
-									assert key != null;
-									assert value != null;
-									attributes.put(key.getEventType(),
-											new UIImmutablePropertyMappingValue(null,
-													AssertionUtilities.assertNonnull(value.apply(node))
-															.map(IUIEventType.StaticHolder.getDefaultPrefix()::concat)
-															.map(ImmutableNamespacePrefixedString::of)
-															.orElse(null)));
-								});
-
-						mappings = MapUtilities.concatMaps(mappings, attributes);
-					}
-					IShapeDescriptorBuilder<?> shapeDescriptorBuilder = createShapeDescriptorBuilder(context, node.getShape());
-					UIComponentConstructor.IArguments argument = new UIComponentConstructor.ImmutableArguments(node.getName(),
-							mappings,
-							shapeDescriptorBuilder.build());
-
-					Class<?> clazz = AssertionUtilities.assertNonnull(context.getAliasesView().get(node.getClazz()));
-					Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIComponentConstructor.class,
-							Arrays.asList(clazz.getDeclaredConstructors()));
+					Class<?> clazz = AssertionUtilities.assertNonnull(subContext.getAliasesView().get(view.getClazz()));
+					Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIViewComponentConstructor.class, Arrays.asList(clazz.getDeclaredConstructors()));
 					MethodHandle constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
 
-					return (IUIComponent) constructorHandle.invoke(argument);
-				}),
-				Component::getComponent,
-				(p, c) -> {
-					if (!Iterables.isEmpty(c)) {
-						if (!(p instanceof IUIComponentContainer))
-							throw new IllegalArgumentException(
-									new LogMessageBuilder()
-											.addMarkers(UIMarkers.getInstance()::getMarkerParser)
-											.addKeyValue("p", p).addKeyValue("c", c)
-											.addMessages(() -> getResourceBundle().getString("construct.component.container.instance_of.fail"))
-											.build()
-							);
-						((IUIComponentContainer) p).addChildren(c);
-					}
-					return p;
-				},
-				n -> {
-					throw new IllegalArgumentException(
-							new LogMessageBuilder()
-									.addMarkers(UIMarkers.getInstance()::getMarkerParser)
-									.addKeyValue("n", n).addKeyValue("component", component)
-									.addMessages(() -> getResourceBundle().getString("construct.view.tree.cyclic"))
-									.build()
-					);
-				})
-				.orElseThrow(AssertionError::new);
+					return (IUIViewComponent<?, ?>) constructorHandle.invoke(argument);
+				}))
+				.orElseThrow(IllegalArgumentException::new);
 	}
 
-	@SuppressWarnings({"RedundantThrows", "UnstableApiUsage"})
-	@Override
-	public ComponentUI parse1(ComponentUI resource)
+	public static IUIComponent createComponent(IJAXBAdapterContext context, Component component)
 			throws Throwable {
-		Class<?> viewClass = AssertionUtilities.assertNonnull(getAliases().get(resource.getView().getClazz()));
-		if (!getTypeToken().getRawType().isAssignableFrom(viewClass))
-			throw new IllegalArgumentException(
-					new LogMessageBuilder()
-							.addMarkers(UIMarkers.getInstance()::getMarkerParser)
-							.addKeyValue("viewClass", viewClass).addKeyValue("this::getGenericClass", this::getTypeToken)
-							.addMessages(() -> getResourceBundle().getString("construct.view.instance_of.fail"))
-							.build()
-			);
+		return context.getDatum(IJAXBUIComponentAdapterContext.class)
+				.map(IThrowingFunction.executeNow(subContext ->
+						TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, component,
+								IThrowingFunction.executeNow(node -> {
+									assert node != null;
+									Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(context, node.getProperty());
+									// COMMENT attributes
+									{
+										Map<INamespacePrefixedString, IUIPropertyMappingValue> attributes = new HashMap<>(getEventTypeFunctionMap().size());
 
-		return resource;
+										getEventTypeFunctionMap()
+												.forEach((key, value) -> {
+													assert key != null;
+													assert value != null;
+													attributes.put(key.getEventType(),
+															new UIImmutablePropertyMappingValue(null,
+																	AssertionUtilities.assertNonnull(value.apply(node))
+																			.map(IUIEventType.StaticHolder.getDefaultPrefix()::concat)
+																			.map(ImmutableNamespacePrefixedString::of)
+																			.orElse(null)));
+												});
+
+										mappings = MapUtilities.concatMaps(mappings, attributes);
+									}
+									IShapeDescriptorBuilder<?> shapeDescriptorBuilder = createShapeDescriptorBuilder(context, node.getShape());
+									UIComponentConstructor.IArguments argument = new UIComponentConstructor.ImmutableArguments(node.getName(),
+											mappings,
+											shapeDescriptorBuilder.build());
+
+									Class<?> clazz = AssertionUtilities.assertNonnull(subContext.getAliasesView().get(node.getClazz()));
+									Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIComponentConstructor.class,
+											Arrays.asList(clazz.getDeclaredConstructors()));
+									MethodHandle constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
+
+									return (IUIComponent) constructorHandle.invoke(argument);
+								}),
+								Component::getComponent,
+								(p, c) -> {
+									if (!Iterables.isEmpty(c)) {
+										if (!(p instanceof IUIComponentContainer))
+											throw new IllegalArgumentException(
+													new LogMessageBuilder()
+															.addMarkers(UIMarkers.getInstance()::getMarkerParser)
+															.addKeyValue("p", p).addKeyValue("c", c)
+															.addMessages(() -> getResourceBundle().getString("construct.component.container.instance_of.fail"))
+															.build()
+											);
+										((IUIComponentContainer) p).addChildren(c);
+									}
+									return p;
+								},
+								n -> {
+									throw new IllegalArgumentException(
+											new LogMessageBuilder()
+													.addMarkers(UIMarkers.getInstance()::getMarkerParser)
+													.addKeyValue("n", n).addKeyValue("component", component)
+													.addMessages(() -> getResourceBundle().getString("construct.view.tree.cyclic"))
+													.build()
+									);
+								})
+								.orElseThrow(AssertionError::new)
+				))
+				.orElseThrow(IllegalArgumentException::new);
 	}
 
 	public static @Immutable Map<IUIEventType, Function<@Nonnull Component, @Nonnull Optional<String>>> getEventTypeFunctionMap() { return EVENT_TYPE_FUNCTION_MAP; }
@@ -294,70 +274,48 @@ public class UIDefaultComponentParser<T extends IUIViewComponent<?, ?>>
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static IShapeDescriptorBuilder<?> createShapeDescriptorBuilder(IUIJAXBComponentParserContext context, Shape shape) {
-		AffineTransform transform = shape.getAffineTransform()
-				.map(transform1 -> IJAXBAdapterRegistry.adaptFromJAXB(JAXBImmutableAdapterContext.of(LegacyJAXBAdapterRegistry.getRegistry()), transform1))
-				.map(AffineTransform.class::cast)
-				.orElseGet(AffineTransform::new);
+	public static IShapeDescriptorBuilder<?> createShapeDescriptorBuilder(IJAXBAdapterContext context, Shape shape) {
+		return context.getDatum(IJAXBUIComponentAdapterContext.class)
+				.map(subContext -> {
+					AffineTransform transform = shape.getAffineTransform()
+							.map(transform1 -> IJAXBAdapterRegistry.adaptFromJAXB(context, transform1))
+							.map(AffineTransform.class::cast)
+							.orElseGet(AffineTransform::new);
 
-		// COMMENT create hierarchy
-		@SuppressWarnings("unchecked") T view = (T) createView(new UIImmutableDefaultComponentParserContext(getAliases(), getHandlers(), null, null), rawView); // COMMENT should be checked
-		IUIDefaultComponentParserContext viewContext = new UIImmutableDefaultComponentParserContext(getAliases(), getHandlers(), view, view);
-		view.setManager(
-				CastUtilities.castUnchecked(createComponent(viewContext, rawComponent)) // COMMENT may throw
-		);
+					IShapeDescriptorBuilder<?> sdb = ShapeDescriptorBuilderFactoryRegistry.getDefaultFactory()
+							.createBuilder(
+									CastUtilities.castUnchecked(AssertionUtilities.assertNonnull(subContext.getAliasesView().get(shape.getClazz()))) // COMMENT should not throw
+							);
 
-		// COMMENT configure view
-		Iterables.concat(
-				rawView.getExtension(),
-				rawView.getAnyContainer()
-						.map(AnyContainer::getAny)
-						.orElseGet(ImmutableList::of))
-				.forEach(any -> {
-							assert any != null;
-							IUIAbstractDefaultComponentParserContext.findHandler(viewContext, any)
-									.ifPresent(handler -> handler.accept(
-											viewContext,
-											CastUtilities.castUnchecked(any) // COMMENT should not throw
-									));
-						}
-				);
-
-		// COMMENT configure components
-		TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, rawComponent,
-				node -> {
-					assert node != null;
-					IUIComponent component = IUIView.getNamedTrackers(view).get(IUIComponent.class, node.getName())
-							.orElseThrow(AssertionError::new);
-					IUIDefaultComponentParserContext componentContext = new UIImmutableDefaultComponentParserContext(getAliases(), getHandlers(), view, component);
-					Iterables.concat(
-							node.getAnchor(),
-							ImmutableSet.of(node.getRendererContainer()),
-							node.getExtension(),
-							node.getAnyContainer()
-									.map(AnyContainer::getAny)
-									.orElseGet(ImmutableList::of))
-							.forEach(any -> {
-								assert any != null;
-								IUIAbstractDefaultComponentParserContext.findHandler(componentContext, any)
-										.ifPresent(handler -> handler.accept(
-												componentContext,
-												CastUtilities.castUnchecked(any) // COMMENT should not throw
-										));
+					shape.getProperty().stream().unordered()
+							.forEach(p -> {
+								assert !p.getBindingKey().isPresent();
+								sdb.setProperty(p.getKey(), p.getAny()
+										.map(any -> IJAXBAdapterRegistry.adaptFromJAXB(context, any))
+										.orElse(null));
 							});
-					return node;
-				},
-				Component::getComponent,
-				null,
-				node -> {
-					throw new IllegalArgumentException(
-							new LogMessageBuilder()
-									.addMarkers(UIMarkers.getInstance()::getMarkerParser)
-									.addKeyValue("node", node).addKeyValue("rawComponent", rawComponent)
-									.addMessages(() -> getResourceBundle().getString("construct.view.tree.cyclic"))
-									.build()
-					);
-				});
-		return view;
+
+					return sdb.setX(shape.getX()).setY(shape.getY()).setWidth(shape.getWidth()).setHeight(shape.getHeight())
+							.transformConcatenate(transform)
+							.constrain(shape.getConstraint().stream()
+									.map(c -> new ShapeConstraint(
+											c.getMinX().orElse(null),
+											c.getMinY().orElse(null),
+											c.getMaxX().orElse(null),
+											c.getMaxY().orElse(null),
+											c.getMinWidth().orElse(null),
+											c.getMinHeight().orElse(null),
+											c.getMaxWidth().orElse(null),
+											c.getMaxHeight().orElse(null)
+									))
+									.collect(ImmutableList.toImmutableList()));
+				})
+				.orElseThrow(IllegalArgumentException::new);
+	}
+
+	@Override
+	@Deprecated
+	public @Nonnull ComponentUI rightToLeft(@Nonnull IUIViewComponent<?, ?> right) {
+		throw new UnsupportedOperationException(); // TODO implement
 	}
 }
