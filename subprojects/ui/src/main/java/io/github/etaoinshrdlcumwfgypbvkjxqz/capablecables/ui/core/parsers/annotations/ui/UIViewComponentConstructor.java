@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.components;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
@@ -11,30 +11,22 @@ import java.util.Map;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.CONSTRUCTOR)
-public @interface UIExtensionConstructor {
+public @interface UIViewComponentConstructor {
+	@SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 	interface IArguments {
 		@Immutable
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView();
-
-		Class<?> getContainerClass();
 	}
 
-	@Immutable
 	class ImmutableArguments
 			implements IArguments {
 		private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
-		private final Class<?> containerClass;
 
-		public ImmutableArguments(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings,
-		                          Class<?> containerClass) {
+		public ImmutableArguments(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings) {
 			this.mappings = ImmutableMap.copyOf(mappings);
-			this.containerClass = containerClass;
 		}
 
 		@Override
 		public @Immutable Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(mappings); }
-
-		@Override
-		public Class<?> getContainerClass() { return containerClass; }
 	}
 }
