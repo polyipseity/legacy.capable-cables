@@ -12,8 +12,9 @@ public enum PreconditionUtilities {
 		int typesLength = types.length;
 		Preconditions.checkElementIndex(typesLength - 1, args.length);
 		LoopUtilities.doNTimes(typesLength, index -> {
-			@Nullable Object arg = args[index];
-			Preconditions.checkArgument(arg == null || types[index].isInstance(arg));
+			int i = Math.toIntExact(index);
+			@Nullable Object arg = args[i];
+			Preconditions.checkArgument(arg == null || types[i].isInstance(arg));
 		});
 	}
 

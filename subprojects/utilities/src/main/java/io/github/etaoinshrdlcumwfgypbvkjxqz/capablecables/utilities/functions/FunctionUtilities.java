@@ -1,7 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.AlwaysNull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 
 import java.util.function.*;
 
@@ -37,14 +37,14 @@ public enum FunctionUtilities {
 	@SuppressWarnings("unchecked") // COMMENT always safe as it accepts any 'Object'
 	public static <T, U> BiPredicate<T, U> getAlwaysFalseBiPredicate() { return (BiPredicate<T, U>) ALWAYS_FALSE_BI_PREDICATE; }
 
-	public static Supplier<@Nullable Void> asVoidSupplier(Runnable function) {
+	public static Supplier<@AlwaysNull Void> asVoidSupplier(Runnable function) {
 		return () -> {
 			function.run();
 			return null;
 		};
 	}
 
-	public static <T> Function<T, @Nullable Void> asVoidFunction(Consumer<T> function) {
+	public static <T> Function<T, @AlwaysNull Void> asVoidFunction(Consumer<T> function) {
 		return t -> {
 			function.accept(t);
 			return null;

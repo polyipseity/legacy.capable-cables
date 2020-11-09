@@ -3,6 +3,9 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.math.DoubleMath;
+
+import java.math.RoundingMode;
 
 public enum PrimitiveUtilities {
 	;
@@ -61,5 +64,10 @@ public enum PrimitiveUtilities {
 
 	public static ImmutableBiMap<Class<?>, Class<?>> getPrimitiveTypeToBoxedTypeBiMap() {
 		return PRIMITIVE_TYPE_TO_BOXED_TYPE_BI_MAP;
+	}
+
+	public static long toIntegerExact(double x)
+			throws ArithmeticException {
+		return DoubleMath.roundToLong(x, RoundingMode.UNNECESSARY);
 	}
 }
