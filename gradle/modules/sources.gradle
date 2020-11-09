@@ -73,8 +73,8 @@ project.ext.makeSourcesTasks = { Closure c ->
 // COMMENT append
 afterEvaluate {
 	tasks.withType(AbstractCompile).configureEach {
-		options.fork = false
 		options.compilerArgs << '-Xlint'
+		options.annotationProcessorPath = configurations.annotationProcessor // COMMENT use new behavior
 
 		if (buildType == 'DEBUG')
 			options.verbose = true
