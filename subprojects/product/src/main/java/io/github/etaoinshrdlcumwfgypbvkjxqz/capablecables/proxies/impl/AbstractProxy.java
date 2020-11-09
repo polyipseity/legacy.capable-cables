@@ -2,11 +2,11 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.impl;
 
 import com.google.common.base.Stopwatch;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModConfiguration;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.core.IProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import net.minecraftforge.fml.event.lifecycle.*;
+import org.slf4j.Marker;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Optional;
@@ -30,21 +30,21 @@ public abstract class AbstractProxy<S>
 	public boolean onModLifecycle(@Nullable ModLifecycleEvent event) {
 		boolean ret = getParent().map(superProxy -> superProxy.onModLifecycle(event)).orElse(false);
 		if (event == null)
-			ret |= processEvent(getResourceBundle().getString("event.construction.name"), null, evt -> onConstruction());
+			ret |= processEvent(getMarker(), getResourceBundle().getString("event.construction.name"), null, evt -> onConstruction());
 		else if (event instanceof FMLFingerprintViolationEvent)
-			ret |= processEvent(getResourceBundle().getString("event.fingerprint_violation.name"), (FMLFingerprintViolationEvent) event, this::onFingerprintViolation);
+			ret |= processEvent(getMarker(), getResourceBundle().getString("event.fingerprint_violation.name"), (FMLFingerprintViolationEvent) event, this::onFingerprintViolation);
 		else if (event instanceof FMLCommonSetupEvent)
-			ret |= processEvent(getResourceBundle().getString("event.setup.name"), (FMLCommonSetupEvent) event, this::onSetup);
+			ret |= processEvent(getMarker(), getResourceBundle().getString("event.setup.name"), (FMLCommonSetupEvent) event, this::onSetup);
 		else if (event instanceof InterModEnqueueEvent)
-			ret |= processEvent(getResourceBundle().getString("event.imc_enqueue.name"), (InterModEnqueueEvent) event, this::onInterModEnqueue);
+			ret |= processEvent(getMarker(), getResourceBundle().getString("event.imc_enqueue.name"), (InterModEnqueueEvent) event, this::onInterModEnqueue);
 		else if (event instanceof InterModProcessEvent)
-			ret |= processEvent(getResourceBundle().getString("event.imc_process.name"), (InterModProcessEvent) event, this::onInterModProcess);
+			ret |= processEvent(getMarker(), getResourceBundle().getString("event.imc_process.name"), (InterModProcessEvent) event, this::onInterModProcess);
 		else if (event instanceof FMLLoadCompleteEvent)
-			ret |= processEvent(getResourceBundle().getString("event.load_complete.name"), (FMLLoadCompleteEvent) event, this::onLoadComplete);
+			ret |= processEvent(getMarker(), getResourceBundle().getString("event.load_complete.name"), (FMLLoadCompleteEvent) event, this::onLoadComplete);
 		else if (event instanceof FMLModIdMappingEvent)
-			ret |= processEvent(getResourceBundle().getString("event.mod_id_mapping.name"), (FMLModIdMappingEvent) event, this::onModIDMapping);
+			ret |= processEvent(getMarker(), getResourceBundle().getString("event.mod_id_mapping.name"), (FMLModIdMappingEvent) event, this::onModIDMapping);
 		else if (event instanceof GatherDataEvent)
-			ret |= processEvent(getResourceBundle().getString("event.gather_data.name"), (GatherDataEvent) event, this::onGatherData);
+			ret |= processEvent(getMarker(), getResourceBundle().getString("event.gather_data.name"), (GatherDataEvent) event, this::onGatherData);
 		return ret;
 	}
 
@@ -53,10 +53,10 @@ public abstract class AbstractProxy<S>
 	}
 
 	@SuppressWarnings("SameReturnValue")
-	protected static <E extends ModLifecycleEvent> boolean processEvent(CharSequence name, @Nullable E event, Consumer<? super E> processor) {
+	protected static <E extends ModLifecycleEvent> boolean processEvent(Marker marker, CharSequence name, @Nullable E event, Consumer<? super E> processor) {
 		ModConfiguration.getInstance().getLogger()
 				.atInfo()
-				.addMarker(ModMarkers.getInstance().getMarkerModLifecycle())
+				.addMarker(marker)
 				.addArgument(name)
 				.log(() -> getResourceBundle().getString("event.process.start"));
 		Stopwatch stopwatch = Stopwatch.createStarted();
@@ -64,11 +64,13 @@ public abstract class AbstractProxy<S>
 		stopwatch.stop();
 		ModConfiguration.getInstance().getLogger()
 				.atInfo()
-				.addMarker(ModMarkers.getInstance().getMarkerModLifecycle())
+				.addMarker(marker)
 				.addArgument(name).addArgument(stopwatch::toString).addArgument(() -> stopwatch.elapsed(NANOSECONDS))
 				.log(() -> getResourceBundle().getString("event.process.end"));
 		return true;
 	}
+
+	protected abstract Marker getMarker();
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 

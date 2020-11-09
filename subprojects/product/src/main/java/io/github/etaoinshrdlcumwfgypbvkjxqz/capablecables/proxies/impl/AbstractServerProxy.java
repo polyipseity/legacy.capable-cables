@@ -27,7 +27,7 @@ public abstract class AbstractServerProxy
 		if (super.onModLifecycle(event))
 			return true;
 		else if (event instanceof FMLDedicatedServerSetupEvent)
-			return processEvent(getResourceBundle().getString("event.server_setup.name"), (FMLDedicatedServerSetupEvent) event, this::onSetupSided);
+			return processEvent(getMarker(), getResourceBundle().getString("event.server_setup.name"), (FMLDedicatedServerSetupEvent) event, this::onSetupSided);
 		return false;
 	}
 

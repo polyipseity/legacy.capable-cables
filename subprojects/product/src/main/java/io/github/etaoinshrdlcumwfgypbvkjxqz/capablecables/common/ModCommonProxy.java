@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common;
 
 import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.blocks.ModBlocks;
@@ -12,6 +13,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUti
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.*;
+import org.slf4j.Marker;
 
 import java.util.function.Supplier;
 
@@ -26,6 +28,11 @@ public final class ModCommonProxy
 
 	public static ModCommonProxy getInstance() {
 		return INSTANCE.get();
+	}
+
+	@Override
+	protected Marker getMarker() {
+		return ModMarkers.getInstance().getMarkerLifecycle();
 	}
 
 	@Override

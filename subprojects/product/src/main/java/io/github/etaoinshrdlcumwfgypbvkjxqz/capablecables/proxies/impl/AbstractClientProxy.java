@@ -27,7 +27,7 @@ public abstract class AbstractClientProxy
 		if (super.onModLifecycle(event))
 			return true;
 		else if (event instanceof FMLClientSetupEvent)
-			return processEvent(getResourceBundle().getString("event.client_setup.name"), (FMLClientSetupEvent) event, this::onSetupSided);
+			return processEvent(getMarker(), getResourceBundle().getString("event.client_setup.name"), (FMLClientSetupEvent) event, this::onSetupSided);
 		return false;
 	}
 

@@ -69,7 +69,7 @@ public final class ModMod {
 		if (!getProxy().onModLifecycle(event))
 			ModConfiguration.getInstance().getLogger()
 					.atInfo()
-					.addMarker(ModMarkers.getInstance().getMarkerModLifecycle())
+					.addMarker(ModMarkers.getInstance().getMarkerLifecycle())
 					.addKeyValue("event", event)
 					.log(() -> getResourceBundle().getString("event.lifecycle.unhandled"));
 	}

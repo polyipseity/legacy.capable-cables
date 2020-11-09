@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.client;
 
 import com.google.common.base.Suppliers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.ModCommonProxy;
@@ -15,6 +16,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.thro
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.event.lifecycle.*;
+import org.slf4j.Marker;
 
 import java.util.function.Supplier;
 
@@ -29,6 +31,11 @@ public final class ModClientProxy
 	}
 
 	public static ModClientProxy getInstance() { return INSTANCE.get(); }
+
+	@Override
+	protected Marker getMarker() {
+		return ModMarkers.getInstance().getMarkerLifecycleClient();
+	}
 
 	@Override
 	protected void onConstruction() {

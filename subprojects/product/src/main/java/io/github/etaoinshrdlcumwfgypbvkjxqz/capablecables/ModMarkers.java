@@ -7,6 +7,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.MarkersTemplate;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -17,7 +19,9 @@ import java.util.function.Supplier;
 public final class ModMarkers extends MarkersTemplate {
 	private static final Supplier<@Nonnull ModMarkers> INSTANCE = Suppliers.memoize(ModMarkers::new);
 
-	private final Marker markerModLifecycle = getMarker("mod lifecycle");
+	private final Marker markerLifecycle = getMarker("lifecycle");
+	private final Marker markerLifecycleClient = MarkersTemplate.addReferences(getMarkerLifecycle(), getMarker("client"));
+	private final Marker markerLifecycleServer = MarkersTemplate.addReferences(getMarkerLifecycle(), getMarker("server"));
 	private final Marker markerRegistrable = getMarker("registrable");
 	private final LoadingCache<IForgeRegistry<?>, Marker> registryMarkers =
 			MarkersTemplate.getMarkersBuilder().build(CacheLoader.from(registry ->
@@ -42,7 +46,17 @@ public final class ModMarkers extends MarkersTemplate {
 
 	protected LoadingCache<IForgeRegistryEntry<?>, Marker> getRegistryEntryMarkers() { return registryEntryMarkers; }
 
-	public Marker getMarkerModLifecycle() { return markerModLifecycle; }
+	public Marker getMarkerLifecycle() { return markerLifecycle; }
+
+	@OnlyIn(Dist.CLIENT)
+	public Marker getMarkerLifecycleClient() {
+		return markerLifecycleClient;
+	}
+
+	@OnlyIn(Dist.DEDICATED_SERVER)
+	public Marker getMarkerLifecycleServer() {
+		return markerLifecycleServer;
+	}
 
 	public Marker getMarkerRegistrable() { return markerRegistrable; }
 }
