@@ -7,18 +7,14 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.utilities.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.DoubleDimension2D;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LoopUtilities;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.renderer.texture.NativeImage;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import org.lwjgl.system.MemoryUtil;
 import sun.awt.image.WritableRasterNative;
 import sun.java2d.StateTrackableDelegate;
 import sun.java2d.SurfaceData;
@@ -26,12 +22,9 @@ import sun.java2d.loops.SurfaceType;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.ColorModel;
-import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
-import java.lang.invoke.MethodHandle;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
@@ -39,19 +32,9 @@ public final class MinecraftSurfaceData
 		extends SurfaceData
 		implements AutoCloseable {
 	private static final Supplier<@Nonnull MinecraftSurfaceData> INSTANCE = Suppliers.memoize(MinecraftSurfaceData::new);
-	private static final MethodHandle NATIVE_IMAGE_IMAGE_POINTER_GETTER;
-
-	static {
-		try {
-			NATIVE_IMAGE_IMAGE_POINTER_GETTER = InvokeUtilities.getImplLookup().findGetter(NativeImage.class, "imagePointer", long.class);
-		} catch (NoSuchFieldException | IllegalAccessException e) {
-			throw ThrowableUtilities.propagate(e);
-		}
-	}
 
 	private WritableRaster fullRaster;
-	private NativeImageDataBuffer nativeImageDataBuffer;
-	private DynamicTexture texture;
+	private DynamicTexturesDataBuffer dataBuffer;
 
 	private MinecraftSurfaceData() {
 		super(StateTrackableDelegate.createInstance(State.STABLE),
@@ -64,63 +47,43 @@ public final class MinecraftSurfaceData
 		 */
 
 		Rectangle bounds = getBounds();
-		this.texture = createTexture(bounds);
-		this.nativeImageDataBuffer = new NativeImageDataBuffer(AssertionUtilities.assertNonnull(this.texture.getTextureData()));
-		this.fullRaster = createRaster(bounds, getColorModel(), this.nativeImageDataBuffer);
+		this.dataBuffer = new DynamicTexturesDataBuffer(bounds.width, bounds.height, DynamicTexturesDataBuffer.getTargetTextureSize(), false);
+		this.fullRaster = createRaster(bounds, getColorModel(), this.dataBuffer);
 
 		IEventBus eventBus = AssertionUtilities.assertNonnull(Bus.FORGE.bus().get());
 		eventBus.addListener(EventPriority.NORMAL, true, this::onResize);
 	}
 
-	private static DynamicTexture createTexture(Rectangle2D bounds) {
-		return new DynamicTexture((int) bounds.getWidth(), (int) bounds.getHeight(), true);
-	}
-
-	private static WritableRaster createRaster(Rectangle2D bounds, ColorModel colorModel, NativeImageDataBuffer nativeImageDataBuffer) {
-		return WritableRasterNative.createNativeRaster(colorModel.createCompatibleSampleModel((int) bounds.getWidth(), (int) bounds.getHeight()),
-				nativeImageDataBuffer);
+	private static WritableRaster createRaster(Rectangle bounds, ColorModel colorModel, DynamicTexturesDataBuffer dataBuffer) {
+		return WritableRasterNative.createNativeRaster(colorModel.createCompatibleSampleModel(bounds.width, bounds.height),
+				dataBuffer);
 	}
 
 	private void onResize(GuiScreenEvent.InitGuiEvent.Pre event) {
 		close();
 
 		Rectangle bounds = getBounds();
-		setTexture(createTexture(bounds));
-		setNativeImageDataBuffer(new NativeImageDataBuffer(AssertionUtilities.assertNonnull(getTexture().getTextureData())));
-		setFullRaster(createRaster(bounds, getColorModel(), getNativeImageDataBuffer()));
+		setDataBuffer(new DynamicTexturesDataBuffer(bounds.width, bounds.height, DynamicTexturesDataBuffer.getTargetTextureSize(), false));
+		setFullRaster(createRaster(bounds, getColorModel(), getDataBuffer()));
 
 		MinecraftGraphics.recreateGraphics(); // COMMENT resets the clip
 	}
 
 	@Override
 	public void close() {
-		getNativeImageDataBuffer().close();
-		// COMMENT must close the data buffer first
-		getTexture().close();
+		getDataBuffer().close();
 	}
 
-	protected DynamicTexture getTexture() {
-		return texture;
+	protected DynamicTexturesDataBuffer getDataBuffer() {
+		return dataBuffer;
 	}
 
-	protected NativeImageDataBuffer getNativeImageDataBuffer() {
-		return nativeImageDataBuffer;
-	}
-
-	protected void setNativeImageDataBuffer(NativeImageDataBuffer nativeImageDataBuffer) {
-		this.nativeImageDataBuffer = nativeImageDataBuffer;
-	}
-
-	protected void setTexture(DynamicTexture texture) {
-		this.texture = texture;
+	protected void setDataBuffer(DynamicTexturesDataBuffer dataBuffer) {
+		this.dataBuffer = dataBuffer;
 	}
 
 	public static MinecraftSurfaceData getInstance() {
 		return INSTANCE.get();
-	}
-
-	public static MethodHandle getNativeImageImagePointerGetter() {
-		return NATIVE_IMAGE_IMAGE_POINTER_GETTER;
 	}
 
 	@Override
@@ -159,105 +122,38 @@ public final class MinecraftSurfaceData
 	}
 
 	public void clear() {
-		getNativeImageDataBuffer().clear();
+		getDataBuffer().clear();
 	}
 
 	public void draw() {
-		Rectangle bounds = getBounds();
-		DynamicTexture texture = getTexture();
+		DynamicTexturesDataBuffer.runIfOpen(getDataBuffer(), instance -> {
+			RenderSystem.enableBlend();
+			RenderSystem.defaultBlendFunc();
+			RenderSystem.disableAlphaTest();
 
-		// COMMENT we write directly to 'NativeImage'
-		texture.updateDynamicTexture();
+			LoopUtilities.doNTimesNested(indexes -> {
+				// COMMENT gather data
+				int textureX = Math.toIntExact(indexes[0]), textureY = Math.toIntExact(indexes[1]);
+				DynamicTexture texture = DynamicTexturesDataBuffer.getTexture(instance, textureX, textureY);
+				Rectangle textureBounds = new Rectangle(
+						DynamicTexturesDataBuffer.toAbsoluteCoordinate(instance, textureX), DynamicTexturesDataBuffer.toAbsoluteCoordinate(instance, textureY),
+						instance.getTextureSize(), instance.getTextureSize()
+				);
 
-		RenderSystem.enableBlend();
-		RenderSystem.defaultBlendFunc();
-		RenderSystem.disableAlphaTest();
-		RenderSystem.bindTexture(texture.getGlTextureId());
-		MinecraftDrawingUtilities.blit(AffineTransformUtilities.getIdentity(),
-				bounds,
-				new Point2D.Double(),
-				new DoubleDimension2D(bounds.getWidth(), bounds.getHeight()));
-		RenderSystem.enableAlphaTest();
-		RenderSystem.disableBlend();
-	}
+				// COMMENT upload texture
+				texture.updateDynamicTexture(); // COMMENT we write directly to 'NativeImage'
 
-	@OnlyIn(Dist.CLIENT)
-	private static final class NativeImageDataBuffer
-			extends DataBuffer
-			implements AutoCloseable {
-		private final long pointer;
-		private final long sizeInBytes;
-		private final Object closedLockObject = new Object();
-		private boolean closed = false;
+				// COMMENT draw texture
+				RenderSystem.bindTexture(texture.getGlTextureId());
+				MinecraftDrawingUtilities.blit(AffineTransformUtilities.getIdentity(),
+						textureBounds,
+						new Point2D.Double(),
+						textureBounds.getSize());
 
-		private NativeImageDataBuffer(NativeImage nativeImage) {
-			super(DataBuffer.TYPE_INT, nativeImage.getWidth() * nativeImage.getHeight());
-			assert nativeImage.getFormat() == NativeImage.PixelFormat.RGBA;
-			try {
-				this.pointer = (long) getNativeImageImagePointerGetter().invokeExact(nativeImage);
-			} catch (Throwable throwable) {
-				throw ThrowableUtilities.propagate(throwable);
-			}
-			this.sizeInBytes = Integer.BYTES * getSize();
-		}
+			}, instance.getTexturesWidth(), instance.getTexturesHeight());
 
-		@Override
-		public int getElem(int bank, int i) {
-			assert bank == 0;
-			long offset = Integer.BYTES * i;
-			assert offset >= 0;
-			assert offset < getSizeInBytes();
-			synchronized (getClosedLockObject()) {
-				if (!isClosed())
-					return MemoryUtil.memGetInt(getPointer() + offset);
-			}
-			return 0;
-		}
-
-		protected long getSizeInBytes() {
-			return sizeInBytes;
-		}
-
-		protected final Object getClosedLockObject() {
-			return closedLockObject;
-		}
-
-		protected boolean isClosed() {
-			return closed;
-		}
-
-		protected long getPointer() {
-			return pointer;
-		}
-
-		@Override
-		public void setElem(int bank, int i, int val) {
-			assert bank == 0;
-			long offset = Integer.BYTES * i;
-			assert offset >= 0;
-			assert offset < getSizeInBytes();
-			synchronized (getClosedLockObject()) {
-				if (!isClosed())
-					MemoryUtil.memPutInt(getPointer() + offset, val);
-			}
-		}
-
-		@Override
-		public void close() {
-			synchronized (getClosedLockObject()) {
-				markClosed();
-			}
-		}
-
-		protected void markClosed() {
-			this.closed = true;
-		}
-
-		protected void clear() {
-			synchronized (getClosedLockObject()) {
-				if (!isClosed())
-					MemoryUtil.memSet(getPointer(), 0, getSizeInBytes());
-			}
-		}
+			RenderSystem.enableAlphaTest();
+			RenderSystem.disableBlend();
+		});
 	}
 }
