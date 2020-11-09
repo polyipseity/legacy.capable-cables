@@ -55,6 +55,7 @@ public final class DynamicTexturesDataBuffer
 	private final Lock closeLock = new ReentrantLock();
 	private boolean closed = false;
 
+	@SuppressWarnings({"NullableProblems", "RedundantTypeArguments"})
 	public DynamicTexturesDataBuffer(int width, int height, int textureSize, boolean closeSynchronized) {
 		super(DataBuffer.TYPE_INT, width * height);
 		this.width = width;
@@ -69,10 +70,11 @@ public final class DynamicTexturesDataBuffer
 		this.texturePointers = new long[this.texturesWidth][this.texturesHeight];
 
 		try {
-			LoopUtilities.doNTimesNested(IThrowingConsumer.executeNow(indexes -> {
+			LoopUtilities.doNTimesNested(IThrowingConsumer.<@Nonnull long[], Throwable>executeNow(indexes -> {
 						int x = Math.toIntExact(indexes[0]);
 						int y = Math.toIntExact(indexes[1]);
-						@SuppressWarnings("ObjectAllocationInLoop") DynamicTexture texture = new DynamicTexture(this.textureSize, this.textureSize, true);
+						DynamicTexture texture = new DynamicTexture(this.textureSize, this.textureSize, true);
+						assert texture.getTextureData() != null;
 						assert texture.getTextureData().getFormat() == NativeImage.PixelFormat.RGBA;
 						this.textures[x][y] = texture;
 						this.texturePointers[x][y] = (long) getNativeImageImagePointerGetter().invokeExact((NativeImage) texture.getTextureData());
@@ -229,6 +231,7 @@ public final class DynamicTexturesDataBuffer
 		this.closed = true;
 	}
 
+	@SuppressWarnings("UnusedReturnValue")
 	public static <T extends DynamicTexturesDataBuffer, R> Optional<R> applyIfOpen(T instance, Function<@Nonnull ? super T, @Nullable ? extends R> action) {
 		if (instance.isCloseSynchronized()) {
 			Lock closeLock = instance.getCloseLock();

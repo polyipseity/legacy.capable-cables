@@ -1,5 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+
 import java.util.function.Consumer;
 import java.util.function.LongConsumer;
 import java.util.stream.LongStream;
@@ -16,7 +18,7 @@ public enum LoopUtilities {
 				.forEachOrdered(action);
 	}
 
-	public static void doNTimesNested(Consumer<? super long[]> action, long... ns) {
+	public static void doNTimesNested(Consumer<@Nonnull ? super long[]> action, long... ns) {
 		if (ArrayUtilities.isEmpty(ns))
 			return;
 		long[] indexes = new long[ns.length];
