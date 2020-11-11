@@ -70,7 +70,7 @@ public class UIDefaultComponentContainer
 		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 					getChildren().add(index, component);
 					component.onParentChange(null, this);
-					getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
+					getBinderObserverSupplierHolder().getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
 							BindingUtilities.initializeBindings(ImmutableList.of(component), binderObserverSupplier));
 				},
 				new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.PRE, component, null, this),
@@ -88,7 +88,7 @@ public class UIDefaultComponentContainer
 						EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 									getChildren().remove(component);
 									component.onParentChange(this, null);
-									getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
+									getBinderObserverSupplierHolder().getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
 											BindingUtilities.cleanupBindings(ImmutableList.of(component), binderObserverSupplier));
 								},
 								new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.PRE, component, this, null),

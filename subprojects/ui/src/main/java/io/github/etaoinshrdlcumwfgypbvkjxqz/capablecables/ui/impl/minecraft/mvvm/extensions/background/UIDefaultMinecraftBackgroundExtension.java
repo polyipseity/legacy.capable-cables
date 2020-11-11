@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.extensions.background;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
@@ -7,6 +8,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUISubInf
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.events.bus.IUIMinecraftRenderEventExtension;
@@ -14,18 +16,21 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.extensions.IUIMinecraftScreenProviderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.IUIMinecraftViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIAbstractViewBusEvent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputDevices;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputPointerDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional3;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -34,8 +39,8 @@ import org.slf4j.Logger;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
 public class UIDefaultMinecraftBackgroundExtension
@@ -46,7 +51,10 @@ public class UIDefaultMinecraftBackgroundExtension
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final AutoCloseableRotator<RenderObserver, RuntimeException> renderObserverRotator =
 			new AutoCloseableRotator<>(() -> new RenderObserver(this, UIConfiguration.getInstance().getLogger()), Disposable::dispose);
-	private final AtomicReference<IUIRendererContainer<IBackgroundRenderer>> rendererContainerReference = new AtomicReference<>();
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
+	private final IUIRendererContainerContainer<IBackgroundRenderer> rendererContainerContainer =
+			new UIDefaultRendererContainerContainer<>(this,
+					UIDefaultRendererContainerContainer.createRendererContainerInitializer(UIMinecraftBackgroundExtensionEmptyBackgroundRenderer.class));
 
 	public UIDefaultMinecraftBackgroundExtension() { this(getDefaultArguments()); }
 
@@ -59,17 +67,19 @@ public class UIDefaultMinecraftBackgroundExtension
 
 	@Override
 	public IUIRendererContainer<? extends IBackgroundRenderer> getRendererContainer()
-			throws IllegalStateException { return Optional.ofNullable(getRendererContainerReference().get()).orElseThrow(IllegalStateException::new); }
+			throws IllegalStateException {
+		return getRendererContainerContainer().getRendererContainer();
+	}
+
+	protected IUIRendererContainerContainer<IBackgroundRenderer> getRendererContainerContainer() {
+		return rendererContainerContainer;
+	}
 
 	@Override
 	public void initializeRendererContainer(@NonNls CharSequence name)
 			throws IllegalStateException {
-		if (!getRendererContainerReference().compareAndSet(null,
-				new UIDefaultRendererContainer<>(name, this, UIMinecraftBackgroundExtensionEmptyBackgroundRenderer.class)))
-			throw new IllegalStateException();
+		getRendererContainerContainer().initializeRendererContainer(name);
 	}
-
-	protected AtomicReference<IUIRendererContainer<IBackgroundRenderer>> getRendererContainerReference() { return rendererContainerReference; }
 
 	@Override
 	public IExtensionType<INamespacePrefixedString, ?, IUIMinecraftViewComponent<?, ?>> getType() { return StaticHolder.getType().getValue(); }
@@ -82,6 +92,24 @@ public class UIDefaultMinecraftBackgroundExtension
 	}
 
 	protected AutoCloseableRotator<RenderObserver, RuntimeException> getRenderObserverRotator() { return renderObserverRotator; }
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		IUIMinecraftBackgroundExtension.super.initializeBindings(binderObserverSupplier);
+		BindingUtilities.initializeBindings(
+				ImmutableList.of(getRendererContainerContainer()),
+				binderObserverSupplier);
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		IUIMinecraftBackgroundExtension.super.cleanupBindings(binderObserverSupplier);
+		BindingUtilities.cleanupBindings(
+				ImmutableList.of(getRendererContainerContainer()),
+				binderObserverSupplier);
+	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper

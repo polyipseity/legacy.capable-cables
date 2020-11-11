@@ -20,7 +20,7 @@ public final class ImmutableAttributedText
 	private final @Immutable Map<AttributedCharacterIterator.Attribute, Object> attributes;
 	private final Supplier<@Nonnull AttributedString> compiler;
 
-	private ImmutableAttributedText(List<? extends IUnion<? extends CharSequence, ? extends IAttributedText>> children,
+	private ImmutableAttributedText(Iterable<? extends IUnion<? extends CharSequence, ? extends IAttributedText>> children,
 	                                Map<? extends AttributedCharacterIterator.Attribute, ?> attributes) {
 		this.children = ImmutableList.copyOf(children);
 		this.attributes = ImmutableMap.copyOf(attributes);
@@ -60,7 +60,7 @@ public final class ImmutableAttributedText
 		return attributes;
 	}
 
-	public static ImmutableAttributedText of(List<? extends IUnion<? extends CharSequence, ? extends IAttributedText>> children,
+	public static ImmutableAttributedText of(Iterable<? extends IUnion<? extends CharSequence, ? extends IAttributedText>> children,
 	                                         Map<? extends AttributedCharacterIterator.Attribute, ?> attributes) {
 		return new ImmutableAttributedText(children, attributes);
 	}

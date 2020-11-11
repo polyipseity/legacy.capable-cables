@@ -32,6 +32,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.methods.IBindingMethodSource;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.methods.ImmutableBindingMethodSource;
@@ -76,8 +77,7 @@ public class UIDefaultComponent
 	private final AtomicBoolean modifyingShape = new AtomicBoolean();
 	private final List<IUIComponentModifier> modifiers = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 	private OptionalWeakReference<IUIComponentContainer> parent = new OptionalWeakReference<>(null);
-	@Nullable
-	private Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier;
+	private final BinderObserverSupplierHolder binderObserverSupplierHolder = new BinderObserverSupplierHolder();
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	@UIComponentConstructor
@@ -267,15 +267,19 @@ public class UIDefaultComponent
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
 		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
 		Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> result = IExtensionContainer.addExtensionImpl(this, getExtensions(), extension);
-		getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
+		getBinderObserverSupplierHolder().getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
 				BindingUtilities.findAndInitializeBindings(ImmutableList.of(extension), binderObserverSupplier));
 		return result;
+	}
+
+	protected BinderObserverSupplierHolder getBinderObserverSupplierHolder() {
+		return binderObserverSupplierHolder;
 	}
 
 	@Override
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) {
 		Optional<IExtension<? extends INamespacePrefixedString, ?>> result = IExtensionContainer.removeExtensionImpl(getExtensions(), key);
-		getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
+		getBinderObserverSupplierHolder().getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
 				BindingUtilities.findAndCleanupBindings(result.map(ImmutableList::of).orElseGet(ImmutableList::of), binderObserverSupplier));
 		return result;
 	}
@@ -289,15 +293,11 @@ public class UIDefaultComponent
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() { return extensions; }
 
-	protected Optional<? extends Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>>> getBinderObserverSupplier() { return Optional.ofNullable(binderObserverSupplier); }
-
-	protected void setBinderObserverSupplier(@Nullable Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) { this.binderObserverSupplier = binderObserverSupplier; }
-
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		IUIComponent.super.initializeBindings(binderObserverSupplier);
-		setBinderObserverSupplier(binderObserverSupplier);
+		getBinderObserverSupplierHolder().setBinderObserverSupplier(binderObserverSupplier);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 				() -> ImmutableBinderAction.bind(getActive(), getVisible()));
 		BindingUtilities.findAndInitializeBindings(getExtensions().values(), binderObserverSupplier);
@@ -307,7 +307,7 @@ public class UIDefaultComponent
 	@OverridingMethodsMustInvokeSuper
 	public void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		IUIComponent.super.cleanupBindings(binderObserverSupplier);
-		setBinderObserverSupplier(null);
+		getBinderObserverSupplierHolder().setBinderObserverSupplier(null);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 				() -> ImmutableBinderAction.unbind(getActive(), getVisible()));
 		BindingUtilities.findAndCleanupBindings(getExtensions().values(), binderObserverSupplier);

@@ -139,7 +139,8 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		getManager().ifPresent(previousManager -> EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(),
 				() -> {
 					previousManager.setView(null);
-					getBinderObserverSupplier().ifPresent(binderObserverSupplier -> previousManager.cleanupBindings(binderObserverSupplier)); // TODO javac bug - replace with method reference if fixed
+					getBinderObserverSupplierHolder().getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
+							previousManager.cleanupBindings(binderObserverSupplier)); // TODO javac bug - replace with method reference if fixed
 					IUIView.getNamedTrackers(this).removeAll(IUIComponent.class, getChildrenFlatView());
 				},
 				new UIAbstractComponentHierarchyChangeBusEvent.View(EnumHookStage.PRE, previousManager, this, null),
@@ -148,7 +149,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		Optional.ofNullable(manager).ifPresent(nextManager -> EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(),
 				() -> {
 					nextManager.setView(this);
-					getBinderObserverSupplier().ifPresent(nextManager::initializeBindings);
+					getBinderObserverSupplierHolder().getBinderObserverSupplier().ifPresent(nextManager::initializeBindings);
 					IUIView.getNamedTrackers(this).addAll(IUIComponent.class, getChildrenFlatView());
 				},
 				new UIAbstractComponentHierarchyChangeBusEvent.View(EnumHookStage.PRE, nextManager, null, this),
