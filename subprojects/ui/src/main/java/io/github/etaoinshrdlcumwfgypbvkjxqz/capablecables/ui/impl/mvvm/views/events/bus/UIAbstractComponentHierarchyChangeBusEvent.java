@@ -2,7 +2,6 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.ev
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
 
@@ -15,9 +14,9 @@ public abstract class UIAbstractComponentHierarchyChangeBusEvent<T, V>
 	}
 
 	public static class Parent
-			extends UIAbstractComponentChangeBusEvent<Void, Optional<IUIComponentContainer>> {
+			extends UIAbstractComponentChangeBusEvent<Void, Optional<IUIComponent>> {
 		public Parent(EnumHookStage stage, IUIComponent component,
-		              @Nullable IUIComponentContainer previous, @Nullable IUIComponentContainer current) {
+		              @Nullable IUIComponent previous, @Nullable IUIComponent current) {
 			super(Void.class, stage, component, Optional.ofNullable(previous), Optional.ofNullable(current));
 		}
 	}

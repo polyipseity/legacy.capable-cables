@@ -1,12 +1,11 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.traits.IHasBindingMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.TreeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer3;
@@ -60,10 +59,7 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 					}
 					return component;
 				},
-				component -> CastUtilities.castChecked(IUIComponentContainer.class, component)
-						.filter(predicate)
-						.map(IUIComponentContainer::getChildrenView)
-						.orElseGet(ImmutableList::of),
+				component -> predicate.test(component) ? component.getChildrenView() : ImmutableSet.of(),
 				IThrowingBiFunction.executeNow((parent, children) -> {
 					if (predicate.test(parent)) {
 						try (IUIComponentContext contextCopy = context.clone()) {

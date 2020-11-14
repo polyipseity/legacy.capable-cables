@@ -2,12 +2,15 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.co
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentModifier;
@@ -19,12 +22,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIE
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIDefaultEventTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.extensions.UIExtensionRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.caches.UIDefaultCacheExtension;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIAbstractComponentHierarchyChangeBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIComponentModifyShapeDescriptorBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interactions.ProviderShapeDescriptor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.DelayedFieldInitializer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -41,12 +42,15 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.even
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EventBusUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
@@ -79,7 +83,7 @@ public class UIDefaultComponent
 	private final IBindingField<Boolean> active;
 	private final AtomicBoolean modifyingShape = new AtomicBoolean();
 	private final List<IUIComponentModifier> modifiers = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
-	private OptionalWeakReference<IUIComponentContainer> parent = new OptionalWeakReference<>(null);
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	private final BinderObserverSupplierHolder binderObserverSupplierHolder = new BinderObserverSupplierHolder();
 
 	private final DelayedFieldInitializer<ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>>> extensionsInitializer;
@@ -129,8 +133,7 @@ public class UIDefaultComponent
 		return ret;
 	}
 
-	@Override
-	public Optional<? extends IUIComponentContainer> getParent() { return parent.getOptional(); }
+	private final List<IUIComponent> children = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 
 	@Override
 	public boolean isVisible() { return getVisible().getValue(); }
@@ -145,22 +148,10 @@ public class UIDefaultComponent
 	@Override
 	public boolean isModifyingShape() { return getModifyingShape().get(); }
 
-	@Override
-	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
-	public void onParentChange(@Nullable IUIComponentContainer previous, @Nullable IUIComponentContainer next) {
-		// COMMENT no need to concern that the view is not present yet as setting the manager of the view adds all components automatically
-		getManager()
-				.flatMap(IUIComponentManager::getView)
-				.map(IUIView::getNamedTrackers)
-				.ifPresent(trackers -> trackers.remove(IUIComponent.class, this));
-		setParent(next);
-		getManager()
-				.flatMap(IUIComponentManager::getView)
-				.map(IUIView::getNamedTrackers)
-				.ifPresent(trackers -> trackers.add(IUIComponent.class, this));
-	}
+	private OptionalWeakReference<IUIComponent> parent = new OptionalWeakReference<>(null);
 
-	protected void setParent(@Nullable IUIComponentContainer parent) { this.parent = new OptionalWeakReference<>(parent); }
+	@Override
+	public Optional<? extends IUIComponent> getParent() { return parent.getOptional(); }
 
 	@Override
 	public Shape getAbsoluteShape()
@@ -300,6 +291,110 @@ public class UIDefaultComponent
 	}
 
 	@Override
+	public List<IUIComponent> getChildrenView() { return ImmutableList.copyOf(getChildren()); }
+
+	@Override
+	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
+	public void onParentChange(@Nullable IUIComponent previous, @Nullable IUIComponent next) {
+		// COMMENT no need to concern that the view is not present yet as setting the manager of the view adds all components automatically
+		getManager()
+				.flatMap(IUIComponentManager::getView)
+				.map(IUIView::getNamedTrackers)
+				.ifPresent(trackers -> trackers.remove(IUIComponent.class, this));
+		setParent(next);
+		getManager()
+				.flatMap(IUIComponentManager::getView)
+				.map(IUIView::getNamedTrackers)
+				.ifPresent(trackers -> trackers.add(IUIComponent.class, this));
+	}
+
+	@Override
+	public void transformChildren(AffineTransform transform) {
+		Rectangle2D bounds = getShapeDescriptor().getShapeOutput().getBounds2D();
+		transform.translate(bounds.getX(), bounds.getY());
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	@Override
+	public boolean addChildren(Iterable<? extends IUIComponent> components) {
+		return Streams.stream(components)
+				.map(component -> !getChildren().contains(component) && addChildAt(getChildren().size(), component))
+				.reduce(false, Boolean::logicalOr);
+	}
+
+	@Override
+	public boolean addChildAt(int index, IUIComponent component) {
+		if (equals(component))
+			throw new IllegalArgumentException(
+					new LogMessageBuilder()
+							.addMarkers(UIMarkers.getInstance()::getMarkerUIComponent)
+							.addKeyValue("index", index).addKeyValue("component", component)
+							.addMessages(() -> getResourceBundle().getString("children.add.self"))
+							.build()
+			);
+		if (getChildren().contains(component))
+			return moveChildTo(index, component);
+		component.getParent()
+				.ifPresent(p -> p.removeChildren(ImmutableList.of(component)));
+		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
+					getChildren().add(index, component);
+					component.onParentChange(null, this);
+					getBinderObserverSupplierHolder().getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
+							BindingUtilities.initializeBindings(ImmutableList.of(component), binderObserverSupplier));
+				},
+				new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.PRE, component, null, this),
+				new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.POST, component, null, this));
+		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh);
+		return true;
+	}
+
+	@Override
+	public boolean removeChildren(Iterable<? extends IUIComponent> components) {
+		@SuppressWarnings("UnstableApiUsage") boolean ret = Streams.stream(components)
+				.map(component -> {
+					int index = getChildren().indexOf(component);
+					if (index != -1) {
+						EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
+									getChildren().remove(component);
+									component.onParentChange(this, null);
+									getBinderObserverSupplierHolder().getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
+											BindingUtilities.cleanupBindings(ImmutableList.of(component), binderObserverSupplier));
+								},
+								new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.PRE, component, this, null),
+								new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.POST, component, this, null));
+						return true;
+					}
+					return false;
+				})
+				.reduce(false, Boolean::logicalOr);
+		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh);
+		return ret;
+	}
+
+	@Override
+	public boolean moveChildTo(int index, IUIComponent component) {
+		int previous = getChildren().indexOf(component);
+		if (previous == index || previous == -1)
+			return false;
+		getChildren().remove(previous);
+		getChildren().add(index, component);
+		return true;
+	}
+
+	@Override
+	public boolean moveChildToTop(IUIComponent component) { return moveChildTo(getChildren().size() - 1, component); }
+
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected List<IUIComponent> getChildren() { return children; }
+
+	protected void setParent(@Nullable IUIComponent parent) { this.parent = new OptionalWeakReference<>(parent); }
+
+	@Override
+	public Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(getMappings()); }
+
+	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		IUIComponent.super.initializeBindings(binderObserverSupplier);
@@ -307,6 +402,7 @@ public class UIDefaultComponent
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 				() -> ImmutableBinderAction.bind(getActive(), getVisible()));
 		BindingUtilities.findAndInitializeBindings(getExtensions().values(), binderObserverSupplier);
+		BindingUtilities.initializeBindings(getChildren(), binderObserverSupplier);
 	}
 
 	@Override
@@ -317,10 +413,6 @@ public class UIDefaultComponent
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 				() -> ImmutableBinderAction.unbind(getActive(), getVisible()));
 		BindingUtilities.findAndCleanupBindings(getExtensions().values(), binderObserverSupplier);
+		BindingUtilities.cleanupBindings(getChildren(), binderObserverSupplier);
 	}
-
-	@Override
-	public Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(getMappings()); }
-
-
 }

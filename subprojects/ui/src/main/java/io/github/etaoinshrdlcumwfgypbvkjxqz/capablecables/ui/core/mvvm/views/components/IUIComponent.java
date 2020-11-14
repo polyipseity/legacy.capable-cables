@@ -1,12 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.traits.IHasBindingMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentLifecycleModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentModifier;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentTransformChildrenModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptor;
@@ -22,19 +23,21 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface IUIComponent
 		extends INamed, INode, IShapeDescriptorProvider, IHasBinding, IHasBindingMap, IUIEventTarget, IExtensionContainer<INamespacePrefixedString>,
-		IUIComponentLifecycleModifier {
+		IUIComponentLifecycleModifier, IUIComponentTransformChildrenModifier {
 	static <T> Optional<T> getYoungestParentInstanceOf(IUIComponent self, Class<T> clazz) {
-		for (Iterator<IUIComponentContainer> iterator = new ParentIterator(self.getParent().orElse(null));
+		for (Iterator<IUIComponent> iterator = new ParentIterator(self.getParent().orElse(null));
 		     iterator.hasNext(); ) {
-			IUIComponentContainer element = iterator.next();
+			IUIComponent element = iterator.next();
 			if (clazz.isInstance(element))
 				return Optional.of(clazz.cast(element));
 		}
@@ -74,7 +77,7 @@ public interface IUIComponent
 				action.test(shapeDescriptor));
 	}
 
-	Optional<? extends IUIComponentContainer> getParent();
+	Optional<? extends IUIComponent> getParent();
 
 	default Optional<? extends IUIComponentManager<?>> getManager() { return UIDefaultCacheExtension.CacheUniversal.getManager().getValue().get(this); }
 
@@ -82,18 +85,41 @@ public interface IUIComponent
 
 	void setVisible(boolean visible);
 
-	void onParentChange(@Nullable IUIComponentContainer previous, @Nullable IUIComponentContainer next);
+	@SuppressWarnings("UnstableApiUsage")
+	static Map<String, IUIComponent> getNamedChildrenMapView(IUIComponent instance) {
+		return instance.getChildrenView().stream().unordered()
+				.filter(c -> c.getName().isPresent())
+				.collect(ImmutableMap.toImmutableMap(c -> {
+					Optional<? extends String> id = c.getName();
+					assert id.isPresent();
+					return id.get();
+				}, Function.identity()));
+	}
 
 	void setActive(boolean active);
 
 	@Override
 	default boolean isFocusable() { return false; }
 
-	@Override
-	default List<? extends IUIComponent> getChildNodes() { return ImmutableList.of(); }
+	List<IUIComponent> getChildrenView();
+
+	void onParentChange(@Nullable IUIComponent previous, @Nullable IUIComponent next);
 
 	@Override
-	default Optional<? extends IUIComponentContainer> getParentNode() { return getParent(); }
+	void transformChildren(AffineTransform transform);
+
+	@SuppressWarnings("UnusedReturnValue")
+	boolean addChildren(Iterable<? extends IUIComponent> components);
+
+	boolean addChildAt(int index, IUIComponent component);
+
+	@SuppressWarnings("UnusedReturnValue")
+	boolean removeChildren(Iterable<? extends IUIComponent> components);
+
+	boolean moveChildTo(int index, IUIComponent component);
+
+	@SuppressWarnings("UnusedReturnValue")
+	boolean moveChildToTop(IUIComponent component);
 
 	List<? extends IUIComponentModifier> getModifiersView();
 
@@ -113,11 +139,17 @@ public interface IUIComponent
 
 	boolean containsPoint(IUIComponentContext context, Point2D point);
 
-	class ParentIterator
-			implements Iterator<IUIComponentContainer> {
-		private final AtomicReference<IUIComponentContainer> current;
+	@Override
+	default List<? extends IUIComponent> getChildNodes() { return getChildrenView(); }
 
-		public ParentIterator(@Nullable IUIComponentContainer current) {
+	@Override
+	default Optional<? extends IUIComponent> getParentNode() { return getParent(); }
+
+	class ParentIterator
+			implements Iterator<IUIComponent> {
+		private final AtomicReference<IUIComponent> current;
+
+		public ParentIterator(@Nullable IUIComponent current) {
 			this.current = new AtomicReference<>(current);
 		}
 
@@ -127,7 +159,7 @@ public interface IUIComponent
 		}
 
 		@Override
-		public IUIComponentContainer next() {
+		public IUIComponent next() {
 			return AssertionUtilities.assertNonnull(getCurrent().getAndUpdate(cur -> {
 				if (cur == null)
 					throw new NoSuchElementException();
@@ -135,6 +167,6 @@ public interface IUIComponent
 			}));
 		}
 
-		protected AtomicReference<IUIComponentContainer> getCurrent() { return current; }
+		protected AtomicReference<IUIComponent> getCurrent() { return current; }
 	}
 }

@@ -2,7 +2,6 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.co
 
 import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContextInternal;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContextMutatorResult;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentTransformChildrenModifier;
@@ -47,14 +46,11 @@ public class UIDefaultComponentContextMutator
 
 		// COMMENT transform
 		AffineTransform transform = transformStack.push();
-		path.getPathEnd().ifPresent(presentPathEnd -> {
-			if (presentPathEnd instanceof IUIComponentContainer)
-				IUIComponentTransformChildrenModifier.handleComponentModifiers((IUIComponentContainer) presentPathEnd,
+		path.getPathEnd().ifPresent(presentPathEnd ->
+				IUIComponentTransformChildrenModifier.handleComponentModifiers(presentPathEnd,
 						presentPathEnd.getModifiersView(),
-						transform);
-			else
-				throw new IllegalStateException();
-		});
+						transform)
+		);
 		// COMMENT path
 		path.subPath(ImmutableList.of(element));
 		// COMMENT graphics

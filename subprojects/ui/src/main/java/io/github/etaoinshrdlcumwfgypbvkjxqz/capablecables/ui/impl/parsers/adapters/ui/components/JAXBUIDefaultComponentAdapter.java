@@ -9,7 +9,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventComponentType;
@@ -232,17 +231,7 @@ public class JAXBUIDefaultComponentAdapter
 								}),
 								Component::getComponent,
 								(p, c) -> {
-									if (!Iterables.isEmpty(c)) {
-										if (!(p instanceof IUIComponentContainer))
-											throw new IllegalArgumentException(
-													new LogMessageBuilder()
-															.addMarkers(UIMarkers.getInstance()::getMarkerParser)
-															.addKeyValue("p", p).addKeyValue("c", c)
-															.addMessages(() -> getResourceBundle().getString("construct.component.container.instance_of.fail"))
-															.build()
-											);
-										((IUIComponentContainer) p).addChildren(c);
-									}
+									p.addChildren(c);
 									return p;
 								},
 								n -> {

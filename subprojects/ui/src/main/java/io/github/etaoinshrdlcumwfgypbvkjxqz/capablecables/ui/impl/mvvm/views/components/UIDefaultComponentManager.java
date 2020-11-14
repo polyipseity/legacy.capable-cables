@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 public class UIDefaultComponentManager<S extends Shape>
-		extends UIDefaultComponentContainer
+		extends UIDefaultComponent
 		implements IUIComponentManager<S> {
 	private OptionalWeakReference<IUIViewComponent<?, ?>> view = new OptionalWeakReference<>(null);
 

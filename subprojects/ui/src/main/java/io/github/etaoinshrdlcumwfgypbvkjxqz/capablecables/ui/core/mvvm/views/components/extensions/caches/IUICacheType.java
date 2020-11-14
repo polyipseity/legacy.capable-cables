@@ -1,7 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.StackTraceUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
@@ -17,7 +16,7 @@ public interface IUICacheType<V, C extends IExtensionContainer<INamespacePrefixe
 				.ifPresent(cache -> cache.invalidate(key));
 	}
 
-	static void invalidateChildrenImpl(IUIComponentContainer container, IUICacheType<?, ? super IUIComponent> type) {
+	static void invalidateChildrenImpl(IUIComponent container, IUICacheType<?, ? super IUIComponent> type) {
 		container.getChildrenView().stream().unordered()
 				.forEach(type::invalidate);
 	}
