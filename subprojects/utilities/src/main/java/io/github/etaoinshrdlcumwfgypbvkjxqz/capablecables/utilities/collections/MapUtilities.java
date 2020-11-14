@@ -229,10 +229,13 @@ public enum MapUtilities {
 				} catch (NoSuchMethodException | IllegalAccessException e) {
 					throw ThrowableUtilities.propagate(e);
 				}
+				invokeHandle = invokeHandle.asType(invokeHandle.type().changeReturnType(BiMap.class));
+
+				MethodHandle finalInvokeHandle = invokeHandle;
 				// TODO Java 9 - use LambdaMetaFactory
 				CONSTRUCTOR = (forward, backward) -> {
 					try {
-						return (BiMap<?, ?>) invokeHandle.invoke(forward, backward);
+						return (BiMap<?, ?>) finalInvokeHandle.invokeExact((Map<?, ?>) forward, (Map<?, ?>) backward);
 					} catch (Throwable throwable) {
 						throw ThrowableUtilities.propagate(throwable);
 					}

@@ -57,6 +57,7 @@ public interface IUIRendererContainer<R extends IUIRenderer<?>>
 		Class<?> clazz = rendererContainer.getDefaultRendererClass();
 		Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIRendererConstructor.class, Arrays.asList(clazz.getDeclaredConstructors()));
 		MethodHandle constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
+		constructorHandle = constructorHandle.asType(constructorHandle.type().changeReturnType(IUIRenderer.class));
 
 		UIRendererConstructor.IArguments argument = new UIRendererConstructor.ImmutableArguments(
 				ImmutableMap.of(),
@@ -64,7 +65,7 @@ public interface IUIRendererContainer<R extends IUIRenderer<?>>
 						.orElseThrow(IllegalStateException::new).getClass()
 		);
 
-		return (IUIRenderer<?>) constructorHandle.invoke(argument);
+		return (IUIRenderer<?>) constructorHandle.invokeExact((UIRendererConstructor.IArguments) argument);
 	}
 
 	Optional<? extends IUIRendererContainerContainer<?>> getContainer();

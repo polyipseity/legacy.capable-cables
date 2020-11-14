@@ -13,7 +13,7 @@ public interface ICloneable
 	static <T extends Cloneable> T clone(T obj) {
 		// TODO Java 9 - use LambdaMetaFactory
 		try {
-			return (T) StaticHolder.getCloneMethodHandle().invoke(obj);
+			return (T) (Object) StaticHolder.getCloneMethodHandle().invokeExact((Object) obj);
 		} catch (Throwable throwable) {
 			throw ThrowableUtilities.propagate(throwable);
 		}

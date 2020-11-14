@@ -142,7 +142,7 @@ public enum ClassUtilities {
 	public static Class<?> defineClass(ClassLoader classLoader, CharSequence name, byte[] data) {
 		// TODO Java 9 - use Lookup.defineClass
 		try {
-			return (Class<?>) getDefineClassMethodHandle().invokeExact(classLoader, name.toString(), data, 0, data.length);
+			return (Class<?>) getDefineClassMethodHandle().invokeExact((ClassLoader) classLoader, (String) name.toString(), (byte[]) data, (int) 0, (int) data.length);
 		} catch (Throwable throwable) {
 			throw ThrowableUtilities.propagate(throwable);
 		}

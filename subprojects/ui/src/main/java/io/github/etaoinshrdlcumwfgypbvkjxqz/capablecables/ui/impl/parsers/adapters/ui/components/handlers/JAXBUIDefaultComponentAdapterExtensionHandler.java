@@ -52,10 +52,11 @@ public class JAXBUIDefaultComponentAdapterExtensionHandler
 					} catch (IllegalAccessException e) {
 						throw ThrowableUtilities.propagate(e);
 					}
+					constructorHandle = constructorHandle.asType(constructorHandle.type().changeReturnType(IUIExtension.class));
 
 					IUIExtension<?, ?> ret;
 					try {
-						ret = (IUIExtension<?, ?>) constructorHandle.invoke(argument);
+						ret = (IUIExtension<?, ?>) constructorHandle.invokeExact((UIExtensionConstructor.IArguments) argument);
 					} catch (Throwable throwable) {
 						throw ThrowableUtilities.propagate(throwable);
 					}
@@ -72,17 +73,15 @@ public class JAXBUIDefaultComponentAdapterExtensionHandler
 							left.getAnyContainer()
 									.<Iterable<Object>>map(AnyContainer::getAny)
 									.orElseGet(ImmutableSet::of))
-							.forEach(IThrowingConsumer.executeNow(any -> {
-								assert any != null;
-								IJAXBUIComponentBasedAdapterContext.findHandler(subContext1, any)
-										.ifPresent(IThrowingConsumer.executeNow(handler -> {
-											assert handler != null;
-											handler.accept(
-													context.withData(ImmutableMap.of(IJAXBUIComponentAdapterContext.class, subContext1)),
-													CastUtilities.castUnchecked(any) // COMMENT should not throw
-											);
-										}));
-							}));
+							.forEach(IThrowingConsumer.executeNow(any ->
+									IJAXBUIComponentBasedAdapterContext.findHandler(subContext1, any)
+											.ifPresent(IThrowingConsumer.executeNow(handler ->
+													handler.accept(
+															context.withData(ImmutableMap.of(IJAXBUIComponentAdapterContext.class, subContext1)),
+															CastUtilities.castUnchecked(any) // COMMENT should not throw
+													)
+											))
+							));
 				});
 	}
 }

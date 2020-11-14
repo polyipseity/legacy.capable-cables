@@ -1,7 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.ClassUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.DynamicUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
@@ -19,8 +22,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
-public class EventBusListenerAdapter<T extends Event, O>
-		extends AbstractDelegatingObject<O>
+public class EventBusListenerAdapter<T extends Event>
 		implements Consumer<T> {
 	// TODO Should a PR be created to fix 'EventBus' not checking whether methods with the 'SubscribeEvent' annotation is a bridge method? (Since bridge methods also have the annotation, methods that have a bridge method in runtime will have the bridge method registered along side with the original method, which is likely undesirable. The bridge method will have its parameter's type erased, meaning the parameter type will become the upper bound type. This means, in our case, for 'Observer', the argument type is 'Object', which causes a crash. However, for super methods that have its parameter's generic type erased to Event, it can cause subtle bugs, such as unexpected ClassCastExceptions caused by dispatching Event and its subtypes to the bridge method, which calls the original method.)
 
@@ -33,17 +35,16 @@ public class EventBusListenerAdapter<T extends Event, O>
 	private final MethodHandle methodHandle;
 
 	@SuppressWarnings({"unchecked"})
-	public EventBusListenerAdapter(O delegated, Class<? super O> superClass, @NonNls CharSequence methodName)
+	public <O> EventBusListenerAdapter(O delegate, Class<? super O> superClass, @NonNls CharSequence methodName)
 			throws NoSuchMethodException {
-		super(delegated);
-		Class<?> delegatedClazz = delegated.getClass();
+		Class<?> delegatedClazz = delegate.getClass();
 
 		Optional<Class<?>> et = DynamicUtilities.Extensions.wrapTypeResolverResult(TypeResolver.resolveRawArgument(superClass, delegatedClazz));
 		if (!et.isPresent())
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
 							.addMarkers(UtilitiesMarkers.getInstance()::getMarkerEvent)
-							.addKeyValue("delegated", delegated).addKeyValue("superClass", superClass).addKeyValue("methodName", methodName)
+							.addKeyValue("delegate", delegate).addKeyValue("superClass", superClass).addKeyValue("methodName", methodName)
 							.addMessages(() -> getResourceBundle().getString("construct.delegated.generics.unresolvable"))
 							.build()
 			);
@@ -64,16 +65,20 @@ public class EventBusListenerAdapter<T extends Event, O>
 			m = methodTemporary
 					.orElseThrow(NoSuchMethodException::new);
 		}
+		MethodHandle methodHandle;
 		try {
 			// TODO Java 9 - use LambdaMetaFactory
-			this.methodHandle = InvokeUtilities.getImplLookup().unreflect(m);
+			methodHandle = InvokeUtilities.getImplLookup().unreflect(m);
 		} catch (IllegalAccessException e) {
 			throw ThrowableUtilities.propagate(e);
 		}
+		methodHandle = methodHandle.bindTo(delegate);
+		methodHandle = methodHandle.asType(methodHandle.type().changeParameterType(0, Event.class));
+		this.methodHandle = methodHandle;
 
 		Optional<? extends SubscribeEvent> se = Optional.ofNullable(m.getAnnotation(SubscribeEvent.class));
-		if (!se.isPresent() && delegated instanceof ISubscribeEventProvider)
-			se = ((ISubscribeEventProvider) delegated).getSubscribeEvent();
+		if (!se.isPresent() && delegate instanceof ISubscribeEventProvider)
+			se = ((ISubscribeEventProvider) delegate).getSubscribeEvent();
 		this.priority = se.map(SubscribeEvent::priority).orElse(EventPriority.NORMAL);
 		this.receiveCancelled = se.filter(SubscribeEvent::receiveCanceled).isPresent();
 
@@ -100,7 +105,7 @@ public class EventBusListenerAdapter<T extends Event, O>
 	@Override
 	public void accept(T t) {
 		try {
-			getMethodHandle().invoke(getDelegate(), t);
+			getMethodHandle().invokeExact((Event) t);
 		} catch (Throwable throwable) {
 			throw ThrowableUtilities.propagate(throwable);
 		}

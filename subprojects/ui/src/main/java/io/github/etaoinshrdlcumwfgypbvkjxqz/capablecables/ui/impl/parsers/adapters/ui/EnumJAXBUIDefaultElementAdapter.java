@@ -116,7 +116,7 @@ public enum EnumJAXBUIDefaultElementAdapter {
 						@Nonnull
 						public JAXBElement<String> apply(@Nonnull IJAXBAdapterContext context, @Nonnull AttributedCharacterIterator.Attribute right) {
 							try {
-								return ObjectFactories.getDefaultUIObjectFactory().createTextAttribute((String) getGetNameVirtualMethodHandle().invokeExact(right));
+								return ObjectFactories.getDefaultUIObjectFactory().createTextAttribute((String) getGetNameVirtualMethodHandle().invokeExact((AttributedCharacterIterator.Attribute) right));
 							} catch (Throwable throwable) {
 								throw ThrowableUtilities.propagate(throwable);
 							}

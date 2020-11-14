@@ -185,8 +185,9 @@ public class JAXBUIDefaultComponentAdapter
 					Class<?> clazz = AssertionUtilities.assertNonnull(subContext.getAliasesView().get(view.getClazz()));
 					Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIViewComponentConstructor.class, Arrays.asList(clazz.getDeclaredConstructors()));
 					MethodHandle constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
+					constructorHandle = constructorHandle.asType(constructorHandle.type().changeReturnType(IUIViewComponent.class));
 
-					return (IUIViewComponent<?, ?>) constructorHandle.invoke(argument);
+					return (IUIViewComponent<?, ?>) constructorHandle.invokeExact((UIViewComponentConstructor.IArguments) argument);
 				}))
 				.orElseThrow(IllegalArgumentException::new);
 	}
@@ -197,7 +198,6 @@ public class JAXBUIDefaultComponentAdapter
 				.map(IThrowingFunction.executeNow(subContext ->
 						TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, component,
 								IThrowingFunction.executeNow(node -> {
-									assert node != null;
 									Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(context, node.getProperty());
 									// COMMENT attributes
 									{
@@ -226,8 +226,9 @@ public class JAXBUIDefaultComponentAdapter
 									Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIComponentConstructor.class,
 											Arrays.asList(clazz.getDeclaredConstructors()));
 									MethodHandle constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
+									constructorHandle = constructorHandle.asType(constructorHandle.type().changeReturnType(IUIComponent.class));
 
-									return (IUIComponent) constructorHandle.invoke(argument);
+									return (IUIComponent) constructorHandle.invokeExact((UIComponentConstructor.IArguments) argument);
 								}),
 								Component::getComponent,
 								(p, c) -> {

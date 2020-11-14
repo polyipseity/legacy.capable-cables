@@ -50,6 +50,7 @@ public class JAXBUIDefaultComponentThemeAdapterRendererHandler
 											} catch (IllegalAccessException e) {
 												throw ThrowableUtilities.propagate(e);
 											}
+											constructorHandle = constructorHandle.asType(constructorHandle.type().changeReturnType(IUIRenderer.class));
 
 											UIRendererConstructor.IArguments argument = new UIRendererConstructor.ImmutableArguments(
 													mappings,
@@ -59,7 +60,7 @@ public class JAXBUIDefaultComponentThemeAdapterRendererHandler
 
 											IUIRenderer<?> ret;
 											try {
-												ret = (IUIRenderer<?>) constructorHandle.invoke(argument);
+												ret = (IUIRenderer<?>) constructorHandle.invokeExact((UIRendererConstructor.IArguments) argument);
 											} catch (Throwable throwable) {
 												throw ThrowableUtilities.propagate(throwable);
 											}

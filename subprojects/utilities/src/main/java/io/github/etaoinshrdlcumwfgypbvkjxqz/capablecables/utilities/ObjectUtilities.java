@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
+import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Streams;
@@ -9,6 +10,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
+import org.jetbrains.annotations.NonNls;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
@@ -21,74 +23,74 @@ import java.util.function.ToIntFunction;
 public enum ObjectUtilities {
 	;
 
-	private static final ToIntFunction<?> HASH_CODE_SUPER_INVOKER_DEFAULT = (self) -> 1;
-	private static final LoadingCache<Class<?>, BiPredicate<@Nonnull ?, @Nonnull ? super Object>> EQUALS_SUPER_INVOKERS_MAP =
-			CacheUtilities.newCacheBuilderNormalThreaded()
-					.weakKeys()
-					.initialCapacity(CapacityUtilities.getInitialCapacityEnormous())
-					.build(CacheLoader.from(clazz -> {
-						assert clazz != null;
-						MethodHandle methodHandle;
-						try {
-							// TODO Java 9 - LambdaMetaFactory
-							methodHandle = InvokeUtilities.getImplLookup().findSpecial(Object.class, "equals", MethodType.methodType(boolean.class, Object.class), clazz);
-						} catch (NoSuchMethodException | IllegalAccessException e) {
-							throw ThrowableUtilities.propagate(e);
-						}
-						if (Object.class.equals(InvokeUtilities.revealDeclaringClass(methodHandle))) // COMMENT 'super' calls the 'Object' impl, replace it with 'true'
-							return FunctionUtilities.getAlwaysTrueBiPredicate();
-						return (self, other) -> {
-							try {
-								return (boolean) methodHandle.invoke(self, other);
-							} catch (Throwable throwable) {
-								throw ThrowableUtilities.propagate(throwable);
-							}
-						};
-					}));
-	private static final LoadingCache<Class<?>, ToIntFunction<?>> HASH_CODE_SUPER_INVOKERS_MAP =
-			CacheUtilities.newCacheBuilderNormalThreaded()
-					.weakKeys()
-					.initialCapacity(CapacityUtilities.getInitialCapacityEnormous())
-					.build(CacheLoader.from(clazz -> {
-						assert clazz != null;
-						MethodHandle methodHandle;
-						try {
-							// TODO Java 9 - LambdaMetaFactory
-							methodHandle = InvokeUtilities.getImplLookup().findSpecial(Object.class, "hashCode", MethodType.methodType(int.class), clazz);
-						} catch (NoSuchMethodException | IllegalAccessException e) {
-							throw ThrowableUtilities.propagate(e);
-						}
-						if (Object.class.equals(InvokeUtilities.revealDeclaringClass(methodHandle))) // COMMENT 'super' calls the 'Object' impl, replace it with 'true'
-							return getHashCodeSuperInvokerDefault();
-						return (self) -> {
-							try {
-								return (int) methodHandle.invoke(self);
-							} catch (Throwable throwable) {
-								throw ThrowableUtilities.propagate(throwable);
-							}
-						};
-					}));
-	private static final LoadingCache<Class<?>, Function<@Nonnull ?, @Nonnull ? extends String>> TO_STRING_SUPER_INVOKERS_MAP =
-			CacheUtilities.newCacheBuilderNormalThreaded()
-					.weakKeys()
-					.initialCapacity(CapacityUtilities.getInitialCapacityEnormous())
-					.build(CacheLoader.from(clazz -> {
-						assert clazz != null;
-						MethodHandle methodHandle;
-						try {
-							// TODO Java 9 - LambdaMetaFactory
-							methodHandle = InvokeUtilities.getImplLookup().findSpecial(Object.class, "toString", MethodType.methodType(String.class), clazz);
-						} catch (NoSuchMethodException | IllegalAccessException e) {
-							throw ThrowableUtilities.propagate(e);
-						}
-						return (self) -> {
-							try {
-								return (String) methodHandle.invoke(self);
-							} catch (Throwable throwable) {
-								throw ThrowableUtilities.propagate(throwable);
-							}
-						};
-					}));
+	private static final LoadingCache<Class<?>, BiPredicate<@Nonnull ?, @Nonnull ? super Object>> EQUALS_SUPER_INVOKER_MAP;
+	private static final LoadingCache<Class<?>, ToIntFunction<?>> HASH_CODE_SUPER_INVOKER_MAP;
+	private static final LoadingCache<Class<?>, Function<@Nonnull ?, @Nonnull ? extends String>> TO_STRING_SUPER_INVOKER_MAP;
+
+	static {
+		CacheBuilder<Object, Object> mapBuilder = CacheUtilities.newCacheBuilderNormalThreaded()
+				.weakKeys()
+				.initialCapacity(CapacityUtilities.getInitialCapacityEnormous());
+		EQUALS_SUPER_INVOKER_MAP = mapBuilder
+				.build(createSuperInvokerMapLoader("equals", MethodType.methodType(boolean.class, Object.class),
+						FunctionUtilities.getAlwaysTrueBiPredicate(),
+						FunctionUtilities.getAlwaysTrueBiPredicate(),
+						specialMethodHandle -> {
+							MethodHandle specialMethodHandle1 = specialMethodHandle.asType(specialMethodHandle.type().changeParameterType(0, Object.class));
+							return (self, other) -> {
+								try {
+									return (boolean) specialMethodHandle1.invokeExact((Object) self, (Object) other);
+								} catch (Throwable throwable) {
+									throw ThrowableUtilities.propagate(throwable);
+								}
+							};
+						}));
+		HASH_CODE_SUPER_INVOKER_MAP = mapBuilder
+				.build(createSuperInvokerMapLoader("hashCode", MethodType.methodType(int.class),
+						self -> 0,
+						self -> 0,
+						specialMethodHandle -> {
+							MethodHandle specialMethodHandle1 = specialMethodHandle.asType(specialMethodHandle.type().changeParameterType(0, Object.class));
+							return self -> {
+								try {
+									return (int) specialMethodHandle1.invokeExact((Object) self);
+								} catch (Throwable throwable) {
+									throw ThrowableUtilities.propagate(throwable);
+								}
+							};
+						}));
+		{
+			/*
+
+			 */
+			MethodHandle objectToStringSpecial;
+			try {
+				objectToStringSpecial = InvokeUtilities.getImplLookup().findSpecial(Object.class, "toString", MethodType.methodType(String.class), Object.class);
+			} catch (NoSuchMethodException | IllegalAccessException e) {
+				throw ThrowableUtilities.propagate(e);
+			}
+			TO_STRING_SUPER_INVOKER_MAP = mapBuilder
+					.build(ObjectUtilities.createSuperInvokerMapLoader("toString", MethodType.methodType(String.class),
+							self -> {
+								try {
+									return (String) objectToStringSpecial.invokeExact((Object) self);
+								} catch (Throwable throwable) {
+									throw ThrowableUtilities.propagate(throwable);
+								}
+							},
+							self -> "",
+							specialMethodHandle -> {
+								MethodHandle specialMethodHandle1 = specialMethodHandle.asType(specialMethodHandle.type().changeParameterType(0, Object.class));
+								return self -> {
+									try {
+										return (String) specialMethodHandle1.invokeExact((Object) self);
+									} catch (Throwable throwable) {
+										throw ThrowableUtilities.propagate(throwable);
+									}
+								};
+							}));
+		}
+	}
 
 	@SuppressWarnings({"ObjectEquality", "UnstableApiUsage"})
 	public static <T> boolean equalsImpl(T self,
@@ -96,6 +98,7 @@ public enum ObjectUtilities {
 	                                     Class<T> referenceClass,
 	                                     boolean acceptSubclasses,
 	                                     Iterable<? extends Function<@Nonnull ? super T, @Nullable ?>> variables) {
+
 		if (self == other)
 			return true;
 		if (acceptSubclasses) {
