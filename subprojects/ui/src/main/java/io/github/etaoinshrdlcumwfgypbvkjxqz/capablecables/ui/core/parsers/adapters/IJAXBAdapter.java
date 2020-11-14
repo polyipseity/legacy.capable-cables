@@ -11,9 +11,10 @@ import java.util.Optional;
 
 public interface IJAXBAdapter<L, R>
 		extends IDuplexFunction<@Nonnull L, @Nonnull R>, ISealedClassCandidate {
+	@SuppressWarnings("try")
 	static <L, R> R leftToRight(IJAXBAdapter<L, R> instance, IJAXBAdapterContext context, L left)
 			throws IllegalArgumentException {
-		try (@SuppressWarnings("try") UncheckedAutoCloseable ignored = instance.pushThreadLocalContext(context)) {
+		try (UncheckedAutoCloseable ignored = instance.pushThreadLocalContext(context)) {
 			return AssertionUtilities.assertNonnull(instance.leftToRight(left));
 		}
 	}
@@ -30,9 +31,10 @@ public interface IJAXBAdapter<L, R>
 	@Deprecated
 	L rightToLeft(@Nonnull R right);
 
+	@SuppressWarnings("try")
 	static <L, R> L rightToLeft(IJAXBAdapter<L, R> instance, IJAXBAdapterContext context, R right)
 			throws IllegalArgumentException {
-		try (@SuppressWarnings("try") UncheckedAutoCloseable ignored = instance.pushThreadLocalContext(context)) {
+		try (UncheckedAutoCloseable ignored = instance.pushThreadLocalContext(context)) {
 			return AssertionUtilities.assertNonnull(instance.rightToLeft(right));
 		}
 	}

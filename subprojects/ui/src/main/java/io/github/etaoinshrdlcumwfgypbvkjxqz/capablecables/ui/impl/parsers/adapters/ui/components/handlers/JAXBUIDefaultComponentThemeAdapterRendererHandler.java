@@ -28,7 +28,7 @@ public class JAXBUIDefaultComponentThemeAdapterRendererHandler
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings({"deprecation", "cast"})
 	protected void accept0(IJAXBAdapterContext context, IJAXBUIComponentThemeAdapterContext subContext, Renderer left) {
 		// COMMENT we should try to prepare as much as possible beforehand
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = JAXBUIDefaultComponentAdapter.createMappings(context, left.getProperty());

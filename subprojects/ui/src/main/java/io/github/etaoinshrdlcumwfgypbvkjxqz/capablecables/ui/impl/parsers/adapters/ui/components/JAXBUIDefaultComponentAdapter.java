@@ -174,6 +174,7 @@ public class JAXBUIDefaultComponentAdapter
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
+	@SuppressWarnings("cast")
 	public static IUIViewComponent<?, ?> createView(IJAXBAdapterContext context, View view)
 			throws Throwable {
 		return context.getDatum(IJAXBUIComponentAdapterContext.class)
@@ -191,6 +192,7 @@ public class JAXBUIDefaultComponentAdapter
 				.orElseThrow(IllegalArgumentException::new);
 	}
 
+	@SuppressWarnings("cast")
 	public static IUIComponent createComponent(IJAXBAdapterContext context, Component component)
 			throws Throwable {
 		return context.getDatum(IJAXBUIComponentAdapterContext.class)

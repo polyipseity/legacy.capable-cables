@@ -139,6 +139,7 @@ public enum ClassUtilities {
 				.collect(ImmutableSet.toImmutableSet());
 	}
 
+	@SuppressWarnings("cast")
 	public static Class<?> defineClass(ClassLoader classLoader, CharSequence name, byte[] data) {
 		// TODO Java 9 - use Lookup.defineClass
 		try {

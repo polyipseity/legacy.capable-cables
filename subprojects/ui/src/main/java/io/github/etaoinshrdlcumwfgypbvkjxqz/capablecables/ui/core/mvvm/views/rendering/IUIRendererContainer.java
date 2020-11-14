@@ -52,6 +52,7 @@ public interface IUIRendererContainer<R extends IUIRenderer<?>>
 
 	Class<? extends R> getDefaultRendererClass();
 
+	@SuppressWarnings("cast")
 	static IUIRenderer<?> createDefaultRenderer(IUIRendererContainer<?> rendererContainer)
 			throws Throwable {
 		Class<?> clazz = rendererContainer.getDefaultRendererClass();

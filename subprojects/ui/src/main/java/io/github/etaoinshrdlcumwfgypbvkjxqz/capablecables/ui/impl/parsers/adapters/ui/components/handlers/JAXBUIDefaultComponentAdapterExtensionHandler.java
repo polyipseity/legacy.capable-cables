@@ -33,8 +33,8 @@ public class JAXBUIDefaultComponentAdapterExtensionHandler
 		super(IJAXBUIComponentAdapterContext.class);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
+	@SuppressWarnings({"deprecation", "cast"})
 	protected void accept0(IJAXBAdapterContext context, IJAXBUIComponentAdapterContext subContext, Extension left) {
 		subContext.getContainer()
 				.flatMap(container -> CastUtilities.castChecked(IExtensionContainer.class, container))

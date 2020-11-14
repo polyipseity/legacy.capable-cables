@@ -55,7 +55,7 @@ public final class DynamicTexturesDataBuffer
 	private final Lock closeLock = new ReentrantLock();
 	private boolean closed = false;
 
-	@SuppressWarnings({"NullableProblems", "RedundantTypeArguments"})
+	@SuppressWarnings({"NullableProblems", "RedundantTypeArguments", "cast"})
 	public DynamicTexturesDataBuffer(int width, int height, int textureSize, boolean closeSynchronized) {
 		super(DataBuffer.TYPE_INT, width * height);
 		this.width = width;

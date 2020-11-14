@@ -114,6 +114,7 @@ public enum EnumJAXBUIDefaultElementAdapter {
 
 						@Override
 						@Nonnull
+						@SuppressWarnings("cast")
 						public JAXBElement<String> apply(@Nonnull IJAXBAdapterContext context, @Nonnull AttributedCharacterIterator.Attribute right) {
 							try {
 								return ObjectFactories.getDefaultUIObjectFactory().createTextAttribute((String) getGetNameVirtualMethodHandle().invokeExact((AttributedCharacterIterator.Attribute) right));

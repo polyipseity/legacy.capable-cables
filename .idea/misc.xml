@@ -65,6 +65,22 @@
         </list>
       </value>
     </option>
+    <instrumentedNotNulls>
+      <option value="android.support.annotation.NonNull" />
+      <option value="androidx.annotation.NonNull" />
+      <option value="androidx.annotation.RecentlyNonNull" />
+      <option value="com.android.annotations.NonNull" />
+      <option value="edu.umd.cs.findbugs.annotations.NonNull" />
+      <option value="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull" />
+      <option value="io.reactivex.annotations.NonNull" />
+      <option value="io.reactivex.rxjava3.annotations.NonNull" />
+      <option value="javax.annotation.Nonnull" />
+      <option value="org.checkerframework.checker.nullness.compatqual.NonNullDecl" />
+      <option value="org.checkerframework.checker.nullness.compatqual.NonNullType" />
+      <option value="org.checkerframework.checker.nullness.qual.NonNull" />
+      <option value="org.eclipse.jdt.annotation.NonNull" />
+      <option value="org.jetbrains.annotations.NotNull" />
+    </instrumentedNotNulls>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8u252" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
