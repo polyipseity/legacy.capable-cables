@@ -108,7 +108,7 @@ public enum ObjectUtilities {
 			if (other == null || !referenceClass.equals(other.getClass()))
 				return false;
 		}
-		if (!getEqualsSuperInvokersMap().getUnchecked(self.getClass()).test(CastUtilities.castUnchecked(self), other))
+		if (!getEqualsSuperInvokerMap().getUnchecked(self.getClass()).test(CastUtilities.castUnchecked(self), other))
 			return false;
 
 		@SuppressWarnings("unchecked") T that = (T) other;
@@ -116,8 +116,8 @@ public enum ObjectUtilities {
 				.allMatch(variable -> Objects.equals(variable.apply(self), variable.apply(that)));
 	}
 
-	private static LoadingCache<Class<?>, BiPredicate<@Nonnull ?, @Nonnull ? super Object>> getEqualsSuperInvokersMap() {
-		return EQUALS_SUPER_INVOKERS_MAP;
+	private static LoadingCache<Class<?>, BiPredicate<@Nonnull ?, @Nonnull ? super Object>> getEqualsSuperInvokerMap() {
+		return EQUALS_SUPER_INVOKER_MAP;
 	}
 
 	/**
@@ -125,7 +125,7 @@ public enum ObjectUtilities {
 	 */
 	@SuppressWarnings({"MagicNumber", "UnstableApiUsage"})
 	public static <T> int hashCodeImpl(T self, Iterable<? extends Function<@Nonnull ? super T, @Nullable ?>> variables) {
-		final int[] result = {getHashCodeSuperInvokersMap().getUnchecked(self.getClass()).applyAsInt(CastUtilities.castUnchecked(self))};
+		final int[] result = {getHashCodeSuperInvokerMap().getUnchecked(self.getClass()).applyAsInt(CastUtilities.castUnchecked(self))};
 		Streams.stream(variables)
 				.map(variable -> variable.apply(self))
 				.mapToInt(Objects::hashCode)
@@ -156,11 +156,45 @@ public enum ObjectUtilities {
 			ret.append(key).append('=').append(AssertionUtilities.assertNonnull(valueFunction).apply(self));
 		});
 		ret.append('}');
-		ret.append(getToStringSuperInvokersMap().getUnchecked(self.getClass()).apply(CastUtilities.castUnchecked(self)));
+		ret.append(getToStringSuperInvokerMap().getUnchecked(self.getClass()).apply(CastUtilities.castUnchecked(self)));
 		return ret.toString();
 	}
 
-	private static LoadingCache<Class<?>, Function<@Nonnull ?, @Nonnull ? extends String>> getToStringSuperInvokersMap() {
-		return TO_STRING_SUPER_INVOKERS_MAP;
+	private static LoadingCache<Class<?>, Function<@Nonnull ?, @Nonnull ? extends String>> getToStringSuperInvokerMap() {
+		return TO_STRING_SUPER_INVOKER_MAP;
+	}
+
+	private static <V> CacheLoader<Class<?>, V> createSuperInvokerMapLoader(@NonNls CharSequence methodName,
+	                                                                        MethodType methodType,
+	                                                                        V valueIfObjectIsSuper,
+	                                                                        V valueIfObjectIsInvoker,
+	                                                                        Function<@Nonnull ? super MethodHandle, @Nonnull ? extends V> valueConverter) {
+		String methodName1 = methodName.toString();
+		return CacheLoader.from(clazz -> {
+			assert clazz != null;
+			MethodHandle specialMethodHandle;
+			try {
+				MethodHandle virtualMethodHandle =
+						InvokeUtilities.getImplLookup().findVirtual(clazz, methodName1, methodType);
+				Class<?> invokerClazz = InvokeUtilities.revealDeclaringClass(virtualMethodHandle);
+				if (Object.class.equals(invokerClazz)) {
+					/* COMMENT
+					The invoker is 'Object'.
+					This only happens if the corresponding static impl method is not used properly.
+					*/
+					return valueIfObjectIsInvoker;
+				}
+
+				// TODO Java 9 - LambdaMetaFactory
+				specialMethodHandle = InvokeUtilities.getImplLookup().findSpecial(Object.class, methodName1, methodType, invokerClazz);
+			} catch (NoSuchMethodException | IllegalAccessException e) {
+				throw ThrowableUtilities.propagate(e);
+			}
+			if (Object.class.equals(InvokeUtilities.revealDeclaringClass(specialMethodHandle))) {
+				// COMMENT 'super' calls the 'Object' impl
+				return valueIfObjectIsSuper;
+			}
+			return valueConverter.apply(specialMethodHandle);
+		});
 	}
 }
