@@ -7,6 +7,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUI
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeDescriptorProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.easings.EnumUICommonAnimationEasing;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -54,11 +55,14 @@ public enum UIAnimationTargetUtilities {
 		public static DoubleConsumer transform(IShapeDescriptorProvider provider,
 		                                       double initialValue,
 		                                       BiFunction<@Nonnull ? super Double, @Nonnull ? super Double, @Nonnull ? extends AffineTransform> valueDiffFunction) {
-			return new ChangeAwareDoubleConsumer(initialValue, (previousValue, value) -> provider.modifyShape(() -> {
-				provider.getShapeDescriptor()
-						.transform(valueDiffFunction.apply(previousValue, value));
-				return true;
-			}));
+			OptionalWeakReference<IShapeDescriptorProvider> providerRef = new OptionalWeakReference<>(provider); // COMMENT weak ref, we should not own the provider
+			return new ChangeAwareDoubleConsumer(initialValue, (previousValue, value) -> providerRef.getOptional().ifPresent(provider1 ->
+					provider1.modifyShape(() -> {
+						provider1.getShapeDescriptor()
+								.transform(valueDiffFunction.apply(previousValue, value));
+						return true;
+					})
+			));
 		}
 
 		public static DoubleConsumer translateY(IShapeDescriptorProvider provider) {

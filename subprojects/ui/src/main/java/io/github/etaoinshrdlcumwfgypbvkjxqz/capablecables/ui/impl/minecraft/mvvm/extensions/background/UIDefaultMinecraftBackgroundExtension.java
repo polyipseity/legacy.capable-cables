@@ -42,18 +42,18 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
+
 @OnlyIn(Dist.CLIENT)
 public class UIDefaultMinecraftBackgroundExtension
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIMinecraftViewComponent<?, ?>, IUIMinecraftViewComponent<?, ?>>
 		implements IUIMinecraftBackgroundExtension {
 	private static final UIExtensionConstructor.IArguments DEFAULT_ARGUMENTS =
 			new UIExtensionConstructor.ImmutableArguments(ImmutableMap.of(), IUIMinecraftViewComponent.class);
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final AutoCloseableRotator<RenderObserver, RuntimeException> renderObserverRotator =
-			new AutoCloseableRotator<>(() -> new RenderObserver(this, UIConfiguration.getInstance().getLogger()), Disposable::dispose);
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
+			new AutoCloseableRotator<>(() -> new RenderObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()), Disposable::dispose);
 	private final IUIRendererContainerContainer<IBackgroundRenderer> rendererContainerContainer =
-			new UIDefaultRendererContainerContainer<>(this,
+			new UIDefaultRendererContainerContainer<>(suppressThisEscapedWarning(() -> this),
 					UIDefaultRendererContainerContainer.createRendererContainerInitializer(UIMinecraftBackgroundExtensionEmptyBackgroundRenderer.class));
 
 	public UIDefaultMinecraftBackgroundExtension() { this(getDefaultArguments()); }

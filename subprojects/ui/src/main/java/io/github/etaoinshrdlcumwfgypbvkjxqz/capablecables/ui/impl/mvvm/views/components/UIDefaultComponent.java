@@ -24,6 +24,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interac
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.DelayedFieldInitializer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -53,6 +54,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
+
 public class UIDefaultComponent
 		extends UIDefaultEventTarget
 		implements IUIComponent {
@@ -79,7 +82,8 @@ public class UIDefaultComponent
 	private OptionalWeakReference<IUIComponentContainer> parent = new OptionalWeakReference<>(null);
 	private final BinderObserverSupplierHolder binderObserverSupplierHolder = new BinderObserverSupplierHolder();
 
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
+	private final DelayedFieldInitializer<ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>>> extensionsInitializer;
+
 	@UIComponentConstructor
 	public UIDefaultComponent(UIComponentConstructor.IArguments arguments) {
 		this.name = arguments.getName().orElse(null);
@@ -88,14 +92,15 @@ public class UIDefaultComponent
 		this.mappings = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
 
-		this.shapeDescriptor = new ProviderShapeDescriptor<>(this, arguments.getShapeDescriptor());
+		this.shapeDescriptor = new ProviderShapeDescriptor<>(suppressThisEscapedWarning(() -> this), arguments.getShapeDescriptor());
 
 		this.visible = IUIPropertyMappingValue.createBindingField(Boolean.class, true,
 				this.mappings.get(getPropertyVisibleLocation()));
 		this.active = IUIPropertyMappingValue.createBindingField(Boolean.class, true,
 				this.mappings.get(getPropertyActiveLocation()));
 
-		IExtensionContainer.addExtensionChecked(this, new UIDefaultCacheExtension());
+		this.extensionsInitializer = new DelayedFieldInitializer<>(field ->
+				IExtensionContainer.addExtensionChecked(this, new UIDefaultCacheExtension()));
 	}
 
 	public static INamespacePrefixedString getPropertyVisibleLocation() { return PROPERTY_VISIBLE_LOCATION; }
@@ -290,8 +295,9 @@ public class UIDefaultComponent
 	@Override
 	public Map<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() { return extensions; }
+	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() {
+		return extensionsInitializer.apply(extensions);
+	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper

@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl;
 
+import com.google.common.collect.SetMultimap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
@@ -14,6 +15,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIEv
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIEventUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIFunctionalEventListener;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultComponentContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.DelayedFieldInitializer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
@@ -53,7 +55,8 @@ public class UIButtonComponent
 			MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(IButtonState.values().length).makeMap()
 	);
 
-	@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
+	private final DelayedFieldInitializer<SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters>> eventTargetListenersInitializer;
+
 	@UIComponentConstructor
 	public UIButtonComponent(UIComponentConstructor.IArguments arguments) {
 		super(arguments);
@@ -64,32 +67,39 @@ public class UIButtonComponent
 		this.onActivated = new ImmutableBindingMethodSource<>(IUIEvent.class,
 				Optional.ofNullable(mappings.get(getMethodOnActivatedLocation())).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 
-		addEventListener(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(e -> {
-			if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET)
-				getButtonStates().add(IButtonState.HOVERING);
-		}), false);
-		addEventListener(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(e -> {
-			if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET)
-				getButtonStates().remove(IButtonState.HOVERING);
-		}), false);
+		this.eventTargetListenersInitializer = new DelayedFieldInitializer<>(field -> {
+			addEventListener(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(e -> {
+				if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET)
+					getButtonStates().add(IButtonState.HOVERING);
+			}), false);
+			addEventListener(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(e -> {
+				if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET)
+					getButtonStates().remove(IButtonState.HOVERING);
+			}), false);
 
-		addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(e -> {
-			if (IUIEventActivate.shouldActivate(this, e)) {
-				getButtonStates().add(IButtonState.PRESSING);
-				e.stopPropagation();
-			}
-		}), false);
-		addEventListener(EnumUIEventDOMType.MOUSE_UP.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(e -> {
-			if (getButtonStates().remove(IButtonState.PRESSING) && getButtonStates().contains(IButtonState.HOVERING)) {
-				getOnActivated().invoke(e);
-				e.stopPropagation();
-			}
-		}), false);
+			addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(e -> {
+				if (IUIEventActivate.shouldActivate(this, e)) {
+					getButtonStates().add(IButtonState.PRESSING);
+					e.stopPropagation();
+				}
+			}), false);
+			addEventListener(EnumUIEventDOMType.MOUSE_UP.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(e -> {
+				if (getButtonStates().remove(IButtonState.PRESSING) && getButtonStates().contains(IButtonState.HOVERING)) {
+					getOnActivated().invoke(e);
+					e.stopPropagation();
+				}
+			}), false);
 
-		addEventListener(EnumUIEventDOMType.KEY_DOWN.getEventType(), new UIFunctionalEventListener<IUIEventKeyboard>(e -> {
-			if (IUIEventActivate.shouldActivate(this, e))
-				getOnActivated().invoke(e);
-		}), false);
+			addEventListener(EnumUIEventDOMType.KEY_DOWN.getEventType(), new UIFunctionalEventListener<IUIEventKeyboard>(e -> {
+				if (IUIEventActivate.shouldActivate(this, e))
+					getOnActivated().invoke(e);
+			}), false);
+		});
+	}
+
+	@Override
+	protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
+		return this.eventTargetListenersInitializer.apply(super.getEventTargetListeners());
 	}
 
 	public static INamespacePrefixedString getMethodOnActivateLocation() {

@@ -3,6 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.co
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.SetMultimap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
@@ -26,6 +27,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.DelayedFieldInitializer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
@@ -54,6 +56,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 
 public class UITeleportingComponentUserRelocatableExtension<C extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, C>
@@ -96,11 +100,9 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 		return PROPERTY_RELOCATE_BORDERS;
 	}
 
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	private final Modifier modifier = new Modifier(this);
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
+	private final Modifier modifier = new Modifier(suppressThisEscapedWarning(() -> this));
 	private final IUIRendererContainerContainer<IRelocatingRenderer> rendererContainerContainer =
-			new UIDefaultRendererContainerContainer<>(this,
+			new UIDefaultRendererContainerContainer<>(suppressThisEscapedWarning(() -> this),
 					UIDefaultRendererContainerContainer.createRendererContainerInitializer(UIComponentUserRelocatableExtensionEmptyRelocatingRenderer.class));
 	@Nullable
 	private IRelocateData relocateData;
@@ -238,33 +240,42 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 		@Nullable
 		private Integer activeMouseButton;
 
-		@SuppressWarnings({"OverridableMethodCallDuringObjectConstruction", "rawtypes", "RedundantSuppression"})
+		private final DelayedFieldInitializer<SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters>> eventTargetListenersInitializer;
+
+		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 		protected Modifier(UITeleportingComponentUserRelocatableExtension<?> owner) {
 			super(IShapeDescriptor.StaticHolder.getShapeDescriptorPlaceholder());
 			this.owner = new OptionalWeakReference<>(owner);
 
-			addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> {
-				if (!getActiveMouseButton().isPresent()) {
-					int button = evt.getData().getButton();
-					getOwner()
-							.filter(owner2 -> owner2.getActivationMouseButtons().getValue().contains(button))
-							.filter(owner2 -> startRelocateMaybe(evt.getViewContext(), evt.getData().getCursorPositionView()))
-							.flatMap(owner2 -> owner2.getContainer()) // TODO Java 9 - IllegalAccessError now, make method ref
-							.ifPresent(c -> {
-								c.getParent().ifPresent(p ->
-										p.moveChildToTop(c));
-								setActiveMouseButton(button);
-								evt.stopPropagation();
-							});
-				}
-			}), false);
-			addEventListener(EnumUIEventDOMType.MOUSE_UP.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> {
-				if (getActiveMouseButton().filter(Predicate.isEqual(evt.getData().getButton())).isPresent()
-						&& finishRelocateMaybe(evt.getViewContext(), evt.getData().getCursorPositionView())) {
-					evt.stopPropagation();
-					setActiveMouseButton(null);
-				}
-			}), false);
+			this.eventTargetListenersInitializer = new DelayedFieldInitializer<>(field -> {
+				addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> {
+					if (!getActiveMouseButton().isPresent()) {
+						int button = evt.getData().getButton();
+						getOwner()
+								.filter(owner2 -> owner2.getActivationMouseButtons().getValue().contains(button))
+								.filter(owner2 -> startRelocateMaybe(evt.getViewContext(), evt.getData().getCursorPositionView()))
+								.flatMap(owner2 -> owner2.getContainer()) // TODO Java 9 - IllegalAccessError now, make method ref
+								.ifPresent(c -> {
+									c.getParent().ifPresent(p ->
+											p.moveChildToTop(c));
+									setActiveMouseButton(button);
+									evt.stopPropagation();
+								});
+					}
+				}), false);
+				addEventListener(EnumUIEventDOMType.MOUSE_UP.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> {
+					if (getActiveMouseButton().filter(Predicate.isEqual(evt.getData().getButton())).isPresent()
+							&& finishRelocateMaybe(evt.getViewContext(), evt.getData().getCursorPositionView())) {
+						evt.stopPropagation();
+						setActiveMouseButton(null);
+					}
+				}), false);
+			});
+		}
+
+		@Override
+		protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
+			return this.eventTargetListenersInitializer.apply(super.getEventTargetListeners());
 		}
 
 		protected Optional<Integer> getActiveMouseButton() {

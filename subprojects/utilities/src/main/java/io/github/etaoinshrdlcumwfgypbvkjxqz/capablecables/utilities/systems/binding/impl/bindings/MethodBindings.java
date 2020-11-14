@@ -24,6 +24,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
+
 public class MethodBindings
 		extends AbstractBindings<IBindingMethod<?>> {
 	private final Map<IBindingMethodSource<?>, Disposable> sources =
@@ -31,12 +33,11 @@ public class MethodBindings
 	private final Set<IBindingMethodDestination<?>> destinations =
 			Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacityTiny()).makeMap());
 
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public MethodBindings(INamespacePrefixedString bindingKey,
 	                      Supplier<@Nonnull ? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>>> transformersSupplier) {
 		super(bindingKey, transformersSupplier);
 		@SuppressWarnings("UnnecessaryLocalVariable") Map<IBindingMethodSource<?>, Disposable> sourcesRef = sources;
-		Cleaner.create(CleanerUtilities.getCleanerReferent(this), () ->
+		Cleaner.create(CleanerUtilities.getCleanerReferent(suppressThisEscapedWarning(() -> this)), () ->
 				sourcesRef.values().stream().unordered().forEach(Disposable::dispose));
 	}
 

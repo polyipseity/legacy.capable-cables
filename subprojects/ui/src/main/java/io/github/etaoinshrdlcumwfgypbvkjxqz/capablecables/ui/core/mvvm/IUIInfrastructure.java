@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.viewmodels.IUIViewModel;
@@ -11,6 +12,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.exte
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 
 import java.util.ResourceBundle;
+import java.util.function.Supplier;
 
 public interface IUIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, B extends IBinder>
 		extends IExtensionContainer<INamespacePrefixedString> {
@@ -66,6 +68,20 @@ public interface IUIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel
 	B getBinder();
 
 	void setBinder(B binder);
+
+	static <T extends IUIInfrastructure<V, VM, B>,
+			V extends IUIView<?>,
+			VM extends IUIViewModel<?>,
+			B extends IBinder> T create(Supplier<@Nonnull ? extends T> constructor,
+	                                    V view,
+	                                    VM viewModel,
+	                                    B binder) {
+		T result = constructor.get();
+		result.setView(view);
+		result.setViewModel(viewModel);
+		result.setBinder(binder);
+		return result;
+	}
 
 	enum StaticHolder {
 		;

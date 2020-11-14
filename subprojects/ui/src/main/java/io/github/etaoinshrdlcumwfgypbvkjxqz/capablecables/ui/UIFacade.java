@@ -41,7 +41,7 @@ public enum UIFacade {
 		}
 
 		public static IUIMinecraftInfrastructure<?, ?, ?> createInfrastructure(IUIMinecraftView<?> view, IUIMinecraftViewModel<?> viewModel, IBinder binder) {
-			return new UIDefaultMinecraftInfrastructure<>(view, viewModel, binder);
+			return UIDefaultMinecraftInfrastructure.of(view, viewModel, binder);
 		}
 
 		public static Document parseResource(INamespacePrefixedString location) throws IOException, SAXException {

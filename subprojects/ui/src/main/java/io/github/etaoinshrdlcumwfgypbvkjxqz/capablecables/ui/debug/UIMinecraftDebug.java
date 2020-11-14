@@ -97,6 +97,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 import static java.util.Objects.requireNonNull;
 
 public enum UIMinecraftDebug {
@@ -236,12 +237,11 @@ public enum UIMinecraftDebug {
 			public static final int CURSOR_SHAPE_RADIUS = 10;
 
 			private Color cursorHighlighterColor = Color.WHITE;
-			@SuppressWarnings("ThisEscapedInObjectConstruction")
 			private final IUIAnimationControl animations =
 					UIStandardAnimationControlFactory.createSimple(UIStandardAnimationControlFactory.EnumDirection.ALTERNATE,
 							UIAnimationTargetUtilities.andThen(
 									UIAnimationTargetUtilities.range(rgb -> setCursorHighlighterColor(new Color((int) rgb)), 0, 0xFFFFFFL, EnumUICommonAnimationEasing.LINEAR),
-									UIAnimationTargetUtilities.range(UIAnimationTargetUtilities.ShapeDescriptors.translateY(this), 0, 100, EnumUICommonAnimationEasing.IN_OUT_BOUNCE)
+									UIAnimationTargetUtilities.range(UIAnimationTargetUtilities.ShapeDescriptors.translateY(suppressThisEscapedWarning(() -> this)), 0, 100, EnumUICommonAnimationEasing.IN_OUT_BOUNCE)
 							),
 							ITicker.StaticHolder.getSystemTicker(),
 							true,

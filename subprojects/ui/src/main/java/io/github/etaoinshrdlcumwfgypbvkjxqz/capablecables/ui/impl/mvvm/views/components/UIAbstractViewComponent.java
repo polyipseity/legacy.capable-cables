@@ -36,6 +36,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
 import io.reactivex.rxjava3.observers.DisposableObserver;
@@ -52,39 +53,48 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
+
 public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		extends UIAbstractView<S>
 		implements IUIViewComponent<S, M> {
 	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
-	private final ConcurrentMap<Class<?>, IUIViewCoordinator> coordinatorMap =
-			MapBuilderUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
 	@Nullable
 	private M manager;
+	private final DelayedFieldInitializer<ConcurrentMap<Class<?>, IUIViewCoordinator>> coordinatorMapInitializer;
+	private final DelayedFieldInitializer<ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>>> extensionsInitializer;
 
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	@UIViewComponentConstructor
 	public UIAbstractViewComponent(UIViewComponentConstructor.IArguments arguments) {
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.mappings = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
 
-		IUIThemeStack themeStack = new UIArrayThemeStack(
-				theme ->
-						theme.apply(
-								IUIView.getNamedTrackers(this)
-										.getTracker(CastUtilities.<Class<IUIRendererContainer<?>>>castUnchecked(IUIRendererContainer.class))
-										.asMapView()
-										.values()
-						),
-				CapacityUtilities.getInitialCapacitySmall()
+		this.coordinatorMapInitializer = new DelayedFieldInitializer<>(field -> {
+			IUIThemeStack themeStack = new UIArrayThemeStack(
+					theme ->
+							theme.apply(
+									IUIView.getNamedTrackers(this)
+											.getTracker(CastUtilities.<Class<IUIRendererContainer<?>>>castUnchecked(IUIRendererContainer.class))
+											.asMapView()
+											.values()
+							),
+					CapacityUtilities.getInitialCapacitySmall()
+			);
+			themeStack.push(new UIDefaultViewComponentTheme());
+
+			field.put(IUIComponentPathResolver.class, new UIDefaultComponentPathResolver());
+			field.put(IUIComponentShapeAnchorController.class, new UIDefaultComponentShapeAnchorController());
+			field.put(IUIThemeStack.class, themeStack);
+		});
+		this.extensionsInitializer = new DelayedFieldInitializer<>(field ->
+				IExtensionContainer.addExtensionChecked(this, new UIDefaultCacheExtension())
 		);
-		themeStack.push(new UIDefaultViewComponentTheme());
+	}
 
-		this.coordinatorMap.put(IUIComponentPathResolver.class, new UIDefaultComponentPathResolver());
-		this.coordinatorMap.put(IUIComponentShapeAnchorController.class, new UIDefaultComponentShapeAnchorController());
-		this.coordinatorMap.put(IUIThemeStack.class, themeStack);
-
-		IExtensionContainer.addExtensionChecked(this, new UIDefaultCacheExtension());
+	@Override
+	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() {
+		return this.extensionsInitializer.apply(super.getExtensions());
 	}
 
 	@Override
@@ -221,18 +231,23 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		);
 	}
 
+	@Override
+	protected ConcurrentMap<Class<?>, IUIViewCoordinator> getCoordinatorMap() {
+		return this.coordinatorMapInitializer.apply(super.getCoordinatorMap());
+	}
+
 	public enum CacheViewComponent {
 		;
 
-		@SuppressWarnings({"ThisEscapedInObjectConstruction", "rawtypes", "RedundantSuppression", "unchecked", "AnonymousInnerClassMayBeStatic"})
+		@SuppressWarnings({"rawtypes", "RedundantSuppression", "unchecked", "AnonymousInnerClassMayBeStatic"})
 		private static final IRegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
 				FunctionUtilities.apply(IUICacheType.generateKey("children_flat"),
 						key -> UICacheRegistry.getInstance().register(key,
 								new UIAbstractCacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
 									{
 										OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
-												new OptionalWeakReference<>(this);
-										Cleaner.create(CleanerUtilities.getCleanerReferent(this),
+												new OptionalWeakReference<>(suppressThisEscapedWarning(() -> this));
+										Cleaner.create(CleanerUtilities.getCleanerReferent(suppressThisEscapedWarning(() -> this)),
 												new AutoSubscribingCompositeDisposable<>(
 														UIEventBusEntryPoint.getEventBus(),
 														new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
@@ -273,29 +288,29 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 										return ImmutableList.copyOf(ret);
 									}
 								}));
-		@SuppressWarnings({"UnstableApiUsage", "ThisEscapedInObjectConstruction", "rawtypes", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
+		@SuppressWarnings({"UnstableApiUsage", "rawtypes", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
 		private static final IRegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
 				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("children_flat.focusable"),
 						key -> UICacheRegistry.getInstance().register(key,
 								new UIAbstractCacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
 									{
 										OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
-												new OptionalWeakReference<>(this);
-										Cleaner.create(CleanerUtilities.getCleanerReferent(this),
+												new OptionalWeakReference<>(suppressThisEscapedWarning(() -> this));
+										Cleaner.create(CleanerUtilities.getCleanerReferent(suppressThisEscapedWarning(() -> this)),
 												new AutoSubscribingCompositeDisposable<>(
 														UIEventBusEntryPoint.getEventBus(),
 														new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
 																new FunctionalEventBusDisposableObserver<>(
 																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
 																		event -> {
-																	if (event.getStage().isPost())
-																		thisRef.getOptional()
-																				.ifPresent(t -> event.getComponent().getManager()
-																						.flatMap(IUIComponentManager::getView)
-																						.ifPresent(view -> t.invalidate(view)));
-																}),
-														UIConfiguration.getInstance().getLogger()
-												) {},
+																			if (event.getStage().isPost())
+																				thisRef.getOptional()
+																						.ifPresent(t -> event.getComponent().getManager()
+																								.flatMap(IUIComponentManager::getView)
+																								.ifPresent(view -> t.invalidate(view)));
+																		}),
+																UIConfiguration.getInstance().getLogger()
+														) {},
 												new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.View>(
 														new FunctionalEventBusDisposableObserver<>(
 																new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
@@ -326,17 +341,5 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		public static IRegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> getChildrenFlatFocusable() {
 			return CHILDREN_FLAT_FOCUSABLE;
 		}
-	}
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	@Override
-	protected ConcurrentMap<Class<?>, IUIViewCoordinator> getCoordinatorMap() {
-		for (Iterator<Map.Entry<Class<?>, IUIViewCoordinator>> iterator = super.getCoordinatorMap().entrySet().iterator();
-		     iterator.hasNext(); ) {
-			Map.Entry<Class<?>, IUIViewCoordinator> entry = iterator.next();
-			iterator.remove();
-			coordinatorMap.putIfAbsent(AssertionUtilities.assertNonnull(entry.getKey()), entry.getValue());
-		}
-		return coordinatorMap;
 	}
 }

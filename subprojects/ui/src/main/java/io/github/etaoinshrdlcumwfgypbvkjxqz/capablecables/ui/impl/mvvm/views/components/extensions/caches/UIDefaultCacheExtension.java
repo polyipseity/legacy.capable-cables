@@ -31,6 +31,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.regi
 import net.minecraftforge.eventbus.api.EventPriority;
 import sun.misc.Cleaner;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
+
 public class UIDefaultCacheExtension
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IExtensionContainer<INamespacePrefixedString>, IExtensionContainer<INamespacePrefixedString>>
 		implements IUICacheExtension {
@@ -65,26 +67,26 @@ public class UIDefaultCacheExtension
 	public enum CacheUniversal {
 		;
 
-		@SuppressWarnings({"ThisEscapedInObjectConstruction", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
+		@SuppressWarnings({"unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
 		private static final IRegistryObject<IUICacheType<IUIComponentManager<?>, IUIComponent>> MANAGER =
 				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("manager"),
 						key -> UICacheRegistry.getInstance().register(key,
 								new UIAbstractCacheType<IUIComponentManager<?>, IUIComponent>(key) {
 									{
 										OptionalWeakReference<? extends IUICacheType<?, IUIComponent>> thisRef =
-												new OptionalWeakReference<>(this);
-										Cleaner.create(CleanerUtilities.getCleanerReferent(this),
+												new OptionalWeakReference<>(suppressThisEscapedWarning(() -> this));
+										Cleaner.create(CleanerUtilities.getCleanerReferent(suppressThisEscapedWarning(() -> this)),
 												new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
 														new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
 																new FunctionalEventBusDisposableObserver<>(
 																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
 																		event -> {
 																			if (event.getStage().isPost())
-																		thisRef.getOptional().ifPresent(t ->
-																				t.invalidate(event.getComponent()));
-																}
-														),
-														UIConfiguration.getInstance().getLogger()
+																				thisRef.getOptional().ifPresent(t ->
+																						t.invalidate(event.getComponent()));
+																		}
+																),
+																UIConfiguration.getInstance().getLogger()
 														) {}
 												)::dispose);
 									}
@@ -96,27 +98,27 @@ public class UIDefaultCacheExtension
 												.orElseThrow(CacheLoaderLoadedNullException::new);
 									}
 								})));
-		@SuppressWarnings({"ThisEscapedInObjectConstruction", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
+		@SuppressWarnings({"unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
 		private static final IRegistryObject<IUICacheType<Integer, IUIComponent>> Z =
 				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("z"),
 						key -> UICacheRegistry.getInstance().register(key,
 								new UIAbstractCacheType<Integer, IUIComponent>(key) {
 									{
 										OptionalWeakReference<? extends IUICacheType<?, IUIComponent>> thisRef =
-												new OptionalWeakReference<>(this);
-										Cleaner.create(CleanerUtilities.getCleanerReferent(this),
+												new OptionalWeakReference<>(suppressThisEscapedWarning(() -> this));
+										Cleaner.create(CleanerUtilities.getCleanerReferent(suppressThisEscapedWarning(() -> this)),
 												new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
 														new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
 																new FunctionalEventBusDisposableObserver<>(
 																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
 																		event -> {
 																			if (event.getStage().isPost())
-																		thisRef.getOptional().ifPresent(t ->
-																				t.invalidate(event.getComponent()));
-																}
-														),
-														UIConfiguration.getInstance().getLogger()
-												) {}
+																				thisRef.getOptional().ifPresent(t ->
+																						t.invalidate(event.getComponent()));
+																		}
+																),
+																UIConfiguration.getInstance().getLogger()
+														) {}
 										)::dispose);
 							}
 

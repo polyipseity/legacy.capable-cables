@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIContextContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIInfrastructure;
@@ -29,16 +30,24 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
+
 public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, B extends IBinder>
 		implements IUIInfrastructure<V, VM, B> {
 	private final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
 	private final CompositeDisposable binderDisposables = new CompositeDisposable();
-	private V view;
-	private VM viewModel;
-	private B binder;
+	private @Nullable V internalView;
+	private @Nullable VM internalViewModel;
+	private @Nullable B internalBinder;
 	private boolean bound = false;
 
 	private final Supplier<@Nonnull Optional<DisposableObserver<IBinderAction>>> binderObserverSupplier;
+
+	public static <V extends IUIView<?>,
+			VM extends IUIViewModel<?>,
+			B extends IBinder> UIDefaultInfrastructure<V, VM, B> of(V view, VM viewModel, B binder) {
+		return IUIInfrastructure.create(UIDefaultInfrastructure::new, view, viewModel, binder);
+	}
 
 	@Override
 	@Deprecated
@@ -50,8 +59,28 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 	@Override
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtensionImpl(getExtensions(), key); }
 
+	@SuppressWarnings("RedundantTypeArguments")
+	protected UIDefaultInfrastructure() {
+		OptionalWeakReference<UIDefaultInfrastructure<V, VM, B>> thisWeakReference = new OptionalWeakReference<>(suppressThisEscapedWarning(() -> this));
+		this.binderObserverSupplier = () -> thisWeakReference.getOptional().map(UIDefaultInfrastructure<V, VM, B>::createBinderActionObserver);
+	}
+
+	protected Optional<? extends V> getInternalView() {
+		return Optional.ofNullable(internalView);
+	}
+
+	protected Optional<? extends VM> getInternalViewModel() {
+		return Optional.ofNullable(internalViewModel);
+	}
+
+	protected Optional<? extends B> getInternalBinder() {
+		return Optional.ofNullable(internalBinder);
+	}
+
 	@Override
-	public V getView() { return view; }
+	public V getView() {
+		return getInternalView().orElseThrow(IllegalStateException::new);
+	}
 
 	@Override
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return IExtensionContainer.getExtensionImpl(getExtensions(), key); }
@@ -60,26 +89,19 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 	public Map<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
 
 	@Override
-	public VM getViewModel() { return viewModel; }
+	public VM getViewModel() {
+		return getInternalViewModel().orElseThrow(IllegalStateException::new);
+	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() { return extensions; }
 
 	@Override
-	public B getBinder() { return binder; }
-
-	@SuppressWarnings({"ThisEscapedInObjectConstruction", "RedundantTypeArguments"})
-	public UIDefaultInfrastructure(V view, VM viewModel, B binder) {
-		this.view = view;
-		this.viewModel = viewModel;
-		this.binder = binder;
-
-		view.setInfrastructure(this);
-		viewModel.setInfrastructure(this);
-
-		OptionalWeakReference<UIDefaultInfrastructure<V, VM, B>> thisWeakReference = new OptionalWeakReference<>(this);
-		this.binderObserverSupplier = () -> thisWeakReference.getOptional().map(UIDefaultInfrastructure<V, VM, B>::createBinderActionObserver);
+	public B getBinder() {
+		return getInternalBinder().orElseThrow(IllegalStateException::new);
 	}
+
+
 
 	protected DisposableObserver<IBinderAction> createBinderActionObserver() {
 		return new BinderActionDelegatingDisposableObserver(createBinderActionObserver(getBinder()), getBinderDisposables());
@@ -106,8 +128,8 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 	@Override
 	public void setView(V view) {
 		IUIInfrastructure.checkBoundState(isBound(), false);
-		getView().setInfrastructure(null);
-		this.view = view;
+		getInternalView().ifPresent(internalView -> internalView.setInfrastructure(null));
+		this.internalView = view;
 		getView().setInfrastructure(this);
 	}
 
@@ -158,15 +180,15 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 	@Override
 	public void setViewModel(VM viewModel) {
 		IUIInfrastructure.checkBoundState(isBound(), false);
-		getViewModel().setInfrastructure(null);
-		this.viewModel = viewModel;
+		getInternalViewModel().ifPresent(internalViewModel -> internalViewModel.setInfrastructure(null));
+		this.internalViewModel = viewModel;
 		getViewModel().setInfrastructure(this);
 	}
 
 	@Override
 	public void setBinder(B binder) {
 		IUIInfrastructure.checkBoundState(isBound(), false);
-		this.binder = binder;
+		this.internalBinder = binder;
 	}
 
 	protected CompositeDisposable getBinderDisposables() { return binderDisposables; }

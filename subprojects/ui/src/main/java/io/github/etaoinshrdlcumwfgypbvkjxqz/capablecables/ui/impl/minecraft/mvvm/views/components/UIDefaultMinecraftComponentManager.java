@@ -23,6 +23,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
+
 @OnlyIn(Dist.CLIENT)
 public class UIDefaultMinecraftComponentManager
 		extends UIDefaultComponentManager<Rectangle2D>

@@ -25,15 +25,16 @@ import sun.misc.Cleaner;
 import java.util.*;
 import java.util.stream.BaseStream;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
+
 public class UIDefaultComponentShapeAnchorController
 		extends DefaultShapeAnchorController<IUIComponent>
 		implements IUIComponentShapeAnchorController {
 
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public UIDefaultComponentShapeAnchorController() {
-		Cleaner.create(CleanerUtilities.getCleanerReferent(this),
+		Cleaner.create(CleanerUtilities.getCleanerReferent(suppressThisEscapedWarning(() -> this)),
 				new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
-						new ModifyShapeDescriptorObserver(this, UIConfiguration.getInstance().getLogger())
+						new ModifyShapeDescriptorObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger())
 				)::dispose);
 	}
 

@@ -60,6 +60,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
+
 @OnlyIn(Dist.CLIENT)
 public class UIMinecraftScreenAdapter
 		<I extends IUIMinecraftInfrastructure<?, ?, ?>, C extends Container>
@@ -91,7 +93,6 @@ public class UIMinecraftScreenAdapter
 	@Nullable
 	private ImmutableMouseButtonClickData lastMouseClickData = null;
 
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	protected UIMinecraftScreenAdapter(ITextComponent title, I infrastructure, @Nullable C containerObject, Set<Integer> closeKeys, Set<Integer> changeFocusKeys) {
 		super(title);
 		this.title = title;
@@ -102,7 +103,7 @@ public class UIMinecraftScreenAdapter
 		this.changeFocusKeys = Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(changeFocusKeys.size()).makeMap());
 		this.changeFocusKeys.addAll(changeFocusKeys);
 
-		IExtensionContainer.addExtensionChecked(this.infrastructure, new UIDefaultMinecraftScreenProviderExtension(this));
+		IExtensionContainer.addExtensionChecked(this.infrastructure, new UIDefaultMinecraftScreenProviderExtension(suppressThisEscapedWarning(() -> this)));
 		if (containerObject != null)
 			IExtensionContainer.addExtensionChecked(this.infrastructure, new UIImmutableMinecraftContainerProviderExtension(this.containerObject));
 	}

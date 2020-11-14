@@ -11,15 +11,16 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.stream.Collectors;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
+
 public class ArrayAffineTransformStack
 		extends AbstractAffineTransformStack {
 	private final Deque<AffineTransform> data;
 
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public ArrayAffineTransformStack(int initialCapacity) {
 		this.data = new ArrayDeque<>(initialCapacity);
 		this.data.push(new AffineTransform());
-		Cleaner.create(CleanerUtilities.getCleanerReferent(this), new LeakNotifier(this.data, UIConfiguration.getInstance().getLogger()));
+		Cleaner.create(CleanerUtilities.getCleanerReferent(suppressThisEscapedWarning(() -> this)), new LeakNotifier(this.data, UIConfiguration.getInstance().getLogger()));
 	}
 
 	@Override

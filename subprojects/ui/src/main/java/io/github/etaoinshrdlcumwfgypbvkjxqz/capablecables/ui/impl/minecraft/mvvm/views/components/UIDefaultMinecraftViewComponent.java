@@ -29,30 +29,40 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIAbstractViewBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.DelayedFieldInitializer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftOpenGLUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.paths.FunctionalPath;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EventBusUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.awt.*;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentMap;
 
 @OnlyIn(Dist.CLIENT)
 public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		extends UIAbstractViewComponent<S, M>
 		implements IUIMinecraftViewComponent<S, M> {
+	private final DelayedFieldInitializer<ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>>> extensionsInitializer;
 
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	@UIViewComponentConstructor
 	public UIDefaultMinecraftViewComponent(UIViewComponentConstructor.IArguments arguments) {
 		super(arguments);
 
-		IExtensionContainer.addExtensionChecked(this, new UIDefaultMinecraftBackgroundExtension()); // COMMENT to ensure that 'GuiScreenEvent.BackgroundDrawnEvent' is fired
+		this.extensionsInitializer = new DelayedFieldInitializer<>(field ->
+				IExtensionContainer.addExtensionChecked(this, new UIDefaultMinecraftBackgroundExtension()) /* COMMENT to ensure that 'GuiScreenEvent.BackgroundDrawnEvent' is fired */);
+	}
+
+	@Override
+	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() {
+		return extensionsInitializer.apply(super.getExtensions());
 	}
 
 	@Override
@@ -62,27 +72,27 @@ public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUICompo
 		IUIView.getAnimationController(this).render();
 		getManager()
 				.ifPresent(manager -> {
-							try (IUIComponentContext componentContext = createComponentContext()
-									.orElseThrow(IllegalStateException::new)) {
-								EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
-											EnumMinecraftCropMethod cropMethod = EnumMinecraftCropMethod.getBestMethod();
-											cropMethod.enable();
-											IUIViewComponent.traverseComponentTreeDefault(componentContext,
-													manager,
-													(componentContext2, result) -> {
-														assert result != null;
-														assert componentContext2 != null;
-														IUIComponentMinecraft component = (IUIComponentMinecraft) result.getComponent();
-														IUIComponentModifier.streamSpecificModifiersUnion(result.getModifiersView(), IUIComponentRendererInvokerModifier.class)
-																.forEachOrdered(modifierIntersection -> {
-																	IUIComponentModifier left = modifierIntersection.getLeft();
-																	IUIComponentRendererInvokerModifier right = modifierIntersection.getRight();
-																	EnumModifyStage.PRE.advanceModifyStage(left);
-																	right.invokeRenderer(componentContext2); // COMMENT pre
-																	left.resetModifyStage();
-																});
-														component.getRendererContainer().getRenderer()
-																.ifPresent(renderer ->
+					try (IUIComponentContext componentContext = createComponentContext()
+							.orElseThrow(IllegalStateException::new)) {
+						EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
+									EnumMinecraftCropMethod cropMethod = EnumMinecraftCropMethod.getBestMethod();
+									cropMethod.enable();
+									IUIViewComponent.traverseComponentTreeDefault(componentContext,
+											manager,
+											(componentContext2, result) -> {
+												assert result != null;
+												assert componentContext2 != null;
+												IUIComponentMinecraft component = (IUIComponentMinecraft) result.getComponent();
+												IUIComponentModifier.streamSpecificModifiersUnion(result.getModifiersView(), IUIComponentRendererInvokerModifier.class)
+														.forEachOrdered(modifierIntersection -> {
+															IUIComponentModifier left = modifierIntersection.getLeft();
+															IUIComponentRendererInvokerModifier right = modifierIntersection.getRight();
+															EnumModifyStage.PRE.advanceModifyStage(left);
+															right.invokeRenderer(componentContext2); // COMMENT pre
+															left.resetModifyStage();
+														});
+												component.getRendererContainer().getRenderer()
+														.ifPresent(renderer ->
 																		renderer.render(componentContext2, EnumRenderStage.PRE_CHILDREN,
 																				CastUtilities.castUnchecked(component),
 																				partialTicks)

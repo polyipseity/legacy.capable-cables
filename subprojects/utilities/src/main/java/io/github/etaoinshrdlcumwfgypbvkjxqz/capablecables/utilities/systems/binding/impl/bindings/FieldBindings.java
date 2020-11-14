@@ -23,18 +23,19 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
+
 public class FieldBindings
 		extends AbstractBindings<IBindingField<?>> {
 	private final Map<IBindingField<?>, Disposable> fields =
 			MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacityTiny()).makeMap();
 	private final AtomicBoolean isSource = new AtomicBoolean(true);
 
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	public FieldBindings(INamespacePrefixedString bindingKey,
 	                     Supplier<@Nonnull ? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>>> transformersSupplier) {
 		super(bindingKey, transformersSupplier);
 		@SuppressWarnings("UnnecessaryLocalVariable") Map<IBindingField<?>, Disposable> fieldsRef = fields;
-		Cleaner.create(CleanerUtilities.getCleanerReferent(this), () ->
+		Cleaner.create(CleanerUtilities.getCleanerReferent(suppressThisEscapedWarning(() -> this)), () ->
 				fieldsRef.values().stream().unordered().forEach(Disposable::dispose));
 	}
 
@@ -48,16 +49,15 @@ public class FieldBindings
 					assert f != null;
 					getFields().keySet().stream().unordered()
 							.findAny()
-							.ifPresent(IThrowingConsumer.executeNow(fc -> {
-								assert fc != null;
-								f.setValue(CastUtilities.castUnchecked( // COMMENT should be of the right type
-												transform(getTransformers(),
-														CastUtilities.castUnchecked(fc.getValue()), // COMMENT should be always safe
-														fc.getTypeToken().getRawType(),
-														f.getTypeToken().getRawType()
-												)
-								));
-							}));
+							.ifPresent(IThrowingConsumer.executeNow(fc ->
+									f.setValue(CastUtilities.castUnchecked( // COMMENT should be of the right type
+											transform(getTransformers(),
+													CastUtilities.castUnchecked(fc.getValue()), // COMMENT should be always safe
+													fc.getTypeToken().getRawType(),
+													f.getTypeToken().getRawType()
+											)
+									))
+							));
 					DisposableObserver<?> d = createSynchronizationObserver(f, getFields().keySet(), getTransformers(), getIsSource());
 					getFields().put(f, d);
 					f.getField().getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
@@ -80,18 +80,17 @@ public class FieldBindings
 					try {
 						Streams.stream(to).unordered()
 								.filter(FunctionUtilities.notPredicate(Predicate.isEqual(from)))
-								.forEach(IThrowingConsumer.executeNow(destination -> {
-									assert destination != null;
-									destination.setValue(
-											CastUtilities.castUnchecked( // COMMENT should be of the correct type
-															transform(transformers,
-																	t,
-																	from.getTypeToken().getRawType(),
-																	destination.getTypeToken().getRawType()
-															)
-											)
-									);
-								}));
+								.forEach(IThrowingConsumer.executeNow(destination ->
+										destination.setValue(
+												CastUtilities.castUnchecked( // COMMENT should be of the correct type
+														transform(transformers,
+																t,
+																from.getTypeToken().getRawType(),
+																destination.getTypeToken().getRawType()
+														)
+												)
+										)
+								));
 					} catch (NoSuchBindingTransformerException e) {
 						onError(e);
 					} finally {

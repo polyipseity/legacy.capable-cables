@@ -11,7 +11,9 @@ public enum CleanerUtilities {
 			CacheUtilities.newCacheBuilderNormalThreaded().initialCapacity(CapacityUtilities.getInitialCapacityEnormous()).weakKeys()
 					.build(CacheLoader.from(Object::new));
 
-	public static Object getCleanerReferent(Object object) { return getCleanerReferentMap().getUnchecked(object); }
+	public static Object getCleanerReferent(Object object) {
+		return getCleanerReferentMap().getUnchecked(object);
+	}
 
 	@SuppressWarnings("SameReturnValue")
 	private static LoadingCache<Object, Object> getCleanerReferentMap() { return CLEANER_REFERENT_MAP; }
