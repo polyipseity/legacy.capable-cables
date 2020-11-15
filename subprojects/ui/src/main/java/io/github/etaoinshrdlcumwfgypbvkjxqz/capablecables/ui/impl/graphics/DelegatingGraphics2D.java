@@ -22,8 +22,7 @@ import java.util.function.Function;
 
 public class DelegatingGraphics2D
 		extends Graphics2D {
-	@NonNls
-	private static final @Immutable Map<String, Function<@Nonnull DelegatingGraphics2D, @Nullable ?>> OBJECT_VARIABLE_MAP =
+	private static final @NonNls Map<String, Function<@Nonnull DelegatingGraphics2D, @Nullable ?>> OBJECT_VARIABLE_MAP =
 			ImmutableMap.<String, Function<@Nonnull DelegatingGraphics2D, @Nullable ?>>builder()
 					.put("delegate", DelegatingGraphics2D::getDelegate)
 					.build();
@@ -41,8 +40,6 @@ public class DelegatingGraphics2D
 
 	@Override
 	public void draw(Shape s) {getDelegate().draw(s);}
-
-	public static @Immutable Map<String, Function<@Nonnull DelegatingGraphics2D, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 
 	@Override
 	public void drawImage(BufferedImage img, BufferedImageOp op, int x, int y) {getDelegate().drawImage(img, op, x, y);}
@@ -279,7 +276,7 @@ public class DelegatingGraphics2D
 
 	@Override
 	public String toString() {
-		return ObjectUtilities.toStringImpl(this, getObjectVariableMap());
+		return ObjectUtilities.toStringImpl(this, getObjectVariableMapView());
 	}
 
 	@Override
@@ -291,15 +288,19 @@ public class DelegatingGraphics2D
 	@Override
 	public Rectangle getClipBounds(Rectangle r) {return getDelegate().getClipBounds(r);}
 
+	public static @Immutable @NonNls Map<String, Function<@Nonnull DelegatingGraphics2D, @Nullable ?>> getObjectVariableMapView() { return ImmutableMap.copyOf(getObjectVariableMap()); }
+
+	private static @NonNls Map<String, Function<@Nonnull DelegatingGraphics2D, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
+
 	@Override
 	public int hashCode() {
-		return ObjectUtilities.hashCodeImpl(this, getObjectVariableMap().values());
+		return ObjectUtilities.hashCodeImpl(this, getObjectVariableMapView().values());
 	}
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	public boolean equals(Object o) {
-		return ObjectUtilities.equalsImpl(this, o, DelegatingGraphics2D.class, true, getObjectVariableMap().values());
+		return ObjectUtilities.equalsImpl(this, o, DelegatingGraphics2D.class, true, getObjectVariableMapView().values());
 	}
 
 

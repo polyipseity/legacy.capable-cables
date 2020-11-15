@@ -10,6 +10,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIContextContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.adapters.IUIAdapter;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.extensions.cursors.ICursorHandleProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.extensions.cursors.IUICursorHandleProviderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventKeyboard;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventMouse;
@@ -24,10 +25,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.UIImmutab
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.viewmodels.UIImmutableViewModelContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.UIImmutableViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.UIInputUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftOpenGLUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTextComponentUtilities;
@@ -113,17 +111,27 @@ public class UIMinecraftScreenAdapter
 
 	public void setTitle(ITextComponent title) { this.title = title; }
 
+	private long lastCursorHandle = MemoryUtilities.getInvalidAddress();
+
+	protected long getLastCursorHandle() {
+		return lastCursorHandle;
+	}
+
 	@Override
 	@Deprecated
 	public void render(int mouseX, int mouseY, float partialTicks) {
 		IUIContextContainer context = getContextContainer();
 		getInfrastructure().getView().render(context.getViewContext(), partialTicks);
-		IUICursorHandleProviderExtension.StaticHolder.getType().getValue().find(getInfrastructure().getView()).ifPresent(ext ->
-				GLFW.glfwSetCursor(
-						MinecraftOpenGLUtilities.getWindowHandle(),
-						ext.getCursorHandle().orElse(MemoryUtil.NULL)
-				)
-		);
+		setCursorHandle(IUICursorHandleProviderExtension.StaticHolder.getType().getValue().find(getInfrastructure().getView())
+				.flatMap(ICursorHandleProvider::getCursorHandle)
+				.orElse(MemoryUtil.NULL));
+	}
+
+	protected void setCursorHandle(long cursorHandle) {
+		if (this.lastCursorHandle != cursorHandle) {
+			GLFW.glfwSetCursor(MinecraftOpenGLUtilities.getWindowHandle(),
+					this.lastCursorHandle = cursorHandle);
+		}
 	}
 
 	protected IUIContextContainer getContextContainer() { return contextContainer; }
@@ -196,6 +204,7 @@ public class UIMinecraftScreenAdapter
 		IUIInfrastructure.bindSafe(getInfrastructure(), getContextContainer());
 		setSize(width, height);
 		getInfrastructure().initialize();
+		setCursorHandle(MemoryUtil.NULL);
 	}
 
 	@Override
@@ -207,7 +216,7 @@ public class UIMinecraftScreenAdapter
 	public void removed() {
 		IUIContextContainer context = getContextContainer();
 
-		GLFW.glfwSetCursor(MinecraftOpenGLUtilities.getWindowHandle(), MemoryUtil.NULL);
+		setCursorHandle(MemoryUtil.NULL);
 		{
 			// COMMENT generate opposite synthetic events
 			// COMMENT NO default actions

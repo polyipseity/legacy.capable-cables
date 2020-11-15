@@ -11,7 +11,7 @@ public enum PrimitiveUtilities {
 	;
 
 
-	static final ImmutableMap<Class<?>, Object> PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP =
+	private static final ImmutableMap<Class<?>, Object> PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP =
 			ImmutableMap.<Class<?>, Object>builder()
 					.put(int.class, 0)
 					.put(float.class, 0F)

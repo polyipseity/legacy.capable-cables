@@ -50,7 +50,7 @@ public final class ImmutableUnion<L, R>
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		return ObjectUtilities.equalsImpl(this, o, CastUtilities.<Class<ITuple2<?, ?>>>castUnchecked(IUnion.class), true, StaticHolder.getObjectVariableMap().values());
 	}
 

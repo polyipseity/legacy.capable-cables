@@ -99,7 +99,7 @@ public final class MinecraftSurfaceData
 
 	@Override
 	public Raster getRaster(int x, int y, int w, int h) {
-		return getFullRaster().createWritableChild(x, y, w, h, x, y, null);
+		return getFullRaster(); // COMMENT avoid creation of objects
 	}
 
 	protected WritableRaster getFullRaster() {

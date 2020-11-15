@@ -53,7 +53,7 @@ public final class ImmutableIntersection<L, R>
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@Nullable Object o) {
 		return ObjectUtilities.equalsImpl(this, o, CastUtilities.<Class<IIntersection<?, ?>>>castUnchecked(IIntersection.class), true, StaticHolder.getObjectVariableMap().values());
 	}
 

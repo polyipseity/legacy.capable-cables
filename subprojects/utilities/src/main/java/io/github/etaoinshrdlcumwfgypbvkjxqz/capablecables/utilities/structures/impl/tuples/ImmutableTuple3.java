@@ -3,21 +3,25 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple3;
 
-public final class ImmutableTuple2<L, R>
+public final class ImmutableTuple3<L, M, R>
 		extends AbstractTuple
-		implements ITuple2<L, R> {
+		implements ITuple3<L, M, R> {
 	private final L left;
+	private final M middle;
 	private final R right;
 
-	private ImmutableTuple2(L left, R right) {
-		super(left, right);
+	private ImmutableTuple3(L left, M middle, R right) {
+		super(left, middle, right);
 		this.left = left;
+		this.middle = middle;
 		this.right = right;
 	}
 
-	public static <L, R> ImmutableTuple2<L, R> of(L left, R right) { return new ImmutableTuple2<>(left, right); }
+	public static <L, M, R> ImmutableTuple3<L, M, R> of(L left, M middle, R right) {
+		return new ImmutableTuple3<>(left, middle, right);
+	}
 
 	@Override
 	public L getLeft() {
@@ -25,13 +29,13 @@ public final class ImmutableTuple2<L, R>
 	}
 
 	@Override
-	public R getRight() {
-		return right;
+	public M getMiddle() {
+		return middle;
 	}
 
 	@Override
-	public ITuple2<R, L> swap() {
-		return of(getRight(), getLeft());
+	public R getRight() {
+		return right;
 	}
 
 	@Override
@@ -42,7 +46,7 @@ public final class ImmutableTuple2<L, R>
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	public boolean equals(@Nullable Object o) {
-		return ObjectUtilities.equalsImpl(this, o, CastUtilities.<Class<ITuple2<?, ?>>>castUnchecked(ITuple2.class), true, StaticHolder.getObjectVariableMap().values());
+		return ObjectUtilities.equalsImpl(this, o, CastUtilities.<Class<ITuple3<?, ?, ?>>>castUnchecked(ITuple3.class), true, StaticHolder.getObjectVariableMap().values());
 	}
 
 	@Override

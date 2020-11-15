@@ -18,6 +18,11 @@ public abstract class AbstractTuple
 		return getData()[index];
 	}
 
+	@Override
+	public int size() {
+		return getData().length;
+	}
+
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Object[] getData() { return data; }
 }

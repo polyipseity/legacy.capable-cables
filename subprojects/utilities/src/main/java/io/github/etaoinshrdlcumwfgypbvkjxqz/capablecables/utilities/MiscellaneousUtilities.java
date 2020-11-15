@@ -2,9 +2,11 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.PrimitiveUtilities.PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP;
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.PrimitiveUtilities.getPrimitiveDataTypeToDefaultValueMap;
 
 /**
  * Contains utilities that are hard or too small to be categorized.
@@ -19,11 +21,11 @@ public enum MiscellaneousUtilities {
 	@SuppressWarnings("unchecked")
 	public static <T> Optional<T> getDefaultValue(@Nullable Class<T> type) {
 		return Optional.ofNullable(type)
-				.flatMap(t ->
-						PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP.entrySet().stream().unordered()
-								.filter(e -> AssertionUtilities.assertNonnull(e.getKey()).isAssignableFrom(t))
-								.findAny())
-				.map(e -> (T) e.getValue());
+				.map(t -> getPrimitiveDataTypeToDefaultValueMap().entrySet().stream().unordered()
+						.filter(e -> AssertionUtilities.assertNonnull(e.getKey()).isAssignableFrom(t)))
+				.flatMap(Stream::findAny)
+				.map(Map.Entry::getValue)
+				.map(e -> (T) e);
 	}
 
 	/**
