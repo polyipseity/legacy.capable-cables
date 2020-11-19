@@ -36,7 +36,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIDefa
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.JAXBImmutableAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ColorUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftClientUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTextComponentUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinder;
@@ -55,6 +54,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.exte
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputPointerDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time.core.ITicker;
+import io.netty.buffer.Unpooled;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import jakarta.xml.bind.JAXBException;
 import net.minecraft.block.Block;
@@ -67,6 +67,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ActionResultType;
@@ -411,13 +412,13 @@ public enum UIMinecraftDebug {
 
 	private static final class DebugContainer extends Container {
 		private static final Supplier<@Nonnull ContainerType<DebugContainer>> TYPE_INSTANCE = Suppliers.memoize(() ->
-				IForgeContainerType.create((windowId, inv, data) ->
-						new DebugContainer(windowId, AssertionUtilities.assertNonnull(MinecraftClientUtilities.getMinecraftNonnull().world), data.readBlockPos())));
+				IForgeContainerType.create((windowID, inv, data) ->
+						new DebugContainer(windowID, AssertionUtilities.assertNonnull(inv.player.getEntityWorld().getTileEntity(data.readBlockPos())))));
 		private final TileEntity tileEntity;
 
-		private DebugContainer(int id, World world, BlockPos pos) {
+		private DebugContainer(int id, TileEntity tileEntity) {
 			super(getTypeInstance(), id);
-			tileEntity = requireNonNull(world.getTileEntity(pos));
+			this.tileEntity = tileEntity;
 		}
 
 		private static ContainerType<DebugContainer> getTypeInstance() { return AssertionUtilities.assertNonnull(TYPE_INSTANCE.get()); }
@@ -446,12 +447,9 @@ public enum UIMinecraftDebug {
 		@SuppressWarnings("deprecation")
 		@Override
 		public @Nonnull ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-			if (!worldIn.isRemote) {
-				TileEntity tileEntity = requireNonNull(worldIn.getTileEntity(pos));
-				if (tileEntity instanceof INamedContainerProvider)
-					NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) tileEntity, tileEntity.getPos());
-				else
-					throw new InternalError();
+			if (!worldIn.isRemote()) {
+				TileEntity tileEntity = AssertionUtilities.assertNonnull(worldIn.getTileEntity(pos));
+				NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) tileEntity, tileEntity.getPos());
 			}
 			return ActionResultType.SUCCESS;
 		}
@@ -461,12 +459,18 @@ public enum UIMinecraftDebug {
 		private static final Supplier<@Nonnull TileEntityType<DebugTileEntity>> TYPE_INSTANCE = Suppliers.memoize(() ->
 				TileEntityType.Builder.create(DebugTileEntity::new, DebugBlock.getInstance()).build(null));
 
-		private DebugTileEntity() { super(requireNonNull(getTypeInstance())); }
+		private DebugTileEntity() {
+			super(getTypeInstance());
+		}
 
-		private static TileEntityType<DebugTileEntity> getTypeInstance() { return AssertionUtilities.assertNonnull(TYPE_INSTANCE.get()); }
+		private static TileEntityType<DebugTileEntity> getTypeInstance() {
+			return AssertionUtilities.assertNonnull(TYPE_INSTANCE.get());
+		}
 
 		@Override
-		public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) { return new DebugContainer(id, requireNonNull(getWorld()), getPos()); }
+		public Container createMenu(int id, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+			return DebugContainer.getTypeInstance().create(id, playerInventory, new PacketBuffer(Unpooled.buffer(Long.BYTES)).writeBlockPos(getPos()));
+		}
 
 		@Override
 		public @Nonnull ITextComponent getDisplayName() { return UIMinecraftDebug.getDisplayName(); }

@@ -46,7 +46,7 @@ public final class UIConfiguration
 			because Mac is immutable.
 
 			See https://github.com/LWJGL/lwjgl3/issues/306#issuecomment-300481571.
-			 */
+			*/
 			System.setProperty("java.awt.headless", "true");
 
 			UIEventBusEntryPoint.setEventBus(EventBusSubject.getUIEventBus());

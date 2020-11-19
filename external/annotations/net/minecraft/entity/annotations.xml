@@ -1,0 +1,5 @@
+<root>
+	<item name='net.minecraft.entity.Entity net.minecraft.world.World getEntityWorld()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull'/>
+	</item>
+</root>
