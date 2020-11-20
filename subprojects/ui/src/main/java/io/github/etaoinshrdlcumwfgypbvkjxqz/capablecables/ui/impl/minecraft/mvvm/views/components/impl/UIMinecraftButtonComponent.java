@@ -3,13 +3,15 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvv
 import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.UIProperty;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIComponentArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIRendererArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIComponentConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.binding.UIProperty;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIComponentConstructor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.rendering.IUIMinecraftComponentRenderer;
@@ -34,8 +36,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
-
 @OnlyIn(Dist.CLIENT)
 public class UIMinecraftButtonComponent
 		extends UIButtonComponent
@@ -46,7 +46,7 @@ public class UIMinecraftButtonComponent
 					UIDefaultRendererContainerContainer.createRendererContainerInitializer(DefaultRenderer.class));
 
 	@UIComponentConstructor
-	public UIMinecraftButtonComponent(UIComponentConstructor.IArguments arguments) { super(arguments); }
+	public UIMinecraftButtonComponent(IUIComponentArguments arguments) { super(arguments); }
 
 	@Override
 	public IUIRendererContainer<? extends IUIMinecraftComponentRenderer<?>> getRendererContainer()
@@ -124,7 +124,7 @@ public class UIMinecraftButtonComponent
 		private final IBindingField<Color> pressedBorderColor;
 
 		@UIRendererConstructor
-		public DefaultRenderer(UIRendererConstructor.IArguments arguments) {
+		public DefaultRenderer(IUIRendererArguments arguments) {
 			super(arguments);
 
 			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();

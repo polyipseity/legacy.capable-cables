@@ -7,6 +7,9 @@ import com.google.common.collect.SetMultimap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.UIProperty;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIExtensionArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.cursors.ICursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
@@ -21,8 +24,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.eve
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIComponentRendererInvokerModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.binding.UIProperty;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.cursors.EnumGLFWCursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIFunctionalEventListener;
@@ -83,7 +84,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 
 	@SuppressWarnings("unchecked")
 	@UIExtensionConstructor
-	public UITeleportingComponentUserResizableExtension(UIExtensionConstructor.IArguments arguments) {
+	public UITeleportingComponentUserResizableExtension(IUIExtensionArguments arguments) {
 		super((Class<C>) arguments.getContainerClass());
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();

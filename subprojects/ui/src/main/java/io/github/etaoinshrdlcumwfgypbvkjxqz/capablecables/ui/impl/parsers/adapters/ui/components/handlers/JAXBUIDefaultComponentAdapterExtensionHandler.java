@@ -6,12 +6,14 @@ import com.google.common.collect.Iterables;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.AnyContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Extension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIExtensionArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.extensions.IUIExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ui.components.contexts.IJAXBUIComponentAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ui.components.contexts.IJAXBUIComponentBasedAdapterContext;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIExtensionConstructor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.JAXBUIDefaultComponentAdapter;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableExtensionArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.JAXBUIComponentUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.contexts.JAXBUIImmutableComponentAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
@@ -40,8 +42,8 @@ public class JAXBUIDefaultComponentAdapterExtensionHandler
 				.flatMap(container -> CastUtilities.castChecked(IExtensionContainer.class, container))
 				.map(CastUtilities::<IExtensionContainer<?>>castUnchecked)
 				.ifPresent(container -> {
-					Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = JAXBUIDefaultComponentAdapter.createMappings(context, left.getProperty());
-					UIExtensionConstructor.IArguments argument = new UIExtensionConstructor.ImmutableArguments(mappings, container.getClass());
+					Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = JAXBUIComponentUtilities.createMappings(context, left.getProperty());
+					IUIExtensionArguments argument = new UIImmutableExtensionArguments(mappings, container.getClass());
 
 					Class<?> clazz = AssertionUtilities.assertNonnull(subContext.getAliasesView().get(left.getClazz()));
 					Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIExtensionConstructor.class,
@@ -56,7 +58,7 @@ public class JAXBUIDefaultComponentAdapterExtensionHandler
 
 					IUIExtension<?, ?> ret;
 					try {
-						ret = (IUIExtension<?, ?>) constructorHandle.invokeExact((UIExtensionConstructor.IArguments) argument);
+						ret = (IUIExtension<?, ?>) constructorHandle.invokeExact((IUIExtensionArguments) argument);
 					} catch (Throwable throwable) {
 						throw ThrowableUtilities.propagate(throwable);
 					}

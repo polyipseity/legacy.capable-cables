@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.binding;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding;
 
 import java.lang.annotation.*;
 

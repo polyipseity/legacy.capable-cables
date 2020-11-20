@@ -8,6 +8,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.UIProperty;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIComponentArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
@@ -15,8 +18,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.binding.UIProperty;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIDefaultEventTarget;
@@ -89,7 +90,7 @@ public class UIDefaultComponent
 	private final DelayedFieldInitializer<ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>>> extensionsInitializer;
 
 	@UIComponentConstructor
-	public UIDefaultComponent(UIComponentConstructor.IArguments arguments) {
+	public UIDefaultComponent(IUIComponentArguments arguments) {
 		this.name = arguments.getName().orElse(null);
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();

@@ -7,6 +7,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIFacade;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationControl;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIRendererArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
@@ -15,7 +17,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.eve
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventKeyboard;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventMouse;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBAdapterRegistry;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeDescriptorProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming.IUITheme;
@@ -252,7 +253,7 @@ public enum UIMinecraftDebug {
 							UIStandardAnimationControlFactory.getInfiniteLoop());
 
 			@UIRendererConstructor
-			public CustomWindowMinecraftComponentRenderer(UIRendererConstructor.IArguments arguments) { super(arguments); }
+			public CustomWindowMinecraftComponentRenderer(IUIRendererArguments arguments) { super(arguments); }
 
 			@Override
 			@SuppressWarnings({"rawtypes", "RedundantSuppression"})

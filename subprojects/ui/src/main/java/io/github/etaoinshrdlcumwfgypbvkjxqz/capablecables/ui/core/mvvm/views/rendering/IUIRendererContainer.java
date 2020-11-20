@@ -4,8 +4,10 @@ import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIRendererArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamed;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIRendererConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableRendererArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.AnnotationUtilities;
@@ -60,13 +62,13 @@ public interface IUIRendererContainer<R extends IUIRenderer<?>>
 		MethodHandle constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
 		constructorHandle = constructorHandle.asType(constructorHandle.type().changeReturnType(IUIRenderer.class));
 
-		UIRendererConstructor.IArguments argument = new UIRendererConstructor.ImmutableArguments(
+		IUIRendererArguments argument = new UIImmutableRendererArguments(
 				ImmutableMap.of(),
 				rendererContainer.getContainer()
 						.orElseThrow(IllegalStateException::new).getClass()
 		);
 
-		return (IUIRenderer<?>) constructorHandle.invokeExact((UIRendererConstructor.IArguments) argument);
+		return (IUIRenderer<?>) constructorHandle.invokeExact((IUIRendererArguments) argument);
 	}
 
 	Optional<? extends IUIRendererContainerContainer<?>> getContainer();

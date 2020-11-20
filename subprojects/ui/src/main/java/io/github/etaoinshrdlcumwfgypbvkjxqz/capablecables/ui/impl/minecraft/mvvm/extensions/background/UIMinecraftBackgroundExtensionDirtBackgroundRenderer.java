@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.extensions.background;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIRendererConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIRendererArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.utilities.UIMinecraftBackgrounds;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.api.distmarker.Dist;
@@ -12,7 +13,7 @@ import java.awt.geom.Point2D;
 public class UIMinecraftBackgroundExtensionDirtBackgroundRenderer
 		extends UIMinecraftBackgroundExtensionEmptyBackgroundRenderer {
 	@UIRendererConstructor
-	public UIMinecraftBackgroundExtensionDirtBackgroundRenderer(UIRendererConstructor.IArguments arguments) {
+	public UIMinecraftBackgroundExtensionDirtBackgroundRenderer(IUIRendererArguments arguments) {
 		super(arguments);
 	}
 

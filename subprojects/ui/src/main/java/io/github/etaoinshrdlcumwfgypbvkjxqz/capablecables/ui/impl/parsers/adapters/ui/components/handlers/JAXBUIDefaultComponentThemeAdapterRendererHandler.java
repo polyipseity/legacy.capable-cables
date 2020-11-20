@@ -3,11 +3,13 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapt
 import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Renderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIRendererArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ui.components.contexts.IJAXBUIComponentThemeAdapterContext;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIRendererConstructor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.JAXBUIDefaultComponentAdapter;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableRendererArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.JAXBUIComponentUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.AnnotationUtilities;
@@ -52,7 +54,7 @@ public class JAXBUIDefaultComponentThemeAdapterRendererHandler
 											}
 											constructorHandle = constructorHandle.asType(constructorHandle.type().changeReturnType(IUIRenderer.class));
 
-											UIRendererConstructor.IArguments argument = new UIRendererConstructor.ImmutableArguments(
+											IUIRendererArguments argument = new UIImmutableRendererArguments(
 													mappings,
 													rendererContainer.getContainer()
 															.orElseThrow(IllegalStateException::new).getClass()
@@ -60,7 +62,7 @@ public class JAXBUIDefaultComponentThemeAdapterRendererHandler
 
 											IUIRenderer<?> ret;
 											try {
-												ret = (IUIRenderer<?>) constructorHandle.invokeExact((UIRendererConstructor.IArguments) argument);
+												ret = (IUIRenderer<?>) constructorHandle.invokeExact((IUIRendererArguments) argument);
 											} catch (Throwable throwable) {
 												throw ThrowableUtilities.propagate(throwable);
 											}

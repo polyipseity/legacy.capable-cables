@@ -2,10 +2,11 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvv
 
 import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIComponentArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.rendering.IUIMinecraftComponentRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.rendering.UIDefaultMinecraftComponentRenderer;
@@ -23,8 +24,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
-
 @OnlyIn(Dist.CLIENT)
 public class UIDefaultMinecraftComponentManager
 		extends UIDefaultComponentManager<Rectangle2D>
@@ -35,7 +34,7 @@ public class UIDefaultMinecraftComponentManager
 					UIDefaultRendererContainerContainer.createRendererContainerInitializer(UIDefaultMinecraftComponentRenderer.class));
 
 	@UIComponentConstructor
-	public UIDefaultMinecraftComponentManager(UIComponentConstructor.IArguments arguments) {
+	public UIDefaultMinecraftComponentManager(IUIComponentArguments arguments) {
 		super(arguments);
 	}
 

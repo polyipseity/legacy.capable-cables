@@ -2,6 +2,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvv
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIViewComponentArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIViewComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
@@ -11,7 +13,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIComponentRendererInvokerModifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIViewComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.MinecraftGraphics;
@@ -53,7 +54,7 @@ public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUICompo
 	private final DelayedFieldInitializer<ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>>> extensionsInitializer;
 
 	@UIViewComponentConstructor
-	public UIDefaultMinecraftViewComponent(UIViewComponentConstructor.IArguments arguments) {
+	public UIDefaultMinecraftViewComponent(IUIViewComponentArguments arguments) {
 		super(arguments);
 
 		this.extensionsInitializer = new DelayedFieldInitializer<>(field ->

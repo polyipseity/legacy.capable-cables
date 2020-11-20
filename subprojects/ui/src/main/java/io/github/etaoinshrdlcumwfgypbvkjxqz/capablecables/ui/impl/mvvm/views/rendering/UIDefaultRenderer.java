@@ -4,8 +4,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIRendererArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRenderer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -22,7 +23,7 @@ public class UIDefaultRenderer<C>
 
 	@SuppressWarnings({"unchecked", "UnstableApiUsage"})
 	@UIRendererConstructor
-	public UIDefaultRenderer(UIRendererConstructor.IArguments arguments) {
+	public UIDefaultRenderer(IUIRendererArguments arguments) {
 		this.typeToken = ((TypeToken<C>) TypeToken.of(arguments.getContainerClass()));
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();

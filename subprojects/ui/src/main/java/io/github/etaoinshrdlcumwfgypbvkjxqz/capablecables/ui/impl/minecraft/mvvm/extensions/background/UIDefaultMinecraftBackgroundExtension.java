@@ -4,12 +4,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIExtensionArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUISubInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIExtensionConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableExtensionArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.events.bus.IUIMinecraftRenderEventExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.extensions.IUIMinecraftBackgroundExtension;
@@ -48,8 +50,8 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Suppr
 public class UIDefaultMinecraftBackgroundExtension
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIMinecraftViewComponent<?, ?>, IUIMinecraftViewComponent<?, ?>>
 		implements IUIMinecraftBackgroundExtension {
-	private static final UIExtensionConstructor.IArguments DEFAULT_ARGUMENTS =
-			new UIExtensionConstructor.ImmutableArguments(ImmutableMap.of(), IUIMinecraftViewComponent.class);
+	private static final IUIExtensionArguments DEFAULT_ARGUMENTS =
+			new UIImmutableExtensionArguments(ImmutableMap.of(), IUIMinecraftViewComponent.class);
 	private final AutoCloseableRotator<RenderObserver, RuntimeException> renderObserverRotator =
 			new AutoCloseableRotator<>(() -> new RenderObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()), Disposable::dispose);
 	private final IUIRendererContainerContainer<IBackgroundRenderer> rendererContainerContainer =
@@ -59,11 +61,11 @@ public class UIDefaultMinecraftBackgroundExtension
 	public UIDefaultMinecraftBackgroundExtension() { this(getDefaultArguments()); }
 
 	@UIExtensionConstructor
-	public UIDefaultMinecraftBackgroundExtension(@SuppressWarnings("unused") UIExtensionConstructor.IArguments arguments) {
+	public UIDefaultMinecraftBackgroundExtension(@SuppressWarnings("unused") IUIExtensionArguments arguments) {
 		super(CastUtilities.castUnchecked(IUIMinecraftViewComponent.class));
 	}
 
-	protected static UIExtensionConstructor.IArguments getDefaultArguments() { return DEFAULT_ARGUMENTS; }
+	protected static IUIExtensionArguments getDefaultArguments() { return DEFAULT_ARGUMENTS; }
 
 	@Override
 	public IUIRendererContainer<? extends IBackgroundRenderer> getRendererContainer()

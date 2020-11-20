@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.extensions.background;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIRendererConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIRendererArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.extensions.IUIMinecraftBackgroundExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.utilities.UIMinecraftBackgrounds;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRenderer;
@@ -16,7 +17,7 @@ public class UIMinecraftBackgroundExtensionEmptyBackgroundRenderer
 		implements IUIMinecraftBackgroundExtension.IBackgroundRenderer {
 
 	@UIRendererConstructor
-	public UIMinecraftBackgroundExtensionEmptyBackgroundRenderer(UIRendererConstructor.IArguments arguments) { super(arguments); }
+	public UIMinecraftBackgroundExtensionEmptyBackgroundRenderer(IUIRendererArguments arguments) { super(arguments); }
 
 	@Override
 	public void render(Screen screen, Point2D mouse, double partialTicks) { UIMinecraftBackgrounds.notifyBackgroundDrawn(screen); }

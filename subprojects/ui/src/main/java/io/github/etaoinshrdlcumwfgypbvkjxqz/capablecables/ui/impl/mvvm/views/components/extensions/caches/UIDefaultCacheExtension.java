@@ -5,12 +5,14 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterators;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIExtensionArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches.IUICacheExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches.IUICacheType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches.UICacheRegistry;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIExtensionConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableExtensionArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIAbstractComponentHierarchyChangeBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
@@ -35,7 +37,7 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Suppr
 public class UIDefaultCacheExtension
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IExtensionContainer<INamespacePrefixedString>, IExtensionContainer<INamespacePrefixedString>>
 		implements IUICacheExtension {
-	private static final UIExtensionConstructor.IArguments DEFAULT_ARGUMENTS = new UIExtensionConstructor.ImmutableArguments(ImmutableMap.of(), IExtensionContainer.class);
+	private static final IUIExtensionArguments DEFAULT_ARGUMENTS = new UIImmutableExtensionArguments(ImmutableMap.of(), IExtensionContainer.class);
 	private final Cache<INamespacePrefixedString, Object> cache =
 			CacheBuilder.newBuilder()
 					.initialCapacity(CapacityUtilities.getInitialCapacitySmall())
@@ -45,11 +47,11 @@ public class UIDefaultCacheExtension
 	public UIDefaultCacheExtension() { this(getDefaultArguments()); }
 
 	@UIExtensionConstructor
-	public UIDefaultCacheExtension(@SuppressWarnings("unused") UIExtensionConstructor.IArguments arguments) {
+	public UIDefaultCacheExtension(@SuppressWarnings("unused") IUIExtensionArguments arguments) {
 		super(CastUtilities.castUnchecked(IExtensionContainer.class)); // COMMENT should not matter in this case
 	}
 
-	protected static UIExtensionConstructor.IArguments getDefaultArguments() { return DEFAULT_ARGUMENTS; }
+	protected static IUIExtensionArguments getDefaultArguments() { return DEFAULT_ARGUMENTS; }
 
 	@Override
 	public void onExtensionRemoved() {

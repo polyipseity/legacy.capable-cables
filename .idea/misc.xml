@@ -9,7 +9,7 @@
       <item index="4" class="java.lang.String" itemvalue="$group__.ui.core.parsers.components.UIComponentConstructor" />
       <item index="5" class="java.lang.String" itemvalue="$group__.ui.core.parsers.components.UIExtensionConstructor" />
       <item index="6" class="java.lang.String" itemvalue="$group__.ui.core.parsers.components.UIRendererConstructor" />
-      <item index="7" class="java.lang.String" itemvalue="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIComponentConstructor" />
+      <item index="7" class="java.lang.String" itemvalue="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIComponentConstructor" />
       <item index="8" class="java.lang.String" itemvalue="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.components.UIRendererConstructor" />
       <item index="9" class="java.lang.String" itemvalue="net.minecraftforge.eventbus.api.SubscribeEvent" />
       <item index="10" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.Mod" />

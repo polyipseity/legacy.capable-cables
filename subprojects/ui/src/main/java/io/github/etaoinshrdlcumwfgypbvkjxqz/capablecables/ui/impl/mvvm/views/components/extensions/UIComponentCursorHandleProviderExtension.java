@@ -1,6 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions;
 
 import com.google.common.collect.ImmutableMap;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIExtensionArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.extensions.cursors.IUICursorHandleProviderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
@@ -8,7 +10,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentCursorHandleProviderModifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.annotations.ui.UIExtensionConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableExtensionArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.modifiers.UIEmptyComponentCursorHandleProviderModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -23,16 +25,16 @@ import java.util.Optional;
 public class UIComponentCursorHandleProviderExtension
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIView<?>, IUIViewComponent<?, ?>>
 		implements IUICursorHandleProviderExtension {
-	private static final UIExtensionConstructor.IArguments DEFAULT_ARGUMENTS = new UIExtensionConstructor.ImmutableArguments(ImmutableMap.of(), IUIViewComponent.class);
+	private static final IUIExtensionArguments DEFAULT_ARGUMENTS = new UIImmutableExtensionArguments(ImmutableMap.of(), IUIViewComponent.class);
 
 	public UIComponentCursorHandleProviderExtension() { this(getDefaultArguments()); }
 
 	@UIExtensionConstructor
-	public UIComponentCursorHandleProviderExtension(@SuppressWarnings("unused") UIExtensionConstructor.IArguments arguments) {
+	public UIComponentCursorHandleProviderExtension(@SuppressWarnings("unused") IUIExtensionArguments arguments) {
 		super(CastUtilities.castUnchecked(IUIViewComponent.class));
 	}
 
-	protected static UIExtensionConstructor.IArguments getDefaultArguments() { return DEFAULT_ARGUMENTS; }
+	protected static IUIExtensionArguments getDefaultArguments() { return DEFAULT_ARGUMENTS; }
 
 	@Override
 	public Optional<Long> getCursorHandle() {
