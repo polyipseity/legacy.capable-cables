@@ -10,11 +10,11 @@ import javax.annotation.concurrent.Immutable;
 public final class ImmutableNamespacePrefixedString
 		implements INamespacePrefixedString {
 	private final String namespace;
-	private final String path;
+	private final String string;
 
-	private ImmutableNamespacePrefixedString(@NonNls CharSequence namespace, @NonNls CharSequence path) {
+	private ImmutableNamespacePrefixedString(@NonNls CharSequence namespace, @NonNls CharSequence string) {
 		this.namespace = namespace.toString();
-		this.path = path.toString();
+		this.string = string.toString();
 	}
 
 	public static ImmutableNamespacePrefixedString of(@NonNls CharSequence string) {
@@ -22,15 +22,15 @@ public final class ImmutableNamespacePrefixedString
 		return of(decomposed[0], decomposed[1]);
 	}
 
-	public static ImmutableNamespacePrefixedString of(@NonNls CharSequence namespace, @NonNls CharSequence path) {
-		return new ImmutableNamespacePrefixedString(namespace, path);
+	public static ImmutableNamespacePrefixedString of(@NonNls CharSequence namespace, @NonNls CharSequence string) {
+		return new ImmutableNamespacePrefixedString(namespace, string);
 	}
 
 	@Override
 	public @NonNls String getNamespace() { return namespace; }
 
 	@Override
-	public @NonNls String getPath() { return path; }
+	public @NonNls String getString() { return string; }
 
 	@Override
 	public int hashCode() { return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariableMap().values()); }

@@ -25,7 +25,7 @@ public interface IUIMinecraftBackgroundExtension
 	enum StaticHolder {
 		;
 
-		private static final INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(IUIExtension.StaticHolder.getDefaultNamespace(), "background");
+		private static final INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(MinecraftUtilities.getNamespace(), "background");
 		@SuppressWarnings("unchecked")
 		private static final
 		IRegistryObject<IExtensionType<INamespacePrefixedString, IUIMinecraftBackgroundExtension, IUIMinecraftViewComponent<?, ?>>> TYPE =

@@ -10,5 +10,5 @@ public enum NamespaceUtilities {
 	@NonNls
 	public static String getNamespacePrefixedString(@NonNls CharSequence separator, @NonNls CharSequence namespace, @NonNls CharSequence string) { return namespace.toString() + separator + string; }
 
-	public static ResourceLocation toResourceLocation(INamespacePrefixedString string) { return new ResourceLocation(string.getNamespace(), string.getPath()); }
+	public static ResourceLocation toResourceLocation(INamespacePrefixedString string) { return new ResourceLocation(string.getNamespace(), string.getString()); }
 }

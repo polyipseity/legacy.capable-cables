@@ -19,7 +19,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.Minec
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.IUIMinecraftViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.components.IUIComponentMinecraft;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.components.modifiers.IUIComponentMinecraftLifecycleModifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.rendering.IUIMinecraftComponentRenderer.EnumRenderStage;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.extensions.IUIMinecraftRenderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.events.bus.UIImmutableMinecraftRenderEventExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.extensions.background.UIDefaultMinecraftBackgroundExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.utilities.EnumMinecraftCropMethod;
@@ -135,7 +135,13 @@ public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUICompo
 	}
 
 	@Override
-	public Optional<? extends IUIComponentContext> createComponentContext() throws IllegalStateException {
+	protected void acceptRenderEvent(UIAbstractViewBusEvent.Render event) {
+		IUIMinecraftRenderExtension.StaticHolder.getType().getValue().find(this).ifPresent(extension ->
+				IExtensionContainer.addExtensionChecked(event, UIImmutableMinecraftRenderEventExtension.of(extension.getPartialTicks())));
+	}
+
+	@Override
+	public Optional<? extends IUIComponentContext> createComponentContext() {
 		return getContext()
 				.map(context -> {
 							try (AutoCloseableGraphics2D graphics = MinecraftGraphics.createGraphics()) {

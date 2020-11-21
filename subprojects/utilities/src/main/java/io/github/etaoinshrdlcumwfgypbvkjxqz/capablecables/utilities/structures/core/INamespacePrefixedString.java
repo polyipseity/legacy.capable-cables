@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 public interface INamespacePrefixedString {
 	@SuppressWarnings("SwitchStatementWithTooFewBranches")
 	static String[] decompose(CharSequence string) {
-		String[] ss = string.toString().split(Pattern.quote(StaticHolder.SEPARATOR), 2);
+		String[] ss = StaticHolder.getSeparatorPattern().split(string, 2);
 		switch (ss.length) {
 			case 2:
 				return ss;
@@ -35,19 +35,26 @@ public interface INamespacePrefixedString {
 		}
 	}
 
-	default String asString() { return getNamespace() + StaticHolder.SEPARATOR + getPath(); }
+	default String asString() { return getNamespace() + StaticHolder.getSeparator() + getString(); }
 
 	@NonNls
 	String getNamespace();
 
 	@NonNls
-	String getPath();
+	String getString();
+
+	@Override
+	int hashCode();
+
+	@Override
+	boolean equals(Object obj);
 
 	enum StaticHolder {
 		;
 
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 		public static final @NonNls String SEPARATOR = ":";
+		private static final Pattern SEPARATOR_PATTERN = Pattern.compile(getSeparator(), Pattern.LITERAL);
 		private static final Marker CLASS_MARKER =
 				MarkersTemplate.addReferences(UtilitiesMarkers.getInstance().getClassMarker(),
 						UtilitiesMarkers.getInstance().getMarkerStructure());
@@ -55,8 +62,16 @@ public interface INamespacePrefixedString {
 		private static final @Immutable Map<String, Function<@Nonnull INamespacePrefixedString, @Nullable ?>> OBJECT_VARIABLE_MAP =
 				ImmutableMap.<String, Function<@Nonnull INamespacePrefixedString, @Nullable ?>>builder()
 						.put("namespace", INamespacePrefixedString::getNamespace)
-						.put("path", INamespacePrefixedString::getPath)
+						.put("string", INamespacePrefixedString::getString)
 						.build();
+
+		public static String getSeparator() {
+			return SEPARATOR;
+		}
+
+		public static Pattern getSeparatorPattern() {
+			return SEPARATOR_PATTERN;
+		}
 
 		public static @Immutable Map<String, Function<@Nonnull INamespacePrefixedString, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 

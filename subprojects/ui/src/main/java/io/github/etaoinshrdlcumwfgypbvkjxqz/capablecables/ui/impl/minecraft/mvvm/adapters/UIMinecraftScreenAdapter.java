@@ -19,6 +19,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIEv
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.IUIMinecraftInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.extensions.IUIMinecraftScreenProviderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.extensions.UIImmutableMinecraftContainerProviderExtension;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.extensions.UIDefaultMinecraftRenderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.utilities.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.utilities.UIMinecraftBackgrounds;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.UIImmutableContextContainer;
@@ -104,6 +105,16 @@ public class UIMinecraftScreenAdapter
 		IExtensionContainer.addExtensionChecked(this.infrastructure, new UIDefaultMinecraftScreenProviderExtension(suppressThisEscapedWarning(() -> this)));
 		if (containerObject != null)
 			IExtensionContainer.addExtensionChecked(this.infrastructure, new UIImmutableMinecraftContainerProviderExtension(this.containerObject));
+
+		IExtensionContainer.addExtensionChecked(this.infrastructure.getView(), new UIDefaultMinecraftRenderExtension(this::getLastPartialTicks));
+	}
+
+	protected double getLastPartialTicks() {
+		return lastPartialTicks;
+	}
+
+	protected void setLastPartialTicks(double lastPartialTicks) {
+		this.lastPartialTicks = lastPartialTicks;
 	}
 
 	@Override

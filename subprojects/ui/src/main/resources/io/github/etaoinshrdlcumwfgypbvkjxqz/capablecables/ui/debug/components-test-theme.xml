@@ -34,7 +34,7 @@
 	          class="renderer.extension.user_resizable.previewing.minecraft"/>
 
 	<renderer name="WindowAnchoredRenderer">
-		<property key="default:property.window.controls.color" bindingKey="default:anchoredWindowBorderColor"/>
+		<property key="default:property.window.controls.color" bindingKey="renderer:anchoredWindowBorderColor"/>
 	</renderer>
 
 	<renderer name="WindowAnchoredExtensionRelocatableRenderer"

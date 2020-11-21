@@ -160,9 +160,6 @@ public class UIButtonComponent
 	}
 
 	public interface IUIEventActivate extends IUIEvent {
-		@NonNls String TYPE_STRING = IUIEventType.StaticHolder.getDefaultPrefix() + "component.button.activated";
-		INamespacePrefixedString TYPE = ImmutableNamespacePrefixedString.of(TYPE_STRING);
-
 		static boolean shouldActivate(UIButtonComponent self, IUIEvent event) {
 			return UIEventUtilities.dispatchEvent(new IUIEventActivate.Impl((IUIEventTarget.Functional) e -> {
 				self.getOnActivate().invoke((IUIEventActivate) e);
@@ -172,17 +169,32 @@ public class UIButtonComponent
 
 		IUIEvent getCause();
 
+		enum StaticHolder {
+			;
+
+			public static final @NonNls String TYPE_STRING = IUIEventType.StaticHolder.DEFAULT_PREFIX + "component.button.activated";
+			private static final INamespacePrefixedString TYPE = ImmutableNamespacePrefixedString.of(getTypeString());
+
+			public static String getTypeString() {
+				return TYPE_STRING;
+			}
+
+			public static INamespacePrefixedString getType() {
+				return TYPE;
+			}
+		}
+
 		class Impl
 				extends UIDefaultEvent
 				implements IUIEventActivate {
 			static {
-				UIEventRegistry.getInstance().register(TYPE, IUIEventActivate.class); // COMMENT custom: button will be activated
+				UIEventRegistry.getInstance().register(StaticHolder.getType(), IUIEventActivate.class); // COMMENT custom: button will be activated
 			}
 
 			private final IUIEvent cause;
 
 			public Impl(IUIEventTarget target, IUIEvent cause) {
-				super(TYPE, false, true, cause.getViewContext(), target);
+				super(StaticHolder.getType(), false, true, cause.getViewContext(), target);
 				this.cause = cause;
 			}
 
