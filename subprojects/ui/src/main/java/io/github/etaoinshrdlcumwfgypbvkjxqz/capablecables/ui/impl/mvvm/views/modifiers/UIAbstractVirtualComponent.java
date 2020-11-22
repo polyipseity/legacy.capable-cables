@@ -22,7 +22,7 @@ public abstract class UIAbstractVirtualComponent
 	private OptionalWeakReference<IUIComponent> targetComponent = new OptionalWeakReference<>(null);
 
 	public UIAbstractVirtualComponent(IShapeDescriptor<?> shapeDescriptor) {
-		super(new UIImmutableComponentArguments(null, ImmutableMap.of(), shapeDescriptor));
+		super(UIImmutableComponentArguments.of(null, ImmutableMap.of(), shapeDescriptor, null));
 	}
 
 	@Override

@@ -25,7 +25,7 @@ import java.util.Optional;
 public class UIComponentCursorHandleProviderExtension
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIView<?>, IUIViewComponent<?, ?>>
 		implements IUICursorHandleProviderExtension {
-	private static final IUIExtensionArguments DEFAULT_ARGUMENTS = new UIImmutableExtensionArguments(ImmutableMap.of(), IUIViewComponent.class);
+	private static final IUIExtensionArguments DEFAULT_ARGUMENTS = UIImmutableExtensionArguments.of(ImmutableMap.of(), IUIViewComponent.class, null);
 
 	public UIComponentCursorHandleProviderExtension() { this(getDefaultArguments()); }
 

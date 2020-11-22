@@ -2,11 +2,13 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvv
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIExtensionArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUISubInfrastructure;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
@@ -25,7 +27,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.Log
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.DefaultBinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputDevices;
@@ -36,7 +40,6 @@ import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
@@ -51,36 +54,50 @@ public class UIDefaultMinecraftBackgroundExtension
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIMinecraftViewComponent<?, ?>, IUIMinecraftViewComponent<?, ?>>
 		implements IUIMinecraftBackgroundExtension {
 	private static final IUIExtensionArguments DEFAULT_ARGUMENTS =
-			new UIImmutableExtensionArguments(ImmutableMap.of(), IUIMinecraftViewComponent.class);
+			UIImmutableExtensionArguments.of(ImmutableMap.of(), IUIMinecraftViewComponent.class, null);
 	private final AutoCloseableRotator<RenderObserver, RuntimeException> renderObserverRotator =
 			new AutoCloseableRotator<>(() -> new RenderObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()), Disposable::dispose);
-	private final IUIRendererContainerContainer<IBackgroundRenderer> rendererContainerContainer =
-			new UIDefaultRendererContainerContainer<>(suppressThisEscapedWarning(() -> this),
-					UIDefaultRendererContainerContainer.createRendererContainerInitializer(UIMinecraftBackgroundExtensionEmptyBackgroundRenderer.class));
+	private final IUIRendererContainerContainer<IBackgroundRenderer> rendererContainerContainer;
+
+	private final IBinderObserverSupplierHolder binderObserverSupplierHolder = new DefaultBinderObserverSupplierHolder();
 
 	public UIDefaultMinecraftBackgroundExtension() { this(getDefaultArguments()); }
 
 	@UIExtensionConstructor
 	public UIDefaultMinecraftBackgroundExtension(@SuppressWarnings("unused") IUIExtensionArguments arguments) {
 		super(CastUtilities.castUnchecked(IUIMinecraftViewComponent.class));
+
+		this.rendererContainerContainer =
+				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this), UIMinecraftBackgroundExtensionEmptyBackgroundRenderer.class);
 	}
 
 	protected static IUIExtensionArguments getDefaultArguments() { return DEFAULT_ARGUMENTS; }
 
 	@Override
-	public IUIRendererContainer<? extends IBackgroundRenderer> getRendererContainer()
-			throws IllegalStateException {
-		return getRendererContainerContainer().getRendererContainer();
+	@OverridingMethodsMustInvokeSuper
+	public void onExtensionAdded(IUIMinecraftViewComponent<?, ?> container) {
+		super.onExtensionAdded(container);
+		UIEventBusEntryPoint.<UIAbstractViewBusEvent.Render>getEventBus().subscribe(getRenderObserverRotator().get());
+		IUIView.registerRendererContainers(container, ImmutableSet.of(getRendererContainer()));
 	}
 
 	protected IUIRendererContainerContainer<IBackgroundRenderer> getRendererContainerContainer() {
 		return rendererContainerContainer;
 	}
 
+	protected AutoCloseableRotator<RenderObserver, RuntimeException> getRenderObserverRotator() { return renderObserverRotator; }
+
 	@Override
-	public void initializeRendererContainer(@NonNls CharSequence name)
-			throws IllegalStateException {
-		getRendererContainerContainer().initializeRendererContainer(name);
+	public IUIRendererContainer<? extends IBackgroundRenderer> getRendererContainer() {
+		return getRendererContainerContainer().getRendererContainer();
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void onExtensionRemoved() {
+		getContainer().ifPresent(container -> IUIView.unregisterRendererContainers(container, ImmutableSet.of(getRendererContainer())));
+		getRenderObserverRotator().close();
+		super.onExtensionRemoved();
 	}
 
 	@Override
@@ -88,36 +105,24 @@ public class UIDefaultMinecraftBackgroundExtension
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void onExtensionAdded(IUIMinecraftViewComponent<?, ?> container) {
-		super.onExtensionAdded(container);
-		UIEventBusEntryPoint.<UIAbstractViewBusEvent.Render>getEventBus().subscribe(getRenderObserverRotator().get());
-	}
-
-	protected AutoCloseableRotator<RenderObserver, RuntimeException> getRenderObserverRotator() { return renderObserverRotator; }
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
 	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		IUIMinecraftBackgroundExtension.super.initializeBindings(binderObserverSupplier);
+		getBinderObserverSupplierHolder().setValue(binderObserverSupplier);
 		BindingUtilities.initializeBindings(
-				ImmutableList.of(getRendererContainerContainer()),
-				binderObserverSupplier);
+				binderObserverSupplier, ImmutableList.of(getRendererContainerContainer())
+		);
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		IUIMinecraftBackgroundExtension.super.cleanupBindings(binderObserverSupplier);
-		BindingUtilities.cleanupBindings(
-				ImmutableList.of(getRendererContainerContainer()),
-				binderObserverSupplier);
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void onExtensionRemoved() {
-		super.onExtensionRemoved();
-		getRenderObserverRotator().close();
+	public void cleanupBindings() {
+		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
+				BindingUtilities.cleanupBindings(
+						ImmutableList.of(getRendererContainerContainer())
+				)
+		);
+		getBinderObserverSupplierHolder().setValue(null);
+		IUIMinecraftBackgroundExtension.super.cleanupBindings();
 	}
 
 	@OnlyIn(Dist.CLIENT)
@@ -158,5 +163,9 @@ public class UIDefaultMinecraftBackgroundExtension
 		}
 
 		protected Optional<? extends UIDefaultMinecraftBackgroundExtension> getOwner() { return owner.getOptional(); }
+	}
+
+	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
+		return binderObserverSupplierHolder;
 	}
 }

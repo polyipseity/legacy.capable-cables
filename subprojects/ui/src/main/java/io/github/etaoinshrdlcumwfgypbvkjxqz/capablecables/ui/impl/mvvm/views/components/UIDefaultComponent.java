@@ -1,8 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Streams;
+import com.google.common.collect.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.AlwaysNull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
@@ -11,6 +10,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPro
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.UIProperty;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIComponentArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIComponentConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIStructureLifecycleContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.lifecycles.EnumUILifecycleState;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.lifecycles.IUILifecycleStateTracker;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
@@ -18,13 +20,21 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIComponentRenderer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamedTrackers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIDefaultEventTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.extensions.UIExtensionRegistry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.lifecycles.UIDefaultLifecycleStateTracker;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.lifecycles.UILifecycleUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.caches.UIDefaultCacheExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIAbstractComponentHierarchyChangeBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIComponentModifyShapeDescriptorBusEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultComponentRenderer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interactions.ProviderShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
@@ -32,11 +42,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.O
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.methods.IBindingMethodSource;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.DefaultBinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.methods.ImmutableBindingMethodSource;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
@@ -85,7 +96,10 @@ public class UIDefaultComponent
 	private final AtomicBoolean modifyingShape = new AtomicBoolean();
 	private final List<IUIComponentModifier> modifiers = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
-	private final BinderObserverSupplierHolder binderObserverSupplierHolder = new BinderObserverSupplierHolder();
+	private final IBinderObserverSupplierHolder binderObserverSupplierHolder = new DefaultBinderObserverSupplierHolder();
+	private final IUILifecycleStateTracker lifecycleStateTracker = new UIDefaultLifecycleStateTracker();
+
+	private final IUIRendererContainerContainer<IUIComponentRenderer<?>> rendererContainerContainer;
 
 	private final DelayedFieldInitializer<ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>>> extensionsInitializer;
 
@@ -98,6 +112,10 @@ public class UIDefaultComponent
 		this.mappings.putAll(mappings);
 
 		this.shapeDescriptor = new ProviderShapeDescriptor<>(suppressThisEscapedWarning(() -> this), arguments.getShapeDescriptor());
+
+		this.rendererContainerContainer =
+				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this),
+						CastUtilities.castUnchecked(UIDefaultComponentRenderer.class));
 
 		this.visible = IUIPropertyMappingValue.createBindingField(Boolean.class, true,
 				this.mappings.get(getPropertyVisibleLocation()));
@@ -238,12 +256,6 @@ public class UIDefaultComponent
 	}
 
 	@Override
-	public void initialize(IUIComponentContext context) {}
-
-	@Override
-	public void removed(IUIComponentContext context) {}
-
-	@Override
 	public boolean containsPoint(IUIComponentContext context, Point2D point) {
 		return IUIComponent.getContextualShape(context, this).contains(point);
 	}
@@ -264,20 +276,20 @@ public class UIDefaultComponent
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
 		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
 		Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> result = IExtensionContainer.addExtensionImpl(this, getExtensions(), extension);
-		getBinderObserverSupplierHolder().getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
-				BindingUtilities.findAndInitializeBindings(ImmutableList.of(extension), binderObserverSupplier));
+		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
+				BindingUtilities.findAndInitializeBindings(binderObserverSupplier, ImmutableList.of(extension)));
 		return result;
 	}
 
-	protected BinderObserverSupplierHolder getBinderObserverSupplierHolder() {
+	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
 		return binderObserverSupplierHolder;
 	}
 
 	@Override
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) {
 		Optional<IExtension<? extends INamespacePrefixedString, ?>> result = IExtensionContainer.removeExtensionImpl(getExtensions(), key);
-		getBinderObserverSupplierHolder().getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
-				BindingUtilities.findAndCleanupBindings(result.map(ImmutableList::of).orElseGet(ImmutableList::of), binderObserverSupplier));
+		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
+				BindingUtilities.findAndCleanupBindings(result.map(ImmutableList::of).orElseGet(ImmutableList::of)));
 		return result;
 	}
 
@@ -295,18 +307,8 @@ public class UIDefaultComponent
 	public List<IUIComponent> getChildrenView() { return ImmutableList.copyOf(getChildren()); }
 
 	@Override
-	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 	public void onParentChange(@Nullable IUIComponent previous, @Nullable IUIComponent next) {
-		// COMMENT no need to concern that the view is not present yet as setting the manager of the view adds all components automatically
-		getManager()
-				.flatMap(IUIComponentManager::getView)
-				.map(IUIView::getNamedTrackers)
-				.ifPresent(trackers -> trackers.remove(IUIComponent.class, this));
 		setParent(next);
-		getManager()
-				.flatMap(IUIComponentManager::getView)
-				.map(IUIView::getNamedTrackers)
-				.ifPresent(trackers -> trackers.add(IUIComponent.class, this));
 	}
 
 	@Override
@@ -340,12 +342,10 @@ public class UIDefaultComponent
 		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 					getChildren().add(index, component);
 					component.onParentChange(null, this);
-					getBinderObserverSupplierHolder().getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
-							BindingUtilities.initializeBindings(ImmutableList.of(component), binderObserverSupplier));
 				},
 				new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.PRE, component, null, this),
 				new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.POST, component, null, this));
-		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh);
+		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh); // TODO relocation perhaps
 		return true;
 	}
 
@@ -358,8 +358,6 @@ public class UIDefaultComponent
 						EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
 									getChildren().remove(component);
 									component.onParentChange(this, null);
-									getBinderObserverSupplierHolder().getBinderObserverSupplier().ifPresent(binderObserverSupplier ->
-											BindingUtilities.cleanupBindings(ImmutableList.of(component), binderObserverSupplier));
 								},
 								new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.PRE, component, this, null),
 								new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.POST, component, this, null));
@@ -368,7 +366,7 @@ public class UIDefaultComponent
 					return false;
 				})
 				.reduce(false, Boolean::logicalOr);
-		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh);
+		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh); // TODO relocation perhaps
 		return ret;
 	}
 
@@ -393,27 +391,132 @@ public class UIDefaultComponent
 	protected void setParent(@Nullable IUIComponent parent) { this.parent = new OptionalWeakReference<>(parent); }
 
 	@Override
+	public IUILifecycleStateTracker getLifecycleStateTracker() {
+		return lifecycleStateTracker;
+	}
+
+	@Override
 	public Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(getMappings()); }
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public final void bind(IUIStructureLifecycleContext context) {
+		UILifecycleUtilities.addStateIdempotent(this, EnumUILifecycleState.BOUND, context, true, context1 -> {
+			IUIComponent.super.bind(context1);
+			bind0(context1);
+		});
+	}
+
+	@SuppressWarnings("ConstantConditions")
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public final void unbind(@AlwaysNull @Nullable Void context) {
+		UILifecycleUtilities.removeStateIdempotent(this, EnumUILifecycleState.BOUND, context, context1 -> {
+			unbind0(context1);
+			IUIComponent.super.unbind(context1);
+		});
+	}
+
+	@OverridingMethodsMustInvokeSuper
+	protected void unbind0(@SuppressWarnings("unused") @AlwaysNull @Nullable Void context) {}
+
+	@OverridingMethodsMustInvokeSuper
+	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
+	protected void bind0(IUIStructureLifecycleContext context) {
+		initializeBindings(context.getBinderObserverSupplier());
+		getManager()
+				.flatMap(IUIComponentManager::getView)
+				.ifPresent(view -> {
+					@SuppressWarnings("UnstableApiUsage")
+					Iterable<? extends IUIRendererContainer<?>> rendererContainers =
+							Iterables.concat(ImmutableSet.of(getRendererContainer()),
+									getExtensions().values().stream().unordered()
+											.filter(IUIRendererContainerContainer.class::isInstance)
+											.<IUIRendererContainerContainer<?>>map(IUIRendererContainerContainer.class::cast)
+											.map(IUIRendererContainerContainer::getRendererContainer)
+											.collect(ImmutableList.toImmutableList()));
+
+					INamedTrackers namedTrackers = IUIView.getNamedTrackers(view);
+					namedTrackers.add(IUIComponent.class, this);
+					namedTrackers.addAll(IUIRendererContainer.class, rendererContainers);
+					IUIView.getThemeStack(view).applyAll(rendererContainers);
+				});
+	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		IUIComponent.super.initializeBindings(binderObserverSupplier);
-		getBinderObserverSupplierHolder().setBinderObserverSupplier(binderObserverSupplier);
+		getBinderObserverSupplierHolder().setValue(binderObserverSupplier);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 				() -> ImmutableBinderAction.bind(getActive(), getVisible()));
-		BindingUtilities.findAndInitializeBindings(getExtensions().values(), binderObserverSupplier);
-		BindingUtilities.initializeBindings(getChildren(), binderObserverSupplier);
+		BindingUtilities.findAndInitializeBindings(binderObserverSupplier, getExtensions().values());
+		// COMMENT do not init children, view component should do that via bind
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		IUIComponent.super.cleanupBindings(binderObserverSupplier);
-		getBinderObserverSupplierHolder().setBinderObserverSupplier(null);
-		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-				() -> ImmutableBinderAction.unbind(getActive(), getVisible()));
-		BindingUtilities.findAndCleanupBindings(getExtensions().values(), binderObserverSupplier);
-		BindingUtilities.cleanupBindings(getChildren(), binderObserverSupplier);
+	public void cleanupBindings() {
+		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier -> {
+			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+					() -> ImmutableBinderAction.unbind(getActive(), getVisible()));
+			BindingUtilities.findAndCleanupBindings(getExtensions().values());
+			// COMMENT do not cleanup children, view component should do that via unbind
+		});
+		getBinderObserverSupplierHolder().setValue(null);
+		IUIComponent.super.cleanupBindings();
 	}
+
+	@Override
+	public IUIRendererContainer<? extends IUIComponentRenderer<?>> getRendererContainer() {
+		return getRendererContainerContainer().getRendererContainer();
+	}
+
+	protected IUIRendererContainerContainer<IUIComponentRenderer<?>> getRendererContainerContainer() {
+		return rendererContainerContainer;
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public final void initialize(IUIComponentContext context) {
+		UILifecycleUtilities.addStateIdempotent(this, EnumUILifecycleState.INITIALIZED, context, false, context1 -> {
+			IUIComponent.super.initialize(context1);
+			initialize0(context1);
+		});
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public final void cleanup(IUIComponentContext context) {
+		UILifecycleUtilities.removeStateIdempotent(this, EnumUILifecycleState.INITIALIZED, context, context1 -> {
+			cleanup0(context1);
+			IUIComponent.super.cleanup(context1);
+		});
+	}
+
+	@OverridingMethodsMustInvokeSuper
+	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
+	protected void cleanup0(IUIComponentContext context) {
+		getManager()
+				.flatMap(IUIComponentManager::getView)
+				.ifPresent(view -> {
+					@SuppressWarnings("UnstableApiUsage")
+					Iterable<? extends IUIRendererContainer<?>> rendererContainers =
+							Iterables.concat(ImmutableSet.of(getRendererContainer()),
+									getExtensions().values().stream().unordered()
+											.filter(IUIRendererContainerContainer.class::isInstance)
+											.<IUIRendererContainerContainer<?>>map(IUIRendererContainerContainer.class::cast)
+											.map(IUIRendererContainerContainer::getRendererContainer)
+											.collect(ImmutableList.toImmutableList()));
+
+					INamedTrackers namedTrackers = IUIView.getNamedTrackers(view);
+					namedTrackers.remove(IUIComponent.class, this);
+					namedTrackers.removeAll(IUIRendererContainer.class, rendererContainers);
+					UIDefaultingTheme.applyDefaultRenderers(rendererContainers);
+				});
+		cleanupBindings();
+	}
+
+	@OverridingMethodsMustInvokeSuper
+	protected void initialize0(IUIComponentContext context) {}
 }

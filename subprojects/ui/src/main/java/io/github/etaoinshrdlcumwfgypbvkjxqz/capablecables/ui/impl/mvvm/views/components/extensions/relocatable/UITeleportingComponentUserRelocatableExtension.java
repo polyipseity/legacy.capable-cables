@@ -11,9 +11,11 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.UIProp
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIExtensionArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.IUIComponentUserRelocatableExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentCursorHandleProviderModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventMouse;
@@ -33,10 +35,11 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.O
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.DefaultBinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
@@ -75,10 +78,19 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 	@UIProperty(PROPERTY_ACTIVATION_MOUSE_BUTTONS)
 	private final IBindingField<Map<EnumUISide, Double>> relocateBorders;
 
+	private final Modifier modifier = new Modifier(suppressThisEscapedWarning(() -> this));
+	private final IUIRendererContainerContainer<IRelocatingRenderer> rendererContainerContainer;
+	private final IBinderObserverSupplierHolder binderObserverSupplierHolder = new DefaultBinderObserverSupplierHolder();
+	@Nullable
+	private IRelocateData relocateData;
+
 	@SuppressWarnings("unchecked")
 	@UIExtensionConstructor
 	public UITeleportingComponentUserRelocatableExtension(IUIExtensionArguments arguments) {
 		super((Class<C>) arguments.getContainerClass());
+
+		this.rendererContainerContainer =
+				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this), UIComponentUserRelocatableExtensionEmptyRelocatingRenderer.class);
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.activationMouseButtons = IUIPropertyMappingValue.<Set<Integer>>createBindingField(CastUtilities.castUnchecked(Set.class),
@@ -101,32 +113,31 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 		return PROPERTY_RELOCATE_BORDERS;
 	}
 
-	private final Modifier modifier = new Modifier(suppressThisEscapedWarning(() -> this));
-	private final IUIRendererContainerContainer<IRelocatingRenderer> rendererContainerContainer =
-			new UIDefaultRendererContainerContainer<>(suppressThisEscapedWarning(() -> this),
-					UIDefaultRendererContainerContainer.createRendererContainerInitializer(UIComponentUserRelocatableExtensionEmptyRelocatingRenderer.class));
-	@Nullable
-	private IRelocateData relocateData;
-	private final BinderObserverSupplierHolder binderObserverSupplierHolder = new BinderObserverSupplierHolder();
-
-	@Override
-	public IUIRendererContainer<? extends IRelocatingRenderer> getRendererContainer()
-			throws IllegalStateException {
-		return getRendererContainerContainer().getRendererContainer();
-	}
-
 	public static String getPropertyActivationMouseButtons() {
 		return PROPERTY_ACTIVATION_MOUSE_BUTTONS;
 	}
 
-	protected IBindingField<Set<Integer>> getActivationMouseButtons() {
-		return activationMouseButtons;
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		IUIComponentUserRelocatableExtension.super.initializeBindings(binderObserverSupplier);
+		getBinderObserverSupplierHolder().setValue(binderObserverSupplier);
+		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+				() -> ImmutableBinderAction.bind(
+						getActivationMouseButtons(),
+						getRelocateBorders()
+				));
+		BindingUtilities.initializeBindings(
+				binderObserverSupplier, ImmutableList.of(getRendererContainerContainer())
+		);
 	}
 
-	@Override
-	public void initializeRendererContainer(@NonNls CharSequence name)
-			throws IllegalStateException {
-		getRendererContainerContainer().initializeRendererContainer(name);
+	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
+		return binderObserverSupplierHolder;
+	}
+
+	protected IBindingField<Set<Integer>> getActivationMouseButtons() {
+		return activationMouseButtons;
 	}
 
 	protected IUIRendererContainerContainer<IRelocatingRenderer> getRendererContainerContainer() {
@@ -135,61 +146,52 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		IUIComponentUserRelocatableExtension.super.initializeBindings(binderObserverSupplier);
-		getBinderObserverSupplierHolder().setBinderObserverSupplier(binderObserverSupplier);
-		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-				() -> ImmutableBinderAction.bind(
-						getActivationMouseButtons(),
-						getRelocateBorders()
-				));
-		BindingUtilities.initializeBindings(
-				ImmutableList.of(getRendererContainerContainer()),
-				binderObserverSupplier
-		);
+	public void cleanupBindings() {
+		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier -> {
+			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+					() -> ImmutableBinderAction.unbind(
+							getActivationMouseButtons(),
+							getRelocateBorders()
+					));
+			BindingUtilities.cleanupBindings(
+					ImmutableList.of(getRendererContainerContainer())
+			);
+		});
+		getBinderObserverSupplierHolder().setValue(null);
+		IUIComponentUserRelocatableExtension.super.cleanupBindings();
 	}
-
-	protected BinderObserverSupplierHolder getBinderObserverSupplierHolder() {
-		return binderObserverSupplierHolder;
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		IUIComponentUserRelocatableExtension.super.cleanupBindings(binderObserverSupplier);
-		getBinderObserverSupplierHolder().setBinderObserverSupplier(null);
-		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-				() -> ImmutableBinderAction.unbind(
-						getActivationMouseButtons(),
-						getRelocateBorders()
-				));
-		BindingUtilities.cleanupBindings(
-				ImmutableList.of(getRendererContainerContainer()),
-				binderObserverSupplier
-		);
-	}
-
-	@Override
-	public IExtensionType<INamespacePrefixedString, ?, IUIComponent> getType() { return StaticHolder.getTYPE().getValue(); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 	public void onExtensionAdded(IUIComponent container) {
 		super.onExtensionAdded(container);
-		getContainer().ifPresent(c -> c.addModifier(getModifier()));
+		container.addModifier(getModifier());
+		container.getManager().flatMap(IUIComponentManager::getView)
+				.ifPresent(view -> IUIView.registerRendererContainers(view, ImmutableSet.of(getRendererContainer())));
 	}
-
-	protected Modifier getModifier() { return modifier; }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 	public void onExtensionRemoved() {
+		getContainer().ifPresent(container -> {
+			container.removeModifier(getModifier());
+			container.getManager().flatMap(IUIComponentManager::getView)
+					.ifPresent(view -> IUIView.unregisterRendererContainers(view, ImmutableSet.of(getRendererContainer())));
+		});
 		super.onExtensionRemoved();
-		getContainer().ifPresent(c ->
-				c.removeModifier(getModifier()));
 	}
+
+	protected Modifier getModifier() { return modifier; }
+
+	@Override
+	public IUIRendererContainer<? extends IRelocatingRenderer> getRendererContainer() {
+		return getRendererContainerContainer().getRendererContainer();
+	}
+
+	@Override
+	public IExtensionType<INamespacePrefixedString, ?, IUIComponent> getType() { return StaticHolder.getTYPE().getValue(); }
 
 	@Override
 	public Optional<? extends Shape> getRelocateShape() {

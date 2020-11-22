@@ -54,7 +54,7 @@ public class JAXBUIDefaultComponentThemeAdapterRendererHandler
 											}
 											constructorHandle = constructorHandle.asType(constructorHandle.type().changeReturnType(IUIRenderer.class));
 
-											IUIRendererArguments argument = new UIImmutableRendererArguments(
+											IUIRendererArguments argument = UIImmutableRendererArguments.of(
 													mappings,
 													rendererContainer.getContainer()
 															.orElseThrow(IllegalStateException::new).getClass()

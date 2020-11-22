@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.re
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIRendererArguments;
@@ -10,9 +11,14 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.DefaultBinderObserverSupplierHolder;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class UIDefaultRenderer<C>
 		implements IUIRenderer<C> {
@@ -20,6 +26,8 @@ public class UIDefaultRenderer<C>
 	private final TypeToken<C> typeToken;
 	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
 	private OptionalWeakReference<C> container = new OptionalWeakReference<>(null);
+
+	private final IBinderObserverSupplierHolder binderObserverSupplierHolder = new DefaultBinderObserverSupplierHolder();
 
 	@SuppressWarnings({"unchecked", "UnstableApiUsage"})
 	@UIRendererConstructor
@@ -56,4 +64,20 @@ public class UIDefaultRenderer<C>
 	public Optional<? extends C> getContainer() { return container.getOptional(); }
 
 	public void setContainer(@Nullable C container) { this.container = new OptionalWeakReference<>(container); }
+
+	@Override
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		IUIRenderer.super.initializeBindings(binderObserverSupplier);
+		getBinderObserverSupplierHolder().setValue(binderObserverSupplier);
+	}
+
+	@Override
+	public void cleanupBindings() {
+		getBinderObserverSupplierHolder().setValue(null);
+		IUIRenderer.super.cleanupBindings();
+	}
+
+	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
+		return binderObserverSupplierHolder;
+	}
 }

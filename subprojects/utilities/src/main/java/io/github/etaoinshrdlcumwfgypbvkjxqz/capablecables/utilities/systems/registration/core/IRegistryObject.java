@@ -13,6 +13,7 @@ public interface IRegistryObject<V>
 
 	@Nonnull
 	@Override
+	@Deprecated
 	default V get() { return getValue(); }
 
 	V getValue();

@@ -12,6 +12,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIInfras
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.adapters.IUIAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.extensions.cursors.ICursorHandleProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.extensions.cursors.IUICursorHandleProviderExtension;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.lifecycles.IUIActiveLifecycle;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventKeyboard;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventMouse;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventTarget;
@@ -91,6 +92,7 @@ public class UIMinecraftScreenAdapter
 	private IUIEventTarget focus;
 	@Nullable
 	private ImmutableMouseButtonClickData lastMouseClickData = null;
+	private double lastPartialTicks = 0D;
 
 	protected UIMinecraftScreenAdapter(ITextComponent title, I infrastructure, @Nullable C containerObject, Set<Integer> closeKeys, Set<Integer> changeFocusKeys) {
 		super(title);
@@ -131,8 +133,8 @@ public class UIMinecraftScreenAdapter
 	@Override
 	@Deprecated
 	public void render(int mouseX, int mouseY, float partialTicks) {
-		IUIContextContainer context = getContextContainer();
-		getInfrastructure().getView().render(context.getViewContext(), partialTicks);
+		setLastPartialTicks(partialTicks);
+		getInfrastructure().getView().render();
 		setCursorHandle(IUICursorHandleProviderExtension.StaticHolder.getType().getValue().find(getInfrastructure().getView())
 				.flatMap(ICursorHandleProvider::getCursorHandle)
 				.orElse(MemoryUtil.NULL));
@@ -212,9 +214,9 @@ public class UIMinecraftScreenAdapter
 	@Override
 	@Deprecated
 	protected void init() {
-		IUIInfrastructure.bindSafe(getInfrastructure(), getContextContainer());
+		getInfrastructure().bind(getContextContainer()); // COMMENT does nothing if already bound
 		setSize(width, height);
-		getInfrastructure().initialize();
+		IUIActiveLifecycle.initializeV(getInfrastructure());
 		setCursorHandle(MemoryUtil.NULL);
 	}
 
@@ -244,8 +246,7 @@ public class UIMinecraftScreenAdapter
 			setLastMouseClickData(context, null, null);
 			setFocus(context, null);
 		}
-		getInfrastructure().removed();
-		IUIInfrastructure.unbindSafe(getInfrastructure());
+		IUIActiveLifecycle.cleanupV(getInfrastructure());
 	}
 
 	@Override

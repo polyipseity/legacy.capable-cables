@@ -1,23 +1,21 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.lifecycles.IUIActiveLifecycle;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public interface IUIComponentLifecycleModifier {
+@SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
+public interface IUIComponentActiveLifecycleModifier
+		extends IUIActiveLifecycle<IUIComponentContext, IUIComponentContext> {
 	static void handleComponentModifiers(IUIComponent component,
 	                                     Iterable<? extends IUIComponentModifier> modifiers,
-	                                     IUIComponentContext context,
-	                                     BiConsumer<@Nonnull ? super IUIComponentLifecycleModifier, @Nonnull ? super IUIComponentContext> action) {
+	                                     Consumer<@Nonnull ? super IUIComponentActiveLifecycleModifier> action) {
 		IUIComponentModifier.handleComponentModifiers(component,
 				modifiers,
-				IUIComponentLifecycleModifier.class,
-				modifier -> action.accept(modifier, context));
+				IUIComponentActiveLifecycleModifier.class,
+				action);
 	}
-
-	void initialize(IUIComponentContext context);
-
-	void removed(IUIComponentContext context);
 }

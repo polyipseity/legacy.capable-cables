@@ -62,7 +62,7 @@ public interface IUIRendererContainer<R extends IUIRenderer<?>>
 		MethodHandle constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
 		constructorHandle = constructorHandle.asType(constructorHandle.type().changeReturnType(IUIRenderer.class));
 
-		IUIRendererArguments argument = new UIImmutableRendererArguments(
+		IUIRendererArguments argument = UIImmutableRendererArguments.of(
 				ImmutableMap.of(),
 				rendererContainer.getContainer()
 						.orElseThrow(IllegalStateException::new).getClass()

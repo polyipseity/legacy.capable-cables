@@ -15,7 +15,7 @@ public interface IHasBinding {
 	}
 
 	@OverridingMethodsMustInvokeSuper
-	default void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	default void cleanupBindings() {
 		// COMMENT for 'OverridingMethodsMustInvokeSuper'
 	}
 }

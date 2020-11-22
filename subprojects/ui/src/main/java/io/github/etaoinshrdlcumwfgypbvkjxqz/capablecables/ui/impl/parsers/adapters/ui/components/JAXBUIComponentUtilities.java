@@ -63,9 +63,10 @@ public enum JAXBUIComponentUtilities {
 										mappings = MapUtilities.concatMaps(mappings, attributes);
 									}
 									IShapeDescriptorBuilder<?> shapeDescriptorBuilder = createShapeDescriptorBuilder(context, node.getShape());
-									IUIComponentArguments argument = new UIImmutableComponentArguments(node.getName(),
+									IUIComponentArguments argument = UIImmutableComponentArguments.of(node.getName(),
 											mappings,
-											shapeDescriptorBuilder.build());
+											shapeDescriptorBuilder.build(),
+											node.getRendererName());
 
 									Class<?> clazz = AssertionUtilities.assertNonnull(subContext.getAliasesView().get(node.getClazz()));
 									Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIComponentConstructor.class,

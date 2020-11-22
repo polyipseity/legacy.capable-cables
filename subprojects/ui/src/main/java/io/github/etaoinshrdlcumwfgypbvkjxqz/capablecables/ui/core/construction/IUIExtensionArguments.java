@@ -5,10 +5,13 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPro
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 
 import java.util.Map;
+import java.util.Optional;
 
 public interface IUIExtensionArguments {
 	@Immutable
 	Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView();
 
 	Class<?> getContainerClass();
+
+	Optional<? extends String> getRendererName();
 }

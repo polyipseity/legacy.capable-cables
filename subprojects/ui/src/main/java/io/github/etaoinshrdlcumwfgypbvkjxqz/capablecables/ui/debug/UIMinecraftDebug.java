@@ -15,6 +15,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUI
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventKeyboard;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventMouse;
@@ -151,6 +152,17 @@ public enum UIMinecraftDebug {
 		private static final ComponentUI JAXB_VIEW;
 		private static final ComponentTheme JAXB_THEME;
 
+		private boolean useCode = false;
+
+		@Override
+		public @Nonnull AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> create(DebugContainer container, PlayerInventory inv, ITextComponent title) {
+			return isUseCode() ? createCodeUI(container) : createUI(container);
+		}
+
+		public boolean isUseCode() {
+			return useCode;
+		}
+
 		static {
 			{
 				// COMMENT view parser
@@ -189,9 +201,9 @@ public enum UIMinecraftDebug {
 
 		private static String getComponentTestThemeXMLPath() { return COMPONENT_TEST_THEME_XML_PATH; }
 
-		@Override
-		public AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> create(DebugContainer container, PlayerInventory inv, ITextComponent title) {
-			return createUI(container);
+		@SuppressWarnings("unused")
+		public void setUseCode(boolean useCode) {
+			this.useCode = useCode;
 		}
 
 		private static AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> createUI(DebugContainer container) {
@@ -218,6 +230,34 @@ public enum UIMinecraftDebug {
 			return screen;
 		}
 
+		private static AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> createCodeUI(DebugContainer container) {
+			// COMMENT component
+			IUIMinecraftViewComponent<?, IUIComponentManager<Rectangle2D>> view;
+			{
+				UIDefaultComponentManager<Rectangle2D> componentManager =
+						new UIDefaultComponentManager<>(UIImmutableComponentArguments.of(null, ImmutableMap.of(), new RectangularShapeDescriptor<>(new Rectangle(0, 0, 100, 100)), null));
+				{
+					UIWindowComponent window =
+							new UIWindowComponent(UIImmutableComponentArguments.of(null, ImmutableMap.of(), new RectangularShapeDescriptor<>(new Rectangle(0, 0, 100, 100)), null));
+					componentManager.addChildren(ImmutableSet.of(window));
+				}
+				view = IUIViewComponent.create(() -> new UIDefaultMinecraftViewComponent<>(UIImmutableViewComponentArguments.of(ImmutableMap.of())),
+						componentManager);
+			}
+
+			// COMMENT theme
+			IUIView.getThemeStack(view).push(new UIEmptyTheme());
+
+			return UIFacade.Minecraft.createScreen(
+					getDisplayName(),
+					UIFacade.Minecraft.createInfrastructure(
+							view,
+							new ViewModel(),
+							new DefaultBinder()
+					),
+					container);
+		}
+
 		private static IUIMinecraftViewComponent<?, ?> createView() {
 			return (IUIMinecraftViewComponent<?, ?>) IJAXBAdapterRegistry.adaptFromJAXB(
 					JAXBImmutableAdapterContext.of(UIDefaultComponentSchemaHolder.getAdapterRegistry()),
@@ -241,9 +281,8 @@ public enum UIMinecraftDebug {
 		}
 
 		@SuppressWarnings("unused")
-		@OnlyIn(Dist.CLIENT)
-		private static final class CustomWindowMinecraftComponentRenderer<C extends UIMinecraftWindowComponent>
-				extends UIMinecraftWindowComponent.DefaultRenderer<C>
+		private static final class CustomWindowComponentRenderer<C extends UIWindowComponent>
+				extends UIWindowComponent.DefaultRenderer<C>
 				implements IShapeDescriptorProvider {
 			public static final int CURSOR_SHAPE_RADIUS = 10;
 
@@ -262,7 +301,9 @@ public enum UIMinecraftDebug {
 							UIStandardAnimationControlFactory.getInfiniteLoop());
 
 			@UIRendererConstructor
-			public CustomWindowMinecraftComponentRenderer(IUIRendererArguments arguments) { super(arguments); }
+			public CustomWindowComponentRenderer(IUIRendererArguments arguments) {
+				super(arguments);
+			}
 
 			@Override
 			@SuppressWarnings({"rawtypes", "RedundantSuppression"})
@@ -293,9 +334,9 @@ public enum UIMinecraftDebug {
 			}
 
 			@Override
-			public void render(IUIComponentContext context, EnumRenderStage stage, C component, double partialTicks) {
-				super.render(context, stage, component, partialTicks);
-				if (stage.isPreChildren()) {
+			public void render(IUIComponentContext context, EnumRenderStage stage) {
+				super.render(context, stage);
+				if (stage == EnumRenderStage.PRE_CHILDREN) {
 					context.getViewContext().getInputDevices().getPointerDevice()
 							.map(IInputPointerDevice::getPositionView)
 							.ifPresent(pointerPosition -> {
@@ -404,14 +445,15 @@ public enum UIMinecraftDebug {
 
 			@Override
 			@OverridingMethodsMustInvokeSuper
-			public void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-				super.cleanupBindings(binderObserverSupplier);
-				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-						() -> ImmutableBinderAction.unbind(
-								getAnchoredWindowBorderColor(),
-								getButtonOnActivate(), getButtonOnActivated()
-						)
-				);
+			public void cleanupBindings() {
+				getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
+						BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+								() -> ImmutableBinderAction.unbind(
+										getAnchoredWindowBorderColor(),
+										getButtonOnActivate(), getButtonOnActivated()
+								)
+						));
+				super.cleanupBindings();
 			}
 		}
 
@@ -456,6 +498,7 @@ public enum UIMinecraftDebug {
 
 		@SuppressWarnings("deprecation")
 		@Override
+		@Deprecated
 		public @Nonnull ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
 			if (!worldIn.isRemote()) {
 				TileEntity tileEntity = AssertionUtilities.assertNonnull(worldIn.getTileEntity(pos));

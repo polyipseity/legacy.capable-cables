@@ -12,6 +12,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.I
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIExtensionConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.cursors.ICursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
@@ -36,10 +37,11 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.O
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.DefaultBinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
@@ -75,6 +77,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 	private static final INamespacePrefixedString PROPERTY_ACTIVATION_MOUSE_BUTTONS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyActivationMouseButtons());
 	private static final INamespacePrefixedString PROPERTY_RESIZE_BORDERS_DEFAULT_THICKNESS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyResizeBordersDefaultThickness());
 	private static final INamespacePrefixedString PROPERTY_RESIZE_BORDERS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyResizeBorders());
+
 	@UIProperty(PROPERTY_ACTIVATION_MOUSE_BUTTONS)
 	private final IBindingField<Set<Integer>> activationMouseButtons;
 	@UIProperty(PROPERTY_RESIZE_BORDERS)
@@ -82,10 +85,19 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 	@UIProperty(PROPERTY_RESIZE_BORDERS_DEFAULT_THICKNESS)
 	private final IBindingField<Map<EnumUISide, Double>> resizeBorders;
 
+	private final Modifier modifier = new Modifier(suppressThisEscapedWarning(() -> this));
+	private final IUIRendererContainerContainer<IResizingRenderer> rendererContainerContainer;
+	private final IBinderObserverSupplierHolder binderObserverSupplierHolder = new DefaultBinderObserverSupplierHolder();
+	@Nullable
+	private IResizeData resizeData;
+
 	@SuppressWarnings("unchecked")
 	@UIExtensionConstructor
 	public UITeleportingComponentUserResizableExtension(IUIExtensionArguments arguments) {
 		super((Class<C>) arguments.getContainerClass());
+
+		this.rendererContainerContainer =
+				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this), UIComponentUserResizeableExtensionEmptyResizingRenderer.class);
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.activationMouseButtons = IUIPropertyMappingValue.<Set<Integer>>createBindingField(CastUtilities.castUnchecked(Set.class),
@@ -110,18 +122,19 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		return PROPERTY_RESIZE_BORDERS_LOCATION;
 	}
 
-	private final Modifier modifier = new Modifier(suppressThisEscapedWarning(() -> this));
-	private final IUIRendererContainerContainer<IResizingRenderer> rendererContainerContainer =
-			new UIDefaultRendererContainerContainer<>(suppressThisEscapedWarning(() -> this),
-					UIDefaultRendererContainerContainer.createRendererContainerInitializer(UIComponentUserResizeableExtensionEmptyResizingRenderer.class));
-	@Nullable
-	private IResizeData resizeData;
-	private final BinderObserverSupplierHolder binderObserverSupplierHolder = new BinderObserverSupplierHolder();
-
 	@Override
-	public IUIRendererContainer<? extends IResizingRenderer> getRendererContainer()
-			throws IllegalStateException {
-		return getRendererContainerContainer().getRendererContainer();
+	@OverridingMethodsMustInvokeSuper
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		IUIComponentUserResizableExtension.super.initializeBindings(binderObserverSupplier);
+		getBinderObserverSupplierHolder().setValue(binderObserverSupplier);
+		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+				() -> ImmutableBinderAction.bind(
+						getActivationMouseButtons(),
+						getResizeBorders(), getResizeBorderDefaultThickness()
+				));
+		BindingUtilities.initializeBindings(
+				binderObserverSupplier, ImmutableList.of(getRendererContainerContainer())
+		);
 	}
 
 	public static String getPropertyActivationMouseButtons() {
@@ -187,72 +200,62 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		return Optional.ofNullable(cursor);
 	}
 
-	@Override
-	public void initializeRendererContainer(@NonNls CharSequence name)
-			throws IllegalStateException {
-		getRendererContainerContainer().initializeRendererContainer(name);
-	}
-
 	protected IUIRendererContainerContainer<IResizingRenderer> getRendererContainerContainer() {
 		return rendererContainerContainer;
 	}
 
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		IUIComponentUserResizableExtension.super.initializeBindings(binderObserverSupplier);
-		getBinderObserverSupplierHolder().setBinderObserverSupplier(binderObserverSupplier);
-		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-				() -> ImmutableBinderAction.bind(
-						getActivationMouseButtons(),
-						getResizeBorders(), getResizeBorderDefaultThickness()
-				));
-		BindingUtilities.initializeBindings(
-				ImmutableList.of(getRendererContainerContainer()),
-				binderObserverSupplier
-		);
-	}
-
-	protected BinderObserverSupplierHolder getBinderObserverSupplierHolder() {
+	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
 		return binderObserverSupplierHolder;
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		IUIComponentUserResizableExtension.super.cleanupBindings(binderObserverSupplier);
-		getBinderObserverSupplierHolder().setBinderObserverSupplier(null);
-		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-				() -> ImmutableBinderAction.unbind(
-						getActivationMouseButtons(),
-						getResizeBorders(), getResizeBorderDefaultThickness()
-				));
-		BindingUtilities.cleanupBindings(
-				ImmutableList.of(getRendererContainerContainer()),
-				binderObserverSupplier
-		);
+	public void cleanupBindings() {
+		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier -> {
+			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+					() -> ImmutableBinderAction.unbind(
+							getActivationMouseButtons(),
+							getResizeBorders(), getResizeBorderDefaultThickness()
+					));
+			BindingUtilities.cleanupBindings(
+					ImmutableList.of(getRendererContainerContainer())
+			);
+		});
+		getBinderObserverSupplierHolder().setValue(null);
+		IUIComponentUserResizableExtension.super.cleanupBindings();
 	}
-
-	@Override
-	public IExtensionType<INamespacePrefixedString, ?, IUIComponent> getType() { return StaticHolder.getType().getValue(); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 	public void onExtensionAdded(IUIComponent container) {
 		super.onExtensionAdded(container);
-		getContainer().ifPresent(c -> c.addModifier(getModifier()));
+		container.addModifier(getModifier());
+		container.getManager().flatMap(IUIComponentManager::getView)
+				.ifPresent(view -> IUIView.registerRendererContainers(view, ImmutableSet.of(getRendererContainer())));
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
+	public void onExtensionRemoved() {
+		getContainer().ifPresent(container -> {
+			container.removeModifier(getModifier());
+			container.getManager().flatMap(IUIComponentManager::getView)
+					.ifPresent(view -> IUIView.unregisterRendererContainers(view, ImmutableSet.of(getRendererContainer())));
+		});
+		super.onExtensionRemoved();
 	}
 
 	protected Modifier getModifier() { return modifier; }
 
 	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void onExtensionRemoved() {
-		super.onExtensionRemoved();
-		getContainer()
-				.ifPresent(c -> c.removeModifier(getModifier()));
+	public IUIRendererContainer<? extends IResizingRenderer> getRendererContainer() {
+		return getRendererContainerContainer().getRendererContainer();
 	}
+
+	@Override
+	public IExtensionType<INamespacePrefixedString, ?, IUIComponent> getType() { return StaticHolder.getType().getValue(); }
 
 	protected IBindingField<Map<EnumUISide, Double>> getResizeBorders() {
 		return resizeBorders;

@@ -37,7 +37,7 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Suppr
 public class UIDefaultCacheExtension
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IExtensionContainer<INamespacePrefixedString>, IExtensionContainer<INamespacePrefixedString>>
 		implements IUICacheExtension {
-	private static final IUIExtensionArguments DEFAULT_ARGUMENTS = new UIImmutableExtensionArguments(ImmutableMap.of(), IExtensionContainer.class);
+	private static final IUIExtensionArguments DEFAULT_ARGUMENTS = UIImmutableExtensionArguments.of(ImmutableMap.of(), IExtensionContainer.class, null);
 	private final Cache<INamespacePrefixedString, Object> cache =
 			CacheBuilder.newBuilder()
 					.initialCapacity(CapacityUtilities.getInitialCapacitySmall())
@@ -55,8 +55,8 @@ public class UIDefaultCacheExtension
 
 	@Override
 	public void onExtensionRemoved() {
-		super.onExtensionRemoved();
 		getDelegate().invalidateAll();
+		super.onExtensionRemoved();
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.core.mvvm.views.IUIMinecraftViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.extensions.UIExtensionRegistry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.MinecraftUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
@@ -20,7 +21,6 @@ import java.util.Optional;
 @OnlyIn(Dist.CLIENT)
 public interface IUIMinecraftBackgroundExtension
 		extends IUIExtension<INamespacePrefixedString, IUIMinecraftViewComponent<?, ?>>, IUIRendererContainerContainer<IUIMinecraftBackgroundExtension.IBackgroundRenderer> {
-
 	@OnlyIn(Dist.CLIENT)
 	enum StaticHolder {
 		;

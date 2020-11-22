@@ -14,10 +14,15 @@ public final class UIImmutableRendererArguments
 	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
 	private final Class<?> containerClass;
 
-	public UIImmutableRendererArguments(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings,
-	                                    Class<?> containerClass) {
+	private UIImmutableRendererArguments(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings,
+	                                     Class<?> containerClass) {
 		this.mappings = ImmutableMap.copyOf(mappings);
 		this.containerClass = containerClass;
+	}
+
+	public static UIImmutableRendererArguments of(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings,
+	                                              Class<?> containerClass) {
+		return new UIImmutableRendererArguments(mappings, containerClass);
 	}
 
 	@Override

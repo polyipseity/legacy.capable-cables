@@ -3,6 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.naming;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.DuplicateNameException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamedTracker;
@@ -21,8 +22,9 @@ public abstract class AbstractNamedTracker<E extends INamed>
 			throws DuplicateNameException {
 		return element.getName()
 				.map(name -> {
-					if (getData().put(name, element) != null)
-						throw new DuplicateNameException();
+					@Nullable E previousElement = getData().put(name, element);
+					if (!(previousElement == null || element.equals(previousElement)))
+						throw new DuplicateNameException(name);
 					return true;
 				})
 				.orElse(false);

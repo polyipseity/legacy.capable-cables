@@ -87,11 +87,13 @@ public class UIDefaultComponentUserRelocatableExtensionPreviewingRelocatingRende
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		super.cleanupBindings(binderObserverSupplier);
-		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-				() -> ImmutableBinderAction.unbind(
-						getPreviewColor()
-				));
+	public void cleanupBindings() {
+		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
+				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+						() -> ImmutableBinderAction.unbind(
+								getPreviewColor()
+						))
+		);
+		super.cleanupBindings();
 	}
 }

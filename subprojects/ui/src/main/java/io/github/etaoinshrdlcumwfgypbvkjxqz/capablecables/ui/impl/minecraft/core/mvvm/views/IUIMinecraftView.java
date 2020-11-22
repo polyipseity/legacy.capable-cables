@@ -10,6 +10,4 @@ import java.awt.*;
 
 @OnlyIn(Dist.CLIENT)
 public interface IUIMinecraftView<S extends Shape>
-		extends IUIView<S>, IUIMinecraftSubInfrastructure<IUIViewContext> {
-	void render(IUIViewContext context, double partialTicks);
-}
+		extends IUIView<S>, IUIMinecraftSubInfrastructure<IUIViewContext> {}

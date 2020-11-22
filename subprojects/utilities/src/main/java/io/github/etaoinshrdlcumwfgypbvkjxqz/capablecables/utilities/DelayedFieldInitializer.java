@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 public class DelayedFieldInitializer<T> {
 	private final Object initializeLock = new Object();
 	@Nullable
-	private Consumer<? super T> initializer;
+	private Consumer<@Nonnull ? super T> initializer;
 	private volatile boolean initialized = false;
 
 	public DelayedFieldInitializer(Consumer<@Nonnull ? super T> initializer) {

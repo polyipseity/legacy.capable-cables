@@ -20,34 +20,36 @@ public enum BindingUtilities {
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static void findAndInitializeBindings(Iterable<?> objects, Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public static void findAndInitializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier,
+	                                             Iterable<?> objects) {
 		initializeBindings(
-				Streams.stream(objects).unordered()
+				binderObserverSupplier, Streams.stream(objects).unordered()
 						.filter(IHasBinding.class::isInstance)
 						.map(IHasBinding.class::cast)
-						.collect(ImmutableSet.toImmutableSet()),
-				binderObserverSupplier);
+						.collect(ImmutableSet.toImmutableSet())
+		);
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static void initializeBindings(Iterable<? extends IHasBinding> bindings, Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public static void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier,
+	                                      Iterable<? extends IHasBinding> bindings) {
 		Streams.stream(bindings).unordered()
 				.forEach(binding -> binding.initializeBindings(binderObserverSupplier));
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static void findAndCleanupBindings(Iterable<?> objects, Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public static void findAndCleanupBindings(Iterable<?> objects) {
 		cleanupBindings(
 				Streams.stream(objects).unordered()
 						.filter(IHasBinding.class::isInstance)
 						.map(IHasBinding.class::cast)
-						.collect(ImmutableSet.toImmutableSet()),
-				binderObserverSupplier);
+						.collect(ImmutableSet.toImmutableSet())
+		);
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static void cleanupBindings(Iterable<? extends IHasBinding> bindings, Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+	public static void cleanupBindings(Iterable<? extends IHasBinding> bindings) {
 		Streams.stream(bindings).unordered()
-				.forEach(binding -> binding.cleanupBindings(binderObserverSupplier));
+				.forEach(IHasBinding::cleanupBindings);
 	}
 }

@@ -13,7 +13,7 @@ public abstract class AbstractNamed
 	private final String name;
 
 	public AbstractNamed(@NonNls @Nullable CharSequence name) {
-		this.name = Optional.ofNullable(name).map(CharSequence::toString).orElse("");
+		this.name = Optional.ofNullable(name).map(CharSequence::toString).orElse(null);
 	}
 
 	@Override

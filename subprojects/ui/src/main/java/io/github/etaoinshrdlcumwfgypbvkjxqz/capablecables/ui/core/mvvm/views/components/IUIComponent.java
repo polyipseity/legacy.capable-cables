@@ -5,10 +5,13 @@ import com.google.common.collect.Lists;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.traits.IHasBindingMap;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentLifecycleModifier;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentActiveLifecycleModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentModifier;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentStructureLifecycleModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentTransformChildrenModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventTarget;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIComponentRenderer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeDescriptorProvider;
@@ -32,8 +35,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface IUIComponent
-		extends INamed, INode, IShapeDescriptorProvider, IHasBinding, IHasBindingMap, IUIEventTarget, IExtensionContainer<INamespacePrefixedString>,
-		IUIComponentLifecycleModifier, IUIComponentTransformChildrenModifier {
+		extends INamed, INode, IShapeDescriptorProvider, IHasBinding, IHasBindingMap, IUIEventTarget, IExtensionContainer<INamespacePrefixedString>, IUIRendererContainerContainer<IUIComponentRenderer<?>>,
+		IUIComponentStructureLifecycleModifier, IUIComponentActiveLifecycleModifier, IUIComponentTransformChildrenModifier {
 	static <T> Optional<T> getYoungestParentInstanceOf(IUIComponent self, Class<T> clazz) {
 		for (Iterator<IUIComponent> iterator = new ParentIterator(self.getParent().orElse(null));
 		     iterator.hasNext(); ) {
@@ -130,12 +133,6 @@ public interface IUIComponent
 
 	@SuppressWarnings("UnusedReturnValue")
 	boolean moveModifierToTop(IUIComponentModifier modifier);
-
-	@Override
-	void initialize(IUIComponentContext context);
-
-	@Override
-	void removed(IUIComponentContext context);
 
 	boolean containsPoint(IUIComponentContext context, Point2D point);
 

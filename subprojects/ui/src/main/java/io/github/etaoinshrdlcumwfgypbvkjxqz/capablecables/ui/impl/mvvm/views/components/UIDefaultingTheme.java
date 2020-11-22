@@ -5,11 +5,15 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming.IUIThe
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 
-public class UIDefaultViewComponentTheme
+public class UIDefaultingTheme
 		implements IUITheme {
-	@SuppressWarnings("deprecation")
 	@Override
 	public void apply(Iterable<? extends IUIRendererContainer<?>> rendererContainers) {
+		applyDefaultRenderers(rendererContainers);
+	}
+
+	@SuppressWarnings("deprecation")
+	public static void applyDefaultRenderers(Iterable<? extends IUIRendererContainer<?>> rendererContainers) {
 		rendererContainers.forEach(rendererContainer -> {
 			try {
 				rendererContainer.setRenderer(

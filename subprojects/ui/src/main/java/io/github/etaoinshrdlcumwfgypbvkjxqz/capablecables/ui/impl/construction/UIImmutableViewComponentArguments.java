@@ -13,8 +13,12 @@ public final class UIImmutableViewComponentArguments
 		implements IUIViewComponentArguments {
 	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
 
-	public UIImmutableViewComponentArguments(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings) {
+	private UIImmutableViewComponentArguments(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings) {
 		this.mappings = ImmutableMap.copyOf(mappings);
+	}
+
+	public static UIImmutableViewComponentArguments of(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings) {
+		return new UIImmutableViewComponentArguments(mappings);
 	}
 
 	@Override

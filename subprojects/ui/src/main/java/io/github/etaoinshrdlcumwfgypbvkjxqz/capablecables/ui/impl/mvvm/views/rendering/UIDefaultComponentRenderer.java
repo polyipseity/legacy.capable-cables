@@ -3,6 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.re
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIRendererArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIComponentRenderer;
 
 public class UIDefaultComponentRenderer<C extends IUIComponent>
@@ -10,4 +11,7 @@ public class UIDefaultComponentRenderer<C extends IUIComponent>
 		implements IUIComponentRenderer<C> {
 	@UIRendererConstructor
 	public UIDefaultComponentRenderer(IUIRendererArguments arguments) { super(arguments); }
+
+	@Override
+	public void render(IUIComponentContext context, EnumRenderStage stage) {}
 }

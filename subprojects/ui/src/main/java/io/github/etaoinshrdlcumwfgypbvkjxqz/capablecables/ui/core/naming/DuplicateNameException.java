@@ -5,7 +5,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import java.util.Optional;
 
 public class DuplicateNameException
-		extends IllegalStateException {
+		extends IllegalArgumentException {
 	private static final long serialVersionUID = 8045556356079069945L;
 
 	public DuplicateNameException() {}

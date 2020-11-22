@@ -9,6 +9,7 @@ public enum FunctionUtilities {
 	;
 
 	private static final Consumer<?> EMPTY_CONSUMER = t -> {};
+	private static final BiConsumer<?, ?> EMPTY_BI_CONSUMER = (t, u) -> {};
 	private static final Runnable EMPTY_RUNNABLE = () -> {};
 	private static final Predicate<?> ALWAYS_FALSE_PREDICATE = t -> false;
 	private static final Predicate<?> ALWAYS_TRUE_PREDICATE = t -> true;
@@ -18,6 +19,9 @@ public enum FunctionUtilities {
 
 	@SuppressWarnings("unchecked") // COMMENT always safe as it accepts any 'Object'
 	public static <T> Consumer<T> getEmptyConsumer() { return (Consumer<T>) EMPTY_CONSUMER; }
+
+	@SuppressWarnings("unchecked") // COMMENT always safe as it accepts any 'Object'
+	public static <T, U> BiConsumer<T, U> getEmptyBiConsumer() { return (BiConsumer<T, U>) EMPTY_BI_CONSUMER; }
 
 	public static Runnable getEmptyRunnable() {
 		return EMPTY_RUNNABLE;

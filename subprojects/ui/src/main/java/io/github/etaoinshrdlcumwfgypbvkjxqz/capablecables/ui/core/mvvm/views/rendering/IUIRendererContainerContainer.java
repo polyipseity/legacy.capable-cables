@@ -1,13 +1,9 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBinding;
-import org.jetbrains.annotations.NonNls;
 
+@SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface IUIRendererContainerContainer<R extends IUIRenderer<?>>
 		extends IHasBinding {
-	IUIRendererContainer<? extends R> getRendererContainer()
-			throws IllegalStateException;
-
-	void initializeRendererContainer(@NonNls CharSequence name)
-			throws IllegalStateException;
+	IUIRendererContainer<? extends R> getRendererContainer();
 }

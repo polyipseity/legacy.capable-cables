@@ -105,6 +105,4 @@ public enum EnumGLFWCursor
 
 	@Override
 	public void close() { GLFW.glfwDestroyCursor(getHandle()); }
-
-
 }

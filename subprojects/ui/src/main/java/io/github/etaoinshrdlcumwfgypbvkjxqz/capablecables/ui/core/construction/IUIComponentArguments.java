@@ -7,6 +7,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descrip
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 
 import java.util.Map;
+import java.util.Optional;
 
 public interface IUIComponentArguments
 		extends INamed {
@@ -14,4 +15,6 @@ public interface IUIComponentArguments
 	Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView();
 
 	IShapeDescriptor<?> getShapeDescriptor();
+
+	Optional<? extends String> getRendererName();
 }

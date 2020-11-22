@@ -9,8 +9,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.naming.AbstractNamed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BinderObserverSupplierHolder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.DefaultBinderObserverSupplierHolder;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.jetbrains.annotations.NonNls;
 
@@ -22,12 +23,12 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 		extends AbstractNamed
 		implements IUIRendererContainer<R> {
 	private final OptionalWeakReference<IUIRendererContainerContainer<?>> container;
-	private final BinderObserverSupplierHolder binderObserverSupplierHolder = new BinderObserverSupplierHolder();
+	private final IBinderObserverSupplierHolder binderObserverSupplierHolder = new DefaultBinderObserverSupplierHolder();
 	private final Class<? extends R> defaultRendererClass;
 	@Nullable
 	private R renderer;
 
-	public UIDefaultRendererContainer(@NonNls CharSequence name, IUIRendererContainerContainer<?> container, Class<? extends R> defaultRendererClass) {
+	public UIDefaultRendererContainer(@Nullable @NonNls CharSequence name, IUIRendererContainerContainer<?> container, Class<? extends R> defaultRendererClass) {
 		super(name);
 		this.container = new OptionalWeakReference<>(container);
 		this.defaultRendererClass = defaultRendererClass;
@@ -37,26 +38,24 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 	@OverridingMethodsMustInvokeSuper
 	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		IUIRendererContainer.super.initializeBindings(binderObserverSupplier);
-		getBinderObserverSupplierHolder().setBinderObserverSupplier(binderObserverSupplier);
+		getBinderObserverSupplierHolder().setValue(binderObserverSupplier);
 		BindingUtilities.initializeBindings(
-				getRenderer().map(ImmutableList::of).orElseGet(ImmutableList::of),
-				binderObserverSupplier
+				binderObserverSupplier, getRenderer().map(ImmutableList::of).orElseGet(ImmutableList::of)
 		);
 	}
 
-	protected BinderObserverSupplierHolder getBinderObserverSupplierHolder() {
+	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
 		return binderObserverSupplierHolder;
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void cleanupBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		IUIRendererContainer.super.cleanupBindings(binderObserverSupplier);
-		getBinderObserverSupplierHolder().setBinderObserverSupplier(null);
-		BindingUtilities.cleanupBindings(
-				getRenderer().map(ImmutableList::of).orElseGet(ImmutableList::of),
-				binderObserverSupplier
-		);
+	public void cleanupBindings() {
+		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
+				BindingUtilities.cleanupBindings(
+						getRenderer().map(ImmutableList::of).orElseGet(ImmutableList::of)));
+		getBinderObserverSupplierHolder().setValue(null);
+		IUIRendererContainer.super.cleanupBindings();
 	}
 
 	@Override
@@ -75,11 +74,11 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 				renderer,
 				nextRenderer -> {
 					Optional<? extends Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>>> binderObserverSupplier =
-							getBinderObserverSupplierHolder().getBinderObserverSupplier();
+							getBinderObserverSupplierHolder().getValue();
 					@Nullable R previousRenderer = this.renderer;
 					this.renderer = nextRenderer;
 					if (previousRenderer != null)
-						binderObserverSupplier.ifPresent(previousRenderer::cleanupBindings);
+						binderObserverSupplier.ifPresent(binderObserverSupplier1 -> previousRenderer.cleanupBindings());
 					if (nextRenderer != null)
 						binderObserverSupplier.ifPresent(nextRenderer::initializeBindings);
 				},

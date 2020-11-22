@@ -6,7 +6,7 @@
 	<!-- SECTION using -->
 	<!-- COMMENT renderers -->
 	<using alias="renderer.component.window.debug.custom"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIMinecraftDebug$DebugUI$CustomWindowMinecraftComponentRenderer"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIMinecraftDebug$DebugUI$CustomWindowComponentRenderer"/>
 	<using alias="renderer.extension.minecraft.background.default"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.extensions.background.UIMinecraftBackgroundExtensionDefaultBackgroundRenderer"/>
 	<using alias="renderer.extension.user_relocatable.previewing.minecraft"

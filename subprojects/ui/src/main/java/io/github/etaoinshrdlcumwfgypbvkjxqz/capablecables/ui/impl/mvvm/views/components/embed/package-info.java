@@ -2,7 +2,7 @@
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
 @LocalVariablesAreNonnullByDefault
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.wrappers;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.embed;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.FieldsAreNonnullByDefault;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.LocalVariablesAreNonnullByDefault;

@@ -17,8 +17,8 @@ import java.util.stream.Stream;
 
 public interface IUIComponentModifier {
 	@SuppressWarnings("UnstableApiUsage")
-	static <M> Stream<IIntersection<IUIComponentModifier, M>> streamSpecificModifiersUnion(Iterable<? extends IUIComponentModifier> modifiers,
-	                                                                                       Class<M> modifierClass) {
+	static <M> Stream<IIntersection<IUIComponentModifier, M>> streamSpecificModifiersIntersection(Iterable<? extends IUIComponentModifier> modifiers,
+	                                                                                              Class<M> modifierClass) {
 		return Streams.stream(modifiers)
 				.filter(modifierClass::isInstance)
 				.map(modifier -> ImmutableIntersection.of(modifier, modifierClass.cast(modifier)));

@@ -19,7 +19,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.AnnotationUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingConsumer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
@@ -36,14 +35,14 @@ public class JAXBUIDefaultComponentAdapterExtensionHandler
 	}
 
 	@Override
-	@SuppressWarnings({"deprecation", "cast"})
+	@SuppressWarnings({"deprecation", "cast", "unchecked", "RedundantSuppression"})
 	protected void accept0(IJAXBAdapterContext context, IJAXBUIComponentAdapterContext subContext, Extension left) {
 		subContext.getContainer()
 				.flatMap(container -> CastUtilities.castChecked(IExtensionContainer.class, container))
 				.map(CastUtilities::<IExtensionContainer<?>>castUnchecked)
 				.ifPresent(container -> {
 					Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = JAXBUIComponentUtilities.createMappings(context, left.getProperty());
-					IUIExtensionArguments argument = new UIImmutableExtensionArguments(mappings, container.getClass());
+					IUIExtensionArguments argument = UIImmutableExtensionArguments.of(mappings, container.getClass(), left.getRendererName());
 
 					Class<?> clazz = AssertionUtilities.assertNonnull(subContext.getAliasesView().get(left.getClazz()));
 					Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIExtensionConstructor.class,
@@ -71,19 +70,18 @@ public class JAXBUIDefaultComponentAdapterExtensionHandler
 							subContext.getView().orElse(null),
 							ret);
 					Iterables.concat(
-							ImmutableSet.of(left.getRendererContainer()),
 							left.getAnyContainer()
 									.<Iterable<Object>>map(AnyContainer::getAny)
 									.orElseGet(ImmutableSet::of))
-							.forEach(IThrowingConsumer.executeNow(any ->
+							.forEach(any ->
 									IJAXBUIComponentBasedAdapterContext.findHandler(subContext1, any)
-											.ifPresent(IThrowingConsumer.executeNow(handler ->
+											.ifPresent(handler ->
 													handler.accept(
 															context.withData(ImmutableMap.of(IJAXBUIComponentAdapterContext.class, subContext1)),
 															CastUtilities.castUnchecked(any) // COMMENT should not throw
 													)
-											))
-							));
+											)
+							);
 				});
 	}
 }

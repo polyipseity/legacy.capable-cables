@@ -24,7 +24,11 @@ public interface INamed {
 							return name.get();
 						},
 						Function.identity(),
-						(named1, named2) -> { throw new DuplicateNameException(); }
+						(named1, named2) -> {
+							if (named1.equals(named2))
+								return named1;
+							throw new DuplicateNameException(named1.getName().orElse(null));
+						}
 				));
 	}
 }

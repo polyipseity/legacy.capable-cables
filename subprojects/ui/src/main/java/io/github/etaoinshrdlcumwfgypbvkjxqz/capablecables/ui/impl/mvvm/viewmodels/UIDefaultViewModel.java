@@ -17,10 +17,4 @@ public class UIDefaultViewModel<M extends IUIModel>
 
 	@Override
 	public void setModel(M model) { this.model = model; }
-
-	@Override
-	public void initialize() {}
-
-	@Override
-	public void removed() {}
 }

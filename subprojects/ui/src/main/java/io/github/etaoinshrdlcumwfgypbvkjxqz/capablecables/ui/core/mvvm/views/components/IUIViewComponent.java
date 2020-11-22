@@ -2,7 +2,6 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.co
 
 import com.google.common.collect.ImmutableSet;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.traits.IHasBindingMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
@@ -11,34 +10,39 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.Fu
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingBiFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBinding;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional2;
 
 import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager<?>>
 		extends IHasBinding, IHasBindingMap, IUIView<S> {
 	static Optional<IUIComponentContext> createComponentContextWithManager(IUIViewComponent<?, ?> instance) {
-		return Optional2.of(
-				() -> instance.createComponentContext().orElse(null),
-				() -> instance.getManager().orElse(null))
-				.map(values -> {
-					IUIComponentContext context = values.getValue1Nonnull();
-					IUIComponentManager<?> manager = values.getValue2Nonnull();
-					context.getMutator().push(context, manager);
+		return instance.createComponentContext()
+				.map(context -> {
+					context.getMutator().push(context, instance.getManager());
 					return context;
 				});
 	}
 
-	Optional<? extends IUIComponentContext> createComponentContext()
-			throws IllegalStateException;
+	Optional<? extends IUIComponentContext> createComponentContext();
 
-	Optional<? extends M> getManager();
+	M getManager();
 
-	void setManager(@Nullable M manager);
+	void setManager(M manager);
+
+	static <T extends IUIViewComponent<S, M>,
+			S extends Shape,
+			M extends IUIComponentManager<?>> T create(Supplier<@Nonnull ? extends T> constructor,
+	                                                   M manager) {
+		T result = constructor.get();
+		result.setManager(manager);
+		return result;
+	}
 
 	static <T extends Throwable> void traverseComponentTreeDefault(IUIComponentContext context,
 	                                                               IUIComponent root,
@@ -69,6 +73,33 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 					}
 					return parent;
 				}),
+				repeated -> { throw new AssertionError(); });
+	}
+
+	static void traverseComponentTreeDefault(IUIComponent root,
+	                                         Consumer<@Nonnull ? super IUIComponent> pre,
+	                                         BiConsumer<@Nonnull ? super IUIComponent, @Nonnull ? super Iterable<? super IUIComponent>> post) {
+		traverseComponentTreeDefault(root, pre, post, FunctionUtilities.getAlwaysTruePredicate());
+	}
+
+	static void traverseComponentTreeDefault(IUIComponent root,
+	                                         Consumer<@Nonnull ? super IUIComponent> pre,
+	                                         BiConsumer<@Nonnull ? super IUIComponent, @Nonnull ? super Iterable<? super IUIComponent>> post,
+	                                         Predicate<@Nonnull ? super IUIComponent> predicate) {
+		TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, root,
+				component -> {
+					if (predicate.test(component)) {
+						pre.accept(component);
+					}
+					return component;
+				},
+				component -> predicate.test(component) ? component.getChildrenView() : ImmutableSet.of(),
+				(parent, children) -> {
+					if (predicate.test(parent)) {
+						post.accept(parent, children);
+					}
+					return parent;
+				},
 				repeated -> { throw new AssertionError(); });
 	}
 

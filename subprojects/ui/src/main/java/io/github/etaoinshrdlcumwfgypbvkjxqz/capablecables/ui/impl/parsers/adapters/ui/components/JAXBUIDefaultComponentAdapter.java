@@ -84,13 +84,13 @@ public class JAXBUIDefaultComponentAdapter
 
 	public static <T extends JAXBUIDefaultComponentAdapter> T makeParserStandard(T instance) {
 		instance.addObjectHandler(Anchor.class, new JAXBUIDefaultComponentAdapterAnchorHandler());
-		instance.addObjectHandler(RendererContainer.class, new JAXBUIDefaultComponentAdapterRendererContainerHandler());
 		instance.addObjectHandler(Extension.class, new JAXBUIDefaultComponentAdapterExtensionHandler());
 		return instance;
 	}
 
 	@Override
 	@Deprecated
+	@SuppressWarnings({"unchecked", "RedundantSuppression"})
 	public @Nonnull IUIViewComponent<?, ?> leftToRight(@Nonnull ComponentUI left) {
 		return getThreadLocalContext()
 				.map(context -> {
@@ -130,15 +130,14 @@ public class JAXBUIDefaultComponentAdapter
 								);
 
 						// COMMENT configure components
+						Map<String, IUIComponent> componentMap = INamed.toNamedMap(view.getChildrenFlatView()); // COMMENT need to build it ourselves
 						TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, rawComponent,
 								node -> {
 									assert node != null;
-									IUIComponent component = IUIView.getNamedTrackers(view).get(IUIComponent.class, node.getName())
-											.orElseThrow(AssertionError::new);
+									IUIComponent component = AssertionUtilities.assertNonnull(componentMap.get(node.getName()));
 									IJAXBUIComponentAdapterContext componentContext = new JAXBUIImmutableComponentAdapterContext(aliases, getObjectHandlers(), getElementHandlers(), view, component);
 									Iterables.concat(
 											node.getAnchor(),
-											ImmutableSet.of(node.getRendererContainer()),
 											node.getExtension(),
 											node.getAnyContainer()
 													.map(AnyContainer::getAny)

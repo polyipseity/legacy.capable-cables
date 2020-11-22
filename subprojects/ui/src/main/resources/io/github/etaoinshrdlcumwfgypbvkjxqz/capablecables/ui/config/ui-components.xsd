@@ -30,9 +30,9 @@
 			<xs:field xpath="@target"/>
 		</xs:keyref>
 		<!-- COMMENT renderer container name -->
-		<xs:key name="componentUIRendererContainerName">
-			<xs:selector xpath=".//ui:renderer-container"/>
-			<xs:field xpath="@name"/>
+		<xs:key name="componentUIRendererName">
+			<xs:selector xpath=".//ui:component|ui:extension"/>
+			<xs:field xpath="@rendererName"/>
 		</xs:key>
 		<!-- COMMENT using id -->
 		<xs:key name="componentUIUsingID">
@@ -73,22 +73,15 @@
 		</xs:complexType>
 	</xs:element>
 
-	<!-- COMMENT renderer container -->
-	<xs:element name="rendererContainer">
-		<xs:complexType>
-			<xs:attribute name="name" type="xs:string" use="required"/>
-		</xs:complexType>
-	</xs:element>
-
 	<!-- COMMENT extension -->
 	<xs:element name="extension">
 		<xs:complexType>
 			<xs:sequence>
 				<xs:group ref="ui:propertyContainerGroup"/>
-				<xs:element ref="ui:rendererContainer"/>
 				<xs:element ref="ui:anyContainer" minOccurs="0"/>
 			</xs:sequence>
 			<xs:attributeGroup ref="ui:classBasedAttributeGroup"/>
+			<xs:attributeGroup ref="ui:hasRendererGroup"/>
 		</xs:complexType>
 	</xs:element>
 
@@ -110,7 +103,6 @@
 			<xs:sequence>
 				<xs:element ref="ui:shape"/>
 				<xs:element ref="ui:anchor" minOccurs="0" maxOccurs="unbounded"/>
-				<xs:element ref="ui:rendererContainer"/>
 				<xs:group ref="ui:propertyContainerGroup"/>
 				<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
@@ -119,6 +111,7 @@
 			<xs:attributeGroup ref="ui:classBasedAttributeGroup"/>
 			<xs:attribute name="name" type="xs:string" use="required"/>
 			<xs:attributeGroup ref="ui:componentEventsAttributeGroup"/>
+			<xs:attributeGroup ref="ui:hasRendererGroup"/>
 		</xs:complexType>
 	</xs:element>
 
@@ -176,6 +169,10 @@
 	<xs:attributeGroup name="componentEventsAttributeGroup">
 		<xs:attributeGroup ref="ui:DOMEventsAttributeGroup"/>
 		<xs:attribute name="char_typed" type="ui:NSPrefixedString"/>
+	</xs:attributeGroup>
+
+	<xs:attributeGroup name="hasRendererGroup">
+		<xs:attribute name="rendererName" type="xs:string" use="required"/>
 	</xs:attributeGroup>
 
 	<!-- SECTION elements -->
