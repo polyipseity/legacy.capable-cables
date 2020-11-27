@@ -31,20 +31,20 @@ public final class ImmutableUnion<L, R>
 		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariableMap().values());
 	}
 
-	public static <L, R> ImmutableUnion<L, R> left(L left) {
-		return of(left, null);
-	}
-
-	public static <L, R> ImmutableUnion<L, R> choice(Object object, Class<L> leftClazz, Class<R> rightClazz)
+	public static <L, R> ImmutableUnion<L, R> of(Object object, Class<L> leftClazz, Class<R> rightClazz)
 			throws IllegalArgumentException {
 		if (leftClazz.isInstance(object))
-			return left(leftClazz.cast(object));
+			return ofLeft(leftClazz.cast(object));
 		else if (rightClazz.isInstance(object))
-			return right(rightClazz.cast(object));
+			return ofRight(rightClazz.cast(object));
 		throw new IllegalArgumentException();
 	}
 
-	public static <L, R> ImmutableUnion<L, R> right(R right) {
+	public static <L, R> ImmutableUnion<L, R> ofLeft(L left) {
+		return of(left, null);
+	}
+
+	public static <L, R> ImmutableUnion<L, R> ofRight(R right) {
 		return of(null, right);
 	}
 
@@ -76,8 +76,8 @@ public final class ImmutableUnion<L, R>
 	@Override
 	public <L2, R2> IUnion<L2, R2> mapBoth(Function<@Nonnull ? super L, @Nonnull ? extends L2> leftMapper, Function<@Nonnull ? super R, @Nonnull ? extends R2> rightMapper) throws IllegalArgumentException {
 		return map(
-				left -> left(leftMapper.apply(left)),
-				right -> right(rightMapper.apply(right))
+				left -> ofLeft(leftMapper.apply(left)),
+				right -> ofRight(rightMapper.apply(right))
 		);
 	}
 
@@ -90,14 +90,15 @@ public final class ImmutableUnion<L, R>
 	}
 
 	@Override
-	public void accept(Consumer<@Nonnull ? super L> leftConsumer, Consumer<@Nonnull ? super R> rightConsumer) {
-		// COMMENT at least one of them is present
-		getLeft().ifPresent(leftConsumer);
-		getRight().ifPresent(rightConsumer);
+	public IUnion<R, L> swap() {
+		return map(ImmutableUnion::ofRight, ImmutableUnion::ofLeft);
 	}
 
 	@Override
-	public IUnion<R, L> swap() {
-		return map(ImmutableUnion::right, ImmutableUnion::left);
+	public IUnion<L, R> accept(Consumer<@Nonnull ? super L> leftConsumer, Consumer<@Nonnull ? super R> rightConsumer) {
+		// COMMENT one and only one of them is present
+		getLeft().ifPresent(leftConsumer);
+		getRight().ifPresent(rightConsumer);
+		return this;
 	}
 }

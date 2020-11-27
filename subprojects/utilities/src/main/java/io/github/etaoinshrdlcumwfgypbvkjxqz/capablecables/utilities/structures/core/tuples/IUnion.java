@@ -35,5 +35,5 @@ public interface IUnion<L, R>
 		return instance.map(Function.identity(), Function.identity());
 	}
 
-	void accept(Consumer<@Nonnull ? super L> leftConsumer, Consumer<@Nonnull ? super R> rightConsumer);
+	IUnion<L, R> accept(Consumer<@Nonnull ? super L> leftConsumer, Consumer<@Nonnull ? super R> rightConsumer);
 }
