@@ -41,13 +41,6 @@ public class UIDefaultComponentUserResizableExtensionPreviewingResizingRenderer
 				.ifPresent(shape -> render0(context, shape));
 	}
 
-	@NonNls
-	public static final String PROPERTY_PREVIEW_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.previewing.preview.color";
-	private static final INamespacePrefixedString PROPERTY_PREVIEW_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyPreviewColor());
-
-	@UIProperty(PROPERTY_PREVIEW_COLOR)
-	private final IBindingField<Color> previewColor;
-
 	@UIRendererConstructor
 	public UIDefaultComponentUserResizableExtensionPreviewingResizingRenderer(IUIRendererArguments arguments) {
 		super(arguments);

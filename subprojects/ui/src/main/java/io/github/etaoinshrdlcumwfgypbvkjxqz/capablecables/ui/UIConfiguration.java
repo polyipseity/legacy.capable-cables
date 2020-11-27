@@ -47,7 +47,7 @@ public final class UIConfiguration
 
 			See https://github.com/LWJGL/lwjgl3/issues/306#issuecomment-300481571.
 			*/
-			System.setProperty("java.awt.headless", "true");
+			System.setProperty("java.awt.headless", "true"); // COMMENT err...  it is not needed actually, Minecraft sets it already
 
 			UIEventBusEntryPoint.setEventBus(EventBusSubject.getUIEventBus());
 		}

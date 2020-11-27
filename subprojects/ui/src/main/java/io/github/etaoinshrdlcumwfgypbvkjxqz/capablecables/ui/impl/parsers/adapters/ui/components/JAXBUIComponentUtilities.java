@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Streams;
@@ -42,18 +43,70 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.i
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableUnion;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 
-import java.util.Map;
+import java.awt.geom.AffineTransform;
+import java.lang.invoke.MethodHandle;
+import java.lang.reflect.Constructor;
+import java.util.*;
+import java.util.function.Function;
 
+// TODO needs improvement, too procedural
 public enum JAXBUIComponentUtilities {
 	;
+
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
+	private static final Map<IUIEventType, Function<@Nonnull IUnion<? extends Component, ? extends ComponentEmbed>, @Nonnull Optional<String>>> EVENT_TYPE_FUNCTION_MAP = ImmutableMap.<IUIEventType, Function<@Nonnull IUnion<? extends Component, ? extends ComponentEmbed>, @Nonnull Optional<String>>>builder()
+			.put(EnumUIEventDOMType.LOAD, component -> component.map(Component::getLoad, ComponentEmbed::getLoad))
+			.put(EnumUIEventDOMType.UNLOAD, component -> component.map(Component::getUnload, ComponentEmbed::getUnload))
+			.put(EnumUIEventDOMType.ABORT, component -> component.map(Component::getAbort, ComponentEmbed::getAbort))
+			.put(EnumUIEventDOMType.ERROR, component -> component.map(Component::getError, ComponentEmbed::getError))
+			.put(EnumUIEventDOMType.SELECT, component -> component.map(Component::getSelect, ComponentEmbed::getSelect))
+			.put(EnumUIEventDOMType.FOCUS_OUT_POST, component -> component.map(Component::getBlur, ComponentEmbed::getBlur))
+			.put(EnumUIEventDOMType.FOCUS_IN_POST, component -> component.map(Component::getFocus, ComponentEmbed::getFocus))
+			.put(EnumUIEventDOMType.FOCUS_IN_PRE, component -> component.map(Component::getFocusin, ComponentEmbed::getFocusin))
+			.put(EnumUIEventDOMType.FOCUS_OUT_PRE, component -> component.map(Component::getFocusout, ComponentEmbed::getFocusout))
+			.put(EnumUIEventDOMType.CLICK_AUXILIARY, component -> component.map(Component::getAuxclick, ComponentEmbed::getAuxclick))
+			.put(EnumUIEventDOMType.CLICK, component -> component.map(Component::getClick, ComponentEmbed::getClick))
+			.put(EnumUIEventDOMType.CLICK_DOUBLE, component -> component.map(Component::getDblclick, ComponentEmbed::getDblclick))
+			.put(EnumUIEventDOMType.MOUSE_DOWN, component -> component.map(Component::getMousedown, ComponentEmbed::getMousedown))
+			.put(EnumUIEventDOMType.MOUSE_ENTER, component -> component.map(Component::getMouseenter, ComponentEmbed::getMouseenter))
+			.put(EnumUIEventDOMType.MOUSE_LEAVE, component -> component.map(Component::getMouseleave, ComponentEmbed::getMouseleave))
+			.put(EnumUIEventDOMType.MOUSE_MOVE, component -> component.map(Component::getMousemove, ComponentEmbed::getMousemove))
+			.put(EnumUIEventDOMType.MOUSE_LEAVE_SELF, component -> component.map(Component::getMouseout, ComponentEmbed::getMouseout))
+			.put(EnumUIEventDOMType.MOUSE_ENTER_SELF, component -> component.map(Component::getMouseover, ComponentEmbed::getMouseover))
+			.put(EnumUIEventDOMType.MOUSE_UP, component -> component.map(Component::getMouseup, ComponentEmbed::getMouseup))
+			.put(EnumUIEventDOMType.WHEEL, component -> component.map(Component::getWheel, ComponentEmbed::getWheel))
+			.put(EnumUIEventDOMType.INPUT_PRE, component -> component.map(Component::getBeforeinput, ComponentEmbed::getBeforeinput))
+			.put(EnumUIEventDOMType.INPUT_POST, component -> component.map(Component::getInput, ComponentEmbed::getInput))
+			.put(EnumUIEventDOMType.KEY_DOWN, component -> component.map(Component::getKeydown, ComponentEmbed::getKeydown))
+			.put(EnumUIEventDOMType.KEY_UP, component -> component.map(Component::getKeyup, ComponentEmbed::getKeyup))
+			.put(EnumUIEventDOMType.COMPOSITION_START, component -> component.map(Component::getCompositionstart, ComponentEmbed::getCompositionstart))
+			.put(EnumUIEventDOMType.COMPOSITION_UPDATE, component -> component.map(Component::getCompositionupdate, ComponentEmbed::getCompositionupdate))
+			.put(EnumUIEventDOMType.COMPOSITION_END, component -> component.map(Component::getCompositionend, ComponentEmbed::getCompositionend))
+			.put(EnumUIEventComponentType.CHAR_TYPED, component -> component.map(Component::getCharTyped, ComponentEmbed::getCharTyped))
+			.build();
 
 	@SuppressWarnings("UnstableApiUsage")
 	public static @Immutable Map<String, Class<?>> adaptUsingFromJAXB(Iterable<? extends Using> using)
 			throws ClassNotFoundException {
 		return Streams.stream(using).unordered()
-				.map(IThrowingFunction.executeNow(u -> {
-					assert u != null;
-					return Maps.immutableEntry(u.getAlias(), Class.forName(u.getTarget()));
+				.map(IThrowingFunction.executeNow(u -> Maps.immutableEntry(u.getAlias(), Class.forName(u.getTarget()))))
+				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+	}
+
+	@SuppressWarnings("cast")
+	public static IUIViewComponent<?, ?> createView(IJAXBAdapterContext context, View view)
+			throws Throwable {
+		return context.getDatum(IJAXBUIComponentAdapterContext.class)
+				.map(IThrowingFunction.executeNow(subContext -> {
+					Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(context, view.getProperty());
+					IUIViewComponentArguments argument = UIImmutableViewComponentArguments.of(mappings);
+
+					Class<?> clazz = AssertionUtilities.assertNonnull(subContext.getAliasesView().get(view.getClazz()));
+					Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIViewComponentConstructor.class, Arrays.asList(clazz.getDeclaredConstructors()));
+					MethodHandle constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
+					constructorHandle = constructorHandle.asType(constructorHandle.type().changeReturnType(IUIViewComponent.class));
+
+					return (IUIViewComponent<?, ?>) constructorHandle.invokeExact((IUIViewComponentArguments) argument);
 				}))
 				.orElseThrow(IllegalArgumentException::new);
 	}
@@ -78,30 +131,17 @@ public enum JAXBUIComponentUtilities {
 				.map(IThrowingFunction.executeNow(subContext ->
 						TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, component,
 								IThrowingFunction.executeNow(node -> {
-									Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(context, node.getProperty());
-									// COMMENT attributes
-									{
-										Map<INamespacePrefixedString, IUIPropertyMappingValue> attributes = new HashMap<>(getEventTypeFunctionMap().size());
+									Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings =
+											MapUtilities.concatMaps(createMappings(context, node.getProperty()),
+													createEventMappings(ImmutableUnion.ofLeft(node)));
 
-										getEventTypeFunctionMap()
-												.forEach((key, value) -> {
-													assert key != null;
-													assert value != null;
-													attributes.put(key.getEventType(),
-															new UIImmutablePropertyMappingValue(null,
-																	AssertionUtilities.assertNonnull(value.apply(node))
-																			.map(IUIEventType.StaticHolder.getDefaultPrefix()::concat)
-																			.map(ImmutableNamespacePrefixedString::of)
-																			.orElse(null)));
-												});
-
-										mappings = MapUtilities.concatMaps(mappings, attributes);
-									}
 									IShapeDescriptorBuilder<?> shapeDescriptorBuilder = createShapeDescriptorBuilder(context, node.getShape());
 									IUIComponentArguments argument = UIImmutableComponentArguments.of(node.getName(),
 											mappings,
 											shapeDescriptorBuilder.build(),
-											node.getRendererName());
+											node.getRendererName(),
+											createComponentEmbedPrototypeMap(context, node.getComponentEmbed())
+									);
 
 									Class<?> clazz = AssertionUtilities.assertNonnull(subContext.getAliasesView().get(node.getClazz()));
 									Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIComponentConstructor.class,
@@ -130,7 +170,32 @@ public enum JAXBUIComponentUtilities {
 				.orElseThrow(IllegalArgumentException::new);
 	}
 
-	public static @Immutable Map<IUIEventType, Function<@Nonnull Component, @Nonnull Optional<String>>> getEventTypeFunctionMap() { return EVENT_TYPE_FUNCTION_MAP; }
+	@SuppressWarnings("UnstableApiUsage")
+	public static @Immutable Map<String, IUIComponentArguments.IEmbedPrototype> createComponentEmbedPrototypeMap(IJAXBAdapterContext context,
+	                                                                                                             Iterable<? extends ComponentEmbed> jaxbComponentEmbeds) {
+		return Streams.stream(jaxbComponentEmbeds)
+				.map(jaxbComponentEmbed -> Maps.immutableEntry(jaxbComponentEmbed.getName(),
+						UIImmutableComponentEmbedPrototypeArguments.of(createMappings(context, jaxbComponentEmbed.getProperty()),
+								jaxbComponentEmbed.getRendererName().orElse(null),
+								createComponentEmbedPrototypeMap(context, jaxbComponentEmbed.getComponentEmbed()))))
+				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+	}
+
+	public static @Immutable Map<INamespacePrefixedString, IUIPropertyMappingValue> createEventMappings(IUnion<? extends Component, ? extends ComponentEmbed> component) {
+		Map<INamespacePrefixedString, IUIPropertyMappingValue> attributes = new HashMap<>(getEventTypeFunctionMapView().size());
+		getEventTypeFunctionMapView()
+				.forEach((key, value) -> {
+					assert key != null;
+					assert value != null;
+					attributes.put(key.getEventType(),
+							new UIImmutablePropertyMappingValue(null,
+									AssertionUtilities.assertNonnull(value.apply(component))
+											.map(IUIEventType.StaticHolder.getDefaultPrefix()::concat)
+											.map(ImmutableNamespacePrefixedString::of)
+											.orElse(null)));
+				});
+		return ImmutableMap.copyOf(attributes);
+	}
 
 	@SuppressWarnings("UnstableApiUsage")
 	public static IShapeDescriptorBuilder<?> createShapeDescriptorBuilder(IJAXBAdapterContext context, Shape shape) {
@@ -174,5 +239,13 @@ public enum JAXBUIComponentUtilities {
 
 	protected static ResourceBundle getResourceBundle() {
 		return RESOURCE_BUNDLE;
+	}
+
+	public static @Immutable Map<IUIEventType, Function<@Nonnull IUnion<? extends Component, ? extends ComponentEmbed>, @Nonnull Optional<String>>> getEventTypeFunctionMapView() {
+		return ImmutableMap.copyOf(getEventTypeFunctionMap());
+	}
+
+	private static Map<IUIEventType, Function<@Nonnull IUnion<? extends Component, ? extends ComponentEmbed>, @Nonnull Optional<String>>> getEventTypeFunctionMap() {
+		return EVENT_TYPE_FUNCTION_MAP;
 	}
 }

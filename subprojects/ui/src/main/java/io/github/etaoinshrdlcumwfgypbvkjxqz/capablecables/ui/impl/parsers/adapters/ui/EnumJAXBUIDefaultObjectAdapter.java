@@ -75,7 +75,7 @@ public enum EnumJAXBUIDefaultObjectAdapter {
 								(Map<AttributedCharacterIterator.Attribute, Object>) IJAXBAdapterRegistry.adaptFromJAXB(context, leftAttributes);
 						List<IUnion<CharSequence, IAttributedText>> rightChildren = leftChildren.stream()
 								.map(leftChild -> IJAXBAdapterRegistry.adaptFromJAXB(context, leftChild))
-								.map(rightChild -> ImmutableUnion.choice(rightChild, CharSequence.class, IAttributedText.class))
+								.map(rightChild -> ImmutableUnion.of(rightChild, CharSequence.class, IAttributedText.class))
 								.collect(ImmutableList.toImmutableList());
 
 						return ImmutableAttributedText.of(rightChildren, rightAttributes);

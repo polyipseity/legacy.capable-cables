@@ -2,7 +2,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:ui="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
            targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
-           version="3.0.0"
+           version="3.2.0"
            xml:lang="EN">
 	<!-- SECTION includes -->
 
@@ -105,6 +105,7 @@
 				<xs:element ref="ui:anchor" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:group ref="ui:propertyContainerGroup"/>
 				<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:componentEmbed" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
 				<xs:element ref="ui:anyContainer" minOccurs="0"/>
 			</xs:sequence>
@@ -112,6 +113,21 @@
 			<xs:attribute name="name" type="xs:string" use="required"/>
 			<xs:attributeGroup ref="ui:componentEventsAttributeGroup"/>
 			<xs:attributeGroup ref="ui:hasRendererGroup"/>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- COMMENT component embed -->
+	<xs:element name="componentEmbed">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="ui:propertyContainerGroup"/>
+				<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:componentEmbed" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:anyContainer" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attributeGroup ref="ui:componentEventsAttributeGroup"/>
+			<xs:attributeGroup ref="ui:hasOptionalRendererGroup"/>
 		</xs:complexType>
 	</xs:element>
 
@@ -171,8 +187,12 @@
 		<xs:attribute name="char_typed" type="ui:NSPrefixedString"/>
 	</xs:attributeGroup>
 
+	<!-- COMMENT has renderer groups -->
 	<xs:attributeGroup name="hasRendererGroup">
 		<xs:attribute name="rendererName" type="xs:string" use="required"/>
+	</xs:attributeGroup>
+	<xs:attributeGroup name="hasOptionalRendererGroup">
+		<xs:attribute name="rendererName" type="xs:string"/>
 	</xs:attributeGroup>
 
 	<!-- SECTION elements -->

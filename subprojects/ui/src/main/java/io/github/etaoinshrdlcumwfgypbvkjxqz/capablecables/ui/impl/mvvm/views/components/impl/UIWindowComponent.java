@@ -91,6 +91,8 @@ public class UIWindowComponent
 
 	private final Runnable eventTargetListenersInitializer;
 
+	private final IUIControlsEmbed<?> controlsEmbed;
+
 	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 	@UIComponentConstructor
 	public UIWindowComponent(IUIComponentArguments arguments) {
@@ -100,7 +102,7 @@ public class UIWindowComponent
 				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this),
 						CastUtilities.castUnchecked(DefaultRenderer.class));
 
-		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
+		Map<INamespacePrefixedString, ? extends IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.controlsSide = IUIPropertyMappingValue.createBindingField(EnumUISide.class, EnumUISide.UP,
 				mappings.get(getPropertyControlsSideLocation()));
 		this.controlsThickness = IUIPropertyMappingValue.createBindingField(Double.class, 10D,
@@ -111,6 +113,62 @@ public class UIWindowComponent
 		this.eventTargetListenersInitializer = new OneUseRunnable(() ->
 				addEventListener(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(), new UIFunctionalEventListener<IUIEventFocus>(e ->
 						getParent().orElseThrow(InternalError::new).moveChildToTop(this)), true)
+		);
+
+		OptionalWeakReference<UIWindowComponent> thisReference = new OptionalWeakReference<>(suppressThisEscapedWarning(() -> this));
+		this.controlsEmbed = new UIDefaultControlsEmbed<>(
+				UIShapeComponent.class,
+				suppressThisEscapedWarning(() -> this),
+				ImmutableMap.<String, IUIComponentEmbedArguments>builder()
+						.put(IUIControlsEmbed.StaticHolder.getName(),
+								arguments.computeEmbedArgument(IUIControlsEmbed.StaticHolder.getName(), UIShapeComponent::new,
+										new SupplierShapeDescriptor<>(() ->
+												thisReference.getOptional()
+														.map(this1 -> {
+															// COMMENT renders the controls
+															EnumUISide controlsSide = this1.getControlsSide().getValue();
+															Rectangle2D this1Bounds = IUIComponent.getShape(this1).getBounds2D();
+															Point2D contentTranslation = getWindowContentTranslation(this1);
+
+															Rectangle2D result = new Rectangle2D.Double(-contentTranslation.getX(), -contentTranslation.getY(),
+																	this1Bounds.getWidth(),
+																	this1Bounds.getHeight());
+															EnumUISide oppositeBorderSide = controlsSide.getOpposite().orElseThrow(IllegalStateException::new);
+															oppositeBorderSide.setValue(result,
+																	controlsSide.getValue(result)
+																			+ controlsSide.inwardsBy(this1.getControlsThickness().getValue())
+																			.orElseThrow(IllegalStateException::new));
+
+															return result;
+														})
+														.orElseGet(Rectangle2D.Double::new)
+										)))
+						.put(EnumControlsAction.CLOSE.getName(),
+								arguments.computeEmbedArgument(EnumControlsAction.CLOSE.getName(), UIButtonComponent::new,
+										new SupplierShapeDescriptor<>(() ->
+												thisReference.getOptional()
+														.map(this1 -> {
+															EnumUISide controlsSide = this1.getControlsSide().getValue();
+															EnumUIRotation controlsRotation = this1.getControlsDirection().getValue();
+															Rectangle2D controlsBounds = IUIComponent.getShape(this1.getControlsEmbed().getComponent()).getBounds2D();
+
+															Rectangle2D result = new Rectangle2D.Double(0D, 0D, controlsBounds.getWidth(), controlsBounds.getHeight());
+															double size = controlsSide.getAxis().getSize(controlsBounds);
+															EnumUISide startingResultSide = controlsRotation.rotateBy(controlsSide, 1L)
+																	.orElseThrow(IllegalStateException::new);
+															EnumUISide endingResultSide = startingResultSide.getOpposite()
+																	.orElseThrow(IllegalStateException::new);
+															endingResultSide.setValue(result,
+																	startingResultSide.getValue(result)
+																			+ startingResultSide.inwardsBy(size)
+																			.orElseThrow(IllegalStateException::new));
+
+															return result;
+														})
+														.orElseGet(Rectangle2D.Double::new)
+										)
+								))
+						.build()
 		);
 	}
 
@@ -158,15 +216,9 @@ public class UIWindowComponent
 	}
 
 	@Override
-	public void transformChildren(AffineTransform transform) {
-		super.transformChildren(transform);
-		Point2D translation = new Point2D.Double();
-
-		EnumUISide controlsSide = getControlsSide().getValue();
-		if (controlsSide.getType() == EnumUISideType.LOCATION)
-			controlsSide.getAxis().setCoordinate(translation, getControlsThickness().getValue());
-
-		transform.translate(translation.getX(), translation.getY());
+	protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
+		eventTargetListenersInitializer.run();
+		return super.getEventTargetListeners();
 	}
 
 	protected IBindingField<EnumUISide> getControlsSide() {
@@ -308,9 +360,7 @@ public class UIWindowComponent
 		private static final INamespacePrefixedString PROPERTY_BORDER_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyBorderColor());
 
 		@UIProperty(PROPERTY_BACKGROUND_COLOR)
-		private final IBindingField<Color> backgroundColor;
-		@UIProperty(PROPERTY_BORDER_COLOR)
-		private final IBindingField<Color> controlsColor;
+		private final IBindingField<Color> backgroundColor; // TODO Color to Paint
 
 		@UIRendererConstructor
 		public DefaultRenderer(IUIRendererArguments arguments) {
@@ -369,6 +419,7 @@ public class UIWindowComponent
 
 		@Override
 		public void render(IUIComponentContext context, EnumRenderStage stage) {
+			super.render(context, stage);
 			getContainer().ifPresent(container -> {
 				if (stage == EnumRenderStage.PRE_CHILDREN) {
 					Shape relativeShape = IUIComponent.getShape(container);
@@ -376,25 +427,46 @@ public class UIWindowComponent
 						graphics.setColor(getBackgroundColor().getValue());
 						graphics.fill(relativeShape);
 					}
-				} else if (stage == EnumRenderStage.POST_CHILDREN) {
-					// COMMENT renders the controls
-					EnumUISide controlsSide = container.getControlsSide().getValue();
-
-					Rectangle2D containerShapeBounds = IUIComponent.getShape(container).getBounds2D();
-					EnumUISide oppositeBorderSide = controlsSide.getOpposite().orElseThrow(IllegalStateException::new);
-					oppositeBorderSide.setValue(containerShapeBounds,
-							controlsSide.getValue(containerShapeBounds)
-									+ controlsSide.inwardsBy(container.getControlsThickness().getValue())
-									.orElseThrow(IllegalStateException::new));
-
-					try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
-						graphics.setColor(getControlsColor().getValue());
-						graphics.fill(containerShapeBounds); // COMMENT controls background
-					}
-
-					EnumUIRotation controlsDirection = container.getControlsDirection().getValue();
 				}
 			});
+		}
+	}
+
+	public static class UIDefaultControlsEmbed<C extends UIShapeComponent>
+			extends UIAbstractComponentEmbed<C>
+			implements IUIControlsEmbed<C> {
+		private final Map<EnumControlsAction, IUIComponentEmbed<? extends UIButtonComponent>> actionButtons;
+
+		@SuppressWarnings("UnstableApiUsage")
+		public UIDefaultControlsEmbed(Class<C> type,
+		                              IUIComponent owner,
+		                              Map<? super String, ? extends IUIComponentEmbedArguments> arguments) {
+			super(type, owner, AssertionUtilities.assertNonnull(arguments.get(StaticHolder.getName())));
+			this.actionButtons = Maps.immutableEnumMap(Maps.asMap(EnumSet.allOf(EnumControlsAction.class),
+					key -> {
+						assert key != null;
+						return new UIChildlessComponentEmbed<>(
+								UIButtonComponent.class,
+								getComponent(),
+								AssertionUtilities.assertNonnull(arguments.get(key.getName()))
+						);
+					}
+			));
+		}
+
+		@SuppressWarnings("UnstableApiUsage")
+		@Override
+		public @Immutable Map<EnumControlsAction, ? extends IUIComponentEmbed<? extends UIButtonComponent>> getActionButtonsView() {
+			return Maps.immutableEnumMap(getActionButtons());
+		}
+
+		protected Map<EnumControlsAction, ? extends IUIComponentEmbed<? extends UIButtonComponent>> getActionButtons() {
+			return actionButtons;
+		}
+
+		@Override
+		public List<? extends IUIComponentEmbed<?>> getChildrenView() {
+			return ImmutableList.copyOf(getActionButtons().values());
 		}
 	}
 }

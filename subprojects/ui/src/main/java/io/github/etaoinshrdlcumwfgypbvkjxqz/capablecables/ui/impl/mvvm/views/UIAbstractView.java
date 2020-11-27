@@ -12,7 +12,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming.IUIThe
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.controllers.UIDefaultAnimationController;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.UIAbstractSubInfrastructure;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultingTheme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIAbstractViewBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.naming.ConcurrentConfigurableNamedTracker;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.naming.LoadingNamedTrackers;

@@ -7,7 +7,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time
 public enum UIStandardAnimationControlFactory {
 	;
 
-	public static final int INFINITE_LOOP = -1;
+	public static final long INFINITE_LOOP = -1L;
 
 	public static UIAbstractStandardAnimationControl createSimple(EnumDirection direction,
 	                                                              IUIAnimationTarget target,
@@ -85,7 +85,7 @@ public enum UIStandardAnimationControlFactory {
 		}
 	}
 
-	public static int getInfiniteLoop() { return INFINITE_LOOP; }
+	public static long getInfiniteLoop() { return INFINITE_LOOP; }
 
 	public enum EnumDirection {
 		NORMAL,

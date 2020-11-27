@@ -17,8 +17,10 @@
 	<!-- SECTION renderers -->
 	<renderer name="ViewBackgroundRenderer" class="renderer.extension.minecraft.background.default"/>
 
-	<renderer name="Window1Renderer" class="renderer.component.window.debug.custom">
-		<property key="default:property.window.controls.color">
+	<renderer name="Window1Renderer" class="renderer.component.window.debug.custom"/>
+
+	<renderer name="Window1Renderer.controls">
+		<property key="default:property.shape.color.filled">
 			<color green="128"/>
 		</property>
 	</renderer>
@@ -33,8 +35,8 @@
 	<renderer name="Window1ExtensionResizableRenderer"
 	          class="renderer.extension.user_resizable.previewing.minecraft"/>
 
-	<renderer name="WindowAnchoredRenderer">
-		<property key="default:property.window.controls.color" bindingKey="renderer:anchoredWindowBorderColor"/>
+	<renderer name="WindowAnchoredControlsRenderer">
+		<property key="default:property.shape.color.filled" bindingKey="renderer:anchoredWindowBorderColor"/>
 	</renderer>
 
 	<renderer name="WindowAnchoredExtensionRelocatableRenderer"

@@ -31,9 +31,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.U
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableViewComponentArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.models.UIAbstractModel;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.UIComponentCursorHandleProviderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIButtonComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIDefaultComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIWindowComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIDefaultComponentSchemaHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.JAXBImmutableAdapterContext;
@@ -235,10 +235,18 @@ public enum UIMinecraftDebug {
 			IUIMinecraftViewComponent<?, IUIComponentManager<Rectangle2D>> view;
 			{
 				UIDefaultComponentManager<Rectangle2D> componentManager =
-						new UIDefaultComponentManager<>(UIImmutableComponentArguments.of(null, ImmutableMap.of(), new RectangularShapeDescriptor<>(new Rectangle(0, 0, 100, 100)), null));
+						new UIDefaultComponentManager<>(UIImmutableComponentArguments.of(null,
+								ImmutableMap.of(),
+								new RectangularShapeDescriptor<>(new Rectangle(0, 0, 100, 100)),
+								null,
+								ImmutableMap.of()));
 				{
 					UIWindowComponent window =
-							new UIWindowComponent(UIImmutableComponentArguments.of(null, ImmutableMap.of(), new RectangularShapeDescriptor<>(new Rectangle(0, 0, 100, 100)), null));
+							new UIWindowComponent(UIImmutableComponentArguments.of(null,
+									ImmutableMap.of(),
+									new RectangularShapeDescriptor<>(new Rectangle(0, 0, 100, 100)),
+									null,
+									ImmutableMap.of()));
 					componentManager.addChildren(ImmutableSet.of(window));
 				}
 				view = IUIViewComponent.create(() -> new UIDefaultMinecraftViewComponent<>(UIImmutableViewComponentArguments.of(ImmutableMap.of())),
@@ -290,14 +298,14 @@ public enum UIMinecraftDebug {
 			private final IUIAnimationControl animations =
 					UIStandardAnimationControlFactory.createSimple(UIStandardAnimationControlFactory.EnumDirection.ALTERNATE,
 							UIAnimationTargetUtilities.andThen(
-									UIAnimationTargetUtilities.range(rgb -> setCursorHighlighterColor(new Color((int) rgb)), 0, 0xFFFFFFL, EnumUICommonAnimationEasing.LINEAR),
+									UIAnimationTargetUtilities.range(rgb -> setCursorHighlighterColor(new Color((int) rgb)), 0L, 0xFFFFFFL, EnumUICommonAnimationEasing.LINEAR),
 									UIAnimationTargetUtilities.range(UIAnimationTargetUtilities.ShapeDescriptors.translateY(suppressThisEscapedWarning(() -> this)), 0, 100, EnumUICommonAnimationEasing.IN_OUT_BOUNCE)
 							),
 							ITicker.StaticHolder.getSystemTicker(),
 							true,
-							TimeUnit.SECONDS.toNanos(5),
-							TimeUnit.SECONDS.toNanos(1),
-							TimeUnit.SECONDS.toNanos(2),
+							TimeUnit.SECONDS.toNanos(5L),
+							TimeUnit.SECONDS.toNanos(1L),
+							TimeUnit.SECONDS.toNanos(2L),
 							UIStandardAnimationControlFactory.getInfiniteLoop());
 
 			@UIRendererConstructor
