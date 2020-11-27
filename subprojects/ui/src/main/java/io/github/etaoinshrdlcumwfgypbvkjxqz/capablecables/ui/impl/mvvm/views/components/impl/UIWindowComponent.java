@@ -353,11 +353,8 @@ public class UIWindowComponent
 			extends UIDefaultComponentRenderer<C> {
 		@NonNls
 		public static final String PROPERTY_BACKGROUND_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.background.color";
-		@NonNls
-		public static final String PROPERTY_BORDER_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.controls.color";
 
 		private static final INamespacePrefixedString PROPERTY_BACKGROUND_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyBackgroundColor());
-		private static final INamespacePrefixedString PROPERTY_BORDER_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyBorderColor());
 
 		@UIProperty(PROPERTY_BACKGROUND_COLOR)
 		private final IBindingField<Color> backgroundColor; // TODO Color to Paint
@@ -369,24 +366,14 @@ public class UIWindowComponent
 			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 			this.backgroundColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.BLACK,
 					mappings.get(getPropertyBackgroundColorLocation()));
-			this.controlsColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.WHITE,
-					mappings.get(getPropertyBorderColorLocation()));
 		}
 
 		public static INamespacePrefixedString getPropertyBackgroundColorLocation() {
 			return PROPERTY_BACKGROUND_COLOR_LOCATION;
 		}
 
-		public static INamespacePrefixedString getPropertyBorderColorLocation() {
-			return PROPERTY_BORDER_COLOR_LOCATION;
-		}
-
 		public static String getPropertyBackgroundColor() {
 			return PROPERTY_BACKGROUND_COLOR;
-		}
-
-		public static String getPropertyBorderColor() {
-			return PROPERTY_BORDER_COLOR;
 		}
 
 		@Override
@@ -395,7 +382,7 @@ public class UIWindowComponent
 			super.initializeBindings(binderObserverSupplier);
 			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 					() -> ImmutableBinderAction.bind(
-							getBackgroundColor(), getControlsColor()
+							getBackgroundColor()
 					)
 			);
 		}
@@ -406,7 +393,7 @@ public class UIWindowComponent
 			getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
 					BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
 							() -> ImmutableBinderAction.unbind(
-									getBackgroundColor(), getControlsColor()
+									getBackgroundColor()
 							)
 					)
 			);
@@ -414,8 +401,6 @@ public class UIWindowComponent
 		}
 
 		public IBindingField<Color> getBackgroundColor() { return backgroundColor; }
-
-		public IBindingField<Color> getControlsColor() { return controlsColor; }
 
 		@Override
 		public void render(IUIComponentContext context, EnumRenderStage stage) {
