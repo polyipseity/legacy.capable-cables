@@ -40,6 +40,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer3;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.OneUseConsumer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -60,6 +62,7 @@ import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -69,8 +72,8 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		extends UIAbstractView<S>
 		implements IUIViewComponent<S, M> {
 	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
-	private final DelayedFieldInitializer<ConcurrentMap<Class<?>, IUIViewCoordinator>> coordinatorMapInitializer;
-	private final DelayedFieldInitializer<ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>>> extensionsInitializer;
+	private final Consumer<ConcurrentMap<Class<?>, IUIViewCoordinator>> coordinatorMapInitializer;
+	private final Runnable extensionsInitializer;
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final AutoCloseableRotator<ComponentHierarchyChangeParentObserver, RuntimeException> componentHierarchyChangeParentObserverRotator =
 			new AutoCloseableRotator<>(() -> new ComponentHierarchyChangeParentObserver(this, UIConfiguration.getInstance().getLogger()), Disposable::dispose);
@@ -83,7 +86,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		this.mappings = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
 
-		this.coordinatorMapInitializer = new DelayedFieldInitializer<>(field -> {
+		this.coordinatorMapInitializer = new OneUseConsumer<>(field -> {
 			IUIThemeStack themeStack = new UIArrayThemeStack(
 					theme ->
 							theme.apply(
@@ -100,14 +103,15 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 			field.put(IUIComponentShapeAnchorController.class, new UIDefaultComponentShapeAnchorController());
 			field.put(IUIThemeStack.class, themeStack);
 		});
-		this.extensionsInitializer = new DelayedFieldInitializer<>(field ->
+		this.extensionsInitializer = new OneUseRunnable(() ->
 				IExtensionContainer.addExtensionChecked(this, new UIDefaultCacheExtension())
 		);
 	}
 
 	@Override
 	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() {
-		return extensionsInitializer.apply(super.getExtensions());
+		extensionsInitializer.run();
+		return super.getExtensions();
 	}
 
 	@Override
@@ -295,7 +299,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 
 	@Override
 	protected ConcurrentMap<Class<?>, IUIViewCoordinator> getCoordinatorMap() {
-		return coordinatorMapInitializer.apply(super.getCoordinatorMap());
+		return FunctionUtilities.accept(super.getCoordinatorMap(), coordinatorMapInitializer);
 	}
 
 	public enum CacheViewComponent {

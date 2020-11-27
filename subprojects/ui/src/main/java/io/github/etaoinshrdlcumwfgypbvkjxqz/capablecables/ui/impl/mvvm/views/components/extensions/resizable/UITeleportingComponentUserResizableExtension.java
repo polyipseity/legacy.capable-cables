@@ -32,7 +32,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.mod
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.DelayedFieldInitializer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.IIntersection;
@@ -305,14 +305,14 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		@Nullable
 		private Integer activeMouseButton;
 
-		private final DelayedFieldInitializer<SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters>> eventTargetListenersInitializer;
+		private final Runnable eventTargetListenersInitializer;
 
 		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 		protected Modifier(UITeleportingComponentUserResizableExtension<?> owner) {
 			super(IShapeDescriptor.StaticHolder.getShapeDescriptorPlaceholder());
 			this.owner = new OptionalWeakReference<>(owner);
 
-			this.eventTargetListenersInitializer = new DelayedFieldInitializer<>(field -> {
+			this.eventTargetListenersInitializer = new OneUseRunnable(() -> {
 				addEventListener(EnumUIEventDOMType.MOUSE_ENTER.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> setBeingHovered(true)), false);
 				addEventListener(EnumUIEventDOMType.MOUSE_LEAVE.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> setBeingHovered(false)), false);
 				addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> {
@@ -342,7 +342,8 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 
 		@Override
 		protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
-			return eventTargetListenersInitializer.apply(super.getEventTargetListeners());
+			eventTargetListenersInitializer.run();
+			return super.getEventTargetListeners();
 		}
 
 		protected Optional<Integer> getActiveMouseButton() {

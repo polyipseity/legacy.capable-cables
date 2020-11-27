@@ -36,8 +36,13 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.eve
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultComponentRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interactions.ProviderShapeDescriptor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.theming.UIDefaultingTheme;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
@@ -101,7 +106,7 @@ public class UIDefaultComponent
 
 	private final IUIRendererContainerContainer<IUIComponentRenderer<?>> rendererContainerContainer;
 
-	private final DelayedFieldInitializer<ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>>> extensionsInitializer;
+	private final Runnable extensionsInitializer;
 
 	@UIComponentConstructor
 	public UIDefaultComponent(IUIComponentArguments arguments) {
@@ -128,7 +133,7 @@ public class UIDefaultComponent
 		this.active = IUIPropertyMappingValue.createBindingField(Boolean.class, true,
 				this.mappings.get(getPropertyActiveLocation()));
 
-		this.extensionsInitializer = new DelayedFieldInitializer<>(field ->
+		this.extensionsInitializer = new OneUseRunnable(() ->
 				IExtensionContainer.addExtensionChecked(this, new UIDefaultCacheExtension()));
 	}
 
@@ -305,8 +310,10 @@ public class UIDefaultComponent
 	@Override
 	public Map<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
 
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() {
-		return extensionsInitializer.apply(extensions);
+		extensionsInitializer.run();
+		return extensions;
 	}
 
 	@Override

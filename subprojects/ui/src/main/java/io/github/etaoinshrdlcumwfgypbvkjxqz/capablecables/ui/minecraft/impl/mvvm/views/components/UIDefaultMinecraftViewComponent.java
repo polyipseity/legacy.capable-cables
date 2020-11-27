@@ -20,8 +20,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.extensions.background.UIDefaultMinecraftBackgroundExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.utilities.EnumMinecraftCropMethod;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.DelayedFieldInitializer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer3;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftOpenGLUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtension;
@@ -37,19 +37,20 @@ import java.util.concurrent.ConcurrentMap;
 public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		extends UIAbstractViewComponent<S, M>
 		implements IUIMinecraftViewComponent<S, M> {
-	private final DelayedFieldInitializer<ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>>> extensionsInitializer;
+	private final Runnable extensionsInitializer;
 
 	@UIViewComponentConstructor
 	public UIDefaultMinecraftViewComponent(IUIViewComponentArguments arguments) {
 		super(arguments);
 
-		this.extensionsInitializer = new DelayedFieldInitializer<>(field ->
+		this.extensionsInitializer = new OneUseRunnable(() ->
 				IExtensionContainer.addExtensionChecked(this, new UIDefaultMinecraftBackgroundExtension()) /* COMMENT to ensure that 'GuiScreenEvent.BackgroundDrawnEvent' is fired */);
 	}
 
 	@Override
 	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() {
-		return extensionsInitializer.apply(super.getExtensions());
+		extensionsInitializer.run();
+		return super.getExtensions();
 	}
 
 	@Override

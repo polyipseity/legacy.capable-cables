@@ -21,9 +21,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIDe
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIEventRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIEventUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIFunctionalEventListener;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.DelayedFieldInitializer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultComponentRenderer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainerContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
@@ -68,7 +71,7 @@ public class UIButtonComponent
 
 	private final IUIRendererContainerContainer<IUIComponentRenderer<?>> rendererContainerContainer;
 
-	private final DelayedFieldInitializer<SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters>> eventTargetListenersInitializer;
+	private final Runnable eventTargetListenersInitializer;
 
 	@UIComponentConstructor
 	public UIButtonComponent(IUIComponentArguments arguments) {
@@ -84,7 +87,7 @@ public class UIButtonComponent
 				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this),
 						CastUtilities.castUnchecked(DefaultRenderer.class));
 
-		this.eventTargetListenersInitializer = new DelayedFieldInitializer<>(field -> {
+		this.eventTargetListenersInitializer = new OneUseRunnable(() -> {
 			addEventListener(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(e -> {
 				if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET)
 					getButtonStates().add(IButtonState.HOVERING);

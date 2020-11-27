@@ -1,18 +1,20 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.UIProperty;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIComponentArguments;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIRendererArguments;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIComponentConstructor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIRendererConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIStructureLifecycleContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIReshapeExplicitly;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.embed.IUIComponentEmbed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventFocus;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIComponentRenderer;
@@ -21,16 +23,19 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descrip
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIFunctionalEventListener;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.embed.UIAbstractComponentEmbed;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.embed.UIChildlessComponentEmbed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIComponentModifyShapeDescriptorBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultComponentRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainerContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.descriptors.SupplierShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUIRotation;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISideType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.DelayedFieldInitializer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -53,9 +58,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
-import java.util.ConcurrentModificationException;
-import java.util.Map;
-import java.util.Optional;
+import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -85,7 +89,7 @@ public class UIWindowComponent
 	@UIProperty(PROPERTY_CONTROLS_DIRECTION)
 	private final IBindingField<EnumUIRotation> controlsDirection;
 
-	private final DelayedFieldInitializer<SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters>> eventTargetListenersInitializer;
+	private final Runnable eventTargetListenersInitializer;
 
 	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 	@UIComponentConstructor
@@ -104,15 +108,18 @@ public class UIWindowComponent
 		this.controlsDirection = IUIPropertyMappingValue.createBindingField(EnumUIRotation.class, EnumUIRotation.CLOCKWISE,
 				mappings.get(getPropertyControlsDirectionLocation()));
 
-		this.eventTargetListenersInitializer = new DelayedFieldInitializer<>(field ->
+		this.eventTargetListenersInitializer = new OneUseRunnable(() ->
 				addEventListener(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(), new UIFunctionalEventListener<IUIEventFocus>(e ->
 						getParent().orElseThrow(InternalError::new).moveChildToTop(this)), true)
 		);
 	}
 
-	@Override
-	protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
-		return eventTargetListenersInitializer.apply(super.getEventTargetListeners());
+	protected static Point2D getWindowContentTranslation(UIWindowComponent instance) {
+		Point2D translation = new Point2D.Double();
+		EnumUISide controlsSide = instance.getControlsSide().getValue();
+		if (controlsSide.getType() == EnumUISideType.LOCATION)
+			controlsSide.getAxis().setCoordinate(translation, instance.getControlsThickness().getValue());
+		return translation;
 	}
 
 	@Override
@@ -144,6 +151,10 @@ public class UIWindowComponent
 
 	public static String getPropertyControlsThickness() {
 		return PROPERTY_CONTROLS_THICKNESS;
+	}
+
+	protected IUIControlsEmbed<?> getControlsEmbed() {
+		return controlsEmbed;
 	}
 
 	@Override
@@ -244,6 +255,46 @@ public class UIWindowComponent
 	public boolean reshape(Predicate<? super IShapeDescriptor<? super RectangularShape>> action) throws ConcurrentModificationException {
 		return IUIComponent.reshapeComponent(this, getShapeDescriptor(), action);
 		// TODO reshape logic
+	}
+
+	@Override
+	public void transformChildren(AffineTransform transform) {
+		super.transformChildren(transform);
+		Point2D translation = getWindowContentTranslation(this);
+		transform.translate(translation.getX(), translation.getY());
+	}
+
+	@Override
+	protected List<IUIComponent> getChildren() {
+		getControlsEmbed().getEmbedInitializer().run();
+		return super.getChildren();
+	}
+
+	public enum EnumControlsAction {
+		CLOSE {
+			@Override
+			public @NonNls String getName() {
+				return "close";
+			}
+		},
+		;
+
+		public abstract @NonNls String getName();
+	}
+
+	public interface IUIControlsEmbed<C extends UIShapeComponent>
+			extends IUIComponentEmbed<C> {
+		@Immutable Map<EnumControlsAction, ? extends IUIComponentEmbed<? extends UIButtonComponent>> getActionButtonsView();
+
+		enum StaticHolder {
+			;
+
+			public static final @NonNls String NAME = "controls";
+
+			public static @NonNls String getName() {
+				return NAME;
+			}
+		}
 	}
 
 	public static class DefaultRenderer<C extends UIWindowComponent>
