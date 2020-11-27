@@ -410,18 +410,18 @@ public enum UIMinecraftDebug {
 			protected IBindingMethodDestination<UIButtonComponent.IUIEventActivate> getButtonOnActivate() { return buttonOnActivate; }
 
 			protected void onButtonActivate(UIButtonComponent.IUIEventActivate e) {
-				boolean ret = false;
+				boolean shouldActivate = false;
 				IUIEvent ec = e.getCause();
 				if (ec instanceof IUIEventMouse) {
 					IUIEventMouse ecc = (IUIEventMouse) ec;
 					if (ecc.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT)
-						ret = true;
+						shouldActivate = true;
 				} else if (ec instanceof IUIEventKeyboard) {
 					IUIEventKeyboard ecc = (IUIEventKeyboard) ec;
 					if (ecc.getData().getKey() == GLFW.GLFW_KEY_ENTER)
-						ret = true;
+						shouldActivate = true;
 				}
-				if (!ret)
+				if (shouldActivate)
 					e.preventDefault();
 			}
 

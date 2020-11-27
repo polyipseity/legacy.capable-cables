@@ -182,9 +182,10 @@ public class UIButtonComponent
 
 	public interface IUIEventActivate extends IUIEvent {
 		static boolean shouldActivate(UIButtonComponent self, IUIEvent event) {
-			return UIEventUtilities.dispatchEvent(new IUIEventActivate.Impl((IUIEventTarget.Functional) e -> {
+			// COMMENT false means default, which is to do nothing, prevented
+			return !UIEventUtilities.dispatchEvent(new UIDefaultEventActivate((Functional) e -> {
 				self.getOnActivate().invoke((IUIEventActivate) e);
-				return !event.isDefaultPrevented();
+				return true; // COMMENT did work
 			}, event));
 		}
 
