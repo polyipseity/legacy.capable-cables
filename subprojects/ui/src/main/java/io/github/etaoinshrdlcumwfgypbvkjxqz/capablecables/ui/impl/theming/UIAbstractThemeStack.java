@@ -1,15 +1,15 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.theming;
 
+import com.google.common.collect.ForwardingDeque;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming.IUITheme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming.IUIThemeStack;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.AbstractObjectStack;
 
 import java.util.function.Consumer;
 
 public abstract class UIAbstractThemeStack
-		extends AbstractObjectStack<IUITheme>
+		extends ForwardingDeque<IUITheme>
 		implements IUIThemeStack {
 	private final Consumer<@Nonnull ? super IUITheme> applier;
 
@@ -18,22 +18,21 @@ public abstract class UIAbstractThemeStack
 	}
 
 	@Override
-	public IUITheme push(IUITheme element) {
-		IUITheme ret = super.push(element);
+	public IUITheme pop() {
+		IUITheme popped = super.pop();
 		getApplier().accept(element());
-		return ret;
+		return popped;
 	}
 
 	@Override
-	public IUITheme pop() {
-		IUITheme ret = super.pop();
+	public void push(IUITheme element) {
+		super.push(element);
 		getApplier().accept(element());
-		return ret;
 	}
 
 	@Override
 	public void applyAll(Iterable<? extends IUIRendererContainer<?>> rendererContainers) {
-		getData().descendingIterator() // COMMENT from tail to head, tail is the lowest theme, head is the highest theme
+		descendingIterator() // COMMENT from tail to head, tail is the lowest theme, head is the highest theme
 				.forEachRemaining(theme -> theme.apply(rendererContainers));
 	}
 

@@ -6,6 +6,7 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public enum ArrayUtilities {
 	;
@@ -40,6 +41,11 @@ public enum ArrayUtilities {
 	public static boolean isEmpty(Object array)
 			throws IllegalArgumentException {
 		return Array.getLength(array) == 0;
+	}
+
+	public static <T> boolean contains(T[] array, Object element) {
+		return Arrays.stream(array).unordered()
+				.anyMatch(Predicate.isEqual(element));
 	}
 
 	@SuppressWarnings({"unchecked"})

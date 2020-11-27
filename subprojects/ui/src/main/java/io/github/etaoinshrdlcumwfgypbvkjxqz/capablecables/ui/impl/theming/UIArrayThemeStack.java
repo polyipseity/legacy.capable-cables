@@ -9,14 +9,16 @@ import java.util.function.Consumer;
 
 public class UIArrayThemeStack
 		extends UIAbstractThemeStack {
-	private final Deque<IUITheme> data;
+	private final Deque<IUITheme> delegate;
 
 	public UIArrayThemeStack(Consumer<@Nonnull ? super IUITheme> applier, int initialCapacity) {
 		super(applier);
-		this.data = new ArrayDeque<>(initialCapacity);
+		this.delegate = new ArrayDeque<>(initialCapacity);
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	@Override
-	protected Deque<IUITheme> getData() { return data; }
+	protected Deque<IUITheme> delegate() {
+		return delegate;
+	}
 }

@@ -4,12 +4,16 @@ import com.google.common.collect.ImmutableList;
 
 import java.util.List;
 
-public class ImmutablePath<T>
+public final class ImmutablePath<T>
 		extends AbstractPath<T> {
 	private final List<T> data;
 
-	public ImmutablePath(Iterable<? extends T> data) {
+	private ImmutablePath(Iterable<? extends T> data) {
 		this.data = ImmutableList.copyOf(data);
+	}
+
+	public static <T> ImmutablePath<T> of(Iterable<? extends T> data) {
+		return new ImmutablePath<>(data);
 	}
 
 	@Override

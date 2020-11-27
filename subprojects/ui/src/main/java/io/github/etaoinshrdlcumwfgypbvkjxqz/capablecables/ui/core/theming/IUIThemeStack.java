@@ -2,9 +2,10 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewCoordinator;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IObjectStack;
+
+import java.util.Deque;
 
 public interface IUIThemeStack
-		extends IObjectStack<IUITheme>, IUIViewCoordinator {
+		extends Deque<IUITheme>, IUIViewCoordinator {
 	void applyAll(Iterable<? extends IUIRendererContainer<?>> rendererContainers);
 }

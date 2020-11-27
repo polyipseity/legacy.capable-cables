@@ -19,7 +19,8 @@ public interface ICloneable
 		}
 	}
 
-	ICloneable clone() throws CloneNotSupportedException;
+	ICloneable clone()
+			throws CloneNotSupportedException;
 
 	enum StaticHolder {
 		;
