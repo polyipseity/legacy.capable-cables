@@ -20,8 +20,8 @@ public final class ModMarkers extends MarkersTemplate {
 	private static final Supplier<@Nonnull ModMarkers> INSTANCE = Suppliers.memoize(ModMarkers::new);
 
 	private final Marker markerLifecycle = getMarker("lifecycle");
-	private final Marker markerLifecycleClient = MarkersTemplate.addReferences(getMarkerLifecycle(), getMarker("client"));
-	private final Marker markerLifecycleServer = MarkersTemplate.addReferences(getMarkerLifecycle(), getMarker("server"));
+	private final Marker markerLifecycleClient = MarkersTemplate.addReferences(getMarker("client"), getMarkerLifecycle());
+	private final Marker markerLifecycleServer = MarkersTemplate.addReferences(getMarker("server"), getMarkerLifecycle());
 	private final Marker markerRegistrable = getMarker("registrable");
 	private final LoadingCache<IForgeRegistry<?>, Marker> registryMarkers =
 			MarkersTemplate.getMarkersBuilder().build(CacheLoader.from(registry ->
