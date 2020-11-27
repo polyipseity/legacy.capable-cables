@@ -1,11 +1,14 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.registries;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapter;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBObjectAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBAdapterRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBElementAdapterRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBObjectAdapterRegistry;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.JAXBAbstractObjectAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
@@ -17,6 +20,19 @@ import java.util.ResourceBundle;
 public class JAXBDefaultAdapterRegistry
 		implements IJAXBAdapterRegistry {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
+	private static final IJAXBObjectAdapter<?, ?> IDENTITY_OBJECT_ADAPTER = new JAXBAbstractObjectAdapter<Object, Object>() {
+		@Override
+		@Deprecated
+		public @Nonnull Object leftToRight(@Nonnull Object left) {
+			return left;
+		}
+
+		@Override
+		@Deprecated
+		public @Nonnull Object rightToLeft(@Nonnull Object right) {
+			return right;
+		}
+	};
 	private final IJAXBObjectAdapterRegistry objectRegistry;
 	private final IJAXBElementAdapterRegistry elementRegistry;
 
@@ -28,6 +44,9 @@ public class JAXBDefaultAdapterRegistry
 	@SuppressWarnings({"unchecked", "rawtypes", "RedundantSuppression"})
 	@Override
 	public <L> Optional<? extends IJAXBAdapter<L, ?>> findFromJAXBAdapter(L jaxbObject) {
+		if (IJAXBAdapterRegistry.isOfJAXBSpecialType(jaxbObject))
+			return Optional.of(getIdentityObjectAdapter()); // COMMENT handles 'String's, primitives, etc.
+
 		if (jaxbObject instanceof JAXBElement)
 			return (Optional<? extends IJAXBAdapter<L, ?>>) // COMMENT should be safe
 					getElementRegistry().getWithLeftChecked(((JAXBElement<?>) jaxbObject).getName())
@@ -35,6 +54,11 @@ public class JAXBDefaultAdapterRegistry
 		return (Optional<? extends IJAXBAdapter<L, ?>>) // COMMENT should be safe
 				getObjectRegistry().getWithLeftChecked(jaxbObject.getClass())
 						.map(IRegistryObject::getValue);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> IJAXBObjectAdapter<T, T> getIdentityObjectAdapter() {
+		return (IJAXBObjectAdapter<T, T>) IDENTITY_OBJECT_ADAPTER; // COMMENT identity, accepts 'Object'
 	}
 
 	@SuppressWarnings({"rawtypes", "RedundantSuppression"})

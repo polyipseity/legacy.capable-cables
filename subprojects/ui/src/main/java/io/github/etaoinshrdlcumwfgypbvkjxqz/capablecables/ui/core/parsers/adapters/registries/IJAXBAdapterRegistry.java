@@ -1,5 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries;
 
+import com.google.common.collect.ImmutableSet;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapter;
@@ -9,6 +11,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.temp
 
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 public interface IJAXBAdapterRegistry {
 	static Object adaptFromJAXB(IJAXBAdapterContext context, Object jaxbObject)
@@ -57,11 +60,23 @@ public interface IJAXBAdapterRegistry {
 
 	IJAXBObjectAdapterRegistry getObjectRegistry();
 
+	static boolean isOfJAXBSpecialType(Object jaxbObject) {
+		// COMMENT these types are treated specially - if we encounter these just return the object directly
+		return StaticHolder.getJAXBSpecialTypes().contains(jaxbObject.getClass());
+	}
+
 	enum StaticHolder {
 		;
 
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
+		private static final @Immutable Set<Class<?>> JAXB_SPECIAL_TYPES = ImmutableSet.of(
+				Boolean.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, String.class
+		);
 
 		public static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
+
+		public static @Immutable Set<Class<?>> getJAXBSpecialTypes() {
+			return JAXB_SPECIAL_TYPES;
+		}
 	}
 }
