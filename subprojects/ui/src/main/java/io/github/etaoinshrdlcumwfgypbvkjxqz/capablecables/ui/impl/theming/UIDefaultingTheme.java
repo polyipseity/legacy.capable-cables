@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.theming;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming.IUITheme;
