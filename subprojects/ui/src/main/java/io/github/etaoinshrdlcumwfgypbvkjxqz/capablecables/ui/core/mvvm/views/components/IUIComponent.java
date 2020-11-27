@@ -71,7 +71,7 @@ public interface IUIComponent
 		path.add(component);
 		new ParentIterator(component.getParent().orElse(null))
 				.forEachRemaining(path::add);
-		return new ImmutablePath<>(Lists.reverse(path));
+		return ImmutablePath.of(Lists.reverse(path));
 	}
 
 	static <S extends Shape> boolean reshapeComponent(IUIComponent self, IShapeDescriptor<? super S> shapeDescriptor, Predicate<? super IShapeDescriptor<? super S>> action)

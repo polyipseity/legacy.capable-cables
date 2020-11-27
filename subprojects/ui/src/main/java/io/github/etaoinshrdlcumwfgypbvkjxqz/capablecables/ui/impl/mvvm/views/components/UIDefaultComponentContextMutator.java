@@ -5,11 +5,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContextInternal;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContextMutatorResult;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentTransformChildrenModifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.paths.IAffineTransformStack;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.IPath;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.util.Deque;
 import java.util.Optional;
 
 public class UIDefaultComponentContextMutator
@@ -18,7 +19,8 @@ public class UIDefaultComponentContextMutator
 	public IUIComponentContextMutatorResult pop(IUIComponentContextInternal context) {
 		Graphics2D graphics = context.getGraphicsRef();
 		IPath<IUIComponent> path = context.getPathRef();
-		IAffineTransformStack transformStack = context.getTransformStackRef();
+		Deque<AffineTransform> transformStack = context.getTransformStackRef();
+		Deque<Shape> clipStack = context.getClipStackRef();
 
 		Optional<? extends IUIComponent> pathEnd = path.getPathEnd();
 
@@ -27,13 +29,11 @@ public class UIDefaultComponentContextMutator
 		assert pathEnd.isPresent(); // COMMENT due to path.parentPath
 		// COMMENT transform
 		transformStack.pop();
+		// COMMENT clip
+		clipStack.pop();
 		// COMMENT graphics
 		graphics.setTransform(transformStack.element());
-		graphics.setClip(
-				path.getPathEnd()
-						.map(IUIComponent::getShape)
-						.orElse(null)
-		); // COMMENT automatically transforms
+		graphics.setClip(clipStack.element()); // COMMENT automatically transforms
 
 		return UIImmutableComponentContextMutatorResult.of(pathEnd.get());
 	}
@@ -42,10 +42,12 @@ public class UIDefaultComponentContextMutator
 	public IUIComponentContextMutatorResult push(IUIComponentContextInternal context, IUIComponent element) {
 		Graphics2D graphics = context.getGraphicsRef();
 		IPath<IUIComponent> path = context.getPathRef();
-		IAffineTransformStack transformStack = context.getTransformStackRef();
+		Deque<AffineTransform> transformStack = context.getTransformStackRef();
+		Deque<Shape> clipStack = context.getClipStackRef();
 
 		// COMMENT transform
-		AffineTransform transform = transformStack.push();
+		AffineTransform transform = (AffineTransform) AssertionUtilities.assertNonnull(transformStack.element()).clone();
+		transformStack.push(transform);
 		path.getPathEnd().ifPresent(presentPathEnd ->
 				IUIComponentTransformChildrenModifier.handleComponentModifiers(presentPathEnd,
 						presentPathEnd.getModifiersView(),
@@ -55,7 +57,9 @@ public class UIDefaultComponentContextMutator
 		path.subPath(ImmutableList.of(element));
 		// COMMENT graphics
 		graphics.setTransform(transform);
-		graphics.setClip(IUIComponent.getShape(element)); // COMMENT automatically transforms
+		graphics.clip(IUIComponent.getShape(element)); // COMMENT automatically transforms
+		// COMMENT clip
+		clipStack.push(graphics.getClip());
 
 		return UIImmutableComponentContextMutatorResult.of(element);
 	}

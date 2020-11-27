@@ -1,13 +1,16 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.paths.IAffineTransformStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICloneable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.IPath;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.MarkersTemplate;
+import org.slf4j.Marker;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.util.Deque;
 import java.util.Optional;
 
 public interface IUIComponentContext
@@ -33,12 +36,25 @@ public interface IUIComponentContext
 
 	@Immutable IUIViewContext getViewContext();
 
-	@Immutable IPath<IUIComponent> getPathView();
+	@Immutable IPath<? extends IUIComponent> getPathView();
 
-	@Immutable IAffineTransformStack getTransformStackView();
+	@Immutable Deque<? extends AffineTransform> getTransformStackView();
+
+	@Immutable Deque<? extends Shape> getClipStackView();
 
 	Graphics2D createGraphics();
 
 	@Override
 	void close();
+
+	enum StaticHolder {
+		;
+
+		private static final Marker CLASS_MARKER = MarkersTemplate.addReferences(UIMarkers.getInstance().getClassMarker(),
+				UIMarkers.getInstance().getMarkerStructure());
+
+		public static Marker getClassMarker() {
+			return CLASS_MARKER;
+		}
+	}
 }

@@ -3,11 +3,15 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.co
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContextInternal;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.paths.IAffineTransformStack;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LoopUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.ListBackedDeque;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.IPath;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.paths.ImmutablePath;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.util.Deque;
 
 public abstract class UIAbstractComponentContext
 		implements IUIComponentContextInternal {
@@ -21,17 +25,18 @@ public abstract class UIAbstractComponentContext
 	}
 
 	@Override
-	public @Immutable IPath<IUIComponent> getPathView() {
-		try {
-			return getPathRef().clone();
-		} catch (CloneNotSupportedException e) {
-			throw ThrowableUtilities.propagate(e);
-		}
+	public @Immutable IPath<? extends IUIComponent> getPathView() {
+		return ImmutablePath.of(getPathRef().asList());
 	}
 
 	@Override
-	public @Immutable IAffineTransformStack getTransformStackView() {
-		return getTransformStackRef().clone();
+	public @Immutable Deque<? extends AffineTransform> getTransformStackView() {
+		return ListBackedDeque.ofImmutable(getTransformStackRef());
+	}
+
+	@Override
+	public @Immutable Deque<? extends Shape> getClipStackView() {
+		return ListBackedDeque.ofImmutable(getClipStackRef());
 	}
 
 	@Override
@@ -42,8 +47,12 @@ public abstract class UIAbstractComponentContext
 	@Override
 	public void close() {
 		getGraphicsRef().dispose();
-		int size = getPathRef().size();
-		getPathRef().parentPath(size);
-		IAffineTransformStack.popNTimes(getTransformStackRef(), size);
+
+		IPath<IUIComponent> path = getPathRef();
+		int size = path.size();
+
+		path.parentPath(size);
+		LoopUtilities.doNTimes(size, getTransformStackRef()::pop);
+		LoopUtilities.doNTimes(size, getClipStackRef()::pop);
 	}
 }

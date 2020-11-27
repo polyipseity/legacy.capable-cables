@@ -1,15 +1,18 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.paths.IAffineTransformStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.IPath;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.util.Deque;
 
 public interface IUIComponentContextInternal
 		extends IUIComponentContext {
 	IPath<IUIComponent> getPathRef();
 
-	IAffineTransformStack getTransformStackRef();
+	Deque<AffineTransform> getTransformStackRef();
+
+	Deque<Shape> getClipStackRef();
 
 	Graphics2D getGraphicsRef();
 
