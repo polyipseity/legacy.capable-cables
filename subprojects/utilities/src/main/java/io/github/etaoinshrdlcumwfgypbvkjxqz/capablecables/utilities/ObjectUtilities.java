@@ -137,12 +137,8 @@ public enum ObjectUtilities {
 		return result[0];
 	}
 
-	private static LoadingCache<Class<?>, ToIntFunction<?>> getHashCodeSuperInvokersMap() {
-		return HASH_CODE_SUPER_INVOKERS_MAP;
-	}
-
-	private static ToIntFunction<?> getHashCodeSuperInvokerDefault() {
-		return HASH_CODE_SUPER_INVOKER_DEFAULT;
+	private static LoadingCache<Class<?>, ToIntFunction<?>> getHashCodeSuperInvokerMap() {
+		return HASH_CODE_SUPER_INVOKER_MAP;
 	}
 
 	public static <T> String toStringImpl(T self, Map<? extends String, ? extends Function<@Nonnull ? super T, @Nullable ?>> variables) {
