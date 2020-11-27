@@ -20,7 +20,6 @@ import java.util.function.BooleanSupplier;
 
 // TODO needs better design, but I cannot think of one
 public interface IShapeDescriptor<S extends Shape> {
-
 	static void checkIsBeingModified(IShapeDescriptor<?> shapeDescriptor) throws IllegalStateException {
 		if (!shapeDescriptor.isBeingModified())
 			throw new IllegalStateException(
@@ -65,7 +64,7 @@ public interface IShapeDescriptor<S extends Shape> {
 	enum StaticHolder {
 		;
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
-		private static final IShapeConstraint CONSTRAINT_MINIMUM = new ShapeConstraint(null, null, null, null, 1d, 1d, null, null);
+		private static final IShapeConstraint CONSTRAINT_MINIMUM = new ShapeConstraint(null, null, null, null, 1D, 1D, null, null);
 		private static final Rectangle2D SHAPE_PLACEHOLDER = new Rectangle2D.Double(0, 0, 1, 1);
 
 		protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }

@@ -9,7 +9,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtil
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 
-import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -26,8 +25,7 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 	private boolean beingModified = false;
 
 	@Override
-	@OverridingMethodsMustInvokeSuper
-	public boolean modify(BooleanSupplier action)
+	public final boolean modify(BooleanSupplier action)
 			throws ConcurrentModificationException {
 		if (isBeingModified())
 			throw new ConcurrentModificationException(
@@ -44,7 +42,6 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 	}
 
 	protected AbstractShapeDescriptor() {}
-
 
 	@Override
 	public List<IShapeConstraint> getConstraintsView() { return ImmutableList.copyOf(getConstraints()); }
@@ -64,27 +61,29 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 	}
 
 	@Override
-	@OverridingMethodsMustInvokeSuper
-	public boolean crop(Rectangle2D bounds)
+	public final boolean crop(Rectangle2D bounds)
 			throws IllegalStateException {
 		IShapeDescriptor.checkIsBeingModified(this);
-		return false;
+		return crop0(bounds);
+	}
+
+	protected abstract boolean crop0(Rectangle2D bounds);
+
+	@Override
+	public final boolean adapt(Rectangle2D frame)
+			throws IllegalStateException {
+		IShapeDescriptor.checkIsBeingModified(this);
+		return adapt0(frame);
 	}
 
 	@Override
-	@OverridingMethodsMustInvokeSuper
-	public boolean adapt(Rectangle2D frame) throws IllegalStateException {
-		IShapeDescriptor.checkIsBeingModified(this);
-		return false;
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public boolean transform(AffineTransform transform)
+	public final boolean transform(AffineTransform transform)
 			throws IllegalStateException {
 		IShapeDescriptor.checkIsBeingModified(this);
-		return false;
+		return transform0(transform);
 	}
+
+	protected abstract boolean transform0(AffineTransform transform);
 
 	protected boolean modify0(BooleanSupplier action) {
 		boolean ret = action.getAsBoolean();

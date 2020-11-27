@@ -2,7 +2,6 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.descri
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl.UIObjectUtilities;
 
-import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
@@ -29,10 +28,7 @@ public class RectangularShapeDescriptor<S extends RectangularShape>
 	protected void setShape(S shape) { this.shape = shape; }
 
 	@Override
-	@OverridingMethodsMustInvokeSuper
-	public boolean crop(Rectangle2D bounds)
-			throws IllegalStateException {
-		super.crop(bounds);
+	public boolean crop0(Rectangle2D bounds) {
 		Rectangle2D currentBounds = getShape().getBounds2D();
 		Rectangle2D.intersect(currentBounds, bounds, currentBounds);
 		getShape().setFrame(currentBounds);
@@ -40,18 +36,7 @@ public class RectangularShapeDescriptor<S extends RectangularShape>
 	}
 
 	@Override
-	public boolean adapt(Rectangle2D frame)
-			throws IllegalStateException {
-		super.adapt(frame);
-		getShape().setFrame(frame);
-		return true;
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public boolean transform(AffineTransform transform)
-			throws IllegalStateException {
-		super.transform(transform);
+	public boolean transform0(AffineTransform transform) {
 		UIObjectUtilities.transformRectangularShape(transform, getShape(), getShape());
 		return true;
 	}

@@ -11,10 +11,12 @@ import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
-public class DelegatingShapeDescriptor<S extends Shape>
-		extends AbstractDelegatingObject<IShapeDescriptor<S>>
+public abstract class AbstractDelegatingShapeDescriptor<S extends Shape, D extends IShapeDescriptor<?>>
+		extends AbstractDelegatingObject<D>
 		implements IShapeDescriptor<S> {
-	public DelegatingShapeDescriptor(IShapeDescriptor<S> delegated) { super(delegated); }
+	public AbstractDelegatingShapeDescriptor(D delegated) {
+		super(delegated);
+	}
 
 	@Override
 	public boolean isBeingModified() { return getDelegate().isBeingModified(); }

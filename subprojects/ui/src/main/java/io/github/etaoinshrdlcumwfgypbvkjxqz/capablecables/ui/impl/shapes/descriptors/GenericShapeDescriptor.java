@@ -3,12 +3,12 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.descri
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl.UIObjectUtilities;
 
-import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
-public class GenericShapeDescriptor extends AbstractShapeDescriptor<Shape> {
+public class GenericShapeDescriptor
+		extends AbstractShapeDescriptor<Shape> {
 	private Shape shape;
 
 	public GenericShapeDescriptor(Shape shape) {
@@ -28,10 +28,7 @@ public class GenericShapeDescriptor extends AbstractShapeDescriptor<Shape> {
 	protected void setShape(Shape shape) { this.shape = shape; }
 
 	@Override
-	@OverridingMethodsMustInvokeSuper
-	public boolean crop(Rectangle2D bounds)
-			throws IllegalStateException {
-		super.crop(bounds);
+	public boolean crop0(Rectangle2D bounds) {
 		Rectangle2D currentBounds = getShape().getBounds2D();
 		Rectangle2D.intersect(currentBounds, bounds, currentBounds);
 		setShape(AffineTransformUtilities.getTransformFromTo(getShape().getBounds2D(), currentBounds).createTransformedShape(getShape()));
@@ -39,17 +36,7 @@ public class GenericShapeDescriptor extends AbstractShapeDescriptor<Shape> {
 	}
 
 	@Override
-	public boolean adapt(Rectangle2D frame) throws IllegalStateException {
-		super.adapt(frame);
-		setShape(AffineTransformUtilities.getTransformFromTo(getShape().getBounds2D(), frame).createTransformedShape(getShape()));
-		return true;
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public boolean transform(AffineTransform transform)
-			throws IllegalStateException {
-		super.transform(transform);
+	public boolean transform0(AffineTransform transform) {
 		setShape(transform.createTransformedShape(getShape()));
 		return true;
 	}
