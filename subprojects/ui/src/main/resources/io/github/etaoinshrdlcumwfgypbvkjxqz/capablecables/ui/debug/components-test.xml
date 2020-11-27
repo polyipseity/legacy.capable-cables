@@ -17,7 +17,9 @@
 	<using alias="component.window"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIWindowComponent"/>
 	<using alias="component.button"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.minecraft.mvvm.views.components.impl.UIMinecraftButtonComponent"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIButtonComponent"/>
+	<using alias="component.label"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UILabelComponent"/>
 	<!-- COMMENT extensions -->
 	<using alias="extension.minecraft.background.default"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.extensions.background.UIDefaultMinecraftBackgroundExtension"/>
@@ -65,6 +67,70 @@
 					</map>
 				</property>
 			</extension>
+
+			<componentEmbed name="controls">
+				<extension class="extension.user_relocatable" rendererName="Window1ExtensionRelocatableRenderer">
+					<property key="default:property.teleporting.target">
+						<string>Window1</string>
+					</property>
+					<property key="default:property.teleporting.activation.mouse">
+						<set>
+							<int>1</int><!-- COMMENT right -->
+							<int>2</int><!-- COMMENT middle -->
+						</set>
+					</property>
+				</extension>
+			</componentEmbed>
+
+			<component class="component.label" name="Window1Label" rendererName="Window1LabelRenderer">
+				<shape class="shape.rectangle" width="200" height="50"/>
+
+				<property key="default:property.text">
+					<attributedText>
+						<map>
+							<entry>
+								<any>
+									<textAttribute>foreground</textAttribute>
+								</any>
+								<any>
+									<color red="128" green="128" blue="128"/>
+								</any>
+							</entry>
+							<entry>
+								<any>
+									<textAttribute>underline</textAttribute>
+								</any>
+								<any>
+									<int>0</int><!-- COMMENT 0 - enabled -->
+								</any>
+							</entry>
+						</map>
+						<attributedText>
+							<map>
+								<entry>
+									<any>
+										<textAttribute>foreground</textAttribute>
+									</any>
+									<any>
+										<color red="255" green="255" blue="255"/>
+									</any>
+								</entry>
+								<entry>
+									<any>
+										<textAttribute>strikethrough</textAttribute>
+									</any>
+									<any>
+										<boolean>true</boolean>
+									</any>
+								</entry>
+							</map>
+							<string><![CDATA[This is an example text.  There are some more text here...
+]]></string>
+						</attributedText>
+						<string><![CDATA[Can you see me?]]></string>
+					</attributedText>
+				</property>
+			</component>
 		</component>
 
 		<component class="component.window" name="WindowAnchored" rendererName="WindowAnchoredRenderer">

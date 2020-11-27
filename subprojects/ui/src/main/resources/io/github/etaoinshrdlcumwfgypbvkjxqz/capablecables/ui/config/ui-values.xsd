@@ -2,7 +2,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:ui="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
            targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
-           version="3.0.0"
+           version="3.1.0"
            xml:lang="EN">
 	<!-- TODO change some global elements to local elements, JAXB seems to dislike local elements -->
 
@@ -64,27 +64,6 @@
 		</xs:complexType>
 	</xs:element>
 
-	<!-- COMMENT FontRenderContext -->
-	<xs:element name="fontRenderContext">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="ui:affineTransform" minOccurs="0"/>
-				<xs:element ref="ui:textAntiAliasRenderingHint"/>
-				<xs:element ref="ui:fractionalMetricsRenderingHint"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-
-	<!-- COMMENT ITextLayout -->
-	<xs:element name="textLayout">
-		<xs:complexType>
-			<xs:sequence>
-				<xs:element ref="ui:fontRenderContext"/>
-				<xs:element ref="ui:attributedText"/>
-			</xs:sequence>
-		</xs:complexType>
-	</xs:element>
-
 	<!-- COMMENT AffineTransform -->
 	<xs:element name="affineTransform">
 		<xs:complexType>
@@ -118,12 +97,6 @@
 
 	<!-- COMMENT EnumUISide -->
 	<xs:element name="uiSide" type="ui:uiSideType"/>
-
-	<!-- COMMENT ITextAntiAliasRenderingHintWrapper -->
-	<xs:element name="textAntiAliasRenderingHint" type="ui:textAntiAliasRenderingHintType"/>
-
-	<!-- COMMENT IFractionalMetricsRenderingHintWrapper -->
-	<xs:element name="fractionalMetricsRenderingHint" type="ui:fractionalMetricsRenderingHintType"/>
 
 	<!-- SECTION types -->
 
@@ -166,29 +139,6 @@
 			<xs:enumeration value="RIGHT"/>
 			<xs:enumeration value="HORIZONTAL"/>
 			<xs:enumeration value="VERTICAL"/>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<!-- COMMENT ITextAntiAliasRenderingHintWrapper type -->
-	<xs:simpleType name="textAntiAliasRenderingHintType">
-		<xs:restriction base="xs:NMTOKEN">
-			<xs:enumeration value="DEFAULT"/>
-			<xs:enumeration value="ON"/>
-			<xs:enumeration value="OFF"/>
-			<xs:enumeration value="GASP"/>
-			<xs:enumeration value="LCD_HRGB"/>
-			<xs:enumeration value="LCD_HBGR"/>
-			<xs:enumeration value="LCD_VRGB"/>
-			<xs:enumeration value="LCD_VBGR"/>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<!-- COMMENT IFractionalMetricsRenderingHintWrapper type -->
-	<xs:simpleType name="fractionalMetricsRenderingHintType">
-		<xs:restriction base="xs:NMTOKEN">
-			<xs:enumeration value="DEFAULT"/>
-			<xs:enumeration value="ON"/>
-			<xs:enumeration value="OFF"/>
 		</xs:restriction>
 	</xs:simpleType>
 </xs:schema>

@@ -302,6 +302,4 @@ public class DelegatingGraphics2D
 	public boolean equals(Object o) {
 		return ObjectUtilities.equalsImpl(this, o, DelegatingGraphics2D.class, true, getObjectVariableMapView().values());
 	}
-
-
 }

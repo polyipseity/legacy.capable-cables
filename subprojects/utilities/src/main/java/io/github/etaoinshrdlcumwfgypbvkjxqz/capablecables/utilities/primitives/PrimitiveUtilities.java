@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives;
 
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;

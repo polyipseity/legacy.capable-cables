@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.text;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Ordered;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableTuple2;
@@ -15,12 +16,12 @@ import java.util.Map;
 
 public class AttributedStringBuilder {
 	private final List<String> stringList;
-	private final Map<ITuple2<Integer, Integer>, Map<Attribute, Object>> attributesList;
+	private final @Ordered Map<ITuple2<Integer, Integer>, Map<Attribute, Object>> attributesList;
 	private int length = 0;
 
 	public AttributedStringBuilder(int initialCapacity) {
 		this.stringList = new ArrayList<>(initialCapacity);
-		this.attributesList = new LinkedHashMap<>(initialCapacity);
+		this.attributesList = new LinkedHashMap<>(initialCapacity); // COMMENT ensure order
 	}
 
 	public AttributedStringBuilder attachAttributes(Map<? extends Attribute, ?> attributes) {
@@ -39,13 +40,15 @@ public class AttributedStringBuilder {
 	}
 
 	public AttributedStringBuilder attachAttributes(int from, int to, Map<? extends Attribute, ?> attributes) {
-		// COMMENT it is possible that the range already exists
-		getAttributesList().merge(ImmutableTuple2.of(from, to), ImmutableMap.copyOf(attributes), MapUtilities::concatMaps);
+		if (from != to) { // COMMENT need to check, will throw exception if zero length text is added
+			// COMMENT it is possible that the range already exists
+			getAttributesList().merge(ImmutableTuple2.of(from, to), ImmutableMap.copyOf(attributes), MapUtilities::concatMaps);
+		}
 		return this;
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Map<ITuple2<Integer, Integer>, Map<Attribute, Object>> getAttributesList() {
+	protected @Ordered Map<ITuple2<Integer, Integer>, Map<Attribute, Object>> getAttributesList() {
 		return attributesList;
 	}
 
@@ -66,7 +69,7 @@ public class AttributedStringBuilder {
 						.reduce("", String::concat)
 		);
 		getAttributesList().forEach((range, attributes) -> {
-			assert range != null;
+			assert !range.getLeft().equals(range.getRight());
 			result.addAttributes(attributes, range.getLeft(), range.getRight());
 		});
 		return result;

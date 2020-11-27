@@ -4,19 +4,13 @@ import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.FractionalMetricsRenderingHintType;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.TextAntiAliasRenderingHintType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.UiSideType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBElementAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBAdapterRegistry;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.wrappers.IFractionalMetricsRenderingHintWrapper;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.wrappers.ITextAntiAliasRenderingHintWrapper;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.JAXBUIUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.JAXBUIUtilities.ObjectFactories;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.JAXBFunctionalElementAdapter;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.wrappers.EnumFractionalMetricsRenderingHintWrapper;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.wrappers.EnumTextAntiAliasRenderingHintWrapper;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
@@ -42,20 +36,6 @@ public enum EnumJAXBUIDefaultElementAdapter {
 			new JAXBFunctionalElementAdapter<UiSideType, EnumUISide>(
 					(context, left) -> EnumUISide.valueOf(left.getValue().name()),
 					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createUiSide(UiSideType.valueOf(right.name()))
-			)),
-	@SuppressWarnings("Convert2Diamond") TEXT_ANTI_ALIAS_RENDERING_HINT(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createTextAntiAliasRenderingHint), ITextAntiAliasRenderingHintWrapper.class),
-			new JAXBFunctionalElementAdapter<TextAntiAliasRenderingHintType, ITextAntiAliasRenderingHintWrapper>(
-					(context, left) -> EnumTextAntiAliasRenderingHintWrapper.valueOf(left.getValue().name()),
-					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createTextAntiAliasRenderingHint(
-							TextAntiAliasRenderingHintType.valueOf(EnumTextAntiAliasRenderingHintWrapper.valueOfData(right.getData()).name())
-					)
-			)),
-	@SuppressWarnings("Convert2Diamond") FRACTIONAL_METRICS_RENDERING_HINT(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createFractionalMetricsRenderingHint), IFractionalMetricsRenderingHintWrapper.class),
-			new JAXBFunctionalElementAdapter<FractionalMetricsRenderingHintType, IFractionalMetricsRenderingHintWrapper>(
-					(context, left) -> EnumFractionalMetricsRenderingHintWrapper.valueOf(left.getValue().name()),
-					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createFractionalMetricsRenderingHint(
-							FractionalMetricsRenderingHintType.valueOf(EnumFractionalMetricsRenderingHintWrapper.valueOfData(right.getData()).name())
-					)
 			)),
 	@SuppressWarnings({"unchecked", "Convert2Diamond"}) TEXT_ATTRIBUTE(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createTextAttribute), AttributedCharacterIterator.Attribute.class),
 			new JAXBFunctionalElementAdapter<String, AttributedCharacterIterator.Attribute>(

@@ -32,16 +32,14 @@ public final class ImmutableAttributedText
 					.forEachOrdered(child ->
 							child.accept(
 									charSequence -> resultBuilder.addCharSequence(charSequence).attachAttributes(getAttributes()),
-									attributedCharacterIterator ->
-											TextUtilities.forEachRun(attributedCharacterIterator,
-													attributedCharacterIterator1 -> {
+									text ->
+											TextUtilities.forEachRun(text,
+													text1 -> {
 														Map<AttributedCharacterIterator.Attribute, Object> childAttributes =
-																attributedCharacterIterator1.getAttributes();
-														String runString =
-																TextUtilities.next(attributedCharacterIterator1,
-																		attributedCharacterIterator1.getRunLimit()
-																				- attributedCharacterIterator1.getRunStart());
-														resultBuilder.addCharSequence(runString)
+																text1.getAttributes();
+														resultBuilder.addCharSequence(
+																TextUtilities.currentRun(text1)
+														)
 																.attachAttributes(getAttributes()) // COMMENT attach ours first
 																.attachAttributes(childAttributes) // COMMENT child's attributes overwrite ours
 														;
