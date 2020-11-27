@@ -117,15 +117,6 @@ public class UIButtonComponent
 		});
 	}
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Set<EnumButtonState> getButtonStates() { return buttonStates; }
-
-	@Override
-	protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
-		eventTargetListenersInitializer.run();
-		return super.getEventTargetListeners();
-	}
-
 	public static INamespacePrefixedString getMethodOnActivateLocation() {
 		return METHOD_ON_ACTIVATE_LOCATION;
 	}
@@ -134,10 +125,8 @@ public class UIButtonComponent
 		return METHOD_ON_ACTIVATED_LOCATION;
 	}
 
-	@Override
-	protected IUIRendererContainerContainer<IUIComponentRenderer<?>> getRendererContainerContainer() {
-		return rendererContainerContainer;
-	}
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected Set<EnumButtonState> getButtonStates() { return buttonStates; }
 
 	protected IBindingMethodSource<IUIEvent> getOnActivated() {
 		return onActivated;
@@ -169,10 +158,21 @@ public class UIButtonComponent
 		super.cleanupBindings();
 	}
 
+	@Override
+	protected IUIRendererContainerContainer<IUIComponentRenderer<?>> getRendererContainerContainer() {
+		return rendererContainerContainer;
+	}
+
 	protected IBindingMethodSource<IUIEventActivate> getOnActivate() { return onActivate; }
 
 	@Override
 	public boolean isFocusable() { return true; }
+
+	@Override
+	protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
+		eventTargetListenersInitializer.run();
+		return super.getEventTargetListeners();
+	}
 
 	@Override
 	public Optional<Long> getCursorHandle(IUIComponentContext context) {

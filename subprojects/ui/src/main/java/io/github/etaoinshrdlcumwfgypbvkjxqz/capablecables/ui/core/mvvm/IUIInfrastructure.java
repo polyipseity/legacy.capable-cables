@@ -17,18 +17,6 @@ public interface IUIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel
 		extends
 		IUIStructureLifecycle<IUIContextContainer, @AlwaysNull @Nullable Void>, IUIActiveLifecycle<@AlwaysNull @Nullable Void, @AlwaysNull @Nullable Void>,
 		IExtensionContainer<INamespacePrefixedString> {
-	V getView();
-
-	void setView(V view);
-
-	VM getViewModel();
-
-	void setViewModel(VM viewModel);
-
-	B getBinder();
-
-	void setBinder(B binder);
-
 	static <T extends IUIInfrastructure<V, VM, B>,
 			V extends IUIView<?>,
 			VM extends IUIViewModel<?>,
@@ -42,4 +30,16 @@ public interface IUIInfrastructure<V extends IUIView<?>, VM extends IUIViewModel
 		result.setBinder(binder);
 		return result;
 	}
+
+	V getView();
+
+	void setView(V view);
+
+	VM getViewModel();
+
+	void setViewModel(VM viewModel);
+
+	B getBinder();
+
+	void setBinder(B binder);
 }

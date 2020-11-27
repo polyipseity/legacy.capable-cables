@@ -107,12 +107,44 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 				mappings.get(getPropertyRelocateBordersLocation()));
 	}
 
-	public static INamespacePrefixedString getPropertyRelocateBordersLocation() {
-		return PROPERTY_RELOCATE_BORDERS_LOCATION;
+	public static INamespacePrefixedString getPropertyTargetComponentLocation() {
+		return PROPERTY_TARGET_COMPONENT_LOCATION;
 	}
 
 	public static INamespacePrefixedString getPropertyActivationMouseButtonsLocation() {
 		return PROPERTY_ACTIVATION_MOUSE_BUTTONS_LOCATION;
+	}
+
+	public static INamespacePrefixedString getPropertyRelocateBordersLocation() {
+		return PROPERTY_RELOCATE_BORDERS_LOCATION;
+	}
+
+	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
+	protected static Optional<IUIComponent> getTargetComponent(UITeleportingComponentUserRelocatableExtension<?> instance) {
+		String targetComponent = instance.getTargetComponent().getValue();
+		return targetComponent.isEmpty() // COMMENT empty component names are disallowed, so this indicates using the container
+				? OptionalUtilities.upcast(instance.getContainer())
+				: instance.getContainer()
+				.flatMap(IUIComponent::getManager)
+				.flatMap(IUIComponentManager::getView)
+				.map(IUIView::getNamedTrackers)
+				.flatMap(namedTrackers -> OptionalUtilities.upcast(namedTrackers.get(IUIComponent.class, targetComponent)));
+	}
+
+	protected IBindingField<String> getTargetComponent() {
+		return targetComponent;
+	}
+
+	public static String getPropertyRelocateBorders() {
+		return PROPERTY_RELOCATE_BORDERS;
+	}
+
+	public static String getPropertyActivationMouseButtons() {
+		return PROPERTY_ACTIVATION_MOUSE_BUTTONS;
+	}
+
+	public static String getPropertyTargetComponent() {
+		return PROPERTY_TARGET_COMPONENT;
 	}
 
 	@Override
@@ -136,6 +168,10 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 
 	protected IBindingField<Set<Integer>> getActivationMouseButtons() {
 		return activationMouseButtons;
+	}
+
+	protected IBindingField<Map<EnumUISide, Double>> getRelocateBorders() {
+		return relocateBorders;
 	}
 
 	protected IUIRendererContainerContainer<IRelocatingRenderer> getRendererContainerContainer() {
@@ -191,38 +227,6 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 	@Override
 	public IExtensionType<INamespacePrefixedString, ?, IUIComponent> getType() { return StaticHolder.getTYPE().getValue(); }
 
-	public static INamespacePrefixedString getPropertyTargetComponentLocation() {
-		return PROPERTY_TARGET_COMPONENT_LOCATION;
-	}
-
-	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
-	protected static Optional<IUIComponent> getTargetComponent(UITeleportingComponentUserRelocatableExtension<?> instance) {
-		String targetComponent = instance.getTargetComponent().getValue();
-		return targetComponent.isEmpty() // COMMENT empty component names are disallowed, so this indicates using the container
-				? OptionalUtilities.upcast(instance.getContainer())
-				: instance.getContainer()
-				.flatMap(IUIComponent::getManager)
-				.flatMap(IUIComponentManager::getView)
-				.map(IUIView::getNamedTrackers)
-				.flatMap(namedTrackers -> OptionalUtilities.upcast(namedTrackers.get(IUIComponent.class, targetComponent)));
-	}
-
-	protected IBindingField<String> getTargetComponent() {
-		return targetComponent;
-	}
-
-	public static String getPropertyRelocateBorders() {
-		return PROPERTY_RELOCATE_BORDERS;
-	}
-
-	public static String getPropertyActivationMouseButtons() {
-		return PROPERTY_ACTIVATION_MOUSE_BUTTONS;
-	}
-
-	public static String getPropertyTargetComponent() {
-		return PROPERTY_TARGET_COMPONENT;
-	}
-
 	@Override
 	public Optional<? extends Shape> getRelocateShape() {
 		return getContainer()
@@ -266,20 +270,14 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 
 	protected void setRelocateData(@Nullable IRelocateData relocateData) { this.relocateData = relocateData; }
 
-	protected IBindingField<Map<EnumUISide, Double>> getRelocateBorders() {
-		return relocateBorders;
-	}
-
 	public static class Modifier
 			extends UIAbstractVirtualComponent
 			implements IUIComponentCursorHandleProviderModifier, IUIComponentRendererInvokerModifier {
 		private final OptionalWeakReference<UITeleportingComponentUserRelocatableExtension<?>> owner;
 		private final Object lockObject = new Object();
-
+		private final Runnable eventTargetListenersInitializer;
 		@Nullable
 		private Integer activeMouseButton;
-
-		private final Runnable eventTargetListenersInitializer;
 
 		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 		protected Modifier(UITeleportingComponentUserRelocatableExtension<?> owner) {
@@ -312,12 +310,6 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 			});
 		}
 
-		@Override
-		protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
-			eventTargetListenersInitializer.run();
-			return super.getEventTargetListeners();
-		}
-
 		protected Optional<Integer> getActiveMouseButton() {
 			return Optional.ofNullable(activeMouseButton);
 		}
@@ -325,6 +317,8 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 		protected void setActiveMouseButton(@Nullable Integer activeMouseButton) {
 			this.activeMouseButton = activeMouseButton;
 		}
+
+		public Optional<? extends UITeleportingComponentUserRelocatableExtension<?>> getOwner() { return owner.getOptional(); }
 
 		protected boolean startRelocateMaybe(@SuppressWarnings("unused") IUIViewContext viewContext, Point2D point) {
 			return getOwner().flatMap(owner -> UITeleportingComponentUserRelocatableExtension.getTargetComponent(owner).map(targetComponent -> {
@@ -340,8 +334,6 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 				return true;
 			})).orElse(false);
 		}
-
-		public Optional<? extends UITeleportingComponentUserRelocatableExtension<?>> getOwner() { return owner.getOptional(); }
 
 		protected boolean finishRelocateMaybe(@SuppressWarnings("unused") IUIViewContext viewContext, Point2D point) {
 			return getOwner()
@@ -364,6 +356,12 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 		}
 
 		protected Object getLockObject() { return lockObject; }
+
+		@Override
+		protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
+			eventTargetListenersInitializer.run();
+			return super.getEventTargetListeners();
+		}
 
 		@Override
 		@SuppressWarnings({"rawtypes", "RedundantSuppression"})

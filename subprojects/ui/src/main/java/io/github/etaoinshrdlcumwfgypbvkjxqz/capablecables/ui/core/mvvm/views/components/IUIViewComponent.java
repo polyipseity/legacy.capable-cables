@@ -103,8 +103,6 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 				repeated -> { throw new AssertionError(); });
 	}
 
-	List<IUIComponent> getChildrenFlatView();
-
 	static IUIComponentPathResolver getPathResolver(IUIViewComponent<?, ?> instance) {
 		return instance.getCoordinator(IUIComponentPathResolver.class).orElseThrow(AssertionError::new);
 	}
@@ -112,4 +110,6 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 	static IUIComponentShapeAnchorController getShapeAnchorController(IUIViewComponent<?, ?> instance) {
 		return instance.getCoordinator(IUIComponentShapeAnchorController.class).orElseThrow(AssertionError::new);
 	}
+
+	List<IUIComponent> getChildrenFlatView();
 }

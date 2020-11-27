@@ -199,6 +199,15 @@ public class WrenchItem extends Item {
 		@SuppressWarnings("OverridableMethodCallDuringObjectConstruction")
 		protected Tag(@Nullable CompoundNBT tag) { deserializeNBT(tag); }
 
+		@Nullable
+		public CompoundNBT getPickedUpBlock() {
+			return pickedUpBlock;
+		}
+
+		public void setPickedUpBlock(@Nullable CompoundNBT pickedUpBlock) {
+			this.pickedUpBlock = pickedUpBlock;
+		}
+
 		@Override
 		@Nullable
 		public CompoundNBT serializeNBT() {
@@ -230,15 +239,6 @@ public class WrenchItem extends Item {
 				}
 				NBTUtilities.readChildIfHasKey(pickup.get(), "entity", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(this::setPickedUpEntity);
 			}
-		}
-
-		@Nullable
-		public CompoundNBT getPickedUpBlock() {
-			return pickedUpBlock;
-		}
-
-		public void setPickedUpBlock(@Nullable CompoundNBT pickedUpBlock) {
-			this.pickedUpBlock = pickedUpBlock;
 		}
 
 		@Nullable

@@ -18,12 +18,12 @@ public abstract class JAXBAbstractAdapter<L, R>
 		return () -> pushThreadLocalContext(previousContext);
 	}
 
-	protected ThreadLocal<IJAXBAdapterContext> getContextThreadLocal() {
-		return contextThreadLocal;
-	}
-
 	@Override
 	public Optional<? extends IJAXBAdapterContext> getThreadLocalContext() {
 		return Optional.ofNullable(getContextThreadLocal().get());
+	}
+
+	protected ThreadLocal<IJAXBAdapterContext> getContextThreadLocal() {
+		return contextThreadLocal;
 	}
 }

@@ -21,16 +21,16 @@ public final class UIImmutableComponentContextMutatorResult
 		return new UIImmutableComponentContextMutatorResult(component, component.getModifiersView());
 	}
 
+	private static UIImmutableComponentContextMutatorResult of(IUIComponent component, Iterable<? extends IUIComponentModifier> modifiers) {
+		return new UIImmutableComponentContextMutatorResult(component, modifiers);
+	}
+
 	@Override
 	public IUIComponent getComponent() { return component; }
 
 	@Override
 	public List<? extends IUIComponentModifier> getModifiersView() {
 		return ImmutableList.copyOf(getModifiers());
-	}
-
-	private static UIImmutableComponentContextMutatorResult of(IUIComponent component, Iterable<? extends IUIComponentModifier> modifiers) {
-		return new UIImmutableComponentContextMutatorResult(component, modifiers);
 	}
 
 	protected List<IUIComponentModifier> getModifiers() { return modifiers; }

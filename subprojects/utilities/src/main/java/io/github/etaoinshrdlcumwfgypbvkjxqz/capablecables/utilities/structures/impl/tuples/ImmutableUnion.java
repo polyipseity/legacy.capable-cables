@@ -26,11 +26,6 @@ public final class ImmutableUnion<L, R>
 		this.right = right;
 	}
 
-	@Override
-	public int hashCode() {
-		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariableMap().values());
-	}
-
 	public static <L, R> ImmutableUnion<L, R> of(Object object, Class<L> leftClazz, Class<R> rightClazz)
 			throws IllegalArgumentException {
 		if (leftClazz.isInstance(object))
@@ -48,6 +43,15 @@ public final class ImmutableUnion<L, R>
 		return of(null, right);
 	}
 
+	private static <L, R> ImmutableUnion<L, R> of(@Nullable L left, @Nullable R right) {
+		return new ImmutableUnion<>(left, right);
+	}
+
+	@Override
+	public int hashCode() {
+		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariableMap().values());
+	}
+
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	public boolean equals(@Nullable Object o) {
@@ -59,8 +63,12 @@ public final class ImmutableUnion<L, R>
 		return ObjectUtilities.toStringImpl(this, StaticHolder.getObjectVariableMap());
 	}
 
-	private static <L, R> ImmutableUnion<L, R> of(@Nullable L left, @Nullable R right) {
-		return new ImmutableUnion<>(left, right);
+	@Override
+	public <L2, R2> IUnion<L2, R2> mapBoth(Function<@Nonnull ? super L, @Nonnull ? extends L2> leftMapper, Function<@Nonnull ? super R, @Nonnull ? extends R2> rightMapper) throws IllegalArgumentException {
+		return map(
+				left -> ofLeft(leftMapper.apply(left)),
+				right -> ofRight(rightMapper.apply(right))
+		);
 	}
 
 	@Override
@@ -71,14 +79,6 @@ public final class ImmutableUnion<L, R>
 	@Override
 	public Optional<? extends R> getRight() {
 		return Optional.ofNullable(right);
-	}
-
-	@Override
-	public <L2, R2> IUnion<L2, R2> mapBoth(Function<@Nonnull ? super L, @Nonnull ? extends L2> leftMapper, Function<@Nonnull ? super R, @Nonnull ? extends R2> rightMapper) throws IllegalArgumentException {
-		return map(
-				left -> ofLeft(leftMapper.apply(left)),
-				right -> ofRight(rightMapper.apply(right))
-		);
 	}
 
 	@Override

@@ -120,13 +120,6 @@ public enum EnumJAXBUIDefaultObjectAdapter {
 		registry.getObjectRegistry().register(getKey(), getValue()); // COMMENT use deprecated, checked offers no benefits
 	}
 
-	@Override
-	public String toString() {
-		return ObjectUtilities.toStringImpl(this, getObjectVariableMap());
-	}
-
-	public static ImmutableMap<String, Function<@Nonnull EnumJAXBUIDefaultObjectAdapter, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
-
 	public ITuple2<? extends Class<?>, ? extends Class<?>> getKey() {
 		return key;
 	}
@@ -134,4 +127,11 @@ public enum EnumJAXBUIDefaultObjectAdapter {
 	public IJAXBObjectAdapter<?, ?> getValue() {
 		return value;
 	}
+
+	@Override
+	public String toString() {
+		return ObjectUtilities.toStringImpl(this, getObjectVariableMap());
+	}
+
+	public static ImmutableMap<String, Function<@Nonnull EnumJAXBUIDefaultObjectAdapter, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 }

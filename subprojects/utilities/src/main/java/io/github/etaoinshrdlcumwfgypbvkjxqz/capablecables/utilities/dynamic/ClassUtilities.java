@@ -149,6 +149,10 @@ public enum ClassUtilities {
 		}
 	}
 
+	private static MethodHandle getDefineClassMethodHandle() {
+		return DEFINE_CLASS_METHOD_HANDLE;
+	}
+
 	public static String getPackage(Class<?> clazz) {
 		String r = clazz.getName().replace(clazz.getSimpleName(), "");
 		if (r.endsWith(".")) r = r.substring(0, r.length() - 1);
@@ -156,8 +160,4 @@ public enum ClassUtilities {
 	}
 
 	public static boolean isClassAbstract(Class<?> clazz) { return clazz.isInterface() || Modifier.isAbstract(clazz.getModifiers()); }
-
-	private static MethodHandle getDefineClassMethodHandle() {
-		return DEFINE_CLASS_METHOD_HANDLE;
-	}
 }

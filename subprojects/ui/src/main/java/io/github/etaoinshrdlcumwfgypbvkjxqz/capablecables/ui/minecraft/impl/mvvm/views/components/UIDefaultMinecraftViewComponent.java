@@ -72,21 +72,6 @@ public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUICompo
 				IExtensionContainer.addExtensionChecked(event, UIImmutableMinecraftRenderEventExtension.of(extension.getPartialTicks())));
 	}
 
-	@Override
-	public Optional<? extends IUIComponentContext> createComponentContext() {
-		return getContext()
-				.map(context -> {
-							try (AutoCloseableGraphics2D graphics = MinecraftGraphics.createGraphics()) {
-								return new UIDefaultComponentContext(
-										context,
-										this,
-										new UIDefaultComponentContextMutator(),
-										graphics);
-							}
-						}
-				);
-	}
-
 	@SuppressWarnings("RedundantTypeArguments")
 	@Override
 	public void tick() {
@@ -107,5 +92,20 @@ public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUICompo
 					IConsumer3.StaticHolder.getEmpty(),
 					IUIEventTarget::isActive);
 		}
+	}
+
+	@Override
+	public Optional<? extends IUIComponentContext> createComponentContext() {
+		return getContext()
+				.map(context -> {
+							try (AutoCloseableGraphics2D graphics = MinecraftGraphics.createGraphics()) {
+								return new UIDefaultComponentContext(
+										context,
+										this,
+										new UIDefaultComponentContextMutator(),
+										graphics);
+							}
+						}
+				);
 	}
 }

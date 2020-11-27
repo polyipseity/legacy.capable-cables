@@ -23,9 +23,9 @@ public interface IUIView<S extends Shape>
 		IUIView.getNamedTrackers(instance).addAll(IUIRendererContainer.class, rendererContainers);
 	}
 
-	IUIEventTarget getTargetAtPoint(Point2D point);
-
-	Optional<? extends IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next);
+	static INamedTrackers getNamedTrackers(IUIView<?> instance) {
+		return instance.getCoordinator(INamedTrackers.class).orElseThrow(AssertionError::new);
+	}
 
 	static IUIAnimationController getAnimationController(IUIView<?> instance) {
 		return instance.getCoordinator(IUIAnimationController.class).orElseThrow(AssertionError::new);
@@ -33,19 +33,19 @@ public interface IUIView<S extends Shape>
 
 	<C extends IUIViewCoordinator> Optional<? extends C> getCoordinator(Class<C> key);
 
-	static INamedTrackers getNamedTrackers(IUIView<?> instance) {
-		return instance.getCoordinator(INamedTrackers.class).orElseThrow(AssertionError::new);
-	}
-
 	static IUIThemeStack getThemeStack(IUIView<?> instance) {
 		return instance.getCoordinator(IUIThemeStack.class).orElseThrow(AssertionError::new);
 	}
 
-	@Immutable Map<Class<?>, IUIViewCoordinator> getCoordinatorMapView();
-
 	static void unregisterRendererContainers(IUIView<?> instance, Iterable<? extends IUIRendererContainer<?>> rendererContainers) {
 		IUIView.getNamedTrackers(instance).removeAll(IUIRendererContainer.class, rendererContainers);
 	}
+
+	IUIEventTarget getTargetAtPoint(Point2D point);
+
+	Optional<? extends IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next);
+
+	@Immutable Map<Class<?>, IUIViewCoordinator> getCoordinatorMapView();
 
 	void render();
 }

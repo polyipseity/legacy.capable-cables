@@ -15,9 +15,6 @@ import java.util.Optional;
 
 public interface IUIComponentContext
 		extends ICloneable, AutoCloseable {
-	@Override
-	IUIComponentContext clone();
-
 	static Shape createContextualShape(IUIComponentContext context, Shape shape) {
 		return getCurrentTransform(context).createTransformedShape(shape);
 	}
@@ -29,6 +26,9 @@ public interface IUIComponentContext
 	static Optional<? extends IUIComponent> getCurrentComponent(IUIComponentContext context) {
 		return ((IUIComponentContextInternal) context).getPathRef().getPathEnd();
 	}
+
+	@Override
+	IUIComponentContext clone();
 
 	IUIViewComponent<?, ?> getView();
 

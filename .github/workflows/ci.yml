@@ -19,7 +19,7 @@ jobs:
 
     strategy:
       matrix:
-        build-type: [DEBUG, RELEASE]
+        build-type: [ DEBUG, RELEASE ]
 
     runs-on: ubuntu-latest
     env:

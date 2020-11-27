@@ -80,6 +80,8 @@ public class DefaultBinder
 		return ret;
 	}
 
+	protected LoadingCache<IBinding.EnumBindingType, LoadingCache<INamespacePrefixedString, IBindings<?>>> getBindings() { return bindings; }
+
 	@SuppressWarnings("UnstableApiUsage")
 	protected static MultimapBuilder.SetMultimapBuilder<Object, Object> getBindingsMultiMapBuilder() {
 		return BINDINGS_MULTI_MAP_BUILDER;
@@ -143,6 +145,4 @@ public class DefaultBinder
 	}
 
 	protected LoadingCache<IBinding.EnumBindingType, LoadingCache<Class<?>, Cache<Class<?>, Function<@Nonnull ?, @Nonnull ?>>>> getTransformers() { return transformers; }
-
-	protected LoadingCache<IBinding.EnumBindingType, LoadingCache<INamespacePrefixedString, IBindings<?>>> getBindings() { return bindings; }
 }

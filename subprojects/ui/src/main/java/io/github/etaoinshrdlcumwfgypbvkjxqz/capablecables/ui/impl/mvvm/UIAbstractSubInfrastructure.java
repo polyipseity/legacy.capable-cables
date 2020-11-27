@@ -35,11 +35,11 @@ import java.util.function.Supplier;
 public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructureContext>
 		implements IUISubInfrastructure<C> {
 	private final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
+	private final IUILifecycleStateTracker lifecycleStateTracker = new UIDefaultLifecycleStateTracker();
+	private final IBinderObserverSupplierHolder binderObserverSupplierHolder = new DefaultBinderObserverSupplierHolder();
 	private OptionalWeakReference<IUIInfrastructure<?, ?, ?>> infrastructure = new OptionalWeakReference<>(null);
 	@Nullable
 	private C context;
-	private final IUILifecycleStateTracker lifecycleStateTracker = new UIDefaultLifecycleStateTracker();
-	private final IBinderObserverSupplierHolder binderObserverSupplierHolder = new DefaultBinderObserverSupplierHolder();
 
 	@Override
 	@Deprecated
@@ -49,6 +49,27 @@ public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructure
 		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
 				BindingUtilities.findAndInitializeBindings(binderObserverSupplier, ImmutableList.of(extension)));
 		return result;
+	}
+
+	@Override
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) {
+		Optional<IExtension<? extends INamespacePrefixedString, ?>> result = IExtensionContainer.removeExtensionImpl(getExtensions(), key);
+		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
+				BindingUtilities.findAndCleanupBindings(result.map(ImmutableList::of).orElseGet(ImmutableList::of)));
+		return result;
+	}
+
+	@Override
+	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return IExtensionContainer.getExtensionImpl(getExtensions(), key); }
+
+	@Override
+	public Map<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() { return extensions; }
+
+	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
+		return binderObserverSupplierHolder;
 	}
 
 	@Override
@@ -70,27 +91,6 @@ public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructure
 	public void setContext(@Nullable C context) {
 		this.context = context;
 	}
-
-	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
-		return binderObserverSupplierHolder;
-	}
-
-	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) {
-		Optional<IExtension<? extends INamespacePrefixedString, ?>> result = IExtensionContainer.removeExtensionImpl(getExtensions(), key);
-		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
-				BindingUtilities.findAndCleanupBindings(result.map(ImmutableList::of).orElseGet(ImmutableList::of)));
-		return result;
-	}
-
-	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return IExtensionContainer.getExtensionImpl(getExtensions(), key); }
-
-	@Override
-	public Map<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() { return extensions; }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper

@@ -21,16 +21,15 @@ public class EventBusSubject
 	private static final ThreadLocal<Subject<Event>> MOD_EVENT_BUS = ThreadLocal.withInitial(() ->
 			new EventBusSubject(AssertionUtilities.assertNonnull(Bus.MOD.bus().get())));
 	private static final Subject<Event> UI_EVENT_BUS = new EventBusSubject(new BusBuilder().build());
+	private final IEventBus delegate;
+
+	public EventBusSubject(IEventBus delegate) { this.delegate = delegate; }
 
 	public static Subject<Event> getModEventBus() { return AssertionUtilities.assertNonnull(MOD_EVENT_BUS.get()); }
 
 	public static Subject<Event> getUIEventBus() { return UI_EVENT_BUS; }
 
 	public static Subject<Event> getForgeEventBus() { return FORGE_EVENT_BUS; }
-
-	private final IEventBus delegate;
-
-	public EventBusSubject(IEventBus delegate) { this.delegate = delegate; }
 
 	@Override
 	public boolean hasObservers() { return true; }

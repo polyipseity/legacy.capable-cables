@@ -47,9 +47,9 @@ public abstract class ConfigurationTemplate<D> {
 
 	protected AtomicBoolean getConfigured() { return configured; }
 
-	protected abstract void configure0(D data);
-
 	public static Marker getClassMarker() { return AssertionUtilities.assertNonnull(CLASS_MARKER.get()); }
+
+	protected abstract void configure0(D data);
 
 	public enum StaticHolder {
 		;

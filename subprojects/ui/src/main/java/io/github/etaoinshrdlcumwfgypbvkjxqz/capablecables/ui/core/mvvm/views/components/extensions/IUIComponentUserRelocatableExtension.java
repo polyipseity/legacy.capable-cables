@@ -31,19 +31,6 @@ public interface IUIComponentUserRelocatableExtension<C extends IUIComponent>
 
 	Optional<? extends IRelocateData> getRelocateData();
 
-	interface IRelocateData {
-		Optional<? extends IIntersection<? extends IUIComponent, ? extends IUIReshapeExplicitly<?>>> getTargetComponent();
-
-		Point2D getPreviousPointView();
-
-		Optional<? extends Shape> handle(Point2D point);
-	}
-
-	interface IRelocatingRenderer
-			extends IUIRenderer<IUIComponentUserRelocatableExtension<?>> {
-		void render(IUIComponentContext context, IRelocateData data);
-	}
-
 	enum StaticHolder {
 		;
 
@@ -60,5 +47,18 @@ public interface IUIComponentUserRelocatableExtension<C extends IUIComponent>
 		public static IRegistryObject<IExtensionType<INamespacePrefixedString, IUIComponentUserRelocatableExtension<?>, IUIComponent>> getTYPE() {
 			return TYPE;
 		}
+	}
+
+	interface IRelocateData {
+		Optional<? extends IIntersection<? extends IUIComponent, ? extends IUIReshapeExplicitly<?>>> getTargetComponent();
+
+		Point2D getPreviousPointView();
+
+		Optional<? extends Shape> handle(Point2D point);
+	}
+
+	interface IRelocatingRenderer
+			extends IUIRenderer<IUIComponentUserRelocatableExtension<?>> {
+		void render(IUIComponentContext context, IRelocateData data);
 	}
 }

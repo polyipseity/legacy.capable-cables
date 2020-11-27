@@ -44,17 +44,55 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 		implements IUIInfrastructure<V, VM, B> {
 	private final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
 	private final CompositeDisposable binderDisposables = new CompositeDisposable();
+	private final IUILifecycleStateTracker lifecycleStateTracker = new UIDefaultLifecycleStateTracker();
+	private final Supplier<@Nonnull Optional<DisposableObserver<IBinderAction>>> binderObserverSupplier;
 	private @Nullable V internalView;
 	private @Nullable VM internalViewModel;
 	private @Nullable B internalBinder;
-	private final IUILifecycleStateTracker lifecycleStateTracker = new UIDefaultLifecycleStateTracker();
-
-	private final Supplier<@Nonnull Optional<DisposableObserver<IBinderAction>>> binderObserverSupplier;
 
 	public static <V extends IUIView<?>,
 			VM extends IUIViewModel<?>,
 			B extends IBinder> UIDefaultInfrastructure<V, VM, B> of(V view, VM viewModel, B binder) {
 		return IUIInfrastructure.create(UIDefaultInfrastructure::new, view, viewModel, binder);
+	}
+
+	@SuppressWarnings("RedundantTypeArguments")
+	protected UIDefaultInfrastructure() {
+		OptionalWeakReference<UIDefaultInfrastructure<V, VM, B>> thisWeakReference = new OptionalWeakReference<>(suppressThisEscapedWarning(() -> this));
+		this.binderObserverSupplier = () -> thisWeakReference.getOptional().map(UIDefaultInfrastructure<V, VM, B>::createBinderActionObserver);
+	}
+
+	protected DisposableObserver<IBinderAction> createBinderActionObserver() {
+		return new BinderActionDelegatingDisposableObserver(createBinderActionObserver(getBinder()), getBinderDisposables());
+	}
+
+	public static DisposableObserver<IBinderAction> createBinderActionObserver(IBinder binder) {
+		return new LoggingDisposableObserver<>(new DefaultDisposableObserver<IBinderAction>() {
+			@Override
+			public void onNext(@Nonnull IBinderAction o) {
+				switch (o.getActionType()) {
+					case BIND:
+						try {
+							binder.bind(o.getBindings());
+						} catch (NoSuchBindingTransformerException e) {
+							onError(e);
+						}
+						break;
+					case UNBIND:
+						binder.unbind(o.getBindings());
+						break;
+					default:
+						onError(new AssertionError());
+						break;
+				}
+			}
+		}, UIConfiguration.getInstance().getLogger());
+	}
+
+	protected CompositeDisposable getBinderDisposables() { return binderDisposables; }
+
+	protected Optional<? extends B> getInternalBinder() {
+		return Optional.ofNullable(internalBinder);
 	}
 
 	@Override
@@ -67,51 +105,14 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 	@Override
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtensionImpl(getExtensions(), key); }
 
-	@SuppressWarnings("RedundantTypeArguments")
-	protected UIDefaultInfrastructure() {
-		OptionalWeakReference<UIDefaultInfrastructure<V, VM, B>> thisWeakReference = new OptionalWeakReference<>(suppressThisEscapedWarning(() -> this));
-		this.binderObserverSupplier = () -> thisWeakReference.getOptional().map(UIDefaultInfrastructure<V, VM, B>::createBinderActionObserver);
-	}
-
-	protected Optional<? extends V> getInternalView() {
-		return Optional.ofNullable(internalView);
-	}
-
-	protected Optional<? extends VM> getInternalViewModel() {
-		return Optional.ofNullable(internalViewModel);
-	}
-
-	protected Optional<? extends B> getInternalBinder() {
-		return Optional.ofNullable(internalBinder);
-	}
-
-	@Override
-	public V getView() {
-		return getInternalView().orElseThrow(IllegalStateException::new);
-	}
-
 	@Override
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return IExtensionContainer.getExtensionImpl(getExtensions(), key); }
 
 	@Override
 	public Map<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
 
-	@Override
-	public VM getViewModel() {
-		return getInternalViewModel().orElseThrow(IllegalStateException::new);
-	}
-
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() { return extensions; }
-
-	@Override
-	public B getBinder() {
-		return getInternalBinder().orElseThrow(IllegalStateException::new);
-	}
-
-	protected DisposableObserver<IBinderAction> createBinderActionObserver() {
-		return new BinderActionDelegatingDisposableObserver(createBinderActionObserver(getBinder()), getBinderDisposables());
-	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -156,8 +157,58 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 		getViewModel().bind(structureLifecycleContext);
 	}
 
+	@Override
+	public V getView() {
+		return getInternalView().orElseThrow(IllegalStateException::new);
+	}
+
 	protected Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> getBinderObserverSupplier() {
 		return binderObserverSupplier;
+	}
+
+	protected Optional<? extends V> getInternalView() {
+		return Optional.ofNullable(internalView);
+	}
+
+	protected Optional<? extends VM> getInternalViewModel() {
+		return Optional.ofNullable(internalViewModel);
+	}
+
+	@Override
+	public void setView(V view) {
+		IUIStructureLifecycle.checkBoundState(getLifecycleStateTracker().containsState(EnumUILifecycleState.BOUND), false);
+		getInternalView().ifPresent(internalView -> internalView.setInfrastructure(null));
+		this.internalView = view;
+		getView().setInfrastructure(this);
+	}
+
+	@Override
+	public VM getViewModel() {
+		return getInternalViewModel().orElseThrow(IllegalStateException::new);
+	}
+
+	@Override
+	public void setViewModel(VM viewModel) {
+		IUIStructureLifecycle.checkBoundState(getLifecycleStateTracker().containsState(EnumUILifecycleState.BOUND), false);
+		getInternalViewModel().ifPresent(internalViewModel -> internalViewModel.setInfrastructure(null));
+		this.internalViewModel = viewModel;
+		getViewModel().setInfrastructure(this);
+	}
+
+	@Override
+	public B getBinder() {
+		return getInternalBinder().orElseThrow(IllegalStateException::new);
+	}
+
+	@Override
+	public void setBinder(B binder) {
+		IUIStructureLifecycle.checkBoundState(getLifecycleStateTracker().containsState(EnumUILifecycleState.BOUND), false);
+		this.internalBinder = binder;
+	}
+
+	@Override
+	public IUILifecycleStateTracker getLifecycleStateTracker() {
+		return lifecycleStateTracker;
 	}
 
 	@SuppressWarnings("ConstantConditions")
@@ -190,58 +241,6 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 	protected void cleanup0(@SuppressWarnings("unused") @AlwaysNull @Nullable Void context) {
 		IUIActiveLifecycle.cleanupV(getViewModel());
 		IUIActiveLifecycle.cleanupV(getView());
-	}
-
-	public static DisposableObserver<IBinderAction> createBinderActionObserver(IBinder binder) {
-		return new LoggingDisposableObserver<>(new DefaultDisposableObserver<IBinderAction>() {
-			@Override
-			public void onNext(@Nonnull IBinderAction o) {
-				switch (o.getActionType()) {
-					case BIND:
-						try {
-							binder.bind(o.getBindings());
-						} catch (NoSuchBindingTransformerException e) {
-							onError(e);
-						}
-						break;
-					case UNBIND:
-						binder.unbind(o.getBindings());
-						break;
-					default:
-						onError(new AssertionError());
-						break;
-				}
-			}
-		}, UIConfiguration.getInstance().getLogger());
-	}
-
-	@Override
-	public void setView(V view) {
-		IUIStructureLifecycle.checkBoundState(getLifecycleStateTracker().containsState(EnumUILifecycleState.BOUND), false);
-		getInternalView().ifPresent(internalView -> internalView.setInfrastructure(null));
-		this.internalView = view;
-		getView().setInfrastructure(this);
-	}
-
-	@Override
-	public void setViewModel(VM viewModel) {
-		IUIStructureLifecycle.checkBoundState(getLifecycleStateTracker().containsState(EnumUILifecycleState.BOUND), false);
-		getInternalViewModel().ifPresent(internalViewModel -> internalViewModel.setInfrastructure(null));
-		this.internalViewModel = viewModel;
-		getViewModel().setInfrastructure(this);
-	}
-
-	@Override
-	public void setBinder(B binder) {
-		IUIStructureLifecycle.checkBoundState(getLifecycleStateTracker().containsState(EnumUILifecycleState.BOUND), false);
-		this.internalBinder = binder;
-	}
-
-	protected CompositeDisposable getBinderDisposables() { return binderDisposables; }
-
-	@Override
-	public IUILifecycleStateTracker getLifecycleStateTracker() {
-		return lifecycleStateTracker;
 	}
 
 	protected static final class BinderActionDelegatingDisposableObserver

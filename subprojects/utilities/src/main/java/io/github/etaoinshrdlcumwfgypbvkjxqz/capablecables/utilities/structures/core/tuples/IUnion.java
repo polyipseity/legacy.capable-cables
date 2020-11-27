@@ -25,15 +25,15 @@ public interface IUnion<L, R>
 		return instance.mapBoth(Function.identity(), rightMapper);
 	}
 
-	@Override
-	IUnion<R, L> swap();
+	static <L extends T, R extends T, T> T get(IUnion<L, R> instance) {
+		return instance.map(Function.identity(), Function.identity());
+	}
 
 	<T> T map(Function<@Nonnull ? super L, @Nonnull ? extends T> leftMapper, Function<@Nonnull ? super R, @Nonnull ? extends T> rightMapper)
 			throws IllegalArgumentException;
 
-	static <L extends T, R extends T, T> T get(IUnion<L, R> instance) {
-		return instance.map(Function.identity(), Function.identity());
-	}
+	@Override
+	IUnion<R, L> swap();
 
 	IUnion<L, R> accept(Consumer<@Nonnull ? super L> leftConsumer, Consumer<@Nonnull ? super R> rightConsumer);
 }

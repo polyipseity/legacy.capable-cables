@@ -10,8 +10,6 @@ import java.util.function.Function;
 
 @FunctionalInterface
 public interface INamed {
-	Optional<? extends String> getName();
-
 	@SuppressWarnings("UnstableApiUsage")
 	static <T extends INamed> @Immutable Map<String, T> toNamedMap(Iterable<? extends T> namedIterable)
 			throws DuplicateNameException {
@@ -31,4 +29,6 @@ public interface INamed {
 						}
 				));
 	}
+
+	Optional<? extends String> getName();
 }

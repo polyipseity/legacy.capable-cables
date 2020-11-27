@@ -33,14 +33,6 @@ public class UIDefaultComponentUserRelocatableExtensionPreviewingRelocatingRende
 	@UIProperty(PROPERTY_PREVIEW_COLOR)
 	private final IBindingField<Color> previewColor; // TODO Color to Paint
 
-	@Override
-	public final void render(IUIComponentContext context, IUIComponentUserRelocatableExtension.IRelocateData data) {
-		context.getViewContext().getInputDevices().getPointerDevice()
-				.map(IInputPointerDevice::getPositionView)
-				.flatMap(data::handle)
-				.ifPresent(shape -> render0(context, shape));
-	}
-
 	@UIRendererConstructor
 	public UIDefaultComponentUserRelocatableExtensionPreviewingRelocatingRenderer(IUIRendererArguments arguments) {
 		super(arguments);
@@ -53,6 +45,14 @@ public class UIDefaultComponentUserRelocatableExtensionPreviewingRelocatingRende
 	public static INamespacePrefixedString getPropertyPreviewColorLocation() { return PROPERTY_PREVIEW_COLOR_LOCATION; }
 
 	public static String getPropertyPreviewColor() { return PROPERTY_PREVIEW_COLOR; }
+
+	@Override
+	public final void render(IUIComponentContext context, IUIComponentUserRelocatableExtension.IRelocateData data) {
+		context.getViewContext().getInputDevices().getPointerDevice()
+				.map(IInputPointerDevice::getPositionView)
+				.flatMap(data::handle)
+				.ifPresent(shape -> render0(context, shape));
+	}
 
 	protected void render0(IUIComponentContext context, Shape shape) {
 		try (IUIComponentContext contextCopy = context.clone()) {

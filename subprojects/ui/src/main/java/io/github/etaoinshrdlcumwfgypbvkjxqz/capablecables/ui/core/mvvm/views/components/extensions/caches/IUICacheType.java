@@ -23,13 +23,13 @@ public interface IUICacheType<V, C extends IExtensionContainer<INamespacePrefixe
 
 	void invalidate(C container);
 
-	INamespacePrefixedString getKey();
-
-	Optional<? extends V> get(C container);
-
 	static INamespacePrefixedString generateKey(@NonNls CharSequence name) {
 		return ImmutableNamespacePrefixedString.of(StaticHolder.getDefaultNamespace(), StackTraceUtilities.getCallerClass().getName() + '.' + name);
 	}
+
+	INamespacePrefixedString getKey();
+
+	Optional<? extends V> get(C container);
 
 	enum StaticHolder {
 		;

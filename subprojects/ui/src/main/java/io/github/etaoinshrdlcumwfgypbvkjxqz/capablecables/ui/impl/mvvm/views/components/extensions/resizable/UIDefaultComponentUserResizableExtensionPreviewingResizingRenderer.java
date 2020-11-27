@@ -33,14 +33,6 @@ public class UIDefaultComponentUserResizableExtensionPreviewingResizingRenderer
 	@UIProperty(PROPERTY_PREVIEW_COLOR)
 	private final IBindingField<Color> previewColor; // TODO Color to Paint
 
-	@Override
-	public final void render(IUIComponentContext context, IUIComponentUserResizableExtension.IResizeData data) {
-		context.getViewContext().getInputDevices().getPointerDevice()
-				.map(IInputPointerDevice::getPositionView)
-				.flatMap(data::handle)
-				.ifPresent(shape -> render0(context, shape));
-	}
-
 	@UIRendererConstructor
 	public UIDefaultComponentUserResizableExtensionPreviewingResizingRenderer(IUIRendererArguments arguments) {
 		super(arguments);
@@ -54,6 +46,14 @@ public class UIDefaultComponentUserResizableExtensionPreviewingResizingRenderer
 	public static INamespacePrefixedString getPropertyPreviewColorLocation() { return PROPERTY_PREVIEW_COLOR_LOCATION; }
 
 	public static String getPropertyPreviewColor() { return PROPERTY_PREVIEW_COLOR; }
+
+	@Override
+	public final void render(IUIComponentContext context, IUIComponentUserResizableExtension.IResizeData data) {
+		context.getViewContext().getInputDevices().getPointerDevice()
+				.map(IInputPointerDevice::getPositionView)
+				.flatMap(data::handle)
+				.ifPresent(shape -> render0(context, shape));
+	}
 
 	protected void render0(IUIComponentContext context, Shape shape) {
 		try (IUIComponentContext contextCopy = context.clone()) {

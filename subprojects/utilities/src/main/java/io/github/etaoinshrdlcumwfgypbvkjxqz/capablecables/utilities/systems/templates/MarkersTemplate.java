@@ -27,8 +27,6 @@ public abstract class MarkersTemplate {
 	private final Marker markerStructure;
 	private final LoadingCache<Class<?>, Marker> classMarkers;
 
-	protected static CacheBuilder<Object, Object> getMarkersBuilder() { return MARKERS_BUILDER; }
-
 	protected MarkersTemplate(CharSequence namespace) {
 		this.namespace = namespace.toString();
 		this.markerUnmarked = getMarker("unmarked");
@@ -43,10 +41,14 @@ public abstract class MarkersTemplate {
 
 	public final Marker getMarker(@NonNls CharSequence string) { return MarkerFactory.getMarker(getNamespacePrefixedString(string)); }
 
+	protected static CacheBuilder<Object, Object> getMarkersBuilder() { return MARKERS_BUILDER; }
+
 	public static Marker addReferences(Marker marker, Marker... references) {
 		Arrays.stream(references).forEachOrdered(marker::add);
 		return marker;
 	}
+
+	public Marker getMarkerClass() { return markerClass; }
 
 	protected String getNamespacePrefixedString(CharSequence string) { return NamespaceUtilities.getNamespacePrefixedString(getSeparator(), getNamespace(), string); }
 
@@ -56,11 +58,9 @@ public abstract class MarkersTemplate {
 
 	public Marker getClassMarker() { return getClassMarkers().getUnchecked(StackTraceUtilities.getCallerClass()); }
 
-	public Marker getClassMarker(Class<?> clazz) { return getClassMarkers().getUnchecked(clazz); }
-
 	protected LoadingCache<Class<?>, Marker> getClassMarkers() { return classMarkers; }
 
-	public Marker getMarkerClass() { return markerClass; }
+	public Marker getClassMarker(Class<?> clazz) { return getClassMarkers().getUnchecked(clazz); }
 
 	public Marker getMarkerUnmarked() { return markerUnmarked; }
 

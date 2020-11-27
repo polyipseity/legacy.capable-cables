@@ -42,11 +42,6 @@ public abstract class AbstractTimestampedInputData
 		return result;
 	}
 
-	@Override
-	public AbstractTimestampedInputData clone() throws CloneNotSupportedException {
-		return (AbstractTimestampedInputData) super.clone();
-	}
-
 	protected static long getTimestampFieldOffset() {
 		return TIMESTAMP_FIELD_OFFSET;
 	}
@@ -60,6 +55,11 @@ public abstract class AbstractTimestampedInputData
 	@Override
 	public boolean equals(Object obj) {
 		return ObjectUtilities.equalsImpl(this, obj, ITimestampedInputData.class, true, ITimestampedInputData.StaticHolder.getObjectVariableMap().values());
+	}
+
+	@Override
+	public AbstractTimestampedInputData clone() throws CloneNotSupportedException {
+		return (AbstractTimestampedInputData) super.clone();
 	}
 
 	@Override

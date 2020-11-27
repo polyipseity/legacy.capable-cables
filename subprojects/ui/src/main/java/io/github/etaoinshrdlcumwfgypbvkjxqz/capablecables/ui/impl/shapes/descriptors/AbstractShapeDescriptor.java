@@ -24,6 +24,8 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 	private final List<IShapeConstraint> constraints = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 	private boolean beingModified = false;
 
+	protected AbstractShapeDescriptor() {}
+
 	@Override
 	public final boolean modify(BooleanSupplier action)
 			throws ConcurrentModificationException {
@@ -41,7 +43,6 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 		return ret;
 	}
 
-	protected AbstractShapeDescriptor() {}
 
 	@Override
 	public List<IShapeConstraint> getConstraintsView() { return ImmutableList.copyOf(getConstraints()); }

@@ -37,9 +37,6 @@ public class TransitionSystem<S extends IState<D>, E, D>
 		this.transitions = ImmutableMap.copyOf(transitions);
 	}
 
-	@Override
-	public @Immutable Map<BiPredicate<@Nonnull ? super ITransitionSystem<S, E, D>, @Nonnull ? super D>, Function<@Nonnull ? super D, @Nonnull ? extends S>> getTransitionsView() { return ImmutableMap.copyOf(getTransitions()); }
-
 	@SuppressWarnings("unchecked")
 	public static <S extends IState<D>, E, D> ITransitionSystem<S, E, D> getUninitialized() {
 		return (ITransitionSystem<S, E, D>) UNINITIALIZED; // COMMENT step always throw
@@ -65,13 +62,16 @@ public class TransitionSystem<S extends IState<D>, E, D>
 	@Override
 	public Optional<? extends E> getInput() { return Optional.ofNullable(input); }
 
-	protected @Immutable Map<BiPredicate<@Nonnull ? super ITransitionSystem<S, E, D>, @Nonnull ? super D>, Function<@Nonnull ? super D, @Nonnull ? extends S>> getTransitions() {
-		return transitions;
-	}
+	@Override
+	public @Immutable Map<BiPredicate<@Nonnull ? super ITransitionSystem<S, E, D>, @Nonnull ? super D>, Function<@Nonnull ? super D, @Nonnull ? extends S>> getTransitionsView() { return ImmutableMap.copyOf(getTransitions()); }
 
 	protected void setInput(@Nullable E input) { this.input = input; }
 
 	protected void setState(S state) { this.state = state; }
+
+	protected @Immutable Map<BiPredicate<@Nonnull ? super ITransitionSystem<S, E, D>, @Nonnull ? super D>, Function<@Nonnull ? super D, @Nonnull ? extends S>> getTransitions() {
+		return transitions;
+	}
 
 	@Override
 	public int hashCode() { return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariableMap().values()); }

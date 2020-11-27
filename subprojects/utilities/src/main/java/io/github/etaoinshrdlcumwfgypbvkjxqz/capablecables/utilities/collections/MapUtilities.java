@@ -104,11 +104,11 @@ public enum MapUtilities {
 	public enum PublicAbstractBiMapHolder {
 		;
 
-		private static final long serialVersionUID = 3864726593737949225L; // COMMENT should not affect Enum serialization
 		public static final String SUPERCLASS_NAME = "com.google.common.collect.AbstractBiMap";
+		public static final @NonNls String SOURCE_DEBUG = "ASM";
+		private static final long serialVersionUID = 3864726593737949225L; // COMMENT should not affect Enum serialization
 		public static final @NonNls String CLASS_SIMPLE_NAME = "AbstractBiMap_" + serialVersionUID; // COMMENT hopefully they will not name a new class like so...
 		private static final Pattern LITERAL_SUPERCLASS_SIMPLE_NAME = Pattern.compile("AbstractBiMap", Pattern.LITERAL);
-		public static final @NonNls String SOURCE_DEBUG = "ASM";
 		private static final Class<?> CLAZZ;
 		private static final BiFunction<@Nonnull Map<?, ?>, @Nonnull Map<?, ?>, @Nonnull ? extends BiMap<?, ?>> CONSTRUCTOR;
 

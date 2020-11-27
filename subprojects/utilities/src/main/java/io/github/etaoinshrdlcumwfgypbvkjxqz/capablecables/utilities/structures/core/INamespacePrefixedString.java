@@ -52,8 +52,8 @@ public interface INamespacePrefixedString {
 	enum StaticHolder {
 		;
 
-		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 		public static final @NonNls String SEPARATOR = ":";
+		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 		private static final Pattern SEPARATOR_PATTERN = Pattern.compile(getSeparator(), Pattern.LITERAL);
 		private static final Marker CLASS_MARKER =
 				MarkersTemplate.addReferences(UtilitiesMarkers.getInstance().getClassMarker(),

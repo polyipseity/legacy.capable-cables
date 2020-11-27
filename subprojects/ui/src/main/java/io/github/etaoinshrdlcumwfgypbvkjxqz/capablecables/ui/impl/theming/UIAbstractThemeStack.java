@@ -30,11 +30,11 @@ public abstract class UIAbstractThemeStack
 		getApplier().accept(element());
 	}
 
+	protected Consumer<@Nonnull ? super IUITheme> getApplier() { return applier; }
+
 	@Override
 	public void applyAll(Iterable<? extends IUIRendererContainer<?>> rendererContainers) {
 		descendingIterator() // COMMENT from tail to head, tail is the lowest theme, head is the highest theme
 				.forEachRemaining(theme -> theme.apply(rendererContainers));
 	}
-
-	protected Consumer<@Nonnull ? super IUITheme> getApplier() { return applier; }
 }

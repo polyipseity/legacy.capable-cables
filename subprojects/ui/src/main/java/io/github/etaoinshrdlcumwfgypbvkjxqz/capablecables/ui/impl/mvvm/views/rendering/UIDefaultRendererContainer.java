@@ -59,13 +59,13 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 	}
 
 	@Override
-	public Optional<? extends R> getRenderer() { return Optional.ofNullable(renderer); }
-
-	@Override
 	public Class<? extends R> getDefaultRendererClass() { return defaultRendererClass; }
 
 	@Override
 	public Optional<? extends IUIRendererContainerContainer<?>> getContainer() { return container.getOptional(); }
+
+	@Override
+	public Optional<? extends R> getRenderer() { return Optional.ofNullable(renderer); }
 
 	@Override
 	@Deprecated

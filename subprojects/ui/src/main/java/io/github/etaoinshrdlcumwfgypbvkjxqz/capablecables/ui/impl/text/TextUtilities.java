@@ -187,19 +187,8 @@ public enum TextUtilities {
 		return unifyLineSeparators(charSequence, System.lineSeparator());
 	}
 
-	public static Font getDefaultFont() {
-		return DEFAULT_FONT;
-	}
-
 	public static String currentRun(AttributedCharacterIterator text) {
 		return next(text, text.getRunLimit() - text.getRunStart());
-	}
-
-	public static String next(CharacterIterator text, int length) {
-		char[] result = new char[length]; // COMMENT doing it directly
-		for (int i = 0; i < length; ++i, text.next())
-			result[i] = text.current();
-		return String.valueOf(result);
 	}
 
 	public static String unifyLineSeparators(CharSequence charSequence, CharSequence lineSeparator) {
@@ -213,7 +202,18 @@ public enum TextUtilities {
 		return String.join(lineSeparator, lines[0]);
 	}
 
+	public static String next(CharacterIterator text, int length) {
+		char[] result = new char[length]; // COMMENT doing it directly
+		for (int i = 0; i < length; ++i, text.next())
+			result[i] = text.current();
+		return String.valueOf(result);
+	}
+
 	public static @Immutable @Ordered Set<Pattern> getLineSeparatorPatterns() {
 		return ImmutableSet.copyOf(LINE_SEPARATOR_PATTERNS);
+	}
+
+	public static Font getDefaultFont() {
+		return DEFAULT_FONT;
 	}
 }

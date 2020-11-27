@@ -99,29 +99,6 @@ public enum AffineTransformUtilities {
 
 	public static int toMatrix4x4ArrayIndex(int row, int column) { return (row << 2) + column; }
 
-	public static int toFlatMatrixArrayIndex(int row, int column) { return (column << 1) + row; }
-
-	public static double getM00(AffineTransform transform) { return transform.getScaleX(); }
-
-	public static double getM01(AffineTransform transform) { return transform.getShearX(); }
-
-	public static double getM10(AffineTransform transform) { return transform.getShearY(); }
-
-	public static double getM11(AffineTransform transform) { return transform.getScaleY(); }
-
-	public static double getM02(AffineTransform transform) { return transform.getTranslateX(); }
-
-	public static double getM12(AffineTransform transform) { return transform.getTranslateY(); }
-
-	public static void assertProperFlatMatrix(double[] matrix) {
-		assertFullFlatMatrix(matrix);
-		assertPartialFlatMatrix(matrix);
-	}
-
-	public static void assertFullFlatMatrix(double[] matrix) { assert matrix.length == 6; }
-
-	public static void assertPartialFlatMatrix(double[] matrix) { assert matrix.length == 4; }
-
 	public static int getScaleXIndex() {
 		return SCALE_X_INDEX;
 	}
@@ -145,6 +122,29 @@ public enum AffineTransformUtilities {
 	public static int getTranslateYIndex() {
 		return TRANSLATE_Y_INDEX;
 	}
+
+	public static int toFlatMatrixArrayIndex(int row, int column) { return (column << 1) + row; }
+
+	public static double getM00(AffineTransform transform) { return transform.getScaleX(); }
+
+	public static double getM01(AffineTransform transform) { return transform.getShearX(); }
+
+	public static double getM10(AffineTransform transform) { return transform.getShearY(); }
+
+	public static double getM11(AffineTransform transform) { return transform.getScaleY(); }
+
+	public static double getM02(AffineTransform transform) { return transform.getTranslateX(); }
+
+	public static double getM12(AffineTransform transform) { return transform.getTranslateY(); }
+
+	public static void assertProperFlatMatrix(double[] matrix) {
+		assertFullFlatMatrix(matrix);
+		assertPartialFlatMatrix(matrix);
+	}
+
+	public static void assertFullFlatMatrix(double[] matrix) { assert matrix.length == 6; }
+
+	public static void assertPartialFlatMatrix(double[] matrix) { assert matrix.length == 4; }
 
 	public static ImmutableMap<String, Integer> getNameToMatrixIndexMap() { return NAME_TO_MATRIX_INDEX_MAP; }
 }

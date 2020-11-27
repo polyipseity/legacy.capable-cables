@@ -24,10 +24,9 @@ import java.util.ResourceBundle;
 public enum MinecraftMatrixUtilities {
 	;
 
+	public static final int MATRIX_ARRAY_LENGTH = 16;
 	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker();
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
-
-	public static final int MATRIX_ARRAY_LENGTH = 16;
 	private static final Matrix4f IDENTITY = FunctionUtilities.accept(new Matrix4f(), Matrix4f::setIdentity);
 
 	public static Matrix4f getTransformFromTo(RectangularShape from, RectangularShape to) {
@@ -51,6 +50,10 @@ public enum MinecraftMatrixUtilities {
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
+	public static Matrix4f getIdentity() {
+		return IDENTITY.copy();
+	}
+
 	public static <R extends RectangularShape> R transformRectangular(Matrix4f matrix, RectangularShape source, R destination) {
 		Point2D[] points = UIObjectUtilities.getDiagonalsFromRectangular(source);
 		destination.setFrameFromDiagonal(transformPoint(matrix, points[0], points[0]),
@@ -70,10 +73,6 @@ public enum MinecraftMatrixUtilities {
 		MinecraftVectorUtilities.setVector4f(destination, source);
 		destination.transform(matrix);
 		return destination;
-	}
-
-	public static Matrix4f getIdentity() {
-		return IDENTITY.copy();
 	}
 
 	public static AffineTransform toAffineTransform(Matrix4f matrix) {

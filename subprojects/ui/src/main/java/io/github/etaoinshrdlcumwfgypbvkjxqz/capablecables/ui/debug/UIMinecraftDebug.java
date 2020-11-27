@@ -152,17 +152,6 @@ public enum UIMinecraftDebug {
 		private static final ComponentUI JAXB_VIEW;
 		private static final ComponentTheme JAXB_THEME;
 
-		private boolean useCode = false;
-
-		@Override
-		public @Nonnull AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> create(DebugContainer container, PlayerInventory inv, ITextComponent title) {
-			return isUseCode() ? createCodeUI(container) : createUI(container);
-		}
-
-		public boolean isUseCode() {
-			return useCode;
-		}
-
 		static {
 			{
 				// COMMENT view parser
@@ -197,37 +186,24 @@ public enum UIMinecraftDebug {
 			IUIView.getThemeStack(view).push(theme);
 		}
 
+		private boolean useCode = false;
+
 		private static String getComponentTestXMLPath() { return COMPONENT_TEST_XML_PATH; }
 
 		private static String getComponentTestThemeXMLPath() { return COMPONENT_TEST_THEME_XML_PATH; }
 
+		@Override
+		public @Nonnull AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> create(DebugContainer container, PlayerInventory inv, ITextComponent title) {
+			return isUseCode() ? createCodeUI(container) : createUI(container);
+		}
+
+		public boolean isUseCode() {
+			return useCode;
+		}
+
 		@SuppressWarnings("unused")
 		public void setUseCode(boolean useCode) {
 			this.useCode = useCode;
-		}
-
-		private static AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> createUI(DebugContainer container) {
-			IBinder binder = new DefaultBinder();
-			// COMMENT Color <-> Integer
-			binder.addTransformer(EnumBindingType.FIELD, Color::getRGB);
-			binder.addTransformer(EnumBindingType.FIELD, ColorUtilities::ofRGBA);
-
-			AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> screen =
-					UIFacade.Minecraft.createScreen(
-							getDisplayName(),
-							UIFacade.Minecraft.createInfrastructure(
-									createView(),
-									new ViewModel(),
-									binder
-							),
-							container);
-			IUITheme theme = createTheme();
-
-			IUIMinecraftView<?> view = screen.getInfrastructure().getView();
-			IExtensionContainer.addExtensionChecked(view, new UIComponentCursorHandleProviderExtension());
-			IUIView.getThemeStack(view).push(theme);
-
-			return screen;
 		}
 
 		private static AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> createCodeUI(DebugContainer container) {
@@ -264,6 +240,30 @@ public enum UIMinecraftDebug {
 							new DefaultBinder()
 					),
 					container);
+		}
+
+		private static AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> createUI(DebugContainer container) {
+			IBinder binder = new DefaultBinder();
+			// COMMENT Color <-> Integer
+			binder.addTransformer(EnumBindingType.FIELD, Color::getRGB);
+			binder.addTransformer(EnumBindingType.FIELD, ColorUtilities::ofRGBA);
+
+			AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> screen =
+					UIFacade.Minecraft.createScreen(
+							getDisplayName(),
+							UIFacade.Minecraft.createInfrastructure(
+									createView(),
+									new ViewModel(),
+									binder
+							),
+							container);
+			IUITheme theme = createTheme();
+
+			IUIMinecraftView<?> view = screen.getInfrastructure().getView();
+			IExtensionContainer.addExtensionChecked(view, new UIComponentCursorHandleProviderExtension());
+			IUIView.getThemeStack(view).push(theme);
+
+			return screen;
 		}
 
 		private static IUIMinecraftViewComponent<?, ?> createView() {
@@ -399,23 +399,21 @@ public enum UIMinecraftDebug {
 					ImmutableNamespacePrefixedString.of(UINamespaceUtilities.getViewBindingNamespace(), "buttonOnActivated"),
 					this::onButtonActivated);
 
+			private ViewModel() { super(new Model()); }
+
 			@Override
 			public void tick() {
 				if (isAnchoredWindowFlickering())
 					getAnchoredWindowBorderColor().setValue(getRandom().nextInt());
 			}
 
-			private ViewModel() { super(new Model()); }
-
 			protected boolean isAnchoredWindowFlickering() { return anchoredWindowFlickering; }
 
 			protected void setAnchoredWindowFlickering(boolean anchoredWindowFlickering) { this.anchoredWindowFlickering = anchoredWindowFlickering; }
 
-			@SuppressWarnings("unused")
-			protected IBindingMethodDestination<IUIEvent> getButtonOnActivated() { return buttonOnActivated; }
+			protected IBindingField<Integer> getAnchoredWindowBorderColor() { return anchoredWindowBorderColor; }
 
-			@SuppressWarnings("unused")
-			protected IBindingMethodDestination<UIButtonComponent.IUIEventActivate> getButtonOnActivate() { return buttonOnActivate; }
+			protected Random getRandom() { return random; }
 
 			protected void onButtonActivate(UIButtonComponent.IUIEventActivate e) {
 				boolean shouldActivate = false;
@@ -435,10 +433,6 @@ public enum UIMinecraftDebug {
 
 			protected void onButtonActivated(IUIEvent e) { setAnchoredWindowFlickering(!isAnchoredWindowFlickering()); }
 
-			protected IBindingField<Integer> getAnchoredWindowBorderColor() { return anchoredWindowBorderColor; }
-
-			protected Random getRandom() { return random; }
-
 			@Override
 			@OverridingMethodsMustInvokeSuper
 			public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
@@ -450,6 +444,12 @@ public enum UIMinecraftDebug {
 						)
 				);
 			}
+
+			@SuppressWarnings("unused")
+			protected IBindingMethodDestination<UIButtonComponent.IUIEventActivate> getButtonOnActivate() { return buttonOnActivate; }
+
+			@SuppressWarnings("unused")
+			protected IBindingMethodDestination<IUIEvent> getButtonOnActivated() { return buttonOnActivated; }
 
 			@Override
 			@OverridingMethodsMustInvokeSuper
@@ -492,11 +492,11 @@ public enum UIMinecraftDebug {
 	private static final class DebugBlock extends Block {
 		private static final Supplier<@Nonnull DebugBlock> INSTANCE = Suppliers.memoize(DebugBlock::new);
 
-		private static DebugBlock getInstance() { return INSTANCE.get(); }
-
 		private DebugBlock() {
 			super(Properties.from(Blocks.STONE));
 		}
+
+		private static DebugBlock getInstance() { return INSTANCE.get(); }
 
 		@Override
 		public boolean hasTileEntity(BlockState state) { return true; }

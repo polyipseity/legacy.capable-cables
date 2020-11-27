@@ -34,6 +34,18 @@ public final class UIEventRegistry
 		super(false);
 	}
 
+	public static void checkEvent(IUIEvent event)
+			throws IllegalArgumentException {
+		if (!isEventValid(event))
+			throw new IllegalArgumentException(
+					new LogMessageBuilder()
+							.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)
+							.addKeyValue("event", event)
+							.addMessages(() -> getResourceBundle().getString("check.event.unregistered"))
+							.build()
+			);
+	}
+
 	public static boolean isEventValid(IUIEvent event) {
 		return Optional.ofNullable(getInstance().getData().get(event.getType()))
 				.map(IRegistryObject::getValue)
@@ -47,24 +59,12 @@ public final class UIEventRegistry
 		return data;
 	}
 
-	public static void checkEvent(IUIEvent event)
-			throws IllegalArgumentException {
-		if (!isEventValid(event))
-			throw new IllegalArgumentException(
-					new LogMessageBuilder()
-							.addMarkers(UIMarkers.getInstance()::getMarkerUIEvent)
-							.addKeyValue("event", event)
-							.addMessages(() -> getResourceBundle().getString("check.event.unregistered"))
-							.build()
-			);
-	}
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	@Override
 	protected Logger getLogger() {
 		return UIConfiguration.getInstance().getLogger();
 	}
-
-	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	public static UIEventRegistry getInstance() { return INSTANCE.get(); }
 }

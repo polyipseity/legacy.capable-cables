@@ -34,7 +34,7 @@ public interface IUIPropertyMappingValue {
 		);
 	}
 
-	Optional<?> getDefaultValue();
-
 	Optional<? extends INamespacePrefixedString> getBindingKey();
+
+	Optional<?> getDefaultValue();
 }

@@ -41,15 +41,15 @@ public final class UIImmutableComponentArguments
 	}
 
 	@Override
-	public @Immutable Map<INamespacePrefixedString, ? extends IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(getMappings()); }
-
-	@Override
 	public IShapeDescriptor<?> getShapeDescriptor() { return shapeDescriptor; }
 
 	@Override
 	public Optional<? extends String> getRendererName() {
 		return Optional.ofNullable(rendererName);
 	}
+
+	@Override
+	public @Immutable Map<INamespacePrefixedString, ? extends IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(getMappings()); }
 
 	@Override
 	public @Immutable Map<String, ? extends IEmbedPrototype> getEmbedArgumentsView() {

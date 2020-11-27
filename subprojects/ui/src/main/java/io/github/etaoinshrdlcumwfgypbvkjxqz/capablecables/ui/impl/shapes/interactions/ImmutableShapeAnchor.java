@@ -28,11 +28,11 @@ public final class ImmutableShapeAnchor
 	public Optional<? extends IShapeDescriptorProvider> getTarget() { return target.getOptional(); }
 
 	@Override
-	public double getBorderThickness() { return borderThickness; }
-
-	@Override
 	public EnumUISide getOriginSide() { return originSide; }
 
 	@Override
 	public EnumUISide getTargetSide() { return targetSide; }
+
+	@Override
+	public double getBorderThickness() { return borderThickness; }
 }

@@ -50,7 +50,7 @@ project.ext.makeSourcesTasks = { Closure c ->
 
 						Map<String, Object> e = inputs.properties
 								.findAll { it.key.startsWith 'expand_' }
-								.collectEntries {[(it.key.replace('expand_', '')): it.value] } as Map<String, Object>
+								.collectEntries { [(it.key.replace('expand_', '')): it.value] } as Map<String, Object>
 						expand e
 					}
 

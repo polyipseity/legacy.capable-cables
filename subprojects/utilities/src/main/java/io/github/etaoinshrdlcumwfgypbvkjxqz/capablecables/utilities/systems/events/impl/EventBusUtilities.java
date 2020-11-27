@@ -24,20 +24,18 @@ public enum EventBusUtilities {
 
 	private static final MethodHandle BUS_ID_GETTER_METHOD_HANDLE;
 
-	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
-
-	public static void runWithPrePostHooks(Subject<Event> bus, Runnable action, Event pre, Event post) {
-		bus.onNext(pre);
-		action.run();
-		bus.onNext(post);
-	}
-
 	static {
 		try {
 			BUS_ID_GETTER_METHOD_HANDLE = InvokeUtilities.getImplLookup().findGetter(EventBus.class, "busID", int.class);
 		} catch (NoSuchFieldException | IllegalAccessException e) {
 			throw ThrowableUtilities.propagate(e);
 		}
+	}
+
+	public static void runWithPrePostHooks(Subject<Event> bus, Runnable action, Event pre, Event post) {
+		bus.onNext(pre);
+		action.run();
+		bus.onNext(post);
 	}
 
 	public static boolean callWithPrePostHooks(Subject<Event> bus, BooleanSupplier action, Event pre, Event post) {
@@ -67,6 +65,8 @@ public enum EventBusUtilities {
 		bus.onNext(post);
 		return r;
 	}
+
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	public static <E extends Event> void cleanListenersCache(IEventBus bus, Class<E> eventType) {
 		if (UtilitiesConstants.getBuildType().isDebug()) {

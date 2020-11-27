@@ -36,12 +36,12 @@ afterEvaluate {
 		task.configure {
 			manifest {
 				attributes([
-						'Specification-Title'     : modID,
-						'Specification-Vendor'    : rootProject.group,
-						'Specification-Version'   : version,
-						'Implementation-Title'    : project.name,
-						'Implementation-Vendor'   : project.group,
-						'Implementation-Version'  : version,
+						'Specification-Title'   : modID,
+						'Specification-Vendor'  : rootProject.group,
+						'Specification-Version' : version,
+						'Implementation-Title'  : project.name,
+						'Implementation-Vendor' : project.group,
+						'Implementation-Version': version,
 				])
 			}
 

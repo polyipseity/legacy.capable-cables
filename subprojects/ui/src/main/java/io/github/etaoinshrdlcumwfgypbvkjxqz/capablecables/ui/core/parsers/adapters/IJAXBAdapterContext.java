@@ -8,12 +8,12 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface IJAXBAdapterContext {
-	IJAXBAdapterRegistry getRegistry();
-
 	static void assertDataIntegrity(Map<Class<?>, ?> data) {
 		assert data.entrySet().stream().unordered()
 				.allMatch(entry -> AssertionUtilities.assertNonnull(entry.getKey()).isInstance(entry.getValue()));
 	}
+
+	IJAXBAdapterRegistry getRegistry();
 
 	<T> Optional<? extends T> getDatum(Class<T> key);
 

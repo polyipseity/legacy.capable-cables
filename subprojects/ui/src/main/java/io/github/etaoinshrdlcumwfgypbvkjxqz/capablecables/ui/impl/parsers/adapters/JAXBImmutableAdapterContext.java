@@ -21,9 +21,8 @@ public final class JAXBImmutableAdapterContext
 		IJAXBAdapterContext.assertDataIntegrity(this.data);
 	}
 
-	@Override
-	public IJAXBAdapterContext withData(Map<Class<?>, ?> data) {
-		return of(registry, MapUtilities.concatMaps(getData(), data));
+	public static JAXBImmutableAdapterContext of(IJAXBAdapterRegistry registry) {
+		return of(registry, ImmutableMap.of());
 	}
 
 	@Override
@@ -36,12 +35,13 @@ public final class JAXBImmutableAdapterContext
 		return Optional.ofNullable(key.cast(getData().get(key)));
 	}
 
-	public static JAXBImmutableAdapterContext of(IJAXBAdapterRegistry registry, Map<Class<?>, ?> data) {
-		return new JAXBImmutableAdapterContext(registry, data);
+	@Override
+	public IJAXBAdapterContext withData(Map<Class<?>, ?> data) {
+		return of(registry, MapUtilities.concatMaps(getData(), data));
 	}
 
-	public static JAXBImmutableAdapterContext of(IJAXBAdapterRegistry registry) {
-		return of(registry, ImmutableMap.of());
+	public static JAXBImmutableAdapterContext of(IJAXBAdapterRegistry registry, Map<Class<?>, ?> data) {
+		return new JAXBImmutableAdapterContext(registry, data);
 	}
 
 	protected Map<Class<?>, ?> getData() {

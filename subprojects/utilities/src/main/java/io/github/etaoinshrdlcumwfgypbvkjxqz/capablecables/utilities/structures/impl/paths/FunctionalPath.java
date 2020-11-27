@@ -10,6 +10,16 @@ import java.util.function.Function;
 
 public class FunctionalPath<T>
 		extends AbstractPath<T> {
+	private static final long DATA_FIELD_OFFSET;
+
+	static {
+		try {
+			DATA_FIELD_OFFSET = DynamicUtilities.getUnsafe().objectFieldOffset(FunctionalPath.class.getDeclaredField("data"));
+		} catch (NoSuchFieldException e) {
+			throw ThrowableUtilities.propagate(e);
+		}
+	}
+
 	private final List<T> data;
 	private final Function<@Nonnull ? super Iterable<? extends T>, @Nonnull ? extends List<T>> generator;
 
@@ -20,20 +30,6 @@ public class FunctionalPath<T>
 
 	protected Function<@Nonnull ? super Iterable<? extends T>, @Nonnull ? extends List<T>> getGenerator() { return generator; }
 
-	private static final long DATA_FIELD_OFFSET;
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	@Override
-	protected List<T> getData() { return data; }
-
-	static {
-		try {
-			DATA_FIELD_OFFSET = DynamicUtilities.getUnsafe().objectFieldOffset(FunctionalPath.class.getDeclaredField("data"));
-		} catch (NoSuchFieldException e) {
-			throw ThrowableUtilities.propagate(e);
-		}
-	}
-
 	@SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
 	@Override
 	public FunctionalPath<T> clone() throws CloneNotSupportedException {
@@ -41,6 +37,10 @@ public class FunctionalPath<T>
 		DynamicUtilities.getUnsafe().putObjectVolatile(result, getDataFieldOffset(), result.generator.apply(result.data));
 		return result;
 	}
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	@Override
+	protected List<T> getData() { return data; }
 
 	protected static long getDataFieldOffset() {
 		return DATA_FIELD_OFFSET;

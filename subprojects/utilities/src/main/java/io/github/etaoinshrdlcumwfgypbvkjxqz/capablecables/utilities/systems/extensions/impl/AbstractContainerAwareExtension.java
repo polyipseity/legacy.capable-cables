@@ -45,17 +45,17 @@ public abstract class AbstractContainerAwareExtension<K, C extends IExtensionCon
 				this::onExtensionRemoved);
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
-	@Override
-	public TypeToken<? extends CE> getTypeToken() {
-		return typeToken;
-	}
-
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void onExtensionRemoved() { setContainer(null); }
+
+	@SuppressWarnings("UnstableApiUsage")
+	@Override
+	public TypeToken<? extends CE> getTypeToken() {
+		return typeToken;
+	}
 
 	protected Optional<? extends CE> getContainer() { return container.getOptional(); }
 

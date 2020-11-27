@@ -34,6 +34,8 @@ public enum UIObjectUtilities {
 		return destination;
 	}
 
+	public static void acceptDimension(Dimension2D dimension, BiConsumer<@Nonnull ? super Double, @Nonnull ? super Double> action) { action.accept(dimension.getWidth(), dimension.getHeight()); }
+
 	public static <R extends RectangularShape> R floorRectangularShape(RectangularShape source, R destination) {
 		acceptRectangularShape(source, (x, y, w, h) ->
 				destination.setFrame(Math.floor(x), Math.floor(y), Math.floor(w), Math.floor(h)));
@@ -42,8 +44,6 @@ public enum UIObjectUtilities {
 
 	public static <TH extends Throwable> void acceptRectangularShape(RectangularShape rectangular, IConsumer4<@Nonnull ? super Double, @Nonnull ? super Double, @Nonnull ? super Double, @Nonnull ? super Double, ? extends TH> action)
 			throws TH { action.accept(rectangular.getX(), rectangular.getY(), rectangular.getWidth(), rectangular.getHeight()); }
-
-	public static void acceptDimension(Dimension2D dimension, BiConsumer<@Nonnull ? super Double, @Nonnull ? super Double> action) { action.accept(dimension.getWidth(), dimension.getHeight()); }
 
 	public static <R extends Point2D> R floorPoint(Point2D source, R destination) {
 		acceptPoint(source, (x, y) -> destination.setLocation(Math.floor(x), Math.floor(y)));

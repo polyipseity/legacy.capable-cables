@@ -24,21 +24,6 @@ public final class ImmutableIntersection<L, R>
 		this.right = Optional.ofNullable(rightClazz).map(clazz -> clazz.cast(object)).orElseGet(() -> (R) object);
 	}
 
-	@SuppressWarnings("ObjectEquality")
-	public static <L, R> ImmutableIntersection<L, R> of(L objectAsLeft, R objectAsRight) {
-		if (objectAsLeft != objectAsRight)
-			throw new IllegalArgumentException();
-		return of(objectAsLeft);
-	}
-
-	private static <L, R> ImmutableIntersection<L, R> of(Object object) {
-		return of(object, null, null);
-	}
-
-	public static <L, R> ImmutableIntersection<L, R> of(Object object, @Nullable Class<L> leftClazz, @Nullable Class<R> rightClazz) {
-		return new ImmutableIntersection<>(object, leftClazz, rightClazz);
-	}
-
 	@Override
 	public <T> T map(BiFunction<@Nonnull ? super L, @Nonnull ? super R, @Nonnull ? extends T> mapper) {
 		return mapper.apply(getLeft(), getRight());
@@ -55,6 +40,26 @@ public final class ImmutableIntersection<L, R>
 	}
 
 	@Override
+	public IIntersection<R, L> swap() {
+		return of(getRight(), getLeft());
+	}
+
+	@SuppressWarnings("ObjectEquality")
+	public static <L, R> ImmutableIntersection<L, R> of(L objectAsLeft, R objectAsRight) {
+		if (objectAsLeft != objectAsRight)
+			throw new IllegalArgumentException();
+		return of(objectAsLeft);
+	}
+
+	private static <L, R> ImmutableIntersection<L, R> of(Object object) {
+		return of(object, null, null);
+	}
+
+	public static <L, R> ImmutableIntersection<L, R> of(Object object, @Nullable Class<L> leftClazz, @Nullable Class<R> rightClazz) {
+		return new ImmutableIntersection<>(object, leftClazz, rightClazz);
+	}
+
+	@Override
 	public int hashCode() {
 		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariableMap().values());
 	}
@@ -68,10 +73,5 @@ public final class ImmutableIntersection<L, R>
 	@Override
 	public String toString() {
 		return ObjectUtilities.toStringImpl(this, StaticHolder.getObjectVariableMap());
-	}
-
-	@Override
-	public IIntersection<R, L> swap() {
-		return of(getRight(), getLeft());
 	}
 }

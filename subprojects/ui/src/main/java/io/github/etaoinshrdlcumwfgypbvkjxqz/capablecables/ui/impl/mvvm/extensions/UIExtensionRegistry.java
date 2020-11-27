@@ -31,6 +31,8 @@ public final class UIExtensionRegistry
 
 	private static MapMaker getDataBuilder() { return DATA_BUILDER; }
 
+	public static UIExtensionRegistry getInstance() { return INSTANCE.get(); }
+
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	@Override
 	protected Map<INamespacePrefixedString, IRegistryObjectInternal<? extends IExtensionType<? extends INamespacePrefixedString, ?, ?>>> getData() {
@@ -41,6 +43,4 @@ public final class UIExtensionRegistry
 	protected Logger getLogger() {
 		return UIConfiguration.getInstance().getLogger();
 	}
-
-	public static UIExtensionRegistry getInstance() { return INSTANCE.get(); }
 }

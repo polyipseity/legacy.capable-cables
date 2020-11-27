@@ -56,9 +56,6 @@ public class LogMessageBuilder {
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected List<Supplier<?>> getMessages() { return messages; }
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected List<Supplier<?>> getArguments() { return arguments; }
-
 	public LogMessageBuilder addArguments(Object... arguments) {
 		return addArguments(
 				Arrays.stream(arguments)
@@ -70,6 +67,9 @@ public class LogMessageBuilder {
 		Collections.addAll(getArguments(), arguments);
 		return this;
 	}
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected List<Supplier<?>> getArguments() { return arguments; }
 
 	@SuppressWarnings("Convert2MethodRef")
 	public String build() {

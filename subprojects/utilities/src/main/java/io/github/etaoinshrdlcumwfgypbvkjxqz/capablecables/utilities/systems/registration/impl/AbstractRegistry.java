@@ -59,9 +59,9 @@ public abstract class AbstractRegistry<K, V>
 
 	protected abstract Logger getLogger();
 
-	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
-
 	protected Marker getMarker() { return marker; }
+
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	@Override
 	public boolean isOverridable() { return overridable; }

@@ -93,6 +93,7 @@ public class UIMinecraftScreenAdapter
 	@Nullable
 	private ImmutableMouseButtonClickData lastMouseClickData = null;
 	private double lastPartialTicks = 0D;
+	private long lastCursorHandle = MemoryUtilities.getInvalidAddress();
 
 	protected UIMinecraftScreenAdapter(ITextComponent title, I infrastructure, @Nullable C containerObject, Set<Integer> closeKeys, Set<Integer> changeFocusKeys) {
 		super(title);
@@ -124,12 +125,6 @@ public class UIMinecraftScreenAdapter
 
 	public void setTitle(ITextComponent title) { this.title = title; }
 
-	private long lastCursorHandle = MemoryUtilities.getInvalidAddress();
-
-	protected long getLastCursorHandle() {
-		return lastCursorHandle;
-	}
-
 	@Override
 	@Deprecated
 	public void render(int mouseX, int mouseY, float partialTicks) {
@@ -140,17 +135,17 @@ public class UIMinecraftScreenAdapter
 				.orElse(MemoryUtil.NULL));
 	}
 
+	protected static <E extends IUIEventKeyboard> E addEventKeyboard(UIMinecraftScreenAdapter<?, ?> self, E event) {
+		self.getKeyboardKeysBeingPressed().put(event.getData().getKey(), event);
+		return event;
+	}
+
 	protected void setCursorHandle(long cursorHandle) {
 		if (this.lastCursorHandle != cursorHandle) {
 			GLFW.glfwSetCursor(MinecraftOpenGLUtilities.getWindowHandle(),
 					this.lastCursorHandle = cursorHandle);
 		}
 	}
-
-	protected IUIContextContainer getContextContainer() { return contextContainer; }
-
-	@Override
-	public I getInfrastructure() { return infrastructure; }
 
 	@Override
 	@Deprecated
@@ -166,6 +161,40 @@ public class UIMinecraftScreenAdapter
 		}
 		return true;
 	}
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected Map<Integer, IUIEventKeyboard> getKeyboardKeysBeingPressed() { return keyboardKeysBeingPressed; }
+
+	@Override
+	public I getInfrastructure() { return infrastructure; }
+
+	protected IUIContextContainer getContextContainer() { return contextContainer; }
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected Set<Integer> getCloseKeys() { return closeKeys; }
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected Set<Integer> getChangeFocusKeys() { return changeFocusKeys; }
+
+	protected boolean setFocus(IUIContextContainer context, @Nullable IUIEventTarget focus) {
+		Optional<? extends IUIEventTarget> p = getFocus(), n = Optional.ofNullable(focus);
+		if (n.map(IUIEventTarget::isFocusable).orElse(true) && !n.equals(p)) {
+			@Nullable IUIEventTarget pv = p.orElse(null);
+			p.ifPresent(f -> UIEventUtilities.dispatchEvent(
+					UIEventUtilities.Factory.createEventFocusOutPre(context.getViewContext(), f, focus)));
+			n.ifPresent(f -> UIEventUtilities.dispatchEvent(
+					UIEventUtilities.Factory.createEventFocusInPre(context.getViewContext(), f, pv)));
+			this.focus = focus;
+			p.ifPresent(f -> UIEventUtilities.dispatchEvent(
+					UIEventUtilities.Factory.createEventFocusOutPost(context.getViewContext(), f, focus)));
+			n.ifPresent(f -> UIEventUtilities.dispatchEvent(
+					UIEventUtilities.Factory.createEventFocusInPost(context.getViewContext(), f, pv)));
+			return true;
+		}
+		return false;
+	}
+
+	protected Optional<? extends IUIEventTarget> getFocus() { return Optional.ofNullable(focus); }
 
 	@Override
 	@Deprecated
@@ -276,38 +305,8 @@ public class UIMinecraftScreenAdapter
 		// COMMENT resize calls init
 	}
 
-	protected Optional<? extends IUIEventTarget> getFocus() { return Optional.ofNullable(focus); }
-
-	protected static <E extends IUIEventKeyboard> E addEventKeyboard(UIMinecraftScreenAdapter<?, ?> self, E event) {
-		self.getKeyboardKeysBeingPressed().put(event.getData().getKey(), event);
-		return event;
-	}
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Set<Integer> getCloseKeys() { return closeKeys; }
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Set<Integer> getChangeFocusKeys() { return changeFocusKeys; }
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Map<Integer, IUIEventKeyboard> getKeyboardKeysBeingPressed() { return keyboardKeysBeingPressed; }
-
-	protected boolean setFocus(IUIContextContainer context, @Nullable IUIEventTarget focus) {
-		Optional<? extends IUIEventTarget> p = getFocus(), n = Optional.ofNullable(focus);
-		if (n.map(IUIEventTarget::isFocusable).orElse(true) && !n.equals(p)) {
-			@Nullable IUIEventTarget pv = p.orElse(null);
-			p.ifPresent(f -> UIEventUtilities.dispatchEvent(
-					UIEventUtilities.Factory.createEventFocusOutPre(context.getViewContext(), f, focus)));
-			n.ifPresent(f -> UIEventUtilities.dispatchEvent(
-					UIEventUtilities.Factory.createEventFocusInPre(context.getViewContext(), f, pv)));
-			this.focus = focus;
-			p.ifPresent(f -> UIEventUtilities.dispatchEvent(
-					UIEventUtilities.Factory.createEventFocusOutPost(context.getViewContext(), f, focus)));
-			n.ifPresent(f -> UIEventUtilities.dispatchEvent(
-					UIEventUtilities.Factory.createEventFocusInPost(context.getViewContext(), f, pv)));
-			return true;
-		}
-		return false;
+	protected long getLastCursorHandle() {
+		return lastCursorHandle;
 	}
 
 	public Set<Integer> getCloseKeysView() { return ImmutableSet.copyOf(getCloseKeys()); }
@@ -619,12 +618,6 @@ public class UIMinecraftScreenAdapter
 			this.owner = new OptionalWeakReference<>(owner);
 		}
 
-		@SuppressWarnings("UnstableApiUsage")
-		@Override
-		public TypeToken<? extends IUIInfrastructure<?, ?, ?>> getTypeToken() {
-			return typeToken;
-		}
-
 		@Override
 		public Optional<? extends Screen> getScreen() { return getOwner(); }
 
@@ -660,5 +653,11 @@ public class UIMinecraftScreenAdapter
 
 		@Override
 		public IExtensionType<INamespacePrefixedString, ?, IUIInfrastructure<?, ?, ?>> getType() { return StaticHolder.getType().getValue(); }
+
+		@SuppressWarnings("UnstableApiUsage")
+		@Override
+		public TypeToken<? extends IUIInfrastructure<?, ?, ?>> getTypeToken() {
+			return typeToken;
+		}
 	}
 }

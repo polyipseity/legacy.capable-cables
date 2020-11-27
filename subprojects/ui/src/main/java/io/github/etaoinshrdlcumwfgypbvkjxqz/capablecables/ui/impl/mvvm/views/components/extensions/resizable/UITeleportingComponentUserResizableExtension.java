@@ -131,6 +131,53 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		return PROPERTY_RESIZE_BORDERS_LOCATION;
 	}
 
+	public static String getPropertyActivationMouseButtons() {
+		return PROPERTY_ACTIVATION_MOUSE_BUTTONS;
+	}
+
+	public static String getPropertyResizeBordersDefaultThickness() {
+		return PROPERTY_RESIZE_BORDERS_DEFAULT_THICKNESS;
+	}
+
+	public static String getPropertyResizeBorders() {
+		return PROPERTY_RESIZE_BORDERS;
+	}
+
+	protected static Optional<ICursor> getCursor(Set<? extends EnumUISide> sides) {
+		@Nullable ICursor cursor = null;
+		if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT)
+				|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
+			cursor = EnumGLFWCursor.EXTENSION_RESIZE_NW_SE_CURSOR;
+		else if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.RIGHT)
+				|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
+			cursor = EnumGLFWCursor.EXTENSION_RESIZE_NE_SW_CURSOR;
+		else if (sides.contains(EnumUISide.LEFT) || sides.contains(EnumUISide.RIGHT))
+			cursor = EnumGLFWCursor.STANDARD_RESIZE_HORIZONTAL_CURSOR;
+		else if (sides.contains(EnumUISide.UP) || sides.contains(EnumUISide.DOWN))
+			cursor = EnumGLFWCursor.STANDARD_RESIZE_VERTICAL_CURSOR;
+		return Optional.ofNullable(cursor);
+	}
+
+	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
+	protected static Optional<IUIComponent> getTargetComponent(UITeleportingComponentUserResizableExtension<?> instance) {
+		String targetComponent = instance.getTargetComponent().getValue();
+		return targetComponent.isEmpty() // COMMENT empty component names are disallowed, so this indicates using the container
+				? OptionalUtilities.upcast(instance.getContainer())
+				: instance.getContainer()
+				.flatMap(IUIComponent::getManager)
+				.flatMap(IUIComponentManager::getView)
+				.map(IUIView::getNamedTrackers)
+				.flatMap(namedTrackers -> OptionalUtilities.upcast(namedTrackers.get(IUIComponent.class, targetComponent)));
+	}
+
+	protected IBindingField<String> getTargetComponent() {
+		return targetComponent;
+	}
+
+	public static String getPropertyTargetComponent() {
+		return PROPERTY_TARGET_COMPONENT;
+	}
+
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
@@ -146,16 +193,41 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		);
 	}
 
-	public static String getPropertyActivationMouseButtons() {
-		return PROPERTY_ACTIVATION_MOUSE_BUTTONS;
+	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
+		return binderObserverSupplierHolder;
 	}
 
-	public static String getPropertyResizeBordersDefaultThickness() {
-		return PROPERTY_RESIZE_BORDERS_DEFAULT_THICKNESS;
+	protected IBindingField<Set<Integer>> getActivationMouseButtons() {
+		return activationMouseButtons;
 	}
 
-	public static String getPropertyResizeBorders() {
-		return PROPERTY_RESIZE_BORDERS;
+	protected IBindingField<Map<EnumUISide, Double>> getResizeBorders() {
+		return resizeBorders;
+	}
+
+	protected IBindingField<Double> getResizeBorderDefaultThickness() {
+		return resizeBorderDefaultThickness;
+	}
+
+	protected IUIRendererContainerContainer<IResizingRenderer> getRendererContainerContainer() {
+		return rendererContainerContainer;
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void cleanupBindings() {
+		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier -> {
+			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+					() -> ImmutableBinderAction.unbind(
+							getActivationMouseButtons(),
+							getResizeBorders(), getResizeBorderDefaultThickness()
+					));
+			BindingUtilities.cleanupBindings(
+					ImmutableList.of(getRendererContainerContainer())
+			);
+		});
+		getBinderObserverSupplierHolder().setValue(null);
+		IUIComponentUserResizableExtension.super.cleanupBindings();
 	}
 
 	@Override
@@ -186,53 +258,10 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 				});
 	}
 
-	protected IBindingField<Double> getResizeBorderDefaultThickness() {
-		return resizeBorderDefaultThickness;
-	}
-
-	protected IBindingField<Set<Integer>> getActivationMouseButtons() {
-		return activationMouseButtons;
-	}
-
-	protected static Optional<ICursor> getCursor(Set<? extends EnumUISide> sides) {
-		@Nullable ICursor cursor = null;
-		if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT)
-				|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
-			cursor = EnumGLFWCursor.EXTENSION_RESIZE_NW_SE_CURSOR;
-		else if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.RIGHT)
-				|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
-			cursor = EnumGLFWCursor.EXTENSION_RESIZE_NE_SW_CURSOR;
-		else if (sides.contains(EnumUISide.LEFT) || sides.contains(EnumUISide.RIGHT))
-			cursor = EnumGLFWCursor.STANDARD_RESIZE_HORIZONTAL_CURSOR;
-		else if (sides.contains(EnumUISide.UP) || sides.contains(EnumUISide.DOWN))
-			cursor = EnumGLFWCursor.STANDARD_RESIZE_VERTICAL_CURSOR;
-		return Optional.ofNullable(cursor);
-	}
-
-	protected IUIRendererContainerContainer<IResizingRenderer> getRendererContainerContainer() {
-		return rendererContainerContainer;
-	}
-
-	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
-		return binderObserverSupplierHolder;
-	}
-
 	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void cleanupBindings() {
-		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier -> {
-			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-					() -> ImmutableBinderAction.unbind(
-							getActivationMouseButtons(),
-							getResizeBorders(), getResizeBorderDefaultThickness()
-					));
-			BindingUtilities.cleanupBindings(
-					ImmutableList.of(getRendererContainerContainer())
-			);
-		});
-		getBinderObserverSupplierHolder().setValue(null);
-		IUIComponentUserResizableExtension.super.cleanupBindings();
-	}
+	public Optional<? extends IResizeData> getResizeData() { return Optional.ofNullable(resizeData); }
+
+	protected void setResizeData(@Nullable IResizeData resizeData) { this.resizeData = resizeData; }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -266,46 +295,15 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 	@Override
 	public IExtensionType<INamespacePrefixedString, ?, IUIComponent> getType() { return StaticHolder.getType().getValue(); }
 
-	protected IBindingField<Map<EnumUISide, Double>> getResizeBorders() {
-		return resizeBorders;
-	}
-
-	@Override
-	public Optional<? extends IResizeData> getResizeData() { return Optional.ofNullable(resizeData); }
-
-	protected void setResizeData(@Nullable IResizeData resizeData) { this.resizeData = resizeData; }
-
-	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
-	protected static Optional<IUIComponent> getTargetComponent(UITeleportingComponentUserResizableExtension<?> instance) {
-		String targetComponent = instance.getTargetComponent().getValue();
-		return targetComponent.isEmpty() // COMMENT empty component names are disallowed, so this indicates using the container
-				? OptionalUtilities.upcast(instance.getContainer())
-				: instance.getContainer()
-				.flatMap(IUIComponent::getManager)
-				.flatMap(IUIComponentManager::getView)
-				.map(IUIView::getNamedTrackers)
-				.flatMap(namedTrackers -> OptionalUtilities.upcast(namedTrackers.get(IUIComponent.class, targetComponent)));
-	}
-
-	protected IBindingField<String> getTargetComponent() {
-		return targetComponent;
-	}
-
-	public static String getPropertyTargetComponent() {
-		return PROPERTY_TARGET_COMPONENT;
-	}
-
 	public static class Modifier
 			extends UIAbstractVirtualComponent
 			implements IUIComponentCursorHandleProviderModifier, IUIComponentRendererInvokerModifier {
 		private final OptionalWeakReference<UITeleportingComponentUserResizableExtension<?>> owner;
 		private final Object lockObject = new Object();
+		private final Runnable eventTargetListenersInitializer;
 		private boolean beingHovered = false;
-
 		@Nullable
 		private Integer activeMouseButton;
-
-		private final Runnable eventTargetListenersInitializer;
 
 		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 		protected Modifier(UITeleportingComponentUserResizableExtension<?> owner) {
@@ -340,12 +338,6 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 			});
 		}
 
-		@Override
-		protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
-			eventTargetListenersInitializer.run();
-			return super.getEventTargetListeners();
-		}
-
 		protected Optional<Integer> getActiveMouseButton() {
 			return Optional.ofNullable(activeMouseButton);
 		}
@@ -353,6 +345,8 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		protected void setActiveMouseButton(@Nullable Integer activeMouseButton) {
 			this.activeMouseButton = activeMouseButton;
 		}
+
+		protected Optional<? extends UITeleportingComponentUserResizableExtension<?>> getOwner() { return owner.getOptional(); }
 
 		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 		protected boolean startResizeMaybe(@SuppressWarnings("unused") IUIViewContext viewContext, Point2D point) {
@@ -403,8 +397,6 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 			).orElse(false);
 		}
 
-		protected Optional<? extends UITeleportingComponentUserResizableExtension<?>> getOwner() { return owner.getOptional(); }
-
 		protected boolean finishResizeMaybe(@SuppressWarnings("unused") IUIViewContext viewContext, Point2D point) {
 			return getOwner().flatMap(owner -> owner.getResizeData().flatMap(data ->
 					Optional2.of(
@@ -424,6 +416,12 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		}
 
 		protected Object getLockObject() { return lockObject; }
+
+		@Override
+		protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
+			eventTargetListenersInitializer.run();
+			return super.getEventTargetListeners();
+		}
 
 		@Override
 		public boolean containsPoint(IUIComponentContext context, Point2D point) {

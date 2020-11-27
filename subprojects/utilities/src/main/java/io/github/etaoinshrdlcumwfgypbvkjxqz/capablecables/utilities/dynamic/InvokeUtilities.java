@@ -95,15 +95,15 @@ public enum InvokeUtilities {
 		return PUBLIC_LOOKUP;
 	}
 
-	public static MethodHandles.Lookup getImplLookup() {
-		return IMPL_LOOKUP;
-	}
-
 	private static int getTrustedLookupModes() {
 		return TRUSTED_LOOKUP_MODES;
 	}
 
 	public static Class<?> revealDeclaringClass(MethodHandle methodHandle) {
 		return getImplLookup().revealDirect(methodHandle).getDeclaringClass();
+	}
+
+	public static MethodHandles.Lookup getImplLookup() {
+		return IMPL_LOOKUP;
 	}
 }

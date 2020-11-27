@@ -172,21 +172,6 @@ public class UIWindowComponent
 		);
 	}
 
-	protected static Point2D getWindowContentTranslation(UIWindowComponent instance) {
-		Point2D translation = new Point2D.Double();
-		EnumUISide controlsSide = instance.getControlsSide().getValue();
-		if (controlsSide.getType() == EnumUISideType.LOCATION)
-			controlsSide.getAxis().setCoordinate(translation, instance.getControlsThickness().getValue());
-		return translation;
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	protected void bind0(IUIStructureLifecycleContext context) {
-		super.bind0(context);
-		IUIReshapeExplicitly.refresh(this);
-	}
-
 	public static INamespacePrefixedString getPropertyControlsSideLocation() {
 		return PROPERTY_CONTROLS_SIDE_LOCATION;
 	}
@@ -197,6 +182,32 @@ public class UIWindowComponent
 
 	public static INamespacePrefixedString getPropertyControlsDirectionLocation() {
 		return PROPERTY_CONTROLS_DIRECTION_LOCATION;
+	}
+
+	protected IBindingField<EnumUISide> getControlsSide() {
+		return controlsSide;
+	}
+
+	protected static Point2D getWindowContentTranslation(UIWindowComponent instance) {
+		Point2D translation = new Point2D.Double();
+		EnumUISide controlsSide = instance.getControlsSide().getValue();
+		if (controlsSide.getType() == EnumUISideType.LOCATION)
+			controlsSide.getAxis().setCoordinate(translation, instance.getControlsThickness().getValue());
+		return translation;
+	}
+
+	protected IBindingField<Double> getControlsThickness() {
+		return controlsThickness;
+	}
+
+	protected IBindingField<EnumUIRotation> getControlsDirection() {
+		return controlsDirection;
+	}
+
+	@Override
+	public boolean reshape(Predicate<? super IShapeDescriptor<? super RectangularShape>> action) throws ConcurrentModificationException {
+		return IUIComponent.reshapeComponent(this, getShapeDescriptor(), action);
+		// TODO reshape logic
 	}
 
 	public static String getPropertyControlsDirection() {
@@ -211,28 +222,40 @@ public class UIWindowComponent
 		return PROPERTY_CONTROLS_THICKNESS;
 	}
 
-	protected IUIControlsEmbed<?> getControlsEmbed() {
-		return controlsEmbed;
-	}
-
 	@Override
 	protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
 		eventTargetListenersInitializer.run();
 		return super.getEventTargetListeners();
 	}
 
-	protected IBindingField<EnumUISide> getControlsSide() {
-		return controlsSide;
-	}
-
-	protected IBindingField<Double> getControlsThickness() {
-		return controlsThickness;
+	@Override
+	protected List<IUIComponent> getChildren() {
+		getControlsEmbed().getEmbedInitializer().run();
+		return super.getChildren();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public IShapeDescriptor<RectangularShape> getShapeDescriptor() {
 		return (IShapeDescriptor<RectangularShape>) super.getShapeDescriptor(); // COMMENT should be safe, see constructor
+	}
+
+	@Override
+	public void transformChildren(AffineTransform transform) {
+		super.transformChildren(transform);
+		Point2D translation = getWindowContentTranslation(this);
+		transform.translate(translation.getX(), translation.getY());
+	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	protected void bind0(IUIStructureLifecycleContext context) {
+		super.bind0(context);
+		IUIReshapeExplicitly.refresh(this);
+	}
+
+	protected IUIControlsEmbed<?> getControlsEmbed() {
+		return controlsEmbed;
 	}
 
 	@Override
@@ -267,33 +290,7 @@ public class UIWindowComponent
 		super.cleanup0(context);
 	}
 
-	protected IBindingField<EnumUIRotation> getControlsDirection() {
-		return controlsDirection;
-	}
-
 	protected AutoCloseableRotator<ModifyShapeDescriptorObserver, RuntimeException> getModifyShapeDescriptorObserver() { return modifyShapeDescriptorObserver; }
-
-	protected static class ModifyShapeDescriptorObserver
-			extends LoggingDisposableObserver<UIComponentModifyShapeDescriptorBusEvent> {
-		private final OptionalWeakReference<UIWindowComponent> owner;
-
-		public ModifyShapeDescriptorObserver(UIWindowComponent owner, Logger logger) {
-			super(logger);
-			this.owner = new OptionalWeakReference<>(owner);
-		}
-
-		@Override
-		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-		public void onNext(UIComponentModifyShapeDescriptorBusEvent event) {
-			super.onNext(event);
-			if (event.getStage().isPost())
-				getOwner()
-						.filter(owner -> owner.getParent().filter(p -> p.equals(event.getComponent())).isPresent())
-						.ifPresent(IUIReshapeExplicitly::refresh);
-		}
-
-		protected Optional<? extends UIWindowComponent> getOwner() { return owner.getOptional(); }
-	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -301,25 +298,6 @@ public class UIWindowComponent
 		super.initialize0(context);
 		UIEventBusEntryPoint.<UIComponentModifyShapeDescriptorBusEvent>getEventBus()
 				.subscribe(getModifyShapeDescriptorObserver().get());
-	}
-
-	@Override
-	public boolean reshape(Predicate<? super IShapeDescriptor<? super RectangularShape>> action) throws ConcurrentModificationException {
-		return IUIComponent.reshapeComponent(this, getShapeDescriptor(), action);
-		// TODO reshape logic
-	}
-
-	@Override
-	public void transformChildren(AffineTransform transform) {
-		super.transformChildren(transform);
-		Point2D translation = getWindowContentTranslation(this);
-		transform.translate(translation.getX(), translation.getY());
-	}
-
-	@Override
-	protected List<IUIComponent> getChildren() {
-		getControlsEmbed().getEmbedInitializer().run();
-		return super.getChildren();
 	}
 
 	public enum EnumControlsAction {
@@ -347,6 +325,28 @@ public class UIWindowComponent
 				return NAME;
 			}
 		}
+	}
+
+	protected static class ModifyShapeDescriptorObserver
+			extends LoggingDisposableObserver<UIComponentModifyShapeDescriptorBusEvent> {
+		private final OptionalWeakReference<UIWindowComponent> owner;
+
+		public ModifyShapeDescriptorObserver(UIWindowComponent owner, Logger logger) {
+			super(logger);
+			this.owner = new OptionalWeakReference<>(owner);
+		}
+
+		@Override
+		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+		public void onNext(UIComponentModifyShapeDescriptorBusEvent event) {
+			super.onNext(event);
+			if (event.getStage().isPost())
+				getOwner()
+						.filter(owner -> owner.getParent().filter(p -> p.equals(event.getComponent())).isPresent())
+						.ifPresent(IUIReshapeExplicitly::refresh);
+		}
+
+		protected Optional<? extends UIWindowComponent> getOwner() { return owner.getOptional(); }
 	}
 
 	public static class DefaultRenderer<C extends UIWindowComponent>

@@ -33,6 +33,24 @@ public interface IUIComponentUserResizableExtension<C extends IUIComponent>
 
 	Optional<? extends IResizeData> getResizeData();
 
+	enum StaticHolder {
+		;
+
+		private static final INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(IUIExtension.StaticHolder.getDefaultNamespace(), "component.user_resizable");
+		@SuppressWarnings("unchecked")
+		private static final
+		IRegistryObject<IExtensionType<INamespacePrefixedString, IUIComponentUserResizableExtension<?>, IUIComponent>> TYPE =
+				UIExtensionRegistry.getInstance().register(getKey(), new ImmutableExtensionType<>(getKey(), (t, i) -> (Optional<? extends IUIComponentUserResizableExtension<?>>) i.getExtension(t.getKey())));
+
+		public static INamespacePrefixedString getKey() {
+			return KEY;
+		}
+
+		public static IRegistryObject<IExtensionType<INamespacePrefixedString, IUIComponentUserResizableExtension<?>, IUIComponent>> getType() {
+			return TYPE;
+		}
+	}
+
 	interface IResizeData {
 		Optional<? extends IIntersection<? extends IUIComponent, ? extends IUIReshapeExplicitly<?>>> getTargetComponent();
 
@@ -50,23 +68,5 @@ public interface IUIComponentUserResizableExtension<C extends IUIComponent>
 	interface IResizingRenderer
 			extends IUIRenderer<IUIComponentUserResizableExtension<?>> {
 		void render(IUIComponentContext context, IResizeData data);
-	}
-
-	enum StaticHolder {
-		;
-
-		private static final INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(IUIExtension.StaticHolder.getDefaultNamespace(), "component.user_resizable");
-		@SuppressWarnings("unchecked")
-		private static final
-		IRegistryObject<IExtensionType<INamespacePrefixedString, IUIComponentUserResizableExtension<?>, IUIComponent>> TYPE =
-				UIExtensionRegistry.getInstance().register(getKey(), new ImmutableExtensionType<>(getKey(), (t, i) -> (Optional<? extends IUIComponentUserResizableExtension<?>>) i.getExtension(t.getKey())));
-
-		public static INamespacePrefixedString getKey() {
-			return KEY;
-		}
-
-		public static IRegistryObject<IExtensionType<INamespacePrefixedString, IUIComponentUserResizableExtension<?>, IUIComponent>> getType() {
-			return TYPE;
-		}
 	}
 }

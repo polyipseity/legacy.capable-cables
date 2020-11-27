@@ -120,14 +120,14 @@ public class UIDefaultCacheExtension
 																),
 																UIConfiguration.getInstance().getLogger()
 														) {}
-										)::dispose);
-							}
+												)::dispose);
+									}
 
-							@Override
-							public void invalidate(IUIComponent container) {
-								super.invalidate(container);
-								IUICacheType.invalidateChildrenImpl(container, this);
-							}
+									@Override
+									public void invalidate(IUIComponent container) {
+										super.invalidate(container);
+										IUICacheType.invalidateChildrenImpl(container, this);
+									}
 
 									@Override
 									protected Integer load(IUIComponent container) {

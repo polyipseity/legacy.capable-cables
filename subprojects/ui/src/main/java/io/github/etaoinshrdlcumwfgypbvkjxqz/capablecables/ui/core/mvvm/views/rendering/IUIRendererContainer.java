@@ -44,15 +44,7 @@ public interface IUIRendererContainer<R extends IUIRenderer<?>>
 			renderer.onRendererAdded(CastUtilities.castUnchecked(container));
 	}
 
-	Optional<? extends R> getRenderer();
-
-	@Deprecated
-		// COMMENT unchecked, use one of the checked variants
-	void setRenderer(@Nullable R renderer);
-
 	static <C extends IUIRendererContainer<? super R>, R extends IUIRenderer<? super C>> void setRendererChecked(C container, R renderer) { container.setRenderer(renderer); }
-
-	Class<? extends R> getDefaultRendererClass();
 
 	@SuppressWarnings("cast")
 	static IUIRenderer<?> createDefaultRenderer(IUIRendererContainer<?> rendererContainer)
@@ -71,7 +63,15 @@ public interface IUIRendererContainer<R extends IUIRenderer<?>>
 		return (IUIRenderer<?>) constructorHandle.invokeExact((IUIRendererArguments) argument);
 	}
 
+	Class<? extends R> getDefaultRendererClass();
+
 	Optional<? extends IUIRendererContainerContainer<?>> getContainer();
+
+	Optional<? extends R> getRenderer();
+
+	@Deprecated
+		// COMMENT unchecked, use one of the checked variants
+	void setRenderer(@Nullable R renderer);
 
 	enum StaticHolder {
 		;

@@ -35,13 +35,15 @@ public abstract class CommonConfigurationTemplate<D extends CommonConfigurationT
 
 	public Supplier<@Nonnull ? extends Locale> getLocaleSupplier() { return AssertionUtilities.assertNonnull(localeSupplier); }
 
+	protected void setLocaleSupplier(@Nullable Supplier<@Nonnull ? extends Locale> localeSupplier) { this.localeSupplier = localeSupplier; }
+
 	public Logger getLogger() { return AssertionUtilities.assertNonnull(logger); }
+
+	protected void setLogger(@Nullable Logger logger) { this.logger = logger; }
 
 	public IThrowableHandler<Throwable> getThrowableHandler() { return AssertionUtilities.assertNonnull(throwableHandler); }
 
 	protected void setThrowableHandler(@Nullable IThrowableHandler<Throwable> throwableHandler) { this.throwableHandler = throwableHandler; }
-
-	protected void setLogger(@Nullable Logger logger) { this.logger = logger; }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -50,8 +52,6 @@ public abstract class CommonConfigurationTemplate<D extends CommonConfigurationT
 		setThrowableHandler(data.getThrowableHandler());
 		setLocaleSupplier(data.getLocaleSupplier());
 	}
-
-	protected void setLocaleSupplier(@Nullable Supplier<@Nonnull ? extends Locale> localeSupplier) { this.localeSupplier = localeSupplier; }
 
 	public static abstract class ConfigurationData implements IRecordCandidate {
 		private final Logger logger;

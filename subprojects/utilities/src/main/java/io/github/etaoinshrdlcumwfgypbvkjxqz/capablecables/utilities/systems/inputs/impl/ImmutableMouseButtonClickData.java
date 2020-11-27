@@ -13,9 +13,6 @@ import java.awt.geom.Point2D;
 public final class ImmutableMouseButtonClickData
 		extends AbstractTimestampedInputData
 		implements IMouseButtonClickData {
-	private final Point2D cursorPosition;
-	private final int button;
-
 	private static final long CURSOR_POSITION_FIELD_OFFSET;
 
 	static {
@@ -26,6 +23,16 @@ public final class ImmutableMouseButtonClickData
 		}
 	}
 
+	private final Point2D cursorPosition;
+	private final int button;
+
+	public ImmutableMouseButtonClickData(Point2D cursorPosition) { this(cursorPosition, IMouseButtonClickData.StaticHolder.getMouseButtonNull()); }
+
+	public ImmutableMouseButtonClickData(Point2D cursorPosition, int button) {
+		this.cursorPosition = (Point2D) cursorPosition.clone();
+		this.button = button;
+	}
+
 	@Override
 	public Point2D getCursorPositionView() { return (Point2D) getCursorPosition().clone(); }
 
@@ -34,11 +41,10 @@ public final class ImmutableMouseButtonClickData
 	@Override
 	public int getButton() { return button; }
 
-	public ImmutableMouseButtonClickData(Point2D cursorPosition) { this(cursorPosition, IMouseButtonClickData.StaticHolder.getMouseButtonNull()); }
-
-	public ImmutableMouseButtonClickData(Point2D cursorPosition, int button) {
-		this.cursorPosition = (Point2D) cursorPosition.clone();
-		this.button = button;
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public ImmutableMouseButtonClickData recreate() {
+		return (ImmutableMouseButtonClickData) super.recreate();
 	}
 
 	@Override
@@ -50,15 +56,6 @@ public final class ImmutableMouseButtonClickData
 	@Override
 	public boolean equals(Object obj) {
 		return ObjectUtilities.equalsImpl(this, obj, IMouseButtonClickData.class, true, IMouseButtonClickData.StaticHolder.getObjectVariableMap().values());
-	}
-
-	@Override
-	public String toString() { return ObjectUtilities.toStringImpl(this, IMouseButtonClickData.StaticHolder.getObjectVariableMap()); }
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public ImmutableMouseButtonClickData recreate() {
-		return (ImmutableMouseButtonClickData) super.recreate();
 	}
 
 	@SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
@@ -73,6 +70,9 @@ public final class ImmutableMouseButtonClickData
 		}
 		return result;
 	}
+
+	@Override
+	public String toString() { return ObjectUtilities.toStringImpl(this, IMouseButtonClickData.StaticHolder.getObjectVariableMap()); }
 
 	protected static long getCursorPositionFieldOffset() {
 		return CURSOR_POSITION_FIELD_OFFSET;

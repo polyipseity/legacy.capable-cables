@@ -11,13 +11,13 @@ public class DefaultThrowableHandler<T extends Throwable>
 	private T throwable;
 
 	@Override
-	public void catch_(T throwable) { setThrowable(throwable); }
-
-	@Override
 	public Optional<? extends T> get() { return getThrowable(); }
 
 	@Override
 	public void clear() { setThrowable(null); }
+
+	@Override
+	public void catch_(T throwable) { setThrowable(throwable); }
 
 	protected Optional<T> getThrowable() { return Optional.ofNullable(throwable); }
 

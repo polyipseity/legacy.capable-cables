@@ -21,15 +21,15 @@ public class UIImmutableMinecraftContainerProviderExtension
 		this.container = container;
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
-	@Override
-	public TypeToken<IUIInfrastructure<?, ?, ?>> getTypeToken() {
-		return typeToken;
-	}
-
 	@Override
 	public Container getContainer() { return container; }
 
 	@Override
 	public IExtensionType<INamespacePrefixedString, ?, IUIInfrastructure<?, ?, ?>> getType() { return StaticHolder.getType().getValue(); }
+
+	@SuppressWarnings("UnstableApiUsage")
+	@Override
+	public TypeToken<IUIInfrastructure<?, ?, ?>> getTypeToken() {
+		return typeToken;
+	}
 }

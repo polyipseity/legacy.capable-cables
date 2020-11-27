@@ -47,6 +47,8 @@ public interface IUIComponent
 		return Optional.empty();
 	}
 
+	Optional<? extends IUIComponent> getParent();
+
 	static Shape getContextualShape(IUIComponentContext context, IUIComponent component) { return IUIComponentContext.createContextualShape(context, getShape(component)); }
 
 	static Shape getShape(IUIComponent component) { return component.getShapeDescriptor().getShapeOutput(); }
@@ -65,6 +67,8 @@ public interface IUIComponent
 		return context;
 	}
 
+	default Optional<? extends IUIComponentManager<?>> getManager() { return UIDefaultCacheExtension.CacheUniversal.getManager().getValue().get(this); }
+
 	@Immutable
 	static IPath<IUIComponent> getPath(IUIComponent component) {
 		List<IUIComponent> path = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
@@ -80,14 +84,6 @@ public interface IUIComponent
 				action.test(shapeDescriptor));
 	}
 
-	Optional<? extends IUIComponent> getParent();
-
-	default Optional<? extends IUIComponentManager<?>> getManager() { return UIDefaultCacheExtension.CacheUniversal.getManager().getValue().get(this); }
-
-	boolean isVisible();
-
-	void setVisible(boolean visible);
-
 	@SuppressWarnings("UnstableApiUsage")
 	static Map<String, IUIComponent> getNamedChildrenMapView(IUIComponent instance) {
 		return instance.getChildrenView().stream().unordered()
@@ -99,12 +95,16 @@ public interface IUIComponent
 				}, Function.identity()));
 	}
 
+	List<IUIComponent> getChildrenView();
+
+	boolean isVisible();
+
+	void setVisible(boolean visible);
+
 	void setActive(boolean active);
 
 	@Override
 	default boolean isFocusable() { return false; }
-
-	List<IUIComponent> getChildrenView();
 
 	void onParentChange(@Nullable IUIComponent previous, @Nullable IUIComponent next);
 

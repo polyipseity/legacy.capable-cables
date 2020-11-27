@@ -81,15 +81,15 @@ public class UIDefaultMinecraftBackgroundExtension
 		IUIView.registerRendererContainers(container, ImmutableSet.of(getRendererContainer()));
 	}
 
-	protected IUIRendererContainerContainer<IBackgroundRenderer> getRendererContainerContainer() {
-		return rendererContainerContainer;
-	}
-
 	protected AutoCloseableRotator<RenderObserver, RuntimeException> getRenderObserverRotator() { return renderObserverRotator; }
 
 	@Override
 	public IUIRendererContainer<? extends IBackgroundRenderer> getRendererContainer() {
 		return getRendererContainerContainer().getRendererContainer();
+	}
+
+	protected IUIRendererContainerContainer<IBackgroundRenderer> getRendererContainerContainer() {
+		return rendererContainerContainer;
 	}
 
 	@Override
@@ -123,6 +123,10 @@ public class UIDefaultMinecraftBackgroundExtension
 		);
 		getBinderObserverSupplierHolder().setValue(null);
 		IUIMinecraftBackgroundExtension.super.cleanupBindings();
+	}
+
+	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
+		return binderObserverSupplierHolder;
 	}
 
 	@OnlyIn(Dist.CLIENT)
@@ -163,9 +167,5 @@ public class UIDefaultMinecraftBackgroundExtension
 		}
 
 		protected Optional<? extends UIDefaultMinecraftBackgroundExtension> getOwner() { return owner.getOptional(); }
-	}
-
-	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
-		return binderObserverSupplierHolder;
 	}
 }

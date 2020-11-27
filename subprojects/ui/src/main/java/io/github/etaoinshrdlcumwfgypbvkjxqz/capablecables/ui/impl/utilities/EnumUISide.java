@@ -228,6 +228,8 @@ public enum EnumUISide {
 		}
 	};
 
+	private static final @Immutable Set<EnumUISide> EDGES = Sets.immutableEnumSet(UP, DOWN, LEFT, RIGHT);
+
 	@SuppressWarnings("UnstableApiUsage")
 	@Immutable
 	public static Set<EnumUISide> getSidesMouseOver(RectangularShape rectangular, Point2D mouse) {
@@ -236,13 +238,11 @@ public enum EnumUISide {
 				.collect(Sets.toImmutableEnumSet());
 	}
 
-	private static final @Immutable Set<EnumUISide> EDGES = Sets.immutableEnumSet(UP, DOWN, LEFT, RIGHT);
+	public abstract boolean isMouseOver(RectangularShape rectangular, Point2D mouse);
 
 	public static @Immutable Set<EnumUISide> getEdges() {
 		return EDGES;
 	}
-
-	public abstract boolean isMouseOver(RectangularShape rectangular, Point2D mouse);
 
 	public abstract EnumUIAxis getAxis();
 

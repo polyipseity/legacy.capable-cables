@@ -11,6 +11,12 @@ import java.util.Optional;
 
 public abstract class AbstractPath<T>
 		implements IPath<T> {
+	@SuppressWarnings("unchecked")
+	@Override
+	public AbstractPath<T> clone() throws CloneNotSupportedException {
+		return (AbstractPath<T>) super.clone();
+	}
+
 	@Override
 	public int size() { return getData().size(); }
 
@@ -41,9 +47,5 @@ public abstract class AbstractPath<T>
 
 	protected abstract List<T> getData();
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public AbstractPath<T> clone() throws CloneNotSupportedException {
-		return (AbstractPath<T>) super.clone();
-	}
+
 }

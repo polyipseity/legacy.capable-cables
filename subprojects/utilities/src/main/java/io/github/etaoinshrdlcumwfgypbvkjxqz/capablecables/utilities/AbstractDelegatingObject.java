@@ -10,16 +10,13 @@ import java.util.Map;
 import java.util.function.Function;
 
 public abstract class AbstractDelegatingObject<T> {
-	private final T delegate;
-
-	public AbstractDelegatingObject(T delegate) { this.delegate = delegate; }
-
-	protected T getDelegate() { return delegate; }
-
 	private static final @NonNls Map<String, Function<@Nonnull AbstractDelegatingObject<?>, @Nullable ?>> OBJECT_VARIABLE_MAP =
 			ImmutableMap.<String, Function<@Nonnull AbstractDelegatingObject<?>, @Nullable ?>>builder()
 					.put("delegate", AbstractDelegatingObject::getDelegate)
 					.build();
+	private final T delegate;
+
+	public AbstractDelegatingObject(T delegate) { this.delegate = delegate; }
 
 	public static @Immutable @NonNls Map<String, Function<AbstractDelegatingObject<?>, ?>> getObjectVariableMapView() {
 		return ImmutableMap.copyOf(getObjectVariableMap());
@@ -28,4 +25,6 @@ public abstract class AbstractDelegatingObject<T> {
 	private static @NonNls Map<String, Function<AbstractDelegatingObject<?>, ?>> getObjectVariableMap() {
 		return OBJECT_VARIABLE_MAP;
 	}
+
+	protected T getDelegate() { return delegate; }
 }

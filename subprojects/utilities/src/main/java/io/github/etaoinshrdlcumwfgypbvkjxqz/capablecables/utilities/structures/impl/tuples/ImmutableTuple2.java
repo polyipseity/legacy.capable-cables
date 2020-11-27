@@ -17,7 +17,23 @@ public final class ImmutableTuple2<L, R>
 		this.right = right;
 	}
 
+	@Override
+	public int hashCode() {
+		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariableMap().values());
+	}
+
+	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+	@Override
+	public boolean equals(@Nullable Object o) {
+		return ObjectUtilities.equalsImpl(this, o, CastUtilities.<Class<ITuple2<?, ?>>>castUnchecked(ITuple2.class), true, StaticHolder.getObjectVariableMap().values());
+	}
+
 	public static <L, R> ImmutableTuple2<L, R> of(L left, R right) { return new ImmutableTuple2<>(left, right); }
+
+	@Override
+	public String toString() {
+		return ObjectUtilities.toStringImpl(this, StaticHolder.getObjectVariableMap());
+	}
 
 	@Override
 	public L getLeft() {
@@ -34,19 +50,5 @@ public final class ImmutableTuple2<L, R>
 		return of(getRight(), getLeft());
 	}
 
-	@Override
-	public int hashCode() {
-		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariableMap().values());
-	}
 
-	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-	@Override
-	public boolean equals(@Nullable Object o) {
-		return ObjectUtilities.equalsImpl(this, o, CastUtilities.<Class<ITuple2<?, ?>>>castUnchecked(ITuple2.class), true, StaticHolder.getObjectVariableMap().values());
-	}
-
-	@Override
-	public String toString() {
-		return ObjectUtilities.toStringImpl(this, StaticHolder.getObjectVariableMap());
-	}
 }

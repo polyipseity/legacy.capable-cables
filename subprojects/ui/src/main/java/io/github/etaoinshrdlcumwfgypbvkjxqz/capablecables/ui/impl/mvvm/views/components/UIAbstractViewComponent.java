@@ -110,6 +110,19 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	}
 
 	@Override
+	public Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(getMappings()); }
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappings() { return mappings; }
+
+	@Override
+	public void setContext(@Nullable IUIViewContext context) {
+		super.setContext(context);
+		if (getContext().isPresent())
+			IUIViewComponent.getShapeAnchorController(this).anchor();
+	}
+
+	@Override
 	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() {
 		extensionsInitializer.run();
 		return super.getExtensions();
@@ -190,12 +203,6 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		this.internalManager = internalManager;
 	}
 
-	@Override
-	public List<IUIComponent> getChildrenFlatView() {
-		return CacheViewComponent.getChildrenFlat().getValue().get(this)
-				.orElseThrow(AssertionError::new);
-	}
-
 	@SuppressWarnings({"Convert2MethodRef", "rawtypes", "RedundantSuppression"})
 	@Override
 	public void setManager(M manager) {
@@ -213,16 +220,9 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	}
 
 	@Override
-	public Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(getMappings()); }
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappings() { return mappings; }
-
-	@Override
-	public void setContext(@Nullable IUIViewContext context) {
-		super.setContext(context);
-		if (getContext().isPresent())
-			IUIViewComponent.getShapeAnchorController(this).anchor();
+	public List<IUIComponent> getChildrenFlatView() {
+		return CacheViewComponent.getChildrenFlat().getValue().get(this)
+				.orElseThrow(AssertionError::new);
 	}
 
 	@Override
@@ -376,18 +376,18 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 																		}),
 																UIConfiguration.getInstance().getLogger()
 														) {},
-												new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.View>(
-														new FunctionalEventBusDisposableObserver<>(
-																new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
-																event -> {
-																	if (event.getStage().isPost())
-																		thisRef.getOptional()
-																				.ifPresent(t -> event.getComponent().getManager()
-																						.flatMap(IUIComponentManager::getView)
-																						.ifPresent(view -> t.invalidate(view)));
-																}),
-														UIConfiguration.getInstance().getLogger()
-												) {}
+														new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.View>(
+																new FunctionalEventBusDisposableObserver<>(
+																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
+																		event -> {
+																			if (event.getStage().isPost())
+																				thisRef.getOptional()
+																						.ifPresent(t -> event.getComponent().getManager()
+																								.flatMap(IUIComponentManager::getView)
+																								.ifPresent(view -> t.invalidate(view)));
+																		}),
+																UIConfiguration.getInstance().getLogger()
+														) {}
 												)::dispose);
 									}
 

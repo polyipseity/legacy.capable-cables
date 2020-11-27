@@ -50,6 +50,17 @@ public abstract class UIAbstractView<S extends Shape>
 		this.coordinatorMap.put(IUIThemeStack.class, themeStack);
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public <C extends IUIViewCoordinator> Optional<? extends C> getCoordinator(Class<C> key) {
+		return (Optional<? extends C>) Optional.ofNullable(getCoordinatorMap().get(key));
+	}
+
+	@Override
+	public @Immutable Map<Class<?>, IUIViewCoordinator> getCoordinatorMapView() {
+		return ImmutableMap.copyOf(getCoordinatorMap());
+	}
+
 	@Override
 	public final void render() {
 		EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
@@ -67,17 +78,6 @@ public abstract class UIAbstractView<S extends Shape>
 	}
 
 	protected void acceptRenderEvent(UIAbstractViewBusEvent.Render event) {}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <C extends IUIViewCoordinator> Optional<? extends C> getCoordinator(Class<C> key) {
-		return (Optional<? extends C>) Optional.ofNullable(getCoordinatorMap().get(key));
-	}
-
-	@Override
-	public @Immutable Map<Class<?>, IUIViewCoordinator> getCoordinatorMapView() {
-		return ImmutableMap.copyOf(getCoordinatorMap());
-	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<Class<?>, IUIViewCoordinator> getCoordinatorMap() {

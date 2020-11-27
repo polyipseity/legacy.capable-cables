@@ -28,11 +28,11 @@ public final class UselessAnnotationProcessor
 	}
 
 	@Override
-	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) { return true; }
-
-	@Override
 	public Set<String> getSupportedAnnotationTypes() { return Collections.emptySet(); }
 
 	@Override
 	public SourceVersion getSupportedSourceVersion() { return SourceVersion.latestSupported(); }
+
+	@Override
+	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) { return true; }
 }

@@ -56,14 +56,14 @@ public interface IJAXBAdapterRegistry {
 
 	<R> Optional<? extends IJAXBAdapter<?, R>> findToJAXBAdapter(R object);
 
-	IJAXBElementAdapterRegistry getElementRegistry();
-
-	IJAXBObjectAdapterRegistry getObjectRegistry();
-
 	static boolean isOfJAXBSpecialType(Object jaxbObject) {
 		// COMMENT these types are treated specially - if we encounter these just return the object directly
 		return StaticHolder.getJAXBSpecialTypes().contains(jaxbObject.getClass());
 	}
+
+	IJAXBElementAdapterRegistry getElementRegistry();
+
+	IJAXBObjectAdapterRegistry getObjectRegistry();
 
 	enum StaticHolder {
 		;

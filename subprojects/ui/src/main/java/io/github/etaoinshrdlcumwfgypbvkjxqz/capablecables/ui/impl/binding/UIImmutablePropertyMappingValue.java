@@ -18,8 +18,8 @@ public final class UIImmutablePropertyMappingValue implements IUIPropertyMapping
 	}
 
 	@Override
-	public Optional<?> getDefaultValue() { return Optional.ofNullable(defaultValue); }
+	public Optional<? extends INamespacePrefixedString> getBindingKey() { return Optional.ofNullable(bindingKey); }
 
 	@Override
-	public Optional<? extends INamespacePrefixedString> getBindingKey() { return Optional.ofNullable(bindingKey); }
+	public Optional<?> getDefaultValue() { return Optional.ofNullable(defaultValue); }
 }

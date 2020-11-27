@@ -10,6 +10,16 @@ import java.util.function.Function;
 
 public class FunctionalConcurrentPath<T>
 		extends AbstractConcurrentPath<T> {
+	private static final long DATA_FIELD_OFFSET;
+
+	static {
+		try {
+			DATA_FIELD_OFFSET = DynamicUtilities.getUnsafe().objectFieldOffset(FunctionalConcurrentPath.class.getDeclaredField("data"));
+		} catch (NoSuchFieldException e) {
+			throw ThrowableUtilities.propagate(e);
+		}
+	}
+
 	private final List<T> data;
 	private final Function<@Nonnull ? super Iterable<? extends T>, @Nonnull ? extends List<T>> generator;
 
@@ -23,16 +33,6 @@ public class FunctionalConcurrentPath<T>
 	protected List<T> getData() { return data; }
 
 	protected Function<@Nonnull ? super Iterable<? extends T>, @Nonnull ? extends List<T>> getGenerator() { return generator; }
-
-	private static final long DATA_FIELD_OFFSET;
-
-	static {
-		try {
-			DATA_FIELD_OFFSET = DynamicUtilities.getUnsafe().objectFieldOffset(FunctionalConcurrentPath.class.getDeclaredField("data"));
-		} catch (NoSuchFieldException e) {
-			throw ThrowableUtilities.propagate(e);
-		}
-	}
 
 	@SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
 	@Override

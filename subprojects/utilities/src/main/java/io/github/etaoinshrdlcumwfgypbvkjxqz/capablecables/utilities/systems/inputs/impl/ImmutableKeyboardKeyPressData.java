@@ -22,29 +22,17 @@ public final class ImmutableKeyboardKeyPressData
 	}
 
 	@Override
-	public int hashCode() { return ObjectUtilities.hashCodeImpl(this, IKeyboardKeyPressData.StaticHolder.getObjectVariableMap().values()); }
-
-	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-	@Override
-	public boolean equals(Object obj) { return ObjectUtilities.equalsImpl(this, obj, IKeyboardKeyPressData.class, true, IKeyboardKeyPressData.StaticHolder.getObjectVariableMap().values()); }
-
-	@Override
-	public String toString() { return ObjectUtilities.toStringImpl(this, IKeyboardKeyPressData.StaticHolder.getObjectVariableMap()); }
-
-	@Override
 	@OverridingMethodsMustInvokeSuper
 	public ImmutableKeyboardKeyPressData recreate() {
 		return (ImmutableKeyboardKeyPressData) super.recreate();
 	}
 
 	@Override
-	public int getKey() { return key; }
+	public int hashCode() { return ObjectUtilities.hashCodeImpl(this, IKeyboardKeyPressData.StaticHolder.getObjectVariableMap().values()); }
 
+	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
-	public int getScanCode() { return scanCode; }
-
-	@Override
-	public int getModifiers() { return modifiers; }
+	public boolean equals(Object obj) { return ObjectUtilities.equalsImpl(this, obj, IKeyboardKeyPressData.class, true, IKeyboardKeyPressData.StaticHolder.getObjectVariableMap().values()); }
 
 	@Override
 	public ImmutableKeyboardKeyPressData clone() {
@@ -54,4 +42,16 @@ public final class ImmutableKeyboardKeyPressData
 			throw ThrowableUtilities.propagate(e);
 		}
 	}
+
+	@Override
+	public String toString() { return ObjectUtilities.toStringImpl(this, IKeyboardKeyPressData.StaticHolder.getObjectVariableMap()); }
+
+	@Override
+	public int getKey() { return key; }
+
+	@Override
+	public int getScanCode() { return scanCode; }
+
+	@Override
+	public int getModifiers() { return modifiers; }
 }

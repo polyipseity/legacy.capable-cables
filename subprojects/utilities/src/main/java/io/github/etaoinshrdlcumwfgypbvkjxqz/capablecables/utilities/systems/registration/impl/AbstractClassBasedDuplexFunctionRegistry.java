@@ -41,18 +41,6 @@ public abstract class AbstractClassBasedDuplexFunctionRegistry
 
 	@Override
 	@Deprecated
-	public Optional<? extends IRegistryObject<? extends IDuplexFunction<?, ?>>> getWithLeft(Class<?> key) {
-		return super.getWithLeft(key);
-	}
-
-	@Override
-	@Deprecated
-	public Optional<? extends IRegistryObject<? extends IDuplexFunction<?, ?>>> getWithRight(Class<?> key) {
-		return super.getWithRight(key);
-	}
-
-	@Override
-	@Deprecated
 	public Optional<? extends IRegistryObject<? extends IDuplexFunction<?, ?>>> get(ITuple2<? extends Class<?>, ? extends Class<?>> key) {
 		return super.get(key);
 	}
@@ -61,5 +49,17 @@ public abstract class AbstractClassBasedDuplexFunctionRegistry
 	@Deprecated
 	public <VL extends IDuplexFunction<?, ?>> IRegistryObject<VL> register(ITuple2<? extends Class<?>, ? extends Class<?>> key, VL value) {
 		return super.register(key, value);
+	}
+
+	@Override
+	@Deprecated
+	public Optional<? extends IRegistryObject<? extends IDuplexFunction<?, ?>>> getWithLeft(Class<?> key) {
+		return super.getWithLeft(key);
+	}
+
+	@Override
+	@Deprecated
+	public Optional<? extends IRegistryObject<? extends IDuplexFunction<?, ?>>> getWithRight(Class<?> key) {
+		return super.getWithRight(key);
 	}
 }

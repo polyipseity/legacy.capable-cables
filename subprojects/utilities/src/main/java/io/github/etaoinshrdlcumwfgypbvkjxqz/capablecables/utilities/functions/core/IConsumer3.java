@@ -17,15 +17,15 @@ public interface IConsumer3<T1, T2, T3, T extends Throwable> {
 		};
 	}
 
+	void accept(@Nullable T1 t1, @Nullable T2 t2, @Nullable T3 t3)
+			throws T;
+
 	default IConsumer3<T1, T2, T3, T> andThen(IConsumer3<? super T1, ? super T2, ? super T3, ? extends T> after) {
 		return (t1, t2, t3) -> {
 			accept(t1, t2, t3);
 			after.accept(t1, t2, t3);
 		};
 	}
-
-	void accept(@Nullable T1 t1, @Nullable T2 t2, @Nullable T3 t3)
-			throws T;
 
 	enum StaticHolder {
 		;

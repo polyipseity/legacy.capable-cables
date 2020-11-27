@@ -7,9 +7,9 @@ import java.util.Optional;
 
 public interface IPath<T>
 		extends ICloneable {
-	int size();
-
 	default boolean isRoot() { return size() == 1; }
+
+	int size();
 
 	default Optional<? extends T> getPathRoot() { return getAt(0); }
 

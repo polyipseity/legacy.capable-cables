@@ -14,7 +14,24 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public abstract class AbstractConcurrentPath<T>
 		extends AbstractPath<T>
 		implements IConcurrentPath<T> {
+	private static final long LOCK_FIELD_OFFSET;
+
+	static {
+		try {
+			LOCK_FIELD_OFFSET = DynamicUtilities.getUnsafe().objectFieldOffset(AbstractConcurrentPath.class.getDeclaredField("lock"));
+		} catch (NoSuchFieldException e) {
+			throw ThrowableUtilities.propagate(e);
+		}
+	}
+
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
+
+	@Override
+	public AbstractConcurrentPath<T> clone() throws CloneNotSupportedException {
+		AbstractConcurrentPath<T> result = (AbstractConcurrentPath<T>) super.clone();
+		DynamicUtilities.getUnsafe().putObjectVolatile(result, getLockFieldOffset(), new ReentrantReadWriteLock());
+		return result;
+	}
 
 	@Override
 	public int size() {
@@ -37,6 +54,15 @@ public abstract class AbstractConcurrentPath<T>
 	}
 
 	@Override
+	public void parentPath(int amount)
+			throws EmptyPathException {
+		Lock writeLock = getLock().writeLock();
+		writeLock.lock();
+		super.parentPath(amount);
+		writeLock.unlock();
+	}
+
+	@Override
 	public List<T> asList() {
 		Lock readLock = getLock().readLock();
 		readLock.lock();
@@ -51,32 +77,6 @@ public abstract class AbstractConcurrentPath<T>
 		writeLock.lock();
 		super.subPath(elements);
 		writeLock.unlock();
-	}
-
-	@Override
-	public void parentPath(int amount)
-			throws EmptyPathException {
-		Lock writeLock = getLock().writeLock();
-		writeLock.lock();
-		super.parentPath(amount);
-		writeLock.unlock();
-	}
-
-	private static final long LOCK_FIELD_OFFSET;
-
-	static {
-		try {
-			LOCK_FIELD_OFFSET = DynamicUtilities.getUnsafe().objectFieldOffset(AbstractConcurrentPath.class.getDeclaredField("lock"));
-		} catch (NoSuchFieldException e) {
-			throw ThrowableUtilities.propagate(e);
-		}
-	}
-
-	@Override
-	public AbstractConcurrentPath<T> clone() throws CloneNotSupportedException {
-		AbstractConcurrentPath<T> result = (AbstractConcurrentPath<T>) super.clone();
-		DynamicUtilities.getUnsafe().putObjectVolatile(result, getLockFieldOffset(), new ReentrantReadWriteLock());
-		return result;
 	}
 
 	protected static long getLockFieldOffset() {

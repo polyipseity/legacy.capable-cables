@@ -31,14 +31,14 @@ public interface IShapeDescriptor<S extends Shape> {
 			);
 	}
 
+	boolean isBeingModified();
+
 	@SuppressWarnings({"UnstableApiUsage", "unchecked"})
 	static <R extends RectangularShape> R constrain(Iterable<? extends IShapeConstraint> constraints, RectangularShape source, R destination) {
 		return Streams.stream((Iterable<IShapeConstraint>) constraints).unordered() // COMMENT should be safe
 				.reduce(StaticHolder.getConstraintMinimum(), IShapeConstraint::createIntersection)
 				.constrain(source, destination);
 	}
-
-	boolean isBeingModified();
 
 	boolean isDynamic(); // TODO implement this for dynamic shape descriptors i.e. returned shape can change by itself
 

@@ -25,9 +25,8 @@ public class UIDefaultRenderer<C>
 	@SuppressWarnings("UnstableApiUsage")
 	private final TypeToken<C> typeToken;
 	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
-	private OptionalWeakReference<C> container = new OptionalWeakReference<>(null);
-
 	private final IBinderObserverSupplierHolder binderObserverSupplierHolder = new DefaultBinderObserverSupplierHolder();
+	private OptionalWeakReference<C> container = new OptionalWeakReference<>(null);
 
 	@SuppressWarnings({"unchecked", "UnstableApiUsage"})
 	@UIRendererConstructor
@@ -37,12 +36,6 @@ public class UIDefaultRenderer<C>
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.mappings = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
-	}
-
-	@SuppressWarnings("UnstableApiUsage")
-	@Override
-	public TypeToken<? extends C> getTypeToken() {
-		return typeToken;
 	}
 
 	@Override
@@ -59,6 +52,12 @@ public class UIDefaultRenderer<C>
 	@Override
 	public void onRendererRemoved() {
 		setContainer(null);
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	@Override
+	public TypeToken<? extends C> getTypeToken() {
+		return typeToken;
 	}
 
 	public Optional<? extends C> getContainer() { return container.getOptional(); }

@@ -87,7 +87,7 @@ public class UIDefaultComponent
 
 	private static final INamespacePrefixedString PROPERTY_VISIBLE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyVisible());
 	private static final INamespacePrefixedString PROPERTY_ACTIVE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyActive());
-
+	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	@Nullable
 	private final String name;
 	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
@@ -100,13 +100,14 @@ public class UIDefaultComponent
 	private final IBindingField<Boolean> active;
 	private final AtomicBoolean modifyingShape = new AtomicBoolean();
 	private final List<IUIComponentModifier> modifiers = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
-	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	private final IBinderObserverSupplierHolder binderObserverSupplierHolder = new DefaultBinderObserverSupplierHolder();
 	private final IUILifecycleStateTracker lifecycleStateTracker = new UIDefaultLifecycleStateTracker();
 
 	private final IUIRendererContainerContainer<IUIComponentRenderer<?>> rendererContainerContainer;
 
 	private final Runnable extensionsInitializer;
+	private final List<IUIComponent> children = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
+	private OptionalWeakReference<IUIComponent> parent = new OptionalWeakReference<>(null);
 
 	@UIComponentConstructor
 	public UIDefaultComponent(IUIComponentArguments arguments) {
@@ -163,25 +164,119 @@ public class UIDefaultComponent
 		return ret;
 	}
 
-	private final List<IUIComponent> children = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
+	@Override
+	public Optional<? extends IUIComponent> getParent() { return parent.getOptional(); }
+
+	@Override
+	public List<IUIComponent> getChildrenView() { return ImmutableList.copyOf(getChildren()); }
 
 	@Override
 	public boolean isVisible() { return getVisible().getValue(); }
 
-	protected AtomicBoolean getModifyingShape() { return modifyingShape; }
-
 	public IBindingField<Boolean> getVisible() { return visible; }
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected List<IUIComponent> getChildren() { return children; }
 
 	@Override
 	public void setVisible(boolean visible) { getVisible().setValue(visible); }
 
+	protected void setParent(@Nullable IUIComponent parent) { this.parent = new OptionalWeakReference<>(parent); }
+
+	@Override
+	public void setActive(boolean active) { getActive().setValue(active); }
+
+	protected AtomicBoolean getModifyingShape() { return modifyingShape; }
+
+	@Override
+	public void onParentChange(@Nullable IUIComponent previous, @Nullable IUIComponent next) {
+		setParent(next);
+	}
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected ConcurrentMap<INamespacePrefixedString, IBindingMethodSource<? extends IUIEvent>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }
+
+	@Override
+	public void transformChildren(AffineTransform transform) {
+		Rectangle2D bounds = getShapeDescriptor().getShapeOutput().getBounds2D();
+		transform.translate(bounds.getX(), bounds.getY());
+	}
+
 	@Override
 	public boolean isModifyingShape() { return getModifyingShape().get(); }
 
-	private OptionalWeakReference<IUIComponent> parent = new OptionalWeakReference<>(null);
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappings() { return mappings; }
+
+	@SuppressWarnings("UnstableApiUsage")
+	@Override
+	public boolean addChildren(Iterable<? extends IUIComponent> components) {
+		return Streams.stream(components)
+				.map(component -> !getChildren().contains(component) && addChildAt(getChildren().size(), component))
+				.reduce(false, Boolean::logicalOr);
+	}
 
 	@Override
-	public Optional<? extends IUIComponent> getParent() { return parent.getOptional(); }
+	public boolean isActive() { return getActive().getValue(); }
+
+	@Override
+	public boolean addChildAt(int index, IUIComponent component) {
+		if (equals(component))
+			throw new IllegalArgumentException(
+					new LogMessageBuilder()
+							.addMarkers(UIMarkers.getInstance()::getMarkerUIComponent)
+							.addKeyValue("index", index).addKeyValue("component", component)
+							.addMessages(() -> getResourceBundle().getString("children.add.self"))
+							.build()
+			);
+		if (getChildren().contains(component))
+			return moveChildTo(index, component);
+		component.getParent()
+				.ifPresent(p -> p.removeChildren(ImmutableList.of(component)));
+		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
+					getChildren().add(index, component);
+					component.onParentChange(null, this);
+				},
+				new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.PRE, component, null, this),
+				new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.POST, component, null, this));
+		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh); // TODO relocation perhaps
+		return true;
+	}
+
+	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
+		return binderObserverSupplierHolder;
+	}
+
+	@Override
+	public boolean removeChildren(Iterable<? extends IUIComponent> components) {
+		@SuppressWarnings("UnstableApiUsage") boolean ret = Streams.stream(components)
+				.map(component -> {
+					int index = getChildren().indexOf(component);
+					if (index != -1) {
+						EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
+									getChildren().remove(component);
+									component.onParentChange(this, null);
+								},
+								new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.PRE, component, this, null),
+								new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.POST, component, this, null));
+						return true;
+					}
+					return false;
+				})
+				.reduce(false, Boolean::logicalOr);
+		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh); // TODO relocation perhaps
+		return ret;
+	}
+
+	@Override
+	public boolean moveChildTo(int index, IUIComponent component) {
+		int previous = getChildren().indexOf(component);
+		if (previous == index || previous == -1)
+			return false;
+		getChildren().remove(previous);
+		getChildren().add(index, component);
+		return true;
+	}
 
 	@Override
 	public Shape getAbsoluteShape()
@@ -190,6 +285,19 @@ public class UIDefaultComponent
 			return IUIComponent.getContextualShape(context, this);
 		}
 	}
+
+
+	public IBindingField<Boolean> getActive() { return active; }
+
+	@Override
+	public boolean moveChildToTop(IUIComponent component) { return moveChildTo(getChildren().size() - 1, component); }
+
+	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
+
+
+	@Override
+	public IShapeDescriptor<?> getShapeDescriptor() { return shapeDescriptor; }
+
 
 	@Override
 	public boolean dispatchEvent(IUIEvent event) {
@@ -205,22 +313,8 @@ public class UIDefaultComponent
 		return ret;
 	}
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<INamespacePrefixedString, IBindingMethodSource<? extends IUIEvent>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappings() { return mappings; }
 
-	@Override
-	public boolean isActive() { return getActive().getValue(); }
-
-	public IBindingField<Boolean> getActive() { return active; }
-
-	@Override
-	public IShapeDescriptor<?> getShapeDescriptor() { return shapeDescriptor; }
-
-	@Override
-	public void setActive(boolean active) { getActive().setValue(active); }
 
 	@Override
 	public List<? extends IUIComponentModifier> getModifiersView() { return ImmutableList.copyOf(getModifiers()); }
@@ -282,6 +376,7 @@ public class UIDefaultComponent
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected List<IUIComponentModifier> getModifiers() { return modifiers; }
 
+
 	@Override
 	@Deprecated
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
@@ -290,10 +385,6 @@ public class UIDefaultComponent
 		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
 				BindingUtilities.findAndInitializeBindings(binderObserverSupplier, ImmutableList.of(extension)));
 		return result;
-	}
-
-	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
-		return binderObserverSupplierHolder;
 	}
 
 	@Override
@@ -316,92 +407,7 @@ public class UIDefaultComponent
 		return extensions;
 	}
 
-	@Override
-	public List<IUIComponent> getChildrenView() { return ImmutableList.copyOf(getChildren()); }
 
-	@Override
-	public void onParentChange(@Nullable IUIComponent previous, @Nullable IUIComponent next) {
-		setParent(next);
-	}
-
-	@Override
-	public void transformChildren(AffineTransform transform) {
-		Rectangle2D bounds = getShapeDescriptor().getShapeOutput().getBounds2D();
-		transform.translate(bounds.getX(), bounds.getY());
-	}
-
-	@SuppressWarnings("UnstableApiUsage")
-	@Override
-	public boolean addChildren(Iterable<? extends IUIComponent> components) {
-		return Streams.stream(components)
-				.map(component -> !getChildren().contains(component) && addChildAt(getChildren().size(), component))
-				.reduce(false, Boolean::logicalOr);
-	}
-
-	@Override
-	public boolean addChildAt(int index, IUIComponent component) {
-		if (equals(component))
-			throw new IllegalArgumentException(
-					new LogMessageBuilder()
-							.addMarkers(UIMarkers.getInstance()::getMarkerUIComponent)
-							.addKeyValue("index", index).addKeyValue("component", component)
-							.addMessages(() -> getResourceBundle().getString("children.add.self"))
-							.build()
-			);
-		if (getChildren().contains(component))
-			return moveChildTo(index, component);
-		component.getParent()
-				.ifPresent(p -> p.removeChildren(ImmutableList.of(component)));
-		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
-					getChildren().add(index, component);
-					component.onParentChange(null, this);
-				},
-				new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.PRE, component, null, this),
-				new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.POST, component, null, this));
-		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh); // TODO relocation perhaps
-		return true;
-	}
-
-	@Override
-	public boolean removeChildren(Iterable<? extends IUIComponent> components) {
-		@SuppressWarnings("UnstableApiUsage") boolean ret = Streams.stream(components)
-				.map(component -> {
-					int index = getChildren().indexOf(component);
-					if (index != -1) {
-						EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
-									getChildren().remove(component);
-									component.onParentChange(this, null);
-								},
-								new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.PRE, component, this, null),
-								new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.POST, component, this, null));
-						return true;
-					}
-					return false;
-				})
-				.reduce(false, Boolean::logicalOr);
-		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh); // TODO relocation perhaps
-		return ret;
-	}
-
-	@Override
-	public boolean moveChildTo(int index, IUIComponent component) {
-		int previous = getChildren().indexOf(component);
-		if (previous == index || previous == -1)
-			return false;
-		getChildren().remove(previous);
-		getChildren().add(index, component);
-		return true;
-	}
-
-	@Override
-	public boolean moveChildToTop(IUIComponent component) { return moveChildTo(getChildren().size() - 1, component); }
-
-	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
-
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected List<IUIComponent> getChildren() { return children; }
-
-	protected void setParent(@Nullable IUIComponent parent) { this.parent = new OptionalWeakReference<>(parent); }
 
 	@Override
 	public IUILifecycleStateTracker getLifecycleStateTracker() {
@@ -538,4 +544,6 @@ public class UIDefaultComponent
 
 	@OverridingMethodsMustInvokeSuper
 	protected void initialize0(IUIComponentContext context) {}
+
+
 }
