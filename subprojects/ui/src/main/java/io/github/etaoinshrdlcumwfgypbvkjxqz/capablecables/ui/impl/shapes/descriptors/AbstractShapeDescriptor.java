@@ -86,15 +86,17 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 		return false;
 	}
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected List<IShapeConstraint> getConstraints() { return constraints; }
-
 	protected boolean modify0(BooleanSupplier action) {
 		boolean ret = action.getAsBoolean();
 		if (ret) {
 			Rectangle2D bounds = getShapeOutput().getBounds2D();
-			adapt(IShapeDescriptor.constrain(getConstraints(), bounds, bounds));
+			adapt(IShapeDescriptor.constrain(getConstraints(), bounds, bounds)); // TODO what if the shape is dynamic
 		}
 		return ret;
 	}
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected List<IShapeConstraint> getConstraints() { return constraints; }
+
+	protected abstract boolean adapt0(Rectangle2D frame);
 }

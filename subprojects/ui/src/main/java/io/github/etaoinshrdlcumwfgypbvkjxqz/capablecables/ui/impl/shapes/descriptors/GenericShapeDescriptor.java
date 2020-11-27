@@ -16,6 +16,11 @@ public class GenericShapeDescriptor extends AbstractShapeDescriptor<Shape> {
 	}
 
 	@Override
+	public boolean isDynamic() {
+		return false;
+	}
+
+	@Override
 	public Shape getShapeOutput() { return UIObjectUtilities.copyShape(getShape()); }
 
 	protected Shape getShape() { return shape; }
@@ -46,6 +51,12 @@ public class GenericShapeDescriptor extends AbstractShapeDescriptor<Shape> {
 			throws IllegalStateException {
 		super.transform(transform);
 		setShape(transform.createTransformedShape(getShape()));
+		return true;
+	}
+
+	@Override
+	public boolean adapt0(Rectangle2D frame) {
+		setShape(AffineTransformUtilities.getTransformFromTo(getShape().getBounds2D(), frame).createTransformedShape(getShape()));
 		return true;
 	}
 }

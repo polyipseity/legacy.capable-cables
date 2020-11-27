@@ -13,6 +13,11 @@ public class RectangularShapeDescriptor<S extends RectangularShape>
 
 	public RectangularShapeDescriptor(S shape) { this.shape = shape; }
 
+	@Override
+	public boolean isDynamic() {
+		return false;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public S getShapeOutput() {
@@ -48,6 +53,12 @@ public class RectangularShapeDescriptor<S extends RectangularShape>
 			throws IllegalStateException {
 		super.transform(transform);
 		UIObjectUtilities.transformRectangularShape(transform, getShape(), getShape());
+		return true;
+	}
+
+	@Override
+	public boolean adapt0(Rectangle2D frame) {
+		getShape().setFrame(frame);
 		return true;
 	}
 }

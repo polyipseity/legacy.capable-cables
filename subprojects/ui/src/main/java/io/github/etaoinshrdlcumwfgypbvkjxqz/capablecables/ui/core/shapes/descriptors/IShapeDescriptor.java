@@ -41,6 +41,8 @@ public interface IShapeDescriptor<S extends Shape> {
 
 	boolean isBeingModified();
 
+	boolean isDynamic(); // TODO implement this for dynamic shape descriptors i.e. returned shape can change by itself
+
 	S getShapeOutput();
 
 	List<IShapeConstraint> getConstraintsView();

@@ -20,7 +20,9 @@ public class DelegatingShapeDescriptor<S extends Shape>
 	public boolean isBeingModified() { return getDelegate().isBeingModified(); }
 
 	@Override
-	public S getShapeOutput() { return getDelegate().getShapeOutput(); }
+	public boolean isDynamic() {
+		return getDelegate().isDynamic();
+	}
 
 	@Override
 	public List<IShapeConstraint> getConstraintsView() { return getDelegate().getConstraintsView(); }
