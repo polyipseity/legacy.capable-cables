@@ -3,8 +3,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.co
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LoopUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IFunction3;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IFunction3;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -49,12 +49,12 @@ public enum EnumModifyStage {
 			 IFunction3<? super RSelf, ? super RPre, ? super RPost, @Nullable ? extends R, ? extends TH> combiner)
 			throws TH {
 		modifiers.forEach(IUIComponentModifier::advanceModifyStage);
-		@Nullable RPre preRet = preAction.apply(modifiers);
+		RPre preRet = preAction.apply(modifiers);
 
-		@Nullable RSelf selfRet = action.get();
+		RSelf selfRet = action.get();
 
 		modifiers.forEach(IUIComponentModifier::advanceModifyStage);
-		@Nullable RPost postRet = postAction.apply(modifiers);
+		RPost postRet = postAction.apply(modifiers);
 
 		modifiers.forEach(IUIComponentModifier::resetModifyStage);
 		return Optional.ofNullable(combiner.apply(selfRet, preRet, postRet));

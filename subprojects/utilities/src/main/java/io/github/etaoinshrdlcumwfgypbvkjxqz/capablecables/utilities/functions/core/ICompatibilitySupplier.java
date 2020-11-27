@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core;
 
 import java.util.function.Supplier;
 

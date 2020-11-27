@@ -6,8 +6,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBu
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.DynamicUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingRunnable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingSupplier;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingRunnable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingSupplier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.logging.LoggingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.core.IThrowableHandler;

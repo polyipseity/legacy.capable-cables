@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IDuplexFunction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IDuplexFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
 
 import java.util.Optional;

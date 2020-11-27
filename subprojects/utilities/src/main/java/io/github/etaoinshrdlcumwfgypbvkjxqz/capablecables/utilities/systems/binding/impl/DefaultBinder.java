@@ -12,7 +12,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtil
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.ManualLoadingCache;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingFunction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinding;
@@ -56,16 +56,14 @@ public class DefaultBinder
 			throws NoSuchBindingTransformerException {
 		return sortAndTrimBindings(bindings).entrySet().stream().unordered()
 				.map(IThrowingFunction.executeNow(typeEntry -> {
-					assert typeEntry != null;
 					LoadingCache<INamespacePrefixedString, IBindings<?>> typeBindings = getBindings().getUnchecked(AssertionUtilities.assertNonnull(typeEntry.getKey()));
 					return AssertionUtilities.assertNonnull(typeEntry.getValue()).asMap().entrySet().stream() // COMMENT sequential, field binding order matters
 							.map(IThrowingFunction.<Map.Entry<INamespacePrefixedString, ? extends Collection<? extends IBinding<?>>>, Boolean,
-									NoSuchBindingTransformerException>executeNow(entry -> {
-								assert entry != null;
-								return typeBindings.getUnchecked(AssertionUtilities.assertNonnull(entry.getKey()))
-										.add(CastUtilities.castUnchecked( // COMMENT should be of the right type
-												AssertionUtilities.assertNonnull(entry.getValue())));
-							}))
+									NoSuchBindingTransformerException>executeNow(entry ->
+									typeBindings.getUnchecked(AssertionUtilities.assertNonnull(entry.getKey()))
+											.add(CastUtilities.castUnchecked( // COMMENT should be of the right type
+													AssertionUtilities.assertNonnull(entry.getValue())))
+							))
 							.reduce(false, Boolean::logicalOr);
 				}))
 				.reduce(false, Boolean::logicalOr);

@@ -1,6 +1,6 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.OneUseValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.OneUseValue;
 
 public class OneUseRunnable
 		implements Runnable {

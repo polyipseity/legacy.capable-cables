@@ -3,7 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapt
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapterContext;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.UncheckedAutoCloseable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.UncheckedAutoCloseable;
 
 import java.util.Optional;
 

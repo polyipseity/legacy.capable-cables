@@ -2,8 +2,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.gra
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IConsumer4;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IFunction4;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IConsumer4;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IFunction4;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -35,17 +35,12 @@ public enum UIObjectUtilities {
 	}
 
 	public static <R extends RectangularShape> R floorRectangularShape(RectangularShape source, R destination) {
-		acceptRectangularShape(source, (x, y, w, h) -> {
-			assert x != null;
-			assert y != null;
-			assert w != null;
-			assert h != null;
-			destination.setFrame(Math.floor(x), Math.floor(y), Math.floor(w), Math.floor(h));
-		});
+		acceptRectangularShape(source, (x, y, w, h) ->
+				destination.setFrame(Math.floor(x), Math.floor(y), Math.floor(w), Math.floor(h)));
 		return destination;
 	}
 
-	public static <TH extends Throwable> void acceptRectangularShape(RectangularShape rectangular, IConsumer4<? super Double, ? super Double, ? super Double, ? super Double, ? extends TH> action)
+	public static <TH extends Throwable> void acceptRectangularShape(RectangularShape rectangular, IConsumer4<@Nonnull ? super Double, @Nonnull ? super Double, @Nonnull ? super Double, @Nonnull ? super Double, ? extends TH> action)
 			throws TH { action.accept(rectangular.getX(), rectangular.getY(), rectangular.getWidth(), rectangular.getHeight()); }
 
 	public static void acceptDimension(Dimension2D dimension, BiConsumer<@Nonnull ? super Double, @Nonnull ? super Double> action) { action.accept(dimension.getWidth(), dimension.getHeight()); }
@@ -75,14 +70,10 @@ public enum UIObjectUtilities {
 	public static <R extends RectangularShape> R transformRectangularShape(AffineTransform transform,
 	                                                                       RectangularShape rectangular,
 	                                                                       R destination) {
-		UIObjectUtilities.acceptRectangularShape(rectangular, (x, y, w, h) -> {
-			assert x != null;
-			assert y != null;
-			assert w != null;
-			assert h != null;
-			destination.setFrame(x * transform.getScaleX() + transform.getTranslateX(), y * transform.getScaleY() + transform.getTranslateY(),
-					w * transform.getScaleX(), h * transform.getScaleY());
-		});
+		UIObjectUtilities.acceptRectangularShape(rectangular, (x, y, w, h) ->
+				destination.setFrame(x * transform.getScaleX() + transform.getTranslateX(), y * transform.getScaleY() + transform.getTranslateY(),
+						w * transform.getScaleX(), h * transform.getScaleY())
+		);
 		return destination;
 	}
 

@@ -1,7 +1,6 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.MaybeNullable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 
 import java.io.Serializable;
 import java.util.function.Function;
@@ -51,12 +50,12 @@ public interface IDuplexFunction<L, R> {
 		public Function<R, L> asRightToLeftFunction() { return getRightToLeftFunction()::apply; }
 
 		@Override
-		@Nullable
-		public R leftToRight(@Nullable L left) { return getLeftToRightFunction().apply(left); }
+		@MaybeNullable
+		public R leftToRight(@MaybeNullable L left) { return getLeftToRightFunction().apply(left); }
 
 		@Override
-		@Nullable
-		public L rightToLeft(@Nullable R right) { return getRightToLeftFunction().apply(right); }
+		@MaybeNullable
+		public L rightToLeft(@MaybeNullable R right) { return getRightToLeftFunction().apply(right); }
 
 		protected Function<? super R, ? extends L> getRightToLeftFunction() { return rightToLeftFunction; }
 
@@ -81,12 +80,12 @@ public interface IDuplexFunction<L, R> {
 		protected IDuplexFunction<R, L> getReverse() { return reverse; }
 
 		@Override
-		@Nullable
-		public R leftToRight(@Nullable L left) { return getReverse().rightToLeft(left); }
+		@MaybeNullable
+		public R leftToRight(@MaybeNullable L left) { return getReverse().rightToLeft(left); }
 
 		@Override
-		@Nullable
-		public L rightToLeft(@Nullable R right) { return getReverse().leftToRight(right); }
+		@MaybeNullable
+		public L rightToLeft(@MaybeNullable R right) { return getReverse().leftToRight(right); }
 
 		@Override
 		public IDuplexFunction<R, L> reverse() { return getReverse(); }

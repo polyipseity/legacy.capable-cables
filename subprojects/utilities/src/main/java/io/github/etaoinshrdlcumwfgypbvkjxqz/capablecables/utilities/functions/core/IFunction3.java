@@ -1,6 +1,6 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.MaybeNullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 
 @FunctionalInterface
@@ -21,8 +21,8 @@ public interface IFunction3<T1, T2, T3, R, T extends Throwable> {
 		return (t1, t2, t3) -> after.apply(apply(t1, t2, t3));
 	}
 
-	@Nullable
-	R apply(@Nullable T1 t1, @Nullable T2 t2, @Nullable T3 t3)
+	@MaybeNullable
+	R apply(@MaybeNullable T1 t1, @MaybeNullable T2 t2, @MaybeNullable T3 t3)
 			throws T;
 
 	enum StaticHolder {

@@ -1,7 +1,8 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AbstractDelegatingObject;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.ICompatibilitySupplier;
 
 import java.util.function.Supplier;
 

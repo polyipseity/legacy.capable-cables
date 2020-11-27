@@ -1,7 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.ICompatibilitySupplier;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.ICompatibilitySupplier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ISealedClassCandidate;
 
 import java.io.Serializable;

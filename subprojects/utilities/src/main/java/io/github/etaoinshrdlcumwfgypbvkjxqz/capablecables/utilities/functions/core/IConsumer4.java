@@ -1,6 +1,6 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.MaybeNullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 
 @FunctionalInterface
@@ -17,7 +17,7 @@ public interface IConsumer4<T1, T2, T3, T4, T extends Throwable> {
 		};
 	}
 
-	void accept(@Nullable T1 t1, @Nullable T2 t2, @Nullable T3 t3, @Nullable T4 t4)
+	void accept(@MaybeNullable T1 t1, @MaybeNullable T2 t2, @MaybeNullable T3 t3, @MaybeNullable T4 t4)
 			throws T;
 
 	default IConsumer4<T1, T2, T3, T4, T> andThen(IConsumer4<? super T1, ? super T2, ? super T3, ? super T4, ? extends T> after) {

@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.ICompatibilitySupplier;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.ICompatibilitySupplier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IValue;
 
 import java.util.Optional;

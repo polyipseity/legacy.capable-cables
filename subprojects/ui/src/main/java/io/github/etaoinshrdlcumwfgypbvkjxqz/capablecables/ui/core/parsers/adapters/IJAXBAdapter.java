@@ -3,8 +3,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapt
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IDuplexFunction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.UncheckedAutoCloseable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IDuplexFunction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.UncheckedAutoCloseable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ISealedClassCandidate;
 
 import java.util.Optional;
