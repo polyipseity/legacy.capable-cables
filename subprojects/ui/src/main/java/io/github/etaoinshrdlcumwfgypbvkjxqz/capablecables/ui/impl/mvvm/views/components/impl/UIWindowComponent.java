@@ -35,6 +35,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.Enum
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CollectionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
@@ -202,6 +203,16 @@ public class UIWindowComponent
 
 	protected IBindingField<EnumUIRotation> getControlsDirection() {
 		return controlsDirection;
+	}
+
+	@Override
+	public boolean addChildren(Iterable<? extends IUIComponent> components) {
+		// COMMENT add components before the controls so that the controls can draw above all others
+		return addChildrenImpl(this,
+				(self, child) ->
+						CollectionUtilities.indexOf(self.getChildren(), self.getControlsEmbed().getComponent())
+								.orElseGet(self.getChildren()::size),
+				components);
 	}
 
 	@Override

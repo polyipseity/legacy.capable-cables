@@ -42,6 +42,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtil
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -74,6 +75,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+import java.util.function.ToIntBiFunction;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 
@@ -208,11 +210,18 @@ public class UIDefaultComponent
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappings() { return mappings; }
 
-	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public boolean addChildren(Iterable<? extends IUIComponent> components) {
+		return addChildrenImpl(this, (self, child) -> self.getChildren().size(), components);
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	public static <T extends UIDefaultComponent, C extends IUIComponent> boolean addChildrenImpl(T instance,
+	                                                                                             ToIntBiFunction<@Nonnull ? super T, @Nonnull ? super C> indexFunction,
+	                                                                                             Iterable<? extends C> components) {
 		return Streams.stream(components)
-				.map(component -> !getChildren().contains(component) && addChildAt(getChildren().size(), component))
+				.filter(FunctionUtilities.notPredicate(instance.getChildren()::contains))
+				.map(component -> instance.addChildAt(indexFunction.applyAsInt(instance, component), component))
 				.reduce(false, Boolean::logicalOr);
 	}
 
