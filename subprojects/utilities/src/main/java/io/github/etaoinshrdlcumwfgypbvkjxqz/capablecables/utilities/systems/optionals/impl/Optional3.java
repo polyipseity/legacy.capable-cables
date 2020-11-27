@@ -75,7 +75,7 @@ public final class Optional3<V1, V2, V3>
 		public V3 getValue3Nonnull() { return AssertionUtilities.assertNonnull(getValue3()); }
 
 		@Nullable
-		public V3 getValue3() { return value3; }
+		protected V3 getValue3() { return value3; }
 
 		@Override
 		public Iterable<? extends Supplier<@Nullable ?>> getSuppliers() { return ImmutableList.of(this::getValue1, this::getValue2, this::getValue3); }

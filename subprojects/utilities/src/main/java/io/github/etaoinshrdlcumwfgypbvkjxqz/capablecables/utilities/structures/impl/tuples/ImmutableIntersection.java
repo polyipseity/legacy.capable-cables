@@ -1,11 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.IIntersection;
 
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 public final class ImmutableIntersection<L, R>
 		extends AbstractTuple
@@ -34,6 +36,11 @@ public final class ImmutableIntersection<L, R>
 
 	public static <L, R> ImmutableIntersection<L, R> of(Object object, @Nullable Class<L> leftClazz, @Nullable Class<R> rightClazz) {
 		return new ImmutableIntersection<>(object, leftClazz, rightClazz);
+	}
+
+	@Override
+	public <T> T map(BiFunction<@Nonnull ? super L, @Nonnull ? super R, @Nonnull ? extends T> mapper) {
+		return mapper.apply(getLeft(), getRight());
 	}
 
 	@Override
