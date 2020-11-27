@@ -26,7 +26,8 @@ public final class ImmutableIntersection<L, R>
 
 	@SuppressWarnings("ObjectEquality")
 	public static <L, R> ImmutableIntersection<L, R> of(L objectAsLeft, R objectAsRight) {
-		assert objectAsLeft == objectAsRight;
+		if (objectAsLeft != objectAsRight)
+			throw new IllegalArgumentException();
 		return of(objectAsLeft);
 	}
 
