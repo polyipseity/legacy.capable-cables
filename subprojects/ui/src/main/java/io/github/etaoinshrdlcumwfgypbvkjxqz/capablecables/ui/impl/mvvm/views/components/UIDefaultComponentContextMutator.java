@@ -33,7 +33,7 @@ public class UIDefaultComponentContextMutator
 		clipStack.pop();
 		// COMMENT graphics
 		graphics.setTransform(transformStack.element());
-		graphics.setClip(clipStack.element()); // COMMENT automatically transforms
+		graphics.setClip(clipStack.peek()); // COMMENT automatically transforms
 
 		return UIImmutableComponentContextMutatorResult.of(pathEnd.get());
 	}
