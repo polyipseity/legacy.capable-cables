@@ -449,7 +449,10 @@ public class UIDefaultComponent
 		IUIComponent.super.initializeBindings(binderObserverSupplier);
 		getBinderObserverSupplierHolder().setValue(binderObserverSupplier);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-				() -> ImmutableBinderAction.bind(getActive(), getVisible()));
+				() -> ImmutableBinderAction.bind(
+						getActive(), getVisible()
+				));
+		BindingUtilities.initializeBindings(binderObserverSupplier, ImmutableSet.of(getRendererContainerContainer()));
 		BindingUtilities.findAndInitializeBindings(binderObserverSupplier, getExtensions().values());
 		// COMMENT do not init children, view component should do that via bind
 	}
@@ -458,9 +461,12 @@ public class UIDefaultComponent
 	@OverridingMethodsMustInvokeSuper
 	public void cleanupBindings() {
 		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier -> {
-			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-					() -> ImmutableBinderAction.unbind(getActive(), getVisible()));
 			BindingUtilities.findAndCleanupBindings(getExtensions().values());
+			BindingUtilities.cleanupBindings(ImmutableSet.of(getRendererContainerContainer()));
+			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+					() -> ImmutableBinderAction.unbind(
+							getActive(), getVisible()
+					));
 			// COMMENT do not cleanup children, view component should do that via unbind
 		});
 		getBinderObserverSupplierHolder().setValue(null);

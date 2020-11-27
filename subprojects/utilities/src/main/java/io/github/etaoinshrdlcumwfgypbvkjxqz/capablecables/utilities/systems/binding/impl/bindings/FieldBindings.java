@@ -5,7 +5,6 @@ import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingBiFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.IThrowingConsumer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.DefaultDisposableObserver;
@@ -79,7 +78,7 @@ public class FieldBindings
 				if (isSource.getAndSet(false)) {
 					try {
 						Streams.stream(to).unordered()
-								.filter(FunctionUtilities.notPredicate(Predicate.isEqual(from)))
+								.filter(Predicate.isEqual(from).negate())
 								.forEach(IThrowingConsumer.executeNow(destination ->
 										destination.setValue(
 												CastUtilities.castUnchecked( // COMMENT should be of the correct type
