@@ -65,8 +65,8 @@ public class UIButtonComponent
 	@UIMethod(METHOD_ON_ACTIVATED)
 	private final IBindingMethodSource<IUIEvent> onActivated;
 
-	private final Set<IButtonState> buttonStates = Collections.newSetFromMap(
-			MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(IButtonState.values().length).makeMap()
+	private final Set<EnumButtonState> buttonStates = Collections.newSetFromMap(
+			MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(EnumButtonState.values().length).makeMap()
 	);
 
 	private final IUIRendererContainerContainer<IUIComponentRenderer<?>> rendererContainerContainer;
@@ -77,7 +77,7 @@ public class UIButtonComponent
 	public UIButtonComponent(IUIComponentArguments arguments) {
 		super(arguments);
 
-		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
+		Map<INamespacePrefixedString, ? extends IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.onActivate = new ImmutableBindingMethodSource<>(IUIEventActivate.class,
 				Optional.ofNullable(mappings.get(getMethodOnActivateLocation())).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 		this.onActivated = new ImmutableBindingMethodSource<>(IUIEvent.class,
@@ -90,21 +90,21 @@ public class UIButtonComponent
 		this.eventTargetListenersInitializer = new OneUseRunnable(() -> {
 			addEventListener(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(e -> {
 				if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET)
-					getButtonStates().add(IButtonState.HOVERING);
+					getButtonStates().add(EnumButtonState.HOVERING);
 			}), false);
 			addEventListener(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(e -> {
 				if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET)
-					getButtonStates().remove(IButtonState.HOVERING);
+					getButtonStates().remove(EnumButtonState.HOVERING);
 			}), false);
 
 			addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(e -> {
 				if (IUIEventActivate.shouldActivate(this, e)) {
-					getButtonStates().add(IButtonState.PRESSING);
+					getButtonStates().add(EnumButtonState.PRESSING);
 					e.stopPropagation();
 				}
 			}), false);
 			addEventListener(EnumUIEventDOMType.MOUSE_UP.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(e -> {
-				if (getButtonStates().remove(IButtonState.PRESSING) && getButtonStates().contains(IButtonState.HOVERING)) {
+				if (getButtonStates().remove(EnumButtonState.PRESSING) && getButtonStates().contains(EnumButtonState.HOVERING)) {
 					getOnActivated().invoke(e);
 					e.stopPropagation();
 				}
@@ -122,7 +122,8 @@ public class UIButtonComponent
 
 	@Override
 	protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
-		return this.eventTargetListenersInitializer.apply(super.getEventTargetListeners());
+		eventTargetListenersInitializer.run();
+		return super.getEventTargetListeners();
 	}
 
 	public static INamespacePrefixedString getMethodOnActivateLocation() {
@@ -133,8 +134,10 @@ public class UIButtonComponent
 		return METHOD_ON_ACTIVATED_LOCATION;
 	}
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Set<IButtonState> getButtonStates() { return buttonStates; }
+	@Override
+	protected IUIRendererContainerContainer<IUIComponentRenderer<?>> getRendererContainerContainer() {
+		return rendererContainerContainer;
+	}
 
 	protected IBindingMethodSource<IUIEvent> getOnActivated() {
 		return onActivated;
@@ -173,12 +176,12 @@ public class UIButtonComponent
 
 	@Override
 	public Optional<Long> getCursorHandle(IUIComponentContext context) {
-		return getButtonStates().contains(IButtonState.HOVERING)
+		return getButtonStates().contains(EnumButtonState.HOVERING)
 				? Optional.of(EnumGLFWCursor.STANDARD_HAND_CURSOR.getHandle())
 				: Optional.empty();
 	}
 
-	public enum IButtonState {
+	public enum EnumButtonState {
 		HOVERING,
 		PRESSING,
 	}
@@ -208,24 +211,24 @@ public class UIButtonComponent
 				return TYPE;
 			}
 		}
+	}
 
-		class Impl
-				extends UIDefaultEvent
-				implements IUIEventActivate {
-			static {
-				UIEventRegistry.getInstance().register(StaticHolder.getType(), IUIEventActivate.class); // COMMENT custom: button will be activated
-			}
-
-			private final IUIEvent cause;
-
-			public Impl(IUIEventTarget target, IUIEvent cause) {
-				super(StaticHolder.getType(), false, true, cause.getViewContext(), target);
-				this.cause = cause;
-			}
-
-			@Override
-			public IUIEvent getCause() { return cause; }
+	public static class UIDefaultEventActivate
+			extends UIDefaultEvent
+			implements IUIEventActivate {
+		static {
+			UIEventRegistry.getInstance().register(StaticHolder.getType(), IUIEventActivate.class); // COMMENT custom: button will be activated
 		}
+
+		private final IUIEvent cause;
+
+		public UIDefaultEventActivate(IUIEventTarget target, IUIEvent cause) {
+			super(StaticHolder.getType(), false, true, cause.getViewContext(), target);
+			this.cause = cause;
+		}
+
+		@Override
+		public IUIEvent getCause() { return cause; }
 	}
 
 	public static class DefaultRenderer<C extends UIButtonComponent>
