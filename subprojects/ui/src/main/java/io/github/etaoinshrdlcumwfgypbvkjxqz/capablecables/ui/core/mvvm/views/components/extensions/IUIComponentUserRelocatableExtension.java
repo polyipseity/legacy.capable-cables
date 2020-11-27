@@ -7,9 +7,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.extensions.UIExtensionRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.IIntersection;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.ImmutableExtensionType;
@@ -17,10 +17,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.regi
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.awt.geom.RectangularShape;
 import java.util.Optional;
 
-public interface IUIComponentUserRelocatableExtension<C extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
+public interface IUIComponentUserRelocatableExtension<C extends IUIComponent>
 		extends IUIExtension<INamespacePrefixedString, IUIComponent>, IUIRendererContainerContainer<IUIComponentUserRelocatableExtension.IRelocatingRenderer> {
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
@@ -33,11 +32,11 @@ public interface IUIComponentUserRelocatableExtension<C extends IUIComponent & I
 	Optional<? extends IRelocateData> getRelocateData();
 
 	interface IRelocateData {
+		Optional<? extends IIntersection<? extends IUIComponent, ? extends IUIReshapeExplicitly<?>>> getTargetComponent();
+
 		Point2D getPreviousPointView();
 
-		<R extends RectangularShape> R handle(Point2D point,
-		                                      RectangularShape source,
-		                                      R destination);
+		Optional<? extends Shape> handle(Point2D point);
 	}
 
 	interface IRelocatingRenderer

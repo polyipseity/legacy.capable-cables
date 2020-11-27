@@ -30,9 +30,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.DelayedFieldInitializer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.DelayedFieldInitializer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.IIntersection;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
@@ -44,6 +45,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional2;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.OptionalUtilities;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.jetbrains.annotations.NonNls;
 import org.lwjgl.glfw.GLFW;
@@ -51,10 +53,10 @@ import org.lwjgl.system.MemoryUtil;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.RectangularShape;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -63,16 +65,18 @@ import java.util.function.Supplier;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 
-public class UITeleportingComponentUserRelocatableExtension<C extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
+public class UITeleportingComponentUserRelocatableExtension<C extends IUIComponent>
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, C>
 		implements IUIComponentUserRelocatableExtension<C> {
-	@NonNls
-	public static final String PROPERTY_ACTIVATION_MOUSE_BUTTONS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.teleporting.activation.mouse";
-	@NonNls
-	public static final String PROPERTY_RELOCATE_BORDERS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.teleporting.relocate_borders";
+	public static final @NonNls String PROPERTY_TARGET_COMPONENT = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.teleporting.target";
+	public static final @NonNls String PROPERTY_ACTIVATION_MOUSE_BUTTONS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.teleporting.activation.mouse";
+	public static final @NonNls String PROPERTY_RELOCATE_BORDERS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.teleporting.relocate_borders";
+	private static final INamespacePrefixedString PROPERTY_TARGET_COMPONENT_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyTargetComponent());
 	private static final INamespacePrefixedString PROPERTY_ACTIVATION_MOUSE_BUTTONS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyActivationMouseButtons());
 	private static final INamespacePrefixedString PROPERTY_RELOCATE_BORDERS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyRelocateBorders());
 
+	@UIProperty(PROPERTY_TARGET_COMPONENT)
+	private final IBindingField<String> targetComponent;
 	@UIProperty(PROPERTY_ACTIVATION_MOUSE_BUTTONS)
 	private final IBindingField<Set<Integer>> activationMouseButtons;
 	@UIProperty(PROPERTY_ACTIVATION_MOUSE_BUTTONS)
@@ -93,6 +97,8 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this), UIComponentUserRelocatableExtensionEmptyRelocatingRenderer.class);
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
+		this.targetComponent = IUIPropertyMappingValue.createBindingField(String.class, "",
+				mappings.get(getPropertyTargetComponentLocation()));
 		this.activationMouseButtons = IUIPropertyMappingValue.<Set<Integer>>createBindingField(CastUtilities.castUnchecked(Set.class),
 				() -> ImmutableSet.of(GLFW.GLFW_MOUSE_BUTTON_LEFT),
 				mappings.get(getPropertyActivationMouseButtonsLocation()));
@@ -107,14 +113,6 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 
 	public static INamespacePrefixedString getPropertyActivationMouseButtonsLocation() {
 		return PROPERTY_ACTIVATION_MOUSE_BUTTONS_LOCATION;
-	}
-
-	public static String getPropertyRelocateBorders() {
-		return PROPERTY_RELOCATE_BORDERS;
-	}
-
-	public static String getPropertyActivationMouseButtons() {
-		return PROPERTY_ACTIVATION_MOUSE_BUTTONS;
 	}
 
 	@Override
@@ -193,33 +191,71 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 	@Override
 	public IExtensionType<INamespacePrefixedString, ?, IUIComponent> getType() { return StaticHolder.getTYPE().getValue(); }
 
+	public static INamespacePrefixedString getPropertyTargetComponentLocation() {
+		return PROPERTY_TARGET_COMPONENT_LOCATION;
+	}
+
+	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
+	protected static Optional<IUIComponent> getTargetComponent(UITeleportingComponentUserRelocatableExtension<?> instance) {
+		String targetComponent = instance.getTargetComponent().getValue();
+		return targetComponent.isEmpty() // COMMENT empty component names are disallowed, so this indicates using the container
+				? OptionalUtilities.upcast(instance.getContainer())
+				: instance.getContainer()
+				.flatMap(IUIComponent::getManager)
+				.flatMap(IUIComponentManager::getView)
+				.map(IUIView::getNamedTrackers)
+				.flatMap(namedTrackers -> OptionalUtilities.upcast(namedTrackers.get(IUIComponent.class, targetComponent)));
+	}
+
+	protected IBindingField<String> getTargetComponent() {
+		return targetComponent;
+	}
+
+	public static String getPropertyRelocateBorders() {
+		return PROPERTY_RELOCATE_BORDERS;
+	}
+
+	public static String getPropertyActivationMouseButtons() {
+		return PROPERTY_ACTIVATION_MOUSE_BUTTONS;
+	}
+
+	public static String getPropertyTargetComponent() {
+		return PROPERTY_TARGET_COMPONENT;
+	}
+
 	@Override
 	public Optional<? extends Shape> getRelocateShape() {
 		return getContainer()
-				.map(IUIComponent::getShape)
-				.map(Shape::getBounds2D)
-				.map(containerShapeBounds ->
-						getRelocateBorders().getValue().entrySet().stream().unordered()
-								.map(entry -> {
-									EnumUISide side = AssertionUtilities.assertNonnull(entry.getKey());
-									double thickness = AssertionUtilities.assertNonnull(entry.getValue());
+				.map(container -> {
+					// COMMENT step 1: calculate based on our own data only
+					Area result = getRelocateBorders().getValue().entrySet().stream().unordered()
+							.map(entry -> {
+								EnumUISide side = AssertionUtilities.assertNonnull(entry.getKey());
+								double thickness = AssertionUtilities.assertNonnull(entry.getValue());
 
-									EnumUISide oppositeSide = side.getOpposite().orElseThrow(IllegalStateException::new);
-									Rectangle2D border = (Rectangle2D) containerShapeBounds.clone();
+								EnumUISide oppositeSide = side.getOpposite().orElseThrow(IllegalStateException::new);
+								Rectangle2D border = IUIComponent.getShape(container).getBounds2D();
 
-									// COMMENT we drag the opposite side to a given offset from our side, ignoring other sides
-									oppositeSide.setValue(border,
-											side.getValue(border) + side.inwardsBy(thickness).orElseThrow(IllegalStateException::new));
+								// COMMENT fwe drag the opposite side to a given offset from our side, ignoring other sides
+								oppositeSide.setValue(border,
+										side.getValue(border) + side.inwardsBy(thickness).orElseThrow(IllegalStateException::new));
 
-									return border;
-								})
-								.map(Area::new)
-								.reduce(new Area(), (area1, area2) -> {
-									Area area3 = (Area) area1.clone();
-									area3.add(area2);
-									return area3;
-								})
-				);
+								return border;
+							})
+							.map(Area::new)
+							.collect(Area::new, Area::add, Area::add);
+					// COMMENT step 2: subtract children - we should only affect the component we are acting on
+					AffineTransform childrenTransform = new AffineTransform();
+					container.transformChildren(childrenTransform);
+					result.subtract(
+							container.getChildrenView().stream().unordered()
+									.map(IUIComponent::getShape)
+									.map(childrenTransform::createTransformedShape)
+									.map(Area::new)
+									.collect(Area::new, Area::add, Area::add)
+					);
+					return result;
+				});
 	}
 
 	@Override
@@ -278,7 +314,7 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 
 		@Override
 		protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
-			return this.eventTargetListenersInitializer.apply(super.getEventTargetListeners());
+			return eventTargetListenersInitializer.apply(super.getEventTargetListeners());
 		}
 
 		protected Optional<Integer> getActiveMouseButton() {
@@ -290,33 +326,39 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 		}
 
 		protected boolean startRelocateMaybe(@SuppressWarnings("unused") IUIViewContext viewContext, Point2D point) {
-			return getOwner().map(owner -> {
-				IRelocateData d = new ImmutableRelocateData(point);
+			return getOwner().flatMap(owner -> UITeleportingComponentUserRelocatableExtension.getTargetComponent(owner).map(targetComponent -> {
+				if (!(targetComponent instanceof IUIReshapeExplicitly))
+					return false;
+				IRelocateData data = UIImmutableRelocateData.of((IUIComponent & IUIReshapeExplicitly<?>) targetComponent,
+						point);
 				synchronized (getLockObject()) {
 					if (owner.getRelocateData().isPresent())
 						return false;
-					owner.setRelocateData(d);
+					owner.setRelocateData(data);
 				}
 				return true;
-			}).orElse(false);
+			})).orElse(false);
 		}
 
 		public Optional<? extends UITeleportingComponentUserRelocatableExtension<?>> getOwner() { return owner.getOptional(); }
 
 		protected boolean finishRelocateMaybe(@SuppressWarnings("unused") IUIViewContext viewContext, Point2D point) {
 			return getOwner()
-					.flatMap(owner -> owner.getContainer().flatMap(container -> owner.getRelocateData().map(data -> {
-						Rectangle2D resultRectangle = container.getShapeDescriptor().getShapeOutput().getBounds2D();
-						data.handle((Point2D) point.clone(), resultRectangle, resultRectangle);
-						boolean ret;
-						synchronized (getLockObject()) {
-							if (!owner.getRelocateData().isPresent())
-								return false;
-							ret = container.reshape(s -> s.adapt(resultRectangle));
-							owner.setRelocateData(null);
-						}
-						return ret;
-					})))
+					.flatMap(owner -> owner.getRelocateData().flatMap(data ->
+							Optional2.of(
+									() -> data.getTargetComponent().orElse(null),
+									() -> data.handle((Point2D) point.clone()).orElse(null))
+									.map(dataValues -> {
+										IIntersection<? extends IUIComponent, ? extends IUIReshapeExplicitly<?>> targetComponent = dataValues.getValue1Nonnull();
+										Rectangle2D relativeShapeBounds = dataValues.getValue2Nonnull().getBounds2D();
+										synchronized (getLockObject()) {
+											if (!owner.getRelocateData().isPresent())
+												return false;
+											owner.setRelocateData(null);
+											return targetComponent.getRight().reshape(s -> s.adapt(relativeShapeBounds));
+										}
+									})
+					))
 					.orElse(false);
 		}
 
@@ -354,7 +396,16 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 								.ifPresent(values -> {
 									IRelocatingRenderer renderer = values.getValue1Nonnull();
 									IRelocateData data = values.getValue2Nonnull();
-									renderer.render(context, data);
+									data.getTargetComponent().ifPresent(targetComponent -> {
+										if (targetComponent.getLeft().equals(IUIComponentContext.getCurrentComponent(context)
+												.orElseThrow(AssertionError::new))) {
+											renderer.render(context, data);
+										} else {
+											try (IUIComponentContext context1 = IUIComponent.createContextTo(targetComponent.getLeft())) {
+												renderer.render(context1, data);
+											}
+										}
+									});
 								}));
 			}
 		}

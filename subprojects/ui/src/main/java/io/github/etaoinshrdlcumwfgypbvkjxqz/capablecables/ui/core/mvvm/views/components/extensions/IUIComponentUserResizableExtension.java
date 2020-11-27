@@ -7,10 +7,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.extensions.UIExtensionRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.IIntersection;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.ImmutableExtensionType;
@@ -18,11 +18,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.regi
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.awt.geom.RectangularShape;
 import java.util.Optional;
 import java.util.Set;
 
-public interface IUIComponentUserResizableExtension<C extends IUIComponent & IUIReshapeExplicitly<? extends IShapeDescriptor<? extends RectangularShape>>>
+public interface IUIComponentUserResizableExtension<C extends IUIComponent>
 		extends IUIExtension<INamespacePrefixedString, IUIComponent>, IUIRendererContainerContainer<IUIComponentUserResizableExtension.IResizingRenderer> {
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
@@ -35,6 +34,8 @@ public interface IUIComponentUserResizableExtension<C extends IUIComponent & IUI
 	Optional<? extends IResizeData> getResizeData();
 
 	interface IResizeData {
+		Optional<? extends IIntersection<? extends IUIComponent, ? extends IUIReshapeExplicitly<?>>> getTargetComponent();
+
 		Point2D getPreviousPointView();
 
 		Set<? extends EnumUISide> getSidesView();
@@ -43,9 +44,7 @@ public interface IUIComponentUserResizableExtension<C extends IUIComponent & IUI
 
 		long getInitialCursorHandle();
 
-		<R extends RectangularShape> R handle(Point2D point,
-		                                      RectangularShape source,
-		                                      R destination);
+		Optional<? extends Shape> handle(Point2D point);
 	}
 
 	interface IResizingRenderer

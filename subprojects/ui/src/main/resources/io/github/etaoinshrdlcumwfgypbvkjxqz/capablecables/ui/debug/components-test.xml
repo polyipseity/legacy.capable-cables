@@ -43,34 +43,6 @@
 				<uiSide>DOWN</uiSide>
 			</property>
 
-			<extension class="extension.user_relocatable" rendererName="Window1ExtensionRelocatableRenderer">
-				<property key="default:property.teleporting.activation.mouse">
-					<set>
-						<int>1</int><!-- COMMENT right -->
-						<int>2</int><!-- COMMENT middle -->
-					</set>
-				</property>
-				<property key="default:property.teleporting.relocate_borders">
-					<map>
-						<entry>
-							<any>
-								<uiSide>RIGHT</uiSide>
-							</any>
-							<any>
-								<double>20</double>
-							</any>
-						</entry>
-						<entry>
-							<any>
-								<uiSide>DOWN</uiSide>
-							</any>
-							<any>
-								<double>50</double>
-							</any>
-						</entry>
-					</map>
-				</property>
-			</extension>
 			<extension class="extension.user_resizable" rendererName="Window1ExtensionResizableRenderer">
 				<property key="default:property.teleporting.resize_borders">
 					<map>
@@ -100,7 +72,6 @@
 				<constraint minX="20"/>
 			</shape>
 
-			<extension class="extension.user_relocatable" rendererName="WindowAnchoredExtensionRelocatableRenderer"/>
 			<extension class="extension.user_resizable" rendererName="WindowAnchoredExtensionResizableRenderer"/>
 
 			<component class="component.button" name="Button1" rendererName="Button1Renderer">

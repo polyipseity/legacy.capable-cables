@@ -105,7 +105,13 @@ public class UIDefaultComponent
 
 	@UIComponentConstructor
 	public UIDefaultComponent(IUIComponentArguments arguments) {
-		this.name = arguments.getName().orElse(null);
+		this.name = arguments.getName()
+				.filter(name -> {
+					if (name.isEmpty()) // COMMENT we are not allowing empty names, reserving it for other purposes
+						throw new IllegalArgumentException();
+					return true;
+				})
+				.orElse(null);
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.mappings = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
