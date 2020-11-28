@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.caches;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches.IUICacheExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches.IUICacheType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheLoaderLoadedNullException;
@@ -10,7 +11,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.thro
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-public abstract class UIAbstractCacheType<V, C extends IExtensionContainer<INamespacePrefixedString>>
+public abstract class UIAbstractCacheType<V0, V, C extends IExtensionContainer<INamespacePrefixedString>>
 		implements IUICacheType<V, C> {
 	private final INamespacePrefixedString key;
 
@@ -24,20 +25,50 @@ public abstract class UIAbstractCacheType<V, C extends IExtensionContainer<IName
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Optional<? extends V> get(C container) {
+	public final Optional<? extends V> get(C container) {
 		return IUICacheExtension.StaticHolder.getType().getValue().find(container)
-				.map(cache -> {
-					try {
-						return (V) cache.getDelegate()
-								.get(getKey(), () -> load(container));
-					} catch (ExecutionException e) {
-						if (e.getCause() instanceof CacheLoaderLoadedNullException)
-							return null;
-						throw ThrowableUtilities.propagate(e);
+				.flatMap(cache -> {
+					while (true) {
+						@Nullable V0 loaded;
+						try {
+							loaded = (V0) cache.getDelegate()
+									.get(getKey(), () -> load(container));
+						} catch (ExecutionException e) {
+							if (e.getCause() instanceof CacheLoaderLoadedNullException)
+								loaded = null;
+							else
+								throw ThrowableUtilities.propagate(e);
+						}
+						try {
+							return transform(container, loaded);
+						} catch (ReloadException e) {
+							cache.getDelegate().invalidate(getKey());
+							// COMMENT reload
+						}
 					}
 				});
 	}
 
-	protected abstract V load(C container)
+	protected abstract V0 load(C container)
 			throws Exception;
+
+	protected abstract Optional<? extends V> transform(C container, @Nullable V0 value)
+			throws ReloadException;
+
+	public static class ReloadException
+			extends Exception {
+		private static final long serialVersionUID = -3573856739814562214L;
+	}
+
+	public static abstract class Identity<V, C extends IExtensionContainer<INamespacePrefixedString>>
+			extends UIAbstractCacheType<V, V, C> {
+		public Identity(INamespacePrefixedString key) {
+			super(key);
+		}
+
+		@Override
+		protected final Optional<? extends V> transform(C container, @Nullable V value) {
+			return Optional.ofNullable(value);
+		}
+	}
 }

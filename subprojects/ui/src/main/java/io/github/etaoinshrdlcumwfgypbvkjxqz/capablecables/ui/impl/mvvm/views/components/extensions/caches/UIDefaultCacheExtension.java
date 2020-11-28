@@ -41,6 +41,8 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import sun.misc.Cleaner;
 
+import java.util.Optional;
+
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 
 public class UIDefaultCacheExtension
@@ -81,7 +83,7 @@ public class UIDefaultCacheExtension
 		private static final IRegistryObject<IUICacheType<IUIComponentManager<?>, IUIComponent>> MANAGER =
 				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("manager"),
 						key -> UICacheRegistry.getInstance().register(key,
-								new UIAbstractCacheType<IUIComponentManager<?>, IUIComponent>(key) {
+								new UIAbstractCacheType<OptionalWeakReference<? extends IUIComponentManager<?>>, IUIComponentManager<?>, IUIComponent>(key) {
 									{
 										OptionalWeakReference<? extends IUICacheType<?, IUIComponent>> thisRef =
 												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
@@ -105,17 +107,27 @@ public class UIDefaultCacheExtension
 									}
 
 									@Override
-									protected IUIComponentManager<?> load(IUIComponent container)
+									protected OptionalWeakReference<? extends IUIComponentManager<?>> load(IUIComponent container)
 											throws CacheLoaderLoadedNullException {
 										return IUIComponent.getYoungestParentInstanceOf(container, IUIComponentManager.class)
+												.<OptionalWeakReference<IUIComponentManager<?>>>map(OptionalWeakReference::of)
 												.orElseThrow(CacheLoaderLoadedNullException::new);
+									}
+
+									@Override
+									protected Optional<? extends IUIComponentManager<?>> transform(IUIComponent container,
+									                                                               @Nullable OptionalWeakReference<? extends IUIComponentManager<?>> value) throws ReloadException {
+										if (value == null)
+											return Optional.empty(); // COMMENT no result
+										return Optional.of(value.getOptional()
+												.orElseThrow(ReloadException::new)); // COMMENT stale or expired result, reload
 									}
 								})));
 		@SuppressWarnings("AnonymousInnerClass")
 		private static final IRegistryObject<IUICacheType<Integer, IUIComponent>> Z =
 				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("z"),
 						key -> UICacheRegistry.getInstance().register(key,
-								new UIAbstractCacheType<Integer, IUIComponent>(key) {
+								new UIAbstractCacheType.Identity<Integer, IUIComponent>(key) {
 									{
 										OptionalWeakReference<? extends IUICacheType<?, IUIComponent>> thisRef =
 												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));

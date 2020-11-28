@@ -3,6 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapt
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Anchor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
@@ -18,6 +19,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 
 import java.util.Map;
 
@@ -25,7 +27,12 @@ public class JAXBUIDefaultComponentAdapterAnchorHandler
 		extends JAXBUIAbstractSubContextualAdapterHandler<Anchor, IJAXBUIComponentAdapterContext> {
 	private final LoadingCache<IUIViewComponent<?, ?>, Map<String, IUIComponent>> viewComponentNamedMaps =
 			CacheUtilities.newCacheBuilderSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacityTiny()).weakKeys()
-					.build(CacheLoader.from(view -> INamed.toNamedMap(AssertionUtilities.assertNonnull(view).getChildrenFlatView())));
+					.build(CacheLoader.from(view -> {
+						@Immutable Map<String, IUIComponent> result = INamed.toNamedMap(AssertionUtilities.assertNonnull(view).getChildrenFlatView());
+						Map<String, IUIComponent> weakResult = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(result.size()).weakValues().makeMap();
+						weakResult.putAll(result);
+						return weakResult;
+					}));
 
 	public JAXBUIDefaultComponentAdapterAnchorHandler() {
 		super(IJAXBUIComponentAdapterContext.class);

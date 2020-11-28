@@ -39,6 +39,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.eve
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.theming.UIArrayThemeStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.theming.UIDefaultingTheme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CollectionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IConsumer3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
@@ -240,11 +241,12 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	}
 
 	@Override
+	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 	public Optional<? extends IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) {
 		@Nullable Optional<? extends IUIEventTarget> ret = CastUtilities.castChecked(IUIComponent.class, currentFocus)
 				.flatMap(cf ->
 						CacheViewComponent.getChildrenFlatFocusable().getValue().get(this)
-								.filter(FunctionUtilities.notPredicate(Collection<IUIComponent>::isEmpty))
+								.filter(FunctionUtilities.notPredicate(Collection::isEmpty))
 								.map(f -> f.get(Math.floorMod(
 										Math.max(f.indexOf(cf), 0) + (next ? 1 : -1), f.size()))));
 		if (!ret.isPresent())
@@ -310,10 +312,10 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		;
 
 		@SuppressWarnings({"AnonymousInnerClass", "rawtypes", "RedundantSuppression"})
-		private static final IRegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
+		private static final IRegistryObject<IUICacheType<List<? extends IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
 				FunctionUtilities.apply(IUICacheType.generateKey("children_flat"),
 						key -> UICacheRegistry.getInstance().register(key,
-								new UIAbstractCacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
+								new UIAbstractCacheType<List<? extends OptionalWeakReference<? extends IUIComponent>>, List<? extends IUIComponent>, IUIViewComponent<?, ?>>(key) {
 									{
 										OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
 												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
@@ -352,19 +354,26 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 									}
 
 									@Override
-									protected List<IUIComponent> load(IUIViewComponent<?, ?> container) {
-										List<IUIComponent> ret = new ArrayList<>(CapacityUtilities.getInitialCapacityLarge());
+									protected List<? extends OptionalWeakReference<? extends IUIComponent>> load(IUIViewComponent<?, ?> container) {
+										List<OptionalWeakReference<IUIComponent>> ret = new ArrayList<>(CapacityUtilities.getInitialCapacityLarge());
 										TreeUtilities.<IUIComponent, Object>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, container.getManager(),
-												ret::add,
-												IUIComponent::getChildNodes, null, null);
-										return ImmutableList.copyOf(ret);
+												component -> ret.add(OptionalWeakReference.of(component)),
+												IUIComponent::getChildrenView, null, null);
+										return ret; // COMMENT mutable
+									}
+
+									@Override
+									protected Optional<? extends List<? extends IUIComponent>> transform(IUIViewComponent<?, ?> container,
+									                                                                     @Nullable List<? extends OptionalWeakReference<? extends IUIComponent>> value) {
+										assert value != null;
+										return Optional.of(CollectionUtilities.collectOrRemoveReferences(value));
 									}
 								}));
 		@SuppressWarnings({"AnonymousInnerClass", "rawtypes", "RedundantSuppression"})
-		private static final IRegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
+		private static final IRegistryObject<IUICacheType<List<? extends IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
 				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("children_flat.focusable"),
 						key -> UICacheRegistry.getInstance().register(key,
-								new UIAbstractCacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
+								new UIAbstractCacheType<List<? extends OptionalWeakReference<? extends IUIComponent>>, List<? extends IUIComponent>, IUIViewComponent<?, ?>>(key) {
 									{
 										OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
 												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
@@ -404,18 +413,26 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 
 									@SuppressWarnings("UnstableApiUsage")
 									@Override
-									protected List<IUIComponent> load(IUIViewComponent<?, ?> container) {
+									protected List<? extends OptionalWeakReference<? extends IUIComponent>> load(IUIViewComponent<?, ?> container) {
 										return container.getChildrenFlatView().stream()
 												.filter(IUIComponent::isFocusable)
+												.map(OptionalWeakReference::of)
 												.collect(ImmutableList.toImmutableList());
+									}
+
+									@Override
+									protected Optional<? extends List<? extends IUIComponent>> transform(IUIViewComponent<?, ?> container,
+									                                                                     @Nullable List<? extends OptionalWeakReference<? extends IUIComponent>> value) {
+										assert value != null;
+										return Optional.of(CollectionUtilities.collectOrRemoveReferences(value));
 									}
 								})));
 
-		public static IRegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> getChildrenFlat() {
+		public static IRegistryObject<IUICacheType<List<? extends IUIComponent>, IUIViewComponent<?, ?>>> getChildrenFlat() {
 			return CHILDREN_FLAT;
 		}
 
-		public static IRegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> getChildrenFlatFocusable() {
+		public static IRegistryObject<IUICacheType<List<? extends IUIComponent>, IUIViewComponent<?, ?>>> getChildrenFlatFocusable() {
 			return CHILDREN_FLAT_FOCUSABLE;
 		}
 
