@@ -115,9 +115,9 @@ public enum JAXBUIComponentUtilities {
 	public static Map<INamespacePrefixedString, IUIPropertyMappingValue> createMappings(IJAXBAdapterContext context, Iterable<? extends Property> properties) {
 		return Streams.stream(properties).unordered()
 				.map(p -> Maps.immutableEntry(ImmutableNamespacePrefixedString.of(p.getKey()),
-						new UIImmutablePropertyMappingValue(p.getAny()
-								.map(any -> IJAXBAdapterRegistry.adaptFromJAXB(context, any))
-								.orElse(null),
+						UIImmutablePropertyMappingValue.of(p.getAny()
+										.map(any -> IJAXBAdapterRegistry.adaptFromJAXB(context, any))
+										.orElse(null),
 								p.getBindingKey()
 										.map(ImmutableNamespacePrefixedString::of)
 										.orElse(null))))
@@ -188,7 +188,7 @@ public enum JAXBUIComponentUtilities {
 					assert key != null;
 					assert value != null;
 					attributes.put(key.getEventType(),
-							new UIImmutablePropertyMappingValue(null,
+							UIImmutablePropertyMappingValue.of(null,
 									AssertionUtilities.assertNonnull(value.apply(component))
 											.map(IUIEventType.StaticHolder.getDefaultPrefix()::concat)
 											.map(ImmutableNamespacePrefixedString::of)

@@ -12,9 +12,13 @@ public final class UIImmutablePropertyMappingValue implements IUIPropertyMapping
 	@Nullable
 	private final INamespacePrefixedString bindingKey;
 
-	public UIImmutablePropertyMappingValue(@Nullable Object defaultValue, @Nullable INamespacePrefixedString bindingKey) {
+	private UIImmutablePropertyMappingValue(@Nullable Object defaultValue, @Nullable INamespacePrefixedString bindingKey) {
 		this.defaultValue = defaultValue;
 		this.bindingKey = bindingKey;
+	}
+
+	public static UIImmutablePropertyMappingValue of(@Nullable Object defaultValue, @Nullable INamespacePrefixedString bindingKey) {
+		return new UIImmutablePropertyMappingValue(defaultValue, bindingKey);
 	}
 
 	@Override
