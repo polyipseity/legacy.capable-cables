@@ -38,7 +38,7 @@ public enum MapUtilities {
 		return concatMaps(Arrays.asList(maps)); // COMMENT reuse the array
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
+	@SuppressWarnings({"UnstableApiUsage", "rawtypes", "RedundantSuppression"})
 	public static <K, V> ImmutableMap<K, V> concatMaps(Iterable<? extends Map<? extends K, ? extends V>> maps) {
 		return zipKeysValues(
 				Streams.stream(maps)
