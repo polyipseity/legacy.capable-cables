@@ -18,10 +18,18 @@ public final class ImmutableBindingMethodDestination<T>
 	private final Consumer<@Nonnull ? super T> action;
 
 	@SuppressWarnings("UnstableApiUsage")
-	public ImmutableBindingMethodDestination(Class<T> type, @Nullable INamespacePrefixedString bindingKey, Consumer<@Nonnull ? super T> action) {
+	private ImmutableBindingMethodDestination(Class<T> type,
+	                                          @Nullable INamespacePrefixedString bindingKey,
+	                                          Consumer<@Nonnull ? super T> action) {
 		this.typeToken = TypeToken.of(type);
 		this.bindingKey = bindingKey;
 		this.action = action;
+	}
+
+	public static <T> ImmutableBindingMethodDestination<T> of(Class<T> type,
+	                                                          @Nullable INamespacePrefixedString bindingKey,
+	                                                          Consumer<@Nonnull ? super T> action) {
+		return new ImmutableBindingMethodDestination<>(type, bindingKey, action);
 	}
 
 	@Override

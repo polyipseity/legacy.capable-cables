@@ -21,7 +21,7 @@ public interface IUIPropertyMappingValue {
 	static <T> IBindingField<T> createBindingField(Class<T> clazz,
 	                                               Supplier<@Nonnull ? extends T> defaultValueSupplier,
 	                                               @Nullable IUIPropertyMappingValue mapping) {
-		return new ImmutableBindingField<>(
+		return ImmutableBindingField.of(
 				Optional.ofNullable(mapping)
 						.flatMap(IUIPropertyMappingValue::getBindingKey)
 						.orElse(null),

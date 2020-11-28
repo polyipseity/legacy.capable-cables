@@ -78,9 +78,9 @@ public class UIButtonComponent
 		super(arguments);
 
 		Map<INamespacePrefixedString, ? extends IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-		this.onActivate = new ImmutableBindingMethodSource<>(IUIEventActivate.class,
+		this.onActivate = ImmutableBindingMethodSource.of(IUIEventActivate.class,
 				Optional.ofNullable(mappings.get(getMethodOnActivateLocation())).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
-		this.onActivated = new ImmutableBindingMethodSource<>(IUIEvent.class,
+		this.onActivated = ImmutableBindingMethodSource.of(IUIEvent.class,
 				Optional.ofNullable(mappings.get(getMethodOnActivatedLocation())).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 
 		this.rendererContainerContainer =

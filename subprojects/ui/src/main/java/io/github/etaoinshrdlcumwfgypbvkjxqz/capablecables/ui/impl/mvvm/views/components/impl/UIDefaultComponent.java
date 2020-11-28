@@ -314,7 +314,7 @@ public class UIDefaultComponent
 		INamespacePrefixedString type = event.getType();
 		@Nullable IBindingMethodSource<? extends IUIEvent> method = getEventTargetBindingMethods().get(type);
 		if (method == null) {
-			method = new ImmutableBindingMethodSource<>(event.getClass(),
+			method = ImmutableBindingMethodSource.of(event.getClass(),
 					Optional.ofNullable(getMappings().get(type)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 			getEventTargetBindingMethods().put(type, method);
 		}

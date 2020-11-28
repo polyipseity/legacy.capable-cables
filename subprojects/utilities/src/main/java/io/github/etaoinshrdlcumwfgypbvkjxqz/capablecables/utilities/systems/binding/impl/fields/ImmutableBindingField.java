@@ -13,9 +13,13 @@ public final class ImmutableBindingField<T>
 	private final INamespacePrefixedString bindingKey;
 	private final IObservableField<T> field;
 
-	public ImmutableBindingField(@Nullable INamespacePrefixedString bindingKey, IObservableField<T> field) {
+	private ImmutableBindingField(@Nullable INamespacePrefixedString bindingKey, IObservableField<T> field) {
 		this.bindingKey = bindingKey;
 		this.field = field;
+	}
+
+	public static <T> ImmutableBindingField<T> of(@Nullable INamespacePrefixedString bindingKey, IObservableField<T> field) {
+		return new ImmutableBindingField<>(bindingKey, field);
 	}
 
 	@Override

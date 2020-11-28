@@ -19,9 +19,13 @@ public final class ImmutableBindingMethodSource<T>
 	private final Subject<T> notifierSubject = PublishSubject.create();
 
 	@SuppressWarnings("UnstableApiUsage")
-	public ImmutableBindingMethodSource(Class<T> type, @Nullable INamespacePrefixedString bindingKey) {
+	private ImmutableBindingMethodSource(Class<T> type, @Nullable INamespacePrefixedString bindingKey) {
 		this.typeToken = TypeToken.of(type);
 		this.bindingKey = bindingKey;
+	}
+
+	public static <T> ImmutableBindingMethodSource<T> of(Class<T> type, @Nullable INamespacePrefixedString bindingKey) {
+		return new ImmutableBindingMethodSource<>(type, bindingKey);
 	}
 
 	@Override

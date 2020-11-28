@@ -385,16 +385,16 @@ public enum UIMinecraftDebug {
 		@OnlyIn(Dist.CLIENT)
 		private static final class ViewModel
 				extends UIDefaultMinecraftViewModel<Model> {
-			private final IBindingField<Integer> anchoredWindowBorderColor = new ImmutableBindingField<>(
+			private final IBindingField<Integer> anchoredWindowBorderColor = ImmutableBindingField.of(
 					ImmutableNamespacePrefixedString.of(UINamespaceUtilities.getRendererBindingNamespace(), "anchoredWindowBorderColor"),
 					new MemoryObservableField<>(Integer.class, ColorUtilities.getColorless().getRGB()));
-			private final IBindingMethodDestination<UIButtonComponent.IUIEventActivate> buttonOnActivate = new ImmutableBindingMethodDestination<>(
+			private final IBindingMethodDestination<UIButtonComponent.IUIEventActivate> buttonOnActivate = ImmutableBindingMethodDestination.of(
 					UIButtonComponent.IUIEventActivate.class,
 					ImmutableNamespacePrefixedString.of(UINamespaceUtilities.getViewBindingNamespace(), "buttonOnActivate"),
 					this::onButtonActivate);
 			private final Random random = new Random();
 			private boolean anchoredWindowFlickering = false;
-			private final IBindingMethodDestination<IUIEvent> buttonOnActivated = new ImmutableBindingMethodDestination<>(
+			private final IBindingMethodDestination<IUIEvent> buttonOnActivated = ImmutableBindingMethodDestination.of(
 					IUIEvent.class,
 					ImmutableNamespacePrefixedString.of(UINamespaceUtilities.getViewBindingNamespace(), "buttonOnActivated"),
 					this::onButtonActivated);
