@@ -3,6 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.co
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.AlwaysNull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
@@ -222,7 +223,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	}
 
 	@Override
-	public List<IUIComponent> getChildrenFlatView() {
+	public @Immutable List<? extends IUIComponent> getChildrenFlatView() {
 		return CacheViewComponent.getChildrenFlat().getValue().get(this)
 				.orElseThrow(AssertionError::new);
 	}
