@@ -38,6 +38,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.methods.ImmutableBindingMethodSource;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.jetbrains.annotations.NonNls;
+import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
@@ -111,8 +112,10 @@ public class UIButtonComponent
 			}), false);
 
 			addEventListener(EnumUIEventDOMType.KEY_DOWN.getEventType(), new UIFunctionalEventListener<IUIEventKeyboard>(e -> {
-				if (IUIEventActivate.shouldActivate(this, e))
+				if (IUIEventActivate.shouldActivate(this, e)) {
 					getOnActivated().invoke(e);
+					e.stopPropagation();
+				}
 			}), false);
 		});
 	}
@@ -187,6 +190,7 @@ public class UIButtonComponent
 	}
 
 	public interface IUIEventActivate extends IUIEvent {
+		// TODO move this out of UIButtonComponent, generalize this as well, view model should not depend on view
 		static boolean shouldActivate(UIButtonComponent self, IUIEvent event) {
 			// COMMENT false means default, which is to do nothing, prevented
 			return !UIEventUtilities.dispatchEvent(new UIDefaultEventActivate((Functional) e -> {
@@ -225,6 +229,22 @@ public class UIButtonComponent
 		public UIDefaultEventActivate(IUIEventTarget target, IUIEvent cause) {
 			super(StaticHolder.getType(), false, true, cause.getViewContext(), target);
 			this.cause = cause;
+		}
+
+		public static void handleEventCommonly(IUIEventActivate event) {
+			boolean result = false;
+			IUIEvent eventCause = event.getCause();
+			if (eventCause instanceof IUIEventMouse) {
+				IUIEventMouse eventCause1 = (IUIEventMouse) eventCause;
+				if (eventCause1.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT)
+					result = true;
+			} else if (eventCause instanceof IUIEventKeyboard) {
+				IUIEventKeyboard eventCause1 = (IUIEventKeyboard) eventCause;
+				if (eventCause1.getData().getKey() == GLFW.GLFW_KEY_ENTER)
+					result = true;
+			}
+			if (result)
+				event.preventDefault();
 		}
 
 		@Override

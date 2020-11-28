@@ -17,8 +17,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventKeyboard;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventMouse;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBAdapterRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeDescriptorProvider;
@@ -94,7 +92,6 @@ import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.network.NetworkHooks;
 import org.jetbrains.annotations.NonNls;
-import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
@@ -391,7 +388,7 @@ public enum UIMinecraftDebug {
 			private final IBindingMethodDestination<UIButtonComponent.IUIEventActivate> buttonOnActivate = ImmutableBindingMethodDestination.of(
 					UIButtonComponent.IUIEventActivate.class,
 					ImmutableNamespacePrefixedString.of(UINamespaceUtilities.getViewBindingNamespace(), "buttonOnActivate"),
-					this::onButtonActivate);
+					UIButtonComponent.UIDefaultEventActivate::handleEventCommonly);
 			private final Random random = new Random();
 			private boolean anchoredWindowFlickering = false;
 			private final IBindingMethodDestination<IUIEvent> buttonOnActivated = ImmutableBindingMethodDestination.of(
@@ -414,22 +411,6 @@ public enum UIMinecraftDebug {
 			protected IBindingField<Integer> getAnchoredWindowBorderColor() { return anchoredWindowBorderColor; }
 
 			protected Random getRandom() { return random; }
-
-			protected void onButtonActivate(UIButtonComponent.IUIEventActivate e) {
-				boolean shouldActivate = false;
-				IUIEvent ec = e.getCause();
-				if (ec instanceof IUIEventMouse) {
-					IUIEventMouse ecc = (IUIEventMouse) ec;
-					if (ecc.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT)
-						shouldActivate = true;
-				} else if (ec instanceof IUIEventKeyboard) {
-					IUIEventKeyboard ecc = (IUIEventKeyboard) ec;
-					if (ecc.getData().getKey() == GLFW.GLFW_KEY_ENTER)
-						shouldActivate = true;
-				}
-				if (shouldActivate)
-					e.preventDefault();
-			}
 
 			protected void onButtonActivated(IUIEvent e) { setAnchoredWindowFlickering(!isAnchoredWindowFlickering()); }
 
