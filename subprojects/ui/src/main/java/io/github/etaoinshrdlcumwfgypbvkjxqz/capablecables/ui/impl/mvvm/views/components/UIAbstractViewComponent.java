@@ -320,7 +320,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 														UIEventBusEntryPoint.getEventBus(),
 														SpecializedParentLoggingDisposableObserver.of(
 																new FunctionalEventBusDisposableObserver<>(
-																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
+																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
 																		event -> {
 																			if (event.getStage().isPost())
 																				thisRef.getOptional()
@@ -332,7 +332,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 														),
 														SpecializedViewLoggingDisposableObserver.of(
 																new FunctionalEventBusDisposableObserver<>(
-																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
+																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
 																		event -> {
 																			if (event.getStage().isPost())
 																				thisRef.getOptional()
@@ -367,7 +367,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 														UIEventBusEntryPoint.getEventBus(),
 														SpecializedParentLoggingDisposableObserver.of(
 																new FunctionalEventBusDisposableObserver<>(
-																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
+																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
 																		event -> {
 																			if (event.getStage().isPost())
 																				thisRef.getOptional()
@@ -379,7 +379,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 														),
 														SpecializedViewLoggingDisposableObserver.of(
 																new FunctionalEventBusDisposableObserver<>(
-																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
+																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
 																		event -> {
 																			if (event.getStage().isPost())
 																				thisRef.getOptional()
@@ -484,7 +484,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 													IUIStructureLifecycle::unbindV),
 									FunctionUtilities.getEmptyBiConsumer());
 							try (IUIComponentContext componentContext = IUIComponent.createContextTo(component)) {
-								IUIViewComponent.<RuntimeException>traverseComponentTreeDefault(componentContext, // TODO javac bug, need explicit type arguments
+								IUIViewComponent.traverseComponentTreeDefault(componentContext, // TODO javac bug, need explicit type arguments
 										component,
 										(componentContext1, result) ->
 												IUIComponentActiveLifecycleModifier.handleComponentModifiers(result.getComponent(),

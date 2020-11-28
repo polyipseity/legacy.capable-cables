@@ -13,9 +13,13 @@ public final class ImmutableSubscribeEvent
 	private final EventPriority priority;
 	private final boolean receiveCanceled;
 
-	public ImmutableSubscribeEvent(EventPriority priority, boolean receiveCanceled) {
+	private ImmutableSubscribeEvent(EventPriority priority, boolean receiveCanceled) {
 		this.priority = priority;
 		this.receiveCanceled = receiveCanceled;
+	}
+
+	public static ImmutableSubscribeEvent of(EventPriority priority, boolean receiveCanceled) {
+		return new ImmutableSubscribeEvent(priority, receiveCanceled);
 	}
 
 	@Override

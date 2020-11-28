@@ -85,7 +85,7 @@ public class UIDefaultCacheExtension
 												new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
 														SpecializedParentLoggingDisposableObserver.of(
 																new FunctionalEventBusDisposableObserver<>(
-																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
+																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
 																		event -> {
 																			if (event.getStage().isPost())
 																				thisRef.getOptional().ifPresent(t ->
@@ -116,7 +116,7 @@ public class UIDefaultCacheExtension
 												new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
 														SpecializedParentLoggingDisposableObserver.of(
 																new FunctionalEventBusDisposableObserver<>(
-																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
+																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
 																		event -> {
 																			if (event.getStage().isPost())
 																				thisRef.getOptional().ifPresent(t ->
