@@ -13,8 +13,18 @@ public final class ImmutableNamespacePrefixedString
 	private final String string;
 
 	private ImmutableNamespacePrefixedString(@NonNls CharSequence namespace, @NonNls CharSequence string) {
-		this.namespace = namespace.toString();
-		this.string = string.toString();
+		/* COMMENT
+		Many instances of this type are created with the same strings commonly, so we will intern them.
+
+		Heap instead of PermGen has been used for the intern table since Java 7, so memory is much less of an issue.
+		The default string pool size was increased significantly during Java 7,
+		so the intern performance should be okay.  It can be adjusted by the user if needed.
+
+		It will also help with 'equals' of this type, as two equal strings will return true on the identity check,
+		which is the best case scenario, instead of checking the whole string, which is the worst case scenario.
+		 */
+		this.namespace = namespace.toString().intern();
+		this.string = string.toString().intern();
 	}
 
 	public static ImmutableNamespacePrefixedString of(@NonNls CharSequence string) {
