@@ -43,6 +43,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.co
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseConsumer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ISpecialized;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -409,7 +410,8 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		}
 
 		private static final class SpecializedParentLoggingDisposableObserver
-				extends LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent> {
+				extends LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>
+				implements ISpecialized {
 			private SpecializedParentLoggingDisposableObserver(DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate,
 			                                                   Logger logger) {
 				super(delegate, logger);
@@ -422,7 +424,8 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		}
 
 		private static final class SpecializedViewLoggingDisposableObserver
-				extends LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.View> {
+				extends LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.View>
+				implements ISpecialized {
 			private SpecializedViewLoggingDisposableObserver(DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.View> delegate,
 			                                                 Logger logger) {
 				super(delegate, logger);

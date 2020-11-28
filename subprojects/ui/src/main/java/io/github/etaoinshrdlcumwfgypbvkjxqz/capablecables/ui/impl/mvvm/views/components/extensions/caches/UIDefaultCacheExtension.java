@@ -22,6 +22,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ConcurrencyU
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheLoaderLoadedNullException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ISpecialized;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -150,7 +151,8 @@ public class UIDefaultCacheExtension
 		}
 
 		private static final class SpecializedParentLoggingDisposableObserver
-				extends LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent> {
+				extends LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>
+				implements ISpecialized {
 			private SpecializedParentLoggingDisposableObserver(DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate,
 			                                                   Logger logger) {
 				super(delegate, logger);
