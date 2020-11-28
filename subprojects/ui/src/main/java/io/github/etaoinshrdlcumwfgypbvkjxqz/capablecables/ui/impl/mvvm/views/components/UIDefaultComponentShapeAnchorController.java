@@ -1,5 +1,9 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
@@ -7,6 +11,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeAnchor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeAnchorSet;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIAbstractComponentHierarchyChangeBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIComponentModifyShapeDescriptorBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interactions.DefaultShapeAnchorController;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
@@ -16,6 +21,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.Log
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.AutoSubscribingCompositeDisposable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
+import io.reactivex.rxjava3.annotations.NonNull;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.slf4j.Logger;
@@ -33,11 +39,53 @@ public class UIDefaultComponentShapeAnchorController
 	public UIDefaultComponentShapeAnchorController() {
 		Cleaner.create(suppressThisEscapedWarning(() -> this),
 				new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
-						new ModifyShapeDescriptorObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger())
+						ImmutableList.of(
+								new ModifyShapeDescriptorObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()),
+								new ComponentHierarchyParentChangeObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger())
+						)
 				)::dispose);
 	}
 
-	protected static class ModifyShapeDescriptorObserver
+	public static class ComponentHierarchyParentChangeObserver
+			extends LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent> {
+		private final OptionalWeakReference<UIDefaultComponentShapeAnchorController> owner;
+
+		public ComponentHierarchyParentChangeObserver(UIDefaultComponentShapeAnchorController owner, Logger logger) {
+			super(logger);
+			this.owner = OptionalWeakReference.of(owner);
+		}
+
+		@SuppressWarnings("UnstableApiUsage")
+		@Override
+		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+		public void onNext(UIAbstractComponentHierarchyChangeBusEvent.@NonNull Parent event) {
+			super.onNext(event);
+			if (event.getStage().isPost() && !event.getNext().isPresent())
+				getOwner().ifPresent(owner -> {
+					IUIComponent component = event.getComponent();
+
+					// COMMENT remove component as origin
+					Optional.ofNullable(owner.getAnchorSets().getIfPresent(component))
+							.map(IShapeAnchorSet::getAnchorsView)
+							.map(Map::values)
+							.ifPresent(anchors -> owner.removeAnchors(component, anchors));
+
+					// COMMENT remove component as target
+					ImmutableMap<IShapeAnchorSet, IUIComponent> anchorSetsInverse =
+							MapUtilities.inverse(owner.getAnchorSets().asMap());
+					Streams.stream(Optional.ofNullable(owner.getSubscribersMap().getIfPresent(component))).unordered()
+							.flatMap(Collection::stream)
+							.forEach(shapeAnchor ->
+									shapeAnchor.getContainer()
+											.map(anchorSetsInverse::get)
+											.ifPresent(origin -> owner.removeAnchors(origin, ImmutableSet.of(shapeAnchor))));
+				});
+		}
+
+		protected Optional<? extends UIDefaultComponentShapeAnchorController> getOwner() { return owner.getOptional(); }
+	}
+
+	public static class ModifyShapeDescriptorObserver
 			extends LoggingDisposableObserver<UIComponentModifyShapeDescriptorBusEvent> {
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
@@ -45,7 +93,7 @@ public class UIDefaultComponentShapeAnchorController
 		private final Deque<IShapeAnchor> anchoringAnchors = new ArrayDeque<>(CapacityUtilities.getInitialCapacityMedium());
 		private boolean anchoringSelf = false;
 
-		protected ModifyShapeDescriptorObserver(UIDefaultComponentShapeAnchorController owner, Logger logger) {
+		public ModifyShapeDescriptorObserver(UIDefaultComponentShapeAnchorController owner, Logger logger) {
 			super(logger);
 			this.owner = OptionalWeakReference.of(owner);
 		}
@@ -55,13 +103,12 @@ public class UIDefaultComponentShapeAnchorController
 		public void onNext(UIComponentModifyShapeDescriptorBusEvent event) {
 			super.onNext(event);
 			if (event.getStage().isPost() && !isAnchoringSelf())
-				getOwner()
-						.ifPresent(ctr -> {
-							setAnchoringSelf(true);
-							anchorSelf(event, ctr);
-							setAnchoringSelf(false);
-							anchorOthers(event, ctr);
-						});
+				getOwner().ifPresent(ctr -> {
+					setAnchoringSelf(true);
+					anchorSelf(event, ctr);
+					setAnchoringSelf(false);
+					anchorOthers(event, ctr);
+				});
 		}
 
 		protected boolean isAnchoringSelf() { return anchoringSelf; }
