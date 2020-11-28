@@ -30,7 +30,7 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 
 	public UIDefaultRendererContainer(@Nullable @NonNls CharSequence name, IUIRendererContainerContainer<?> container, Class<? extends R> defaultRendererClass) {
 		super(name);
-		this.container = new OptionalWeakReference<>(container);
+		this.container = OptionalWeakReference.of(container);
 		this.defaultRendererClass = defaultRendererClass;
 	}
 

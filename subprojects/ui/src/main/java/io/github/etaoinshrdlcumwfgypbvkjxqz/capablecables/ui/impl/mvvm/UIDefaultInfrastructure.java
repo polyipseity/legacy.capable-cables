@@ -58,7 +58,7 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 
 	@SuppressWarnings("RedundantTypeArguments")
 	protected UIDefaultInfrastructure() {
-		OptionalWeakReference<UIDefaultInfrastructure<V, VM, B>> thisWeakReference = new OptionalWeakReference<>(suppressThisEscapedWarning(() -> this));
+		OptionalWeakReference<UIDefaultInfrastructure<V, VM, B>> thisWeakReference = OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
 		this.binderObserverSupplier = () -> thisWeakReference.getOptional().map(UIDefaultInfrastructure<V, VM, B>::createBinderActionObserver);
 	}
 

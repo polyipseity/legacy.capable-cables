@@ -109,7 +109,7 @@ public class UIDefaultComponent
 
 	private final Runnable extensionsInitializer;
 	private final List<IUIComponent> children = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
-	private OptionalWeakReference<IUIComponent> parent = new OptionalWeakReference<>(null);
+	private OptionalWeakReference<IUIComponent> parent = OptionalWeakReference.of(null);
 
 	@UIComponentConstructor
 	public UIDefaultComponent(IUIComponentArguments arguments) {
@@ -183,17 +183,17 @@ public class UIDefaultComponent
 	@Override
 	public void setVisible(boolean visible) { getVisible().setValue(visible); }
 
-	protected void setParent(@Nullable IUIComponent parent) { this.parent = new OptionalWeakReference<>(parent); }
-
 	@Override
 	public void setActive(boolean active) { getActive().setValue(active); }
-
-	protected AtomicBoolean getModifyingShape() { return modifyingShape; }
 
 	@Override
 	public void onParentChange(@Nullable IUIComponent previous, @Nullable IUIComponent next) {
 		setParent(next);
 	}
+
+	protected void setParent(@Nullable IUIComponent parent) { this.parent = OptionalWeakReference.of(parent); }
+
+	protected AtomicBoolean getModifyingShape() { return modifyingShape; }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<INamespacePrefixedString, IBindingMethodSource<? extends IUIEvent>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }

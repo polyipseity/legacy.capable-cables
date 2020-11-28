@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 public class UIDefaultComponentManager<S extends Shape>
 		extends UIDefaultComponent
 		implements IUIComponentManager<S> {
-	private OptionalWeakReference<IUIViewComponent<?, ?>> view = new OptionalWeakReference<>(null);
+	private OptionalWeakReference<IUIViewComponent<?, ?>> view = OptionalWeakReference.of(null);
 
 	@UIComponentConstructor
 	public UIDefaultComponentManager(IUIComponentArguments arguments) { super(arguments); }
@@ -47,5 +47,5 @@ public class UIDefaultComponentManager<S extends Shape>
 	}
 
 	@Override
-	public void setView(@Nullable IUIViewComponent<?, ?> view) { this.view = new OptionalWeakReference<>(view); }
+	public void setView(@Nullable IUIViewComponent<?, ?> view) { this.view = OptionalWeakReference.of(view); }
 }

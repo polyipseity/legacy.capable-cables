@@ -13,13 +13,13 @@ import java.util.Optional;
 public abstract class UIAbstractComponentModifier
 		implements IUIComponentModifier {
 	private final ThreadLocal<EnumModifyStage> threadLocalModifyStage = ThreadLocal.withInitial(ConstantValue.of(EnumModifyStage.NONE));
-	private OptionalWeakReference<IUIComponent> targetComponent = new OptionalWeakReference<>(null);
+	private OptionalWeakReference<IUIComponent> targetComponent = OptionalWeakReference.of(null);
 
 	@Override
 	public Optional<? extends IUIComponent> getTargetComponent() { return targetComponent.getOptional(); }
 
 	@Override
-	public void setTargetComponent(@Nullable IUIComponent targetComponent) { this.targetComponent = new OptionalWeakReference<>(targetComponent); }
+	public void setTargetComponent(@Nullable IUIComponent targetComponent) { this.targetComponent = OptionalWeakReference.of(targetComponent); }
 
 	@Override
 	public void advanceModifyStage()

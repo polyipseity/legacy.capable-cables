@@ -116,7 +116,8 @@ public class UIWindowComponent
 						getParent().orElseThrow(InternalError::new).moveChildToTop(this)), true)
 		);
 
-		OptionalWeakReference<UIWindowComponent> thisReference = new OptionalWeakReference<>(suppressThisEscapedWarning(() -> this));
+		OptionalWeakReference<UIWindowComponent> thisReference = OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
+		// COMMENT here be dragons
 		this.controlsEmbed = new UIDefaultControlsEmbed<>(
 				UIShapeComponent.class,
 				suppressThisEscapedWarning(() -> this),
@@ -269,6 +270,18 @@ public class UIWindowComponent
 		return controlsEmbed;
 	}
 
+	public static @NonNls String getPropertyControlsDirection() {
+		return PROPERTY_CONTROLS_DIRECTION;
+	}
+
+	public static @NonNls String getPropertyControlsSide() {
+		return PROPERTY_CONTROLS_SIDE;
+	}
+
+	public static @NonNls String getPropertyControlsThickness() {
+		return PROPERTY_CONTROLS_THICKNESS;
+	}
+
 	@Override
 	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		super.initializeBindings(binderObserverSupplier);
@@ -344,7 +357,7 @@ public class UIWindowComponent
 
 		public ModifyShapeDescriptorObserver(UIWindowComponent owner, Logger logger) {
 			super(logger);
-			this.owner = new OptionalWeakReference<>(owner);
+			this.owner = OptionalWeakReference.of(owner);
 		}
 
 		@Override

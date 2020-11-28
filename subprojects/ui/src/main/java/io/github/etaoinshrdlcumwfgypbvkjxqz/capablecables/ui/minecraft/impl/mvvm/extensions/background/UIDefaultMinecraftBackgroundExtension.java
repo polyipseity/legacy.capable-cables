@@ -136,7 +136,7 @@ public class UIDefaultMinecraftBackgroundExtension
 
 		public RenderObserver(UIDefaultMinecraftBackgroundExtension owner, Logger logger) {
 			super(logger);
-			this.owner = new OptionalWeakReference<>(owner);
+			this.owner = OptionalWeakReference.of(owner);
 		}
 
 		@Override

@@ -17,7 +17,7 @@ import java.util.Optional;
 
 public abstract class AbstractShapeAnchor
 		implements IShapeAnchor {
-	private OptionalWeakReference<IShapeAnchorSet> container = new OptionalWeakReference<>(null);
+	private OptionalWeakReference<IShapeAnchorSet> container = OptionalWeakReference.of(null);
 
 	@Override
 	public Optional<? extends IShapeAnchorSet> getContainer() {
@@ -25,7 +25,7 @@ public abstract class AbstractShapeAnchor
 	}
 
 	protected void setContainer(@Nullable IShapeAnchorSet container) {
-		this.container = new OptionalWeakReference<>(container);
+		this.container = OptionalWeakReference.of(container);
 	}
 
 	@Override

@@ -308,7 +308,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 		protected Modifier(UITeleportingComponentUserResizableExtension<?> owner) {
 			super(IShapeDescriptor.StaticHolder.getShapeDescriptorPlaceholder());
-			this.owner = new OptionalWeakReference<>(owner);
+			this.owner = OptionalWeakReference.of(owner);
 
 			this.eventTargetListenersInitializer = new OneUseRunnable(() -> {
 				addEventListener(EnumUIEventDOMType.MOUSE_ENTER.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> setBeingHovered(true)), false);

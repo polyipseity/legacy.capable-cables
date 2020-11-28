@@ -15,7 +15,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableExtensionArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIAbstractComponentHierarchyChangeBusEvent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ConcurrencyUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheLoaderLoadedNullException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
@@ -75,8 +78,8 @@ public class UIDefaultCacheExtension
 								new UIAbstractCacheType<IUIComponentManager<?>, IUIComponent>(key) {
 									{
 										OptionalWeakReference<? extends IUICacheType<?, IUIComponent>> thisRef =
-												new OptionalWeakReference<>(suppressThisEscapedWarning(() -> this));
-										Cleaner.create(CleanerUtilities.getCleanerReferent(suppressThisEscapedWarning(() -> this)),
+												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
+										Cleaner.create(suppressThisEscapedWarning(() -> this),
 												new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
 														new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
 																new FunctionalEventBusDisposableObserver<>(
@@ -106,8 +109,8 @@ public class UIDefaultCacheExtension
 								new UIAbstractCacheType<Integer, IUIComponent>(key) {
 									{
 										OptionalWeakReference<? extends IUICacheType<?, IUIComponent>> thisRef =
-												new OptionalWeakReference<>(suppressThisEscapedWarning(() -> this));
-										Cleaner.create(CleanerUtilities.getCleanerReferent(suppressThisEscapedWarning(() -> this)),
+												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
+										Cleaner.create(suppressThisEscapedWarning(() -> this),
 												new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
 														new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
 																new FunctionalEventBusDisposableObserver<>(

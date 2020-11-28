@@ -22,7 +22,7 @@ public class ProviderShapeDescriptor<S extends Shape>
 
 	public ProviderShapeDescriptor(IShapeDescriptorProvider owner, IShapeDescriptor<S> delegated) {
 		super(delegated);
-		this.owner = new OptionalWeakReference<>(owner);
+		this.owner = OptionalWeakReference.of(owner);
 	}
 
 	@Override

@@ -282,7 +282,7 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 		protected Modifier(UITeleportingComponentUserRelocatableExtension<?> owner) {
 			super(IShapeDescriptor.StaticHolder.getShapeDescriptorPlaceholder());
-			this.owner = new OptionalWeakReference<>(owner);
+			this.owner = OptionalWeakReference.of(owner);
 
 			this.eventTargetListenersInitializer = new OneUseRunnable(() -> {
 				addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> {

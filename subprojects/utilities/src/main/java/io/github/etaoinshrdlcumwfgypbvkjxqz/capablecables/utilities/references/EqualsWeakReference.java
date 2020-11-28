@@ -11,9 +11,19 @@ import java.util.function.Predicate;
 
 public class EqualsWeakReference<T>
 		extends OptionalWeakReference<T> {
-	public EqualsWeakReference(@Nullable T referent) { super(referent); }
+	private static final EqualsWeakReference<?> NULL_REFERENCE = new EqualsWeakReference<>(null, null);
 
-	public EqualsWeakReference(@Nullable T referent, @Nullable ReferenceQueue<? super T> queue) { super(referent, queue); }
+	protected EqualsWeakReference(@Nullable T referent, @Nullable ReferenceQueue<? super T> queue) { super(referent, queue); }
+
+	public static <T> EqualsWeakReference<T> of(@Nullable T referent) {
+		return of(referent, null);
+	}
+
+	public static <T> EqualsWeakReference<T> of(@Nullable T referent, @Nullable ReferenceQueue<? super T> queue) {
+		if (referent == null && queue == null)
+			return getNullReference();
+		return new EqualsWeakReference<>(referent, queue);
+	}
 
 	@Override
 	public int hashCode() { return Objects.hashCode(get()); }
@@ -25,5 +35,10 @@ public class EqualsWeakReference<T>
 				.map(Reference<Object>::get)
 				.filter(Predicate.isEqual(get()))
 				.isPresent();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> EqualsWeakReference<T> getNullReference() {
+		return (EqualsWeakReference<T>) NULL_REFERENCE; // COMMENT safe, produces 'null'
 	}
 }

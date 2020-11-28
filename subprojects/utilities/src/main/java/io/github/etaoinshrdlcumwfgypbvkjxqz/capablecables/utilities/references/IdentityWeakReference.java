@@ -10,9 +10,19 @@ import java.util.Objects;
 
 public class IdentityWeakReference<T>
 		extends OptionalWeakReference<T> {
-	public IdentityWeakReference(@Nullable T referent) { super(referent); }
+	private static final IdentityWeakReference<?> NULL_REFERENCE = new IdentityWeakReference<>(null, null);
 
-	public IdentityWeakReference(@Nullable T referent, @Nullable ReferenceQueue<? super T> queue) { super(referent, queue); }
+	protected IdentityWeakReference(@Nullable T referent, @Nullable ReferenceQueue<? super T> queue) { super(referent, queue); }
+
+	public static <T> IdentityWeakReference<T> of(@Nullable T referent) {
+		return of(referent, null);
+	}
+
+	public static <T> IdentityWeakReference<T> of(@Nullable T referent, @Nullable ReferenceQueue<? super T> queue) {
+		if (referent == null && queue == null)
+			return getNullReference();
+		return new IdentityWeakReference<>(referent, queue);
+	}
 
 	@Override
 	public int hashCode() { return Objects.hashCode(get()); }
@@ -24,5 +34,10 @@ public class IdentityWeakReference<T>
 				.map(Reference<Object>::get)
 				.filter(oc -> get() == oc)
 				.isPresent();
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> IdentityWeakReference<T> getNullReference() {
+		return (IdentityWeakReference<T>) NULL_REFERENCE; // COMMENT safe, produces 'null'
 	}
 }

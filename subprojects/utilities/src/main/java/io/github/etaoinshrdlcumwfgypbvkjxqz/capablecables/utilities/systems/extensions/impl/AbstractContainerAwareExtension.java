@@ -21,7 +21,7 @@ public abstract class AbstractContainerAwareExtension<K, C extends IExtensionCon
 
 	@SuppressWarnings("UnstableApiUsage")
 	private final TypeToken<? extends CE> typeToken;
-	private OptionalWeakReference<CE> container = new OptionalWeakReference<>(null);
+	private OptionalWeakReference<CE> container = OptionalWeakReference.of(null);
 
 	@SuppressWarnings("UnstableApiUsage")
 	public AbstractContainerAwareExtension(Class<CE> type) {
@@ -59,5 +59,5 @@ public abstract class AbstractContainerAwareExtension<K, C extends IExtensionCon
 
 	protected Optional<? extends CE> getContainer() { return container.getOptional(); }
 
-	protected void setContainer(@Nullable CE container) { this.container = new OptionalWeakReference<>(container); }
+	protected void setContainer(@Nullable CE container) { this.container = OptionalWeakReference.of(container); }
 }

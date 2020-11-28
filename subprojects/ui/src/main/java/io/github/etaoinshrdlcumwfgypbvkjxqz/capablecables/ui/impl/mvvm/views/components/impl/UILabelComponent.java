@@ -156,7 +156,7 @@ public class UILabelComponent
 
 		public AutoResizeShapeDescriptor(UILabelComponent owner, IShapeDescriptor<?> delegated) {
 			super(delegated);
-			this.owner = new OptionalWeakReference<>(owner);
+			this.owner = OptionalWeakReference.of(owner);
 		}
 
 		@Override
@@ -187,7 +187,7 @@ public class UILabelComponent
 
 		public TextBindingField(UILabelComponent owner, IBindingField<IAttributedText> delegate) {
 			super(delegate);
-			this.owner = new OptionalWeakReference<>(owner);
+			this.owner = OptionalWeakReference.of(owner);
 		}
 
 		@Override

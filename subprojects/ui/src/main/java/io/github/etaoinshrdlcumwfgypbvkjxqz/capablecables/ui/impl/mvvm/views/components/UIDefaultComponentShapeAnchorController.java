@@ -10,7 +10,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIE
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIComponentModifyShapeDescriptorBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interactions.DefaultShapeAnchorController;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CleanerUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
@@ -32,7 +31,7 @@ public class UIDefaultComponentShapeAnchorController
 		implements IUIComponentShapeAnchorController {
 
 	public UIDefaultComponentShapeAnchorController() {
-		Cleaner.create(CleanerUtilities.getCleanerReferent(suppressThisEscapedWarning(() -> this)),
+		Cleaner.create(suppressThisEscapedWarning(() -> this),
 				new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
 						new ModifyShapeDescriptorObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger())
 				)::dispose);
@@ -48,7 +47,7 @@ public class UIDefaultComponentShapeAnchorController
 
 		protected ModifyShapeDescriptorObserver(UIDefaultComponentShapeAnchorController owner, Logger logger) {
 			super(logger);
-			this.owner = new OptionalWeakReference<>(owner);
+			this.owner = OptionalWeakReference.of(owner);
 		}
 
 		@Override

@@ -26,7 +26,7 @@ public class UIDefaultRenderer<C>
 	private final TypeToken<C> typeToken;
 	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
 	private final IBinderObserverSupplierHolder binderObserverSupplierHolder = new DefaultBinderObserverSupplierHolder();
-	private OptionalWeakReference<C> container = new OptionalWeakReference<>(null);
+	private OptionalWeakReference<C> container = OptionalWeakReference.of(null);
 
 	@SuppressWarnings({"unchecked", "UnstableApiUsage"})
 	@UIRendererConstructor
@@ -62,7 +62,7 @@ public class UIDefaultRenderer<C>
 
 	public Optional<? extends C> getContainer() { return container.getOptional(); }
 
-	public void setContainer(@Nullable C container) { this.container = new OptionalWeakReference<>(container); }
+	public void setContainer(@Nullable C container) { this.container = OptionalWeakReference.of(container); }
 
 	@Override
 	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {

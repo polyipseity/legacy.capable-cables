@@ -313,8 +313,8 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 								new UIAbstractCacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
 									{
 										OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
-												new OptionalWeakReference<>(suppressThisEscapedWarning(() -> this));
-										Cleaner.create(CleanerUtilities.getCleanerReferent(suppressThisEscapedWarning(() -> this)),
+												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
+										Cleaner.create(suppressThisEscapedWarning(() -> this),
 												new AutoSubscribingCompositeDisposable<>(
 														UIEventBusEntryPoint.getEventBus(),
 														new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
@@ -360,8 +360,8 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 								new UIAbstractCacheType<List<IUIComponent>, IUIViewComponent<?, ?>>(key) {
 									{
 										OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
-												new OptionalWeakReference<>(suppressThisEscapedWarning(() -> this));
-										Cleaner.create(CleanerUtilities.getCleanerReferent(suppressThisEscapedWarning(() -> this)),
+												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
+										Cleaner.create(suppressThisEscapedWarning(() -> this),
 												new AutoSubscribingCompositeDisposable<>(
 														UIEventBusEntryPoint.getEventBus(),
 														new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
@@ -414,7 +414,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 
 		public ComponentHierarchyChangeParentObserver(UIAbstractViewComponent<?, ?> owner, Logger logger) {
 			super(logger);
-			this.owner = new OptionalWeakReference<>(owner);
+			this.owner = OptionalWeakReference.of(owner);
 		}
 
 		@Override

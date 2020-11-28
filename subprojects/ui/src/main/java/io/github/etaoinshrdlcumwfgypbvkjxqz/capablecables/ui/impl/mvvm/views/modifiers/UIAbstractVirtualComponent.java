@@ -19,7 +19,7 @@ public abstract class UIAbstractVirtualComponent
 		extends UIDefaultComponent
 		implements IUIComponentModifier, IUIVirtualComponent {
 	private final ThreadLocal<EnumModifyStage> threadLocalModifyStage = ThreadLocal.withInitial(ConstantValue.of(EnumModifyStage.NONE));
-	private OptionalWeakReference<IUIComponent> targetComponent = new OptionalWeakReference<>(null);
+	private OptionalWeakReference<IUIComponent> targetComponent = OptionalWeakReference.of(null);
 
 	public UIAbstractVirtualComponent(IShapeDescriptor<?> shapeDescriptor) {
 		super(UIImmutableComponentArguments.of(null, ImmutableMap.of(), shapeDescriptor, null, ImmutableMap.of()));
@@ -29,7 +29,7 @@ public abstract class UIAbstractVirtualComponent
 	public Optional<? extends IUIComponent> getTargetComponent() { return targetComponent.getOptional(); }
 
 	@Override
-	public void setTargetComponent(@Nullable IUIComponent targetComponent) { this.targetComponent = new OptionalWeakReference<>(targetComponent); }
+	public void setTargetComponent(@Nullable IUIComponent targetComponent) { this.targetComponent = OptionalWeakReference.of(targetComponent); }
 
 	@Override
 	public void advanceModifyStage()

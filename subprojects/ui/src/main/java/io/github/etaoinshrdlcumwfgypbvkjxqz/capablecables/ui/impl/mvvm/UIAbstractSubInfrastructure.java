@@ -37,7 +37,7 @@ public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructure
 	private final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
 	private final IUILifecycleStateTracker lifecycleStateTracker = new UIDefaultLifecycleStateTracker();
 	private final IBinderObserverSupplierHolder binderObserverSupplierHolder = new DefaultBinderObserverSupplierHolder();
-	private OptionalWeakReference<IUIInfrastructure<?, ?, ?>> infrastructure = new OptionalWeakReference<>(null);
+	private OptionalWeakReference<IUIInfrastructure<?, ?, ?>> infrastructure = OptionalWeakReference.of(null);
 	@Nullable
 	private C context;
 
@@ -79,7 +79,7 @@ public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructure
 
 	@Override
 	public void setInfrastructure(@Nullable IUIInfrastructure<?, ?, ?> infrastructure) {
-		this.infrastructure = new OptionalWeakReference<>(infrastructure);
+		this.infrastructure = OptionalWeakReference.of(infrastructure);
 	}
 
 	@Override

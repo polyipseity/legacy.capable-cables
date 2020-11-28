@@ -615,7 +615,7 @@ public class UIMinecraftScreenAdapter
 		private final OptionalWeakReference<UIMinecraftScreenAdapter<?, ?>> owner;
 
 		public UIDefaultMinecraftScreenProviderExtension(UIMinecraftScreenAdapter<?, ?> owner) {
-			this.owner = new OptionalWeakReference<>(owner);
+			this.owner = OptionalWeakReference.of(owner);
 		}
 
 		@Override

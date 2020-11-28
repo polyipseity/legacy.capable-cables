@@ -15,7 +15,7 @@ public final class ImmutableShapeAnchor
 	private final double borderThickness;
 
 	public ImmutableShapeAnchor(IShapeDescriptorProvider target, EnumUISide originSide, EnumUISide targetSide, double borderThickness) {
-		this.target = new OptionalWeakReference<>(target);
+		this.target = OptionalWeakReference.of(target);
 		this.originSide = originSide;
 		this.targetSide = targetSide;
 		this.borderThickness = borderThickness;

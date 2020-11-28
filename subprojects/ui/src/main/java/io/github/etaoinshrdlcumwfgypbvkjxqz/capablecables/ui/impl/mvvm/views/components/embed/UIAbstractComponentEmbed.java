@@ -22,7 +22,7 @@ public abstract class UIAbstractComponentEmbed<C extends IUIComponent>
 		this.typeToken = TypeToken.of(type);
 		this.component = type.cast(arguments.getConstructor().apply(arguments));
 
-		OptionalWeakReference<IUIComponent> ownerReference = new OptionalWeakReference<>(owner);
+		OptionalWeakReference<IUIComponent> ownerReference = OptionalWeakReference.of(owner);
 		this.embedInitializer = new OneUseRunnable(() ->
 				ownerReference.getOptional().ifPresent(owner1 -> {
 					owner1.addChildren(ImmutableSet.of(getComponent()));
