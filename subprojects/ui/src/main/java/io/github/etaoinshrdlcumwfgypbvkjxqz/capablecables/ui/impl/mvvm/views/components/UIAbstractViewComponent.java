@@ -319,29 +319,31 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 										Cleaner.create(suppressThisEscapedWarning(() -> this),
 												new AutoSubscribingCompositeDisposable<>(
 														UIEventBusEntryPoint.getEventBus(),
-														SpecializedParentLoggingDisposableObserver.of(
-																new FunctionalEventBusDisposableObserver<>(
-																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
-																		event -> {
-																			if (event.getStage().isPost())
-																				thisRef.getOptional()
-																						.ifPresent(t -> event.getComponent().getManager()
-																								.flatMap(IUIComponentManager::getView)
-																								.ifPresent(view -> t.invalidate(view)));
-																		}),
-																UIConfiguration.getInstance().getLogger()
+														SpecializedParentDisposableObserver.of(
+																ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
+																new LoggingDisposableObserver<>(
+																		new FunctionalDisposableObserver<>(
+																				event -> {
+																					if (event.getStage().isPost())
+																						thisRef.getOptional()
+																								.ifPresent(t -> event.getComponent().getManager()
+																										.flatMap(IUIComponentManager::getView)
+																										.ifPresent(view -> t.invalidate(view)));
+																				}),
+																		UIConfiguration.getInstance().getLogger())
 														),
-														SpecializedViewLoggingDisposableObserver.of(
-																new FunctionalEventBusDisposableObserver<>(
-																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
-																		event -> {
-																			if (event.getStage().isPost())
-																				thisRef.getOptional()
-																						.ifPresent(t -> event.getComponent().getManager()
-																								.flatMap(IUIComponentManager::getView)
-																								.ifPresent(view -> t.invalidate(view)));
-																		}),
-																UIConfiguration.getInstance().getLogger()
+														SpecializedViewDisposableObserver.of(
+																ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
+																new LoggingDisposableObserver<>(
+																		new FunctionalDisposableObserver<>(
+																				event -> {
+																					if (event.getStage().isPost())
+																						thisRef.getOptional()
+																								.ifPresent(t -> event.getComponent().getManager()
+																										.flatMap(IUIComponentManager::getView)
+																										.ifPresent(view -> t.invalidate(view)));
+																				}),
+																		UIConfiguration.getInstance().getLogger())
 														)
 												)::dispose);
 									}
@@ -366,29 +368,31 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 										Cleaner.create(suppressThisEscapedWarning(() -> this),
 												new AutoSubscribingCompositeDisposable<>(
 														UIEventBusEntryPoint.getEventBus(),
-														SpecializedParentLoggingDisposableObserver.of(
-																new FunctionalEventBusDisposableObserver<>(
-																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
-																		event -> {
-																			if (event.getStage().isPost())
-																				thisRef.getOptional()
-																						.ifPresent(t -> event.getComponent().getManager()
-																								.flatMap(IUIComponentManager::getView)
-																								.ifPresent(view -> t.invalidate(view)));
-																		}),
-																UIConfiguration.getInstance().getLogger()
+														SpecializedParentDisposableObserver.of(
+																ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
+																new LoggingDisposableObserver<>(
+																		new FunctionalDisposableObserver<>(
+																				event -> {
+																					if (event.getStage().isPost())
+																						thisRef.getOptional()
+																								.ifPresent(t -> event.getComponent().getManager()
+																										.flatMap(IUIComponentManager::getView)
+																										.ifPresent(view -> t.invalidate(view)));
+																				}),
+																		UIConfiguration.getInstance().getLogger())
 														),
-														SpecializedViewLoggingDisposableObserver.of(
-																new FunctionalEventBusDisposableObserver<>(
-																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
-																		event -> {
-																			if (event.getStage().isPost())
-																				thisRef.getOptional()
-																						.ifPresent(t -> event.getComponent().getManager()
-																								.flatMap(IUIComponentManager::getView)
-																								.ifPresent(view -> t.invalidate(view)));
-																		}),
-																UIConfiguration.getInstance().getLogger()
+														SpecializedViewDisposableObserver.of(
+																ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
+																new LoggingDisposableObserver<>(
+																		new FunctionalDisposableObserver<>(
+																				event -> {
+																					if (event.getStage().isPost())
+																						thisRef.getOptional()
+																								.ifPresent(t -> event.getComponent().getManager()
+																										.flatMap(IUIComponentManager::getView)
+																										.ifPresent(view -> t.invalidate(view)));
+																				}),
+																		UIConfiguration.getInstance().getLogger())
 														)
 												)::dispose);
 									}
@@ -409,31 +413,31 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 			return CHILDREN_FLAT_FOCUSABLE;
 		}
 
-		private static final class SpecializedParentLoggingDisposableObserver
-				extends LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>
+		private static final class SpecializedParentDisposableObserver
+				extends SubscribeEventDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>
 				implements ISpecialized {
-			private SpecializedParentLoggingDisposableObserver(DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate,
-			                                                   Logger logger) {
-				super(delegate, logger);
+			private SpecializedParentDisposableObserver(@Nullable SubscribeEvent subscribeEvent,
+			                                            DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate) {
+				super(subscribeEvent, delegate);
 			}
 
-			public static SpecializedParentLoggingDisposableObserver of(DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate,
-			                                                            Logger logger) {
-				return new SpecializedParentLoggingDisposableObserver(delegate, logger);
+			public static SpecializedParentDisposableObserver of(@Nullable SubscribeEvent subscribeEvent,
+			                                                     DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate) {
+				return new SpecializedParentDisposableObserver(subscribeEvent, delegate);
 			}
 		}
 
-		private static final class SpecializedViewLoggingDisposableObserver
-				extends LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.View>
+		private static final class SpecializedViewDisposableObserver
+				extends SubscribeEventDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.View>
 				implements ISpecialized {
-			private SpecializedViewLoggingDisposableObserver(DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.View> delegate,
-			                                                 Logger logger) {
-				super(delegate, logger);
+			private SpecializedViewDisposableObserver(@Nullable SubscribeEvent subscribeEvent,
+			                                          DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.View> delegate) {
+				super(subscribeEvent, delegate);
 			}
 
-			public static SpecializedViewLoggingDisposableObserver of(DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.View> delegate,
-			                                                          Logger logger) {
-				return new SpecializedViewLoggingDisposableObserver(delegate, logger);
+			public static SpecializedViewDisposableObserver of(@Nullable SubscribeEvent subscribeEvent,
+			                                                   DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.View> delegate) {
+				return new SpecializedViewDisposableObserver(subscribeEvent, delegate);
 			}
 		}
 	}

@@ -4,6 +4,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterators;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIExtensionArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIExtensionConstructor;
@@ -27,15 +28,16 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.Log
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.AutoSubscribingCompositeDisposable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.FunctionalEventBusDisposableObserver;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.FunctionalDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.ImmutableSubscribeEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.SubscribeEventDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.eventbus.api.EventPriority;
-import org.slf4j.Logger;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import sun.misc.Cleaner;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
@@ -84,16 +86,17 @@ public class UIDefaultCacheExtension
 												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
 										Cleaner.create(suppressThisEscapedWarning(() -> this),
 												new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
-														SpecializedParentLoggingDisposableObserver.of(
-																new FunctionalEventBusDisposableObserver<>(
-																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
-																		event -> {
-																			if (event.getStage().isPost())
-																				thisRef.getOptional().ifPresent(t ->
-																						t.invalidate(event.getComponent()));
-																		}
-																),
-																UIConfiguration.getInstance().getLogger()
+														SpecializedParentDisposableObserver.of(
+																ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
+																new LoggingDisposableObserver<>(
+																		new FunctionalDisposableObserver<>(
+																				event -> {
+																					if (event.getStage().isPost())
+																						thisRef.getOptional().ifPresent(t ->
+																								t.invalidate(event.getComponent()));
+																				}
+																		),
+																		UIConfiguration.getInstance().getLogger())
 														)
 												)::dispose);
 									}
@@ -115,16 +118,17 @@ public class UIDefaultCacheExtension
 												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
 										Cleaner.create(suppressThisEscapedWarning(() -> this),
 												new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
-														SpecializedParentLoggingDisposableObserver.of(
-																new FunctionalEventBusDisposableObserver<>(
-																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
-																		event -> {
-																			if (event.getStage().isPost())
-																				thisRef.getOptional().ifPresent(t ->
-																						t.invalidate(event.getComponent()));
-																		}
-																),
-																UIConfiguration.getInstance().getLogger()
+														SpecializedParentDisposableObserver.of(
+																ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
+																new LoggingDisposableObserver<>(
+																		new FunctionalDisposableObserver<>(
+																				event -> {
+																					if (event.getStage().isPost())
+																						thisRef.getOptional().ifPresent(t ->
+																								t.invalidate(event.getComponent()));
+																				}
+																		),
+																		UIConfiguration.getInstance().getLogger())
 														)
 												)::dispose);
 									}
@@ -150,17 +154,17 @@ public class UIDefaultCacheExtension
 			return Z;
 		}
 
-		private static final class SpecializedParentLoggingDisposableObserver
-				extends LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>
+		private static final class SpecializedParentDisposableObserver
+				extends SubscribeEventDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>
 				implements ISpecialized {
-			private SpecializedParentLoggingDisposableObserver(DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate,
-			                                                   Logger logger) {
-				super(delegate, logger);
+			private SpecializedParentDisposableObserver(@Nullable SubscribeEvent subscribeEvent,
+			                                            DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate) {
+				super(subscribeEvent, delegate);
 			}
 
-			public static SpecializedParentLoggingDisposableObserver of(DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate,
-			                                                            Logger logger) {
-				return new SpecializedParentLoggingDisposableObserver(delegate, logger);
+			public static SpecializedParentDisposableObserver of(@Nullable SubscribeEvent subscribeEvent,
+			                                                     DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate) {
+				return new SpecializedParentDisposableObserver(subscribeEvent, delegate);
 			}
 		}
 	}
