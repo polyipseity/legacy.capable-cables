@@ -38,14 +38,18 @@ public enum MapUtilities {
 		return concatMaps(Arrays.asList(maps)); // COMMENT reuse the array
 	}
 
+	@SuppressWarnings("UnstableApiUsage")
 	public static <K, V> ImmutableMap<K, V> concatMaps(Iterable<? extends Map<? extends K, ? extends V>> maps) {
-		ImmutableList.Builder<Iterable<? extends K>> keys = ImmutableList.builder();
-		ImmutableList.Builder<Iterable<? extends V>> values = ImmutableList.builder();
-		maps.forEach(map -> {
-			keys.add(map.keySet());
-			values.add(map.values());
-		});
-		return zipKeysValues(Iterables.concat(keys.build()), Iterables.concat(values.build()));
+		return zipKeysValues(
+				Streams.stream(maps)
+						.map(Map::keySet)
+						.flatMap(Collection::stream)
+						.collect(ImmutableList.toImmutableList()),
+				Streams.stream(maps)
+						.map(Map::values)
+						.flatMap(Collection::stream)
+						.collect(ImmutableList.toImmutableList())
+		);
 	}
 
 	public static <K, V> ImmutableMap<K, V> zipKeysValues(Iterable<? extends K> keys, Iterable<? extends V> values) {
