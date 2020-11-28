@@ -84,7 +84,7 @@ public enum MapUtilities {
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static <K, V> ImmutableMap<V, K> inverse(Map<K, V> instance)
+	public static <K, V> ImmutableMap<V, K> inverse(Map<? extends K, ? extends V> instance)
 			throws IllegalArgumentException {
 		return instance.entrySet().stream()
 				.collect(ImmutableMap.toImmutableMap(Map.Entry::getValue, Map.Entry::getKey));
