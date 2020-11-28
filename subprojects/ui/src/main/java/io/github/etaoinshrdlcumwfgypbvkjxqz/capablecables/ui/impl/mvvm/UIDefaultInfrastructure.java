@@ -19,8 +19,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.lifecycle
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.lifecycles.UILifecycleUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.DefaultDisposableObserver;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.DelegatingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -31,6 +29,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.exte
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
+import org.slf4j.Logger;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Map;
@@ -63,30 +62,7 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 	}
 
 	protected DisposableObserver<IBinderAction> createBinderActionObserver() {
-		return new BinderActionDelegatingDisposableObserver(createBinderActionObserver(getBinder()), getBinderDisposables());
-	}
-
-	public static DisposableObserver<IBinderAction> createBinderActionObserver(IBinder binder) {
-		return new LoggingDisposableObserver<>(new DefaultDisposableObserver<IBinderAction>() {
-			@Override
-			public void onNext(@Nonnull IBinderAction o) {
-				switch (o.getActionType()) {
-					case BIND:
-						try {
-							binder.bind(o.getBindings());
-						} catch (NoSuchBindingTransformerException e) {
-							onError(e);
-						}
-						break;
-					case UNBIND:
-						binder.unbind(o.getBindings());
-						break;
-					default:
-						onError(new AssertionError());
-						break;
-				}
-			}
-		}, UIConfiguration.getInstance().getLogger());
+		return new BinderActionDisposableObserver(getBinder(), getBinderDisposables(), UIConfiguration.getInstance().getLogger());
 	}
 
 	protected CompositeDisposable getBinderDisposables() { return binderDisposables; }
@@ -243,24 +219,52 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 		IUIActiveLifecycle.cleanupV(getView());
 	}
 
-	protected static final class BinderActionDelegatingDisposableObserver
-			extends DelegatingDisposableObserver<IBinderAction> {
-		private final CompositeDisposable binderDisposables;
+	protected static final class BinderActionDisposableObserver
+			extends LoggingDisposableObserver<IBinderAction> {
+		private final OptionalWeakReference<IBinder> binder;
+		private final OptionalWeakReference<CompositeDisposable> binderDisposables;
 
-		public BinderActionDelegatingDisposableObserver(DisposableObserver<? super IBinderAction> delegate, CompositeDisposable binderDisposables) {
-			super(delegate);
-			this.binderDisposables = binderDisposables;
+		public BinderActionDisposableObserver(IBinder binder, CompositeDisposable binderDisposables, Logger logger) {
+			super(logger);
+			this.binder = OptionalWeakReference.of(binder);
+			this.binderDisposables = OptionalWeakReference.of(binderDisposables);
 		}
 
 		@Override
-		@OverridingMethodsMustInvokeSuper
 		protected void onStart() {
 			super.onStart();
-			getBinderDisposables().add(this);
+			getBinderDisposables().ifPresent(binderDisposables ->
+					binderDisposables.add(this));
 		}
 
-		protected CompositeDisposable getBinderDisposables() {
-			return binderDisposables;
+		@Override
+		public void onNext(@Nonnull IBinderAction o) {
+			super.onNext(o);
+			getBinder().ifPresent(binder -> {
+				switch (o.getActionType()) {
+					case BIND:
+						try {
+							binder.bind(o.getBindings());
+						} catch (NoSuchBindingTransformerException e) {
+							onError(e);
+						}
+						break;
+					case UNBIND:
+						binder.unbind(o.getBindings());
+						break;
+					default:
+						onError(new AssertionError());
+						break;
+				}
+			});
+		}
+
+		protected Optional<? extends IBinder> getBinder() {
+			return binder.getOptional();
+		}
+
+		protected Optional<? extends CompositeDisposable> getBinderDisposables() {
+			return binderDisposables.getOptional();
 		}
 	}
 }

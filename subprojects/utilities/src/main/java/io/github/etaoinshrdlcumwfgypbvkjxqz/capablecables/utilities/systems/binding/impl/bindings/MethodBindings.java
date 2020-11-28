@@ -10,7 +10,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilitie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingConsumer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.DefaultDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.NoSuchBindingTransformerException;
@@ -19,6 +18,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.methods.IBindingMethodSource;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
+import org.slf4j.Logger;
 import sun.misc.Cleaner;
 
 import java.util.Collections;
@@ -53,7 +53,10 @@ public class MethodBindings
 						case SOURCE:
 							if (!getSources().containsKey(m)) {
 								IBindingMethodSource<?> s = (IBindingMethodSource<?>) m;
-								DisposableObserver<?> d = createDelegatingObserver(s, getDestinations(), getTransformers());
+								DisposableObserver<?> d = new MethodDelegatingDisposableObserver<>(getTransformers(),
+										s,
+										getDestinations(),
+										UtilitiesConfiguration.getInstance().getLogger());
 								s.getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
 								getSources().put(s, d);
 								return true;
@@ -69,28 +72,6 @@ public class MethodBindings
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Map<IBindingMethodSource<?>, Disposable> getSources() { return sources; }
-
-	public static <T> DisposableObserver<T> createDelegatingObserver(IBindingMethodSource<T> source,
-	                                                                 Iterable<? extends IBindingMethodDestination<?>> destinations,
-	                                                                 Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>> transformers) {
-		return new LoggingDisposableObserver<>(new DefaultDisposableObserver<T>() {
-			@SuppressWarnings("UnstableApiUsage")
-			@Override
-			public void onNext(@Nonnull T t) {
-				try {
-					destinations.forEach(IThrowingConsumer.executeNow(destination -> {
-						AssertionUtilities.assertNonnull(destination).accept(CastUtilities.castUnchecked(
-								transform(transformers,
-										t,
-										source.getTypeToken().getRawType(),
-										destination.getTypeToken().getRawType()))); // COMMENT should be of the correct type
-					}));
-				} catch (NoSuchBindingTransformerException ex) {
-					onError(ex);
-				}
-			}
-		}, UtilitiesConfiguration.getInstance().getLogger());
-	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Set<IBindingMethodDestination<?>> getDestinations() { return destinations; }
@@ -128,4 +109,50 @@ public class MethodBindings
 
 	@Override
 	public boolean isEmpty() { return getSources().isEmpty() && getDestinations().isEmpty(); }
+
+	public static class MethodDelegatingDisposableObserver<T>
+			extends LoggingDisposableObserver<T> {
+		private final Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>> transformersRef;
+		private final IBindingMethodSource<T> source;
+		private final Iterable<? extends IBindingMethodDestination<?>> destinationsRef;
+
+		public MethodDelegatingDisposableObserver(Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>> transformersRef,
+		                                          IBindingMethodSource<T> source,
+		                                          Iterable<? extends IBindingMethodDestination<?>> destinationsRef,
+		                                          Logger logger) {
+			super(logger);
+			this.transformersRef = transformersRef;
+			this.source = source;
+			this.destinationsRef = destinationsRef;
+		}
+
+		@SuppressWarnings("UnstableApiUsage")
+		@Override
+		public void onNext(@Nonnull T t) {
+			super.onNext(t);
+			try {
+				getDestinationsRef().forEach(IThrowingConsumer.executeNow(destination -> {
+					AssertionUtilities.assertNonnull(destination).accept(CastUtilities.castUnchecked(
+							transform(getTransformersRef(),
+									t,
+									getSource().getTypeToken().getRawType(),
+									destination.getTypeToken().getRawType()))); // COMMENT should be of the correct type
+				}));
+			} catch (NoSuchBindingTransformerException ex) {
+				onError(ex);
+			}
+		}
+
+		protected Iterable<? extends IBindingMethodDestination<?>> getDestinationsRef() {
+			return destinationsRef;
+		}
+
+		protected Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>> getTransformersRef() {
+			return transformersRef;
+		}
+
+		protected IBindingMethodSource<T> getSource() {
+			return source;
+		}
+	}
 }

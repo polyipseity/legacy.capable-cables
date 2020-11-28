@@ -18,6 +18,7 @@ import java.util.function.Function;
 
 public class TransitionSystem<S extends IState<D>, E, D>
 		implements ITransitionSystem<S, E, D> {
+	@SuppressWarnings("AnonymousInnerClass")
 	private static final ITransitionSystem<IState<Object>, Object, Object> UNINITIALIZED = new TransitionSystem<>(new IState<Object>() {
 		@Override
 		public void transitFromThis(Object argument) { throw new UnsupportedOperationException(); }

@@ -66,43 +66,6 @@ public enum TextUtilities {
 		return ImmutableSet.copyOf(LINE_SEPARATORS);
 	}
 
-	public static Iterator<TextLayout> asTextLayoutIterator(LineBreakMeasurer lineBreakMeasurer,
-	                                                        Function<@Nonnull ? super LineBreakMeasurer, @Nullable ? extends TextLayout> nextFunction) {
-		return new Iterator<TextLayout>() {
-			private final Object nextLockObject = new Object();
-			private @Nullable TextLayout next = nextFunction.apply(lineBreakMeasurer);
-
-			@Override
-			public boolean hasNext() {
-				synchronized (getNextLockObject()) {
-					return getNext().isPresent();
-				}
-			}
-
-			protected Object getNextLockObject() {
-				return nextLockObject;
-			}
-
-			protected Optional<? extends TextLayout> getNext() {
-				return Optional.ofNullable(next);
-			}
-
-			protected void setNext(@Nullable TextLayout next) {
-				this.next = next;
-			}
-
-			@Override
-			public TextLayout next() {
-				TextLayout next;
-				synchronized (getNextLockObject()) {
-					next = getNext().orElseThrow(NoSuchElementException::new);
-					setNext(nextFunction.apply(lineBreakMeasurer));
-				}
-				return next;
-			}
-		};
-	}
-
 	public static AttributedCharacterIterator ensureNonEmpty(AttributedCharacterIterator text) {
 		return isEmpty(text) ? getEmptyAttributedText().compile().getIterator() : text;
 	}
@@ -215,5 +178,61 @@ public enum TextUtilities {
 
 	public static Font getDefaultFont() {
 		return DEFAULT_FONT;
+	}
+
+	public static class LineBreakMeasurerAsTextLayoutIterator
+			implements Iterator<TextLayout> {
+		private final LineBreakMeasurer lineBreakMeasurer;
+		private final Function<@Nonnull ? super LineBreakMeasurer, @Nullable ? extends TextLayout> nextFunction;
+
+		private final Object nextLockObject;
+		private @Nullable TextLayout next;
+
+		public LineBreakMeasurerAsTextLayoutIterator(LineBreakMeasurer lineBreakMeasurer,
+		                                             Function<@Nonnull ? super LineBreakMeasurer, @Nullable ? extends TextLayout> nextFunction) {
+			this.lineBreakMeasurer = lineBreakMeasurer;
+			this.nextFunction = nextFunction;
+
+			this.nextLockObject = new Object();
+			this.next = nextFunction.apply(lineBreakMeasurer);
+		}
+
+		@Override
+		public boolean hasNext() {
+			synchronized (getNextLockObject()) {
+				return getNext().isPresent();
+			}
+		}
+
+		protected Object getNextLockObject() {
+			return nextLockObject;
+		}
+
+		protected Optional<? extends TextLayout> getNext() {
+			return Optional.ofNullable(next);
+		}
+
+		protected void setNext(@Nullable TextLayout next) {
+			this.next = next;
+		}
+
+		@Override
+		public TextLayout next() {
+			TextLayout next;
+			synchronized (getNextLockObject()) {
+				next = getNext()
+						.orElseThrow(NoSuchElementException::new);
+				setNext(getNextFunction().apply(getLineBreakMeasurer()));
+			}
+			return next;
+		}
+
+		protected Function<? super LineBreakMeasurer, ? extends TextLayout> getNextFunction() {
+			return nextFunction;
+		}
+
+		protected LineBreakMeasurer getLineBreakMeasurer() {
+			return lineBreakMeasurer;
+		}
 	}
 }

@@ -32,7 +32,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.exte
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.eventbus.api.EventPriority;
+import org.slf4j.Logger;
 import sun.misc.Cleaner;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
@@ -71,7 +73,7 @@ public class UIDefaultCacheExtension
 	public enum CacheUniversal {
 		;
 
-		@SuppressWarnings({"unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
+		@SuppressWarnings({"unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic", "AnonymousInnerClass"})
 		private static final IRegistryObject<IUICacheType<IUIComponentManager<?>, IUIComponent>> MANAGER =
 				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("manager"),
 						key -> UICacheRegistry.getInstance().register(key,
@@ -81,7 +83,7 @@ public class UIDefaultCacheExtension
 												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
 										Cleaner.create(suppressThisEscapedWarning(() -> this),
 												new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
-														new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
+														SpecializedParentLoggingDisposableObserver.of(
 																new FunctionalEventBusDisposableObserver<>(
 																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
 																		event -> {
@@ -91,7 +93,7 @@ public class UIDefaultCacheExtension
 																		}
 																),
 																UIConfiguration.getInstance().getLogger()
-														) {}
+														)
 												)::dispose);
 									}
 
@@ -102,7 +104,7 @@ public class UIDefaultCacheExtension
 												.orElseThrow(CacheLoaderLoadedNullException::new);
 									}
 								})));
-		@SuppressWarnings({"unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
+		@SuppressWarnings({"unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic", "AnonymousInnerClass"})
 		private static final IRegistryObject<IUICacheType<Integer, IUIComponent>> Z =
 				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("z"),
 						key -> UICacheRegistry.getInstance().register(key,
@@ -112,7 +114,7 @@ public class UIDefaultCacheExtension
 												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
 										Cleaner.create(suppressThisEscapedWarning(() -> this),
 												new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
-														new LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
+														SpecializedParentLoggingDisposableObserver.of(
 																new FunctionalEventBusDisposableObserver<>(
 																		new ImmutableSubscribeEvent(EventPriority.LOWEST, true),
 																		event -> {
@@ -122,7 +124,7 @@ public class UIDefaultCacheExtension
 																		}
 																),
 																UIConfiguration.getInstance().getLogger()
-														) {}
+														)
 												)::dispose);
 									}
 
@@ -145,6 +147,19 @@ public class UIDefaultCacheExtension
 
 		public static IRegistryObject<IUICacheType<Integer, IUIComponent>> getZ() {
 			return Z;
+		}
+
+		private static final class SpecializedParentLoggingDisposableObserver
+				extends LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent> {
+			private SpecializedParentLoggingDisposableObserver(DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate,
+			                                                   Logger logger) {
+				super(delegate, logger);
+			}
+
+			public static SpecializedParentLoggingDisposableObserver of(DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate,
+			                                                            Logger logger) {
+				return new SpecializedParentLoggingDisposableObserver(delegate, logger);
+			}
 		}
 	}
 }

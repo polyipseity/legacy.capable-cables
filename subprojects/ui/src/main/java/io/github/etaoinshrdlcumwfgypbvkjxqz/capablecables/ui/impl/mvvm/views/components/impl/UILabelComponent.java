@@ -209,7 +209,7 @@ public class UILabelComponent
 					float right = data.getRight();
 					return TextUtilities.separateLines(data.getLeft().getIterator()).stream()
 							.map(line -> new LineBreakMeasurer(TextUtilities.ensureNonEmpty(line), data.getMiddle()))
-							.map(line -> TextUtilities.asTextLayoutIterator(line, line1 -> line1.nextLayout(right)))
+							.map(line -> new TextUtilities.LineBreakMeasurerAsTextLayoutIterator(line, line1 -> line1.nextLayout(right)))
 							.flatMap(Streams::stream)
 							.collect(ImmutableList.toImmutableList());
 				}, Object::equals);

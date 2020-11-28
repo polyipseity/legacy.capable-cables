@@ -37,7 +37,7 @@ public enum EnumJAXBUIDefaultElementAdapter {
 					(context, left) -> EnumUISide.valueOf(left.getValue().name()),
 					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createUiSide(UiSideType.valueOf(right.name()))
 			)),
-	@SuppressWarnings({"unchecked", "Convert2Diamond"}) TEXT_ATTRIBUTE(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createTextAttribute), AttributedCharacterIterator.Attribute.class),
+	@SuppressWarnings({"unchecked", "Convert2Diamond", "AnonymousInnerClass"}) TEXT_ATTRIBUTE(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createTextAttribute), AttributedCharacterIterator.Attribute.class),
 			new JAXBFunctionalElementAdapter<String, AttributedCharacterIterator.Attribute>(
 					new BiFunction<@Nonnull IJAXBAdapterContext, @Nonnull JAXBElement<String>, AttributedCharacterIterator.@Nonnull Attribute>() {
 						private final @Immutable Map<String, AttributedCharacterIterator.Attribute> stringAttributeMap;

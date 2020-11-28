@@ -10,13 +10,13 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesCon
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingBiFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingConsumer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.DefaultDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.NoSuchBindingTransformerException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
+import org.slf4j.Logger;
 import sun.misc.Cleaner;
 
 import java.util.Map;
@@ -60,7 +60,11 @@ public class FieldBindings
 											)
 									))
 							));
-					DisposableObserver<?> d = createSynchronizationObserver(f, getFields().keySet(), getTransformers(), getIsSource());
+					DisposableObserver<?> d = new FieldSynchronizationDisposableObserver<>(getTransformers(),
+							f,
+							getFields().keySet(),
+							getIsSource(),
+							UtilitiesConfiguration.getInstance().getLogger());
 					getFields().put(f, d);
 					f.getField().getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
 					return true;
@@ -69,39 +73,6 @@ public class FieldBindings
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	public Map<IBindingField<?>, Disposable> getFields() { return fields; }
-
-	public static <T> DisposableObserver<T> createSynchronizationObserver(IBindingField<T> from,
-	                                                                      Iterable<? extends IBindingField<?>> to,
-	                                                                      Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>> transformers,
-	                                                                      AtomicBoolean isSource) {
-		return new LoggingDisposableObserver<>(new DefaultDisposableObserver<T>() {
-			@SuppressWarnings("UnstableApiUsage")
-			@Override
-			public void onNext(@Nonnull T t) {
-				if (isSource.getAndSet(false)) {
-					try {
-						Streams.stream(to).unordered()
-								.filter(Predicate.isEqual(from).negate())
-								.forEach(IThrowingConsumer.executeNow(destination ->
-										destination.setValue(
-												CastUtilities.castUnchecked( // COMMENT should be of the correct type
-														transform(transformers,
-																t,
-																from.getTypeToken().getRawType(),
-																destination.getTypeToken().getRawType()
-														)
-												)
-										)
-								));
-					} catch (NoSuchBindingTransformerException e) {
-						onError(e);
-					} finally {
-						isSource.set(true);
-					}
-				}
-			}
-		}, UtilitiesConfiguration.getInstance().getLogger());
-	}
 
 	public AtomicBoolean getIsSource() { return isSource; }
 
@@ -128,4 +99,67 @@ public class FieldBindings
 
 	@Override
 	public boolean isEmpty() { return getFields().isEmpty(); }
+
+	public static class FieldSynchronizationDisposableObserver<T>
+			extends LoggingDisposableObserver<T> {
+		private final Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>> transformersRef;
+		private final IBindingField<T> from;
+		private final Iterable<? extends IBindingField<?>> toRef;
+		private final AtomicBoolean isSourceRef;
+
+		public FieldSynchronizationDisposableObserver(Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>> transformersRef,
+		                                              IBindingField<T> from,
+		                                              Iterable<? extends IBindingField<?>> toRef,
+		                                              AtomicBoolean isSourceRef,
+		                                              Logger logger) {
+			super(logger);
+			this.transformersRef = transformersRef;
+			this.from = from;
+			this.toRef = toRef;
+			this.isSourceRef = isSourceRef;
+		}
+
+		@SuppressWarnings("UnstableApiUsage")
+		@Override
+		public void onNext(@Nonnull T t) {
+			super.onNext(t);
+			if (getIsSourceRef().getAndSet(false)) {
+				try {
+					Streams.stream(getToRef()).unordered()
+							.filter(Predicate.isEqual(getFrom()).negate())
+							.forEach(IThrowingConsumer.executeNow(destination ->
+									destination.setValue(
+											CastUtilities.castUnchecked( // COMMENT should be of the correct type
+													transform(getTransformersRef(),
+															t,
+															getFrom().getTypeToken().getRawType(),
+															destination.getTypeToken().getRawType()
+													)
+											)
+									)
+							));
+				} catch (NoSuchBindingTransformerException e) {
+					onError(e);
+				} finally {
+					getIsSourceRef().set(true);
+				}
+			}
+		}
+
+		protected AtomicBoolean getIsSourceRef() {
+			return isSourceRef;
+		}
+
+		protected Iterable<? extends IBindingField<?>> getToRef() {
+			return toRef;
+		}
+
+		protected IBindingField<T> getFrom() {
+			return from;
+		}
+
+		protected Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<?, ?>>> getTransformersRef() {
+			return transformersRef;
+		}
+	}
 }
