@@ -491,7 +491,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 													IUIStructureLifecycle::unbindV),
 									FunctionUtilities.getEmptyBiConsumer());
 							try (IUIComponentContext componentContext = IUIComponent.createContextTo(component)) {
-								IUIViewComponent.traverseComponentTreeDefault(componentContext, // TODO javac bug, need explicit type arguments
+								IUIViewComponent.<RuntimeException>traverseComponentTreeDefault(componentContext, // TODO javac bug, need explicit type arguments
 										component,
 										(componentContext1, result) ->
 												IUIComponentActiveLifecycleModifier.handleComponentModifiers(result.getComponent(),
