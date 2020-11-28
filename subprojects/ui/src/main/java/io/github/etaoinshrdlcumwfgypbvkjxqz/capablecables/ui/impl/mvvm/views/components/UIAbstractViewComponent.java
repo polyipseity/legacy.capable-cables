@@ -308,7 +308,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	public enum CacheViewComponent {
 		;
 
-		@SuppressWarnings("AnonymousInnerClass")
+		@SuppressWarnings({"AnonymousInnerClass", "rawtypes", "RedundantSuppression"})
 		private static final IRegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
 				FunctionUtilities.apply(IUICacheType.generateKey("children_flat"),
 						key -> UICacheRegistry.getInstance().register(key,
@@ -359,7 +359,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 										return ImmutableList.copyOf(ret);
 									}
 								}));
-		@SuppressWarnings("AnonymousInnerClass")
+		@SuppressWarnings({"AnonymousInnerClass", "rawtypes", "RedundantSuppression"})
 		private static final IRegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
 				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("children_flat.focusable"),
 						key -> UICacheRegistry.getInstance().register(key,
