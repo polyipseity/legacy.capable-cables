@@ -56,6 +56,15 @@ public final class UIImmutableComponentArguments
 		return ImmutableMap.copyOf(getEmbedArguments());
 	}
 
+	@Override
+	public IUIComponentArguments withMappings(Map<? extends INamespacePrefixedString, ? extends IUIPropertyMappingValue> mappings) {
+		return of(getName().orElse(null),
+				mappings,
+				getShapeDescriptor(),
+				getRendererName().orElse(null),
+				getEmbedArguments());
+	}
+
 	protected Map<String, ? extends IEmbedPrototype> getEmbedArguments() {
 		return embedArguments;
 	}

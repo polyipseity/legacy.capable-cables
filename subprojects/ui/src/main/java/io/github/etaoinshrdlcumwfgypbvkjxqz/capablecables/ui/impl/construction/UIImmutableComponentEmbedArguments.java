@@ -56,6 +56,12 @@ public final class UIImmutableComponentEmbedArguments
 	}
 
 	@Override
+	public IUIComponentArguments withMappings(Map<? extends INamespacePrefixedString, ? extends IUIPropertyMappingValue> mappings) {
+		return of(getConstructor(),
+				getDelegate().withMappings(mappings));
+	}
+
+	@Override
 	public Optional<IUIComponentEmbedArguments> tryComputeEmbedArgument(CharSequence key, Function<@Nonnull ? super IUIComponentArguments, @Nonnull ? extends IUIComponent> constructor, IShapeDescriptor<?> shapeDescriptor) {
 		return getDelegate().tryComputeEmbedArgument(key, constructor, shapeDescriptor);
 	}
