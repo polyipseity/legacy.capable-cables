@@ -308,7 +308,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	public enum CacheViewComponent {
 		;
 
-		@SuppressWarnings({"rawtypes", "RedundantSuppression", "unchecked", "AnonymousInnerClassMayBeStatic", "AnonymousInnerClass"})
+		@SuppressWarnings("AnonymousInnerClass")
 		private static final IRegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
 				FunctionUtilities.apply(IUICacheType.generateKey("children_flat"),
 						key -> UICacheRegistry.getInstance().register(key,
@@ -319,31 +319,33 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 										Cleaner.create(suppressThisEscapedWarning(() -> this),
 												new AutoSubscribingCompositeDisposable<>(
 														UIEventBusEntryPoint.getEventBus(),
-														SpecializedParentDisposableObserver.of(
-																ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
-																new LoggingDisposableObserver<>(
-																		new FunctionalDisposableObserver<>(
-																				event -> {
-																					if (event.getStage().isPost())
-																						thisRef.getOptional()
-																								.ifPresent(t -> event.getComponent().getManager()
-																										.flatMap(IUIComponentManager::getView)
-																										.ifPresent(view -> t.invalidate(view)));
-																				}),
-																		UIConfiguration.getInstance().getLogger())
-														),
-														SpecializedViewDisposableObserver.of(
-																ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
-																new LoggingDisposableObserver<>(
-																		new FunctionalDisposableObserver<>(
-																				event -> {
-																					if (event.getStage().isPost())
-																						thisRef.getOptional()
-																								.ifPresent(t -> event.getComponent().getManager()
-																										.flatMap(IUIComponentManager::getView)
-																										.ifPresent(view -> t.invalidate(view)));
-																				}),
-																		UIConfiguration.getInstance().getLogger())
+														ImmutableList.of(
+																SpecializedParentDisposableObserver.of(
+																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
+																		new LoggingDisposableObserver<>(
+																				new FunctionalDisposableObserver<>(
+																						event -> {
+																							if (event.getStage().isPost())
+																								thisRef.getOptional()
+																										.ifPresent(t -> event.getComponent().getManager()
+																												.flatMap(IUIComponentManager::getView)
+																												.ifPresent(view -> t.invalidate(view)));
+																						}),
+																				UIConfiguration.getInstance().getLogger())
+																),
+																SpecializedViewDisposableObserver.of(
+																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
+																		new LoggingDisposableObserver<>(
+																				new FunctionalDisposableObserver<>(
+																						event -> {
+																							if (event.getStage().isPost())
+																								thisRef.getOptional()
+																										.ifPresent(t -> event.getComponent().getManager()
+																												.flatMap(IUIComponentManager::getView)
+																												.ifPresent(view -> t.invalidate(view)));
+																						}),
+																				UIConfiguration.getInstance().getLogger())
+																)
 														)
 												)::dispose);
 									}
@@ -357,7 +359,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 										return ImmutableList.copyOf(ret);
 									}
 								}));
-		@SuppressWarnings({"UnstableApiUsage", "rawtypes", "unchecked", "RedundantSuppression", "AnonymousInnerClassMayBeStatic", "AnonymousInnerClass"})
+		@SuppressWarnings("AnonymousInnerClass")
 		private static final IRegistryObject<IUICacheType<List<IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
 				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("children_flat.focusable"),
 						key -> UICacheRegistry.getInstance().register(key,
@@ -368,35 +370,38 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 										Cleaner.create(suppressThisEscapedWarning(() -> this),
 												new AutoSubscribingCompositeDisposable<>(
 														UIEventBusEntryPoint.getEventBus(),
-														SpecializedParentDisposableObserver.of(
-																ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
-																new LoggingDisposableObserver<>(
-																		new FunctionalDisposableObserver<>(
-																				event -> {
-																					if (event.getStage().isPost())
-																						thisRef.getOptional()
-																								.ifPresent(t -> event.getComponent().getManager()
-																										.flatMap(IUIComponentManager::getView)
-																										.ifPresent(view -> t.invalidate(view)));
-																				}),
-																		UIConfiguration.getInstance().getLogger())
-														),
-														SpecializedViewDisposableObserver.of(
-																ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
-																new LoggingDisposableObserver<>(
-																		new FunctionalDisposableObserver<>(
-																				event -> {
-																					if (event.getStage().isPost())
-																						thisRef.getOptional()
-																								.ifPresent(t -> event.getComponent().getManager()
-																										.flatMap(IUIComponentManager::getView)
-																										.ifPresent(view -> t.invalidate(view)));
-																				}),
-																		UIConfiguration.getInstance().getLogger())
+														ImmutableList.of(
+																SpecializedParentDisposableObserver.of(
+																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
+																		new LoggingDisposableObserver<>(
+																				new FunctionalDisposableObserver<>(
+																						event -> {
+																							if (event.getStage().isPost())
+																								thisRef.getOptional()
+																										.ifPresent(t -> event.getComponent().getManager()
+																												.flatMap(IUIComponentManager::getView)
+																												.ifPresent(view -> t.invalidate(view)));
+																						}),
+																				UIConfiguration.getInstance().getLogger())
+																),
+																SpecializedViewDisposableObserver.of(
+																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
+																		new LoggingDisposableObserver<>(
+																				new FunctionalDisposableObserver<>(
+																						event -> {
+																							if (event.getStage().isPost())
+																								thisRef.getOptional()
+																										.ifPresent(t -> event.getComponent().getManager()
+																												.flatMap(IUIComponentManager::getView)
+																												.ifPresent(view -> t.invalidate(view)));
+																						}),
+																				UIConfiguration.getInstance().getLogger())
+																)
 														)
 												)::dispose);
 									}
 
+									@SuppressWarnings("UnstableApiUsage")
 									@Override
 									protected List<IUIComponent> load(IUIViewComponent<?, ?> container) {
 										return container.getChildrenFlatView().stream()
