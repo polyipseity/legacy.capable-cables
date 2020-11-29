@@ -28,10 +28,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.I
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.AutoSubscribingCompositeDisposable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.FunctionalDisposableObserver;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.ImmutableSubscribeEvent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.SubscribeEventDisposableObserver;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
@@ -95,7 +92,7 @@ public class UIDefaultCacheExtension
 																		new LoggingDisposableObserver<>(
 																				new FunctionalDisposableObserver<>(
 																						event -> {
-																							if (event.getStage().isPost())
+																							if (event.getStage() == EnumHookStage.POST)
 																								thisRef.getOptional().ifPresent(t ->
 																										t.invalidate(event.getComponent()));
 																						}
@@ -139,7 +136,7 @@ public class UIDefaultCacheExtension
 																		new LoggingDisposableObserver<>(
 																				new FunctionalDisposableObserver<>(
 																						event -> {
-																							if (event.getStage().isPost())
+																							if (event.getStage() == EnumHookStage.POST)
 																								thisRef.getOptional().ifPresent(t ->
 																										t.invalidate(event.getComponent()));
 																						}

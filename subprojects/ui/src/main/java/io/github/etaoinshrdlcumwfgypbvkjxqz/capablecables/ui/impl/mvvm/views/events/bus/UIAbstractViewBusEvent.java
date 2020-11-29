@@ -29,7 +29,7 @@ public abstract class UIAbstractViewBusEvent<T>
 
 		@Override
 		public boolean isCancelable() {
-			return getStage().isPre();
+			return getStage() == EnumHookStage.PRE;
 		}
 
 		@Override
@@ -39,7 +39,7 @@ public abstract class UIAbstractViewBusEvent<T>
 
 		@Override
 		public boolean hasResult() {
-			return getStage().isPre();
+			return getStage() == EnumHookStage.PRE;
 		}
 	}
 }

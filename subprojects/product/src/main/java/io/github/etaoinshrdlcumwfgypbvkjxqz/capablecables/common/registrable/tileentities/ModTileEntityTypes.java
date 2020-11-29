@@ -4,6 +4,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIMinecraftDebug;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.compile.EnumBuildType;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
@@ -19,7 +20,7 @@ public enum ModTileEntityTypes {
 	private static final RegistryObject<TileEntityType<?>> DEBUG_UI;
 
 	static {
-		DEBUG_UI = UIConstants.getBuildType().isDebug() ? getRegister().register(UIMinecraftDebug.getPath(), UIMinecraftDebug::getTileEntityEntry) : null;
+		DEBUG_UI = UIConstants.getBuildType() == EnumBuildType.DEBUG ? getRegister().register(UIMinecraftDebug.getPath(), UIMinecraftDebug::getTileEntityEntry) : null;
 	}
 
 	public static DeferredRegister<TileEntityType<?>> getRegister() {

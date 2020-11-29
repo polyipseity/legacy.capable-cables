@@ -19,6 +19,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.IUIComponentUserResizableExtension;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.EnumModifyStage;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentCursorHandleProviderModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventMouse;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
@@ -436,7 +437,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 
 		@Override
 		public Optional<Long> getCursorHandle(IUIComponentContext context) {
-			if (getModifyStage().isPre())
+			if (getModifyStage() == EnumModifyStage.PRE)
 				return Optional2.of(
 						() -> getOwner().orElse(null),
 						() -> context.getViewContext().getInputDevices().getPointerDevice().orElse(null))
@@ -484,7 +485,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 
 		@Override
 		public void invokeRenderer(IUIComponentContext context) {
-			if (getModifyStage().isPost()) {
+			if (getModifyStage() == EnumModifyStage.POST) {
 				getOwner().ifPresent(owner ->
 						Optional2.of(
 								() -> owner.getRendererContainer().getRenderer().orElse(null),

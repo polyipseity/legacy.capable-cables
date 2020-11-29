@@ -30,6 +30,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.DefaultBinderObserverSupplierHolder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputDevices;
@@ -143,7 +144,7 @@ public class UIDefaultMinecraftBackgroundExtension
 		@SubscribeEvent
 		public void onNext(@Nonnull UIAbstractViewBusEvent.Render event) {
 			super.onNext(event);
-			if (event.getStage().isPre())
+			if (event.getStage() == EnumHookStage.PRE)
 				Optional3.of(
 						() -> getOwner().orElse(null),
 						() -> IUIMinecraftRenderEventExtension.StaticHolder.getType().find(event).orElse(null),

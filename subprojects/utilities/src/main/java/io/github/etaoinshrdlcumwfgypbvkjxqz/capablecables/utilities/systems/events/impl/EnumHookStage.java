@@ -3,9 +3,4 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.eve
 public enum EnumHookStage {
 	PRE,
 	POST,
-	;
-
-	public boolean isPre() { return this == PRE; }
-
-	public boolean isPost() { return this == POST; }
 }

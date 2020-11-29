@@ -83,10 +83,6 @@ public enum EnumModifyStage {
 		LoopUtilities.doNTimes(ordinal() - modifier.getModifyStage().ordinal(), modifier::advanceModifyStage);
 	}
 
-	public boolean isPre() { return this == PRE; }
-
-	public boolean isPost() { return this == POST; }
-
 	public abstract EnumModifyStage next()
 			throws IllegalStateException;
 }

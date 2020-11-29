@@ -50,6 +50,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.methods.ImmutableBindingMethodDestination;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -436,7 +437,7 @@ public class UIWindowComponent
 		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 		public void onNext(UIComponentModifyShapeDescriptorBusEvent event) {
 			super.onNext(event);
-			if (event.getStage().isPost())
+			if (event.getStage() == EnumHookStage.POST)
 				getOwner()
 						.filter(owner -> owner.getParent().filter(p -> p.equals(event.getComponent())).isPresent())
 						.ifPresent(IUIReshapeExplicitly::refresh);

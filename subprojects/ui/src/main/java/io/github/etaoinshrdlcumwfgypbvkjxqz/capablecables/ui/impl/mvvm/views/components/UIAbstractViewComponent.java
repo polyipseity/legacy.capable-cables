@@ -330,7 +330,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 																		new LoggingDisposableObserver<>(
 																				new FunctionalDisposableObserver<>(
 																						event -> {
-																							if (event.getStage().isPost())
+																							if (event.getStage() == EnumHookStage.POST)
 																								thisRef.getOptional()
 																										.ifPresent(t -> event.getComponent().getManager()
 																												.flatMap(IUIComponentManager::getView)
@@ -343,7 +343,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 																		new LoggingDisposableObserver<>(
 																				new FunctionalDisposableObserver<>(
 																						event -> {
-																							if (event.getStage().isPost())
+																							if (event.getStage() == EnumHookStage.POST)
 																								thisRef.getOptional()
 																										.ifPresent(t -> event.getComponent().getManager()
 																												.flatMap(IUIComponentManager::getView)
@@ -388,7 +388,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 																		new LoggingDisposableObserver<>(
 																				new FunctionalDisposableObserver<>(
 																						event -> {
-																							if (event.getStage().isPost())
+																							if (event.getStage() == EnumHookStage.POST)
 																								thisRef.getOptional()
 																										.ifPresent(t -> event.getComponent().getManager()
 																												.flatMap(IUIComponentManager::getView)
@@ -401,7 +401,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 																		new LoggingDisposableObserver<>(
 																				new FunctionalDisposableObserver<>(
 																						event -> {
-																							if (event.getStage().isPost())
+																							if (event.getStage() == EnumHookStage.POST)
 																								thisRef.getOptional()
 																										.ifPresent(t -> event.getComponent().getManager()
 																												.flatMap(IUIComponentManager::getView)
@@ -481,7 +481,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 		public void onNext(UIAbstractComponentHierarchyChangeBusEvent.@NonNull Parent event) {
 			super.onNext(event);
-			if (event.getStage().isPost()) {
+			if (event.getStage() == EnumHookStage.POST) {
 				getOwner().ifPresent(owner -> {
 					IUIComponent component = event.getComponent();
 					@Nullable IUIViewComponent<?, ?> nextOwner = event.getNext().flatMap(IUIComponent::getManager).flatMap(IUIComponentManager::getView).orElse(null);

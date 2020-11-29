@@ -3,6 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.co
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.compile.EnumBuildType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ public class UIDefaultComponentContextLeakNotifier
 	public UIDefaultComponentContextLeakNotifier(BooleanSupplier closedSupplier, Logger logger) {
 		this.closedSupplier = closedSupplier;
 		this.logger = logger;
-		this.throwable = UIConstants.getBuildType().isDebug() ? ThrowableUtilities.create() : null;
+		this.throwable = UIConstants.getBuildType() == EnumBuildType.DEBUG ? ThrowableUtilities.create() : null;
 	}
 
 	@Override

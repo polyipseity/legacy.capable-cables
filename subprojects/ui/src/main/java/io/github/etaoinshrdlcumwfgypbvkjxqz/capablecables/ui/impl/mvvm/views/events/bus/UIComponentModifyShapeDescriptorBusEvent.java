@@ -15,11 +15,11 @@ public class UIComponentModifyShapeDescriptorBusEvent
 	}
 
 	@Override
-	public boolean isCancelable() { return getStage().isPre(); }
+	public boolean isCancelable() { return getStage() == EnumHookStage.PRE; }
 
 	@Override
 	public EnumHookStage getStage() { return stage; }
 
 	@Override
-	public boolean hasResult() { return getStage().isPre(); }
+	public boolean hasResult() { return getStage() == EnumHookStage.PRE; }
 }

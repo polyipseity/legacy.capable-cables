@@ -20,6 +20,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.AutoSubscribingCompositeDisposable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import io.reactivex.rxjava3.annotations.NonNull;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -60,7 +61,7 @@ public class UIDefaultComponentShapeAnchorController
 		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 		public void onNext(UIAbstractComponentHierarchyChangeBusEvent.@NonNull Parent event) {
 			super.onNext(event);
-			if (event.getStage().isPost() && !event.getNext().isPresent())
+			if (event.getStage() == EnumHookStage.POST && !event.getNext().isPresent())
 				getOwner().ifPresent(owner -> {
 					IUIComponent component = event.getComponent();
 
@@ -102,7 +103,7 @@ public class UIDefaultComponentShapeAnchorController
 		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 		public void onNext(UIComponentModifyShapeDescriptorBusEvent event) {
 			super.onNext(event);
-			if (event.getStage().isPost() && !isAnchoringSelf())
+			if (event.getStage() == EnumHookStage.POST && !isAnchoringSelf())
 				getOwner().ifPresent(ctr -> {
 					setAnchoringSelf(true);
 					anchorSelf(event, ctr);

@@ -9,6 +9,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.impl.AbstractC
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIMinecraftDebug;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.compile.EnumBuildType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.internationalization.MinecraftLocaleUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.ConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.LoggingThrowableHandler;
@@ -84,7 +85,7 @@ public final class ModClientProxy
 
 	@Override
 	protected void onSetupSided(FMLClientSetupEvent event) {
-		if (UIConstants.getBuildType().isDebug())
+		if (UIConstants.getBuildType() == EnumBuildType.DEBUG)
 			UIMinecraftDebug.registerUIFactory();
 	}
 }

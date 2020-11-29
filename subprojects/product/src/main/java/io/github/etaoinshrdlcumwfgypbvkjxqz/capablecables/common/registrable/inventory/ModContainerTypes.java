@@ -4,6 +4,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ModConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIMinecraftDebug;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.compile.EnumBuildType;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
@@ -19,7 +20,7 @@ public enum ModContainerTypes {
 	private static final RegistryObject<ContainerType<?>> DEBUG_UI;
 
 	static {
-		DEBUG_UI = UIConstants.getBuildType().isDebug()
+		DEBUG_UI = UIConstants.getBuildType() == EnumBuildType.DEBUG
 				? getRegister().register(UIMinecraftDebug.getPath(), UIMinecraftDebug::getContainerEntry)
 				: null;
 	}

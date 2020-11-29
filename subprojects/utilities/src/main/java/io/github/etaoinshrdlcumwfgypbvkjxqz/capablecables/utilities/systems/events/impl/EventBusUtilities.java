@@ -4,6 +4,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBu
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.compile.EnumBuildType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
@@ -69,7 +70,7 @@ public enum EventBusUtilities {
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	public static <E extends Event> void cleanListenersCache(IEventBus bus, Class<E> eventType) {
-		if (UtilitiesConstants.getBuildType().isDebug()) {
+		if (UtilitiesConstants.getBuildType() == EnumBuildType.DEBUG) {
 			/* COMMENT
 			Only clean up while debugging as
 			- Rarely useful in production. The extra memory used is not large enough that it deserves such a fix.
