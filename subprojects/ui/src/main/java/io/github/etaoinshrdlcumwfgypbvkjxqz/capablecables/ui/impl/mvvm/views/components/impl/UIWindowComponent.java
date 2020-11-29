@@ -1,9 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.SetMultimap;
+import com.google.common.collect.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
@@ -15,11 +12,14 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUI
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.embed.IUIComponentEmbed;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventFocus;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIComponentRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.UINamespaceUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.binding.UIImmutablePropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIFunctionalEventListener;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
@@ -34,18 +34,22 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.Enum
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISideType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CollectionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinding;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.methods.ImmutableBindingMethodDestination;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -69,11 +73,13 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Suppr
 public class UIWindowComponent
 		extends UIDefaultComponent
 		implements IUIReshapeExplicitly<RectangularShape> {
-	// TODO make window scroll bars, maybe create a new component, and embed into this
+	// TODO scroll bars
 
 	public static final @NonNls String PROPERTY_CONTROLS_SIDE = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.controls.side";
 	public static final @NonNls String PROPERTY_CONTROLS_THICKNESS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.controls.thickness";
 	public static final @NonNls String PROPERTY_CONTROLS_DIRECTION = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.controls.direction";
+	public static final @NonNls String INTERNAL_BINDING_ON_ACTIVATE_PREFIX = "controls.button.activate";
+	public static final @NonNls String INTERNAL_BINDING_ON_ACTIVATED_PREFIX = "controls.button.activated";
 	private static final INamespacePrefixedString PROPERTY_CONTROLS_SIDE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyControlsSide());
 	private static final INamespacePrefixedString PROPERTY_CONTROLS_THICKNESS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyControlsThickness());
 	private static final INamespacePrefixedString PROPERTY_CONTROLS_DIRECTION_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyControlsDirection());
@@ -90,9 +96,10 @@ public class UIWindowComponent
 	@UIProperty(PROPERTY_CONTROLS_DIRECTION)
 	private final IBindingField<EnumUIRotation> controlsDirection;
 
-	private final Runnable eventTargetListenersInitializer;
-
 	private final IUIControlsEmbed<?> controlsEmbed;
+	private final List<IBinding<?>> embedBindings = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
+
+	private final Runnable eventTargetListenersInitializer;
 
 	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 	@UIComponentConstructor
@@ -113,7 +120,9 @@ public class UIWindowComponent
 
 		this.eventTargetListenersInitializer = new OneUseRunnable(() ->
 				addEventListener(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(), new UIFunctionalEventListener<IUIEventFocus>(e ->
-						getParent().orElseThrow(InternalError::new).moveChildToTop(this)), true)
+						getParent().ifPresent(parent ->
+								parent.moveChildToTop(this))
+				), true)
 		);
 
 		OptionalWeakReference<UIWindowComponent> thisReference = OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
@@ -146,7 +155,51 @@ public class UIWindowComponent
 														.orElseGet(Rectangle2D.Double::new)
 										)))
 						.put(EnumControlsAction.CLOSE.getName(),
-								arguments.computeEmbedArgument(EnumControlsAction.CLOSE.getName(), UIButtonComponent::new,
+								arguments.computeEmbedArgument(EnumControlsAction.CLOSE.getName(),
+										arguments1 -> {
+											IUIComponentArguments arguments2;
+											Map<INamespacePrefixedString, ? extends IUIPropertyMappingValue> mappings1 = arguments1.getMappingsView();
+											if (mappings1.containsKey(UIButtonComponent.getMethodOnActivateLocation())
+													|| mappings1.containsKey(UIButtonComponent.getMethodOnActivatedLocation())) {
+												arguments2 = arguments1;
+											} else {
+												arguments2 = thisReference.getOptional()
+														.map(this1 -> {
+															String keyPrefix = UINamespaceUtilities.getUniqueInternalBindingNamespace(this1);
+
+															INamespacePrefixedString onActivateKey =
+																	ImmutableNamespacePrefixedString.of(keyPrefix,
+																			getInternalBindingOnActivatePrefix() + '.' + EnumControlsAction.CLOSE.getName());
+															INamespacePrefixedString onActivatedKey =
+																	ImmutableNamespacePrefixedString.of(keyPrefix,
+																			getInternalBindingOnActivatedPrefix() + '.' + EnumControlsAction.CLOSE.getName());
+
+															this1.getEmbedBindings()
+																	.addAll(ImmutableList.of(
+																			ImmutableBindingMethodDestination.of(UIButtonComponent.IUIEventActivate.class,
+																					onActivateKey,
+																					event -> thisReference.getOptional()
+																							.ifPresent(this2 -> this2.onControlsButtonActivate(EnumControlsAction.CLOSE, event))),
+																			ImmutableBindingMethodDestination.of(IUIEvent.class,
+																					onActivatedKey,
+																					event -> thisReference.getOptional()
+																							.ifPresent(this2 -> this2.onControlsButtonActivated(EnumControlsAction.CLOSE, event)))
+																	));
+
+															return arguments1.withMappings(
+																	MapUtilities.concatMaps(mappings1,
+																			ImmutableMap.of(
+																					UIButtonComponent.getMethodOnActivateLocation(),
+																					UIImmutablePropertyMappingValue.of(null, onActivateKey),
+																					UIButtonComponent.getMethodOnActivatedLocation(),
+																					UIImmutablePropertyMappingValue.of(null, onActivatedKey)
+																			))
+															);
+														})
+														.orElse(arguments1);
+											}
+											return new UIButtonComponent(arguments2);
+										},
 										new SupplierShapeDescriptor<>(() ->
 												thisReference.getOptional()
 														.map(this1 -> {
@@ -186,6 +239,14 @@ public class UIWindowComponent
 		return PROPERTY_CONTROLS_DIRECTION_LOCATION;
 	}
 
+	public static @NonNls String getInternalBindingOnActivatePrefix() {
+		return INTERNAL_BINDING_ON_ACTIVATE_PREFIX;
+	}
+
+	public static @NonNls String getInternalBindingOnActivatedPrefix() {
+		return INTERNAL_BINDING_ON_ACTIVATED_PREFIX;
+	}
+
 	protected IBindingField<EnumUISide> getControlsSide() {
 		return controlsSide;
 	}
@@ -222,16 +283,25 @@ public class UIWindowComponent
 		// TODO reshape logic
 	}
 
-	public static String getPropertyControlsDirection() {
-		return PROPERTY_CONTROLS_DIRECTION;
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected List<IBinding<?>> getEmbedBindings() {
+		return embedBindings;
 	}
 
-	public static String getPropertyControlsSide() {
-		return PROPERTY_CONTROLS_SIDE;
+	protected void onControlsButtonActivate(@SuppressWarnings({"SameParameterValue", "unused"}) EnumControlsAction action, UIButtonComponent.IUIEventActivate event) {
+		UIButtonComponent.UIDefaultEventActivate.handleEventCommonly(event);
 	}
 
-	public static String getPropertyControlsThickness() {
-		return PROPERTY_CONTROLS_THICKNESS;
+	@SuppressWarnings("SwitchStatementWithTooFewBranches")
+	protected void onControlsButtonActivated(@SuppressWarnings("SameParameterValue") EnumControlsAction action, @SuppressWarnings("unused") IUIEvent event) {
+		switch (action) {
+			case CLOSE:
+				getParent().ifPresent(parent ->
+						parent.removeChildren(ImmutableSet.of(this)));
+				break;
+			default:
+				break; // COMMENT just do nothing
+		}
 	}
 
 	@Override
@@ -286,18 +356,20 @@ public class UIWindowComponent
 	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		super.initializeBindings(binderObserverSupplier);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-				() -> ImmutableBinderAction.bind(
-						getControlsSide(), getControlsThickness(), getControlsDirection()
-				));
+				() -> ImmutableBinderAction.bind(Iterables.concat(
+						ImmutableList.of(getControlsSide(), getControlsThickness(), getControlsDirection()),
+						getEmbedBindings()
+				)));
 	}
 
 	@Override
 	public void cleanupBindings() {
 		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
 				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-						() -> ImmutableBinderAction.unbind(
-								getControlsSide(), getControlsThickness(), getControlsDirection()
-						))
+						() -> ImmutableBinderAction.unbind(Iterables.concat(
+								ImmutableList.of(getControlsSide(), getControlsThickness(), getControlsDirection()),
+								getEmbedBindings()
+						)))
 		);
 		super.cleanupBindings();
 	}

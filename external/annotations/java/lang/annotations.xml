@@ -11,6 +11,9 @@
 	<item name='java.lang.Object boolean equals(java.lang.Object) 0'>
 		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
+	<item name='java.lang.System int identityHashCode(java.lang.Object) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
 	<item name='java.lang.ThreadLocal T get()'>
 		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
