@@ -17,6 +17,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapte
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.contexts.JAXBUIImmutableComponentAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.AnnotationUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
@@ -77,7 +78,10 @@ public class JAXBUIDefaultComponentAdapterExtensionHandler
 									IJAXBUIComponentBasedAdapterContext.findHandler(subContext1, any)
 											.ifPresent(handler ->
 													handler.accept(
-															context.withData(ImmutableMap.of(IJAXBUIComponentAdapterContext.class, subContext1)),
+															context.withData(
+																	MapUtilities.concatMaps(context.getDataView(),
+																			ImmutableMap.of(IJAXBUIComponentAdapterContext.class, subContext1))
+															),
 															CastUtilities.castUnchecked(any) // COMMENT should not throw
 													)
 											)

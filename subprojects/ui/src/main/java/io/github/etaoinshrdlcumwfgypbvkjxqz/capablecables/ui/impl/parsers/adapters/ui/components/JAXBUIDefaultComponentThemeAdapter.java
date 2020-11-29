@@ -13,6 +13,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapte
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.handlers.JAXBUIDefaultComponentThemeAdapterRendererHandler;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.theming.UILambdaTheme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 
 public class JAXBUIDefaultComponentThemeAdapter
@@ -40,7 +41,10 @@ public class JAXBUIDefaultComponentThemeAdapter
 						).forEach(element ->
 								IJAXBUIComponentBasedAdapterContext.findHandler(subContext, element)
 										.ifPresent(handler ->
-												handler.accept(context.withData(ImmutableMap.of(IJAXBUIComponentThemeAdapterContext.class, subContext)),
+												handler.accept(context.withData(
+														MapUtilities.concatMaps(context.getDataView(),
+																ImmutableMap.of(IJAXBUIComponentThemeAdapterContext.class, subContext))
+														),
 														CastUtilities.castUnchecked(element)))
 						);
 

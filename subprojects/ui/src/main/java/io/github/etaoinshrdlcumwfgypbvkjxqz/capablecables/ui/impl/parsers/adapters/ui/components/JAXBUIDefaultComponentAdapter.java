@@ -18,6 +18,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.TreeUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.IUnion;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableUnion;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
@@ -50,14 +51,19 @@ public class JAXBUIDefaultComponentAdapter
 
 						// COMMENT create hierarchy
 						IUIViewComponent<?, ?> view = JAXBUIComponentUtilities.createView(
-								context.withData(ImmutableMap.of(
-										IJAXBUIComponentAdapterContext.class, new JAXBUIImmutableComponentAdapterContext(aliases, getObjectHandlers(), getElementHandlers(), null, null)
-								)),
+								context.withData(
+										MapUtilities.concatMaps(context.getDataView(),
+												ImmutableMap.of(
+														IJAXBUIComponentAdapterContext.class, new JAXBUIImmutableComponentAdapterContext(aliases, getObjectHandlers(), getElementHandlers(), null, null))
+										)),
 								rawView);
 						IJAXBUIComponentAdapterContext viewContext = new JAXBUIImmutableComponentAdapterContext(aliases, getObjectHandlers(), getElementHandlers(), view, view);
 						view.setManager(
 								CastUtilities.castUnchecked(JAXBUIComponentUtilities.createComponent(
-										context.withData(ImmutableMap.of(IJAXBUIComponentAdapterContext.class, viewContext)),
+										context.withData(
+												MapUtilities.concatMaps(context.getDataView(),
+														ImmutableMap.of(IJAXBUIComponentAdapterContext.class, viewContext))
+										),
 										rawComponent)) // COMMENT may throw
 						);
 
@@ -71,7 +77,10 @@ public class JAXBUIDefaultComponentAdapter
 											assert any != null;
 											IJAXBUIComponentBasedAdapterContext.findHandler(viewContext, any)
 													.ifPresent(handler -> handler.accept(
-															context.withData(ImmutableMap.of(IJAXBUIComponentAdapterContext.class, viewContext)),
+															context.withData(
+																	MapUtilities.concatMaps(context.getDataView(),
+																			ImmutableMap.of(IJAXBUIComponentAdapterContext.class, viewContext))
+															),
 															CastUtilities.castUnchecked(any) // COMMENT should not throw
 													));
 										}
@@ -115,7 +124,10 @@ public class JAXBUIDefaultComponentAdapter
 												assert any != null;
 												IJAXBUIComponentBasedAdapterContext.findHandler(componentContext, any)
 														.ifPresent(handler -> handler.accept(
-																context.withData(ImmutableMap.of(IJAXBUIComponentAdapterContext.class, componentContext)),
+																context.withData(
+																		MapUtilities.concatMaps(context.getDataView(),
+																				ImmutableMap.of(IJAXBUIComponentAdapterContext.class, componentContext))
+																),
 																CastUtilities.castUnchecked(any) // COMMENT should not throw
 														));
 											});

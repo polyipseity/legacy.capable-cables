@@ -17,7 +17,7 @@ public interface IJAXBAdapterContext {
 
 	<T> Optional<? extends T> getDatum(Class<T> key);
 
-	IJAXBAdapterContext withData(Map<Class<?>, ?> data);
+	IJAXBAdapterContext withData(Map<? extends Class<?>, ?> data);
 
 	@Immutable Map<Class<?>, ?> getDataView();
 }
