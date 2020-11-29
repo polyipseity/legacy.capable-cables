@@ -303,10 +303,8 @@ public class UIDefaultComponent
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
-
 	@Override
 	public IShapeDescriptor<?> getShapeDescriptor() { return shapeDescriptor; }
-
 
 	@Override
 	public boolean dispatchEvent(IUIEvent event) {
@@ -553,6 +551,4 @@ public class UIDefaultComponent
 
 	@OverridingMethodsMustInvokeSuper
 	protected void initialize0(IUIComponentContext context) {}
-
-
 }

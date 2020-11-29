@@ -234,7 +234,9 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		try (IUIComponentContext componentContext = IUIViewComponent.createComponentContextWithManager(this)
 				.orElseThrow(IllegalStateException::new)) {
 			// COMMENT returning null means the point is outside the window, so in that case, just return the manager
-			return IUIViewComponent.getPathResolver(this).resolvePath(componentContext, (Point2D) point.clone()).getComponent()
+			return IUIViewComponent.getPathResolver(this)
+					.resolvePath(componentContext, (Point2D) point.clone())
+					.getComponent()
 					.<IUIComponent>map(Function.identity())
 					.orElseGet(this::getManager);
 		}
