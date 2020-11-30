@@ -44,8 +44,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBu
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
@@ -77,7 +79,9 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import java.util.function.ToIntBiFunction;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool.*;
 
 public class UIDefaultComponent
 		extends UIDefaultEventTarget
@@ -131,10 +135,8 @@ public class UIDefaultComponent
 				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this),
 						CastUtilities.castUnchecked(UIDefaultComponentRenderer.class));
 
-		this.visible = IUIPropertyMappingValue.createBindingField(Boolean.class, true,
-				this.mappings.get(getPropertyVisibleLocation()));
-		this.active = IUIPropertyMappingValue.createBindingField(Boolean.class, true,
-				this.mappings.get(getPropertyActiveLocation()));
+		this.visible = IUIPropertyMappingValue.createBindingField(Boolean.class, ConstantValue.of(suppressBoxing(true)), this.mappings.get(getPropertyVisibleLocation()));
+		this.active = IUIPropertyMappingValue.createBindingField(Boolean.class, ConstantValue.of(suppressBoxing(true)), this.mappings.get(getPropertyActiveLocation()));
 
 		this.extensionsInitializer = new OneUseRunnable(() ->
 				IExtensionContainer.addExtensionChecked(this, new UIDefaultCacheExtension()));
@@ -172,19 +174,28 @@ public class UIDefaultComponent
 	@Override
 	public List<IUIComponent> getChildrenView() { return ImmutableList.copyOf(getChildren()); }
 
-	@Override
-	public boolean isVisible() { return getVisible().getValue(); }
+	@SuppressWarnings("UnstableApiUsage")
+	public static <T extends UIDefaultComponent, C extends IUIComponent> boolean addChildrenImpl(T instance,
+	                                                                                             ToIntBiFunction<@Nonnull ? super T, @Nonnull ? super C> indexFunction,
+	                                                                                             Iterable<? extends C> components) {
+		return stripBool(Streams.stream(components)
+				.filter(FunctionUtilities.notPredicate(instance.getChildren()::contains))
+				.mapToInt(component -> padBool(instance.addChildAt(indexFunction.applyAsInt(instance, component), component)))
+				.reduce(fBool(), PaddedBool::orBool));
+	}
 
 	public IBindingField<Boolean> getVisible() { return visible; }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected List<IUIComponent> getChildren() { return children; }
 
+	@SuppressWarnings("AutoUnboxing")
+	@Override
+	public boolean isVisible() { return getVisible().getValue(); }
+
+	@SuppressWarnings("AutoBoxing")
 	@Override
 	public void setVisible(boolean visible) { getVisible().setValue(visible); }
-
-	@Override
-	public void setActive(boolean active) { getActive().setValue(active); }
 
 	@Override
 	public void onParentChange(@Nullable IUIComponent previous, @Nullable IUIComponent next) {
@@ -215,18 +226,13 @@ public class UIDefaultComponent
 		return addChildrenImpl(this, (self, child) -> self.getChildren().size(), components);
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
-	public static <T extends UIDefaultComponent, C extends IUIComponent> boolean addChildrenImpl(T instance,
-	                                                                                             ToIntBiFunction<@Nonnull ? super T, @Nonnull ? super C> indexFunction,
-	                                                                                             Iterable<? extends C> components) {
-		return Streams.stream(components)
-				.filter(FunctionUtilities.notPredicate(instance.getChildren()::contains))
-				.map(component -> instance.addChildAt(indexFunction.applyAsInt(instance, component), component))
-				.reduce(false, Boolean::logicalOr);
-	}
-
+	@SuppressWarnings("AutoUnboxing")
 	@Override
 	public boolean isActive() { return getActive().getValue(); }
+
+	@SuppressWarnings("AutoBoxing")
+	@Override
+	public void setActive(boolean active) { getActive().setValue(active); }
 
 	@Override
 	public boolean addChildAt(int index, IUIComponent component) {
@@ -234,7 +240,7 @@ public class UIDefaultComponent
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
 							.addMarkers(UIMarkers.getInstance()::getMarkerUIComponent)
-							.addKeyValue("index", index).addKeyValue("component", component)
+							.addKeyValue("index", suppressBoxing(index)).addKeyValue("component", component)
 							.addMessages(() -> getResourceBundle().getString("children.add.self"))
 							.build()
 			);
@@ -258,21 +264,23 @@ public class UIDefaultComponent
 
 	@Override
 	public boolean removeChildren(Iterable<? extends IUIComponent> components) {
-		@SuppressWarnings("UnstableApiUsage") boolean ret = Streams.stream(components)
-				.map(component -> {
-					int index = getChildren().indexOf(component);
-					if (index != -1) {
-						EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
-									getChildren().remove(component);
-									component.onParentChange(this, null);
-								},
-								new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.PRE, component, this, null),
-								new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.POST, component, this, null));
-						return true;
-					}
-					return false;
-				})
-				.reduce(false, Boolean::logicalOr);
+		@SuppressWarnings("UnstableApiUsage") boolean ret = stripBool(
+				Streams.stream(components)
+						.mapToInt(component -> {
+							int index = getChildren().indexOf(component);
+							if (index != -1) {
+								EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
+											getChildren().remove(component);
+											component.onParentChange(this, null);
+										},
+										new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.PRE, component, this, null),
+										new UIAbstractComponentHierarchyChangeBusEvent.Parent(EnumHookStage.POST, component, this, null));
+								return tBool();
+							}
+							return fBool();
+						})
+						.reduce(fBool(), PaddedBool::orBool)
+		);
 		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh); // TODO relocation perhaps
 		return ret;
 	}
@@ -329,9 +337,9 @@ public class UIDefaultComponent
 	@Override
 	public boolean addModifier(IUIComponentModifier modifier) {
 		boolean ret;
-		if (modifier.getTargetComponent()
-				.map(previousTargetComponent -> previousTargetComponent.removeModifier(modifier))
-				.orElse(true)) {
+		if (!modifier.getTargetComponent()
+				.filter(previousTargetComponent -> !previousTargetComponent.removeModifier(modifier))
+				.isPresent()) {
 			AssertionUtilities.assertTrue(getModifiers().add(modifier));
 			modifier.setTargetComponent(this);
 			ret = true;

@@ -23,6 +23,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.
 
 import java.util.Map;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressUnboxing;
+
 public class JAXBUIDefaultComponentAdapterAnchorHandler
 		extends JAXBUIAbstractSubContextualAdapterHandler<Anchor, IJAXBUIComponentAdapterContext> {
 	private final LoadingCache<IUIViewComponent<?, ?>, Map<String, IUIComponent>> viewComponentNamedMaps =
@@ -56,7 +58,7 @@ public class JAXBUIDefaultComponentAdapterAnchorHandler
 														(EnumUISide) IJAXBAdapterRegistry.adaptFromJAXB(context,
 																ObjectFactories.getDefaultUIObjectFactory().createUiSide(left.getTargetSide())
 														),
-														left.getBorderThickness()))))
+														suppressUnboxing(left.getBorderThickness())))))
 				);
 	}
 

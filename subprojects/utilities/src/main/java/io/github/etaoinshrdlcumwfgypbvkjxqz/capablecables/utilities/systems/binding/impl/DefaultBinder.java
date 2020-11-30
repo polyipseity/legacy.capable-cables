@@ -13,6 +13,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilitie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.ManualLoadingCache;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingFunction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingToIntFunction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinding;
@@ -21,6 +23,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 
 import java.util.*;
 import java.util.function.Function;
+
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool.*;
 
 public class DefaultBinder
 		implements IBinder {
@@ -54,19 +58,20 @@ public class DefaultBinder
 	@Override
 	public boolean bind(Iterable<? extends IBinding<?>> bindings)
 			throws NoSuchBindingTransformerException {
-		return sortAndTrimBindings(bindings).entrySet().stream().unordered()
-				.map(IThrowingFunction.executeNow(typeEntry -> {
-					LoadingCache<INamespacePrefixedString, IBindings<?>> typeBindings = getBindings().getUnchecked(AssertionUtilities.assertNonnull(typeEntry.getKey()));
-					return AssertionUtilities.assertNonnull(typeEntry.getValue()).asMap().entrySet().stream() // COMMENT sequential, field binding order matters
-							.map(IThrowingFunction.<Map.Entry<INamespacePrefixedString, ? extends Collection<? extends IBinding<?>>>, Boolean,
-									NoSuchBindingTransformerException>executeNow(entry ->
-									typeBindings.getUnchecked(AssertionUtilities.assertNonnull(entry.getKey()))
-											.add(CastUtilities.castUnchecked( // COMMENT should be of the right type
-													AssertionUtilities.assertNonnull(entry.getValue())))
-							))
-							.reduce(false, Boolean::logicalOr);
-				}))
-				.reduce(false, Boolean::logicalOr);
+		return stripBool(
+				sortAndTrimBindings(bindings).entrySet().stream().unordered()
+						.flatMapToInt(IThrowingFunction.executeNow(typeEntry -> {
+							LoadingCache<INamespacePrefixedString, IBindings<?>> typeBindings = getBindings().getUnchecked(AssertionUtilities.assertNonnull(typeEntry.getKey()));
+							return AssertionUtilities.assertNonnull(typeEntry.getValue()).asMap().entrySet().stream() // COMMENT sequential, field binding order matters
+									.mapToInt(IThrowingToIntFunction.<Map.Entry<INamespacePrefixedString, ? extends Collection<? extends IBinding<?>>>,
+											NoSuchBindingTransformerException>executeNow(entry -> padBool(
+											typeBindings.getUnchecked(AssertionUtilities.assertNonnull(entry.getKey()))
+													.add(CastUtilities.castUnchecked( // COMMENT should be of the right type
+															AssertionUtilities.assertNonnull(entry.getValue())))
+									)));
+						}))
+						.reduce(fBool(), PaddedBool::orBool)
+		);
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
@@ -89,17 +94,19 @@ public class DefaultBinder
 
 	@Override
 	public boolean unbind(Iterable<? extends IBinding<?>> bindings) {
-		boolean ret = sortAndTrimBindings(bindings).entrySet().stream().unordered()
-				.map(typeEntry -> {
-					LoadingCache<INamespacePrefixedString, IBindings<?>> typeBindings = getBindings().getUnchecked(AssertionUtilities.assertNonnull(typeEntry.getKey()));
-					return AssertionUtilities.assertNonnull(typeEntry.getValue()).asMap().entrySet().stream() // COMMENT sequential, field binding order matters
-							.map(entry ->
-									typeBindings.getUnchecked(AssertionUtilities.assertNonnull(entry.getKey()))
-											.remove(CastUtilities.castUnchecked( // COMMENT should be of the right type
-													AssertionUtilities.assertNonnull(entry.getValue()))))
-							.reduce(false, Boolean::logicalOr);
-				})
-				.reduce(false, Boolean::logicalOr);
+		boolean ret = stripBool(
+				sortAndTrimBindings(bindings).entrySet().stream().unordered()
+						.flatMapToInt(typeEntry -> {
+							LoadingCache<INamespacePrefixedString, IBindings<?>> typeBindings = getBindings().getUnchecked(AssertionUtilities.assertNonnull(typeEntry.getKey()));
+							return AssertionUtilities.assertNonnull(typeEntry.getValue()).asMap().entrySet().stream() // COMMENT sequential, field binding order matters
+									.mapToInt(entry -> padBool(
+											typeBindings.getUnchecked(AssertionUtilities.assertNonnull(entry.getKey()))
+													.remove(CastUtilities.castUnchecked( // COMMENT should be of the right type
+															AssertionUtilities.assertNonnull(entry.getValue())))
+									));
+						})
+						.reduce(fBool(), PaddedBool::orBool)
+		);
 		if (ret)
 			getBindings().cleanUp();
 		return ret;
@@ -127,18 +134,20 @@ public class DefaultBinder
 
 	@Override
 	public boolean unbindAll(Set<IBinding.EnumBindingType> types) {
-		boolean ret = types.stream().unordered()
-				.map(getBindings()::getIfPresent)
-				.filter(Objects::nonNull)
-				.filter(typeBindings -> !typeBindings.asMap().isEmpty())
-				.map(typeBindings -> {
-					boolean ret2 = typeBindings.asMap().values().stream().unordered()
-							.map(IBindings::removeAll)
-							.reduce(false, Boolean::logicalOr);
-					typeBindings.invalidateAll();
-					return ret2;
-				})
-				.reduce(false, Boolean::logicalOr);
+		boolean ret = stripBool(
+				types.stream().unordered()
+						.map(getBindings()::getIfPresent)
+						.filter(Objects::nonNull)
+						.filter(typeBindings -> !typeBindings.asMap().isEmpty())
+						.mapToInt(typeBindings -> {
+							int ret2 = typeBindings.asMap().values().stream().unordered()
+									.mapToInt(bindings -> padBool(bindings.removeAll()))
+									.reduce(fBool(), PaddedBool::orBool);
+							typeBindings.invalidateAll();
+							return ret2;
+						})
+						.reduce(fBool(), PaddedBool::orBool)
+		);
 		if (ret)
 			getBindings().cleanUp();
 		return ret;

@@ -106,6 +106,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 import static java.util.Objects.requireNonNull;
 
@@ -242,7 +243,7 @@ public enum UIMinecraftDebug {
 		private static AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> createUI(DebugContainer container) {
 			IBinder binder = new DefaultBinder();
 			// COMMENT Color <-> Integer
-			binder.addTransformer(EnumBindingType.FIELD, Color::getRGB);
+			binder.addTransformer(EnumBindingType.FIELD, (@Nonnull Color color) -> suppressBoxing(color.getRGB()));
 			binder.addTransformer(EnumBindingType.FIELD, ColorUtilities::ofRGBA);
 
 			AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> screen =
@@ -382,6 +383,7 @@ public enum UIMinecraftDebug {
 		@OnlyIn(Dist.CLIENT)
 		private static final class ViewModel
 				extends UIDefaultMinecraftViewModel<Model> {
+			@SuppressWarnings("AutoBoxing")
 			private final IBindingField<Integer> anchoredWindowBorderColor = ImmutableBindingField.of(
 					ImmutableNamespacePrefixedString.of(UINamespaceUtilities.getRendererBindingNamespace(), "anchoredWindowBorderColor"),
 					new MemoryObservableField<>(Integer.class, ColorUtilities.getColorless().getRGB()));
@@ -401,7 +403,7 @@ public enum UIMinecraftDebug {
 			@Override
 			public void tick() {
 				if (isAnchoredWindowFlickering())
-					getAnchoredWindowBorderColor().setValue(getRandom().nextInt());
+					getAnchoredWindowBorderColor().setValue(suppressBoxing(getRandom().nextInt()));
 			}
 
 			protected boolean isAnchoredWindowFlickering() { return anchoredWindowFlickering; }

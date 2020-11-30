@@ -17,22 +17,26 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Asser
 public enum UIAnimationControlUtilities {
 	;
 
+	@SuppressWarnings({"AutoBoxing", "AutoUnboxing"})
 	public static IFunction3<IUIAnimationTarget, Integer, Integer, Double, RuntimeException> stagger(double interval)
 			throws IllegalArgumentException {
 		// COMMENT return a specialized function
 		return (target, index, size) -> interval * assertNonnull(index);
 	}
 
+	@SuppressWarnings({"AutoBoxing", "AutoUnboxing"})
 	public static IFunction3<IUIAnimationTarget, Integer, Integer, Double, RuntimeException> stagger(double from, double to)
 			throws IllegalArgumentException {
 		// COMMENT return a specialized function
 		return (target, index, size) -> from + (from - to) / assertNonnull(size) * assertNonnull(index);
 	}
 
+	@SuppressWarnings("AutoBoxing")
 	public static IFunction3<IUIAnimationTarget, Integer, Integer, Double, RuntimeException> stagger(double from, double to, Map<String, Object> options) {
 		return stagger(ImmutableTuple2.of(from, to), options);
 	}
 
+	@SuppressWarnings({"AutoBoxing", "AutoUnboxing"})
 	private static IFunction3<IUIAnimationTarget, Integer, Integer, Double, RuntimeException> stagger(Object value, Map<String, Object> options)
 			throws IllegalArgumentException {
 		// COMMENT options
@@ -98,8 +102,8 @@ public enum UIAnimationControlUtilities {
 				interval = ((Number) value).doubleValue();
 			} else if (value instanceof ITuple2) {
 				ITuple2<?, ?> tuple = (ITuple2<?, ?>) value;
-				double from = assertNonnull((Double) tuple.getLeft());
-				double to = assertNonnull((Double) tuple.getRight());
+				double from = (Double) tuple.getLeft();
+				double to = (Double) tuple.getRight();
 				interval = (to - from) / maxDiff;
 			} else
 				throw new IllegalArgumentException();
@@ -109,6 +113,7 @@ public enum UIAnimationControlUtilities {
 		};
 	}
 
+	@SuppressWarnings("AutoBoxing")
 	public static IFunction3<IUIAnimationTarget, Integer, Integer, Double, RuntimeException> stagger(double interval, Map<String, Object> options) {
 		return stagger((Object) interval, options);
 	}

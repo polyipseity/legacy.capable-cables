@@ -9,11 +9,14 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interac
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool.*;
 
 public class DefaultShapeAnchorSet
 		implements IShapeAnchorSet {
@@ -32,14 +35,16 @@ public class DefaultShapeAnchorSet
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public boolean addAnchors(Iterable<? extends IShapeAnchor> anchors) {
-		return Streams.stream(anchors)
-				.map(anchor -> {
-					removeSides(AssertionUtilities.assertNonnull(StaticHolder.getExclusiveSidesMap().get(anchor.getOriginSide())));
-					getAnchors().put(anchor.getOriginSide(), anchor);
-					anchor.onContainerAdded(this);
-					return true;
-				})
-				.reduce(false, Boolean::logicalOr);
+		return stripBool(
+				Streams.stream(anchors)
+						.mapToInt(anchor -> {
+							removeSides(AssertionUtilities.assertNonnull(StaticHolder.getExclusiveSidesMap().get(anchor.getOriginSide())));
+							getAnchors().put(anchor.getOriginSide(), anchor);
+							anchor.onContainerAdded(this);
+							return tBool();
+						})
+						.reduce(fBool(), PaddedBool::orBool)
+		);
 	}
 
 	@Override
@@ -48,14 +53,18 @@ public class DefaultShapeAnchorSet
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public boolean removeSides(Iterable<? extends EnumUISide> sides) {
-		return Streams.stream(sides).unordered()
-				.reduce(false, (r, side) ->
-						Optional.ofNullable(getAnchors().remove(side))
-								.filter(a -> {
-									a.onContainerRemoved();
-									return true;
-								})
-								.isPresent() || r, Boolean::logicalOr);
+		return stripBool(
+				Streams.stream(sides).unordered()
+						.mapToInt(side -> padBool(
+								Optional.ofNullable(getAnchors().remove(side))
+										.filter(a -> {
+											a.onContainerRemoved();
+											return true;
+										})
+										.isPresent()
+						))
+						.reduce(fBool(), PaddedBool::orBool)
+		);
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")

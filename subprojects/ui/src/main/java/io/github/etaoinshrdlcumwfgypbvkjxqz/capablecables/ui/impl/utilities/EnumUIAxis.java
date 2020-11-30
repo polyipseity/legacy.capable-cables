@@ -7,6 +7,8 @@ import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.RectangularShape;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressUnboxing;
+
 @Immutable
 public enum EnumUIAxis {
 	X {
@@ -26,7 +28,7 @@ public enum EnumUIAxis {
 		@Override
 		public void setSize(Dimension2D dimension, double value) {
 			UIObjectUtilities.acceptDimension(dimension, (width, height) ->
-					dimension.setSize(value, height));
+					dimension.setSize(value, suppressUnboxing(height)));
 		}
 
 		@Override
@@ -37,7 +39,8 @@ public enum EnumUIAxis {
 		@Override
 		public void setSize(RectangularShape rectangularShape, double value) {
 			UIObjectUtilities.acceptRectangularShape(rectangularShape, (x, y, width, height) ->
-					rectangularShape.setFrame(x, y, value, height));
+					rectangularShape.setFrame(suppressUnboxing(x), suppressUnboxing(y),
+							value, suppressUnboxing(height)));
 		}
 	},
 	Y {
@@ -57,7 +60,7 @@ public enum EnumUIAxis {
 		@Override
 		public void setSize(Dimension2D dimension, double value) {
 			UIObjectUtilities.acceptDimension(dimension, (width, height) ->
-					dimension.setSize(width, value));
+					dimension.setSize(suppressUnboxing(width), value));
 		}
 
 		@Override
@@ -68,7 +71,8 @@ public enum EnumUIAxis {
 		@Override
 		public void setSize(RectangularShape rectangularShape, double value) {
 			UIObjectUtilities.acceptRectangularShape(rectangularShape, (x, y, width, height) ->
-					rectangularShape.setFrame(x, y, width, value));
+					rectangularShape.setFrame(suppressUnboxing(x), suppressUnboxing(y),
+							suppressUnboxing(width), value));
 		}
 	};
 

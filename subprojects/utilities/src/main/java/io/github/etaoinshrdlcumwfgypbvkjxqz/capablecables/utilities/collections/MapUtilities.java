@@ -26,6 +26,8 @@ import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
+
 public enum MapUtilities {
 	;
 
@@ -176,7 +178,7 @@ public enum MapUtilities {
 					cw.visitField(Opcodes.ACC_PRIVATE | Opcodes.ACC_STATIC | Opcodes.ACC_FINAL, "serialVersionUID",
 							Type.LONG_TYPE.getDescriptor(),
 							null,
-							getSerialVersionUID())
+							suppressBoxing(getSerialVersionUID()))
 							.visitEnd();
 				}
 				// COMMENT method <init>

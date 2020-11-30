@@ -18,6 +18,8 @@ import java.awt.geom.Rectangle2D;
 import java.lang.ref.WeakReference;
 import java.util.Optional;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressUnboxing;
+
 @Immutable
 public final class UIImmutableRelocateData
 		implements IUIComponentUserRelocatableExtension.IRelocateData {
@@ -56,8 +58,9 @@ public final class UIImmutableRelocateData
 					Rectangle2D result = shape.getBounds2D();
 					Point2D previousPoint = getPreviousPoint();
 					UIObjectUtilities.acceptRectangularShape(result,
-							(x, y, width, height) -> result.setFrame(x + (point.getX() - previousPoint.getX()), y + (point.getY() - previousPoint.getY()),
-									width, height));
+							(x, y, width, height) ->
+									result.setFrame(suppressUnboxing(x) + (point.getX() - previousPoint.getX()), suppressUnboxing(y) + (point.getY() - previousPoint.getY()),
+											suppressUnboxing(width), suppressUnboxing(height)));
 					return result;
 				});
 	}

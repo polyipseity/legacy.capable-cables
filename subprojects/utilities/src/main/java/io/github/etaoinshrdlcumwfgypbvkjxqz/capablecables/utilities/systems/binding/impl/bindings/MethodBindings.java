@@ -3,13 +3,13 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bin
 import com.google.common.cache.Cache;
 import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingConsumer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.NoSuchBindingTransformerException;
@@ -23,11 +23,13 @@ import sun.misc.Cleaner;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool.*;
 
 public class MethodBindings
 		extends AbstractBindings<IBindingMethod<?>> {
@@ -47,27 +49,35 @@ public class MethodBindings
 	@Override
 	@SuppressWarnings({"SuspiciousMethodCalls", "UnstableApiUsage"})
 	public boolean add(Iterable<? extends IBindingMethod<?>> methods) {
-		return Streams.stream(methods).unordered()
-				.reduce(false, (r, m) -> {
-					switch (m.getMethodType()) {
-						case SOURCE:
-							if (!getSources().containsKey(m)) {
-								IBindingMethodSource<?> s = (IBindingMethodSource<?>) m;
-								DisposableObserver<?> d = new MethodDelegatingDisposableObserver<>(getTransformers(),
-										s,
-										getDestinations(),
-										UtilitiesConfiguration.getInstance().getLogger());
-								s.getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
-								getSources().put(s, d);
-								return true;
+		return stripBool(
+				Streams.stream(methods).unordered()
+						.mapToInt(method -> {
+							boolean ret;
+							switch (method.getMethodType()) {
+								case SOURCE:
+									if (!getSources().containsKey(method)) {
+										IBindingMethodSource<?> s = (IBindingMethodSource<?>) method;
+										DisposableObserver<?> d = new MethodDelegatingDisposableObserver<>(getTransformers(),
+												s,
+												getDestinations(),
+												UtilitiesConfiguration.getInstance().getLogger());
+										s.getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
+										getSources().put(s, d);
+										ret = true;
+										break;
+									}
+									ret = false;
+									break;
+								case DESTINATION:
+									ret = getDestinations().add((IBindingMethodDestination<?>) method);
+									break;
+								default:
+									throw new AssertionError();
 							}
-							return false;
-						case DESTINATION:
-							return getDestinations().add((IBindingMethodDestination<?>) m);
-						default:
-							throw new InternalError();
-					}
-				}, Boolean::logicalOr);
+							return padBool(ret);
+						})
+						.reduce(fBool(), PaddedBool::orBool)
+		);
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
@@ -79,22 +89,26 @@ public class MethodBindings
 	@Override
 	@SuppressWarnings({"SuspiciousMethodCalls", "UnstableApiUsage"})
 	public boolean remove(Iterable<? extends IBindingMethod<?>> methods) {
-		return Streams.stream(methods).unordered()
-				.reduce(false, (r, m) -> {
-					switch (m.getMethodType()) {
-						case SOURCE:
-							@Nullable Disposable d = getSources().remove(m);
-							if (d != null) {
-								d.dispose();
-								return true;
+		return stripBool(
+				Streams.stream(methods).unordered()
+						.mapToInt(method -> {
+							boolean ret;
+							switch (method.getMethodType()) {
+								case SOURCE:
+									Optional<Disposable> disposable = Optional.ofNullable(getSources().remove(method));
+									disposable.ifPresent(Disposable::dispose);
+									ret = disposable.isPresent();
+									break;
+								case DESTINATION:
+									ret = getDestinations().remove(method);
+									break;
+								default:
+									throw new AssertionError();
 							}
-							return false;
-						case DESTINATION:
-							return getDestinations().remove(m);
-						default:
-							throw new InternalError();
-					}
-				}, Boolean::logicalOr);
+							return padBool(ret);
+						})
+						.reduce(fBool(), PaddedBool::orBool)
+		);
 	}
 
 	@Override

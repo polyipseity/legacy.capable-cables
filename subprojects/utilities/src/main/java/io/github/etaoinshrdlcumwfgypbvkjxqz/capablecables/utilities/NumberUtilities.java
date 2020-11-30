@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
-import java.util.Optional;
+import java.util.OptionalDouble;
 
 import static java.lang.Double.doubleToLongBits;
 
@@ -15,11 +15,11 @@ public enum NumberUtilities {
 
 	public static boolean isDouble(CharSequence string) { return tryParseDouble(string).isPresent(); }
 
-	public static Optional<Double> tryParseDouble(CharSequence string) {
+	public static OptionalDouble tryParseDouble(CharSequence string) {
 		try {
-			return Optional.of(Double.parseDouble(string.toString()));
+			return OptionalDouble.of(Double.parseDouble(string.toString()));
 		} catch (NumberFormatException ex) {
-			return Optional.empty();
+			return OptionalDouble.empty();
 		}
 	}
 }

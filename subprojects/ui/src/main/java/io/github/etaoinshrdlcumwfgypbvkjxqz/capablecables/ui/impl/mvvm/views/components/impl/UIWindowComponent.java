@@ -42,6 +42,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.im
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinding;
@@ -69,7 +70,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.*;
 
 public class UIWindowComponent
 		extends UIDefaultComponent
@@ -112,12 +113,9 @@ public class UIWindowComponent
 						CastUtilities.castUnchecked(DefaultRenderer.class));
 
 		Map<INamespacePrefixedString, ? extends IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-		this.controlsSide = IUIPropertyMappingValue.createBindingField(EnumUISide.class, EnumUISide.UP,
-				mappings.get(getPropertyControlsSideLocation()));
-		this.controlsThickness = IUIPropertyMappingValue.createBindingField(Double.class, 10D,
-				mappings.get(getPropertyControlsThicknessLocation()));
-		this.controlsDirection = IUIPropertyMappingValue.createBindingField(EnumUIRotation.class, EnumUIRotation.CLOCKWISE,
-				mappings.get(getPropertyControlsDirectionLocation()));
+		this.controlsSide = IUIPropertyMappingValue.createBindingField(EnumUISide.class, ConstantValue.of(EnumUISide.UP), mappings.get(getPropertyControlsSideLocation()));
+		this.controlsThickness = IUIPropertyMappingValue.createBindingField(Double.class, ConstantValue.of(suppressBoxing(10D)), mappings.get(getPropertyControlsThicknessLocation()));
+		this.controlsDirection = IUIPropertyMappingValue.createBindingField(EnumUIRotation.class, ConstantValue.of(EnumUIRotation.CLOCKWISE), mappings.get(getPropertyControlsDirectionLocation()));
 
 		this.eventTargetListenersInitializer = new OneUseRunnable(() ->
 				addEventListener(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(), new UIFunctionalEventListener<IUIEventFocus>(e ->
@@ -148,7 +146,7 @@ public class UIWindowComponent
 															EnumUISide oppositeBorderSide = controlsSide.getOpposite().orElseThrow(IllegalStateException::new);
 															oppositeBorderSide.setValue(result,
 																	controlsSide.getValue(result)
-																			+ controlsSide.inwardsBy(this1.getControlsThickness().getValue())
+																			+ controlsSide.inwardsBy(suppressUnboxing(this1.getControlsThickness().getValue()))
 																			.orElseThrow(IllegalStateException::new));
 
 															return result;
@@ -256,7 +254,7 @@ public class UIWindowComponent
 		Point2D translation = new Point2D.Double();
 		EnumUISide controlsSide = instance.getControlsSide().getValue();
 		if (controlsSide.getType() == EnumUISideType.LOCATION)
-			controlsSide.getAxis().setCoordinate(translation, instance.getControlsThickness().getValue());
+			controlsSide.getAxis().setCoordinate(translation, suppressUnboxing(instance.getControlsThickness().getValue()));
 		return translation;
 	}
 
@@ -461,8 +459,7 @@ public class UIWindowComponent
 			super(arguments);
 
 			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-			this.backgroundColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.BLACK,
-					mappings.get(getPropertyBackgroundColorLocation()));
+			this.backgroundColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.BLACK), mappings.get(getPropertyBackgroundColorLocation()));
 		}
 
 		public static INamespacePrefixedString getPropertyBackgroundColorLocation() {

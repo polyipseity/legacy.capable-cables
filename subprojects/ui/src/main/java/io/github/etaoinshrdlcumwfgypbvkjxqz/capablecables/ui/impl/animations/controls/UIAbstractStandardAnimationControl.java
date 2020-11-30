@@ -6,19 +6,23 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUI
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.UIImmutableAnimationTime;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IFunction3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time.core.ITicker;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
+import it.unimi.dsi.fastutil.longs.LongLists;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.function.ToLongBiFunction;
 import java.util.stream.IntStream;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
+
 public abstract class UIAbstractStandardAnimationControl
 		extends UIAbstractAnimationControl {
 	private final boolean autoPlay;
-	private final List<Long> localDurations;
-	private final List<Long> startDelays;
-	private final List<Long> endDelays;
-	private final List<Long> loops;
+	private final LongList localDurations;
+	private final LongList startDelays;
+	private final LongList endDelays;
+	private final LongList loops;
 	@Nullable
 	private IUIAnimationTime totalDuration = null;
 
@@ -31,28 +35,29 @@ public abstract class UIAbstractStandardAnimationControl
 	                                          IFunction3<? super IUIAnimationTarget, ? super Integer, ? super Integer, ? extends Long, ? extends RuntimeException> loopFunction) {
 		super(targets, ticker);
 		this.autoPlay = autoPlay;
-		this.localDurations = generateListFromFunction(targets, durationFunction);
-		this.startDelays = generateListFromFunction(targets, startDelayFunction);
-		this.endDelays = generateListFromFunction(targets, endDelayFunction);
-		this.loops = generateListFromFunction(targets, loopFunction);
+		this.localDurations = LongLists.unmodifiable(new LongArrayList(generateListFromFunction(targets, durationFunction)));
+		this.startDelays = LongLists.unmodifiable(new LongArrayList(generateListFromFunction(targets, startDelayFunction)));
+		this.endDelays = LongLists.unmodifiable(new LongArrayList(generateListFromFunction(targets, endDelayFunction)));
+		this.loops = LongLists.unmodifiable(new LongArrayList(generateListFromFunction(targets, loopFunction)));
 	}
 
 	protected static <T extends UIAbstractStandardAnimationControl> IUIAnimationTime calculateTotalDuration(T self, ToLongBiFunction<? super T, ? super Integer> calculateTotalDurationFunction) {
 		if (IntStream.range(0, self.getTargets().size())
-				.mapToLong(index -> self.getLoops().get(index))
+				.mapToLong(index -> self.getLoops().getLong(index))
 				.filter(loop -> loop == UIStandardAnimationControlFactory.getInfiniteLoop())
 				.findAny()
 				.isPresent())
 			return UIImmutableAnimationTime.getInfinity();
 		return UIImmutableAnimationTime.of(
 				IntStream.range(0, self.getTargets().size())
-						.mapToLong(index -> calculateTotalDurationFunction.applyAsLong(self, index))
+						.mapToLong(index -> calculateTotalDurationFunction.applyAsLong(self, suppressBoxing(index)))
 						.max()
 						.orElse(0)
 		);
 	}
 
-	protected List<Long> getLoops() {
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected LongList getLoops() {
 		return loops;
 	}
 
@@ -68,15 +73,18 @@ public abstract class UIAbstractStandardAnimationControl
 
 	public boolean isAutoPlay() { return autoPlay; }
 
-	protected List<Long> getLocalDurations() {
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected LongList getLocalDurations() {
 		return localDurations;
 	}
 
-	protected List<Long> getStartDelays() {
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected LongList getStartDelays() {
 		return startDelays;
 	}
 
-	protected List<Long> getEndDelays() {
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected LongList getEndDelays() {
 		return endDelays;
 	}
 

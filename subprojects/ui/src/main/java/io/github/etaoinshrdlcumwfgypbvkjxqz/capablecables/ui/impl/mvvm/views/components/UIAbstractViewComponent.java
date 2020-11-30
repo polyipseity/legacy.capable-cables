@@ -358,8 +358,11 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 									@Override
 									protected List<? extends OptionalWeakReference<? extends IUIComponent>> load(IUIViewComponent<?, ?> container) {
 										List<OptionalWeakReference<IUIComponent>> ret = new ArrayList<>(CapacityUtilities.getInitialCapacityLarge());
-										TreeUtilities.<IUIComponent, Object>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, container.getManager(),
-												component -> ret.add(OptionalWeakReference.of(component)),
+										TreeUtilities.<IUIComponent, Void>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, container.getManager(),
+												component -> {
+													ret.add(OptionalWeakReference.of(component));
+													return null;
+												},
 												IUIComponent::getChildrenView, null, null);
 										return ret; // COMMENT mutable
 									}

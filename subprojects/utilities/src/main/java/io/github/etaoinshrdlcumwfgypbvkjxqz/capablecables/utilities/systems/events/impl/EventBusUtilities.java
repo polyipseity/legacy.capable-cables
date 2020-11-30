@@ -18,6 +18,9 @@ import java.lang.invoke.MethodHandle;
 import java.util.ResourceBundle;
 import java.util.function.BooleanSupplier;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressUnboxing;
+
 public enum EventBusUtilities {
 	;
 
@@ -79,10 +82,11 @@ public enum EventBusUtilities {
 			- According to https://github.com/MinecraftForge/EventBus/issues/39#issuecomment-664039387, this *can* result in a race condition.
 			  The exact nature of this race condition is unknown to us at this time.
 			 */
-			ThrowableUtilities.getQuietly(() ->
-					(int) getBusIdGetterMethodHandle().invokeExact((EventBus) bus), Throwable.class, UtilitiesConfiguration.getInstance().getThrowableHandler())
+			ThrowableUtilities.getQuietly(() -> suppressBoxing(
+					(int) getBusIdGetterMethodHandle().invokeExact((EventBus) bus)
+			), Throwable.class, UtilitiesConfiguration.getInstance().getThrowableHandler())
 					.ifPresent(id ->
-							EventListenerHelper.getListenerList(eventType).getListeners(id));
+							EventListenerHelper.getListenerList(eventType).getListeners(suppressUnboxing(id)));
 		}
 	}
 

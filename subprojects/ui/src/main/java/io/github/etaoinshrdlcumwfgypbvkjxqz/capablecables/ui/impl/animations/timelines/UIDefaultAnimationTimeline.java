@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.function.LongUnaryOperator;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
+
 public class UIDefaultAnimationTimeline
 		extends UIAbstractAnimationTimeline {
 	private final boolean autoPlay;
@@ -42,7 +44,7 @@ public class UIDefaultAnimationTimeline
 		long start = offsetFunction.applyAsLong(offset.get());
 		IUIAnimationTime duration = control.getDuration();
 		IUIAnimationTime end = IUIAnimationTime.max(UIImmutableAnimationTime.of(start), duration);
-		boolean ret = getKeyframes().put(start, control);
+		@SuppressWarnings("AutoBoxing") boolean ret = getKeyframes().put(start, control);
 		if (ret) {
 			setOffset(end);
 			setDuration(IUIAnimationTime.max(getDuration(), end));
@@ -99,10 +101,10 @@ public class UIDefaultAnimationTimeline
 		}
 		long elapsed = getElapsed();
 		for (long key : getKeyframes().keySet().stream().unordered()
-				.mapToLong(key -> key)
+				.mapToLong(Long::longValue)
 				.filter(key -> key >= elapsed)
 				.toArray()) {
-			Collection<IUIAnimationControl> keyframes = getKeyframes().removeAll(key);
+			Collection<IUIAnimationControl> keyframes = getKeyframes().removeAll(suppressBoxing(key));
 			getPlayingKeyframes().addAll(keyframes);
 			keyframes.forEach(IUIAnimationControl::play);
 		}

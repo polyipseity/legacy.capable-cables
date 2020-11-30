@@ -16,6 +16,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilitie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import org.jetbrains.annotations.NonNls;
@@ -23,6 +24,8 @@ import org.jetbrains.annotations.NonNls;
 import java.util.ResourceBundle;
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool.*;
 
 public class UIDefaultEventTarget
 		implements IUIEventTarget {
@@ -72,14 +75,16 @@ public class UIDefaultEventTarget
 				);
 		}
 
-		return listeners.stream()
-				.filter(shouldHandle)
-				.map(UIEventListenerWithParameters::getListener)
-				.map(listener -> {
-					listener.accept(CastUtilities.castUnchecked(event));
-					return true;
-				})
-				.reduce(false, Boolean::logicalOr);
+		return stripBool(
+				listeners.stream()
+						.filter(shouldHandle)
+						.map(UIEventListenerWithParameters::getListener)
+						.mapToInt(listener -> {
+							listener.accept(CastUtilities.castUnchecked(event));
+							return tBool();
+						})
+						.reduce(fBool(), PaddedBool::orBool)
+		);
 	}
 
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
@@ -94,6 +99,7 @@ public class UIDefaultEventTarget
 	protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() { return eventTargetListeners; }
 
 	public static class UIEventListenerWithParameters {
+		@SuppressWarnings("AutoBoxing")
 		@NonNls
 		private static final ImmutableMap<String, Function<@Nonnull UIEventListenerWithParameters, @Nullable ?>> OBJECT_VARIABLE_MAP =
 				ImmutableMap.<String, Function<@Nonnull UIEventListenerWithParameters, @Nullable ?>>builder()

@@ -14,6 +14,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressUnboxing;
+
 public class AttributedStringBuilder {
 	private final List<String> stringList;
 	private final @Ordered Map<ITuple2<Integer, Integer>, Map<Attribute, Object>> attributesList;
@@ -42,7 +45,9 @@ public class AttributedStringBuilder {
 	public AttributedStringBuilder attachAttributes(int from, int to, Map<? extends Attribute, ?> attributes) {
 		if (from != to) { // COMMENT need to check, will throw exception if zero length text is added
 			// COMMENT it is possible that the range already exists
-			getAttributesList().merge(ImmutableTuple2.of(from, to), ImmutableMap.copyOf(attributes), MapUtilities::concatMaps);
+			getAttributesList().merge(ImmutableTuple2.of(suppressBoxing(from), suppressBoxing(to)),
+					ImmutableMap.copyOf(attributes),
+					MapUtilities::concatMaps);
 		}
 		return this;
 	}
@@ -70,7 +75,7 @@ public class AttributedStringBuilder {
 		);
 		getAttributesList().forEach((range, attributes) -> {
 			assert !range.getLeft().equals(range.getRight());
-			result.addAttributes(attributes, range.getLeft(), range.getRight());
+			result.addAttributes(attributes, suppressUnboxing(range.getLeft()), suppressUnboxing(range.getRight()));
 		});
 		return result;
 	}

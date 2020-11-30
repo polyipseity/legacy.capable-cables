@@ -64,47 +64,35 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 		return this;
 	}
 
+	@SuppressWarnings("AutoUnboxing")
 	@Override
 	public AbstractShapeDescriptorBuilder<S> setWidth(double width) {
-		UIObjectUtilities.acceptRectangularShape(getBounds(), (rx, ry, rw, rh) -> {
-			assert rx != null;
-			assert ry != null;
-			assert rh != null;
-			getBounds().setFrame(rx, ry, width, rh);
-		});
+		UIObjectUtilities.acceptRectangularShape(getBounds(), (rx, ry, rw, rh) ->
+				getBounds().setFrame(rx, ry, width, rh));
 		return this;
 	}
 
+	@SuppressWarnings("AutoUnboxing")
 	@Override
 	public AbstractShapeDescriptorBuilder<S> setHeight(double height) {
-		UIObjectUtilities.acceptRectangularShape(getBounds(), (rx, ry, rw, rh) -> {
-			assert rx != null;
-			assert ry != null;
-			assert rw != null;
-			getBounds().setFrame(rx, ry, rw, height);
-		});
+		UIObjectUtilities.acceptRectangularShape(getBounds(), (rx, ry, rw, rh) ->
+				getBounds().setFrame(rx, ry, rw, height));
 		return this;
 	}
 
+	@SuppressWarnings("AutoUnboxing")
 	@Override
 	public AbstractShapeDescriptorBuilder<S> setX(double x) {
-		UIObjectUtilities.acceptRectangularShape(getBounds(), (rx, ry, rw, rh) -> {
-			assert ry != null;
-			assert rw != null;
-			assert rh != null;
-			getBounds().setFrame(x, ry, rw, rh);
-		});
+		UIObjectUtilities.acceptRectangularShape(getBounds(), (rx, ry, rw, rh) ->
+				getBounds().setFrame(x, ry, rw, rh));
 		return this;
 	}
 
+	@SuppressWarnings("AutoUnboxing")
 	@Override
 	public AbstractShapeDescriptorBuilder<S> setY(double y) {
-		UIObjectUtilities.acceptRectangularShape(getBounds(), (rx, ry, rw, rh) -> {
-			assert rx != null;
-			assert rw != null;
-			assert rh != null;
-			getBounds().setFrame(rx, y, rw, rh);
-		});
+		UIObjectUtilities.acceptRectangularShape(getBounds(), (rx, ry, rw, rh) ->
+				getBounds().setFrame(rx, y, rw, rh));
 		return this;
 	}
 

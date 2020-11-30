@@ -1,7 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.resizable;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
@@ -37,6 +36,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.im
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.IIntersection;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
@@ -48,9 +48,16 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputPointerDevice;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IMouseButtonClickData;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.OptionalUtilities;
 import io.reactivex.rxjava3.observers.DisposableObserver;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.ints.IntSets;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMaps;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import org.jetbrains.annotations.NonNls;
 import org.lwjgl.glfw.GLFW;
 
@@ -59,12 +66,10 @@ import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Predicate;
+import java.util.*;
 import java.util.function.Supplier;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 
 public class UITeleportingComponentUserResizableExtension<C extends IUIComponent>
@@ -82,12 +87,13 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 
 	@UIProperty(PROPERTY_TARGET_COMPONENT)
 	private final IBindingField<String> targetComponent;
-	@UIProperty(PROPERTY_ACTIVATION_MOUSE_BUTTONS)
-	private final IBindingField<Set<Integer>> activationMouseButtons;
+	@UIProperty(PROPERTY_ACTIVATION_MOUSE_BUTTONS) // COMMENT accepted type: Set<? extends Integer>
+	private final IBindingField<IntSet> activationMouseButtons;
 	@UIProperty(PROPERTY_RESIZE_BORDERS)
 	private final IBindingField<Double> resizeBorderDefaultThickness;
 	@UIProperty(PROPERTY_RESIZE_BORDERS_DEFAULT_THICKNESS)
-	private final IBindingField<Map<EnumUISide, Double>> resizeBorders;
+	// COMMENT accepted type: Map<? extends EnumUISide, ? extends Double>
+	private final IBindingField<Object2DoubleMap<EnumUISide>> resizeBorders;
 
 	private final Modifier modifier = new Modifier(suppressThisEscapedWarning(() -> this));
 	private final IUIRendererContainerContainer<IResizingRenderer> rendererContainerContainer;
@@ -104,16 +110,18 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this), UIComponentUserResizeableExtensionEmptyResizingRenderer.class);
 
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-		this.targetComponent = IUIPropertyMappingValue.createBindingField(String.class, "",
-				mappings.get(getPropertyTargetComponentLocation()));
-		this.activationMouseButtons = IUIPropertyMappingValue.<Set<Integer>>createBindingField(CastUtilities.castUnchecked(Set.class),
-				() -> ImmutableSet.of(GLFW.GLFW_MOUSE_BUTTON_LEFT),
-				mappings.get(getPropertyActivationMouseButtonsLocation()));
-		this.resizeBorderDefaultThickness = IUIPropertyMappingValue.createBindingField(Double.class, 10D,
-				mappings.get(getPropertyResizeBordersDefaultThicknessLocation()));
-		this.resizeBorders = IUIPropertyMappingValue.<Map<EnumUISide, Double>>createBindingField(CastUtilities.castUnchecked(Map.class),
-				ImmutableMap::of,
-				mappings.get(getPropertyResizeBordersLocation()));
+		this.targetComponent = IUIPropertyMappingValue.createBindingField(String.class, ConstantValue.of(""), mappings.get(getPropertyTargetComponentLocation()));
+		this.activationMouseButtons = IUIPropertyMappingValue.createBindingField(IntSet.class,
+				() -> IntSets.singleton(GLFW.GLFW_MOUSE_BUTTON_LEFT),
+				mappings.get(getPropertyActivationMouseButtonsLocation()),
+				CastUtilities.<Class<Set<? extends Integer>>>castUnchecked(Set.class),
+				mappingValue -> IntSets.unmodifiable(new IntOpenHashSet(mappingValue)));
+		this.resizeBorderDefaultThickness = IUIPropertyMappingValue.createBindingField(Double.class, ConstantValue.of(suppressBoxing(10D)), mappings.get(getPropertyResizeBordersDefaultThicknessLocation()));
+		this.resizeBorders = IUIPropertyMappingValue.createBindingField(CastUtilities.castUnchecked(Object2DoubleMap.class),
+				Object2DoubleMaps::emptyMap,
+				mappings.get(getPropertyResizeBordersLocation()),
+				CastUtilities.<Class<Map<EnumUISide, Double>>>castUnchecked(Map.class),
+				mappingValue -> Object2DoubleMaps.unmodifiable(new Object2DoubleOpenHashMap<>(mappingValue)));
 	}
 
 	public static INamespacePrefixedString getPropertyTargetComponentLocation() {
@@ -198,20 +206,40 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		return binderObserverSupplierHolder;
 	}
 
-	protected IBindingField<Set<Integer>> getActivationMouseButtons() {
-		return activationMouseButtons;
-	}
+	@Override
+	public Optional<? extends Shape> getResizeShape() {
+		return getContainer()
+				.map(IUIComponent::getShape)
+				.map(Shape::getBounds2D)
+				.map(containerShapeBounds -> {
+					@SuppressWarnings("AutoUnboxing") double defaultThickness = getResizeBorderDefaultThickness().getValue();
+					Object2DoubleMap<EnumUISide> borders = getResizeBorders().getValue();
+					Area resizeShape = new Area(
+							EnumUISide.getEdges().stream().unordered()
+									.map(side -> {
+										EnumUISide oppositeSide = side.getOpposite().orElseThrow(AssertionError::new);
+										Rectangle2D border = (Rectangle2D) containerShapeBounds.clone();
 
-	protected IBindingField<Map<EnumUISide, Double>> getResizeBorders() {
-		return resizeBorders;
+										// COMMENT we drag the opposite side to a given offset from our side, ignoring other sides
+										oppositeSide.setValue(border,
+												side.getValue(border)
+														+ side.outwardsBy(borders.getOrDefault(side, defaultThickness)).orElseThrow(AssertionError::new));
+
+										return border;
+									})
+									.reduce(containerShapeBounds, Rectangle2D::createUnion)
+					);
+					resizeShape.subtract(new Area(containerShapeBounds));
+					return resizeShape;
+				});
 	}
 
 	protected IBindingField<Double> getResizeBorderDefaultThickness() {
 		return resizeBorderDefaultThickness;
 	}
 
-	protected IUIRendererContainerContainer<IResizingRenderer> getRendererContainerContainer() {
-		return rendererContainerContainer;
+	protected IBindingField<Object2DoubleMap<EnumUISide>> getResizeBorders() {
+		return resizeBorders;
 	}
 
 	@Override
@@ -231,32 +259,12 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		IUIComponentUserResizableExtension.super.cleanupBindings();
 	}
 
-	@Override
-	public Optional<? extends Shape> getResizeShape() {
-		return getContainer()
-				.map(IUIComponent::getShape)
-				.map(Shape::getBounds2D)
-				.map(containerShapeBounds -> {
-					double defaultThickness = getResizeBorderDefaultThickness().getValue();
-					Map<EnumUISide, Double> borders = getResizeBorders().getValue();
-					Area resizeShape = new Area(
-							EnumUISide.getEdges().stream().unordered()
-									.map(side -> {
-										EnumUISide oppositeSide = side.getOpposite().orElseThrow(AssertionError::new);
-										Rectangle2D border = (Rectangle2D) containerShapeBounds.clone();
+	protected IBindingField<IntSet> getActivationMouseButtons() {
+		return activationMouseButtons;
+	}
 
-										// COMMENT we drag the opposite side to a given offset from our side, ignoring other sides
-										oppositeSide.setValue(border,
-												side.getValue(border)
-														+ side.outwardsBy(borders.getOrDefault(side, defaultThickness)).orElseThrow(AssertionError::new));
-
-										return border;
-									})
-									.reduce(containerShapeBounds, Rectangle2D::createUnion)
-					);
-					resizeShape.subtract(new Area(containerShapeBounds));
-					return resizeShape;
-				});
+	protected IUIRendererContainerContainer<IResizingRenderer> getRendererContainerContainer() {
+		return rendererContainerContainer;
 	}
 
 	@Override
@@ -324,13 +332,13 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 								.ifPresent(c -> {
 									c.getParent().ifPresent(p ->
 											p.moveChildToTop(c));
-									setActiveMouseButton(button);
+									setActiveMouseButton(suppressBoxing(button));
 									evt.stopPropagation();
 								});
 					}
 				}), false);
 				addEventListener(EnumUIEventDOMType.MOUSE_UP.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(evt -> {
-					if (getActiveMouseButton().filter(Predicate.isEqual(evt.getData().getButton())).isPresent()
+					if (getActiveMouseButton().orElseGet(IMouseButtonClickData.StaticHolder::getMouseButtonNull) == evt.getData().getButton()
 							&& finishResizeMaybe(evt.getViewContext(), evt.getData().getCursorPositionView())) {
 						evt.stopPropagation();
 						setActiveMouseButton(null);
@@ -339,8 +347,8 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 			});
 		}
 
-		protected Optional<Integer> getActiveMouseButton() {
-			return Optional.ofNullable(activeMouseButton);
+		protected OptionalInt getActiveMouseButton() {
+			return OptionalUtilities.ofInt(activeMouseButton);
 		}
 
 		protected void setActiveMouseButton(@Nullable Integer activeMouseButton) {
@@ -351,19 +359,19 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 
 		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 		protected boolean startResizeMaybe(@SuppressWarnings("unused") IUIViewContext viewContext, Point2D point) {
-			return getOwner().flatMap(owner ->
+			return getOwner().filter(owner ->
 					Optional2.of(
 							() -> owner.getContainer().orElse(null),
 							() -> UITeleportingComponentUserResizableExtension.getTargetComponent(owner)
 									.filter(IUIReshapeExplicitly.class::isInstance)
 									.orElse(null))
-							.flatMap(ownerValues -> {
+							.filter(ownerValues -> {
 								IUIComponent container = ownerValues.getValue1Nonnull();
 								IUIComponent targetComponent = ownerValues.getValue2Nonnull();
 								return targetComponent.getManager()
 										.flatMap(IUIComponentManager::getView)
-										.flatMap(view -> IUIViewComponent.createComponentContextWithManager(view)
-												.map(context -> {
+										.filter(view -> IUIViewComponent.createComponentContextWithManager(view)
+												.filter(context -> {
 													try (IUIComponentContext context1 = context) {
 														IUIViewComponent.getPathResolver(view).resolvePath(context1, (Point2D) point.clone());
 
@@ -392,18 +400,18 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 														}
 														return true;
 													}
-												})
-										);
-							})
-			).orElse(false);
+												}).isPresent()
+										).isPresent();
+							}).isPresent()
+			).isPresent();
 		}
 
 		protected boolean finishResizeMaybe(@SuppressWarnings("unused") IUIViewContext viewContext, Point2D point) {
-			return getOwner().flatMap(owner -> owner.getResizeData().flatMap(data ->
+			return getOwner().filter(owner -> owner.getResizeData().filter(data ->
 					Optional2.of(
 							() -> data.getTargetComponent().orElse(null),
 							() -> data.handle((Point2D) point.clone()).orElse(null))
-							.map(dataValues -> {
+							.filter(dataValues -> {
 								IIntersection<? extends IUIComponent, ? extends IUIReshapeExplicitly<?>> targetComponent = dataValues.getValue1Nonnull();
 								Rectangle2D relativeShapeBounds = dataValues.getValue2Nonnull().getBounds2D();
 								synchronized (getLockObject()) {
@@ -413,7 +421,8 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 									return targetComponent.getRight().reshape(s -> s.adapt(relativeShapeBounds));
 								}
 							})
-			)).orElse(false);
+							.isPresent()
+			).isPresent()).isPresent();
 		}
 
 		protected Object getLockObject() { return lockObject; }
@@ -427,26 +436,25 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		@Override
 		public boolean containsPoint(IUIComponentContext context, Point2D point) {
 			return getOwner()
-					.flatMap(owner -> owner.isResizing() ?
-							Optional.of(true) :
-							owner.getResizeShape()
-									.map(shape -> IUIComponentContext.createContextualShape(context, shape))
-									.map(shape -> shape.contains(point)))
-					.orElse(false);
+					.filter(owner -> owner.isResizing()
+							|| owner.getResizeShape()
+							.map(shape -> IUIComponentContext.createContextualShape(context, shape))
+							.filter(shape -> shape.contains(point))
+							.isPresent())
+					.isPresent();
 		}
 
 		@Override
-		public Optional<Long> getCursorHandle(IUIComponentContext context) {
+		public OptionalLong getCursorHandle(IUIComponentContext context) {
 			if (getModifyStage() == EnumModifyStage.PRE)
 				return Optional2.of(
 						() -> getOwner().orElse(null),
 						() -> context.getViewContext().getInputDevices().getPointerDevice().orElse(null))
-						.flatMap(values -> {
+						.map(values -> {
 							UITeleportingComponentUserResizableExtension<?> owner = values.getValue1Nonnull();
 							IInputPointerDevice pointerDevice = values.getValue2Nonnull();
 							Point2D cursorPosition = pointerDevice.getPositionView();
-							@SuppressWarnings("Convert2MethodRef") @Nullable
-							Optional<? extends Long> ret = owner.getResizeData()
+							OptionalLong ret = owner.getResizeData()
 									.map(d -> d.getBaseView()
 											.map(b -> {
 												Set<EnumUISide> sides = EnumUISide.getSidesMouseOver(
@@ -454,29 +462,32 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 														cursorPosition);
 												if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT)
 														|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
-													return EnumGLFWCursor.EXTENSION_RESIZE_NW_SE_CURSOR.getHandle();
+													return OptionalLong.of(EnumGLFWCursor.EXTENSION_RESIZE_NW_SE_CURSOR.getHandle());
 												else if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.RIGHT)
 														|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
-													return EnumGLFWCursor.EXTENSION_RESIZE_NE_SW_CURSOR.getHandle();
-												return null;
+													return OptionalLong.of(EnumGLFWCursor.EXTENSION_RESIZE_NE_SW_CURSOR.getHandle());
+												return OptionalLong.empty();
 											})
-											.orElseGet(() -> d.getInitialCursorHandle())
-									); // COMMENT compiler bug, long does not get boxed to Long with a method reference
+											.orElseGet(() -> OptionalLong.of(d.getInitialCursorHandle()))
+									)
+									.orElseGet(OptionalLong::empty);
 
 							if (!ret.isPresent())
-								ret = owner.getContainer()
-										.filter(c -> isBeingHovered())
-										.flatMap(c ->
+								ret = isBeingHovered()
+										? owner.getContainer()
+										.flatMap(container ->
 												getCursor(
 														EnumUISide.getSidesMouseOver(
-																IUIComponent.getContextualShape(context, c).getBounds2D(),
-																cursorPosition)
-												)
-														.map(ICursor::getHandle));
+																IUIComponent.getContextualShape(context, container).getBounds2D(),
+																cursorPosition))
+														.map(cursor -> OptionalLong.of(cursor.getHandle())))
+										.orElseGet(OptionalLong::empty)
+										: OptionalLong.empty();
 
 							return ret;
-						});
-			return Optional.empty();
+						})
+						.orElseGet(OptionalLong::empty);
+			return OptionalLong.empty();
 		}
 
 		protected boolean isBeingHovered() { return beingHovered; }

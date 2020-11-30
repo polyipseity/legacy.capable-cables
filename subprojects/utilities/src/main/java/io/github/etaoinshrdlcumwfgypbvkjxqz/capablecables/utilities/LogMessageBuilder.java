@@ -3,12 +3,15 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.logging.FormattingUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Marker;
 
 import java.util.*;
 import java.util.function.Supplier;
+
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool.*;
 
 public class LogMessageBuilder {
 	private final Set<@Nonnull Supplier<?>> markers = new LinkedHashSet<>(CapacityUtilities.getInitialCapacitySmall());
@@ -74,17 +77,19 @@ public class LogMessageBuilder {
 	@SuppressWarnings("Convert2MethodRef")
 	public String build() {
 		StringBuilder ret = new StringBuilder(CapacityUtilities.getInitialCapacityLarge());
-		if (getMarkers().stream()
-				.map(Supplier::get)
-				.map(marker ->
-						CastUtilities.castChecked(Marker.class, marker)
-								.map(Marker::getName)
-								.orElseGet(() -> marker.toString())) // TODO Java compiler bug - method reference
-				.map(markerString -> {
-					ret.append('[').append(markerString).append(']');
-					return true;
-				})
-				.reduce(false, Boolean::logicalOr))
+		if (stripBool(
+				getMarkers().stream()
+						.map(Supplier::get)
+						.map(marker ->
+								CastUtilities.castChecked(Marker.class, marker)
+										.map(Marker::getName)
+										.orElseGet(() -> marker.toString())) // TODO Java compiler bug - method reference
+						.mapToInt(markerString -> {
+							ret.append('[').append(markerString).append(']');
+							return tBool();
+						})
+						.reduce(fBool(), PaddedBool::orBool)
+		))
 			ret.append(' ');
 		getKeyValuePairs().forEach((key, value) ->
 				ret.append(key).append('=').append(value.get()).append(' '));

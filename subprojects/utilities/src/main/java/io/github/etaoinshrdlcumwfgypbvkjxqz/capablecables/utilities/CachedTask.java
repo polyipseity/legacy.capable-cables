@@ -24,8 +24,8 @@ public class CachedTask<T, R>
 	public R apply(T t) {
 		R result;
 		if (getLastInput()
-				.map(lastInput -> getInputChecker().test(lastInput, t)) // COMMENT true means reuse cache
-				.orElse(false)) {
+				.filter(lastInput -> getInputChecker().test(lastInput, t)) // COMMENT true means reuse cache
+				.isPresent()) {
 			assert getLastOutput().isPresent();
 			result = getLastOutput().get();
 		} else {

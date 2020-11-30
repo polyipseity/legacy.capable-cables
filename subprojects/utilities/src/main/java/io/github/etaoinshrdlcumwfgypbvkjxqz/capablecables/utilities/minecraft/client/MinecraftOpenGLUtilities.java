@@ -9,17 +9,22 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.ManualLoadingCache;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.MainWindow;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NonNls;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.system.MemoryStack;
 
+import java.nio.IntBuffer;
 import java.util.*;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
+
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressUnboxing;
 
 @OnlyIn(Dist.CLIENT)
 public enum MinecraftOpenGLUtilities {
@@ -145,31 +150,38 @@ public enum MinecraftOpenGLUtilities {
 	public enum State {
 		;
 
-		private static final ConcurrentMap<Integer, Object> STATE =
-				MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacityMedium()).makeMap();
+		private static final Int2ObjectMap<Object> STATE = new Int2ObjectOpenHashMap<>(CapacityUtilities.getInitialCapacityMedium());
 
-		public static int getInteger(int name) { return (int) getState().computeIfAbsent(name, GL11::glGetInteger); }
+		public static int getInteger(int name) {
+			return suppressUnboxing((Integer)
+					getState().computeIfAbsent(name, name1 -> suppressBoxing(GL11.glGetInteger(name1)))
+			);
+		}
 
-		private static ConcurrentMap<Integer, Object> getState() {
+		private static Int2ObjectMap<Object> getState() {
 			return STATE;
 		}
 
 		public static void setInteger(int name, int param, BiConsumer<@Nonnull Integer, @Nonnull Integer> setter) {
-			setter.accept(name, param);
-			getState().put(name, param);
+			setter.accept(suppressBoxing(name), suppressBoxing(param));
+			getState().put(name, Integer.valueOf(param));
 		}
 
 		public static void getIntegerValue(int name, int[] params) {
 			int[] ret = (int[]) getState().computeIfAbsent(name, n -> {
 				int[] p = new int[params.length];
-				GL11.glGetIntegerv(n, p);
+				try (MemoryStack stack = MemoryStack.stackPush()) {
+					IntBuffer p1 = stack.mallocInt(p.length);
+					GL11.glGetIntegerv(n, p1);
+					p1.get(p);
+				}
 				return p;
 			});
 			System.arraycopy(ret, 0, params, 0, params.length);
 		}
 
 		public static void setIntegerValue(int name, int[] params, @SuppressWarnings("NullableProblems") BiConsumer<@Nonnull Integer, @Nonnull int[]> setter) {
-			setter.accept(name, params);
+			setter.accept(suppressBoxing(name), params);
 			getState().put(name, params.clone());
 		}
 	}

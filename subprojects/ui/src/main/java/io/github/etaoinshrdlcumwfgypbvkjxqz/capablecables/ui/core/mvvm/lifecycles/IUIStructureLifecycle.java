@@ -9,6 +9,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.temp
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.ResourceBundle;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
+
 @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
 public interface IUIStructureLifecycle<IC, CC>
 		extends IUILifecycle {
@@ -38,7 +40,7 @@ public interface IUIStructureLifecycle<IC, CC>
 			throw new IllegalStateException(
 					new LogMessageBuilder()
 							.addMarkers(UIMarkers.getInstance()::getMarkerUIInfrastructure)
-							.addKeyValue("bound", bound).addKeyValue("expected", expected)
+							.addKeyValue("bound", suppressBoxing(bound)).addKeyValue("expected", suppressBoxing(expected))
 							.addMessages(bound
 									? () -> StaticHolder.getResourceBundle().getString("check.bound.true")
 									: () -> StaticHolder.getResourceBundle().getString("check.bound.false"))

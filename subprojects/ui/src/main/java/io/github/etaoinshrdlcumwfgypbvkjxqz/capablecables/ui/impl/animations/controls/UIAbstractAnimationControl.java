@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
+
 public abstract class UIAbstractAnimationControl
 		extends UIAbstractAnimationPlayable
 		implements IUIAnimationControl {
@@ -34,10 +36,10 @@ public abstract class UIAbstractAnimationControl
 			throws TH {
 		@Immutable List<IUIAnimationTarget> targetsList = ImmutableList.copyOf(targets);
 		final int[] index = {0};
-		int size = targetsList.size();
+		@SuppressWarnings("AutoBoxing") Integer size = targetsList.size();
 		ImmutableList.Builder<R> ret = ImmutableList.builder();
 		targetsList.forEach(IThrowingConsumer.executeNow(target -> {
-			ret.add(AssertionUtilities.assertNonnull(function.apply(target, index[0], size)));
+			ret.add(AssertionUtilities.assertNonnull(function.apply(target, suppressBoxing(index[0]), size)));
 			++index[0];
 		}));
 		return ret.build();

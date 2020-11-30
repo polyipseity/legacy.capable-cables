@@ -6,10 +6,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 
 import java.lang.ref.Reference;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.OptionalInt;
+import java.util.*;
 
 public enum CollectionUtilities {
 	;
@@ -22,6 +19,20 @@ public enum CollectionUtilities {
 	public static <T> OptionalInt lastIndexOf(List<T> instance, T o) {
 		int result = instance.lastIndexOf(o);
 		return result == -1 ? OptionalInt.empty() : OptionalInt.of(result);
+	}
+
+	public static <T> long countEqualPrefixes(Iterable<? extends T> a, Iterable<? extends T> b) {
+		long result = 0;
+		Iterator<? extends T>
+				aIterator = a.iterator(),
+				bIterator = b.iterator();
+		while (aIterator.hasNext() && bIterator.hasNext()) {
+			if (Objects.equals(aIterator.next(), bIterator.next()))
+				++result;
+			else
+				break;
+		}
+		return result;
 	}
 
 	public static <T> @Immutable List<T> collectOrRemoveReferences(Iterable<? extends Reference<? extends T>> instance) {

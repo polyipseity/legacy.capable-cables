@@ -10,7 +10,7 @@ import java.math.RoundingMode;
 public enum PrimitiveUtilities {
 	;
 
-
+	@SuppressWarnings("AutoBoxing")
 	private static final ImmutableMap<Class<?>, Object> PRIMITIVE_DATA_TYPE_TO_DEFAULT_VALUE_MAP =
 			ImmutableMap.<Class<?>, Object>builder()
 					.put(int.class, 0)

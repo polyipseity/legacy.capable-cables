@@ -30,7 +30,7 @@ import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public enum EnumJAXBUIDefaultObjectAdapter {
-	COLOR(ImmutableTuple2.of(Color.class, java.awt.Color.class),
+	@SuppressWarnings({"AutoBoxing", "AutoUnboxing"}) COLOR(ImmutableTuple2.of(Color.class, java.awt.Color.class),
 			new JAXBFunctionalObjectAdapter<>(
 					(context, left) -> new java.awt.Color(left.getRed(), left.getGreen(), left.getBlue(), left.getAlpha()),
 					(context, right) -> {
@@ -41,7 +41,7 @@ public enum EnumJAXBUIDefaultObjectAdapter {
 						left.setAlpha((short) right.getAlpha());
 						return left;
 					})),
-	AFFINE_TRANSFORM(ImmutableTuple2.of(AffineTransform.class, java.awt.geom.AffineTransform.class),
+	@SuppressWarnings({"AutoUnboxing", "AutoBoxing"}) AFFINE_TRANSFORM(ImmutableTuple2.of(AffineTransform.class, java.awt.geom.AffineTransform.class),
 			new JAXBFunctionalObjectAdapter<>(
 					(context, left) -> {
 						return new java.awt.geom.AffineTransform(new double[]{

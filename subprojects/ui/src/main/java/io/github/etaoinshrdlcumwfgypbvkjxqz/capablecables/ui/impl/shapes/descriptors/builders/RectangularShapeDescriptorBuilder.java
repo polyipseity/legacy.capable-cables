@@ -9,6 +9,8 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressUnboxing;
+
 public abstract class RectangularShapeDescriptorBuilder<S extends RectangularShape>
 		extends AbstractShapeDescriptorBuilder<S> {
 	protected RectangularShapeDescriptorBuilder(Class<S> genericClass) { super(genericClass); }
@@ -16,13 +18,9 @@ public abstract class RectangularShapeDescriptorBuilder<S extends RectangularSha
 	@Override
 	public IShapeDescriptor<S> build() {
 		S s = createRectangularShape();
-		UIObjectUtilities.acceptRectangularShape(getBounds(), (x, y, w, h) -> {
-			assert x != null;
-			assert y != null;
-			assert w != null;
-			assert h != null;
-			s.setFrame(x, y, w, h);
-		}); // TODO javac bug, no method ref here
+		UIObjectUtilities.acceptRectangularShape(getBounds(), (x, y, width, height) ->
+				s.setFrame(suppressUnboxing(x), suppressUnboxing(y),
+						suppressUnboxing(width), suppressUnboxing(height))); // TODO javac bug, no method ref here
 		UIObjectUtilities.transformRectangularShape(getTransform(), s, s);
 		IShapeDescriptor<S> ret = new RectangularShapeDescriptor<>(s);
 		IShapeDescriptorBuilder.addUIObjects(ret, getConstraints());

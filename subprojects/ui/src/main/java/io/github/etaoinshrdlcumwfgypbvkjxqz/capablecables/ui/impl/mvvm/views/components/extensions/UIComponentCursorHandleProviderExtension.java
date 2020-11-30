@@ -20,7 +20,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inpu
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputPointerDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional2;
 
-import java.util.Optional;
+import java.util.OptionalLong;
 
 public class UIComponentCursorHandleProviderExtension
 		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIView<?>, IUIViewComponent<?, ?>>
@@ -37,7 +37,7 @@ public class UIComponentCursorHandleProviderExtension
 	protected static IUIExtensionArguments getDefaultArguments() { return DEFAULT_ARGUMENTS; }
 
 	@Override
-	public Optional<Long> getCursorHandle() {
+	public OptionalLong getCursorHandle() {
 		return getContainer()
 				.flatMap(view ->
 						Optional2.of(
@@ -47,11 +47,11 @@ public class UIComponentCursorHandleProviderExtension
 										.map(IUIViewContext::getInputDevices)
 										.flatMap(IInputDevices::getPointerDevice)
 										.orElse(null))
-								.flatMap(values -> {
+								.map(values -> {
 									IUIComponentContext componentContext = values.getValue1Nonnull();
 									IInputPointerDevice pointerDevice = values.getValue2Nonnull();
 									try (IUIComponentContext safeComponentContext = componentContext) {
-										Optional<Long> ret = Optional.empty();
+										OptionalLong ret = OptionalLong.empty();
 										IUIViewComponent.getPathResolver(view).resolvePath(safeComponentContext, pointerDevice.getPositionView());
 										while (!safeComponentContext.getPathView().isEmpty()) {
 											IUIComponent component = IUIComponentContext.getCurrentComponent(safeComponentContext)
@@ -69,7 +69,9 @@ public class UIComponentCursorHandleProviderExtension
 										}
 										return ret;
 									}
-								}));
+								})
+				)
+				.orElseGet(OptionalLong::empty);
 	}
 
 	@Override

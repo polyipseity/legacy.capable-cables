@@ -40,6 +40,7 @@ import sun.misc.Cleaner;
 
 import java.util.Optional;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 
 public class UIDefaultCacheExtension
@@ -156,7 +157,7 @@ public class UIDefaultCacheExtension
 									@Override
 									protected Integer load(IUIComponent container) {
 										// COMMENT 0 counts container already
-										return Iterators.size(new IUIComponent.ParentIterator(container.getParent().orElse(null)));
+										return suppressBoxing(Iterators.size(new IUIComponent.ParentIterator(container.getParent().orElse(null))));
 									}
 								})));
 

@@ -8,7 +8,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.ite
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.utilities.BlockUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.utilities.NBTUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.utilities.RayTraceResultUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.OptionalUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -35,8 +35,11 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
 
 public class WrenchItem extends Item {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(ModConfiguration.getInstance());
@@ -62,7 +65,8 @@ public class WrenchItem extends Item {
 				if (user != null && user.isSneaking()) {
 					if (tag.getPickedUpBlock() != null) {
 						BlockPos targetPos = BlockUtilities.getPlacePosition(targetBlock);
-						BlockState state = Block.getStateById(AssertionUtilities.assertNonnull(tag.getPickedUpBlockState()));
+						assert tag.getPickedUpBlockState().isPresent();
+						BlockState state = Block.getStateById(tag.getPickedUpBlockState().getAsInt());
 						// todo blacklist and whitelist system
 						return state.isValidPosition(world, targetPos) && BlockUtilities.checkNoEntityCollision(state, world, targetPos);
 					}
@@ -85,8 +89,8 @@ public class WrenchItem extends Item {
 				BlockRayTraceResult targetBlock = (BlockRayTraceResult) target;
 				if (tag.getPickedUpBlock() != null) {
 					BlockPos pos = BlockUtilities.getPlacePosition(targetBlock);
-					assert tag.getPickedUpBlockState() != null;
-					BlockState state = Block.getStateById(tag.getPickedUpBlockState());
+					assert tag.getPickedUpBlockState().isPresent();
+					BlockState state = Block.getStateById(tag.getPickedUpBlockState().getAsInt());
 					if (!world.setBlockState(pos, state)) {
 						// COMMENT only a warning, since placing it outside the build height triggers this
 						ModConfiguration.getInstance().getLogger()
@@ -133,7 +137,7 @@ public class WrenchItem extends Item {
 					BlockPos pos = targetBlock.getPos();
 					BlockState state = world.getBlockState(pos);
 					@Nullable TileEntity tile = state.getBlock().hasTileEntity(state) ? world.getTileEntity(pos) : null;
-					tag.setPickedUpBlockState(Block.getStateId(state));
+					tag.setPickedUpBlockState(suppressBoxing(Block.getStateId(state)));
 					if (tile != null) {
 						tag.setPickedUpBlockTile(tile.serializeNBT());
 						world.removeTileEntity(pos);
@@ -216,7 +220,7 @@ public class WrenchItem extends Item {
 				CompoundNBT pickup = new CompoundNBT();
 				{
 					CompoundNBT pickedUpBlock = new CompoundNBT();
-					NBTUtilities.setChildIfNotNull(pickedUpBlock, "state", getPickedUpBlockState(), CompoundNBT::putInt);
+					NBTUtilities.setChildIfNotNull(pickedUpBlock, "state", OptionalUtilities.valueOf(getPickedUpBlockState()), CompoundNBT::putInt);
 					NBTUtilities.setChildIfNotNull(pickedUpBlock, "tile", getPickedUpBlockTile(), CompoundNBT::put);
 					if (NBTUtilities.setTagIfNotEmpty(pickup, "block", pickedUpBlock))
 						this.setPickedUpBlock(pickedUpBlock);
@@ -233,17 +237,19 @@ public class WrenchItem extends Item {
 				AtomicReference<CompoundNBT> pickup = new AtomicReference<>();
 				NBTUtilities.readChildIfHasKey(tag, "pickup", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(pickup::set);
 				{
-					NBTUtilities.readChildIfHasKey(pickup.get(), "block", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(this::setPickedUpBlock);
-					NBTUtilities.readChildIfHasKey(getPickedUpBlock(), "state", () -> IntNBT.valueOf(0), CompoundNBT::getInt).ifPresent(this::setPickedUpBlockState);
-					NBTUtilities.readChildIfHasKey(getPickedUpBlock(), "tile", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(this::setPickedUpBlockTile);
+					NBTUtilities.readChildIfHasKey(pickup.get(), "block", CompoundNBT::new, CompoundNBT::getCompound)
+							.ifPresent(this::setPickedUpBlock);
+					NBTUtilities.readChildIfHasKey(getPickedUpBlock(), "state", () -> IntNBT.valueOf(0), (compoundNBT, key) -> suppressBoxing(compoundNBT.getInt(key)))
+							.ifPresent(this::setPickedUpBlockState);
+					NBTUtilities.readChildIfHasKey(getPickedUpBlock(), "tile", CompoundNBT::new, CompoundNBT::getCompound)
+							.ifPresent(this::setPickedUpBlockTile);
 				}
 				NBTUtilities.readChildIfHasKey(pickup.get(), "entity", CompoundNBT::new, CompoundNBT::getCompound).ifPresent(this::setPickedUpEntity);
 			}
 		}
 
-		@Nullable
-		public Integer getPickedUpBlockState() {
-			return pickedUpBlockState;
+		public OptionalInt getPickedUpBlockState() {
+			return OptionalUtilities.ofInt(pickedUpBlockState);
 		}
 
 		@Nullable

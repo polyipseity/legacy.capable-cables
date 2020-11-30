@@ -16,6 +16,7 @@ public abstract class AbstractDimension2D
 		extends Dimension2D
 		implements Serializable {
 	private static final long serialVersionUID = -6888542933393503233L;
+	@SuppressWarnings("AutoBoxing")
 	@NonNls
 	private static final @Immutable Map<String, Function<@Nonnull Dimension2D, @Nullable ?>> OBJECT_VARIABLE_MAP =
 			ImmutableMap.<String, Function<@Nonnull Dimension2D, @Nullable ?>>builder()

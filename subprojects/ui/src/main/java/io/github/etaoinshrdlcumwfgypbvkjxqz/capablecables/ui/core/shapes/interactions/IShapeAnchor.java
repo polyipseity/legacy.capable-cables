@@ -33,6 +33,7 @@ public interface IShapeAnchor {
 	enum StaticHolder {
 		;
 
+		@SuppressWarnings("AutoBoxing")
 		@NonNls
 		private static final ImmutableMap<String, Function<@Nonnull IShapeAnchor, @Nullable ?>> OBJECT_VARIABLE_MAP =
 				ImmutableMap.<String, Function<@Nonnull IShapeAnchor, @Nullable ?>>builder()

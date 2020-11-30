@@ -26,6 +26,7 @@ public interface IMouseButtonClickData
 	enum StaticHolder {
 		;
 		public static final int MOUSE_BUTTON_NULL = -1;
+		@SuppressWarnings("AutoBoxing")
 		@NonNls
 		private static final ImmutableMap<String, Function<@Nonnull IMouseButtonClickData, @Nullable ?>> OBJECT_VARIABLE_MAP =
 				ImmutableMap.<String, Function<@Nonnull IMouseButtonClickData, @Nullable ?>>builder()

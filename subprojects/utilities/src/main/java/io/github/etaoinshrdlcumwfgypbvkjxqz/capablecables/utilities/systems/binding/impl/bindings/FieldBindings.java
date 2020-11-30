@@ -3,13 +3,12 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bin
 import com.google.common.cache.Cache;
 import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingBiFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingConsumer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.NoSuchBindingTransformerException;
@@ -20,12 +19,14 @@ import org.slf4j.Logger;
 import sun.misc.Cleaner;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool.*;
 
 public class FieldBindings
 		extends AbstractBindings<IBindingField<?>> {
@@ -45,30 +46,32 @@ public class FieldBindings
 	@SuppressWarnings("UnstableApiUsage")
 	public boolean add(Iterable<? extends IBindingField<?>> fields)
 			throws NoSuchBindingTransformerException {
-		return Streams.stream(fields) // COMMENT sequential, field binding order matters
-				.filter(key -> !getFields().containsKey(key))
-				.reduce(false, IThrowingBiFunction.executeNow((r, f) -> {
-					assert f != null;
-					getFields().keySet().stream().unordered()
-							.findAny()
-							.ifPresent(IThrowingConsumer.executeNow(fc ->
-									f.setValue(CastUtilities.castUnchecked( // COMMENT should be of the right type
-											transform(getTransformers(),
-													CastUtilities.castUnchecked(fc.getValue()), // COMMENT should be always safe
-													fc.getTypeToken().getRawType(),
-													f.getTypeToken().getRawType()
-											)
-									))
-							));
-					DisposableObserver<?> d = new FieldSynchronizationDisposableObserver<>(getTransformers(),
-							f,
-							getFields().keySet(),
-							getIsSource(),
-							UtilitiesConfiguration.getInstance().getLogger());
-					getFields().put(f, d);
-					f.getField().getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
-					return true;
-				}), Boolean::logicalOr);
+		return stripBool(
+				Streams.stream(fields) // COMMENT sequential, field binding order matters
+						.filter(key -> !getFields().containsKey(key))
+						.mapToInt(field -> {
+							getFields().keySet().stream().unordered()
+									.findAny()
+									.ifPresent(IThrowingConsumer.executeNow(fc ->
+											field.setValue(CastUtilities.castUnchecked( // COMMENT should be of the right type
+													transform(getTransformers(),
+															CastUtilities.castUnchecked(fc.getValue()), // COMMENT should be always safe
+															fc.getTypeToken().getRawType(),
+															field.getTypeToken().getRawType()
+													)
+											))
+									));
+							DisposableObserver<?> d = new FieldSynchronizationDisposableObserver<>(getTransformers(),
+									field,
+									getFields().keySet(),
+									getIsSource(),
+									UtilitiesConfiguration.getInstance().getLogger());
+							getFields().put(field, d);
+							field.getField().getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
+							return tBool();
+						})
+						.reduce(fBool(), PaddedBool::orBool)
+		);
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
@@ -79,13 +82,14 @@ public class FieldBindings
 	@Override
 	@SuppressWarnings("UnstableApiUsage")
 	public boolean remove(Iterable<? extends IBindingField<?>> fields) {
-		return Streams.stream(fields).unordered()
-				.filter(getFields()::containsKey)
-				.reduce(false, (r, f) -> {
-					Disposable d = AssertionUtilities.assertNonnull(getFields().remove(f));
-					d.dispose();
-					return true;
-				}, Boolean::logicalOr);
+		return stripBool(
+				Streams.stream(fields).unordered()
+						.map(getFields()::remove)
+						.filter(Objects::nonNull)
+						.peek(Disposable::dispose)
+						.mapToInt(disposable -> tBool())
+						.reduce(fBool(), PaddedBool::orBool)
+		);
 	}
 
 	@Override

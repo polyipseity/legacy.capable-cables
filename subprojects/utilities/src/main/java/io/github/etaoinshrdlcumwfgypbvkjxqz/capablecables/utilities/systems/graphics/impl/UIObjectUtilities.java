@@ -13,7 +13,6 @@ import java.awt.geom.RectangularShape;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities.assertNonnull;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
@@ -29,44 +28,64 @@ public enum UIObjectUtilities {
 		};
 	}
 
+	@SuppressWarnings("AutoUnboxing")
 	public static <R extends Dimension2D> R floorDimension(Dimension2D source, R destination) {
 		acceptDimension(source, (x, y) -> destination.setSize(Math.floor(x), Math.floor(y)));
 		return destination;
 	}
 
-	public static void acceptDimension(Dimension2D dimension, BiConsumer<@Nonnull ? super Double, @Nonnull ? super Double> action) { action.accept(dimension.getWidth(), dimension.getHeight()); }
+	@SuppressWarnings("AutoBoxing")
+	public static void acceptDimension(Dimension2D dimension, BiConsumer<@Nonnull ? super Double, @Nonnull ? super Double> action) {
+		action.accept(dimension.getWidth(), dimension.getHeight());
+	}
 
+	@SuppressWarnings("AutoUnboxing")
 	public static <R extends RectangularShape> R floorRectangularShape(RectangularShape source, R destination) {
 		acceptRectangularShape(source, (x, y, w, h) ->
 				destination.setFrame(Math.floor(x), Math.floor(y), Math.floor(w), Math.floor(h)));
 		return destination;
 	}
 
+	@SuppressWarnings("AutoBoxing")
 	public static <TH extends Throwable> void acceptRectangularShape(RectangularShape rectangular, IConsumer4<@Nonnull ? super Double, @Nonnull ? super Double, @Nonnull ? super Double, @Nonnull ? super Double, ? extends TH> action)
-			throws TH { action.accept(rectangular.getX(), rectangular.getY(), rectangular.getWidth(), rectangular.getHeight()); }
+			throws TH {
+		action.accept(rectangular.getX(), rectangular.getY(), rectangular.getWidth(), rectangular.getHeight());
+	}
 
+	@SuppressWarnings("AutoUnboxing")
 	public static <R extends Point2D> R floorPoint(Point2D source, R destination) {
 		acceptPoint(source, (x, y) -> destination.setLocation(Math.floor(x), Math.floor(y)));
 		return destination;
 	}
 
-	public static void acceptPoint(Point2D point, BiConsumer<@Nonnull ? super Double, @Nonnull ? super Double> action) { action.accept(point.getX(), point.getY()); }
+	@SuppressWarnings("AutoBoxing")
+	public static void acceptPoint(Point2D point, BiConsumer<@Nonnull ? super Double, @Nonnull ? super Double> action) {
+		action.accept(point.getX(), point.getY());
+	}
 
+	@SuppressWarnings("AutoUnboxing")
 	public static <R extends Point2D> R minPoint(Point2D a, Point2D b, R destination) {
 		acceptPoint(a, (ax, ay) -> acceptPoint(b, (bx, by) -> destination.setLocation(min(ax, bx), min(ay, by))));
 		return destination;
 	}
 
+	@SuppressWarnings("AutoUnboxing")
 	public static <R extends Point2D> R maxPoint(Point2D a, Point2D b, R destination) {
 		acceptPoint(a, (ax, ay) -> acceptPoint(b, (bx, by) -> destination.setLocation(max(ax, bx), max(ay, by))));
 		return destination;
 	}
 
-	public static <T> T applyPoint(Point2D point, BiFunction<@Nonnull ? super Double, @Nonnull ? super Double, ? extends T> action) { return action.apply(point.getX(), point.getY()); }
+	@SuppressWarnings("AutoBoxing")
+	public static <T> T applyPoint(Point2D point, BiFunction<@Nonnull ? super Double, @Nonnull ? super Double, ? extends T> action) {
+		return action.apply(point.getX(), point.getY());
+	}
 
-	public static <T> T applyDimension(Dimension2D dimension, BiFunction<@Nonnull ? super Double, @Nonnull ? super Double, ? extends T> action) { return action.apply(dimension.getWidth(), dimension.getHeight()); }
+	@SuppressWarnings("AutoBoxing")
+	public static <T> T applyDimension(Dimension2D dimension, BiFunction<@Nonnull ? super Double, @Nonnull ? super Double, ? extends T> action) {
+		return action.apply(dimension.getWidth(), dimension.getHeight());
+	}
 
-	@SuppressWarnings("UnusedReturnValue")
+	@SuppressWarnings({"UnusedReturnValue", "AutoUnboxing"})
 	public static <R extends RectangularShape> R transformRectangularShape(AffineTransform transform,
 	                                                                       RectangularShape rectangular,
 	                                                                       R destination) {
@@ -77,6 +96,9 @@ public enum UIObjectUtilities {
 		return destination;
 	}
 
+	@SuppressWarnings("AutoBoxing")
 	public static <T, TH extends Throwable> T applyRectangularShape(RectangularShape rectangular, IFunction4<? super Double, ? super Double, ? super Double, ? super Double, ? extends T, ? extends TH> action)
-			throws TH { return assertNonnull(action.apply(rectangular.getX(), rectangular.getY(), rectangular.getWidth(), rectangular.getHeight())); }
+			throws TH {
+		return action.apply(rectangular.getX(), rectangular.getY(), rectangular.getWidth(), rectangular.getHeight());
+	}
 }

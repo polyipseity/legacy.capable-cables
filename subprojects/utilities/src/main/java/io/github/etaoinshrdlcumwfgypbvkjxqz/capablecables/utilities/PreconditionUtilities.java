@@ -20,7 +20,6 @@ public enum PreconditionUtilities {
 
 	public static void checkArrayContentType(Class<?> type, Object... array) {
 		Arrays.stream(array).unordered()
-				.map(o -> o == null || type.isInstance(o))
-				.forEach(Preconditions::checkArgument);
+				.forEach(o -> Preconditions.checkArgument(o == null || type.isInstance(o)));
 	}
 }

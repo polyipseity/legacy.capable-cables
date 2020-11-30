@@ -58,8 +58,14 @@ public final class UIImmutableComponentPathResolverResult
 	protected List<IUIVirtualComponent> getVirtualComponents() { return virtualComponents; }
 
 	@Override
-	public boolean isPresent() { return getComponent().isPresent(); }
+	public boolean isPresent() {
+		return getComponent().isPresent();
+	}
 
 	@Override
-	public boolean isVirtual() { return getComponent().map(IUIVirtualComponent.class::isInstance).orElse(false); }
+	public boolean isVirtual() {
+		return getComponent()
+				.filter(IUIVirtualComponent.class::isInstance)
+				.isPresent();
+	}
 }

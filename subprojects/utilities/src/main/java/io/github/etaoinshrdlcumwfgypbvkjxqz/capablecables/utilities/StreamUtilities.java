@@ -9,8 +9,6 @@ import java.util.stream.Stream;
 
 public enum StreamUtilities {
 	;
-
-
 	// COMMENT from http://gee.cs.oswego.edu/dl/html/StreamParallelGuidance.html
 	public static final int THRESHOLD_PARALLEL = 10000;
 

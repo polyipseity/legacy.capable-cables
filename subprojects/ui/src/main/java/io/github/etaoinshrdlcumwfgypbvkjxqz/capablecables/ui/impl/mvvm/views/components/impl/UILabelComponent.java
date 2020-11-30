@@ -28,6 +28,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.F
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple3;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableTuple3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
@@ -51,7 +52,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.*;
 
 public class UILabelComponent
 		extends UIDefaultComponent {
@@ -79,10 +80,8 @@ public class UILabelComponent
 
 		@Immutable Map<INamespacePrefixedString, ? extends IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.text = new TextBindingField(suppressThisEscapedWarning(() -> this),
-				IUIPropertyMappingValue.createBindingField(IAttributedText.class, TextUtilities.getEmptyAttributedText(),
-						mappings.get(getPropertyTextLocation())));
-		this.autoResize = IUIPropertyMappingValue.createBindingField(Boolean.class, true,
-				mappings.get(getPropertyAutoResizeLocation()));
+				IUIPropertyMappingValue.createBindingField(IAttributedText.class, ConstantValue.of(TextUtilities.getEmptyAttributedText()), mappings.get(getPropertyTextLocation())));
+		this.autoResize = IUIPropertyMappingValue.createBindingField(Boolean.class, ConstantValue.of(suppressBoxing(true)), mappings.get(getPropertyAutoResizeLocation()));
 	}
 
 	public static INamespacePrefixedString getPropertyTextLocation() {
@@ -162,7 +161,7 @@ public class UILabelComponent
 		@Override
 		public Shape getShapeOutput() {
 			return getOwner()
-					.filter(owner -> owner.getAutoResize().getValue())
+					.filter(owner -> suppressUnboxing(owner.getAutoResize().getValue()))
 					.<Shape>map(owner -> {
 						Rectangle2D bounds = getDelegate().getShapeOutput().getBounds2D();
 						Dimension2D dimension = owner.getTextDimension();
@@ -229,7 +228,7 @@ public class UILabelComponent
 						Point2D textPen = new Point2D.Double(componentBounds.getX(), componentBounds.getY());
 						float textWidth = FloatUtilities.saturatedCast(componentBounds.getWidth());
 						TextUtilities.drawLines(graphics, textPen, textWidth,
-								getTextLayoutTask().apply(ImmutableTuple3.of(container.getText().getValue().compile(), graphics.getFontRenderContext(), textWidth)));
+								getTextLayoutTask().apply(ImmutableTuple3.of(container.getText().getValue().compile(), graphics.getFontRenderContext(), suppressBoxing(textWidth))));
 					}
 				}
 			});

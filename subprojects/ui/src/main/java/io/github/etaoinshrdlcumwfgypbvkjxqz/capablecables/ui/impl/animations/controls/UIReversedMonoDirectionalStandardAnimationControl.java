@@ -6,8 +6,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.MathUtilitie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IFunction3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time.core.ITicker;
 
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities.assertNonnull;
-
 public class UIReversedMonoDirectionalStandardAnimationControl
 		extends UIAbstractStandardAnimationControl {
 	protected UIReversedMonoDirectionalStandardAnimationControl(Iterable<? extends IUIAnimationTarget> targets,
@@ -23,7 +21,7 @@ public class UIReversedMonoDirectionalStandardAnimationControl
 	@Override
 	protected double getProgressForTarget(IUIAnimationTarget target, int index, int size) {
 		long currentProgress = getCurrentProgress(this, index);
-		long loop = assertNonnull(getLoops().get(index));
+		long loop = getLoops().getLong(index);
 		if (loop != UIStandardAnimationControlFactory.getInfiniteLoop()) {
 			double currentLoop = getCurrentLoop(this, index);
 			if (currentLoop >= loop)
@@ -31,14 +29,14 @@ public class UIReversedMonoDirectionalStandardAnimationControl
 			else if (currentLoop < 0)
 				currentProgress = 1;
 		}
-		return (double) currentProgress / assertNonnull(getLocalDurations().get(index));
+		return (double) currentProgress / getLocalDurations().getLong(index);
 	}
 
 	protected static long getCurrentProgress(UIReversedMonoDirectionalStandardAnimationControl instance, int index) {
 		return MathUtilities.clamp(
-				Math.floorMod(instance.getElapsed(), getTotalDuration(instance, index)) - assertNonnull(instance.getEndDelays().get(index)),
+				Math.floorMod(instance.getElapsed(), getTotalDuration(instance, index)) - instance.getEndDelays().getLong(index),
 				0,
-				assertNonnull(instance.getLocalDurations().get(index)));
+				instance.getLocalDurations().getLong(index));
 	}
 
 	protected static double getCurrentLoop(UIReversedMonoDirectionalStandardAnimationControl instance, int index) {
@@ -46,9 +44,9 @@ public class UIReversedMonoDirectionalStandardAnimationControl
 	}
 
 	protected static long getTotalDuration(UIReversedMonoDirectionalStandardAnimationControl instance, int index) {
-		return assertNonnull(instance.getEndDelays().get(index))
-				+ assertNonnull(instance.getLocalDurations().get(index))
-				+ assertNonnull(instance.getStartDelays().get(index));
+		return instance.getEndDelays().getLong(index)
+				+ instance.getLocalDurations().getLong(index)
+				+ instance.getStartDelays().getLong(index);
 	}
 
 	@Override

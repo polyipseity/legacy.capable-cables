@@ -28,6 +28,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilitie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
@@ -42,10 +43,7 @@ import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
@@ -178,10 +176,10 @@ public class UIButtonComponent
 	}
 
 	@Override
-	public Optional<Long> getCursorHandle(IUIComponentContext context) {
+	public OptionalLong getCursorHandle(IUIComponentContext context) {
 		return getButtonStates().contains(EnumButtonState.HOVERING)
-				? Optional.of(EnumGLFWCursor.STANDARD_HAND_CURSOR.getHandle())
-				: Optional.empty();
+				? OptionalLong.of(EnumGLFWCursor.STANDARD_HAND_CURSOR.getHandle())
+				: OptionalLong.empty();
 	}
 
 	public enum EnumButtonState {
@@ -291,18 +289,12 @@ public class UIButtonComponent
 			super(arguments);
 
 			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-			this.baseColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.DARK_GRAY,
-					mappings.get(getPropertyBaseColorLocation()));
-			this.baseBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.DARK_GRAY,
-					mappings.get(getPropertyBaseBorderColorLocation()));
-			this.hoveringColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.GRAY,
-					mappings.get(getPropertyHoveringColorLocation()));
-			this.hoveringBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.GRAY,
-					mappings.get(getPropertyHoveringBorderColorLocation()));
-			this.pressedColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.LIGHT_GRAY,
-					mappings.get(getPropertyPressedColorLocation()));
-			this.pressedBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, Color.LIGHT_GRAY,
-					mappings.get(getPropertyPressedBorderColorLocation()));
+			this.baseColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.DARK_GRAY), mappings.get(getPropertyBaseColorLocation()));
+			this.baseBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.DARK_GRAY), mappings.get(getPropertyBaseBorderColorLocation()));
+			this.hoveringColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.GRAY), mappings.get(getPropertyHoveringColorLocation()));
+			this.hoveringBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.GRAY), mappings.get(getPropertyHoveringBorderColorLocation()));
+			this.pressedColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.LIGHT_GRAY), mappings.get(getPropertyPressedColorLocation()));
+			this.pressedBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.LIGHT_GRAY), mappings.get(getPropertyPressedBorderColorLocation()));
 		}
 
 		public static INamespacePrefixedString getPropertyBaseColorLocation() {

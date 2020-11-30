@@ -6,6 +6,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descrip
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeDescriptorProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.descriptors.AbstractDelegatingShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 
@@ -33,7 +34,9 @@ public class ProviderShapeDescriptor<S extends Shape>
 	@Override
 	public boolean modify(BooleanSupplier action)
 			throws ConcurrentModificationException {
-		if (!getOwner().map(IShapeDescriptorProvider::isModifyingShape).orElse(true))
+		if (getOwner()
+				.filter(FunctionUtilities.notPredicate(IShapeDescriptorProvider::isModifyingShape))
+				.isPresent())
 			throw new IllegalStateException(
 					new LogMessageBuilder()
 							.addMarkers(UIMarkers.getInstance()::getMarkerShape)

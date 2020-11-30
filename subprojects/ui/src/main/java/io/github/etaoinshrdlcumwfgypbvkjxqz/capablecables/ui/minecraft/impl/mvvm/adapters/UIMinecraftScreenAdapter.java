@@ -1,9 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.adapters;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Streams;
 import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
@@ -28,11 +26,14 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.utilities.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.utilities.UIMinecraftBackgrounds;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CollectionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftOpenGLUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTextComponentUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTooltipUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.inputs.MinecraftInputPointerDevice;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.PrimitiveStreamUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.INode;
@@ -43,6 +44,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inpu
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl.ImmutableInputDevices;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl.ImmutableKeyboardKeyPressData;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl.ImmutableMouseButtonClickData;
+import it.unimi.dsi.fastutil.ints.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.IGuiEventListener;
@@ -57,10 +59,13 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
-import java.util.concurrent.ConcurrentMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalLong;
+import java.util.Set;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool.*;
 
 @OnlyIn(Dist.CLIENT)
 public class UIMinecraftScreenAdapter
@@ -70,11 +75,12 @@ public class UIMinecraftScreenAdapter
 	private final I infrastructure;
 	@Nullable
 	private final C containerObject;
-	private final Set<Integer> closeKeys, changeFocusKeys;
-	private final ConcurrentMap<Integer, IUIEventKeyboard>
-			keyboardKeysBeingPressed = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
-	private final ConcurrentMap<Integer, IUIEventMouse>
-			mouseButtonsBeingPressed = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
+	private final IntSet closeKeys;
+	private final IntSet changeFocusKeys;
+	private final Int2ObjectMap<IUIEventKeyboard>
+			keyboardKeysBeingPressed = new Int2ObjectOpenHashMap<>(CapacityUtilities.getInitialCapacitySmall());
+	private final Int2ObjectMap<IUIEventMouse>
+			mouseButtonsBeingPressed = new Int2ObjectOpenHashMap<>(CapacityUtilities.getInitialCapacitySmall());
 	private final IUIContextContainer contextContainer =
 			new UIImmutableContextContainer(
 					new UIImmutableViewContext(
@@ -95,15 +101,13 @@ public class UIMinecraftScreenAdapter
 	private double lastPartialTicks = 0D;
 	private long lastCursorHandle = MemoryUtilities.getInvalidAddress();
 
-	protected UIMinecraftScreenAdapter(ITextComponent title, I infrastructure, @Nullable C containerObject, Set<Integer> closeKeys, Set<Integer> changeFocusKeys) {
+	protected UIMinecraftScreenAdapter(ITextComponent title, I infrastructure, @Nullable C containerObject, IntIterable closeKeys, IntIterable changeFocusKeys) {
 		super(title);
 		this.title = title;
 		this.infrastructure = infrastructure;
 		this.containerObject = containerObject;
-		this.closeKeys = Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(closeKeys.size()).makeMap());
-		this.closeKeys.addAll(closeKeys);
-		this.changeFocusKeys = Collections.newSetFromMap(MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(changeFocusKeys.size()).makeMap());
-		this.changeFocusKeys.addAll(changeFocusKeys);
+		this.closeKeys = new IntOpenHashSet(closeKeys.iterator());
+		this.changeFocusKeys = new IntOpenHashSet(changeFocusKeys.iterator());
 
 		IExtensionContainer.addExtensionChecked(this.infrastructure, new UIDefaultMinecraftScreenProviderExtension(suppressThisEscapedWarning(() -> this)));
 		if (containerObject != null)
@@ -131,7 +135,8 @@ public class UIMinecraftScreenAdapter
 		setLastPartialTicks(partialTicks);
 		getInfrastructure().getView().render();
 		setCursorHandle(IUICursorHandleProviderExtension.StaticHolder.getType().getValue().find(getInfrastructure().getView())
-				.flatMap(ICursorHandleProvider::getCursorHandle)
+				.map(ICursorHandleProvider::getCursorHandle)
+				.orElseGet(OptionalLong::empty)
 				.orElse(MemoryUtil.NULL));
 	}
 
@@ -151,9 +156,11 @@ public class UIMinecraftScreenAdapter
 	@Deprecated
 	public boolean keyPressed(int key, int scanCode, int modifiers) {
 		IUIContextContainer context = getContextContainer();
-		if (getFocus().map(f -> UIEventUtilities.dispatchEvent(
-				addEventKeyboard(this, UIEventUtilities.Factory.createEventKeyDown(context.getViewContext(), f,
-						new ImmutableKeyboardKeyPressData(key, scanCode, modifiers))))).orElse(true)) {
+		if (!getFocus()
+				.filter(f -> !UIEventUtilities.dispatchEvent(
+						addEventKeyboard(this, UIEventUtilities.Factory.createEventKeyDown(context.getViewContext(), f,
+								new ImmutableKeyboardKeyPressData(key, scanCode, modifiers)))))
+				.isPresent()) {
 			if (getCloseKeys().contains(key))
 				onClose();
 			if (getChangeFocusKeys().contains(key))
@@ -163,7 +170,7 @@ public class UIMinecraftScreenAdapter
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Map<Integer, IUIEventKeyboard> getKeyboardKeysBeingPressed() { return keyboardKeysBeingPressed; }
+	protected IntSet getCloseKeys() { return closeKeys; }
 
 	@Override
 	public I getInfrastructure() { return infrastructure; }
@@ -171,28 +178,35 @@ public class UIMinecraftScreenAdapter
 	protected IUIContextContainer getContextContainer() { return contextContainer; }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Set<Integer> getCloseKeys() { return closeKeys; }
+	protected IntSet getChangeFocusKeys() { return changeFocusKeys; }
+
+	@Override
+	@Deprecated
+	public void removed() {
+		IUIContextContainer context = getContextContainer();
+
+		setCursorHandle(MemoryUtil.NULL);
+		{
+			// COMMENT generate opposite synthetic events
+			// COMMENT NO default actions
+			new IntOpenHashSet(getKeyboardKeysBeingPressed().keySet())
+					.forEach((int k) ->
+							removeEventKeyboard(this, k).ifPresent(e2 ->
+									UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventKeyboardOpposite(e2))));
+			Point2D cp = getContextContainer().getViewContext().getInputDevices().getPointerDevice().orElseThrow(AssertionError::new).getPositionView();
+			new IntOpenHashSet(getMouseButtonsBeingPressed().keySet())
+					.forEach((int k) ->
+							removeEventMouse(this, k).ifPresent(e2 ->
+									UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e2, cp))));
+			setTargetBeingHoveredByMouse(context, null, new ImmutableMouseButtonClickData(cp));
+			setLastMouseClickData(context, null, null);
+			setFocus(context, null);
+		}
+		IUIActiveLifecycle.cleanupV(getInfrastructure());
+	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Set<Integer> getChangeFocusKeys() { return changeFocusKeys; }
-
-	protected boolean setFocus(IUIContextContainer context, @Nullable IUIEventTarget focus) {
-		Optional<? extends IUIEventTarget> p = getFocus(), n = Optional.ofNullable(focus);
-		if (n.map(IUIEventTarget::isFocusable).orElse(true) && !n.equals(p)) {
-			@Nullable IUIEventTarget pv = p.orElse(null);
-			p.ifPresent(f -> UIEventUtilities.dispatchEvent(
-					UIEventUtilities.Factory.createEventFocusOutPre(context.getViewContext(), f, focus)));
-			n.ifPresent(f -> UIEventUtilities.dispatchEvent(
-					UIEventUtilities.Factory.createEventFocusInPre(context.getViewContext(), f, pv)));
-			this.focus = focus;
-			p.ifPresent(f -> UIEventUtilities.dispatchEvent(
-					UIEventUtilities.Factory.createEventFocusOutPost(context.getViewContext(), f, focus)));
-			n.ifPresent(f -> UIEventUtilities.dispatchEvent(
-					UIEventUtilities.Factory.createEventFocusInPost(context.getViewContext(), f, pv)));
-			return true;
-		}
-		return false;
-	}
+	protected Int2ObjectMap<IUIEventKeyboard> getKeyboardKeysBeingPressed() { return keyboardKeysBeingPressed; }
 
 	protected Optional<? extends IUIEventTarget> getFocus() { return Optional.ofNullable(focus); }
 
@@ -253,30 +267,8 @@ public class UIMinecraftScreenAdapter
 	@Deprecated
 	public void tick() { getInfrastructure().tick(); }
 
-	@Override
-	@Deprecated
-	public void removed() {
-		IUIContextContainer context = getContextContainer();
-
-		setCursorHandle(MemoryUtil.NULL);
-		{
-			// COMMENT generate opposite synthetic events
-			// COMMENT NO default actions
-			ImmutableSet.copyOf(getKeyboardKeysBeingPressed().keySet()).stream().unordered()
-					.forEach(k ->
-							removeEventKeyboard(this, k).ifPresent(e2 ->
-									UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventKeyboardOpposite(e2))));
-			Point2D cp = getContextContainer().getViewContext().getInputDevices().getPointerDevice().orElseThrow(AssertionError::new).getPositionView();
-			ImmutableSet.copyOf(getMouseButtonsBeingPressed().keySet()).stream().unordered()
-					.forEach(k ->
-							removeEventMouse(this, AssertionUtilities.assertNonnull(k)).ifPresent(e2 ->
-									UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e2, cp))));
-			setTargetBeingHoveredByMouse(context, null, new ImmutableMouseButtonClickData(cp));
-			setLastMouseClickData(context, null, null);
-			setFocus(context, null);
-		}
-		IUIActiveLifecycle.cleanupV(getInfrastructure());
-	}
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected Int2ObjectMap<IUIEventMouse> getMouseButtonsBeingPressed() { return mouseButtonsBeingPressed; }
 
 	@Override
 	@Deprecated
@@ -309,36 +301,83 @@ public class UIMinecraftScreenAdapter
 		return lastCursorHandle;
 	}
 
-	public Set<Integer> getCloseKeysView() { return ImmutableSet.copyOf(getCloseKeys()); }
-
-	@SuppressWarnings("UnstableApiUsage")
-	public boolean addCloseKeys(Iterable<Integer> keys) {
-		return Streams.stream(keys).unordered()
-				.map(getCloseKeys()::add)
-				.reduce(false, Boolean::logicalOr);
+	protected void setTargetBeingHoveredByMouse(IUIContextContainer context, @Nullable IUIEventTarget targetBeingHoveredByMouse, IMouseButtonClickData data) {
+		Optional<? extends IUIEventTarget> o = getTargetBeingHoveredByMouse();
+		Optional<IUIEventTarget> n = Optional.ofNullable(targetBeingHoveredByMouse);
+		if (!n.equals(o)) {
+			List<?>
+					op = o.map(t ->
+					CastUtilities.castChecked(INode.class, t)
+							.<List<?>>map(UIEventUtilities::computeNodePath)
+							.orElseGet(() -> ImmutableList.of(t)))
+					.orElseGet(ImmutableList::of),
+					np = n.map(t ->
+							CastUtilities.castChecked(INode.class, t)
+									.<List<?>>map(UIEventUtilities::computeNodePath)
+									.orElseGet(() -> ImmutableList.of(t)))
+							.orElseGet(ImmutableList::of);
+			int equalParents = Math.toIntExact(CollectionUtilities.countEqualPrefixes(op, np)); // COMMENT paths equal for [0,equalParents)
+			o.ifPresent(t -> {
+				UIEventUtilities.dispatchEvent(
+						UIEventUtilities.Factory.createEventMouseLeaveSelf(context.getViewContext(), t, data, n.orElse(null))); // COMMENT consider bubbling
+				Lists.reverse(op.subList(equalParents, op.size())).forEach(t2 ->
+						CastUtilities.castChecked(IUIEventTarget.class, t2)
+								.ifPresent(t3 -> UIEventUtilities.dispatchEvent(
+										UIEventUtilities.Factory.createEventMouseLeave(context.getViewContext(), t3, data, n.orElse(null)))));
+			});
+			this.targetBeingHoveredByMouse = targetBeingHoveredByMouse;
+			n.ifPresent(t -> {
+				UIEventUtilities.dispatchEvent(
+						UIEventUtilities.Factory.createEventMouseEnterSelf(context.getViewContext(), t, data, o.orElse(null))); // COMMENT consider bubbling
+				np.subList(equalParents, np.size()).forEach(t2 ->
+						CastUtilities.castChecked(IUIEventTarget.class, t2)
+								.ifPresent(t3 -> UIEventUtilities.dispatchEvent(
+										UIEventUtilities.Factory.createEventMouseEnter(context.getViewContext(), t3, data, o.orElse(null)))));
+			});
+		}
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
-	public boolean removeCloseKeys(Iterable<Integer> keys) {
-		return Streams.stream(keys).unordered()
-				.map(getCloseKeys()::remove)
-				.reduce(false, Boolean::logicalOr);
+	protected boolean setFocus(IUIContextContainer context, @Nullable IUIEventTarget focus) {
+		Optional<? extends IUIEventTarget> p = getFocus(), n = Optional.ofNullable(focus);
+		if (!(n.filter(FunctionUtilities.notPredicate(IUIEventTarget::isFocusable)).isPresent()
+				|| n.equals(p))) {
+			@Nullable IUIEventTarget pv = p.orElse(null);
+			p.ifPresent(f -> UIEventUtilities.dispatchEvent(
+					UIEventUtilities.Factory.createEventFocusOutPre(context.getViewContext(), f, focus)));
+			n.ifPresent(f -> UIEventUtilities.dispatchEvent(
+					UIEventUtilities.Factory.createEventFocusInPre(context.getViewContext(), f, pv)));
+			this.focus = focus;
+			p.ifPresent(f -> UIEventUtilities.dispatchEvent(
+					UIEventUtilities.Factory.createEventFocusOutPost(context.getViewContext(), f, focus)));
+			n.ifPresent(f -> UIEventUtilities.dispatchEvent(
+					UIEventUtilities.Factory.createEventFocusInPost(context.getViewContext(), f, pv)));
+			return true;
+		}
+		return false;
 	}
 
-	public Set<Integer> getChangeFocusKeysView() { return ImmutableSet.copyOf(getChangeFocusKeys()); }
-
-	@SuppressWarnings("UnstableApiUsage")
-	public boolean addChangeFocusKeys(Iterable<Integer> keys) {
-		return Streams.stream(keys).unordered()
-				.map(getChangeFocusKeys()::add)
-				.reduce(false, Boolean::logicalOr);
+	public IntSet getCloseKeysView() {
+		return IntSets.unmodifiable(new IntOpenHashSet(getCloseKeys()));
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
-	public boolean removeChangeFocusKeys(Iterable<Integer> keys) {
-		return Streams.stream(keys).unordered()
-				.map(getChangeFocusKeys()::remove)
-				.reduce(false, Boolean::logicalOr);
+	public boolean addCloseKeys(IntIterable keys) {
+		return stripBool(
+				PrimitiveStreamUtilities.streamInt(keys)
+						.map(key -> padBool(getCloseKeys().add(key)))
+						.reduce(fBool(), PaddedBool::orBool)
+		);
+	}
+
+	public boolean removeCloseKeys(IntIterable keys) {
+		return stripBool(
+				PrimitiveStreamUtilities.streamInt(keys)
+						.map(key -> padBool(getCloseKeys().remove(key)))
+						.reduce(fBool(), PaddedBool::orBool)
+		);
+	}
+
+	public IntSet getChangeFocusKeysView() {
+		return IntSets.unmodifiable(new IntOpenHashSet(getChangeFocusKeys()));
 	}
 
 	@Override
@@ -437,8 +476,13 @@ public class UIMinecraftScreenAdapter
 		return event;
 	}
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Map<Integer, IUIEventMouse> getMouseButtonsBeingPressed() { return mouseButtonsBeingPressed; }
+	public boolean addChangeFocusKeys(IntIterable keys) {
+		return stripBool(
+				PrimitiveStreamUtilities.streamInt(keys)
+						.map(key -> padBool(getChangeFocusKeys().add(key)))
+						.reduce(fBool(), PaddedBool::orBool)
+		);
+	}
 
 	@Override
 	public boolean hasContainer() { return getContainerObject().isPresent(); }
@@ -463,48 +507,12 @@ public class UIMinecraftScreenAdapter
 		setTargetBeingHoveredByMouse(context, getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone()), d);
 	}
 
-	protected void setTargetBeingHoveredByMouse(IUIContextContainer context, @Nullable IUIEventTarget targetBeingHoveredByMouse, IMouseButtonClickData data) {
-		Optional<? extends IUIEventTarget> o = getTargetBeingHoveredByMouse();
-		Optional<IUIEventTarget> n = Optional.ofNullable(targetBeingHoveredByMouse);
-		if (!n.equals(o)) {
-			List<?>
-					op = o.map(t ->
-					CastUtilities.castChecked(INode.class, t)
-							.<List<?>>map(UIEventUtilities::computeNodePath)
-							.orElseGet(() -> ImmutableList.of(t)))
-					.orElseGet(ImmutableList::of),
-					np = n.map(t ->
-							CastUtilities.castChecked(INode.class, t)
-									.<List<?>>map(UIEventUtilities::computeNodePath)
-									.orElseGet(() -> ImmutableList.of(t)))
-							.orElseGet(ImmutableList::of);
-			int equalParents = 0;
-			for (@SuppressWarnings("UnstableApiUsage") Iterator<Boolean> iterator =
-			     Streams.zip(op.stream(), np.stream(), Object::equals).iterator();
-			     iterator.hasNext(); ) {
-				if (!iterator.next())
-					break;
-				++equalParents;
-			}
-			int finalEqualParents = equalParents; // COMMENT paths equal for [0,equalParents)
-			o.ifPresent(t -> {
-				UIEventUtilities.dispatchEvent(
-						UIEventUtilities.Factory.createEventMouseLeaveSelf(context.getViewContext(), t, data, n.orElse(null))); // COMMENT consider bubbling
-				Lists.reverse(op.subList(finalEqualParents, op.size())).forEach(t2 ->
-						CastUtilities.castChecked(IUIEventTarget.class, t2)
-								.ifPresent(t3 -> UIEventUtilities.dispatchEvent(
-										UIEventUtilities.Factory.createEventMouseLeave(context.getViewContext(), t3, data, n.orElse(null)))));
-			});
-			this.targetBeingHoveredByMouse = targetBeingHoveredByMouse;
-			n.ifPresent(t -> {
-				UIEventUtilities.dispatchEvent(
-						UIEventUtilities.Factory.createEventMouseEnterSelf(context.getViewContext(), t, data, o.orElse(null))); // COMMENT consider bubbling
-				np.subList(finalEqualParents, np.size()).forEach(t2 ->
-						CastUtilities.castChecked(IUIEventTarget.class, t2)
-								.ifPresent(t3 -> UIEventUtilities.dispatchEvent(
-										UIEventUtilities.Factory.createEventMouseEnter(context.getViewContext(), t3, data, o.orElse(null)))));
-			});
-		}
+	public boolean removeChangeFocusKeys(IntIterable keys) {
+		return stripBool(
+				PrimitiveStreamUtilities.streamInt(keys)
+						.map(key -> padBool(getChangeFocusKeys().remove(key)))
+						.reduce(fBool(), PaddedBool::orBool)
+		);
 	}
 
 	protected Optional<? extends IUIEventTarget> getTargetBeingHoveredByMouse() { return Optional.ofNullable(targetBeingHoveredByMouse); }
@@ -546,8 +554,8 @@ public class UIMinecraftScreenAdapter
 	public static class Builder<I extends IUIMinecraftInfrastructure<?, ?, ?>, C extends Container> {
 		private final ITextComponent title;
 		private final I infrastructure;
-		private Set<Integer> closeKeys = ImmutableSet.of(GLFW.GLFW_KEY_ESCAPE);
-		private Set<Integer> changeFocusKeys = ImmutableSet.of(GLFW.GLFW_KEY_TAB);
+		private IntIterable closeKeys = IntSets.singleton(GLFW.GLFW_KEY_ESCAPE);
+		private IntIterable changeFocusKeys = IntSets.singleton(GLFW.GLFW_KEY_TAB);
 
 		public Builder(ITextComponent title, I infrastructure) {
 			this.title = title;
@@ -567,19 +575,17 @@ public class UIMinecraftScreenAdapter
 
 		protected I getInfrastructure() { return infrastructure; }
 
-		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-		protected Set<Integer> getCloseKeys() { return closeKeys; }
+		protected IntIterable getCloseKeys() { return closeKeys; }
 
-		public Builder<I, C> setCloseKeys(Set<Integer> closeKeys) {
-			this.closeKeys = ImmutableSet.copyOf(closeKeys);
+		public Builder<I, C> setCloseKeys(IntIterable closeKeys) {
+			this.closeKeys = IntSets.unmodifiable(new IntOpenHashSet(closeKeys.iterator()));
 			return this;
 		}
 
-		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-		protected Set<Integer> getChangeFocusKeys() { return changeFocusKeys; }
+		protected IntIterable getChangeFocusKeys() { return changeFocusKeys; }
 
-		public Builder<I, C> setChangeFocusKeys(Set<Integer> changeFocusKeys) {
-			this.changeFocusKeys = ImmutableSet.copyOf(changeFocusKeys);
+		public Builder<I, C> setChangeFocusKeys(IntIterable changeFocusKeys) {
+			this.changeFocusKeys = IntSets.unmodifiable(new IntOpenHashSet(changeFocusKeys.iterator()));
 			return this;
 		}
 

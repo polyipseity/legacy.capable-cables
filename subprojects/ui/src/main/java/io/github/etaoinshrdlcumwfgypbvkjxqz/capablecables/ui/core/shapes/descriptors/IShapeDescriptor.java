@@ -64,6 +64,7 @@ public interface IShapeDescriptor<S extends Shape> {
 	enum StaticHolder {
 		;
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
+		@SuppressWarnings("AutoBoxing")
 		private static final IShapeConstraint CONSTRAINT_MINIMUM = new ShapeConstraint(null, null, null, null, 1D, 1D, null, null);
 		private static final Rectangle2D SHAPE_PLACEHOLDER = new Rectangle2D.Double(0, 0, 1, 1);
 

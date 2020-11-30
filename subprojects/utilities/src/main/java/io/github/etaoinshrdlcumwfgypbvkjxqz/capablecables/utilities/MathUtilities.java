@@ -15,8 +15,8 @@ import java.util.OptionalDouble;
 public enum MathUtilities {
 	;
 
-	@Nullable
-	public static Double minNullable(@Nullable Double a, @Nullable Double b) {
+	@SuppressWarnings({"AutoBoxing", "AutoUnboxing"})
+	public static @Nullable Double minNullable(@Nullable Double a, @Nullable Double b) {
 		if (a == null && b == null)
 			return null;
 		else if (a == null)
@@ -26,8 +26,8 @@ public enum MathUtilities {
 		return Math.min(a, b);
 	}
 
-	@Nullable
-	public static Double maxNullable(@Nullable Double a, @Nullable Double b) {
+	@SuppressWarnings({"AutoBoxing", "AutoUnboxing"})
+	public static @Nullable Double maxNullable(@Nullable Double a, @Nullable Double b) {
 		if (a == null && b == null)
 			return null;
 		else if (a == null)

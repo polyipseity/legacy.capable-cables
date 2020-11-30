@@ -6,8 +6,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.MathUtilitie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IFunction3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time.core.ITicker;
 
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities.assertNonnull;
-
 public class UIBiDirectionalStandardAnimationControl
 		extends UIAbstractStandardAnimationControl {
 	protected UIBiDirectionalStandardAnimationControl(Iterable<? extends IUIAnimationTarget> targets,
@@ -23,7 +21,7 @@ public class UIBiDirectionalStandardAnimationControl
 	@Override
 	protected double getProgressForTarget(IUIAnimationTarget target, int index, int size) {
 		long currentProgress = getCurrentProgress(this, index);
-		long loop = assertNonnull(getLoops().get(index));
+		long loop = getLoops().getLong(index);
 		if (loop != UIStandardAnimationControlFactory.getInfiniteLoop()) {
 			double currentLoop = getCurrentLoop(this, index);
 			if (currentLoop >= loop)
@@ -31,7 +29,7 @@ public class UIBiDirectionalStandardAnimationControl
 			else if (currentLoop < 0)
 				currentProgress = 0;
 		}
-		return (double) currentProgress / assertNonnull(getLocalDurations().get(index));
+		return (double) currentProgress / getLocalDurations().getLong(index);
 	}
 
 	protected static long getCurrentProgress(UIBiDirectionalStandardAnimationControl instance, int index) {
@@ -39,9 +37,9 @@ public class UIBiDirectionalStandardAnimationControl
 		long progress = Math.floorMod(instance.getElapsed(), totalDuration); // COMMENT function shape is /
 		long roundedProgress = Math.round((double) progress / totalDuration) * totalDuration;
 		long actualProgress = Math.abs(progress - roundedProgress); // COMMENT function shape is /\
-		return MathUtilities.clamp(actualProgress - assertNonnull(instance.getStartDelays().get(index)),
+		return MathUtilities.clamp(actualProgress - instance.getStartDelays().getLong(index),
 				0,
-				assertNonnull(instance.getLocalDurations().get(index)));
+				instance.getLocalDurations().getLong(index));
 	}
 
 	protected static double getCurrentLoop(UIBiDirectionalStandardAnimationControl instance, int index) {
@@ -49,9 +47,9 @@ public class UIBiDirectionalStandardAnimationControl
 	}
 
 	protected static long getTotalDuration(UIBiDirectionalStandardAnimationControl instance, int index) {
-		return (assertNonnull(instance.getStartDelays().get(index))
-				+ assertNonnull(instance.getLocalDurations().get(index))
-				+ assertNonnull(instance.getEndDelays().get(index))) << 1;
+		return (instance.getStartDelays().getLong(index)
+				+ instance.getLocalDurations().getLong(index)
+				+ instance.getEndDelays().getLong(index)) << 1;
 	}
 
 	@Override

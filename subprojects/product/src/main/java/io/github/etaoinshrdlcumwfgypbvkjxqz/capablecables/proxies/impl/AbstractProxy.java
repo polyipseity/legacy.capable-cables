@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 public abstract class AbstractProxy<S>
@@ -28,7 +29,9 @@ public abstract class AbstractProxy<S>
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public boolean onModLifecycle(@Nullable ModLifecycleEvent event) {
-		boolean ret = getParent().map(superProxy -> superProxy.onModLifecycle(event)).orElse(false);
+		boolean ret = getParent()
+				.filter(superProxy -> superProxy.onModLifecycle(event))
+				.isPresent();
 		if (event == null)
 			ret |= processEvent(getMarker(), getResourceBundle().getString("event.construction.name"), null, evt -> onConstruction());
 		else if (event instanceof FMLFingerprintViolationEvent)
@@ -65,7 +68,7 @@ public abstract class AbstractProxy<S>
 		ModConfiguration.getInstance().getLogger()
 				.atInfo()
 				.addMarker(marker)
-				.addArgument(name).addArgument(stopwatch::toString).addArgument(() -> stopwatch.elapsed(NANOSECONDS))
+				.addArgument(name).addArgument(stopwatch::toString).addArgument(() -> suppressBoxing(stopwatch.elapsed(NANOSECONDS)))
 				.log(() -> getResourceBundle().getString("event.process.end"));
 		return true;
 	}

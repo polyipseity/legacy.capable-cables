@@ -49,6 +49,8 @@ import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.function.Function;
 
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressUnboxing;
+
 // TODO needs improvement, too procedural
 public enum JAXBUIComponentUtilities {
 	;
@@ -219,7 +221,10 @@ public enum JAXBUIComponentUtilities {
 										.orElse(null));
 							});
 
-					return sdb.setX(shape.getX()).setY(shape.getY()).setWidth(shape.getWidth()).setHeight(shape.getHeight())
+					return sdb.setX(suppressUnboxing(shape.getX()))
+							.setY(suppressUnboxing(shape.getY()))
+							.setWidth(suppressUnboxing(shape.getWidth()))
+							.setHeight(suppressUnboxing(shape.getHeight()))
 							.transformConcatenate(transform)
 							.constrain(shape.getConstraint().stream()
 									.map(c -> new ShapeConstraint(

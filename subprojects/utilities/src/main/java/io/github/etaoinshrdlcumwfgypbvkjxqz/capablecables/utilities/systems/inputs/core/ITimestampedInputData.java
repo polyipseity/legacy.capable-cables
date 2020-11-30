@@ -15,6 +15,7 @@ public interface ITimestampedInputData {
 	enum StaticHolder {
 		;
 
+		@SuppressWarnings("AutoBoxing")
 		@NonNls
 		private static final ImmutableMap<String, Function<@Nonnull ITimestampedInputData, @Nullable ?>> OBJECT_VARIABLE_MAP =
 				ImmutableMap.<String, Function<@Nonnull ITimestampedInputData, @Nullable ?>>builder()

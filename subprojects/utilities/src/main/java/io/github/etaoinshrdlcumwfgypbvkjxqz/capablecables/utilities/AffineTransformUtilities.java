@@ -1,9 +1,12 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities;
 
-import com.google.common.collect.ImmutableMap;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftMatrixUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl.UIObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.client.renderer.Matrix4f;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Marker;
@@ -22,15 +25,19 @@ public enum AffineTransformUtilities {
 	private static final int SCALE_Y_INDEX = toFlatMatrixArrayIndex(1, 1);
 	private static final int TRANSLATE_X_INDEX = toFlatMatrixArrayIndex(0, 2);
 	private static final int TRANSLATE_Y_INDEX = toFlatMatrixArrayIndex(1, 2);
-	@SuppressWarnings("DuplicateStringLiteralInspection")
-	private static final @NonNls ImmutableMap<String, Integer> NAME_TO_MATRIX_INDEX_MAP = ImmutableMap.<String, Integer>builder()
-			.put("translateX", AffineTransformUtilities.getTranslateXIndex())
-			.put("translateY", AffineTransformUtilities.getTranslateYIndex())
-			.put("scaleX", AffineTransformUtilities.getScaleXIndex())
-			.put("scaleY", AffineTransformUtilities.getScaleYIndex())
-			.put("shearX", AffineTransformUtilities.getShearXIndex())
-			.put("shearY", AffineTransformUtilities.getShearYIndex())
-			.build();
+	private static final @NonNls Object2IntMap<String> NAME_TO_MATRIX_INDEX_MAP;
+
+	static {
+		@NonNls Object2IntMap<String> nameToMatrixIndexMap = new Object2IntOpenHashMap<>(6);
+		nameToMatrixIndexMap.put("translateX", AffineTransformUtilities.getTranslateXIndex());
+		nameToMatrixIndexMap.put("translateY", AffineTransformUtilities.getTranslateYIndex());
+		nameToMatrixIndexMap.put("scaleX", AffineTransformUtilities.getScaleXIndex());
+		nameToMatrixIndexMap.put("scaleY", AffineTransformUtilities.getScaleYIndex());
+		nameToMatrixIndexMap.put("shearX", AffineTransformUtilities.getShearXIndex());
+		nameToMatrixIndexMap.put("shearY", AffineTransformUtilities.getShearYIndex());
+		NAME_TO_MATRIX_INDEX_MAP = Object2IntMaps.unmodifiable(nameToMatrixIndexMap);
+	}
+
 	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker();
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 	private static final AffineTransform IDENTITY = new AffineTransform();
@@ -146,5 +153,7 @@ public enum AffineTransformUtilities {
 
 	public static void assertPartialFlatMatrix(double[] matrix) { assert matrix.length == 4; }
 
-	public static ImmutableMap<String, Integer> getNameToMatrixIndexMap() { return NAME_TO_MATRIX_INDEX_MAP; }
+	public static @NonNls @Immutable Object2IntMap<String> getNameToMatrixIndexMapView() { return Object2IntMaps.unmodifiable(getNameToMatrixIndexMap()); }
+
+	private static @NonNls Object2IntMap<String> getNameToMatrixIndexMap() { return NAME_TO_MATRIX_INDEX_MAP; }
 }

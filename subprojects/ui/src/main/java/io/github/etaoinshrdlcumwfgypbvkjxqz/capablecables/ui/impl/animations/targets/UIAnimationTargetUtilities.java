@@ -48,6 +48,7 @@ public enum UIAnimationTargetUtilities {
 	public enum ShapeDescriptors {
 		;
 
+		@SuppressWarnings("AutoUnboxing")
 		public static DoubleConsumer translateX(IShapeDescriptorProvider provider) {
 			return transform(provider, 0, (previousX, x) -> AffineTransform.getTranslateInstance(x - previousX, 0));
 		}
@@ -65,14 +66,17 @@ public enum UIAnimationTargetUtilities {
 			));
 		}
 
+		@SuppressWarnings("AutoUnboxing")
 		public static DoubleConsumer translateY(IShapeDescriptorProvider provider) {
 			return transform(provider, 0, (previousY, y) -> AffineTransform.getTranslateInstance(0, y - previousY));
 		}
 
+		@SuppressWarnings("AutoUnboxing")
 		public static DoubleConsumer rotate(IShapeDescriptorProvider provider) {
 			return transform(provider, 0, (previousAngle, angle) -> AffineTransform.getRotateInstance(angle - previousAngle));
 		}
 
+		@SuppressWarnings("AutoUnboxing")
 		public static DoubleConsumer rotate(IShapeDescriptorProvider provider, Point2D anchor) {
 			double anchorX = anchor.getX();
 			double anchorY = anchor.getY();
@@ -81,15 +85,17 @@ public enum UIAnimationTargetUtilities {
 
 		public static DoubleConsumer scale(IShapeDescriptorProvider provider) {
 			return transform(provider, 1, (previousScale, scale) -> {
-				double scaleFactor = scale / previousScale;
+				@SuppressWarnings("AutoUnboxing") double scaleFactor = scale / previousScale;
 				return AffineTransform.getScaleInstance(scaleFactor, scaleFactor);
 			});
 		}
 
+		@SuppressWarnings("AutoUnboxing")
 		public static DoubleConsumer scaleX(IShapeDescriptorProvider provider) {
 			return transform(provider, 1, (previousScale, scale) -> AffineTransform.getScaleInstance(scale / previousScale, 1));
 		}
 
+		@SuppressWarnings("AutoUnboxing")
 		public static DoubleConsumer scaleY(IShapeDescriptorProvider provider) {
 			return transform(provider, 1, (previousScale, scale) -> AffineTransform.getScaleInstance(1, scale / previousScale));
 		}
@@ -105,6 +111,7 @@ public enum UIAnimationTargetUtilities {
 				this.delegate = delegate;
 			}
 
+			@SuppressWarnings("AutoBoxing")
 			@Override
 			public void accept(double value) {
 				synchronized (getAcceptLockObject()) {

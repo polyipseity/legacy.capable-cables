@@ -27,6 +27,7 @@ public interface IKeyboardKeyPressData
 	enum StaticHolder {
 		;
 
+		@SuppressWarnings("AutoBoxing")
 		@NonNls
 		private static final ImmutableMap<String, Function<@Nonnull IKeyboardKeyPressData, @Nullable ?>> OBJECT_VARIABLE_MAP =
 				ImmutableMap.<String, Function<@Nonnull IKeyboardKeyPressData, @Nullable ?>>builder()

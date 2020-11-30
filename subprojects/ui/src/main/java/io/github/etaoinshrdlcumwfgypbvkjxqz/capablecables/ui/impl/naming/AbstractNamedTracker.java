@@ -7,10 +7,13 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.DuplicateNameException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamedTracker;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
 import org.apache.http.annotation.NotThreadSafe;
 
 import java.util.Map;
 import java.util.Optional;
+
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool.*;
 
 @NotThreadSafe
 public abstract class AbstractNamedTracker<E extends INamed>
@@ -21,22 +24,24 @@ public abstract class AbstractNamedTracker<E extends INamed>
 	public boolean add(E element)
 			throws DuplicateNameException {
 		return element.getName()
-				.map(name -> {
+				.filter(name -> {
 					@Nullable E previousElement = getData().put(name, element);
 					if (!(previousElement == null || element.equals(previousElement)))
 						throw new DuplicateNameException(name);
 					return true;
 				})
-				.orElse(false);
+				.isPresent();
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public boolean addAll(Iterable<? extends E> elements)
 			throws DuplicateNameException {
-		return Streams.stream(elements).unordered()
-				.map(this::add)
-				.reduce(false, Boolean::logicalOr);
+		return stripBool(
+				Streams.stream(elements).unordered()
+						.mapToInt(element -> padBool(add(element)))
+						.reduce(fBool(), PaddedBool::orBool)
+		);
 	}
 
 	@Override
@@ -49,9 +54,11 @@ public abstract class AbstractNamedTracker<E extends INamed>
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
 	public boolean removeAll(Iterable<? extends E> elements) {
-		return Streams.stream(elements).unordered()
-				.map(this::remove)
-				.reduce(false, Boolean::logicalOr);
+		return stripBool(
+				Streams.stream(elements).unordered()
+						.mapToInt(element -> padBool(remove(element)))
+						.reduce(fBool(), PaddedBool::orBool)
+		);
 	}
 
 	@Override
