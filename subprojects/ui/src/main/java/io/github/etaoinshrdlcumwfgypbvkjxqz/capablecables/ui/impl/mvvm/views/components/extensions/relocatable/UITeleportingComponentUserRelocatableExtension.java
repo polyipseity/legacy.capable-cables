@@ -107,7 +107,7 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 		this.activationMouseButtons = IUIPropertyMappingValue.createBindingField(IntSet.class,
 				() -> IntSets.singleton(GLFW.GLFW_MOUSE_BUTTON_LEFT),
 				mappings.get(getPropertyActivationMouseButtonsLocation()),
-				CastUtilities.<Class<Set<? extends Integer>>>castUnchecked(Map.class),
+				CastUtilities.<Class<Set<? extends Integer>>>castUnchecked(Set.class),
 				mappingValue -> IntSets.unmodifiable(new IntOpenHashSet(mappingValue)));
 		this.relocateBorders = IUIPropertyMappingValue.createBindingField(CastUtilities.castUnchecked(Object2DoubleMap.class),
 				() -> {
