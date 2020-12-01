@@ -145,8 +145,8 @@ public enum UIMinecraftDebug {
 		INSTANCE,
 		;
 
-		public static final @NonNls String COMPONENT_TEST_XML_PATH = "components-test.xml";
-		public static final @NonNls String COMPONENT_TEST_THEME_XML_PATH = "components-test-theme.xml";
+		public static final @NonNls String COMPONENT_TEST_XML_PATH = "component-UI-test.xml";
+		public static final @NonNls String COMPONENT_TEST_THEME_XML_PATH = "components-UI-test-theme.xml";
 		private static final ComponentUI JAXB_VIEW;
 		private static final ComponentTheme JAXB_THEME;
 

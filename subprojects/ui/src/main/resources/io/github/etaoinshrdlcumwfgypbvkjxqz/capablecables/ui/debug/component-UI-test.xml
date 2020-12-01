@@ -124,10 +124,13 @@
 									</any>
 								</entry>
 							</map>
-							<string><![CDATA[This is an example text.  There are some more text here...
+							<constantSupplier>
+								<string><![CDATA[This is an example text.  There are some more text here...
 ]]></string>
+							</constantSupplier>
 						</attributedText>
-						<string><![CDATA[Can you see me?]]></string>
+						<resourceBundleLocalizedString key="Window1Label.text_localized"
+						                               baseName="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.ComponentUITest"/>
 					</attributedText>
 				</property>
 			</component>

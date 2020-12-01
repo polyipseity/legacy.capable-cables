@@ -14,6 +14,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.text.IAttribut
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.JAXBUIUtilities.ObjectFactories;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.JAXBFunctionalObjectAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.text.ImmutableAttributedText;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.IUnion;
@@ -27,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 public enum EnumJAXBUIDefaultObjectAdapter {
@@ -65,13 +67,14 @@ public enum EnumJAXBUIDefaultObjectAdapter {
 			new JAXBFunctionalObjectAdapter<>(
 					(context, left) -> {
 						JAXBElement<RelationsType> leftAttributes = ObjectFactories.getDefaultUIObjectFactory().createMap(left.getMap());
-						List<Object> leftChildren = left.getStringOrAttributedText();
+						List<Object> leftChildren = left.getAny();
 
 						@SuppressWarnings("unchecked") Map<AttributedCharacterIterator.Attribute, Object> rightAttributes =
 								(Map<AttributedCharacterIterator.Attribute, Object>) IJAXBAdapterRegistry.adaptFromJAXB(context, leftAttributes);
-						List<IUnion<CharSequence, IAttributedText>> rightChildren = leftChildren.stream()
+						List<IUnion<Supplier<? extends CharSequence>, IAttributedText>> rightChildren = leftChildren.stream()
 								.map(leftChild -> IJAXBAdapterRegistry.adaptFromJAXB(context, leftChild))
-								.map(rightChild -> ImmutableUnion.of(rightChild, CharSequence.class, IAttributedText.class))
+								.map(rightChild -> ImmutableUnion.of(rightChild,
+										CastUtilities.<Class<Supplier<? extends CharSequence>>>castUnchecked(Supplier.class), IAttributedText.class))
 								.collect(ImmutableList.toImmutableList());
 
 						return ImmutableAttributedText.of(rightChildren, rightAttributes);
@@ -80,11 +83,11 @@ public enum EnumJAXBUIDefaultObjectAdapter {
 						AttributedText left = ObjectFactories.getDefaultUIObjectFactory().createAttributedText();
 
 						Map<? extends AttributedCharacterIterator.Attribute, ?> rightAttributes = right.getAttributesView();
-						List<? extends IUnion<? extends CharSequence, ? extends IAttributedText>> rightChildren = right.getChildrenView();
+						List<? extends IUnion<? extends Supplier<? extends CharSequence>, ? extends IAttributedText>> rightChildren = right.getChildrenView();
 
 						@SuppressWarnings("unchecked") JAXBElement<RelationsType> leftAttributes =
 								(JAXBElement<RelationsType>) IJAXBAdapterRegistry.adaptToJAXB(context, rightAttributes);
-						List<Object> leftChildren = left.getStringOrAttributedText();
+						List<Object> leftChildren = left.getAny();
 
 						left.setMap(leftAttributes.getValue());
 						rightChildren.stream()

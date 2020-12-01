@@ -2,7 +2,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:ui="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
            targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
-           version="3.1.0"
+           version="3.2.0"
            xml:lang="EN">
 	<!-- TODO change some global elements to local elements, JAXB seems to dislike local elements -->
 
@@ -57,8 +57,13 @@
 					-->
 				</xs:element>
 				<xs:choice maxOccurs="unbounded">
-					<xs:element ref="ui:string"/>
-					<xs:element ref="ui:attributedText"/>
+					<!-- COMMENT allowed types:
+					- ui:attributedText
+					- anything that extends Supplier<? extends CharSequence>
+
+					Unique Particle Attribution :(
+					-->
+					<xs:any/>
 				</xs:choice>
 			</xs:sequence>
 		</xs:complexType>
@@ -92,6 +97,28 @@
 
 	<!-- COMMENT Map -->
 	<xs:element name="map" type="ui:relationsType"/>
+
+	<!-- SECTION functional -->
+
+	<!-- COMMENT IConstantSupplier -->
+	<xs:element name="constantSupplier">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:any/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- COMMENT IResourceBundleLocalizedString -->
+	<xs:element name="resourceBundleLocalizedString">
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="ui:localizedStringType">
+					<xs:attribute name="baseName" type="xs:string" use="required"/>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
 
 	<!-- SECTION enums -->
 
@@ -141,4 +168,9 @@
 			<xs:enumeration value="VERTICAL"/>
 		</xs:restriction>
 	</xs:simpleType>
+
+	<!-- COMMENT ILocalizedString -->
+	<xs:complexType name="localizedStringType">
+		<xs:attribute name="key" type="xs:string" use="required"/>
+	</xs:complexType>
 </xs:schema>
