@@ -12,7 +12,7 @@ public class GenericShapeDescriptor
 	private Shape shape;
 
 	public GenericShapeDescriptor(Shape shape) {
-		this.shape = shape;
+		this.shape = UIObjectUtilities.copyShape(shape);
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.co
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.AlwaysNull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
@@ -29,6 +30,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIComponentRendererInvokerModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeDescriptorDynamicDetector;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming.IUIThemeStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.UIAbstractView;
@@ -36,6 +38,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.caches.UIDefaultCacheExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.paths.UIDefaultComponentPathResolver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIAbstractComponentHierarchyChangeBusEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interactions.UIFunctionalComponentShapeDescriptorDynamicDetector;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.theming.UIArrayThemeStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.theming.UIDefaultingTheme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
@@ -91,6 +94,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		this.mappings = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
 
+		OptionalWeakReference<UIAbstractViewComponent<S, M>> thisReference = OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
 		this.coordinatorMapInitializer = new OneUseConsumer<>(field -> {
 			IUIThemeStack themeStack = new UIArrayThemeStack(
 					theme ->
@@ -107,6 +111,10 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 			field.put(IUIComponentPathResolver.class, new UIDefaultComponentPathResolver());
 			field.put(IUIComponentShapeAnchorController.class, new UIDefaultComponentShapeAnchorController());
 			field.put(IUIThemeStack.class, themeStack);
+			field.put(IShapeDescriptorDynamicDetector.class, new UIFunctionalComponentShapeDescriptorDynamicDetector(
+					() -> thisReference.getOptional()
+							.<Iterable<? extends IUIComponent>>map(UIAbstractViewComponent::getChildrenFlatView)
+							.orElseGet(ImmutableSet::of)));
 		});
 		this.extensionsInitializer = new OneUseRunnable(() ->
 				IExtensionContainer.addExtensionChecked(this, new UIDefaultCacheExtension())
@@ -264,6 +272,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	@Override
 	protected void render0() {
 		super.render0();
+		IUIViewComponent.getShapeDescriptorDynamicDetector(this).detect();
 		try (IUIComponentContext componentContext = createComponentContext()
 				.orElseThrow(IllegalStateException::new)) {
 			IUIViewComponent.traverseComponentTreeDefault(componentContext,

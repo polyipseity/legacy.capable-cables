@@ -6,6 +6,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.traits.IHasBindingMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.paths.IUIComponentPathResolver;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeDescriptorDynamicDetector;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.TreeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IConsumer3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingBiFunction;
@@ -105,11 +106,18 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 	}
 
 	static IUIComponentPathResolver getPathResolver(IUIViewComponent<?, ?> instance) {
-		return instance.getCoordinator(IUIComponentPathResolver.class).orElseThrow(AssertionError::new);
+		return instance.getCoordinator(IUIComponentPathResolver.class)
+				.orElseThrow(AssertionError::new);
 	}
 
 	static IUIComponentShapeAnchorController getShapeAnchorController(IUIViewComponent<?, ?> instance) {
-		return instance.getCoordinator(IUIComponentShapeAnchorController.class).orElseThrow(AssertionError::new);
+		return instance.getCoordinator(IUIComponentShapeAnchorController.class)
+				.orElseThrow(AssertionError::new);
+	}
+
+	static IShapeDescriptorDynamicDetector getShapeDescriptorDynamicDetector(IUIViewComponent<?, ?> instance) {
+		return instance.getCoordinator(IShapeDescriptorDynamicDetector.class)
+				.orElseThrow(AssertionError::new);
 	}
 
 	@Immutable List<? extends IUIComponent> getChildrenFlatView();

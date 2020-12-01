@@ -15,6 +15,8 @@ public enum FunctionUtilities {
 	private static final Predicate<?> ALWAYS_TRUE_PREDICATE = t -> true;
 	private static final BiPredicate<?, ?> ALWAYS_FALSE_BI_PREDICATE = (t, u) -> false;
 	private static final BiPredicate<?, ?> ALWAYS_TRUE_BI_PREDICATE = (t, u) -> true;
+	private static final BooleanSupplier ALWAYS_FALSE_BOOLEAN_SUPPLIER = () -> false;
+	private static final BooleanSupplier ALWAYS_TRUE_BOOLEAN_SUPPLIER = () -> true;
 
 	@SuppressWarnings("unchecked") // COMMENT always safe as it accepts any 'Object'
 	public static <T> Consumer<T> getEmptyConsumer() { return (Consumer<T>) EMPTY_CONSUMER; }
@@ -61,5 +63,13 @@ public enum FunctionUtilities {
 
 	public static <T, R> R apply(T t, Function<@Nonnull ? super T, ? extends R> action) {
 		return action.apply(t);
+	}
+
+	public static BooleanSupplier getAlwaysTrueBooleanSupplier() {
+		return ALWAYS_TRUE_BOOLEAN_SUPPLIER;
+	}
+
+	public static BooleanSupplier getAlwaysFalseBooleanSupplier() {
+		return ALWAYS_FALSE_BOOLEAN_SUPPLIER;
 	}
 }
