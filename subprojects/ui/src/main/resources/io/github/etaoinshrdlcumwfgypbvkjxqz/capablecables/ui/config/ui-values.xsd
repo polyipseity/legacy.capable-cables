@@ -2,7 +2,7 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:ui="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
            targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
-           version="3.2.0"
+           version="3.3.0"
            xml:lang="EN">
 	<!-- TODO change some global elements to local elements, JAXB seems to dislike local elements -->
 
@@ -125,6 +125,12 @@
 	<!-- COMMENT EnumUISide -->
 	<xs:element name="uiSide" type="ui:uiSideType"/>
 
+	<!-- COMMENT EnumUIRotation -->
+	<xs:element name="uiRotation" type="ui:uiRotationType"/>
+
+	<!-- COMMENT EnumUIAxis -->
+	<xs:element name="uiAxis" type="ui:uiAxisType"/>
+
 	<!-- SECTION types -->
 
 	<!-- COMMENT any type -->
@@ -166,6 +172,22 @@
 			<xs:enumeration value="RIGHT"/>
 			<xs:enumeration value="HORIZONTAL"/>
 			<xs:enumeration value="VERTICAL"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- COMMENT EnumUIRotation type -->
+	<xs:simpleType name="uiRotationType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="CLOCKWISE"/>
+			<xs:enumeration value="COUNTERCLOCKWISE"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- COMMENT EnumUIAxis type -->
+	<xs:simpleType name="uiAxisType">
+		<xs:restriction base="xs:NMTOKEN">
+			<xs:enumeration value="X"/>
+			<xs:enumeration value="Y"/>
 		</xs:restriction>
 	</xs:simpleType>
 

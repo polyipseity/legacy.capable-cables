@@ -4,13 +4,18 @@ import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.UiAxisType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.UiRotationType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.UiSideType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBElementAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.registries.IJAXBAdapterRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.JAXBUIUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.JAXBUIUtilities.ObjectFactories;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.JAXBEnumElementAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.JAXBFunctionalElementAdapter;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUIAxis;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUIRotation;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
@@ -32,11 +37,12 @@ import java.util.function.Function;
 
 @SuppressWarnings("unused")
 public enum EnumJAXBUIDefaultElementAdapter {
-	@SuppressWarnings("Convert2Diamond") UI_SIDE(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createUiSide), EnumUISide.class),
-			new JAXBFunctionalElementAdapter<UiSideType, EnumUISide>(
-					(context, left) -> EnumUISide.valueOf(left.getValue().name()),
-					(context, right) -> ObjectFactories.getDefaultUIObjectFactory().createUiSide(UiSideType.valueOf(right.name()))
-			)),
+	UI_SIDE(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createUiSide), EnumUISide.class),
+			new JAXBEnumElementAdapter<>(UiSideType.class, EnumUISide.class, ObjectFactories.getDefaultUIObjectFactory()::createUiSide)),
+	UI_ROTATION(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createUiRotation), EnumUIRotation.class),
+			new JAXBEnumElementAdapter<>(UiRotationType.class, EnumUIRotation.class, ObjectFactories.getDefaultUIObjectFactory()::createUiRotation)),
+	UI_AXIS(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createUiAxis), EnumUIAxis.class),
+			new JAXBEnumElementAdapter<>(UiAxisType.class, EnumUIAxis.class, ObjectFactories.getDefaultUIObjectFactory()::createUiAxis)),
 	@SuppressWarnings({"unchecked", "Convert2Diamond", "AnonymousInnerClass"}) TEXT_ATTRIBUTE(ImmutableTuple2.of(JAXBUIUtilities.getQName(ObjectFactories.getDefaultUIObjectFactory()::createTextAttribute), AttributedCharacterIterator.Attribute.class),
 			new JAXBFunctionalElementAdapter<String, AttributedCharacterIterator.Attribute>(
 					new BiFunction<@Nonnull IJAXBAdapterContext, @Nonnull JAXBElement<String>, AttributedCharacterIterator.@Nonnull Attribute>() {
