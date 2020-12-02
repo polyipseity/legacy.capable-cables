@@ -18,6 +18,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUI
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentManager;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.embed.IUIComponentEmbed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers.IUIComponentModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIComponentRenderer;
@@ -51,6 +52,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.i
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinding;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.methods.IBindingMethodSource;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
@@ -108,6 +110,7 @@ public class UIDefaultComponent
 	private final List<IUIComponentModifier> modifiers = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 	private final IBinderObserverSupplierHolder binderObserverSupplierHolder = new DefaultBinderObserverSupplierHolder();
 	private final IUILifecycleStateTracker lifecycleStateTracker = new UIDefaultLifecycleStateTracker();
+	private final List<IBinding<?>> embedBindings = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 
 	private final IUIRendererContainerContainer<IUIComponentRenderer<?>> rendererContainerContainer;
 
@@ -186,8 +189,13 @@ public class UIDefaultComponent
 
 	public IBindingField<Boolean> getVisible() { return visible; }
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected List<IUIComponent> getChildren() { return children; }
+	@SuppressWarnings({"AssignmentOrReturnOfFieldWithMutableType", "UnstableApiUsage"})
+	protected List<IUIComponent> getChildren() {
+		Streams.stream(getComponentEmbeds()) // COMMENT should be sequential
+				.map(IUIComponentEmbed::getEmbedInitializer)
+				.forEachOrdered(Runnable::run);
+		return children;
+	}
 
 	@SuppressWarnings("AutoUnboxing")
 	@Override
@@ -477,34 +485,23 @@ public class UIDefaultComponent
 				});
 	}
 
+	protected Iterable<? extends IUIComponentEmbed<?>> getComponentEmbeds() {
+		return ImmutableSet.of();
+	}
+
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		IUIComponent.super.initializeBindings(binderObserverSupplier);
 		getBinderObserverSupplierHolder().setValue(binderObserverSupplier);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-				() -> ImmutableBinderAction.bind(
-						getActive(), getVisible()
-				));
+				() -> ImmutableBinderAction.bind(Iterables.concat(
+						ImmutableList.of(getActive(), getVisible()),
+						getEmbedBindings()
+				)));
 		BindingUtilities.initializeBindings(binderObserverSupplier, ImmutableSet.of(getRendererContainerContainer()));
 		BindingUtilities.findAndInitializeBindings(binderObserverSupplier, getExtensions().values());
 		// COMMENT do not init children, view component should do that via bind
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void cleanupBindings() {
-		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier -> {
-			BindingUtilities.findAndCleanupBindings(getExtensions().values());
-			BindingUtilities.cleanupBindings(ImmutableSet.of(getRendererContainerContainer()));
-			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-					() -> ImmutableBinderAction.unbind(
-							getActive(), getVisible()
-					));
-			// COMMENT do not cleanup children, view component should do that via unbind
-		});
-		getBinderObserverSupplierHolder().setValue(null);
-		IUIComponent.super.cleanupBindings();
 	}
 
 	@Override
@@ -559,4 +556,26 @@ public class UIDefaultComponent
 
 	@OverridingMethodsMustInvokeSuper
 	protected void initialize0(IUIComponentContext context) {}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void cleanupBindings() {
+		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier -> {
+			BindingUtilities.findAndCleanupBindings(getExtensions().values());
+			BindingUtilities.cleanupBindings(ImmutableSet.of(getRendererContainerContainer()));
+			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+					() -> ImmutableBinderAction.unbind(Iterables.concat(
+							ImmutableList.of(getActive(), getVisible()),
+							getEmbedBindings()
+					)));
+			// COMMENT do not cleanup children, view component should do that via unbind
+		});
+		getBinderObserverSupplierHolder().setValue(null);
+		IUIComponent.super.cleanupBindings();
+	}
+
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected List<IBinding<?>> getEmbedBindings() {
+		return embedBindings;
+	}
 }

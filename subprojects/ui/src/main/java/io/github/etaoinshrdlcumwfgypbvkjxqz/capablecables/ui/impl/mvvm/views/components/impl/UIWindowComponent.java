@@ -34,7 +34,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.Enum
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISideType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CollectionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
@@ -45,7 +44,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinding;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
@@ -99,7 +97,6 @@ public class UIWindowComponent
 	private final IBindingField<EnumUIRotation> controlsDirection;
 
 	private final IUIControlsEmbed<?> controlsEmbed;
-	private final List<IBinding<?>> embedBindings = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 
 	private final Runnable eventTargetListenersInitializer;
 
@@ -226,6 +223,12 @@ public class UIWindowComponent
 		);
 	}
 
+	@Override
+	protected Iterable<? extends IUIComponentEmbed<?>> getComponentEmbeds() {
+		return Iterables.concat(super.getComponentEmbeds(),
+				ImmutableSet.of(getControlsEmbed()));
+	}
+
 	public static INamespacePrefixedString getPropertyControlsSideLocation() {
 		return PROPERTY_CONTROLS_SIDE_LOCATION;
 	}
@@ -282,11 +285,6 @@ public class UIWindowComponent
 		// TODO reshape logic
 	}
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected List<IBinding<?>> getEmbedBindings() {
-		return embedBindings;
-	}
-
 	protected void onControlsButtonActivate(@SuppressWarnings({"SameParameterValue", "unused"}) EnumControlsAction action, UIButtonComponent.IUIEventActivate event) {
 		UIButtonComponent.UIDefaultEventActivate.handleEventCommonly(event);
 	}
@@ -307,12 +305,6 @@ public class UIWindowComponent
 	protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
 		eventTargetListenersInitializer.run();
 		return super.getEventTargetListeners();
-	}
-
-	@Override
-	protected List<IUIComponent> getChildren() {
-		getControlsEmbed().getEmbedInitializer().run();
-		return super.getChildren();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -355,20 +347,18 @@ public class UIWindowComponent
 	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		super.initializeBindings(binderObserverSupplier);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-				() -> ImmutableBinderAction.bind(Iterables.concat(
-						ImmutableList.of(getControlsSide(), getControlsThickness(), getControlsDirection()),
-						getEmbedBindings()
-				)));
+				() -> ImmutableBinderAction.bind(
+						getControlsSide(), getControlsThickness(), getControlsDirection()
+				));
 	}
 
 	@Override
 	public void cleanupBindings() {
 		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
 				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-						() -> ImmutableBinderAction.unbind(Iterables.concat(
-								ImmutableList.of(getControlsSide(), getControlsThickness(), getControlsDirection()),
-								getEmbedBindings()
-						)))
+						() -> ImmutableBinderAction.unbind(
+								getControlsSide(), getControlsThickness(), getControlsDirection()
+						))
 		);
 		super.cleanupBindings();
 	}
