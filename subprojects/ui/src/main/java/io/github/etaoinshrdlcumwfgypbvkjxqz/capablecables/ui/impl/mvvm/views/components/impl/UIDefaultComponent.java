@@ -64,6 +64,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.even
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EventBusUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.OptionalUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time.core.ITicker;
 import io.reactivex.rxjava3.observers.DisposableObserver;
@@ -118,6 +119,9 @@ public class UIDefaultComponent
 	private final Runnable extensionsInitializer;
 	private final List<IUIComponent> children = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 	private OptionalWeakReference<IUIComponent> parent = OptionalWeakReference.of(null);
+
+	private @Nullable Long lastUpdateTimeInNanoseconds; // COMMENT treat it as nanoseconds even though the ticker may not return the actual time
+	private @Nullable Long updateTimeDelta;
 
 	@UIComponentConstructor
 	public UIDefaultComponent(IUIComponentArguments arguments) {
@@ -549,7 +553,10 @@ public class UIDefaultComponent
 	}
 
 	@OverridingMethodsMustInvokeSuper
-	protected void initialize0(IUIComponentContext context) {}
+	protected void initialize0(IUIComponentContext context) {
+		setLastUpdateTimeInNanoseconds(null);
+		setUpdateTimeDelta(null);
+	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -575,5 +582,29 @@ public class UIDefaultComponent
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void update(ITicker ticker) {}
+	public void update(ITicker ticker) {
+		long currentTimeInNanoseconds = ticker.read();
+		setUpdateTimeDelta(suppressBoxing(
+				currentTimeInNanoseconds -
+						getLastUpdateTimeInNanoseconds()
+								.orElse(currentTimeInNanoseconds) // COMMENT first update after initialize - no delta
+		));
+		setLastUpdateTimeInNanoseconds(suppressBoxing(currentTimeInNanoseconds));
+	}
+
+	private OptionalLong getLastUpdateTimeInNanoseconds() {
+		return OptionalUtilities.ofLong(lastUpdateTimeInNanoseconds); // COMMENT for internal use ONLY
+	}
+
+	private void setLastUpdateTimeInNanoseconds(@Nullable Long lastUpdateTimeInNanoseconds) {
+		this.lastUpdateTimeInNanoseconds = lastUpdateTimeInNanoseconds;
+	}
+
+	protected OptionalLong getUpdateTimeDelta() {
+		return OptionalUtilities.ofLong(updateTimeDelta);
+	}
+
+	protected void setUpdateTimeDelta(@Nullable Long updateTimeDelta) {
+		this.updateTimeDelta = updateTimeDelta;
+	}
 }
