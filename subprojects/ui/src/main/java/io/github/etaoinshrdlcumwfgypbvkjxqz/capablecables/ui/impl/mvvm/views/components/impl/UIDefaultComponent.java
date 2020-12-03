@@ -194,7 +194,7 @@ public class UIDefaultComponent
 
 	public IBindingField<Boolean> getVisible() { return visible; }
 
-	@SuppressWarnings({"AssignmentOrReturnOfFieldWithMutableType", "UnstableApiUsage"})
+	@SuppressWarnings({"AssignmentOrReturnOfFieldWithMutableType", "UnstableApiUsage", "rawtypes", "RedundantSuppression"})
 	protected List<IUIComponent> getChildren() {
 		Streams.stream(getComponentEmbeds()) // COMMENT should be sequential
 				.map(IUIComponentEmbed::getEmbedInitializer)

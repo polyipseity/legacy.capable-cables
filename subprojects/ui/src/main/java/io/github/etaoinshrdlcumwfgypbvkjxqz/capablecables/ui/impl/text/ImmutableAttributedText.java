@@ -75,7 +75,7 @@ public final class ImmutableAttributedText
 		return ImmutableMap.copyOf(getAttributes());
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
+	@SuppressWarnings({"UnstableApiUsage", "rawtypes", "RedundantSuppression"})
 	@Override
 	public AttributedString compile() {
 		return getCompiler().getUnchecked(
