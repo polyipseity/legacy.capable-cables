@@ -311,7 +311,6 @@ public class UIDefaultComponent
 		}
 	}
 
-
 	public IBindingField<Boolean> getActive() { return active; }
 
 	@Override
@@ -335,9 +334,6 @@ public class UIDefaultComponent
 		method.invoke(CastUtilities.castUnchecked(event)); // COMMENT should match
 		return ret;
 	}
-
-
-
 
 	@Override
 	public List<? extends IUIComponentModifier> getModifiersView() { return ImmutableList.copyOf(getModifiers()); }
@@ -399,7 +395,6 @@ public class UIDefaultComponent
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected List<IUIComponentModifier> getModifiers() { return modifiers; }
 
-
 	@Override
 	@Deprecated
 	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
@@ -429,8 +424,6 @@ public class UIDefaultComponent
 		extensionsInitializer.run();
 		return extensions;
 	}
-
-
 
 	@Override
 	public IUILifecycleStateTracker getLifecycleStateTracker() {
@@ -578,4 +571,8 @@ public class UIDefaultComponent
 	protected List<IBinding<?>> getEmbedBindings() {
 		return embedBindings;
 	}
+
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void update() {}
 }

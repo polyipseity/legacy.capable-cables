@@ -88,6 +88,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 
 	private @Nullable M internalManager;
 
+	@SuppressWarnings("RedundantTypeArguments")
 	@UIViewComponentConstructor
 	public UIAbstractViewComponent(IUIViewComponentArguments arguments) {
 		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
@@ -113,7 +114,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 			field.put(IUIThemeStack.class, themeStack);
 			field.put(IShapeDescriptorDynamicDetector.class, new UIFunctionalComponentShapeDescriptorDynamicDetector(
 					() -> thisReference.getOptional()
-							.<Iterable<? extends IUIComponent>>map(UIAbstractViewComponent::getChildrenFlatView)
+							.<Iterable<? extends IUIComponent>>map(UIAbstractViewComponent<S, M>::getChildrenFlatView)
 							.orElseGet(ImmutableSet::of)));
 		});
 		this.extensionsInitializer = new OneUseRunnable(() ->
@@ -273,6 +274,10 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	protected void render0() {
 		super.render0();
 		IUIViewComponent.getShapeDescriptorDynamicDetector(this).detect();
+
+		// COMMENT update the same rate as render
+		IUIViewComponent.traverseComponentTreeDefault(getManager(), IUIComponent::update, FunctionUtilities.getEmptyBiConsumer());
+
 		try (IUIComponentContext componentContext = createComponentContext()
 				.orElseThrow(IllegalStateException::new)) {
 			IUIViewComponent.traverseComponentTreeDefault(componentContext,

@@ -37,6 +37,8 @@ import java.util.function.Predicate;
 public interface IUIComponent
 		extends INamed, INode, IShapeDescriptorProvider, IHasBinding, IHasBindingMap, IUIEventTarget, IExtensionContainer<INamespacePrefixedString>, IUIRendererContainerContainer<IUIComponentRenderer<?>>,
 		IUIComponentStructureLifecycleModifier, IUIComponentActiveLifecycleModifier, IUIComponentTransformChildrenModifier {
+	void update();
+
 	static <T> Optional<T> getYoungestParentInstanceOf(IUIComponent self, Class<T> clazz) {
 		for (Iterator<IUIComponent> iterator = new ParentIterator(self.getParent().orElse(null));
 		     iterator.hasNext(); ) {
