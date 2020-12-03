@@ -56,6 +56,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.even
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time.core.ITicker;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
@@ -276,7 +277,9 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		IUIViewComponent.getShapeDescriptorDynamicDetector(this).detect();
 
 		// COMMENT update the same rate as render
-		IUIViewComponent.traverseComponentTreeDefault(getManager(), IUIComponent::update, FunctionUtilities.getEmptyBiConsumer());
+		IUIViewComponent.traverseComponentTreeDefault(getManager(),
+				component -> component.update(ITicker.StaticHolder.getSystemTicker()),
+				FunctionUtilities.getEmptyBiConsumer());
 
 		try (IUIComponentContext componentContext = createComponentContext()
 				.orElseThrow(IllegalStateException::new)) {
