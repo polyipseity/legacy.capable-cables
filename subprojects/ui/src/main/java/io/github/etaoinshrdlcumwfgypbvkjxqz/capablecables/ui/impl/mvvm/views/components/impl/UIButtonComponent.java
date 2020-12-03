@@ -230,19 +230,31 @@ public class UIButtonComponent
 		}
 
 		public static void handleEventCommonly(IUIEventActivate event) {
-			boolean result = false;
-			IUIEvent eventCause = event.getCause();
-			if (eventCause instanceof IUIEventMouse) {
-				IUIEventMouse eventCause1 = (IUIEventMouse) eventCause;
-				if (eventCause1.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT)
-					result = true;
-			} else if (eventCause instanceof IUIEventKeyboard) {
-				IUIEventKeyboard eventCause1 = (IUIEventKeyboard) eventCause;
-				if (eventCause1.getData().getKey() == GLFW.GLFW_KEY_ENTER)
-					result = true;
+			// TODO ZeroOneInfinity
+			handleMouseEventCommonly(event);
+			handleKeyboardEventCommonly(event);
+		}
+
+		public static void handleMouseEventCommonly(IUIEventActivate event) {
+			if (!event.isDefaultPrevented()) {
+				IUIEvent eventCause = event.getCause();
+				if (eventCause instanceof IUIEventMouse) {
+					IUIEventMouse eventCause1 = (IUIEventMouse) eventCause;
+					if (eventCause1.getData().getButton() == GLFW.GLFW_MOUSE_BUTTON_LEFT)
+						event.preventDefault();
+				}
 			}
-			if (result)
-				event.preventDefault();
+		}
+
+		public static void handleKeyboardEventCommonly(IUIEventActivate event) {
+			if (!event.isDefaultPrevented()) {
+				IUIEvent eventCause = event.getCause();
+				if (eventCause instanceof IUIEventKeyboard) {
+					IUIEventKeyboard eventCause1 = (IUIEventKeyboard) eventCause;
+					if (eventCause1.getData().getKey() == GLFW.GLFW_KEY_ENTER)
+						event.preventDefault();
+				}
+			}
 		}
 
 		@Override
