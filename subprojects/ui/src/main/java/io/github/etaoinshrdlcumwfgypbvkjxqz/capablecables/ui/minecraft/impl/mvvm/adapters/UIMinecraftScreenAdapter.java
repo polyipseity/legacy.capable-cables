@@ -44,6 +44,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inpu
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl.ImmutableInputDevices;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl.ImmutableKeyboardKeyPressData;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl.ImmutableMouseButtonClickData;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time.core.ITicker;
 import it.unimi.dsi.fastutil.ints.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -84,7 +85,7 @@ public class UIMinecraftScreenAdapter
 	private final IUIContextContainer contextContainer =
 			new UIImmutableContextContainer(
 					new UIImmutableViewContext(
-							new ImmutableInputDevices.Builder()
+							new ImmutableInputDevices.Builder(ITicker.StaticHolder.getSystemTicker())
 									.setPointerDevice(new MinecraftInputPointerDevice())
 									.build()
 					),

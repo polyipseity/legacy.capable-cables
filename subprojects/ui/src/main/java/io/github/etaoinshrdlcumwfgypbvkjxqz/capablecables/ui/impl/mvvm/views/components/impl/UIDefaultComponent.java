@@ -66,7 +66,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.exte
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.OptionalUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time.core.ITicker;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.jetbrains.annotations.NonNls;
 
@@ -582,8 +581,8 @@ public class UIDefaultComponent
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void update(ITicker ticker) {
-		long currentTimeInNanoseconds = ticker.read();
+	public void update(IUIComponentContext context) {
+		long currentTimeInNanoseconds = context.getViewContext().getInputDevices().getTicker().read();
 		setUpdateTimeDelta(suppressBoxing(
 				currentTimeInNanoseconds -
 						getLastUpdateTimeInNanoseconds()

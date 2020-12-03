@@ -4,19 +4,30 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputDevices;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputPointerDevice;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time.core.ITicker;
 
 import java.util.Optional;
 
 public final class ImmutableInputDevices
 		implements IInputDevices {
-	@Nullable
-	private final IInputPointerDevice pointerDevice;
+	private final ITicker ticker;
+	private final @Nullable IInputPointerDevice pointerDevice;
 
-	protected ImmutableInputDevices(@Nullable IInputPointerDevice pointerDevice) {
+	protected ImmutableInputDevices(ITicker ticker,
+	                                @Nullable IInputPointerDevice pointerDevice) {
+		this.ticker = ticker;
 		this.pointerDevice = pointerDevice;
 	}
 
-	private static ImmutableInputDevices of(@Nullable IInputPointerDevice pointerDevice) { return new ImmutableInputDevices(pointerDevice); }
+	private static ImmutableInputDevices of(ITicker ticker,
+	                                        @Nullable IInputPointerDevice pointerDevice) {
+		return new ImmutableInputDevices(ticker, pointerDevice);
+	}
+
+	@Override
+	public ITicker getTicker() {
+		return ticker;
+	}
 
 	@Override
 	public @Immutable Optional<? extends IInputPointerDevice> getPointerDevice() {
@@ -24,16 +35,20 @@ public final class ImmutableInputDevices
 	}
 
 	public static class Builder {
-		@Nullable
-		private IInputPointerDevice pointerDevice;
-
-		public Builder() {}
+		private final ITicker ticker;
+		private @Nullable IInputPointerDevice pointerDevice;
 
 		public Builder(IInputDevices source) {
+			this(source.getTicker());
 			this.pointerDevice = source.getPointerDevice().orElse(null);
 		}
 
+		public Builder(ITicker ticker) {
+			this.ticker = ticker;
+		}
+
 		public Builder snapshot() {
+			// COMMENT ticker is immutable by design
 			getPointerDevice()
 					.map(ImmutableInputPointerDevice::of)
 					.ifPresent(this::setPointerDevice);
@@ -44,13 +59,17 @@ public final class ImmutableInputDevices
 			return Optional.ofNullable(pointerDevice);
 		}
 
+		public ImmutableInputDevices build() {
+			return of(getTicker(), getPointerDevice().orElse(null));
+		}
+
 		public Builder setPointerDevice(@Nullable IInputPointerDevice pointerDevice) {
 			this.pointerDevice = pointerDevice;
 			return this;
 		}
 
-		public ImmutableInputDevices build() {
-			return of(getPointerDevice().orElse(null));
+		protected ITicker getTicker() {
+			return ticker;
 		}
 	}
 }

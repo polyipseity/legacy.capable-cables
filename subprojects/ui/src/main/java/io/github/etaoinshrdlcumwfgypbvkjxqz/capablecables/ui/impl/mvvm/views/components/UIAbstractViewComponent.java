@@ -56,7 +56,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.even
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time.core.ITicker;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
@@ -274,12 +273,8 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	@Override
 	protected void render0() {
 		super.render0();
-		IUIViewComponent.getShapeDescriptorDynamicDetector(this).detect();
 
-		// COMMENT update the same rate as render
-		IUIViewComponent.traverseComponentTreeDefault(getManager(),
-				component -> component.update(ITicker.StaticHolder.getSystemTicker()),
-				FunctionUtilities.getEmptyBiConsumer());
+		IUIViewComponent.getShapeDescriptorDynamicDetector(this).detect();
 
 		try (IUIComponentContext componentContext = createComponentContext()
 				.orElseThrow(IllegalStateException::new)) {
@@ -288,6 +283,10 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 					(componentContext2, result) -> {
 						assert result != null;
 						assert componentContext2 != null;
+
+						// COMMENT update the same rate as render, only need to call it before rendering
+						result.getComponent().update(componentContext2);
+
 						IUIComponentModifier.streamSpecificModifiersIntersection(result.getModifiersView(), IUIComponentRendererInvokerModifier.class)
 								.forEachOrdered(modifierIntersection -> {
 									IUIComponentModifier left = modifierIntersection.getLeft();
