@@ -23,13 +23,12 @@ public interface IUIPropertyMappingValue {
 	                                                   @Nullable IUIPropertyMappingValue mapping,
 	                                                   Class<T0> mappingClazz,
 	                                                   Function<@Nonnull ? super T0, ? extends T> mapper) {
+		Optional<IUIPropertyMappingValue> mapping1 = Optional.ofNullable(mapping);
 		return ImmutableBindingField.of(
-				Optional.ofNullable(mapping)
-						.flatMap(IUIPropertyMappingValue::getBindingKey)
+				mapping1.flatMap(IUIPropertyMappingValue::getBindingKey)
 						.orElse(null),
 				new MemoryObservableField<>(clazz,
-						Optional.ofNullable(mapping)
-								.flatMap(IUIPropertyMappingValue::getDefaultValue)
+						mapping1.flatMap(IUIPropertyMappingValue::getDefaultValue)
 								.map(mappingClazz::cast)
 								.map(mapper)
 								.map(clazz::cast)

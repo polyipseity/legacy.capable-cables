@@ -78,8 +78,8 @@ public class UIWindowComponent
 	public static final @NonNls String PROPERTY_CONTROLS_SIDE = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.controls.side";
 	public static final @NonNls String PROPERTY_CONTROLS_THICKNESS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.controls.thickness";
 	public static final @NonNls String PROPERTY_CONTROLS_DIRECTION = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.controls.direction";
-	public static final @NonNls String INTERNAL_BINDING_ON_ACTIVATE_PREFIX = "controls.button.activate";
-	public static final @NonNls String INTERNAL_BINDING_ON_ACTIVATED_PREFIX = "controls.button.activated";
+	public static final @NonNls String INTERNAL_BINDING_BUTTON_ACTIVATE_PREFIX = "window.controls.button.activate";
+	public static final @NonNls String INTERNAL_BINDING_BUTTON_ACTIVATED_PREFIX = "window.controls.button.activated";
 	private static final INamespacePrefixedString PROPERTY_CONTROLS_SIDE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyControlsSide());
 	private static final INamespacePrefixedString PROPERTY_CONTROLS_THICKNESS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyControlsThickness());
 	private static final INamespacePrefixedString PROPERTY_CONTROLS_DIRECTION_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyControlsDirection());
@@ -165,10 +165,10 @@ public class UIWindowComponent
 
 															INamespacePrefixedString onActivateKey =
 																	ImmutableNamespacePrefixedString.of(keyPrefix,
-																			getInternalBindingOnActivatePrefix() + '.' + EnumControlsAction.CLOSE.getName());
+																			getInternalBindingButtonActivatePrefix() + '.' + EnumControlsAction.CLOSE.getName());
 															INamespacePrefixedString onActivatedKey =
 																	ImmutableNamespacePrefixedString.of(keyPrefix,
-																			getInternalBindingOnActivatedPrefix() + '.' + EnumControlsAction.CLOSE.getName());
+																			getInternalBindingButtonActivatedPrefix() + '.' + EnumControlsAction.CLOSE.getName());
 
 															this1.getEmbedBindings()
 																	.addAll(ImmutableList.of(
@@ -241,12 +241,12 @@ public class UIWindowComponent
 		return PROPERTY_CONTROLS_DIRECTION_LOCATION;
 	}
 
-	public static @NonNls String getInternalBindingOnActivatePrefix() {
-		return INTERNAL_BINDING_ON_ACTIVATE_PREFIX;
+	public static @NonNls String getInternalBindingButtonActivatePrefix() {
+		return INTERNAL_BINDING_BUTTON_ACTIVATE_PREFIX;
 	}
 
-	public static @NonNls String getInternalBindingOnActivatedPrefix() {
-		return INTERNAL_BINDING_ON_ACTIVATED_PREFIX;
+	public static @NonNls String getInternalBindingButtonActivatedPrefix() {
+		return INTERNAL_BINDING_BUTTON_ACTIVATED_PREFIX;
 	}
 
 	protected IBindingField<EnumUISide> getControlsSide() {

@@ -48,7 +48,7 @@ public class UIShapeComponent
 	}
 
 	@Override
-	public IUIRendererContainerContainer<IUIComponentRenderer<?>> getRendererContainerContainer() {
+	protected IUIRendererContainerContainer<IUIComponentRenderer<?>> getRendererContainerContainer() {
 		return rendererContainerContainer;
 	}
 
