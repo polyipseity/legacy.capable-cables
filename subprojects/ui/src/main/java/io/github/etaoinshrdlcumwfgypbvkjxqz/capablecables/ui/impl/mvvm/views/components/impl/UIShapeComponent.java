@@ -14,7 +14,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoC
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultComponentRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ColorUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
@@ -69,8 +68,8 @@ public class UIShapeComponent
 			super(arguments);
 
 			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-			this.filledColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(ColorUtilities.getColorless()), mappings.get(getPropertyFilledColorLocation()));
-			this.borderColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(ColorUtilities.getColorless()), mappings.get(getPropertyBorderColorLocation()));
+			this.filledColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.BLACK), mappings.get(getPropertyFilledColorLocation()));
+			this.borderColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.WHITE), mappings.get(getPropertyBorderColorLocation()));
 		}
 
 		public static INamespacePrefixedString getPropertyFilledColorLocation() {
