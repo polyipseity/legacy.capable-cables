@@ -55,14 +55,19 @@ public class UIButtonComponent
 	public static final String METHOD_ON_ACTIVATE = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "method.button.activate";
 	@NonNls
 	public static final String METHOD_ON_ACTIVATED = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "method.button.activated";
+	@NonNls
+	public static final String METHOD_ON_CANCELED = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "method.button.canceled";
 
 	private static final INamespacePrefixedString METHOD_ON_ACTIVATE_LOCATION = ImmutableNamespacePrefixedString.of(getMethodOnActivate());
 	private static final INamespacePrefixedString METHOD_ON_ACTIVATED_LOCATION = ImmutableNamespacePrefixedString.of(getMethodOnActivated());
+	private static final INamespacePrefixedString METHOD_ON_CANCELED_LOCATION = ImmutableNamespacePrefixedString.of(getMethodOnCanceled());
 
 	@UIMethod(METHOD_ON_ACTIVATE)
 	private final IBindingMethodSource<IUIEventActivate> onActivate;
 	@UIMethod(METHOD_ON_ACTIVATED)
 	private final IBindingMethodSource<IUIEvent> onActivated;
+	@UIMethod(METHOD_ON_CANCELED)
+	private final IBindingMethodSource<IUIEvent> onCanceled;
 
 	private final Set<EnumButtonState> buttonStates = Collections.newSetFromMap(
 			MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(EnumButtonState.values().length).makeMap()
@@ -81,6 +86,8 @@ public class UIButtonComponent
 				Optional.ofNullable(mappings.get(getMethodOnActivateLocation())).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 		this.onActivated = ImmutableBindingMethodSource.of(IUIEvent.class,
 				Optional.ofNullable(mappings.get(getMethodOnActivatedLocation())).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
+		this.onCanceled = ImmutableBindingMethodSource.of(IUIEvent.class,
+				Optional.ofNullable(mappings.get(getMethodOnCanceledLocation())).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 
 		this.rendererContainerContainer =
 				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this),
@@ -103,8 +110,12 @@ public class UIButtonComponent
 				}
 			}), false);
 			addEventListener(EnumUIEventDOMType.MOUSE_UP.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(e -> {
-				if (getButtonStates().remove(EnumButtonState.PRESSING) && getButtonStates().contains(EnumButtonState.HOVERING)) {
-					getOnActivated().invoke(e);
+				if (getButtonStates().remove(EnumButtonState.PRESSING)) {
+					if (getButtonStates().contains(EnumButtonState.HOVERING)) {
+						getOnActivated().invoke(e);
+					} else {
+						getOnCanceled().invoke(e);
+					}
 					e.stopPropagation();
 				}
 			}), false);
@@ -126,6 +137,14 @@ public class UIButtonComponent
 		return METHOD_ON_ACTIVATED_LOCATION;
 	}
 
+	public static INamespacePrefixedString getMethodOnCanceledLocation() {
+		return METHOD_ON_CANCELED_LOCATION;
+	}
+
+	protected IBindingMethodSource<IUIEvent> getOnCanceled() {
+		return onCanceled;
+	}
+
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Set<EnumButtonState> getButtonStates() { return buttonStates; }
 
@@ -141,12 +160,16 @@ public class UIButtonComponent
 		return METHOD_ON_ACTIVATED;
 	}
 
+	public static String getMethodOnCanceled() {
+		return METHOD_ON_CANCELED;
+	}
+
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
 		super.initializeBindings(binderObserverSupplier);
 		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-				() -> ImmutableBinderAction.bind(getOnActivate(), getOnActivated()));
+				() -> ImmutableBinderAction.bind(getOnActivate(), getOnActivated(), getOnCanceled()));
 	}
 
 	@Override
@@ -154,7 +177,7 @@ public class UIButtonComponent
 	public void cleanupBindings() {
 		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
 				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-						() -> ImmutableBinderAction.unbind(getOnActivate(), getOnActivated()))
+						() -> ImmutableBinderAction.unbind(getOnActivate(), getOnActivated(), getOnCanceled()))
 		);
 		super.cleanupBindings();
 	}
