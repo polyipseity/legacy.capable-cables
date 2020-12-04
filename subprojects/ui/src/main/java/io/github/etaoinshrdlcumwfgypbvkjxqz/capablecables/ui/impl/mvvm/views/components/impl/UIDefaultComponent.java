@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.co
 
 import com.google.common.collect.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.AlwaysNull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
@@ -486,6 +487,13 @@ public class UIDefaultComponent
 		return ImmutableSet.of();
 	}
 
+	@SuppressWarnings({"UnstableApiUsage", "rawtypes", "RedundantSuppression"})
+	protected static @Immutable List<IUIComponent> getEmbedComponents(UIDefaultComponent instance) {
+		return Streams.stream(instance.getComponentEmbeds()).unordered()
+				.map(IUIComponentEmbed::getComponent)
+				.collect(ImmutableList.toImmutableList());
+	}
+
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
@@ -581,21 +589,25 @@ public class UIDefaultComponent
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void update(IUIComponentContext context) {
+	public final void update(IUIComponentContext context) {
 		long currentTimeInNanoseconds = context.getViewContext().getInputDevices().getTicker().read();
 		setUpdateTimeDelta(suppressBoxing(
 				currentTimeInNanoseconds -
 						getLastUpdateTimeInNanoseconds()
 								.orElse(currentTimeInNanoseconds) // COMMENT first update after initialize - no delta
 		));
+		update0(context);
 		setLastUpdateTimeInNanoseconds(suppressBoxing(currentTimeInNanoseconds));
 	}
 
-	private OptionalLong getLastUpdateTimeInNanoseconds() {
-		return OptionalUtilities.ofLong(lastUpdateTimeInNanoseconds); // COMMENT for internal use ONLY
+	protected OptionalLong getLastUpdateTimeInNanoseconds() {
+		return OptionalUtilities.ofLong(lastUpdateTimeInNanoseconds);
 	}
 
-	private void setLastUpdateTimeInNanoseconds(@Nullable Long lastUpdateTimeInNanoseconds) {
+	@OverridingMethodsMustInvokeSuper
+	protected void update0(@SuppressWarnings("unused") IUIComponentContext context) {}
+
+	protected void setLastUpdateTimeInNanoseconds(@Nullable Long lastUpdateTimeInNanoseconds) {
 		this.lastUpdateTimeInNanoseconds = lastUpdateTimeInNanoseconds;
 	}
 
