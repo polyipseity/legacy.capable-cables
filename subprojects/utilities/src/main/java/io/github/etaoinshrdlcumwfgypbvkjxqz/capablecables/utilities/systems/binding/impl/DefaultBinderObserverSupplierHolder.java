@@ -11,4 +11,8 @@ import java.util.function.Supplier;
 
 public class DefaultBinderObserverSupplierHolder
 		extends DefaultValueHolder<Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>>>
-		implements IBinderObserverSupplierHolder {}
+		implements IBinderObserverSupplierHolder {
+	public DefaultBinderObserverSupplierHolder() {
+		super(null);
+	}
+}
