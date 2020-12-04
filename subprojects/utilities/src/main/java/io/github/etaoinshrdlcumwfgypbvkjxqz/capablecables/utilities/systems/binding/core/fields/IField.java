@@ -13,6 +13,10 @@ public interface IField<T> {
 
 	void setValue(T value);
 
+	static <T> void updateValue(IField<T> field) {
+		field.setValue(field.getValue());
+	}
+
 	enum StaticHolder {
 		;
 
