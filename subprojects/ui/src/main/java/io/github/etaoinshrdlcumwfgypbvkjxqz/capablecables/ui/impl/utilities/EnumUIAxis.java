@@ -13,6 +13,11 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Suppr
 public enum EnumUIAxis {
 	X {
 		@Override
+		public EnumUIAxis getOpposite() {
+			return Y;
+		}
+
+		@Override
 		public double getCoordinate(Point2D point) { return point.getX(); }
 
 		@Override
@@ -45,6 +50,11 @@ public enum EnumUIAxis {
 	},
 	Y {
 		@Override
+		public EnumUIAxis getOpposite() {
+			return X;
+		}
+
+		@Override
 		public double getCoordinate(Point2D point) { return point.getY(); }
 
 		@Override
@@ -75,6 +85,8 @@ public enum EnumUIAxis {
 							suppressUnboxing(width), value));
 		}
 	};
+
+	public abstract EnumUIAxis getOpposite();
 
 	public abstract double getCoordinate(Point2D point);
 
