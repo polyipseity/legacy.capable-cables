@@ -89,10 +89,10 @@ public enum EnumTimeUnit {
 		int valuesLength = values.length;
 		double[][] scales = new double[valuesLength][valuesLength];
 		for (int fromIndex = 0; fromIndex < valuesLength; ++fromIndex) {
-			long fromScale = values[fromIndex].getScale();
+			double fromScale = values[fromIndex].getScale();
 			for (int toIndex = 0; toIndex < valuesLength; ++toIndex) {
-				long toScale = values[toIndex].getScale();
-				long scale = toScale / fromScale;
+				double toScale = values[toIndex].getScale();
+				double scale = toScale / fromScale;
 				scales[fromIndex][toIndex] = scale;
 			}
 		}
