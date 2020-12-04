@@ -156,4 +156,8 @@ public enum AffineTransformUtilities {
 	public static @NonNls @Immutable Object2IntMap<String> getNameToMatrixIndexMapView() { return Object2IntMaps.unmodifiable(getNameToMatrixIndexMap()); }
 
 	private static @NonNls Object2IntMap<String> getNameToMatrixIndexMap() { return NAME_TO_MATRIX_INDEX_MAP; }
+
+	public static void translateByPoint(AffineTransform instance, Point2D point) {
+		instance.translate(point.getX(), point.getY());
+	}
 }

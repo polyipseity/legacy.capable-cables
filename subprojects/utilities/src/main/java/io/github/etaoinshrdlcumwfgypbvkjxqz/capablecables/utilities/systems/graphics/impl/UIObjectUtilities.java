@@ -21,6 +21,11 @@ public enum UIObjectUtilities {
 
 	public static Shape copyShape(Shape shape) { return AffineTransformUtilities.getIdentity().createTransformedShape(shape); }
 
+	public static <T extends RectangularShape> T unPositionedRectangularShape(T source, T destination) {
+		destination.setFrame(0D, 0D, source.getWidth(), source.getHeight());
+		return destination;
+	}
+
 	public static Point2D[] getDiagonalsFromRectangular(RectangularShape rectangular) {
 		return new Point2D[]{
 				new Point2D.Double(rectangular.getX(), rectangular.getY()),
