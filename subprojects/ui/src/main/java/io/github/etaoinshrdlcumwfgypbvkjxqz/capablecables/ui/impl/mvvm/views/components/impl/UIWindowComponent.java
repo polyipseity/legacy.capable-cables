@@ -2,7 +2,6 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.co
 
 import com.google.common.collect.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.UIProperty;
@@ -22,13 +21,13 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.UINamespaceUti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.binding.UIImmutablePropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIFunctionalEventListener;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.embed.UIAbstractComponentEmbed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.embed.UIChildlessComponentEmbed;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.embed.UIComponentEmbedUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIComponentModifyShapeDescriptorBusEvent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultComponentRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.descriptors.SupplierShapeDescriptor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUIAxis;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUIRotation;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISideType;
@@ -36,12 +35,13 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CollectionUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IValueHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.DefaultValueHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
@@ -52,26 +52,28 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMaps;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
-import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
-import java.util.List;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.*;
 
 public class UIWindowComponent
-		extends UIDefaultComponent
+		extends UIShapeComponent
 		implements IUIReshapeExplicitly<RectangularShape> {
 	// TODO scroll bars
 
@@ -435,69 +437,10 @@ public class UIWindowComponent
 	}
 
 	public static class DefaultRenderer<C extends UIWindowComponent>
-			extends UIDefaultComponentRenderer<C> {
-		@NonNls
-		public static final String PROPERTY_BACKGROUND_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.window.background.color";
-
-		private static final INamespacePrefixedString PROPERTY_BACKGROUND_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyBackgroundColor());
-
-		@UIProperty(PROPERTY_BACKGROUND_COLOR)
-		private final IBindingField<Color> backgroundColor; // TODO Color to Paint
-
+			extends UIShapeComponent.DefaultRenderer<C> {
 		@UIRendererConstructor
 		public DefaultRenderer(IUIRendererArguments arguments) {
 			super(arguments);
-
-			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-			this.backgroundColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.BLACK), mappings.get(getPropertyBackgroundColorLocation()));
-		}
-
-		public static INamespacePrefixedString getPropertyBackgroundColorLocation() {
-			return PROPERTY_BACKGROUND_COLOR_LOCATION;
-		}
-
-		public static String getPropertyBackgroundColor() {
-			return PROPERTY_BACKGROUND_COLOR;
-		}
-
-		@Override
-		@OverridingMethodsMustInvokeSuper
-		public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-			super.initializeBindings(binderObserverSupplier);
-			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-					() -> ImmutableBinderAction.bind(
-							getBackgroundColor()
-					)
-			);
-		}
-
-		@Override
-		@OverridingMethodsMustInvokeSuper
-		public void cleanupBindings() {
-			getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
-					BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-							() -> ImmutableBinderAction.unbind(
-									getBackgroundColor()
-							)
-					)
-			);
-			super.cleanupBindings();
-		}
-
-		public IBindingField<Color> getBackgroundColor() { return backgroundColor; }
-
-		@Override
-		public void render(IUIComponentContext context, EnumRenderStage stage) {
-			super.render(context, stage);
-			getContainer().ifPresent(container -> {
-				if (stage == EnumRenderStage.PRE_CHILDREN) {
-					Shape relativeShape = IUIComponent.getShape(container);
-					try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
-						graphics.setColor(getBackgroundColor().getValue());
-						graphics.fill(relativeShape);
-					}
-				}
-			});
 		}
 	}
 
