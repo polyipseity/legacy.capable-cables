@@ -26,10 +26,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CachedTask;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.FloatUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableTuple3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
@@ -58,8 +58,8 @@ public class UILabelComponent
 		extends UIDefaultComponent {
 	public static final @NonNls String PROPERTY_TEXT = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.text";
 	public static final @NonNls String PROPERTY_AUTO_RESIZE = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.auto_resize";
-	private static final INamespacePrefixedString PROPERTY_TEXT_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyText());
-	private static final INamespacePrefixedString PROPERTY_AUTO_RESIZE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyAutoResize());
+	private static final IIdentifier PROPERTY_TEXT_IDENTIFIER = ImmutableIdentifier.of(getPropertyText());
+	private static final IIdentifier PROPERTY_AUTO_RESIZE_IDENTIFIER = ImmutableIdentifier.of(getPropertyAutoResize());
 
 	private final IUIRendererContainerContainer<IUIComponentRenderer<?>> rendererContainerContainer;
 
@@ -78,18 +78,18 @@ public class UILabelComponent
 				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this),
 						CastUtilities.castUnchecked(DefaultRenderer.class));
 
-		@Immutable Map<INamespacePrefixedString, ? extends IUIPropertyMappingValue> mappings = arguments.getMappingsView();
+		@Immutable Map<IIdentifier, ? extends IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.text = new TextBindingField(suppressThisEscapedWarning(() -> this),
-				IUIPropertyMappingValue.createBindingField(IAttributedText.class, ConstantValue.of(TextUtilities.getEmptyAttributedText()), mappings.get(getPropertyTextLocation())));
-		this.autoResize = IUIPropertyMappingValue.createBindingField(Boolean.class, ConstantValue.of(suppressBoxing(true)), mappings.get(getPropertyAutoResizeLocation()));
+				IUIPropertyMappingValue.createBindingField(IAttributedText.class, ConstantValue.of(TextUtilities.getEmptyAttributedText()), mappings.get(getPropertyTextIdentifier())));
+		this.autoResize = IUIPropertyMappingValue.createBindingField(Boolean.class, ConstantValue.of(suppressBoxing(true)), mappings.get(getPropertyAutoResizeIdentifier()));
 	}
 
-	public static INamespacePrefixedString getPropertyTextLocation() {
-		return PROPERTY_TEXT_LOCATION;
+	public static IIdentifier getPropertyTextIdentifier() {
+		return PROPERTY_TEXT_IDENTIFIER;
 	}
 
-	public static INamespacePrefixedString getPropertyAutoResizeLocation() {
-		return PROPERTY_AUTO_RESIZE_LOCATION;
+	public static IIdentifier getPropertyAutoResizeIdentifier() {
+		return PROPERTY_AUTO_RESIZE_IDENTIFIER;
 	}
 
 	public static String getPropertyText() {

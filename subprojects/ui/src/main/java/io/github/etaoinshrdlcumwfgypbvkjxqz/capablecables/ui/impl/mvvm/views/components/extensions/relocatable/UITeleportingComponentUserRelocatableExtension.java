@@ -32,10 +32,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.IIntersection;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
@@ -72,14 +72,14 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Suppr
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 
 public class UITeleportingComponentUserRelocatableExtension<C extends IUIComponent>
-		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIComponent, C>
+		extends AbstractContainerAwareExtension<IIdentifier, IUIComponent, C>
 		implements IUIComponentUserRelocatableExtension<C> {
 	public static final @NonNls String PROPERTY_TARGET_COMPONENT = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.teleporting.target";
 	public static final @NonNls String PROPERTY_ACTIVATION_MOUSE_BUTTONS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.teleporting.activation.mouse";
 	public static final @NonNls String PROPERTY_RELOCATE_BORDERS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.teleporting.relocate_borders";
-	private static final INamespacePrefixedString PROPERTY_TARGET_COMPONENT_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyTargetComponent());
-	private static final INamespacePrefixedString PROPERTY_ACTIVATION_MOUSE_BUTTONS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyActivationMouseButtons());
-	private static final INamespacePrefixedString PROPERTY_RELOCATE_BORDERS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyRelocateBorders());
+	private static final IIdentifier PROPERTY_TARGET_COMPONENT_IDENTIFIER = ImmutableIdentifier.of(getPropertyTargetComponent());
+	private static final IIdentifier PROPERTY_ACTIVATION_MOUSE_BUTTONS_IDENTIFIER = ImmutableIdentifier.of(getPropertyActivationMouseButtons());
+	private static final IIdentifier PROPERTY_RELOCATE_BORDERS_IDENTIFIER = ImmutableIdentifier.of(getPropertyRelocateBorders());
 
 	@UIProperty(PROPERTY_TARGET_COMPONENT)
 	private final IBindingField<String> targetComponent;
@@ -102,11 +102,11 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 		this.rendererContainerContainer =
 				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this), UIComponentUserRelocatableExtensionEmptyRelocatingRenderer.class);
 
-		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-		this.targetComponent = IUIPropertyMappingValue.createBindingField(String.class, ConstantValue.of(""), mappings.get(getPropertyTargetComponentLocation()));
+		Map<IIdentifier, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
+		this.targetComponent = IUIPropertyMappingValue.createBindingField(String.class, ConstantValue.of(""), mappings.get(getPropertyTargetComponentIdentifier()));
 		this.activationMouseButtons = IUIPropertyMappingValue.createBindingField(IntSet.class,
 				() -> IntSets.singleton(GLFW.GLFW_MOUSE_BUTTON_LEFT),
-				mappings.get(getPropertyActivationMouseButtonsLocation()),
+				mappings.get(getPropertyActivationMouseButtonsIdentifier()),
 				CastUtilities.<Class<Set<? extends Integer>>>castUnchecked(Set.class),
 				mappingValue -> IntSets.unmodifiable(new IntOpenHashSet(mappingValue)));
 		this.relocateBorders = IUIPropertyMappingValue.createBindingField(CastUtilities.castUnchecked(Object2DoubleMap.class),
@@ -115,21 +115,21 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 					defaultValue.put(EnumUISide.UP, 10D);
 					return Object2DoubleMaps.unmodifiable(defaultValue);
 				},
-				mappings.get(getPropertyRelocateBordersLocation()),
+				mappings.get(getPropertyRelocateBordersIdentifier()),
 				CastUtilities.<Class<Map<? extends EnumUISide, ? extends Double>>>castUnchecked(Map.class),
 				mappingValue -> Object2DoubleMaps.unmodifiable(new Object2DoubleOpenHashMap<>(mappingValue)));
 	}
 
-	public static INamespacePrefixedString getPropertyTargetComponentLocation() {
-		return PROPERTY_TARGET_COMPONENT_LOCATION;
+	public static IIdentifier getPropertyTargetComponentIdentifier() {
+		return PROPERTY_TARGET_COMPONENT_IDENTIFIER;
 	}
 
-	public static INamespacePrefixedString getPropertyActivationMouseButtonsLocation() {
-		return PROPERTY_ACTIVATION_MOUSE_BUTTONS_LOCATION;
+	public static IIdentifier getPropertyActivationMouseButtonsIdentifier() {
+		return PROPERTY_ACTIVATION_MOUSE_BUTTONS_IDENTIFIER;
 	}
 
-	public static INamespacePrefixedString getPropertyRelocateBordersLocation() {
-		return PROPERTY_RELOCATE_BORDERS_LOCATION;
+	public static IIdentifier getPropertyRelocateBordersIdentifier() {
+		return PROPERTY_RELOCATE_BORDERS_IDENTIFIER;
 	}
 
 	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
@@ -269,7 +269,7 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 	}
 
 	@Override
-	public IExtensionType<INamespacePrefixedString, ?, IUIComponent> getType() { return StaticHolder.getTYPE().getValue(); }
+	public IExtensionType<IIdentifier, ?, IUIComponent> getType() { return StaticHolder.getTYPE().getValue(); }
 
 	protected IBindingField<Object2DoubleMap<EnumUISide>> getRelocateBorders() {
 		return relocateBorders;
@@ -370,7 +370,7 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 		protected Object getLockObject() { return lockObject; }
 
 		@Override
-		protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
+		protected SetMultimap<IIdentifier, UIEventListenerWithParameters> getEventTargetListeners() {
 			eventTargetListenersInitializer.run();
 			return super.getEventTargetListeners();
 		}

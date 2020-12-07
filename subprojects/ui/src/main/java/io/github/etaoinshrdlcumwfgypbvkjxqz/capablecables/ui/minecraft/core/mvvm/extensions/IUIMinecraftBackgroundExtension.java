@@ -6,8 +6,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.extensions.UIExtensionRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.IUIMinecraftViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.MinecraftUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.ImmutableExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
@@ -20,22 +20,22 @@ import java.util.Optional;
 
 @OnlyIn(Dist.CLIENT)
 public interface IUIMinecraftBackgroundExtension
-		extends IUIExtension<INamespacePrefixedString, IUIMinecraftViewComponent<?, ?>>, IUIRendererContainerContainer<IUIMinecraftBackgroundExtension.IBackgroundRenderer> {
+		extends IUIExtension<IIdentifier, IUIMinecraftViewComponent<?, ?>>, IUIRendererContainerContainer<IUIMinecraftBackgroundExtension.IBackgroundRenderer> {
 	@OnlyIn(Dist.CLIENT)
 	enum StaticHolder {
 		;
 
-		private static final INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(MinecraftUtilities.getNamespace(), "background");
+		private static final IIdentifier KEY = ImmutableIdentifier.of(MinecraftUtilities.getNamespace(), "background");
 		@SuppressWarnings("unchecked")
 		private static final
-		IRegistryObject<IExtensionType<INamespacePrefixedString, IUIMinecraftBackgroundExtension, IUIMinecraftViewComponent<?, ?>>> TYPE =
+		IRegistryObject<IExtensionType<IIdentifier, IUIMinecraftBackgroundExtension, IUIMinecraftViewComponent<?, ?>>> TYPE =
 				UIExtensionRegistry.getInstance().register(getKey(), new ImmutableExtensionType<>(getKey(), (t, i) -> (Optional<? extends IUIMinecraftBackgroundExtension>) i.getExtension(t.getKey())));
 
-		public static INamespacePrefixedString getKey() {
+		public static IIdentifier getKey() {
 			return KEY;
 		}
 
-		public static IRegistryObject<IExtensionType<INamespacePrefixedString, IUIMinecraftBackgroundExtension, IUIMinecraftViewComponent<?, ?>>> getType() {
+		public static IRegistryObject<IExtensionType<IIdentifier, IUIMinecraftBackgroundExtension, IUIMinecraftViewComponent<?, ?>>> getType() {
 			return TYPE;
 		}
 	}

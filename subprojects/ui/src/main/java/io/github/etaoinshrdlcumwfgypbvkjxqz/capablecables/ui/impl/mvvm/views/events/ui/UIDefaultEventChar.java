@@ -4,13 +4,13 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUI
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventChar;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIDefaultEvent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 
 public class UIDefaultEventChar extends UIDefaultEvent implements IUIEventChar {
 	private final char codePoint;
 	private final int modifiers;
 
-	public UIDefaultEventChar(INamespacePrefixedString type, boolean canBubble, boolean cancelable, IUIViewContext viewContext, IUIEventTarget target, char codePoint, int modifiers) {
+	public UIDefaultEventChar(IIdentifier type, boolean canBubble, boolean cancelable, IUIViewContext viewContext, IUIEventTarget target, char codePoint, int modifiers) {
 		super(type, canBubble, cancelable, viewContext, target);
 		this.codePoint = codePoint;
 		this.modifiers = modifiers;

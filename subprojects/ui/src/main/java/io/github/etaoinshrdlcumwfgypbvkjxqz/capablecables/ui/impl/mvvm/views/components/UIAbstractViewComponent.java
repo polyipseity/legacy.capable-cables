@@ -51,7 +51,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.im
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ISpecialized;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
@@ -79,7 +79,7 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Suppr
 public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		extends UIAbstractView<S>
 		implements IUIViewComponent<S, M> {
-	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
+	private final Map<IIdentifier, IUIPropertyMappingValue> mappings;
 	private final Consumer<ConcurrentMap<Class<?>, IUIViewCoordinator>> coordinatorMapInitializer;
 	private final Runnable extensionsInitializer;
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
@@ -91,7 +91,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	@SuppressWarnings("RedundantTypeArguments")
 	@UIViewComponentConstructor
 	public UIAbstractViewComponent(IUIViewComponentArguments arguments) {
-		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
+		Map<IIdentifier, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.mappings = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
 
@@ -123,10 +123,10 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	}
 
 	@Override
-	public Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(getMappings()); }
+	public Map<IIdentifier, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(getMappings()); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappings() { return mappings; }
+	protected Map<IIdentifier, IUIPropertyMappingValue> getMappings() { return mappings; }
 
 	@Override
 	public void setContext(@Nullable IUIViewContext context) {
@@ -136,7 +136,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	}
 
 	@Override
-	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() {
+	protected ConcurrentMap<IIdentifier, IExtension<? extends IIdentifier, ?>> getExtensions() {
 		extensionsInitializer.run();
 		return super.getExtensions();
 	}

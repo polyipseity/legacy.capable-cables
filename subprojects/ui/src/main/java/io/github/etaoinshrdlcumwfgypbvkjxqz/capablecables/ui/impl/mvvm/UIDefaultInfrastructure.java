@@ -21,7 +21,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtil
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.NoSuchBindingTransformerException;
@@ -41,7 +41,7 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Suppr
 
 public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewModel<?>, B extends IBinder>
 		implements IUIInfrastructure<V, VM, B> {
-	private final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
+	private final ConcurrentMap<IIdentifier, IExtension<? extends IIdentifier, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
 	private final CompositeDisposable binderDisposables = new CompositeDisposable();
 	private final IUILifecycleStateTracker lifecycleStateTracker = new UIDefaultLifecycleStateTracker();
 	private final Supplier<@Nonnull Optional<DisposableObserver<IBinderAction>>> binderObserverSupplier;
@@ -73,22 +73,22 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 
 	@Override
 	@Deprecated
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
+	public Optional<? extends IExtension<? extends IIdentifier, ?>> addExtension(IExtension<? extends IIdentifier, ?> extension) {
 		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
 		return IExtensionContainer.addExtensionImpl(this, getExtensions(), extension);
 	}
 
 	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) { return IExtensionContainer.removeExtensionImpl(getExtensions(), key); }
+	public Optional<? extends IExtension<? extends IIdentifier, ?>> removeExtension(IIdentifier key) { return IExtensionContainer.removeExtensionImpl(getExtensions(), key); }
 
 	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return IExtensionContainer.getExtensionImpl(getExtensions(), key); }
+	public Optional<? extends IExtension<? extends IIdentifier, ?>> getExtension(IIdentifier key) { return IExtensionContainer.getExtensionImpl(getExtensions(), key); }
 
 	@Override
-	public Map<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
+	public Map<IIdentifier, IExtension<? extends IIdentifier, ?>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() { return extensions; }
+	protected ConcurrentMap<IIdentifier, IExtension<? extends IIdentifier, ?>> getExtensions() { return extensions; }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper

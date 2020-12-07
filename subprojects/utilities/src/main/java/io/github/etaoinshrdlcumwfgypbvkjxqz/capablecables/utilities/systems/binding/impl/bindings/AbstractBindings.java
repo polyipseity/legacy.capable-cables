@@ -6,7 +6,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilitie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinding;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.NoSuchBindingTransformerException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.bindings.IBindings;
@@ -23,9 +23,9 @@ public abstract class AbstractBindings<B extends IBinding<?>>
 
 	private final Supplier<@Nonnull ? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>>> transformersSupplier;
 
-	private final INamespacePrefixedString bindingKey;
+	private final IIdentifier bindingKey;
 
-	protected AbstractBindings(INamespacePrefixedString bindingKey,
+	protected AbstractBindings(IIdentifier bindingKey,
 	                           Supplier<@Nonnull ? extends Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>>> transformersSupplier) {
 		this.bindingKey = bindingKey;
 		this.transformersSupplier = transformersSupplier;
@@ -60,7 +60,7 @@ public abstract class AbstractBindings<B extends IBinding<?>>
 	protected static ResourceBundle getResourceBundle() { return RESOURCE_BUNDLE; }
 
 	@Override
-	public Optional<? extends INamespacePrefixedString> getBindingKey() { return Optional.of(bindingKey); }
+	public Optional<? extends IIdentifier> getBindingKey() { return Optional.of(bindingKey); }
 
 	protected Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>> getTransformers() { return getTransformersSupplier().get(); }
 

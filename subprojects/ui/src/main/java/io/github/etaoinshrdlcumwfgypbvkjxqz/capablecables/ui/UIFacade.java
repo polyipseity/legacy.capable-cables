@@ -8,7 +8,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.adapters.AbstractScreenAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.adapters.UIMinecraftScreenAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftResourceUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 import net.minecraft.inventory.container.Container;
@@ -44,7 +44,7 @@ public enum UIFacade {
 			return UIDefaultMinecraftInfrastructure.of(view, viewModel, binder);
 		}
 
-		public static Document parseResource(INamespacePrefixedString location) throws IOException, SAXException {
+		public static Document parseResource(IIdentifier location) throws IOException, SAXException {
 			try (InputStream res = MinecraftResourceUtilities.getInputStream(location)) {
 				return Resources.parseDocumentInput(new InputSource(res));
 			}

@@ -8,7 +8,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.I
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AbstractDelegatingObject;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 
 import java.util.Map;
 import java.util.Optional;
@@ -46,7 +46,7 @@ public final class UIImmutableComponentEmbedArguments
 	}
 
 	@Override
-	public @Immutable Map<INamespacePrefixedString, ? extends IUIPropertyMappingValue> getMappingsView() {
+	public @Immutable Map<IIdentifier, ? extends IUIPropertyMappingValue> getMappingsView() {
 		return getDelegate().getMappingsView();
 	}
 
@@ -56,7 +56,7 @@ public final class UIImmutableComponentEmbedArguments
 	}
 
 	@Override
-	public IUIComponentArguments withMappings(Map<? extends INamespacePrefixedString, ? extends IUIPropertyMappingValue> mappings) {
+	public IUIComponentArguments withMappings(Map<? extends IIdentifier, ? extends IUIPropertyMappingValue> mappings) {
 		return of(getConstructor(),
 				getDelegate().withMappings(mappings));
 	}

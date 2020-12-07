@@ -12,8 +12,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.descrip
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObjectInternal;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.impl.AbstractRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.impl.DefaultRegistryObject;
@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 public class DefaultShapeDescriptorBuilderFactory
 		extends AbstractRegistry<Class<? extends Shape>, Supplier<@Nonnull ? extends IShapeDescriptorBuilder<?>>>
 		implements IShapeDescriptorBuilderFactory {
-	private static final INamespacePrefixedString DEFAULT_FACTORY_KEY = ImmutableNamespacePrefixedString.of(StaticHolder.getDefaultNamespace(), "default");
+	private static final IIdentifier DEFAULT_FACTORY_KEY = ImmutableIdentifier.of(StaticHolder.getDefaultNamespace(), "default");
 	private static final @Immutable Map<Class<? extends Shape>, Supplier<@Nonnull IRegistryObjectInternal<Supplier<@Nonnull ? extends IShapeDescriptorBuilder<?>>>>> DEFAULTS_SUPPLIER =
 			ImmutableMap.<Class<? extends Shape>, Supplier<@Nonnull IRegistryObjectInternal<Supplier<@Nonnull ? extends IShapeDescriptorBuilder<?>>>>>builder()
 					.put(Rectangle2D.class, () -> new DefaultRegistryObject<>(RectangularShapeDescriptorBuilder.Rectangle2DSD::new))
@@ -47,7 +47,7 @@ public class DefaultShapeDescriptorBuilderFactory
 
 	protected static @Immutable Map<Class<? extends Shape>, Supplier<@Nonnull IRegistryObjectInternal<Supplier<@Nonnull ? extends IShapeDescriptorBuilder<?>>>>> getDefaultsSupplier() { return DEFAULTS_SUPPLIER; }
 
-	public static INamespacePrefixedString getDefaultFactoryKey() { return DEFAULT_FACTORY_KEY; }
+	public static IIdentifier getDefaultFactoryKey() { return DEFAULT_FACTORY_KEY; }
 
 	@SuppressWarnings("unchecked")
 	@Override

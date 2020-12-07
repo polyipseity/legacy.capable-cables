@@ -11,7 +11,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descrip
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObjectInternal;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.impl.AbstractRegistry;
@@ -25,15 +25,15 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
 public final class ShapeDescriptorBuilderFactoryRegistry
-		extends AbstractRegistry<INamespacePrefixedString, IShapeDescriptorBuilderFactory> {
-	private static final @Immutable Map<INamespacePrefixedString, Supplier<@Nonnull IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>>> DEFAULTS_SUPPLIER = ImmutableMap.<INamespacePrefixedString, Supplier<@Nonnull IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>>>builder()
+		extends AbstractRegistry<IIdentifier, IShapeDescriptorBuilderFactory> {
+	private static final @Immutable Map<IIdentifier, Supplier<@Nonnull IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>>> DEFAULTS_SUPPLIER = ImmutableMap.<IIdentifier, Supplier<@Nonnull IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>>>builder()
 			.put(DefaultShapeDescriptorBuilderFactory.getDefaultFactoryKey(), () -> new DefaultRegistryObject<>(new DefaultShapeDescriptorBuilderFactory()))
 			.build();
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	private static final Supplier<@Nonnull ShapeDescriptorBuilderFactoryRegistry> INSTANCE = Suppliers.memoize(ShapeDescriptorBuilderFactoryRegistry::new);
 	private static final long serialVersionUID = 6379579158201410218L;
 
-	private final ConcurrentMap<INamespacePrefixedString, IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>> data;
+	private final ConcurrentMap<IIdentifier, IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>> data;
 
 	private ShapeDescriptorBuilderFactoryRegistry() {
 		super(true);
@@ -41,7 +41,7 @@ public final class ShapeDescriptorBuilderFactoryRegistry
 		this.data.putAll(Maps.transformValues(getDefaultsSupplier(), Supplier::get));
 	}
 
-	protected static @Immutable Map<INamespacePrefixedString, Supplier<@Nonnull IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>>> getDefaultsSupplier() { return DEFAULTS_SUPPLIER; }
+	protected static @Immutable Map<IIdentifier, Supplier<@Nonnull IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>>> getDefaultsSupplier() { return DEFAULTS_SUPPLIER; }
 
 	public static DefaultShapeDescriptorBuilderFactory getDefaultFactory() {
 		return (DefaultShapeDescriptorBuilderFactory) getInstance()
@@ -53,7 +53,7 @@ public final class ShapeDescriptorBuilderFactoryRegistry
 	public static ShapeDescriptorBuilderFactoryRegistry getInstance() { return INSTANCE.get(); }
 
 	@Override
-	public <VL extends IShapeDescriptorBuilderFactory> IRegistryObject<VL> register(INamespacePrefixedString key, VL value) {
+	public <VL extends IShapeDescriptorBuilderFactory> IRegistryObject<VL> register(IIdentifier key, VL value) {
 		if (DefaultShapeDescriptorBuilderFactory.getDefaultFactoryKey().equals(key))
 			throw new IllegalStateException(
 					new LogMessageBuilder()
@@ -67,7 +67,7 @@ public final class ShapeDescriptorBuilderFactoryRegistry
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	@Override
-	protected ConcurrentMap<INamespacePrefixedString, IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>> getData() {
+	protected ConcurrentMap<IIdentifier, IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>> getData() {
 		return data;
 	}
 

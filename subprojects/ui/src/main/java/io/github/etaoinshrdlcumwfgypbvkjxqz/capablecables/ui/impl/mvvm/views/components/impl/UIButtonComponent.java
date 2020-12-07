@@ -27,9 +27,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.methods.IBindingMethodSource;
@@ -58,9 +58,9 @@ public class UIButtonComponent
 	@NonNls
 	public static final String METHOD_ON_CANCELED = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "method.button.canceled";
 
-	private static final INamespacePrefixedString METHOD_ON_ACTIVATE_LOCATION = ImmutableNamespacePrefixedString.of(getMethodOnActivate());
-	private static final INamespacePrefixedString METHOD_ON_ACTIVATED_LOCATION = ImmutableNamespacePrefixedString.of(getMethodOnActivated());
-	private static final INamespacePrefixedString METHOD_ON_CANCELED_LOCATION = ImmutableNamespacePrefixedString.of(getMethodOnCanceled());
+	private static final IIdentifier METHOD_ON_ACTIVATE_IDENTIFIER = ImmutableIdentifier.of(getMethodOnActivate());
+	private static final IIdentifier METHOD_ON_ACTIVATED_IDENTIFIER = ImmutableIdentifier.of(getMethodOnActivated());
+	private static final IIdentifier METHOD_ON_CANCELED_IDENTIFIER = ImmutableIdentifier.of(getMethodOnCanceled());
 
 	@UIMethod(METHOD_ON_ACTIVATE)
 	private final IBindingMethodSource<IUIEventActivate> onActivate;
@@ -81,13 +81,13 @@ public class UIButtonComponent
 	public UIButtonComponent(IUIComponentArguments arguments) {
 		super(arguments);
 
-		Map<INamespacePrefixedString, ? extends IUIPropertyMappingValue> mappings = arguments.getMappingsView();
+		Map<IIdentifier, ? extends IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.onActivate = ImmutableBindingMethodSource.of(IUIEventActivate.class,
-				Optional.ofNullable(mappings.get(getMethodOnActivateLocation())).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
+				Optional.ofNullable(mappings.get(getMethodOnActivateIdentifier())).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 		this.onActivated = ImmutableBindingMethodSource.of(IUIEvent.class,
-				Optional.ofNullable(mappings.get(getMethodOnActivatedLocation())).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
+				Optional.ofNullable(mappings.get(getMethodOnActivatedIdentifier())).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 		this.onCanceled = ImmutableBindingMethodSource.of(IUIEvent.class,
-				Optional.ofNullable(mappings.get(getMethodOnCanceledLocation())).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
+				Optional.ofNullable(mappings.get(getMethodOnCanceledIdentifier())).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
 
 		this.rendererContainerContainer =
 				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this),
@@ -129,16 +129,16 @@ public class UIButtonComponent
 		});
 	}
 
-	public static INamespacePrefixedString getMethodOnActivateLocation() {
-		return METHOD_ON_ACTIVATE_LOCATION;
+	public static IIdentifier getMethodOnActivateIdentifier() {
+		return METHOD_ON_ACTIVATE_IDENTIFIER;
 	}
 
-	public static INamespacePrefixedString getMethodOnActivatedLocation() {
-		return METHOD_ON_ACTIVATED_LOCATION;
+	public static IIdentifier getMethodOnActivatedIdentifier() {
+		return METHOD_ON_ACTIVATED_IDENTIFIER;
 	}
 
-	public static INamespacePrefixedString getMethodOnCanceledLocation() {
-		return METHOD_ON_CANCELED_LOCATION;
+	public static IIdentifier getMethodOnCanceledIdentifier() {
+		return METHOD_ON_CANCELED_IDENTIFIER;
 	}
 
 	protected IBindingMethodSource<IUIEvent> getOnCanceled() {
@@ -193,7 +193,7 @@ public class UIButtonComponent
 	public boolean isFocusable() { return true; }
 
 	@Override
-	protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
+	protected SetMultimap<IIdentifier, UIEventListenerWithParameters> getEventTargetListeners() {
 		eventTargetListenersInitializer.run();
 		return super.getEventTargetListeners();
 	}
@@ -226,13 +226,13 @@ public class UIButtonComponent
 			;
 
 			public static final @NonNls String TYPE_STRING = IUIEventType.StaticHolder.DEFAULT_PREFIX + "component.button.activated";
-			private static final INamespacePrefixedString TYPE = ImmutableNamespacePrefixedString.of(getTypeString());
+			private static final IIdentifier TYPE = ImmutableIdentifier.of(getTypeString());
 
 			public static String getTypeString() {
 				return TYPE_STRING;
 			}
 
-			public static INamespacePrefixedString getType() {
+			public static IIdentifier getType() {
 				return TYPE;
 			}
 		}
@@ -299,12 +299,12 @@ public class UIButtonComponent
 		@NonNls
 		public static final String PROPERTY_PRESSED_BORDER_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.button.pressed.border.color";
 
-		private static final INamespacePrefixedString PROPERTY_BASE_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyBaseColor());
-		private static final INamespacePrefixedString PROPERTY_BASE_BORDER_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyBaseBorderColor());
-		private static final INamespacePrefixedString PROPERTY_HOVERING_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyHoveringColor());
-		private static final INamespacePrefixedString PROPERTY_HOVERING_BORDER_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyHoveringBorderColor());
-		private static final INamespacePrefixedString PROPERTY_PRESSED_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyPressedColor());
-		private static final INamespacePrefixedString PROPERTY_PRESSED_BORDER_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyPressedBorderColor());
+		private static final IIdentifier PROPERTY_BASE_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyBaseColor());
+		private static final IIdentifier PROPERTY_BASE_BORDER_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyBaseBorderColor());
+		private static final IIdentifier PROPERTY_HOVERING_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyHoveringColor());
+		private static final IIdentifier PROPERTY_HOVERING_BORDER_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyHoveringBorderColor());
+		private static final IIdentifier PROPERTY_PRESSED_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyPressedColor());
+		private static final IIdentifier PROPERTY_PRESSED_BORDER_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyPressedBorderColor());
 
 		@UIProperty(PROPERTY_BASE_COLOR)
 		private final IBindingField<Color> baseColor;
@@ -323,37 +323,37 @@ public class UIButtonComponent
 		public DefaultRenderer(IUIRendererArguments arguments) {
 			super(arguments);
 
-			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-			this.baseColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.DARK_GRAY), mappings.get(getPropertyBaseColorLocation()));
-			this.baseBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.DARK_GRAY), mappings.get(getPropertyBaseBorderColorLocation()));
-			this.hoveringColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.GRAY), mappings.get(getPropertyHoveringColorLocation()));
-			this.hoveringBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.GRAY), mappings.get(getPropertyHoveringBorderColorLocation()));
-			this.pressedColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.LIGHT_GRAY), mappings.get(getPropertyPressedColorLocation()));
-			this.pressedBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.LIGHT_GRAY), mappings.get(getPropertyPressedBorderColorLocation()));
+			Map<IIdentifier, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
+			this.baseColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.DARK_GRAY), mappings.get(getPropertyBaseColorIdentifier()));
+			this.baseBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.DARK_GRAY), mappings.get(getPropertyBaseBorderColorIdentifier()));
+			this.hoveringColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.GRAY), mappings.get(getPropertyHoveringColorIdentifier()));
+			this.hoveringBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.GRAY), mappings.get(getPropertyHoveringBorderColorIdentifier()));
+			this.pressedColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.LIGHT_GRAY), mappings.get(getPropertyPressedColorIdentifier()));
+			this.pressedBorderColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.LIGHT_GRAY), mappings.get(getPropertyPressedBorderColorIdentifier()));
 		}
 
-		public static INamespacePrefixedString getPropertyBaseColorLocation() {
-			return PROPERTY_BASE_COLOR_LOCATION;
+		public static IIdentifier getPropertyBaseColorIdentifier() {
+			return PROPERTY_BASE_COLOR_IDENTIFIER;
 		}
 
-		public static INamespacePrefixedString getPropertyBaseBorderColorLocation() {
-			return PROPERTY_BASE_BORDER_COLOR_LOCATION;
+		public static IIdentifier getPropertyBaseBorderColorIdentifier() {
+			return PROPERTY_BASE_BORDER_COLOR_IDENTIFIER;
 		}
 
-		public static INamespacePrefixedString getPropertyHoveringColorLocation() {
-			return PROPERTY_HOVERING_COLOR_LOCATION;
+		public static IIdentifier getPropertyHoveringColorIdentifier() {
+			return PROPERTY_HOVERING_COLOR_IDENTIFIER;
 		}
 
-		public static INamespacePrefixedString getPropertyHoveringBorderColorLocation() {
-			return PROPERTY_HOVERING_BORDER_COLOR_LOCATION;
+		public static IIdentifier getPropertyHoveringBorderColorIdentifier() {
+			return PROPERTY_HOVERING_BORDER_COLOR_IDENTIFIER;
 		}
 
-		public static INamespacePrefixedString getPropertyPressedColorLocation() {
-			return PROPERTY_PRESSED_COLOR_LOCATION;
+		public static IIdentifier getPropertyPressedColorIdentifier() {
+			return PROPERTY_PRESSED_COLOR_IDENTIFIER;
 		}
 
-		public static INamespacePrefixedString getPropertyPressedBorderColorLocation() {
-			return PROPERTY_PRESSED_BORDER_COLOR_LOCATION;
+		public static IIdentifier getPropertyPressedBorderColorIdentifier() {
+			return PROPERTY_PRESSED_BORDER_COLOR_IDENTIFIER;
 		}
 
 		public static String getPropertyBaseColor() {

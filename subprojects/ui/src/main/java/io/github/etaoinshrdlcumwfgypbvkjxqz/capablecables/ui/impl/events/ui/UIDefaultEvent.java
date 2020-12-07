@@ -4,12 +4,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventTarget;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class UIDefaultEvent implements IUIEvent {
-	private final INamespacePrefixedString type;
+	private final IIdentifier type;
 	private final boolean canBubble;
 	private final boolean cancelable;
 	private final IUIViewContext viewContext;
@@ -18,7 +18,7 @@ public class UIDefaultEvent implements IUIEvent {
 	private EnumPhase phase = EnumPhase.NONE;
 	private boolean propagationStopped = false;
 
-	public UIDefaultEvent(INamespacePrefixedString type, boolean canBubble, boolean cancelable, IUIViewContext viewContext, IUIEventTarget target) {
+	public UIDefaultEvent(IIdentifier type, boolean canBubble, boolean cancelable, IUIViewContext viewContext, IUIEventTarget target) {
 		this.type = type;
 		this.canBubble = canBubble;
 		this.cancelable = cancelable;
@@ -27,7 +27,7 @@ public class UIDefaultEvent implements IUIEvent {
 	}
 
 	@Override
-	public INamespacePrefixedString getType() { return type; }
+	public IIdentifier getType() { return type; }
 
 	@Override
 	public IUIEventTarget getTarget() { return target; }

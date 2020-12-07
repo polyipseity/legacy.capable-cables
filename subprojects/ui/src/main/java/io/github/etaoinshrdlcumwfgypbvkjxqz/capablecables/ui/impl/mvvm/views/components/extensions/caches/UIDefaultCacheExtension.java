@@ -27,7 +27,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.im
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ISpecialized;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
@@ -44,10 +44,10 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Suppr
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 
 public class UIDefaultCacheExtension
-		extends AbstractContainerAwareExtension<INamespacePrefixedString, IExtensionContainer<INamespacePrefixedString>, IExtensionContainer<INamespacePrefixedString>>
+		extends AbstractContainerAwareExtension<IIdentifier, IExtensionContainer<IIdentifier>, IExtensionContainer<IIdentifier>>
 		implements IUICacheExtension {
 	private static final IUIExtensionArguments DEFAULT_ARGUMENTS = UIImmutableExtensionArguments.of(ImmutableMap.of(), IExtensionContainer.class, null);
-	private final Cache<INamespacePrefixedString, Object> cache =
+	private final Cache<IIdentifier, Object> cache =
 			CacheBuilder.newBuilder()
 					.initialCapacity(CapacityUtilities.getInitialCapacitySmall())
 					.expireAfterAccess(CacheUtilities.getCacheExpirationAccessDuration(), CacheUtilities.getCacheExpirationAccessTimeUnit())
@@ -69,10 +69,10 @@ public class UIDefaultCacheExtension
 	}
 
 	@Override
-	public Cache<INamespacePrefixedString, Object> getDelegate() { return cache; }
+	public Cache<IIdentifier, Object> getDelegate() { return cache; }
 
 	@Override
-	public IExtensionType<INamespacePrefixedString, ?, IExtensionContainer<INamespacePrefixedString>> getType() { return StaticHolder.getType().getValue(); }
+	public IExtensionType<IIdentifier, ?, IExtensionContainer<IIdentifier>> getType() { return StaticHolder.getType().getValue(); }
 
 	public enum CacheUniversal {
 		;

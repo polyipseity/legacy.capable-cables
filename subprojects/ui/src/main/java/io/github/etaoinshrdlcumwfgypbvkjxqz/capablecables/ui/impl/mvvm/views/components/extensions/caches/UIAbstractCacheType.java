@@ -4,24 +4,24 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches.IUICacheExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.caches.IUICacheType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheLoaderLoadedNullException;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-public abstract class UIAbstractCacheType<V0, V, C extends IExtensionContainer<INamespacePrefixedString>>
+public abstract class UIAbstractCacheType<V0, V, C extends IExtensionContainer<IIdentifier>>
 		implements IUICacheType<V, C> {
-	private final INamespacePrefixedString key;
+	private final IIdentifier key;
 
-	public UIAbstractCacheType(INamespacePrefixedString key) { this.key = key; }
+	public UIAbstractCacheType(IIdentifier key) { this.key = key; }
 
 	@Override
 	public void invalidate(C container) { IUICacheType.invalidateImpl(container, getKey()); }
 
 	@Override
-	public INamespacePrefixedString getKey() { return key; }
+	public IIdentifier getKey() { return key; }
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -60,9 +60,9 @@ public abstract class UIAbstractCacheType<V0, V, C extends IExtensionContainer<I
 		private static final long serialVersionUID = -3573856739814562214L;
 	}
 
-	public static abstract class Identity<V, C extends IExtensionContainer<INamespacePrefixedString>>
+	public static abstract class Identity<V, C extends IExtensionContainer<IIdentifier>>
 			extends UIAbstractCacheType<V, V, C> {
-		public Identity(INamespacePrefixedString key) {
+		public Identity(IIdentifier key) {
 			super(key);
 		}
 

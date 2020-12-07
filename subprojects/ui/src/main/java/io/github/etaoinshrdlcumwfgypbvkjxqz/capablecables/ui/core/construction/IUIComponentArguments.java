@@ -6,7 +6,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPro
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import org.jetbrains.annotations.NonNls;
 
 import java.util.Map;
@@ -23,11 +23,11 @@ public interface IUIComponentArguments
 
 	Optional<? extends String> getRendererName();
 
-	@Immutable Map<INamespacePrefixedString, ? extends IUIPropertyMappingValue> getMappingsView();
+	@Immutable Map<IIdentifier, ? extends IUIPropertyMappingValue> getMappingsView();
 
 	@Immutable Map<String, ? extends IEmbedPrototype> getEmbedArgumentsView();
 
-	IUIComponentArguments withMappings(Map<? extends INamespacePrefixedString, ? extends IUIPropertyMappingValue> mappings);
+	IUIComponentArguments withMappings(Map<? extends IIdentifier, ? extends IUIPropertyMappingValue> mappings);
 
 	Optional<IUIComponentEmbedArguments> tryComputeEmbedArgument(CharSequence key, Function<@Nonnull ? super IUIComponentArguments, @Nonnull ? extends IUIComponent> constructor, IShapeDescriptor<?> shapeDescriptor);
 
@@ -49,7 +49,7 @@ public interface IUIComponentArguments
 	}
 
 	interface IEmbedPrototype {
-		@Immutable Map<INamespacePrefixedString, ? extends IUIPropertyMappingValue> getMappingsView();
+		@Immutable Map<IIdentifier, ? extends IUIPropertyMappingValue> getMappingsView();
 
 		Optional<? extends String> getRendererName();
 

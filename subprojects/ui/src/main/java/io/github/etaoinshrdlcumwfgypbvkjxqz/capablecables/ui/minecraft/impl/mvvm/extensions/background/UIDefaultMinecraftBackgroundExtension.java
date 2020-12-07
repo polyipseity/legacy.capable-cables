@@ -25,7 +25,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseabl
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
@@ -52,7 +52,7 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Suppr
 
 @OnlyIn(Dist.CLIENT)
 public class UIDefaultMinecraftBackgroundExtension
-		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIMinecraftViewComponent<?, ?>, IUIMinecraftViewComponent<?, ?>>
+		extends AbstractContainerAwareExtension<IIdentifier, IUIMinecraftViewComponent<?, ?>, IUIMinecraftViewComponent<?, ?>>
 		implements IUIMinecraftBackgroundExtension {
 	private static final IUIExtensionArguments DEFAULT_ARGUMENTS =
 			UIImmutableExtensionArguments.of(ImmutableMap.of(), IUIMinecraftViewComponent.class, null);
@@ -102,7 +102,7 @@ public class UIDefaultMinecraftBackgroundExtension
 	}
 
 	@Override
-	public IExtensionType<INamespacePrefixedString, ?, IUIMinecraftViewComponent<?, ?>> getType() { return StaticHolder.getType().getValue(); }
+	public IExtensionType<IIdentifier, ?, IUIMinecraftViewComponent<?, ?>> getType() { return StaticHolder.getType().getValue(); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper

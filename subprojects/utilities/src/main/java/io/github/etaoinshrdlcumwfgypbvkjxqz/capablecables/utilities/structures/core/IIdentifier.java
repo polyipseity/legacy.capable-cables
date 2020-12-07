@@ -17,31 +17,23 @@ import java.util.ResourceBundle;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-public interface INamespacePrefixedString {
-	@SuppressWarnings("SwitchStatementWithTooFewBranches")
-	static String[] decompose(CharSequence string) {
-		String[] ss = StaticHolder.getSeparatorPattern().split(string, 2);
-		switch (ss.length) {
-			case 2:
-				return ss;
-			default:
-				throw new IllegalArgumentException(
-						new LogMessageBuilder()
-								.addMarkers(StaticHolder::getClassMarker)
-								.addKeyValue("string", string)
-								.addMessages(() -> StaticHolder.getResourceBundle().getString("decompose.fail"))
-								.build()
-				);
-		}
-	}
-
-	default String asString() { return getNamespace() + StaticHolder.getSeparator() + getString(); }
-
+public interface IIdentifier
+		extends CharSequence {
 	@NonNls
 	String getNamespace();
 
-	@NonNls
-	String getString();
+	static String[] decompose(CharSequence charSequence) {
+		String[] decomposed = StaticHolder.getSeparatorPattern().split(charSequence, 2);
+		if (decomposed.length == 2)
+			return decomposed;
+		throw new IllegalArgumentException(
+				new LogMessageBuilder()
+						.addMarkers(StaticHolder::getClassMarker)
+						.addKeyValue("charSequence", charSequence)
+						.addMessages(() -> StaticHolder.getResourceBundle().getString("decompose.fail"))
+						.build()
+		);
+	}
 
 	@Override
 	int hashCode();
@@ -49,21 +41,33 @@ public interface INamespacePrefixedString {
 	@Override
 	boolean equals(Object obj);
 
+	static String asString(IIdentifier instance) {
+		return instance.getNamespace() + StaticHolder.getSeparator() + instance.getName();
+	}
+
+	@NonNls
+	String getName();
+
 	enum StaticHolder {
 		;
 
-		public static final @NonNls String SEPARATOR = ":";
+		public static final char SEPARATOR_CHAR = ':';
+		public static final @NonNls String SEPARATOR = "" + SEPARATOR_CHAR;
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 		private static final Pattern SEPARATOR_PATTERN = Pattern.compile(getSeparator(), Pattern.LITERAL);
 		private static final Marker CLASS_MARKER =
 				MarkersTemplate.addReferences(UtilitiesMarkers.getInstance().getClassMarker(),
 						UtilitiesMarkers.getInstance().getMarkerStructure());
 
-		private static final @Immutable Map<String, Function<@Nonnull INamespacePrefixedString, @Nullable ?>> OBJECT_VARIABLE_MAP =
-				ImmutableMap.<String, Function<@Nonnull INamespacePrefixedString, @Nullable ?>>builder()
-						.put("namespace", INamespacePrefixedString::getNamespace)
-						.put("string", INamespacePrefixedString::getString)
+		private static final @Immutable @NonNls Map<String, Function<@Nonnull IIdentifier, @Nullable ?>> OBJECT_VARIABLE_MAP =
+				ImmutableMap.<String, Function<@Nonnull IIdentifier, @Nullable ?>>builder()
+						.put("namespace", IIdentifier::getNamespace)
+						.put("name", IIdentifier::getName)
 						.build();
+
+		public static char getSeparatorChar() {
+			return SEPARATOR_CHAR;
+		}
 
 		public static String getSeparator() {
 			return SEPARATOR;
@@ -73,7 +77,7 @@ public interface INamespacePrefixedString {
 			return SEPARATOR_PATTERN;
 		}
 
-		public static @Immutable Map<String, Function<@Nonnull INamespacePrefixedString, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
+		public static @Immutable @NonNls Map<String, Function<@Nonnull IIdentifier, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 
 		public static Marker getClassMarker() { return CLASS_MARKER; }
 

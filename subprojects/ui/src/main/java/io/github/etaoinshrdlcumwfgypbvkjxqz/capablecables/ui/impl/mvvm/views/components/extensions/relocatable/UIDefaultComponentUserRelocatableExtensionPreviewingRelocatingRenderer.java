@@ -8,9 +8,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.U
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.extensions.IUIComponentUserRelocatableExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
@@ -30,7 +30,7 @@ public class UIDefaultComponentUserRelocatableExtensionPreviewingRelocatingRende
 		extends UIAbstractComponentUserRelocatableExtensionRelocatingRenderer {
 	@NonNls
 	public static final String PROPERTY_PREVIEW_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.previewing.preview.color";
-	private static final INamespacePrefixedString PROPERTY_PREVIEW_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyPreviewColor());
+	private static final IIdentifier PROPERTY_PREVIEW_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyPreviewColor());
 	@UIProperty(PROPERTY_PREVIEW_COLOR)
 	private final IBindingField<Color> previewColor; // TODO Color to Paint
 
@@ -38,11 +38,11 @@ public class UIDefaultComponentUserRelocatableExtensionPreviewingRelocatingRende
 	public UIDefaultComponentUserRelocatableExtensionPreviewingRelocatingRenderer(IUIRendererArguments arguments) {
 		super(arguments);
 
-		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-		this.previewColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.DARK_GRAY), mappings.get(getPropertyPreviewColorLocation()));
+		Map<IIdentifier, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
+		this.previewColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.DARK_GRAY), mappings.get(getPropertyPreviewColorIdentifier()));
 	}
 
-	public static INamespacePrefixedString getPropertyPreviewColorLocation() { return PROPERTY_PREVIEW_COLOR_LOCATION; }
+	public static IIdentifier getPropertyPreviewColorIdentifier() { return PROPERTY_PREVIEW_COLOR_IDENTIFIER; }
 
 	public static String getPropertyPreviewColor() { return PROPERTY_PREVIEW_COLOR; }
 

@@ -37,9 +37,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.AnnotationUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingFunction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.IUnion;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableUnion;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 
@@ -100,7 +100,7 @@ public enum JAXBUIComponentUtilities {
 			throws Throwable {
 		return context.getDatum(IJAXBUIComponentAdapterContext.class)
 				.map(IThrowingFunction.executeNow(subContext -> {
-					Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = createMappings(context, view.getProperty());
+					Map<IIdentifier, IUIPropertyMappingValue> mappings = createMappings(context, view.getProperty());
 					IUIViewComponentArguments argument = UIImmutableViewComponentArguments.of(mappings);
 
 					Class<?> clazz = AssertionUtilities.assertNonnull(subContext.getAliasesView().get(view.getClazz()));
@@ -114,14 +114,14 @@ public enum JAXBUIComponentUtilities {
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static Map<INamespacePrefixedString, IUIPropertyMappingValue> createMappings(IJAXBAdapterContext context, Iterable<? extends Property> properties) {
+	public static Map<IIdentifier, IUIPropertyMappingValue> createMappings(IJAXBAdapterContext context, Iterable<? extends Property> properties) {
 		return Streams.stream(properties).unordered()
-				.map(p -> Maps.immutableEntry(ImmutableNamespacePrefixedString.of(p.getKey()),
+				.map(p -> Maps.immutableEntry(ImmutableIdentifier.of(p.getKey()),
 						UIImmutablePropertyMappingValue.of(p.getAny()
 										.map(any -> IJAXBAdapterRegistry.adaptFromJAXB(context, any))
 										.orElse(null),
 								p.getBindingKey()
-										.map(ImmutableNamespacePrefixedString::of)
+										.map(ImmutableIdentifier::of)
 										.orElse(null))))
 				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
@@ -133,7 +133,7 @@ public enum JAXBUIComponentUtilities {
 				.map(IThrowingFunction.executeNow(subContext ->
 						TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, component,
 								IThrowingFunction.executeNow(node -> {
-									Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings =
+									Map<IIdentifier, IUIPropertyMappingValue> mappings =
 											MapUtilities.concatMaps(createMappings(context, node.getProperty()),
 													createEventMappings(ImmutableUnion.ofLeft(node)));
 
@@ -183,8 +183,8 @@ public enum JAXBUIComponentUtilities {
 				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
-	public static @Immutable Map<INamespacePrefixedString, IUIPropertyMappingValue> createEventMappings(IUnion<? extends Component, ? extends ComponentEmbed> component) {
-		Map<INamespacePrefixedString, IUIPropertyMappingValue> attributes = new HashMap<>(getEventTypeFunctionMapView().size());
+	public static @Immutable Map<IIdentifier, IUIPropertyMappingValue> createEventMappings(IUnion<? extends Component, ? extends ComponentEmbed> component) {
+		Map<IIdentifier, IUIPropertyMappingValue> attributes = new HashMap<>(getEventTypeFunctionMapView().size());
 		getEventTypeFunctionMapView()
 				.forEach((key, value) -> {
 					assert key != null;
@@ -193,7 +193,7 @@ public enum JAXBUIComponentUtilities {
 							UIImmutablePropertyMappingValue.of(null,
 									AssertionUtilities.assertNonnull(value.apply(component))
 											.map(IUIEventType.StaticHolder.getDefaultPrefix()::concat)
-											.map(ImmutableNamespacePrefixedString::of)
+											.map(ImmutableIdentifier::of)
 											.orElse(null)));
 				});
 		return ImmutableMap.copyOf(attributes);

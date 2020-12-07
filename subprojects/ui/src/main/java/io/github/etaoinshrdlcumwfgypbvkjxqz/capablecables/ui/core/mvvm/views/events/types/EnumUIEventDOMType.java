@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventType;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import org.jetbrains.annotations.NonNls;
 
 public enum EnumUIEventDOMType
@@ -54,12 +54,12 @@ public enum EnumUIEventDOMType
 
 	@NonNls
 	private final String eventTypeString;
-	private final INamespacePrefixedString eventType;
+	private final IIdentifier eventType;
 
 	EnumUIEventDOMType(@NonNls CharSequence eventTypeString) {
 		String eventTypeString2 = eventTypeString.toString();
 		this.eventTypeString = eventTypeString2;
-		this.eventType = ImmutableNamespacePrefixedString.of(eventTypeString2);
+		this.eventType = ImmutableIdentifier.of(eventTypeString2);
 	}
 
 	@Override
@@ -67,5 +67,5 @@ public enum EnumUIEventDOMType
 	public String getEventTypeString() { return eventTypeString; }
 
 	@Override
-	public INamespacePrefixedString getEventType() { return eventType; }
+	public IIdentifier getEventType() { return eventType; }
 }

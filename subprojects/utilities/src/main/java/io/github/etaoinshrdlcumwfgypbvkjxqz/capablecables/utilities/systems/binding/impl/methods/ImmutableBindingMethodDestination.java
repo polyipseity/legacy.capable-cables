@@ -3,7 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bin
 import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.methods.IBindingMethodDestination;
 
 import java.util.Optional;
@@ -14,12 +14,12 @@ public final class ImmutableBindingMethodDestination<T>
 	@SuppressWarnings("UnstableApiUsage")
 	private final TypeToken<T> typeToken;
 	@Nullable
-	private final INamespacePrefixedString bindingKey;
+	private final IIdentifier bindingKey;
 	private final Consumer<@Nonnull ? super T> action;
 
 	@SuppressWarnings("UnstableApiUsage")
 	private ImmutableBindingMethodDestination(Class<T> type,
-	                                          @Nullable INamespacePrefixedString bindingKey,
+	                                          @Nullable IIdentifier bindingKey,
 	                                          Consumer<@Nonnull ? super T> action) {
 		this.typeToken = TypeToken.of(type);
 		this.bindingKey = bindingKey;
@@ -27,13 +27,13 @@ public final class ImmutableBindingMethodDestination<T>
 	}
 
 	public static <T> ImmutableBindingMethodDestination<T> of(Class<T> type,
-	                                                          @Nullable INamespacePrefixedString bindingKey,
+	                                                          @Nullable IIdentifier bindingKey,
 	                                                          Consumer<@Nonnull ? super T> action) {
 		return new ImmutableBindingMethodDestination<>(type, bindingKey, action);
 	}
 
 	@Override
-	public Optional<? extends INamespacePrefixedString> getBindingKey() { return Optional.ofNullable(bindingKey); }
+	public Optional<? extends IIdentifier> getBindingKey() { return Optional.ofNullable(bindingKey); }
 
 	@Override
 	public void accept(@Nonnull T argument) { getAction().accept(argument); }

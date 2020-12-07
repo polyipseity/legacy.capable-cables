@@ -48,9 +48,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.im
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinding;
@@ -95,14 +95,14 @@ public class UIDefaultComponent
 	@NonNls
 	public static final String PROPERTY_ACTIVE = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.default.active";
 
-	private static final INamespacePrefixedString PROPERTY_VISIBLE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyVisible());
-	private static final INamespacePrefixedString PROPERTY_ACTIVE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyActive());
+	private static final IIdentifier PROPERTY_VISIBLE_IDENTIFIER = ImmutableIdentifier.of(getPropertyVisible());
+	private static final IIdentifier PROPERTY_ACTIVE_IDENTIFIER = ImmutableIdentifier.of(getPropertyActive());
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	@Nullable
 	private final String name;
-	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
-	private final ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
-	private final ConcurrentMap<INamespacePrefixedString, IBindingMethodSource<? extends IUIEvent>> eventTargetBindingMethods = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
+	private final Map<IIdentifier, IUIPropertyMappingValue> mappings;
+	private final ConcurrentMap<IIdentifier, IExtension<? extends IIdentifier, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
+	private final ConcurrentMap<IIdentifier, IBindingMethodSource<? extends IUIEvent>> eventTargetBindingMethods = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
 	private final IShapeDescriptor<?> shapeDescriptor;
 	@UIProperty(PROPERTY_VISIBLE)
 	private final IBindingField<Boolean> visible;
@@ -133,7 +133,7 @@ public class UIDefaultComponent
 				})
 				.orElse(null);
 
-		Map<INamespacePrefixedString, ? extends IUIPropertyMappingValue> mappings = arguments.getMappingsView();
+		Map<IIdentifier, ? extends IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.mappings = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
 
@@ -143,16 +143,16 @@ public class UIDefaultComponent
 				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this),
 						CastUtilities.castUnchecked(UIDefaultComponentRenderer.class));
 
-		this.visible = IUIPropertyMappingValue.createBindingField(Boolean.class, ConstantValue.of(suppressBoxing(true)), this.mappings.get(getPropertyVisibleLocation()));
-		this.active = IUIPropertyMappingValue.createBindingField(Boolean.class, ConstantValue.of(suppressBoxing(true)), this.mappings.get(getPropertyActiveLocation()));
+		this.visible = IUIPropertyMappingValue.createBindingField(Boolean.class, ConstantValue.of(suppressBoxing(true)), this.mappings.get(getPropertyVisibleIdentifier()));
+		this.active = IUIPropertyMappingValue.createBindingField(Boolean.class, ConstantValue.of(suppressBoxing(true)), this.mappings.get(getPropertyActiveIdentifier()));
 
 		this.extensionsInitializer = new OneUseRunnable(() ->
 				IExtensionContainer.addExtensionChecked(this, new UIDefaultCacheExtension()));
 	}
 
-	public static INamespacePrefixedString getPropertyVisibleLocation() { return PROPERTY_VISIBLE_LOCATION; }
+	public static IIdentifier getPropertyVisibleIdentifier() { return PROPERTY_VISIBLE_IDENTIFIER; }
 
-	public static INamespacePrefixedString getPropertyActiveLocation() { return PROPERTY_ACTIVE_LOCATION; }
+	public static IIdentifier getPropertyActiveIdentifier() { return PROPERTY_ACTIVE_IDENTIFIER; }
 
 	public static String getPropertyVisible() {
 		return PROPERTY_VISIBLE;
@@ -219,8 +219,19 @@ public class UIDefaultComponent
 
 	protected AtomicBoolean getModifyingShape() { return modifyingShape; }
 
-	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<INamespacePrefixedString, IBindingMethodSource<? extends IUIEvent>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }
+	@Override
+	public boolean dispatchEvent(IUIEvent event) {
+		boolean ret = super.dispatchEvent(event);
+		IIdentifier type = event.getType();
+		@Nullable IBindingMethodSource<? extends IUIEvent> method = getEventTargetBindingMethods().get(type);
+		if (method == null) {
+			method = ImmutableBindingMethodSource.of(event.getClass(),
+					Optional.ofNullable(getMappings().get(type)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
+			getEventTargetBindingMethods().put(type, method);
+		}
+		method.invoke(CastUtilities.castUnchecked(event)); // COMMENT should match
+		return ret;
+	}
 
 	@Override
 	public void transformChildren(AffineTransform transform) {
@@ -232,7 +243,7 @@ public class UIDefaultComponent
 	public boolean isModifyingShape() { return getModifyingShape().get(); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappings() { return mappings; }
+	protected ConcurrentMap<IIdentifier, IBindingMethodSource<? extends IUIEvent>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }
 
 	@Override
 	public boolean addChildren(Iterable<? extends IUIComponent> components) {
@@ -326,19 +337,8 @@ public class UIDefaultComponent
 	@Override
 	public IShapeDescriptor<?> getShapeDescriptor() { return shapeDescriptor; }
 
-	@Override
-	public boolean dispatchEvent(IUIEvent event) {
-		boolean ret = super.dispatchEvent(event);
-		INamespacePrefixedString type = event.getType();
-		@Nullable IBindingMethodSource<? extends IUIEvent> method = getEventTargetBindingMethods().get(type);
-		if (method == null) {
-			method = ImmutableBindingMethodSource.of(event.getClass(),
-					Optional.ofNullable(getMappings().get(type)).flatMap(IUIPropertyMappingValue::getBindingKey).orElse(null));
-			getEventTargetBindingMethods().put(type, method);
-		}
-		method.invoke(CastUtilities.castUnchecked(event)); // COMMENT should match
-		return ret;
-	}
+	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+	protected Map<IIdentifier, IUIPropertyMappingValue> getMappings() { return mappings; }
 
 	@Override
 	public List<? extends IUIComponentModifier> getModifiersView() { return ImmutableList.copyOf(getModifiers()); }
@@ -402,30 +402,30 @@ public class UIDefaultComponent
 
 	@Override
 	@Deprecated
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> addExtension(IExtension<? extends INamespacePrefixedString, ?> extension) {
+	public Optional<? extends IExtension<? extends IIdentifier, ?>> addExtension(IExtension<? extends IIdentifier, ?> extension) {
 		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
-		Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> result = IExtensionContainer.addExtensionImpl(this, getExtensions(), extension);
+		Optional<? extends IExtension<? extends IIdentifier, ?>> result = IExtensionContainer.addExtensionImpl(this, getExtensions(), extension);
 		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
 				BindingUtilities.findAndInitializeBindings(binderObserverSupplier, ImmutableList.of(extension)));
 		return result;
 	}
 
 	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> removeExtension(INamespacePrefixedString key) {
-		Optional<IExtension<? extends INamespacePrefixedString, ?>> result = IExtensionContainer.removeExtensionImpl(getExtensions(), key);
+	public Optional<? extends IExtension<? extends IIdentifier, ?>> removeExtension(IIdentifier key) {
+		Optional<IExtension<? extends IIdentifier, ?>> result = IExtensionContainer.removeExtensionImpl(getExtensions(), key);
 		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
 				BindingUtilities.findAndCleanupBindings(result.map(ImmutableList::of).orElseGet(ImmutableList::of)));
 		return result;
 	}
 
 	@Override
-	public Optional<? extends IExtension<? extends INamespacePrefixedString, ?>> getExtension(INamespacePrefixedString key) { return IExtensionContainer.getExtensionImpl(getExtensions(), key); }
+	public Optional<? extends IExtension<? extends IIdentifier, ?>> getExtension(IIdentifier key) { return IExtensionContainer.getExtensionImpl(getExtensions(), key); }
 
 	@Override
-	public Map<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
+	public Map<IIdentifier, IExtension<? extends IIdentifier, ?>> getExtensionsView() { return ImmutableMap.copyOf(getExtensions()); }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected ConcurrentMap<INamespacePrefixedString, IExtension<? extends INamespacePrefixedString, ?>> getExtensions() {
+	protected ConcurrentMap<IIdentifier, IExtension<? extends IIdentifier, ?>> getExtensions() {
 		extensionsInitializer.run();
 		return extensions;
 	}
@@ -436,7 +436,7 @@ public class UIDefaultComponent
 	}
 
 	@Override
-	public Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(getMappings()); }
+	public Map<IIdentifier, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(getMappings()); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper

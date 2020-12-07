@@ -2,15 +2,15 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.co
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.StackTraceUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import org.jetbrains.annotations.NonNls;
 
 import java.util.Optional;
 
-public interface IUICacheType<V, C extends IExtensionContainer<INamespacePrefixedString>> {
-	static void invalidateImpl(IExtensionContainer<INamespacePrefixedString> container, INamespacePrefixedString key) {
+public interface IUICacheType<V, C extends IExtensionContainer<IIdentifier>> {
+	static void invalidateImpl(IExtensionContainer<IIdentifier> container, IIdentifier key) {
 		IUICacheExtension.StaticHolder.getType().getValue().find(container)
 				.map(IUICacheExtension::getDelegate)
 				.ifPresent(cache -> cache.invalidate(key));
@@ -23,11 +23,11 @@ public interface IUICacheType<V, C extends IExtensionContainer<INamespacePrefixe
 
 	void invalidate(C container);
 
-	static INamespacePrefixedString generateKey(@NonNls CharSequence name) {
-		return ImmutableNamespacePrefixedString.of(StaticHolder.getDefaultNamespace(), StackTraceUtilities.getCallerClass().getName() + '.' + name);
+	static IIdentifier generateKey(@NonNls CharSequence name) {
+		return ImmutableIdentifier.of(StaticHolder.getDefaultNamespace(), StackTraceUtilities.getCallerClass().getName() + '.' + name);
 	}
 
-	INamespacePrefixedString getKey();
+	IIdentifier getKey();
 
 	Optional<? extends V> get(C container);
 
@@ -35,7 +35,7 @@ public interface IUICacheType<V, C extends IExtensionContainer<INamespacePrefixe
 		;
 
 		public static final @NonNls String DEFAULT_NAMESPACE = "default";
-		public static final @NonNls String DEFAULT_PREFIX = DEFAULT_NAMESPACE + INamespacePrefixedString.StaticHolder.SEPARATOR;
+		public static final @NonNls String DEFAULT_PREFIX = DEFAULT_NAMESPACE + IIdentifier.StaticHolder.SEPARATOR;
 
 		public static @NonNls String getDefaultNamespace() { return DEFAULT_NAMESPACE; }
 

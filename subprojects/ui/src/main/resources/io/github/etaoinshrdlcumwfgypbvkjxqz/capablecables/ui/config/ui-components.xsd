@@ -152,39 +152,39 @@
 
 	<!-- COMMENT DOM events attribute group -->
 	<xs:attributeGroup name="DOMEventsAttributeGroup">
-		<xs:attribute name="load" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="unload" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="abort" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="error" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="select" type="ui:NSPrefixedString"/>
-		<xs:attribute name="blur" type="ui:NSPrefixedString"/>
-		<xs:attribute name="focus" type="ui:NSPrefixedString"/>
-		<xs:attribute name="focusin" type="ui:NSPrefixedString"/>
-		<xs:attribute name="focusout" type="ui:NSPrefixedString"/>
-		<xs:attribute name="auxclick" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="click" type="ui:NSPrefixedString"/>
-		<xs:attribute name="dblclick" type="ui:NSPrefixedString"/>
-		<xs:attribute name="mousedown" type="ui:NSPrefixedString"/>
-		<xs:attribute name="mouseenter" type="ui:NSPrefixedString"/>
-		<xs:attribute name="mouseleave" type="ui:NSPrefixedString"/>
-		<xs:attribute name="mousemove" type="ui:NSPrefixedString"/>
-		<xs:attribute name="mouseout" type="ui:NSPrefixedString"/>
-		<xs:attribute name="mouseover" type="ui:NSPrefixedString"/>
-		<xs:attribute name="mouseup" type="ui:NSPrefixedString"/>
-		<xs:attribute name="wheel" type="ui:NSPrefixedString"/>
-		<xs:attribute name="beforeinput" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="input" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="keydown" type="ui:NSPrefixedString"/>
-		<xs:attribute name="keyup" type="ui:NSPrefixedString"/>
-		<xs:attribute name="compositionstart" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="compositionupdate" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
-		<xs:attribute name="compositionend" type="ui:NSPrefixedString"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="load" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="unload" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="abort" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="error" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="select" type="ui:identifier"/>
+		<xs:attribute name="blur" type="ui:identifier"/>
+		<xs:attribute name="focus" type="ui:identifier"/>
+		<xs:attribute name="focusin" type="ui:identifier"/>
+		<xs:attribute name="focusout" type="ui:identifier"/>
+		<xs:attribute name="auxclick" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="click" type="ui:identifier"/>
+		<xs:attribute name="dblclick" type="ui:identifier"/>
+		<xs:attribute name="mousedown" type="ui:identifier"/>
+		<xs:attribute name="mouseenter" type="ui:identifier"/>
+		<xs:attribute name="mouseleave" type="ui:identifier"/>
+		<xs:attribute name="mousemove" type="ui:identifier"/>
+		<xs:attribute name="mouseout" type="ui:identifier"/>
+		<xs:attribute name="mouseover" type="ui:identifier"/>
+		<xs:attribute name="mouseup" type="ui:identifier"/>
+		<xs:attribute name="wheel" type="ui:identifier"/>
+		<xs:attribute name="beforeinput" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="input" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="keydown" type="ui:identifier"/>
+		<xs:attribute name="keyup" type="ui:identifier"/>
+		<xs:attribute name="compositionstart" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="compositionupdate" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="compositionend" type="ui:identifier"/><!-- COMMENT unused, reserved -->
 	</xs:attributeGroup>
 
 	<!-- COMMENT component events attribute group -->
 	<xs:attributeGroup name="componentEventsAttributeGroup">
 		<xs:attributeGroup ref="ui:DOMEventsAttributeGroup"/>
-		<xs:attribute name="char_typed" type="ui:NSPrefixedString"/>
+		<xs:attribute name="char_typed" type="ui:identifier"/>
 	</xs:attributeGroup>
 
 	<!-- COMMENT has renderer groups -->
@@ -204,8 +204,8 @@
 			<xs:sequence>
 				<xs:any minOccurs="0"/>
 			</xs:sequence>
-			<xs:attribute name="key" type="ui:NSPrefixedString" use="required"/>
-			<xs:attribute name="bindingKey" type="ui:NSPrefixedString"/>
+			<xs:attribute name="key" type="ui:identifier" use="required"/>
+			<xs:attribute name="bindingKey" type="ui:identifier"/>
 		</xs:complexType>
 	</xs:element>
 
@@ -244,8 +244,8 @@
 
 	<!-- SECTION types -->
 
-	<!-- COMMENT INamespacePrefixedString -->
-	<xs:simpleType name="NSPrefixedString">
+	<!-- COMMENT IIdentifier -->
+	<xs:simpleType name="identifier">
 		<xs:restriction base="xs:string">
 			<xs:pattern value=".*:.*"/>
 		</xs:restriction>

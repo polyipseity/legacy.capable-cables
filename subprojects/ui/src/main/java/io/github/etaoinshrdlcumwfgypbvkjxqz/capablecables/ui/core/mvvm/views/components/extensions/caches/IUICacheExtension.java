@@ -3,8 +3,8 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.co
 import com.google.common.cache.Cache;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.extensions.IUIExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.extensions.UIExtensionRegistry;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.ImmutableExtensionType;
@@ -13,23 +13,23 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.regi
 import java.util.Optional;
 
 public interface IUICacheExtension
-		extends IUIExtension<INamespacePrefixedString, IExtensionContainer<INamespacePrefixedString>> {
+		extends IUIExtension<IIdentifier, IExtensionContainer<IIdentifier>> {
 
-	Cache<INamespacePrefixedString, Object> getDelegate();
+	Cache<IIdentifier, Object> getDelegate();
 
 	enum StaticHolder {
 		;
 
-		private static final INamespacePrefixedString KEY = ImmutableNamespacePrefixedString.of(IUIExtension.StaticHolder.getDefaultNamespace(), "cache");
+		private static final IIdentifier KEY = ImmutableIdentifier.of(IUIExtension.StaticHolder.getDefaultNamespace(), "cache");
 		@SuppressWarnings("unchecked")
-		private static final IRegistryObject<IExtensionType<INamespacePrefixedString, IUICacheExtension, IExtensionContainer<INamespacePrefixedString>>> TYPE =
+		private static final IRegistryObject<IExtensionType<IIdentifier, IUICacheExtension, IExtensionContainer<IIdentifier>>> TYPE =
 				UIExtensionRegistry.getInstance().register(getKey(), new ImmutableExtensionType<>(getKey(), (t, i) -> (Optional<? extends IUICacheExtension>) i.getExtension(t.getKey())));
 
-		public static INamespacePrefixedString getKey() {
+		public static IIdentifier getKey() {
 			return KEY;
 		}
 
-		public static IRegistryObject<IExtensionType<INamespacePrefixedString, IUICacheExtension, IExtensionContainer<INamespacePrefixedString>>> getType() {
+		public static IRegistryObject<IExtensionType<IIdentifier, IUICacheExtension, IExtensionContainer<IIdentifier>>> getType() {
 			return TYPE;
 		}
 	}

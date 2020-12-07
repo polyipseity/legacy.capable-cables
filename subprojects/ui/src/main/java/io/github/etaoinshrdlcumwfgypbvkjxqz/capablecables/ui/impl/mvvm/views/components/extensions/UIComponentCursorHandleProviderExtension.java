@@ -13,7 +13,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableExtensionArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.modifiers.UIEmptyComponentCursorHandleProviderModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputDevices;
@@ -23,7 +23,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.opti
 import java.util.OptionalLong;
 
 public class UIComponentCursorHandleProviderExtension
-		extends AbstractContainerAwareExtension<INamespacePrefixedString, IUIView<?>, IUIViewComponent<?, ?>>
+		extends AbstractContainerAwareExtension<IIdentifier, IUIView<?>, IUIViewComponent<?, ?>>
 		implements IUICursorHandleProviderExtension {
 	private static final IUIExtensionArguments DEFAULT_ARGUMENTS = UIImmutableExtensionArguments.of(ImmutableMap.of(), IUIViewComponent.class, null);
 
@@ -75,5 +75,5 @@ public class UIComponentCursorHandleProviderExtension
 	}
 
 	@Override
-	public IExtensionType<INamespacePrefixedString, ?, IUIView<?>> getType() { return StaticHolder.getType().getValue(); }
+	public IExtensionType<IIdentifier, ?, IUIView<?>> getType() { return StaticHolder.getType().getValue(); }
 }

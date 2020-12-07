@@ -46,7 +46,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ColorUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTextComponentUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinding.EnumBindingType;
@@ -385,17 +385,17 @@ public enum UIMinecraftDebug {
 				extends UIDefaultMinecraftViewModel<Model> {
 			@SuppressWarnings("AutoBoxing")
 			private final IBindingField<Integer> anchoredWindowBorderColor = ImmutableBindingField.of(
-					ImmutableNamespacePrefixedString.of(UINamespaceUtilities.getRendererBindingNamespace(), "anchoredWindowBorderColor"),
+					ImmutableIdentifier.of(UINamespaceUtilities.getRendererBindingNamespace(), "anchoredWindowBorderColor"),
 					new MemoryObservableField<>(Integer.class, ColorUtilities.getColorless().getRGB()));
 			private final IBindingMethodDestination<UIButtonComponent.IUIEventActivate> buttonOnActivate = ImmutableBindingMethodDestination.of(
 					UIButtonComponent.IUIEventActivate.class,
-					ImmutableNamespacePrefixedString.of(UINamespaceUtilities.getViewBindingNamespace(), "buttonOnActivate"),
+					ImmutableIdentifier.of(UINamespaceUtilities.getViewBindingNamespace(), "buttonOnActivate"),
 					UIButtonComponent.UIDefaultEventActivate::handleEventCommonly);
 			private final Random random = new Random();
 			private boolean anchoredWindowFlickering = false;
 			private final IBindingMethodDestination<IUIEvent> buttonOnActivated = ImmutableBindingMethodDestination.of(
 					IUIEvent.class,
-					ImmutableNamespacePrefixedString.of(UINamespaceUtilities.getViewBindingNamespace(), "buttonOnActivated"),
+					ImmutableIdentifier.of(UINamespaceUtilities.getViewBindingNamespace(), "buttonOnActivated"),
 					this::onButtonActivated);
 
 			private ViewModel() { super(new Model()); }

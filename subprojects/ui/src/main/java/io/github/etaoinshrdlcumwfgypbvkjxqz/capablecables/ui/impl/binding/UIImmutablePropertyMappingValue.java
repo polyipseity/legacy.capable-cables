@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.binding;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 
 import java.util.Optional;
 
@@ -10,19 +10,19 @@ public final class UIImmutablePropertyMappingValue implements IUIPropertyMapping
 	@Nullable
 	private final Object defaultValue;
 	@Nullable
-	private final INamespacePrefixedString bindingKey;
+	private final IIdentifier bindingKey;
 
-	private UIImmutablePropertyMappingValue(@Nullable Object defaultValue, @Nullable INamespacePrefixedString bindingKey) {
+	private UIImmutablePropertyMappingValue(@Nullable Object defaultValue, @Nullable IIdentifier bindingKey) {
 		this.defaultValue = defaultValue;
 		this.bindingKey = bindingKey;
 	}
 
-	public static UIImmutablePropertyMappingValue of(@Nullable Object defaultValue, @Nullable INamespacePrefixedString bindingKey) {
+	public static UIImmutablePropertyMappingValue of(@Nullable Object defaultValue, @Nullable IIdentifier bindingKey) {
 		return new UIImmutablePropertyMappingValue(defaultValue, bindingKey);
 	}
 
 	@Override
-	public Optional<? extends INamespacePrefixedString> getBindingKey() { return Optional.ofNullable(bindingKey); }
+	public Optional<? extends IIdentifier> getBindingKey() { return Optional.ofNullable(bindingKey); }
 
 	@Override
 	public Optional<?> getDefaultValue() { return Optional.ofNullable(defaultValue); }

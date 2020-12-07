@@ -15,7 +15,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingToIntFunction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinding;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.NoSuchBindingTransformerException;
@@ -32,7 +32,7 @@ public class DefaultBinder
 	private static final MultimapBuilder.SetMultimapBuilder<Object, Object> BINDINGS_MULTI_MAP_BUILDER = MultimapBuilder
 			.linkedHashKeys(CapacityUtilities.getInitialCapacityMedium())
 			.linkedHashSetValues(CapacityUtilities.getInitialCapacityTiny()); // COMMENT order is important
-	private final LoadingCache<IBinding.EnumBindingType, LoadingCache<INamespacePrefixedString, IBindings<?>>> bindings;
+	private final LoadingCache<IBinding.EnumBindingType, LoadingCache<IIdentifier, IBindings<?>>> bindings;
 	private final LoadingCache<IBinding.EnumBindingType, LoadingCache<Class<?>, Cache<Class<?>, Function<@Nonnull ?, @Nonnull ?>>>> transformers;
 
 	{
@@ -61,9 +61,9 @@ public class DefaultBinder
 		return stripBool(
 				sortAndTrimBindings(bindings).entrySet().stream().unordered()
 						.flatMapToInt(IThrowingFunction.executeNow(typeEntry -> {
-							LoadingCache<INamespacePrefixedString, IBindings<?>> typeBindings = getBindings().getUnchecked(AssertionUtilities.assertNonnull(typeEntry.getKey()));
+							LoadingCache<IIdentifier, IBindings<?>> typeBindings = getBindings().getUnchecked(AssertionUtilities.assertNonnull(typeEntry.getKey()));
 							return AssertionUtilities.assertNonnull(typeEntry.getValue()).asMap().entrySet().stream() // COMMENT sequential, field binding order matters
-									.mapToInt(IThrowingToIntFunction.<Map.Entry<INamespacePrefixedString, ? extends Collection<? extends IBinding<?>>>,
+									.mapToInt(IThrowingToIntFunction.<Map.Entry<IIdentifier, ? extends Collection<? extends IBinding<?>>>,
 											NoSuchBindingTransformerException>executeNow(entry -> padBool(
 											typeBindings.getUnchecked(AssertionUtilities.assertNonnull(entry.getKey()))
 													.add(CastUtilities.castUnchecked( // COMMENT should be of the right type
@@ -75,8 +75,8 @@ public class DefaultBinder
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static <B extends IBinding<?>> Map<IBinding.EnumBindingType, Multimap<INamespacePrefixedString, B>> sortAndTrimBindings(Iterable<B> bindings) {
-		Map<IBinding.EnumBindingType, Multimap<INamespacePrefixedString, B>> ret =
+	public static <B extends IBinding<?>> Map<IBinding.EnumBindingType, Multimap<IIdentifier, B>> sortAndTrimBindings(Iterable<B> bindings) {
+		Map<IBinding.EnumBindingType, Multimap<IIdentifier, B>> ret =
 				new EnumMap<>(IBinding.EnumBindingType.class);
 		bindings.forEach(b ->
 				b.getBindingKey()
@@ -85,7 +85,7 @@ public class DefaultBinder
 		return ret;
 	}
 
-	protected LoadingCache<IBinding.EnumBindingType, LoadingCache<INamespacePrefixedString, IBindings<?>>> getBindings() { return bindings; }
+	protected LoadingCache<IBinding.EnumBindingType, LoadingCache<IIdentifier, IBindings<?>>> getBindings() { return bindings; }
 
 	@SuppressWarnings("UnstableApiUsage")
 	protected static MultimapBuilder.SetMultimapBuilder<Object, Object> getBindingsMultiMapBuilder() {
@@ -97,7 +97,7 @@ public class DefaultBinder
 		boolean ret = stripBool(
 				sortAndTrimBindings(bindings).entrySet().stream().unordered()
 						.flatMapToInt(typeEntry -> {
-							LoadingCache<INamespacePrefixedString, IBindings<?>> typeBindings = getBindings().getUnchecked(AssertionUtilities.assertNonnull(typeEntry.getKey()));
+							LoadingCache<IIdentifier, IBindings<?>> typeBindings = getBindings().getUnchecked(AssertionUtilities.assertNonnull(typeEntry.getKey()));
 							return AssertionUtilities.assertNonnull(typeEntry.getValue()).asMap().entrySet().stream() // COMMENT sequential, field binding order matters
 									.mapToInt(entry -> padBool(
 											typeBindings.getUnchecked(AssertionUtilities.assertNonnull(entry.getKey()))

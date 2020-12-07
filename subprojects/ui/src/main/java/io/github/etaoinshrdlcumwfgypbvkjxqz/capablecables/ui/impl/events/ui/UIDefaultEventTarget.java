@@ -17,7 +17,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBu
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import org.jetbrains.annotations.NonNls;
 
@@ -31,16 +31,16 @@ public class UIDefaultEventTarget
 		implements IUIEventTarget {
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	@SuppressWarnings("UnstableApiUsage")
-	private final SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> eventTargetListeners = MultimapBuilder
+	private final SetMultimap<IIdentifier, UIEventListenerWithParameters> eventTargetListeners = MultimapBuilder
 			.hashKeys(CapacityUtilities.getInitialCapacitySmall())
 			.linkedHashSetValues(CapacityUtilities.getInitialCapacitySmall())
 			.build();
 
 	@Override
-	public boolean addEventListener(INamespacePrefixedString type, IUIEventListener<?> listener, boolean useCapture) { return getEventTargetListeners().put(type, new UIEventListenerWithParameters(listener, useCapture)); }
+	public boolean addEventListener(IIdentifier type, IUIEventListener<?> listener, boolean useCapture) { return getEventTargetListeners().put(type, new UIEventListenerWithParameters(listener, useCapture)); }
 
 	@Override
-	public boolean removeEventListener(INamespacePrefixedString type, IUIEventListener<?> listener, boolean useCapture) {
+	public boolean removeEventListener(IIdentifier type, IUIEventListener<?> listener, boolean useCapture) {
 		if (getEventTargetListeners().remove(type, new UIEventListenerWithParameters(listener, useCapture))) {
 			listener.markAsRemoved();
 			return true;
@@ -96,7 +96,7 @@ public class UIDefaultEventTarget
 	public boolean isFocusable() { return false; }
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-	protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() { return eventTargetListeners; }
+	protected SetMultimap<IIdentifier, UIEventListenerWithParameters> getEventTargetListeners() { return eventTargetListeners; }
 
 	public static class UIEventListenerWithParameters {
 		@SuppressWarnings("AutoBoxing")

@@ -14,9 +14,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoC
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultComponentRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
@@ -55,8 +55,8 @@ public class UIShapeComponent
 			extends UIDefaultComponentRenderer<C> {
 		public static final @NonNls String PROPERTY_FILLED_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.shape.color.filled";
 		public static final @NonNls String PROPERTY_BORDER_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.shape.color.border";
-		private static final INamespacePrefixedString PROPERTY_FILLED_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyFilledColor());
-		private static final INamespacePrefixedString PROPERTY_BORDER_COLOR_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyBorderColor());
+		private static final IIdentifier PROPERTY_FILLED_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyFilledColor());
+		private static final IIdentifier PROPERTY_BORDER_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyBorderColor());
 
 		@UIProperty(PROPERTY_FILLED_COLOR)
 		private final IBindingField<Color> filledColor; // TODO Color to Paint
@@ -67,17 +67,17 @@ public class UIShapeComponent
 		public DefaultRenderer(IUIRendererArguments arguments) {
 			super(arguments);
 
-			Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-			this.filledColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.BLACK), mappings.get(getPropertyFilledColorLocation()));
-			this.borderColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.WHITE), mappings.get(getPropertyBorderColorLocation()));
+			Map<IIdentifier, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
+			this.filledColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.BLACK), mappings.get(getPropertyFilledColorIdentifier()));
+			this.borderColor = IUIPropertyMappingValue.createBindingField(Color.class, ConstantValue.of(Color.WHITE), mappings.get(getPropertyBorderColorIdentifier()));
 		}
 
-		public static INamespacePrefixedString getPropertyFilledColorLocation() {
-			return PROPERTY_FILLED_COLOR_LOCATION;
+		public static IIdentifier getPropertyFilledColorIdentifier() {
+			return PROPERTY_FILLED_COLOR_IDENTIFIER;
 		}
 
-		public static INamespacePrefixedString getPropertyBorderColorLocation() {
-			return PROPERTY_BORDER_COLOR_LOCATION;
+		public static IIdentifier getPropertyBorderColorIdentifier() {
+			return PROPERTY_BORDER_COLOR_IDENTIFIER;
 		}
 
 		public static String getPropertyBorderColor() {

@@ -33,11 +33,11 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.EnumTimeUnit
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IValueHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.DefaultValueHolder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IField;
@@ -74,11 +74,11 @@ public class UIScrollbarComponent
 	public static final @NonNls String INTERNAL_BINDING_BUTTON_ACTIVATE_PREFIX = "scrollbar.button.activate";
 	public static final @NonNls String INTERNAL_BINDING_BUTTON_ACTIVATED_PREFIX = "scrollbar.button.activated";
 	public static final @NonNls String INTERNAL_BINDING_BUTTON_CANCELED_PREFIX = "scrollbar.button.canceled";
-	private static final INamespacePrefixedString PROPERTY_SCROLL_DIRECTION_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyScrollDirection());
-	private static final INamespacePrefixedString PROPERTY_SCROLL_RELATIVE_PROGRESS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyScrollRelativeProgress());
-	private static final INamespacePrefixedString PROPERTY_THUMB_RELATIVE_SIZE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyThumbRelativeSize());
-	private static final INamespacePrefixedString PROPERTY_THUMB_MOVEMENT_RELATIVE_SPEED_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyThumbMovementRelativeSpeed());
-	private static final INamespacePrefixedString PROPERTY_BUTTON_SIZE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyButtonSize());
+	private static final IIdentifier PROPERTY_SCROLL_DIRECTION_IDENTIFIER = ImmutableIdentifier.of(getPropertyScrollDirection());
+	private static final IIdentifier PROPERTY_SCROLL_RELATIVE_PROGRESS_IDENTIFIER = ImmutableIdentifier.of(getPropertyScrollRelativeProgress());
+	private static final IIdentifier PROPERTY_THUMB_RELATIVE_SIZE_IDENTIFIER = ImmutableIdentifier.of(getPropertyThumbRelativeSize());
+	private static final IIdentifier PROPERTY_THUMB_MOVEMENT_RELATIVE_SPEED_IDENTIFIER = ImmutableIdentifier.of(getPropertyThumbMovementRelativeSpeed());
+	private static final IIdentifier PROPERTY_BUTTON_SIZE_IDENTIFIER = ImmutableIdentifier.of(getPropertyButtonSize());
 	@SuppressWarnings("UnstableApiUsage")
 	private static final @Immutable Map<EnumUIAxis, EnumUISide> AXIS_TO_CONVENTIONAL_DIRECTION_MAP = Maps.immutableEnumMap(ImmutableMap.of(
 			EnumUIAxis.X, EnumUISide.RIGHT,
@@ -112,14 +112,14 @@ public class UIScrollbarComponent
 				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this),
 						CastUtilities.castUnchecked(DefaultRenderer.class));
 
-		Map<INamespacePrefixedString, ? extends IUIPropertyMappingValue> mappings = arguments.getMappingsView();
+		Map<IIdentifier, ? extends IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		OptionalWeakReference<UIScrollbarComponent> thisReference = OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
 
 		this.scrollDirection = IUIPropertyMappingValue.createBindingField(EnumUISide.class, ConstantValue.of(EnumUISide.DOWN),
-				mappings.get(getPropertyScrollDirectionLocation()));
+				mappings.get(getPropertyScrollDirectionIdentifier()));
 		this.scrollRelativeProgress = RangedBindingField.of(
 				IUIPropertyMappingValue.createBindingField(Double.class, ConstantValue.of(suppressBoxing(0D)),
-						mappings.get(getPropertyScrollRelativeProgressLocation())),
+						mappings.get(getPropertyScrollRelativeProgressIdentifier())),
 				ConstantValue.of(suppressBoxing(0D)),
 				() -> {
 					// COMMENT see 'PropertyThumbRelativeSizeObserver'
@@ -133,11 +133,11 @@ public class UIScrollbarComponent
 				}
 		);
 		this.thumbRelativeSize = IUIPropertyMappingValue.createBindingField(Double.class, ConstantValue.of(suppressBoxing(1D)),
-				mappings.get(getPropertyThumbRelativeSizeLocation()));
+				mappings.get(getPropertyThumbRelativeSizeIdentifier()));
 		this.thumbMovementRelativeSpeed = IUIPropertyMappingValue.createBindingField(Double.class, ConstantValue.of(suppressBoxing(1D)),
-				mappings.get(getPropertyThumbMovementRelativeSpeedLocation()));
+				mappings.get(getPropertyThumbMovementRelativeSpeedIdentifier()));
 		this.buttonSize = IUIPropertyMappingValue.createBindingField(Double.class, ConstantValue.of(suppressBoxing(10D)),
-				mappings.get(getPropertyButtonSizeLocation()));
+				mappings.get(getPropertyButtonSizeIdentifier()));
 
 		this.thumbRelativeSize.getField().getNotifier()
 				.subscribe(new PropertyThumbRelativeSizeObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()));
@@ -179,25 +179,25 @@ public class UIScrollbarComponent
 										.<IUIComponentArguments>map(this1 -> {
 											String keyPrefix = UINamespaceUtilities.getUniqueInternalBindingNamespace(this1);
 
-											INamespacePrefixedString onActivateKey =
-													ImmutableNamespacePrefixedString.of(keyPrefix,
+											IIdentifier onActivateKey =
+													ImmutableIdentifier.of(keyPrefix,
 															getInternalBindingButtonActivatePrefix() + ".thumb");
-											INamespacePrefixedString onActivatedKey =
-													ImmutableNamespacePrefixedString.of(keyPrefix,
+											IIdentifier onActivatedKey =
+													ImmutableIdentifier.of(keyPrefix,
 															getInternalBindingButtonActivatedPrefix() + ".thumb");
-											INamespacePrefixedString onCanceledKey =
-													ImmutableNamespacePrefixedString.of(keyPrefix,
+											IIdentifier onCanceledKey =
+													ImmutableIdentifier.of(keyPrefix,
 															getInternalBindingButtonCanceledPrefix() + ".thumb");
 
 											IValueHolder<IUIComponentArguments> pointerArguments = DefaultValueHolder.of(arguments1);
 
 											if (UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
 													ImmutableMap.of(
-															UIButtonComponent.getMethodOnActivateLocation(),
+															UIButtonComponent.getMethodOnActivateIdentifier(),
 															() -> UIImmutablePropertyMappingValue.of(null, onActivateKey),
-															UIButtonComponent.getMethodOnActivatedLocation(),
+															UIButtonComponent.getMethodOnActivatedIdentifier(),
 															() -> UIImmutablePropertyMappingValue.of(null, onActivatedKey),
-															UIButtonComponent.getMethodOnCanceledLocation(),
+															UIButtonComponent.getMethodOnCanceledIdentifier(),
 															() -> UIImmutablePropertyMappingValue.of(null, onCanceledKey)
 													))) {
 												this1.getEmbedBindings()
@@ -258,25 +258,25 @@ public class UIScrollbarComponent
 										.<IUIComponentArguments>map(this1 -> {
 											String keyPrefix = UINamespaceUtilities.getUniqueInternalBindingNamespace(this1);
 
-											INamespacePrefixedString onActivateKey =
-													ImmutableNamespacePrefixedString.of(keyPrefix,
+											IIdentifier onActivateKey =
+													ImmutableIdentifier.of(keyPrefix,
 															getInternalBindingButtonActivatePrefix() + ".1");
-											INamespacePrefixedString onActivatedKey =
-													ImmutableNamespacePrefixedString.of(keyPrefix,
+											IIdentifier onActivatedKey =
+													ImmutableIdentifier.of(keyPrefix,
 															getInternalBindingButtonActivatedPrefix() + ".1");
-											INamespacePrefixedString onCanceledKey =
-													ImmutableNamespacePrefixedString.of(keyPrefix,
+											IIdentifier onCanceledKey =
+													ImmutableIdentifier.of(keyPrefix,
 															getInternalBindingButtonCanceledPrefix() + ".1");
 
 											IValueHolder<IUIComponentArguments> pointerArguments = DefaultValueHolder.of(arguments1);
 
 											if (UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
 													ImmutableMap.of(
-															UIButtonComponent.getMethodOnActivateLocation(),
+															UIButtonComponent.getMethodOnActivateIdentifier(),
 															() -> UIImmutablePropertyMappingValue.of(null, onActivateKey),
-															UIButtonComponent.getMethodOnActivatedLocation(),
+															UIButtonComponent.getMethodOnActivatedIdentifier(),
 															() -> UIImmutablePropertyMappingValue.of(null, onActivatedKey),
-															UIButtonComponent.getMethodOnCanceledLocation(),
+															UIButtonComponent.getMethodOnCanceledIdentifier(),
 															() -> UIImmutablePropertyMappingValue.of(null, onCanceledKey)
 													))) {
 												this1.getEmbedBindings()
@@ -329,25 +329,25 @@ public class UIScrollbarComponent
 										.<IUIComponentArguments>map(this1 -> {
 											String keyPrefix = UINamespaceUtilities.getUniqueInternalBindingNamespace(this1);
 
-											INamespacePrefixedString onActivateKey =
-													ImmutableNamespacePrefixedString.of(keyPrefix,
+											IIdentifier onActivateKey =
+													ImmutableIdentifier.of(keyPrefix,
 															getInternalBindingButtonActivatePrefix() + ".2");
-											INamespacePrefixedString onActivatedKey =
-													ImmutableNamespacePrefixedString.of(keyPrefix,
+											IIdentifier onActivatedKey =
+													ImmutableIdentifier.of(keyPrefix,
 															getInternalBindingButtonActivatedPrefix() + ".2");
-											INamespacePrefixedString onCanceledKey =
-													ImmutableNamespacePrefixedString.of(keyPrefix,
+											IIdentifier onCanceledKey =
+													ImmutableIdentifier.of(keyPrefix,
 															getInternalBindingButtonCanceledPrefix() + ".2");
 
 											IValueHolder<IUIComponentArguments> pointerArguments = DefaultValueHolder.of(arguments1);
 
 											if (UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
 													ImmutableMap.of(
-															UIButtonComponent.getMethodOnActivateLocation(),
+															UIButtonComponent.getMethodOnActivateIdentifier(),
 															() -> UIImmutablePropertyMappingValue.of(null, onActivateKey),
-															UIButtonComponent.getMethodOnActivatedLocation(),
+															UIButtonComponent.getMethodOnActivatedIdentifier(),
 															() -> UIImmutablePropertyMappingValue.of(null, onActivatedKey),
-															UIButtonComponent.getMethodOnCanceledLocation(),
+															UIButtonComponent.getMethodOnCanceledIdentifier(),
 															() -> UIImmutablePropertyMappingValue.of(null, onCanceledKey)
 													))) {
 												this1.getEmbedBindings()
@@ -394,28 +394,28 @@ public class UIScrollbarComponent
 						)));
 	}
 
-	public static INamespacePrefixedString getPropertyScrollDirectionLocation() {
-		return PROPERTY_SCROLL_DIRECTION_LOCATION;
+	public static IIdentifier getPropertyScrollDirectionIdentifier() {
+		return PROPERTY_SCROLL_DIRECTION_IDENTIFIER;
 	}
 
-	public static INamespacePrefixedString getPropertyScrollRelativeProgressLocation() {
-		return PROPERTY_SCROLL_RELATIVE_PROGRESS_LOCATION;
+	public static IIdentifier getPropertyScrollRelativeProgressIdentifier() {
+		return PROPERTY_SCROLL_RELATIVE_PROGRESS_IDENTIFIER;
 	}
 
 	protected IBindingField<Double> getThumbRelativeSize() {
 		return thumbRelativeSize;
 	}
 
-	public static INamespacePrefixedString getPropertyThumbRelativeSizeLocation() {
-		return PROPERTY_THUMB_RELATIVE_SIZE_LOCATION;
+	public static IIdentifier getPropertyThumbRelativeSizeIdentifier() {
+		return PROPERTY_THUMB_RELATIVE_SIZE_IDENTIFIER;
 	}
 
-	public static INamespacePrefixedString getPropertyThumbMovementRelativeSpeedLocation() {
-		return PROPERTY_THUMB_MOVEMENT_RELATIVE_SPEED_LOCATION;
+	public static IIdentifier getPropertyThumbMovementRelativeSpeedIdentifier() {
+		return PROPERTY_THUMB_MOVEMENT_RELATIVE_SPEED_IDENTIFIER;
 	}
 
-	public static INamespacePrefixedString getPropertyButtonSizeLocation() {
-		return PROPERTY_BUTTON_SIZE_LOCATION;
+	public static IIdentifier getPropertyButtonSizeIdentifier() {
+		return PROPERTY_BUTTON_SIZE_IDENTIFIER;
 	}
 
 	public static @NonNls String getEmbedThumbName() {

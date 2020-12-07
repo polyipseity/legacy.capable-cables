@@ -40,11 +40,11 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.im
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IValueHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.DefaultValueHolder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableNamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
@@ -94,11 +94,11 @@ public class UIWindowComponent
 	public static final @NonNls String INTERNAL_BINDING_SCROLLBAR_THUMB_RELATIVE_SIZE_PREFIX = "window.scrollbar.thumb.relative_size";
 	public static final @NonNls String EMBED_VERTICAL_SCROLLBAR_NAME = "scrollbar.vertical";
 	public static final @NonNls String EMBED_HORIZONTAL_SCROLLBAR_NAME = "scrollbar.horizontal";
-	private static final INamespacePrefixedString PROPERTY_CONTROLS_SIDE_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyControlsSide());
-	private static final INamespacePrefixedString PROPERTY_CONTROLS_THICKNESS_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyControlsThickness());
-	private static final INamespacePrefixedString PROPERTY_CONTROLS_DIRECTION_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyControlsDirection());
-	private static final INamespacePrefixedString PROPERTY_SCROLLBAR_SIDES_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyScrollbarSides());
-	private static final INamespacePrefixedString PROPERTY_SCROLLBAR_THICKNESSES_LOCATION = ImmutableNamespacePrefixedString.of(getPropertyScrollbarThicknesses());
+	private static final IIdentifier PROPERTY_CONTROLS_SIDE_IDENTIFIER = ImmutableIdentifier.of(getPropertyControlsSide());
+	private static final IIdentifier PROPERTY_CONTROLS_THICKNESS_IDENTIFIER = ImmutableIdentifier.of(getPropertyControlsThickness());
+	private static final IIdentifier PROPERTY_CONTROLS_DIRECTION_IDENTIFIER = ImmutableIdentifier.of(getPropertyControlsDirection());
+	private static final IIdentifier PROPERTY_SCROLLBAR_SIDES_IDENTIFIER = ImmutableIdentifier.of(getPropertyScrollbarSides());
+	private static final IIdentifier PROPERTY_SCROLLBAR_THICKNESSES_IDENTIFIER = ImmutableIdentifier.of(getPropertyScrollbarThicknesses());
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final AutoCloseableRotator<ModifyShapeDescriptorObserver, RuntimeException> modifyShapeDescriptorObserver =
@@ -137,16 +137,16 @@ public class UIWindowComponent
 				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this),
 						CastUtilities.castUnchecked(DefaultRenderer.class));
 
-		Map<INamespacePrefixedString, ? extends IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-		this.controlsSide = IUIPropertyMappingValue.createBindingField(EnumUISide.class, ConstantValue.of(EnumUISide.UP), mappings.get(getPropertyControlsSideLocation()));
-		this.controlsThickness = IUIPropertyMappingValue.createBindingField(Double.class, ConstantValue.of(suppressBoxing(10D)), mappings.get(getPropertyControlsThicknessLocation()));
-		this.controlsDirection = IUIPropertyMappingValue.createBindingField(EnumUIRotation.class, ConstantValue.of(EnumUIRotation.CLOCKWISE), mappings.get(getPropertyControlsDirectionLocation()));
+		Map<IIdentifier, ? extends IUIPropertyMappingValue> mappings = arguments.getMappingsView();
+		this.controlsSide = IUIPropertyMappingValue.createBindingField(EnumUISide.class, ConstantValue.of(EnumUISide.UP), mappings.get(getPropertyControlsSideIdentifier()));
+		this.controlsThickness = IUIPropertyMappingValue.createBindingField(Double.class, ConstantValue.of(suppressBoxing(10D)), mappings.get(getPropertyControlsThicknessIdentifier()));
+		this.controlsDirection = IUIPropertyMappingValue.createBindingField(EnumUIRotation.class, ConstantValue.of(EnumUIRotation.CLOCKWISE), mappings.get(getPropertyControlsDirectionIdentifier()));
 		this.scrollbarSides = IUIPropertyMappingValue.createBindingField(CastUtilities.castUnchecked(Map.class),
 				() -> ImmutableMap.<EnumUIAxis, EnumUISide>builder()
 						.put(EnumUIAxis.X, EnumUISide.DOWN)
 						.put(EnumUIAxis.Y, EnumUISide.RIGHT)
 						.build(),
-				mappings.get(getPropertyScrollbarSidesLocation()));
+				mappings.get(getPropertyScrollbarSidesIdentifier()));
 		this.scrollbarThicknesses = IUIPropertyMappingValue.createBindingField(CastUtilities.castUnchecked(Object2DoubleMap.class),
 				() -> {
 					Object2DoubleMap<EnumUIAxis> defaultValue = new Object2DoubleOpenHashMap<>(EnumUIAxis.values().length);
@@ -154,7 +154,7 @@ public class UIWindowComponent
 					defaultValue.put(EnumUIAxis.Y, 10D);
 					return Object2DoubleMaps.unmodifiable(defaultValue);
 				},
-				mappings.get(getPropertyScrollbarThicknessesLocation()),
+				mappings.get(getPropertyScrollbarThicknessesIdentifier()),
 				CastUtilities.<Class<Map<? extends EnumUIAxis, ? extends Double>>>castUnchecked(Map.class),
 				mappingValue -> Object2DoubleMaps.unmodifiable(new Object2DoubleOpenHashMap<>(mappingValue)));
 
@@ -198,20 +198,20 @@ public class UIWindowComponent
 														.<IUIComponentArguments>map(this1 -> {
 															String keyPrefix = UINamespaceUtilities.getUniqueInternalBindingNamespace(this1);
 
-															INamespacePrefixedString onActivateKey =
-																	ImmutableNamespacePrefixedString.of(keyPrefix,
+															IIdentifier onActivateKey =
+																	ImmutableIdentifier.of(keyPrefix,
 																			getInternalBindingControlsButtonActivatePrefix() + '.' + EnumControlsAction.CLOSE.getName());
-															INamespacePrefixedString onActivatedKey =
-																	ImmutableNamespacePrefixedString.of(keyPrefix,
+															IIdentifier onActivatedKey =
+																	ImmutableIdentifier.of(keyPrefix,
 																			getInternalBindingControlsButtonActivatedPrefix() + '.' + EnumControlsAction.CLOSE.getName());
 
 															IValueHolder<IUIComponentArguments> pointerArguments = DefaultValueHolder.of(arguments1);
 
 															if (UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
 																	ImmutableMap.of(
-																			UIButtonComponent.getMethodOnActivateLocation(),
+																			UIButtonComponent.getMethodOnActivateIdentifier(),
 																			() -> UIImmutablePropertyMappingValue.of(null, onActivateKey),
-																			UIButtonComponent.getMethodOnActivatedLocation(),
+																			UIButtonComponent.getMethodOnActivatedIdentifier(),
 																			() -> UIImmutablePropertyMappingValue.of(null, onActivatedKey)
 																	))) {
 																this1.getEmbedBindings()
@@ -284,12 +284,12 @@ public class UIWindowComponent
 		this.scrollbarThumbRelativeSizeMap = Maps.immutableEnumMap(thumbRelativeSizeMap);
 	}
 
-	public static INamespacePrefixedString getPropertyScrollbarSidesLocation() {
-		return PROPERTY_SCROLLBAR_SIDES_LOCATION;
+	public static IIdentifier getPropertyControlsSideIdentifier() {
+		return PROPERTY_CONTROLS_SIDE_IDENTIFIER;
 	}
 
-	public static INamespacePrefixedString getPropertyScrollbarThicknessesLocation() {
-		return PROPERTY_SCROLLBAR_THICKNESSES_LOCATION;
+	public static IIdentifier getPropertyControlsThicknessIdentifier() {
+		return PROPERTY_CONTROLS_THICKNESS_IDENTIFIER;
 	}
 
 	protected static Point2D getWindowContentTranslation(UIWindowComponent instance) {
@@ -308,6 +308,46 @@ public class UIWindowComponent
 		return INTERNAL_BINDING_CONTROLS_BUTTON_ACTIVATED_PREFIX;
 	}
 
+	public static IIdentifier getPropertyControlsDirectionIdentifier() {
+		return PROPERTY_CONTROLS_DIRECTION_IDENTIFIER;
+	}
+
+	public static @NonNls String getEmbedVerticalScrollbarName() {
+		return EMBED_VERTICAL_SCROLLBAR_NAME;
+	}
+
+	public static @NonNls String getEmbedHorizontalScrollbarName() {
+		return EMBED_HORIZONTAL_SCROLLBAR_NAME;
+	}
+
+	protected static Point2D getWindowContentBaseTranslation(UIWindowComponent instance) {
+		Point2D translation = new Point2D.Double();
+		EnumUISide controlsSide = instance.getControlsSide().getValue();
+		if (controlsSide.getType() == EnumUISideType.LOCATION)
+			controlsSide.getAxis().setCoordinate(translation, suppressUnboxing(instance.getControlsThickness().getValue()));
+		return translation;
+	}
+
+	protected Point2D getContentScrollOffset() {
+		return contentScrollOffset;
+	}
+
+	public static @NonNls String getInternalBindingScrollbarRelativeProgressPrefix() {
+		return INTERNAL_BINDING_SCROLLBAR_RELATIVE_PROGRESS_PREFIX;
+	}
+
+	public static @NonNls String getInternalBindingScrollbarThumbRelativeSizePrefix() {
+		return INTERNAL_BINDING_SCROLLBAR_THUMB_RELATIVE_SIZE_PREFIX;
+	}
+
+	public static IIdentifier getPropertyScrollbarSidesIdentifier() {
+		return PROPERTY_SCROLLBAR_SIDES_IDENTIFIER;
+	}
+
+	public static IIdentifier getPropertyScrollbarThicknessesIdentifier() {
+		return PROPERTY_SCROLLBAR_THICKNESSES_IDENTIFIER;
+	}
+
 	protected static IUIComponentEmbed<UIScrollbarComponent> createScrollbarEmbed(UIWindowComponent owner,
 	                                                                              CharSequence key,
 	                                                                              EnumUIAxis axis,
@@ -323,26 +363,26 @@ public class UIWindowComponent
 										.<IUIComponentArguments>map(owner1 -> {
 											String keyPrefix = UINamespaceUtilities.getUniqueInternalBindingNamespace(owner1);
 
-											INamespacePrefixedString scrollRelativeProgressKey =
-													ImmutableNamespacePrefixedString.of(keyPrefix,
+											IIdentifier scrollRelativeProgressKey =
+													ImmutableIdentifier.of(keyPrefix,
 															getInternalBindingScrollbarRelativeProgressPrefix() + '.' + axis.name());
-											INamespacePrefixedString thumbRelativeSizeKey =
-													ImmutableNamespacePrefixedString.of(keyPrefix,
+											IIdentifier thumbRelativeSizeKey =
+													ImmutableIdentifier.of(keyPrefix,
 															getInternalBindingScrollbarThumbRelativeSizePrefix() + '.' + axis.name());
 
 											IValueHolder<IUIComponentArguments> pointerArguments = DefaultValueHolder.of(arguments1);
 
 											UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
 													ImmutableMap.of(
-															UIScrollbarComponent.getPropertyScrollDirectionLocation(),
+															UIScrollbarComponent.getPropertyScrollDirectionIdentifier(),
 															() -> UIImmutablePropertyMappingValue.of(UIScrollbarComponent.getAxisToConventionalDirectionMap().get(axis), null)
 													));
 
 											if (UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
 													ImmutableMap.of(
-															UIScrollbarComponent.getPropertyScrollRelativeProgressLocation(),
+															UIScrollbarComponent.getPropertyScrollRelativeProgressIdentifier(),
 															() -> UIImmutablePropertyMappingValue.of(null, scrollRelativeProgressKey),
-															UIScrollbarComponent.getPropertyThumbRelativeSizeLocation(),
+															UIScrollbarComponent.getPropertyThumbRelativeSizeIdentifier(),
 															() -> UIImmutablePropertyMappingValue.of(null, thumbRelativeSizeKey)
 													))) {
 												IBindingField<Double> scrollRelativeProgressField =
@@ -395,46 +435,6 @@ public class UIWindowComponent
 										})
 										.orElseGet(Rectangle2D.Double::new)
 						)));
-	}
-
-	public static @NonNls String getEmbedVerticalScrollbarName() {
-		return EMBED_VERTICAL_SCROLLBAR_NAME;
-	}
-
-	public static @NonNls String getEmbedHorizontalScrollbarName() {
-		return EMBED_HORIZONTAL_SCROLLBAR_NAME;
-	}
-
-	protected static Point2D getWindowContentBaseTranslation(UIWindowComponent instance) {
-		Point2D translation = new Point2D.Double();
-		EnumUISide controlsSide = instance.getControlsSide().getValue();
-		if (controlsSide.getType() == EnumUISideType.LOCATION)
-			controlsSide.getAxis().setCoordinate(translation, suppressUnboxing(instance.getControlsThickness().getValue()));
-		return translation;
-	}
-
-	protected Point2D getContentScrollOffset() {
-		return contentScrollOffset;
-	}
-
-	public static @NonNls String getInternalBindingScrollbarRelativeProgressPrefix() {
-		return INTERNAL_BINDING_SCROLLBAR_RELATIVE_PROGRESS_PREFIX;
-	}
-
-	public static @NonNls String getInternalBindingScrollbarThumbRelativeSizePrefix() {
-		return INTERNAL_BINDING_SCROLLBAR_THUMB_RELATIVE_SIZE_PREFIX;
-	}
-
-	public static INamespacePrefixedString getPropertyControlsSideLocation() {
-		return PROPERTY_CONTROLS_SIDE_LOCATION;
-	}
-
-	public static INamespacePrefixedString getPropertyControlsThicknessLocation() {
-		return PROPERTY_CONTROLS_THICKNESS_LOCATION;
-	}
-
-	public static INamespacePrefixedString getPropertyControlsDirectionLocation() {
-		return PROPERTY_CONTROLS_DIRECTION_LOCATION;
 	}
 
 	protected IBindingField<Object2DoubleMap<EnumUIAxis>> getScrollbarThicknesses() {
@@ -515,7 +515,7 @@ public class UIWindowComponent
 	}
 
 	@Override
-	protected SetMultimap<INamespacePrefixedString, UIEventListenerWithParameters> getEventTargetListeners() {
+	protected SetMultimap<IIdentifier, UIEventListenerWithParameters> getEventTargetListeners() {
 		eventTargetListenersInitializer.run();
 		return super.getEventTargetListeners();
 	}

@@ -14,7 +14,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.AnnotationUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 
 import java.lang.invoke.MethodHandle;
@@ -33,7 +33,7 @@ public class JAXBUIDefaultComponentThemeAdapterRendererHandler
 	@SuppressWarnings({"deprecation", "cast"})
 	protected void accept0(IJAXBAdapterContext context, IJAXBUIComponentThemeAdapterContext subContext, Renderer left) {
 		// COMMENT we should try to prepare as much as possible beforehand
-		Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings = JAXBUIComponentUtilities.createMappings(context, left.getProperty());
+		Map<IIdentifier, IUIPropertyMappingValue> mappings = JAXBUIComponentUtilities.createMappings(context, left.getProperty());
 		String name = left.getName();
 		Optional<Class<?>> rawClass = left.getClazz()
 				.map(classAlias -> AssertionUtilities.assertNonnull(subContext.getAliasesView().get(classAlias)));

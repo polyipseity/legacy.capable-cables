@@ -6,7 +6,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractExtensionRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObjectInternal;
@@ -17,12 +17,12 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
 public final class UIExtensionRegistry
-		extends AbstractExtensionRegistry<INamespacePrefixedString, IExtensionType<? extends INamespacePrefixedString, ?, ?>> {
+		extends AbstractExtensionRegistry<IIdentifier, IExtensionType<? extends IIdentifier, ?, ?>> {
 	private static final Supplier<@Nonnull UIExtensionRegistry> INSTANCE = Suppliers.memoize(UIExtensionRegistry::new);
 	private static final long serialVersionUID = -7931184191525680470L;
 	private static final MapMaker DATA_BUILDER =
 			MapBuilderUtilities.newMapMakerNormalThreaded().initialCapacity(CapacityUtilities.getInitialCapacityMedium());
-	private final ConcurrentMap<INamespacePrefixedString, IRegistryObjectInternal<? extends IExtensionType<? extends INamespacePrefixedString, ?, ?>>> data =
+	private final ConcurrentMap<IIdentifier, IRegistryObjectInternal<? extends IExtensionType<? extends IIdentifier, ?, ?>>> data =
 			getDataBuilder().makeMap();
 
 	private UIExtensionRegistry() {
@@ -35,7 +35,7 @@ public final class UIExtensionRegistry
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	@Override
-	protected Map<INamespacePrefixedString, IRegistryObjectInternal<? extends IExtensionType<? extends INamespacePrefixedString, ?, ?>>> getData() {
+	protected Map<IIdentifier, IRegistryObjectInternal<? extends IExtensionType<? extends IIdentifier, ?, ?>>> getData() {
 		return data;
 	}
 

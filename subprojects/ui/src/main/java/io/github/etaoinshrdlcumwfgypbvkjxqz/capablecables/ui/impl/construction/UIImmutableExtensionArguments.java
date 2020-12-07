@@ -5,7 +5,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIExtensionArguments;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.INamespacePrefixedString;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import org.jetbrains.annotations.NonNls;
 
 import java.util.Map;
@@ -14,11 +14,11 @@ import java.util.Optional;
 @Immutable
 public final class UIImmutableExtensionArguments
 		implements IUIExtensionArguments {
-	private final Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings;
+	private final Map<IIdentifier, IUIPropertyMappingValue> mappings;
 	private final Class<?> containerClass;
 	private final @Nullable String rendererName;
 
-	private UIImmutableExtensionArguments(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings,
+	private UIImmutableExtensionArguments(Map<IIdentifier, IUIPropertyMappingValue> mappings,
 	                                      Class<?> containerClass,
 	                                      @Nullable @NonNls CharSequence rendererName) {
 		this.mappings = ImmutableMap.copyOf(mappings);
@@ -26,14 +26,14 @@ public final class UIImmutableExtensionArguments
 		this.rendererName = Optional.ofNullable(rendererName).map(CharSequence::toString).orElse(null);
 	}
 
-	public static UIImmutableExtensionArguments of(Map<INamespacePrefixedString, IUIPropertyMappingValue> mappings,
+	public static UIImmutableExtensionArguments of(Map<IIdentifier, IUIPropertyMappingValue> mappings,
 	                                               Class<?> containerClass,
 	                                               @Nullable @NonNls CharSequence rendererName) {
 		return new UIImmutableExtensionArguments(mappings, containerClass, rendererName);
 	}
 
 	@Override
-	public @Immutable Map<INamespacePrefixedString, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(mappings); }
+	public @Immutable Map<IIdentifier, IUIPropertyMappingValue> getMappingsView() { return ImmutableMap.copyOf(mappings); }
 
 	@Override
 	public Class<?> getContainerClass() { return containerClass; }
