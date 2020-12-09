@@ -1,7 +1,8 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.software;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.text.TextUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ColorUtilities;
 import net.minecraftforge.api.distmarker.Dist;
@@ -12,7 +13,7 @@ import java.awt.*;
 import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
-public enum MinecraftGraphics {
+public enum MinecraftSoftwareGraphics2D {
 	;
 
 	private static final Map<RenderingHints.Key, Object> DEFAULT_RENDERING_HINTS;
@@ -44,11 +45,11 @@ public enum MinecraftGraphics {
 	}
 
 	public static void draw() {
-		MinecraftSurfaceData.getInstance().draw();
+		MinecraftDynamicTextureSurfaceData.getInstance().draw();
 	}
 
 	public static void clear() {
-		MinecraftSurfaceData.getInstance().clear();
+		MinecraftDynamicTextureSurfaceData.getInstance().clear();
 	}
 
 	public static void recreateGraphics() {
@@ -57,7 +58,7 @@ public enum MinecraftGraphics {
 	}
 
 	private static Graphics2D initializeGraphics() {
-		Graphics2D graphics = new SunGraphics2D(MinecraftSurfaceData.getInstance(), ColorUtilities.getColorless(), ColorUtilities.getColorless(), TextUtilities.getDefaultFont());
+		Graphics2D graphics = new SunGraphics2D(MinecraftDynamicTextureSurfaceData.getInstance(), ColorUtilities.getColorless(), ColorUtilities.getColorless(), TextUtilities.getDefaultFont());
 		graphics.setRenderingHints(getDefaultRenderingHints());
 		/* COMMENT
 		The default blend func for Minecraft is in RenderSystem.defaultBlendFunc.

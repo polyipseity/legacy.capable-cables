@@ -7,7 +7,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.MinecraftGraphics;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.software.MinecraftSoftwareGraphics2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIAbstractViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultComponentContextMutator;
@@ -18,7 +18,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.extensions.IUIMinecraftRenderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.events.bus.UIImmutableMinecraftRenderEventExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.extensions.background.UIDefaultMinecraftBackgroundExtension;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.utilities.EnumMinecraftCropMethod;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IConsumer3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
@@ -55,15 +54,11 @@ public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUICompo
 
 	@Override
 	protected void render0() {
-		EnumMinecraftCropMethod cropMethod = EnumMinecraftCropMethod.getBestMethod();
-
-		MinecraftGraphics.clear();
-		MinecraftOpenGLUtilities.Stacks.clearAll();
-		cropMethod.enable();
+		MinecraftSoftwareGraphics2D.clear();
+		MinecraftOpenGLUtilities.Stacks.clearAll(); // COMMENT clear for clean stacks
 		super.render0();
-		cropMethod.disable();
-		MinecraftOpenGLUtilities.Stacks.clearAll();
-		MinecraftGraphics.draw();
+		MinecraftOpenGLUtilities.Stacks.clearAll(); // COMMENT clear for leak detection
+		MinecraftSoftwareGraphics2D.draw();
 	}
 
 	@Override
@@ -98,7 +93,7 @@ public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUICompo
 	public Optional<? extends IUIComponentContext> createComponentContext() {
 		return getContext()
 				.map(context -> {
-							try (AutoCloseableGraphics2D graphics = MinecraftGraphics.createGraphics()) {
+							try (AutoCloseableGraphics2D graphics = MinecraftSoftwareGraphics2D.createGraphics()) {
 								return new UIDefaultComponentContext(
 										context,
 										this,

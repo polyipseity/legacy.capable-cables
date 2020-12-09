@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.software;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
@@ -21,8 +21,6 @@ import java.awt.image.DataBuffer;
 import java.lang.invoke.MethodHandle;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -47,22 +45,19 @@ public final class DynamicTexturesDataBuffer
 	private final int height;
 	private final int textureSize;
 	private final long textureMemorySize;
-	private final boolean closeSynchronized;
 	private final int texturesWidth;
 	private final int texturesHeight;
 	private final DynamicTexture[][] textures;
 	private final long[][] texturePointers;
-	private final Lock closeLock = new ReentrantLock();
 	private boolean closed = false;
 
 	@SuppressWarnings({"NullableProblems", "RedundantTypeArguments", "cast"})
-	public DynamicTexturesDataBuffer(int width, int height, int textureSize, boolean closeSynchronized) {
+	public DynamicTexturesDataBuffer(int width, int height, int textureSize) {
 		super(DataBuffer.TYPE_INT, width * height);
 		this.width = width;
 		this.height = height;
 		this.textureSize = textureSize;
-		this.textureMemorySize = Integer.BYTES * this.textureSize * this.textureSize;
-		this.closeSynchronized = closeSynchronized;
+		this.textureMemorySize = (long) Integer.BYTES * this.textureSize * this.textureSize;
 
 		this.texturesWidth = Math.toIntExact(PrimitiveUtilities.toIntegerExact(Math.ceil((double) this.width / this.textureSize)));
 		this.texturesHeight = Math.toIntExact(PrimitiveUtilities.toIntegerExact(Math.ceil((double) this.height / this.textureSize)));
@@ -78,8 +73,8 @@ public final class DynamicTexturesDataBuffer
 						assert texture.getTextureData().getFormat() == NativeImage.PixelFormat.RGBA;
 						this.textures[x][y] = texture;
 						this.texturePointers[x][y] = (long) getNativeImageImagePointerGetter().invokeExact((NativeImage) texture.getTextureData());
-					})
-					, this.texturesWidth, this.texturesHeight);
+					}),
+					this.texturesWidth, this.texturesHeight);
 		} catch (Throwable throwable) {
 			throw ThrowableUtilities.propagate(throwable);
 		}
@@ -118,51 +113,19 @@ public final class DynamicTexturesDataBuffer
 		return height;
 	}
 
+	@SuppressWarnings("UnusedReturnValue")
+	public static <T extends DynamicTexturesDataBuffer, R> Optional<R> applyIfOpen(T instance, Function<@Nonnull ? super T, @Nullable ? extends R> action) {
+		return instance.isClosed() ? Optional.empty() : Optional.ofNullable(action.apply(instance));
+	}
+
 	@Override
 	public int getElem(int bank, int i) {
 		/* COMMENT
 		avoid creating objects, this method is called thousands of times every frame
 		this also means we will avoid using 'runIfOpen' as it creates functional objects
 		*/
-		if (isCloseSynchronized()) {
-			Lock closeLock = getCloseLock();
-			closeLock.lock();
-			try {
-				return isClosed() ? 0 : MemoryUtil.memGetInt(getElemPointer(this, bank, i));
-			} finally {
-				closeLock.unlock();
-			}
-		} else
-			return isClosed() ? 0 : MemoryUtil.memGetInt(getElemPointer(this, bank, i));
-	}
-
-	@Override
-	public void setElem(int bank, int i, int val) {
-		/* COMMENT
-		avoid creating objects, this method is called thousands of times every frame
-		this also means we will avoid using 'runIfOpen' as it creates functional objects
-		*/
-		if (isCloseSynchronized()) {
-			Lock closeLock = getCloseLock();
-			closeLock.lock();
-			try {
-				if (!isClosed())
-					MemoryUtil.memPutInt(getElemPointer(this, bank, i), val);
-			} finally {
-				closeLock.unlock();
-			}
-		} else {
-			if (!isClosed())
-				MemoryUtil.memPutInt(getElemPointer(this, bank, i), val);
-		}
-	}
-
-	public boolean isCloseSynchronized() {
-		return closeSynchronized;
-	}
-
-	protected Lock getCloseLock() {
-		return closeLock;
+		assert !isClosed(); // COMMENT skip check during production, even faster
+		return MemoryUtil.memGetInt(getElemPointer(this, bank, i));
 	}
 
 	public boolean isClosed() {
@@ -231,18 +194,14 @@ public final class DynamicTexturesDataBuffer
 		this.closed = true;
 	}
 
-	@SuppressWarnings("UnusedReturnValue")
-	public static <T extends DynamicTexturesDataBuffer, R> Optional<R> applyIfOpen(T instance, Function<@Nonnull ? super T, @Nullable ? extends R> action) {
-		if (instance.isCloseSynchronized()) {
-			Lock closeLock = instance.getCloseLock();
-			closeLock.lock();
-			try {
-				return instance.isClosed() ? Optional.empty() : Optional.ofNullable(action.apply(instance));
-			} finally {
-				closeLock.unlock();
-			}
-		} else
-			return instance.isClosed() ? Optional.empty() : Optional.ofNullable(action.apply(instance));
+	@Override
+	public void setElem(int bank, int i, int val) {
+		/* COMMENT
+		avoid creating objects, this method is called thousands of times every frame
+		this also means we will avoid using 'runIfOpen' as it creates functional objects
+		*/
+		assert !isClosed(); // COMMENT skip check during production, even faster
+		MemoryUtil.memPutInt(getElemPointer(this, bank, i), val);
 	}
 
 	public void clear() {

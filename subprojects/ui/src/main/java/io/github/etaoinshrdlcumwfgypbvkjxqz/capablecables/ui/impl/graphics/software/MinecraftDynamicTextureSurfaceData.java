@@ -1,9 +1,10 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.software;
 
 import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.MinecraftGraphicsDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.utilities.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
@@ -28,15 +29,15 @@ import java.awt.image.WritableRaster;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
-public final class MinecraftSurfaceData
+public final class MinecraftDynamicTextureSurfaceData
 		extends SurfaceData
 		implements AutoCloseable {
-	private static final Supplier<@Nonnull MinecraftSurfaceData> INSTANCE = Suppliers.memoize(MinecraftSurfaceData::new);
+	private static final Supplier<@Nonnull MinecraftDynamicTextureSurfaceData> INSTANCE = Suppliers.memoize(MinecraftDynamicTextureSurfaceData::new);
 
 	private WritableRaster fullRaster;
 	private DynamicTexturesDataBuffer dataBuffer;
 
-	private MinecraftSurfaceData() {
+	private MinecraftDynamicTextureSurfaceData() {
 		super(StateTrackableDelegate.createInstance(State.STABLE),
 				SurfaceType.Any,
 				MinecraftGraphicsDevice.getInstance().getDefaultConfiguration().getColorModel());
@@ -47,7 +48,7 @@ public final class MinecraftSurfaceData
 		 */
 
 		Rectangle bounds = getBounds();
-		this.dataBuffer = new DynamicTexturesDataBuffer(bounds.width, bounds.height, DynamicTexturesDataBuffer.getTargetTextureSize(), false);
+		this.dataBuffer = new DynamicTexturesDataBuffer(bounds.width, bounds.height, DynamicTexturesDataBuffer.getTargetTextureSize());
 		this.fullRaster = createRaster(bounds, getColorModel(), this.dataBuffer);
 
 		IEventBus eventBus = AssertionUtilities.assertNonnull(Bus.FORGE.bus().get());
@@ -63,10 +64,10 @@ public final class MinecraftSurfaceData
 		close();
 
 		Rectangle bounds = getBounds();
-		setDataBuffer(new DynamicTexturesDataBuffer(bounds.width, bounds.height, DynamicTexturesDataBuffer.getTargetTextureSize(), false));
+		setDataBuffer(new DynamicTexturesDataBuffer(bounds.width, bounds.height, DynamicTexturesDataBuffer.getTargetTextureSize()));
 		setFullRaster(createRaster(bounds, getColorModel(), getDataBuffer()));
 
-		MinecraftGraphics.recreateGraphics(); // COMMENT resets the clip
+		MinecraftSoftwareGraphics2D.recreateGraphics(); // COMMENT resets the clip
 	}
 
 	@Override
@@ -82,7 +83,7 @@ public final class MinecraftSurfaceData
 		this.dataBuffer = dataBuffer;
 	}
 
-	public static MinecraftSurfaceData getInstance() {
+	public static MinecraftDynamicTextureSurfaceData getInstance() {
 		return INSTANCE.get();
 	}
 
