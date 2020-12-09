@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL11C;
 
 import java.awt.*;
 import java.awt.geom.*;
@@ -172,7 +173,7 @@ public enum MinecraftDrawingUtilities {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder buffer = tessellator.getBuffer();
 		// TODO: concave and self-intersecting polygons
-		buffer.begin(filled ? GL11.GL_POLYGON : GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+		buffer.begin(filled ? GL11.GL_POLYGON : GL11C.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 		double[] segment = new double[6];
 		while (!path.isDone()) {
 			switch (path.currentSegment(segment)) {

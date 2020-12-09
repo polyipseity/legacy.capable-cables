@@ -21,7 +21,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IConsumer3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftOpenGLUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
@@ -55,9 +54,7 @@ public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUICompo
 	@Override
 	protected void render0() {
 		MinecraftSoftwareGraphics2D.clear();
-		MinecraftOpenGLUtilities.Stacks.clearAll(); // COMMENT clear for clean stacks
 		super.render0();
-		MinecraftOpenGLUtilities.Stacks.clearAll(); // COMMENT clear for leak detection
 		MinecraftSoftwareGraphics2D.draw();
 	}
 

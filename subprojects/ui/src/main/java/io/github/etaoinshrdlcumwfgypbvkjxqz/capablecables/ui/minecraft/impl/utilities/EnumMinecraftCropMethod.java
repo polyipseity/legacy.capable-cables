@@ -34,21 +34,17 @@ public enum EnumMinecraftCropMethod {
 		@Override
 		public void setCrop(Shape shape, int z) {
 			Rectangle2D shapeBounds = shape.getBounds2D();
-			MinecraftOpenGLUtilities.State.setIntegerValue(GL11.GL_SCISSOR_BOX,
-					new int[]{
-							Ints.saturatedCast(DoubleMath.roundToLong(PrimitiveUtilities.toIntegerSaturated(shapeBounds.getX()), RoundingMode.DOWN)),
-							Ints.saturatedCast(DoubleMath.roundToLong(PrimitiveUtilities.toIntegerSaturated(shapeBounds.getY()), RoundingMode.DOWN)),
-							Ints.saturatedCast(DoubleMath.roundToLong(PrimitiveUtilities.toIntegerSaturated(shapeBounds.getWidth()), RoundingMode.UP)),
-							Ints.saturatedCast(DoubleMath.roundToLong(PrimitiveUtilities.toIntegerSaturated(shapeBounds.getHeight()), RoundingMode.UP))
-					},
-					(i, v) -> GL11C.glScissor(v[0], v[1], v[2], v[3]));
+			GL11C.glScissor(
+					Ints.saturatedCast(DoubleMath.roundToLong(PrimitiveUtilities.toIntegerSaturated(shapeBounds.getX()), RoundingMode.DOWN)),
+					Ints.saturatedCast(DoubleMath.roundToLong(PrimitiveUtilities.toIntegerSaturated(shapeBounds.getY()), RoundingMode.DOWN)),
+					Ints.saturatedCast(DoubleMath.roundToLong(PrimitiveUtilities.toIntegerSaturated(shapeBounds.getWidth()), RoundingMode.UP)),
+					Ints.saturatedCast(DoubleMath.roundToLong(PrimitiveUtilities.toIntegerSaturated(shapeBounds.getHeight()), RoundingMode.UP))
+			);
 		}
 
 		@Override
 		public void clearCrop() {
-			MinecraftOpenGLUtilities.State.setIntegerValue(GL11.GL_SCISSOR_BOX,
-					new int[]{0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE},
-					(i, v) -> GL11C.glScissor(v[0], v[1], v[2], v[3]));
+			GL11C.glScissor(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
 		}
 	},
 	STENCIL_BUFFER {
@@ -66,7 +62,7 @@ public enum EnumMinecraftCropMethod {
 		public void setCrop(Shape shape, int z) {
 			int stencilZ = Math.floorMod(
 					z,
-					MathUtilities.pow2Int(MinecraftOpenGLUtilities.State.getInteger(GL11.GL_STENCIL_BITS))
+					MathUtilities.pow2Int(GL11C.glGetInteger(GL11.GL_STENCIL_BITS))
 			);
 
 			RenderSystem.stencilFunc(GL11C.GL_ALWAYS, stencilZ, MinecraftOpenGLUtilities.getGlMaskAllBits());
