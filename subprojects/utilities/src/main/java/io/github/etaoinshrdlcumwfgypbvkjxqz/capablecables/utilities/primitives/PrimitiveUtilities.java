@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.math.DoubleMath;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ComparableUtilities;
 
 import java.math.RoundingMode;
 
@@ -69,5 +70,15 @@ public enum PrimitiveUtilities {
 	public static long toIntegerExact(double x)
 			throws ArithmeticException {
 		return DoubleMath.roundToLong(x, RoundingMode.UNNECESSARY);
+	}
+
+	public static double toIntegerSaturated(double x) {
+		if (Double.isFinite(x)) {
+			if (ComparableUtilities.greaterThan(x, Long.MAX_VALUE))
+				return Long.MAX_VALUE;
+			if (ComparableUtilities.lessThan(x, Long.MIN_VALUE))
+				return Long.MIN_VALUE;
+		}
+		return x;
 	}
 }
