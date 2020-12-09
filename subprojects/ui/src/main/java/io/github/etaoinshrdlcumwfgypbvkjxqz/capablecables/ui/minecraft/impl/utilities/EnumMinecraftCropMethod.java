@@ -1,130 +1,92 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.utilities;
 
+import com.google.common.math.DoubleMath;
+import com.google.common.primitives.Ints;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.MathUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.UncheckedAutoCloseable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftClientUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftOpenGLUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.EnumMinecraftUICoordinateSystem;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl.CoordinateSystemUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl.UIObjectUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.PrimitiveUtilities;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL14;
+import org.lwjgl.opengl.GL11C;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.math.RoundingMode;
 
-// TODO remove the use of this in IUIComponent but keep the class
 @OnlyIn(Dist.CLIENT)
+// TODO this class could use some improvements, such as better methods
 public enum EnumMinecraftCropMethod {
 	GL_SCISSOR {
 		@Override
 		public void enable() {
-			MinecraftOpenGLUtilities.Stacks.push("GL_SCISSOR_TEST",
-					() -> GL11.glEnable(GL11.GL_SCISSOR_TEST),
-					() -> GL11.glDisable(GL11.GL_SCISSOR_TEST));
+			GL11C.glEnable(GL11C.GL_SCISSOR_TEST);
 		}
 
 		@Override
 		public void disable() {
-			MinecraftOpenGLUtilities.Stacks.pop("GL_SCISSOR_TEST");
+			GL11C.glDisable(GL11C.GL_SCISSOR_TEST);
 		}
 
 		@Override
-		public void crop(Shape shape, int z) {
-			int[] oldBounds = new int[4];
-			MinecraftOpenGLUtilities.State.getIntegerValue(GL11.GL_SCISSOR_BOX, oldBounds);
-			Rectangle2D newBounds = shape.getBounds2D();
-			UIObjectUtilities.acceptRectangularShape(
-					CoordinateSystemUtilities.convertRectangularShape(
-							UIObjectUtilities.floorRectangularShape(newBounds, newBounds),
-							newBounds,
-							EnumMinecraftUICoordinateSystem.SCALED, EnumMinecraftUICoordinateSystem.NATIVE
-					).createIntersection(new Rectangle2D.Double(oldBounds[0], oldBounds[1], oldBounds[2], oldBounds[3])),
-					(x, y, w, h) -> MinecraftOpenGLUtilities.Stacks.push("glScissor",
-							() -> {
-								assert x != null;
-								assert y != null;
-								assert w != null;
-								assert h != null;
-								MinecraftOpenGLUtilities.State.setIntegerValue(GL11.GL_SCISSOR_BOX, new int[]{x.intValue(), y.intValue(), w.intValue(), h.intValue()},
-										(i, v) -> GL11.glScissor(v[0], v[1], v[2], v[3]));
-							}, MinecraftOpenGLUtilities.Stacks.getGlScissorFallback()));
+		public void setCrop(Shape shape, int z) {
+			Rectangle2D shapeBounds = shape.getBounds2D();
+			MinecraftOpenGLUtilities.State.setIntegerValue(GL11.GL_SCISSOR_BOX,
+					new int[]{
+							Ints.saturatedCast(DoubleMath.roundToLong(PrimitiveUtilities.toIntegerSaturated(shapeBounds.getX()), RoundingMode.DOWN)),
+							Ints.saturatedCast(DoubleMath.roundToLong(PrimitiveUtilities.toIntegerSaturated(shapeBounds.getY()), RoundingMode.DOWN)),
+							Ints.saturatedCast(DoubleMath.roundToLong(PrimitiveUtilities.toIntegerSaturated(shapeBounds.getWidth()), RoundingMode.UP)),
+							Ints.saturatedCast(DoubleMath.roundToLong(PrimitiveUtilities.toIntegerSaturated(shapeBounds.getHeight()), RoundingMode.UP))
+					},
+					(i, v) -> GL11C.glScissor(v[0], v[1], v[2], v[3]));
 		}
 
 		@Override
-		public void unCrop(Shape shape) {
-			MinecraftOpenGLUtilities.Stacks.pop("glScissor");
+		public void clearCrop() {
+			MinecraftOpenGLUtilities.State.setIntegerValue(GL11.GL_SCISSOR_BOX,
+					new int[]{0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE},
+					(i, v) -> GL11C.glScissor(v[0], v[1], v[2], v[3]));
 		}
 	},
 	STENCIL_BUFFER {
 		@Override
 		public void enable() {
-			MinecraftOpenGLUtilities.Stacks.push("GL_STENCIL_TEST",
-					() -> GL11.glEnable(GL11.GL_STENCIL_TEST), () -> GL11.glDisable(GL11.GL_STENCIL_TEST));
-			MinecraftOpenGLUtilities.Stacks.push("stencilMask",
-					() -> RenderSystem.stencilMask(MinecraftOpenGLUtilities.getGlMaskAllBits()), MinecraftOpenGLUtilities.Stacks.getStencilMaskFallback());
+			GL11C.glEnable(GL11C.GL_STENCIL_TEST);
 		}
 
 		@Override
 		public void disable() {
-			MinecraftOpenGLUtilities.Stacks.pop("stencilMask");
-			MinecraftOpenGLUtilities.Stacks.pop("GL_STENCIL_TEST");
+			GL11C.glDisable(GL11C.GL_STENCIL_TEST);
 		}
 
 		@Override
-		public void crop(Shape shape, int z) {
-			int stencilRef = Math.floorMod(
+		public void setCrop(Shape shape, int z) {
+			int stencilZ = Math.floorMod(
 					z,
 					MathUtilities.pow2Int(MinecraftOpenGLUtilities.State.getInteger(GL11.GL_STENCIL_BITS))
 			);
 
-			MinecraftOpenGLUtilities.Stacks.push("stencilFunc",
-					() -> RenderSystem.stencilFunc(GL11.GL_EQUAL, stencilRef, MinecraftOpenGLUtilities.getGlMaskAllBits()),
-					MinecraftOpenGLUtilities.Stacks.getStencilFuncFallback());
-			MinecraftOpenGLUtilities.Stacks.push("stencilOp",
-					() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL14.GL_INCR_WRAP, GL14.GL_INCR_WRAP),
-					MinecraftOpenGLUtilities.Stacks.getStencilOpFallback());
-			MinecraftOpenGLUtilities.Stacks.push("colorMask",
-					() -> RenderSystem.colorMask(false, false, false, false),
-					MinecraftOpenGLUtilities.Stacks.getColorMaskFallback());
+			RenderSystem.stencilFunc(GL11C.GL_ALWAYS, stencilZ, MinecraftOpenGLUtilities.getGlMaskAllBits());
+			RenderSystem.stencilOp(GL11C.GL_KEEP, GL11C.GL_REPLACE, GL11C.GL_REPLACE);
 
+			RenderSystem.colorMask(false, false, false, false);
 			MinecraftDrawingUtilities.drawShape(shape, true, Color.WHITE, 0);
+			RenderSystem.colorMask(true, true, true, true);
 
-			MinecraftOpenGLUtilities.Stacks.pop("colorMask");
-			MinecraftOpenGLUtilities.Stacks.pop("stencilOp");
-			MinecraftOpenGLUtilities.Stacks.pop("stencilFunc");
-
-			MinecraftOpenGLUtilities.Stacks.push("stencilFunc",
-					() -> RenderSystem.stencilFunc(GL11.GL_LESS, stencilRef, MinecraftOpenGLUtilities.getGlMaskAllBits()),
-					MinecraftOpenGLUtilities.Stacks.getStencilFuncFallback());
-
-			MinecraftOpenGLUtilities.Stacks.push("stencilOp",
-					() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_KEEP, GL11.GL_KEEP),
-					MinecraftOpenGLUtilities.Stacks.getStencilOpFallback());
+			RenderSystem.stencilFunc(GL11C.GL_EQUAL, stencilZ, MinecraftOpenGLUtilities.getGlMaskAllBits());
 		}
 
 		@Override
-		public void unCrop(Shape shape) {
-			MinecraftOpenGLUtilities.Stacks.pop("stencilOp");
-
-			MinecraftOpenGLUtilities.Stacks.push("stencilOp",
-					() -> RenderSystem.stencilOp(GL11.GL_KEEP, GL11.GL_REPLACE, GL11.GL_REPLACE),
-					MinecraftOpenGLUtilities.Stacks.getStencilOpFallback());
-			MinecraftOpenGLUtilities.Stacks.push("colorMask",
-					() -> RenderSystem.colorMask(false, false, false, false),
-					MinecraftOpenGLUtilities.Stacks.getColorMaskFallback());
-
-			MinecraftDrawingUtilities.drawShape(shape, true, Color.BLACK, 0);
-
-			MinecraftOpenGLUtilities.Stacks.pop("colorMask");
-			MinecraftOpenGLUtilities.Stacks.pop("stencilOp");
-
-			MinecraftOpenGLUtilities.Stacks.pop("stencilFunc");
+		public void clearCrop() {
+			RenderSystem.clearStencil(0);
 		}
 	},
 	;
+
+	private final UncheckedAutoCloseable disabler = this::disable;
 
 	public static EnumMinecraftCropMethod getBestMethod() {
 		return MinecraftClientUtilities.getMinecraftNonnull().getFramebuffer().isStencilEnabled()
@@ -136,7 +98,16 @@ public enum EnumMinecraftCropMethod {
 
 	public abstract void disable();
 
-	public abstract void crop(Shape shape, int z);
+	public UncheckedAutoCloseable use() {
+		enable();
+		return getDisabler();
+	}
 
-	public abstract void unCrop(Shape shape);
+	protected UncheckedAutoCloseable getDisabler() {
+		return disabler;
+	}
+
+	public abstract void setCrop(Shape shape, int z);
+
+	public abstract void clearCrop();
 }
