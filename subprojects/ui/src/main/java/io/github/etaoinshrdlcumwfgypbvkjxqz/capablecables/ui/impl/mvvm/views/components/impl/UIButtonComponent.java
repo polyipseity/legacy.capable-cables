@@ -17,10 +17,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.eve
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIComponentRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.cursors.EnumGLFWCursor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIDefaultEvent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIEventRegistry;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIEventUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIFunctionalEventListener;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultComponentRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainerContainer;
@@ -94,14 +91,14 @@ public class UIButtonComponent
 						CastUtilities.castUnchecked(DefaultRenderer.class));
 
 		this.eventTargetListenersInitializer = new OneUseRunnable(() -> {
-			addEventListener(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(e -> {
-				if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET)
-					getButtonStates().add(EnumButtonState.HOVERING);
-			}), false);
-			addEventListener(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(e -> {
-				if (e.getPhase() == IUIEvent.EnumPhase.AT_TARGET)
-					getButtonStates().remove(EnumButtonState.HOVERING);
-			}), false);
+			addEventListener(EnumUIEventDOMType.MOUSE_ENTER_SELF.getEventType(),
+					UIPhasedDelegatingEventListener.of(IUIEvent.EnumPhase.AT_TARGET,
+							new UIFunctionalEventListener<IUIEventMouse>(event -> getButtonStates().add(EnumButtonState.HOVERING))),
+					false);
+			addEventListener(EnumUIEventDOMType.MOUSE_LEAVE_SELF.getEventType(),
+					UIPhasedDelegatingEventListener.of(IUIEvent.EnumPhase.AT_TARGET,
+							new UIFunctionalEventListener<IUIEventMouse>(event -> getButtonStates().remove(EnumButtonState.HOVERING))),
+					false);
 
 			addEventListener(EnumUIEventDOMType.MOUSE_DOWN.getEventType(), new UIFunctionalEventListener<IUIEventMouse>(e -> {
 				if (IUIEventActivate.shouldActivate(this, e)) {
