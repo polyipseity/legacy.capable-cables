@@ -1,6 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.concurrent.Immutable;
@@ -27,8 +28,8 @@ public final class ImmutableIdentifier
 	}
 
 	public static ImmutableIdentifier of(@NonNls CharSequence string) {
-		String[] decomposed = IIdentifier.decompose(string);
-		return of(decomposed[0], decomposed[1]);
+		ITuple2<String, String> decomposed = IIdentifier.decompose(string);
+		return of(decomposed.getLeft(), decomposed.getRight());
 	}
 
 	public static ImmutableIdentifier of(@NonNls CharSequence namespace, @NonNls CharSequence string) {

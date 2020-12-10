@@ -7,6 +7,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesMarkers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableTuple2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.MarkersTemplate;
 import org.jetbrains.annotations.NonNls;
@@ -22,10 +24,10 @@ public interface IIdentifier
 	@NonNls
 	String getNamespace();
 
-	static String[] decompose(CharSequence charSequence) {
+	static ITuple2<String, String> decompose(CharSequence charSequence) {
 		String[] decomposed = StaticHolder.getSeparatorPattern().split(charSequence, 2);
 		if (decomposed.length == 2)
-			return decomposed;
+			return ImmutableTuple2.of(decomposed[0], decomposed[1]);
 		throw new IllegalArgumentException(
 				new LogMessageBuilder()
 						.addMarkers(StaticHolder::getClassMarker)
