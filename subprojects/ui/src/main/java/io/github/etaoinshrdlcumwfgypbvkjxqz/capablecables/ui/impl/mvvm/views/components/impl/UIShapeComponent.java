@@ -55,8 +55,8 @@ public class UIShapeComponent
 			extends UIDefaultComponentRenderer<C> {
 		public static final @NonNls String PROPERTY_FILLED_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.shape.color.filled";
 		public static final @NonNls String PROPERTY_BORDER_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.shape.color.border";
-		private static final IIdentifier PROPERTY_FILLED_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyFilledColor());
-		private static final IIdentifier PROPERTY_BORDER_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyBorderColor());
+		private static final IIdentifier PROPERTY_FILLED_COLOR_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyFilledColor());
+		private static final IIdentifier PROPERTY_BORDER_COLOR_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyBorderColor());
 
 		@UIProperty(PROPERTY_FILLED_COLOR)
 		private final IBindingField<Color> filledColor; // TODO Color to Paint

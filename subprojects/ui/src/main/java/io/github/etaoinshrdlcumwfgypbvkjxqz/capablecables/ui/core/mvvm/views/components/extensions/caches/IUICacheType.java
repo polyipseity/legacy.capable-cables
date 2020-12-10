@@ -24,7 +24,7 @@ public interface IUICacheType<V, C extends IExtensionContainer<IIdentifier>> {
 	void invalidate(C container);
 
 	static IIdentifier generateKey(@NonNls CharSequence name) {
-		return ImmutableIdentifier.of(StaticHolder.getDefaultNamespace(), StackTraceUtilities.getCallerClass().getName() + '.' + name);
+		return ImmutableIdentifier.ofInterning(StaticHolder.getDefaultNamespace(), StackTraceUtilities.getCallerClass().getName() + '.' + name);
 	}
 
 	IIdentifier getKey();

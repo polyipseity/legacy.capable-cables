@@ -75,11 +75,11 @@ public class UIScrollbarComponent
 	public static final @NonNls String INTERNAL_BINDING_BUTTON_ACTIVATE_PREFIX = "scrollbar.button.activate";
 	public static final @NonNls String INTERNAL_BINDING_BUTTON_ACTIVATED_PREFIX = "scrollbar.button.activated";
 	public static final @NonNls String INTERNAL_BINDING_BUTTON_CANCELED_PREFIX = "scrollbar.button.canceled";
-	private static final IIdentifier PROPERTY_SCROLL_DIRECTION_IDENTIFIER = ImmutableIdentifier.of(getPropertyScrollDirection());
-	private static final IIdentifier PROPERTY_SCROLL_RELATIVE_PROGRESS_IDENTIFIER = ImmutableIdentifier.of(getPropertyScrollRelativeProgress());
-	private static final IIdentifier PROPERTY_THUMB_RELATIVE_SIZE_IDENTIFIER = ImmutableIdentifier.of(getPropertyThumbRelativeSize());
-	private static final IIdentifier PROPERTY_THUMB_MOVEMENT_RELATIVE_SPEED_IDENTIFIER = ImmutableIdentifier.of(getPropertyThumbMovementRelativeSpeed());
-	private static final IIdentifier PROPERTY_BUTTON_SIZE_IDENTIFIER = ImmutableIdentifier.of(getPropertyButtonSize());
+	private static final IIdentifier PROPERTY_SCROLL_DIRECTION_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyScrollDirection());
+	private static final IIdentifier PROPERTY_SCROLL_RELATIVE_PROGRESS_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyScrollRelativeProgress());
+	private static final IIdentifier PROPERTY_THUMB_RELATIVE_SIZE_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyThumbRelativeSize());
+	private static final IIdentifier PROPERTY_THUMB_MOVEMENT_RELATIVE_SPEED_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyThumbMovementRelativeSpeed());
+	private static final IIdentifier PROPERTY_BUTTON_SIZE_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyButtonSize());
 	@SuppressWarnings("UnstableApiUsage")
 	private static final @Immutable Map<EnumUIAxis, EnumUISide> AXIS_TO_CONVENTIONAL_DIRECTION_MAP = Maps.immutableEnumMap(ImmutableMap.of(
 			EnumUIAxis.X, EnumUISide.RIGHT,
@@ -181,14 +181,17 @@ public class UIScrollbarComponent
 											String keyPrefix = UINamespaceUtilities.getUniqueInternalBindingNamespace(this1);
 
 											IIdentifier onActivateKey =
-													ImmutableIdentifier.of(keyPrefix,
-															getInternalBindingButtonActivatePrefix() + '.' + getEmbedThumbName());
+													ImmutableIdentifier.ofInterning(keyPrefix,
+															getInternalBindingButtonActivatePrefix() + '.' + getEmbedThumbName(),
+															false, true);
 											IIdentifier onActivatedKey =
-													ImmutableIdentifier.of(keyPrefix,
-															getInternalBindingButtonActivatedPrefix() + '.' + getEmbedThumbName());
+													ImmutableIdentifier.ofInterning(keyPrefix,
+															getInternalBindingButtonActivatedPrefix() + '.' + getEmbedThumbName(),
+															false, true);
 											IIdentifier onCanceledKey =
-													ImmutableIdentifier.of(keyPrefix,
-															getInternalBindingButtonCanceledPrefix() + '.' + getEmbedThumbName());
+													ImmutableIdentifier.ofInterning(keyPrefix,
+															getInternalBindingButtonCanceledPrefix() + '.' + getEmbedThumbName(),
+															false, true);
 
 											IValueHolder<IUIComponentArguments> pointerArguments = DefaultValueHolder.of(arguments1);
 
@@ -282,14 +285,17 @@ public class UIScrollbarComponent
 									String keyPrefix = UINamespaceUtilities.getUniqueInternalBindingNamespace(owner1);
 
 									IIdentifier onActivateKey =
-											ImmutableIdentifier.of(keyPrefix,
-													getInternalBindingButtonActivatePrefix() + '.' + key1);
+											ImmutableIdentifier.ofInterning(keyPrefix,
+													getInternalBindingButtonActivatePrefix() + '.' + key1,
+													false, true);
 									IIdentifier onActivatedKey =
-											ImmutableIdentifier.of(keyPrefix,
-													getInternalBindingButtonActivatedPrefix() + '.' + key1);
+											ImmutableIdentifier.ofInterning(keyPrefix,
+													getInternalBindingButtonActivatedPrefix() + '.' + key1,
+													false, true);
 									IIdentifier onCanceledKey =
-											ImmutableIdentifier.of(keyPrefix,
-													getInternalBindingButtonCanceledPrefix() + '.' + key1);
+											ImmutableIdentifier.ofInterning(keyPrefix,
+													getInternalBindingButtonCanceledPrefix() + '.' + key1,
+													false, true);
 
 									IValueHolder<IUIComponentArguments> pointerArguments = DefaultValueHolder.of(arguments1);
 

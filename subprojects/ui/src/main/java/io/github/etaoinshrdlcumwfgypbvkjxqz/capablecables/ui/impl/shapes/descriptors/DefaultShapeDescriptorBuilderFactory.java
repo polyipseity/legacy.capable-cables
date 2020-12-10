@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 public class DefaultShapeDescriptorBuilderFactory
 		extends AbstractRegistry<Class<? extends Shape>, Supplier<@Nonnull ? extends IShapeDescriptorBuilder<?>>>
 		implements IShapeDescriptorBuilderFactory {
-	private static final IIdentifier DEFAULT_FACTORY_KEY = ImmutableIdentifier.of(StaticHolder.getDefaultNamespace(), "default");
+	private static final IIdentifier DEFAULT_FACTORY_KEY = ImmutableIdentifier.ofInterning(StaticHolder.getDefaultNamespace(), "default");
 	private static final @Immutable Map<Class<? extends Shape>, Supplier<@Nonnull IRegistryObjectInternal<Supplier<@Nonnull ? extends IShapeDescriptorBuilder<?>>>>> DEFAULTS_SUPPLIER =
 			ImmutableMap.<Class<? extends Shape>, Supplier<@Nonnull IRegistryObjectInternal<Supplier<@Nonnull ? extends IShapeDescriptorBuilder<?>>>>>builder()
 					.put(Rectangle2D.class, () -> new DefaultRegistryObject<>(RectangularShapeDescriptorBuilder.Rectangle2DSD::new))

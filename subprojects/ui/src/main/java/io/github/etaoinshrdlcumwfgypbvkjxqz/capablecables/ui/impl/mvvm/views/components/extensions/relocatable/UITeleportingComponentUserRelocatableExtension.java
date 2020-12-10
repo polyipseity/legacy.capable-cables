@@ -81,9 +81,9 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 	public static final @NonNls String PROPERTY_TARGET_COMPONENT = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.teleporting.target";
 	public static final @NonNls String PROPERTY_ACTIVATION_MOUSE_BUTTONS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.teleporting.activation.mouse";
 	public static final @NonNls String PROPERTY_RELOCATE_BORDERS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.teleporting.relocate_borders";
-	private static final IIdentifier PROPERTY_TARGET_COMPONENT_IDENTIFIER = ImmutableIdentifier.of(getPropertyTargetComponent());
-	private static final IIdentifier PROPERTY_ACTIVATION_MOUSE_BUTTONS_IDENTIFIER = ImmutableIdentifier.of(getPropertyActivationMouseButtons());
-	private static final IIdentifier PROPERTY_RELOCATE_BORDERS_IDENTIFIER = ImmutableIdentifier.of(getPropertyRelocateBorders());
+	private static final IIdentifier PROPERTY_TARGET_COMPONENT_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyTargetComponent());
+	private static final IIdentifier PROPERTY_ACTIVATION_MOUSE_BUTTONS_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyActivationMouseButtons());
+	private static final IIdentifier PROPERTY_RELOCATE_BORDERS_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyRelocateBorders());
 
 	@UIProperty(PROPERTY_TARGET_COMPONENT)
 	private final IBindingField<String> targetComponent;

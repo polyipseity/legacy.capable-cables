@@ -385,17 +385,17 @@ public enum UIMinecraftDebug {
 				extends UIDefaultMinecraftViewModel<Model> {
 			@SuppressWarnings("AutoBoxing")
 			private final IBindingField<Integer> anchoredWindowBorderColor = ImmutableBindingField.of(
-					ImmutableIdentifier.of(UINamespaceUtilities.getRendererBindingNamespace(), "anchoredWindowBorderColor"),
+					ImmutableIdentifier.ofInterning(UINamespaceUtilities.getRendererBindingNamespace(), "anchoredWindowBorderColor"),
 					new MemoryObservableField<>(Integer.class, ColorUtilities.getColorless().getRGB()));
 			private final IBindingMethodDestination<UIButtonComponent.IUIEventActivate> buttonOnActivate = ImmutableBindingMethodDestination.of(
 					UIButtonComponent.IUIEventActivate.class,
-					ImmutableIdentifier.of(UINamespaceUtilities.getViewBindingNamespace(), "buttonOnActivate"),
+					ImmutableIdentifier.ofInterning(UINamespaceUtilities.getViewBindingNamespace(), "buttonOnActivate"),
 					UIButtonComponent.UIDefaultEventActivate::handleEventCommonly);
 			private final Random random = new Random();
 			private boolean anchoredWindowFlickering = false;
 			private final IBindingMethodDestination<IUIEvent> buttonOnActivated = ImmutableBindingMethodDestination.of(
 					IUIEvent.class,
-					ImmutableIdentifier.of(UINamespaceUtilities.getViewBindingNamespace(), "buttonOnActivated"),
+					ImmutableIdentifier.ofInterning(UINamespaceUtilities.getViewBindingNamespace(), "buttonOnActivated"),
 					this::onButtonActivated);
 
 			private ViewModel() { super(new Model()); }

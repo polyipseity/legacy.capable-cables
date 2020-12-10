@@ -34,7 +34,7 @@ public interface IUIComponentUserRelocatableExtension<C extends IUIComponent>
 	enum StaticHolder {
 		;
 
-		private static final IIdentifier KEY = ImmutableIdentifier.of(IUIExtension.StaticHolder.getDefaultNamespace(), "component.user_relocatable");
+		private static final IIdentifier KEY = ImmutableIdentifier.ofInterning(IUIExtension.StaticHolder.getDefaultNamespace(), "component.user_relocatable");
 		@SuppressWarnings("unchecked")
 		private static final
 		IRegistryObject<IExtensionType<IIdentifier, IUIComponentUserRelocatableExtension<?>, IUIComponent>> TYPE =

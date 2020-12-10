@@ -30,7 +30,7 @@ public class UIDefaultComponentUserRelocatableExtensionPreviewingRelocatingRende
 		extends UIAbstractComponentUserRelocatableExtensionRelocatingRenderer {
 	@NonNls
 	public static final String PROPERTY_PREVIEW_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.previewing.preview.color";
-	private static final IIdentifier PROPERTY_PREVIEW_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyPreviewColor());
+	private static final IIdentifier PROPERTY_PREVIEW_COLOR_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyPreviewColor());
 	@UIProperty(PROPERTY_PREVIEW_COLOR)
 	private final IBindingField<Color> previewColor; // TODO Color to Paint
 

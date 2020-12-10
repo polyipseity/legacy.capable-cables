@@ -116,12 +116,12 @@ public enum JAXBUIComponentUtilities {
 	@SuppressWarnings("UnstableApiUsage")
 	public static Map<IIdentifier, IUIPropertyMappingValue> createMappings(IJAXBAdapterContext context, Iterable<? extends Property> properties) {
 		return Streams.stream(properties).unordered()
-				.map(p -> Maps.immutableEntry(ImmutableIdentifier.of(p.getKey()),
+				.map(p -> Maps.immutableEntry(ImmutableIdentifier.ofInterning(p.getKey()),
 						UIImmutablePropertyMappingValue.of(p.getAny()
 										.map(any -> IJAXBAdapterRegistry.adaptFromJAXB(context, any))
 										.orElse(null),
 								p.getBindingKey()
-										.map(ImmutableIdentifier::of)
+										.map(ImmutableIdentifier::ofInterning)
 										.orElse(null))))
 				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
@@ -193,7 +193,7 @@ public enum JAXBUIComponentUtilities {
 							UIImmutablePropertyMappingValue.of(null,
 									AssertionUtilities.assertNonnull(value.apply(component))
 											.map(IUIEventType.StaticHolder.getDefaultPrefix()::concat)
-											.map(ImmutableIdentifier::of)
+											.map(ImmutableIdentifier::ofInterning)
 											.orElse(null)));
 				});
 		return ImmutableMap.copyOf(attributes);

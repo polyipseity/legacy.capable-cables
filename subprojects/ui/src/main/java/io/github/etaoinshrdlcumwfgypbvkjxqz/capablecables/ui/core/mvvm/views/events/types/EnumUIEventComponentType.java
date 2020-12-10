@@ -15,9 +15,7 @@ public enum EnumUIEventComponentType
 	private final IIdentifier eventType;
 
 	EnumUIEventComponentType(@SuppressWarnings("SameParameterValue") @NonNls CharSequence eventTypeString) {
-		String eventTypeString2 = eventTypeString.toString();
-		this.eventTypeString = eventTypeString2;
-		this.eventType = ImmutableIdentifier.of(eventTypeString2);
+		this.eventType = ImmutableIdentifier.ofInterning(this.eventTypeString = eventTypeString.toString());
 	}
 
 	@Override

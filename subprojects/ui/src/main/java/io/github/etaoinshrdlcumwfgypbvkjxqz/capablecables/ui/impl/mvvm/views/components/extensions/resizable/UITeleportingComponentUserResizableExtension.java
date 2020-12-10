@@ -83,10 +83,10 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 	public static final @NonNls String PROPERTY_RESIZE_BORDERS_DEFAULT_THICKNESS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.teleporting.resize_borders.default_thickness";
 	@NonNls
 	public static final String PROPERTY_RESIZE_BORDERS = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.teleporting.resize_borders";
-	private static final IIdentifier PROPERTY_TARGET_COMPONENT_IDENTIFIER = ImmutableIdentifier.of(getPropertyTargetComponent());
-	private static final IIdentifier PROPERTY_ACTIVATION_MOUSE_BUTTONS_IDENTIFIER = ImmutableIdentifier.of(getPropertyActivationMouseButtons());
-	private static final IIdentifier PROPERTY_RESIZE_BORDERS_DEFAULT_THICKNESS_IDENTIFIER = ImmutableIdentifier.of(getPropertyResizeBordersDefaultThickness());
-	private static final IIdentifier PROPERTY_RESIZE_BORDERS_IDENTIFIER = ImmutableIdentifier.of(getPropertyResizeBorders());
+	private static final IIdentifier PROPERTY_TARGET_COMPONENT_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyTargetComponent());
+	private static final IIdentifier PROPERTY_ACTIVATION_MOUSE_BUTTONS_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyActivationMouseButtons());
+	private static final IIdentifier PROPERTY_RESIZE_BORDERS_DEFAULT_THICKNESS_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyResizeBordersDefaultThickness());
+	private static final IIdentifier PROPERTY_RESIZE_BORDERS_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyResizeBorders());
 
 	@UIProperty(PROPERTY_TARGET_COMPONENT)
 	private final IBindingField<String> targetComponent;

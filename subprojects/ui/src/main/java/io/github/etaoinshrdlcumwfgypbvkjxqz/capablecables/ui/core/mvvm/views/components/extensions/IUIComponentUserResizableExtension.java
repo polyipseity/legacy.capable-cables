@@ -37,7 +37,7 @@ public interface IUIComponentUserResizableExtension<C extends IUIComponent>
 	enum StaticHolder {
 		;
 
-		private static final IIdentifier KEY = ImmutableIdentifier.of(IUIExtension.StaticHolder.getDefaultNamespace(), "component.user_resizable");
+		private static final IIdentifier KEY = ImmutableIdentifier.ofInterning(IUIExtension.StaticHolder.getDefaultNamespace(), "component.user_resizable");
 		@SuppressWarnings("unchecked")
 		private static final
 		IRegistryObject<IExtensionType<IIdentifier, IUIComponentUserResizableExtension<?>, IUIComponent>> TYPE =

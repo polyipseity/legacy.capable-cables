@@ -59,9 +59,9 @@ public class UIButtonComponent
 	@NonNls
 	public static final String METHOD_ON_CANCELED = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "method.button.canceled";
 
-	private static final IIdentifier METHOD_ON_ACTIVATE_IDENTIFIER = ImmutableIdentifier.of(getMethodOnActivate());
-	private static final IIdentifier METHOD_ON_ACTIVATED_IDENTIFIER = ImmutableIdentifier.of(getMethodOnActivated());
-	private static final IIdentifier METHOD_ON_CANCELED_IDENTIFIER = ImmutableIdentifier.of(getMethodOnCanceled());
+	private static final IIdentifier METHOD_ON_ACTIVATE_IDENTIFIER = ImmutableIdentifier.ofInterning(getMethodOnActivate());
+	private static final IIdentifier METHOD_ON_ACTIVATED_IDENTIFIER = ImmutableIdentifier.ofInterning(getMethodOnActivated());
+	private static final IIdentifier METHOD_ON_CANCELED_IDENTIFIER = ImmutableIdentifier.ofInterning(getMethodOnCanceled());
 
 	@UIMethod(METHOD_ON_ACTIVATE)
 	private final IBindingMethodSource<IUIEventActivate> onActivate;
@@ -227,7 +227,7 @@ public class UIButtonComponent
 			;
 
 			public static final @NonNls String TYPE_STRING = IUIEventType.StaticHolder.DEFAULT_PREFIX + "component.button.activated";
-			private static final IIdentifier TYPE = ImmutableIdentifier.of(getTypeString());
+			private static final IIdentifier TYPE = ImmutableIdentifier.ofInterning(getTypeString());
 
 			public static String getTypeString() {
 				return TYPE_STRING;
@@ -300,12 +300,12 @@ public class UIButtonComponent
 		@NonNls
 		public static final String PROPERTY_PRESSED_BORDER_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.button.pressed.border.color";
 
-		private static final IIdentifier PROPERTY_BASE_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyBaseColor());
-		private static final IIdentifier PROPERTY_BASE_BORDER_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyBaseBorderColor());
-		private static final IIdentifier PROPERTY_HOVERING_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyHoveringColor());
-		private static final IIdentifier PROPERTY_HOVERING_BORDER_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyHoveringBorderColor());
-		private static final IIdentifier PROPERTY_PRESSED_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyPressedColor());
-		private static final IIdentifier PROPERTY_PRESSED_BORDER_COLOR_IDENTIFIER = ImmutableIdentifier.of(getPropertyPressedBorderColor());
+		private static final IIdentifier PROPERTY_BASE_COLOR_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyBaseColor());
+		private static final IIdentifier PROPERTY_BASE_BORDER_COLOR_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyBaseBorderColor());
+		private static final IIdentifier PROPERTY_HOVERING_COLOR_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyHoveringColor());
+		private static final IIdentifier PROPERTY_HOVERING_BORDER_COLOR_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyHoveringBorderColor());
+		private static final IIdentifier PROPERTY_PRESSED_COLOR_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyPressedColor());
+		private static final IIdentifier PROPERTY_PRESSED_BORDER_COLOR_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyPressedBorderColor());
 
 		@UIProperty(PROPERTY_BASE_COLOR)
 		private final IBindingField<Color> baseColor;

@@ -16,7 +16,7 @@ public interface IUICursorHandleProviderExtension
 	enum StaticHolder {
 		;
 
-		private static final IIdentifier KEY = ImmutableIdentifier.of(IUIExtension.StaticHolder.getDefaultNamespace(), "cursor_custom");
+		private static final IIdentifier KEY = ImmutableIdentifier.ofInterning(IUIExtension.StaticHolder.getDefaultNamespace(), "cursor_custom");
 		@SuppressWarnings("unchecked")
 		private static final
 		IRegistryObject<IExtensionType<IIdentifier, IUICursorHandleProviderExtension, IUIView<?>>> TYPE =

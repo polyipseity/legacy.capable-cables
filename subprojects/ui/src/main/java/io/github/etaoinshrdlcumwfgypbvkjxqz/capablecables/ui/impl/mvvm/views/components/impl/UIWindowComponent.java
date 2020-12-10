@@ -97,11 +97,11 @@ public class UIWindowComponent
 	public static final @NonNls String INTERNAL_BINDING_SCROLLBAR_THUMB_RELATIVE_SIZE_PREFIX = "window.scrollbar.thumb.relative_size";
 	public static final @NonNls String EMBED_VERTICAL_SCROLLBAR_NAME = "scrollbar.vertical";
 	public static final @NonNls String EMBED_HORIZONTAL_SCROLLBAR_NAME = "scrollbar.horizontal";
-	private static final IIdentifier PROPERTY_CONTROLS_SIDE_IDENTIFIER = ImmutableIdentifier.of(getPropertyControlsSide());
-	private static final IIdentifier PROPERTY_CONTROLS_THICKNESS_IDENTIFIER = ImmutableIdentifier.of(getPropertyControlsThickness());
-	private static final IIdentifier PROPERTY_CONTROLS_DIRECTION_IDENTIFIER = ImmutableIdentifier.of(getPropertyControlsDirection());
-	private static final IIdentifier PROPERTY_SCROLLBAR_SIDES_IDENTIFIER = ImmutableIdentifier.of(getPropertyScrollbarSides());
-	private static final IIdentifier PROPERTY_SCROLLBAR_THICKNESSES_IDENTIFIER = ImmutableIdentifier.of(getPropertyScrollbarThicknesses());
+	private static final IIdentifier PROPERTY_CONTROLS_SIDE_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyControlsSide());
+	private static final IIdentifier PROPERTY_CONTROLS_THICKNESS_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyControlsThickness());
+	private static final IIdentifier PROPERTY_CONTROLS_DIRECTION_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyControlsDirection());
+	private static final IIdentifier PROPERTY_SCROLLBAR_SIDES_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyScrollbarSides());
+	private static final IIdentifier PROPERTY_SCROLLBAR_THICKNESSES_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyScrollbarThicknesses());
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
 	private final AutoCloseableRotator<ModifyShapeDescriptorObserver, RuntimeException> modifyShapeDescriptorObserver =
@@ -202,11 +202,13 @@ public class UIWindowComponent
 															String keyPrefix = UINamespaceUtilities.getUniqueInternalBindingNamespace(this1);
 
 															IIdentifier onActivateKey =
-																	ImmutableIdentifier.of(keyPrefix,
-																			getInternalBindingControlsButtonActivatePrefix() + '.' + EnumControlsAction.CLOSE.getName());
+																	ImmutableIdentifier.ofInterning(keyPrefix,
+																			getInternalBindingControlsButtonActivatePrefix() + '.' + EnumControlsAction.CLOSE.getName(),
+																			false, true);
 															IIdentifier onActivatedKey =
-																	ImmutableIdentifier.of(keyPrefix,
-																			getInternalBindingControlsButtonActivatedPrefix() + '.' + EnumControlsAction.CLOSE.getName());
+																	ImmutableIdentifier.ofInterning(keyPrefix,
+																			getInternalBindingControlsButtonActivatedPrefix() + '.' + EnumControlsAction.CLOSE.getName(),
+																			false, true);
 
 															IValueHolder<IUIComponentArguments> pointerArguments = DefaultValueHolder.of(arguments1);
 
@@ -379,11 +381,13 @@ public class UIWindowComponent
 									String keyPrefix = UINamespaceUtilities.getUniqueInternalBindingNamespace(owner1);
 
 									IIdentifier scrollRelativeProgressKey =
-											ImmutableIdentifier.of(keyPrefix,
-													getInternalBindingScrollbarRelativeProgressPrefix() + '.' + axis.name());
+											ImmutableIdentifier.ofInterning(keyPrefix,
+													getInternalBindingScrollbarRelativeProgressPrefix() + '.' + axis.name(),
+													false, true);
 									IIdentifier thumbRelativeSizeKey =
-											ImmutableIdentifier.of(keyPrefix,
-													getInternalBindingScrollbarThumbRelativeSizePrefix() + '.' + axis.name());
+											ImmutableIdentifier.ofInterning(keyPrefix,
+													getInternalBindingScrollbarThumbRelativeSizePrefix() + '.' + axis.name(),
+													false, true);
 
 									IValueHolder<IUIComponentArguments> pointerArguments = DefaultValueHolder.of(arguments1);
 

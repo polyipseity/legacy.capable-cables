@@ -95,8 +95,8 @@ public class UIDefaultComponent
 	@NonNls
 	public static final String PROPERTY_ACTIVE = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.default.active";
 
-	private static final IIdentifier PROPERTY_VISIBLE_IDENTIFIER = ImmutableIdentifier.of(getPropertyVisible());
-	private static final IIdentifier PROPERTY_ACTIVE_IDENTIFIER = ImmutableIdentifier.of(getPropertyActive());
+	private static final IIdentifier PROPERTY_VISIBLE_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyVisible());
+	private static final IIdentifier PROPERTY_ACTIVE_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyActive());
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 	@Nullable
 	private final String name;

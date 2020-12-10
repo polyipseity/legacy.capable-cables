@@ -25,7 +25,7 @@ public interface IUIMinecraftContainerProviderExtension
 	enum StaticHolder {
 		;
 
-		private static final IIdentifier KEY = ImmutableIdentifier.of(MinecraftUtilities.getNamespace(), "container");
+		private static final IIdentifier KEY = ImmutableIdentifier.ofInterning(MinecraftUtilities.getNamespace(), "container");
 		@SuppressWarnings("unchecked")
 		private static final
 		IRegistryObject<IExtensionType<IIdentifier, IUIMinecraftContainerProviderExtension, IUIInfrastructure<?, ?, ?>>> TYPE =

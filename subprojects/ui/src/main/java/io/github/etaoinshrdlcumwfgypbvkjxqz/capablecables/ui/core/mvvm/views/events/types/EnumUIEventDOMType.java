@@ -57,9 +57,7 @@ public enum EnumUIEventDOMType
 	private final IIdentifier eventType;
 
 	EnumUIEventDOMType(@NonNls CharSequence eventTypeString) {
-		String eventTypeString2 = eventTypeString.toString();
-		this.eventTypeString = eventTypeString2;
-		this.eventType = ImmutableIdentifier.of(eventTypeString2);
+		this.eventType = ImmutableIdentifier.ofInterning(this.eventTypeString = eventTypeString.toString()); // COMMENT Wow!  What a great piece of readable code.
 	}
 
 	@Override

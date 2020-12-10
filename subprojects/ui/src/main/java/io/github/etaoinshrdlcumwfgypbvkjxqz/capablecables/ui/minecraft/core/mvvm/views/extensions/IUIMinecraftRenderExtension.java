@@ -23,7 +23,7 @@ public interface IUIMinecraftRenderExtension
 	enum StaticHolder {
 		;
 
-		private static final IIdentifier KEY = ImmutableIdentifier.of(MinecraftUtilities.getNamespace(), "render");
+		private static final IIdentifier KEY = ImmutableIdentifier.ofInterning(MinecraftUtilities.getNamespace(), "render");
 		@SuppressWarnings("unchecked")
 		private static final
 		IRegistryObject<IExtensionType<IIdentifier, IUIMinecraftRenderExtension, IUIView<?>>> TYPE =

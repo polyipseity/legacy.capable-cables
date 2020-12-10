@@ -20,7 +20,7 @@ public interface IUICacheExtension
 	enum StaticHolder {
 		;
 
-		private static final IIdentifier KEY = ImmutableIdentifier.of(IUIExtension.StaticHolder.getDefaultNamespace(), "cache");
+		private static final IIdentifier KEY = ImmutableIdentifier.ofInterning(IUIExtension.StaticHolder.getDefaultNamespace(), "cache");
 		@SuppressWarnings("unchecked")
 		private static final IRegistryObject<IExtensionType<IIdentifier, IUICacheExtension, IExtensionContainer<IIdentifier>>> TYPE =
 				UIExtensionRegistry.getInstance().register(getKey(), new ImmutableExtensionType<>(getKey(), (t, i) -> (Optional<? extends IUICacheExtension>) i.getExtension(t.getKey())));

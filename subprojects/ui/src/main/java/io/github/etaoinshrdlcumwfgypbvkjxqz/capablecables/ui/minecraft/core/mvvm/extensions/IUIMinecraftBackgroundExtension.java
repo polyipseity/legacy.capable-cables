@@ -25,7 +25,7 @@ public interface IUIMinecraftBackgroundExtension
 	enum StaticHolder {
 		;
 
-		private static final IIdentifier KEY = ImmutableIdentifier.of(MinecraftUtilities.getNamespace(), "background");
+		private static final IIdentifier KEY = ImmutableIdentifier.ofInterning(MinecraftUtilities.getNamespace(), "background");
 		@SuppressWarnings("unchecked")
 		private static final
 		IRegistryObject<IExtensionType<IIdentifier, IUIMinecraftBackgroundExtension, IUIMinecraftViewComponent<?, ?>>> TYPE =

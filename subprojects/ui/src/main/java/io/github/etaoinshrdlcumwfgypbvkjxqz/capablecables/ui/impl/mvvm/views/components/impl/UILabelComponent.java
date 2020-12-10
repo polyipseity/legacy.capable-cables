@@ -58,8 +58,8 @@ public class UILabelComponent
 		extends UIDefaultComponent {
 	public static final @NonNls String PROPERTY_TEXT = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.text";
 	public static final @NonNls String PROPERTY_AUTO_RESIZE = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.auto_resize";
-	private static final IIdentifier PROPERTY_TEXT_IDENTIFIER = ImmutableIdentifier.of(getPropertyText());
-	private static final IIdentifier PROPERTY_AUTO_RESIZE_IDENTIFIER = ImmutableIdentifier.of(getPropertyAutoResize());
+	private static final IIdentifier PROPERTY_TEXT_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyText());
+	private static final IIdentifier PROPERTY_AUTO_RESIZE_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyAutoResize());
 
 	private final IUIRendererContainerContainer<IUIComponentRenderer<?>> rendererContainerContainer;
 

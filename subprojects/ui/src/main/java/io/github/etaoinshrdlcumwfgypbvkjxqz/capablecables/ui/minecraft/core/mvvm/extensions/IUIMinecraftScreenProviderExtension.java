@@ -35,7 +35,7 @@ public interface IUIMinecraftScreenProviderExtension
 	enum StaticHolder {
 		;
 
-		private static final IIdentifier KEY = ImmutableIdentifier.of(MinecraftUtilities.getNamespace(), "screen");
+		private static final IIdentifier KEY = ImmutableIdentifier.ofInterning(MinecraftUtilities.getNamespace(), "screen");
 		@SuppressWarnings("unchecked")
 		private static final IRegistryObject<IExtensionType<IIdentifier, IUIMinecraftScreenProviderExtension, IUIInfrastructure<?, ?, ?>>> TYPE =
 				UIExtensionRegistry.getInstance().register(getKey(), new ImmutableExtensionType<>(getKey(), (t, i) -> (Optional<? extends IUIMinecraftScreenProviderExtension>) i.getExtension(t.getKey())));

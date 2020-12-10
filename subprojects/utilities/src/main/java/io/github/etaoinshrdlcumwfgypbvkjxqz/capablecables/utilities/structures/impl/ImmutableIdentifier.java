@@ -10,9 +10,23 @@ import javax.annotation.concurrent.Immutable;
 public final class ImmutableIdentifier
 		extends AbstractIdentifier {
 	private final String namespace;
-	private final String string;
+	private final String name;
 
-	private ImmutableIdentifier(@NonNls CharSequence namespace, @NonNls CharSequence string) {
+	private ImmutableIdentifier(@NonNls CharSequence namespace, @NonNls CharSequence name) {
+		this.namespace = namespace.toString();
+		this.name = name.toString();
+	}
+
+	public static ImmutableIdentifier of(@NonNls CharSequence string) {
+		return ofInterning(string, false, false);
+	}
+
+	public static ImmutableIdentifier ofInterning(@NonNls CharSequence string, boolean internNamespace, boolean internName) {
+		ITuple2<String, String> decomposed = IIdentifier.decompose(string);
+		return ofInterning(decomposed.getLeft(), decomposed.getRight(), internNamespace, internName);
+	}
+
+	public static ImmutableIdentifier ofInterning(@NonNls CharSequence namespace, @NonNls CharSequence name, boolean internNamespace, boolean internName) {
 		/* COMMENT
 		Many instances of this type are created with the same strings commonly, so we will intern them.
 
@@ -22,23 +36,26 @@ public final class ImmutableIdentifier
 
 		It will also help with 'equals' of this type, as two equal strings will return true on the identity check,
 		which is the best case scenario, instead of checking the whole string, which is the worst case scenario.
-		 */
-		this.namespace = namespace.toString().intern();
-		this.string = string.toString().intern();
+		*/
+		return new ImmutableIdentifier(internNamespace ? namespace.toString().intern() : namespace,
+				internName ? name.toString().intern() : name);
 	}
 
-	public static ImmutableIdentifier of(@NonNls CharSequence string) {
-		ITuple2<String, String> decomposed = IIdentifier.decompose(string);
-		return of(decomposed.getLeft(), decomposed.getRight());
+	public static ImmutableIdentifier of(@NonNls CharSequence namespace, @NonNls CharSequence name) {
+		return ofInterning(namespace, name, false, false);
 	}
 
-	public static ImmutableIdentifier of(@NonNls CharSequence namespace, @NonNls CharSequence string) {
-		return new ImmutableIdentifier(namespace, string);
+	public static ImmutableIdentifier ofInterning(@NonNls CharSequence namespace, @NonNls CharSequence name) {
+		return ofInterning(namespace, name, true, true);
+	}
+
+	public static ImmutableIdentifier ofInterning(@NonNls CharSequence string) {
+		return ofInterning(string, true, true);
 	}
 
 	@Override
 	public @NonNls String getNamespace() { return namespace; }
 
 	@Override
-	public @NonNls String getName() { return string; }
+	public @NonNls String getName() { return name; }
 }
