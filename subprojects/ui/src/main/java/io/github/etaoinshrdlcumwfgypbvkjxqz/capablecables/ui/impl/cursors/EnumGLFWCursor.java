@@ -13,6 +13,7 @@ import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.system.MemoryUtil;
+import sun.misc.Cleaner;
 
 import java.awt.geom.Point2D;
 import java.io.IOException;
@@ -20,6 +21,8 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.function.LongSupplier;
+
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 
 public enum EnumGLFWCursor
 		implements ICursor {
@@ -56,9 +59,23 @@ public enum EnumGLFWCursor
 	}),
 	;
 
-	private final long handle;
+	private final ICursor delegate;
 
-	EnumGLFWCursor(LongSupplier handle) { this.handle = handle.getAsLong(); }
+	EnumGLFWCursor(LongSupplier handle) {
+		ICursor delegate = ImmutableGLFWCursor.of(handle.getAsLong());
+		this.delegate = delegate;
+		Cleaner.create(suppressThisEscapedWarning(() -> this),
+				delegate::close);
+	}
+
+	@Override
+	public String toString() {
+		return getDelegate().toString();
+	}
+
+	protected ICursor getDelegate() {
+		return delegate;
+	}
 
 	@SuppressWarnings("EmptyMethod")
 	public static void initializeClass() {}
@@ -102,12 +119,12 @@ public enum EnumGLFWCursor
 	}
 
 	@Override
-	public long getHandle() { return handle; }
+	public long getHandle() {
+		return getDelegate().getHandle();
+	}
 
 	@Override
 	public void close() {
-		long handle = getHandle();
-		if (handle != MemoryUtil.NULL)
-			GLFW.glfwDestroyCursor(handle);
+		getDelegate().close();
 	}
 }

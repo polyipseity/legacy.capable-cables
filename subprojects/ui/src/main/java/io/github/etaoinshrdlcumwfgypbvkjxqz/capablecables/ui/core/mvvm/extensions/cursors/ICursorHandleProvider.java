@@ -1,8 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.extensions.cursors;
 
-import java.util.OptionalLong;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.ICursor;
+
+import java.util.Optional;
 
 @FunctionalInterface
 public interface ICursorHandleProvider {
-	OptionalLong getCursorHandle();
+	Optional<? extends ICursor> getCursorHandle();
 }

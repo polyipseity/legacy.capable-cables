@@ -14,6 +14,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.ImmutableExtensionType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.ICursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
 
 import java.awt.*;
@@ -60,7 +61,7 @@ public interface IUIComponentUserResizableExtension<C extends IUIComponent>
 
 		Optional<? extends Point2D> getBaseView();
 
-		long getInitialCursorHandle();
+		ICursor getInitialCursorHandle();
 
 		Optional<? extends Shape> handle(Point2D point);
 	}

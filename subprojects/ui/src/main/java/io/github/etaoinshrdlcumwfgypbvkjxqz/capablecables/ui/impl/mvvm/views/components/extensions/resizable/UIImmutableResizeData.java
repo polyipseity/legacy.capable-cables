@@ -14,6 +14,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableIntersection;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.TupleUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.ICursor;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -30,13 +31,13 @@ public final class UIImmutableResizeData
 	private final Set<EnumUISide> sides;
 	@Nullable
 	private final Point2D base;
-	private final long initialCursorHandle;
+	private final ICursor initialCursorHandle;
 
 	private <TC extends IUIComponent & IUIReshapeExplicitly<?>> UIImmutableResizeData(TC targetComponent,
 	                                                                                  Point2D previousPoint,
 	                                                                                  Set<EnumUISide> sides,
 	                                                                                  @Nullable Point2D base,
-	                                                                                  long initialCursorHandle) {
+	                                                                                  ICursor initialCursorHandle) {
 		WeakReference<TC> targetComponentReference = OptionalWeakReference.of(targetComponent);
 		this.targetComponent = ImmutableIntersection.of(targetComponentReference, targetComponentReference);
 		this.previousPoint = (Point2D) previousPoint.clone();
@@ -49,7 +50,7 @@ public final class UIImmutableResizeData
 	                                                                                           Point2D previousPoint,
 	                                                                                           Set<EnumUISide> sides,
 	                                                                                           @Nullable Point2D base,
-	                                                                                           long initialCursorHandle) {
+	                                                                                           ICursor initialCursorHandle) {
 		return new UIImmutableResizeData(targetComponent, previousPoint, sides, base, initialCursorHandle);
 	}
 
@@ -68,7 +69,7 @@ public final class UIImmutableResizeData
 	public Optional<? extends Point2D> getBaseView() { return getBase().map(Point2D::clone).map(CastUtilities::castUnchecked); }
 
 	@Override
-	public long getInitialCursorHandle() { return initialCursorHandle; }
+	public ICursor getInitialCursorHandle() { return initialCursorHandle; }
 
 	protected Optional<Point2D> getBase() { return Optional.ofNullable(base); }
 

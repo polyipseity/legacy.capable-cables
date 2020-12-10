@@ -34,13 +34,17 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.methods.ImmutableBindingMethodSource;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.ICursor;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.jetbrains.annotations.NonNls;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
@@ -196,10 +200,10 @@ public class UIButtonComponent
 	}
 
 	@Override
-	public OptionalLong getCursorHandle(IUIComponentContext context) {
+	public Optional<? extends ICursor> getCursorHandle(IUIComponentContext context) {
 		return getButtonStates().contains(EnumButtonState.HOVERING)
-				? OptionalLong.of(EnumGLFWCursor.STANDARD_HAND_CURSOR.getHandle())
-				: OptionalLong.empty();
+				? Optional.of(EnumGLFWCursor.STANDARD_HAND_CURSOR)
+				: Optional.empty();
 	}
 
 	public enum EnumButtonState {

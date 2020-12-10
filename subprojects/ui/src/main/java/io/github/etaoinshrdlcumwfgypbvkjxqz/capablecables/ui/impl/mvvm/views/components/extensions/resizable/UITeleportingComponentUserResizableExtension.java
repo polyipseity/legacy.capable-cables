@@ -66,7 +66,10 @@ import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
@@ -392,7 +395,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 																point,
 																sides,
 																base[0],
-																getCursor(sides).orElseThrow(InternalError::new).getHandle());
+																getCursor(sides).orElseThrow(AssertionError::new));
 														synchronized (getLockObject()) {
 															if (owner.getResizeData().isPresent())
 																return false;
@@ -445,32 +448,31 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		}
 
 		@Override
-		public OptionalLong getCursorHandle(IUIComponentContext context) {
+		public Optional<? extends ICursor> getCursorHandle(IUIComponentContext context) {
 			if (getModifyStage() == EnumModifyStage.PRE)
 				return Optional2.of(
 						() -> getOwner().orElse(null),
 						() -> context.getViewContext().getInputDevices().getPointerDevice().orElse(null))
-						.map(values -> {
+						.flatMap(values -> {
 							UITeleportingComponentUserResizableExtension<?> owner = values.getValue1Nonnull();
 							IPointerDevice pointerDevice = values.getValue2Nonnull();
 							Point2D cursorPosition = pointerDevice.getPositionView();
-							OptionalLong ret = owner.getResizeData()
+							@SuppressWarnings("Convert2MethodRef") Optional<? extends ICursor> ret = owner.getResizeData()
 									.map(d -> d.getBaseView()
-											.map(b -> {
+											.<ICursor>flatMap(b -> {
 												Set<EnumUISide> sides = EnumUISide.getSidesPointOver(
 														new Rectangle2D.Double(b.getX(), b.getY(), 0, 0),
 														cursorPosition);
 												if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT)
 														|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
-													return OptionalLong.of(EnumGLFWCursor.EXTENSION_RESIZE_NW_SE_CURSOR.getHandle());
+													return Optional.of(EnumGLFWCursor.EXTENSION_RESIZE_NW_SE_CURSOR);
 												else if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.RIGHT)
 														|| sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
-													return OptionalLong.of(EnumGLFWCursor.EXTENSION_RESIZE_NE_SW_CURSOR.getHandle());
-												return OptionalLong.empty();
+													return Optional.of(EnumGLFWCursor.EXTENSION_RESIZE_NE_SW_CURSOR);
+												return Optional.empty();
 											})
-											.orElseGet(() -> OptionalLong.of(d.getInitialCursorHandle()))
-									)
-									.orElseGet(OptionalLong::empty);
+											.orElseGet(() -> d.getInitialCursorHandle()) // TODO javac bug
+									);
 
 							if (!ret.isPresent())
 								ret = isBeingHovered()
@@ -479,15 +481,12 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 												getCursor(
 														EnumUISide.getSidesPointOver(
 																IUIComponent.getContextualShape(context, container).getBounds2D(),
-																cursorPosition))
-														.map(cursor -> OptionalLong.of(cursor.getHandle())))
-										.orElseGet(OptionalLong::empty)
-										: OptionalLong.empty();
+																cursorPosition)))
+										: Optional.empty();
 
 							return ret;
-						})
-						.orElseGet(OptionalLong::empty);
-			return OptionalLong.empty();
+						});
+			return Optional.empty();
 		}
 
 		protected boolean isBeingHovered() { return beingHovered; }

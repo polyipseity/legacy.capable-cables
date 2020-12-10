@@ -16,11 +16,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilitie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.ICursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputDevices;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IPointerDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional2;
 
-import java.util.OptionalLong;
+import java.util.Optional;
 
 public class UIComponentCursorHandleProviderExtension
 		extends AbstractContainerAwareExtension<IIdentifier, IUIView<?>, IUIViewComponent<?, ?>>
@@ -37,7 +38,7 @@ public class UIComponentCursorHandleProviderExtension
 	protected static IUIExtensionArguments getDefaultArguments() { return DEFAULT_ARGUMENTS; }
 
 	@Override
-	public OptionalLong getCursorHandle() {
+	public Optional<? extends ICursor> getCursorHandle() {
 		return getContainer()
 				.flatMap(view ->
 						Optional2.of(
@@ -47,11 +48,11 @@ public class UIComponentCursorHandleProviderExtension
 										.map(IUIViewContext::getInputDevices)
 										.flatMap(IInputDevices::getPointerDevice)
 										.orElse(null))
-								.map(values -> {
+								.flatMap(values -> {
 									IUIComponentContext componentContext = values.getValue1Nonnull();
 									IPointerDevice pointerDevice = values.getValue2Nonnull();
 									try (IUIComponentContext safeComponentContext = componentContext) {
-										OptionalLong ret = OptionalLong.empty();
+										Optional<? extends ICursor> ret = Optional.empty();
 										IUIViewComponent.getPathResolver(view).resolvePath(safeComponentContext, pointerDevice.getPositionView());
 										while (!safeComponentContext.getPathView().isEmpty()) {
 											IUIComponent component = IUIComponentContext.getCurrentComponent(safeComponentContext)
@@ -70,8 +71,7 @@ public class UIComponentCursorHandleProviderExtension
 										return ret;
 									}
 								})
-				)
-				.orElseGet(OptionalLong::empty);
+				);
 	}
 
 	@Override

@@ -14,6 +14,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.lifecycle
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventKeyboard;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventMouse;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventTarget;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.cursors.EnumGLFWCursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIEventUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.UIImmutableContextContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.viewmodels.UIImmutableViewModelContext;
@@ -40,11 +41,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.DoubleDimension2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.ICursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IMouseButtonClickData;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl.ImmutableCursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl.ImmutableInputDevices;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl.ImmutableKeyboardKeyPressData;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl.ImmutableMouseButtonClickData;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.OptionalUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time.core.ITicker;
 import it.unimi.dsi.fastutil.ints.*;
 import net.minecraft.client.Minecraft;
@@ -57,13 +59,11 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.system.MemoryUtil;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalLong;
 import java.util.Set;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
@@ -102,7 +102,8 @@ public class UIMinecraftScreenAdapter
 	@Nullable
 	private ImmutableMouseButtonClickData lastMouseClickData = null;
 	private double lastPartialTicks = 0D;
-	private long lastCursorHandle = MemoryUtilities.getInvalidAddress();
+	@Nullable
+	private ICursor lastCursor = null;
 
 	protected UIMinecraftScreenAdapter(ITextComponent title, I infrastructure, @Nullable C containerObject, IntIterable closeKeys, IntIterable changeFocusKeys) {
 		super(title);
@@ -137,10 +138,12 @@ public class UIMinecraftScreenAdapter
 	public void render(int mouseX, int mouseY, float partialTicks) {
 		setLastPartialTicks(partialTicks);
 		getInfrastructure().getView().render();
-		setCursorHandle(IUICursorHandleProviderExtension.StaticHolder.getType().getValue().find(getInfrastructure().getView())
-				.map(ICursorHandleProvider::getCursorHandle)
-				.orElseGet(OptionalLong::empty)
-				.orElse(MemoryUtil.NULL));
+		setCursor(
+				OptionalUtilities.<ICursor>upcast(
+						IUICursorHandleProviderExtension.StaticHolder.getType().getValue().find(getInfrastructure().getView())
+								.flatMap(ICursorHandleProvider::getCursorHandle)
+				).orElse(EnumGLFWCursor.DEFAULT_CURSOR)
+		);
 	}
 
 	protected static <E extends IUIEventKeyboard> E addEventKeyboard(UIMinecraftScreenAdapter<?, ?> self, E event) {
@@ -148,11 +151,11 @@ public class UIMinecraftScreenAdapter
 		return event;
 	}
 
-	protected void setCursorHandle(long cursorHandle) {
-		if (this.lastCursorHandle != cursorHandle) {
-			this.lastCursorHandle = cursorHandle;
+	protected void setCursor(ICursor cursor) {
+		if (!cursor.equals(this.lastCursor)) {
+			this.lastCursor = cursor;
 			getContextContainer().getViewContext().getInputDevices().getPointerDevice()
-					.ifPresent(pointerDevice -> pointerDevice.setCursor(ImmutableCursor.of(cursorHandle)));
+					.ifPresent(pointerDevice -> pointerDevice.setCursor(cursor));
 		}
 	}
 
@@ -186,27 +189,11 @@ public class UIMinecraftScreenAdapter
 
 	@Override
 	@Deprecated
-	public void removed() {
-		IUIContextContainer context = getContextContainer();
-
-		setCursorHandle(MemoryUtil.NULL);
-		{
-			// COMMENT generate opposite synthetic events
-			// COMMENT NO default actions
-			new IntOpenHashSet(getKeyboardKeysBeingPressed().keySet())
-					.forEach((int k) ->
-							removeEventKeyboard(this, k).ifPresent(e2 ->
-									UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventKeyboardOpposite(e2))));
-			Point2D cp = getContextContainer().getViewContext().getInputDevices().getPointerDevice().orElseThrow(AssertionError::new).getPositionView();
-			new IntOpenHashSet(getMouseButtonsBeingPressed().keySet())
-					.forEach((int k) ->
-							removeEventMouse(this, k).ifPresent(e2 ->
-									UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e2, cp))));
-			setTargetBeingHoveredByMouse(context, null, new ImmutableMouseButtonClickData(cp));
-			setLastMouseClickData(context, null, null);
-			setFocus(context, null);
-		}
-		IUIActiveLifecycle.cleanupV(getInfrastructure());
+	protected void init() {
+		getInfrastructure().bind(getContextContainer()); // COMMENT does nothing if already bound
+		setSize(width, height);
+		IUIActiveLifecycle.initializeV(getInfrastructure());
+		setCursor(EnumGLFWCursor.DEFAULT_CURSOR);
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
@@ -260,11 +247,27 @@ public class UIMinecraftScreenAdapter
 
 	@Override
 	@Deprecated
-	protected void init() {
-		getInfrastructure().bind(getContextContainer()); // COMMENT does nothing if already bound
-		setSize(width, height);
-		IUIActiveLifecycle.initializeV(getInfrastructure());
-		setCursorHandle(MemoryUtil.NULL);
+	public void removed() {
+		IUIContextContainer context = getContextContainer();
+
+		setCursor(EnumGLFWCursor.DEFAULT_CURSOR);
+		{
+			// COMMENT generate opposite synthetic events
+			// COMMENT NO default actions
+			new IntOpenHashSet(getKeyboardKeysBeingPressed().keySet())
+					.forEach((int k) ->
+							removeEventKeyboard(this, k).ifPresent(e2 ->
+									UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventKeyboardOpposite(e2))));
+			Point2D cp = getContextContainer().getViewContext().getInputDevices().getPointerDevice().orElseThrow(AssertionError::new).getPositionView();
+			new IntOpenHashSet(getMouseButtonsBeingPressed().keySet())
+					.forEach((int k) ->
+							removeEventMouse(this, k).ifPresent(e2 ->
+									UIEventUtilities.dispatchEvent(UIEventUtilities.Factory.generateSyntheticEventMouseOpposite(e2, cp))));
+			setTargetBeingHoveredByMouse(context, null, new ImmutableMouseButtonClickData(cp));
+			setLastMouseClickData(context, null, null);
+			setFocus(context, null);
+		}
+		IUIActiveLifecycle.cleanupV(getInfrastructure());
 	}
 
 	@Override
@@ -301,8 +304,8 @@ public class UIMinecraftScreenAdapter
 		// COMMENT resize calls init
 	}
 
-	protected long getLastCursorHandle() {
-		return lastCursorHandle;
+	protected Optional<? extends ICursor> getLastCursor() {
+		return Optional.ofNullable(lastCursor);
 	}
 
 	protected void setTargetBeingHoveredByMouse(IUIContextContainer context, @Nullable IUIEventTarget targetBeingHoveredByMouse, IMouseButtonClickData data) {
