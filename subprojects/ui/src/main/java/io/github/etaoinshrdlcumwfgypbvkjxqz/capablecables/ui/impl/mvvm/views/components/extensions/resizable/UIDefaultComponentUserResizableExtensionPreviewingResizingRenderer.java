@@ -16,7 +16,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputPointerDevice;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IPointerDevice;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.jetbrains.annotations.NonNls;
 
@@ -50,7 +50,7 @@ public class UIDefaultComponentUserResizableExtensionPreviewingResizingRenderer
 	@Override
 	public final void render(IUIComponentContext context, IUIComponentUserResizableExtension.IResizeData data) {
 		context.getViewContext().getInputDevices().getPointerDevice()
-				.map(IInputPointerDevice::getPositionView)
+				.map(IPointerDevice::getPositionView)
 				.flatMap(data::handle)
 				.ifPresent(shape -> render0(context, shape));
 	}

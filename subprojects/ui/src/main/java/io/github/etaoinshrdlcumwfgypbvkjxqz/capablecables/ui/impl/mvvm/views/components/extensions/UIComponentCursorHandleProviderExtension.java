@@ -17,7 +17,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputDevices;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputPointerDevice;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IPointerDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional2;
 
 import java.util.OptionalLong;
@@ -49,7 +49,7 @@ public class UIComponentCursorHandleProviderExtension
 										.orElse(null))
 								.map(values -> {
 									IUIComponentContext componentContext = values.getValue1Nonnull();
-									IInputPointerDevice pointerDevice = values.getValue2Nonnull();
+									IPointerDevice pointerDevice = values.getValue2Nonnull();
 									try (IUIComponentContext safeComponentContext = componentContext) {
 										OptionalLong ret = OptionalLong.empty();
 										IUIViewComponent.getPathResolver(view).resolvePath(safeComponentContext, pointerDevice.getPositionView());

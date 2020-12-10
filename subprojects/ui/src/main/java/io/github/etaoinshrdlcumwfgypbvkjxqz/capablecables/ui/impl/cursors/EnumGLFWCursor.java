@@ -2,9 +2,9 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.cursors;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.cursors.ICursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl.UIObjectUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.ICursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 import net.minecraft.client.renderer.texture.TextureUtil;
 import org.jetbrains.annotations.NonNls;
@@ -23,6 +23,7 @@ import java.util.function.LongSupplier;
 
 public enum EnumGLFWCursor
 		implements ICursor {
+	DEFAULT_CURSOR(() -> MemoryUtil.NULL),
 	STANDARD_ARROW_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_ARROW_CURSOR)),
 	STANDARD_I_BEAM_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_IBEAM_CURSOR)),
 	STANDARD_CROSS_HAIR_CURSOR(() -> GLFW.glfwCreateStandardCursor(GLFW.GLFW_CROSSHAIR_CURSOR)),
@@ -104,5 +105,9 @@ public enum EnumGLFWCursor
 	public long getHandle() { return handle; }
 
 	@Override
-	public void close() { GLFW.glfwDestroyCursor(getHandle()); }
+	public void close() {
+		long handle = getHandle();
+		if (handle != MemoryUtil.NULL)
+			GLFW.glfwDestroyCursor(handle);
+	}
 }

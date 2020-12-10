@@ -28,10 +28,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.util
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CollectionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftOpenGLUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTextComponentUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTooltipUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.inputs.MinecraftInputPointerDevice;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.inputs.MinecraftKeyboardDevice;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.inputs.MinecraftPointerDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.PrimitiveStreamUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
@@ -41,6 +41,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.i
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IMouseButtonClickData;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl.ImmutableCursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl.ImmutableInputDevices;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl.ImmutableKeyboardKeyPressData;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl.ImmutableMouseButtonClickData;
@@ -86,7 +87,8 @@ public class UIMinecraftScreenAdapter
 			new UIImmutableContextContainer(
 					new UIImmutableViewContext(
 							new ImmutableInputDevices.Builder(ITicker.StaticHolder.getSystemTicker())
-									.setPointerDevice(new MinecraftInputPointerDevice())
+									.setPointerDevice(new MinecraftPointerDevice())
+									.setKeyboardDevice(new MinecraftKeyboardDevice())
 									.build()
 					),
 					new UIImmutableViewModelContext()
@@ -148,8 +150,9 @@ public class UIMinecraftScreenAdapter
 
 	protected void setCursorHandle(long cursorHandle) {
 		if (this.lastCursorHandle != cursorHandle) {
-			GLFW.glfwSetCursor(MinecraftOpenGLUtilities.getWindowHandle(),
-					this.lastCursorHandle = cursorHandle);
+			this.lastCursorHandle = cursorHandle;
+			getContextContainer().getViewContext().getInputDevices().getPointerDevice()
+					.ifPresent(pointerDevice -> pointerDevice.setCursor(ImmutableCursor.of(cursorHandle)));
 		}
 	}
 

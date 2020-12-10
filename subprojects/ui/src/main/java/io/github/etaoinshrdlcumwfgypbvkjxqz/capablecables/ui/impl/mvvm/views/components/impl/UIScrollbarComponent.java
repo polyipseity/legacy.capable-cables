@@ -502,7 +502,7 @@ public class UIScrollbarComponent
 			if (!getThumbPullingProgressStart().isPresent())
 				setThumbPullingProgressStart(getScrollRelativeProgress().getValue());
 			context.getViewContext().getInputDevices().getPointerDevice()
-					.map(IInputPointerDevice::getPositionView)
+					.map(IPointerDevice::getPositionView)
 					.ifPresent(pointerPosition -> {
 						EnumUISide scrollDirection = getScrollDirection().getValue();
 						double thumbPullingCoordinate = scrollDirection.getAxis().getCoordinate(pointerPosition);
@@ -523,8 +523,7 @@ public class UIScrollbarComponent
 					});
 		} else if (!scrollbarStates.isEmpty()) {
 			// COMMENT we are not pulling the thumb
-			double nominalThumbDiff = suppressUnboxing(getThumbMovementRelativeSpeed().getValue())
-					* suppressUnboxing(getThumbRelativeSize().getValue())
+			double nominalThumbDiff = getThumbMovementSpeed(this)
 					* getUpdateTimeDelta().orElse(0L)
 					* EnumTimeUnit.getScale(EnumTimeUnit.SECOND, EnumTimeUnit.NANOSECOND);
 			double thumbDiff = scrollbarStates.stream().unordered()
@@ -535,6 +534,11 @@ public class UIScrollbarComponent
 							+ thumbDiff
 			));
 		}
+	}
+
+	protected static double getThumbMovementSpeed(UIScrollbarComponent instance) {
+		return suppressUnboxing(instance.getThumbMovementRelativeSpeed().getValue())
+				* suppressUnboxing(instance.getThumbRelativeSize().getValue());
 	}
 
 	protected OptionalDouble getThumbPullingProgressStart() {

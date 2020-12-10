@@ -6,8 +6,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time
 import java.util.Optional;
 
 public interface IInputDevices {
-	ITicker getTicker();
+	ITicker getTicker(); // COMMENT should always be available, 'System#nanoTime'
 
-	@Immutable
-	Optional<? extends IInputPointerDevice> getPointerDevice();
+	Optional<@Immutable ? extends IPointerDevice> getPointerDevice();
+
+	Optional<@Immutable ? extends IKeyboardDevice> getKeyboardDevice();
 }
