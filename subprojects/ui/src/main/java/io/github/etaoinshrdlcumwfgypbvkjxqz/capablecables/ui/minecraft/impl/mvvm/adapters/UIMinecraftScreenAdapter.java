@@ -165,7 +165,7 @@ public class UIMinecraftScreenAdapter
 			if (getCloseKeys().contains(key))
 				onClose();
 			if (getChangeFocusKeys().contains(key))
-				changeFocus((modifiers & GLFW.GLFW_MOD_SHIFT) == 0);
+				changeFocus(!MaskUtilities.containsAll(modifiers, GLFW.GLFW_MOD_SHIFT));
 		}
 		return true;
 	}
