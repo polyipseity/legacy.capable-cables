@@ -12,7 +12,7 @@ import java.util.Set;
 
 @Immutable
 public enum EnumUISide {
-	// COMMENT 'setFrameFromDiagonal' has a useful side effect of ensuring that width and height are always non-negative
+	// COMMENT 'setFrameFromDiagonal' has an useful side effect of ensuring that width and height are always non-negative
 	UP {
 		@Override
 		public EnumUIAxis getAxis() { return EnumUIAxis.Y; }
@@ -21,7 +21,7 @@ public enum EnumUISide {
 		public Optional<? extends EnumUISide> getOpposite() { return Optional.of(DOWN); }
 
 		@Override
-		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return mouse.getY() < rectangular.getY(); }
+		public boolean isPointOver(RectangularShape rectangular, Point2D point) { return point.getY() < rectangular.getY(); }
 
 		@Override
 		public double getValue(RectangularShape shape) {
@@ -56,7 +56,7 @@ public enum EnumUISide {
 		public Optional<? extends EnumUISide> getOpposite() { return Optional.of(UP); }
 
 		@Override
-		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return mouse.getY() >= rectangular.getMaxY(); }
+		public boolean isPointOver(RectangularShape rectangular, Point2D point) { return point.getY() >= rectangular.getMaxY(); }
 
 		@Override
 		public double getValue(RectangularShape shape) {
@@ -91,7 +91,7 @@ public enum EnumUISide {
 		public Optional<? extends EnumUISide> getOpposite() { return Optional.of(RIGHT); }
 
 		@Override
-		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return mouse.getX() < rectangular.getX(); }
+		public boolean isPointOver(RectangularShape rectangular, Point2D point) { return point.getX() < rectangular.getX(); }
 
 		@Override
 		public double getValue(RectangularShape shape) {
@@ -126,7 +126,7 @@ public enum EnumUISide {
 		public Optional<? extends EnumUISide> getOpposite() { return Optional.of(LEFT); }
 
 		@Override
-		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) { return mouse.getX() >= rectangular.getMaxX(); }
+		public boolean isPointOver(RectangularShape rectangular, Point2D point) { return point.getX() >= rectangular.getMaxX(); }
 
 		@Override
 		public double getValue(RectangularShape shape) {
@@ -155,7 +155,7 @@ public enum EnumUISide {
 	},
 	HORIZONTAL {
 		@Override
-		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) {
+		public boolean isPointOver(RectangularShape rectangular, Point2D point) {
 			return false;
 		}
 
@@ -192,7 +192,7 @@ public enum EnumUISide {
 	},
 	VERTICAL {
 		@Override
-		public boolean isMouseOver(RectangularShape rectangular, Point2D mouse) {
+		public boolean isPointOver(RectangularShape rectangular, Point2D point) {
 			return false;
 		}
 
@@ -232,13 +232,13 @@ public enum EnumUISide {
 
 	@SuppressWarnings("UnstableApiUsage")
 	@Immutable
-	public static Set<EnumUISide> getSidesMouseOver(RectangularShape rectangular, Point2D mouse) {
+	public static Set<EnumUISide> getSidesPointOver(RectangularShape rectangular, Point2D point) {
 		return Arrays.stream(EnumUISide.values()).unordered()
-				.filter(side -> side.isMouseOver(rectangular, mouse))
+				.filter(side -> side.isPointOver(rectangular, point))
 				.collect(Sets.toImmutableEnumSet());
 	}
 
-	public abstract boolean isMouseOver(RectangularShape rectangular, Point2D mouse);
+	public abstract boolean isPointOver(RectangularShape rectangular, Point2D point);
 
 	public static @Immutable Set<EnumUISide> getEdges() {
 		return EDGES;

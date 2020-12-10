@@ -376,7 +376,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 														IUIViewComponent.getPathResolver(view).resolvePath(context1, (Point2D) point.clone());
 
 														Rectangle2D contextualShape = IUIComponent.getContextualShape(context1, container).getBounds2D();
-														Set<EnumUISide> sides = EnumUISide.getSidesMouseOver(contextualShape, point);
+														Set<EnumUISide> sides = EnumUISide.getSidesPointOver(contextualShape, point);
 
 														Point2D[] base = {null}; // TODO ASM - replace it with non-array variable, ASM hates annotations here
 														if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT))
@@ -457,7 +457,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 							OptionalLong ret = owner.getResizeData()
 									.map(d -> d.getBaseView()
 											.map(b -> {
-												Set<EnumUISide> sides = EnumUISide.getSidesMouseOver(
+												Set<EnumUISide> sides = EnumUISide.getSidesPointOver(
 														new Rectangle2D.Double(b.getX(), b.getY(), 0, 0),
 														cursorPosition);
 												if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT)
@@ -477,7 +477,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 										? owner.getContainer()
 										.flatMap(container ->
 												getCursor(
-														EnumUISide.getSidesMouseOver(
+														EnumUISide.getSidesPointOver(
 																IUIComponent.getContextualShape(context, container).getBounds2D(),
 																cursorPosition))
 														.map(cursor -> OptionalLong.of(cursor.getHandle())))
