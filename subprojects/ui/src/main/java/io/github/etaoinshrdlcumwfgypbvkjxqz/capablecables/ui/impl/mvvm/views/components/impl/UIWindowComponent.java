@@ -259,18 +259,20 @@ public class UIWindowComponent
 		Map<EnumUIAxis, IBindingField<Double>> scrollRelativeProgressMap = new EnumMap<>(EnumUIAxis.class);
 		Map<EnumUIAxis, IBindingField<Double>> thumbRelativeSizeMap = new EnumMap<>(EnumUIAxis.class);
 		this.scrollbarEmbeds = ImmutableMap.<EnumUIAxis, IUIComponentEmbed<UIScrollbarComponent>>builder()
-				.put(EnumUIAxis.X, createScrollbarEmbed(suppressThisEscapedWarning(() -> this),
-						getEmbedVerticalScrollbarName(),
-						EnumUIAxis.X,
-						arguments,
-						scrollRelativeProgressMap,
-						thumbRelativeSizeMap))
-				.put(EnumUIAxis.Y, createScrollbarEmbed(suppressThisEscapedWarning(() -> this),
-						getEmbedHorizontalScrollbarName(),
-						EnumUIAxis.Y,
-						arguments,
-						scrollRelativeProgressMap,
-						thumbRelativeSizeMap))
+				.put(EnumUIAxis.X, new UIChildlessComponentEmbed<>(UIScrollbarComponent.class, suppressThisEscapedWarning(() -> this),
+						createScrollbarEmbedArguments(suppressThisEscapedWarning(() -> this),
+								getEmbedVerticalScrollbarName(),
+								EnumUIAxis.X,
+								arguments,
+								scrollRelativeProgressMap,
+								thumbRelativeSizeMap)))
+				.put(EnumUIAxis.Y, new UIChildlessComponentEmbed<>(UIScrollbarComponent.class, suppressThisEscapedWarning(() -> this),
+						createScrollbarEmbedArguments(suppressThisEscapedWarning(() -> this),
+								getEmbedHorizontalScrollbarName(),
+								EnumUIAxis.Y,
+								arguments,
+								scrollRelativeProgressMap,
+								thumbRelativeSizeMap)))
 				.build();
 
 		this.eventTargetListenersInitializer = new OneUseRunnable(() ->
@@ -348,93 +350,91 @@ public class UIWindowComponent
 		return PROPERTY_SCROLLBAR_THICKNESSES_IDENTIFIER;
 	}
 
-	protected static IUIComponentEmbed<UIScrollbarComponent> createScrollbarEmbed(UIWindowComponent owner,
-	                                                                              CharSequence key,
-	                                                                              EnumUIAxis axis,
-	                                                                              IUIComponentArguments arguments,
-	                                                                              Map<EnumUIAxis, IBindingField<Double>> scrollRelativeProgressMap,
-	                                                                              Map<EnumUIAxis, IBindingField<Double>> thumbRelativeSizeMap) {
+	protected static IUIComponentEmbedArguments createScrollbarEmbedArguments(UIWindowComponent owner,
+	                                                                          CharSequence key,
+	                                                                          EnumUIAxis axis,
+	                                                                          IUIComponentArguments arguments,
+	                                                                          Map<EnumUIAxis, IBindingField<Double>> scrollRelativeProgressMap,
+	                                                                          Map<EnumUIAxis, IBindingField<Double>> thumbRelativeSizeMap) {
 		OptionalWeakReference<UIWindowComponent> ownerReference = OptionalWeakReference.of(owner);
-		return new UIChildlessComponentEmbed<>(UIScrollbarComponent.class,
-				owner,
-				arguments.computeEmbedArgument(key,
-						arguments1 -> new UIScrollbarComponent(
-								ownerReference.getOptional()
-										.<IUIComponentArguments>map(owner1 -> {
-											String keyPrefix = UINamespaceUtilities.getUniqueInternalBindingNamespace(owner1);
+		return arguments.computeEmbedArgument(key,
+				arguments1 -> new UIScrollbarComponent(
+						ownerReference.getOptional()
+								.<IUIComponentArguments>map(owner1 -> {
+									String keyPrefix = UINamespaceUtilities.getUniqueInternalBindingNamespace(owner1);
 
-											IIdentifier scrollRelativeProgressKey =
-													ImmutableIdentifier.of(keyPrefix,
-															getInternalBindingScrollbarRelativeProgressPrefix() + '.' + axis.name());
-											IIdentifier thumbRelativeSizeKey =
-													ImmutableIdentifier.of(keyPrefix,
-															getInternalBindingScrollbarThumbRelativeSizePrefix() + '.' + axis.name());
+									IIdentifier scrollRelativeProgressKey =
+											ImmutableIdentifier.of(keyPrefix,
+													getInternalBindingScrollbarRelativeProgressPrefix() + '.' + axis.name());
+									IIdentifier thumbRelativeSizeKey =
+											ImmutableIdentifier.of(keyPrefix,
+													getInternalBindingScrollbarThumbRelativeSizePrefix() + '.' + axis.name());
 
-											IValueHolder<IUIComponentArguments> pointerArguments = DefaultValueHolder.of(arguments1);
+									IValueHolder<IUIComponentArguments> pointerArguments = DefaultValueHolder.of(arguments1);
 
-											UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
-													ImmutableMap.of(
-															UIScrollbarComponent.getPropertyScrollDirectionIdentifier(),
-															() -> UIImmutablePropertyMappingValue.of(UIScrollbarComponent.getAxisToConventionalDirectionMap().get(axis), null)
-													));
+									UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
+											ImmutableMap.of(
+													UIScrollbarComponent.getPropertyScrollDirectionIdentifier(),
+													() -> UIImmutablePropertyMappingValue.of(UIScrollbarComponent.getAxisToConventionalDirectionMap().get(axis), null)
+											));
 
-											if (UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
-													ImmutableMap.of(
-															UIScrollbarComponent.getPropertyScrollRelativeProgressIdentifier(),
-															() -> UIImmutablePropertyMappingValue.of(null, scrollRelativeProgressKey),
-															UIScrollbarComponent.getPropertyThumbRelativeSizeIdentifier(),
-															() -> UIImmutablePropertyMappingValue.of(null, thumbRelativeSizeKey)
-													))) {
-												IBindingField<Double> scrollRelativeProgressField =
-														ImmutableBindingField.of(scrollRelativeProgressKey,
-																new MemoryObservableField<>(Double.class, suppressBoxing(0D)));
-												IBindingField<Double> thumbRelativeProgressField =
-														ImmutableBindingField.of(thumbRelativeSizeKey,
-																new MemoryObservableField<>(Double.class, suppressBoxing(1D)));
+									if (UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
+											ImmutableMap.of(
+													UIScrollbarComponent.getPropertyScrollRelativeProgressIdentifier(),
+													() -> UIImmutablePropertyMappingValue.of(null, scrollRelativeProgressKey),
+													UIScrollbarComponent.getPropertyThumbRelativeSizeIdentifier(),
+													() -> UIImmutablePropertyMappingValue.of(null, thumbRelativeSizeKey)
+											))) {
+										IBindingField<Double> scrollRelativeProgressField =
+												ImmutableBindingField.of(scrollRelativeProgressKey,
+														new MemoryObservableField<>(Double.class, suppressBoxing(0D)));
+										IBindingField<Double> thumbRelativeProgressField =
+												ImmutableBindingField.of(thumbRelativeSizeKey,
+														new MemoryObservableField<>(Double.class, suppressBoxing(1D)));
 
-												scrollRelativeProgressField.getField().getNotifier().subscribe(
-														new ContentScrollOffsetUpdater(owner1, axis, UIConfiguration.getInstance().getLogger())
-												);
+										scrollRelativeProgressField.getField().getNotifier().subscribe(
+												new ContentScrollOffsetUpdater(owner1, axis, UIConfiguration.getInstance().getLogger())
+										);
 
-												scrollRelativeProgressMap.put(axis, scrollRelativeProgressField);
-												thumbRelativeSizeMap.put(axis, thumbRelativeProgressField);
-											}
+										scrollRelativeProgressMap.put(axis, scrollRelativeProgressField);
+										thumbRelativeSizeMap.put(axis, thumbRelativeProgressField);
+									}
 
-											return pointerArguments.getValue()
-													.orElseThrow(AssertionError::new);
-										}).orElse(arguments1)
-						),
-						new SupplierShapeDescriptor<>(() ->
-								ownerReference.getOptional()
-										.map(owner2 -> {
-											// COMMENT collect data for self
-											Object2DoubleMap<EnumUIAxis> scrollbarThicknesses = owner2.getScrollbarThicknesses().getValue();
-											Point2D contentScrollOffset = owner2.getContentScrollOffset(); // COMMENT the scrollbar should resist translation caused by itself
-											Rectangle2D owner2ShapeBounds = getWindowContentBounds(owner2);
-											EnumUISide scrollbarSide = AssertionUtilities.assertNonnull(owner2.getScrollbarSides().getValue().get(axis));
-											EnumUISide scrollbarSideOpposite = scrollbarSide.getOpposite().orElseThrow(IllegalStateException::new);
-											double scrollbarThickness = scrollbarThicknesses.getDouble(axis);
+									return pointerArguments.getValue()
+											.orElseThrow(AssertionError::new);
+								}).orElse(arguments1)
+				),
+				new SupplierShapeDescriptor<>(() ->
+						ownerReference.getOptional()
+								.map(owner2 -> {
+									// COMMENT collect data for self
+									Object2DoubleMap<EnumUIAxis> scrollbarThicknesses = owner2.getScrollbarThicknesses().getValue();
+									Point2D contentScrollOffset = owner2.getContentScrollOffset(); // COMMENT the scrollbar should resist translation caused by itself
+									Rectangle2D owner2ShapeBounds = getWindowContentBounds(owner2);
+									EnumUISide scrollbarSide = AssertionUtilities.assertNonnull(owner2.getScrollbarSides().getValue().get(axis));
+									EnumUISide scrollbarSideOpposite = scrollbarSide.getOpposite().orElseThrow(IllegalStateException::new);
+									double scrollbarThickness = scrollbarThicknesses.getDouble(axis);
 
-											// COMMENT generate
-											Rectangle2D result = new Rectangle2D.Double(-contentScrollOffset.getX(), -contentScrollOffset.getY(),
-													owner2ShapeBounds.getWidth() + scrollbarThicknesses.getDouble(EnumUIAxis.X),
-													owner2ShapeBounds.getHeight() + scrollbarThicknesses.getDouble(EnumUIAxis.Y));
-											scrollbarSideOpposite.setValue(result,
-													scrollbarSide.getValue(result)
-															+ scrollbarSide.inwardsBy(scrollbarThickness).orElseThrow(IllegalStateException::new));
+									// COMMENT generate
+									Rectangle2D result = new Rectangle2D.Double(-contentScrollOffset.getX(), -contentScrollOffset.getY(),
+											owner2ShapeBounds.getWidth() + scrollbarThicknesses.getDouble(EnumUIAxis.X),
+											owner2ShapeBounds.getHeight() + scrollbarThicknesses.getDouble(EnumUIAxis.Y));
+									scrollbarSideOpposite.setValue(result,
+											scrollbarSide.getValue(result)
+													+ scrollbarSide.inwardsBy(scrollbarThickness).orElseThrow(IllegalStateException::new));
 
-											// COMMENT consider the other scrollbar
-											EnumUIAxis otherAxis = axis.getOpposite();
-											EnumUISide otherScrollbarSide = AssertionUtilities.assertNonnull(owner2.getScrollbarSides().getValue().get(otherAxis));
-											double otherScrollbarThickness = scrollbarThicknesses.getDouble(otherAxis);
-											otherScrollbarSide.setValue(result,
-													otherScrollbarSide.getValue(result)
-															+ otherScrollbarSide.inwardsBy(otherScrollbarThickness).orElseThrow(IllegalStateException::new));
+									// COMMENT consider the other scrollbar
+									EnumUIAxis otherAxis = axis.getOpposite();
+									EnumUISide otherScrollbarSide = AssertionUtilities.assertNonnull(owner2.getScrollbarSides().getValue().get(otherAxis));
+									double otherScrollbarThickness = scrollbarThicknesses.getDouble(otherAxis);
+									otherScrollbarSide.setValue(result,
+											otherScrollbarSide.getValue(result)
+													+ otherScrollbarSide.inwardsBy(otherScrollbarThickness).orElseThrow(IllegalStateException::new));
 
-											return result;
-										})
-										.orElseGet(Rectangle2D.Double::new)
-						)));
+									return result;
+								})
+								.orElseGet(Rectangle2D.Double::new)
+				));
 	}
 
 	protected IBindingField<Object2DoubleMap<EnumUIAxis>> getScrollbarThicknesses() {

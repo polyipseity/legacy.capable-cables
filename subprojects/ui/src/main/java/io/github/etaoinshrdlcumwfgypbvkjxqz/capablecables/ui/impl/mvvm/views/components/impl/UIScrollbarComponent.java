@@ -10,10 +10,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.UIProperty;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIComponentArguments;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIRendererArguments;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIComponentConstructor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIRendererConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.embed.IUIComponentEmbed;
@@ -95,8 +92,7 @@ public class UIScrollbarComponent
 	@UIProperty(PROPERTY_BUTTON_SIZE)
 	private final IBindingField<Double> buttonSize;
 	private final IUIComponentEmbed<UIButtonComponent> thumbEmbed;
-	private final IUIComponentEmbed<UIButtonComponent> button1Embed;
-	private final IUIComponentEmbed<UIButtonComponent> button2Embed;
+	private final @Immutable Map<EnumScrollbarState, IUIComponentEmbed<? extends UIButtonComponent>> buttonEmbeds;
 	private final IUIRendererContainerContainer<IUIComponentRenderer<?>> rendererContainerContainer;
 	private final Set<EnumScrollbarState> scrollbarStates = Collections.newSetFromMap(
 			MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(EnumScrollbarState.values().length).makeMap()
@@ -104,6 +100,7 @@ public class UIScrollbarComponent
 	private @Nullable Double thumbPullingProgressStart;
 	private @Nullable Double thumbPullingStartingPoint;
 
+	@SuppressWarnings("UnstableApiUsage")
 	@UIComponentConstructor
 	public UIScrollbarComponent(IUIComponentArguments arguments) {
 		super(arguments);
@@ -181,13 +178,13 @@ public class UIScrollbarComponent
 
 											IIdentifier onActivateKey =
 													ImmutableIdentifier.of(keyPrefix,
-															getInternalBindingButtonActivatePrefix() + ".thumb");
+															getInternalBindingButtonActivatePrefix() + '.' + getEmbedThumbName());
 											IIdentifier onActivatedKey =
 													ImmutableIdentifier.of(keyPrefix,
-															getInternalBindingButtonActivatedPrefix() + ".thumb");
+															getInternalBindingButtonActivatedPrefix() + '.' + getEmbedThumbName());
 											IIdentifier onCanceledKey =
 													ImmutableIdentifier.of(keyPrefix,
-															getInternalBindingButtonCanceledPrefix() + ".thumb");
+															getInternalBindingButtonCanceledPrefix() + '.' + getEmbedThumbName());
 
 											IValueHolder<IUIComponentArguments> pointerArguments = DefaultValueHolder.of(arguments1);
 
@@ -250,148 +247,106 @@ public class UIScrollbarComponent
 										})
 										.orElseGet(Rectangle2D.Double::new)
 						)));
-		// COMMENT button 1, initial position of the thumb
-		this.button1Embed = new UIChildlessComponentEmbed<>(UIButtonComponent.class, suppressThisEscapedWarning(() -> this),
-				arguments.computeEmbedArgument(getEmbedButton1Name(),
-						arguments1 -> new UIButtonComponent(
-								thisReference.getOptional()
-										.<IUIComponentArguments>map(this1 -> {
-											String keyPrefix = UINamespaceUtilities.getUniqueInternalBindingNamespace(this1);
+		this.buttonEmbeds = Maps.immutableEnumMap(ImmutableMap.of(
+				// COMMENT button 1, initial position of the thumb
+				EnumScrollbarState.SCROLLING_BACKWARD,
+				new UIChildlessComponentEmbed<>(UIButtonComponent.class, suppressThisEscapedWarning(() -> this),
+						createButtonEmbedArguments(suppressThisEscapedWarning(() -> this),
+								getEmbedButton1Name(),
+								arguments,
+								EnumScrollbarState.SCROLLING_BACKWARD)),
+				// COMMENT button 2, position limit of the thumb
+				EnumScrollbarState.SCROLLING_FORWARD,
+				new UIChildlessComponentEmbed<>(UIButtonComponent.class, suppressThisEscapedWarning(() -> this),
+						createButtonEmbedArguments(suppressThisEscapedWarning(() -> this),
+								getEmbedButton2Name(),
+								arguments,
+								EnumScrollbarState.SCROLLING_FORWARD))
+		));
+	}
 
-											IIdentifier onActivateKey =
-													ImmutableIdentifier.of(keyPrefix,
-															getInternalBindingButtonActivatePrefix() + ".1");
-											IIdentifier onActivatedKey =
-													ImmutableIdentifier.of(keyPrefix,
-															getInternalBindingButtonActivatedPrefix() + ".1");
-											IIdentifier onCanceledKey =
-													ImmutableIdentifier.of(keyPrefix,
-															getInternalBindingButtonCanceledPrefix() + ".1");
+	protected static IUIComponentEmbedArguments createButtonEmbedArguments(UIScrollbarComponent owner,
+	                                                                       CharSequence key,
+	                                                                       IUIComponentArguments arguments,
+	                                                                       EnumScrollbarState state) {
+		OptionalWeakReference<UIScrollbarComponent> ownerReference = OptionalWeakReference.of(owner);
+		String key1 = key.toString();
+		return arguments.computeEmbedArgument(key1,
+				arguments1 -> new UIButtonComponent(
+						ownerReference.getOptional()
+								.<IUIComponentArguments>map(owner1 -> {
+									String keyPrefix = UINamespaceUtilities.getUniqueInternalBindingNamespace(owner1);
 
-											IValueHolder<IUIComponentArguments> pointerArguments = DefaultValueHolder.of(arguments1);
+									IIdentifier onActivateKey =
+											ImmutableIdentifier.of(keyPrefix,
+													getInternalBindingButtonActivatePrefix() + '.' + key1);
+									IIdentifier onActivatedKey =
+											ImmutableIdentifier.of(keyPrefix,
+													getInternalBindingButtonActivatedPrefix() + '.' + key1);
+									IIdentifier onCanceledKey =
+											ImmutableIdentifier.of(keyPrefix,
+													getInternalBindingButtonCanceledPrefix() + '.' + key1);
 
-											if (UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
-													ImmutableMap.of(
-															UIButtonComponent.getMethodOnActivateIdentifier(),
-															() -> UIImmutablePropertyMappingValue.of(null, onActivateKey),
-															UIButtonComponent.getMethodOnActivatedIdentifier(),
-															() -> UIImmutablePropertyMappingValue.of(null, onActivatedKey),
-															UIButtonComponent.getMethodOnCanceledIdentifier(),
-															() -> UIImmutablePropertyMappingValue.of(null, onCanceledKey)
-													))) {
-												this1.getEmbedBindings()
-														.addAll(ImmutableList.of(
-																ImmutableBindingMethodDestination.of(UIButtonComponent.IUIEventActivate.class,
-																		onActivateKey,
-																		event -> thisReference.getOptional()
-																				.ifPresent(this2 -> this2.onButtonActivate(EnumScrollbarState.SCROLLING_BACKWARD, event))),
-																ImmutableBindingMethodDestination.of(IUIEvent.class,
-																		onActivatedKey,
-																		event -> thisReference.getOptional()
-																				.ifPresent(this2 -> this2.onButtonFinish(EnumScrollbarState.SCROLLING_BACKWARD, event))),
-																ImmutableBindingMethodDestination.of(IUIEvent.class,
-																		onCanceledKey,
-																		event -> thisReference.getOptional()
-																				.ifPresent(this2 -> this2.onButtonFinish(EnumScrollbarState.SCROLLING_BACKWARD, event)))
-														));
-											}
+									IValueHolder<IUIComponentArguments> pointerArguments = DefaultValueHolder.of(arguments1);
 
-											return pointerArguments.getValue()
-													.orElseThrow(AssertionError::new);
-										}).orElse(arguments1)
-						),
-						new SupplierShapeDescriptor<>(() ->
-								thisReference.getOptional()
-										.map(this1 -> {
-											Shape this1Shape = IUIComponent.getShape(this1);
-											EnumUISide endingScrollDirection = this1.getScrollDirection().getValue();
-											EnumUISide startingScrollDirection = endingScrollDirection.getOpposite().orElseThrow(IllegalStateException::new);
-											@SuppressWarnings("AutoUnboxing") double buttonSize = this1.getButtonSize().getValue();
+									if (UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
+											ImmutableMap.of(
+													UIButtonComponent.getMethodOnActivateIdentifier(),
+													() -> UIImmutablePropertyMappingValue.of(null, onActivateKey),
+													UIButtonComponent.getMethodOnActivatedIdentifier(),
+													() -> UIImmutablePropertyMappingValue.of(null, onActivatedKey),
+													UIButtonComponent.getMethodOnCanceledIdentifier(),
+													() -> UIImmutablePropertyMappingValue.of(null, onCanceledKey)
+											))) {
+										owner1.getEmbedBindings()
+												.addAll(ImmutableList.of(
+														ImmutableBindingMethodDestination.of(UIButtonComponent.IUIEventActivate.class,
+																onActivateKey,
+																event -> ownerReference.getOptional()
+																		.ifPresent(owner2 -> owner2.onButtonActivate(state, event))),
+														ImmutableBindingMethodDestination.of(IUIEvent.class,
+																onActivatedKey,
+																event -> ownerReference.getOptional()
+																		.ifPresent(owner2 -> owner2.onButtonFinish(state, event))),
+														ImmutableBindingMethodDestination.of(IUIEvent.class,
+																onCanceledKey,
+																event -> ownerReference.getOptional()
+																		.ifPresent(owner2 -> owner2.onButtonFinish(state, event)))
+												));
+									}
 
-											Rectangle2D this1ShapeBounds = this1Shape.getBounds2D();
+									return pointerArguments.getValue()
+											.orElseThrow(AssertionError::new);
+								}).orElse(arguments1)
+				),
+				new SupplierShapeDescriptor<>(() ->
+						ownerReference.getOptional()
+								.map(owner1 -> {
+									Shape ownerShape = IUIComponent.getShape(owner1);
+									Rectangle2D ownerShapeBounds = ownerShape.getBounds2D();
+									EnumUISide scrollDirection = owner1.getScrollDirection().getValue();
+									EnumUIAxis scrollAxis = scrollDirection.getAxis();
+									EnumUISide buttonSide = state.getButtonSide(scrollDirection)
+											.orElseThrow(IllegalArgumentException::new);
+									EnumUISide buttonSideOpposite = buttonSide.getOpposite()
+											.orElseThrow(IllegalStateException::new);
 
-											Rectangle2D result = new Rectangle2D.Double(0D, 0D,
-													this1ShapeBounds.getWidth(), this1ShapeBounds.getHeight());
-											endingScrollDirection.setValue(result,
-													startingScrollDirection.getValue(result)
-															+ startingScrollDirection.inwardsBy(buttonSize)
-															.orElseThrow(IllegalStateException::new));
+									double scrollbarLength = scrollAxis.getSize(ownerShapeBounds);
+									// COMMENT if the scrollbar length is too small, split the length into 2 evenly for both buttons
+									@SuppressWarnings({"AutoUnboxing", "MagicNumber"}) double buttonSize =
+											Math.min(owner1.getButtonSize().getValue(), scrollbarLength / 2D);
 
-											return result;
-										})
-										.orElseGet(Rectangle2D.Double::new)
-						)));
-		// COMMENT button 2, position limit of the thumb
-		this.button2Embed = new UIChildlessComponentEmbed<>(UIButtonComponent.class, suppressThisEscapedWarning(() -> this),
-				arguments.computeEmbedArgument(getEmbedButton2Name(),
-						arguments1 -> new UIButtonComponent(
-								thisReference.getOptional()
-										.<IUIComponentArguments>map(this1 -> {
-											String keyPrefix = UINamespaceUtilities.getUniqueInternalBindingNamespace(this1);
+									Rectangle2D result = new Rectangle2D.Double(0D, 0D,
+											ownerShapeBounds.getWidth(), ownerShapeBounds.getHeight());
+									buttonSideOpposite.setValue(result,
+											buttonSide.getValue(result)
+													+ buttonSide.inwardsBy(buttonSize)
+													.orElseThrow(IllegalStateException::new));
 
-											IIdentifier onActivateKey =
-													ImmutableIdentifier.of(keyPrefix,
-															getInternalBindingButtonActivatePrefix() + ".2");
-											IIdentifier onActivatedKey =
-													ImmutableIdentifier.of(keyPrefix,
-															getInternalBindingButtonActivatedPrefix() + ".2");
-											IIdentifier onCanceledKey =
-													ImmutableIdentifier.of(keyPrefix,
-															getInternalBindingButtonCanceledPrefix() + ".2");
-
-											IValueHolder<IUIComponentArguments> pointerArguments = DefaultValueHolder.of(arguments1);
-
-											if (UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
-													ImmutableMap.of(
-															UIButtonComponent.getMethodOnActivateIdentifier(),
-															() -> UIImmutablePropertyMappingValue.of(null, onActivateKey),
-															UIButtonComponent.getMethodOnActivatedIdentifier(),
-															() -> UIImmutablePropertyMappingValue.of(null, onActivatedKey),
-															UIButtonComponent.getMethodOnCanceledIdentifier(),
-															() -> UIImmutablePropertyMappingValue.of(null, onCanceledKey)
-													))) {
-												this1.getEmbedBindings()
-														.addAll(ImmutableList.of(
-																ImmutableBindingMethodDestination.of(UIButtonComponent.IUIEventActivate.class,
-																		onActivateKey,
-																		event -> thisReference.getOptional()
-																				.ifPresent(this2 -> this2.onButtonActivate(EnumScrollbarState.SCROLLING_FORWARD, event))),
-																ImmutableBindingMethodDestination.of(IUIEvent.class,
-																		onActivatedKey,
-																		event -> thisReference.getOptional()
-																				.ifPresent(this2 -> this2.onButtonFinish(EnumScrollbarState.SCROLLING_FORWARD, event))),
-																ImmutableBindingMethodDestination.of(IUIEvent.class,
-																		onCanceledKey,
-																		event -> thisReference.getOptional()
-																				.ifPresent(this2 -> this2.onButtonFinish(EnumScrollbarState.SCROLLING_FORWARD, event)))
-														));
-											}
-
-											return pointerArguments.getValue()
-													.orElseThrow(AssertionError::new);
-										}).orElse(arguments1)
-						),
-						new SupplierShapeDescriptor<>(() ->
-								thisReference.getOptional()
-										.map(this1 -> {
-											Shape this1Shape = IUIComponent.getShape(this1);
-											EnumUISide endingScrollDirection = this1.getScrollDirection().getValue();
-											EnumUISide startingScrollDirection = endingScrollDirection.getOpposite().orElseThrow(IllegalStateException::new);
-											@SuppressWarnings("AutoUnboxing") double buttonSize = this1.getButtonSize().getValue();
-
-											Rectangle2D this1ShapeBounds = this1Shape.getBounds2D();
-
-											Rectangle2D result = new Rectangle2D.Double(0D, 0D,
-													this1ShapeBounds.getWidth(), this1ShapeBounds.getHeight());
-											startingScrollDirection.setValue(result,
-													endingScrollDirection.getValue(result)
-															+ endingScrollDirection.inwardsBy(buttonSize)
-															.orElseThrow(IllegalStateException::new));
-
-											return result;
-										})
-										.orElseGet(Rectangle2D.Double::new)
-						)));
+									return result;
+								})
+								.orElseGet(Rectangle2D.Double::new)
+				));
 	}
 
 	public static IIdentifier getPropertyScrollDirectionIdentifier() {
@@ -509,9 +464,10 @@ public class UIScrollbarComponent
 	protected Iterable<? extends IUIComponentEmbed<?>> getComponentEmbeds() {
 		return Iterables.concat(super.getComponentEmbeds(),
 				ImmutableList.of(
-						getThumbEmbed(),
-						getButton1Embed(), getButton2Embed()
-				));
+						getThumbEmbed()
+				),
+				getButtonEmbeds().values()
+		);
 	}
 
 	@Override
@@ -605,41 +561,13 @@ public class UIScrollbarComponent
 		return thumbEmbed;
 	}
 
-	protected IUIComponentEmbed<? extends UIButtonComponent> getButton1Embed() {
-		return button1Embed;
-	}
-
-	protected IUIComponentEmbed<? extends UIButtonComponent> getButton2Embed() {
-		return button2Embed;
-	}
-
 	@Override
 	protected IUIRendererContainerContainer<IUIComponentRenderer<?>> getRendererContainerContainer() {
 		return rendererContainerContainer;
 	}
 
-	public enum EnumScrollbarState {
-		PULLING {
-			@Override
-			public double getDiff(double diff) {
-				return 0D;
-			}
-		},
-		SCROLLING_FORWARD {
-			@Override
-			public double getDiff(double diff) {
-				return diff;
-			}
-		},
-		SCROLLING_BACKWARD {
-			@Override
-			public double getDiff(double diff) {
-				return -diff;
-			}
-		},
-		;
-
-		public abstract double getDiff(double diff);
+	protected @Immutable Map<EnumScrollbarState, ? extends IUIComponentEmbed<? extends UIButtonComponent>> getButtonEmbeds() {
+		return buttonEmbeds;
 	}
 
 	public static class DefaultRenderer<C extends UIScrollbarComponent>
@@ -670,5 +598,49 @@ public class UIScrollbarComponent
 		protected Optional<? extends UIScrollbarComponent> getOwner() {
 			return owner.getOptional();
 		}
+	}
+
+	public enum EnumScrollbarState {
+		PULLING {
+			@Override
+			public double getDiff(double diff) {
+				return 0D;
+			}
+
+			@Override
+			public Optional<? extends EnumUISide> getButtonSide(EnumUISide scrollDirection) {
+				return Optional.empty();
+			}
+		},
+		SCROLLING_FORWARD {
+			@Override
+			public double getDiff(double diff) {
+				return diff;
+			}
+
+			@Override
+			public Optional<? extends EnumUISide> getButtonSide(EnumUISide scrollDirection) {
+				return Optional.of(scrollDirection);
+			}
+		},
+		SCROLLING_BACKWARD {
+			@Override
+			public double getDiff(double diff) {
+				return -diff;
+			}
+
+			@Override
+			public Optional<? extends EnumUISide> getButtonSide(EnumUISide scrollDirection) {
+				return Optional.of(
+						scrollDirection.getOpposite()
+								.orElseThrow(IllegalStateException::new)
+				);
+			}
+		},
+		;
+
+		public abstract double getDiff(double diff);
+
+		public abstract Optional<? extends EnumUISide> getButtonSide(EnumUISide scrollDirection);
 	}
 }
