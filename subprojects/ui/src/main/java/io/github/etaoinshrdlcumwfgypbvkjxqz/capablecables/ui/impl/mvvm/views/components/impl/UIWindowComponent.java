@@ -763,11 +763,12 @@ public class UIWindowComponent
 		if (updateThumbSize) {
 			for (EnumUIAxis axis : EnumUIAxis.values()) {
 				double thumbRelativeSize = axis.getSize(contentBounds) / axis.getSize(contentFullBounds);
-				if (Double.isNaN(thumbRelativeSize))
-					continue; // COMMENT the divisor is probably 0D, skip
-				Optional.ofNullable(getScrollbarThumbRelativeSizeMap().get(axis))
-						.ifPresent(scrollbarThumbRelativeSizeField ->
-								scrollbarThumbRelativeSizeField.setValue(suppressBoxing(thumbRelativeSize)));
+				if (Double.isFinite(thumbRelativeSize)) {
+					// COMMENT the divisor may be 0D
+					Optional.ofNullable(getScrollbarThumbRelativeSizeMap().get(axis))
+							.ifPresent(scrollbarThumbRelativeSizeField ->
+									scrollbarThumbRelativeSizeField.setValue(suppressBoxing(thumbRelativeSize)));
+				}
 			}
 		}
 
@@ -776,13 +777,14 @@ public class UIWindowComponent
 			for (EnumUIAxis axis : EnumUIAxis.values()) {
 				// COMMENT note that the scale is reversed, this can avoid another division which may result in another NaN
 				double contentBoundsReverseScale = axis.getSize(previousContentFullBounds) / axis.getSize(contentFullBounds);
-				if (Double.isNaN(contentBoundsReverseScale))
-					continue; // COMMENT the divisor is probably 0D, skip
-				Optional.ofNullable(getScrollRelativeProgressMap().get(axis))
-						.ifPresent(scrollRelativeProgressField ->
-								scrollRelativeProgressField.setValue(suppressBoxing(
-										suppressUnboxing(scrollRelativeProgressField.getValue()) * contentBoundsReverseScale
-								)));
+				if (Double.isFinite(contentBoundsReverseScale)) {
+					// COMMENT the divisor may be 0D
+					Optional.ofNullable(getScrollRelativeProgressMap().get(axis))
+							.ifPresent(scrollRelativeProgressField ->
+									scrollRelativeProgressField.setValue(suppressBoxing(
+											suppressUnboxing(scrollRelativeProgressField.getValue()) * contentBoundsReverseScale
+									)));
+				}
 			}
 		}
 	}
