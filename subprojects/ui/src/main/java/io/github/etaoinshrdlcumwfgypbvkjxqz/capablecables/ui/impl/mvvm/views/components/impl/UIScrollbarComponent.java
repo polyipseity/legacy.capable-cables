@@ -15,10 +15,12 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.embed.IUIComponentEmbed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventMouseWheel;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIComponentRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.UINamespaceUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.binding.UIImmutablePropertyMappingValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIAbstractEventListener;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.embed.UIChildlessComponentEmbed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.embed.UIComponentEmbedUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainerContainer;
@@ -43,7 +45,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.fields.RangedBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.methods.ImmutableBindingMethodDestination;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputPointerDevice;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IPointerDevice;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl.KeyboardDeviceUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.OptionalUtilities;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.jetbrains.annotations.NonNls;
@@ -53,6 +56,7 @@ import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.*;
@@ -646,5 +650,75 @@ public class UIScrollbarComponent
 		public abstract double getDiff(double diff);
 
 		public abstract Optional<? extends EnumUISide> getButtonSide(EnumUISide scrollDirection);
+	}
+
+	public static class FunctionalWheelEventListener<T extends UIScrollbarComponent>
+			extends UIAbstractEventListener<IUIEventMouseWheel> {
+		private final OptionalWeakReference<T> owner;
+		private final BiConsumer<@Nonnull ? super T, @Nonnull ? super IUIEventMouseWheel> action;
+
+		protected FunctionalWheelEventListener(T owner,
+		                                       BiConsumer<@Nonnull ? super T, @Nonnull ? super IUIEventMouseWheel> action) {
+			this.owner = OptionalWeakReference.of(owner);
+			this.action = action;
+		}
+
+		public static <T extends UIScrollbarComponent> FunctionalWheelEventListener<T> ofConventional(T owner, Supplier<@Nonnull ? extends OptionalDouble> deltaDivisorSupplier) {
+			return of(owner, (owner1, event) -> {
+				EnumUISide scrollDirection = owner1.getScrollDirection().getValue();
+				EnumUIAxis scrollAxis = scrollDirection.getAxis();
+
+				boolean scroll;
+				switch (scrollAxis) {
+					case X:
+						// COMMENT has keyboard and when shift mod is active
+						scroll = event.getViewContext().getInputDevices().getKeyboardDevice()
+								.filter(KeyboardDeviceUtilities::isShiftModifierActive)
+								.isPresent();
+						break;
+					case Y:
+						// COMMENT no keyboards or when shift mod is inactive
+						scroll = !event.getViewContext().getInputDevices().getKeyboardDevice()
+								.filter(KeyboardDeviceUtilities::isShiftModifierActive)
+								.isPresent();
+						break;
+					default:
+						throw new AssertionError();
+				}
+
+				if (scroll) {
+					IBindingField<Double> scrollRelativeProgressField = owner1.getScrollRelativeProgress();
+
+					@SuppressWarnings("AutoUnboxing") double scrollRelativeProgress = scrollRelativeProgressField.getValue();
+					// COMMENT scrolling down gives negative delta
+					double scrollRelativeProgressDiff = -event.getDelta() / deltaDivisorSupplier.get().orElse(0D); // COMMENT 0D cancels the scroll (non-finite)
+
+					if (Double.isFinite(scrollRelativeProgressDiff)) {
+						scrollRelativeProgressField.setValue(suppressBoxing(scrollRelativeProgress + scrollRelativeProgressDiff));
+						event.stopPropagation();
+					}
+				}
+			});
+		}
+
+		public static <T extends UIScrollbarComponent> FunctionalWheelEventListener<T> of(T owner,
+		                                                                                  BiConsumer<@Nonnull ? super T, @Nonnull ? super IUIEventMouseWheel> action) {
+			return new FunctionalWheelEventListener<>(owner, action);
+		}
+
+		@Override
+		protected void accept0(IUIEventMouseWheel event) {
+			getOwner()
+					.filter(IUIComponent::isActive)
+					.ifPresent(owner -> getAction().accept(owner, event));
+		}
+
+		protected Optional<? extends T> getOwner() {
+			return owner.getOptional();
+		}
+
+		protected BiConsumer<? super T, ? super IUIEventMouseWheel> getAction() {
+			return action;
+		}
 	}
 }

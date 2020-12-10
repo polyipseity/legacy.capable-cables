@@ -13,6 +13,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.embed.IUIComponentEmbed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventFocus;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventListener;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.IUIEventMouseWheel;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.events.types.EnumUIEventDOMType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIComponentRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
@@ -21,6 +23,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.UINamespaceUti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.binding.UIImmutablePropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIFunctionalEventListener;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIPhasedDelegatingEventListener;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.embed.UIAbstractComponentEmbed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.embed.UIChildlessComponentEmbed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.embed.UIComponentEmbedUtilities;
@@ -275,12 +278,24 @@ public class UIWindowComponent
 								thumbRelativeSizeMap)))
 				.build();
 
-		this.eventTargetListenersInitializer = new OneUseRunnable(() ->
-				addEventListener(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(), new UIFunctionalEventListener<IUIEventFocus>(e ->
-						getParent().ifPresent(parent ->
-								parent.moveChildToTop(this))
-				), true)
-		);
+		this.eventTargetListenersInitializer = new OneUseRunnable(() -> {
+			addEventListener(EnumUIEventDOMType.FOCUS_IN_POST.getEventType(), new UIFunctionalEventListener<IUIEventFocus>(e ->
+					getParent().ifPresent(parent ->
+							parent.moveChildToTop(this))
+			), true);
+			getScrollbarEmbeds().forEach((axis, scrollbarEmbed) -> {
+				IUIEventListener<IUIEventMouseWheel> conventionalListener =
+						UIScrollbarComponent.FunctionalWheelEventListener.ofConventional(scrollbarEmbed.getComponent(),
+								() -> thisReference.getOptional()
+										.map(UIWindowComponent::getWindowContentBounds)
+										.map(contentBounds -> OptionalDouble.of(axis.getSize(contentBounds)))
+										.orElseGet(OptionalDouble::empty)
+						);
+				addEventListener(EnumUIEventDOMType.WHEEL.getEventType(),
+						UIPhasedDelegatingEventListener.of(IUIEvent.EnumPhase.AT_TARGET, conventionalListener),
+						false);
+			});
+		});
 
 		this.scrollRelativeProgressMap = Maps.immutableEnumMap(scrollRelativeProgressMap);
 		this.scrollbarThumbRelativeSizeMap = Maps.immutableEnumMap(thumbRelativeSizeMap);
