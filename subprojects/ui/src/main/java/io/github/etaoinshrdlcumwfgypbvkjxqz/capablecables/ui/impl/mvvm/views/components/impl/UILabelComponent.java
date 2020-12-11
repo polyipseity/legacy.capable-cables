@@ -54,6 +54,7 @@ import java.awt.geom.Rectangle2D;
 import java.text.AttributedString;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.function.Supplier;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.*;
@@ -63,10 +64,10 @@ public class UILabelComponent
 	// COMMENT I do not think there is a need to implement vertical text...  Think of it, when was the last time you see some vertical text online?
 	public static final @NonNls String PROPERTY_TEXT = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.label.text";
 	public static final @NonNls String PROPERTY_AUTO_RESIZE = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.label.auto_resize";
-	public static final @NonNls String PROPERTY_SOFT_WARP = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.label.soft_warp";
+	public static final @NonNls String PROPERTY_OVERFLOW_POLICY = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.label.overflow_policy";
 	private static final IIdentifier PROPERTY_TEXT_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyText());
 	private static final IIdentifier PROPERTY_AUTO_RESIZE_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyAutoResize());
-	private static final IIdentifier PROPERTY_SOFT_WARP_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertySoftWarp());
+	private static final IIdentifier PROPERTY_OVERFLOW_POLICY_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyOverflowPolicy());
 
 	private final IUIRendererContainerContainer<IUIComponentRenderer<?>> rendererContainerContainer;
 
@@ -74,8 +75,8 @@ public class UILabelComponent
 	private final IBindingField<IAttributedText> text;
 	@UIProperty(PROPERTY_AUTO_RESIZE)
 	private final IBindingField<Boolean> autoResize;
-	@UIProperty(PROPERTY_SOFT_WARP)
-	private final IBindingField<Boolean> softWarp;
+	@UIProperty(PROPERTY_OVERFLOW_POLICY)
+	private final IBindingField<IOverflowPolicy> overflowPolicy; // COMMENT accepted type: CharSequence
 	@Nullable
 	private Dimension2D textDimension;
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
@@ -100,12 +101,14 @@ public class UILabelComponent
 				mappings.get(getPropertyTextIdentifier()));
 		this.autoResize = IUIPropertyMappingValue.createBindingField(Boolean.class, ConstantValue.of(suppressBoxing(true)),
 				mappings.get(getPropertyAutoResizeIdentifier()));
-		this.softWarp = IUIPropertyMappingValue.createBindingField(Boolean.class, ConstantValue.of(suppressBoxing(false)),
-				mappings.get(getPropertySoftWarpIdentifier()));
+		this.overflowPolicy = IUIPropertyMappingValue.createBindingField(IOverflowPolicy.class, ConstantValue.of(EnumOverflowPolicy.WARP),
+				mappings.get(getPropertyOverflowPolicyIdentifier()),
+				CharSequence.class,
+				mappingValue -> EnumOverflowPolicy.valueOf(mappingValue.toString()));
 
 		this.text.getField().getNotifier()
 				.subscribe(new TextDimensionInvalidatorDisposableObserver(suppressThisEscapedWarning(() -> this)));
-		this.softWarp.getField().getNotifier()
+		this.overflowPolicy.getField().getNotifier()
 				.subscribe(new TextDimensionInvalidatorDisposableObserver(suppressThisEscapedWarning(() -> this)));
 	}
 
@@ -125,8 +128,8 @@ public class UILabelComponent
 		return PROPERTY_AUTO_RESIZE_IDENTIFIER;
 	}
 
-	public static IIdentifier getPropertySoftWarpIdentifier() {
-		return PROPERTY_SOFT_WARP_IDENTIFIER;
+	public static IIdentifier getPropertyOverflowPolicyIdentifier() {
+		return PROPERTY_OVERFLOW_POLICY_IDENTIFIER;
 	}
 
 	public static @NonNls String getPropertyText() {
@@ -142,8 +145,8 @@ public class UILabelComponent
 		return rendererContainerContainer;
 	}
 
-	public static @NonNls String getPropertySoftWarp() {
-		return PROPERTY_SOFT_WARP;
+	public static @NonNls String getPropertyOverflowPolicy() {
+		return PROPERTY_OVERFLOW_POLICY;
 	}
 
 	protected IBindingField<Boolean> getAutoResize() {
@@ -181,56 +184,19 @@ public class UILabelComponent
 		}
 	}
 
-	public static class DefaultRenderer<C extends UILabelComponent>
-			extends UIDefaultComponentRenderer<C> {
-		@SuppressWarnings("UnstableApiUsage")
-		private final CachedTask<ITuple3<? extends AttributedString, ? extends FontRenderContext, ? extends Float>, Iterable<? extends TextLayout>> textLayoutTask =
-				new CachedTask<>(data -> {
-					float right = data.getRight();
-					return TextUtilities.separateLines(data.getLeft().getIterator()).stream()
-							.map(line -> new LineBreakMeasurer(TextUtilities.ensureNonEmpty(line), data.getMiddle()))
-							.map(line -> new TextUtilities.LineBreakMeasurerAsTextLayoutIterator(line, line1 -> line1.nextLayout(right)))
-							.flatMap(Streams::stream)
-							.collect(ImmutableList.toImmutableList());
-				}, Object::equals);
-
-		@UIRendererConstructor
-		public DefaultRenderer(IUIRendererArguments arguments) {
-			super(arguments);
-		}
-
-		@Override
-		public void render(IUIComponentContext context, EnumRenderStage stage) {
-			super.render(context, stage);
-			getContainer().ifPresent(container -> {
-				if (stage == EnumRenderStage.PRE_CHILDREN) {
-					Rectangle2D componentBounds = IUIComponent.getShape(container).getBounds2D();
-					try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
-						Point2D textPen = new Point2D.Double(componentBounds.getX(), componentBounds.getY());
-						float textWidth = FloatUtilities.saturatedCast(componentBounds.getWidth());
-						TextUtilities.drawLines(graphics, textPen, textWidth,
-								getTextLayoutTask().apply(ImmutableTuple3.of(container.getText().getValue().compile(), graphics.getFontRenderContext(), suppressBoxing(textWidth))));
-					}
-				}
-			});
-		}
-
-		protected CachedTask<? super ITuple3<? extends AttributedString, ? extends FontRenderContext, ? extends Float>, ? extends Iterable<? extends TextLayout>> getTextLayoutTask() {
-			return textLayoutTask;
-		}
-	}
-
 	@SuppressWarnings("UnstableApiUsage")
 	protected Dimension2D getTextDimension() {
 		@Nullable Dimension2D result = textDimension;
 		if (result == null) {
-			if (suppressUnboxing(getSoftWarp().getValue())) {
-				// COMMENT need to use super since 'AutoResizeShapeDescriptor' calls this method, there may a better way though...
-				float wrappingWidth = FloatUtilities.saturatedCast(super.getShapeDescriptor().getShapeOutput().getBounds2D().getWidth());
+			IOverflowPolicy overflowPolicy = getOverflowPolicy().getValue();
+			// COMMENT need to use super since 'AutoResizeShapeDescriptor' calls this method, there may a better way though...
+			OptionalDouble autoResizeTextWidth = overflowPolicy.getAutoResizeTextWidth(super.getShapeDescriptor());
+			if (autoResizeTextWidth.isPresent()) {
+				float autoResizeTextWidth1 = FloatUtilities.saturatedCast(autoResizeTextWidth.getAsDouble());
 				result = TextUtilities.getLinesDimension(
 						TextUtilities.separateLines(getText().getValue().compile().getIterator()).stream()
 								.map(line -> new LineBreakMeasurer(line, TextUtilities.getDefaultFontRenderContext())) // TODO proper frc
-								.map(line -> new TextUtilities.LineBreakMeasurerAsTextLayoutIterator(line, line1 -> line1.nextLayout(wrappingWidth)))
+								.map(line -> new TextUtilities.LineBreakMeasurerAsTextLayoutIterator(line, line1 -> line1.nextLayout(autoResizeTextWidth1)))
 								.flatMap(Streams::stream)
 								.collect(ImmutableList.toImmutableList())
 				);
@@ -246,8 +212,18 @@ public class UILabelComponent
 		return result;
 	}
 
-	protected IBindingField<Boolean> getSoftWarp() {
-		return softWarp;
+	protected IBindingField<IOverflowPolicy> getOverflowPolicy() {
+		return overflowPolicy;
+	}
+
+	@Override
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		super.initializeBindings(binderObserverSupplier);
+		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier, () ->
+				ImmutableBinderAction.bind(
+						getText(),
+						getAutoResize(), getOverflowPolicy()
+				));
 	}
 
 	@Override
@@ -260,24 +236,40 @@ public class UILabelComponent
 	}
 
 	@Override
-	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		super.initializeBindings(binderObserverSupplier);
-		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier, () ->
-				ImmutableBinderAction.bind(
-						getText(),
-						getAutoResize(), getSoftWarp()
-				));
-	}
-
-	@Override
 	public void cleanupBindings() {
 		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
 				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier, () ->
 						ImmutableBinderAction.unbind(
 								getText(),
-								getAutoResize(), getSoftWarp()
+								getAutoResize(), getOverflowPolicy()
 						)));
 		super.cleanupBindings();
+	}
+
+	public enum EnumOverflowPolicy
+			implements IOverflowPolicy {
+		WARP {
+			@Override
+			public OptionalDouble getAutoResizeTextWidth(IShapeDescriptor<?> originalShapeDescriptor) {
+				return OptionalDouble.of(originalShapeDescriptor.getShapeOutput().getBounds2D().getWidth()); // COMMENT do not resize
+			}
+
+			@Override
+			public OptionalDouble getRenderTextWidth(IShapeDescriptor<?> resizedShapeDescriptor) {
+				return OptionalDouble.of(resizedShapeDescriptor.getShapeOutput().getBounds2D().getWidth()); // COMMENT limit rendering within view
+			}
+		},
+		TRUNCATE {
+			@Override
+			public OptionalDouble getAutoResizeTextWidth(IShapeDescriptor<?> originalShapeDescriptor) {
+				return OptionalDouble.empty(); // COMMENT resize to match
+			}
+
+			@Override
+			public OptionalDouble getRenderTextWidth(IShapeDescriptor<?> resizedShapeDescriptor) {
+				return OptionalDouble.empty(); // COMMENT infinitely far is OK
+			}
+		},
 	}
 
 	public static class TextDimensionInvalidatorDisposableObserver
@@ -296,6 +288,62 @@ public class UILabelComponent
 
 		protected Optional<? extends UILabelComponent> getOwner() {
 			return owner.getOptional();
+		}
+	}
+
+	public interface IOverflowPolicy {
+		OptionalDouble getAutoResizeTextWidth(IShapeDescriptor<?> originalShapeDescriptor);
+
+		OptionalDouble getRenderTextWidth(IShapeDescriptor<?> resizedShapeDescriptor);
+	}
+
+	public static class DefaultRenderer<C extends UILabelComponent>
+			extends UIDefaultComponentRenderer<C> {
+		@SuppressWarnings("UnstableApiUsage")
+		private final CachedTask<ITuple3<? extends AttributedString, ? extends FontRenderContext, ? extends OptionalDouble>, Iterable<? extends TextLayout>> textLayoutTask =
+				new CachedTask<>(data -> {
+					OptionalDouble right = data.getRight();
+					if (right.isPresent()) {
+						float right1 = FloatUtilities.saturatedCast(right.getAsDouble());
+						return TextUtilities.separateLines(data.getLeft().getIterator()).stream()
+								.map(line -> new LineBreakMeasurer(TextUtilities.ensureNonEmpty(line), data.getMiddle()))
+								.map(line -> new TextUtilities.LineBreakMeasurerAsTextLayoutIterator(line, line1 -> line1.nextLayout(right1)))
+								.flatMap(Streams::stream)
+								.collect(ImmutableList.toImmutableList());
+					} else {
+						// COMMENT draw without limits
+						return TextUtilities.separateLines(data.getLeft().getIterator()).stream()
+								.map(line -> new TextLayout(TextUtilities.ensureNonEmpty(line), data.getMiddle()))
+								.collect(ImmutableList.toImmutableList());
+					}
+				}, Object::equals);
+
+		@UIRendererConstructor
+		public DefaultRenderer(IUIRendererArguments arguments) {
+			super(arguments);
+		}
+
+		@Override
+		public void render(IUIComponentContext context, EnumRenderStage stage) {
+			super.render(context, stage);
+			getContainer().ifPresent(container -> {
+				if (stage == EnumRenderStage.PRE_CHILDREN) {
+					IOverflowPolicy overflowPolicy = container.getOverflowPolicy().getValue();
+					Rectangle2D componentBounds = IUIComponent.getShape(container).getBounds2D();
+					double componentBoundsWidth = componentBounds.getWidth();
+
+					try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
+						Point2D textPen = new Point2D.Double(componentBounds.getX(), componentBounds.getY());
+						OptionalDouble textWidth = overflowPolicy.getRenderTextWidth(container.getShapeDescriptor());
+						TextUtilities.drawLines(graphics, textPen, componentBoundsWidth,
+								getTextLayoutTask().apply(ImmutableTuple3.of(container.getText().getValue().compile(), graphics.getFontRenderContext(), textWidth)));
+					}
+				}
+			});
+		}
+
+		protected CachedTask<? super ITuple3<? extends AttributedString, ? extends FontRenderContext, ? extends OptionalDouble>, ? extends Iterable<? extends TextLayout>> getTextLayoutTask() {
+			return textLayoutTask;
 		}
 	}
 }

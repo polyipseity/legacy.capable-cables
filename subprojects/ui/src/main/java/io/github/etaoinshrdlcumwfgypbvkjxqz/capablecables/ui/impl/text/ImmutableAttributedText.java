@@ -96,7 +96,7 @@ public final class ImmutableAttributedText
 				getChildren().stream()
 						.map(child -> child.mapBoth(Supplier::get, IAttributedText::compile))
 						.map(child -> IUnion.mapLeft(child, CharSequence::toString))
-						.map(child -> IUnion.mapLeft(child, childLeft -> childLeft.isEmpty() ? " " : childLeft)) // COMMENT empty strings are replaced with a space
+						.map(child -> IUnion.mapLeft(child, TextUtilities::ensureNonEmpty)) // COMMENT empty strings are replaced with a space
 						.collect(ImmutableList.toImmutableList())
 		);
 	}

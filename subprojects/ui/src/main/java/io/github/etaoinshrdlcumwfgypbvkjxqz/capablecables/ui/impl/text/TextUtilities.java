@@ -61,10 +61,6 @@ public enum TextUtilities {
 		return ImmutableSet.copyOf(LINE_SEPARATORS);
 	}
 
-	public static AttributedCharacterIterator ensureNonEmpty(AttributedCharacterIterator text) {
-		return isEmpty(text) ? getEmptyAttributedText().compile().getIterator() : text;
-	}
-
 	public static boolean isEmpty(CharacterIterator text) {
 		return text.getEndIndex() == text.getBeginIndex();
 	}
@@ -75,6 +71,15 @@ public enum TextUtilities {
 
 	public static CharacterIterator ensureNonEmpty(CharacterIterator text) {
 		return isEmpty(text) ? getEmptyAttributedText().compile().getIterator() : text;
+	}
+
+	public static AttributedCharacterIterator ensureNonEmpty(AttributedCharacterIterator text) {
+		return isEmpty(text) ? getEmptyAttributedText().compile().getIterator() : text;
+	}
+
+	public static String ensureNonEmpty(CharSequence text) {
+		String text1 = text.toString();
+		return text1.isEmpty() ? " " : text1;
 	}
 
 	public static void drawLines(Graphics2D graphics, Point2D position, double width, Iterable<? extends TextLayout> lines) {
