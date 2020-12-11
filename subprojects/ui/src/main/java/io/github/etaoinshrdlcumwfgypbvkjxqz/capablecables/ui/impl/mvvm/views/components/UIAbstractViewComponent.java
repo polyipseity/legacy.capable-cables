@@ -486,7 +486,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		}
 	}
 
-	protected static class ComponentHierarchyChangeParentObserver
+	public static class ComponentHierarchyChangeParentObserver
 			extends LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent> {
 		private final OptionalWeakReference<UIAbstractViewComponent<?, ?>> owner;
 

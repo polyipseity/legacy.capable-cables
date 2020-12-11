@@ -51,7 +51,7 @@ public class UIShapeComponent
 		return rendererContainerContainer;
 	}
 
-	protected static class DefaultRenderer<C extends UIShapeComponent>
+	public static class DefaultRenderer<C extends UIShapeComponent>
 			extends UIDefaultComponentRenderer<C> {
 		public static final @NonNls String PROPERTY_FILLED_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.shape.color.filled";
 		public static final @NonNls String PROPERTY_BORDER_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.shape.color.border";

@@ -79,7 +79,7 @@ public class EventBusSubject
 	@Override
 	public void onComplete() { throw new UnsupportedOperationException(); }
 
-	protected static class EventBusForgeDisposable
+	public static class EventBusForgeDisposable
 			implements Disposable {
 		private final AtomicBoolean disposed = new AtomicBoolean();
 		private final IEventBus owner;

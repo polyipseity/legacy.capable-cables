@@ -149,7 +149,7 @@ public class UILabelComponent
 		return autoResize;
 	}
 
-	protected static class AutoResizeShapeDescriptor
+	public static class AutoResizeShapeDescriptor
 			extends AbstractDelegatingShapeDescriptor<Shape, IShapeDescriptor<?>> {
 		private final OptionalWeakReference<UILabelComponent> owner;
 
@@ -180,7 +180,7 @@ public class UILabelComponent
 		}
 	}
 
-	protected static class TextBindingField
+	public static class TextBindingField
 			extends DelegatingBindingField<IAttributedText> {
 		private final OptionalWeakReference<UILabelComponent> owner;
 

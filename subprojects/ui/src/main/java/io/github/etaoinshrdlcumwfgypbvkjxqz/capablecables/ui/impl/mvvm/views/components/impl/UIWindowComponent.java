@@ -668,7 +668,7 @@ public class UIWindowComponent
 		}
 	}
 
-	protected static class ModifyShapeDescriptorObserver
+	public static class ModifyShapeDescriptorObserver
 			extends LoggingDisposableObserver<UIComponentModifyShapeDescriptorBusEvent> {
 		private final OptionalWeakReference<UIWindowComponent> owner;
 

@@ -219,7 +219,7 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 		IUIActiveLifecycle.cleanupV(getView());
 	}
 
-	protected static final class BinderActionDisposableObserver
+	public static class BinderActionDisposableObserver
 			extends LoggingDisposableObserver<IBinderAction> {
 		private final OptionalWeakReference<IBinder> binder;
 		private final OptionalWeakReference<CompositeDisposable> binderDisposables;

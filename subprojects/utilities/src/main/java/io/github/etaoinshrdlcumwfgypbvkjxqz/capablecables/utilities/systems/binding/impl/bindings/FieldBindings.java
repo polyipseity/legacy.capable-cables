@@ -8,6 +8,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilitie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingConsumer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
@@ -48,7 +49,7 @@ public class FieldBindings
 			throws NoSuchBindingTransformerException {
 		return stripBool(
 				Streams.stream(fields) // COMMENT sequential, field binding order matters
-						.filter(key -> !getFields().containsKey(key))
+						.filter(FunctionUtilities.notPredicate(getFields()::containsKey))
 						.mapToInt(field -> {
 							getFields().keySet().stream().unordered()
 									.findAny()

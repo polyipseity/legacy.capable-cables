@@ -19,8 +19,6 @@ import java.util.stream.Collector;
 
 public abstract class CompositeDisposableCollector<DC extends Disposable & DisposableContainer>
 		implements Collector<Disposable, DC, Disposable> {
-	protected CompositeDisposableCollector() {}
-
 	public static Collector<Disposable, ?, Disposable> collect(boolean ordered) { return ordered ? ListCompositeDisposableCollector.getInstance() : SetCompositeDisposableCollector.getInstance(); }
 
 	@Override
@@ -29,7 +27,7 @@ public abstract class CompositeDisposableCollector<DC extends Disposable & Dispo
 	@Override
 	public Function<@Nonnull DC, @Nonnull Disposable> finisher() { return CastUtilities::upcast; }
 
-	protected static class SetCompositeDisposableCollector
+	public static class SetCompositeDisposableCollector
 			extends CompositeDisposableCollector<CompositeDisposable> {
 		private static final Supplier<@Nonnull SetCompositeDisposableCollector> INSTANCE = Suppliers.memoize(SetCompositeDisposableCollector::new);
 		private static final ImmutableSet<Characteristics> CHARACTERISTICS = Sets.immutableEnumSet(Characteristics.IDENTITY_FINISH, Characteristics.UNORDERED);
@@ -49,7 +47,7 @@ public abstract class CompositeDisposableCollector<DC extends Disposable & Dispo
 		protected static ImmutableSet<Characteristics> getCharacteristics() { return CHARACTERISTICS; }
 	}
 
-	protected static class ListCompositeDisposableCollector
+	public static class ListCompositeDisposableCollector
 			extends CompositeDisposableCollector<ListCompositeDisposable> {
 		private static final Supplier<@Nonnull ListCompositeDisposableCollector> INSTANCE = Suppliers.memoize(ListCompositeDisposableCollector::new);
 		private static final ImmutableSet<Characteristics> CHARACTERISTICS = Sets.immutableEnumSet(Characteristics.IDENTITY_FINISH);

@@ -189,8 +189,7 @@ public class WrenchItem extends Item {
 		}
 	}
 
-
-	protected static class Tag implements INBTSerializable<CompoundNBT> {
+	public static class Tag implements INBTSerializable<CompoundNBT> {
 		@Nullable
 		private CompoundNBT pickedUpBlock;
 		@Nullable

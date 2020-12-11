@@ -28,32 +28,12 @@ public class NamedNodeMapMap
 
 	public static NamedNodeMapMap wrap(NamedNodeMap delegated) { return new NamedNodeMapMap(delegated); }
 
-	protected static class EntryThis
-			implements Entry<String, Node> {
-		private final Map<String, Node> parent;
-		@Nullable
-		private final String key;
-
-		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-		public EntryThis(Map<String, Node> parent, @Nullable String key) {
-			this.parent = parent;
-			this.key = key;
-		}
-
-		@Nullable
-		@Override
-		public String getKey() { return key; }
-
-		@Nullable
-		@Override
-		public Node getValue() { return getParent().get(getKey()); }
-
-		@Nullable
-		@Override
-		public Node setValue(Node value) { return getParent().put(getKey(), value); }
-
-		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
-		protected Map<String, Node> getParent() { return parent; }
+	@SuppressWarnings("UnstableApiUsage")
+	@Override
+	public @Nonnull Set<Entry<String, Node>> entrySet() {
+		return keySet().stream().unordered()
+				.map(k -> new InternalEntry(this, k))
+				.collect(ImmutableSet.toImmutableSet());
 	}
 
 	@Override
@@ -131,9 +111,33 @@ public class NamedNodeMapMap
 	@Override
 	public @Nonnull Collection<Node> values() { return getAsList(); }
 
-	@SuppressWarnings("UnstableApiUsage")
-	@Override
-	public @Nonnull Set<Entry<String, Node>> entrySet() { return keySet().stream().unordered().map(k -> new EntryThis(this, k)).collect(ImmutableSet.toImmutableSet()); }
+	protected static class InternalEntry
+			implements Entry<String, Node> {
+		private final Map<String, Node> parent;
+		@Nullable
+		private final String key;
+
+		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+		public InternalEntry(Map<String, Node> parent, @Nullable String key) {
+			this.parent = parent;
+			this.key = key;
+		}
+
+		@Nullable
+		@Override
+		public String getKey() { return key; }
+
+		@Nullable
+		@Override
+		public Node getValue() { return getParent().get(getKey()); }
+
+		@Nullable
+		@Override
+		public Node setValue(Node value) { return getParent().put(getKey(), value); }
+
+		@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
+		protected Map<String, Node> getParent() { return parent; }
+	}
 
 	protected static String[] splitString(String string) { return string.split(Pattern.quote(":")); }
 
