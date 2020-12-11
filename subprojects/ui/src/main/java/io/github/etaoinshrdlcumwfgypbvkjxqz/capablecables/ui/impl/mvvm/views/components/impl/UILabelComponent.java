@@ -1,5 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl;
 
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
@@ -24,7 +26,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.descrip
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.text.TextUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CachedTask;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.FloatUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.DefaultDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple3;
@@ -36,7 +40,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.fields.DelegatingBindingField;
+import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.jetbrains.annotations.NonNls;
 
@@ -56,19 +60,32 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Suppr
 
 public class UILabelComponent
 		extends UIDefaultComponent {
-	public static final @NonNls String PROPERTY_TEXT = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.text";
-	public static final @NonNls String PROPERTY_AUTO_RESIZE = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.auto_resize";
+	// COMMENT I do not think there is a need to implement vertical text...  Think of it, when was the last time you see some vertical text online?
+	public static final @NonNls String PROPERTY_TEXT = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.label.text";
+	public static final @NonNls String PROPERTY_AUTO_RESIZE = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.label.auto_resize";
+	public static final @NonNls String PROPERTY_SOFT_WARP = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.label.soft_warp";
 	private static final IIdentifier PROPERTY_TEXT_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyText());
 	private static final IIdentifier PROPERTY_AUTO_RESIZE_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyAutoResize());
+	private static final IIdentifier PROPERTY_SOFT_WARP_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertySoftWarp());
 
 	private final IUIRendererContainerContainer<IUIComponentRenderer<?>> rendererContainerContainer;
 
 	@UIProperty(PROPERTY_TEXT)
 	private final IBindingField<IAttributedText> text;
-	@UIProperty(PROPERTY_TEXT)
+	@UIProperty(PROPERTY_AUTO_RESIZE)
 	private final IBindingField<Boolean> autoResize;
+	@UIProperty(PROPERTY_SOFT_WARP)
+	private final IBindingField<Boolean> softWarp;
 	@Nullable
 	private Dimension2D textDimension;
+	@SuppressWarnings("ThisEscapedInObjectConstruction")
+	private final LoadingCache<IShapeDescriptor<?>, IShapeDescriptor<?>> autoResizeShapeDescriptorCache =
+			CacheUtilities.newCacheBuilderSingleThreaded().weakKeys().build(
+					CacheLoader.from(shapeDescriptor -> {
+						assert shapeDescriptor != null;
+						return new AutoResizeShapeDescriptor(this, shapeDescriptor);
+					})
+			);
 
 	@UIComponentConstructor
 	public UILabelComponent(IUIComponentArguments arguments) {
@@ -79,37 +96,17 @@ public class UILabelComponent
 						CastUtilities.castUnchecked(DefaultRenderer.class));
 
 		@Immutable Map<IIdentifier, ? extends IUIPropertyMappingValue> mappings = arguments.getMappingsView();
-		this.text = new TextBindingField(suppressThisEscapedWarning(() -> this),
-				IUIPropertyMappingValue.createBindingField(IAttributedText.class, ConstantValue.of(TextUtilities.getEmptyAttributedText()), mappings.get(getPropertyTextIdentifier())));
-		this.autoResize = IUIPropertyMappingValue.createBindingField(Boolean.class, ConstantValue.of(suppressBoxing(true)), mappings.get(getPropertyAutoResizeIdentifier()));
-	}
+		this.text = IUIPropertyMappingValue.createBindingField(IAttributedText.class, ConstantValue.of(TextUtilities.getEmptyAttributedText()),
+				mappings.get(getPropertyTextIdentifier()));
+		this.autoResize = IUIPropertyMappingValue.createBindingField(Boolean.class, ConstantValue.of(suppressBoxing(true)),
+				mappings.get(getPropertyAutoResizeIdentifier()));
+		this.softWarp = IUIPropertyMappingValue.createBindingField(Boolean.class, ConstantValue.of(suppressBoxing(false)),
+				mappings.get(getPropertySoftWarpIdentifier()));
 
-	public static IIdentifier getPropertyTextIdentifier() {
-		return PROPERTY_TEXT_IDENTIFIER;
-	}
-
-	public static IIdentifier getPropertyAutoResizeIdentifier() {
-		return PROPERTY_AUTO_RESIZE_IDENTIFIER;
-	}
-
-	public static String getPropertyText() {
-		return PROPERTY_TEXT;
-	}
-
-	public static String getPropertyAutoResize() {
-		return PROPERTY_AUTO_RESIZE;
-	}
-
-	@SuppressWarnings("UnstableApiUsage")
-	protected Dimension2D getTextDimension() {
-		@Nullable Dimension2D result = textDimension;
-		if (result == null)
-			result = textDimension = TextUtilities.getLinesDimension(
-					TextUtilities.separateLines(getText().getValue().compile().getIterator()).stream()
-							.map(line -> new TextLayout(line, TextUtilities.getDefaultFontRenderContext())) // TODO proper frc
-							.collect(ImmutableList.toImmutableList())
-			);
-		return result;
+		this.text.getField().getNotifier()
+				.subscribe(new TextDimensionInvalidatorDisposableObserver(suppressThisEscapedWarning(() -> this)));
+		this.softWarp.getField().getNotifier()
+				.subscribe(new TextDimensionInvalidatorDisposableObserver(suppressThisEscapedWarning(() -> this)));
 	}
 
 	protected IBindingField<IAttributedText> getText() {
@@ -120,29 +117,33 @@ public class UILabelComponent
 		textDimension = null;
 	}
 
-	@Override
-	public IShapeDescriptor<?> getShapeDescriptor() {
-		return new AutoResizeShapeDescriptor(this, super.getShapeDescriptor());
+	public static IIdentifier getPropertyTextIdentifier() {
+		return PROPERTY_TEXT_IDENTIFIER;
 	}
 
-	@Override
-	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		super.initializeBindings(binderObserverSupplier);
-		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier, () ->
-				ImmutableBinderAction.bind(getText()));
+	public static IIdentifier getPropertyAutoResizeIdentifier() {
+		return PROPERTY_AUTO_RESIZE_IDENTIFIER;
 	}
 
-	@Override
-	public void cleanupBindings() {
-		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
-				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier, () ->
-						ImmutableBinderAction.unbind(getText())));
-		super.cleanupBindings();
+	public static IIdentifier getPropertySoftWarpIdentifier() {
+		return PROPERTY_SOFT_WARP_IDENTIFIER;
+	}
+
+	public static @NonNls String getPropertyText() {
+		return PROPERTY_TEXT;
+	}
+
+	public static @NonNls String getPropertyAutoResize() {
+		return PROPERTY_AUTO_RESIZE;
 	}
 
 	@Override
 	public IUIRendererContainerContainer<IUIComponentRenderer<?>> getRendererContainerContainer() {
 		return rendererContainerContainer;
+	}
+
+	public static @NonNls String getPropertySoftWarp() {
+		return PROPERTY_SOFT_WARP;
 	}
 
 	protected IBindingField<Boolean> getAutoResize() {
@@ -177,26 +178,6 @@ public class UILabelComponent
 		@Override
 		public boolean isDynamic() {
 			return true;
-		}
-	}
-
-	public static class TextBindingField
-			extends DelegatingBindingField<IAttributedText> {
-		private final OptionalWeakReference<UILabelComponent> owner;
-
-		public TextBindingField(UILabelComponent owner, IBindingField<IAttributedText> delegate) {
-			super(delegate);
-			this.owner = OptionalWeakReference.of(owner);
-		}
-
-		@Override
-		public void setValue(IAttributedText value) {
-			getOwner().ifPresent(UILabelComponent::invalidateTextDimension);
-			super.setValue(value);
-		}
-
-		protected Optional<? extends UILabelComponent> getOwner() {
-			return owner.getOptional();
 		}
 	}
 
@@ -236,6 +217,85 @@ public class UILabelComponent
 
 		protected CachedTask<? super ITuple3<? extends AttributedString, ? extends FontRenderContext, ? extends Float>, ? extends Iterable<? extends TextLayout>> getTextLayoutTask() {
 			return textLayoutTask;
+		}
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	protected Dimension2D getTextDimension() {
+		@Nullable Dimension2D result = textDimension;
+		if (result == null) {
+			if (suppressUnboxing(getSoftWarp().getValue())) {
+				// COMMENT need to use super since 'AutoResizeShapeDescriptor' calls this method, there may a better way though...
+				float wrappingWidth = FloatUtilities.saturatedCast(super.getShapeDescriptor().getShapeOutput().getBounds2D().getWidth());
+				result = TextUtilities.getLinesDimension(
+						TextUtilities.separateLines(getText().getValue().compile().getIterator()).stream()
+								.map(line -> new LineBreakMeasurer(line, TextUtilities.getDefaultFontRenderContext())) // TODO proper frc
+								.map(line -> new TextUtilities.LineBreakMeasurerAsTextLayoutIterator(line, line1 -> line1.nextLayout(wrappingWidth)))
+								.flatMap(Streams::stream)
+								.collect(ImmutableList.toImmutableList())
+				);
+			} else {
+				result = TextUtilities.getLinesDimension(
+						TextUtilities.separateLines(getText().getValue().compile().getIterator()).stream()
+								.map(line -> new TextLayout(line, TextUtilities.getDefaultFontRenderContext())) // TODO proper frc
+								.collect(ImmutableList.toImmutableList())
+				);
+			}
+			textDimension = result;
+		}
+		return result;
+	}
+
+	protected IBindingField<Boolean> getSoftWarp() {
+		return softWarp;
+	}
+
+	@Override
+	public IShapeDescriptor<?> getShapeDescriptor() {
+		return getAutoResizeShapeDescriptorCache().getUnchecked(super.getShapeDescriptor());
+	}
+
+	protected LoadingCache<IShapeDescriptor<?>, IShapeDescriptor<?>> getAutoResizeShapeDescriptorCache() {
+		return autoResizeShapeDescriptorCache;
+	}
+
+	@Override
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+		super.initializeBindings(binderObserverSupplier);
+		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier, () ->
+				ImmutableBinderAction.bind(
+						getText(),
+						getAutoResize(), getSoftWarp()
+				));
+	}
+
+	@Override
+	public void cleanupBindings() {
+		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
+				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier, () ->
+						ImmutableBinderAction.unbind(
+								getText(),
+								getAutoResize(), getSoftWarp()
+						)));
+		super.cleanupBindings();
+	}
+
+	public static class TextDimensionInvalidatorDisposableObserver
+			extends DefaultDisposableObserver<Object> {
+		private final OptionalWeakReference<UILabelComponent> owner;
+
+		public TextDimensionInvalidatorDisposableObserver(UILabelComponent owner) {
+			this.owner = OptionalWeakReference.of(owner);
+		}
+
+		@Override
+		public void onNext(@NonNull Object o) {
+			super.onNext(o);
+			getOwner().ifPresent(UILabelComponent::invalidateTextDimension);
+		}
+
+		protected Optional<? extends UILabelComponent> getOwner() {
+			return owner.getOptional();
 		}
 	}
 }

@@ -85,7 +85,7 @@
 			<component class="component.label" name="Window1Label" rendererName="Window1LabelRenderer">
 				<shape class="shape.rectangle" width="200" height="50"/>
 
-				<property key="default:property.text">
+				<property key="default:property.label.text">
 					<attributedText>
 						<map>
 							<entry>
