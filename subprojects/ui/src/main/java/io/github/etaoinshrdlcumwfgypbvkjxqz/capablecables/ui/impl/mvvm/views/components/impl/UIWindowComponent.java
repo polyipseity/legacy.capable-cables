@@ -215,9 +215,9 @@ public class UIWindowComponent
 															if (UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
 																	ImmutableMap.of(
 																			UIButtonComponent.getMethodOnActivateIdentifier(),
-																			() -> UIImmutablePropertyMappingValue.of(null, onActivateKey),
+																			() -> UIImmutablePropertyMappingValue.ofKey(onActivateKey),
 																			UIButtonComponent.getMethodOnActivatedIdentifier(),
-																			() -> UIImmutablePropertyMappingValue.of(null, onActivatedKey)
+																			() -> UIImmutablePropertyMappingValue.ofKey(onActivatedKey)
 																	))) {
 																this1.getEmbedBindings()
 																		.addAll(ImmutableList.of(
@@ -394,15 +394,15 @@ public class UIWindowComponent
 									UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
 											ImmutableMap.of(
 													UIScrollbarComponent.getPropertyScrollDirectionIdentifier(),
-													() -> UIImmutablePropertyMappingValue.of(UIScrollbarComponent.getAxisToConventionalDirectionMap().get(axis), null)
+													() -> UIImmutablePropertyMappingValue.ofValue(UIScrollbarComponent.getAxisToConventionalDirectionMap().get(axis))
 											));
 
 									if (UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
 											ImmutableMap.of(
 													UIScrollbarComponent.getPropertyScrollRelativeProgressIdentifier(),
-													() -> UIImmutablePropertyMappingValue.of(null, scrollRelativeProgressKey),
+													() -> UIImmutablePropertyMappingValue.ofKey(scrollRelativeProgressKey),
 													UIScrollbarComponent.getPropertyThumbRelativeSizeIdentifier(),
-													() -> UIImmutablePropertyMappingValue.of(null, thumbRelativeSizeKey)
+													() -> UIImmutablePropertyMappingValue.ofKey(thumbRelativeSizeKey)
 											))) {
 										IBindingField<Double> scrollRelativeProgressField =
 												ImmutableBindingField.of(scrollRelativeProgressKey,

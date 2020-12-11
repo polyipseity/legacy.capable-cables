@@ -198,11 +198,11 @@ public class UIScrollbarComponent
 											if (UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
 													ImmutableMap.of(
 															UIButtonComponent.getMethodOnActivateIdentifier(),
-															() -> UIImmutablePropertyMappingValue.of(null, onActivateKey),
+															() -> UIImmutablePropertyMappingValue.ofKey(onActivateKey),
 															UIButtonComponent.getMethodOnActivatedIdentifier(),
-															() -> UIImmutablePropertyMappingValue.of(null, onActivatedKey),
+															() -> UIImmutablePropertyMappingValue.ofKey(onActivatedKey),
 															UIButtonComponent.getMethodOnCanceledIdentifier(),
-															() -> UIImmutablePropertyMappingValue.of(null, onCanceledKey)
+															() -> UIImmutablePropertyMappingValue.ofKey(onCanceledKey)
 													))) {
 												this1.getEmbedBindings()
 														.addAll(ImmutableList.of(
@@ -302,11 +302,11 @@ public class UIScrollbarComponent
 									if (UIComponentEmbedUtilities.withMappingsIfUndefined(pointerArguments,
 											ImmutableMap.of(
 													UIButtonComponent.getMethodOnActivateIdentifier(),
-													() -> UIImmutablePropertyMappingValue.of(null, onActivateKey),
+													() -> UIImmutablePropertyMappingValue.ofKey(onActivateKey),
 													UIButtonComponent.getMethodOnActivatedIdentifier(),
-													() -> UIImmutablePropertyMappingValue.of(null, onActivatedKey),
+													() -> UIImmutablePropertyMappingValue.ofKey(onActivatedKey),
 													UIButtonComponent.getMethodOnCanceledIdentifier(),
-													() -> UIImmutablePropertyMappingValue.of(null, onCanceledKey)
+													() -> UIImmutablePropertyMappingValue.ofKey(onCanceledKey)
 											))) {
 										owner1.getEmbedBindings()
 												.addAll(ImmutableList.of(

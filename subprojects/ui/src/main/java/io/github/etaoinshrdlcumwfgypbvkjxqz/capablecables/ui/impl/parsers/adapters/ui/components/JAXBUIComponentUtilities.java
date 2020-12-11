@@ -190,7 +190,7 @@ public enum JAXBUIComponentUtilities {
 					assert key != null;
 					assert value != null;
 					attributes.put(key.getEventType(),
-							UIImmutablePropertyMappingValue.of(null,
+							UIImmutablePropertyMappingValue.ofKey(
 									AssertionUtilities.assertNonnull(value.apply(component))
 											.map(IUIEventType.StaticHolder.getDefaultPrefix()::concat)
 											.map(ImmutableIdentifier::ofInterning)

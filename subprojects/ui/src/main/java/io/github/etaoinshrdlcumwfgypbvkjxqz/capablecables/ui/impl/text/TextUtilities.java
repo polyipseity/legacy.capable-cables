@@ -1,7 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.text;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
@@ -12,9 +11,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.text.IAttribut
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.FloatUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.DoubleDimension2D;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableUnion;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
@@ -53,10 +50,7 @@ public enum TextUtilities {
 				.collect(ImmutableSet.toImmutableSet());
 		DEFAULT_FONT = new Font(null);
 		DEFAULT_FONT_RENDER_CONTEXT = new FontRenderContext(AffineTransformUtilities.getIdentity(), RenderingHints.VALUE_TEXT_ANTIALIAS_DEFAULT, RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
-		EMPTY_ATTRIBUTED_TEXT = ImmutableAttributedText.of(
-				ImmutableList.of(ImmutableUnion.ofLeft(ConstantValue.of(" "))), // COMMENT the string cannot be empty
-				ImmutableMap.of()
-		);
+		EMPTY_ATTRIBUTED_TEXT = ImmutableAttributedText.ofCharSequence("");
 	}
 
 	public static FontRenderContext getDefaultFontRenderContext() {

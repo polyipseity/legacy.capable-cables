@@ -21,6 +21,14 @@ public final class UIImmutablePropertyMappingValue implements IUIPropertyMapping
 		return new UIImmutablePropertyMappingValue(defaultValue, bindingKey);
 	}
 
+	public static UIImmutablePropertyMappingValue ofValue(@Nullable Object value) {
+		return of(value, null);
+	}
+
+	public static UIImmutablePropertyMappingValue ofKey(@Nullable IIdentifier bindingKey) {
+		return of(null, bindingKey);
+	}
+
 	@Override
 	public Optional<? extends IIdentifier> getBindingKey() { return Optional.ofNullable(bindingKey); }
 

@@ -8,6 +8,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.text.IAttributedText;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.IUnion;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableUnion;
 
 import java.text.AttributedCharacterIterator;
 import java.text.AttributedString;
@@ -52,6 +54,18 @@ public final class ImmutableAttributedText
 		this.attributes = ImmutableMap.copyOf(attributes);
 	}
 
+	public static ImmutableAttributedText ofCharSequence(CharSequence charSequence) {
+		return ofCharSequenceSupplier(ConstantValue.of(charSequence));
+	}
+
+	public static ImmutableAttributedText ofCharSequenceSupplier(Supplier<? extends CharSequence> charSequenceSupplier) {
+		return ofChildren(ImmutableList.of(ImmutableUnion.ofLeft(charSequenceSupplier)));
+	}
+
+	public static ImmutableAttributedText ofChildren(Iterable<? extends IUnion<? extends Supplier<? extends CharSequence>, ? extends IAttributedText>> children) {
+		return of(children, ImmutableMap.of());
+	}
+
 	public static ImmutableAttributedText of(Iterable<? extends IUnion<? extends Supplier<? extends CharSequence>, ? extends IAttributedText>> children,
 	                                         Map<? extends AttributedCharacterIterator.Attribute, ?> attributes) {
 		return new ImmutableAttributedText(children, attributes);
@@ -82,6 +96,7 @@ public final class ImmutableAttributedText
 				getChildren().stream()
 						.map(child -> child.mapBoth(Supplier::get, IAttributedText::compile))
 						.map(child -> IUnion.mapLeft(child, CharSequence::toString))
+						.map(child -> IUnion.mapLeft(child, childLeft -> childLeft.isEmpty() ? " " : childLeft)) // COMMENT empty strings are replaced with a space
 						.collect(ImmutableList.toImmutableList())
 		);
 	}
