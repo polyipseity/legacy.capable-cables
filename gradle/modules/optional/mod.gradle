@@ -1,0 +1,60 @@
+//////////////////////////////////////////////////
+// TITLE Mod
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply.call(['stringToStringList'])
+
+archivesBaseName = rootProject.name
+
+minecraft {
+	// Default run configurations.
+	// These can be tweaked, removed, or duplicated as needed.
+	runs {
+		client {
+			// Recommended logging data for a userdev environment
+			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+			// Recommended logging level for the console
+			property 'forge.logging.console.level', 'debug'
+		}
+
+		server {
+			// Recommended logging data for a userdev environment
+			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+			// Recommended logging level for the console
+			property 'forge.logging.console.level', 'debug'
+		}
+
+		data {
+			// Recommended logging data for a userdev environment
+			property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+			// Recommended logging level for the console
+			property 'forge.logging.console.level', 'debug'
+
+			args '--mod', modID, '--all', '--output', file('src/generated/resources/')
+		}
+	}
+
+	afterEvaluate {
+		runs.configureEach {
+			workingDirectory file(minecraftRunDirectory)
+			if (project != rootProject) ideaModule "${rootProject.name}${project.path.replace ':', '.'}.main"
+			jvmArgs stringToStringList.call(minecraftJvmArguments) as List<String>
+
+			mods.create(modID) {
+				source sourceSets.main
+
+				configurations.runtimeClasspath.allDependencies.each { dependency ->
+					// COMMENT Add non-mod modules for correct classloading behavior
+					if (dependency instanceof ProjectDependency)
+						source dependency.dependencyProject.sourceSets.main as SourceSet
+				}
+			}
+		}
+	}
+}

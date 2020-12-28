@@ -1,0 +1,59 @@
+//////////////////////////////////////////////////
+// TITLE Gradle Build Script
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+apply from: "$utilitiesDir${separator}throwable.gradle"
+apply from: "$utilitiesDir${separator}io${separator}io.gradle"
+
+apply from: "$modulesDir${separator}optional${separator}generated.gradle"
+apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
+apply from: "$modulesDir${separator}optional${separator}jaxb.gradle"
+apply from: "$modulesDir${separator}optional${separator}publishing.gradle"
+
+def moduleName = 'UI'
+def compileJava = tasks.named 'compileJava'
+
+// COMMENT JAXB
+dependencies {
+	// TODO jaxb 'codes.rafael.xjc:nullsafe:1.1'
+	jaxb files('libs/nullsafe-1.2-SNAPSHOT.jar')
+}
+File xjcMainUIGeneratedDir = file "${getGeneratedDirectory.call 'main'}${separator}xjc_ui"
+CharSequence xjcMainUIContextPath = "${jaxbPackagePrefix}.ui"
+sourceSets.main.java.srcDir xjcMainUIGeneratedDir
+def xjcMainUI = createJaxbXJCTask.call('xjcMainUI',
+		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/ui*.xsd' }.files },
+		xjcMainUIGeneratedDir,
+		['-extension',
+		 '-p', xjcMainUIContextPath,
+		 '-readOnly',
+		 '-encoding', 'UTF-8',
+		 '-enableIntrospection',
+		 '-contentForWildcard',
+		 '-xmlschema',
+		 '-verbose',
+		 '-Xinject-code',
+		 '-Xlocator',
+		 '-mark-generated', '-Xann', 'javax.annotation.Generated',
+		 // COMMENT -Xpropertyaccessors broken
+		 '-Xnullsafegetters'
+		],
+		sourceSets.main.resources.srcDirs.collectMany { fileTree(it) { include '**/ui*.xjb' }.files })
+compileJava.configure { dependsOn xjcMainUI }
+
+makeSourcesTasks.call { Task it ->
+	it.inputs.properties([
+			expand$pattern             : '**/*Constants.*',
+			expand_moduleName          : moduleName,
+			expand_buildType           : buildType,
+			expand_xjcMainUIContextPath: xjcMainUIContextPath,
+	])
+}
+
+makeJUnitPlatformTests.call()
+
+afterEvaluate {
+	writePOM()
+}

@@ -1,23 +1,23 @@
 <root>
 	<item name='net.minecraft.util.ResourceLocation ResourceLocation(java.lang.String, java.lang.String) 0'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 	<item name='net.minecraft.util.Tuple A getA()'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 	<item name='net.minecraft.util.Tuple B getB()'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 	<item name='net.minecraft.util.Tuple Tuple(A, B) 0'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 	<item name='net.minecraft.util.Tuple Tuple(A, B) 1'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 	<item name='net.minecraft.util.Tuple a'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 	<item name='net.minecraft.util.Tuple b'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 </root>

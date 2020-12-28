@@ -1,0 +1,46 @@
+//////////////////////////////////////////////////
+// TITLE Resources
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply.call(['evaluateGStringString'])
+
+project.ext.makeResourcesTasks = { Closure c ->
+	afterEvaluate {
+		tasks.names.findAll { it.startsWith('process') && it.endsWith('Resources') }.each { CharSequence taskName ->
+			String taskName2 = taskName.toString()
+
+			// COMMENT Avoid messing around internal tasks.
+			if (taskName2.contains('_')) return
+
+			def task = tasks.named taskName2
+			String taskSourceSetName = taskName2.replace('process', '').replace('Resources', ''),
+			       sourceSetName = (taskSourceSetName.empty ? 'main' : taskSourceSetName).uncapitalize()
+
+			task.configure {
+				configure c
+				Map<String, Object> e = inputs.properties
+						.findAll { it.key.startsWith 'expand_' }
+						.collectEntries { [(it.key.replace('expand_', '')): it.value] } as Map<String, Object>
+
+				// COMMENT replace stuff in the to-be-processed files, nothing else
+				rename ~/(.*)\.in(.*)/, '$1$2'
+				from(sourceSets."$sourceSetName".resources.srcDirs) {
+					include '**/*.in*'
+
+					// COMMENT replace variables
+					expand e
+				}
+
+				// COMMENT copy everything else except the processed files
+				from(sourceSets."$sourceSetName".resources.srcDirs) { exclude '**/*.in*' }
+			}
+
+			tasks.named("compile${taskSourceSetName}Java").configure {
+				finalizedBy task // COMMENT fix resources not processed
+			}
+		}
+	}
+}

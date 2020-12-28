@@ -1,0 +1,87 @@
+//////////////////////////////////////////////////
+// TITLE JAXB
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply.call(['clearDirectory'])
+
+ext {
+	jaxbPackagePrefix = "${project.group}.jaxb${path.replace(':', '.').replaceAll(/\.\u0024/, '.')}"
+}
+
+configurations {
+	jaxb
+	compileOnly.extendsFrom jaxb
+}
+
+dependencies {
+	CharSequence version = '3.0.0-M4'
+
+	// COMMENT runtime
+	implementation "org.glassfish.jaxb:jaxb-runtime:$version"
+	// COMMENT compile
+	// COMMENT schema to Java
+	jaxb "org.glassfish.jaxb:jaxb-xjc:$version"
+	// COMMENT Java to schema
+	jaxb "org.glassfish.jaxb:jaxb-jxc:$version"
+}
+
+def xjc = tasks.register 'xjc'
+def jxc = tasks.register 'jxc'
+
+project.ext.createJaxbXJCTask = { CharSequence taskName, Collection<?> sources, File destDir, Collection<? extends CharSequence> options = [], Collection<?> bindInfo = [] ->
+	def task = tasks.register(taskName.toString(), JavaExec) {
+		group 'jaxb'
+
+		List<File> s = sources.collectMany { files(it).files }
+		List<File> b = bindInfo.collectMany { files(it).files }
+
+		inputs.files s
+		inputs.property 'options', options
+		inputs.files b
+		outputs.dir destDir
+
+		classpath configurations.jaxb
+		main 'com.sun.tools.xjc.XJCFacade'
+
+		args((((['-d', destDir.canonicalPath] as List<String>)
+				+ options)
+				+ s.collect { it.canonicalPath })
+				+ b.collectMany { ['-b', it.canonicalPath] })
+
+		doFirst {
+			destDir.mkdirs()
+			clearDirectory.call destDir
+		}
+	}
+	xjc.configure { dependsOn task }
+	task
+}
+
+project.ext.createJaxbJXCTask = { CharSequence taskName, Collection<?> sources, File destDir, Collection<String> options = [] ->
+	def task = tasks.register(taskName.toString(), JaxaExec) {
+		group 'jaxb'
+
+		List<File> s = sources.collectMany { files(it).files }
+
+		inputs.files s
+		inputs.property 'options', options
+		outputs.dir destDir
+
+		classpath configurations.jaxb
+		main 'com.sun.tools.jxc.SchemaGeneratorFacade'
+
+		args(((['-d', destDir.canonicalPath] as List<String>)
+				+ options)
+				+ s.collect { it.canonicalPath })
+
+		doFirst {
+			destDir.mkdirs()
+			clearDirectory.call destDir
+		}
+	}
+	jxc.configure { dependsOn task }
+	task
+}

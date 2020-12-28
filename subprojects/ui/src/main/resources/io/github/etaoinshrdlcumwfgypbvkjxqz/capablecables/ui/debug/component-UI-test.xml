@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<componentUI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
+             xsi:schemaLocation="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui ../config/ui.xsd"
+             xml:lang="EN">
+	<!-- SECTION using -->
+
+	<!-- COMMENT shapes -->
+	<using alias="shape.rectangle" target="java.awt.geom.Rectangle2D"/>
+	<using alias="shape.ellipse" target="java.awt.geom.Ellipse2D"/>
+	<!-- COMMENT views -->
+	<using alias="view.minecraft"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.views.components.UIDefaultMinecraftViewComponent"/>
+	<!-- COMMENT components -->
+	<using alias="component.manager"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIDefaultComponentManager"/>
+	<using alias="component.window"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIWindowComponent"/>
+	<using alias="component.button"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIButtonComponent"/>
+	<using alias="component.label"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UILabelComponent"/>
+	<using alias="component.list"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIListComponent"/>
+	<!-- COMMENT extensions -->
+	<using alias="extension.minecraft.background.default"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.extensions.background.UIDefaultMinecraftBackgroundExtension"/>
+	<using alias="extension.user_relocatable"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.relocatable.UITeleportingComponentUserRelocatableExtension"/>
+	<using alias="extension.user_resizable"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.resizable.UITeleportingComponentUserResizableExtension"/>
+
+	<!-- SECTION view -->
+	<view class="view.minecraft">
+		<extension class="extension.minecraft.background.default" rendererName="ViewBackgroundRenderer"/>
+	</view>
+
+	<!-- SECTION components -->
+	<component class="component.manager" name="Root" rendererName="RootRenderer">
+		<shape class="shape.rectangle"/>
+
+		<component class="component.window" name="Window1" rendererName="Window1Renderer">
+			<shape class="shape.rectangle" x="10" y="10" width="100" height="100"/>
+			<anchor target="WindowAnchored" originSide="LEFT" targetSide="RIGHT" borderThickness="5"/>
+
+			<property key="default:property.window.controls.side">
+				<uiSide>DOWN</uiSide>
+			</property>
+
+			<extension class="extension.user_resizable" rendererName="Window1ExtensionResizableRenderer">
+				<property key="default:property.teleporting.resize_borders">
+					<map>
+						<entry>
+							<any>
+								<uiSide>RIGHT</uiSide>
+							</any>
+							<any>
+								<double>20</double>
+							</any>
+						</entry>
+						<entry>
+							<any>
+								<uiSide>DOWN</uiSide>
+							</any>
+							<any>
+								<double>50</double>
+							</any>
+						</entry>
+					</map>
+				</property>
+			</extension>
+
+			<componentEmbed name="controls">
+				<extension class="extension.user_relocatable" rendererName="Window1ExtensionRelocatableRenderer">
+					<property key="default:property.teleporting.target">
+						<string>Window1</string>
+					</property>
+					<property key="default:property.teleporting.activation.mouse">
+						<set>
+							<int>1</int><!-- COMMENT right -->
+							<int>2</int><!-- COMMENT middle -->
+						</set>
+					</property>
+				</extension>
+			</componentEmbed>
+
+			<component class="component.label" name="Window1Label" rendererName="Window1LabelRenderer">
+				<shape class="shape.rectangle" width="200" height="50"/>
+
+				<property key="default:property.label.text">
+					<attributedText>
+						<map>
+							<entry>
+								<any>
+									<textAttribute>foreground</textAttribute>
+								</any>
+								<any>
+									<color red="128" green="128" blue="128"/>
+								</any>
+							</entry>
+							<entry>
+								<any>
+									<textAttribute>underline</textAttribute>
+								</any>
+								<any>
+									<int>0</int><!-- COMMENT 0 - enabled -->
+								</any>
+							</entry>
+						</map>
+						<attributedText>
+							<map>
+								<entry>
+									<any>
+										<textAttribute>foreground</textAttribute>
+									</any>
+									<any>
+										<color red="255" green="255" blue="255"/>
+									</any>
+								</entry>
+								<entry>
+									<any>
+										<textAttribute>strikethrough</textAttribute>
+									</any>
+									<any>
+										<boolean>true</boolean>
+									</any>
+								</entry>
+							</map>
+							<constantSupplier>
+								<string><![CDATA[This is an example text.  There are some more text here...
+]]></string>
+							</constantSupplier>
+						</attributedText>
+						<resourceBundleLocalizedString key="Window1Label.text_localized"
+						                               baseName="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.ComponentUITest"/>
+					</attributedText>
+				</property>
+			</component>
+
+			<component class="component.list" name="Window1List" rendererName="Window1ListRenderer">
+				<shape class="shape.rectangle" y="50" width="100" height="1000"/>
+
+				<property key="default:property.list.data">
+					<list>
+						<string>Item 0</string>
+						<string>Item 1</string>
+						<string>Item 2</string>
+						<string>Item 3</string>
+						<string>Item 4</string>
+						<string>Item 5</string>
+						<string>Item 6</string>
+						<string>Item 7</string>
+						<string>Item 8</string>
+						<string>Item 9</string>
+						<string>Item 10</string>
+						<string>Item
+							....................................................................................................
+						</string>
+					</list>
+				</property>
+			</component>
+		</component>
+
+		<component class="component.window" name="WindowAnchored" rendererName="WindowAnchoredRenderer">
+			<shape class="shape.rectangle" x="50" y="50" width="200" height="200">
+				<constraint minX="20"/>
+			</shape>
+
+			<extension class="extension.user_resizable" rendererName="WindowAnchoredExtensionResizableRenderer"/>
+
+			<componentEmbed name="controls" rendererName="WindowAnchoredControlsRenderer">
+				<extension class="extension.user_relocatable" rendererName="WindowAnchoredExtensionRelocatableRenderer">
+					<property key="default:property.teleporting.target">
+						<string>WindowAnchored</string>
+					</property>
+				</extension>
+			</componentEmbed>
+
+			<component class="component.button" name="Button1" rendererName="Button1Renderer">
+				<shape class="shape.ellipse" width="100" height="100">
+					<affineTransform scaleX="0.7071067811865475" scaleY="0.7071067811865475"
+					                 shearX="-0.7071067811865475" shearY="0.7071067811865475"/><!-- CODE
+					rotate(1D, 1D);
+					translate(10D, 10D);
+					-->
+				</shape>
+
+				<property key="default:method.button.activate" bindingKey="view:buttonOnActivate"/>
+				<property key="default:method.button.activated" bindingKey="view:buttonOnActivated"/>
+			</component>
+		</component>
+	</component>
+</componentUI>

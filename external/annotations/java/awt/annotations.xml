@@ -1,0 +1,32 @@
+<root>
+	<item name='java.awt.Container java.awt.Component findComponentAt(int, int)'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='java.awt.Container java.awt.Component findComponentAt(java.awt.Point)'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='java.awt.Container java.awt.LayoutManager getLayout()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='java.awt.Graphics java.awt.Shape getClip()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='java.awt.Graphics void setClip(java.awt.Shape) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='java.awt.Graphics void setColor(java.awt.Color) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='java.awt.Graphics2D void clip(java.awt.Shape) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='java.awt.Graphics2D void setComposite(java.awt.Composite) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='java.awt.Graphics2D void setPaint(java.awt.Paint) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='java.awt.Graphics2D void setStroke(java.awt.Stroke) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+</root>

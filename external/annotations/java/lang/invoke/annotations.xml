@@ -1,2 +1,26 @@
 <root>
+	<item name='java.lang.invoke.LambdaMetafactory java.lang.invoke.CallSite altMetafactory(java.lang.invoke.MethodHandles.Lookup, java.lang.String, java.lang.invoke.MethodType, java.lang.Object...) 1'>
+		<annotation name='org.jetbrains.annotations.NonNls'/>
+	</item>
+	<item name='java.lang.invoke.LambdaMetafactory java.lang.invoke.CallSite metafactory(java.lang.invoke.MethodHandles.Lookup, java.lang.String, java.lang.invoke.MethodType, java.lang.invoke.MethodType, java.lang.invoke.MethodHandle, java.lang.invoke.MethodType) 1'>
+		<annotation name='org.jetbrains.annotations.NonNls'/>
+	</item>
+	<item name='java.lang.invoke.MethodHandles.Lookup java.lang.invoke.MethodHandle findGetter(java.lang.Class&lt;?&gt;, java.lang.String, java.lang.Class&lt;?&gt;) 1'>
+		<annotation name='org.jetbrains.annotations.NonNls'/>
+	</item>
+	<item name='java.lang.invoke.MethodHandles.Lookup java.lang.invoke.MethodHandle findSetter(java.lang.Class&lt;?&gt;, java.lang.String, java.lang.Class&lt;?&gt;) 1'>
+		<annotation name='org.jetbrains.annotations.NonNls'/>
+	</item>
+	<item name='java.lang.invoke.MethodHandles.Lookup java.lang.invoke.MethodHandle findSpecial(java.lang.Class&lt;?&gt;, java.lang.String, java.lang.invoke.MethodType, java.lang.Class&lt;?&gt;) 1'>
+		<annotation name='org.jetbrains.annotations.NonNls'/>
+	</item>
+	<item name='java.lang.invoke.MethodHandles.Lookup java.lang.invoke.MethodHandle findStaticGetter(java.lang.Class&lt;?&gt;, java.lang.String, java.lang.Class&lt;?&gt;) 1'>
+		<annotation name='org.jetbrains.annotations.NonNls'/>
+	</item>
+	<item name='java.lang.invoke.MethodHandles.Lookup java.lang.invoke.MethodHandle findStaticSetter(java.lang.Class&lt;?&gt;, java.lang.String, java.lang.Class&lt;?&gt;) 1'>
+		<annotation name='org.jetbrains.annotations.NonNls'/>
+	</item>
+	<item name='java.lang.invoke.MethodHandles.Lookup java.lang.invoke.MethodHandle findVirtual(java.lang.Class&lt;?&gt;, java.lang.String, java.lang.invoke.MethodType) 1'>
+		<annotation name='org.jetbrains.annotations.NonNls'/>
+	</item>
 </root>

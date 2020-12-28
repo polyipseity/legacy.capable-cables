@@ -1,0 +1,47 @@
+//////////////////////////////////////////////////
+// TITLE Publishing
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply.call(['caughtThrowable', 'createNewFile', 'stringToStringList'])
+
+apply plugin: 'maven-publish'
+
+// Example configuration to allow publishing using the maven-publish task
+// we define a custom artifact that is sourced from the jar output task
+// and then declare that to be published
+// Note you'll need to add a repository here
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			project.ext.configurePOM = { Closure action -> pom action }
+			project.ext.writePOM = { File destination = project.file 'pom.xml' ->
+				pom.withXml {
+					createNewFile destination
+					destination.setWritable true, false
+					destination.text = it.asString().toString()
+				}
+			}
+
+			from components.java
+
+			afterEvaluate {
+				stringToStringList(publishedArtifactTaskNames).each { CharSequence taskName ->
+					String taskName2 = taskName.toString()
+					// COMMENT jar is included by the component already, including it again will make the task fail
+					if (taskName2 != 'jar')
+						artifact tasks[taskName2] // COMMENT cannot use Provider
+				}
+			}
+		}
+	}
+	repositories {
+		if (!repositoryDirectoryLocal.empty) {
+			maven {
+				url "file:///${rootProject.file(repositoryDirectoryLocal).absolutePath}"
+			}
+		}
+	}
+}

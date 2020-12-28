@@ -1,0 +1,9 @@
+//////////////////////////////////////////////////
+// TITLE Generated
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+project.ext.getGeneratedDirectory = { CharSequence sourceSetName ->
+	"src${separator}$sourceSetName${separator}generated_"
+}

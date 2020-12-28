@@ -1,0 +1,20 @@
+<root>
+	<item name='com.google.common.collect.ForwardingMap V put(K, V) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='com.google.common.collect.ForwardingMap V put(K, V) 1'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='com.google.common.collect.ImmutableBiMap.Builder Builder()'>
+		<annotation name='java.lang.Deprecated'/>
+	</item>
+	<item name='com.google.common.collect.ImmutableList.Builder Builder()'>
+		<annotation name='java.lang.Deprecated'/>
+	</item>
+	<item name='com.google.common.collect.ImmutableMap.Builder Builder()'>
+		<annotation name='java.lang.Deprecated'/>
+	</item>
+	<item name='com.google.common.collect.ImmutableSet.Builder Builder()'>
+		<annotation name='java.lang.Deprecated'/>
+	</item>
+</root>

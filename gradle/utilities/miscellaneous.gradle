@@ -5,6 +5,7 @@
 
 // COMMENT arguments
 
-project.ext.parseArgument = { String k, String envK, Object defaultV = null ->
-	project.hasProperty(k) ? property(k) : System.getenv(envK) != null ? System.getenv(envK) : defaultV
+project.ext.parseArgument = { CharSequence k, String envK, Object defaultV = null ->
+	String k2 = k.toString()
+	project.hasProperty(k2) ? property(k2) : System.getenv(envK) != null ? System.getenv(envK) : defaultV
 }

@@ -2,11 +2,15 @@
 // TITLE Collections
 //////////////////////////////////////////////////
 
-project.ext.stringToStringList = { String s -> s == '[]' ? [] : s.substring(1, s.length() - 1).split('(?<!\\\\),', 0).collect { it.trim().replace '\\,', ',' } }
+project.ext.stringToStringList = { CharSequence s ->
+	String s2 = s.toString()
+	s == '[]' ? [] : s2.substring(1, s2.length() - 1).split('(?<!\\\\),', 0).collect { it.trim().replace '\\,', ',' }
+}
 
-project.ext.stringToStringMap = { String s ->
+project.ext.stringToStringMap = { CharSequence s ->
+	String s2 = s.toString()
 	Map<String, List<String>> r = [:]
-	(s == '[:]' ? [] : stringToStringList.call(s)).each {
+	(s2 == '[:]' ? [] : stringToStringList.call(s2)).each {
 		List<String> e = it.trim().split('(?<!\\\\):', 2).collect { it.trim().replace('\\:', ':') }
 		if (r.containsKey(e.first())) r[e.first()] << e.last()
 		else r[e.first()] = [e.last()]

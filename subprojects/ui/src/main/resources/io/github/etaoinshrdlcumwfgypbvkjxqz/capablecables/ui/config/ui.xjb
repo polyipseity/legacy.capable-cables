@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<bindings xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:ci="http://jaxb.dev.java.net/plugin/code-injector"
+          xmlns="http://java.sun.com/xml/ns/jaxb"
+          version="1.0">
+	<bindings schemaLocation="ui-values.xsd">
+		<bindings node="/xs:schema">
+			<!-- COMMENT AnyType -->
+			<bindings node="xs:complexType[@name='anyType']">
+				<ci:code>
+				<![CDATA[
+						@io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull
+						@jakarta.xml.bind.annotation.XmlTransient
+						private final io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.AnyType thisObj = this;
+
+						@io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull
+						public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.AnyType of(@io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull Object value) {
+							@io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.AnyType result = new io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.AnyType();
+							result.setAny(value);
+							return result;
+						}
+					]]>
+				</ci:code>
+			</bindings>
+			<!-- COMMENT Tuple2Type -->
+			<bindings node="xs:complexType[@name='tuple2Type']">
+				<ci:code>
+				<![CDATA[
+						@io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull
+						@jakarta.xml.bind.annotation.XmlTransient
+						private final io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Tuple2Type thisObj = this;
+
+						@io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull
+						public static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Tuple2Type of(@io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull Object left, @io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull Object right) {
+							@io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Tuple2Type result = new io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Tuple2Type();
+							result.getAny().set(0, io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.AnyType.of(left));
+							result.getAny().set(1, io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.AnyType.of(right));
+							return result;
+						}
+
+						@io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull
+						@jakarta.xml.bind.annotation.XmlTransient
+						public Object getLeft() {
+							@io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.AnyType result = thisObj.getAny().get(0);
+							assert result != null;
+							return result.getAny();
+						}
+
+						@io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull
+						@jakarta.xml.bind.annotation.XmlTransient
+						public Object getRight() {
+							@io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.AnyType result = thisObj.getAny().get(1);
+							assert result != null;
+							return result.getAny();
+						}
+					]]>
+				</ci:code>
+			</bindings>
+		</bindings>
+	</bindings>
+</bindings>

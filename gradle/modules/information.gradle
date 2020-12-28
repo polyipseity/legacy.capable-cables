@@ -1,0 +1,10 @@
+//////////////////////////////////////////////////
+// TITLE Information
+//////////////////////////////////////////////////
+
+archivesBaseName = project.name
+group = group_ // COMMENT https://maven.apache.org/guides/mini/guide-naming-conventions.html
+description = description_
+
+// COMMENT Need this here so eclipse task generates correctly.
+java { sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8 }

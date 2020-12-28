@@ -1,0 +1,33 @@
+//////////////////////////////////////////////////
+// TITLE Shadow
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply.call([])
+
+apply plugin: 'com.github.johnrengelman.shadow'
+
+def shadowJar = tasks.named 'shadowJar'
+
+configurations {
+	shade {
+		canBeResolved true
+		canBeConsumed false
+	}
+}
+
+// COMMENT append
+afterEvaluate {
+	shadowJar.configure {
+		configurations = [project.configurations.shade]
+		// CODE relocate 'org.ejml', 'your.new.package.here.ejml' // COMMENT shading example
+		project.configurations.shade.allDependencies.each {
+			if (it.group)
+				if (it.group != project.group)
+					relocate it.group, "${project.group}.shaded${project.path.replace ':', '.'}.${it.group}"
+		}
+		classifier ''
+	}
+}

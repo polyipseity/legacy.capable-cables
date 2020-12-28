@@ -1,0 +1,5 @@
+{
+  "block.${modID}.cable": "Cable",
+  "item.${modID}.wrench": "Wrench",
+  "itemGroup.${modID}.default": "${name}"
+}

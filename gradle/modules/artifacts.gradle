@@ -1,0 +1,59 @@
+//////////////////////////////////////////////////
+// TITLE Artifacts
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply.call([])
+
+def jar = tasks.named 'jar'
+def javadoc = tasks.named 'javadoc'
+
+jar.configure {
+	classifier 'thin'
+}
+tasks.register('deobfJar', Jar) {
+	dependsOn jar
+	from sourceSets.main.java.outputDir
+	classifier 'dev'
+}
+tasks.register('sourcesJar', Jar) {
+	dependsOn jar
+	from sourceSets.main.allSource.srcDirs
+	classifier 'sources'
+}
+tasks.register('javadocJar', Jar) {
+	dependsOn jar
+	from javadoc.get().destinationDir
+	classifier 'javadoc'
+}
+
+afterEvaluate {
+	stringToStringList(artifactTaskNames).each { CharSequence taskName ->
+		def task = tasks.named taskName.toString()
+
+		task.configure {
+			manifest {
+				attributes([
+						'Specification-Title'   : modID,
+						'Specification-Vendor'  : rootProject.group,
+						'Specification-Version' : version,
+						'Implementation-Title'  : project.name,
+						'Implementation-Vendor' : project.group,
+						'Implementation-Version': version,
+				])
+			}
+
+			doFirst {
+				manifest {
+					attributes([
+							'Implementation-Timestamp': new Date().format('yyyy-MM-dd\'T\'HH:mm:ssZ'), // COMMENT this should not affect whether the task is up-to-date
+					])
+				}
+			}
+		}
+
+		artifacts.archives task
+	}
+}

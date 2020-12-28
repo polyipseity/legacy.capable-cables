@@ -1,0 +1,85 @@
+//////////////////////////////////////////////////
+// TITLE Sources
+//////////////////////////////////////////////////
+
+import static java.io.File.separator
+
+apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
+checkApply.call(['evaluateGStringString', 'createNewFile'])
+
+project.ext.makeSourcesTasks = { Closure c ->
+	afterEvaluate {
+		tasks.names.findAll { it.startsWith 'compile' }.each { CharSequence taskName ->
+			String taskName2 = taskName.toString()
+
+			// COMMENT Avoid messing around internal tasks.
+			if (taskName2.contains('_')) return
+
+			def task = tasks.named taskName2
+			String taskSourceSetName = taskName2.replace('compile', ''),
+			       sourceSetName = taskSourceSetName.uncapitalize()
+			sourceSetName = sourceSets.find { sourceSetName.startsWith it.name }?.name
+			String language = taskName2.replace "compile", ''
+			if (sourceSetName == null)
+				sourceSetName = 'main'
+			else
+				language = language.replace sourceSetName.capitalize(), ''
+
+			Set<File> sourceSet = sourceSets."$sourceSetName"."${language.uncapitalize()}".srcDirs
+
+			def pre = tasks.register("preProcess${taskName2.capitalize()}", Sync) {
+				group task.get().group
+				description "Prepare sources for processing $sourceSetName $language."
+
+				from sourceSet
+				into temporaryDir
+			}
+
+			def process = tasks.register("process${taskName2.capitalize()}", Sync) {
+				group task.get().group
+				description "Process $sourceSetName $language."
+				dependsOn pre
+
+				configure c
+
+				into temporaryDir
+
+				if (inputs.properties.containsKey('expand$pattern')) {
+					from(pre.get().temporaryDir) {
+						include inputs.properties.expand$pattern
+
+						Map<String, Object> e = inputs.properties
+								.findAll { it.key.startsWith 'expand_' }
+								.collectEntries { [(it.key.replace('expand_', '')): it.value] } as Map<String, Object>
+						expand e
+					}
+
+					from(pre.get().temporaryDir) {
+						exclude inputs.properties.expand$pattern
+					}
+				} else {
+					from pre.get().temporaryDir
+				}
+
+				task.get().source = destinationDir
+			}
+
+			pre.configure { mustRunAfter task.get().dependsOn.findAll { it != process } }
+			task.configure { dependsOn process }
+		}
+	}
+}
+
+// COMMENT append
+afterEvaluate {
+	tasks.withType(AbstractCompile).configureEach {
+		// COMMENT Avoid messing around internal tasks.
+		if (it.name.contains('_')) return
+
+		options.compilerArgs << '-Xlint'
+		options.annotationProcessorPath = configurations.annotationProcessor // COMMENT use new behavior
+
+		if (buildType == 'DEBUG')
+			options.verbose = true
+	}
+}

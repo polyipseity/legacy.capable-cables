@@ -1,0 +1,6 @@
+<!--suppress DeprecatedClassUsageInspection -->
+<root>
+	<item name='javax.xml.bind.JAXBElement'>
+		<annotation name='java.lang.Deprecated'/>
+	</item>
+</root>

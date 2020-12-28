@@ -1,0 +1,20 @@
+//////////////////////////////////////////////////
+// TITLE Versioning
+//////////////////////////////////////////////////
+
+
+ext {
+	versioned = project.hasProperty('major') && project.hasProperty('minor') && project.hasProperty('patch') && project.hasProperty('final') && project.hasProperty('pre') && project.hasProperty('releaseCandidate')
+	if (versioned) {
+		major = major.toInteger()
+		minor = minor.toInteger()
+		patch = patch.toInteger()
+		project.ext.'final' = this.'final'.toBoolean()
+		pre = pre.toBoolean()
+		releaseCandidate = releaseCandidate.toInteger()
+		if (this.'final' && pre) throw new IllegalArgumentException('"final" and "pre" are both "true"')
+		if ((this.'final' || pre) && releaseCandidate != 0) throw new IllegalArgumentException("'${this.'final' ? 'final' : 'pre'}' is 'true' while 'releaseCandidate' is NOT '0' but '$releaseCandidate'")
+	}
+}
+
+version = versioned ? "${major}.${minor}.${patch}${property('final') ? '-final' : pre ? '-beta' : releaseCandidate != 0 ? "-rc$releaseCandidate" : ''}" : parent?.version

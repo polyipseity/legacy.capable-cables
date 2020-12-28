@@ -7,31 +7,33 @@ import static java.io.File.separator
 apply from: "$utilitiesDir${separator}miscellaneous.gradle"
 apply from: "$utilitiesDir${separator}globals.gradle"
 apply from: "$utilitiesDir${separator}collections.gradle"
+apply from: "$utilitiesDir${separator}throwable.gradle"
 apply from: "$utilitiesDir${separator}io${separator}io.gradle"
 apply from: "$utilitiesDir${separator}io${separator}properties${separator}properties.gradle"
 apply from: "$utilitiesDir${separator}io${separator}properties${separator}ext.properties.gradle"
 
+apply from: "$modulesDir${separator}optional${separator}shadow.gradle"
+apply from: "$modulesDir${separator}optional${separator}api.gradle"
 apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
 apply from: "$modulesDir${separator}optional${separator}mod.gradle"
+apply from: "$modulesDir${separator}optional${separator}publishing.gradle"
 
-makeSourceTasks.call { Task it ->
-	//noinspection GrUnresolvedAccess
+makeSourcesTasks.call { Task it ->
 	it.inputs.properties([
-			expand_group: project.group,
-			expand_modId: modId,
-			expand_name : name_,
+			expand$pattern  : '**/*Constants.*',
+			expand_modID    : modID,
+			expand_buildType: buildType,
 	])
 }
 
 makeResourcesTasks.call { Task it ->
-	//noinspection GrUnresolvedAccess
 	it.inputs.properties([
 			expand_modLoader         : modLoader,
 			expand_loaderVersion     : loaderVersion,
 			expand_issueTrackerURLKey: issueTrackerURL.empty ? '' : 'issueTrackerURL=',
 			expand_issueTrackerURL   : issueTrackerURL.empty ? '' : "\"$issueTrackerURL\"",
 			expand_showAsResourcePack: showAsResourcePack,
-			expand_modId             : modId,
+			expand_modID             : modID,
 			expand_version           : version,
 			expand_displayName       : name_,
 			expand_namespaceKey      : namespace.empty ? '' : 'namespace=',
@@ -51,3 +53,7 @@ makeResourcesTasks.call { Task it ->
 }
 
 makeJUnitPlatformTests.call()
+
+afterEvaluate {
+	writePOM()
+}

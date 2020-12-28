@@ -18,22 +18,18 @@ buildscript {
 
 	dependencies {
 		classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
-		classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.4'
 	}
 	// COMMENT Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 }
 
-configurations {
-	replaced {
-		canBeResolved false
-		canBeConsumed false
-	}
+plugins {
+	id 'com.github.johnrengelman.shadow' version '4.0.4' apply false
 }
 
 allprojects {
 	ext {
 		utilitiesDir = "$rootDir${separator}gradle${separator}utilities".toString()
-		modulesDir = "$utilitiesDir${separator}modules".toString()
+		modulesDir = "$rootDir${separator}gradle${separator}modules".toString()
 	}
 
 	apply from: "$modulesDir${separator}plugins.gradle"
@@ -54,21 +50,24 @@ allprojects {
 	apply from: "$modulesDir${separator}repositories.gradle"
 	apply from: "$modulesDir${separator}dependencies.gradle"
 
-	apply from: "$modulesDir${separator}source.gradle"
+	apply from: "$modulesDir${separator}sources.gradle"
 	apply from: "$modulesDir${separator}resources.gradle"
 	apply from: "$modulesDir${separator}javadoc.gradle"
 
 	apply from: "$modulesDir${separator}optional${separator}test.gradle"
-	apply from: "$modulesDir${separator}jar.gradle"
+	apply from: "$modulesDir${separator}artifacts.gradle"
 
 	apply from: "$modulesDir${separator}optional${separator}ide.gradle"
 
+	ext {
+		mainSubproject = project rootProject.ext.mainSubprojectPath
+		// COMMENT mod
+		modID = rootProject.ext.modID
+	}
 
 	// COMMENT append
 	afterEvaluate { storeExt.call() }
 }
-
-apply from: "$utilitiesDir${separator}throwable.gradle"
 
 ext {
 	// COMMENT game
@@ -76,31 +75,40 @@ ext {
 	String[] minecraftVersions = minecraftVersion.split Pattern.quote('.')
 	minecraftVersionMajor = minecraftVersions.first().toInteger()
 	minecraftVersionMinor = minecraftVersions[1].toInteger()
-	// COMMENT mod
-	modId = project.name
 }
 
-apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
-apply from: "$modulesDir${separator}optional${separator}api.gradle"
-apply from: "$modulesDir${separator}optional${separator}publishing.gradle"
+apply from: "$utilitiesDir${separator}throwable.gradle"
+apply from: "$utilitiesDir${separator}gradle${separator}tasks.gradle"
 
-afterEvaluate {
-	Project pSub = project(subprojectMain)
-	if (pSub != project) {
-		evaluationDependsOn subprojectMain
-		pSub.tasks.each {
-			Task t = tasks.findByName(it.name)
-			if (t != null) {
-				t.dependsOn it
-				t.configure { enabled false }
-			} else task it.name, dependsOn: it
+apply from: "$modulesDir${separator}optional${separator}minecraft-forge.gradle"
+
+if (mainSubproject == project) {
+	apply from: "$modulesDir${separator}optional${separator}publishing.gradle"
+
+	afterEvaluate {
+		writePOM()
+	}
+} else {
+	afterEvaluate {
+		mainSubproject.tasks.configureEach { Task subprojectTask ->
+			def projectTask = findNamedTask subprojectTask.name
+			if (projectTask) {
+				try {
+					projectTask.configure {
+						dependsOn subprojectTask
+						enabled false
+					}
+				} catch (IllegalStateException ex) {
+					// COMMENT task is not configurable
+					caughtThrowable ex
+				}
+			} else {
+				tasks.register(subprojectTask.name) {
+					it.group subprojectTask.group
+					it.dependsOn subprojectTask
+				}
+			}
 		}
-		pSub.tasks.whenTaskAdded { Task tSub ->
-			Task t = tasks.findByName(tSub.name)
-			if (t != null) {
-				t.dependsOn tSub
-				t.configure { enabled false }
-			} else task tSub.name, dependsOn: tSub
-		}
+		evaluationDependsOn mainSubproject.path
 	}
 }

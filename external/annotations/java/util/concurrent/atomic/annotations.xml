@@ -1,0 +1,14 @@
+<root>
+	<item name='java.util.concurrent.atomic.AtomicReference V get()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='java.util.concurrent.atomic.AtomicReference V getAndSet(V)'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='java.util.concurrent.atomic.AtomicReference V getAndUpdate(java.util.function.UnaryOperator&lt;V&gt;)'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='java.util.concurrent.atomic.AtomicReference void set(V) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+</root>

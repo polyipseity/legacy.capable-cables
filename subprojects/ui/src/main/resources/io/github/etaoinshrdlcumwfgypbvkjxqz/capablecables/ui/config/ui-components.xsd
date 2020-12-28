@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:ui="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
+           targetNamespace="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
+           version="3.2.0"
+           xml:lang="EN">
+	<!-- SECTION includes -->
+
+	<xs:include schemaLocation="ui-values.xsd"/>
+
+	<!-- SECTION ================================================== UI ================================================== -->
+
+	<!-- COMMENT component UI -->
+	<xs:element name="componentUI">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ui:using" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:view"/>
+				<xs:element ref="ui:component"/>
+			</xs:sequence>
+			<xs:anyAttribute namespace="##other" processContents="lax"/>
+		</xs:complexType>
+		<!-- COMMENT component name -->
+		<xs:key name="componentUIComponentName">
+			<xs:selector xpath=".//ui:component"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		<xs:keyref name="componentUIComponentIDRef" refer="ui:componentUIComponentName">
+			<xs:selector xpath=".//ui:anchor"/>
+			<xs:field xpath="@target"/>
+		</xs:keyref>
+		<!-- COMMENT renderer container name -->
+		<xs:key name="componentUIRendererName">
+			<xs:selector xpath=".//ui:component|ui:extension"/>
+			<xs:field xpath="@rendererName"/>
+		</xs:key>
+		<!-- COMMENT using id -->
+		<xs:key name="componentUIUsingID">
+			<xs:selector xpath="ui:using"/>
+			<xs:field xpath="@alias"/>
+		</xs:key>
+		<xs:keyref name="componentUIUsingIDRef" refer="ui:componentUIUsingID">
+			<xs:selector xpath=".//ui:*"/><!-- TODO no idea why './/ui:*' does not work -->
+			<xs:field xpath="@class"/>
+		</xs:keyref>
+	</xs:element>
+
+	<!-- SECTION top -->
+
+	<!-- COMMENT using -->
+	<xs:element name="using">
+		<xs:complexType>
+			<xs:attribute name="alias" type="xs:string" use="required"/>
+			<xs:attribute name="target" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- SECTION components -->
+
+	<!-- COMMENT shape -->
+	<xs:element name="shape">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ui:affineTransform" minOccurs="0"/>
+				<xs:element ref="ui:constraint" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:group ref="ui:propertyContainerGroup"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="ui:classBasedAttributeGroup"/>
+			<xs:attribute name="x" type="xs:double" default="0"/>
+			<xs:attribute name="y" type="xs:double" default="0"/>
+			<xs:attribute name="width" type="xs:double" default="1"/>
+			<xs:attribute name="height" type="xs:double" default="1"/>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- COMMENT extension -->
+	<xs:element name="extension">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="ui:propertyContainerGroup"/>
+				<xs:element ref="ui:anyContainer" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="ui:classBasedAttributeGroup"/>
+			<xs:attributeGroup ref="ui:hasRendererGroup"/>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- COMMENT view -->
+	<xs:element name="view">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="ui:propertyContainerGroup"/>
+				<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:anyContainer" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="ui:classBasedAttributeGroup"/>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- COMMENT component -->
+	<xs:element name="component">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ui:shape"/>
+				<xs:element ref="ui:anchor" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:group ref="ui:propertyContainerGroup"/>
+				<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:componentEmbed" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:component" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:anyContainer" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="ui:classBasedAttributeGroup"/>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attributeGroup ref="ui:componentEventsAttributeGroup"/>
+			<xs:attributeGroup ref="ui:hasRendererGroup"/>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- COMMENT component embed -->
+	<xs:element name="componentEmbed">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="ui:propertyContainerGroup"/>
+				<xs:element ref="ui:extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:componentEmbed" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:anyContainer" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attributeGroup ref="ui:componentEventsAttributeGroup"/>
+			<xs:attributeGroup ref="ui:hasOptionalRendererGroup"/>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- SECTION ================================================== utilities ================================================== -->
+
+	<!-- SECTION groups -->
+
+	<!-- COMMENT property container group -->
+	<xs:group name="propertyContainerGroup">
+		<xs:sequence>
+			<xs:element ref="ui:property" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:group>
+
+	<!-- COMMENT class-based attribute groups -->
+	<xs:attributeGroup name="classBasedAttributeGroup">
+		<xs:attribute name="class" type="xs:string" use="required"/>
+	</xs:attributeGroup>
+	<xs:attributeGroup name="classBasedOptionalAttributeGroup">
+		<xs:attribute name="class" type="xs:string"/>
+	</xs:attributeGroup>
+
+	<!-- COMMENT DOM events attribute group -->
+	<xs:attributeGroup name="DOMEventsAttributeGroup">
+		<xs:attribute name="load" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="unload" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="abort" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="error" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="select" type="ui:identifier"/>
+		<xs:attribute name="blur" type="ui:identifier"/>
+		<xs:attribute name="focus" type="ui:identifier"/>
+		<xs:attribute name="focusin" type="ui:identifier"/>
+		<xs:attribute name="focusout" type="ui:identifier"/>
+		<xs:attribute name="auxclick" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="click" type="ui:identifier"/>
+		<xs:attribute name="dblclick" type="ui:identifier"/>
+		<xs:attribute name="mousedown" type="ui:identifier"/>
+		<xs:attribute name="mouseenter" type="ui:identifier"/>
+		<xs:attribute name="mouseleave" type="ui:identifier"/>
+		<xs:attribute name="mousemove" type="ui:identifier"/>
+		<xs:attribute name="mouseout" type="ui:identifier"/>
+		<xs:attribute name="mouseover" type="ui:identifier"/>
+		<xs:attribute name="mouseup" type="ui:identifier"/>
+		<xs:attribute name="wheel" type="ui:identifier"/>
+		<xs:attribute name="beforeinput" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="input" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="keydown" type="ui:identifier"/>
+		<xs:attribute name="keyup" type="ui:identifier"/>
+		<xs:attribute name="compositionstart" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="compositionupdate" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+		<xs:attribute name="compositionend" type="ui:identifier"/><!-- COMMENT unused, reserved -->
+	</xs:attributeGroup>
+
+	<!-- COMMENT component events attribute group -->
+	<xs:attributeGroup name="componentEventsAttributeGroup">
+		<xs:attributeGroup ref="ui:DOMEventsAttributeGroup"/>
+		<xs:attribute name="char_typed" type="ui:identifier"/>
+	</xs:attributeGroup>
+
+	<!-- COMMENT has renderer groups -->
+	<xs:attributeGroup name="hasRendererGroup">
+		<xs:attribute name="rendererName" type="xs:string" use="required"/>
+	</xs:attributeGroup>
+	<xs:attributeGroup name="hasOptionalRendererGroup">
+		<xs:attribute name="rendererName" type="xs:string"/>
+	</xs:attributeGroup>
+
+	<!-- SECTION elements -->
+
+	<!-- COMMENT IUIPropertyMappingValue -->
+	<!-- COMMENT property -->
+	<xs:element name="property">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:any minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="key" type="ui:identifier" use="required"/>
+			<xs:attribute name="bindingKey" type="ui:identifier"/>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- COMMENT IShapeConstraint -->
+	<xs:element name="constraint">
+		<xs:complexType>
+			<xs:attribute name="minX" type="xs:double"/>
+			<xs:attribute name="minY" type="xs:double"/>
+			<xs:attribute name="maxX" type="xs:double"/>
+			<xs:attribute name="maxY" type="xs:double"/>
+			<xs:attribute name="minWidth" type="xs:double"/>
+			<xs:attribute name="minHeight" type="xs:double"/>
+			<xs:attribute name="maxWidth" type="xs:double"/>
+			<xs:attribute name="maxHeight" type="xs:double"/>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- COMMENT IShapeAnchor -->
+	<xs:element name="anchor">
+		<xs:complexType>
+			<xs:attribute name="target" type="xs:string" use="required"/>
+			<xs:attribute name="originSide" type="ui:uiSideType" use="required"/>
+			<xs:attribute name="targetSide" type="ui:uiSideType" use="required"/>
+			<xs:attribute name="borderThickness" type="xs:double" default="0"/>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- COMMENT any container -->
+	<xs:element name="anyContainer">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:any minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<!-- SECTION types -->
+
+	<!-- COMMENT IIdentifier -->
+	<xs:simpleType name="identifier">
+		<xs:restriction base="xs:string">
+			<xs:pattern value=".*:.*"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- SECTION ================================================== theme ================================================== -->
+
+	<xs:element name="componentTheme">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ui:using" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ui:renderer" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:anyAttribute namespace="##other" processContents="lax"/>
+		</xs:complexType>
+		<!-- COMMENT renderer id -->
+		<xs:key name="componentThemeRendererID">
+			<xs:selector xpath=".//ui:renderer"/>
+			<xs:field xpath="@name"/>
+		</xs:key>
+		<!-- COMMENT using id -->
+		<xs:key name="componentThemeUsingID">
+			<xs:selector xpath="ui:using"/>
+			<xs:field xpath="@alias"/>
+		</xs:key>
+		<xs:keyref name="componentThemeUsingIDRef" refer="ui:componentThemeUsingID">
+			<xs:selector xpath=".//ui:*"/><!-- TODO no idea why './/ui:*' does not work -->
+			<xs:field xpath="@class"/>
+		</xs:keyref>
+	</xs:element>
+
+	<!-- COMMENT renderer -->
+	<xs:element name="renderer">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="ui:propertyContainerGroup"/>
+			</xs:sequence>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attributeGroup ref="ui:classBasedOptionalAttributeGroup"/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

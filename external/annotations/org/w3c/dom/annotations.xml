@@ -1,0 +1,32 @@
+<root>
+	<item name='org.w3c.dom.NamedNodeMap org.w3c.dom.Node getNamedItem(java.lang.String)'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.w3c.dom.NamedNodeMap org.w3c.dom.Node getNamedItemNS(java.lang.String, java.lang.String)'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.w3c.dom.NamedNodeMap org.w3c.dom.Node getNamedItemNS(java.lang.String, java.lang.String) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.w3c.dom.NamedNodeMap org.w3c.dom.Node removeNamedItemNS(java.lang.String, java.lang.String)'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull'/>
+	</item>
+	<item name='org.w3c.dom.Node java.lang.String getLocalName()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.w3c.dom.Node java.lang.String getNamespaceURI()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.w3c.dom.Node java.lang.String getNodeValue()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.w3c.dom.Node java.lang.String getTextContent()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.w3c.dom.Node org.w3c.dom.NamedNodeMap getAttributes()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.w3c.dom.NodeList org.w3c.dom.Node item(int)'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+</root>

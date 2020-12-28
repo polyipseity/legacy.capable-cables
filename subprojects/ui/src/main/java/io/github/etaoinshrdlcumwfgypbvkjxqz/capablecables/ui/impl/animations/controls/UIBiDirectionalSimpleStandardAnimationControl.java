@@ -1,0 +1,24 @@
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.controls;
+
+import com.google.common.collect.ImmutableSet;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationTarget;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time.core.ITicker;
+
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
+
+public class UIBiDirectionalSimpleStandardAnimationControl
+		extends UIBiDirectionalStandardAnimationControl {
+	protected UIBiDirectionalSimpleStandardAnimationControl(IUIAnimationTarget target,
+	                                                        ITicker ticker,
+	                                                        boolean autoPlay,
+	                                                        long duration,
+	                                                        long startDelay,
+	                                                        long endDelay,
+	                                                        long loop) {
+		super(ImmutableSet.of(target), ticker, autoPlay,
+				(target2, index, size) -> suppressBoxing(duration),
+				(target2, index, size) -> suppressBoxing(startDelay),
+				(target2, index, size) -> suppressBoxing(endDelay),
+				(target2, index, size) -> suppressBoxing(loop));
+	}
+}
