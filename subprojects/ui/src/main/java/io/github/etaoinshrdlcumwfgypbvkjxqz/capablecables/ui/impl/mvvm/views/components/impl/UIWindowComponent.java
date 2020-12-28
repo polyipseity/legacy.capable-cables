@@ -294,7 +294,8 @@ public class UIWindowComponent
 										.orElseGet(OptionalDouble::empty)
 						);
 				addEventListener(EnumUIEventDOMType.WHEEL.getEventType(),
-						UIPhasedDelegatingEventListener.of(IUIEvent.EnumPhase.AT_TARGET, conventionalListener),
+						UIPhasedDelegatingEventListener.of(Sets.immutableEnumSet(IUIEvent.EnumPhase.AT_TARGET, IUIEvent.EnumPhase.BUBBLING_PHASE),
+								conventionalListener),
 						false);
 			});
 		});

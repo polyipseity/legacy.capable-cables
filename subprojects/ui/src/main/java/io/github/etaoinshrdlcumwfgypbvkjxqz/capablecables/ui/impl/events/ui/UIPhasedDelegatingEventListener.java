@@ -14,7 +14,7 @@ public class UIPhasedDelegatingEventListener<E extends IUIEvent>
 	private final @Immutable Set<IUIEvent.EnumPhase> phases;
 
 	protected UIPhasedDelegatingEventListener(IUIEventListener<? super E> delegate,
-	                                          Set<IUIEvent.EnumPhase> phases) {
+	                                          Iterable<IUIEvent.EnumPhase> phases) {
 		super(delegate);
 		this.phases = Sets.immutableEnumSet(phases);
 	}
@@ -24,7 +24,7 @@ public class UIPhasedDelegatingEventListener<E extends IUIEvent>
 		return of(ImmutableSet.of(phase), delegate);
 	}
 
-	public static <E extends IUIEvent> UIPhasedDelegatingEventListener<E> of(Set<IUIEvent.EnumPhase> phases,
+	public static <E extends IUIEvent> UIPhasedDelegatingEventListener<E> of(Iterable<IUIEvent.EnumPhase> phases,
 	                                                                         IUIEventListener<? super E> delegate) {
 		return new UIPhasedDelegatingEventListener<>(delegate, phases);
 	}
