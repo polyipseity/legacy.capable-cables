@@ -56,7 +56,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.even
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
-import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -505,15 +504,17 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 					IUIComponent component = event.getComponent();
 					@Nullable IUIViewComponent<?, ?> nextOwner = event.getNext().flatMap(IUIComponent::getManager).flatMap(IUIComponentManager::getView).orElse(null);
 					if (owner.equals(nextOwner)) {
-						owner.getLifecycleStateTracker().getStateApplier(EnumUILifecycleState.BOUND)
-								.ifPresent(stateApplier ->
-										IUIViewComponent.traverseComponentTreeDefault(component,
-												component1 ->
-														IUIComponentStructureLifecycleModifier.handleComponentModifiers(component1,
-																component1.getModifiersView(),
-																stateApplier),
-												FunctionUtilities.getEmptyBiConsumer())
-								);
+						if (owner.getLifecycleStateTracker().containsState(EnumUILifecycleState.BOUND)) {
+							owner.getLifecycleStateTracker().getStateApplier(EnumUILifecycleState.BOUND)
+									.ifPresent(stateApplier ->
+											IUIViewComponent.traverseComponentTreeDefault(component,
+													component1 ->
+															IUIComponentStructureLifecycleModifier.handleComponentModifiers(component1,
+																	component1.getModifiersView(),
+																	stateApplier),
+													FunctionUtilities.getEmptyBiConsumer())
+									);
+						}
 						if (owner.getLifecycleStateTracker().containsState(EnumUILifecycleState.INITIALIZED)) {
 							try (IUIComponentContext componentContext = IUIComponent.createContextTo(component)) {
 								IUIViewComponent.<RuntimeException>traverseComponentTreeDefault(componentContext, // TODO javac bug, need explicit type arguments
