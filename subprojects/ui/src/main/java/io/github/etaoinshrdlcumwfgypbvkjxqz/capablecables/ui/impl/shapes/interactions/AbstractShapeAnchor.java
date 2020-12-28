@@ -7,7 +7,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interac
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl.UIObjectUtilities;
 import sun.misc.Cleaner;
 
 import java.awt.geom.AffineTransform;
@@ -32,43 +31,45 @@ public abstract class AbstractShapeAnchor
 	public void anchor(IShapeDescriptorProvider from)
 			throws ConcurrentModificationException {
 		getTarget().ifPresent(target -> {
-			AffineTransform transform;
-			{
-				Rectangle2D bounds = from.getAbsoluteShape().getBounds2D();
-				Rectangle2D newBounds = (Rectangle2D) bounds.clone();
-				double targetValue =
-						getTargetSide().getValue(target.getAbsoluteShape().getBounds2D())
-								+ getTargetSide().outwardsBy(getBorderThickness())
-								.orElse(0);
-				getOriginSide().getOpposite() // COMMENT set opposite side, avoid overshooting
-						.ifPresent(oppositeOriginSide -> {
-							double oppositeOriginSideCurrentValue = oppositeOriginSide.getValue(newBounds);
-							boolean overshoots;
-							switch (oppositeOriginSide.getType()) {
-								case LOCATION:
-									// COMMENT smaller means larger area
-									overshoots = targetValue <= oppositeOriginSideCurrentValue;
-									break;
-								case SIZE:
-									// COMMENT larger means larger area
-									overshoots = targetValue >= oppositeOriginSideCurrentValue;
-									break;
-								default:
-									throw new AssertionError();
-							}
-							if (overshoots) {
-								oppositeOriginSide.setValue(newBounds,
-										targetValue
-												+ oppositeOriginSide.outwardsBy(1).orElseThrow(AssertionError::new));
-							}
-						});
-				getOriginSide().setValue(newBounds, targetValue);
-				transform = AffineTransformUtilities.getTransformFromTo(bounds, newBounds);
-			}
+			// COMMENT calculate new absolute bounds
+			Rectangle2D absoluteBounds = from.getAbsoluteShape().getBounds2D();
+			Rectangle2D newAbsoluteBounds = (Rectangle2D) absoluteBounds.clone();
+			double targetValue =
+					getTargetSide().getValue(target.getAbsoluteShape().getBounds2D())
+							+ getTargetSide().outwardsBy(getBorderThickness())
+							.orElse(0);
+			getOriginSide().getOpposite() // COMMENT set opposite side, avoid overshooting
+					.ifPresent(oppositeOriginSide -> {
+						double oppositeOriginSideCurrentValue = oppositeOriginSide.getValue(newAbsoluteBounds);
+						boolean overshoots;
+						switch (oppositeOriginSide.getType()) {
+							case LOCATION:
+								// COMMENT smaller means larger area
+								overshoots = targetValue <= oppositeOriginSideCurrentValue;
+								break;
+							case SIZE:
+								// COMMENT larger means larger area
+								overshoots = targetValue >= oppositeOriginSideCurrentValue;
+								break;
+							default:
+								throw new AssertionError();
+						}
+						if (overshoots) {
+							oppositeOriginSide.setValue(newAbsoluteBounds,
+									targetValue
+											+ oppositeOriginSide.outwardsBy(1D).orElseThrow(AssertionError::new));
+						}
+					});
+			getOriginSide().setValue(newAbsoluteBounds, targetValue);
+
+			// COMMENT convert new absolute bounds to the relative coordinate space
 			Rectangle2D relativeBounds = from.getShapeDescriptor().getShapeOutput().getBounds2D();
-			UIObjectUtilities.transformRectangularShape(transform, relativeBounds, relativeBounds);
-			from.modifyShape(() ->
-					from.getShapeDescriptor().adapt(relativeBounds));
+			AffineTransform toRelativeTransform = AffineTransformUtilities.getTransformFromTo(absoluteBounds, relativeBounds);
+			Rectangle2D newRelativeBounds = toRelativeTransform.createTransformedShape(newAbsoluteBounds).getBounds2D();
+
+			// COMMENT actually transform
+			AffineTransform transform = AffineTransformUtilities.getTransformFromTo(relativeBounds, newRelativeBounds);
+			from.modifyShape(() -> from.getShapeDescriptor().transform(transform));
 		});
 	}
 

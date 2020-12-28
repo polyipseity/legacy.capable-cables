@@ -40,7 +40,7 @@ public interface IShapeDescriptor<S extends Shape> {
 				.constrain(source, destination);
 	}
 
-	boolean isDynamic(); // TODO implement this for dynamic shape descriptors i.e. returned shape can change by itself
+	boolean isDynamic();
 
 	S getShapeOutput();
 
