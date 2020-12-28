@@ -17,7 +17,7 @@ configurations {
 }
 
 dependencies {
-	CharSequence version = '3.0.0-M4'
+	CharSequence version = '3.0.0'
 
 	// COMMENT runtime
 	implementation "org.glassfish.jaxb:jaxb-runtime:$version"
