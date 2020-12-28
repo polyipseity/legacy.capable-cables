@@ -10,14 +10,16 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesCon
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingConsumer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.NoSuchBindingTransformerException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.methods.IBindingMethod;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.methods.IBindingMethodDestination;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.methods.IBindingMethodSource;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.DelegatingSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.ReactiveUtilities;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.observers.DisposableObserver;
+import io.reactivex.rxjava3.subscribers.DisposableSubscriber;
+import org.reactivestreams.Subscriber;
 import org.slf4j.Logger;
 import sun.misc.Cleaner;
 
@@ -57,10 +59,12 @@ public class MethodBindings
 								case SOURCE:
 									if (!getSources().containsKey(method)) {
 										IBindingMethodSource<?> s = (IBindingMethodSource<?>) method;
-										DisposableObserver<?> d = new MethodDelegatingDisposableObserver<>(getTransformers(),
+										DisposableSubscriber<?> d = MethodDelegatingSubscriber.ofDecorated(
+												getTransformers(),
 												s,
 												getDestinations(),
-												UtilitiesConfiguration.getInstance().getLogger());
+												UtilitiesConfiguration.getInstance().getLogger()
+										);
 										s.getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
 										getSources().put(s, d);
 										ret = true;
@@ -124,20 +128,27 @@ public class MethodBindings
 	@Override
 	public boolean isEmpty() { return getSources().isEmpty() && getDestinations().isEmpty(); }
 
-	public static class MethodDelegatingDisposableObserver<T>
-			extends LoggingDisposableObserver<T> {
+	public static class MethodDelegatingSubscriber<T>
+			extends DelegatingSubscriber<T> {
 		private final Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>> transformersRef;
 		private final IBindingMethodSource<T> source;
 		private final Iterable<? extends IBindingMethodDestination<?>> destinationsRef;
 
-		public MethodDelegatingDisposableObserver(Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>> transformersRef,
-		                                          IBindingMethodSource<T> source,
-		                                          Iterable<? extends IBindingMethodDestination<?>> destinationsRef,
-		                                          Logger logger) {
-			super(logger);
+		protected MethodDelegatingSubscriber(Subscriber<? super T> delegate,
+		                                     Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>> transformersRef,
+		                                     IBindingMethodSource<T> source,
+		                                     Iterable<? extends IBindingMethodDestination<?>> destinationsRef) {
+			super(delegate);
 			this.transformersRef = transformersRef;
 			this.source = source;
 			this.destinationsRef = destinationsRef;
+		}
+
+		public static <T> DisposableSubscriber<T> ofDecorated(Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>> transformersRef,
+		                                                      IBindingMethodSource<T> source,
+		                                                      Iterable<? extends IBindingMethodDestination<?>> destinationsRef,
+		                                                      Logger logger) {
+			return ReactiveUtilities.decorateAsListener(delegate -> new MethodDelegatingSubscriber<>(delegate, transformersRef, source, destinationsRef), logger);
 		}
 
 		@SuppressWarnings("UnstableApiUsage")
@@ -153,6 +164,7 @@ public class MethodBindings
 									destination.getTypeToken().getRawType()))); // COMMENT should be of the correct type
 				}));
 			} catch (NoSuchBindingTransformerException ex) {
+				cancel();
 				onError(ex);
 			}
 		}

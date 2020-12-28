@@ -5,7 +5,7 @@ public class MemoryObservableField<T>
 	private T value;
 
 	public MemoryObservableField(Class<T> type, T initialValue) {
-		super(type);
+		super(type, initialValue);
 		this.value = initialValue;
 	}
 
@@ -13,7 +13,7 @@ public class MemoryObservableField<T>
 	public void setValue(T value) {
 		if (!getValue().equals(value)) {
 			this.value = value;
-			getNotifierSubject().onNext(value);
+			getNotifierProcessor().onNext(value);
 		}
 	}
 

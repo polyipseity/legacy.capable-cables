@@ -27,15 +27,14 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.im
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.methods.IBindingMethodSource;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBindingAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.methods.ImmutableBindingMethodSource;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.ICursor;
-import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.jetbrains.annotations.NonNls;
 import org.lwjgl.glfw.GLFW;
 
@@ -45,6 +44,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
@@ -167,18 +167,18 @@ public class UIButtonComponent
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		super.initializeBindings(binderObserverSupplier);
-		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-				() -> ImmutableBinderAction.bind(getOnActivate(), getOnActivated(), getOnCanceled()));
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
+		super.initializeBindings(bindingActionConsumerSupplier);
+		BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier,
+				() -> ImmutableBindingAction.bind(getOnActivate(), getOnActivated(), getOnCanceled()));
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void cleanupBindings() {
-		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
-				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-						() -> ImmutableBinderAction.unbind(getOnActivate(), getOnActivated(), getOnCanceled()))
+		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
+				BindingUtilities.supplyBindingAction(bindingActionConsumer,
+						() -> ImmutableBindingAction.unbind(getOnActivate(), getOnActivated(), getOnCanceled()))
 		);
 		super.cleanupBindings();
 	}
@@ -383,10 +383,10 @@ public class UIButtonComponent
 
 		@Override
 		@OverridingMethodsMustInvokeSuper
-		public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-			super.initializeBindings(binderObserverSupplier);
-			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-					() -> ImmutableBinderAction.bind(
+		public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
+			super.initializeBindings(bindingActionConsumerSupplier);
+			BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier,
+					() -> ImmutableBindingAction.bind(
 							getBaseColor(), getBaseBorderColor(),
 							getHoveringColor(), getHoveringBorderColor(),
 							getPressedColor(), getPressedBorderColor()
@@ -396,9 +396,9 @@ public class UIButtonComponent
 		@Override
 		@OverridingMethodsMustInvokeSuper
 		public void cleanupBindings() {
-			getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
-					BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-							() -> ImmutableBinderAction.unbind(
+			getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
+					BindingUtilities.supplyBindingAction(bindingActionConsumer,
+							() -> ImmutableBindingAction.unbind(
 									getBaseColor(), getBaseBorderColor(),
 									getHoveringColor(), getHoveringBorderColor(),
 									getPressedColor(), getPressedBorderColor()

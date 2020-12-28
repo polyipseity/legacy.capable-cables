@@ -23,28 +23,31 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.core.mvvm.views.IUIMinecraftViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingActionConsumerSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.DefaultBinderObserverSupplierHolder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.DefaultBindingActionConsumerSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputDevices;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IPointerDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional3;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.DelegatingSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.ReactiveUtilities;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.observers.DisposableObserver;
+import io.reactivex.rxjava3.subscribers.DisposableSubscriber;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.reactivestreams.Subscriber;
 import org.slf4j.Logger;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -56,11 +59,11 @@ public class UIDefaultMinecraftBackgroundExtension
 		implements IUIMinecraftBackgroundExtension {
 	private static final IUIExtensionArguments DEFAULT_ARGUMENTS =
 			UIImmutableExtensionArguments.of(ImmutableMap.of(), IUIMinecraftViewComponent.class, null);
-	private final AutoCloseableRotator<RenderObserver, RuntimeException> renderObserverRotator =
-			new AutoCloseableRotator<>(() -> new RenderObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()), Disposable::dispose);
+	private final AutoCloseableRotator<DisposableSubscriber<UIAbstractViewBusEvent.Render>, RuntimeException> renderSubscriberRotator =
+			new AutoCloseableRotator<>(() -> RenderSubscriber.ofDecorated(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()), Disposable::dispose);
 	private final IUIRendererContainerContainer<IBackgroundRenderer> rendererContainerContainer;
 
-	private final IBinderObserverSupplierHolder binderObserverSupplierHolder = new DefaultBinderObserverSupplierHolder();
+	private final IBindingActionConsumerSupplierHolder bindingActionConsumerSupplierHolder = new DefaultBindingActionConsumerSupplierHolder();
 
 	public UIDefaultMinecraftBackgroundExtension() { this(getDefaultArguments()); }
 
@@ -78,11 +81,11 @@ public class UIDefaultMinecraftBackgroundExtension
 	@OverridingMethodsMustInvokeSuper
 	public void onExtensionAdded(IUIMinecraftViewComponent<?, ?> container) {
 		super.onExtensionAdded(container);
-		UIEventBusEntryPoint.<UIAbstractViewBusEvent.Render>getEventBus().subscribe(getRenderObserverRotator().get());
+		UIEventBusEntryPoint.<UIAbstractViewBusEvent.Render>getBusPublisher().subscribe(getRenderSubscriberRotator().get());
 		IUIView.registerRendererContainers(container, ImmutableSet.of(getRendererContainer()));
 	}
 
-	protected AutoCloseableRotator<RenderObserver, RuntimeException> getRenderObserverRotator() { return renderObserverRotator; }
+	protected AutoCloseableRotator<? extends DisposableSubscriber<? super UIAbstractViewBusEvent.Render>, RuntimeException> getRenderSubscriberRotator() { return renderSubscriberRotator; }
 
 	@Override
 	public IUIRendererContainer<? extends IBackgroundRenderer> getRendererContainer() {
@@ -97,7 +100,7 @@ public class UIDefaultMinecraftBackgroundExtension
 	@OverridingMethodsMustInvokeSuper
 	public void onExtensionRemoved() {
 		getContainer().ifPresent(container -> IUIView.unregisterRendererContainers(container, ImmutableSet.of(getRendererContainer())));
-		getRenderObserverRotator().close();
+		getRenderSubscriberRotator().close();
 		super.onExtensionRemoved();
 	}
 
@@ -106,38 +109,38 @@ public class UIDefaultMinecraftBackgroundExtension
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		IUIMinecraftBackgroundExtension.super.initializeBindings(binderObserverSupplier);
-		getBinderObserverSupplierHolder().setValue(binderObserverSupplier);
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
+		IUIMinecraftBackgroundExtension.super.initializeBindings(bindingActionConsumerSupplier);
+		getBindingActionConsumerSupplierHolder().setValue(bindingActionConsumerSupplier);
 		BindingUtilities.initializeBindings(
-				binderObserverSupplier, ImmutableList.of(getRendererContainerContainer())
+				bindingActionConsumerSupplier, ImmutableList.of(getRendererContainerContainer())
 		);
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void cleanupBindings() {
-		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
-				BindingUtilities.cleanupBindings(
-						ImmutableList.of(getRendererContainerContainer())
-				)
-		);
-		getBinderObserverSupplierHolder().setValue(null);
+		BindingUtilities.cleanupBindings(ImmutableList.of(getRendererContainerContainer()));
+		getBindingActionConsumerSupplierHolder().setValue(null);
 		IUIMinecraftBackgroundExtension.super.cleanupBindings();
 	}
 
-	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
-		return binderObserverSupplierHolder;
+	protected IBindingActionConsumerSupplierHolder getBindingActionConsumerSupplierHolder() {
+		return bindingActionConsumerSupplierHolder;
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public static class RenderObserver
-			extends LoggingDisposableObserver<UIAbstractViewBusEvent.Render> {
+	public static class RenderSubscriber
+			extends DelegatingSubscriber<UIAbstractViewBusEvent.Render> {
 		private final OptionalWeakReference<UIDefaultMinecraftBackgroundExtension> owner;
 
-		public RenderObserver(UIDefaultMinecraftBackgroundExtension owner, Logger logger) {
-			super(logger);
+		protected RenderSubscriber(Subscriber<? super UIAbstractViewBusEvent.Render> delegate, UIDefaultMinecraftBackgroundExtension owner) {
+			super(delegate);
 			this.owner = OptionalWeakReference.of(owner);
+		}
+
+		public static DisposableSubscriber<UIAbstractViewBusEvent.Render> ofDecorated(UIDefaultMinecraftBackgroundExtension owner, Logger logger) {
+			return ReactiveUtilities.decorateAsListener(delegate -> new RenderSubscriber(delegate, owner), logger);
 		}
 
 		@Override

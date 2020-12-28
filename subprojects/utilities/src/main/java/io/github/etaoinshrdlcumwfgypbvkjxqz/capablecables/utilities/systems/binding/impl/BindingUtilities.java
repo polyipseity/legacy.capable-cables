@@ -3,27 +3,27 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bin
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBinding;
-import io.reactivex.rxjava3.observers.DisposableObserver;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public enum BindingUtilities {
 	;
 
-	public static void actOnBinderObserverSupplier(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier,
-	                                               Supplier<@Nonnull ? extends IBinderAction> action) {
-		binderObserverSupplier.get()
-				.ifPresent(binderObserver -> binderObserver.onNext(action.get()));
+	public static void supplyBindingAction(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier,
+	                                       Supplier<@Nonnull ? extends IBindingAction> action) {
+		bindingActionConsumerSupplier.get()
+				.ifPresent(binderActionConsumer -> binderActionConsumer.accept(action.get()));
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static void findAndInitializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier,
+	public static void findAndInitializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier,
 	                                             Iterable<?> objects) {
 		initializeBindings(
-				binderObserverSupplier, Streams.stream(objects).unordered()
+				bindingActionConsumerSupplier, Streams.stream(objects).unordered()
 						.filter(IHasBinding.class::isInstance)
 						.map(IHasBinding.class::cast)
 						.collect(ImmutableSet.toImmutableSet())
@@ -31,10 +31,10 @@ public enum BindingUtilities {
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier,
+	public static void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier,
 	                                      Iterable<? extends IHasBinding> bindings) {
 		Streams.stream(bindings).unordered()
-				.forEach(binding -> binding.initializeBindings(binderObserverSupplier));
+				.forEach(binding -> binding.initializeBindings(bindingActionConsumerSupplier));
 	}
 
 	@SuppressWarnings("UnstableApiUsage")

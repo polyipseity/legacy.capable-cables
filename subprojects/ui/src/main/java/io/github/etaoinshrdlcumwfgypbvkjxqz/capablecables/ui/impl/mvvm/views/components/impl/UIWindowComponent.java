@@ -41,31 +41,33 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilitie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CollectionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IValueHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.DefaultValueHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBindingAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.fields.ImmutableBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.fields.MemoryObservableField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.methods.ImmutableBindingMethodDestination;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl.UIObjectUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.DelegatingSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.ReactiveUtilities;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.observers.DisposableObserver;
+import io.reactivex.rxjava3.subscribers.DisposableSubscriber;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
 import it.unimi.dsi.fastutil.objects.Object2DoubleMaps;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.NonNls;
+import org.reactivestreams.Subscriber;
 import org.slf4j.Logger;
 
 import javax.annotation.Nonnull;
@@ -77,6 +79,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.util.List;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -104,8 +107,8 @@ public class UIWindowComponent
 	private static final IIdentifier PROPERTY_SCROLLBAR_THICKNESSES_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyScrollbarThicknesses());
 
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	private final AutoCloseableRotator<ModifyShapeDescriptorObserver, RuntimeException> modifyShapeDescriptorObserver =
-			new AutoCloseableRotator<>(() -> new ModifyShapeDescriptorObserver(this, UIConfiguration.getInstance().getLogger()), Disposable::dispose);
+	private final AutoCloseableRotator<DisposableSubscriber<UIComponentModifyShapeDescriptorBusEvent>, RuntimeException> modifyShapeDescriptorSubscriberRotator =
+			new AutoCloseableRotator<>(() -> ModifyShapeDescriptorSubscriber.ofDecorated(this, UIConfiguration.getInstance().getLogger()), Disposable::dispose);
 	private final IUIRendererContainerContainer<IUIComponentRenderer<?>> rendererContainerContainer;
 
 	@UIProperty(PROPERTY_CONTROLS_SIDE)
@@ -413,7 +416,7 @@ public class UIWindowComponent
 														new MemoryObservableField<>(Double.class, suppressBoxing(1D)));
 
 										scrollRelativeProgressField.getField().getNotifier().subscribe(
-												new ContentScrollOffsetUpdater(owner1, axis, UIConfiguration.getInstance().getLogger())
+												ContentScrollOffsetUpdater.ofDecorated(owner1, axis, UIConfiguration.getInstance().getLogger())
 										);
 
 										scrollRelativeProgressMap.put(axis, scrollRelativeProgressField);
@@ -597,10 +600,10 @@ public class UIWindowComponent
 	}
 
 	@Override
-	public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		super.initializeBindings(binderObserverSupplier);
-		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-				() -> ImmutableBinderAction.bind(Iterables.concat(
+	public void initializeBindings(Supplier<@io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
+		super.initializeBindings(bindingActionConsumerSupplier);
+		BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier,
+				() -> ImmutableBindingAction.bind(Iterables.concat(
 						ImmutableList.of(
 								getControlsSide(), getControlsThickness(), getControlsDirection(),
 								getScrollbarSides(), getScrollbarThicknesses()
@@ -618,11 +621,13 @@ public class UIWindowComponent
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	protected void cleanup0(IUIComponentContext context) {
-		getModifyShapeDescriptorObserver().close();
+		getModifyShapeDescriptorSubscriberRotator().close();
 		super.cleanup0(context);
 	}
 
-	protected AutoCloseableRotator<ModifyShapeDescriptorObserver, RuntimeException> getModifyShapeDescriptorObserver() { return modifyShapeDescriptorObserver; }
+	protected AutoCloseableRotator<? extends DisposableSubscriber<? super UIComponentModifyShapeDescriptorBusEvent>, RuntimeException> getModifyShapeDescriptorSubscriberRotator() {
+		return modifyShapeDescriptorSubscriberRotator;
+	}
 
 	protected @Immutable Map<EnumUIAxis, ? extends IBindingField<Double>> getScrollRelativeProgressMap() {
 		return scrollRelativeProgressMap;
@@ -638,8 +643,8 @@ public class UIWindowComponent
 		super.initialize0(context);
 		getContentScrollOffset().setLocation(0D, 0D);
 		getLastContentFullBounds().setFrame(0D, 0D, 0D, 0D);
-		UIEventBusEntryPoint.<UIComponentModifyShapeDescriptorBusEvent>getEventBus()
-				.subscribe(getModifyShapeDescriptorObserver().get());
+		UIEventBusEntryPoint.<UIComponentModifyShapeDescriptorBusEvent>getBusPublisher()
+				.subscribe(getModifyShapeDescriptorSubscriberRotator().get());
 	}
 
 	public enum EnumControlsAction {
@@ -669,26 +674,20 @@ public class UIWindowComponent
 		}
 	}
 
-	public static class ModifyShapeDescriptorObserver
-			extends LoggingDisposableObserver<UIComponentModifyShapeDescriptorBusEvent> {
-		private final OptionalWeakReference<UIWindowComponent> owner;
-
-		public ModifyShapeDescriptorObserver(UIWindowComponent owner, Logger logger) {
-			super(logger);
-			this.owner = OptionalWeakReference.of(owner);
-		}
-
-		@Override
-		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-		public void onNext(UIComponentModifyShapeDescriptorBusEvent event) {
-			super.onNext(event);
-			if (event.getStage() == EnumHookStage.POST)
-				getOwner()
-						.filter(owner -> owner.getParent().filter(p -> p.equals(event.getComponent())).isPresent())
-						.ifPresent(IUIReshapeExplicitly::refresh);
-		}
-
-		protected Optional<? extends UIWindowComponent> getOwner() { return owner.getOptional(); }
+	@Override
+	public void cleanupBindings() {
+		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
+				BindingUtilities.supplyBindingAction(bindingActionConsumer,
+						() -> ImmutableBindingAction.unbind(Iterables.concat(
+								ImmutableList.of(
+										getControlsSide(), getControlsThickness(), getControlsDirection(),
+										getScrollbarSides(), getScrollbarThicknesses()
+								),
+								getScrollRelativeProgressMap().values(),
+								getScrollbarThumbRelativeSizeMap().values()
+						)))
+		);
+		super.cleanupBindings();
 	}
 
 	public static class DefaultRenderer<C extends UIWindowComponent>
@@ -737,20 +736,30 @@ public class UIWindowComponent
 		}
 	}
 
-	@Override
-	public void cleanupBindings() {
-		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
-				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-						() -> ImmutableBinderAction.unbind(Iterables.concat(
-								ImmutableList.of(
-										getControlsSide(), getControlsThickness(), getControlsDirection(),
-										getScrollbarSides(), getScrollbarThicknesses()
-								),
-								getScrollRelativeProgressMap().values(),
-								getScrollbarThumbRelativeSizeMap().values()
-						)))
-		);
-		super.cleanupBindings();
+	public static class ModifyShapeDescriptorSubscriber
+			extends DelegatingSubscriber<UIComponentModifyShapeDescriptorBusEvent> {
+		private final OptionalWeakReference<UIWindowComponent> owner;
+
+		protected ModifyShapeDescriptorSubscriber(Subscriber<? super UIComponentModifyShapeDescriptorBusEvent> delegate, UIWindowComponent owner) {
+			super(delegate);
+			this.owner = OptionalWeakReference.of(owner);
+		}
+
+		public static DisposableSubscriber<UIComponentModifyShapeDescriptorBusEvent> ofDecorated(UIWindowComponent owner, Logger logger) {
+			return ReactiveUtilities.decorateAsListener(delegate -> new ModifyShapeDescriptorSubscriber(delegate, owner), logger);
+		}
+
+		@Override
+		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+		public void onNext(UIComponentModifyShapeDescriptorBusEvent event) {
+			super.onNext(event);
+			if (event.getStage() == EnumHookStage.POST)
+				getOwner()
+						.filter(owner -> owner.getParent().filter(p -> p.equals(event.getComponent())).isPresent())
+						.ifPresent(IUIReshapeExplicitly::refresh);
+		}
+
+		protected Optional<? extends UIWindowComponent> getOwner() { return owner.getOptional(); }
 	}
 
 	@SuppressWarnings("ObjectAllocationInLoop")
@@ -835,14 +844,18 @@ public class UIWindowComponent
 	}
 
 	public static class ContentScrollOffsetUpdater
-			extends LoggingDisposableObserver<Double> {
+			extends DelegatingSubscriber<Double> {
 		private final OptionalWeakReference<UIWindowComponent> owner;
 		private final EnumUIAxis axis;
 
-		public ContentScrollOffsetUpdater(UIWindowComponent owner, EnumUIAxis axis, Logger logger) {
-			super(logger);
+		protected ContentScrollOffsetUpdater(Subscriber<? super Double> delegate, UIWindowComponent owner, EnumUIAxis axis) {
+			super(delegate);
 			this.owner = OptionalWeakReference.of(owner);
 			this.axis = axis;
+		}
+
+		public static DisposableSubscriber<Double> ofDecorated(UIWindowComponent owner, EnumUIAxis axis, Logger logger) {
+			return ReactiveUtilities.decorateAsListener(delegate -> new ContentScrollOffsetUpdater(delegate, owner, axis), logger);
 		}
 
 		@Override

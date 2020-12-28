@@ -63,7 +63,7 @@ public abstract class UIAbstractView<S extends Shape>
 
 	@Override
 	public final void render() {
-		EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
+		EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getBusSubscriber()::onNext, () -> {
 					render0();
 					return true;
 				},

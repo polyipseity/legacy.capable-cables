@@ -48,13 +48,13 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ColorUtiliti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTextComponentUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinding.EnumBindingType;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.methods.IBindingMethodDestination;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.DefaultBinder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBindingAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.fields.ImmutableBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.fields.MemoryObservableField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.methods.ImmutableBindingMethodDestination;
@@ -63,7 +63,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inpu
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time.core.ITicker;
 import io.netty.buffer.Unpooled;
-import io.reactivex.rxjava3.observers.DisposableObserver;
 import jakarta.xml.bind.JAXBException;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -104,6 +103,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
@@ -418,10 +418,10 @@ public enum UIMinecraftDebug {
 
 			@Override
 			@OverridingMethodsMustInvokeSuper
-			public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-				super.initializeBindings(binderObserverSupplier);
-				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-						() -> ImmutableBinderAction.bind(
+			public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
+				super.initializeBindings(bindingActionConsumerSupplier);
+				BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier,
+						() -> ImmutableBindingAction.bind(
 								getAnchoredWindowBorderColor(),
 								getButtonOnActivate(), getButtonOnActivated()
 						)
@@ -437,9 +437,9 @@ public enum UIMinecraftDebug {
 			@Override
 			@OverridingMethodsMustInvokeSuper
 			public void cleanupBindings() {
-				getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
-						BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-								() -> ImmutableBinderAction.unbind(
+				getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
+						BindingUtilities.supplyBindingAction(bindingActionConsumer,
+								() -> ImmutableBindingAction.unbind(
 										getAnchoredWindowBorderColor(),
 										getButtonOnActivate(), getButtonOnActivated()
 								)

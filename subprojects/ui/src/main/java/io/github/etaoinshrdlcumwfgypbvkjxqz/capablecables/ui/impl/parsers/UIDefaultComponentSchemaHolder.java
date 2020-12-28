@@ -51,7 +51,7 @@ public enum UIDefaultComponentSchemaHolder {
 		{
 			JAXBContextRegisterBusEvent registerEvent = new JAXBContextRegisterBusEvent();
 			registerEvent.addClassesToBeBound(JAXBUIUtilities.ObjectFactories.getDefaultUIObjectFactory().getClass());
-			UIEventBusEntryPoint.getEventBus().onNext(registerEvent);
+			UIEventBusEntryPoint.getBusSubscriber().onNext(registerEvent);
 			try {
 				CONTEXT = JAXBContext.newInstance(registerEvent.getClassesToBeBoundView().toArray(new Class<?>[0]));
 			} catch (JAXBException e) {

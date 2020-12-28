@@ -8,6 +8,7 @@ import java.lang.annotation.Annotation;
 
 @SuppressWarnings("ClassExplicitlyAnnotation")
 @Immutable
+// COMMENT a very cursed class
 public final class ImmutableSubscribeEvent
 		implements SubscribeEvent {
 	private final EventPriority priority;

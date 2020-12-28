@@ -18,25 +18,25 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtil
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingActionConsumerSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.DefaultBinderObserverSupplierHolder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.DefaultBindingActionConsumerSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
-import io.reactivex.rxjava3.observers.DisposableObserver;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructureContext>
 		implements IUISubInfrastructure<C> {
 	private final ConcurrentMap<IIdentifier, IExtension<? extends IIdentifier, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
 	private final IUILifecycleStateTracker lifecycleStateTracker = new UIDefaultLifecycleStateTracker();
-	private final IBinderObserverSupplierHolder binderObserverSupplierHolder = new DefaultBinderObserverSupplierHolder();
+	private final IBindingActionConsumerSupplierHolder bindingActionConsumerSupplierHolder = new DefaultBindingActionConsumerSupplierHolder();
 	private OptionalWeakReference<IUIInfrastructure<?, ?, ?>> infrastructure = OptionalWeakReference.of(null);
 	@Nullable
 	private C context;
@@ -46,16 +46,15 @@ public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructure
 	public Optional<? extends IExtension<? extends IIdentifier, ?>> addExtension(IExtension<? extends IIdentifier, ?> extension) {
 		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
 		Optional<? extends IExtension<? extends IIdentifier, ?>> result = IExtensionContainer.addExtensionImpl(this, getExtensions(), extension);
-		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
-				BindingUtilities.findAndInitializeBindings(binderObserverSupplier, ImmutableList.of(extension)));
+		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
+				BindingUtilities.findAndInitializeBindings(bindingActionConsumer, ImmutableList.of(extension)));
 		return result;
 	}
 
 	@Override
 	public Optional<? extends IExtension<? extends IIdentifier, ?>> removeExtension(IIdentifier key) {
 		Optional<IExtension<? extends IIdentifier, ?>> result = IExtensionContainer.removeExtensionImpl(getExtensions(), key);
-		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
-				BindingUtilities.findAndCleanupBindings(result.map(ImmutableList::of).orElseGet(ImmutableList::of)));
+		BindingUtilities.findAndCleanupBindings(result.map(ImmutableList::of).orElseGet(ImmutableList::of));
 		return result;
 	}
 
@@ -68,8 +67,8 @@ public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructure
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<IIdentifier, IExtension<? extends IIdentifier, ?>> getExtensions() { return extensions; }
 
-	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
-		return binderObserverSupplierHolder;
+	protected IBindingActionConsumerSupplierHolder getBindingActionConsumerSupplierHolder() {
+		return bindingActionConsumerSupplierHolder;
 	}
 
 	@Override
@@ -118,23 +117,22 @@ public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructure
 
 	@OverridingMethodsMustInvokeSuper
 	protected void bind0(IUIStructureLifecycleContext context) {
-		initializeBindings(context.getBinderObserverSupplier());
+		initializeBindings(context.getBindingActionConsumerSupplier());
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		IUISubInfrastructure.super.initializeBindings(binderObserverSupplier);
-		getBinderObserverSupplierHolder().setValue(binderObserverSupplier);
-		BindingUtilities.findAndInitializeBindings(binderObserverSupplier, getExtensions().values());
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
+		IUISubInfrastructure.super.initializeBindings(bindingActionConsumerSupplier);
+		getBindingActionConsumerSupplierHolder().setValue(bindingActionConsumerSupplier);
+		BindingUtilities.findAndInitializeBindings(bindingActionConsumerSupplier, getExtensions().values());
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void cleanupBindings() {
-		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
-				BindingUtilities.findAndCleanupBindings(getExtensions().values()));
-		getBinderObserverSupplierHolder().setValue(null);
+		BindingUtilities.findAndCleanupBindings(getExtensions().values());
+		getBindingActionConsumerSupplierHolder().setValue(null);
 		IUISubInfrastructure.super.cleanupBindings();
 	}
 

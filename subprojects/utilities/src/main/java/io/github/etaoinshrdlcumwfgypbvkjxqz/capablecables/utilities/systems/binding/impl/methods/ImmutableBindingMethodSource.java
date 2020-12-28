@@ -4,9 +4,10 @@ import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.methods.IBindingMethodSource;
-import io.reactivex.rxjava3.core.ObservableSource;
-import io.reactivex.rxjava3.subjects.PublishSubject;
-import io.reactivex.rxjava3.subjects.Subject;
+import io.reactivex.rxjava3.processors.MulticastProcessor;
+import io.reactivex.rxjava3.processors.PublishProcessor;
+import org.reactivestreams.Processor;
+import org.reactivestreams.Publisher;
 
 import java.util.Optional;
 
@@ -16,12 +17,13 @@ public final class ImmutableBindingMethodSource<T>
 	private final TypeToken<T> typeToken;
 	@Nullable
 	private final IIdentifier bindingKey;
-	private final Subject<T> notifierSubject = PublishSubject.create();
+	private final Processor<T, T> notifierProcessor;
 
 	@SuppressWarnings("UnstableApiUsage")
 	private ImmutableBindingMethodSource(Class<T> type, @Nullable IIdentifier bindingKey) {
 		this.typeToken = TypeToken.of(type);
 		this.bindingKey = bindingKey;
+		this.notifierProcessor = PublishProcessor.<T>create().subscribeWith(MulticastProcessor.create());
 	}
 
 	public static <T> ImmutableBindingMethodSource<T> of(Class<T> type, @Nullable IIdentifier bindingKey) {
@@ -29,12 +31,11 @@ public final class ImmutableBindingMethodSource<T>
 	}
 
 	@Override
-	public ObservableSource<T> getNotifier() { return getNotifierSubject(); }
+	public Publisher<T> getNotifier() { return getNotifierProcessor(); }
 
-	@Override
-	public void invoke(T argument) { getNotifierSubject().onNext(argument); }
-
-	protected Subject<T> getNotifierSubject() { return notifierSubject; }
+	protected Processor<T, T> getNotifierProcessor() {
+		return notifierProcessor;
+	}
 
 	@Override
 	public Optional<? extends IIdentifier> getBindingKey() { return Optional.ofNullable(bindingKey); }
@@ -43,5 +44,10 @@ public final class ImmutableBindingMethodSource<T>
 	@Override
 	public TypeToken<T> getTypeToken() {
 		return typeToken;
+	}
+
+	@Override
+	public void invoke(T argument) {
+		getNotifierProcessor().onNext(argument);
 	}
 }

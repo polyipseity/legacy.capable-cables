@@ -2,24 +2,25 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bin
 
 import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IObservableField;
-import io.reactivex.rxjava3.core.ObservableSource;
-import io.reactivex.rxjava3.subjects.PublishSubject;
-import io.reactivex.rxjava3.subjects.Subject;
+import io.reactivex.rxjava3.processors.BehaviorProcessor;
+import org.reactivestreams.Processor;
+import org.reactivestreams.Publisher;
 
 public abstract class AbstractObservableField<T>
 		implements IObservableField<T> {
 	@SuppressWarnings("UnstableApiUsage")
 	private final TypeToken<T> typeToken;
-	private final Subject<T> notifierSubject = PublishSubject.create();
+	private final Processor<T, T> notifierProcessor;
 
 	@SuppressWarnings("UnstableApiUsage")
-	public AbstractObservableField(Class<T> type) {
+	public AbstractObservableField(Class<T> type, T initialValue) {
 		this.typeToken = TypeToken.of(type);
+		this.notifierProcessor = BehaviorProcessor.createDefault(initialValue);
 	}
 
 	@Override
-	public ObservableSource<? extends T> getNotifier() {
-		return getNotifierSubject();
+	public Publisher<T> getNotifier() {
+		return getNotifierProcessor();
 	}
 
 	@Override
@@ -28,7 +29,7 @@ public abstract class AbstractObservableField<T>
 		return typeToken;
 	}
 
-	protected Subject<T> getNotifierSubject() {
-		return notifierSubject;
+	protected Processor<T, T> getNotifierProcessor() {
+		return notifierProcessor;
 	}
 }

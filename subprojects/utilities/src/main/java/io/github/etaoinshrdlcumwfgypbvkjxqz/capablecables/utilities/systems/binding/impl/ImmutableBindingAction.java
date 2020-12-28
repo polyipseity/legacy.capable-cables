@@ -1,37 +1,37 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl;
 
 import com.google.common.collect.ImmutableSet;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinding;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingAction;
 
 import java.util.Arrays;
 
-public final class ImmutableBinderAction implements IBinderAction {
+public final class ImmutableBindingAction implements IBindingAction {
 	private final EnumActionType type;
 	private final Iterable<? extends IBinding<?>> bindings;
 
-	private ImmutableBinderAction(EnumActionType type, Iterable<? extends IBinding<?>> bindings) {
+	private ImmutableBindingAction(EnumActionType type, Iterable<? extends IBinding<?>> bindings) {
 		this.type = type;
 		this.bindings = ImmutableSet.copyOf(bindings);
 	}
 
-	public static ImmutableBinderAction bind(IBinding<?>... bindings) {
+	public static ImmutableBindingAction bind(IBinding<?>... bindings) {
 		return bind(Arrays.asList(bindings)); // COMMENT reuse the array
 	}
 
-	public static ImmutableBinderAction bind(Iterable<? extends IBinding<?>> bindings) {
+	public static ImmutableBindingAction bind(Iterable<? extends IBinding<?>> bindings) {
 		return of(EnumActionType.BIND, bindings);
 	}
 
-	private static ImmutableBinderAction of(EnumActionType type, Iterable<? extends IBinding<?>> bindings) {
-		return new ImmutableBinderAction(type, bindings);
+	private static ImmutableBindingAction of(EnumActionType type, Iterable<? extends IBinding<?>> bindings) {
+		return new ImmutableBindingAction(type, bindings);
 	}
 
-	public static ImmutableBinderAction unbind(IBinding<?>... bindings) {
+	public static ImmutableBindingAction unbind(IBinding<?>... bindings) {
 		return unbind(Arrays.asList(bindings)); // COMMENT reuse the array
 	}
 
-	public static ImmutableBinderAction unbind(Iterable<? extends IBinding<?>> bindings) {
+	public static ImmutableBindingAction unbind(Iterable<? extends IBinding<?>> bindings) {
 		return of(EnumActionType.UNBIND, bindings);
 	}
 

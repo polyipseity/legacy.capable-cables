@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.AlwaysNull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIContextContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.IUIStructureLifecycleContext;
@@ -19,22 +18,19 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.lifecycle
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.lifecycles.UILifecycleUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.NoSuchBindingTransformerException;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
-import io.reactivex.rxjava3.observers.DisposableObserver;
-import org.slf4j.Logger;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
@@ -44,7 +40,7 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 	private final ConcurrentMap<IIdentifier, IExtension<? extends IIdentifier, ?>> extensions = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacitySmall()).makeMap();
 	private final CompositeDisposable binderDisposables = new CompositeDisposable();
 	private final IUILifecycleStateTracker lifecycleStateTracker = new UIDefaultLifecycleStateTracker();
-	private final Supplier<@Nonnull Optional<DisposableObserver<IBinderAction>>> binderObserverSupplier;
+	private final Supplier<@Nonnull Optional<Consumer<? super IBindingAction>>> bindingActionConsumerSupplier;
 	private @Nullable V internalView;
 	private @Nullable VM internalViewModel;
 	private @Nullable B internalBinder;
@@ -58,11 +54,11 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 	@SuppressWarnings("RedundantTypeArguments")
 	protected UIDefaultInfrastructure() {
 		OptionalWeakReference<UIDefaultInfrastructure<V, VM, B>> thisWeakReference = OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
-		this.binderObserverSupplier = () -> thisWeakReference.getOptional().map(UIDefaultInfrastructure<V, VM, B>::createBinderActionObserver);
+		this.bindingActionConsumerSupplier = () -> thisWeakReference.getOptional().map(UIDefaultInfrastructure<V, VM, B>::createBindingActionConsumer);
 	}
 
-	protected DisposableObserver<IBinderAction> createBinderActionObserver() {
-		return new BinderActionDisposableObserver(getBinder(), getBinderDisposables(), UIConfiguration.getInstance().getLogger());
+	protected Consumer<? super IBindingAction> createBindingActionConsumer() {
+		return BinderActionConsumer.of(getBinder());
 	}
 
 	protected CompositeDisposable getBinderDisposables() { return binderDisposables; }
@@ -128,7 +124,7 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 
 		// COMMENT must bind the bindings of view first to ensure that the default values are from the view
 		IUIStructureLifecycleContext structureLifecycleContext =
-				UIImmutableStructureLifecycleContext.of(getBinderObserverSupplier());
+				UIImmutableStructureLifecycleContext.of(getBindingActionConsumerSupplier());
 		getView().bind(structureLifecycleContext);
 		getViewModel().bind(structureLifecycleContext);
 	}
@@ -138,8 +134,8 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 		return getInternalView().orElseThrow(IllegalStateException::new);
 	}
 
-	protected Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> getBinderObserverSupplier() {
-		return binderObserverSupplier;
+	protected Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> getBindingActionConsumerSupplier() {
+		return bindingActionConsumerSupplier;
 	}
 
 	protected Optional<? extends V> getInternalView() {
@@ -219,52 +215,25 @@ public class UIDefaultInfrastructure<V extends IUIView<?>, VM extends IUIViewMod
 		IUIActiveLifecycle.cleanupV(getView());
 	}
 
-	public static class BinderActionDisposableObserver
-			extends LoggingDisposableObserver<IBinderAction> {
+	public static class BinderActionConsumer
+			implements Consumer<IBindingAction> {
 		private final OptionalWeakReference<IBinder> binder;
-		private final OptionalWeakReference<CompositeDisposable> binderDisposables;
 
-		public BinderActionDisposableObserver(IBinder binder, CompositeDisposable binderDisposables, Logger logger) {
-			super(logger);
+		public BinderActionConsumer(IBinder binder) {
 			this.binder = OptionalWeakReference.of(binder);
-			this.binderDisposables = OptionalWeakReference.of(binderDisposables);
+		}
+
+		public static BinderActionConsumer of(IBinder binder) {
+			return new BinderActionConsumer(binder);
 		}
 
 		@Override
-		protected void onStart() {
-			super.onStart();
-			getBinderDisposables().ifPresent(binderDisposables ->
-					binderDisposables.add(this));
-		}
-
-		@Override
-		public void onNext(@Nonnull IBinderAction o) {
-			super.onNext(o);
-			getBinder().ifPresent(binder -> {
-				switch (o.getActionType()) {
-					case BIND:
-						try {
-							binder.bind(o.getBindings());
-						} catch (NoSuchBindingTransformerException e) {
-							onError(e);
-						}
-						break;
-					case UNBIND:
-						binder.unbind(o.getBindings());
-						break;
-					default:
-						onError(new AssertionError());
-						break;
-				}
-			});
+		public void accept(IBindingAction action) {
+			getBinder().ifPresent(action);
 		}
 
 		protected Optional<? extends IBinder> getBinder() {
 			return binder.getOptional();
-		}
-
-		protected Optional<? extends CompositeDisposable> getBinderDisposables() {
-			return binderDisposables.getOptional();
 		}
 	}
 }

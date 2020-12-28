@@ -25,18 +25,20 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.text.Immutable
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUIAxis;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
-import io.reactivex.rxjava3.observers.DisposableObserver;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBindingAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.DelegatingSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.ReactiveUtilities;
+import io.reactivex.rxjava3.subscribers.DisposableSubscriber;
 import org.jetbrains.annotations.NonNls;
+import org.reactivestreams.Subscriber;
 import org.slf4j.Logger;
 
 import java.awt.geom.Rectangle2D;
@@ -45,6 +47,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
@@ -95,9 +98,9 @@ public class UIListComponent<E>
 				mappings.get(getPropertyComponentFactoryIdentifier()));
 
 		this.data.getField().getNotifier().subscribe(
-				new RebuildChildrenDisposableObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()));
+				RebuildChildrenSubscriber.ofDecorated(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()));
 		this.direction.getField().getNotifier().subscribe(
-				new RebuildChildrenDisposableObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()));
+				RebuildChildrenSubscriber.ofDecorated(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()));
 	}
 
 	public static IIdentifier getPropertyDataIdentifier() {
@@ -125,10 +128,10 @@ public class UIListComponent<E>
 	}
 
 	@Override
-	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		super.initializeBindings(binderObserverSupplier);
-		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-				() -> ImmutableBinderAction.bind(
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
+		super.initializeBindings(bindingActionConsumerSupplier);
+		BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier,
+				() -> ImmutableBindingAction.bind(
 						getData(),
 						getDirection(),
 						getComponentFactory()
@@ -137,9 +140,9 @@ public class UIListComponent<E>
 
 	@Override
 	public void cleanupBindings() {
-		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
-				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-						() -> ImmutableBinderAction.unbind(
+		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
+				BindingUtilities.supplyBindingAction(bindingActionConsumer,
+						() -> ImmutableBindingAction.unbind(
 								getData(),
 								getDirection(),
 								getComponentFactory()
@@ -247,13 +250,17 @@ public class UIListComponent<E>
 		}
 	}
 
-	public static class RebuildChildrenDisposableObserver
-			extends LoggingDisposableObserver<Object> {
+	public static class RebuildChildrenSubscriber
+			extends DelegatingSubscriber<Object> {
 		private final OptionalWeakReference<UIListComponent<?>> owner;
 
-		public RebuildChildrenDisposableObserver(UIListComponent<?> owner, Logger logger) {
-			super(logger);
+		protected RebuildChildrenSubscriber(Subscriber<? super Object> delegate, UIListComponent<?> owner) {
+			super(delegate);
 			this.owner = OptionalWeakReference.of(owner);
+		}
+
+		public static DisposableSubscriber<Object> ofDecorated(UIListComponent<?> owner, Logger logger) {
+			return ReactiveUtilities.decorateAsListener(delegate -> new RebuildChildrenSubscriber(delegate, owner), logger);
 		}
 
 		@Override

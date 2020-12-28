@@ -48,18 +48,20 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.co
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseConsumer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ISpecialized;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.DelegatingSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.FunctionalNextSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.ReactiveUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.observers.DisposableObserver;
+import io.reactivex.rxjava3.subscribers.DisposableSubscriber;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.reactivestreams.Subscriber;
 import org.slf4j.Logger;
 import sun.misc.Cleaner;
 
@@ -82,8 +84,8 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	private final Consumer<ConcurrentMap<Class<?>, IUIViewCoordinator>> coordinatorMapInitializer;
 	private final Runnable extensionsInitializer;
 	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	private final AutoCloseableRotator<ComponentHierarchyChangeParentObserver, RuntimeException> componentHierarchyChangeParentObserverRotator =
-			new AutoCloseableRotator<>(() -> new ComponentHierarchyChangeParentObserver(this, UIConfiguration.getInstance().getLogger()), Disposable::dispose);
+	private final AutoCloseableRotator<DisposableSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent>, RuntimeException> componentHierarchyChangeParentSubscriberRotator =
+			new AutoCloseableRotator<>(() -> ComponentHierarchyChangeParentSubscriber.ofDecorated(this, UIConfiguration.getInstance().getLogger()), Disposable::dispose);
 
 	private @Nullable M internalManager;
 
@@ -149,7 +151,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 								component.getModifiersView(),
 								IUIStructureLifecycle::unbindV),
 				FunctionUtilities.getEmptyBiConsumer());
-		getComponentHierarchyChangeParentObserverRotator().close();
+		getComponentHierarchyChangeParentSubscriberRotator().close();
 		super.unbind0(context);
 	}
 
@@ -157,8 +159,8 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	@OverridingMethodsMustInvokeSuper
 	protected void bind0(IUIStructureLifecycleContext context) {
 		super.bind0(context);
-		UIEventBusEntryPoint.<UIAbstractComponentHierarchyChangeBusEvent.Parent>getEventBus()
-				.subscribe(getComponentHierarchyChangeParentObserverRotator().get());
+		UIEventBusEntryPoint.<UIAbstractComponentHierarchyChangeBusEvent.Parent>getBusPublisher()
+				.subscribe(getComponentHierarchyChangeParentSubscriberRotator().get());
 		IUIViewComponent.traverseComponentTreeDefault(getManager(),
 				component ->
 						IUIComponentStructureLifecycleModifier.handleComponentModifiers(component,
@@ -203,8 +205,8 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		return getInternalManager().orElseThrow(IllegalStateException::new);
 	}
 
-	protected AutoCloseableRotator<ComponentHierarchyChangeParentObserver, RuntimeException> getComponentHierarchyChangeParentObserverRotator() {
-		return componentHierarchyChangeParentObserverRotator;
+	protected AutoCloseableRotator<? extends DisposableSubscriber<? super UIAbstractComponentHierarchyChangeBusEvent.Parent>, RuntimeException> getComponentHierarchyChangeParentSubscriberRotator() {
+		return componentHierarchyChangeParentSubscriberRotator;
 	}
 
 	protected Optional<? extends M> getInternalManager() {
@@ -220,12 +222,12 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	public void setManager(M manager) {
 		IUIStructureLifecycle.checkBoundState(getLifecycleStateTracker().containsState(EnumUILifecycleState.BOUND), false);
 		// COMMENT initially 'null'
-		getInternalManager().ifPresent(previousManager -> EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(),
+		getInternalManager().ifPresent(previousManager -> EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getBusSubscriber()::onNext,
 				() -> previousManager.setView(null),
 				new UIAbstractComponentHierarchyChangeBusEvent.View(EnumHookStage.PRE, previousManager, this, null),
 				new UIAbstractComponentHierarchyChangeBusEvent.View(EnumHookStage.POST, previousManager, this, null)));
 		setInternalManager(manager);
-		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(),
+		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getBusSubscriber()::onNext,
 				() -> getManager().setView(this),
 				new UIAbstractComponentHierarchyChangeBusEvent.View(EnumHookStage.PRE, getManager(), null, this),
 				new UIAbstractComponentHierarchyChangeBusEvent.View(EnumHookStage.POST, getManager(), null, this));
@@ -328,7 +330,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	public enum CacheViewComponent {
 		;
 
-		@SuppressWarnings({"AnonymousInnerClass", "rawtypes", "RedundantSuppression"})
+		@SuppressWarnings({"AnonymousInnerClass", "rawtypes", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
 		private static final IRegistryObject<IUICacheType<List<? extends IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
 				FunctionUtilities.apply(IUICacheType.generateKey("children_flat"),
 						key -> UICacheRegistry.getInstance().register(key,
@@ -337,35 +339,39 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 										OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
 												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
 										Cleaner.create(suppressThisEscapedWarning(() -> this),
-												new AutoSubscribingCompositeDisposable<>(
-														UIEventBusEntryPoint.getEventBus(),
+												AutoSubscribingDisposable.of(
+														UIEventBusEntryPoint.getBusPublisher(),
 														ImmutableList.of(
-																SpecializedParentDisposableObserver.of(
+																new EventBusSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
 																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
-																		new LoggingDisposableObserver<>(
-																				new FunctionalDisposableObserver<>(
+																		ReactiveUtilities.decorateAsListener(
+																				delegate -> FunctionalNextSubscriber.of(delegate,
 																						event -> {
 																							if (event.getStage() == EnumHookStage.POST)
 																								thisRef.getOptional()
 																										.ifPresent(t -> event.getComponent().getManager()
 																												.flatMap(IUIComponentManager::getView)
 																												.ifPresent(view -> t.invalidate(view)));
-																						}),
-																				UIConfiguration.getInstance().getLogger())
-																),
-																SpecializedViewDisposableObserver.of(
+																						}
+																				),
+																				UIConfiguration.getInstance().getLogger()
+																		)
+																) {},
+																new EventBusSubscriber<UIAbstractComponentHierarchyChangeBusEvent.View>(
 																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
-																		new LoggingDisposableObserver<>(
-																				new FunctionalDisposableObserver<>(
+																		ReactiveUtilities.decorateAsListener(
+																				delegate -> FunctionalNextSubscriber.of(delegate,
 																						event -> {
 																							if (event.getStage() == EnumHookStage.POST)
 																								thisRef.getOptional()
 																										.ifPresent(t -> event.getComponent().getManager()
 																												.flatMap(IUIComponentManager::getView)
 																												.ifPresent(view -> t.invalidate(view)));
-																						}),
-																				UIConfiguration.getInstance().getLogger())
-																)
+																						}
+																				),
+																				UIConfiguration.getInstance().getLogger()
+																		)
+																) {}
 														)
 												)::dispose);
 									}
@@ -389,7 +395,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 										return Optional.of(CollectionUtilities.collectOrRemoveReferences(value));
 									}
 								}));
-		@SuppressWarnings({"AnonymousInnerClass", "rawtypes", "RedundantSuppression"})
+		@SuppressWarnings({"AnonymousInnerClass", "rawtypes", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
 		private static final IRegistryObject<IUICacheType<List<? extends IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
 				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("children_flat.focusable"),
 						key -> UICacheRegistry.getInstance().register(key,
@@ -398,35 +404,39 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 										OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
 												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
 										Cleaner.create(suppressThisEscapedWarning(() -> this),
-												new AutoSubscribingCompositeDisposable<>(
-														UIEventBusEntryPoint.getEventBus(),
+												AutoSubscribingDisposable.of(
+														UIEventBusEntryPoint.getBusPublisher(),
 														ImmutableList.of(
-																SpecializedParentDisposableObserver.of(
+																new EventBusSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
 																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
-																		new LoggingDisposableObserver<>(
-																				new FunctionalDisposableObserver<>(
+																		ReactiveUtilities.decorateAsListener(
+																				delegate -> FunctionalNextSubscriber.of(delegate,
 																						event -> {
 																							if (event.getStage() == EnumHookStage.POST)
 																								thisRef.getOptional()
 																										.ifPresent(t -> event.getComponent().getManager()
 																												.flatMap(IUIComponentManager::getView)
 																												.ifPresent(view -> t.invalidate(view)));
-																						}),
-																				UIConfiguration.getInstance().getLogger())
-																),
-																SpecializedViewDisposableObserver.of(
+																						}
+																				),
+																				UIConfiguration.getInstance().getLogger()
+																		)
+																) {},
+																new EventBusSubscriber<UIAbstractComponentHierarchyChangeBusEvent.View>(
 																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
-																		new LoggingDisposableObserver<>(
-																				new FunctionalDisposableObserver<>(
+																		ReactiveUtilities.decorateAsListener(
+																				delegate -> FunctionalNextSubscriber.of(delegate,
 																						event -> {
 																							if (event.getStage() == EnumHookStage.POST)
 																								thisRef.getOptional()
 																										.ifPresent(t -> event.getComponent().getManager()
 																												.flatMap(IUIComponentManager::getView)
 																												.ifPresent(view -> t.invalidate(view)));
-																						}),
-																				UIConfiguration.getInstance().getLogger())
-																)
+																						}
+																				),
+																				UIConfiguration.getInstance().getLogger()
+																		)
+																) {}
 														)
 												)::dispose);
 									}
@@ -455,43 +465,19 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		public static IRegistryObject<IUICacheType<List<? extends IUIComponent>, IUIViewComponent<?, ?>>> getChildrenFlatFocusable() {
 			return CHILDREN_FLAT_FOCUSABLE;
 		}
-
-		private static final class SpecializedParentDisposableObserver
-				extends SubscribeEventDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>
-				implements ISpecialized {
-			private SpecializedParentDisposableObserver(@Nullable SubscribeEvent subscribeEvent,
-			                                            DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate) {
-				super(subscribeEvent, delegate);
-			}
-
-			public static SpecializedParentDisposableObserver of(@Nullable SubscribeEvent subscribeEvent,
-			                                                     DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate) {
-				return new SpecializedParentDisposableObserver(subscribeEvent, delegate);
-			}
-		}
-
-		private static final class SpecializedViewDisposableObserver
-				extends SubscribeEventDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.View>
-				implements ISpecialized {
-			private SpecializedViewDisposableObserver(@Nullable SubscribeEvent subscribeEvent,
-			                                          DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.View> delegate) {
-				super(subscribeEvent, delegate);
-			}
-
-			public static SpecializedViewDisposableObserver of(@Nullable SubscribeEvent subscribeEvent,
-			                                                   DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.View> delegate) {
-				return new SpecializedViewDisposableObserver(subscribeEvent, delegate);
-			}
-		}
 	}
 
-	public static class ComponentHierarchyChangeParentObserver
-			extends LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent> {
+	public static class ComponentHierarchyChangeParentSubscriber
+			extends DelegatingSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent> {
 		private final OptionalWeakReference<UIAbstractViewComponent<?, ?>> owner;
 
-		public ComponentHierarchyChangeParentObserver(UIAbstractViewComponent<?, ?> owner, Logger logger) {
-			super(logger);
+		protected ComponentHierarchyChangeParentSubscriber(Subscriber<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate, UIAbstractViewComponent<?, ?> owner) {
+			super(delegate);
 			this.owner = OptionalWeakReference.of(owner);
+		}
+
+		public static DisposableSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent> ofDecorated(UIAbstractViewComponent<?, ?> owner, Logger logger) {
+			return ReactiveUtilities.decorateAsListener(delegate -> new ComponentHierarchyChangeParentSubscriber(delegate, owner), logger);
 		}
 
 		@Override

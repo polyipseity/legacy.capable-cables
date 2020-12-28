@@ -30,26 +30,28 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.Enum
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.EnumTimeUnit;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IValueHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.DefaultValueHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBindingAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.fields.RangedBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.methods.ImmutableBindingMethodDestination;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IPointerDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl.KeyboardDeviceUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.OptionalUtilities;
-import io.reactivex.rxjava3.observers.DisposableObserver;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.DelegatingSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.ReactiveUtilities;
+import io.reactivex.rxjava3.subscribers.DisposableSubscriber;
 import org.jetbrains.annotations.NonNls;
+import org.reactivestreams.Subscriber;
 import org.slf4j.Logger;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
@@ -57,6 +59,7 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.*;
@@ -123,7 +126,7 @@ public class UIScrollbarComponent
 						mappings.get(getPropertyScrollRelativeProgressIdentifier())),
 				ConstantValue.of(suppressBoxing(0D)),
 				() -> {
-					// COMMENT see 'PropertyThumbRelativeSizeObserver'
+					// COMMENT see 'PropertyThumbRelativeSizeSubscriber'
 					return thisReference.getOptional()
 							.map(UIScrollbarComponent::getThumbRelativeSize)
 							.map(IBindingField::getValue)
@@ -141,7 +144,7 @@ public class UIScrollbarComponent
 				mappings.get(getPropertyButtonSizeIdentifier()));
 
 		this.thumbRelativeSize.getField().getNotifier()
-				.subscribe(new PropertyThumbRelativeSizeObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()));
+				.subscribe(PropertyThumbRelativeSizeSubscriber.ofDecorated(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()));
 
 		/* TODO slay the dragons
 		====================================================================================================
@@ -481,10 +484,10 @@ public class UIScrollbarComponent
 	}
 
 	@Override
-	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		super.initializeBindings(binderObserverSupplier);
-		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier, () ->
-				ImmutableBinderAction.bind(
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
+		super.initializeBindings(bindingActionConsumerSupplier);
+		BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier, () ->
+				ImmutableBindingAction.bind(
 						getScrollDirection(), getScrollRelativeProgress(),
 						getThumbRelativeSize(), getThumbMovementRelativeSpeed(),
 						getButtonSize()
@@ -493,9 +496,9 @@ public class UIScrollbarComponent
 
 	@Override
 	public void cleanupBindings() {
-		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
-				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier, () ->
-						ImmutableBinderAction.unbind(
+		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
+				BindingUtilities.supplyBindingAction(bindingActionConsumer, () ->
+						ImmutableBindingAction.unbind(
 								getScrollDirection(), getScrollRelativeProgress(),
 								getThumbRelativeSize(), getThumbMovementRelativeSpeed(),
 								getButtonSize()
@@ -592,13 +595,17 @@ public class UIScrollbarComponent
 		}
 	}
 
-	public static class PropertyThumbRelativeSizeObserver
-			extends LoggingDisposableObserver<Double> {
+	public static class PropertyThumbRelativeSizeSubscriber
+			extends DelegatingSubscriber<Double> {
 		private final OptionalWeakReference<UIScrollbarComponent> owner;
 
-		public PropertyThumbRelativeSizeObserver(UIScrollbarComponent owner, Logger logger) {
-			super(logger);
+		protected PropertyThumbRelativeSizeSubscriber(Subscriber<? super Double> delegate, UIScrollbarComponent owner) {
+			super(delegate);
 			this.owner = OptionalWeakReference.of(owner);
+		}
+
+		public static DisposableSubscriber<Double> ofDecorated(UIScrollbarComponent owner, Logger logger) {
+			return ReactiveUtilities.decorateAsListener(delegate -> new PropertyThumbRelativeSizeSubscriber(delegate, owner), logger);
 		}
 
 		@Override

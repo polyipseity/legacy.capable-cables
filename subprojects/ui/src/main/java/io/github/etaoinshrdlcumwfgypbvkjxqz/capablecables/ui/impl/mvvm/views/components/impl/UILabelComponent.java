@@ -28,23 +28,25 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CachedTask;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ColorUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.FloatUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableTuple3;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.AutoSubscribingCompositeDisposable;
-import io.reactivex.rxjava3.observers.DisposableObserver;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBindingAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.AutoSubscribingDisposable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.DelegatingSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.ReactiveUtilities;
+import io.reactivex.rxjava3.subscribers.DisposableSubscriber;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.NonNls;
+import org.reactivestreams.Subscriber;
 import org.slf4j.Logger;
 import sun.misc.Cleaner;
 
@@ -60,6 +62,7 @@ import java.text.AttributedString;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -105,14 +108,14 @@ public class UILabelComponent
 				mappingValue -> EnumOverflowPolicy.valueOf(mappingValue.toString()));
 
 		this.text.getField().getNotifier()
-				.subscribe(new TextDimensionInvalidatorDisposableObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()));
+				.subscribe(TextDimensionInvalidatorSubscriber.ofDecorated(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()));
 		this.overflowPolicy.getField().getNotifier()
-				.subscribe(new TextDimensionInvalidatorDisposableObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()));
+				.subscribe(TextDimensionInvalidatorSubscriber.ofDecorated(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()));
 
 		Cleaner.create(suppressThisEscapedWarning(() -> this),
-				new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
+				AutoSubscribingDisposable.of(UIEventBusEntryPoint.getBusPublisher(),
 						ImmutableList.of(
-								new ModifyShapeDescriptorObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger())
+								ModifyShapeDescriptorSubscriber.ofDecorated(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger())
 						)
 				)::dispose);
 	}
@@ -210,10 +213,10 @@ public class UILabelComponent
 	}
 
 	@Override
-	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		super.initializeBindings(binderObserverSupplier);
-		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier, () ->
-				ImmutableBinderAction.bind(
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
+		super.initializeBindings(bindingActionConsumerSupplier);
+		BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier, () ->
+				ImmutableBindingAction.bind(
 						getText(),
 						getAutoResize(), getOverflowPolicy()
 				));
@@ -221,9 +224,9 @@ public class UILabelComponent
 
 	@Override
 	public void cleanupBindings() {
-		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
-				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier, () ->
-						ImmutableBinderAction.unbind(
+		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
+				BindingUtilities.supplyBindingAction(bindingActionConsumer, () ->
+						ImmutableBindingAction.unbind(
 								getText(),
 								getAutoResize(), getOverflowPolicy()
 						)));
@@ -256,13 +259,17 @@ public class UILabelComponent
 		},
 	}
 
-	public static class TextDimensionInvalidatorDisposableObserver
-			extends LoggingDisposableObserver<Object> {
+	public static class TextDimensionInvalidatorSubscriber
+			extends DelegatingSubscriber<Object> {
 		private final OptionalWeakReference<UILabelComponent> owner;
 
-		public TextDimensionInvalidatorDisposableObserver(UILabelComponent owner, Logger logger) {
-			super(logger);
+		protected TextDimensionInvalidatorSubscriber(Subscriber<? super Object> delegate, UILabelComponent owner) {
+			super(delegate);
 			this.owner = OptionalWeakReference.of(owner);
+		}
+
+		public static DisposableSubscriber<Object> ofDecorated(UILabelComponent owner, Logger logger) {
+			return ReactiveUtilities.decorateAsListener(delegate -> new TextDimensionInvalidatorSubscriber(delegate, owner), logger);
 		}
 
 		@Override
@@ -276,13 +283,17 @@ public class UILabelComponent
 		}
 	}
 
-	public static class ModifyShapeDescriptorObserver
-			extends LoggingDisposableObserver<UIComponentModifyShapeDescriptorBusEvent> {
+	public static class ModifyShapeDescriptorSubscriber
+			extends DelegatingSubscriber<UIComponentModifyShapeDescriptorBusEvent> {
 		private final OptionalWeakReference<UILabelComponent> owner;
 
-		public ModifyShapeDescriptorObserver(UILabelComponent owner, Logger logger) {
-			super(logger);
+		protected ModifyShapeDescriptorSubscriber(Subscriber<? super UIComponentModifyShapeDescriptorBusEvent> delegate, UILabelComponent owner) {
+			super(delegate);
 			this.owner = OptionalWeakReference.of(owner);
+		}
+
+		public static DisposableSubscriber<UIComponentModifyShapeDescriptorBusEvent> ofDecorated(UILabelComponent owner, Logger logger) {
+			return ReactiveUtilities.decorateAsListener(delegate -> new ModifyShapeDescriptorSubscriber(delegate, owner), logger);
 		}
 
 		@Override
@@ -397,18 +408,18 @@ public class UILabelComponent
 		}
 
 		@Override
-		public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-			super.initializeBindings(binderObserverSupplier);
-			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-					() -> ImmutableBinderAction.bind(
+		public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
+			super.initializeBindings(bindingActionConsumerSupplier);
+			BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier,
+					() -> ImmutableBindingAction.bind(
 							getDefaultForegroundColor(), getDefaultBackgroundColor()
 					));
 		}
 
 		@Override
 		public void cleanupBindings() {
-			getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier -> BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-					() -> ImmutableBinderAction.unbind(
+			getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer -> BindingUtilities.supplyBindingAction(bindingActionConsumer,
+					() -> ImmutableBindingAction.unbind(
 							getDefaultForegroundColor(), getDefaultBackgroundColor()
 					)));
 			super.cleanupBindings();

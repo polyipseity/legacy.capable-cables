@@ -11,13 +11,13 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.DefaultBinderObserverSupplierHolder;
-import io.reactivex.rxjava3.observers.DisposableObserver;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingActionConsumerSupplierHolder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.DefaultBindingActionConsumerSupplierHolder;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class UIDefaultRenderer<C>
@@ -25,7 +25,7 @@ public class UIDefaultRenderer<C>
 	@SuppressWarnings("UnstableApiUsage")
 	private final TypeToken<C> typeToken;
 	private final Map<IIdentifier, IUIPropertyMappingValue> mappings;
-	private final IBinderObserverSupplierHolder binderObserverSupplierHolder = new DefaultBinderObserverSupplierHolder();
+	private final IBindingActionConsumerSupplierHolder bindingActionConsumerSupplierHolder = new DefaultBindingActionConsumerSupplierHolder();
 	private OptionalWeakReference<C> container = OptionalWeakReference.of(null);
 
 	@SuppressWarnings({"unchecked", "UnstableApiUsage"})
@@ -65,18 +65,18 @@ public class UIDefaultRenderer<C>
 	public void setContainer(@Nullable C container) { this.container = OptionalWeakReference.of(container); }
 
 	@Override
-	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		IUIRenderer.super.initializeBindings(binderObserverSupplier);
-		getBinderObserverSupplierHolder().setValue(binderObserverSupplier);
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
+		IUIRenderer.super.initializeBindings(bindingActionConsumerSupplier);
+		getBindingActionConsumerSupplierHolder().setValue(bindingActionConsumerSupplier);
 	}
 
 	@Override
 	public void cleanupBindings() {
-		getBinderObserverSupplierHolder().setValue(null);
+		getBindingActionConsumerSupplierHolder().setValue(null);
 		IUIRenderer.super.cleanupBindings();
 	}
 
-	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
-		return binderObserverSupplierHolder;
+	protected IBindingActionConsumerSupplierHolder getBindingActionConsumerSupplierHolder() {
+		return bindingActionConsumerSupplierHolder;
 	}
 }

@@ -18,13 +18,16 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interac
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.AutoSubscribingCompositeDisposable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.AutoSubscribingDisposable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.DelegatingSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.ReactiveUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
+import io.reactivex.rxjava3.subscribers.DisposableSubscriber;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.reactivestreams.Subscriber;
 import org.slf4j.Logger;
 import sun.misc.Cleaner;
 
@@ -39,21 +42,25 @@ public class UIDefaultComponentShapeAnchorController
 
 	public UIDefaultComponentShapeAnchorController() {
 		Cleaner.create(suppressThisEscapedWarning(() -> this),
-				new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
+				AutoSubscribingDisposable.of(UIEventBusEntryPoint.getBusPublisher(),
 						ImmutableList.of(
-								new ModifyShapeDescriptorObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()),
-								new ComponentHierarchyParentChangeObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger())
+								ModifyShapeDescriptorSubscriber.ofDecorated(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()),
+								ComponentHierarchyParentChangeSubscriber.ofDecorated(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger())
 						)
 				)::dispose);
 	}
 
-	public static class ComponentHierarchyParentChangeObserver
-			extends LoggingDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent> {
+	public static class ComponentHierarchyParentChangeSubscriber
+			extends DelegatingSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent> {
 		private final OptionalWeakReference<UIDefaultComponentShapeAnchorController> owner;
 
-		public ComponentHierarchyParentChangeObserver(UIDefaultComponentShapeAnchorController owner, Logger logger) {
-			super(logger);
+		protected ComponentHierarchyParentChangeSubscriber(Subscriber<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate, UIDefaultComponentShapeAnchorController owner) {
+			super(delegate);
 			this.owner = OptionalWeakReference.of(owner);
+		}
+
+		public static DisposableSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent> ofDecorated(UIDefaultComponentShapeAnchorController owner, Logger logger) {
+			return ReactiveUtilities.decorateAsListener(delegate -> new ComponentHierarchyParentChangeSubscriber(delegate, owner), logger);
 		}
 
 		@SuppressWarnings("UnstableApiUsage")
@@ -86,17 +93,21 @@ public class UIDefaultComponentShapeAnchorController
 		protected Optional<? extends UIDefaultComponentShapeAnchorController> getOwner() { return owner.getOptional(); }
 	}
 
-	public static class ModifyShapeDescriptorObserver
-			extends LoggingDisposableObserver<UIComponentModifyShapeDescriptorBusEvent> {
+	public static class ModifyShapeDescriptorSubscriber
+			extends DelegatingSubscriber<UIComponentModifyShapeDescriptorBusEvent> {
 		private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UIConfiguration.getInstance());
 
 		private final OptionalWeakReference<UIDefaultComponentShapeAnchorController> owner;
 		private final Deque<IShapeAnchor> anchoringAnchors = new ArrayDeque<>(CapacityUtilities.getInitialCapacityMedium());
 		private boolean anchoringSelf = false;
 
-		public ModifyShapeDescriptorObserver(UIDefaultComponentShapeAnchorController owner, Logger logger) {
-			super(logger);
+		protected ModifyShapeDescriptorSubscriber(Subscriber<? super UIComponentModifyShapeDescriptorBusEvent> delegate, UIDefaultComponentShapeAnchorController owner) {
+			super(delegate);
 			this.owner = OptionalWeakReference.of(owner);
+		}
+
+		public static DisposableSubscriber<UIComponentModifyShapeDescriptorBusEvent> ofDecorated(UIDefaultComponentShapeAnchorController owner, Logger logger) {
+			return ReactiveUtilities.decorateAsListener(delegate -> new ModifyShapeDescriptorSubscriber(delegate, owner), logger);
 		}
 
 		@Override

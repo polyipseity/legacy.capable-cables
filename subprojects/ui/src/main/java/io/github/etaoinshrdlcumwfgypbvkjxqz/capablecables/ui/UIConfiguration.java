@@ -3,9 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui;
 import com.google.common.base.Suppliers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.cursors.EnumGLFWCursor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftClientUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EventBusSubject;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.core.IThrowableHandler;
 import net.minecraftforge.api.distmarker.Dist;
@@ -48,8 +46,6 @@ public final class UIConfiguration
 			See https://github.com/LWJGL/lwjgl3/issues/306#issuecomment-300481571.
 			*/
 			System.setProperty("java.awt.headless", "true"); // COMMENT err...  it is not needed actually, Minecraft sets it already
-
-			UIEventBusEntryPoint.setEventBus(EventBusSubject.getUIEventBus());
 		}
 
 		@SuppressWarnings("deprecation")

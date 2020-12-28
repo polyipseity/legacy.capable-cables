@@ -24,18 +24,19 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ConcurrencyU
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheLoaderLoadedNullException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ISpecialized;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.*;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.AutoSubscribingDisposable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EventBusSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.ImmutableSubscribeEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.FunctionalNextSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.ReactiveUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.core.IRegistryObject;
-import io.reactivex.rxjava3.observers.DisposableObserver;
 import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import sun.misc.Cleaner;
 
 import java.util.Optional;
@@ -77,7 +78,7 @@ public class UIDefaultCacheExtension
 	public enum CacheUniversal {
 		;
 
-		@SuppressWarnings("AnonymousInnerClass")
+		@SuppressWarnings({"AnonymousInnerClass", "AnonymousInnerClassMayBeStatic"})
 		private static final IRegistryObject<IUICacheType<IUIComponentManager<?>, IUIComponent>> MANAGER =
 				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("manager"),
 						key -> UICacheRegistry.getInstance().register(key,
@@ -86,20 +87,20 @@ public class UIDefaultCacheExtension
 										OptionalWeakReference<? extends IUICacheType<?, IUIComponent>> thisRef =
 												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
 										Cleaner.create(suppressThisEscapedWarning(() -> this),
-												new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
+												AutoSubscribingDisposable.of(UIEventBusEntryPoint.getBusPublisher(),
 														ImmutableList.of(
-																SpecializedParentDisposableObserver.of(
+																new EventBusSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
 																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
-																		new LoggingDisposableObserver<>(
-																				new FunctionalDisposableObserver<>(
+																		ReactiveUtilities.decorateAsListener(
+																				delegate -> FunctionalNextSubscriber.of(delegate,
 																						event -> {
 																							if (event.getStage() == EnumHookStage.POST)
 																								thisRef.getOptional().ifPresent(t ->
 																										t.invalidate(event.getComponent()));
-																						}
-																				),
-																				UIConfiguration.getInstance().getLogger())
-																)
+																						}),
+																				UIConfiguration.getInstance().getLogger()
+																		)
+																) {}
 														)
 												)::dispose);
 									}
@@ -121,7 +122,7 @@ public class UIDefaultCacheExtension
 												.orElseThrow(ReloadException::new)); // COMMENT stale or expired result, reload
 									}
 								})));
-		@SuppressWarnings("AnonymousInnerClass")
+		@SuppressWarnings({"AnonymousInnerClass", "AnonymousInnerClassMayBeStatic"})
 		private static final IRegistryObject<IUICacheType<Integer, IUIComponent>> Z =
 				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("z"),
 						key -> UICacheRegistry.getInstance().register(key,
@@ -130,20 +131,20 @@ public class UIDefaultCacheExtension
 										OptionalWeakReference<? extends IUICacheType<?, IUIComponent>> thisRef =
 												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
 										Cleaner.create(suppressThisEscapedWarning(() -> this),
-												new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
+												AutoSubscribingDisposable.of(UIEventBusEntryPoint.getBusPublisher(),
 														ImmutableList.of(
-																SpecializedParentDisposableObserver.of(
+																new EventBusSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
 																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
-																		new LoggingDisposableObserver<>(
-																				new FunctionalDisposableObserver<>(
+																		ReactiveUtilities.decorateAsListener(
+																				delegate -> FunctionalNextSubscriber.of(delegate,
 																						event -> {
 																							if (event.getStage() == EnumHookStage.POST)
 																								thisRef.getOptional().ifPresent(t ->
 																										t.invalidate(event.getComponent()));
-																						}
-																				),
-																				UIConfiguration.getInstance().getLogger())
-																)
+																						}),
+																				UIConfiguration.getInstance().getLogger()
+																		)
+																) {}
 														)
 												)::dispose);
 									}
@@ -167,20 +168,6 @@ public class UIDefaultCacheExtension
 
 		public static IRegistryObject<IUICacheType<Integer, IUIComponent>> getZ() {
 			return Z;
-		}
-
-		private static final class SpecializedParentDisposableObserver
-				extends SubscribeEventDisposableObserver<UIAbstractComponentHierarchyChangeBusEvent.Parent>
-				implements ISpecialized {
-			private SpecializedParentDisposableObserver(@Nullable SubscribeEvent subscribeEvent,
-			                                            DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate) {
-				super(subscribeEvent, delegate);
-			}
-
-			public static SpecializedParentDisposableObserver of(@Nullable SubscribeEvent subscribeEvent,
-			                                                     DisposableObserver<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate) {
-				return new SpecializedParentDisposableObserver(subscribeEvent, delegate);
-			}
 		}
 	}
 }

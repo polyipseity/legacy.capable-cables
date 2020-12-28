@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.UIProperty;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIComponentArguments;
@@ -17,18 +18,18 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilitie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
-import io.reactivex.rxjava3.observers.DisposableObserver;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBindingAction;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
@@ -114,18 +115,18 @@ public class UIShapeComponent
 
 		@Override
 		@OverridingMethodsMustInvokeSuper
-		public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-			super.initializeBindings(binderObserverSupplier);
-			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier, () ->
-					ImmutableBinderAction.bind(getFilledColor(), getBorderColor()));
+		public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
+			super.initializeBindings(bindingActionConsumerSupplier);
+			BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier, () ->
+					ImmutableBindingAction.bind(getFilledColor(), getBorderColor()));
 		}
 
 		@Override
 		@OverridingMethodsMustInvokeSuper
 		public void cleanupBindings() {
-			getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
-					BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier, () ->
-							ImmutableBinderAction.unbind(getFilledColor(), getBorderColor()))
+			getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
+					BindingUtilities.supplyBindingAction(bindingActionConsumer, () ->
+							ImmutableBindingAction.unbind(getFilledColor(), getBorderColor()))
 			);
 			super.cleanupBindings();
 		}

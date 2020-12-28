@@ -13,7 +13,9 @@ import net.minecraftforge.client.event.GuiScreenEvent;
 public enum UIMinecraftBackgrounds {
 	;
 
-	public static void notifyBackgroundDrawn(Screen screen) { UIEventBusEntryPoint.getEventBus().onNext(new GuiScreenEvent.BackgroundDrawnEvent(screen)); }
+	public static void notifyBackgroundDrawn(Screen screen) {
+		UIEventBusEntryPoint.getBusSubscriber().onNext(new GuiScreenEvent.BackgroundDrawnEvent(screen));
+	}
 
 	/**
 	 * @see Screen#renderBackground()

@@ -51,15 +51,15 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.O
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderAction;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinderObserverSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBinding;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingActionConsumerSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.methods.IBindingMethodSource;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.DefaultBinderObserverSupplierHolder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.DefaultBindingActionConsumerSupplierHolder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBindingAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.methods.ImmutableBindingMethodSource;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EventBusUtilities;
@@ -67,7 +67,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.exte
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.OptionalUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
-import io.reactivex.rxjava3.observers.DisposableObserver;
 import org.jetbrains.annotations.NonNls;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
@@ -80,6 +79,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.ToIntBiFunction;
 
@@ -110,7 +110,7 @@ public class UIDefaultComponent
 	private final IBindingField<Boolean> active;
 	private final AtomicBoolean modifyingShape = new AtomicBoolean();
 	private final List<IUIComponentModifier> modifiers = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
-	private final IBinderObserverSupplierHolder binderObserverSupplierHolder = new DefaultBinderObserverSupplierHolder();
+	private final IBindingActionConsumerSupplierHolder bindingActionConsumerSupplierHolder = new DefaultBindingActionConsumerSupplierHolder();
 	private final IUILifecycleStateTracker lifecycleStateTracker = new UIDefaultLifecycleStateTracker();
 	private final List<IBinding<?>> embedBindings = new ArrayList<>(CapacityUtilities.getInitialCapacitySmall());
 
@@ -168,7 +168,7 @@ public class UIDefaultComponent
 	@Override
 	public boolean modifyShape(BooleanSupplier action) throws ConcurrentModificationException {
 		getModifyingShape().compareAndSet(false, true);
-		boolean ret = EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () ->
+		boolean ret = EventBusUtilities.callWithPrePostHooks(UIEventBusEntryPoint.getBusSubscriber()::onNext, () ->
 						getShapeDescriptor().modify(action),
 				new UIComponentModifyShapeDescriptorBusEvent(EnumHookStage.PRE, this),
 				new UIComponentModifyShapeDescriptorBusEvent(EnumHookStage.POST, this));
@@ -272,7 +272,7 @@ public class UIDefaultComponent
 			return moveChildTo(index, component);
 		component.getParent()
 				.ifPresent(p -> p.removeChildren(ImmutableList.of(component)));
-		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
+		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getBusSubscriber()::onNext, () -> {
 					getChildren().add(index, component);
 					component.onParentChange(null, this);
 				},
@@ -282,10 +282,6 @@ public class UIDefaultComponent
 		return true;
 	}
 
-	protected IBinderObserverSupplierHolder getBinderObserverSupplierHolder() {
-		return binderObserverSupplierHolder;
-	}
-
 	@Override
 	public boolean removeChildren(Iterable<? extends IUIComponent> components) {
 		@SuppressWarnings("UnstableApiUsage") boolean ret = stripBool(
@@ -293,7 +289,7 @@ public class UIDefaultComponent
 						.mapToInt(component -> {
 							int index = getChildren().indexOf(component);
 							if (index != -1) {
-								EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getEventBus(), () -> {
+								EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getBusSubscriber()::onNext, () -> {
 											getChildren().remove(component);
 											component.onParentChange(this, null);
 										},
@@ -307,6 +303,16 @@ public class UIDefaultComponent
 		);
 		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh); // TODO relocation perhaps
 		return ret;
+	}
+
+	@Override
+	@Deprecated
+	public Optional<? extends IExtension<? extends IIdentifier, ?>> addExtension(IExtension<? extends IIdentifier, ?> extension) {
+		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
+		Optional<? extends IExtension<? extends IIdentifier, ?>> result = IExtensionContainer.addExtensionImpl(this, getExtensions(), extension);
+		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
+				BindingUtilities.findAndInitializeBindings(bindingActionConsumer, ImmutableList.of(extension)));
+		return result;
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
@@ -410,21 +416,14 @@ public class UIDefaultComponent
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected List<IUIComponentModifier> getModifiers() { return modifiers; }
 
-	@Override
-	@Deprecated
-	public Optional<? extends IExtension<? extends IIdentifier, ?>> addExtension(IExtension<? extends IIdentifier, ?> extension) {
-		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
-		Optional<? extends IExtension<? extends IIdentifier, ?>> result = IExtensionContainer.addExtensionImpl(this, getExtensions(), extension);
-		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
-				BindingUtilities.findAndInitializeBindings(binderObserverSupplier, ImmutableList.of(extension)));
-		return result;
+	protected IBindingActionConsumerSupplierHolder getBindingActionConsumerSupplierHolder() {
+		return bindingActionConsumerSupplierHolder;
 	}
 
 	@Override
 	public Optional<? extends IExtension<? extends IIdentifier, ?>> removeExtension(IIdentifier key) {
 		Optional<IExtension<? extends IIdentifier, ?>> result = IExtensionContainer.removeExtensionImpl(getExtensions(), key);
-		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
-				BindingUtilities.findAndCleanupBindings(result.map(ImmutableList::of).orElseGet(ImmutableList::of)));
+		BindingUtilities.findAndCleanupBindings(result.map(ImmutableList::of).orElseGet(ImmutableList::of));
 		return result;
 	}
 
@@ -473,7 +472,7 @@ public class UIDefaultComponent
 	@OverridingMethodsMustInvokeSuper
 	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 	protected void bind0(IUIStructureLifecycleContext context) {
-		initializeBindings(context.getBinderObserverSupplier());
+		initializeBindings(context.getBindingActionConsumerSupplier());
 		getManager()
 				.flatMap(IUIComponentManager::getView)
 				.ifPresent(view -> {
@@ -506,16 +505,16 @@ public class UIDefaultComponent
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
-		IUIComponent.super.initializeBindings(binderObserverSupplier);
-		getBinderObserverSupplierHolder().setValue(binderObserverSupplier);
-		BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-				() -> ImmutableBinderAction.bind(Iterables.concat(
+	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
+		IUIComponent.super.initializeBindings(bindingActionConsumerSupplier);
+		getBindingActionConsumerSupplierHolder().setValue(bindingActionConsumerSupplier);
+		BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier,
+				() -> ImmutableBindingAction.bind(Iterables.concat(
 						ImmutableList.of(getActive(), getVisible()),
 						getEmbedBindings()
 				)));
-		BindingUtilities.initializeBindings(binderObserverSupplier, ImmutableSet.of(getRendererContainerContainer()));
-		BindingUtilities.findAndInitializeBindings(binderObserverSupplier, getExtensions().values());
+		BindingUtilities.initializeBindings(bindingActionConsumerSupplier, ImmutableSet.of(getRendererContainerContainer()));
+		BindingUtilities.findAndInitializeBindings(bindingActionConsumerSupplier, getExtensions().values());
 		// COMMENT do not init children, view component should do that via bind
 	}
 
@@ -578,17 +577,17 @@ public class UIDefaultComponent
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void cleanupBindings() {
-		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier -> {
-			BindingUtilities.findAndCleanupBindings(getExtensions().values());
-			BindingUtilities.cleanupBindings(ImmutableSet.of(getRendererContainerContainer()));
-			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
-					() -> ImmutableBinderAction.unbind(Iterables.concat(
+		BindingUtilities.findAndCleanupBindings(getExtensions().values());
+		BindingUtilities.cleanupBindings(ImmutableSet.of(getRendererContainerContainer()));
+		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer -> {
+			BindingUtilities.supplyBindingAction(bindingActionConsumer,
+					() -> ImmutableBindingAction.unbind(Iterables.concat(
 							ImmutableList.of(getActive(), getVisible()),
 							getEmbedBindings()
 					)));
 			// COMMENT do not cleanup children, view component should do that via unbind
 		});
-		getBinderObserverSupplierHolder().setValue(null);
+		getBindingActionConsumerSupplierHolder().setValue(null);
 		IUIComponent.super.cleanupBindings();
 	}
 

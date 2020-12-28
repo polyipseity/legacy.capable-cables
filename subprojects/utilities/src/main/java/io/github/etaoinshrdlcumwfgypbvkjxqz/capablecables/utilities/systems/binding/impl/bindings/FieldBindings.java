@@ -10,12 +10,14 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.core.IThrowingConsumer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.NoSuchBindingTransformerException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IBindingField;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.DelegatingSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.ReactiveUtilities;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.observers.DisposableObserver;
+import io.reactivex.rxjava3.subscribers.DisposableSubscriber;
+import org.reactivestreams.Subscriber;
 import org.slf4j.Logger;
 import sun.misc.Cleaner;
 
@@ -51,6 +53,8 @@ public class FieldBindings
 				Streams.stream(fields) // COMMENT sequential, field binding order matters
 						.filter(FunctionUtilities.notPredicate(getFields()::containsKey))
 						.mapToInt(field -> {
+							// COMMENT the code below is probably not needed, 'BehaviorProcessor'-like notifier for 'IObservableField' expected
+							/* CODE
 							getFields().keySet().stream().unordered()
 									.findAny()
 									.ifPresent(IThrowingConsumer.executeNow(fc ->
@@ -62,11 +66,14 @@ public class FieldBindings
 													)
 											))
 									));
-							DisposableObserver<?> d = new FieldSynchronizationDisposableObserver<>(getTransformers(),
+							 */
+							DisposableSubscriber<?> d = FieldSynchronizationSubscriber.ofDecorated(
+									getTransformers(),
 									field,
 									getFields().keySet(),
 									getIsSource(),
-									UtilitiesConfiguration.getInstance().getLogger());
+									UtilitiesConfiguration.getInstance().getLogger()
+							);
 							getFields().put(field, d);
 							field.getField().getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
 							return tBool();
@@ -105,23 +112,31 @@ public class FieldBindings
 	@Override
 	public boolean isEmpty() { return getFields().isEmpty(); }
 
-	public static class FieldSynchronizationDisposableObserver<T>
-			extends LoggingDisposableObserver<T> {
+	public static class FieldSynchronizationSubscriber<T>
+			extends DelegatingSubscriber<T> {
 		private final Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>> transformersRef;
 		private final IBindingField<T> from;
 		private final Iterable<? extends IBindingField<?>> toRef;
 		private final AtomicBoolean isSourceRef;
 
-		public FieldSynchronizationDisposableObserver(Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>> transformersRef,
-		                                              IBindingField<T> from,
-		                                              Iterable<? extends IBindingField<?>> toRef,
-		                                              AtomicBoolean isSourceRef,
-		                                              Logger logger) {
-			super(logger);
+		protected FieldSynchronizationSubscriber(Subscriber<? super T> delegate,
+		                                         Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>> transformersRef,
+		                                         IBindingField<T> from,
+		                                         Iterable<? extends IBindingField<?>> toRef,
+		                                         AtomicBoolean isSourceRef) {
+			super(delegate);
 			this.transformersRef = transformersRef;
 			this.from = from;
 			this.toRef = toRef;
 			this.isSourceRef = isSourceRef;
+		}
+
+		public static <T> DisposableSubscriber<T> ofDecorated(Cache<? super Class<?>, ? extends Cache<? super Class<?>, ? extends Function<@Nonnull ?, @Nonnull ?>>> transformersRef,
+		                                                      IBindingField<T> from,
+		                                                      Iterable<? extends IBindingField<?>> toRef,
+		                                                      AtomicBoolean isSourceRef,
+		                                                      Logger logger) {
+			return ReactiveUtilities.decorateAsListener(delegate -> new FieldSynchronizationSubscriber<>(delegate, transformersRef, from, toRef, isSourceRef), logger);
 		}
 
 		@SuppressWarnings("UnstableApiUsage")
@@ -144,6 +159,7 @@ public class FieldBindings
 									)
 							));
 				} catch (NoSuchBindingTransformerException e) {
+					cancel();
 					onError(e);
 				} finally {
 					getIsSourceRef().set(true);

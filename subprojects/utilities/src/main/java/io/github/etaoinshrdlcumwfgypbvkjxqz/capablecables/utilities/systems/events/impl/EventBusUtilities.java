@@ -8,7 +8,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.compile.Enum
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.InvokeUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
-import io.reactivex.rxjava3.subjects.Subject;
 import net.minecraftforge.eventbus.EventBus;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventListenerHelper;
@@ -17,6 +16,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import java.lang.invoke.MethodHandle;
 import java.util.ResourceBundle;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressUnboxing;
@@ -36,13 +36,13 @@ public enum EventBusUtilities {
 		}
 	}
 
-	public static void runWithPrePostHooks(Subject<Event> bus, Runnable action, Event pre, Event post) {
-		bus.onNext(pre);
+	public static void runWithPrePostHooks(Consumer<? super Event> bus, Runnable action, Event pre, Event post) {
+		bus.accept(pre);
 		action.run();
-		bus.onNext(post);
+		bus.accept(post);
 	}
 
-	public static boolean callWithPrePostHooks(Subject<Event> bus, BooleanSupplier action, Event pre, Event post) {
+	public static boolean callWithPrePostHooks(Consumer<? super Event> bus, BooleanSupplier action, Event pre, Event post) {
 		if (!pre.hasResult())
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
@@ -51,7 +51,7 @@ public enum EventBusUtilities {
 							.addMessages(() -> getResourceBundle().getString("event.call.hooks.result.void"))
 							.build()
 			);
-		bus.onNext(pre);
+		bus.accept(pre);
 		boolean r;
 		switch (pre.getResult()) {
 			case DEFAULT:
@@ -66,7 +66,7 @@ public enum EventBusUtilities {
 			default:
 				throw new InternalError();
 		}
-		bus.onNext(post);
+		bus.accept(post);
 		return r;
 	}
 
