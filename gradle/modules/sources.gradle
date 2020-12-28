@@ -73,6 +73,9 @@ project.ext.makeSourcesTasks = { Closure c ->
 // COMMENT append
 afterEvaluate {
 	tasks.withType(AbstractCompile).configureEach {
+		// COMMENT Avoid messing around internal tasks.
+		if (it.name.contains('_')) return
+		
 		options.compilerArgs << '-Xlint'
 		options.annotationProcessorPath = configurations.annotationProcessor // COMMENT use new behavior
 
