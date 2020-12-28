@@ -2,7 +2,7 @@
 <bindings xmlns:xs="http://www.w3.org/2001/XMLSchema"
           xmlns:ci="http://jaxb.dev.java.net/plugin/code-injector"
           xmlns="https://jakarta.ee/xml/ns/jaxb"
-          version="1.0">
+          version="3.0">
 	<bindings schemaLocation="ui-values.xsd">
 		<bindings node="/xs:schema">
 			<!-- COMMENT AnyType -->
