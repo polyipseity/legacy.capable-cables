@@ -20,6 +20,8 @@
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIButtonComponent"/>
 	<using alias="component.label"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UILabelComponent"/>
+	<using alias="component.list"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIListComponent"/>
 	<!-- COMMENT extensions -->
 	<using alias="extension.minecraft.background.default"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.extensions.background.UIDefaultMinecraftBackgroundExtension"/>
@@ -132,6 +134,29 @@
 						<resourceBundleLocalizedString key="Window1Label.text_localized"
 						                               baseName="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.ComponentUITest"/>
 					</attributedText>
+				</property>
+			</component>
+
+			<component class="component.list" name="Window1List" rendererName="Window1ListRenderer">
+				<shape class="shape.rectangle" y="50" width="100" height="1000"/>
+
+				<property key="default:property.list.data">
+					<list>
+						<string>Item 0</string>
+						<string>Item 1</string>
+						<string>Item 2</string>
+						<string>Item 3</string>
+						<string>Item 4</string>
+						<string>Item 5</string>
+						<string>Item 6</string>
+						<string>Item 7</string>
+						<string>Item 8</string>
+						<string>Item 9</string>
+						<string>Item 10</string>
+						<string>Item
+							....................................................................................................
+						</string>
+					</list>
 				</property>
 			</component>
 		</component>

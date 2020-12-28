@@ -309,6 +309,16 @@ public class UIDefaultComponent
 		return ret;
 	}
 
+	@SuppressWarnings("UnstableApiUsage")
+	@Override
+	public boolean clearChildren() {
+		return removeChildren(
+				getChildrenView().stream().unordered()
+						.filter(FunctionUtilities.notPredicate(ImmutableSet.copyOf(getEmbedComponents(this))::contains))
+						.collect(ImmutableList.toImmutableList())
+		);
+	}
+
 	@Override
 	public boolean moveChildTo(int index, IUIComponent component) {
 		int previous = getChildren().indexOf(component);

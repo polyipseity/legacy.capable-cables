@@ -24,6 +24,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
+// TODO should really use ServiceLoader or remove this class
 public final class ShapeDescriptorBuilderFactoryRegistry
 		extends AbstractRegistry<IIdentifier, IShapeDescriptorBuilderFactory> {
 	private static final @Immutable Map<IIdentifier, Supplier<@Nonnull IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>>> DEFAULTS_SUPPLIER = ImmutableMap.<IIdentifier, Supplier<@Nonnull IRegistryObjectInternal<? extends IShapeDescriptorBuilderFactory>>>builder()

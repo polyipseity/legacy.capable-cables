@@ -121,6 +121,9 @@ public interface IUIComponent
 	@SuppressWarnings("UnusedReturnValue")
 	boolean removeChildren(Iterable<? extends IUIComponent> components);
 
+	@SuppressWarnings("UnusedReturnValue")
+	boolean clearChildren();
+
 	boolean moveChildTo(int index, IUIComponent component);
 
 	@SuppressWarnings("UnusedReturnValue")
