@@ -1,11 +1,14 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl.UIObjectUtilities;
 
-import javax.annotation.concurrent.Immutable;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.RectangularShape;
+import java.util.Set;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressUnboxing;
 
@@ -47,6 +50,14 @@ public enum EnumUIAxis {
 					rectangularShape.setFrame(suppressUnboxing(x), suppressUnboxing(y),
 							value, suppressUnboxing(height)));
 		}
+
+		@SuppressWarnings("UnstableApiUsage")
+		@Override
+		public @Immutable Set<EnumUISide> getSides(EnumSidesOption option) {
+			return getXSides().stream().unordered()
+					.filter(option::filterSide)
+					.collect(ImmutableSet.toImmutableSet());
+		}
 	},
 	Y {
 		@Override
@@ -84,7 +95,18 @@ public enum EnumUIAxis {
 					rectangularShape.setFrame(suppressUnboxing(x), suppressUnboxing(y),
 							suppressUnboxing(width), value));
 		}
+
+		@SuppressWarnings("UnstableApiUsage")
+		@Override
+		public @Immutable Set<EnumUISide> getSides(EnumSidesOption option) {
+			return getYSides().stream().unordered()
+					.filter(option::filterSide)
+					.collect(ImmutableSet.toImmutableSet());
+		}
 	};
+
+	private static final @Immutable Set<EnumUISide> X_SIDES = Sets.immutableEnumSet(EnumUISide.LEFT, EnumUISide.RIGHT, EnumUISide.HORIZONTAL);
+	private static final @Immutable Set<EnumUISide> Y_SIDES = Sets.immutableEnumSet(EnumUISide.UP, EnumUISide.DOWN, EnumUISide.VERTICAL);
 
 	public abstract EnumUIAxis getOpposite();
 
@@ -99,4 +121,38 @@ public enum EnumUIAxis {
 	public abstract double getSize(RectangularShape rectangularShape);
 
 	public abstract void setSize(RectangularShape rectangularShape, double value);
+
+	private static @Immutable Set<EnumUISide> getXSides() {
+		return X_SIDES;
+	}
+
+	private static @Immutable Set<EnumUISide> getYSides() {
+		return Y_SIDES;
+	}
+
+	public abstract @Immutable Set<EnumUISide> getSides(EnumSidesOption option);
+
+	public enum EnumSidesOption {
+		NORMAL {
+			@Override
+			public boolean filterSide(EnumUISide side) {
+				return side.getType() != EnumUISideType.CENTER;
+			}
+		},
+		ALL {
+			@Override
+			public boolean filterSide(EnumUISide side) {
+				return true;
+			}
+		},
+		CENTER {
+			@Override
+			public boolean filterSide(EnumUISide side) {
+				return side.getType() == EnumUISideType.CENTER;
+			}
+		},
+		;
+
+		public abstract boolean filterSide(EnumUISide side);
+	}
 }
