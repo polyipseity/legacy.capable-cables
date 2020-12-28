@@ -26,19 +26,10 @@ plugins {
 	id 'com.github.johnrengelman.shadow' version '4.0.4' apply false
 }
 
-configurations {
-	replaced {
-		canBeResolved false
-		canBeConsumed false
-	}
-}
-
 allprojects {
 	ext {
 		utilitiesDir = "$rootDir${separator}gradle${separator}utilities".toString()
 		modulesDir = "$rootDir${separator}gradle${separator}modules".toString()
-		// COMMENT mod
-		modID = project.name
 	}
 
 	apply from: "$modulesDir${separator}plugins.gradle"
@@ -70,6 +61,8 @@ allprojects {
 
 	ext {
 		mainSubproject = project rootProject.ext.mainSubprojectPath
+		// COMMENT mod
+		modID = rootProject.ext.modID
 	}
 
 	// COMMENT append

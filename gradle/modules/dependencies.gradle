@@ -37,6 +37,6 @@ afterEvaluate {
 		'runtime' is superseded by 'runtimeOnly'.
 		 */
 
-		stringToStringMap.call(customDependencies).each { String k, List<String> v -> v.each { dependencies."$k"(evaluateGString.call(it)) } }
+		stringToStringMap.call(customDependencies).each { CharSequence k, List<? extends CharSequence> v -> v.each { dependencies."$k"(evaluateGString.call(it)) } }
 	}
 }

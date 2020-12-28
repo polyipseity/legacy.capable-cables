@@ -1,0 +1,5 @@
+<root>
+	<item name='net.minecraftforge.registries.DeferredRegister net.minecraftforge.fml.RegistryObject&lt;I&gt; register(java.lang.String, java.util.function.Supplier&lt;? extends I&gt;) 0'>
+		<annotation name='org.jetbrains.annotations.NonNls'/>
+	</item>
+</root>

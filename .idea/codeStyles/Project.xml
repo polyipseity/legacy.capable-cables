@@ -85,12 +85,6 @@
         <option name="USE_TAB_CHARACTER" value="true" />
       </indentOptions>
     </codeStyleSettings>
-    <codeStyleSettings language="NBTT">
-      <indentOptions>
-        <option name="USE_TAB_CHARACTER" value="true" />
-        <option name="SMART_TABS" value="true" />
-      </indentOptions>
-    </codeStyleSettings>
     <codeStyleSettings language="Scala">
       <option name="METHOD_ANNOTATION_WRAP" value="0" />
       <option name="CLASS_ANNOTATION_WRAP" value="0" />

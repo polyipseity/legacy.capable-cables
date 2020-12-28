@@ -1,8 +1,6 @@
 //////////////////////////////////////////////////
-// TITLE Source
+// TITLE Sources
 //////////////////////////////////////////////////
-
-import groovy.io.FileType
 
 import static java.io.File.separator
 
@@ -11,15 +9,17 @@ checkApply.call(['evaluateGStringString', 'createNewFile'])
 
 project.ext.makeSourcesTasks = { Closure c ->
 	afterEvaluate {
-		tasks.names.findAll { it.startsWith 'compile' }.each { String taskName ->
-			// COMMENT Avoid messing around internal tasks.
-			if (taskName.contains('_')) return
+		tasks.names.findAll { it.startsWith 'compile' }.each { CharSequence taskName ->
+			String taskName2 = taskName.toString()
 
-			def task = tasks.named taskName
-			String taskSourceSetName = taskName.replace('compile', ''),
+			// COMMENT Avoid messing around internal tasks.
+			if (taskName2.contains('_')) return
+
+			def task = tasks.named taskName2
+			String taskSourceSetName = taskName2.replace('compile', ''),
 			       sourceSetName = taskSourceSetName.uncapitalize()
 			sourceSetName = sourceSets.find { sourceSetName.startsWith it.name }?.name
-			String language = taskName.replace "compile", ''
+			String language = taskName2.replace "compile", ''
 			if (sourceSetName == null)
 				sourceSetName = 'main'
 			else
@@ -27,23 +27,15 @@ project.ext.makeSourcesTasks = { Closure c ->
 
 			Set<File> sourceSet = sourceSets."$sourceSetName"."${language.uncapitalize()}".srcDirs
 
-			def pre = tasks.register("preProcess${taskName.capitalize()}", Sync) {
+			def pre = tasks.register("preProcess${taskName2.capitalize()}", Sync) {
 				group task.get().group
 				description "Prepare sources for processing $sourceSetName $language."
 
 				from sourceSet
 				into temporaryDir
-
-				doLast {
-					destinationDir.eachFileRecurse(FileType.FILES) {
-						it.setWritable true, false
-						// COMMENT standard
-						it.text = it.text.replace('\\', '\\\\').replaceAll(~/\$(.*?)__/) { "\${${it[1]}}" }.replaceAll ~/\$(?!\{)/, '\\\\\\$'
-					}
-				}
 			}
 
-			def process = tasks.register("process${taskName.capitalize()}", Sync) {
+			def process = tasks.register("process${taskName2.capitalize()}", Sync) {
 				group task.get().group
 				description "Process $sourceSetName $language."
 				dependsOn pre
@@ -51,60 +43,29 @@ project.ext.makeSourcesTasks = { Closure c ->
 				configure c
 
 				into temporaryDir
-				from(pre.get().temporaryDir) {
-					if (buildType == 'DEBUG') inputs.property 'expand_group', '$group__'
-					Map<String, Object> e = inputs.properties
-							.findAll { it.key.startsWith 'expand_' }
-							.collectEntries {
-								String k = it.key.replace('expand_', '')
-								[(k): it.value, ("${k}__".toString()): it.value]
-							} as Map<String, Object>
 
-					expand e
+				if (inputs.properties.containsKey('expand$pattern')) {
+					from(pre.get().temporaryDir) {
+						include inputs.properties.expand$pattern
 
-					Binding eb = new Binding(e)
-					eachFile {
-						String parent = evaluateGStringString.call(it.relativePath.parent.pathString, eb).replace '.', separator
-						it.path = "$parent$separator${evaluateGStringString.call it.name, eb}"
+						Map<String, Object> e = inputs.properties
+								.findAll { it.key.startsWith 'expand_' }
+								.collectEntries { [(it.key.replace('expand_', '')): it.value] } as Map<String, Object>
+						expand e
 					}
+
+					from(pre.get().temporaryDir) {
+						exclude inputs.properties.expand$pattern
+					}
+				} else {
+					from pre.get().temporaryDir
 				}
 
 				task.get().source = destinationDir
 			}
 
-			def post = tasks.register("postProcess${taskName.capitalize()}", Jar) {
-				group task.get().group
-				description "Finalize after processing $sourceSetName $language."
-
-				from process.get().destinationDir
-				classifier "$sourceSetName$language"
-				destinationDir = file "$buildDir${separator}replaced"
-
-				if (createNewFile.call(archivePath)) {
-					archivePath.setWritable true, false
-					archivePath.text = 'PK\u0005\u0006\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000'
-				}
-				rootProject.dependencies.replaced files(archivePath)
-			}
-
 			pre.configure { mustRunAfter task.get().dependsOn.findAll { it != process } }
-			task.configure {
-				dependsOn process
-				finalizedBy post
-			}
-
-			tasks.withType(Javadoc).configureEach { Javadoc javadoc ->
-				boolean replaced = false
-				javadoc.source = javadoc.source.findAll {
-					boolean r = false
-					String p = it.canonicalPath
-					r = sourceSet.any { p.contains it.canonicalPath }
-					replaced |= r
-					!r
-				}
-				if (replaced)
-					javadoc.source process.get().destinationDir
-			}
+			task.configure { dependsOn process }
 		}
 	}
 }
@@ -112,8 +73,11 @@ project.ext.makeSourcesTasks = { Closure c ->
 // COMMENT append
 afterEvaluate {
 	tasks.withType(AbstractCompile).configureEach {
-		options.fork = false
+		// COMMENT Avoid messing around internal tasks.
+		if (it.name.contains('_')) return
+
 		options.compilerArgs << '-Xlint'
+		options.annotationProcessorPath = configurations.annotationProcessor // COMMENT use new behavior
 
 		if (buildType == 'DEBUG')
 			options.verbose = true

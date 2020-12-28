@@ -8,7 +8,7 @@ apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['clearDirectory'])
 
 ext {
-	jaxbPackagePrefix = "\$group__.jaxb${path.replace(':', '.').replaceAll(/\.\u0024/, '.')}"
+	jaxbPackagePrefix = "${project.group}.jaxb${path.replace(':', '.').replaceAll(/\.\u0024/, '.')}"
 }
 
 configurations {
@@ -17,11 +17,10 @@ configurations {
 }
 
 dependencies {
-	String version = '3.0.0-M4'
+	CharSequence version = '3.0.0-M4'
 
 	// COMMENT runtime
 	implementation "org.glassfish.jaxb:jaxb-runtime:$version"
-	shade "org.glassfish.jaxb:jaxb-runtime:$version"
 	// COMMENT compile
 	// COMMENT schema to Java
 	jaxb "org.glassfish.jaxb:jaxb-xjc:$version"
@@ -32,8 +31,8 @@ dependencies {
 def xjc = tasks.register 'xjc'
 def jxc = tasks.register 'jxc'
 
-project.ext.createJaxbXJCTask = { String taskName, Collection<?> sources, File destDir, Collection<String> options = [], Collection<?> bindInfo = [] ->
-	def task = tasks.register(taskName, JavaExec) {
+project.ext.createJaxbXJCTask = { CharSequence taskName, Collection<?> sources, File destDir, Collection<? extends CharSequence> options = [], Collection<?> bindInfo = [] ->
+	def task = tasks.register(taskName.toString(), JavaExec) {
 		group 'jaxb'
 
 		List<File> s = sources.collectMany { files(it).files }
@@ -61,8 +60,8 @@ project.ext.createJaxbXJCTask = { String taskName, Collection<?> sources, File d
 	task
 }
 
-project.ext.createJaxbJXCTask = { String taskName, Collection<?> sources, File destDir, Collection<String> options = [] ->
-	def task = tasks.register(taskName, JaxaExec) {
+project.ext.createJaxbJXCTask = { CharSequence taskName, Collection<?> sources, File destDir, Collection<String> options = [] ->
+	def task = tasks.register(taskName.toString(), JaxaExec) {
 		group 'jaxb'
 
 		List<File> s = sources.collectMany { files(it).files }

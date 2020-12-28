@@ -234,6 +234,9 @@ gradle-app.setting
 .idea/sbt.xml
 .idea/scala_compiler.xml
 
+# Eclipse
+.classpath
+
 # Generated
 ext*.properties
 generated/

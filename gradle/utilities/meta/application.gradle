@@ -4,7 +4,7 @@
 
 import groovy.io.FileType
 
-String methodMapName = 'methodMap'
+CharSequence methodMapName = 'methodMap'
 boolean hasMethodMap
 for (int i = 0; (hasMethodMap = rootProject.ext.has methodMapName) && !(rootProject.ext."$methodMapName" instanceof Map<?, ?>); ++i) methodMapName = "methodMap$i"
 
@@ -15,17 +15,17 @@ else {
 	methodMap = [:]
 	file(utilitiesDir).eachFileRecurse(FileType.FILES) {
 		if (!it.name.endsWith('.gradle')) return
-		it.text.findAll(~/project\.ext\.([^ ]+) = \{/) { s, String m ->
+		it.text.findAll(~/project\.ext\.([^ ]+) = \{/) { s, CharSequence m ->
 			File p
-			if ((p = methodMap.put(m, it)) != null) throw new IllegalStateException("Repeated utiliy function: '$m' in both '$p.canonicalPath' and '$it.canonicalPath'")
+			if ((p = methodMap.put(m.toString(), it)) != null) throw new IllegalStateException("Repeated utiliy function: '$m' in both '$p.canonicalPath' and '$it.canonicalPath'")
 			false
 		}
 	}
 	rootProject.ext."$methodMapName" = methodMap
 }
 
-project.ext.checkApply = { Iterable<String> functions ->
-	functions.each {
+project.ext.checkApply = { Iterable<? extends CharSequence> functions ->
+	functions.collect { it.toString() }.each {
 		File f = methodMap.computeIfAbsent it, { throw new IllegalArgumentException("No such utility method: $it") }
 		if (!project.ext.has(it)) throw new IllegalStateException("'$f.canonicalPath' is not applied")
 	}

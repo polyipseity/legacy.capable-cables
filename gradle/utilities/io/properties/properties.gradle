@@ -9,7 +9,7 @@ apply from: "$utilitiesDir${separator}meta${separator}application.gradle"
 checkApply.call(['createNewFile'])
 
 
-project.ext.storeProperties = { Properties prop, String path, String comment = null ->
+project.ext.storeProperties = { Properties prop, CharSequence path, String comment = null ->
 	File f = file path
 	createNewFile.call f
 	FileOutputStream fos = new FileOutputStream(f)
@@ -20,9 +20,9 @@ project.ext.storeProperties = { Properties prop, String path, String comment = n
 	}
 }
 
-project.ext.loadProperties = { String path ->
+project.ext.loadProperties = { CharSequence path ->
 	Properties prop = new Properties()
-	FileInputStream fis = new FileInputStream(path)
+	FileInputStream fis = new FileInputStream(path.toString())
 	try {
 		prop.load fis
 	} finally {

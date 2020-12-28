@@ -9,17 +9,18 @@ checkApply.call(['evaluateGStringString'])
 
 project.ext.makeResourcesTasks = { Closure c ->
 	afterEvaluate {
-		tasks.names.findAll { it.startsWith('process') && it.endsWith('Resources') }.each { String taskName ->
-			// COMMENT Avoid messing around internal tasks.
-			if (taskName.contains('_')) return
+		tasks.names.findAll { it.startsWith('process') && it.endsWith('Resources') }.each { CharSequence taskName ->
+			String taskName2 = taskName.toString()
 
-			def task = tasks.named taskName
-			String taskSourceSetName = taskName.replace('process', '').replace('Resources', ''),
+			// COMMENT Avoid messing around internal tasks.
+			if (taskName2.contains('_')) return
+
+			def task = tasks.named taskName2
+			String taskSourceSetName = taskName2.replace('process', '').replace('Resources', ''),
 			       sourceSetName = (taskSourceSetName.empty ? 'main' : taskSourceSetName).uncapitalize()
 
 			task.configure {
 				configure c
-				if (buildType == 'DEBUG') inputs.property 'expand_group', '$group__'
 				Map<String, Object> e = inputs.properties
 						.findAll { it.key.startsWith 'expand_' }
 						.collectEntries { [(it.key.replace('expand_', '')): it.value] } as Map<String, Object>
@@ -35,15 +36,6 @@ project.ext.makeResourcesTasks = { Closure c ->
 
 				// COMMENT copy everything else except the processed files
 				from(sourceSets."$sourceSetName".resources.srcDirs) { exclude '**/*.in*' }
-
-				Binding eb = new Binding(e)
-				eachFile { it.path = evaluateGStringString.call it.path, eb }
-
-				doLast {
-					List<File> markedForDeletion = []
-					destinationDir.eachDirRecurse { if (it.directorySize() == 0) markedForDeletion << it }
-					markedForDeletion.each { it.deleteDir() }
-				}
 			}
 
 			tasks.named("compile${taskSourceSetName}Java").configure {

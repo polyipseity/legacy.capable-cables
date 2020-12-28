@@ -1,8 +1,11 @@
 <root>
 	<item name='java.lang.reflect.Constructor T getAnnotation(java.lang.Class&lt;T&gt;)'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 	<item name='java.lang.reflect.Method T getAnnotation(java.lang.Class&lt;T&gt;)'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='java.lang.reflect.Method java.lang.String getName()'>
+		<annotation name='org.jetbrains.annotations.NonNls'/>
 	</item>
 </root>

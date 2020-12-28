@@ -1,0 +1,41 @@
+<root>
+	<item name='org.slf4j.event.DefaultLoggingEvent java.lang.Object[] getArgumentArray()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.event.DefaultLoggingEvent java.lang.Throwable getThrowable()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.event.DefaultLoggingEvent java.util.List&lt;java.lang.Object&gt; getArguments()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.event.DefaultLoggingEvent java.util.List&lt;org.slf4j.Marker&gt; getMarkers()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.event.LoggingEvent java.lang.Object[] getArgumentArray()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.event.LoggingEvent java.lang.String getLoggerName()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.event.LoggingEvent java.lang.String getMessage()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.event.LoggingEvent java.lang.String getThreadName()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.event.LoggingEvent java.lang.Throwable getThrowable()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.event.LoggingEvent java.util.List&lt;java.lang.Object&gt; getArguments()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.event.LoggingEvent java.util.List&lt;org.slf4j.Marker&gt; getMarkers()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.event.LoggingEvent java.util.List&lt;org.slf4j.event.KeyValuePair&gt; getKeyValuePairs()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.event.LoggingEvent org.slf4j.event.Level getLevel()'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+</root>

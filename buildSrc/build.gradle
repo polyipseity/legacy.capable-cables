@@ -4,7 +4,7 @@
 
 import static java.io.File.separator
 
-final String rootDir = "$projectDir${separator}.."
+final CharSequence rootDir = "$projectDir${separator}.."
 
 ext {
 	ext.rootDir = rootDir
@@ -17,7 +17,7 @@ apply from: "$utilitiesDir${separator}io${separator}properties${separator}ext.pr
 
 loadExt.call "$rootDir${separator}module.properties"
 
-void updateGradleWrapperDistributionUrl(String newDistributionUrl) {
+void updateGradleWrapperDistributionUrl(CharSequence newDistributionUrl) {
 	Wrapper wrapper = tasks.wrapper // COMMENT cannot use Provider
 	Properties properties = new Properties()
 	File propertiesFile = file wrapper.propertiesFile.absolutePath.replace('buildSrc', '')
@@ -28,7 +28,7 @@ void updateGradleWrapperDistributionUrl(String newDistributionUrl) {
 		fis.close()
 	}
 	String oldDistributionUrl = properties.distributionUrl
-	URL newDistribution = new URL(newDistributionUrl)
+	URL newDistribution = new URL(newDistributionUrl.toString())
 	if (newDistribution != new URL(oldDistributionUrl)) {
 		{ ->
 			HttpURLConnection huc = newDistribution.openConnection() as HttpURLConnection

@@ -1,0 +1,43 @@
+<root>
+	<item name='org.slf4j.spi.LoggingEventBuilder org.slf4j.spi.LoggingEventBuilder addArgument(java.lang.Object) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.spi.LoggingEventBuilder org.slf4j.spi.LoggingEventBuilder addArgument(java.util.function.Supplier&lt;java.lang.Object&gt;) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull'/>
+	</item>
+	<item name='org.slf4j.spi.LoggingEventBuilder org.slf4j.spi.LoggingEventBuilder addKeyValue(java.lang.String, java.lang.Object) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+		<annotation name='org.jetbrains.annotations.NonNls'/>
+	</item>
+	<item name='org.slf4j.spi.LoggingEventBuilder org.slf4j.spi.LoggingEventBuilder addKeyValue(java.lang.String, java.lang.Object) 1'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.spi.LoggingEventBuilder org.slf4j.spi.LoggingEventBuilder addKeyValue(java.lang.String, java.util.function.Supplier&lt;java.lang.Object&gt;) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+		<annotation name='org.jetbrains.annotations.NonNls'/>
+	</item>
+	<item name='org.slf4j.spi.LoggingEventBuilder org.slf4j.spi.LoggingEventBuilder addKeyValue(java.lang.String, java.util.function.Supplier&lt;java.lang.Object&gt;) 1'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull'/>
+	</item>
+	<item name='org.slf4j.spi.LoggingEventBuilder org.slf4j.spi.LoggingEventBuilder addMarker(org.slf4j.Marker) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.spi.LoggingEventBuilder org.slf4j.spi.LoggingEventBuilder setCause(java.lang.Throwable) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.spi.LoggingEventBuilder void log(java.lang.String) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.spi.LoggingEventBuilder void log(java.lang.String, java.lang.Object) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.spi.LoggingEventBuilder void log(java.lang.String, java.lang.Object, java.lang.Object) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.spi.LoggingEventBuilder void log(java.lang.String, java.lang.Object...) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
+	</item>
+	<item name='org.slf4j.spi.LoggingEventBuilder void log(java.util.function.Supplier&lt;java.lang.String&gt;) 0'>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull'/>
+	</item>
+</root>

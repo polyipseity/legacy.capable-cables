@@ -1,37 +1,37 @@
 <!--suppress DeprecatedClassUsageInspection -->
 <root>
 	<item name='java.util.Deque E element()'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 	<item name='java.util.Deque E peek()'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 	<item name='java.util.List E get(int)'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 	<item name='java.util.Map V computeIfPresent(K, java.util.function.BiFunction&lt;? super K,? super V,? extends V&gt;)'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 	<item name='java.util.Map V get(java.lang.Object)'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 	<item name='java.util.Map V remove(java.lang.Object)'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 	<item name='java.util.Map.Entry K getKey()'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 	<item name='java.util.Map.Entry V getValue()'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 	<item name='java.util.Map.Entry V setValue(V)'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 	<item name='java.util.Stack'>
 		<annotation name='java.lang.Deprecated'/>
 	</item>
 	<item name='java.util.Stack E peek()'>
-		<annotation name='javax.annotation.Nullable'/>
+		<annotation name='io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable'/>
 	</item>
 	<item name='java.util.Vector'>
 		<annotation name='java.lang.Deprecated'/>
