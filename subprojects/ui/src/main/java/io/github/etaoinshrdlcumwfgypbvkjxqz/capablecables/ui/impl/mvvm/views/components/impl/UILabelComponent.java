@@ -1,12 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl;
 
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.UIProperty;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIComponentArguments;
@@ -19,16 +17,18 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.text.IAttributedText;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIComponentModifyShapeDescriptorBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultComponentRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainerContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.descriptors.AbstractDelegatingShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.text.TextUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CachedTask;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CacheUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ColorUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.FloatUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.DefaultDisposableObserver;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.LoggingDisposableObserver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple3;
@@ -40,14 +40,19 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBindingKey;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBinderAction;
-import io.reactivex.rxjava3.annotations.NonNull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.AutoSubscribingCompositeDisposable;
 import io.reactivex.rxjava3.observers.DisposableObserver;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.NonNls;
+import org.slf4j.Logger;
+import sun.misc.Cleaner;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineBreakMeasurer;
 import java.awt.font.TextLayout;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -55,9 +60,11 @@ import java.text.AttributedString;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.*;
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressBoxing;
+import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 
 public class UILabelComponent
 		extends UIDefaultComponent {
@@ -77,16 +84,7 @@ public class UILabelComponent
 	private final IBindingField<Boolean> autoResize;
 	@UIProperty(PROPERTY_OVERFLOW_POLICY)
 	private final IBindingField<IOverflowPolicy> overflowPolicy; // COMMENT accepted type: CharSequence
-	@Nullable
-	private Dimension2D textDimension;
-	@SuppressWarnings("ThisEscapedInObjectConstruction")
-	private final LoadingCache<IShapeDescriptor<?>, IShapeDescriptor<?>> autoResizeShapeDescriptorCache =
-			CacheUtilities.newCacheBuilderSingleThreaded().weakKeys().build(
-					CacheLoader.from(shapeDescriptor -> {
-						assert shapeDescriptor != null;
-						return new AutoResizeShapeDescriptor(this, shapeDescriptor);
-					})
-			);
+	private boolean resizeTextDimension = true;
 
 	@UIComponentConstructor
 	public UILabelComponent(IUIComponentArguments arguments) {
@@ -107,109 +105,67 @@ public class UILabelComponent
 				mappingValue -> EnumOverflowPolicy.valueOf(mappingValue.toString()));
 
 		this.text.getField().getNotifier()
-				.subscribe(new TextDimensionInvalidatorDisposableObserver(suppressThisEscapedWarning(() -> this)));
+				.subscribe(new TextDimensionInvalidatorDisposableObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()));
 		this.overflowPolicy.getField().getNotifier()
-				.subscribe(new TextDimensionInvalidatorDisposableObserver(suppressThisEscapedWarning(() -> this)));
+				.subscribe(new TextDimensionInvalidatorDisposableObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()));
+
+		Cleaner.create(suppressThisEscapedWarning(() -> this),
+				new AutoSubscribingCompositeDisposable<>(UIEventBusEntryPoint.getEventBus(),
+						ImmutableList.of(
+								new ModifyShapeDescriptorObserver(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger())
+						)
+				)::dispose);
+	}
+
+	@Override
+	protected void update0(IUIComponentContext context) {
+		super.update0(context);
+		if (isResizeTextDimension()) {
+			@SuppressWarnings("AutoUnboxing") boolean autoResize = getAutoResize().getValue();
+			if (autoResize) {
+				Rectangle2D currentBounds = IUIComponent.getShape(this).getBounds2D();
+				Dimension2D targetDimension = calculateTextDimension();
+				AffineTransform transform = AffineTransformUtilities.getTransformFromTo(currentBounds,
+						new Rectangle2D.Double(currentBounds.getX(), currentBounds.getY(),
+								targetDimension.getWidth(), targetDimension.getHeight()));
+				modifyShape(() -> getShapeDescriptor().transform(transform)); // COMMENT should be before setting the boolean flag to ensure no cycles
+			}
+			setResizeTextDimension(false);
+		}
+	}
+
+	protected boolean isResizeTextDimension() {
+		return resizeTextDimension;
+	}
+
+	protected void setResizeTextDimension(boolean resizeTextDimension) {
+		this.resizeTextDimension = resizeTextDimension;
 	}
 
 	protected IBindingField<IAttributedText> getText() {
 		return text;
 	}
 
-	protected void invalidateTextDimension() {
-		textDimension = null;
-	}
-
-	public static IIdentifier getPropertyTextIdentifier() {
-		return PROPERTY_TEXT_IDENTIFIER;
-	}
-
-	public static IIdentifier getPropertyAutoResizeIdentifier() {
-		return PROPERTY_AUTO_RESIZE_IDENTIFIER;
-	}
-
-	public static IIdentifier getPropertyOverflowPolicyIdentifier() {
-		return PROPERTY_OVERFLOW_POLICY_IDENTIFIER;
-	}
-
-	public static @NonNls String getPropertyText() {
-		return PROPERTY_TEXT;
-	}
-
-	public static @NonNls String getPropertyAutoResize() {
-		return PROPERTY_AUTO_RESIZE;
-	}
-
-	@Override
-	public IUIRendererContainerContainer<IUIComponentRenderer<?>> getRendererContainerContainer() {
-		return rendererContainerContainer;
-	}
-
-	public static @NonNls String getPropertyOverflowPolicy() {
-		return PROPERTY_OVERFLOW_POLICY;
-	}
-
-	protected IBindingField<Boolean> getAutoResize() {
-		return autoResize;
-	}
-
-	public static class AutoResizeShapeDescriptor
-			extends AbstractDelegatingShapeDescriptor<Shape, IShapeDescriptor<?>> {
-		private final OptionalWeakReference<UILabelComponent> owner;
-
-		public AutoResizeShapeDescriptor(UILabelComponent owner, IShapeDescriptor<?> delegated) {
-			super(delegated);
-			this.owner = OptionalWeakReference.of(owner);
-		}
-
-		@Override
-		public Shape getShapeOutput() {
-			return getOwner()
-					.filter(owner -> suppressUnboxing(owner.getAutoResize().getValue()))
-					.<Shape>map(owner -> {
-						Rectangle2D bounds = getDelegate().getShapeOutput().getBounds2D();
-						Dimension2D dimension = owner.getTextDimension();
-						return new Rectangle2D.Double(bounds.getX(), bounds.getY(), dimension.getWidth(), dimension.getHeight());
-					})
-					.orElseGet(getDelegate()::getShapeOutput);
-		}
-
-		protected Optional<? extends UILabelComponent> getOwner() {
-			return owner.getOptional();
-		}
-
-		@Override
-		public boolean isDynamic() {
-			return true;
-		}
-	}
-
 	@SuppressWarnings("UnstableApiUsage")
-	protected Dimension2D getTextDimension() {
-		@Nullable Dimension2D result = textDimension;
-		if (result == null) {
-			IOverflowPolicy overflowPolicy = getOverflowPolicy().getValue();
-			// COMMENT need to use super since 'AutoResizeShapeDescriptor' calls this method, there may a better way though...
-			OptionalDouble autoResizeTextWidth = overflowPolicy.getAutoResizeTextWidth(super.getShapeDescriptor());
-			if (autoResizeTextWidth.isPresent()) {
-				float autoResizeTextWidth1 = FloatUtilities.saturatedCast(autoResizeTextWidth.getAsDouble());
-				result = TextUtilities.getLinesDimension(
-						TextUtilities.separateLines(getText().getValue().compile().getIterator()).stream()
-								.map(line -> new LineBreakMeasurer(line, TextUtilities.getDefaultFontRenderContext())) // TODO proper frc
-								.map(line -> new TextUtilities.LineBreakMeasurerAsTextLayoutIterator(line, line1 -> line1.nextLayout(autoResizeTextWidth1)))
-								.flatMap(Streams::stream)
-								.collect(ImmutableList.toImmutableList())
-				);
-			} else {
-				result = TextUtilities.getLinesDimension(
-						TextUtilities.separateLines(getText().getValue().compile().getIterator()).stream()
-								.map(line -> new TextLayout(line, TextUtilities.getDefaultFontRenderContext())) // TODO proper frc
-								.collect(ImmutableList.toImmutableList())
-				);
-			}
-			textDimension = result;
+	protected Dimension2D calculateTextDimension() {
+		IOverflowPolicy overflowPolicy = getOverflowPolicy().getValue();
+		OptionalDouble autoResizeTextWidth = overflowPolicy.getAutoResizeTextWidth(getShapeDescriptor());
+		if (autoResizeTextWidth.isPresent()) {
+			float autoResizeTextWidth1 = FloatUtilities.saturatedCast(autoResizeTextWidth.getAsDouble());
+			return TextUtilities.getLinesDimension(
+					TextUtilities.separateLines(getText().getValue().compile().getIterator()).stream()
+							.map(line -> new LineBreakMeasurer(line, TextUtilities.getDefaultFontRenderContext())) // TODO proper frc
+							.map(line -> new TextUtilities.LineBreakMeasurerAsTextLayoutIterator(line, line1 -> line1.nextLayout(autoResizeTextWidth1)))
+							.flatMap(Streams::stream)
+							.collect(ImmutableList.toImmutableList())
+			);
+		} else {
+			return TextUtilities.getLinesDimension(
+					TextUtilities.separateLines(getText().getValue().compile().getIterator()).stream()
+							.map(line -> new TextLayout(line, TextUtilities.getDefaultFontRenderContext())) // TODO proper frc
+							.collect(ImmutableList.toImmutableList())
+			);
 		}
-		return result;
 	}
 
 	public static IIdentifier getPropertyTextIdentifier() {
@@ -264,15 +220,6 @@ public class UILabelComponent
 	}
 
 	@Override
-	public IShapeDescriptor<?> getShapeDescriptor() {
-		return getAutoResizeShapeDescriptorCache().getUnchecked(super.getShapeDescriptor());
-	}
-
-	protected LoadingCache<IShapeDescriptor<?>, IShapeDescriptor<?>> getAutoResizeShapeDescriptorCache() {
-		return autoResizeShapeDescriptorCache;
-	}
-
-	@Override
 	public void cleanupBindings() {
 		getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier ->
 				BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier, () ->
@@ -310,10 +257,11 @@ public class UILabelComponent
 	}
 
 	public static class TextDimensionInvalidatorDisposableObserver
-			extends DefaultDisposableObserver<Object> {
+			extends LoggingDisposableObserver<Object> {
 		private final OptionalWeakReference<UILabelComponent> owner;
 
-		public TextDimensionInvalidatorDisposableObserver(UILabelComponent owner) {
+		public TextDimensionInvalidatorDisposableObserver(UILabelComponent owner, Logger logger) {
+			super(logger);
 			this.owner = OptionalWeakReference.of(owner);
 		}
 
@@ -321,6 +269,29 @@ public class UILabelComponent
 		public void onNext(@Nonnull Object o) {
 			super.onNext(o);
 			getOwner().ifPresent(UILabelComponent::invalidateTextDimension);
+		}
+
+		protected Optional<? extends UILabelComponent> getOwner() {
+			return owner.getOptional();
+		}
+	}
+
+	public static class ModifyShapeDescriptorObserver
+			extends LoggingDisposableObserver<UIComponentModifyShapeDescriptorBusEvent> {
+		private final OptionalWeakReference<UILabelComponent> owner;
+
+		public ModifyShapeDescriptorObserver(UILabelComponent owner, Logger logger) {
+			super(logger);
+			this.owner = OptionalWeakReference.of(owner);
+		}
+
+		@Override
+		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
+		public void onNext(@Nonnull UIComponentModifyShapeDescriptorBusEvent event) {
+			super.onNext(event);
+			getOwner()
+					.filter(Predicate.isEqual(event.getComponent()))
+					.ifPresent(UILabelComponent::invalidateTextDimension);
 		}
 
 		protected Optional<? extends UILabelComponent> getOwner() {
@@ -336,6 +307,16 @@ public class UILabelComponent
 
 	public static class DefaultRenderer<C extends UILabelComponent>
 			extends UIDefaultComponentRenderer<C> {
+		public static final @NonNls String PROPERTY_DEFAULT_FOREGROUND_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.label.color.foreground.default";
+		public static final @NonNls String PROPERTY_DEFAULT_BACKGROUND_COLOR = IHasBindingKey.StaticHolder.DEFAULT_PREFIX + "property.label.color.background.default";
+		private static final IIdentifier PROPERTY_DEFAULT_FOREGROUND_COLOR_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyDefaultForegroundColor());
+		private static final IIdentifier PROPERTY_DEFAULT_BACKGROUND_COLOR_IDENTIFIER = ImmutableIdentifier.ofInterning(getPropertyDefaultBackgroundColor());
+
+		@UIProperty(PROPERTY_DEFAULT_FOREGROUND_COLOR)
+		private final IBindingField<Color> defaultForegroundColor; // TODO Color to Paint
+		@UIProperty(PROPERTY_DEFAULT_BACKGROUND_COLOR)
+		private final IBindingField<Color> defaultBackgroundColor; // TODO Color to Paint
+
 		@SuppressWarnings("UnstableApiUsage")
 		private final CachedTask<ITuple3<? extends AttributedString, ? extends FontRenderContext, ? extends OptionalDouble>, Iterable<? extends TextLayout>> textLayoutTask =
 				new CachedTask<>(data -> {
@@ -358,6 +339,23 @@ public class UILabelComponent
 		@UIRendererConstructor
 		public DefaultRenderer(IUIRendererArguments arguments) {
 			super(arguments);
+
+			@Immutable Map<IIdentifier, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
+
+			this.defaultForegroundColor = IUIPropertyMappingValue.createBindingField(Color.class,
+					ConstantValue.of(Color.WHITE),
+					mappings.get(getPropertyDefaultForegroundColorIdentifier()));
+			this.defaultBackgroundColor = IUIPropertyMappingValue.createBindingField(Color.class,
+					ConstantValue.of(ColorUtilities.getColorless()),
+					mappings.get(getPropertyDefaultBackgroundColorIdentifier()));
+		}
+
+		public static IIdentifier getPropertyDefaultForegroundColorIdentifier() {
+			return PROPERTY_DEFAULT_FOREGROUND_COLOR_IDENTIFIER;
+		}
+
+		public static IIdentifier getPropertyDefaultBackgroundColorIdentifier() {
+			return PROPERTY_DEFAULT_BACKGROUND_COLOR_IDENTIFIER;
 		}
 
 		public static @NonNls String getPropertyDefaultForegroundColor() {
@@ -380,11 +378,40 @@ public class UILabelComponent
 					try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
 						Point2D textPen = new Point2D.Double(componentBounds.getX(), componentBounds.getY());
 						OptionalDouble textWidth = overflowPolicy.getRenderTextWidth(container.getShapeDescriptor());
+
+						graphics.setColor(getDefaultForegroundColor().getValue());
+						graphics.setBackground(getDefaultBackgroundColor().getValue());
 						TextUtilities.drawLines(graphics, textPen, componentBoundsWidth,
 								getTextLayoutTask().apply(ImmutableTuple3.of(container.getText().getValue().compile(), graphics.getFontRenderContext(), textWidth)));
 					}
 				}
 			});
+		}
+
+		protected IBindingField<Color> getDefaultForegroundColor() {
+			return defaultForegroundColor;
+		}
+
+		protected IBindingField<Color> getDefaultBackgroundColor() {
+			return defaultBackgroundColor;
+		}
+
+		@Override
+		public void initializeBindings(Supplier<? extends Optional<? extends DisposableObserver<IBinderAction>>> binderObserverSupplier) {
+			super.initializeBindings(binderObserverSupplier);
+			BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+					() -> ImmutableBinderAction.bind(
+							getDefaultForegroundColor(), getDefaultBackgroundColor()
+					));
+		}
+
+		@Override
+		public void cleanupBindings() {
+			getBinderObserverSupplierHolder().getValue().ifPresent(binderObserverSupplier -> BindingUtilities.actOnBinderObserverSupplier(binderObserverSupplier,
+					() -> ImmutableBinderAction.unbind(
+							getDefaultForegroundColor(), getDefaultBackgroundColor()
+					)));
+			super.cleanupBindings();
 		}
 
 		protected CachedTask<? super ITuple3<? extends AttributedString, ? extends FontRenderContext, ? extends OptionalDouble>, ? extends Iterable<? extends TextLayout>> getTextLayoutTask() {
