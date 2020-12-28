@@ -498,7 +498,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 		@Override
 		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
 		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
-		public void onNext(UIAbstractComponentHierarchyChangeBusEvent.@NonNull Parent event) {
+		public void onNext(UIAbstractComponentHierarchyChangeBusEvent.@Nonnull Parent event) {
 			super.onNext(event);
 			if (event.getStage() == EnumHookStage.POST) {
 				getOwner().ifPresent(owner -> {

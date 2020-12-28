@@ -212,6 +212,43 @@ public class UILabelComponent
 		return result;
 	}
 
+	public static IIdentifier getPropertyTextIdentifier() {
+		return PROPERTY_TEXT_IDENTIFIER;
+	}
+
+	public static IIdentifier getPropertyAutoResizeIdentifier() {
+		return PROPERTY_AUTO_RESIZE_IDENTIFIER;
+	}
+
+	public static IIdentifier getPropertyOverflowPolicyIdentifier() {
+		return PROPERTY_OVERFLOW_POLICY_IDENTIFIER;
+	}
+
+	public static @NonNls String getPropertyText() {
+		return PROPERTY_TEXT;
+	}
+
+	public static @NonNls String getPropertyAutoResize() {
+		return PROPERTY_AUTO_RESIZE;
+	}
+
+	@Override
+	public IUIRendererContainerContainer<IUIComponentRenderer<?>> getRendererContainerContainer() {
+		return rendererContainerContainer;
+	}
+
+	public static @NonNls String getPropertyOverflowPolicy() {
+		return PROPERTY_OVERFLOW_POLICY;
+	}
+
+	protected IBindingField<Boolean> getAutoResize() {
+		return autoResize;
+	}
+
+	protected void invalidateTextDimension() {
+		setResizeTextDimension(true);
+	}
+
 	protected IBindingField<IOverflowPolicy> getOverflowPolicy() {
 		return overflowPolicy;
 	}
@@ -281,7 +318,7 @@ public class UILabelComponent
 		}
 
 		@Override
-		public void onNext(@NonNull Object o) {
+		public void onNext(@Nonnull Object o) {
 			super.onNext(o);
 			getOwner().ifPresent(UILabelComponent::invalidateTextDimension);
 		}
@@ -321,6 +358,14 @@ public class UILabelComponent
 		@UIRendererConstructor
 		public DefaultRenderer(IUIRendererArguments arguments) {
 			super(arguments);
+		}
+
+		public static @NonNls String getPropertyDefaultForegroundColor() {
+			return PROPERTY_DEFAULT_FOREGROUND_COLOR;
+		}
+
+		public static @NonNls String getPropertyDefaultBackgroundColor() {
+			return PROPERTY_DEFAULT_BACKGROUND_COLOR;
 		}
 
 		@Override

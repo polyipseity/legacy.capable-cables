@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
@@ -22,7 +23,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.O
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.AutoSubscribingCompositeDisposable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
-import io.reactivex.rxjava3.annotations.NonNull;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.slf4j.Logger;
@@ -59,7 +59,7 @@ public class UIDefaultComponentShapeAnchorController
 		@SuppressWarnings("UnstableApiUsage")
 		@Override
 		@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-		public void onNext(UIAbstractComponentHierarchyChangeBusEvent.@NonNull Parent event) {
+		public void onNext(UIAbstractComponentHierarchyChangeBusEvent.@Nonnull Parent event) {
 			super.onNext(event);
 			if (event.getStage() == EnumHookStage.POST && !event.getNext().isPresent())
 				getOwner().ifPresent(owner -> {

@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive;
 
-import io.reactivex.rxjava3.annotations.NonNull;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.reactivex.rxjava3.observers.DisposableObserver;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
@@ -21,11 +21,11 @@ public class DelegatingDisposableObserver<T>
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void onNext(@NonNull T t) { getDelegate().onNext(t); }
+	public void onNext(@Nonnull T t) { getDelegate().onNext(t); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void onError(@NonNull Throwable e) { getDelegate().onError(e); }
+	public void onError(@Nonnull Throwable e) { getDelegate().onError(e); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
