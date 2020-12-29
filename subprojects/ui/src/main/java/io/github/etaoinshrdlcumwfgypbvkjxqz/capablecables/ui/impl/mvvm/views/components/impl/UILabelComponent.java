@@ -40,6 +40,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.ImmutableBindingAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.AutoSubscribingDisposable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EventBusSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.ImmutableSubscribeEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.DelegatingSubscriber;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.ReactiveUtilities;
 import io.reactivex.rxjava3.subscribers.DisposableSubscriber;
@@ -292,8 +294,17 @@ public class UILabelComponent
 			this.owner = OptionalWeakReference.of(owner);
 		}
 
+		@SuppressWarnings("AnonymousInnerClass")
 		public static DisposableSubscriber<UIComponentModifyShapeDescriptorBusEvent> ofDecorated(UILabelComponent owner, Logger logger) {
-			return ReactiveUtilities.decorateAsListener(delegate -> new ModifyShapeDescriptorSubscriber(delegate, owner), logger);
+			return new EventBusSubscriber<UIComponentModifyShapeDescriptorBusEvent>(
+					ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
+					ReactiveUtilities.decorateAsListener(delegate -> new ModifyShapeDescriptorSubscriber(delegate, owner), logger)
+			) {
+				@Override
+				public void onNext(UIComponentModifyShapeDescriptorBusEvent event) {
+					onNextImpl(event);
+				}
+			};
 		}
 
 		@Override

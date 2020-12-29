@@ -100,7 +100,12 @@ public class UIDefaultCacheExtension
 																						}),
 																				UIConfiguration.getInstance().getLogger()
 																		)
-																) {}
+																) {
+																	@Override
+																	public void onNext(UIAbstractComponentHierarchyChangeBusEvent.Parent event) {
+																		onNextImpl(event);
+																	}
+																}
 														)
 												)::dispose);
 									}
@@ -144,7 +149,12 @@ public class UIDefaultCacheExtension
 																						}),
 																				UIConfiguration.getInstance().getLogger()
 																		)
-																) {}
+																) {
+																	@Override
+																	public void onNext(UIAbstractComponentHierarchyChangeBusEvent.Parent event) {
+																		onNextImpl(event);
+																	}
+																}
 														)
 												)::dispose);
 									}

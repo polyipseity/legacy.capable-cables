@@ -356,7 +356,12 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 																				),
 																				UIConfiguration.getInstance().getLogger()
 																		)
-																) {},
+																) {
+																	@Override
+																	public void onNext(UIAbstractComponentHierarchyChangeBusEvent.Parent event) {
+																		onNextImpl(event);
+																	}
+																},
 																new EventBusSubscriber<UIAbstractComponentHierarchyChangeBusEvent.View>(
 																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
 																		ReactiveUtilities.decorateAsListener(
@@ -371,7 +376,12 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 																				),
 																				UIConfiguration.getInstance().getLogger()
 																		)
-																) {}
+																) {
+																	@Override
+																	public void onNext(UIAbstractComponentHierarchyChangeBusEvent.View event) {
+																		onNextImpl(event);
+																	}
+																}
 														)
 												)::dispose);
 									}
@@ -421,7 +431,12 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 																				),
 																				UIConfiguration.getInstance().getLogger()
 																		)
-																) {},
+																) {
+																	@Override
+																	public void onNext(UIAbstractComponentHierarchyChangeBusEvent.Parent event) {
+																		onNextImpl(event);
+																	}
+																},
 																new EventBusSubscriber<UIAbstractComponentHierarchyChangeBusEvent.View>(
 																		ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
 																		ReactiveUtilities.decorateAsListener(
@@ -436,7 +451,12 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 																				),
 																				UIConfiguration.getInstance().getLogger()
 																		)
-																) {}
+																) {
+																	@Override
+																	public void onNext(UIAbstractComponentHierarchyChangeBusEvent.View event) {
+																		onNextImpl(event);
+																	}
+																}
 														)
 												)::dispose);
 									}
@@ -476,8 +496,17 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 			this.owner = OptionalWeakReference.of(owner);
 		}
 
+		@SuppressWarnings("AnonymousInnerClass")
 		public static DisposableSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent> ofDecorated(UIAbstractViewComponent<?, ?> owner, Logger logger) {
-			return ReactiveUtilities.decorateAsListener(delegate -> new ComponentHierarchyChangeParentSubscriber(delegate, owner), logger);
+			return new EventBusSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
+					ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
+					ReactiveUtilities.decorateAsListener(delegate -> new ComponentHierarchyChangeParentSubscriber(delegate, owner), logger)
+			) {
+				@Override
+				public void onNext(UIAbstractComponentHierarchyChangeBusEvent.Parent event) {
+					onNextImpl(event);
+				}
+			};
 		}
 
 		@Override

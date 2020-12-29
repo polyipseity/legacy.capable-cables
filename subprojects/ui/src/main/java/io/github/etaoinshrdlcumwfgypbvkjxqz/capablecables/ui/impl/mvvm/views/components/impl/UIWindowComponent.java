@@ -56,6 +56,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.fields.MemoryObservableField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.methods.ImmutableBindingMethodDestination;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EventBusSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.ImmutableSubscribeEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl.UIObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.DelegatingSubscriber;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.ReactiveUtilities;
@@ -484,6 +486,11 @@ public class UIWindowComponent
 		return UIObjectUtilities.unPositionedRectangularShape(bounds, bounds);
 	}
 
+	@Override
+	public IUIComponent getContentComponent() {
+		return getContentPane();
+	}
+
 	protected IBindingField<EnumUISide> getControlsSide() {
 		return controlsSide;
 	}
@@ -588,6 +595,12 @@ public class UIWindowComponent
 
 	public static @NonNls String getPropertyControlsThickness() {
 		return PROPERTY_CONTROLS_THICKNESS;
+	}
+
+	@Override
+	public void transformChildren(AffineTransform transform) {
+		super.transformChildren(transform);
+		AffineTransformUtilities.translateByPoint(transform, getContentTranslation(this));
 	}
 
 	@Override
@@ -745,8 +758,17 @@ public class UIWindowComponent
 			this.owner = OptionalWeakReference.of(owner);
 		}
 
+		@SuppressWarnings("AnonymousInnerClass")
 		public static DisposableSubscriber<UIComponentModifyShapeDescriptorBusEvent> ofDecorated(UIWindowComponent owner, Logger logger) {
-			return ReactiveUtilities.decorateAsListener(delegate -> new ModifyShapeDescriptorSubscriber(delegate, owner), logger);
+			return new EventBusSubscriber<UIComponentModifyShapeDescriptorBusEvent>(
+					ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
+					ReactiveUtilities.decorateAsListener(delegate -> new ModifyShapeDescriptorSubscriber(delegate, owner), logger)
+			) {
+				@Override
+				public void onNext(UIComponentModifyShapeDescriptorBusEvent event) {
+					onNextImpl(event);
+				}
+			};
 		}
 
 		@Override

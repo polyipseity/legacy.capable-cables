@@ -30,6 +30,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.BindingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.DefaultBindingActionConsumerSupplierHolder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EventBusSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.ImmutableSubscribeEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.core.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.IInputDevices;
@@ -139,8 +141,17 @@ public class UIDefaultMinecraftBackgroundExtension
 			this.owner = OptionalWeakReference.of(owner);
 		}
 
+		@SuppressWarnings("AnonymousInnerClass")
 		public static DisposableSubscriber<UIAbstractViewBusEvent.Render> ofDecorated(UIDefaultMinecraftBackgroundExtension owner, Logger logger) {
-			return ReactiveUtilities.decorateAsListener(delegate -> new RenderSubscriber(delegate, owner), logger);
+			return new EventBusSubscriber<UIAbstractViewBusEvent.Render>(
+					ImmutableSubscribeEvent.of(),
+					ReactiveUtilities.decorateAsListener(delegate -> new RenderSubscriber(delegate, owner), logger)
+			) {
+				@Override
+				public void onNext(UIAbstractViewBusEvent.Render event) {
+					onNextImpl(event);
+				}
+			};
 		}
 
 		@Override

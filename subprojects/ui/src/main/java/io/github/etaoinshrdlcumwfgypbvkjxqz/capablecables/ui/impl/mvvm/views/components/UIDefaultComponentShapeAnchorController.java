@@ -21,6 +21,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.AutoSubscribingDisposable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EnumHookStage;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.EventBusSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.ImmutableSubscribeEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.DelegatingSubscriber;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.ReactiveUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.templates.CommonConfigurationTemplate;
@@ -59,8 +61,17 @@ public class UIDefaultComponentShapeAnchorController
 			this.owner = OptionalWeakReference.of(owner);
 		}
 
+		@SuppressWarnings("AnonymousInnerClass")
 		public static DisposableSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent> ofDecorated(UIDefaultComponentShapeAnchorController owner, Logger logger) {
-			return ReactiveUtilities.decorateAsListener(delegate -> new ComponentHierarchyParentChangeSubscriber(delegate, owner), logger);
+			return new EventBusSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
+					ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
+					ReactiveUtilities.decorateAsListener(delegate -> new ComponentHierarchyParentChangeSubscriber(delegate, owner), logger)
+			) {
+				@Override
+				public void onNext(UIAbstractComponentHierarchyChangeBusEvent.Parent event) {
+					onNextImpl(event);
+				}
+			};
 		}
 
 		@SuppressWarnings("UnstableApiUsage")
@@ -106,8 +117,17 @@ public class UIDefaultComponentShapeAnchorController
 			this.owner = OptionalWeakReference.of(owner);
 		}
 
+		@SuppressWarnings("AnonymousInnerClass")
 		public static DisposableSubscriber<UIComponentModifyShapeDescriptorBusEvent> ofDecorated(UIDefaultComponentShapeAnchorController owner, Logger logger) {
-			return ReactiveUtilities.decorateAsListener(delegate -> new ModifyShapeDescriptorSubscriber(delegate, owner), logger);
+			return new EventBusSubscriber<UIComponentModifyShapeDescriptorBusEvent>(
+					ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
+					ReactiveUtilities.decorateAsListener(delegate -> new ModifyShapeDescriptorSubscriber(delegate, owner), logger)
+			) {
+				@Override
+				public void onNext(UIComponentModifyShapeDescriptorBusEvent event) {
+					onNextImpl(event);
+				}
+			};
 		}
 
 		@Override
