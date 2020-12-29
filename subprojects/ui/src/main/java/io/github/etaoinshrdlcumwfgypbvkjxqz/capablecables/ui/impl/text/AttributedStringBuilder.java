@@ -69,10 +69,7 @@ public class AttributedStringBuilder {
 	}
 
 	public AttributedString build() {
-		AttributedString result = new AttributedString(
-				getStringList().stream()
-						.reduce("", String::concat)
-		);
+		AttributedString result = new AttributedString(String.join("", getStringList()));
 		getAttributesList().forEach((range, attributes) -> {
 			assert !range.getLeft().equals(range.getRight());
 			result.addAttributes(attributes, suppressUnboxing(range.getLeft()), suppressUnboxing(range.getRight()));

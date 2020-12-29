@@ -10,6 +10,7 @@ import org.slf4j.Marker;
 
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool.*;
 
@@ -97,7 +98,7 @@ public class LogMessageBuilder {
 				getMessages().stream()
 						.map(Supplier::get)
 						.map(Objects::toString)
-						.reduce("", String::concat, String::concat),
+						.collect(Collectors.joining()),
 				getArguments().stream()
 						.map(Supplier::get)
 						.toArray()));
