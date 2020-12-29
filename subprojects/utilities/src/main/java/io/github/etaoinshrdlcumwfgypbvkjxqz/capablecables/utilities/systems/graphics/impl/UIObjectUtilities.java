@@ -21,7 +21,7 @@ public enum UIObjectUtilities {
 
 	public static Shape copyShape(Shape shape) { return AffineTransformUtilities.getIdentity().createTransformedShape(shape); }
 
-	public static <T extends RectangularShape> T unPositionedRectangularShape(T source, T destination) {
+	public static <T extends RectangularShape> T unPositionRectangularShape(T source, T destination) {
 		destination.setFrame(0D, 0D, source.getWidth(), source.getHeight());
 		return destination;
 	}
