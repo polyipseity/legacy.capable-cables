@@ -18,6 +18,11 @@ public abstract class EventBusSubscriber<T>
 		this.subscribeEvent = subscribeEvent;
 	}
 
+	@SuppressWarnings("unused")
+	protected EventBusSubscriber(Subscriber<? super T> delegate) {
+		this(null, delegate);
+	}
+
 	@Override
 	public Optional<? extends SubscribeEvent> getSubscribeEvent() {
 		return Optional.ofNullable(subscribeEvent);

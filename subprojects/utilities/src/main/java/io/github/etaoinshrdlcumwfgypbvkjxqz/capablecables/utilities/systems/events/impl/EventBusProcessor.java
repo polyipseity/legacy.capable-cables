@@ -54,7 +54,7 @@ public class EventBusProcessor
 	protected void onStart() {
 		super.onStart();
 		getDelegate().start();
-		request(1L);
+		request(Long.MAX_VALUE); // COMMENT see 'ContinuouslyRequestingSubscriber'
 	}
 
 	@Override

@@ -23,6 +23,18 @@ public final class ImmutableSubscribeEvent
 		return new ImmutableSubscribeEvent(priority, receiveCanceled);
 	}
 
+	public static ImmutableSubscribeEvent of(boolean receiveCanceled) {
+		return of(EventPriority.NORMAL, receiveCanceled);
+	}
+
+	public static ImmutableSubscribeEvent of(EventPriority priority) {
+		return of(priority, false);
+	}
+
+	public static ImmutableSubscribeEvent of() {
+		return of(EventPriority.NORMAL, false);
+	}
+
 	@Override
 	public EventPriority priority() { return priority; }
 
