@@ -155,7 +155,7 @@ public enum JAXBUIComponentUtilities {
 								}),
 								Component::getComponent,
 								(p, c) -> {
-									p.addChildren(c);
+									IUIComponent.addContentChildren(p, c);
 									return p;
 								},
 								n -> {

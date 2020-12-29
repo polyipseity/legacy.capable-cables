@@ -101,9 +101,12 @@ public interface IUIComponent
 
 	boolean isVisible();
 
-	void setVisible(boolean visible);
+	@SuppressWarnings("UnusedReturnValue")
+	static boolean addContentChildren(IUIComponent instance, Iterable<? extends IUIComponent> components) {
+		return instance.getContentComponent().addChildren(components);
+	}
 
-	void setActive(boolean active);
+	boolean addChildren(Iterable<? extends IUIComponent> components); // COMMENT use 'addContentChildren' instead
 
 	@Override
 	default boolean isFocusable() { return false; }
@@ -113,16 +116,22 @@ public interface IUIComponent
 	@Override
 	void transformChildren(AffineTransform transform);
 
-	@SuppressWarnings("UnusedReturnValue")
-	boolean addChildren(Iterable<? extends IUIComponent> components);
+	IUIComponent getContentComponent();
 
-	boolean addChildAt(int index, IUIComponent component);
+	@SuppressWarnings("unused")
+	static boolean addContentChildAt(IUIComponent instance, int index, IUIComponent component) {
+		return instance.getContentComponent().addChildAt(index, component);
+	}
+
+	boolean addChildAt(int index, IUIComponent component); // COMMENT use 'addContentChildAt' instead
 
 	@SuppressWarnings("UnusedReturnValue")
 	boolean removeChildren(Iterable<? extends IUIComponent> components);
 
 	@SuppressWarnings("UnusedReturnValue")
-	boolean clearChildren();
+	static boolean clearContentChildren(IUIComponent instance) {
+		return instance.getContentComponent().clearChildren();
+	}
 
 	boolean moveChildTo(int index, IUIComponent component);
 
@@ -146,6 +155,14 @@ public interface IUIComponent
 
 	@Override
 	default Optional<? extends IUIComponent> getParentNode() { return getParent(); }
+
+	boolean clearChildren(); // COMMENT use 'clearContentChildren' instead
+
+	@SuppressWarnings("unused")
+	void setVisible(boolean visible);
+
+	@SuppressWarnings("unused")
+	void setActive(boolean active);
 
 	class ParentIterator
 			implements Iterator<IUIComponent> {

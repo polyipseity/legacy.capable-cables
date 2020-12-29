@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug;
 
 import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.ComponentTheme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.ComponentUI;
@@ -221,7 +221,7 @@ public enum UIMinecraftDebug {
 									new RectangularShapeDescriptor<>(new Rectangle(0, 0, 100, 100)),
 									null,
 									ImmutableMap.of()));
-					componentManager.addChildren(ImmutableSet.of(window));
+					IUIComponent.addContentChildren(componentManager, ImmutableList.of(window));
 				}
 				view = IUIViewComponent.create(() -> new UIDefaultMinecraftViewComponent<>(UIImmutableViewComponentArguments.of(ImmutableMap.of())),
 						componentManager);

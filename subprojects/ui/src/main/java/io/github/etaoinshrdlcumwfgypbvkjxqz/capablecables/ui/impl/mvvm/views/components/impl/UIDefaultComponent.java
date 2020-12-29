@@ -177,6 +177,11 @@ public class UIDefaultComponent
 	}
 
 	@Override
+	public IUIComponent getContentComponent() {
+		return this;
+	}
+
+	@Override
 	public Optional<? extends IUIComponent> getParent() { return parent.getOptional(); }
 
 	@Override

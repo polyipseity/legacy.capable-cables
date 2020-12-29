@@ -166,7 +166,8 @@ public class UIListComponent<E>
 
 	@SuppressWarnings({"UnstableApiUsage", "rawtypes", "RedundantSuppression"})
 	protected void rebuildChildren() {
-		clearChildren();
+		IUIComponent contentComponent = getContentComponent();
+		IUIComponent.clearContentChildren(this);
 
 		// data
 		EnumUISide direction = getDirection().getValue();
@@ -183,14 +184,14 @@ public class UIListComponent<E>
 				.map(datum -> componentFactory.apply(this, datum))
 				.collect(ImmutableList.toImmutableList());
 
-		addChildren(children);
+		IUIComponent.addContentChildren(this, children);
 
 		// TODO enhancement: the anchor approach might be terrible for performance for large lists
 		// TODO enhancement: direction-relative-side-specific borders
-		final IShapeAnchor[] nextAnchor = {new ImmutableShapeAnchor(this, startingSide, startingSide, 0D)};
+		final IShapeAnchor[] nextAnchor = {new ImmutableShapeAnchor(contentComponent, startingSide, startingSide, 0D)};
 		children.forEach(child -> {
 			shapeAnchorController.addAnchors(child, sideSides.stream().unordered()
-					.map(sideSide -> new ImmutableShapeAnchor(this, sideSide, sideSide, 0D))
+					.map(sideSide -> new ImmutableShapeAnchor(contentComponent, sideSide, sideSide, 0D))
 					.collect(ImmutableList.toImmutableList()));
 			shapeAnchorController.addAnchors(child, ImmutableSet.of(nextAnchor[0]));
 			nextAnchor[0] = new ImmutableShapeAnchor(child, startingSide, direction, 0D);
