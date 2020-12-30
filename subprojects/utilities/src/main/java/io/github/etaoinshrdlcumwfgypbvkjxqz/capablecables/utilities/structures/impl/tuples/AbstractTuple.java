@@ -1,7 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ArrayUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.tuples.ITuple;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.def.tuples.ITuple;
 
 public abstract class AbstractTuple
 		implements ITuple {

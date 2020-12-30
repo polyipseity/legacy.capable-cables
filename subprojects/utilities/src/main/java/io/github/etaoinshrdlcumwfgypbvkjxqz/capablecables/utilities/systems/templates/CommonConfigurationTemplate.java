@@ -7,7 +7,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.Stac
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.IRecordCandidate;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.internationalization.ChangingLocaleResourceBundle;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.logging.ProperLoggingEventBuilderLogger;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.core.IThrowableHandler;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.def.IThrowableHandler;
 import org.slf4j.Logger;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;

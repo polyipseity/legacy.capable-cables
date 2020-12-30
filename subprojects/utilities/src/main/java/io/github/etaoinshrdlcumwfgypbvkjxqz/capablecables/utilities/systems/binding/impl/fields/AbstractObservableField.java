@@ -1,7 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.fields;
 
 import com.google.common.reflect.TypeToken;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.fields.IObservableField;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.def.fields.IObservableField;
 import io.reactivex.rxjava3.processors.BehaviorProcessor;
 import org.reactivestreams.Processor;
 import org.reactivestreams.Publisher;

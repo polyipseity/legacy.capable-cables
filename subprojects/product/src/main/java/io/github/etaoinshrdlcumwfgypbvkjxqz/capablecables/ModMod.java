@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.client.ModClientProxy;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.core.IProxy;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.proxies.def.IProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.server.ModServerProxy;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.NamespaceUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.UtilitiesConfiguration;

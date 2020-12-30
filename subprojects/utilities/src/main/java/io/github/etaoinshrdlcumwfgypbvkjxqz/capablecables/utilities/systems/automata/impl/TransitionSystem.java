@@ -8,8 +8,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.automata.core.IState;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.automata.core.ITransitionSystem;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.automata.def.IState;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.automata.def.ITransitionSystem;
 
 import java.util.Map;
 import java.util.Optional;

@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.core.ICoordinateSystem;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.def.ICoordinateSystem;
 
 import java.awt.geom.Point2D;
 

@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.core.ISubscribeEventProvider;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.reactive.impl.ReifiedSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.ReifiedSubscriber;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.def.ISubscribeEventProvider;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.reactivestreams.Subscriber;
 
