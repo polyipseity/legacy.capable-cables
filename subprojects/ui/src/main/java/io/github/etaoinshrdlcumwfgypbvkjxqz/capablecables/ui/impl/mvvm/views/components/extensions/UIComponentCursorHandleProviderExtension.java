@@ -18,7 +18,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.exte
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.def.ICursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.def.IInputDevices;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.def.IPointerDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional2;
 
 import java.util.Optional;
@@ -48,9 +47,7 @@ public class UIComponentCursorHandleProviderExtension
 										.map(IUIViewContext::getInputDevices)
 										.flatMap(IInputDevices::getPointerDevice)
 										.orElse(null))
-								.flatMap(values -> {
-									IUIComponentContext componentContext = values.getValue1Nonnull();
-									IPointerDevice pointerDevice = values.getValue2Nonnull();
+								.flatMap((componentContext, pointerDevice) -> {
 									try (IUIComponentContext safeComponentContext = componentContext) {
 										Optional<? extends ICursor> ret = Optional.empty();
 										IUIViewComponent.getPathResolver(view).resolvePath(safeComponentContext, pointerDevice.getPositionView());

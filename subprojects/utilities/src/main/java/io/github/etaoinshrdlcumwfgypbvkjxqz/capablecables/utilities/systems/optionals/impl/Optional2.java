@@ -1,11 +1,16 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl;
 
 import com.google.common.collect.ImmutableList;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.def.ICompositeOptionalValues;
 
 import java.util.Iterator;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 
 public final class Optional2<V1, V2>
@@ -41,6 +46,26 @@ public final class Optional2<V1, V2>
 
 	@Override
 	protected Values<V1, V2> getValues() { return values; }
+
+	/* SECTION specialized */
+
+	public void ifPresent(BiConsumer<@Nonnull ? super V1, @Nonnull ? super V2> consumer) {
+		ifPresent(values -> consumer.accept(values.getValue1Nonnull(), values.getValue2Nonnull()));
+	}
+
+	public Optional2<V1, V2> filter(BiPredicate<@Nonnull ? super V1, @Nonnull ? super V2> predicate) {
+		return filter(values -> predicate.test(values.getValue1Nonnull(), values.getValue2Nonnull()));
+	}
+
+	public <R> Optional<R> map(BiFunction<@Nonnull ? super V1, @Nonnull ? super V2, @Nullable ? extends R> mapper) {
+		return map(values -> mapper.apply(values.getValue1Nonnull(), values.getValue2Nonnull()));
+	}
+
+	public <R> Optional<R> flatMap(BiFunction<@Nonnull ? super V1, @Nonnull ? super V2, @Nonnull ? extends Optional<? extends R>> mapper) {
+		return flatMap(values -> mapper.apply(values.getValue1Nonnull(), values.getValue2Nonnull()));
+	}
+
+	/* SECTION END specialized */
 
 	public static final class Values<V1, V2>
 			implements ICompositeOptionalValues {

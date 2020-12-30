@@ -36,7 +36,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.even
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.def.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.def.IInputDevices;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.def.IPointerDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional3;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.subscribers.DisposableSubscriber;
@@ -165,10 +164,10 @@ public class UIDefaultMinecraftBackgroundExtension
 								.map(IUIViewContext::getInputDevices)
 								.flatMap(IInputDevices::getPointerDevice)
 								.orElse(null))
-						.ifPresent(values -> {
-							UIDefaultMinecraftBackgroundExtension owner = values.getValue1Nonnull();
-							IUIMinecraftRenderEventExtension renderExtension = values.getValue2Nonnull();
-							IPointerDevice pointerDevice = values.getValue3Nonnull();
+						.ifPresent((owner, renderExtension, pointerDevice) -> {
+							assert owner != null;
+							assert renderExtension != null;
+							assert pointerDevice != null;
 							owner.getRendererContainer().getRenderer().ifPresent(renderer ->
 									CastUtilities.castChecked(CastUtilities.<Class<IUIMinecraftViewComponent<?, ?>>>castUnchecked(IUIViewComponent.class), event.getView())
 											.filter(evc -> owner.getContainer().filter(Predicate.isEqual(evc)).isPresent())

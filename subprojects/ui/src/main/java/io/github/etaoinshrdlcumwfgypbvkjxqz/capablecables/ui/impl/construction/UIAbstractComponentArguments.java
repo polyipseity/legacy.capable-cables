@@ -29,9 +29,7 @@ public abstract class UIAbstractComponentArguments
 		return Optional2.of(
 				() -> getName().orElse(null),
 				() -> getEmbedArgumentsView().get(key1))
-				.map(values -> {
-					String parentName = values.getValue1Nonnull();
-					IEmbedPrototype embed = values.getValue2Nonnull();
+				.map((parentName, embed) -> {
 					ImmutableSet<String> key2 = ImmutableSet.of(key1);
 					return UIImmutableComponentEmbedArguments.of(constructor,
 							UIImmutableComponentArguments.of(IUIComponentArguments.computeEmbedName(parentName, key2),

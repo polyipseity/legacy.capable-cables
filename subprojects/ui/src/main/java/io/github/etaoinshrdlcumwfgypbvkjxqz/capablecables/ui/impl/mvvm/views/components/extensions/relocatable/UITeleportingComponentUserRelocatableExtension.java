@@ -34,7 +34,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilitie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.def.IIdentifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.def.tuples.IIntersection;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.def.IBindingAction;
@@ -354,14 +353,12 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 							Optional2.of(
 									() -> data.getTargetComponent().orElse(null),
 									() -> data.handle((Point2D) point.clone()).orElse(null))
-									.filter(dataValues -> {
-										IIntersection<? extends IUIComponent, ? extends IUIReshapeExplicitly<?>> targetComponent = dataValues.getValue1Nonnull();
-										Rectangle2D relativeShapeBounds = dataValues.getValue2Nonnull().getBounds2D();
+									.filter((targetComponent, relativeShape) -> {
 										synchronized (getLockObject()) {
 											if (!owner.getRelocateData().isPresent())
 												return false;
 											owner.setRelocateData(null);
-											return targetComponent.getRight().reshape(s -> s.adapt(relativeShapeBounds));
+											return targetComponent.getRight().reshape(s -> s.adapt(relativeShape.getBounds2D()));
 										}
 									}).isPresent()
 					).isPresent()).isPresent();
@@ -404,20 +401,17 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 						Optional2.of(
 								() -> owner.getRendererContainer().getRenderer().orElse(null),
 								() -> owner.getRelocateData().orElse(null))
-								.ifPresent(values -> {
-									IRelocatingRenderer renderer = values.getValue1Nonnull();
-									IRelocateData data = values.getValue2Nonnull();
-									data.getTargetComponent().ifPresent(targetComponent -> {
-										if (targetComponent.getLeft().equals(IUIComponentContext.getCurrentComponent(context)
-												.orElseThrow(AssertionError::new))) {
-											renderer.render(context, data);
-										} else {
-											try (IUIComponentContext context1 = IUIComponent.createContextTo(targetComponent.getLeft())) {
-												renderer.render(context1, data);
-											}
+								.ifPresent((renderer, data) -> data.getTargetComponent().ifPresent(targetComponent -> {
+									if (targetComponent.getLeft().equals(IUIComponentContext.getCurrentComponent(context)
+											.orElseThrow(AssertionError::new))) {
+										renderer.render(context, data);
+									} else {
+										try (IUIComponentContext context1 = IUIComponent.createContextTo(targetComponent.getLeft())) {
+											renderer.render(context1, data);
 										}
-									});
-								}));
+									}
+								}))
+				);
 			}
 		}
 	}

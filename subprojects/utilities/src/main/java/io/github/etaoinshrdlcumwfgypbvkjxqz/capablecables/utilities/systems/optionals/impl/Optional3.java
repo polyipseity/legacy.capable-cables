@@ -1,11 +1,14 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl;
 
 import com.google.common.collect.ImmutableList;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.def.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.def.ICompositeOptionalValues;
 
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public final class Optional3<V1, V2, V3>
@@ -47,6 +50,38 @@ public final class Optional3<V1, V2, V3>
 
 	@Override
 	protected Values<V1, V2, V3> getValues() { return values; }
+
+	/* SECTION specialized */
+
+	public <EX extends Throwable> void ifPresent(IConsumer3<@Nonnull ? super V1, @Nonnull ? super V2, @Nonnull ? super V3, ? extends EX> consumer)
+			throws EX {
+		ifPresent(IThrowingConsumer.executeNow(values ->
+				consumer.accept(values.getValue1Nonnull(), values.getValue2Nonnull(), values.getValue3Nonnull())
+		));
+	}
+
+	public <EX extends Throwable> Optional3<V1, V2, V3> filter(IFunction3<@Nonnull ? super V1, @Nonnull ? super V2, @Nonnull ? super V3, ? extends Boolean, ? extends EX> predicate)
+			throws EX {
+		return filter(IThrowingPredicate.executeNow(values ->
+				predicate.apply(values.getValue1Nonnull(), values.getValue2Nonnull(), values.getValue3Nonnull())
+		));
+	}
+
+	public <R, EX extends Throwable> Optional<R> map(IFunction3<@Nonnull ? super V1, @Nonnull ? super V2, @Nonnull ? super V3, @Nullable ? extends R, ? extends EX> mapper)
+			throws EX {
+		return map(IThrowingFunction.executeNow(
+				values -> mapper.apply(values.getValue1Nonnull(), values.getValue2Nonnull(), values.getValue3Nonnull())
+		));
+	}
+
+	public <R, EX extends Throwable> Optional<R> flatMap(IFunction3<@Nonnull ? super V1, @Nonnull ? super V2, @Nonnull ? super V3, @Nonnull ? extends Optional<? extends R>, ? extends EX> mapper)
+			throws EX {
+		return flatMap(IThrowingFunction.executeNow(
+				values -> mapper.apply(values.getValue1Nonnull(), values.getValue2Nonnull(), values.getValue3Nonnull())
+		));
+	}
+
+	/* SECTION END specialized */
 
 	public static final class Values<V1, V2, V3>
 			implements ICompositeOptionalValues {

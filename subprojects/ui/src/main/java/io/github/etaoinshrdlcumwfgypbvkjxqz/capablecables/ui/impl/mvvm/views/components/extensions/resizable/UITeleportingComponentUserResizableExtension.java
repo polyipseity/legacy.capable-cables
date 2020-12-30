@@ -34,7 +34,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilitie
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.def.IIdentifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.def.tuples.IIntersection;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.def.IBindingAction;
@@ -48,7 +47,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.exte
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.def.ICursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.def.IMouseButtonClickData;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.def.IPointerDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional2;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.OptionalUtilities;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -365,44 +363,41 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 							() -> UITeleportingComponentUserResizableExtension.getTargetComponent(owner)
 									.filter(IUIReshapeExplicitly.class::isInstance)
 									.orElse(null))
-							.filter(ownerValues -> {
-								IUIComponent container = ownerValues.getValue1Nonnull();
-								IUIComponent targetComponent = ownerValues.getValue2Nonnull();
-								return targetComponent.getManager()
-										.flatMap(IUIComponentManager::getView)
-										.filter(view -> IUIViewComponent.createComponentContextWithManager(view)
-												.filter(context -> {
-													try (IUIComponentContext context1 = context) {
-														IUIViewComponent.getPathResolver(view).resolvePath(context1, (Point2D) point.clone());
+							.filter((container, targetComponent) -> targetComponent.getManager()
+									.flatMap(IUIComponentManager::getView)
+									.filter(view -> IUIViewComponent.createComponentContextWithManager(view)
+											.filter(context -> {
+												try (IUIComponentContext context1 = context) {
+													IUIViewComponent.getPathResolver(view).resolvePath(context1, (Point2D) point.clone());
 
-														Rectangle2D contextualShape = IUIComponent.getContextualShape(context1, container).getBounds2D();
-														Set<EnumUISide> sides = EnumUISide.getSidesPointOver(contextualShape, point);
+													Rectangle2D contextualShape = IUIComponent.getContextualShape(context1, container).getBounds2D();
+													Set<EnumUISide> sides = EnumUISide.getSidesPointOver(contextualShape, point);
 
-														Point2D[] base = {null}; // TODO ASM - replace it with non-array variable, ASM hates annotations here
-														if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT))
-															base[0] = new Point2D.Double(contextualShape.getMaxX(), contextualShape.getMaxY());
-														else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
-															base[0] = new Point2D.Double(contextualShape.getX(), contextualShape.getY());
-														else if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.RIGHT))
-															base[0] = new Point2D.Double(contextualShape.getX(), contextualShape.getMaxY());
-														else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
-															base[0] = new Point2D.Double(contextualShape.getMaxX(), contextualShape.getY());
+													Point2D[] base = {null}; // TODO ASM - replace it with non-array variable, ASM hates annotations here
+													if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.LEFT))
+														base[0] = new Point2D.Double(contextualShape.getMaxX(), contextualShape.getMaxY());
+													else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.RIGHT))
+														base[0] = new Point2D.Double(contextualShape.getX(), contextualShape.getY());
+													else if (sides.contains(EnumUISide.UP) && sides.contains(EnumUISide.RIGHT))
+														base[0] = new Point2D.Double(contextualShape.getX(), contextualShape.getMaxY());
+													else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
+														base[0] = new Point2D.Double(contextualShape.getMaxX(), contextualShape.getY());
 
-														IResizeData data = UIImmutableResizeData.of((IUIComponent & IUIReshapeExplicitly<?>) targetComponent,
-																point,
-																sides,
-																base[0],
-																getCursor(sides).orElseThrow(AssertionError::new));
-														synchronized (getLockObject()) {
-															if (owner.getResizeData().isPresent())
-																return false;
-															owner.setResizeData(data);
-														}
-														return true;
+													IResizeData data = UIImmutableResizeData.of((IUIComponent & IUIReshapeExplicitly<?>) targetComponent,
+															point,
+															sides,
+															base[0],
+															getCursor(sides).orElseThrow(AssertionError::new));
+													synchronized (getLockObject()) {
+														if (owner.getResizeData().isPresent())
+															return false;
+														owner.setResizeData(data);
 													}
-												}).isPresent()
-										).isPresent();
-							}).isPresent()
+													return true;
+												}
+											}).isPresent()
+									).isPresent())
+							.isPresent()
 			).isPresent();
 		}
 
@@ -411,14 +406,12 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 					Optional2.of(
 							() -> data.getTargetComponent().orElse(null),
 							() -> data.handle((Point2D) point.clone()).orElse(null))
-							.filter(dataValues -> {
-								IIntersection<? extends IUIComponent, ? extends IUIReshapeExplicitly<?>> targetComponent = dataValues.getValue1Nonnull();
-								Rectangle2D relativeShapeBounds = dataValues.getValue2Nonnull().getBounds2D();
+							.filter((targetComponent, relativeShape) -> {
 								synchronized (getLockObject()) {
 									if (!owner.getResizeData().isPresent())
 										return false;
 									owner.setResizeData(null);
-									return targetComponent.getRight().reshape(s -> s.adapt(relativeShapeBounds));
+									return targetComponent.getRight().reshape(s -> s.adapt(relativeShape.getBounds2D()));
 								}
 							})
 							.isPresent()
@@ -450,9 +443,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 				return Optional2.of(
 						() -> getOwner().orElse(null),
 						() -> context.getViewContext().getInputDevices().getPointerDevice().orElse(null))
-						.flatMap(values -> {
-							UITeleportingComponentUserResizableExtension<?> owner = values.getValue1Nonnull();
-							IPointerDevice pointerDevice = values.getValue2Nonnull();
+						.flatMap((owner, pointerDevice) -> {
 							Point2D cursorPosition = pointerDevice.getPositionView();
 							@SuppressWarnings("Convert2MethodRef") Optional<? extends ICursor> ret = owner.getResizeData()
 									.map(d -> d.getBaseView()
@@ -497,11 +488,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 						Optional2.of(
 								() -> owner.getRendererContainer().getRenderer().orElse(null),
 								() -> owner.getResizeData().orElse(null))
-								.ifPresent(values -> {
-									IResizingRenderer renderer = values.getValue1Nonnull();
-									IResizeData data = values.getValue2Nonnull();
-									renderer.render(context, data);
-								}));
+								.ifPresent((renderer, data) -> renderer.render(context, data)));
 			}
 		}
 	}
