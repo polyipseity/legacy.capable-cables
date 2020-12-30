@@ -2,7 +2,6 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.co
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.AlwaysNull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
@@ -74,6 +73,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 
@@ -105,6 +105,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 											.getTracker(CastUtilities.<Class<IUIRendererContainer<?>>>castUnchecked(IUIRendererContainer.class))
 											.asMapView()
 											.values()
+											.iterator()
 							),
 					CapacityUtilities.getInitialCapacitySmall()
 			);
@@ -115,8 +116,9 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 			field.put(IUIThemeStack.class, themeStack);
 			field.put(IShapeDescriptorDynamicDetector.class, new UIFunctionalComponentShapeDescriptorDynamicDetector(
 					() -> thisReference.getOptional()
-							.<Iterable<? extends IUIComponent>>map(UIAbstractViewComponent<S, M>::getChildrenFlatView)
-							.orElseGet(ImmutableSet::of)));
+							.map(UIAbstractViewComponent<S, M>::getChildrenFlatView)
+							.map(Iterable::iterator)
+							.orElseGet(CollectionUtilities::getEmptyIterator)));
 		});
 		this.extensionsInitializer = new OneUseRunnable(() ->
 				IExtensionContainer.addExtensionChecked(this, new UIDefaultCacheExtension())
@@ -288,7 +290,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 						// COMMENT update the same rate as render, only need to call it before rendering
 						result.getComponent().update(componentContext2);
 
-						IUIComponentModifier.streamSpecificModifiersIntersection(result.getModifiersView(), IUIComponentRendererInvokerModifier.class)
+						IUIComponentModifier.streamSpecificModifiersIntersection(result.getModifiersView().iterator(), IUIComponentRendererInvokerModifier.class)
 								.forEachOrdered(modifierIntersection -> {
 									IUIComponentModifier left = modifierIntersection.getLeft();
 									IUIComponentRendererInvokerModifier right = modifierIntersection.getRight();
@@ -309,7 +311,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 								renderer.render(componentContext2, IUIComponentRenderer.EnumRenderStage.POST_CHILDREN
 								)
 						);
-						IUIComponentModifier.streamSpecificModifiersIntersection(result.getModifiersView(), IUIComponentRendererInvokerModifier.class)
+						IUIComponentModifier.streamSpecificModifiersIntersection(result.getModifiersView().iterator(), IUIComponentRendererInvokerModifier.class)
 								.forEachOrdered(modifierIntersection -> {
 									IUIComponentModifier left = modifierIntersection.getLeft();
 									IUIComponentRendererInvokerModifier right = modifierIntersection.getRight();
@@ -467,7 +469,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 										return container.getChildrenFlatView().stream()
 												.filter(IUIComponent::isFocusable)
 												.map(OptionalWeakReference::of)
-												.collect(ImmutableList.toImmutableList());
+												.collect(Collectors.toCollection(ArrayList::new)); // COMMENT need mutability
 									}
 
 									@Override

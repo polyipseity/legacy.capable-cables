@@ -5,6 +5,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.IConcurrentPath;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
@@ -72,7 +73,7 @@ public abstract class AbstractConcurrentPath<T>
 	}
 
 	@Override
-	public void subPath(Iterable<? extends T> elements) {
+	public void subPath(Iterator<? extends T> elements) {
 		Lock writeLock = getLock().writeLock();
 		writeLock.lock();
 		super.subPath(elements);

@@ -89,7 +89,7 @@ public abstract class AbstractShapeDescriptor<S extends Shape>
 		boolean ret = action.getAsBoolean();
 		if (ret) {
 			Rectangle2D bounds = getShapeOutput().getBounds2D();
-			adapt(IShapeDescriptor.constrain(getConstraints(), bounds, bounds)); // COMMENT may do nothing if it is dynamic
+			adapt(IShapeDescriptor.constrain(getConstraints().iterator(), bounds, bounds)); // COMMENT may do nothing if it is dynamic
 		}
 		return ret;
 	}

@@ -1,12 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.controllers;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationControllable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Set;
 
 public class UIDefaultAnimationController
@@ -34,12 +35,12 @@ public class UIDefaultAnimationController
 	}
 
 	@Override
-	public boolean add(Iterable<? extends IUIAnimationControllable> elements) {
-		return Iterables.addAll(getControllable(), elements);
+	public boolean add(Iterator<? extends IUIAnimationControllable> elements) {
+		return Iterators.addAll(getControllable(), elements);
 	}
 
 	@Override
-	public boolean remove(Iterable<? extends IUIAnimationControllable> elements) {
+	public boolean remove(Iterator<? extends IUIAnimationControllable> elements) {
 		return getControllable().removeAll(ImmutableSet.copyOf(elements));
 	}
 

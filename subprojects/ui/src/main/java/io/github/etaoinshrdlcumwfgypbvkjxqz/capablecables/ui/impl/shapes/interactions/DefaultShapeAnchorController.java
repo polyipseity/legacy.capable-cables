@@ -17,6 +17,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.im
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,7 +49,7 @@ public class DefaultShapeAnchorController<T extends IShapeDescriptorProvider>
 	}
 
 	@Override
-	public boolean addAnchors(T origin, Iterable<? extends IShapeAnchor> anchors) {
+	public boolean addAnchors(T origin, Iterator<? extends IShapeAnchor> anchors) {
 		IShapeAnchorSet as = getAnchorSets().getUnchecked(origin);
 		boolean ret = as.addAnchors(anchors);
 		as.getAnchorsView().values().stream().unordered()
@@ -60,7 +61,7 @@ public class DefaultShapeAnchorController<T extends IShapeDescriptorProvider>
 
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public boolean removeAnchors(T origin, Iterable<? extends IShapeAnchor> anchors) {
+	public boolean removeAnchors(T origin, Iterator<? extends IShapeAnchor> anchors) {
 		@Nullable IShapeAnchorSet as = getAnchorSets().getIfPresent(origin);
 		if (as == null)
 			return false;

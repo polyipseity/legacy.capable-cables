@@ -1,8 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.extensions.background;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterators;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIExtensionArguments;
@@ -84,7 +83,7 @@ public class UIDefaultMinecraftBackgroundExtension
 	public void onExtensionAdded(IUIMinecraftViewComponent<?, ?> container) {
 		super.onExtensionAdded(container);
 		UIEventBusEntryPoint.<UIAbstractViewBusEvent.Render>getBusPublisher().subscribe(getRenderSubscriberRotator().get());
-		IUIView.registerRendererContainers(container, ImmutableSet.of(getRendererContainer()));
+		IUIView.registerRendererContainers(container, Iterators.singletonIterator(getRendererContainer()));
 	}
 
 	protected AutoCloseableRotator<? extends DisposableSubscriber<? super UIAbstractViewBusEvent.Render>, RuntimeException> getRenderSubscriberRotator() { return renderSubscriberRotator; }
@@ -101,7 +100,7 @@ public class UIDefaultMinecraftBackgroundExtension
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void onExtensionRemoved() {
-		getContainer().ifPresent(container -> IUIView.unregisterRendererContainers(container, ImmutableSet.of(getRendererContainer())));
+		getContainer().ifPresent(container -> IUIView.unregisterRendererContainers(container, Iterators.singletonIterator(getRendererContainer())));
 		getRenderSubscriberRotator().close();
 		super.onExtensionRemoved();
 	}
@@ -115,14 +114,14 @@ public class UIDefaultMinecraftBackgroundExtension
 		IUIMinecraftBackgroundExtension.super.initializeBindings(bindingActionConsumerSupplier);
 		getBindingActionConsumerSupplierHolder().setValue(bindingActionConsumerSupplier);
 		BindingUtilities.initializeBindings(
-				bindingActionConsumerSupplier, ImmutableList.of(getRendererContainerContainer())
+				bindingActionConsumerSupplier, Iterators.singletonIterator(getRendererContainerContainer())
 		);
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void cleanupBindings() {
-		BindingUtilities.cleanupBindings(ImmutableList.of(getRendererContainerContainer()));
+		BindingUtilities.cleanupBindings(Iterators.singletonIterator(getRendererContainerContainer()));
 		getBindingActionConsumerSupplierHolder().setValue(null);
 		IUIMinecraftBackgroundExtension.super.cleanupBindings();
 	}

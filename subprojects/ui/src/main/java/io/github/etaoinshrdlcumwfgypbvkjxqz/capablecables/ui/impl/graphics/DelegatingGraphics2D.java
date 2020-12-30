@@ -88,13 +88,13 @@ public class DelegatingGraphics2D
 	public Color getColor() {return getDelegate().getColor();}
 
 	@Override
-	public void setComposite(Composite comp) {getDelegate().setComposite(comp);}
+	public void setComposite(@Nullable Composite comp) {getDelegate().setComposite(comp);}
 
 	@Override
 	public Graphics create(int x, int y, int width, int height) {return getDelegate().create(x, y, width, height);}
 
 	@Override
-	public void setColor(Color c) {getDelegate().setColor(c);}
+	public void setPaint(@Nullable Paint paint) {getDelegate().setPaint(paint);}
 
 	@Override
 	public void setPaintMode() {getDelegate().setPaintMode();}
@@ -103,7 +103,7 @@ public class DelegatingGraphics2D
 	public boolean drawImage(Image img, int x, int y, int width, int height, Color backgroundColor, ImageObserver observer) {return getDelegate().drawImage(img, x, y, width, height, backgroundColor, observer);}
 
 	@Override
-	public void setPaint(Paint paint) {getDelegate().setPaint(paint);}
+	public void setStroke(@Nullable Stroke s) {getDelegate().setStroke(s);}
 
 	@Override
 	public void setXORMode(Color c1) {getDelegate().setXORMode(c1);}
@@ -118,7 +118,7 @@ public class DelegatingGraphics2D
 	public boolean drawImage(Image img, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2, Color backgroundColor, ImageObserver observer) {return getDelegate().drawImage(img, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, backgroundColor, observer);}
 
 	@Override
-	public void setStroke(Stroke s) {getDelegate().setStroke(s);}
+	public void clip(@Nullable Shape s) {getDelegate().clip(s);}
 
 	@Override
 	public FontMetrics getFontMetrics() {return getDelegate().getFontMetrics();}
@@ -152,7 +152,7 @@ public class DelegatingGraphics2D
 	public Object getRenderingHint(RenderingHints.Key hintKey) {return getDelegate().getRenderingHint(hintKey);}
 
 	@Override
-	public void setClip(Shape clip) {getDelegate().setClip(clip);}
+	public void setColor(@Nullable Color c) {getDelegate().setColor(c);}
 
 	@Override
 	public void copyArea(int x, int y, int width, int height, int dx, int dy) {getDelegate().copyArea(x, y, width, height, dx, dy);}
@@ -176,9 +176,7 @@ public class DelegatingGraphics2D
 	public void clearRect(int x, int y, int width, int height) {getDelegate().clearRect(x, y, width, height);}
 
 	@Override
-	public int hashCode() {
-		return ObjectUtilities.hashCodeImpl(this, getObjectVariableMapView().values());
-	}
+	public void setClip(@Nullable Shape clip) {getDelegate().setClip(clip);}
 
 	@Override
 	public void addRenderingHints(Map<?, ?> hints) {getDelegate().addRenderingHints(hints);}
@@ -296,9 +294,10 @@ public class DelegatingGraphics2D
 	@Override
 	public Stroke getStroke() {return getDelegate().getStroke();}
 
-
 	@Override
-	public void clip(Shape s) {getDelegate().clip(s);}
+	public int hashCode() {
+		return ObjectUtilities.hashCodeImpl(this, getObjectVariableMapView().values().iterator());
+	}
 
 	private static @NonNls Map<String, Function<@Nonnull DelegatingGraphics2D, @Nullable ?>> getObjectVariableMap() { return OBJECT_VARIABLE_MAP; }
 
@@ -308,7 +307,7 @@ public class DelegatingGraphics2D
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	public boolean equals(Object o) {
-		return ObjectUtilities.equalsImpl(this, o, DelegatingGraphics2D.class, true, getObjectVariableMapView().values());
+		return ObjectUtilities.equalsImpl(this, o, DelegatingGraphics2D.class, true, getObjectVariableMapView().values().iterator());
 	}
 
 

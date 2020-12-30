@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.embed;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
 import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIComponentEmbedArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
@@ -25,7 +25,7 @@ public abstract class UIAbstractComponentEmbed<C extends IUIComponent>
 		OptionalWeakReference<IUIComponent> ownerReference = OptionalWeakReference.of(owner);
 		this.embedInitializer = new OneUseRunnable(() ->
 				ownerReference.getOptional().ifPresent(owner1 -> {
-					owner1.addChildren(ImmutableList.of(getComponent())); // COMMENT add to owner directly
+					owner1.addChildren(Iterators.singletonIterator(getComponent())); // COMMENT add to owner directly
 					getChildrenView().stream().unordered()
 							.map(IUIComponentEmbed::getEmbedInitializer)
 							.forEach(Runnable::run);

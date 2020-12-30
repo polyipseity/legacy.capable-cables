@@ -10,6 +10,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.paths.IUIComponentPathResolverResult;
 
 import java.awt.geom.Point2D;
+import java.util.List;
+import java.util.Spliterators;
 
 public abstract class UIAbstractComponentPathResolver
 		implements IUIComponentPathResolver {
@@ -51,7 +53,7 @@ public abstract class UIAbstractComponentPathResolver
 	public IUIComponentPathResolverResult getResult(IUIComponentContext componentContext, Point2D point) {
 		return IUIComponentContext.getCurrentComponent(componentContext)
 				.map(pathEnd -> {
-					ImmutableList<IUIVirtualComponent> virtualComponents = IUIVirtualComponent.findVirtualComponents(componentContext, pathEnd, point);
+					List<IUIVirtualComponent> virtualComponents = ImmutableList.copyOf(Spliterators.iterator(IUIVirtualComponent.findVirtualComponents(componentContext, pathEnd, point)));
 					if (!virtualComponents.isEmpty()) // COMMENT hits virtual component
 						return UIImmutableComponentPathResolverResult.of(Iterables.getLast(virtualComponents), virtualComponents);
 					else if (pathEnd.containsPoint(componentContext, point)) // COMMENT hits component

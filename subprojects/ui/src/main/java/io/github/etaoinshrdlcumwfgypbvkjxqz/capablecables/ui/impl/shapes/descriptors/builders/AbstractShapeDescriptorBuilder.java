@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.descriptors.builders;
 
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
@@ -18,6 +18,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -97,8 +98,8 @@ public abstract class AbstractShapeDescriptorBuilder<S extends Shape>
 	}
 
 	@Override
-	public AbstractShapeDescriptorBuilder<S> constrain(Iterable<? extends IShapeConstraint> constraints) {
-		Iterables.addAll(getConstraints(), constraints);
+	public AbstractShapeDescriptorBuilder<S> constrain(Iterator<? extends IShapeConstraint> constraints) {
+		Iterators.addAll(getConstraints(), constraints);
 		return this;
 	}
 

@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.descriptors;
 
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeConstraint;
@@ -9,13 +9,14 @@ import org.jetbrains.annotations.NonNls;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.util.Iterator;
 
 @SuppressWarnings("UnusedReturnValue")
 public interface IShapeDescriptorBuilder<S extends Shape>
 		extends ITypeCapture {
-	static void addUIObjects(IShapeDescriptor<?> shapeDescriptor, Iterable<? extends IShapeConstraint> constraints) {
+	static void addUIObjects(IShapeDescriptor<?> shapeDescriptor, Iterator<? extends IShapeConstraint> constraints) {
 		shapeDescriptor.modify(() -> {
-			Iterables.addAll(shapeDescriptor.getConstraintsRef(), constraints);
+			Iterators.addAll(shapeDescriptor.getConstraintsRef(), constraints);
 			return false;
 		});
 	}
@@ -39,7 +40,7 @@ public interface IShapeDescriptorBuilder<S extends Shape>
 
 	IShapeDescriptorBuilder<S> setY(double y);
 
-	IShapeDescriptorBuilder<S> constrain(Iterable<? extends IShapeConstraint> constraints);
+	IShapeDescriptorBuilder<S> constrain(Iterator<? extends IShapeConstraint> constraints);
 
 	IShapeDescriptor<S> build();
 }

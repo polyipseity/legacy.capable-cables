@@ -102,11 +102,11 @@ public interface IUIComponent
 	boolean isVisible();
 
 	@SuppressWarnings("UnusedReturnValue")
-	static boolean addContentChildren(IUIComponent instance, Iterable<? extends IUIComponent> components) {
+	static boolean addContentChildren(IUIComponent instance, Iterator<? extends IUIComponent> components) {
 		return instance.getContentComponent().addChildren(components);
 	}
 
-	boolean addChildren(Iterable<? extends IUIComponent> components); // COMMENT use 'addContentChildren' instead
+	boolean addChildren(Iterator<? extends IUIComponent> components); // COMMENT use 'addContentChildren' instead
 
 	@Override
 	default boolean isFocusable() { return false; }
@@ -126,7 +126,7 @@ public interface IUIComponent
 	boolean addChildAt(int index, IUIComponent component); // COMMENT use 'addContentChildAt' instead
 
 	@SuppressWarnings("UnusedReturnValue")
-	boolean removeChildren(Iterable<? extends IUIComponent> components);
+	boolean removeChildren(Iterator<? extends IUIComponent> components);
 
 	@SuppressWarnings("UnusedReturnValue")
 	static boolean clearContentChildren(IUIComponent instance) {

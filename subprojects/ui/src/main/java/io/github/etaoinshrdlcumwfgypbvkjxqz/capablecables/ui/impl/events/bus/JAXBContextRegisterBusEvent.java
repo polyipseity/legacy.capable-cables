@@ -1,13 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.events.impl.AbstractBusEvent;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Set;
 
 public class JAXBContextRegisterBusEvent
@@ -19,9 +19,10 @@ public class JAXBContextRegisterBusEvent
 		super(Void.class);
 	}
 
-	public boolean addClassesToBeBound(Class<?>... classes) { return addClassesToBeBound(ImmutableList.copyOf(classes)); }
-
-	public boolean addClassesToBeBound(Iterable<? extends Class<?>> classes) { return Iterables.addAll(getClassesToBeBound(), classes); }
+	@SuppressWarnings("UnusedReturnValue")
+	public boolean addClassesToBeBound(Iterator<? extends Class<?>> classes) {
+		return Iterators.addAll(getClassesToBeBound(), classes);
+	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Set<Class<?>> getClassesToBeBound() { return classesToBeBound; }

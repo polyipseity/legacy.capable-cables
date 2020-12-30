@@ -1,7 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.resizable;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.SetMultimap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
@@ -196,12 +196,12 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		IUIComponentUserResizableExtension.super.initializeBindings(bindingActionConsumerSupplier);
 		getBindingActionConsumerSupplierHolder().setValue(bindingActionConsumerSupplier);
 		BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier,
-				() -> ImmutableBindingAction.bind(
+				() -> ImmutableBindingAction.bind(ImmutableList.of(
 						getActivationMouseButtons(),
 						getResizeBorders(), getResizeBorderDefaultThickness()
-				));
+				)));
 		BindingUtilities.initializeBindings(
-				bindingActionConsumerSupplier, ImmutableList.of(getRendererContainerContainer())
+				bindingActionConsumerSupplier, Iterators.singletonIterator(getRendererContainerContainer())
 		);
 	}
 
@@ -249,11 +249,12 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 	@OverridingMethodsMustInvokeSuper
 	public void cleanupBindings() {
 		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer -> BindingUtilities.supplyBindingAction(bindingActionConsumer,
-				() -> ImmutableBindingAction.unbind(
+				() -> ImmutableBindingAction.unbind(ImmutableList.of(
 						getActivationMouseButtons(),
 						getResizeBorders(), getResizeBorderDefaultThickness()
-				)));
-		BindingUtilities.cleanupBindings(ImmutableList.of(getRendererContainerContainer()));
+				))
+		));
+		BindingUtilities.cleanupBindings(Iterators.singletonIterator(getRendererContainerContainer()));
 		getBindingActionConsumerSupplierHolder().setValue(null);
 		IUIComponentUserResizableExtension.super.cleanupBindings();
 	}
@@ -278,7 +279,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		super.onExtensionAdded(container);
 		container.addModifier(getModifier());
 		container.getManager().flatMap(IUIComponentManager::getView)
-				.ifPresent(view -> IUIView.registerRendererContainers(view, ImmutableSet.of(getRendererContainer())));
+				.ifPresent(view -> IUIView.registerRendererContainers(view, Iterators.singletonIterator(getRendererContainer())));
 	}
 
 	@Override
@@ -288,7 +289,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		getContainer().ifPresent(container -> {
 			container.removeModifier(getModifier());
 			container.getManager().flatMap(IUIComponentManager::getView)
-					.ifPresent(view -> IUIView.unregisterRendererContainers(view, ImmutableSet.of(getRendererContainer())));
+					.ifPresent(view -> IUIView.unregisterRendererContainers(view, Iterators.singletonIterator(getRendererContainer())));
 		});
 		super.onExtensionRemoved();
 	}

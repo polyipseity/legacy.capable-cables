@@ -487,22 +487,22 @@ public class UIScrollbarComponent
 	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
 		super.initializeBindings(bindingActionConsumerSupplier);
 		BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier, () ->
-				ImmutableBindingAction.bind(
+				ImmutableBindingAction.bind(ImmutableList.of(
 						getScrollDirection(), getScrollRelativeProgress(),
 						getThumbRelativeSize(), getThumbMovementRelativeSpeed(),
 						getButtonSize()
-				));
+				)));
 	}
 
 	@Override
 	public void cleanupBindings() {
 		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
 				BindingUtilities.supplyBindingAction(bindingActionConsumer, () ->
-						ImmutableBindingAction.unbind(
+						ImmutableBindingAction.unbind(ImmutableList.of(
 								getScrollDirection(), getScrollRelativeProgress(),
 								getThumbRelativeSize(), getThumbMovementRelativeSpeed(),
 								getButtonSize()
-						)));
+						))));
 		super.cleanupBindings();
 	}
 

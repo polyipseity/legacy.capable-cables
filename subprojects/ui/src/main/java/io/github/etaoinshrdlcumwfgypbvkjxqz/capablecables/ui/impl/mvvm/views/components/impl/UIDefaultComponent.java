@@ -43,6 +43,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CollectionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
@@ -187,14 +188,11 @@ public class UIDefaultComponent
 	@Override
 	public List<IUIComponent> getChildrenView() { return ImmutableList.copyOf(getChildren()); }
 
-	@SuppressWarnings("UnstableApiUsage")
-	public static <T extends UIDefaultComponent, C extends IUIComponent> boolean addChildrenImpl(T instance,
-	                                                                                             ToIntBiFunction<@Nonnull ? super T, @Nonnull ? super C> indexFunction,
-	                                                                                             Iterable<? extends C> components) {
-		return stripBool(Streams.stream(components)
-				.filter(FunctionUtilities.notPredicate(instance.getChildren()::contains))
-				.mapToInt(component -> padBool(instance.addChildAt(indexFunction.applyAsInt(instance, component), component)))
-				.reduce(fBool(), PaddedBool::orBool));
+	@SuppressWarnings({"UnstableApiUsage", "rawtypes", "RedundantSuppression"})
+	protected static @Immutable Spliterator<IUIComponent> getEmbedComponents(UIDefaultComponent instance) {
+		return Streams.stream(instance.getComponentEmbeds()).unordered()
+				.<IUIComponent>map(IUIComponentEmbed::getComponent)
+				.spliterator();
 	}
 
 	public IBindingField<Boolean> getVisible() { return visible; }
@@ -250,9 +248,8 @@ public class UIDefaultComponent
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<IIdentifier, IBindingMethodSource<? extends IUIEvent>> getEventTargetBindingMethods() { return eventTargetBindingMethods; }
 
-	@Override
-	public boolean addChildren(Iterable<? extends IUIComponent> components) {
-		return addChildrenImpl(this, (self, child) -> self.getChildren().size(), components);
+	protected Iterable<? extends IUIComponentEmbed<?>> getComponentEmbeds() {
+		return ImmutableList.of();
 	}
 
 	@SuppressWarnings("AutoUnboxing")
@@ -262,6 +259,21 @@ public class UIDefaultComponent
 	@SuppressWarnings("AutoBoxing")
 	@Override
 	public void setActive(boolean active) { getActive().setValue(active); }
+
+	@Override
+	public boolean addChildren(Iterator<? extends IUIComponent> components) {
+		return addChildrenImpl(this, (self, child) -> self.getChildren().size(), components);
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	public static <T extends UIDefaultComponent, C extends IUIComponent> boolean addChildrenImpl(T instance,
+	                                                                                             ToIntBiFunction<@Nonnull ? super T, @Nonnull ? super C> indexFunction,
+	                                                                                             Iterator<? extends C> components) {
+		return stripBool(Streams.stream(components)
+				.filter(FunctionUtilities.notPredicate(instance.getChildren()::contains))
+				.mapToInt(component -> padBool(instance.addChildAt(indexFunction.applyAsInt(instance, component), component)))
+				.reduce(fBool(), PaddedBool::orBool));
+	}
 
 	@Override
 	public boolean addChildAt(int index, IUIComponent component) {
@@ -276,7 +288,7 @@ public class UIDefaultComponent
 		if (getChildren().contains(component))
 			return moveChildTo(index, component);
 		component.getParent()
-				.ifPresent(p -> p.removeChildren(ImmutableList.of(component)));
+				.ifPresent(p -> p.removeChildren(Iterators.singletonIterator(component)));
 		EventBusUtilities.runWithPrePostHooks(UIEventBusEntryPoint.getBusSubscriber()::onNext, () -> {
 					getChildren().add(index, component);
 					component.onParentChange(null, this);
@@ -288,7 +300,7 @@ public class UIDefaultComponent
 	}
 
 	@Override
-	public boolean removeChildren(Iterable<? extends IUIComponent> components) {
+	public boolean removeChildren(Iterator<? extends IUIComponent> components) {
 		@SuppressWarnings("UnstableApiUsage") boolean ret = stripBool(
 				Streams.stream(components)
 						.mapToInt(component -> {
@@ -308,26 +320,6 @@ public class UIDefaultComponent
 		);
 		IUIComponent.getYoungestParentInstanceOf(this, IUIReshapeExplicitly.class).ifPresent(IUIReshapeExplicitly::refresh); // TODO relocation perhaps
 		return ret;
-	}
-
-	@Override
-	@Deprecated
-	public Optional<? extends IExtension<? extends IIdentifier, ?>> addExtension(IExtension<? extends IIdentifier, ?> extension) {
-		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
-		Optional<? extends IExtension<? extends IIdentifier, ?>> result = IExtensionContainer.addExtensionImpl(this, getExtensions(), extension);
-		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
-				BindingUtilities.findAndInitializeBindings(bindingActionConsumer, ImmutableList.of(extension)));
-		return result;
-	}
-
-	@SuppressWarnings("UnstableApiUsage")
-	@Override
-	public boolean clearChildren() {
-		return removeChildren(
-				getChildrenView().stream().unordered()
-						.filter(FunctionUtilities.notPredicate(ImmutableSet.copyOf(getEmbedComponents(this))::contains))
-						.collect(ImmutableList.toImmutableList())
-		);
 	}
 
 	@Override
@@ -426,10 +418,12 @@ public class UIDefaultComponent
 	}
 
 	@Override
-	public Optional<? extends IExtension<? extends IIdentifier, ?>> removeExtension(IIdentifier key) {
-		Optional<IExtension<? extends IIdentifier, ?>> result = IExtensionContainer.removeExtensionImpl(getExtensions(), key);
-		BindingUtilities.findAndCleanupBindings(result.map(ImmutableList::of).orElseGet(ImmutableList::of));
-		return result;
+	public boolean clearChildren() {
+		return removeChildren(
+				getChildrenView().stream().unordered()
+						.filter(FunctionUtilities.notPredicate(ImmutableSet.copyOf(Spliterators.iterator(getEmbedComponents(this)))::contains))
+						.iterator()
+		);
 	}
 
 	@Override
@@ -474,6 +468,23 @@ public class UIDefaultComponent
 	@OverridingMethodsMustInvokeSuper
 	protected void unbind0(@SuppressWarnings("unused") @AlwaysNull @Nullable Void context) {}
 
+	@Override
+	@Deprecated
+	public Optional<? extends IExtension<? extends IIdentifier, ?>> addExtension(IExtension<? extends IIdentifier, ?> extension) {
+		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
+		Optional<? extends IExtension<? extends IIdentifier, ?>> result = IExtensionContainer.addExtensionImpl(this, getExtensions(), extension);
+		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
+				BindingUtilities.findAndInitializeBindings(bindingActionConsumer, Iterators.singletonIterator(extension)));
+		return result;
+	}
+
+	@Override
+	public Optional<? extends IExtension<? extends IIdentifier, ?>> removeExtension(IIdentifier key) {
+		Optional<IExtension<? extends IIdentifier, ?>> result = IExtensionContainer.removeExtensionImpl(getExtensions(), key);
+		BindingUtilities.findAndCleanupBindings(CollectionUtilities.iterate(result));
+		return result;
+	}
+
 	@OverridingMethodsMustInvokeSuper
 	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 	protected void bind0(IUIStructureLifecycleContext context) {
@@ -491,21 +502,10 @@ public class UIDefaultComponent
 											.collect(ImmutableList.toImmutableList()));
 
 					INamedTrackers namedTrackers = IUIView.getNamedTrackers(view);
-					namedTrackers.add(IUIComponent.class, this);
-					namedTrackers.addAll(IUIRendererContainer.class, rendererContainers);
-					IUIView.getThemeStack(view).applyAll(rendererContainers);
+					namedTrackers.add(IUIComponent.class, Iterators.singletonIterator(this));
+					namedTrackers.add(IUIRendererContainer.class, rendererContainers.iterator());
+					IUIView.getThemeStack(view).apply(rendererContainers.iterator());
 				});
-	}
-
-	protected Iterable<? extends IUIComponentEmbed<?>> getComponentEmbeds() {
-		return ImmutableSet.of();
-	}
-
-	@SuppressWarnings({"UnstableApiUsage", "rawtypes", "RedundantSuppression"})
-	protected static @Immutable List<IUIComponent> getEmbedComponents(UIDefaultComponent instance) {
-		return Streams.stream(instance.getComponentEmbeds()).unordered()
-				.map(IUIComponentEmbed::getComponent)
-				.collect(ImmutableList.toImmutableList());
 	}
 
 	@Override
@@ -518,8 +518,8 @@ public class UIDefaultComponent
 						ImmutableList.of(getActive(), getVisible()),
 						getEmbedBindings()
 				)));
-		BindingUtilities.initializeBindings(bindingActionConsumerSupplier, ImmutableSet.of(getRendererContainerContainer()));
-		BindingUtilities.findAndInitializeBindings(bindingActionConsumerSupplier, getExtensions().values());
+		BindingUtilities.initializeBindings(bindingActionConsumerSupplier, Iterators.singletonIterator(getRendererContainerContainer()));
+		BindingUtilities.findAndInitializeBindings(bindingActionConsumerSupplier, getExtensions().values().iterator());
 		// COMMENT do not init children, view component should do that via bind
 	}
 
@@ -550,6 +550,29 @@ public class UIDefaultComponent
 		});
 	}
 
+	@Override
+	@OverridingMethodsMustInvokeSuper
+	public void cleanupBindings() {
+		BindingUtilities.findAndCleanupBindings(getExtensions().values().iterator());
+		BindingUtilities.cleanupBindings(Iterators.singletonIterator(getRendererContainerContainer()));
+		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer -> {
+			BindingUtilities.supplyBindingAction(bindingActionConsumer,
+					() -> ImmutableBindingAction.unbind(Iterables.concat(
+							ImmutableList.of(getActive(), getVisible()),
+							getEmbedBindings()
+					)));
+			// COMMENT do not cleanup children, view component should do that via unbind
+		});
+		getBindingActionConsumerSupplierHolder().setValue(null);
+		IUIComponent.super.cleanupBindings();
+	}
+
+	@OverridingMethodsMustInvokeSuper
+	protected void initialize0(IUIComponentContext context) {
+		setLastUpdateTimeInNanoseconds(null);
+		setUpdateTimeDelta(null);
+	}
+
 	@OverridingMethodsMustInvokeSuper
 	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 	protected void cleanup0(IUIComponentContext context) {
@@ -566,34 +589,11 @@ public class UIDefaultComponent
 											.collect(ImmutableList.toImmutableList()));
 
 					INamedTrackers namedTrackers = IUIView.getNamedTrackers(view);
-					namedTrackers.remove(IUIComponent.class, this);
-					namedTrackers.removeAll(IUIRendererContainer.class, rendererContainers);
-					UIDefaultingTheme.applyDefaultRenderers(rendererContainers);
+					namedTrackers.remove(IUIComponent.class, Iterators.singletonIterator(this));
+					namedTrackers.remove(IUIRendererContainer.class, rendererContainers.iterator());
+					UIDefaultingTheme.applyDefaultRenderers(rendererContainers.iterator());
 				});
 		cleanupBindings();
-	}
-
-	@OverridingMethodsMustInvokeSuper
-	protected void initialize0(IUIComponentContext context) {
-		setLastUpdateTimeInNanoseconds(null);
-		setUpdateTimeDelta(null);
-	}
-
-	@Override
-	@OverridingMethodsMustInvokeSuper
-	public void cleanupBindings() {
-		BindingUtilities.findAndCleanupBindings(getExtensions().values());
-		BindingUtilities.cleanupBindings(ImmutableSet.of(getRendererContainerContainer()));
-		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer -> {
-			BindingUtilities.supplyBindingAction(bindingActionConsumer,
-					() -> ImmutableBindingAction.unbind(Iterables.concat(
-							ImmutableList.of(getActive(), getVisible()),
-							getEmbedBindings()
-					)));
-			// COMMENT do not cleanup children, view component should do that via unbind
-		});
-		getBindingActionConsumerSupplierHolder().setValue(null);
-		IUIComponent.super.cleanupBindings();
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")

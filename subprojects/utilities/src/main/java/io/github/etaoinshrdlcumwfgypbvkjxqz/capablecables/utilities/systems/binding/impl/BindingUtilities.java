@@ -1,11 +1,11 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.traits.IHasBinding;
 
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -21,34 +21,35 @@ public enum BindingUtilities {
 
 	@SuppressWarnings("UnstableApiUsage")
 	public static void findAndInitializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier,
-	                                             Iterable<?> objects) {
+	                                             Iterator<?> objects) {
 		initializeBindings(
-				bindingActionConsumerSupplier, Streams.stream(objects).unordered()
+				bindingActionConsumerSupplier,
+				Streams.stream(objects).unordered()
 						.filter(IHasBinding.class::isInstance)
 						.map(IHasBinding.class::cast)
-						.collect(ImmutableSet.toImmutableSet())
+						.iterator()
 		);
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
 	public static void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier,
-	                                      Iterable<? extends IHasBinding> bindings) {
+	                                      Iterator<? extends IHasBinding> bindings) {
 		Streams.stream(bindings).unordered()
 				.forEach(binding -> binding.initializeBindings(bindingActionConsumerSupplier));
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static void findAndCleanupBindings(Iterable<?> objects) {
+	public static void findAndCleanupBindings(Iterator<?> objects) {
 		cleanupBindings(
 				Streams.stream(objects).unordered()
 						.filter(IHasBinding.class::isInstance)
 						.map(IHasBinding.class::cast)
-						.collect(ImmutableSet.toImmutableSet())
+						.iterator()
 		);
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static void cleanupBindings(Iterable<? extends IHasBinding> bindings) {
+	public static void cleanupBindings(Iterator<? extends IHasBinding> bindings) {
 		Streams.stream(bindings).unordered()
 				.forEach(IHasBinding::cleanupBindings);
 	}

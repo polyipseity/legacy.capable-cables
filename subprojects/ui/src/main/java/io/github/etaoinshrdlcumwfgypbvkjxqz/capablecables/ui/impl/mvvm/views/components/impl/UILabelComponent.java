@@ -153,24 +153,24 @@ public class UILabelComponent
 
 	@SuppressWarnings("UnstableApiUsage")
 	protected Dimension2D calculateTextDimension() {
+		Iterable<? extends TextLayout> lines;
+
 		IOverflowPolicy overflowPolicy = getOverflowPolicy().getValue();
 		OptionalDouble autoResizeTextWidth = overflowPolicy.getAutoResizeTextWidth(getShapeDescriptor());
 		if (autoResizeTextWidth.isPresent()) {
 			float autoResizeTextWidth1 = FloatUtilities.saturatedCast(autoResizeTextWidth.getAsDouble());
-			return TextUtilities.getLinesDimension(
-					TextUtilities.separateLines(getText().getValue().compile().getIterator()).stream()
-							.map(line -> new LineBreakMeasurer(line, TextUtilities.getDefaultFontRenderContext())) // TODO proper frc
-							.map(line -> new TextUtilities.LineBreakMeasurerAsTextLayoutIterator(line, line1 -> line1.nextLayout(autoResizeTextWidth1)))
-							.flatMap(Streams::stream)
-							.collect(ImmutableList.toImmutableList())
-			);
+			lines = TextUtilities.separateLines(getText().getValue().compile().getIterator()).stream()
+					.map(line -> new LineBreakMeasurer(line, TextUtilities.getDefaultFontRenderContext())) // TODO proper frc
+					.map(line -> new TextUtilities.LineBreakMeasurerAsTextLayoutIterator(line, line1 -> line1.nextLayout(autoResizeTextWidth1)))
+					.flatMap(Streams::stream)
+					.collect(ImmutableList.toImmutableList());
 		} else {
-			return TextUtilities.getLinesDimension(
-					TextUtilities.separateLines(getText().getValue().compile().getIterator()).stream()
-							.map(line -> new TextLayout(line, TextUtilities.getDefaultFontRenderContext())) // TODO proper frc
-							.collect(ImmutableList.toImmutableList())
-			);
+			lines = TextUtilities.separateLines(getText().getValue().compile().getIterator()).stream()
+					.map(line -> new TextLayout(line, TextUtilities.getDefaultFontRenderContext())) // TODO proper frc
+					.collect(ImmutableList.toImmutableList());
 		}
+
+		return TextUtilities.getLinesDimension(lines);
 	}
 
 	public static IIdentifier getPropertyTextIdentifier() {
@@ -218,20 +218,20 @@ public class UILabelComponent
 	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
 		super.initializeBindings(bindingActionConsumerSupplier);
 		BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier, () ->
-				ImmutableBindingAction.bind(
+				ImmutableBindingAction.bind(ImmutableList.of(
 						getText(),
 						getAutoResize(), getOverflowPolicy()
-				));
+				)));
 	}
 
 	@Override
 	public void cleanupBindings() {
 		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
 				BindingUtilities.supplyBindingAction(bindingActionConsumer, () ->
-						ImmutableBindingAction.unbind(
+						ImmutableBindingAction.unbind(ImmutableList.of(
 								getText(),
 								getAutoResize(), getOverflowPolicy()
-						)));
+						))));
 		super.cleanupBindings();
 	}
 
@@ -404,7 +404,7 @@ public class UILabelComponent
 						graphics.setColor(getDefaultForegroundColor().getValue());
 						graphics.setBackground(getDefaultBackgroundColor().getValue());
 						TextUtilities.drawLines(graphics, textPen, componentBoundsWidth,
-								getTextLayoutTask().apply(ImmutableTuple3.of(container.getText().getValue().compile(), graphics.getFontRenderContext(), textWidth)));
+								getTextLayoutTask().apply(ImmutableTuple3.of(container.getText().getValue().compile(), graphics.getFontRenderContext(), textWidth)).iterator());
 					}
 				}
 			});
@@ -422,17 +422,17 @@ public class UILabelComponent
 		public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
 			super.initializeBindings(bindingActionConsumerSupplier);
 			BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier,
-					() -> ImmutableBindingAction.bind(
+					() -> ImmutableBindingAction.bind(ImmutableList.of(
 							getDefaultForegroundColor(), getDefaultBackgroundColor()
-					));
+					)));
 		}
 
 		@Override
 		public void cleanupBindings() {
 			getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer -> BindingUtilities.supplyBindingAction(bindingActionConsumer,
-					() -> ImmutableBindingAction.unbind(
+					() -> ImmutableBindingAction.unbind(ImmutableList.of(
 							getDefaultForegroundColor(), getDefaultBackgroundColor()
-					)));
+					))));
 			super.cleanupBindings();
 		}
 

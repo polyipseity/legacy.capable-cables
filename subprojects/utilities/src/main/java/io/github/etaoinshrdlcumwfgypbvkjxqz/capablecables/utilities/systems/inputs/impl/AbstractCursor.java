@@ -7,13 +7,13 @@ public abstract class AbstractCursor
 		implements ICursor {
 	@Override
 	public int hashCode() {
-		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariableMap().values());
+		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariableMap().values().iterator());
 	}
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	public boolean equals(Object obj) {
-		return ObjectUtilities.equalsImpl(this, obj, ICursor.class, true, StaticHolder.getObjectVariableMap().values());
+		return ObjectUtilities.equalsImpl(this, obj, ICursor.class, true, StaticHolder.getObjectVariableMap().values().iterator());
 	}
 
 	@Override

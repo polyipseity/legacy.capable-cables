@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interactions;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Iterators;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions.IShapeDescriptorProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
@@ -21,7 +21,7 @@ public final class ImmutableShapeAnchor
 		this.borderThickness = borderThickness;
 		Cleaner.create(target, () ->
 				getContainer().ifPresent(c ->
-						c.removeSides(Sets.immutableEnumSet(getOriginSide()))));
+						c.removeSides(Iterators.singletonIterator(getOriginSide()))));
 	}
 
 	@Override

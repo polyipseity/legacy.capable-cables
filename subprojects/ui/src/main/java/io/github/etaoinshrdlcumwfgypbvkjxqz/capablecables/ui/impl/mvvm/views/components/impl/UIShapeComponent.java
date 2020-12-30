@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl;
 
+import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.UIProperty;
@@ -118,7 +119,9 @@ public class UIShapeComponent
 		public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
 			super.initializeBindings(bindingActionConsumerSupplier);
 			BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier, () ->
-					ImmutableBindingAction.bind(getFilledColor(), getBorderColor()));
+					ImmutableBindingAction.bind(ImmutableList.of(
+							getFilledColor(), getBorderColor()
+					)));
 		}
 
 		@Override
@@ -126,7 +129,9 @@ public class UIShapeComponent
 		public void cleanupBindings() {
 			getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
 					BindingUtilities.supplyBindingAction(bindingActionConsumer, () ->
-							ImmutableBindingAction.unbind(getFilledColor(), getBorderColor()))
+							ImmutableBindingAction.unbind(ImmutableList.of(
+									getFilledColor(), getBorderColor()
+							)))
 			);
 			super.cleanupBindings();
 		}

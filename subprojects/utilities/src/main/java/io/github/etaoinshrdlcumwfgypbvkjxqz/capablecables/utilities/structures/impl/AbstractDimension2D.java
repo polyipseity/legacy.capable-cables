@@ -31,13 +31,13 @@ public abstract class AbstractDimension2D
 
 	@Override
 	public int hashCode() {
-		return ObjectUtilities.hashCodeImpl(this, getObjectVariableMap().values());
+		return ObjectUtilities.hashCodeImpl(this, getObjectVariableMap().values().iterator());
 	}
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	public boolean equals(@Nullable Object obj) {
-		return ObjectUtilities.equalsImpl(this, obj, Dimension2D.class, true, getObjectVariableMap().values());
+		return ObjectUtilities.equalsImpl(this, obj, Dimension2D.class, true, getObjectVariableMap().values().iterator());
 	}
 
 	@Override

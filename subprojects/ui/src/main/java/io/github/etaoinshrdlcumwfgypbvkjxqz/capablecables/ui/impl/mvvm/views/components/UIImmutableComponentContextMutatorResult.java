@@ -18,7 +18,7 @@ public final class UIImmutableComponentContextMutatorResult
 	}
 
 	public static UIImmutableComponentContextMutatorResult of(IUIComponent component) {
-		return new UIImmutableComponentContextMutatorResult(component, component.getModifiersView());
+		return of(component, component.getModifiersView());
 	}
 
 	private static UIImmutableComponentContextMutatorResult of(IUIComponent component, Iterable<? extends IUIComponentModifier> modifiers) {

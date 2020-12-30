@@ -9,6 +9,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtil
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 
 import java.awt.*;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Predicate;
@@ -18,9 +19,9 @@ public class UIFunctionalComponentShapeDescriptorDynamicDetector
 		implements IShapeDescriptorDynamicDetector {
 	private final ConcurrentMap<IUIComponent, Shape> componentLastShapeMap =
 			MapBuilderUtilities.newMapMakerSingleThreaded().weakKeys().initialCapacity(CapacityUtilities.getInitialCapacityLarge()).makeMap();
-	private final Supplier<? extends Iterable<? extends IUIComponent>> componentIterableSupplier;
+	private final Supplier<? extends Iterator<? extends IUIComponent>> componentIterableSupplier;
 
-	public UIFunctionalComponentShapeDescriptorDynamicDetector(Supplier<? extends Iterable<? extends IUIComponent>> componentIterableSupplier) {
+	public UIFunctionalComponentShapeDescriptorDynamicDetector(Supplier<? extends Iterator<? extends IUIComponent>> componentIterableSupplier) {
 		this.componentIterableSupplier = componentIterableSupplier;
 	}
 
@@ -42,7 +43,7 @@ public class UIFunctionalComponentShapeDescriptorDynamicDetector
 				});
 	}
 
-	protected Supplier<? extends Iterable<? extends IUIComponent>> getComponentIterableSupplier() {
+	protected Supplier<? extends Iterator<? extends IUIComponent>> getComponentIterableSupplier() {
 		return componentIterableSupplier;
 	}
 

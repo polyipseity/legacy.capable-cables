@@ -1,12 +1,12 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering;
 
-import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.naming.AbstractNamed;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CollectionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingAction;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.core.IBindingActionConsumerSupplierHolder;
@@ -40,7 +40,7 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 		IUIRendererContainer.super.initializeBindings(bindingActionConsumerSupplier);
 		getBindingActionConsumerSupplierHolder().setValue(bindingActionConsumerSupplier);
 		BindingUtilities.initializeBindings(
-				bindingActionConsumerSupplier, getRenderer().map(ImmutableList::of).orElseGet(ImmutableList::of)
+				bindingActionConsumerSupplier, CollectionUtilities.iterate(getRenderer())
 		);
 	}
 
@@ -51,7 +51,7 @@ public class UIDefaultRendererContainer<R extends IUIRenderer<?>>
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void cleanupBindings() {
-		BindingUtilities.cleanupBindings(getRenderer().map(ImmutableList::of).orElseGet(ImmutableList::of));
+		BindingUtilities.cleanupBindings(CollectionUtilities.iterate(getRenderer()));
 		getBindingActionConsumerSupplierHolder().setValue(null);
 		IUIRendererContainer.super.cleanupBindings();
 	}

@@ -1,7 +1,5 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.targets;
 
-import com.google.common.collect.ImmutableList;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationEasing;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.animations.IUIAnimationTarget;
@@ -11,8 +9,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.O
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.DoubleConsumer;
@@ -20,12 +16,9 @@ import java.util.function.DoubleConsumer;
 public enum UIAnimationTargetUtilities {
 	;
 
-	public static IUIAnimationTarget andThen(IUIAnimationTarget... targets) { return andThen(Arrays.asList(targets)); }
-
-	public static IUIAnimationTarget andThen(Iterable<? extends IUIAnimationTarget> targets) {
-		@Immutable List<IUIAnimationTarget> targetsCopy = ImmutableList.copyOf(targets);
+	public static IUIAnimationTarget compose(Iterable<? extends IUIAnimationTarget> targets) {
 		return progress ->
-				targetsCopy.forEach(target ->
+				targets.forEach(target ->
 						target.accept(progress));
 	}
 

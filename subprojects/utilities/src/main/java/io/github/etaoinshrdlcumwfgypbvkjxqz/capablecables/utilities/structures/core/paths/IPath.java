@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.interfaces.ICloneable;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +20,7 @@ public interface IPath<T>
 
 	List<T> asList();
 
-	void subPath(Iterable<? extends T> elements);
+	void subPath(Iterator<? extends T> elements);
 
 	void parentPath(int amount)
 			throws EmptyPathException;

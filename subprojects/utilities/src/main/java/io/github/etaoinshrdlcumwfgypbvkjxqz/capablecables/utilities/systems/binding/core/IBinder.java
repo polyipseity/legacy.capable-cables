@@ -5,6 +5,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.Dyna
 import net.jodah.typetools.TypeResolver;
 
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -18,10 +19,10 @@ public interface IBinder {
 		return DynamicUtilities.Extensions.wrapTypeResolverResults(TypeResolver.resolveRawArguments(Function.class, transformer.getClass()));
 	}
 
-	boolean bind(Iterable<? extends IBinding<?>> bindings)
+	boolean bind(Iterator<? extends IBinding<?>> bindings)
 			throws NoSuchBindingTransformerException;
 
-	boolean unbind(Iterable<? extends IBinding<?>> bindings);
+	boolean unbind(Iterator<? extends IBinding<?>> bindings);
 
 	<T, R> Optional<? extends Function<@Nonnull T, @Nonnull R>> addTransformer(IBinding.EnumBindingType type, Function<@Nonnull T, @Nonnull R> transformer);
 

@@ -4,13 +4,14 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Objects;
 
 public enum EnumUtilities {
 	;
 
 	@SuppressWarnings({"UnstableApiUsage", "rawtypes", "RedundantSuppression"})
-	public static boolean areNamesCompatible(Iterable<? extends Class<? extends Enum<?>>> enums) {
+	public static boolean areNamesCompatible(Iterator<? extends Class<? extends Enum<?>>> enums) {
 		long count = Streams.stream(enums).unordered()
 				.map(Class::getEnumConstants)
 				.peek(Objects::requireNonNull)

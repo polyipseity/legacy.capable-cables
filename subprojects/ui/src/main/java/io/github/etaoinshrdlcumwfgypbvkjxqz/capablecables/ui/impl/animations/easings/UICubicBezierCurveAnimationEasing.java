@@ -19,7 +19,7 @@ public final class UICubicBezierCurveAnimationEasing
 
 	@Override
 	protected double getTForX(double x) {
-		return MathUtilities.BezierCurves.getCubicTForX(x, getControlPoints())
+		return MathUtilities.BezierCurves.getCubicTForX(x, getControlPoints().iterator())
 				.orElseThrow(IllegalArgumentException::new);
 	}
 }

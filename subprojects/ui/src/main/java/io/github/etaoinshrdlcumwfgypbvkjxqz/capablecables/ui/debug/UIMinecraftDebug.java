@@ -3,6 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterators;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.ComponentTheme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.ComponentUI;
@@ -221,7 +222,7 @@ public enum UIMinecraftDebug {
 									new RectangularShapeDescriptor<>(new Rectangle(0, 0, 100, 100)),
 									null,
 									ImmutableMap.of()));
-					IUIComponent.addContentChildren(componentManager, ImmutableList.of(window));
+					IUIComponent.addContentChildren(componentManager, Iterators.singletonIterator(window));
 				}
 				view = IUIViewComponent.create(() -> new UIDefaultMinecraftViewComponent<>(UIImmutableViewComponentArguments.of(ImmutableMap.of())),
 						componentManager);
@@ -295,10 +296,10 @@ public enum UIMinecraftDebug {
 			private Color cursorHighlighterColor = Color.WHITE;
 			private final IUIAnimationControl animations =
 					UIStandardAnimationControlFactory.createSimple(UIStandardAnimationControlFactory.EnumDirection.ALTERNATE,
-							UIAnimationTargetUtilities.andThen(
+							UIAnimationTargetUtilities.compose(ImmutableList.of(
 									UIAnimationTargetUtilities.range(rgb -> setCursorHighlighterColor(new Color((int) rgb)), 0L, 0xFFFFFFL, EnumUICommonAnimationEasing.LINEAR),
 									UIAnimationTargetUtilities.range(UIAnimationTargetUtilities.ShapeDescriptors.translateY(suppressThisEscapedWarning(() -> this)), 0, 100, EnumUICommonAnimationEasing.IN_OUT_BOUNCE)
-							),
+							)),
 							ITicker.StaticHolder.getSystemTicker(),
 							true,
 							TimeUnit.SECONDS.toNanos(5L),
@@ -321,7 +322,7 @@ public enum UIMinecraftDebug {
 						.flatMap(IUIComponentManager::getView)
 						.map(IUIView::getAnimationController)
 						.ifPresent(animationController ->
-								animationController.add(getAnimations()));
+								animationController.add(Iterators.singletonIterator(getAnimations())));
 			}
 
 			protected IUIAnimationControl getAnimations() { return animations; }
@@ -334,7 +335,7 @@ public enum UIMinecraftDebug {
 						.flatMap(IUIComponentManager::getView)
 						.map(IUIView::getAnimationController)
 						.ifPresent(animationController ->
-								animationController.remove(getAnimations()));
+								animationController.remove(Iterators.singletonIterator(getAnimations())));
 				getAnimations().reset();
 				super.onRendererRemoved();
 			}
@@ -421,10 +422,10 @@ public enum UIMinecraftDebug {
 			public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
 				super.initializeBindings(bindingActionConsumerSupplier);
 				BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier,
-						() -> ImmutableBindingAction.bind(
+						() -> ImmutableBindingAction.bind(ImmutableList.of(
 								getAnchoredWindowBorderColor(),
 								getButtonOnActivate(), getButtonOnActivated()
-						)
+						))
 				);
 			}
 
@@ -439,10 +440,10 @@ public enum UIMinecraftDebug {
 			public void cleanupBindings() {
 				getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
 						BindingUtilities.supplyBindingAction(bindingActionConsumer,
-								() -> ImmutableBindingAction.unbind(
+								() -> ImmutableBindingAction.unbind(ImmutableList.of(
 										getAnchoredWindowBorderColor(),
 										getButtonOnActivate(), getButtonOnActivated()
-								)
+								))
 						));
 				super.cleanupBindings();
 			}

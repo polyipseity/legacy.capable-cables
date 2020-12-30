@@ -30,7 +30,7 @@ public class JAXBUIDefaultComponentAdapterAnchorHandler
 	private final LoadingCache<IUIViewComponent<?, ?>, Map<String, IUIComponent>> viewComponentNamedMaps =
 			CacheUtilities.newCacheBuilderSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacityTiny()).weakKeys()
 					.build(CacheLoader.from(view -> {
-						@Immutable Map<String, IUIComponent> result = INamed.toNamedMap(AssertionUtilities.assertNonnull(view).getChildrenFlatView());
+						@Immutable Map<String, IUIComponent> result = INamed.toNamedMap(AssertionUtilities.assertNonnull(view).getChildrenFlatView().iterator());
 						Map<String, IUIComponent> weakResult = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(result.size()).weakValues().makeMap();
 						weakResult.putAll(result);
 						return weakResult;
@@ -58,7 +58,10 @@ public class JAXBUIDefaultComponentAdapterAnchorHandler
 														(EnumUISide) IJAXBAdapterRegistry.adaptFromJAXB(context,
 																ObjectFactories.getDefaultUIObjectFactory().createUiSide(left.getTargetSide())
 														),
-														suppressUnboxing(left.getBorderThickness())))))
+														suppressUnboxing(left.getBorderThickness())))
+														.iterator()
+										)
+								)
 				);
 	}
 

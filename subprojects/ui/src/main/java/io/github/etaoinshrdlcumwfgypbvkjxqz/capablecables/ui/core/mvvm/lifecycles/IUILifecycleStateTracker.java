@@ -1,10 +1,11 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.lifecycles;
 
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 public interface IUILifecycleStateTracker {
-	void apply(Iterable<?> statefulObjects);
+	void apply(Iterator<?> statefulObjects);
 
 	boolean containsState(EnumUILifecycleState state);
 

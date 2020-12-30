@@ -101,7 +101,7 @@ public enum EnumUIAxis {
 		public @Immutable Set<EnumUISide> getSides(EnumSidesOption option) {
 			return getYSides().stream().unordered()
 					.filter(option::filterSide)
-					.collect(ImmutableSet.toImmutableSet());
+					.collect(Sets.toImmutableEnumSet());
 		}
 	};
 

@@ -35,10 +35,10 @@ public abstract class UIAbstractStandardAnimationControl
 	                                          IFunction3<? super IUIAnimationTarget, ? super Integer, ? super Integer, ? extends Long, ? extends RuntimeException> loopFunction) {
 		super(targets, ticker);
 		this.autoPlay = autoPlay;
-		this.localDurations = LongLists.unmodifiable(new LongArrayList(generateListFromFunction(targets, durationFunction)));
-		this.startDelays = LongLists.unmodifiable(new LongArrayList(generateListFromFunction(targets, startDelayFunction)));
-		this.endDelays = LongLists.unmodifiable(new LongArrayList(generateListFromFunction(targets, endDelayFunction)));
-		this.loops = LongLists.unmodifiable(new LongArrayList(generateListFromFunction(targets, loopFunction)));
+		this.localDurations = LongLists.unmodifiable(new LongArrayList(generateListFromFunction(targets.iterator(), durationFunction)));
+		this.startDelays = LongLists.unmodifiable(new LongArrayList(generateListFromFunction(targets.iterator(), startDelayFunction)));
+		this.endDelays = LongLists.unmodifiable(new LongArrayList(generateListFromFunction(targets.iterator(), endDelayFunction)));
+		this.loops = LongLists.unmodifiable(new LongArrayList(generateListFromFunction(targets.iterator(), loopFunction)));
 	}
 
 	protected static <T extends UIAbstractStandardAnimationControl> IUIAnimationTime calculateTotalDuration(T self, ToLongBiFunction<? super T, ? super Integer> calculateTotalDurationFunction) {

@@ -11,6 +11,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming.IUIThe
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
@@ -19,8 +20,8 @@ import java.util.Optional;
  */
 public interface IUIView<S extends Shape>
 		extends IUISubInfrastructure<IUIViewContext>, IUIReshapeExplicitly<S> {
-	static void registerRendererContainers(IUIView<?> instance, Iterable<? extends IUIRendererContainer<?>> rendererContainers) {
-		IUIView.getNamedTrackers(instance).addAll(IUIRendererContainer.class, rendererContainers);
+	static void registerRendererContainers(IUIView<?> instance, Iterator<? extends IUIRendererContainer<?>> rendererContainers) {
+		IUIView.getNamedTrackers(instance).add(IUIRendererContainer.class, rendererContainers);
 	}
 
 	static INamedTrackers getNamedTrackers(IUIView<?> instance) {
@@ -37,8 +38,8 @@ public interface IUIView<S extends Shape>
 		return instance.getCoordinator(IUIThemeStack.class).orElseThrow(AssertionError::new);
 	}
 
-	static void unregisterRendererContainers(IUIView<?> instance, Iterable<? extends IUIRendererContainer<?>> rendererContainers) {
-		IUIView.getNamedTrackers(instance).removeAll(IUIRendererContainer.class, rendererContainers);
+	static void unregisterRendererContainers(IUIView<?> instance, Iterator<? extends IUIRendererContainer<?>> rendererContainers) {
+		IUIView.getNamedTrackers(instance).remove(IUIRendererContainer.class, rendererContainers);
 	}
 
 	IUIEventTarget getTargetAtPoint(Point2D point);

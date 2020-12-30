@@ -1,11 +1,12 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.paths;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.EmptyPathException;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.paths.IPath;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,12 +41,10 @@ public abstract class AbstractPath<T>
 	public List<T> asList() { return ImmutableList.copyOf(getData()); }
 
 	@Override
-	public void subPath(Iterable<? extends T> elements) { Iterables.addAll(getData(), elements); }
+	public void subPath(Iterator<? extends T> elements) { Iterators.addAll(getData(), elements); }
 
 	@Override
 	public boolean isEmpty() { return size() == 0; }
 
 	protected abstract List<T> getData();
-
-
 }

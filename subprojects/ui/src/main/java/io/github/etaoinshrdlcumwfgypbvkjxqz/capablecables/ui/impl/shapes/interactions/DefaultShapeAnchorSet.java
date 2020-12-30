@@ -12,6 +12,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUti
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -35,15 +36,15 @@ public class DefaultShapeAnchorSet
 
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public boolean addAnchors(Iterable<? extends IShapeAnchor> anchors) {
+	public boolean addAnchors(Iterator<? extends IShapeAnchor> anchors) {
 		return stripBool(
 				Streams.stream(anchors)
-						.mapToInt(anchor -> {
-							removeSides(AssertionUtilities.assertNonnull(StaticHolder.getExclusiveSidesMap().get(anchor.getOriginSide())));
+						.peek(anchor -> {
+							removeSides(AssertionUtilities.assertNonnull(StaticHolder.getExclusiveSidesMap().get(anchor.getOriginSide())).iterator());
 							getAnchors().put(anchor.getOriginSide(), anchor);
 							anchor.onContainerAdded(this);
-							return tBool();
 						})
+						.mapToInt(PaddedBoolStreams::tBool)
 						.reduce(fBool(), PaddedBool::orBool)
 		);
 	}
@@ -53,7 +54,7 @@ public class DefaultShapeAnchorSet
 
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public boolean removeSides(Iterable<? extends EnumUISide> sides) {
+	public boolean removeSides(Iterator<? extends EnumUISide> sides) {
 		return stripBool(
 				Streams.stream(sides).unordered()
 						.map(getAnchors()::remove)

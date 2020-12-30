@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NonNls;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodType;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiPredicate;
@@ -98,7 +99,7 @@ public enum ObjectUtilities {
 	                                     @Nullable Object other,
 	                                     Class<T> referenceClass,
 	                                     boolean acceptSubclasses,
-	                                     Iterable<? extends Function<@Nonnull ? super T, @Nullable ?>> variables) {
+	                                     Iterator<? extends Function<@Nonnull ? super T, @Nullable ?>> variables) {
 
 		if (self == other)
 			return true;
@@ -125,9 +126,9 @@ public enum ObjectUtilities {
 	 * @see java.util.Arrays#hashCode(Object[])
 	 */
 	@SuppressWarnings({"MagicNumber", "UnstableApiUsage"})
-	public static <T> int hashCodeImpl(T self, Iterable<? extends Function<@Nonnull ? super T, @Nullable ?>> variables) {
+	public static <T> int hashCodeImpl(T self, Iterator<? extends Function<@Nonnull ? super T, @Nullable ?>> variables) {
 		final int[] result = {getHashCodeSuperInvokerMap().getUnchecked(self.getClass()).applyAsInt(CastUtilities.castUnchecked(self))};
-		Streams.stream(variables)
+		Streams.stream(variables) // COMMENT need to be sequential
 				.map(variable -> variable.apply(self))
 				.mapToInt(Objects::hashCode)
 				.forEachOrdered(variableHashCode -> {

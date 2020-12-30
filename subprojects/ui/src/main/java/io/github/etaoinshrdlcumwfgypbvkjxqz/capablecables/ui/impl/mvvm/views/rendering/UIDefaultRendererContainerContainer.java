@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRenderer;
@@ -39,7 +39,7 @@ public class UIDefaultRendererContainerContainer<R extends IUIRenderer<?>>
 		IUIRendererContainerContainer.super.initializeBindings(bindingActionConsumerSupplier);
 		getBindingActionConsumerSupplierHolder().setValue(bindingActionConsumerSupplier);
 		BindingUtilities.initializeBindings(bindingActionConsumerSupplier,
-				ImmutableList.of(getRendererContainer()));
+				Iterators.singletonIterator(getRendererContainer()));
 	}
 
 	protected IBindingActionConsumerSupplierHolder getBindingActionConsumerSupplierHolder() {
@@ -54,7 +54,7 @@ public class UIDefaultRendererContainerContainer<R extends IUIRenderer<?>>
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void cleanupBindings() {
-		BindingUtilities.cleanupBindings(ImmutableList.of(getRendererContainer()));
+		BindingUtilities.cleanupBindings(Iterators.singletonIterator(getRendererContainer()));
 		getBindingActionConsumerSupplierHolder().setValue(null);
 		IUIRendererContainerContainer.super.cleanupBindings();
 	}

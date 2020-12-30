@@ -1,7 +1,9 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections;
 
-import com.google.common.collect.*;
-import com.google.common.primitives.Ints;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
@@ -46,20 +48,19 @@ public enum MapUtilities {
 				Streams.stream(maps)
 						.map(Map::keySet)
 						.flatMap(Collection::stream)
-						.collect(ImmutableList.toImmutableList()),
+						.iterator(),
 				Streams.stream(maps)
 						.map(Map::values)
 						.flatMap(Collection::stream)
-						.collect(ImmutableList.toImmutableList())
+						.iterator()
 		);
 	}
 
-	public static <K, V> ImmutableMap<K, V> zipKeysValues(Iterable<? extends K> keys, Iterable<? extends V> values) {
-		Map<K, V> ret = new HashMap<>(Ints.saturatedCast(SpliteratorUtilities.estimateSizeOrElse(keys.spliterator(), CapacityUtilities.getInitialCapacityMedium())));
+	public static <K, V> ImmutableMap<K, V> zipKeysValues(Iterator<? extends K> keys, Iterator<? extends V> values) {
+		Map<K, V> ret = new HashMap<>(CapacityUtilities.getInitialCapacitySmall());
 
-		Iterator<? extends V> iteratorValues = values.iterator();
-		keys.forEach(k -> {
-			if (!iteratorValues.hasNext())
+		keys.forEachRemaining(k -> {
+			if (!values.hasNext())
 				throw new IllegalArgumentException(
 						new LogMessageBuilder()
 								.addMarkers(MapUtilities::getClassMarker)
@@ -67,9 +68,9 @@ public enum MapUtilities {
 								.addMessages(() -> getResourceBundle().getString("stitch.keys.long"))
 								.build()
 				);
-			ret.put(k, iteratorValues.next());
+			ret.put(k, values.next());
 		});
-		if (iteratorValues.hasNext())
+		if (values.hasNext())
 			throw new IllegalArgumentException(
 					new LogMessageBuilder()
 							.addMarkers(MapUtilities::getClassMarker)

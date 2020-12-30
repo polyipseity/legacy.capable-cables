@@ -31,7 +31,7 @@ public class JAXBUIDefaultComponentThemeAdapter
 		return getThreadLocalContext()
 				.map(context -> {
 					try {
-						IJAXBUIComponentThemeAdapterContext subContext = new JAXBUIImmutableComponentThemeAdapterContext(JAXBUIComponentUtilities.adaptUsingFromJAXB(left.getUsing()),
+						IJAXBUIComponentThemeAdapterContext subContext = new JAXBUIImmutableComponentThemeAdapterContext(JAXBUIComponentUtilities.adaptUsingFromJAXB(left.getUsing().iterator()),
 								getObjectHandlers(),
 								getElementHandlers(),
 								new UILambdaTheme.Builder());

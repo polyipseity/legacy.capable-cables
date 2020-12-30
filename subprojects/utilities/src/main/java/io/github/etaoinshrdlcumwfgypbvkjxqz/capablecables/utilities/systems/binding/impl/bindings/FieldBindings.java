@@ -21,6 +21,7 @@ import org.reactivestreams.Subscriber;
 import org.slf4j.Logger;
 import sun.misc.Cleaner;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -47,12 +48,12 @@ public class FieldBindings
 
 	@Override
 	@SuppressWarnings("UnstableApiUsage")
-	public boolean add(Iterable<? extends IBindingField<?>> fields)
+	public boolean add(Iterator<? extends IBindingField<?>> fields)
 			throws NoSuchBindingTransformerException {
 		return stripBool(
 				Streams.stream(fields) // COMMENT sequential, field binding order matters
 						.filter(FunctionUtilities.notPredicate(getFields()::containsKey))
-						.mapToInt(field -> {
+						.peek(field -> {
 							// COMMENT the code below is probably not needed, 'BehaviorProcessor'-like notifier for 'IObservableField' expected
 							/* CODE
 							getFields().keySet().stream().unordered()
@@ -76,8 +77,8 @@ public class FieldBindings
 							);
 							getFields().put(field, d);
 							field.getField().getNotifier().subscribe(CastUtilities.castUnchecked(d)); // COMMENT should be of the same type
-							return tBool();
 						})
+						.mapToInt(PaddedBoolStreams::tBool)
 						.reduce(fBool(), PaddedBool::orBool)
 		);
 	}
@@ -89,7 +90,7 @@ public class FieldBindings
 
 	@Override
 	@SuppressWarnings("UnstableApiUsage")
-	public boolean remove(Iterable<? extends IBindingField<?>> fields) {
+	public boolean remove(Iterator<? extends IBindingField<?>> fields) {
 		return stripBool(
 				Streams.stream(fields).unordered()
 						.map(getFields()::remove)

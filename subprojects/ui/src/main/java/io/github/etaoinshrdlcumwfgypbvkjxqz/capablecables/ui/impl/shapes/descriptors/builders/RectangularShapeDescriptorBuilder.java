@@ -23,7 +23,7 @@ public abstract class RectangularShapeDescriptorBuilder<S extends RectangularSha
 						suppressUnboxing(width), suppressUnboxing(height))); // TODO javac bug, no method ref here
 		UIObjectUtilities.transformRectangularShape(getTransform(), s, s);
 		IShapeDescriptor<S> ret = new RectangularShapeDescriptor<>(s);
-		IShapeDescriptorBuilder.addUIObjects(ret, getConstraints());
+		IShapeDescriptorBuilder.addUIObjects(ret, getConstraints().iterator());
 		return ret;
 	}
 

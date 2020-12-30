@@ -23,7 +23,8 @@ public abstract class AbstractBezierCurveUIAnimationEasing
 
 	@Override
 	public double applyAsDouble(double x) {
-		return MathUtilities.BezierCurves.bezierCurveExact(new Point2D.Double(), getTForX(x), getControlPoints()).getY();
+		return MathUtilities.BezierCurves.bezierCurveExact(new Point2D.Double(), getTForX(x), getControlPoints().iterator())
+				.getY();
 	}
 
 	protected abstract double getTForX(double x);

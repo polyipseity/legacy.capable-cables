@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.handlers;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -26,7 +27,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.thro
 
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
 import java.util.Map;
 
 public class JAXBUIDefaultComponentAdapterExtensionHandler
@@ -42,12 +42,12 @@ public class JAXBUIDefaultComponentAdapterExtensionHandler
 				.flatMap(container -> CastUtilities.castChecked(IExtensionContainer.class, container))
 				.map(CastUtilities::<IExtensionContainer<?>>castUnchecked)
 				.ifPresent(container -> {
-					Map<IIdentifier, IUIPropertyMappingValue> mappings = JAXBUIComponentUtilities.createMappings(context, left.getProperty());
+					Map<IIdentifier, IUIPropertyMappingValue> mappings = JAXBUIComponentUtilities.createMappings(context, left.getProperty().iterator());
 					IUIExtensionArguments argument = UIImmutableExtensionArguments.of(mappings, container.getClass(), left.getRendererName());
 
 					Class<?> clazz = AssertionUtilities.assertNonnull(subContext.getAliasesView().get(left.getClazz()));
 					Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIExtensionConstructor.class,
-							Arrays.asList(clazz.getDeclaredConstructors()));
+							ImmutableList.copyOf(clazz.getDeclaredConstructors()).iterator());
 					MethodHandle constructorHandle;
 					try {
 						constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);

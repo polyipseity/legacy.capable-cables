@@ -9,6 +9,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.c
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.tuples.ImmutableIntersection;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -17,7 +18,7 @@ import java.util.stream.Stream;
 
 public interface IUIComponentModifier {
 	@SuppressWarnings("UnstableApiUsage")
-	static <M> Stream<IIntersection<IUIComponentModifier, M>> streamSpecificModifiersIntersection(Iterable<? extends IUIComponentModifier> modifiers,
+	static <M> Stream<IIntersection<IUIComponentModifier, M>> streamSpecificModifiersIntersection(Iterator<? extends IUIComponentModifier> modifiers,
 	                                                                                              Class<M> modifierClass) {
 		return Streams.stream(modifiers)
 				.filter(modifierClass::isInstance)
@@ -30,12 +31,12 @@ public interface IUIComponentModifier {
 	                                         Consumer<@Nonnull ? super M> action) {
 		EnumModifyStage.handleModifiers(() -> action.accept(component),
 				modifiers,
-				modifiers2 -> streamSpecificModifiers(modifiers2, modifierClass)
+				modifiers2 -> streamSpecificModifiers(modifiers2.iterator(), modifierClass)
 						.forEachOrdered(action));
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	static <M> Stream<M> streamSpecificModifiers(Iterable<? extends IUIComponentModifier> modifiers,
+	static <M> Stream<M> streamSpecificModifiers(Iterator<? extends IUIComponentModifier> modifiers,
 	                                             Class<M> modifierClass) {
 		return Streams.stream(modifiers)
 				.filter(modifierClass::isInstance)
@@ -49,18 +50,14 @@ public interface IUIComponentModifier {
 	                                                           Function<@Nonnull ? super Iterable<? extends RInter>, ? extends R> combiner) {
 		return EnumModifyStage.handleModifiers(() -> action.apply(component),
 				modifiers,
-				modifiers2 -> streamSpecificModifiers(modifiers2, modifierClass)
+				modifiers2 -> streamSpecificModifiers(modifiers2.iterator(), modifierClass)
 						.map(action)
-						.collect(Collectors.toList()),
-				(self, pre, post) -> {
-					assert pre != null;
-					assert post != null;
-					return combiner.apply(Iterables.concat(
-							pre,
-							Collections.singleton(self), // COMMENT need to allow 'null'
-							post
-					));
-				});
+						.collect(Collectors.toList()) /* COMMENT need to allow for 'null' */,
+				(self, pre, post) -> combiner.apply(Iterables.concat(
+						pre,
+						Collections.singleton(self), // COMMENT need to allow for 'null'
+						post
+				)));
 	}
 
 	Optional<? extends IUIComponent> getTargetComponent();

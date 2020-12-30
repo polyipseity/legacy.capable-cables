@@ -4,8 +4,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.lifecycle
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.lifecycles.IUILifecycleStateTracker;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.FunctionUtilities;
 
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
@@ -17,11 +19,12 @@ public class UIDefaultLifecycleStateTracker
 			MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(EnumUILifecycleState.values().length).makeMap();
 
 	@Override
-	public void apply(Iterable<?> statefulObjects) {
-		getStateAppliers().entrySet().stream()
+	public void apply(Iterator<?> statefulObjects) {
+		statefulObjects.forEachRemaining(getStateAppliers().entrySet().stream()
 				.sorted(Comparator.comparingInt(entry -> AssertionUtilities.assertNonnull(entry.getKey()).ordinal()))
 				.map(Map.Entry::getValue)
-				.forEachOrdered(statefulObjects::forEach);
+				.map(AssertionUtilities::assertNonnull)
+				.reduce(FunctionUtilities.getEmptyConsumer(), Consumer::andThen));
 	}
 
 	@Override

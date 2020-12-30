@@ -115,11 +115,11 @@ public class UIDefaultEventTarget
 		}
 
 		@Override
-		public int hashCode() { return ObjectUtilities.hashCodeImpl(this, getObjectVariableMap().values()); }
+		public int hashCode() { return ObjectUtilities.hashCodeImpl(this, getObjectVariableMap().values().iterator()); }
 
 		@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 		@Override
-		public boolean equals(Object obj) { return ObjectUtilities.equalsImpl(this, obj, UIEventListenerWithParameters.class, false, getObjectVariableMap().values()); }
+		public boolean equals(Object obj) { return ObjectUtilities.equalsImpl(this, obj, UIEventListenerWithParameters.class, false, getObjectVariableMap().values().iterator()); }
 
 		@Override
 		public String toString() { return ObjectUtilities.toStringImpl(this, getObjectVariableMap()); }

@@ -1,11 +1,13 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.handlers;
 
 import com.google.common.collect.ImmutableList;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Renderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.IUIRendererArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRenderer;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.IJAXBAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.parsers.adapters.ui.components.contexts.IJAXBUIComponentThemeAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableRendererArguments;
@@ -19,9 +21,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.thro
 
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class JAXBUIDefaultComponentThemeAdapterRendererHandler
 		extends JAXBUIAbstractSubContextualAdapterHandler<Renderer, IJAXBUIComponentThemeAdapterContext> {
@@ -33,19 +35,19 @@ public class JAXBUIDefaultComponentThemeAdapterRendererHandler
 	@SuppressWarnings({"deprecation", "cast"})
 	protected void accept0(IJAXBAdapterContext context, IJAXBUIComponentThemeAdapterContext subContext, Renderer left) {
 		// COMMENT we should try to prepare as much as possible beforehand
-		Map<IIdentifier, IUIPropertyMappingValue> mappings = JAXBUIComponentUtilities.createMappings(context, left.getProperty());
+		Map<IIdentifier, IUIPropertyMappingValue> mappings = JAXBUIComponentUtilities.createMappings(context, left.getProperty().iterator());
 		String name = left.getName();
 		Optional<Class<?>> rawClass = left.getClazz()
 				.map(classAlias -> AssertionUtilities.assertNonnull(subContext.getAliasesView().get(classAlias)));
 
 		subContext.getBuilder()
-				.addRendererContainerAppliers(ImmutableList.of(
+				.addRendererContainerAppliers(ImmutableList.<Consumer<@Nonnull ? super Map<? super String, ? extends IUIRendererContainer<?>>>>of(
 						rendererContainerMap ->
 								Optional.ofNullable(rendererContainerMap.get(name))
 										.ifPresent(rendererContainer -> {
 											Class<?> clazz = rawClass
 													.orElseGet(rendererContainer::getDefaultRendererClass);
-											Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIRendererConstructor.class, Arrays.asList(clazz.getDeclaredConstructors()));
+											Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIRendererConstructor.class, ImmutableList.copyOf(clazz.getDeclaredConstructors()).iterator());
 											MethodHandle constructorHandle;
 											try {
 												constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
@@ -69,6 +71,6 @@ public class JAXBUIDefaultComponentThemeAdapterRendererHandler
 
 											rendererContainer.setRenderer(CastUtilities.castUnchecked(ret)); // COMMENT setRenderer should check
 										})
-				));
+				).iterator());
 	}
 }

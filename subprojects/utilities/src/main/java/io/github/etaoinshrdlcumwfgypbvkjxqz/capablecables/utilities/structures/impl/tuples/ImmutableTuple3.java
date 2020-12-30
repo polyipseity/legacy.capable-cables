@@ -40,13 +40,13 @@ public final class ImmutableTuple3<L, M, R>
 
 	@Override
 	public int hashCode() {
-		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariableMap().values());
+		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariableMap().values().iterator());
 	}
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	public boolean equals(@Nullable Object o) {
-		return ObjectUtilities.equalsImpl(this, o, CastUtilities.<Class<ITuple3<?, ?, ?>>>castUnchecked(ITuple3.class), true, StaticHolder.getObjectVariableMap().values());
+		return ObjectUtilities.equalsImpl(this, o, CastUtilities.<Class<ITuple3<?, ?, ?>>>castUnchecked(ITuple3.class), true, StaticHolder.getObjectVariableMap().values().iterator());
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamedT
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamedTrackers;
 
 import javax.annotation.concurrent.ThreadSafe;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
@@ -16,25 +17,13 @@ import java.util.Optional;
 public abstract class AbstractNamedTrackers
 		implements INamedTrackers {
 	@Override
-	public <E extends INamed> boolean add(Class<E> clazz, E element) throws DuplicateNameException {
-		return getTracker(clazz).add(element);
+	public <E extends INamed> boolean add(Class<E> clazz, Iterator<? extends E> elements) throws DuplicateNameException {
+		return getTracker(clazz).add(elements);
 	}
 
 	@Override
-	public <E extends INamed> boolean remove(Class<E> clazz, E element) {
-		boolean result = getTracker(clazz).remove(element);
-		getData().cleanUp();
-		return result;
-	}
-
-	@Override
-	public <E extends INamed> boolean addAll(Class<E> clazz, Iterable<? extends E> elements) throws DuplicateNameException {
-		return getTracker(clazz).addAll(elements);
-	}
-
-	@Override
-	public <E extends INamed> boolean removeAll(Class<E> clazz, Iterable<? extends E> elements) {
-		boolean result = getTracker(clazz).removeAll(elements);
+	public <E extends INamed> boolean remove(Class<E> clazz, Iterator<? extends E> elements) {
+		boolean result = getTracker(clazz).remove(elements);
 		getData().cleanUp();
 		return result;
 	}

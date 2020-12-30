@@ -64,6 +64,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.Optional;
+import java.util.PrimitiveIterator;
 import java.util.Set;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
@@ -323,7 +324,7 @@ public class UIMinecraftScreenAdapter
 									.<List<?>>map(UIEventUtilities::computeNodePath)
 									.orElseGet(() -> ImmutableList.of(t)))
 							.orElseGet(ImmutableList::of);
-			int equalParents = Math.toIntExact(CollectionUtilities.countEqualPrefixes(op, np)); // COMMENT paths equal for [0,equalParents)
+			int equalParents = Math.toIntExact(CollectionUtilities.countEqualPrefixes(op.iterator(), np.iterator())); // COMMENT paths equal for [0,equalParents)
 			o.ifPresent(t -> {
 				UIEventUtilities.dispatchEvent(
 						UIEventUtilities.Factory.createEventMouseLeaveSelf(context.getViewContext(), t, data, n.orElse(null))); // COMMENT consider bubbling
@@ -367,17 +368,17 @@ public class UIMinecraftScreenAdapter
 		return IntSets.unmodifiable(new IntOpenHashSet(getCloseKeys()));
 	}
 
-	public boolean addCloseKeys(IntIterable keys) {
+	public boolean addCloseKeys(PrimitiveIterator.OfInt keys) {
 		return stripBool(
-				PrimitiveStreamUtilities.streamInt(keys)
+				PrimitiveStreamUtilities.stream(keys)
 						.map(key -> padBool(getCloseKeys().add(key)))
 						.reduce(fBool(), PaddedBool::orBool)
 		);
 	}
 
-	public boolean removeCloseKeys(IntIterable keys) {
+	public boolean removeCloseKeys(PrimitiveIterator.OfInt keys) {
 		return stripBool(
-				PrimitiveStreamUtilities.streamInt(keys)
+				PrimitiveStreamUtilities.stream(keys)
 						.map(key -> padBool(getCloseKeys().remove(key)))
 						.reduce(fBool(), PaddedBool::orBool)
 		);
@@ -483,9 +484,9 @@ public class UIMinecraftScreenAdapter
 		return event;
 	}
 
-	public boolean addChangeFocusKeys(IntIterable keys) {
+	public boolean addChangeFocusKeys(PrimitiveIterator.OfInt keys) {
 		return stripBool(
-				PrimitiveStreamUtilities.streamInt(keys)
+				PrimitiveStreamUtilities.stream(keys)
 						.map(key -> padBool(getChangeFocusKeys().add(key)))
 						.reduce(fBool(), PaddedBool::orBool)
 		);
@@ -514,9 +515,9 @@ public class UIMinecraftScreenAdapter
 		setTargetBeingHoveredByMouse(context, getInfrastructure().getView().getTargetAtPoint((Point2D) cp.clone()), d);
 	}
 
-	public boolean removeChangeFocusKeys(IntIterable keys) {
+	public boolean removeChangeFocusKeys(PrimitiveIterator.OfInt keys) {
 		return stripBool(
-				PrimitiveStreamUtilities.streamInt(keys)
+				PrimitiveStreamUtilities.stream(keys)
 						.map(key -> padBool(getChangeFocusKeys().remove(key)))
 						.reduce(fBool(), PaddedBool::orBool)
 		);

@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.SetMultimap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
@@ -170,7 +171,9 @@ public class UIButtonComponent
 	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
 		super.initializeBindings(bindingActionConsumerSupplier);
 		BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier,
-				() -> ImmutableBindingAction.bind(getOnActivate(), getOnActivated(), getOnCanceled()));
+				() -> ImmutableBindingAction.bind(ImmutableList.of(
+						getOnActivate(), getOnActivated(), getOnCanceled()
+				)));
 	}
 
 	@Override
@@ -178,7 +181,9 @@ public class UIButtonComponent
 	public void cleanupBindings() {
 		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
 				BindingUtilities.supplyBindingAction(bindingActionConsumer,
-						() -> ImmutableBindingAction.unbind(getOnActivate(), getOnActivated(), getOnCanceled()))
+						() -> ImmutableBindingAction.unbind(ImmutableList.of(
+								getOnActivate(), getOnActivated(), getOnCanceled()
+						)))
 		);
 		super.cleanupBindings();
 	}
@@ -386,11 +391,11 @@ public class UIButtonComponent
 		public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
 			super.initializeBindings(bindingActionConsumerSupplier);
 			BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier,
-					() -> ImmutableBindingAction.bind(
+					() -> ImmutableBindingAction.bind(ImmutableList.of(
 							getBaseColor(), getBaseBorderColor(),
 							getHoveringColor(), getHoveringBorderColor(),
 							getPressedColor(), getPressedBorderColor()
-					));
+					)));
 		}
 
 		@Override
@@ -398,11 +403,11 @@ public class UIButtonComponent
 		public void cleanupBindings() {
 			getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
 					BindingUtilities.supplyBindingAction(bindingActionConsumer,
-							() -> ImmutableBindingAction.unbind(
+							() -> ImmutableBindingAction.unbind(ImmutableList.of(
 									getBaseColor(), getBaseBorderColor(),
 									getHoveringColor(), getHoveringBorderColor(),
 									getPressedColor(), getPressedBorderColor()
-							)));
+							))));
 			super.cleanupBindings();
 		}
 

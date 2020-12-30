@@ -6,6 +6,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming.IUITheme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming.IUIThemeStack;
 
+import java.util.Iterator;
 import java.util.function.Consumer;
 
 public abstract class UIAbstractThemeStack
@@ -33,7 +34,7 @@ public abstract class UIAbstractThemeStack
 	protected Consumer<@Nonnull ? super IUITheme> getApplier() { return applier; }
 
 	@Override
-	public void applyAll(Iterable<? extends IUIRendererContainer<?>> rendererContainers) {
+	public void apply(Iterator<? extends IUIRendererContainer<?>> rendererContainers) {
 		descendingIterator() // COMMENT from tail to head, tail is the lowest theme, head is the highest theme
 				.forEachRemaining(theme -> theme.apply(rendererContainers));
 	}

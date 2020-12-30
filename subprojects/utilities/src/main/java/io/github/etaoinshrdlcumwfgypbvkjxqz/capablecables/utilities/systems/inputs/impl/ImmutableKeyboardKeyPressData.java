@@ -28,11 +28,11 @@ public final class ImmutableKeyboardKeyPressData
 	}
 
 	@Override
-	public int hashCode() { return ObjectUtilities.hashCodeImpl(this, IKeyboardKeyPressData.StaticHolder.getObjectVariableMap().values()); }
+	public int hashCode() { return ObjectUtilities.hashCodeImpl(this, IKeyboardKeyPressData.StaticHolder.getObjectVariableMap().values().iterator()); }
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
-	public boolean equals(Object obj) { return ObjectUtilities.equalsImpl(this, obj, IKeyboardKeyPressData.class, true, IKeyboardKeyPressData.StaticHolder.getObjectVariableMap().values()); }
+	public boolean equals(Object obj) { return ObjectUtilities.equalsImpl(this, obj, IKeyboardKeyPressData.class, true, IKeyboardKeyPressData.StaticHolder.getObjectVariableMap().values().iterator()); }
 
 	@Override
 	public ImmutableKeyboardKeyPressData clone() {

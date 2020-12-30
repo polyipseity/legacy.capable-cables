@@ -88,7 +88,7 @@ public enum JAXBUIComponentUtilities {
 			.build();
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static @Immutable Map<String, Class<?>> adaptUsingFromJAXB(Iterable<? extends Using> using)
+	public static @Immutable Map<String, Class<?>> adaptUsingFromJAXB(Iterator<? extends Using> using)
 			throws ClassNotFoundException {
 		return Streams.stream(using).unordered()
 				.map(IThrowingFunction.executeNow(u -> Maps.immutableEntry(u.getAlias(), Class.forName(u.getTarget()))))
@@ -100,11 +100,11 @@ public enum JAXBUIComponentUtilities {
 			throws Throwable {
 		return context.getDatum(IJAXBUIComponentAdapterContext.class)
 				.map(IThrowingFunction.executeNow(subContext -> {
-					Map<IIdentifier, IUIPropertyMappingValue> mappings = createMappings(context, view.getProperty());
+					Map<IIdentifier, IUIPropertyMappingValue> mappings = createMappings(context, view.getProperty().iterator());
 					IUIViewComponentArguments argument = UIImmutableViewComponentArguments.of(mappings);
 
 					Class<?> clazz = AssertionUtilities.assertNonnull(subContext.getAliasesView().get(view.getClazz()));
-					Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIViewComponentConstructor.class, Arrays.asList(clazz.getDeclaredConstructors()));
+					Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIViewComponentConstructor.class, ImmutableList.copyOf(clazz.getDeclaredConstructors()).iterator());
 					MethodHandle constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
 					constructorHandle = constructorHandle.asType(constructorHandle.type().changeReturnType(IUIViewComponent.class));
 
@@ -114,7 +114,7 @@ public enum JAXBUIComponentUtilities {
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static Map<IIdentifier, IUIPropertyMappingValue> createMappings(IJAXBAdapterContext context, Iterable<? extends Property> properties) {
+	public static Map<IIdentifier, IUIPropertyMappingValue> createMappings(IJAXBAdapterContext context, Iterator<? extends Property> properties) {
 		return Streams.stream(properties).unordered()
 				.map(p -> Maps.immutableEntry(ImmutableIdentifier.ofInterning(p.getKey()),
 						UIImmutablePropertyMappingValue.of(p.getAny()
@@ -134,7 +134,7 @@ public enum JAXBUIComponentUtilities {
 						TreeUtilities.visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, component,
 								IThrowingFunction.executeNow(node -> {
 									Map<IIdentifier, IUIPropertyMappingValue> mappings =
-											MapUtilities.concatMaps(createMappings(context, node.getProperty()),
+											MapUtilities.concatMaps(createMappings(context, node.getProperty().iterator()),
 													createEventMappings(ImmutableUnion.ofLeft(node)));
 
 									IShapeDescriptorBuilder<?> shapeDescriptorBuilder = createShapeDescriptorBuilder(context, node.getShape());
@@ -142,12 +142,12 @@ public enum JAXBUIComponentUtilities {
 											mappings,
 											shapeDescriptorBuilder.build(),
 											node.getRendererName(),
-											createComponentEmbedPrototypeMap(context, node.getComponentEmbed())
+											createComponentEmbedPrototypeMap(context, node.getComponentEmbed().iterator())
 									);
 
 									Class<?> clazz = AssertionUtilities.assertNonnull(subContext.getAliasesView().get(node.getClazz()));
 									Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIComponentConstructor.class,
-											Arrays.asList(clazz.getDeclaredConstructors()));
+											ImmutableList.copyOf(clazz.getDeclaredConstructors()).iterator());
 									MethodHandle constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
 									constructorHandle = constructorHandle.asType(constructorHandle.type().changeReturnType(IUIComponent.class));
 
@@ -155,7 +155,7 @@ public enum JAXBUIComponentUtilities {
 								}),
 								Component::getComponent,
 								(p, c) -> {
-									IUIComponent.addContentChildren(p, c);
+									IUIComponent.addContentChildren(p, c.iterator());
 									return p;
 								},
 								n -> {
@@ -174,12 +174,12 @@ public enum JAXBUIComponentUtilities {
 
 	@SuppressWarnings("UnstableApiUsage")
 	public static @Immutable Map<String, IUIComponentArguments.IEmbedPrototype> createComponentEmbedPrototypeMap(IJAXBAdapterContext context,
-	                                                                                                             Iterable<? extends ComponentEmbed> jaxbComponentEmbeds) {
+	                                                                                                             Iterator<? extends ComponentEmbed> jaxbComponentEmbeds) {
 		return Streams.stream(jaxbComponentEmbeds)
 				.map(jaxbComponentEmbed -> Maps.immutableEntry(jaxbComponentEmbed.getName(),
-						UIImmutableComponentEmbedPrototypeArguments.of(createMappings(context, jaxbComponentEmbed.getProperty()),
+						UIImmutableComponentEmbedPrototypeArguments.of(createMappings(context, jaxbComponentEmbed.getProperty().iterator()),
 								jaxbComponentEmbed.getRendererName().orElse(null),
-								createComponentEmbedPrototypeMap(context, jaxbComponentEmbed.getComponentEmbed()))))
+								createComponentEmbedPrototypeMap(context, jaxbComponentEmbed.getComponentEmbed().iterator()))))
 				.collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
@@ -199,7 +199,6 @@ public enum JAXBUIComponentUtilities {
 		return ImmutableMap.copyOf(attributes);
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
 	public static IShapeDescriptorBuilder<?> createShapeDescriptorBuilder(IJAXBAdapterContext context, Shape shape) {
 		return context.getDatum(IJAXBUIComponentAdapterContext.class)
 				.map(subContext -> {
@@ -237,7 +236,7 @@ public enum JAXBUIComponentUtilities {
 											c.getMaxWidth().orElse(null),
 											c.getMaxHeight().orElse(null)
 									))
-									.collect(ImmutableList.toImmutableList()));
+									.iterator());
 				})
 				.orElseThrow(IllegalArgumentException::new);
 	}

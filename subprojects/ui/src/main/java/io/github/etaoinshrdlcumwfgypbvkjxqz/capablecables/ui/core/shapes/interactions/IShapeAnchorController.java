@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.shapes.interactions;
 
+import java.util.Iterator;
 import java.util.Map;
 
 public interface IShapeAnchorController<T extends IShapeDescriptorProvider> {
@@ -8,7 +9,8 @@ public interface IShapeAnchorController<T extends IShapeDescriptorProvider> {
 	void anchor();
 
 	@SuppressWarnings("UnusedReturnValue")
-	boolean addAnchors(T origin, Iterable<? extends IShapeAnchor> anchors);
+	boolean addAnchors(T origin, Iterator<? extends IShapeAnchor> anchors);
 
-	boolean removeAnchors(T origin, Iterable<? extends IShapeAnchor> anchors);
+	@SuppressWarnings("UnusedReturnValue")
+	boolean removeAnchors(T origin, Iterator<? extends IShapeAnchor> anchors);
 }

@@ -60,5 +60,17 @@ public enum BooleanUtilities {
 		public static boolean stripBool(byte value) {
 			return value != fBool();
 		}
+
+		public enum PaddedBoolStreams {
+			;
+
+			public static byte tBool(@SuppressWarnings("unused") Object unused) {
+				return PaddedBool.tBool();
+			}
+
+			public static byte fBool(@SuppressWarnings("unused") Object unused) {
+				return PaddedBool.fBool();
+			}
+		}
 	}
 }

@@ -1,7 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.modifiers;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.core.ICursor;
@@ -15,7 +14,7 @@ public interface IUIComponentCursorHandleProviderModifier {
 	                                                            Iterable<? extends IUIComponentModifier> modifiers,
 	                                                            IUIComponentContext context) {
 		return IUIComponentModifier.handleComponentModifiers(component,
-				Lists.reverse(ImmutableList.copyOf(modifiers)),
+				ImmutableList.copyOf(modifiers).reverse(),
 				IUIComponentCursorHandleProviderModifier.class,
 				modifier -> modifier.getCursorHandle(context),
 				cursors -> Streams.stream(cursors)

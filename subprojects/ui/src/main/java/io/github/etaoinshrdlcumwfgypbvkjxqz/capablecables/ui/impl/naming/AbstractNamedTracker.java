@@ -10,6 +10,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.naming.INamedT
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool;
 import org.apache.http.annotation.NotThreadSafe;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 
@@ -20,43 +21,32 @@ public abstract class AbstractNamedTracker<E extends INamed>
 		implements INamedTracker<E> {
 	protected abstract Map<String, E> getData();
 
-	@Override
-	public boolean add(E element)
-			throws DuplicateNameException {
-		return element.getName()
-				.filter(name -> {
-					@Nullable E previousElement = getData().put(name, element);
-					if (!(previousElement == null || element.equals(previousElement)))
-						throw new DuplicateNameException(name);
-					return true;
-				})
-				.isPresent();
-	}
-
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public boolean addAll(Iterable<? extends E> elements)
+	public boolean add(Iterator<? extends E> elements)
 			throws DuplicateNameException {
 		return stripBool(
 				Streams.stream(elements).unordered()
-						.mapToInt(element -> padBool(add(element)))
+						.filter(element -> element.getName().isPresent())
+						.peek(element -> {
+							String name = element.getName().get();
+							@Nullable E previousElement = getData().putIfAbsent(name, element); // COMMENT ensure not modified after the exception is thrown
+							if (!(previousElement == null || element.equals(previousElement)))
+								throw new DuplicateNameException(name);
+						})
+						.mapToInt(element -> tBool())
 						.reduce(fBool(), PaddedBool::orBool)
 		);
 	}
 
-	@Override
-	public boolean remove(E element) {
-		return element.getName()
-				.map(getData()::remove)
-				.isPresent();
-	}
-
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
-	public boolean removeAll(Iterable<? extends E> elements) {
+	public boolean remove(Iterator<? extends E> elements) {
+		Map<String, E> data = getData();
 		return stripBool(
 				Streams.stream(elements).unordered()
-						.mapToInt(element -> padBool(remove(element)))
+						.filter(element -> element.getName().isPresent())
+						.mapToInt(element -> padBool(data.remove(element.getName().get(), element)))
 						.reduce(fBool(), PaddedBool::orBool)
 		);
 	}

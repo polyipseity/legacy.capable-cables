@@ -59,10 +59,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalDouble;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -290,18 +287,13 @@ public class UIScrollPanelComponent
 		AffineTransformUtilities.translateByPoint(transform, getContentScrollOffset());
 	}
 
-	@Override
-	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
-	public boolean addChildren(Iterable<? extends IUIComponent> components) {
-		// COMMENT add components before the scrollbars so that the scrollbars can draw above all others
-		return addChildrenImpl(this,
-				(self, child) -> self.getScrollbarEmbeds().values().stream()
-						.map(IUIComponentEmbed::getComponent)
-						.map(embedComponent -> CollectionUtilities.indexOf(self.getChildren(), embedComponent))
-						.mapToInt(embedComponentIndex -> embedComponentIndex.orElseGet(self.getChildren()::size))
-						.min()
-						.orElseGet(self.getChildren()::size)
-				, components);
+	protected static Rectangle2D getContentFullBounds(UIScrollPanelComponent instance) {
+		// COMMENT 0, 0 is after 'transformChildren'
+		return instance.getChildren().stream().unordered()
+				.filter(FunctionUtilities.notPredicate(ImmutableSet.copyOf(Spliterators.iterator(getEmbedComponents(instance)))::contains)) // COMMENT embeds are not content
+				.map(IUIComponent::getShape)
+				.map(Shape::getBounds2D)
+				.reduce(getContentBounds(instance), Rectangle2D::createUnion);
 	}
 
 	@Override
@@ -425,13 +417,18 @@ public class UIScrollPanelComponent
 		return UIObjectUtilities.unPositionRectangularShape(bounds, bounds);
 	}
 
-	protected static Rectangle2D getContentFullBounds(UIScrollPanelComponent instance) {
-		// COMMENT 0, 0 is after 'transformChildren'
-		return instance.getChildren().stream().unordered()
-				.filter(FunctionUtilities.notPredicate(getEmbedComponents(instance)::contains)) // COMMENT embeds are not content
-				.map(IUIComponent::getShape)
-				.map(Shape::getBounds2D)
-				.reduce(getContentBounds(instance), Rectangle2D::createUnion);
+	@Override
+	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
+	public boolean addChildren(Iterator<? extends IUIComponent> components) {
+		// COMMENT add components before the scrollbars so that the scrollbars can draw above all others
+		return addChildrenImpl(this,
+				(self, child) -> self.getScrollbarEmbeds().values().stream()
+						.map(IUIComponentEmbed::getComponent)
+						.map(embedComponent -> CollectionUtilities.indexOf(self.getChildren(), embedComponent))
+						.mapToInt(embedComponentIndex -> embedComponentIndex.orElseGet(self.getChildren()::size))
+						.min()
+						.orElseGet(self.getChildren()::size)
+				, components);
 	}
 
 	protected @Immutable Map<EnumUIAxis, ? extends IBindingField<Double>> getScrollbarThumbRelativeSizeMap() {

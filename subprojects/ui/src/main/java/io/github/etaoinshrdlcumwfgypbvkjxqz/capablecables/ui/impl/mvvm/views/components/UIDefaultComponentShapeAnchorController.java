@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.co
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
@@ -87,6 +87,7 @@ public class UIDefaultComponentShapeAnchorController
 					Optional.ofNullable(owner.getAnchorSets().getIfPresent(component))
 							.map(IShapeAnchorSet::getAnchorsView)
 							.map(Map::values)
+							.map(Collection::iterator)
 							.ifPresent(anchors -> owner.removeAnchors(component, anchors));
 
 					// COMMENT remove component as target
@@ -97,7 +98,7 @@ public class UIDefaultComponentShapeAnchorController
 							.forEach(shapeAnchor ->
 									shapeAnchor.getContainer()
 											.map(anchorSetsInverse::get)
-											.ifPresent(origin -> owner.removeAnchors(origin, ImmutableSet.of(shapeAnchor))));
+											.ifPresent(origin -> owner.removeAnchors(origin, Iterators.singletonIterator(shapeAnchor))));
 				});
 		}
 

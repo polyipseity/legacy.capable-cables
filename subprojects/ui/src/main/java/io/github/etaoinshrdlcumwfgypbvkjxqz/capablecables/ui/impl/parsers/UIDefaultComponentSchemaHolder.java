@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers;
 
+import com.google.common.collect.Iterators;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.config.UISchemas;
@@ -50,7 +51,7 @@ public enum UIDefaultComponentSchemaHolder {
 
 		{
 			JAXBContextRegisterBusEvent registerEvent = new JAXBContextRegisterBusEvent();
-			registerEvent.addClassesToBeBound(JAXBUIUtilities.ObjectFactories.getDefaultUIObjectFactory().getClass());
+			registerEvent.addClassesToBeBound(Iterators.singletonIterator(JAXBUIUtilities.ObjectFactories.getDefaultUIObjectFactory().getClass()));
 			UIEventBusEntryPoint.getBusSubscriber().onNext(registerEvent);
 			try {
 				CONTEXT = JAXBContext.newInstance(registerEvent.getClassesToBeBoundView().toArray(new Class<?>[0]));

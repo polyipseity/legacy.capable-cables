@@ -39,6 +39,7 @@ public class FunctionalConcurrentPath<T>
 	public FunctionalConcurrentPath<T> clone() throws CloneNotSupportedException {
 		FunctionalConcurrentPath<T> result = (FunctionalConcurrentPath<T>) super.clone();
 		DynamicUtilities.getUnsafe().putObjectVolatile(result, getDataFieldOffset(), result.generator.apply(result.data));
+		// COMMENT no need to clone the generator
 		return result;
 	}
 

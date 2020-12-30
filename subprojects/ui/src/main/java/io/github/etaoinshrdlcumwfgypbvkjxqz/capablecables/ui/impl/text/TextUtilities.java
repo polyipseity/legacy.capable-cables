@@ -82,9 +82,9 @@ public enum TextUtilities {
 		return text1.isEmpty() ? " " : text1;
 	}
 
-	public static void drawLines(Graphics2D graphics, Point2D position, double width, Iterable<? extends TextLayout> lines) {
+	public static void drawLines(Graphics2D graphics, Point2D position, double width, Iterator<? extends TextLayout> lines) {
 		Point2D pen = (Point2D) position.clone();
-		lines.forEach(line -> {
+		lines.forEachRemaining(line -> {
 			drawLineWithCoordinates(graphics, pen, width, line);
 			pen.setLocation(pen.getX(), pen.getY() + line.getAscent() + line.getDescent() + line.getLeading());
 		});

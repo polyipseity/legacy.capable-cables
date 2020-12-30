@@ -19,7 +19,7 @@ public final class UIQuadraticBezierCurveAnimationEasing
 
 	@Override
 	protected double getTForX(double x) {
-		return MathUtilities.BezierCurves.getQuadraticTForX(x, getControlPoints())
+		return MathUtilities.BezierCurves.getQuadraticTForX(x, getControlPoints().iterator())
 				.orElseThrow(IllegalArgumentException::new);
 	}
 }

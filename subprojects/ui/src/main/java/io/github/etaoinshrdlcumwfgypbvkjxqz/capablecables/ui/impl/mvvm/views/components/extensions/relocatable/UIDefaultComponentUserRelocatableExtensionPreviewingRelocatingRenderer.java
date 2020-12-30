@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.relocatable;
 
+import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.binding.UIProperty;
@@ -74,9 +75,9 @@ public class UIDefaultComponentUserRelocatableExtensionPreviewingRelocatingRende
 	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
 		super.initializeBindings(bindingActionConsumerSupplier);
 		BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier,
-				() -> ImmutableBindingAction.bind(
+				() -> ImmutableBindingAction.bind(ImmutableList.of(
 						getPreviewColor()
-				));
+				)));
 	}
 
 	@Override
@@ -84,9 +85,9 @@ public class UIDefaultComponentUserRelocatableExtensionPreviewingRelocatingRende
 	public void cleanupBindings() {
 		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
 				BindingUtilities.supplyBindingAction(bindingActionConsumer,
-						() -> ImmutableBindingAction.unbind(
+						() -> ImmutableBindingAction.unbind(ImmutableList.of(
 								getPreviewColor()
-						))
+						)))
 		);
 		super.cleanupBindings();
 	}

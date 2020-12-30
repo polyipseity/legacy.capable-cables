@@ -1,7 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.relocatable;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.SetMultimap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
@@ -170,12 +170,12 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 		IUIComponentUserRelocatableExtension.super.initializeBindings(bindingActionConsumerSupplier);
 		getBindingActionConsumerSupplierHolder().setValue(bindingActionConsumerSupplier);
 		BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier,
-				() -> ImmutableBindingAction.bind(
+				() -> ImmutableBindingAction.bind(ImmutableList.of(
 						getActivationMouseButtons(),
 						getRelocateBorders()
-				));
+				)));
 		BindingUtilities.initializeBindings(
-				bindingActionConsumerSupplier, ImmutableList.of(getRendererContainerContainer())
+				bindingActionConsumerSupplier, Iterators.singletonIterator(getRendererContainerContainer())
 		);
 	}
 
@@ -230,11 +230,11 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 	@OverridingMethodsMustInvokeSuper
 	public void cleanupBindings() {
 		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer -> BindingUtilities.supplyBindingAction(bindingActionConsumer,
-				() -> ImmutableBindingAction.unbind(
+				() -> ImmutableBindingAction.unbind(ImmutableList.of(
 						getActivationMouseButtons(),
 						getRelocateBorders()
-				)));
-		BindingUtilities.cleanupBindings(ImmutableList.of(getRendererContainerContainer()));
+				))));
+		BindingUtilities.cleanupBindings(Iterators.singletonIterator(getRendererContainerContainer()));
 		getBindingActionConsumerSupplierHolder().setValue(null);
 		IUIComponentUserRelocatableExtension.super.cleanupBindings();
 	}
@@ -246,7 +246,7 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 		super.onExtensionAdded(container);
 		container.addModifier(getModifier());
 		container.getManager().flatMap(IUIComponentManager::getView)
-				.ifPresent(view -> IUIView.registerRendererContainers(view, ImmutableSet.of(getRendererContainer())));
+				.ifPresent(view -> IUIView.registerRendererContainers(view, Iterators.singletonIterator(getRendererContainer())));
 	}
 
 	@Override
@@ -256,7 +256,7 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 		getContainer().ifPresent(container -> {
 			container.removeModifier(getModifier());
 			container.getManager().flatMap(IUIComponentManager::getView)
-					.ifPresent(view -> IUIView.unregisterRendererContainers(view, ImmutableSet.of(getRendererContainer())));
+					.ifPresent(view -> IUIView.unregisterRendererContainers(view, Iterators.singletonIterator(getRendererContainer())));
 		});
 		super.onExtensionRemoved();
 	}

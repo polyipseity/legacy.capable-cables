@@ -1,5 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
@@ -17,7 +18,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.temp
 
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
@@ -50,7 +50,7 @@ public interface IUIRendererContainer<R extends IUIRenderer<?>>
 	static IUIRenderer<?> createDefaultRenderer(IUIRendererContainer<?> rendererContainer)
 			throws Throwable {
 		Class<?> clazz = rendererContainer.getDefaultRendererClass();
-		Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIRendererConstructor.class, Arrays.asList(clazz.getDeclaredConstructors()));
+		Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIRendererConstructor.class, ImmutableList.copyOf(clazz.getDeclaredConstructors()).iterator());
 		MethodHandle constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
 		constructorHandle = constructorHandle.asType(constructorHandle.type().changeReturnType(IUIRenderer.class));
 

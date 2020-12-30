@@ -42,16 +42,17 @@ public enum ClassUtilities {
 		return r.build();
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
-	public static Set<Field> getAllFields(Class<?> clazz) {
+	public static Spliterator<Field> getAllFields(Class<?> clazz) {
 		return getThisAndSuperclassesAndInterfaces(clazz).stream()
 				.flatMap(Collection::stream)
 				.map(Class::getDeclaredFields)
 				.flatMap(Arrays::stream)
-				.collect(ImmutableSet.toImmutableSet());
+				.spliterator();
 	}
 
-	public static List<Set<Class<?>>> getThisAndSuperclassesAndInterfaces(Class<?> type) { return ImmutableList.<Set<Class<?>>>builder().add(ImmutableSet.of(type)).addAll(getSuperclassesAndInterfaces(type)).build(); }
+	public static List<Set<Class<?>>> getThisAndSuperclassesAndInterfaces(Class<?> type) {
+		return ImmutableList.<Set<Class<?>>>builder().add(ImmutableSet.of(type)).addAll(getSuperclassesAndInterfaces(type)).build();
+	}
 
 	@SuppressWarnings({"ObjectAllocationInLoop", "UnstableApiUsage"})
 	public static List<Set<Class<?>>> getSuperclassesAndInterfaces(Class<?> clazz) {
@@ -130,13 +131,12 @@ public enum ClassUtilities {
 				.findFirst();
 	}
 
-	@SuppressWarnings("UnstableApiUsage")
-	public static Set<Method> getAllMethods(Class<?> clazz) {
+	public static Spliterator<Method> getAllMethods(Class<?> clazz) {
 		return getThisAndSuperclassesAndInterfaces(clazz).stream()
 				.flatMap(Collection::stream)
 				.map(Class::getDeclaredMethods)
 				.flatMap(Arrays::stream)
-				.collect(ImmutableSet.toImmutableSet());
+				.spliterator();
 	}
 
 	@SuppressWarnings("cast")

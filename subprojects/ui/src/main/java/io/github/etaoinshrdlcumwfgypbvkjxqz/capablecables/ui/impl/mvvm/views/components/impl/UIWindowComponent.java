@@ -314,7 +314,7 @@ public class UIWindowComponent
 		switch (action) {
 			case CLOSE:
 				getParent().ifPresent(parent ->
-						parent.removeChildren(ImmutableSet.of(this)));
+						parent.removeChildren(Iterators.singletonIterator(this)));
 				break;
 			default:
 				break; // COMMENT just do nothing

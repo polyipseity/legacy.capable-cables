@@ -1,7 +1,7 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterators;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.AlwaysNull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
@@ -15,6 +15,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.extension
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.lifecycles.UIDefaultLifecycleStateTracker;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.lifecycles.UILifecycleUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.CollectionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections.MapBuilderUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.core.IIdentifier;
@@ -47,14 +48,14 @@ public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructure
 		UIExtensionRegistry.getInstance().checkExtensionRegistered(extension);
 		Optional<? extends IExtension<? extends IIdentifier, ?>> result = IExtensionContainer.addExtensionImpl(this, getExtensions(), extension);
 		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
-				BindingUtilities.findAndInitializeBindings(bindingActionConsumer, ImmutableList.of(extension)));
+				BindingUtilities.findAndInitializeBindings(bindingActionConsumer, Iterators.singletonIterator(extension)));
 		return result;
 	}
 
 	@Override
 	public Optional<? extends IExtension<? extends IIdentifier, ?>> removeExtension(IIdentifier key) {
 		Optional<IExtension<? extends IIdentifier, ?>> result = IExtensionContainer.removeExtensionImpl(getExtensions(), key);
-		BindingUtilities.findAndCleanupBindings(result.map(ImmutableList::of).orElseGet(ImmutableList::of));
+		BindingUtilities.findAndCleanupBindings(CollectionUtilities.iterate(result));
 		return result;
 	}
 
@@ -125,13 +126,13 @@ public abstract class UIAbstractSubInfrastructure<C extends IUISubInfrastructure
 	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
 		IUISubInfrastructure.super.initializeBindings(bindingActionConsumerSupplier);
 		getBindingActionConsumerSupplierHolder().setValue(bindingActionConsumerSupplier);
-		BindingUtilities.findAndInitializeBindings(bindingActionConsumerSupplier, getExtensions().values());
+		BindingUtilities.findAndInitializeBindings(bindingActionConsumerSupplier, getExtensions().values().iterator());
 	}
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
 	public void cleanupBindings() {
-		BindingUtilities.findAndCleanupBindings(getExtensions().values());
+		BindingUtilities.findAndCleanupBindings(getExtensions().values().iterator());
 		getBindingActionConsumerSupplierHolder().setValue(null);
 		IUISubInfrastructure.super.cleanupBindings();
 	}

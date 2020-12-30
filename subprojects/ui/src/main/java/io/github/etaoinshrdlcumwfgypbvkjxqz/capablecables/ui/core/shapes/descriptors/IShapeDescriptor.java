@@ -14,9 +14,11 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RectangularShape;
 import java.util.ConcurrentModificationException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 
 // TODO needs better design, but I cannot think of one
 public interface IShapeDescriptor<S extends Shape> {
@@ -33,9 +35,10 @@ public interface IShapeDescriptor<S extends Shape> {
 
 	boolean isBeingModified();
 
-	@SuppressWarnings({"UnstableApiUsage", "unchecked"})
-	static <R extends RectangularShape> R constrain(Iterable<? extends IShapeConstraint> constraints, RectangularShape source, R destination) {
-		return Streams.stream((Iterable<IShapeConstraint>) constraints).unordered() // COMMENT should be safe
+	@SuppressWarnings("UnstableApiUsage")
+	static <R extends RectangularShape> R constrain(Iterator<? extends IShapeConstraint> constraints, RectangularShape source, R destination) {
+		return Streams.stream(constraints).unordered()
+				.<IShapeConstraint>map(Function.identity())
 				.reduce(StaticHolder.getConstraintMinimum(), IShapeConstraint::createIntersection)
 				.constrain(source, destination);
 	}

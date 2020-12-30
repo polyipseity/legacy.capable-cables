@@ -5,29 +5,30 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.EnumUISide;
 
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.Map;
 
 public interface IShapeAnchorSet {
-	boolean addAnchors(Iterable<? extends IShapeAnchor> anchors);
+	boolean addAnchors(Iterator<? extends IShapeAnchor> anchors);
 
 	@SuppressWarnings("UnstableApiUsage")
-	default boolean removeAnchors(Iterable<? extends IShapeAnchor> anchors) {
+	default boolean removeAnchors(Iterator<? extends IShapeAnchor> anchors) {
 		Map<? extends EnumUISide, ? extends IShapeAnchor> as = getAnchorsView();
 		return removeSides(Streams.stream(anchors)
 				.filter(as::containsValue)
 				.map(IShapeAnchor::getOriginSide)
-				.collect(ImmutableList.toImmutableList()));
+				.iterator());
 	}
 
 	Map<? extends EnumUISide, ? extends IShapeAnchor> getAnchorsView();
 
-	boolean removeSides(Iterable<? extends EnumUISide> sides);
+	boolean removeSides(Iterator<? extends EnumUISide> sides);
 
 	default void anchor(IShapeDescriptorProvider from) { getAnchorsView().values().stream().unordered().forEach(v -> v.anchor(from)); }
 
 	default boolean isEmpty() { return getAnchorsView().isEmpty(); }
 
-	default boolean clear() { return removeSides(EnumSet.allOf(EnumUISide.class)); }
+	default boolean clear() { return removeSides(EnumSet.allOf(EnumUISide.class).iterator()); }
 
 	enum StaticHolder {
 		;

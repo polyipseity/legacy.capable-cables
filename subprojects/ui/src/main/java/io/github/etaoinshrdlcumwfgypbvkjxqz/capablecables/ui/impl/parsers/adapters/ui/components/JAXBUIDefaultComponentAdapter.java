@@ -45,7 +45,7 @@ public class JAXBUIDefaultComponentAdapter
 				.map(context -> {
 					try {
 						// COMMENT raw
-						@Immutable Map<String, Class<?>> aliases = JAXBUIComponentUtilities.adaptUsingFromJAXB(left.getUsing());
+						@Immutable Map<String, Class<?>> aliases = JAXBUIComponentUtilities.adaptUsingFromJAXB(left.getUsing().iterator());
 						View rawView = left.getView();
 						Component rawComponent = left.getComponent();
 
@@ -87,7 +87,7 @@ public class JAXBUIDefaultComponentAdapter
 								);
 
 						// COMMENT configure components
-						Map<String, IUIComponent> componentMap = INamed.toNamedMap(view.getChildrenFlatView()); // COMMENT need to build it ourselves
+						Map<String, IUIComponent> componentMap = INamed.toNamedMap(view.getChildrenFlatView().iterator()); // COMMENT need to build it ourselves
 						Deque<@NonNls String>
 								componentNames = new ArrayDeque<>(CapacityUtilities.getInitialCapacityMedium()),
 								embedComponentNames = new ArrayDeque<>(CapacityUtilities.getInitialCapacitySmall());

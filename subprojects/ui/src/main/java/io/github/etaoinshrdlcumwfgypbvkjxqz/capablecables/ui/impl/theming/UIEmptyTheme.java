@@ -3,8 +3,10 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.theming;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.theming.IUITheme;
 
+import java.util.Iterator;
+
 public class UIEmptyTheme
 		implements IUITheme {
 	@Override
-	public void apply(Iterable<? extends IUIRendererContainer<?>> rendererContainers) {}
+	public void apply(Iterator<? extends IUIRendererContainer<?>> rendererContainers) {}
 }

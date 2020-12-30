@@ -13,6 +13,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.co
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time.core.ITicker;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -31,7 +32,7 @@ public abstract class UIAbstractAnimationControl
 	}
 
 	@Immutable
-	protected static <R, TH extends Throwable> List<R> generateListFromFunction(Iterable<? extends IUIAnimationTarget> targets,
+	protected static <R, TH extends Throwable> List<R> generateListFromFunction(Iterator<? extends IUIAnimationTarget> targets,
 	                                                                            IFunction3<? super IUIAnimationTarget, ? super Integer, ? super Integer, ? extends R, ? extends TH> function)
 			throws TH {
 		@Immutable List<IUIAnimationTarget> targetsList = ImmutableList.copyOf(targets);

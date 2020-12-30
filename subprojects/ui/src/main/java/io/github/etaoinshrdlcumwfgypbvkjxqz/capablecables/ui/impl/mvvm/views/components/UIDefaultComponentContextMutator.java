@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContextInternal;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.mvvm.views.components.IUIComponentContextMutatorResult;
@@ -54,7 +54,7 @@ public class UIDefaultComponentContextMutator
 						transform)
 		);
 		// COMMENT path
-		path.subPath(ImmutableList.of(element));
+		path.subPath(Iterators.singletonIterator(element));
 		// COMMENT graphics
 		graphics.setTransform(transform);
 		graphics.clip(IUIComponent.getShape(element)); // COMMENT automatically transforms

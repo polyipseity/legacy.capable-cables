@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.co
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterators;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
@@ -131,22 +131,22 @@ public class UIListComponent<E>
 	public void initializeBindings(Supplier<@Nonnull ? extends Optional<? extends Consumer<? super IBindingAction>>> bindingActionConsumerSupplier) {
 		super.initializeBindings(bindingActionConsumerSupplier);
 		BindingUtilities.supplyBindingAction(bindingActionConsumerSupplier,
-				() -> ImmutableBindingAction.bind(
+				() -> ImmutableBindingAction.bind(ImmutableList.of(
 						getData(),
 						getDirection(),
 						getComponentFactory()
-				));
+				)));
 	}
 
 	@Override
 	public void cleanupBindings() {
 		getBindingActionConsumerSupplierHolder().getValue().ifPresent(bindingActionConsumer ->
 				BindingUtilities.supplyBindingAction(bindingActionConsumer,
-						() -> ImmutableBindingAction.unbind(
+						() -> ImmutableBindingAction.unbind(ImmutableList.of(
 								getData(),
 								getDirection(),
 								getComponentFactory()
-						))
+						)))
 		);
 		super.cleanupBindings();
 	}
@@ -184,16 +184,18 @@ public class UIListComponent<E>
 				.map(datum -> componentFactory.apply(this, datum))
 				.collect(ImmutableList.toImmutableList());
 
-		IUIComponent.addContentChildren(this, children);
+		IUIComponent.addContentChildren(this, children.iterator());
 
 		// TODO enhancement: the anchor approach might be terrible for performance for large lists
 		// TODO enhancement: direction-relative-side-specific borders
 		final IShapeAnchor[] nextAnchor = {new ImmutableShapeAnchor(contentComponent, startingSide, startingSide, 0D)};
 		children.forEach(child -> {
-			shapeAnchorController.addAnchors(child, sideSides.stream().unordered()
-					.map(sideSide -> new ImmutableShapeAnchor(contentComponent, sideSide, sideSide, 0D))
-					.collect(ImmutableList.toImmutableList()));
-			shapeAnchorController.addAnchors(child, ImmutableSet.of(nextAnchor[0]));
+			shapeAnchorController.addAnchors(child, Iterators.concat(
+					sideSides.stream().unordered()
+							.map(sideSide -> new ImmutableShapeAnchor(contentComponent, sideSide, sideSide, 0D))
+							.iterator(),
+					Iterators.singletonIterator(nextAnchor[0])
+			));
 			nextAnchor[0] = new ImmutableShapeAnchor(child, startingSide, direction, 0D);
 		});
 		shapeAnchorController.anchor();

@@ -14,7 +14,7 @@ public class JAXBEnumElementAdapter<L extends Enum<L>, R extends Enum<R>>
 	private final Function<@Nonnull ? super L, @Nonnull ? extends JAXBElement<L>> elementWrapper;
 
 	public JAXBEnumElementAdapter(Class<L> leftClazz, Class<R> rightClazz, Function<@Nonnull ? super L, @Nonnull ? extends JAXBElement<L>> elementWrapper) {
-		assert EnumUtilities.areNamesCompatible(ImmutableList.of(leftClazz, rightClazz));
+		assert EnumUtilities.areNamesCompatible(ImmutableList.of(leftClazz, rightClazz).iterator());
 
 		this.leftClazz = leftClazz;
 		this.rightClazz = rightClazz;

@@ -9,6 +9,7 @@ import java.awt.geom.Point2D;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.OptionalDouble;
 
@@ -156,7 +157,7 @@ public enum MathUtilities {
 	public enum BezierCurves {
 		;
 
-		public static OptionalDouble getQuadraticTForX(double x, Iterable<? extends Point2D> points) {
+		public static OptionalDouble getQuadraticTForX(double x, Iterator<? extends Point2D> points) {
 			@Immutable List<Point2D> pointsList = ImmutableList.copyOf(points);
 			assert pointsList.size() == 3;
 			return getQuadraticTForX(x,
@@ -189,7 +190,7 @@ public enum MathUtilities {
 			return OptionalDouble.empty();
 		}
 
-		public static OptionalDouble getCubicTForX(double x, Iterable<? extends Point2D> points) {
+		public static OptionalDouble getCubicTForX(double x, Iterator<? extends Point2D> points) {
 			@Immutable List<Point2D> pointsList = ImmutableList.copyOf(points);
 			assert pointsList.size() == 4;
 			return getCubicTForX(x,
@@ -213,14 +214,14 @@ public enum MathUtilities {
 			return filterTForXRoots(roots);
 		}
 
-		public static Point2D bezierCurveExact(Point2D destination, double t, Iterable<? extends Point2D> points)
+		public static Point2D bezierCurveExact(Point2D destination, double t, Iterator<? extends Point2D> points)
 				throws ArithmeticException {
 			BigDecimal[] point = bezierCurve(t, points);
 			destination.setLocation(BigDecimals.doubleValueExact(point[0]), BigDecimals.doubleValueExact(point[1]));
 			return destination;
 		}
 
-		public static BigDecimal[] bezierCurve(double t, Iterable<? extends Point2D> points) {
+		public static BigDecimal[] bezierCurve(double t, Iterator<? extends Point2D> points) {
 			assert t >= 0;
 			assert t <= 1;
 			final BigDecimal[] ret = {BigDecimal.ZERO, BigDecimal.ZERO}; // COMMENT 0 is x, 1 is y
@@ -241,7 +242,7 @@ public enum MathUtilities {
 			return ret;
 		}
 
-		public static Point2D bezierCurve(Point2D destination, double t, Iterable<? extends Point2D> points) {
+		public static Point2D bezierCurve(Point2D destination, double t, Iterator<? extends Point2D> points) {
 			BigDecimal[] point = bezierCurve(t, points);
 			destination.setLocation(point[0].doubleValue(), point[1].doubleValue());
 			return destination;

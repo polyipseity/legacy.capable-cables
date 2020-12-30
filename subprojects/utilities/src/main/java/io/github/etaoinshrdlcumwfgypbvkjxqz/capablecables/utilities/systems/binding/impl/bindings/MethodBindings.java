@@ -23,10 +23,7 @@ import org.reactivestreams.Subscriber;
 import org.slf4j.Logger;
 import sun.misc.Cleaner;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -50,7 +47,7 @@ public class MethodBindings
 
 	@Override
 	@SuppressWarnings({"SuspiciousMethodCalls", "UnstableApiUsage"})
-	public boolean add(Iterable<? extends IBindingMethod<?>> methods) {
+	public boolean add(Iterator<? extends IBindingMethod<?>> methods) {
 		return stripBool(
 				Streams.stream(methods).unordered()
 						.mapToInt(method -> {
@@ -92,7 +89,7 @@ public class MethodBindings
 
 	@Override
 	@SuppressWarnings({"SuspiciousMethodCalls", "UnstableApiUsage"})
-	public boolean remove(Iterable<? extends IBindingMethod<?>> methods) {
+	public boolean remove(Iterator<? extends IBindingMethod<?>> methods) {
 		return stripBool(
 				Streams.stream(methods).unordered()
 						.mapToInt(method -> {

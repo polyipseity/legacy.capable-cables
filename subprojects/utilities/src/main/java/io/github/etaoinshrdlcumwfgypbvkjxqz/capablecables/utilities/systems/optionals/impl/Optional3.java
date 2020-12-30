@@ -5,6 +5,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.core.ICompositeOptionalValues;
 
+import java.util.Iterator;
 import java.util.function.Supplier;
 
 public final class Optional3<V1, V2, V3>
@@ -78,6 +79,8 @@ public final class Optional3<V1, V2, V3>
 		protected V3 getValue3() { return value3; }
 
 		@Override
-		public Iterable<? extends Supplier<@Nullable ?>> getSuppliers() { return ImmutableList.of(this::getValue1, this::getValue2, this::getValue3); }
+		public Iterator<? extends Supplier<@Nullable ?>> getSuppliers() {
+			return ImmutableList.<Supplier<@Nullable ?>>of(this::getValue1, this::getValue2, this::getValue3).iterator();
+		}
 	}
 }

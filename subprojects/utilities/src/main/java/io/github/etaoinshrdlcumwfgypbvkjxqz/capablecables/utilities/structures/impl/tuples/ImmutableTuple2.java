@@ -19,13 +19,13 @@ public final class ImmutableTuple2<L, R>
 
 	@Override
 	public int hashCode() {
-		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariableMap().values());
+		return ObjectUtilities.hashCodeImpl(this, StaticHolder.getObjectVariableMap().values().iterator());
 	}
 
 	@SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
 	@Override
 	public boolean equals(@Nullable Object o) {
-		return ObjectUtilities.equalsImpl(this, o, CastUtilities.<Class<ITuple2<?, ?>>>castUnchecked(ITuple2.class), true, StaticHolder.getObjectVariableMap().values());
+		return ObjectUtilities.equalsImpl(this, o, CastUtilities.<Class<ITuple2<?, ?>>>castUnchecked(ITuple2.class), true, StaticHolder.getObjectVariableMap().values().iterator());
 	}
 
 	public static <L, R> ImmutableTuple2<L, R> of(L left, R right) { return new ImmutableTuple2<>(left, right); }

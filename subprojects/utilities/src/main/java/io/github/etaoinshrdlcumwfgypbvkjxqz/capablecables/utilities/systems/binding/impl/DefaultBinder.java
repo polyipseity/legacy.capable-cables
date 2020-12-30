@@ -4,8 +4,11 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.Streams;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
@@ -56,7 +59,7 @@ public class DefaultBinder
 	}
 
 	@Override
-	public boolean bind(Iterable<? extends IBinding<?>> bindings)
+	public boolean bind(Iterator<? extends IBinding<?>> bindings)
 			throws NoSuchBindingTransformerException {
 		return stripBool(
 				sortAndTrimBindings(bindings).entrySet().stream().unordered()
@@ -75,14 +78,16 @@ public class DefaultBinder
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static <B extends IBinding<?>> Map<IBinding.EnumBindingType, Multimap<IIdentifier, B>> sortAndTrimBindings(Iterable<B> bindings) {
+	public static <B extends IBinding<?>> @Immutable Map<IBinding.EnumBindingType, Multimap<IIdentifier, B>> sortAndTrimBindings(Iterator<B> bindings) {
 		Map<IBinding.EnumBindingType, Multimap<IIdentifier, B>> ret =
 				new EnumMap<>(IBinding.EnumBindingType.class);
-		bindings.forEach(b ->
-				b.getBindingKey()
-						.ifPresent(bk ->
-								ret.computeIfAbsent(b.getBindingType(), k -> getBindingsMultiMapBuilder().build()).put(bk, b)));
-		return ret;
+		Streams.stream(bindings)
+				.filter(binding -> binding.getBindingKey().isPresent())
+				.forEachOrdered(binding ->
+						ret.computeIfAbsent(binding.getBindingType(), k -> getBindingsMultiMapBuilder().build())
+								.put(binding.getBindingKey().get(), binding)
+				);
+		return Maps.immutableEnumMap(ret);
 	}
 
 	protected LoadingCache<IBinding.EnumBindingType, LoadingCache<IIdentifier, IBindings<?>>> getBindings() { return bindings; }
@@ -93,7 +98,7 @@ public class DefaultBinder
 	}
 
 	@Override
-	public boolean unbind(Iterable<? extends IBinding<?>> bindings) {
+	public boolean unbind(Iterator<? extends IBinding<?>> bindings) {
 		boolean ret = stripBool(
 				sortAndTrimBindings(bindings).entrySet().stream().unordered()
 						.flatMapToInt(typeEntry -> {

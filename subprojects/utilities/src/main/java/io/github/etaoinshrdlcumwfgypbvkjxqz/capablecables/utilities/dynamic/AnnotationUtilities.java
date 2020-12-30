@@ -1,7 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.LogMessageBuilder;
@@ -14,6 +13,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.function.Function;
 
 public enum AnnotationUtilities {
 	;
@@ -21,17 +21,18 @@ public enum AnnotationUtilities {
 	private static final Marker CLASS_MARKER = UtilitiesMarkers.getInstance().getClassMarker();
 	private static final ResourceBundle RESOURCE_BUNDLE = CommonConfigurationTemplate.createBundle(UtilitiesConfiguration.getInstance());
 
-	public static <R extends AnnotatedElement> R getElementAnnotatedWith(Class<? extends Annotation> annotationClass, Iterable<? extends R> elements)
+	public static <R extends AnnotatedElement> R getElementAnnotatedWith(Class<? extends Annotation> annotationClass, Iterator<? extends R> elements)
 			throws NoSuchElementException, IllegalArgumentException {
-		return Iterables.getOnlyElement(getElementsAnnotatedWith(annotationClass, elements));
+		return Iterators.getOnlyElement(Spliterators.iterator(getElementsAnnotatedWith(annotationClass, elements)));
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
 	@Immutable
-	public static <R extends AnnotatedElement> Set<R> getElementsAnnotatedWith(Class<? extends Annotation> annotationClass, Iterable<? extends R> elements) {
+	public static <R extends AnnotatedElement> Spliterator<R> getElementsAnnotatedWith(Class<? extends Annotation> annotationClass, Iterator<? extends R> elements) {
 		return Streams.stream(elements).unordered()
 				.filter(element -> element.isAnnotationPresent(annotationClass))
-				.collect(ImmutableSet.toImmutableSet());
+				.<R>map(Function.identity())
+				.spliterator();
 	}
 
 	public static <A extends Annotation> A getEffectiveAnnotationWithInheritingConsidered(Class<A> annotationType, Method method) throws IllegalArgumentException {
