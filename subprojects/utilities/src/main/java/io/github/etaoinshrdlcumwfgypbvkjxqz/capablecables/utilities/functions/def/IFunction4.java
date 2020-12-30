@@ -5,7 +5,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.thro
 
 @FunctionalInterface
 public interface IFunction4<T1, T2, T3, T4, R, T extends Throwable> {
-	@SuppressWarnings("RedundantThrows")
 	static <T1, T2, T3, T4, R, T extends Throwable> IFunction4<T1, T2, T3, T4, R, RuntimeException> executeNow(IFunction4<T1, T2, T3, T4, R, T> lambda)
 			throws T {
 		return (t1, t2, t3, t4) -> {

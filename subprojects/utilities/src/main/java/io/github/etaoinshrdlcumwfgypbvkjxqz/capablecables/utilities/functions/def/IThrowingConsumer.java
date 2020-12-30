@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 
 @FunctionalInterface
 public interface IThrowingConsumer<T, TH extends Throwable> {
-	@SuppressWarnings("RedundantThrows")
 	static <T, TH extends Throwable> Consumer<T> executeNow(IThrowingConsumer<T, TH> lambda)
 			throws TH {
 		return t -> {

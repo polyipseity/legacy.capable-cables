@@ -7,7 +7,6 @@ import java.util.function.Supplier;
 
 @FunctionalInterface
 public interface IThrowingSupplier<V, TH extends Throwable> {
-	@SuppressWarnings("RedundantThrows")
 	static <V, TH extends Throwable> Supplier<V> executeNow(IThrowingSupplier<V, TH> lambda)
 			throws TH {
 		return () -> {

@@ -7,7 +7,6 @@ import java.util.function.Function;
 
 @FunctionalInterface
 public interface IThrowingFunction<T, R, TH extends Throwable> {
-	@SuppressWarnings("RedundantThrows")
 	static <T, R, TH extends Throwable> Function<T, R> executeNow(IThrowingFunction<T, R, TH> lambda)
 			throws TH {
 		return t -> {

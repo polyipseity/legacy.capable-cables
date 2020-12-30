@@ -4,7 +4,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.thro
 
 @FunctionalInterface
 public interface IThrowingRunnable<TH extends Throwable> {
-	@SuppressWarnings("RedundantThrows")
 	static <TH extends Throwable> Runnable executeNow(IThrowingRunnable<TH> lambda)
 			throws TH {
 		return () -> {
