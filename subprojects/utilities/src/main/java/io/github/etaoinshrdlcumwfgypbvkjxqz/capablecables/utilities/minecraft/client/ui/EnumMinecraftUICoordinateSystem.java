@@ -2,9 +2,12 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.c
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.MinecraftClientUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.def.ICoordinateSystem;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.awt.geom.Point2D;
 
+@OnlyIn(Dist.CLIENT)
 public enum EnumMinecraftUICoordinateSystem
 		implements ICoordinateSystem {
 	SCALED {
