@@ -360,7 +360,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 			return getOwner().filter(owner ->
 					Optional2.of(
 							() -> owner.getContainer().orElse(null),
-							() -> UITeleportingComponentUserResizableExtension.getTargetComponent(owner)
+							() -> (IUIComponent & IUIReshapeExplicitly<?>) UITeleportingComponentUserResizableExtension.getTargetComponent(owner)
 									.filter(IUIReshapeExplicitly.class::isInstance)
 									.orElse(null))
 							.filter((container, targetComponent) -> targetComponent.getManager()
@@ -383,7 +383,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 													else if (sides.contains(EnumUISide.DOWN) && sides.contains(EnumUISide.LEFT))
 														base[0] = new Point2D.Double(contextualShape.getMaxX(), contextualShape.getY());
 
-													IResizeData data = UIImmutableResizeData.of((IUIComponent & IUIReshapeExplicitly<?>) targetComponent,
+													IResizeData data = UIImmutableResizeData.of(targetComponent,
 															point,
 															sides,
 															base[0],
