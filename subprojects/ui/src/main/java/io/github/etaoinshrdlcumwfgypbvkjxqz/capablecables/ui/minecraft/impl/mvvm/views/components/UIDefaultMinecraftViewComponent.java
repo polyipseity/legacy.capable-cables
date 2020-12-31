@@ -5,21 +5,15 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.UI
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIViewComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.events.IUIEventTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.software.MinecraftSoftwareGraphics2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIAbstractViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultComponentContextMutator;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIAbstractViewBusEvent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.views.IUIMinecraftViewComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.views.components.IUIComponentMinecraft;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.views.components.modifiers.IUIComponentMinecraftLifecycleModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.views.extensions.IUIMinecraftRenderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.events.bus.UIImmutableMinecraftRenderEventExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.extensions.background.UIDefaultMinecraftBackgroundExtension;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.def.IConsumer3;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.def.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.def.IExtension;
@@ -34,7 +28,7 @@ import java.util.concurrent.ConcurrentMap;
 @OnlyIn(Dist.CLIENT)
 public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		extends UIAbstractViewComponent<S, M>
-		implements IUIMinecraftViewComponent<S, M> {
+		implements IUIViewComponent<S, M> {
 	private final Runnable extensionsInitializer;
 
 	@UIViewComponentConstructor
@@ -62,28 +56,6 @@ public class UIDefaultMinecraftViewComponent<S extends Shape, M extends IUICompo
 	protected void acceptRenderEvent(UIAbstractViewBusEvent.Render event) {
 		IUIMinecraftRenderExtension.StaticHolder.getType().getValue().find(this).ifPresent(extension ->
 				IExtensionContainer.addExtensionChecked(event, UIImmutableMinecraftRenderEventExtension.of(extension.getPartialTicks())));
-	}
-
-	@SuppressWarnings("RedundantTypeArguments")
-	@Override
-	public void tick() {
-		try (IUIComponentContext componentContext = createComponentContext().orElseThrow(IllegalStateException::new)) {
-			IUIViewComponent.<RuntimeException>traverseComponentTreeDefault(componentContext, // TODO javac bug, need explicit type arguments
-					getManager(),
-					(componentContext2, result) -> {
-						assert componentContext2 != null;
-						assert result != null;
-						CastUtilities.castChecked(IUIComponentMinecraft.class, result.getComponent())
-								.ifPresent(cc ->
-										IUIComponentMinecraftLifecycleModifier.handleComponentModifiers(cc,
-												result.getModifiersView(),
-												componentContext2,
-												IUIComponentMinecraftLifecycleModifier::tick)
-								);
-					},
-					IConsumer3.StaticHolder.getEmpty(),
-					IUIEventTarget::isActive);
-		}
 	}
 
 	@Override

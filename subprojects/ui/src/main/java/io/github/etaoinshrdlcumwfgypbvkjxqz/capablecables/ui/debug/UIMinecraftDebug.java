@@ -30,6 +30,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.tar
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableComponentArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableViewComponentArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.viewmodels.UIDefaultViewModel;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.UIComponentCursorHandleProviderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIButtonComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIDefaultComponentManager;
@@ -38,15 +39,14 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIDefa
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.JAXBImmutableAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.descriptors.RectangularShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.theming.UIEmptyTheme;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.IUIMinecraftInfrastructure;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.views.IUIMinecraftView;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.views.IUIMinecraftViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.adapters.AbstractContainerScreenAdapter;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.viewmodels.UIDefaultMinecraftViewModel;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.extensions.UIAbstractMinecraftTickerExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.views.components.UIDefaultMinecraftViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ColorUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.impl.OneUseRunnable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.minecraft.client.ui.MinecraftTextComponentUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.def.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.def.IBinder;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.def.IBinding.EnumBindingType;
@@ -59,6 +59,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.fields.ImmutableBindingField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.fields.MemoryObservableField;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.impl.methods.ImmutableBindingMethodDestination;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.def.IExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.def.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.def.IPointerDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
@@ -102,6 +103,7 @@ import java.io.InputStream;
 import java.util.ConcurrentModificationException;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -142,7 +144,7 @@ public enum UIMinecraftDebug {
 
 	@OnlyIn(Dist.CLIENT)
 	private enum DebugUI
-			implements ScreenManager.IScreenFactory<DebugContainer, AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer>> {
+			implements ScreenManager.IScreenFactory<DebugContainer, AbstractContainerScreenAdapter<?, DebugContainer>> {
 		INSTANCE,
 		;
 
@@ -180,7 +182,7 @@ public enum UIMinecraftDebug {
 			}
 
 			// COMMENT early check
-			IUIMinecraftViewComponent<?, ?> view = createView();
+			IUIViewComponent<?, ?> view = createView();
 			IUITheme theme = createTheme();
 			IUIView.getThemeStack(view).push(theme);
 		}
@@ -192,7 +194,7 @@ public enum UIMinecraftDebug {
 		private static String getComponentTestThemeXMLPath() { return COMPONENT_TEST_THEME_XML_PATH; }
 
 		@Override
-		public @Nonnull AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> create(DebugContainer container, PlayerInventory inv, ITextComponent title) {
+		public @Nonnull AbstractContainerScreenAdapter<?, DebugContainer> create(DebugContainer container, PlayerInventory inv, ITextComponent title) {
 			return isUseCode() ? createCodeUI(container) : createUI(container);
 		}
 
@@ -205,9 +207,9 @@ public enum UIMinecraftDebug {
 			this.useCode = useCode;
 		}
 
-		private static AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> createCodeUI(DebugContainer container) {
+		private static AbstractContainerScreenAdapter<?, DebugContainer> createCodeUI(DebugContainer container) {
 			// COMMENT component
-			IUIMinecraftViewComponent<?, IUIComponentManager<Rectangle2D>> view;
+			IUIViewComponent<?, IUIComponentManager<Rectangle2D>> view;
 			{
 				UIDefaultComponentManager<Rectangle2D> componentManager =
 						new UIDefaultComponentManager<>(UIImmutableComponentArguments.of(null,
@@ -241,13 +243,13 @@ public enum UIMinecraftDebug {
 					container);
 		}
 
-		private static AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> createUI(DebugContainer container) {
+		private static AbstractContainerScreenAdapter<?, DebugContainer> createUI(DebugContainer container) {
 			IBinder binder = new DefaultBinder();
 			// COMMENT Color <-> Integer
 			binder.addTransformer(EnumBindingType.FIELD, (@Nonnull Color color) -> suppressBoxing(color.getRGB()));
 			binder.addTransformer(EnumBindingType.FIELD, ColorUtilities::ofRGBA);
 
-			AbstractContainerScreenAdapter<? extends IUIMinecraftInfrastructure<?, ?, ?>, DebugContainer> screen =
+			AbstractContainerScreenAdapter<?, DebugContainer> screen =
 					UIFacade.Minecraft.createScreen(
 							getDisplayName(),
 							UIFacade.Minecraft.createInfrastructure(
@@ -258,15 +260,15 @@ public enum UIMinecraftDebug {
 							container);
 			IUITheme theme = createTheme();
 
-			IUIMinecraftView<?> view = screen.getInfrastructure().getView();
+			IUIView<?> view = screen.getInfrastructure().getView();
 			IExtensionContainer.addExtensionChecked(view, new UIComponentCursorHandleProviderExtension());
 			IUIView.getThemeStack(view).push(theme);
 
 			return screen;
 		}
 
-		private static IUIMinecraftViewComponent<?, ?> createView() {
-			return (IUIMinecraftViewComponent<?, ?>) IJAXBAdapterRegistry.adaptFromJAXB(
+		private static IUIViewComponent<?, ?> createView() {
+			return (IUIViewComponent<?, ?>) IJAXBAdapterRegistry.adaptFromJAXB(
 					JAXBImmutableAdapterContext.of(UIDefaultComponentSchemaHolder.getAdapterRegistry()),
 					getJAXBView()
 			);
@@ -383,7 +385,7 @@ public enum UIMinecraftDebug {
 
 		@OnlyIn(Dist.CLIENT)
 		private static final class ViewModel
-				extends UIDefaultMinecraftViewModel<Model> {
+				extends UIDefaultViewModel<Model> {
 			@SuppressWarnings("AutoBoxing")
 			private final IBindingField<Integer> anchoredWindowBorderColor = ImmutableBindingField.of(
 					ImmutableIdentifier.ofInterning(UINamespaceUtilities.getRendererBindingNamespace(), "anchoredWindowBorderColor"),
@@ -399,12 +401,13 @@ public enum UIMinecraftDebug {
 					ImmutableIdentifier.ofInterning(UINamespaceUtilities.getViewBindingNamespace(), "buttonOnActivated"),
 					this::onButtonActivated);
 
-			private ViewModel() { super(new Model()); }
+			private final Runnable extensionsInitializer;
 
-			@Override
-			public void tick() {
-				if (isAnchoredWindowFlickering())
-					getAnchoredWindowBorderColor().setValue(suppressBoxing(getRandom().nextInt()));
+			private ViewModel() {
+				super(new Model());
+
+				this.extensionsInitializer = new OneUseRunnable(() ->
+						IExtensionContainer.addExtensionChecked(this, MinecraftTickerExtension.of()));
 			}
 
 			protected boolean isAnchoredWindowFlickering() { return anchoredWindowFlickering; }
@@ -446,6 +449,32 @@ public enum UIMinecraftDebug {
 								))
 						));
 				super.cleanupBindings();
+			}
+
+			@Override
+			protected ConcurrentMap<IIdentifier, IExtension<? extends IIdentifier, ?>> getExtensions() {
+				extensionsInitializer.run();
+				return super.getExtensions();
+			}
+
+			@OnlyIn(Dist.CLIENT)
+			private static final class MinecraftTickerExtension
+					extends UIAbstractMinecraftTickerExtension<ViewModel> {
+				private MinecraftTickerExtension() {
+					super(ViewModel.class);
+				}
+
+				private static MinecraftTickerExtension of() {
+					return new MinecraftTickerExtension();
+				}
+
+				@Override
+				public void tick() {
+					getContainer().ifPresent(container -> {
+						if (container.isAnchoredWindowFlickering())
+							container.getAnchoredWindowBorderColor().setValue(suppressBoxing(container.getRandom().nextInt()));
+					});
+				}
 			}
 		}
 

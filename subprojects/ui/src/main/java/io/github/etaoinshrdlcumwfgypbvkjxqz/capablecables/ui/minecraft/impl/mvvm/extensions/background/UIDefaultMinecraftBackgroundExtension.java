@@ -19,7 +19,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.ren
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.events.bus.IUIMinecraftRenderEventExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.extensions.IUIMinecraftBackgroundExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.extensions.IUIMinecraftScreenProviderExtension;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.views.IUIMinecraftViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.DelegatingSubscriber;
@@ -55,10 +54,10 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Suppr
 
 @OnlyIn(Dist.CLIENT)
 public class UIDefaultMinecraftBackgroundExtension
-		extends AbstractContainerAwareExtension<IIdentifier, IUIMinecraftViewComponent<?, ?>, IUIMinecraftViewComponent<?, ?>>
+		extends AbstractContainerAwareExtension<IIdentifier, IUIView<?>, IUIView<?>>
 		implements IUIMinecraftBackgroundExtension {
 	private static final IUIExtensionArguments DEFAULT_ARGUMENTS =
-			UIImmutableExtensionArguments.of(ImmutableMap.of(), IUIMinecraftViewComponent.class, null);
+			UIImmutableExtensionArguments.of(ImmutableMap.of(), IUIView.class, null);
 	private final AutoCloseableRotator<DisposableSubscriber<UIAbstractViewBusEvent.Render>, RuntimeException> renderSubscriberRotator =
 			new AutoCloseableRotator<>(() -> RenderSubscriber.ofDecorated(suppressThisEscapedWarning(() -> this), UIConfiguration.getInstance().getLogger()), Disposable::dispose);
 	private final IUIRendererContainerContainer<IBackgroundRenderer> rendererContainerContainer;
@@ -69,7 +68,7 @@ public class UIDefaultMinecraftBackgroundExtension
 
 	@UIExtensionConstructor
 	public UIDefaultMinecraftBackgroundExtension(@SuppressWarnings("unused") IUIExtensionArguments arguments) {
-		super(CastUtilities.castUnchecked(IUIMinecraftViewComponent.class));
+		super(CastUtilities.castUnchecked(IUIView.class));
 
 		this.rendererContainerContainer =
 				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this), UIMinecraftBackgroundExtensionEmptyBackgroundRenderer.class);
@@ -79,7 +78,7 @@ public class UIDefaultMinecraftBackgroundExtension
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void onExtensionAdded(IUIMinecraftViewComponent<?, ?> container) {
+	public void onExtensionAdded(IUIView<?> container) {
 		super.onExtensionAdded(container);
 		UIEventBusEntryPoint.<UIAbstractViewBusEvent.Render>getBusPublisher().subscribe(getRenderSubscriberRotator().get());
 		IUIView.registerRendererContainers(container, Iterators.singletonIterator(getRendererContainer()));
@@ -105,7 +104,7 @@ public class UIDefaultMinecraftBackgroundExtension
 	}
 
 	@Override
-	public IExtensionType<IIdentifier, ?, IUIMinecraftViewComponent<?, ?>> getType() { return StaticHolder.getType().getValue(); }
+	public IExtensionType<IIdentifier, ?, IUIView<?>> getType() { return StaticHolder.getType().getValue(); }
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
@@ -169,7 +168,7 @@ public class UIDefaultMinecraftBackgroundExtension
 							assert renderExtension != null;
 							assert pointerDevice != null;
 							owner.getRendererContainer().getRenderer().ifPresent(renderer ->
-									CastUtilities.castChecked(CastUtilities.<Class<IUIMinecraftViewComponent<?, ?>>>castUnchecked(IUIViewComponent.class), event.getView())
+									CastUtilities.castChecked(CastUtilities.<Class<IUIView<?>>>castUnchecked(IUIViewComponent.class), event.getView())
 											.filter(evc -> owner.getContainer().filter(Predicate.isEqual(evc)).isPresent())
 											.flatMap(IUISubInfrastructure::getInfrastructure)
 											.flatMap(IUIMinecraftScreenProviderExtension.StaticHolder.getType().getValue()::find)

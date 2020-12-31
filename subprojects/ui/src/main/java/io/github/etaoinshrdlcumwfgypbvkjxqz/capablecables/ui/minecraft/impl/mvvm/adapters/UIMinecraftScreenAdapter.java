@@ -20,8 +20,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.UIImmutab
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.viewmodels.UIImmutableViewModelContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.UIImmutableViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.UIInputUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.IUIMinecraftInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.extensions.IUIMinecraftScreenProviderExtension;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.extensions.IUIMinecraftTickerExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.extensions.UIImmutableMinecraftContainerProviderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.views.extensions.UIDefaultMinecraftRenderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.utilities.MinecraftDrawingUtilities;
@@ -72,7 +72,7 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primi
 
 @OnlyIn(Dist.CLIENT)
 public class UIMinecraftScreenAdapter
-		<I extends IUIMinecraftInfrastructure<?, ?, ?>, C extends Container>
+		<I extends IUIInfrastructure<?, ?, ?>, C extends Container>
 		extends AbstractContainerScreenAdapter<I, C>
 		implements IUIAdapter<I> {
 	private final I infrastructure;
@@ -273,7 +273,10 @@ public class UIMinecraftScreenAdapter
 
 	@Override
 	@Deprecated
-	public void tick() { getInfrastructure().tick(); }
+	public void tick() {
+		IUIMinecraftTickerExtension.StaticHolder.getType().getValue().find(getInfrastructure().getViewModel())
+				.ifPresent(IUIMinecraftTickerExtension::tick);
+	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected Int2ObjectMap<IUIEventMouse> getMouseButtonsBeingPressed() { return mouseButtonsBeingPressed; }
@@ -559,7 +562,7 @@ public class UIMinecraftScreenAdapter
 	public void blit(int x, int y, int u, int v, int w, int h) { MinecraftDrawingUtilities.blit(AffineTransformUtilities.getIdentity(), new Rectangle2D.Double(x, y, w, h), new Point2D.Double(u, v), new DoubleDimension2D(256, 256), getBlitOffset()); }
 
 	@OnlyIn(Dist.CLIENT)
-	public static class Builder<I extends IUIMinecraftInfrastructure<?, ?, ?>, C extends Container> {
+	public static class Builder<I extends IUIInfrastructure<?, ?, ?>, C extends Container> {
 		private final ITextComponent title;
 		private final I infrastructure;
 		private IntIterable closeKeys = IntSets.singleton(GLFW.GLFW_KEY_ESCAPE);
@@ -598,7 +601,7 @@ public class UIMinecraftScreenAdapter
 		}
 
 		@OnlyIn(Dist.CLIENT)
-		public static class WithChildren<I extends IUIMinecraftInfrastructure<?, ?, ?>, C extends Container>
+		public static class WithChildren<I extends IUIInfrastructure<?, ?, ?>, C extends Container>
 				extends Builder<I, C> {
 			private final C containerObject;
 
