@@ -186,6 +186,11 @@ public class UIDefaultComponent
 	public Optional<? extends IUIComponent> getParent() { return parent.getOptional(); }
 
 	@Override
+	public Optional<? extends IUIComponentManager<?>> getManager() {
+		return UIDefaultCacheExtension.ComponentCache.getManager().getValue().get(this);
+	}
+
+	@Override
 	public List<IUIComponent> getChildrenView() { return ImmutableList.copyOf(getChildren()); }
 
 	@SuppressWarnings({"UnstableApiUsage", "rawtypes", "RedundantSuppression"})

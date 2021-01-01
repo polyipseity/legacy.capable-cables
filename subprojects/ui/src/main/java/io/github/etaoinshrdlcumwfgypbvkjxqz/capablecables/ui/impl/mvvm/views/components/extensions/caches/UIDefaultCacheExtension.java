@@ -75,7 +75,7 @@ public class UIDefaultCacheExtension
 	@Override
 	public IExtensionType<IIdentifier, ?, IExtensionContainer<IIdentifier>> getType() { return StaticHolder.getType().getValue(); }
 
-	public enum CacheUniversal {
+	public enum ComponentCache {
 		;
 
 		@SuppressWarnings({"AnonymousInnerClass", "AnonymousInnerClassMayBeStatic"})

@@ -127,7 +127,7 @@ public class UIDefaultComponentView<S extends Shape, M extends IUIComponentManag
 
 	@Override
 	public @Immutable List<? extends IUIComponent> getChildrenFlatView() {
-		return Caches.getChildrenFlat().getValue().get(this)
+		return ComponentViewCache.getChildrenFlat().getValue().get(this)
 				.orElseThrow(AssertionError::new);
 	}
 
@@ -265,7 +265,7 @@ public class UIDefaultComponentView<S extends Shape, M extends IUIComponentManag
 	public Optional<? extends IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) {
 		@Nullable Optional<? extends IUIEventTarget> ret = CastUtilities.castChecked(IUIComponent.class, currentFocus)
 				.flatMap(cf ->
-						Caches.getChildrenFlatFocusable().getValue().get(this)
+						ComponentViewCache.getChildrenFlatFocusable().getValue().get(this)
 								.filter(FunctionUtilities.notPredicate(Collection::isEmpty))
 								.map(f -> f.get(Math.floorMod(
 										Math.max(f.indexOf(cf), 0) + (next ? 1 : -1), f.size()))));
@@ -345,7 +345,7 @@ public class UIDefaultComponentView<S extends Shape, M extends IUIComponentManag
 				));
 	}
 
-	public enum Caches {
+	public enum ComponentViewCache {
 		;
 
 		@SuppressWarnings({"AnonymousInnerClass", "rawtypes", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
