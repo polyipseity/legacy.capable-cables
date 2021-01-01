@@ -2,15 +2,12 @@
 <project version="4">
   <component name="EntryPointsManager">
     <list size="9">
-      <item index="0" class="java.lang.String" itemvalue="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIComponentConstructor" />
-      <item index="1" class="java.lang.String" itemvalue="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIExtensionConstructor" />
-      <item index="2" class="java.lang.String" itemvalue="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIRendererConstructor" />
-      <item index="3" class="java.lang.String" itemvalue="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.core.construction.UIViewComponentConstructor" />
-      <item index="4" class="java.lang.String" itemvalue="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.UIViewComponentConstructor" />
-      <item index="5" class="java.lang.String" itemvalue="net.minecraftforge.eventbus.api.SubscribeEvent" />
-      <item index="6" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.Mod" />
-      <item index="7" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.Mod.EventHandler" />
-      <item index="8" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.eventhandler.SubscribeEvent" />
+      <item index="0" class="java.lang.String" itemvalue="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.UIComponentConstructor" />
+      <item index="1" class="java.lang.String" itemvalue="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.UIExtensionConstructor" />
+      <item index="2" class="java.lang.String" itemvalue="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.UIRendererConstructor" />
+      <item index="3" class="java.lang.String" itemvalue="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.UIViewConstructor" />
+      <item index="4" class="java.lang.String" itemvalue="net.minecraftforge.eventbus.api.SubscribeEvent" />
+      <item index="5" class="java.lang.String" itemvalue="net.minecraftforge.fml.common.Mod" />
     </list>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
