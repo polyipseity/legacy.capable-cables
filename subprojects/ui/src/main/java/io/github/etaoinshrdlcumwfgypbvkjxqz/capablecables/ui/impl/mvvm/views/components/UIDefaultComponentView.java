@@ -19,10 +19,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.IUIV
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.extensions.caches.IUICacheType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.extensions.caches.UICacheRegistry;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.modifiers.EnumModifyStage;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.modifiers.IUIComponentActiveLifecycleModifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.modifiers.IUIComponentModifier;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.modifiers.IUIComponentStructureLifecycleModifier;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.modifiers.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.paths.IUIComponentPathResolver;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.events.IUIEventTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.rendering.IUIComponentRenderer;
@@ -294,7 +291,9 @@ public class UIDefaultComponentView<S extends Shape, M extends IUIComponentManag
 						assert componentContext2 != null;
 
 						// COMMENT update the same rate as render, only need to call it before rendering
-						result.getComponent().update(componentContext2);
+						IUIComponentUpdateModifier.handleComponentModifiers(result.getComponent(),
+								result.getModifiersView(),
+								componentContext2);
 
 						IUIComponentModifier.streamSpecificModifiersIntersection(result.getModifiersView().iterator(), IUIComponentRendererInvokerModifier.class)
 								.forEachOrdered(modifierIntersection -> {

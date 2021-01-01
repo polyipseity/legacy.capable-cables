@@ -31,9 +31,13 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public interface IUIComponent
-		extends INamed, INode, IShapeDescriptorProvider, IHasBinding, IHasBindingMap, IUIEventTarget, IExtensionContainer<IIdentifier>, IUIRendererContainerContainer<IUIComponentRenderer<?>>,
-		IUIComponentStructureLifecycleModifier, IUIComponentActiveLifecycleModifier, IUIComponentTransformChildrenModifier {
-	void update(IUIComponentContext context);
+		extends /* COMMENT warning: multiple inheritance as its extreme */ INamed, INode, IShapeDescriptorProvider, IHasBinding, IHasBindingMap, IUIEventTarget, IExtensionContainer<IIdentifier>, IUIRendererContainerContainer<IUIComponentRenderer<?>>,
+		IUIComponentStructureLifecycleModifier, IUIComponentActiveLifecycleModifier, IUIComponentUpdateModifier, IUIComponentTransformChildrenModifier {
+	Optional<? extends IUIComponent> getParent();
+
+	static Shape getContextualShape(IUIComponentContext context, IUIComponent component) { return IUIComponentContext.createContextualShape(context, getShape(component)); }
+
+	static Shape getShape(IUIComponent component) { return component.getShapeDescriptor().getShapeOutput(); }
 
 	static <T> Optional<T> getYoungestParentInstanceOf(IUIComponent self, Class<T> clazz) {
 		for (Iterator<IUIComponent> iterator = new ParentIterator(self.getParent().orElse(null));
@@ -44,12 +48,6 @@ public interface IUIComponent
 		}
 		return Optional.empty();
 	}
-
-	Optional<? extends IUIComponent> getParent();
-
-	static Shape getContextualShape(IUIComponentContext context, IUIComponent component) { return IUIComponentContext.createContextualShape(context, getShape(component)); }
-
-	static Shape getShape(IUIComponent component) { return component.getShapeDescriptor().getShapeOutput(); }
 
 	@Immutable
 	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
