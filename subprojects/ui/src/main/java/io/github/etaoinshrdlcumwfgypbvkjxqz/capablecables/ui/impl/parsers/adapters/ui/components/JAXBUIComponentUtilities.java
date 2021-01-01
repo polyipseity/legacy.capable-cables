@@ -11,11 +11,11 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIMarkers;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.binding.IUIPropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.IUIComponentArguments;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.IUIViewComponentArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.IUIViewArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.UIComponentConstructor;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.UIViewComponentConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.UIViewConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIViewComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.events.IUIEventType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.events.types.EnumUIEventComponentType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.events.types.EnumUIEventDOMType;
@@ -26,7 +26,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.shapes.descript
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.binding.UIImmutablePropertyMappingValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableComponentArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableComponentEmbedPrototypeArguments;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableViewComponentArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableViewArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.descriptors.ShapeDescriptorBuilderFactoryRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.interactions.ShapeConstraint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
@@ -96,19 +96,19 @@ public enum JAXBUIComponentUtilities {
 	}
 
 	@SuppressWarnings("cast")
-	public static IUIViewComponent<?, ?> createView(IJAXBAdapterContext context, View view)
+	public static IUIComponentView<?, ?> createView(IJAXBAdapterContext context, View view)
 			throws Throwable {
 		return context.getDatum(IJAXBUIComponentAdapterContext.class)
 				.map(IThrowingFunction.executeNow(subContext -> {
 					Map<IIdentifier, IUIPropertyMappingValue> mappings = createMappings(context, view.getProperty().iterator());
-					IUIViewComponentArguments argument = UIImmutableViewComponentArguments.of(mappings);
+					IUIViewArguments argument = UIImmutableViewArguments.of(mappings);
 
 					Class<?> clazz = AssertionUtilities.assertNonnull(subContext.getAliasesView().get(view.getClazz()));
-					Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIViewComponentConstructor.class, ImmutableList.copyOf(clazz.getDeclaredConstructors()).iterator());
+					Constructor<?> constructor = AnnotationUtilities.getElementAnnotatedWith(UIViewConstructor.class, ImmutableList.copyOf(clazz.getDeclaredConstructors()).iterator());
 					MethodHandle constructorHandle = InvokeUtilities.getImplLookup().unreflectConstructor(constructor);
-					constructorHandle = constructorHandle.asType(constructorHandle.type().changeReturnType(IUIViewComponent.class));
+					constructorHandle = constructorHandle.asType(constructorHandle.type().changeReturnType(IUIComponentView.class));
 
-					return (IUIViewComponent<?, ?>) constructorHandle.invokeExact((IUIViewComponentArguments) argument);
+					return (IUIComponentView<?, ?>) constructorHandle.invokeExact((IUIViewArguments) argument);
 				}))
 				.orElseThrow(IllegalArgumentException::new);
 	}

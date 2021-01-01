@@ -8,7 +8,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentContextMutator;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIViewComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.UIDefaultComponentContextLeakNotifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.DynamicUtilities;
@@ -46,7 +46,7 @@ public class UIDefaultComponentContext
 	}
 
 	private final IUIViewContext viewContext;
-	private final IUIViewComponent<?, ?> view;
+	private final IUIComponentView<?, ?> view;
 	private final IUIComponentContextMutator mutator;
 	private final @Nullable Graphics2D graphics;
 	private final IPath<IUIComponent> path;
@@ -55,7 +55,7 @@ public class UIDefaultComponentContext
 	private final boolean[] closed;
 
 	public UIDefaultComponentContext(IUIViewContext viewContext,
-	                                 IUIViewComponent<?, ?> view,
+	                                 IUIComponentView<?, ?> view,
 	                                 IUIComponentContextMutator mutator) {
 		this.viewContext = viewContext;
 		this.view = view;
@@ -164,7 +164,7 @@ public class UIDefaultComponentContext
 	}
 
 	@Override
-	public IUIViewComponent<?, ?> getView() {
+	public IUIComponentView<?, ?> getView() {
 		return view;
 	}
 

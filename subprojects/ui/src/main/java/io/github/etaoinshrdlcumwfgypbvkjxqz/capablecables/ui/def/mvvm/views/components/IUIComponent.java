@@ -62,7 +62,7 @@ public interface IUIComponent
 				component
 						.getManager()
 						.flatMap(IUIComponentManager::getView)
-						.flatMap(IUIViewComponent::createComponentContext)
+						.flatMap(IUIComponentView::createComponentContext)
 						.orElseThrow(IllegalStateException::new);
 		getPath(component).asList()
 				.forEach(element -> context.getMutator().push(context, element));

@@ -520,7 +520,7 @@ public class UIDefaultComponent
 				)));
 		BindingUtilities.initializeBindings(bindingActionConsumerSupplier, Iterators.singletonIterator(getRendererContainerContainer()));
 		BindingUtilities.findAndInitializeBindings(bindingActionConsumerSupplier, getExtensions().values().iterator());
-		// COMMENT do not init children, view component should do that via bind
+		// COMMENT do not init children, view should do that via bind
 	}
 
 	@Override
@@ -561,7 +561,7 @@ public class UIDefaultComponent
 							ImmutableList.of(getActive(), getVisible()),
 							getEmbedBindings()
 					)));
-			// COMMENT do not cleanup children, view component should do that via unbind
+			// COMMENT do not cleanup children, view should do that via unbind
 		});
 		getBindingActionConsumerSupplierHolder().setValue(null);
 		IUIComponent.super.cleanupBindings();

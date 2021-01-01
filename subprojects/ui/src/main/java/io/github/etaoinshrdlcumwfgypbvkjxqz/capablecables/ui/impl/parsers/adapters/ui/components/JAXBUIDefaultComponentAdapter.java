@@ -6,7 +6,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.*;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.IUIComponentArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIViewComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.naming.INamed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.parsers.adapters.ui.components.IJAXBUIComponentAdapter;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.parsers.adapters.ui.components.contexts.IJAXBUIComponentAdapterContext;
@@ -29,8 +29,8 @@ import java.util.Deque;
 import java.util.Map;
 
 public class JAXBUIDefaultComponentAdapter
-		extends JAXBUIAbstractComponentBasedAdapter<ComponentUI, IUIViewComponent<?, ?>>
-		implements IJAXBUIComponentAdapter<ComponentUI, IUIViewComponent<?, ?>> {
+		extends JAXBUIAbstractComponentBasedAdapter<ComponentUI, IUIComponentView<?, ?>>
+		implements IJAXBUIComponentAdapter<ComponentUI, IUIComponentView<?, ?>> {
 	public static <T extends JAXBUIDefaultComponentAdapter> T makeParserStandard(T instance) {
 		instance.addObjectHandler(Anchor.class, new JAXBUIDefaultComponentAdapterAnchorHandler());
 		instance.addObjectHandler(Extension.class, new JAXBUIDefaultComponentAdapterExtensionHandler());
@@ -40,7 +40,7 @@ public class JAXBUIDefaultComponentAdapter
 	@Override
 	@Deprecated
 	@SuppressWarnings({"unchecked", "RedundantSuppression", "UnstableApiUsage", "CallToSuspiciousStringMethod"})
-	public @Nonnull IUIViewComponent<?, ?> leftToRight(@Nonnull ComponentUI left) {
+	public @Nonnull IUIComponentView<?, ?> leftToRight(@Nonnull ComponentUI left) {
 		return getThreadLocalContext()
 				.map(context -> {
 					try {
@@ -50,7 +50,7 @@ public class JAXBUIDefaultComponentAdapter
 						Component rawComponent = left.getComponent();
 
 						// COMMENT create hierarchy
-						IUIViewComponent<?, ?> view = JAXBUIComponentUtilities.createView(
+						IUIComponentView<?, ?> view = JAXBUIComponentUtilities.createView(
 								context.withData(
 										MapUtilities.concatMaps(context.getDataView(),
 												ImmutableMap.of(
@@ -167,7 +167,7 @@ public class JAXBUIDefaultComponentAdapter
 
 	@Override
 	@Deprecated
-	public @Nonnull ComponentUI rightToLeft(@Nonnull IUIViewComponent<?, ?> right) {
+	public @Nonnull ComponentUI rightToLeft(@Nonnull IUIComponentView<?, ?> right) {
 		throw new UnsupportedOperationException(); // TODO implement
 	}
 }

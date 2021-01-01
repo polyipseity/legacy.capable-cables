@@ -6,7 +6,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.IU
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.UIComponentConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentManager;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIViewComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.references.OptionalWeakReference;
 
@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 public class UIDefaultComponentManager<S extends Shape>
 		extends UIDefaultComponent
 		implements IUIComponentManager<S> {
-	private OptionalWeakReference<IUIViewComponent<?, ?>> view = OptionalWeakReference.of(null);
+	private OptionalWeakReference<IUIComponentView<?, ?>> view = OptionalWeakReference.of(null);
 
 	@UIComponentConstructor
 	public UIDefaultComponentManager(IUIComponentArguments arguments) { super(arguments); }
@@ -37,8 +37,8 @@ public class UIDefaultComponentManager<S extends Shape>
 
 	@Override
 	@SuppressWarnings({"rawtypes", "RedundantSuppression"})
-	public Optional<? extends IUIViewComponent<?, ?>> getView() {
-		@Nullable Optional<? extends IUIViewComponent<?, ?>> ret;
+	public Optional<? extends IUIComponentView<?, ?>> getView() {
+		@Nullable Optional<? extends IUIComponentView<?, ?>> ret;
 		if ((ret = view.getOptional()).isPresent())
 			return ret;
 		return getParent()
@@ -47,5 +47,5 @@ public class UIDefaultComponentManager<S extends Shape>
 	}
 
 	@Override
-	public void setView(@Nullable IUIViewComponent<?, ?> view) { this.view = OptionalWeakReference.of(view); }
+	public void setView(@Nullable IUIComponentView<?, ?> view) { this.view = OptionalWeakReference.of(view); }
 }

@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapt
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIViewComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.parsers.adapters.IJAXBAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.parsers.adapters.ui.components.contexts.IJAXBUIComponentAdapterContext;
 import jakarta.xml.bind.JAXBElement;
@@ -15,14 +15,14 @@ import java.util.function.BiConsumer;
 public final class JAXBUIImmutableComponentAdapterContext
 		extends JAXBUIAbstractImmutableComponentBasedAdapterContext
 		implements IJAXBUIComponentAdapterContext {
-	private final @Nullable IUIViewComponent<?, ?> view;
+	private final @Nullable IUIComponentView<?, ?> view;
 	@Nullable
 	private final Object container;
 
 	public JAXBUIImmutableComponentAdapterContext(Map<? extends String, ? extends Class<?>> aliases,
 	                                              Map<? extends Class<?>, ? extends BiConsumer<? super IJAXBAdapterContext, @Nonnull ?>> objectHandlers,
 	                                              Map<? extends QName, ? extends BiConsumer<? super IJAXBAdapterContext, ? super JAXBElement<?>>> elementHandlers,
-	                                              @Nullable IUIViewComponent<?, ?> view,
+	                                              @Nullable IUIComponentView<?, ?> view,
 	                                              @Nullable Object container) {
 		super(aliases, objectHandlers, elementHandlers);
 		this.view = view;
@@ -33,5 +33,5 @@ public final class JAXBUIImmutableComponentAdapterContext
 	public Optional<?> getContainer() { return Optional.ofNullable(container); }
 
 	@Override
-	public Optional<? extends IUIViewComponent<?, ?>> getView() { return Optional.ofNullable(view); }
+	public Optional<? extends IUIComponentView<?, ?>> getView() { return Optional.ofNullable(view); }
 }

@@ -174,7 +174,7 @@ public class UIListComponent<E>
 		BiFunction<@Nonnull ? super UIListComponent<? extends E>, @Nonnull ? super E, @Nonnull ? extends IUIComponent> componentFactory = getComponentFactory().getValue();
 		IUIComponentShapeAnchorController shapeAnchorController = getManager()
 				.flatMap(IUIComponentManager::getView)
-				.map(IUIViewComponent::getShapeAnchorController)
+				.map(IUIComponentView::getShapeAnchorController)
 				.orElseThrow(IllegalStateException::new);
 
 		// calculate

@@ -7,7 +7,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.Anchor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentManager;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIViewComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.naming.INamed;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.parsers.adapters.IJAXBAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.parsers.adapters.registries.IJAXBAdapterRegistry;
@@ -27,7 +27,7 @@ import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.Suppr
 
 public class JAXBUIDefaultComponentAdapterAnchorHandler
 		extends JAXBUIAbstractSubContextualAdapterHandler<Anchor, IJAXBUIComponentAdapterContext> {
-	private final LoadingCache<IUIViewComponent<?, ?>, Map<String, IUIComponent>> viewComponentNamedMaps =
+	private final LoadingCache<IUIComponentView<?, ?>, Map<String, IUIComponent>> viewNamedMaps =
 			CacheUtilities.newCacheBuilderSingleThreaded().initialCapacity(CapacityUtilities.getInitialCapacityTiny()).weakKeys()
 					.build(CacheLoader.from(view -> {
 						@Immutable Map<String, IUIComponent> result = INamed.toNamedMap(AssertionUtilities.assertNonnull(view).getChildrenFlatView().iterator());
@@ -49,9 +49,9 @@ public class JAXBUIDefaultComponentAdapterAnchorHandler
 						container.getManager()
 								.flatMap(IUIComponentManager::getView)
 								.ifPresent(view ->
-										IUIViewComponent.getShapeAnchorController(view).addAnchors(container,
+										IUIComponentView.getShapeAnchorController(view).addAnchors(container,
 												ImmutableList.of(new ImmutableShapeAnchor(
-														AssertionUtilities.assertNonnull(getViewComponentNamedMaps().getUnchecked(view).get(left.getTarget())),
+														AssertionUtilities.assertNonnull(getViewNamedMaps().getUnchecked(view).get(left.getTarget())),
 														(EnumUISide) IJAXBAdapterRegistry.adaptFromJAXB(context,
 																ObjectFactories.getDefaultUIObjectFactory().createUiSide(left.getOriginSide())
 														),
@@ -65,7 +65,7 @@ public class JAXBUIDefaultComponentAdapterAnchorHandler
 				);
 	}
 
-	protected LoadingCache<IUIViewComponent<?, ?>, Map<String, IUIComponent>> getViewComponentNamedMaps() {
-		return viewComponentNamedMaps;
+	protected LoadingCache<IUIComponentView<?, ?>, Map<String, IUIComponent>> getViewNamedMaps() {
+		return viewNamedMaps;
 	}
 }

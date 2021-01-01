@@ -15,7 +15,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.IUIV
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentManager;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIViewComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.extensions.IUIComponentUserResizableExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.modifiers.EnumModifyStage;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.modifiers.IUIComponentCursorHandleProviderModifier;
@@ -365,10 +365,10 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 									.orElse(null))
 							.filter((container, targetComponent) -> targetComponent.getManager()
 									.flatMap(IUIComponentManager::getView)
-									.filter(view -> IUIViewComponent.createComponentContextWithManager(view)
+									.filter(view -> IUIComponentView.createComponentContextWithManager(view)
 											.filter(context -> {
 												try (IUIComponentContext context1 = context) {
-													IUIViewComponent.getPathResolver(view).resolvePath(context1, (Point2D) point.clone());
+													IUIComponentView.getPathResolver(view).resolvePath(context1, (Point2D) point.clone());
 
 													Rectangle2D contextualShape = IUIComponent.getContextualShape(context1, container).getBounds2D();
 													Set<EnumUISide> sides = EnumUISide.getSidesPointOver(contextualShape, point);

@@ -33,7 +33,7 @@ public interface IUIComponentContext
 	@Override
 	IUIComponentContext clone();
 
-	IUIViewComponent<?, ?> getView();
+	IUIComponentView<?, ?> getView();
 
 	IUIComponentContextMutator getMutator();
 

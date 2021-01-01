@@ -7,8 +7,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.d
 import java.util.Map;
 
 @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
-public
-interface IUIViewComponentArguments {
+public interface IUIViewArguments {
 	@Immutable
 	Map<IIdentifier, IUIPropertyMappingValue> getMappingsView();
 }

@@ -2,7 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapt
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.ComponentTheme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.ComponentUI;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIViewComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.parsers.adapters.registries.IJAXBAdapterRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.theming.IUITheme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.ui.components.JAXBUIDefaultComponentAdapter;
@@ -19,7 +19,7 @@ public enum JAXBUIAdapters {
 		EnumJAXBUIDefaultElementAdapter.registerAll(registry);
 		// COMMENT UI component
 		registry.getObjectRegistry().registerChecked(
-				ImmutableTuple2.of(ComponentUI.class, CastUtilities.castUnchecked(IUIViewComponent.class)),
+				ImmutableTuple2.of(ComponentUI.class, CastUtilities.castUnchecked(IUIComponentView.class)),
 				JAXBUIDefaultComponentAdapter.makeParserStandard(new JAXBUIDefaultComponentAdapter())
 		);
 		registry.getObjectRegistry().registerChecked(

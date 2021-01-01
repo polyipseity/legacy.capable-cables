@@ -8,7 +8,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.IUIV
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentContext;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIViewComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.modifiers.IUIComponentCursorHandleProviderModifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableExtensionArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.modifiers.UIEmptyComponentCursorHandleProviderModifier;
@@ -23,15 +23,15 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.opti
 import java.util.Optional;
 
 public class UIComponentCursorHandleProviderExtension
-		extends AbstractContainerAwareExtension<IIdentifier, IUIView<?>, IUIViewComponent<?, ?>>
+		extends AbstractContainerAwareExtension<IIdentifier, IUIView<?>, IUIComponentView<?, ?>>
 		implements IUICursorHandleProviderExtension {
-	private static final IUIExtensionArguments DEFAULT_ARGUMENTS = UIImmutableExtensionArguments.of(ImmutableMap.of(), IUIViewComponent.class, null);
+	private static final IUIExtensionArguments DEFAULT_ARGUMENTS = UIImmutableExtensionArguments.of(ImmutableMap.of(), IUIComponentView.class, null);
 
 	public UIComponentCursorHandleProviderExtension() { this(getDefaultArguments()); }
 
 	@UIExtensionConstructor
 	public UIComponentCursorHandleProviderExtension(@SuppressWarnings("unused") IUIExtensionArguments arguments) {
-		super(CastUtilities.castUnchecked(IUIViewComponent.class));
+		super(CastUtilities.castUnchecked(IUIComponentView.class));
 	}
 
 	protected static IUIExtensionArguments getDefaultArguments() { return DEFAULT_ARGUMENTS; }
@@ -41,7 +41,7 @@ public class UIComponentCursorHandleProviderExtension
 		return getContainer()
 				.flatMap(view ->
 						Optional2.of(
-								() -> IUIViewComponent.createComponentContextWithManager(view)
+								() -> IUIComponentView.createComponentContextWithManager(view)
 										.orElse(null),
 								() -> view.getContext()
 										.map(IUIViewContext::getInputDevices)
@@ -50,7 +50,7 @@ public class UIComponentCursorHandleProviderExtension
 								.flatMap((componentContext, pointerDevice) -> {
 									try (IUIComponentContext safeComponentContext = componentContext) {
 										Optional<? extends ICursor> ret = Optional.empty();
-										IUIViewComponent.getPathResolver(view).resolvePath(safeComponentContext, pointerDevice.getPositionView());
+										IUIComponentView.getPathResolver(view).resolvePath(safeComponentContext, pointerDevice.getPositionView());
 										while (!safeComponentContext.getPathView().isEmpty()) {
 											IUIComponent component = IUIComponentContext.getCurrentComponent(safeComponentContext)
 													.orElseThrow(AssertionError::new);

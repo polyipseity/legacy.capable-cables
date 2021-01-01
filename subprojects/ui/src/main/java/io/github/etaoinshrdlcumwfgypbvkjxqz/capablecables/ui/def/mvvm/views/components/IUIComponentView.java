@@ -21,9 +21,9 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager<?>>
+public interface IUIComponentView<S extends Shape, M extends IUIComponentManager<?>>
 		extends IHasBinding, IHasBindingMap, IUIView<S> {
-	static Optional<IUIComponentContext> createComponentContextWithManager(IUIViewComponent<?, ?> instance) {
+	static Optional<IUIComponentContext> createComponentContextWithManager(IUIComponentView<?, ?> instance) {
 		return instance.createComponentContext()
 				.map(context -> {
 					context.getMutator().push(context, instance.getManager());
@@ -37,7 +37,7 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 
 	void setManager(M manager);
 
-	static <T extends IUIViewComponent<S, M>,
+	static <T extends IUIComponentView<S, M>,
 			S extends Shape,
 			M extends IUIComponentManager<?>> T create(Supplier<@Nonnull ? extends T> constructor,
 	                                                   M manager) {
@@ -105,17 +105,17 @@ public interface IUIViewComponent<S extends Shape, M extends IUIComponentManager
 				repeated -> { throw new AssertionError(); });
 	}
 
-	static IUIComponentPathResolver getPathResolver(IUIViewComponent<?, ?> instance) {
+	static IUIComponentPathResolver getPathResolver(IUIComponentView<?, ?> instance) {
 		return instance.getCoordinator(IUIComponentPathResolver.class)
 				.orElseThrow(AssertionError::new);
 	}
 
-	static IUIComponentShapeAnchorController getShapeAnchorController(IUIViewComponent<?, ?> instance) {
+	static IUIComponentShapeAnchorController getShapeAnchorController(IUIComponentView<?, ?> instance) {
 		return instance.getCoordinator(IUIComponentShapeAnchorController.class)
 				.orElseThrow(AssertionError::new);
 	}
 
-	static IShapeDescriptorDynamicDetector getShapeDescriptorDynamicDetector(IUIViewComponent<?, ?> instance) {
+	static IShapeDescriptorDynamicDetector getShapeDescriptorDynamicDetector(IUIComponentView<?, ?> instance) {
 		return instance.getCoordinator(IShapeDescriptorDynamicDetector.class)
 				.orElseThrow(AssertionError::new);
 	}

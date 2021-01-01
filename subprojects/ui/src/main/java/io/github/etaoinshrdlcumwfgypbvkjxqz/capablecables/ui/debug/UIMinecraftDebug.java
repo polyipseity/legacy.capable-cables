@@ -17,7 +17,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.IUIV
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentManager;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIViewComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.events.IUIEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.parsers.adapters.registries.IJAXBAdapterRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.shapes.descriptors.IShapeDescriptor;
@@ -28,9 +28,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.con
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.easings.EnumUICommonAnimationEasing;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.animations.targets.UIAnimationTargetUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableComponentArguments;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableViewComponentArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableViewArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.viewmodels.UIDefaultViewModel;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultViewComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultComponentView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.UIComponentCursorHandleProviderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIButtonComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIDefaultComponentManager;
@@ -181,7 +181,7 @@ public enum UIMinecraftDebug {
 			}
 
 			// COMMENT early check
-			IUIViewComponent<?, ?> view = createView();
+			IUIComponentView<?, ?> view = createView();
 			IUITheme theme = createTheme();
 			IUIView.getThemeStack(view).push(theme);
 		}
@@ -208,7 +208,7 @@ public enum UIMinecraftDebug {
 
 		private static AbstractContainerScreenAdapter<?, DebugContainer> createCodeUI(DebugContainer container) {
 			// COMMENT component
-			IUIViewComponent<?, IUIComponentManager<Rectangle2D>> view;
+			IUIComponentView<?, IUIComponentManager<Rectangle2D>> view;
 			{
 				UIDefaultComponentManager<Rectangle2D> componentManager =
 						new UIDefaultComponentManager<>(UIImmutableComponentArguments.of(null,
@@ -225,7 +225,7 @@ public enum UIMinecraftDebug {
 									ImmutableMap.of()));
 					IUIComponent.addContentChildren(componentManager, Iterators.singletonIterator(window));
 				}
-				view = UIDefaultViewComponent.of(UIImmutableViewComponentArguments.of(ImmutableMap.of()),
+				view = UIDefaultComponentView.of(UIImmutableViewArguments.of(ImmutableMap.of()),
 						componentManager);
 			}
 
@@ -266,8 +266,8 @@ public enum UIMinecraftDebug {
 			return screen;
 		}
 
-		private static IUIViewComponent<?, ?> createView() {
-			return (IUIViewComponent<?, ?>) IJAXBAdapterRegistry.adaptFromJAXB(
+		private static IUIComponentView<?, ?> createView() {
+			return (IUIComponentView<?, ?>) IJAXBAdapterRegistry.adaptFromJAXB(
 					JAXBImmutableAdapterContext.of(UIDefaultComponentSchemaHolder.getAdapterRegistry()),
 					getJAXBView()
 			);

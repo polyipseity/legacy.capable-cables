@@ -8,8 +8,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.binding.IUIPropertyMappingValue;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.IUIViewComponentArguments;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.UIViewComponentConstructor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.IUIViewArguments;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.UIViewConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.IUIStructureLifecycleContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.lifecycles.EnumUILifecycleState;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.lifecycles.IUIStructureLifecycle;
@@ -77,9 +77,9 @@ import java.util.stream.Collectors;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 
-public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManager<S>>
+public class UIDefaultComponentView<S extends Shape, M extends IUIComponentManager<S>>
 		extends UIAbstractView<S>
-		implements IUIViewComponent<S, M> {
+		implements IUIComponentView<S, M> {
 	private final Map<IIdentifier, IUIPropertyMappingValue> mappings;
 	private final Consumer<ConcurrentMap<Class<?>, IUIViewCoordinator>> coordinatorMapInitializer;
 	private final Runnable extensionsInitializer;
@@ -90,13 +90,13 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 	private @Nullable M internalManager;
 
 	@SuppressWarnings("RedundantTypeArguments")
-	@UIViewComponentConstructor
-	protected UIDefaultViewComponent(IUIViewComponentArguments arguments) {
+	@UIViewConstructor
+	protected UIDefaultComponentView(IUIViewArguments arguments) {
 		Map<IIdentifier, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.mappings = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
 
-		OptionalWeakReference<UIDefaultViewComponent<S, M>> thisReference = OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
+		OptionalWeakReference<UIDefaultComponentView<S, M>> thisReference = OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
 		this.coordinatorMapInitializer = new OneUseConsumer<>(field -> {
 			IUIThemeStack themeStack = new UIArrayThemeStack(
 					theme ->
@@ -116,7 +116,7 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 			field.put(IUIThemeStack.class, themeStack);
 			field.put(IShapeDescriptorDynamicDetector.class, new UIFunctionalComponentShapeDescriptorDynamicDetector(
 					() -> thisReference.getOptional()
-							.map(UIDefaultViewComponent<S, M>::getChildrenFlatView)
+							.map(UIDefaultComponentView<S, M>::getChildrenFlatView)
 							.map(Iterable::iterator)
 							.orElseGet(CollectionUtilities::getEmptyIterator)));
 		});
@@ -125,9 +125,15 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 		);
 	}
 
-	public static <S extends Shape, M extends IUIComponentManager<S>> UIDefaultViewComponent<S, M> of(IUIViewComponentArguments arguments,
+	@Override
+	public @Immutable List<? extends IUIComponent> getChildrenFlatView() {
+		return Caches.getChildrenFlat().getValue().get(this)
+				.orElseThrow(AssertionError::new);
+	}
+
+	public static <S extends Shape, M extends IUIComponentManager<S>> UIDefaultComponentView<S, M> of(IUIViewArguments arguments,
 	                                                                                                  M manager) {
-		return IUIViewComponent.create(() -> new UIDefaultViewComponent<>(arguments),
+		return IUIComponentView.create(() -> new UIDefaultComponentView<>(arguments),
 				manager);
 	}
 
@@ -138,22 +144,22 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 	protected Map<IIdentifier, IUIPropertyMappingValue> getMappings() { return mappings; }
 
 	@Override
-	public void setContext(@Nullable IUIViewContext context) {
-		super.setContext(context);
-		if (getContext().isPresent())
-			IUIViewComponent.getShapeAnchorController(this).anchor();
-	}
-
-	@Override
 	protected ConcurrentMap<IIdentifier, IExtension<? extends IIdentifier, ?>> getExtensions() {
 		extensionsInitializer.run();
 		return super.getExtensions();
 	}
 
 	@Override
+	public void setContext(@Nullable IUIViewContext context) {
+		super.setContext(context);
+		if (getContext().isPresent())
+			IUIComponentView.getShapeAnchorController(this).anchor();
+	}
+
+	@Override
 	@OverridingMethodsMustInvokeSuper
 	protected void unbind0(@SuppressWarnings("unused") @AlwaysNull @Nullable Void context) {
-		IUIViewComponent.traverseComponentTreeDefault(getManager(),
+		IUIComponentView.traverseComponentTreeDefault(getManager(),
 				component ->
 						IUIComponentStructureLifecycleModifier.handleComponentModifiers(component,
 								component.getModifiersView(),
@@ -169,7 +175,7 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 		super.bind0(context);
 		UIEventBusEntryPoint.<UIAbstractComponentHierarchyChangeBusEvent.Parent>getBusPublisher()
 				.subscribe(getComponentHierarchyChangeParentSubscriberRotator().get());
-		IUIViewComponent.traverseComponentTreeDefault(getManager(),
+		IUIComponentView.traverseComponentTreeDefault(getManager(),
 				component ->
 						IUIComponentStructureLifecycleModifier.handleComponentModifiers(component,
 								component.getModifiersView(),
@@ -182,7 +188,7 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 	@OverridingMethodsMustInvokeSuper
 	protected void cleanup0(@AlwaysNull @Nullable Void context) {
 		try (IUIComponentContext componentContext = createComponentContext().orElseThrow(IllegalStateException::new)) {
-			IUIViewComponent.<RuntimeException>traverseComponentTreeDefault(componentContext, // TODO javac bug, need explicit type arguments
+			IUIComponentView.<RuntimeException>traverseComponentTreeDefault(componentContext, // TODO javac bug, need explicit type arguments
 					getManager(),
 					(componentContext1, result) ->
 							IUIComponentActiveLifecycleModifier.handleComponentModifiers(result.getComponent(),
@@ -191,21 +197,6 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 					IConsumer3.StaticHolder.getEmpty());
 		}
 		super.cleanup0(context);
-	}
-
-	@SuppressWarnings("RedundantTypeArguments")
-	@Override
-	protected void initialize0(@AlwaysNull @Nullable Void context) {
-		super.initialize0(context);
-		try (IUIComponentContext componentContext = createComponentContext().orElseThrow(IllegalStateException::new)) {
-			IUIViewComponent.<RuntimeException>traverseComponentTreeDefault(componentContext, // TODO javac bug, need explicit type arguments
-					getManager(),
-					(componentContext1, result) ->
-							IUIComponentActiveLifecycleModifier.handleComponentModifiers(result.getComponent(),
-									result.getModifiersView(),
-									modifier -> modifier.initialize(componentContext1)),
-					IConsumer3.StaticHolder.getEmpty());
-		}
 	}
 
 	@Override
@@ -241,18 +232,27 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 				new UIAbstractComponentHierarchyChangeBusEvent.View(EnumHookStage.POST, getManager(), null, this));
 	}
 
+	@SuppressWarnings("RedundantTypeArguments")
 	@Override
-	public @Immutable List<? extends IUIComponent> getChildrenFlatView() {
-		return CacheViewComponent.getChildrenFlat().getValue().get(this)
-				.orElseThrow(AssertionError::new);
+	protected void initialize0(@AlwaysNull @Nullable Void context) {
+		super.initialize0(context);
+		try (IUIComponentContext componentContext = createComponentContext().orElseThrow(IllegalStateException::new)) {
+			IUIComponentView.<RuntimeException>traverseComponentTreeDefault(componentContext, // TODO javac bug, need explicit type arguments
+					getManager(),
+					(componentContext1, result) ->
+							IUIComponentActiveLifecycleModifier.handleComponentModifiers(result.getComponent(),
+									result.getModifiersView(),
+									modifier -> modifier.initialize(componentContext1)),
+					IConsumer3.StaticHolder.getEmpty());
+		}
 	}
 
 	@Override
 	public IUIEventTarget getTargetAtPoint(Point2D point) {
-		try (IUIComponentContext componentContext = IUIViewComponent.createComponentContextWithManager(this)
+		try (IUIComponentContext componentContext = IUIComponentView.createComponentContextWithManager(this)
 				.orElseThrow(IllegalStateException::new)) {
 			// COMMENT returning null means the point is outside the window, so in that case, just return the manager
-			return IUIViewComponent.getPathResolver(this)
+			return IUIComponentView.getPathResolver(this)
 					.resolvePath(componentContext, (Point2D) point.clone())
 					.getComponent()
 					.<IUIComponent>map(Function.identity())
@@ -265,7 +265,7 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 	public Optional<? extends IUIEventTarget> changeFocus(@Nullable IUIEventTarget currentFocus, boolean next) {
 		@Nullable Optional<? extends IUIEventTarget> ret = CastUtilities.castChecked(IUIComponent.class, currentFocus)
 				.flatMap(cf ->
-						CacheViewComponent.getChildrenFlatFocusable().getValue().get(this)
+						Caches.getChildrenFlatFocusable().getValue().get(this)
 								.filter(FunctionUtilities.notPredicate(Collection::isEmpty))
 								.map(f -> f.get(Math.floorMod(
 										Math.max(f.indexOf(cf), 0) + (next ? 1 : -1), f.size()))));
@@ -283,11 +283,11 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 	protected void render0() {
 		super.render0();
 
-		IUIViewComponent.getShapeDescriptorDynamicDetector(this).detect(); // TODO not good
+		IUIComponentView.getShapeDescriptorDynamicDetector(this).detect(); // TODO not good
 
 		try (IUIComponentContext componentContext = createComponentContext()
 				.orElseThrow(IllegalStateException::new)) {
-			IUIViewComponent.traverseComponentTreeDefault(componentContext,
+			IUIComponentView.traverseComponentTreeDefault(componentContext,
 					getManager(),
 					(componentContext2, result) -> {
 						assert result != null;
@@ -345,16 +345,16 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 				));
 	}
 
-	public enum CacheViewComponent {
+	public enum Caches {
 		;
 
 		@SuppressWarnings({"AnonymousInnerClass", "rawtypes", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
-		private static final IRegistryObject<IUICacheType<List<? extends IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT =
+		private static final IRegistryObject<IUICacheType<List<? extends IUIComponent>, IUIComponentView<?, ?>>> CHILDREN_FLAT =
 				FunctionUtilities.apply(IUICacheType.generateKey("children_flat"),
 						key -> UICacheRegistry.getInstance().register(key,
-								new UIAbstractCacheType<List<? extends OptionalWeakReference<? extends IUIComponent>>, List<? extends IUIComponent>, IUIViewComponent<?, ?>>(key) {
+								new UIAbstractCacheType<List<? extends OptionalWeakReference<? extends IUIComponent>>, List<? extends IUIComponent>, IUIComponentView<?, ?>>(key) {
 									{
-										OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
+										OptionalWeakReference<? extends IUICacheType<?, IUIComponentView<?, ?>>> thisRef =
 												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
 										Cleaner.create(suppressThisEscapedWarning(() -> this),
 												AutoSubscribingDisposable.of(
@@ -405,7 +405,7 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 									}
 
 									@Override
-									protected List<? extends OptionalWeakReference<? extends IUIComponent>> load(IUIViewComponent<?, ?> container) {
+									protected List<? extends OptionalWeakReference<? extends IUIComponent>> load(IUIComponentView<?, ?> container) {
 										List<OptionalWeakReference<IUIComponent>> ret = new ArrayList<>(CapacityUtilities.getInitialCapacityLarge());
 										TreeUtilities.<IUIComponent, Void>visitNodes(TreeUtilities.EnumStrategy.DEPTH_FIRST, container.getManager(),
 												component -> {
@@ -417,19 +417,19 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 									}
 
 									@Override
-									protected Optional<? extends List<? extends IUIComponent>> transform(IUIViewComponent<?, ?> container,
+									protected Optional<? extends List<? extends IUIComponent>> transform(IUIComponentView<?, ?> container,
 									                                                                     @Nullable List<? extends OptionalWeakReference<? extends IUIComponent>> value) {
 										assert value != null;
 										return Optional.of(CollectionUtilities.collectOrRemoveReferences(value));
 									}
 								}));
 		@SuppressWarnings({"AnonymousInnerClass", "rawtypes", "RedundantSuppression", "AnonymousInnerClassMayBeStatic"})
-		private static final IRegistryObject<IUICacheType<List<? extends IUIComponent>, IUIViewComponent<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
+		private static final IRegistryObject<IUICacheType<List<? extends IUIComponent>, IUIComponentView<?, ?>>> CHILDREN_FLAT_FOCUSABLE =
 				AssertionUtilities.assertNonnull(FunctionUtilities.apply(IUICacheType.generateKey("children_flat.focusable"),
 						key -> UICacheRegistry.getInstance().register(key,
-								new UIAbstractCacheType<List<? extends OptionalWeakReference<? extends IUIComponent>>, List<? extends IUIComponent>, IUIViewComponent<?, ?>>(key) {
+								new UIAbstractCacheType<List<? extends OptionalWeakReference<? extends IUIComponent>>, List<? extends IUIComponent>, IUIComponentView<?, ?>>(key) {
 									{
-										OptionalWeakReference<? extends IUICacheType<?, IUIViewComponent<?, ?>>> thisRef =
+										OptionalWeakReference<? extends IUICacheType<?, IUIComponentView<?, ?>>> thisRef =
 												OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
 										Cleaner.create(suppressThisEscapedWarning(() -> this),
 												AutoSubscribingDisposable.of(
@@ -481,7 +481,7 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 
 									@SuppressWarnings("UnstableApiUsage")
 									@Override
-									protected List<? extends OptionalWeakReference<? extends IUIComponent>> load(IUIViewComponent<?, ?> container) {
+									protected List<? extends OptionalWeakReference<? extends IUIComponent>> load(IUIComponentView<?, ?> container) {
 										return container.getChildrenFlatView().stream()
 												.filter(IUIComponent::isFocusable)
 												.map(OptionalWeakReference::of)
@@ -489,33 +489,33 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 									}
 
 									@Override
-									protected Optional<? extends List<? extends IUIComponent>> transform(IUIViewComponent<?, ?> container,
+									protected Optional<? extends List<? extends IUIComponent>> transform(IUIComponentView<?, ?> container,
 									                                                                     @Nullable List<? extends OptionalWeakReference<? extends IUIComponent>> value) {
 										assert value != null;
 										return Optional.of(CollectionUtilities.collectOrRemoveReferences(value));
 									}
 								})));
 
-		public static IRegistryObject<IUICacheType<List<? extends IUIComponent>, IUIViewComponent<?, ?>>> getChildrenFlat() {
+		public static IRegistryObject<IUICacheType<List<? extends IUIComponent>, IUIComponentView<?, ?>>> getChildrenFlat() {
 			return CHILDREN_FLAT;
 		}
 
-		public static IRegistryObject<IUICacheType<List<? extends IUIComponent>, IUIViewComponent<?, ?>>> getChildrenFlatFocusable() {
+		public static IRegistryObject<IUICacheType<List<? extends IUIComponent>, IUIComponentView<?, ?>>> getChildrenFlatFocusable() {
 			return CHILDREN_FLAT_FOCUSABLE;
 		}
 	}
 
 	public static class ComponentHierarchyChangeParentSubscriber
 			extends DelegatingSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent> {
-		private final OptionalWeakReference<UIDefaultViewComponent<?, ?>> owner;
+		private final OptionalWeakReference<UIDefaultComponentView<?, ?>> owner;
 
-		protected ComponentHierarchyChangeParentSubscriber(Subscriber<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate, UIDefaultViewComponent<?, ?> owner) {
+		protected ComponentHierarchyChangeParentSubscriber(Subscriber<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate, UIDefaultComponentView<?, ?> owner) {
 			super(delegate);
 			this.owner = OptionalWeakReference.of(owner);
 		}
 
 		@SuppressWarnings("AnonymousInnerClass")
-		public static DisposableSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent> ofDecorated(UIDefaultViewComponent<?, ?> owner, Logger logger) {
+		public static DisposableSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent> ofDecorated(UIDefaultComponentView<?, ?> owner, Logger logger) {
 			return new EventBusSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
 					ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
 					ReactiveUtilities.decorateAsListener(delegate -> new ComponentHierarchyChangeParentSubscriber(delegate, owner), logger)
@@ -535,12 +535,12 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 			if (event.getStage() == EnumHookStage.POST) {
 				getOwner().ifPresent(owner -> {
 					IUIComponent component = event.getComponent();
-					@Nullable IUIViewComponent<?, ?> nextOwner = event.getNext().flatMap(IUIComponent::getManager).flatMap(IUIComponentManager::getView).orElse(null);
+					@Nullable IUIComponentView<?, ?> nextOwner = event.getNext().flatMap(IUIComponent::getManager).flatMap(IUIComponentManager::getView).orElse(null);
 					if (owner.equals(nextOwner)) {
 						if (owner.getLifecycleStateTracker().containsState(EnumUILifecycleState.BOUND)) {
 							owner.getLifecycleStateTracker().getStateApplier(EnumUILifecycleState.BOUND)
 									.ifPresent(stateApplier ->
-											IUIViewComponent.traverseComponentTreeDefault(component,
+											IUIComponentView.traverseComponentTreeDefault(component,
 													component1 ->
 															IUIComponentStructureLifecycleModifier.handleComponentModifiers(component1,
 																	component1.getModifiersView(),
@@ -550,7 +550,7 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 						}
 						if (owner.getLifecycleStateTracker().containsState(EnumUILifecycleState.INITIALIZED)) {
 							try (IUIComponentContext componentContext = IUIComponent.createContextTo(component)) {
-								IUIViewComponent.<RuntimeException>traverseComponentTreeDefault(componentContext, // TODO javac bug, need explicit type arguments
+								IUIComponentView.<RuntimeException>traverseComponentTreeDefault(componentContext, // TODO javac bug, need explicit type arguments
 										component,
 										(componentContext1, result) ->
 												IUIComponentActiveLifecycleModifier.handleComponentModifiers(result.getComponent(),
@@ -560,16 +560,16 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 							}
 						}
 					} else {
-						@Nullable IUIViewComponent<?, ?> previousOwner = event.getPrevious().flatMap(IUIComponent::getManager).flatMap(IUIComponentManager::getView).orElse(null);
+						@Nullable IUIComponentView<?, ?> previousOwner = event.getPrevious().flatMap(IUIComponent::getManager).flatMap(IUIComponentManager::getView).orElse(null);
 						if (owner.equals(previousOwner)) {
-							IUIViewComponent.traverseComponentTreeDefault(component,
+							IUIComponentView.traverseComponentTreeDefault(component,
 									component1 ->
 											IUIComponentStructureLifecycleModifier.handleComponentModifiers(component1,
 													component.getModifiersView(),
 													IUIStructureLifecycle::unbindV),
 									FunctionUtilities.getEmptyBiConsumer());
 							try (IUIComponentContext componentContext = IUIComponent.createContextTo(component)) {
-								IUIViewComponent.<RuntimeException>traverseComponentTreeDefault(componentContext, // TODO javac bug, need explicit type arguments
+								IUIComponentView.<RuntimeException>traverseComponentTreeDefault(componentContext, // TODO javac bug, need explicit type arguments
 										component,
 										(componentContext1, result) ->
 												IUIComponentActiveLifecycleModifier.handleComponentModifiers(result.getComponent(),
@@ -583,7 +583,7 @@ public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManag
 			}
 		}
 
-		protected Optional<? extends UIDefaultViewComponent<?, ?>> getOwner() {
+		protected Optional<? extends UIDefaultComponentView<?, ?>> getOwner() {
 			return owner.getOptional();
 		}
 	}
