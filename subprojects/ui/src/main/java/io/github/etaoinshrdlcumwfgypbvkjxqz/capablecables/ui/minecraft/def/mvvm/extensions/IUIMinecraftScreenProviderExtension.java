@@ -15,17 +15,19 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.Set;
 
 @OnlyIn(Dist.CLIENT)
 public interface IUIMinecraftScreenProviderExtension
 		extends IUIExtension<IIdentifier, IUIInfrastructure<?, ?, ?>> {
-
 	Optional<? extends Screen> getScreen();
 
 	Optional<? extends Set<Integer>> getCloseKeys();
 
 	Optional<? extends Set<Integer>> getChangeFocusKeys();
+
+	OptionalDouble getPartialTicks();
 
 	boolean setPaused(boolean paused);
 

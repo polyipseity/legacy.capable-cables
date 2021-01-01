@@ -67,8 +67,8 @@ public abstract class UIAbstractView<S extends Shape>
 					render0();
 					return true;
 				},
-				FunctionUtilities.accept(new UIAbstractViewBusEvent.Render(EnumHookStage.PRE, this), this::acceptRenderEvent),
-				FunctionUtilities.accept(new UIAbstractViewBusEvent.Render(EnumHookStage.POST, this), this::acceptRenderEvent));
+				new UIAbstractViewBusEvent.Render(EnumHookStage.PRE, this),
+				new UIAbstractViewBusEvent.Render(EnumHookStage.POST, this));
 	}
 
 	protected void render0() {
@@ -76,8 +76,6 @@ public abstract class UIAbstractView<S extends Shape>
 		animationController.update();
 		animationController.render();
 	}
-
-	protected void acceptRenderEvent(UIAbstractViewBusEvent.Render event) {}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
 	protected ConcurrentMap<Class<?>, IUIViewCoordinator> getCoordinatorMap() {

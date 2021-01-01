@@ -77,7 +77,7 @@ import java.util.stream.Collectors;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 
-public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComponentManager<S>>
+public class UIDefaultViewComponent<S extends Shape, M extends IUIComponentManager<S>>
 		extends UIAbstractView<S>
 		implements IUIViewComponent<S, M> {
 	private final Map<IIdentifier, IUIPropertyMappingValue> mappings;
@@ -91,12 +91,12 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 
 	@SuppressWarnings("RedundantTypeArguments")
 	@UIViewComponentConstructor
-	public UIAbstractViewComponent(IUIViewComponentArguments arguments) {
+	protected UIDefaultViewComponent(IUIViewComponentArguments arguments) {
 		Map<IIdentifier, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.mappings = MapBuilderUtilities.newMapMakerSingleThreaded().initialCapacity(mappings.size()).makeMap();
 		this.mappings.putAll(mappings);
 
-		OptionalWeakReference<UIAbstractViewComponent<S, M>> thisReference = OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
+		OptionalWeakReference<UIDefaultViewComponent<S, M>> thisReference = OptionalWeakReference.of(suppressThisEscapedWarning(() -> this));
 		this.coordinatorMapInitializer = new OneUseConsumer<>(field -> {
 			IUIThemeStack themeStack = new UIArrayThemeStack(
 					theme ->
@@ -116,13 +116,19 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 			field.put(IUIThemeStack.class, themeStack);
 			field.put(IShapeDescriptorDynamicDetector.class, new UIFunctionalComponentShapeDescriptorDynamicDetector(
 					() -> thisReference.getOptional()
-							.map(UIAbstractViewComponent<S, M>::getChildrenFlatView)
+							.map(UIDefaultViewComponent<S, M>::getChildrenFlatView)
 							.map(Iterable::iterator)
 							.orElseGet(CollectionUtilities::getEmptyIterator)));
 		});
 		this.extensionsInitializer = new OneUseRunnable(() ->
 				IExtensionContainer.addExtensionChecked(this, new UIDefaultCacheExtension())
 		);
+	}
+
+	public static <S extends Shape, M extends IUIComponentManager<S>> UIDefaultViewComponent<S, M> of(IUIViewComponentArguments arguments,
+	                                                                                                  M manager) {
+		return IUIViewComponent.create(() -> new UIDefaultViewComponent<>(arguments),
+				manager);
 	}
 
 	@Override
@@ -277,7 +283,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	protected void render0() {
 		super.render0();
 
-		IUIViewComponent.getShapeDescriptorDynamicDetector(this).detect();
+		IUIViewComponent.getShapeDescriptorDynamicDetector(this).detect(); // TODO not good
 
 		try (IUIComponentContext componentContext = createComponentContext()
 				.orElseThrow(IllegalStateException::new)) {
@@ -327,6 +333,16 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 	@Override
 	protected ConcurrentMap<Class<?>, IUIViewCoordinator> getCoordinatorMap() {
 		return FunctionUtilities.accept(super.getCoordinatorMap(), coordinatorMapInitializer);
+	}
+
+	@Override
+	public Optional<? extends IUIComponentContext> createComponentContext() {
+		return getContext()
+				.map(context -> new UIDefaultComponentContext(
+						context,
+						this,
+						new UIDefaultComponentContextMutator()
+				));
 	}
 
 	public enum CacheViewComponent {
@@ -491,15 +507,15 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 
 	public static class ComponentHierarchyChangeParentSubscriber
 			extends DelegatingSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent> {
-		private final OptionalWeakReference<UIAbstractViewComponent<?, ?>> owner;
+		private final OptionalWeakReference<UIDefaultViewComponent<?, ?>> owner;
 
-		protected ComponentHierarchyChangeParentSubscriber(Subscriber<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate, UIAbstractViewComponent<?, ?> owner) {
+		protected ComponentHierarchyChangeParentSubscriber(Subscriber<? super UIAbstractComponentHierarchyChangeBusEvent.Parent> delegate, UIDefaultViewComponent<?, ?> owner) {
 			super(delegate);
 			this.owner = OptionalWeakReference.of(owner);
 		}
 
 		@SuppressWarnings("AnonymousInnerClass")
-		public static DisposableSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent> ofDecorated(UIAbstractViewComponent<?, ?> owner, Logger logger) {
+		public static DisposableSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent> ofDecorated(UIDefaultViewComponent<?, ?> owner, Logger logger) {
 			return new EventBusSubscriber<UIAbstractComponentHierarchyChangeBusEvent.Parent>(
 					ImmutableSubscribeEvent.of(EventPriority.LOWEST, true),
 					ReactiveUtilities.decorateAsListener(delegate -> new ComponentHierarchyChangeParentSubscriber(delegate, owner), logger)
@@ -567,7 +583,7 @@ public abstract class UIAbstractViewComponent<S extends Shape, M extends IUIComp
 			}
 		}
 
-		protected Optional<? extends UIAbstractViewComponent<?, ?>> getOwner() {
+		protected Optional<? extends UIDefaultViewComponent<?, ?>> getOwner() {
 			return owner.getOptional();
 		}
 	}

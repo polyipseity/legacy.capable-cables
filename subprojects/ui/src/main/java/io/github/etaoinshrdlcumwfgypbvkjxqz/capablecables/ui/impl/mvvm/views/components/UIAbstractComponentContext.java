@@ -12,6 +12,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.thro
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.Deque;
+import java.util.Optional;
 
 public abstract class UIAbstractComponentContext
 		implements IUIComponentContextInternal {
@@ -40,13 +41,8 @@ public abstract class UIAbstractComponentContext
 	}
 
 	@Override
-	public Graphics2D createGraphics() {
-		return (Graphics2D) getGraphicsRef().create();
-	}
-
-	@Override
 	public void close() {
-		getGraphicsRef().dispose();
+		getGraphicsRef().ifPresent(Graphics::dispose);
 
 		IPath<IUIComponent> path = getPathRef();
 		int size = path.size();
@@ -54,5 +50,12 @@ public abstract class UIAbstractComponentContext
 		path.parentPath(size);
 		LoopUtilities.doNTimes(size, getTransformStackRef()::pop);
 		LoopUtilities.doNTimes(size, getClipStackRef()::pop);
+	}
+
+	@Override
+	public Optional<? extends Graphics2D> createGraphics() {
+		return getGraphicsRef()
+				.map(Graphics::create)
+				.map(Graphics2D.class::cast);
 	}
 }

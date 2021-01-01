@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.extensions.background;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.views.extensions.background;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterators;
@@ -9,16 +9,14 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.UI
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.IUISubInfrastructure;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.IUIViewContext;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIViewComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.rendering.IUIRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableExtensionArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIAbstractViewBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainerContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.events.bus.IUIMinecraftRenderEventExtension;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.extensions.IUIMinecraftBackgroundExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.extensions.IUIMinecraftScreenProviderExtension;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.views.extensions.IUIMinecraftBackgroundExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AutoCloseableRotator;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.reactive.DelegatingSubscriber;
@@ -35,7 +33,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.even
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.def.IExtensionType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.impl.AbstractContainerAwareExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.def.IInputDevices;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional3;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.Optional2;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.subscribers.DisposableSubscriber;
 import net.minecraftforge.api.distmarker.Dist;
@@ -46,6 +44,7 @@ import org.slf4j.Logger;
 
 import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -155,27 +154,34 @@ public class UIDefaultMinecraftBackgroundExtension
 		@SubscribeEvent
 		public void onNext(@Nonnull UIAbstractViewBusEvent.Render event) {
 			super.onNext(event);
+			// COMMENT Do you like lambda hell?
 			if (event.getStage() == EnumHookStage.PRE)
-				Optional3.of(
+				Optional2.of(
 						() -> getOwner().orElse(null),
-						() -> IUIMinecraftRenderEventExtension.StaticHolder.getType().find(event).orElse(null),
 						() -> event.getView().getContext()
 								.map(IUIViewContext::getInputDevices)
 								.flatMap(IInputDevices::getPointerDevice)
-								.orElse(null))
-						.ifPresent((owner, renderExtension, pointerDevice) -> {
-							assert owner != null;
-							assert renderExtension != null;
-							assert pointerDevice != null;
-							owner.getRendererContainer().getRenderer().ifPresent(renderer ->
-									CastUtilities.castChecked(CastUtilities.<Class<IUIView<?>>>castUnchecked(IUIViewComponent.class), event.getView())
-											.filter(evc -> owner.getContainer().filter(Predicate.isEqual(evc)).isPresent())
-											.flatMap(IUISubInfrastructure::getInfrastructure)
-											.flatMap(IUIMinecraftScreenProviderExtension.StaticHolder.getType().getValue()::find)
-											.flatMap(IUIMinecraftScreenProviderExtension::getScreen)
-											.ifPresent(screen -> renderer.render(screen, pointerDevice.getPositionView(), renderExtension.getPartialTicks()))
+								.orElse(null)
+				).ifPresent((owner, pointerDevice) -> {
+					assert owner != null;
+					assert pointerDevice != null;
+					Optional2.of(
+							() -> owner.getRendererContainer().getRenderer().orElse(null),
+							() -> owner.getContainer()
+									.filter(Predicate.isEqual(event.getView()))
+									.flatMap(IUISubInfrastructure::getInfrastructure)
+									.flatMap(IUIMinecraftScreenProviderExtension.StaticHolder.getType().getValue()::find)
+									.orElse(null)
+					).ifPresent((renderer, screenExtension) -> {
+						OptionalDouble partialTicks = screenExtension.getPartialTicks();
+						if (partialTicks.isPresent()) {
+							double partialTicks1 = partialTicks.getAsDouble();
+							screenExtension.getScreen().ifPresent(screen ->
+									renderer.render(screen, pointerDevice.getPositionView(), partialTicks1)
 							);
-						});
+						}
+					});
+				});
 		}
 
 		protected Optional<? extends UIDefaultMinecraftBackgroundExtension> getOwner() { return owner.getOptional(); }

@@ -10,7 +10,7 @@
 	<using alias="shape.ellipse" target="java.awt.geom.Ellipse2D"/>
 	<!-- COMMENT views -->
 	<using alias="view.minecraft"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.views.components.UIDefaultMinecraftViewComponent"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultViewComponent"/>
 	<!-- COMMENT components -->
 	<using alias="component.manager"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIDefaultComponentManager"/>
@@ -24,7 +24,7 @@
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIListComponent"/>
 	<!-- COMMENT extensions -->
 	<using alias="extension.minecraft.background.default"
-	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.extensions.background.UIDefaultMinecraftBackgroundExtension"/>
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.views.extensions.background.UIDefaultMinecraftBackgroundExtension"/>
 	<using alias="extension.user_relocatable"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.relocatable.UITeleportingComponentUserRelocatableExtension"/>
 	<using alias="extension.user_resizable"

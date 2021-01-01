@@ -11,19 +11,23 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.adapters.I
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.extensions.cursors.ICursorHandleProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.extensions.cursors.IUICursorHandleProviderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.lifecycles.IUIActiveLifecycle;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.IUIView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.events.IUIEventKeyboard;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.events.IUIEventMouse;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.events.IUIEventTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.cursors.EnumGLFWCursor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.ui.UIEventUtilities;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.software.MinecraftSoftwareGraphics2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.UIImmutableContextContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.viewmodels.UIImmutableViewModelContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.UIImmutableViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.utilities.UIInputUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.extensions.IUIMinecraftScreenProviderExtension;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.extensions.IUIMinecraftTickerExtension;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.viewmodels.extensions.IUIMinecraftTickerExtension;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.def.mvvm.views.extensions.IUIMinecraftBackgroundExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.extensions.UIImmutableMinecraftContainerProviderExtension;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.views.extensions.UIDefaultMinecraftRenderExtension;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.views.extensions.background.UIDefaultMinecraftBackgroundExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.utilities.MinecraftDrawingUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.utilities.UIMinecraftBackgrounds;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.*;
@@ -46,6 +50,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.d
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.impl.ImmutableInputDevices;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.impl.ImmutableKeyboardKeyPressData;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.impl.ImmutableMouseButtonClickData;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.impl.ImmutableOutputDevices;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.optionals.impl.OptionalUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time.impl.Tickers;
 import it.unimi.dsi.fastutil.ints.*;
@@ -62,10 +67,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.List;
-import java.util.Optional;
-import java.util.PrimitiveIterator;
-import java.util.Set;
+import java.util.*;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.primitives.BooleanUtilities.PaddedBool.*;
@@ -84,16 +86,7 @@ public class UIMinecraftScreenAdapter
 			keyboardKeysBeingPressed = new Int2ObjectOpenHashMap<>(CapacityUtilities.getInitialCapacitySmall());
 	private final Int2ObjectMap<IUIEventMouse>
 			mouseButtonsBeingPressed = new Int2ObjectOpenHashMap<>(CapacityUtilities.getInitialCapacitySmall());
-	private final IUIContextContainer contextContainer =
-			new UIImmutableContextContainer(
-					new UIImmutableViewContext(
-							new ImmutableInputDevices.Builder(Tickers.SYSTEM)
-									.setPointerDevice(new MinecraftPointerDevice())
-									.setKeyboardDevice(new MinecraftKeyboardDevice())
-									.build()
-					),
-					new UIImmutableViewModelContext()
-			);
+	private final IUIContextContainer contextContainer;
 	private boolean paused = false;
 	@Nullable
 	private IUIEventTarget targetBeingHoveredByMouse = null;
@@ -114,11 +107,31 @@ public class UIMinecraftScreenAdapter
 		this.closeKeys = new IntOpenHashSet(closeKeys.iterator());
 		this.changeFocusKeys = new IntOpenHashSet(changeFocusKeys.iterator());
 
+		try (AutoCloseableGraphics2D graphics = MinecraftSoftwareGraphics2D.createGraphics()) {
+			this.contextContainer = new UIImmutableContextContainer(
+					UIImmutableViewContext.of(
+							new ImmutableInputDevices.Builder(Tickers.SYSTEM)
+									.setPointerDevice(new MinecraftPointerDevice())
+									.setKeyboardDevice(new MinecraftKeyboardDevice())
+									.build(),
+							new ImmutableOutputDevices.Builder()
+									.setGraphics(graphics)
+									.build()
+					),
+					new UIImmutableViewModelContext()
+			);
+		}
+
+		// COMMENT add extensions
 		IExtensionContainer.addExtensionChecked(this.infrastructure, new UIDefaultMinecraftScreenProviderExtension(suppressThisEscapedWarning(() -> this)));
 		if (containerObject != null)
 			IExtensionContainer.addExtensionChecked(this.infrastructure, new UIImmutableMinecraftContainerProviderExtension(this.containerObject));
 
-		IExtensionContainer.addExtensionChecked(this.infrastructure.getView(), new UIDefaultMinecraftRenderExtension(this::getLastPartialTicks));
+		IUIView<?> view = this.infrastructure.getView();
+		if (!IExtensionContainer.containsExtension(view, IUIMinecraftBackgroundExtension.StaticHolder.getKey())) {
+			// COMMENT to ensure that 'GuiScreenEvent.BackgroundDrawnEvent' is fired
+			IExtensionContainer.addExtensionChecked(view, new UIDefaultMinecraftBackgroundExtension());
+		}
 	}
 
 	protected double getLastPartialTicks() {
@@ -138,7 +151,11 @@ public class UIMinecraftScreenAdapter
 	@Deprecated
 	public void render(int mouseX, int mouseY, float partialTicks) {
 		setLastPartialTicks(partialTicks);
+
+		MinecraftSoftwareGraphics2D.clear();
 		getInfrastructure().getView().render();
+		MinecraftSoftwareGraphics2D.draw();
+
 		setCursor(
 				OptionalUtilities.<ICursor>upcast(
 						IUICursorHandleProviderExtension.StaticHolder.getType().getValue().find(getInfrastructure().getView())
@@ -645,6 +662,13 @@ public class UIMinecraftScreenAdapter
 		@Override
 		@SuppressWarnings({"rawtypes", "RedundantSuppression"})
 		public Optional<? extends Set<Integer>> getChangeFocusKeys() { return getOwner().map(UIMinecraftScreenAdapter::getChangeFocusKeys); }
+
+		@Override
+		public OptionalDouble getPartialTicks() {
+			return getOwner()
+					.map(owner -> OptionalDouble.of(owner.getLastPartialTicks()))
+					.orElseGet(OptionalDouble::empty);
+		}
 
 		@Override
 		public boolean setPaused(boolean paused) {

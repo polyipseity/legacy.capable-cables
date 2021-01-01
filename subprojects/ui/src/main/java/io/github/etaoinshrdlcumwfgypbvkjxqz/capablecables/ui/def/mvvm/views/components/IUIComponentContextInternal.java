@@ -5,6 +5,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.d
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.Deque;
+import java.util.Optional;
 
 public interface IUIComponentContextInternal
 		extends IUIComponentContext {
@@ -14,7 +15,7 @@ public interface IUIComponentContextInternal
 
 	Deque<Shape> getClipStackRef();
 
-	Graphics2D getGraphicsRef();
+	Optional<? extends Graphics2D> getGraphicsRef();
 
 	@Override
 	IUIComponentContextInternal clone();

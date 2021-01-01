@@ -8,7 +8,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.IU
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.construction.UIRendererConstructor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.extensions.IUIComponentUserResizableExtension;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.def.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ConstantValue;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.ImmutableIdentifier;
@@ -57,15 +56,14 @@ public class UIDefaultComponentUserResizableExtensionPreviewingResizingRenderer
 	}
 
 	protected void render0(IUIComponentContext context, Shape shape) {
-		try (IUIComponentContext contextCopy = context.clone()) {
-			contextCopy.getMutator().pop(contextCopy); // COMMENT draw in the parent context
-			try (AutoCloseableGraphics2D currentGraphics = AutoCloseableGraphics2D.of(context.createGraphics());
-			     AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(contextCopy.createGraphics())) {
-				graphics.setTransform(currentGraphics.getTransform()); // COMMENT but with the current transform
-				graphics.setColor(getPreviewColor().getValue());
+		try (IUIComponentContext parentContext = context.clone()) {
+			parentContext.getMutator().pop(parentContext); // COMMENT draw in the parent context
+			IUIComponentContext.withGraphics(context, graphics -> IUIComponentContext.withGraphics(parentContext, parentGraphics -> {
+				parentGraphics.setTransform(graphics.getTransform()); // COMMENT but with the current transform
+				parentGraphics.setColor(getPreviewColor().getValue());
 				// COMMENT the result is that the clipping is relaxed
-				graphics.draw(shape);
-			}
+				parentGraphics.draw(shape);
+			}));
 		}
 	}
 

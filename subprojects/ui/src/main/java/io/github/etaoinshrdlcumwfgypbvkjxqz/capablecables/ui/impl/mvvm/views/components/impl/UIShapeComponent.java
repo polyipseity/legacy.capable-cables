@@ -12,7 +12,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.comp
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.rendering.IUIComponentRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.rendering.IUIRendererContainerContainer;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultComponentRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainerContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CastUtilities;
@@ -96,12 +95,12 @@ public class UIShapeComponent
 			getContainer().ifPresent(container -> {
 				if (stage == EnumRenderStage.PRE_CHILDREN) {
 					Shape relativeShape = IUIComponent.getShape(container);
-					try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
+					IUIComponentContext.withGraphics(context, graphics -> {
 						graphics.setPaint(getFilledColor().getValue());
 						graphics.fill(relativeShape);
 						graphics.setPaint(getBorderColor().getValue());
 						graphics.draw(relativeShape);
-					}
+					});
 				}
 			});
 		}

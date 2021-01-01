@@ -18,7 +18,6 @@ import java.util.Optional;
 @OnlyIn(Dist.CLIENT)
 public interface IUIMinecraftContainerProviderExtension
 		extends IUIExtension<IIdentifier, IUIInfrastructure<?, ?, ?>> {
-
 	Container getContainer();
 
 	@OnlyIn(Dist.CLIENT)

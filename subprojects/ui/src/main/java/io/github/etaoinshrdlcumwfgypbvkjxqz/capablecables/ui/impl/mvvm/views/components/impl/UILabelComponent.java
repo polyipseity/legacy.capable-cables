@@ -18,7 +18,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.rend
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.text.IAttributedText;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics.AutoCloseableGraphics2D;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.events.bus.UIComponentModifyShapeDescriptorBusEvent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultComponentRenderer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.rendering.UIDefaultRendererContainerContainer;
@@ -397,7 +396,7 @@ public class UILabelComponent
 					Rectangle2D componentBounds = IUIComponent.getShape(container).getBounds2D();
 					double componentBoundsWidth = componentBounds.getWidth();
 
-					try (AutoCloseableGraphics2D graphics = AutoCloseableGraphics2D.of(context.createGraphics())) {
+					IUIComponentContext.withGraphics(context, graphics -> {
 						Point2D textPen = new Point2D.Double(componentBounds.getX(), componentBounds.getY());
 						OptionalDouble textWidth = overflowPolicy.getRenderTextWidth(container.getShapeDescriptor());
 
@@ -405,7 +404,7 @@ public class UILabelComponent
 						graphics.setBackground(getDefaultBackgroundColor().getValue());
 						TextUtilities.drawLines(graphics, textPen, componentBoundsWidth,
 								getTextLayoutTask().apply(ImmutableTuple3.of(container.getText().getValue().compile(), graphics.getFontRenderContext(), textWidth)).iterator());
-					}
+					});
 				}
 			});
 		}

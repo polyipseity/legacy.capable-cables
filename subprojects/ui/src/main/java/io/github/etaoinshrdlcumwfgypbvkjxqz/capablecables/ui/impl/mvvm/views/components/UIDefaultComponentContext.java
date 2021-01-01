@@ -3,6 +3,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.co
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.IUIViewContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponent;
@@ -16,11 +17,11 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.i
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 import sun.misc.Cleaner;
 
-import javax.annotation.WillNotClose;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Optional;
 
 import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 
@@ -47,7 +48,7 @@ public class UIDefaultComponentContext
 	private final IUIViewContext viewContext;
 	private final IUIViewComponent<?, ?> view;
 	private final IUIComponentContextMutator mutator;
-	private final Graphics2D graphics;
+	private final @Nullable Graphics2D graphics;
 	private final IPath<IUIComponent> path;
 	private final Deque<AffineTransform> transformStack;
 	private final Deque<Shape> clipStack;
@@ -55,12 +56,11 @@ public class UIDefaultComponentContext
 
 	public UIDefaultComponentContext(IUIViewContext viewContext,
 	                                 IUIViewComponent<?, ?> view,
-	                                 IUIComponentContextMutator mutator,
-	                                 @WillNotClose Graphics2D graphics) {
+	                                 IUIComponentContextMutator mutator) {
 		this.viewContext = viewContext;
 		this.view = view;
 		this.mutator = mutator;
-		this.graphics = (Graphics2D) graphics.create();
+		this.graphics = viewContext.getOutputDevices().createGraphics().orElse(null);
 
 		this.path = new FunctionalPath<>(ImmutableList.of(), Lists::newArrayList);
 		this.transformStack = new ArrayDeque<>(CapacityUtilities.getInitialCapacityMedium());
@@ -106,12 +106,12 @@ public class UIDefaultComponentContext
 	public Deque<Shape> getClipStackRef() { return getClipStack(); }
 
 	@Override
-	public Graphics2D getGraphicsRef() {
+	public Optional<? extends Graphics2D> getGraphicsRef() {
 		return getGraphics();
 	}
 
-	protected Graphics2D getGraphics() {
-		return graphics;
+	protected Optional<? extends Graphics2D> getGraphics() {
+		return Optional.ofNullable(graphics);
 	}
 
 	@SuppressWarnings("AssignmentOrReturnOfFieldWithMutableType")
@@ -125,7 +125,7 @@ public class UIDefaultComponentContext
 		UIDefaultComponentContext result;
 		try {
 			result = (UIDefaultComponentContext) super.clone();
-			DynamicUtilities.getUnsafe().putObject(result, getGraphicsFieldOffset(), result.graphics.create());
+			DynamicUtilities.getUnsafe().putObject(result, getGraphicsFieldOffset(), Optional.ofNullable(result.graphics).map(Graphics::create).orElse(null));
 			DynamicUtilities.getUnsafe().putObject(result, getPathFieldOffset(), result.path.clone());
 			DynamicUtilities.getUnsafe().putObject(result, getTransformStackFieldOffset(), new ArrayDeque<>(result.transformStack));
 			DynamicUtilities.getUnsafe().putObject(result, getClipStackFieldOffset(), new ArrayDeque<>(result.clipStack));
