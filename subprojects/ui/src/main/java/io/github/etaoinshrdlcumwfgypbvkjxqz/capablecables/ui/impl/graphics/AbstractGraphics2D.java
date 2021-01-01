@@ -1,12 +1,12 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.graphics;
 
+import com.google.common.collect.ImmutableList;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ColorUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl.UIObjectUtilities;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Area;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -42,9 +42,7 @@ public abstract class AbstractGraphics2D
 			setClip(shape);
 			return;
 		}
-		Area newClip = new Area(clip);
-		newClip.intersect(new Area(shape));
-		setInternalClip(newClip);
+		setInternalClip(UIObjectUtilities.intersectShapes(ImmutableList.of(clip, shape).iterator()));
 	}
 
 	@Override

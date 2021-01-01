@@ -1,15 +1,14 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl;
 
+import com.google.common.collect.Streams;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.def.IConsumer4;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.def.IFunction4;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Dimension2D;
-import java.awt.geom.Point2D;
-import java.awt.geom.RectangularShape;
+import java.awt.geom.*;
+import java.util.Iterator;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
@@ -19,7 +18,16 @@ import static java.lang.Math.min;
 public enum UIObjectUtilities {
 	;
 
-	public static Shape copyShape(Shape shape) { return AffineTransformUtilities.getIdentity().createTransformedShape(shape); }
+	public static Shape copyShape(Shape shape) {
+		return AffineTransformUtilities.getIdentity().createTransformedShape(shape);
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	public static Shape intersectShapes(Iterator<? extends Shape> shapes) {
+		return Streams.stream(shapes).unordered()
+				.map(Area::new)
+				.collect(Area::new, Area::intersect, Area::intersect);
+	}
 
 	public static <T extends RectangularShape> T unPositionRectangularShape(T source, T destination) {
 		destination.setFrame(0D, 0D, source.getWidth(), source.getHeight());
