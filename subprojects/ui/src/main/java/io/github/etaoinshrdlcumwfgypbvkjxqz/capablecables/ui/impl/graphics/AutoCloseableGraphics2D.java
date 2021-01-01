@@ -11,8 +11,13 @@ public class AutoCloseableGraphics2D
 
 	public static AutoCloseableGraphics2D of(Graphics2D delegate) {
 		if (delegate instanceof AutoCloseableGraphics2D)
-			return (AutoCloseableGraphics2D) delegate;
+			return of((AutoCloseableGraphics2D) delegate);
 		return new AutoCloseableGraphics2D(delegate);
+	}
+
+	@Deprecated // COMMENT catch cases where graphics is already closeable
+	public static AutoCloseableGraphics2D of(AutoCloseableGraphics2D delegate) {
+		return delegate;
 	}
 
 	@Override
