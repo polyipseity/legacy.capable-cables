@@ -1,7 +1,7 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.impl;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AbstractDelegatingObject;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.def.IKeyboardDevice;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.def.IKeyboardDevice;
 
 public final class ImmutableKeyboardDevice
 		extends AbstractDelegatingObject<IKeyboardDevice>

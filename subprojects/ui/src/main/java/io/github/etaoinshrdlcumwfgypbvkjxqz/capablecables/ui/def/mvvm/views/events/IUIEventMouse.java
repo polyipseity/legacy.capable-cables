@@ -1,6 +1,6 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.events;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.def.IMouseButtonClickData;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.def.IMouseButtonClickData;
 
 import java.util.Optional;
 

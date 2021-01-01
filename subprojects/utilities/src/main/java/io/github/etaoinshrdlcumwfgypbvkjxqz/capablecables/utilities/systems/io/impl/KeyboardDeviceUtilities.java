@@ -1,6 +1,6 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.impl;
 
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.def.IKeyboardDevice;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.def.IKeyboardDevice;
 import org.lwjgl.glfw.GLFW;
 
 public enum KeyboardDeviceUtilities {

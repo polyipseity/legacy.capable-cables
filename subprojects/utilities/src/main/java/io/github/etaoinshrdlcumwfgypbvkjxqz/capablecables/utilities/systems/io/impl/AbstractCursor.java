@@ -1,7 +1,7 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.impl;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.impl;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.ObjectUtilities;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.def.ICursor;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.def.ICursor;
 
 public abstract class AbstractCursor
 		implements ICursor {

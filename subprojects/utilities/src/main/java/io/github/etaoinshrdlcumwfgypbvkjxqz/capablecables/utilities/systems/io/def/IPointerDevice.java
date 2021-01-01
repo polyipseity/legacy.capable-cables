@@ -1,4 +1,4 @@
-package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.inputs.def;
+package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.def;
 
 import java.awt.geom.Point2D;
 
