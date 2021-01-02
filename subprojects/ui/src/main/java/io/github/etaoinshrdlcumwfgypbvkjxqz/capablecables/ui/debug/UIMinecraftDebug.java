@@ -31,7 +31,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.U
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.construction.UIImmutableViewArguments;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.viewmodels.UIDefaultViewModel;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultComponentView;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.UIComponentCursorHandleProviderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIButtonComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIDefaultComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIWindowComponent;
@@ -260,7 +259,6 @@ public enum UIMinecraftDebug {
 			IUITheme theme = createTheme();
 
 			IUIView<?> view = screen.getInfrastructure().getView();
-			IExtensionContainer.addExtensionChecked(view, new UIComponentCursorHandleProviderExtension());
 			IUIView.getThemeStack(view).push(theme);
 
 			return screen;

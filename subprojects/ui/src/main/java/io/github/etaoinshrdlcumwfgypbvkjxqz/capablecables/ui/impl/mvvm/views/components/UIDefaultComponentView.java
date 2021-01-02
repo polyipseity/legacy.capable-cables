@@ -30,6 +30,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.shapes.interact
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.theming.IUIThemeStack;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.events.bus.UIEventBusEntryPoint;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.UIAbstractView;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.UIComponentCursorHandleProviderExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.caches.UIAbstractCacheType;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.caches.UIDefaultCacheExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.paths.UIDefaultComponentPathResolver;
@@ -117,9 +118,10 @@ public class UIDefaultComponentView<S extends Shape, M extends IUIComponentManag
 							.map(Iterable::iterator)
 							.orElseGet(CollectionUtilities::getEmptyIterator)));
 		});
-		this.extensionsInitializer = new OneUseRunnable(() ->
-				IExtensionContainer.addExtensionChecked(this, new UIDefaultCacheExtension())
-		);
+		this.extensionsInitializer = new OneUseRunnable(() -> {
+			IExtensionContainer.addExtensionChecked(this, new UIDefaultCacheExtension());
+			IExtensionContainer.addExtensionChecked(this, new UIComponentCursorHandleProviderExtension()); // COMMENT delegate cursor support to components
+		});
 	}
 
 	@Override

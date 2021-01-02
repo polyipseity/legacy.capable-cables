@@ -123,10 +123,12 @@ public class UIMinecraftScreenAdapter
 		}
 
 		// COMMENT add extensions
+		// COMMENT infrastructure
 		IExtensionContainer.addExtensionChecked(this.infrastructure, new UIDefaultMinecraftScreenProviderExtension(suppressThisEscapedWarning(() -> this)));
 		if (containerObject != null)
 			IExtensionContainer.addExtensionChecked(this.infrastructure, new UIImmutableMinecraftContainerProviderExtension(this.containerObject));
 
+		// COMMENT view
 		IUIView<?> view = this.infrastructure.getView();
 		if (!IExtensionContainer.containsExtension(view, IUIMinecraftBackgroundExtension.StaticHolder.getKey())) {
 			// COMMENT to ensure that 'GuiScreenEvent.BackgroundDrawnEvent' is fired
