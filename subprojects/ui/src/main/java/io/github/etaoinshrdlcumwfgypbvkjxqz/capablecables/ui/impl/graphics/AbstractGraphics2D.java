@@ -42,7 +42,8 @@ public abstract class AbstractGraphics2D
 			setClip(shape);
 			return;
 		}
-		setInternalClip(UIObjectUtilities.intersectShapes(ImmutableList.of(clip, shape).iterator()));
+		setInternalClip(UIObjectUtilities.intersectShapes(ImmutableList.of(clip, shape).iterator())
+				.orElseThrow(AssertionError::new) /* COMMENT have 2 elements */);
 	}
 
 	@Override

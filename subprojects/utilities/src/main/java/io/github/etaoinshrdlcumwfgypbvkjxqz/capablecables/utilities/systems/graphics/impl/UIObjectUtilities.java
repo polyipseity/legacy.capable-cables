@@ -9,8 +9,10 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.functions.de
 import java.awt.*;
 import java.awt.geom.*;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -23,10 +25,14 @@ public enum UIObjectUtilities {
 	}
 
 	@SuppressWarnings("UnstableApiUsage")
-	public static Shape intersectShapes(Iterator<? extends Shape> shapes) {
+	public static Optional<Shape> intersectShapes(Iterator<? extends Shape> shapes) {
 		return Streams.stream(shapes).unordered()
-				.map(Area::new)
-				.collect(Area::new, Area::intersect, Area::intersect);
+				.<Shape>map(Function.identity())
+				.reduce((shape1, shape2) -> {
+					Area result = new Area(shape1);
+					result.intersect(new Area(shape2));
+					return result;
+				});
 	}
 
 	public static <T extends RectangularShape> T unPositionRectangularShape(T source, T destination) {

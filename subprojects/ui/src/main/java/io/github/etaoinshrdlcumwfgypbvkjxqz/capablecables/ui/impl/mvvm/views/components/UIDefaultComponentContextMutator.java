@@ -5,6 +5,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.comp
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentContextInternal;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentContextMutatorResult;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.modifiers.IUIComponentTransformChildrenModifier;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AffineTransformUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.AssertionUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.def.paths.IPath;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.graphics.impl.UIObjectUtilities;
@@ -36,8 +37,9 @@ public class UIDefaultComponentContextMutator
 
 		// COMMENT graphics
 		context.getGraphicsRef().ifPresent(graphics -> {
+			graphics.setTransform(AffineTransformUtilities.getIdentity()); // COMMENT need to un-transform it to set the clip absolutely
+			graphics.setClip(clipStack.peek());
 			graphics.setTransform(transformStack.element());
-			graphics.setClip(clipStack.peek()); // COMMENT automatically transforms
 		});
 
 		return UIImmutableComponentContextMutatorResult.of(pathEnd.get());
@@ -51,26 +53,27 @@ public class UIDefaultComponentContextMutator
 
 		// COMMENT transform
 		AffineTransform transform = (AffineTransform) AssertionUtilities.assertNonnull(transformStack.element()).clone();
-		transformStack.push(transform);
 		path.getPathEnd().ifPresent(presentPathEnd ->
 				IUIComponentTransformChildrenModifier.handleComponentModifiers(presentPathEnd,
 						presentPathEnd.getModifiersView(),
 						transform)
 		);
+		transformStack.push(transform);
 		// COMMENT path
 		path.subPath(Iterators.singletonIterator(element));
 		// COMMENT clip
 		Shape clip = UIObjectUtilities.intersectShapes(
-				Stream.of(clipStack.peek(), IUIComponent.getShape(element))
+				Stream.of(clipStack.peek(), transform.createTransformedShape(IUIComponent.getShape(element)))
 						.filter(Objects::nonNull)
 						.iterator()
-		);
+		).orElseThrow(AssertionError::new); // COMMENT must have at least 1 element
 		clipStack.push(clip);
 
 		// COMMENT graphics
 		context.getGraphicsRef().ifPresent(graphics -> {
+			graphics.setTransform(AffineTransformUtilities.getIdentity()); // COMMENT need to un-transform it to set the clip absolutely
+			graphics.setClip(clip);
 			graphics.setTransform(transform);
-			graphics.setClip(clip); // COMMENT automatically transforms
 		});
 
 		return UIImmutableComponentContextMutatorResult.of(element);
