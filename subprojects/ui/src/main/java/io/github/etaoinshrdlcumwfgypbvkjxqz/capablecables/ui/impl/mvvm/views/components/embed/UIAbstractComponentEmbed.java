@@ -26,7 +26,7 @@ public abstract class UIAbstractComponentEmbed<C extends IUIComponent>
 		this.embedInitializer = new OneUseRunnable(() ->
 				ownerReference.getOptional().ifPresent(owner1 -> {
 					owner1.addChildren(Iterators.singletonIterator(getComponent())); // COMMENT add to owner directly
-					getChildrenView().stream().unordered()
+					getChildrenView().stream()
 							.map(IUIComponentEmbed::getEmbedInitializer)
 							.forEach(Runnable::run);
 				})

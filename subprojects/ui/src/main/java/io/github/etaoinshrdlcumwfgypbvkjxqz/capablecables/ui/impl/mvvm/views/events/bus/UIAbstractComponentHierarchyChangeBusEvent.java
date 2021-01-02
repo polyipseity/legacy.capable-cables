@@ -16,8 +16,8 @@ public abstract class UIAbstractComponentHierarchyChangeBusEvent<T, V>
 	public static class Parent
 			extends UIAbstractComponentChangeBusEvent<Void, Optional<IUIComponent>> {
 		public Parent(EnumHookStage stage, IUIComponent component,
-		              @Nullable IUIComponent previous, @Nullable IUIComponent current) {
-			super(Void.class, stage, component, Optional.ofNullable(previous), Optional.ofNullable(current));
+		              @Nullable IUIComponent previous, @Nullable IUIComponent next) {
+			super(Void.class, stage, component, Optional.ofNullable(previous), Optional.ofNullable(next));
 		}
 	}
 

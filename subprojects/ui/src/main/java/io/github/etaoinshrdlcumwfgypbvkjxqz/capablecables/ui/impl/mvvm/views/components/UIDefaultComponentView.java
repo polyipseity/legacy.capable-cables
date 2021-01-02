@@ -536,17 +536,15 @@ public class UIDefaultComponentView<S extends Shape, M extends IUIComponentManag
 					IUIComponent component = event.getComponent();
 					@Nullable IUIComponentView<?, ?> nextOwner = event.getNext().flatMap(IUIComponent::getManager).flatMap(IUIComponentManager::getView).orElse(null);
 					if (owner.equals(nextOwner)) {
-						if (owner.getLifecycleStateTracker().containsState(EnumUILifecycleState.BOUND)) {
-							owner.getLifecycleStateTracker().getStateApplier(EnumUILifecycleState.BOUND)
-									.ifPresent(stateApplier ->
-											IUIComponentView.traverseComponentTreeDefault(component,
-													component1 ->
-															IUIComponentStructureLifecycleModifier.handleComponentModifiers(component1,
-																	component1.getModifiersView(),
-																	stateApplier),
-													FunctionUtilities.getEmptyBiConsumer())
-									);
-						}
+						owner.getLifecycleStateTracker().getStateApplier(EnumUILifecycleState.BOUND)
+								.ifPresent(stateApplier ->
+										IUIComponentView.traverseComponentTreeDefault(component,
+												component1 ->
+														IUIComponentStructureLifecycleModifier.handleComponentModifiers(component1,
+																component1.getModifiersView(),
+																stateApplier),
+												FunctionUtilities.getEmptyBiConsumer())
+								);
 						if (owner.getLifecycleStateTracker().containsState(EnumUILifecycleState.INITIALIZED)) {
 							try (IUIComponentContext componentContext = IUIComponent.createContextTo(component)) {
 								IUIComponentView.<RuntimeException>traverseComponentTreeDefault(componentContext, // TODO javac bug, need explicit type arguments
@@ -561,12 +559,6 @@ public class UIDefaultComponentView<S extends Shape, M extends IUIComponentManag
 					} else {
 						@Nullable IUIComponentView<?, ?> previousOwner = event.getPrevious().flatMap(IUIComponent::getManager).flatMap(IUIComponentManager::getView).orElse(null);
 						if (owner.equals(previousOwner)) {
-							IUIComponentView.traverseComponentTreeDefault(component,
-									component1 ->
-											IUIComponentStructureLifecycleModifier.handleComponentModifiers(component1,
-													component.getModifiersView(),
-													IUIStructureLifecycle::unbindV),
-									FunctionUtilities.getEmptyBiConsumer());
 							try (IUIComponentContext componentContext = IUIComponent.createContextTo(component)) {
 								IUIComponentView.<RuntimeException>traverseComponentTreeDefault(componentContext, // TODO javac bug, need explicit type arguments
 										component,
@@ -576,6 +568,12 @@ public class UIDefaultComponentView<S extends Shape, M extends IUIComponentManag
 														modifier -> modifier.cleanup(componentContext1)),
 										IConsumer3.StaticHolder.getEmpty());
 							}
+							IUIComponentView.traverseComponentTreeDefault(component,
+									component1 ->
+											IUIComponentStructureLifecycleModifier.handleComponentModifiers(component1,
+													component.getModifiersView(),
+													IUIStructureLifecycle::unbindV),
+									FunctionUtilities.getEmptyBiConsumer());
 						}
 					}
 				});

@@ -499,7 +499,7 @@ public class UIDefaultComponent
 				.ifPresent(view -> {
 					@SuppressWarnings("UnstableApiUsage")
 					Iterable<? extends IUIRendererContainer<?>> rendererContainers =
-							Iterables.concat(ImmutableSet.of(getRendererContainer()),
+							Iterables.concat(ImmutableList.of(getRendererContainer()),
 									getExtensions().values().stream().unordered()
 											.filter(IUIRendererContainerContainer.class::isInstance)
 											.<IUIRendererContainerContainer<?>>map(IUIRendererContainerContainer.class::cast)

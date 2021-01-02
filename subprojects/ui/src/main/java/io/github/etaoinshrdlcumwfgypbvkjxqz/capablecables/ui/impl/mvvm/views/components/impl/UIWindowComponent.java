@@ -369,7 +369,7 @@ public class UIWindowComponent
 	@Override
 	protected Iterable<? extends IUIComponentEmbed<?>> getComponentEmbeds() {
 		return Iterables.concat(super.getComponentEmbeds(),
-				ImmutableSet.of(
+				ImmutableList.of(
 						getControlsEmbed(), getContentPaneEmbed() // COMMENT controls on top of content pane
 				));
 	}
