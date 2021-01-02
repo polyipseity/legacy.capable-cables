@@ -67,11 +67,12 @@ public class DefaultBinder
 							LoadingCache<IIdentifier, IBindings<?>> typeBindings = getBindings().getUnchecked(AssertionUtilities.assertNonnull(typeEntry.getKey()));
 							return AssertionUtilities.assertNonnull(typeEntry.getValue()).asMap().entrySet().stream() // COMMENT sequential, field binding order matters
 									.mapToInt(IThrowingToIntFunction.<Map.Entry<IIdentifier, ? extends Collection<? extends IBinding<?>>>,
-											NoSuchBindingTransformerException>executeNow(entry -> padBool(
-											typeBindings.getUnchecked(AssertionUtilities.assertNonnull(entry.getKey()))
-													.add(CastUtilities.castUnchecked( // COMMENT should be of the right type
-															AssertionUtilities.assertNonnull(entry.getValue())))
-									)));
+											NoSuchBindingTransformerException>executeNow(entry -> {
+										assert entry.getKey() != null;
+										assert entry.getValue() != null;
+										return padBool(typeBindings.getUnchecked(entry.getKey())
+												.add(CastUtilities.castUnchecked(entry.getValue().iterator() /* COMMENT should be of the right type */)));
+									}));
 						}))
 						.reduce(fBool(), PaddedBool::orBool)
 		);
@@ -104,11 +105,13 @@ public class DefaultBinder
 						.flatMapToInt(typeEntry -> {
 							LoadingCache<IIdentifier, IBindings<?>> typeBindings = getBindings().getUnchecked(AssertionUtilities.assertNonnull(typeEntry.getKey()));
 							return AssertionUtilities.assertNonnull(typeEntry.getValue()).asMap().entrySet().stream() // COMMENT sequential, field binding order matters
-									.mapToInt(entry -> padBool(
-											typeBindings.getUnchecked(AssertionUtilities.assertNonnull(entry.getKey()))
-													.remove(CastUtilities.castUnchecked( // COMMENT should be of the right type
-															AssertionUtilities.assertNonnull(entry.getValue())))
-									));
+									.mapToInt(IThrowingToIntFunction.<Map.Entry<IIdentifier, ? extends Collection<? extends IBinding<?>>>,
+											NoSuchBindingTransformerException>executeNow(entry -> {
+										assert entry.getKey() != null;
+										assert entry.getValue() != null;
+										return padBool(typeBindings.getUnchecked(entry.getKey())
+												.remove(CastUtilities.castUnchecked(entry.getValue().iterator() /* COMMENT should be of the right type */)));
+									}));
 						})
 						.reduce(fBool(), PaddedBool::orBool)
 		);
