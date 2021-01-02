@@ -2,6 +2,7 @@ package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.collections
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 
@@ -23,7 +24,7 @@ public class ListBackedDeque<E>
 		this.reverseData = Lists.reverse(this.data);
 	}
 
-	public static <E> ListBackedDeque<E> ofImmutable(Iterable<? extends E> data) {
+	public static <E> @Immutable ListBackedDeque<E> ofImmutable(Iterable<? extends E> data) {
 		return new ListBackedDeque<>(ImmutableList::copyOf, data);
 	}
 
