@@ -85,8 +85,7 @@ public enum EventBusUtilities {
 			ThrowableUtilities.getQuietly(() -> suppressBoxing(
 					(int) getBusIdGetterMethodHandle().invokeExact((EventBus) bus)
 			), Throwable.class, UtilitiesConfiguration.getInstance().getThrowableHandler())
-					.ifPresent(id ->
-							EventListenerHelper.getListenerList(eventType).getListeners(suppressUnboxing(id)));
+					.ifPresent(id -> EventListenerHelper.getListenerList(eventType).getListeners(suppressUnboxing(id)));
 		}
 	}
 

@@ -4,7 +4,6 @@ import com.google.common.reflect.TypeToken;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.def.IIdentifier;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.binding.def.methods.IBindingMethodSource;
-import io.reactivex.rxjava3.processors.MulticastProcessor;
 import io.reactivex.rxjava3.processors.PublishProcessor;
 import org.reactivestreams.Processor;
 import org.reactivestreams.Publisher;
@@ -23,7 +22,7 @@ public final class ImmutableBindingMethodSource<T>
 	private ImmutableBindingMethodSource(Class<T> type, @Nullable IIdentifier bindingKey) {
 		this.typeToken = TypeToken.of(type);
 		this.bindingKey = bindingKey;
-		this.notifierProcessor = PublishProcessor.<T>create().subscribeWith(MulticastProcessor.create());
+		this.notifierProcessor = PublishProcessor.create(); // COMMENT discard overflown ones to avoid references to the argument objects
 	}
 
 	public static <T> ImmutableBindingMethodSource<T> of(Class<T> type, @Nullable IIdentifier bindingKey) {

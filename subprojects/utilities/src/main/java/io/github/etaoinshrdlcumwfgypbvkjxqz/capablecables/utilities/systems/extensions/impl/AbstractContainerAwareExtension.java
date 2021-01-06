@@ -49,7 +49,9 @@ public abstract class AbstractContainerAwareExtension<K, C extends IExtensionCon
 
 	@Override
 	@OverridingMethodsMustInvokeSuper
-	public void onExtensionRemoved() { setContainer(null); }
+	public void onExtensionRemoved() {
+		setContainer(null);
+	}
 
 	@SuppressWarnings("UnstableApiUsage")
 	@Override
