@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 
 public abstract class AbstractParsedSupplier<P, T>
 		implements ICompatibilitySupplier<T> {
-	private final Supplier<P> lazyParsed = Suppliers.memoize(this::parse);
+	private Supplier<P> lazyParsed = Suppliers.memoize(this::parse);
 
 	protected abstract P parse();
 
@@ -19,8 +19,17 @@ public abstract class AbstractParsedSupplier<P, T>
 
 	protected abstract T transform(P parsed);
 
+	@SuppressWarnings("unused") // COMMENT intended for debugging
+	public void reparse() {
+		setLazyParsed(Suppliers.memoize(this::parse));
+	}
+
 	protected Supplier<? extends P> getLazyParsed() {
 		return lazyParsed;
+	}
+
+	protected void setLazyParsed(Supplier<P> lazyParsed) {
+		this.lazyParsed = lazyParsed;
 	}
 
 	public static class Functional<P, T>
