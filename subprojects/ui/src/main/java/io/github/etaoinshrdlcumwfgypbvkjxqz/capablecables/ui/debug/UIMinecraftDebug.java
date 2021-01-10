@@ -5,8 +5,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterators;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nonnull;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.ComponentTheme;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.jaxb.subprojects.ui.ui.ComponentUI;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConfiguration;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIFacade;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.animations.IUIAnimationControl;
@@ -19,7 +17,6 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.comp
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.components.IUIComponentView;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.events.IUIEvent;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.parsers.adapters.registries.IJAXBAdapterRegistry;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.shapes.descriptors.IShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.shapes.interactions.IShapeDescriptorProvider;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.theming.IUITheme;
@@ -34,8 +31,9 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.com
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIButtonComponent;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIDefaultComponentManager;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIWindowComponent;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.AbstractParsedSupplier;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.ParserUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.UIDefaultComponentSchemaHolder;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.parsers.adapters.JAXBImmutableAdapterContext;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.shapes.descriptors.RectangularShapeDescriptor;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.theming.UIEmptyTheme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.minecraft.impl.mvvm.adapters.AbstractContainerScreenAdapter;
@@ -60,10 +58,8 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.bind
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.def.IExtension;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.extensions.def.IExtensionContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.def.IPointerDevice;
-import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.time.impl.Tickers;
 import io.netty.buffer.Unpooled;
-import jakarta.xml.bind.JAXBException;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -96,8 +92,6 @@ import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ConcurrentModificationException;
 import java.util.Optional;
 import java.util.Random;
@@ -148,40 +142,25 @@ public enum UIMinecraftDebug {
 
 		public static final @NonNls String COMPONENT_TEST_XML_PATH = "component-UI-test.xml";
 		public static final @NonNls String COMPONENT_TEST_THEME_XML_PATH = "components-UI-test-theme.xml";
-		private static final ComponentUI JAXB_VIEW;
-		private static final ComponentTheme JAXB_THEME;
+		private static final Supplier<IUIComponentView<?, ?>> VIEW_SUPPLIER = AbstractParsedSupplier.Functional.of(
+				() -> ParserUtilities.parseJAXBResource(UIDefaultComponentSchemaHolder.getContext(),
+						DebugUI.class,
+						getComponentTestXMLPath(),
+						UIConfiguration.getInstance().getThrowableHandler()),
+				parsed -> (IUIComponentView<?, ?>) ParserUtilities.transformJAXBResource(UIDefaultComponentSchemaHolder.getAdapterRegistry(), parsed)
+		);
+		private static final Supplier<IUITheme> THEME_SUPPLIER = AbstractParsedSupplier.Functional.of(
+				() -> ParserUtilities.parseJAXBResource(UIDefaultComponentSchemaHolder.getContext(),
+						DebugUI.class,
+						getComponentTestThemeXMLPath(),
+						UIConfiguration.getInstance().getThrowableHandler()),
+				parsed -> (IUITheme) ParserUtilities.transformJAXBResource(UIDefaultComponentSchemaHolder.getAdapterRegistry(), parsed)
+		);
 
 		static {
-			{
-				// COMMENT view parser
-				InputStream is = AssertionUtilities.assertNonnull(DebugUI.class.getResourceAsStream(getComponentTestXMLPath()));
-				try {
-					try {
-						JAXB_VIEW = (ComponentUI) UIDefaultComponentSchemaHolder.getContext().createUnmarshaller().unmarshal(is);
-					} catch (JAXBException e) {
-						throw ThrowableUtilities.propagate(e);
-					}
-				} finally {
-					ThrowableUtilities.runQuietly(is::close, IOException.class, UIConfiguration.getInstance().getThrowableHandler());
-				}
-			}
-			{
-				// COMMENT theme parser
-				InputStream is = AssertionUtilities.assertNonnull(DebugUI.class.getResourceAsStream(getComponentTestThemeXMLPath()));
-				try {
-					try {
-						JAXB_THEME = (ComponentTheme) UIDefaultComponentSchemaHolder.getContext().createUnmarshaller().unmarshal(is);
-					} catch (JAXBException e) {
-						throw ThrowableUtilities.propagate(e);
-					}
-				} finally {
-					ThrowableUtilities.runQuietly(is::close, IOException.class, UIConfiguration.getInstance().getThrowableHandler());
-				}
-			}
-
 			// COMMENT early check
-			IUIComponentView<?, ?> view = createView();
-			IUITheme theme = createTheme();
+			IUIComponentView<?, ?> view = getViewSupplier().get();
+			IUITheme theme = getThemeSupplier().get();
 			IUIView.getThemeStack(view).push(theme);
 		}
 
@@ -190,6 +169,33 @@ public enum UIMinecraftDebug {
 		private static String getComponentTestXMLPath() { return COMPONENT_TEST_XML_PATH; }
 
 		private static String getComponentTestThemeXMLPath() { return COMPONENT_TEST_THEME_XML_PATH; }
+
+		private static AbstractContainerScreenAdapter<?, DebugContainer> createUI(DebugContainer container) {
+			IBinder binder = new DefaultBinder();
+			// COMMENT Color <-> Integer
+			binder.addTransformer(EnumBindingType.FIELD, (@Nonnull Color color) -> suppressBoxing(color.getRGB()));
+			binder.addTransformer(EnumBindingType.FIELD, ColorUtilities::ofRGBA);
+
+			AbstractContainerScreenAdapter<?, DebugContainer> screen =
+					UIFacade.Minecraft.createScreen(
+							getDisplayName(),
+							UIFacade.Minecraft.createInfrastructure(
+									getViewSupplier().get(),
+									new ViewModel(),
+									binder
+							),
+							container);
+			IUITheme theme = getThemeSupplier().get();
+
+			IUIView<?> view = screen.getInfrastructure().getView();
+			IUIView.getThemeStack(view).push(theme);
+
+			return screen;
+		}
+
+		private static Supplier<IUIComponentView<?, ?>> getViewSupplier() {
+			return VIEW_SUPPLIER;
+		}
 
 		@Override
 		public @Nonnull AbstractContainerScreenAdapter<?, DebugContainer> create(DebugContainer container, PlayerInventory inv, ITextComponent title) {
@@ -241,49 +247,8 @@ public enum UIMinecraftDebug {
 					container);
 		}
 
-		private static AbstractContainerScreenAdapter<?, DebugContainer> createUI(DebugContainer container) {
-			IBinder binder = new DefaultBinder();
-			// COMMENT Color <-> Integer
-			binder.addTransformer(EnumBindingType.FIELD, (@Nonnull Color color) -> suppressBoxing(color.getRGB()));
-			binder.addTransformer(EnumBindingType.FIELD, ColorUtilities::ofRGBA);
-
-			AbstractContainerScreenAdapter<?, DebugContainer> screen =
-					UIFacade.Minecraft.createScreen(
-							getDisplayName(),
-							UIFacade.Minecraft.createInfrastructure(
-									createView(),
-									new ViewModel(),
-									binder
-							),
-							container);
-			IUITheme theme = createTheme();
-
-			IUIView<?> view = screen.getInfrastructure().getView();
-			IUIView.getThemeStack(view).push(theme);
-
-			return screen;
-		}
-
-		private static IUIComponentView<?, ?> createView() {
-			return (IUIComponentView<?, ?>) IJAXBAdapterRegistry.adaptFromJAXB(
-					JAXBImmutableAdapterContext.of(UIDefaultComponentSchemaHolder.getAdapterRegistry()),
-					getJAXBView()
-			);
-		}
-
-		private static IUITheme createTheme() {
-			return (IUITheme) IJAXBAdapterRegistry.adaptFromJAXB(
-					JAXBImmutableAdapterContext.of(UIDefaultComponentSchemaHolder.getAdapterRegistry()),
-					getJAXBTheme()
-			);
-		}
-
-		public static ComponentUI getJAXBView() {
-			return JAXB_VIEW;
-		}
-
-		public static ComponentTheme getJAXBTheme() {
-			return JAXB_THEME;
+		private static Supplier<IUITheme> getThemeSupplier() {
+			return THEME_SUPPLIER;
 		}
 
 		@SuppressWarnings("unused")
