@@ -30,7 +30,7 @@ public enum ThrowableUtilities {
 	public static RuntimeException propagate(Throwable throwable)
 			throws RuntimeException, Error { throw propagate(throwable, ThrowableUtilities::wrap); }
 
-	@SuppressWarnings({"ThrowCaughtLocally", "RedundantThrows"})
+	@SuppressWarnings("ThrowCaughtLocally")
 	public static <T extends Throwable, R extends Throwable> RuntimeException propagate(T throwable,
 	                                                                                    Function<@Nonnull ? super T, @Nonnull ? extends R> checkedWrapper)
 			throws R, RuntimeException, Error {
@@ -89,14 +89,14 @@ public enum ThrowableUtilities {
 
 	public static void logCatch(Throwable t, Logger logger) { LoggingUtilities.getXLogger(logger).catching(XLogger.Level.DEBUG, t); }
 
-	public static <TH extends Throwable> void runQuietly(IThrowingRunnable<? extends TH> lambda, Class<TH> throwableClass, IThrowableHandler<? super Throwable> handler) {
+	public static <TH extends Throwable> void runQuietly(IThrowingRunnable<? extends TH> lambda, Class<TH> throwableClass, IThrowableHandler<? super TH> handler) {
 		getQuietly(() -> {
 			lambda.run();
 			return null;
 		}, throwableClass, handler);
 	}
 
-	public static <V, TH extends Throwable> Optional<V> getQuietly(IThrowingSupplier<V, ? extends TH> lambda, Class<TH> throwableClass, IThrowableHandler<? super Throwable> handler) {
+	public static <V, TH extends Throwable> Optional<V> getQuietly(IThrowingSupplier<V, ? extends TH> lambda, Class<TH> throwableClass, IThrowableHandler<? super TH> handler) {
 		try {
 			return Optional.ofNullable(lambda.get());
 		} catch (Throwable throwable) {
