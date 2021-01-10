@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<componentUI xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui"
+             xsi:schemaLocation="https://github.com/etaoinshrdlcumwfgypbvkjxqz/Capable-Cables/schemas/ui ../../config/ui.xsd"
+             xml:lang="EN">
+	<!-- SECTION using -->
+
+	<using alias="shape.rectangle" target="java.awt.geom.Rectangle2D"/>
+
+	<using alias="view.default"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultComponentView"/>
+
+	<using alias="component.manager"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIDefaultComponentManager"/>
+	<using alias="component.window"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIWindowComponent"/>
+	<using alias="component.list"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIListComponent"/>
+
+
+	<!-- SECTION view -->
+	<view class="view.default"/>
+
+
+	<!-- SECTION components -->
+	<component class="component.manager" name="Manager" rendererName="ManagerRenderer">
+		<shape class="shape.rectangle"/>
+
+		<component class="component.window" name="PaletteWindow" rendererName="PaletteWindowRenderer">
+			<shape class="shape.rectangle" width="100" height="500"/>
+
+			<!-- TODO window title -->
+
+			<component class="component.list" name="PaletteList" rendererName="PaletteListRenderer">
+				<shape class="shape.rectangle"/>
+
+				<anchor target="PaletteWindow.window.content_pane" originSide="UP" targetSide="UP"/>
+				<anchor target="PaletteWindow.window.content_pane" originSide="RIGHT" targetSide="RIGHT"/>
+				<anchor target="PaletteWindow.window.content_pane" originSide="DOWN" targetSide="DOWN"/>
+				<anchor target="PaletteWindow.window.content_pane" originSide="LEFT" targetSide="LEFT"/>
+
+				<property key="default:property.list.data" bindingKey="view:default.palette"/>
+			</component>
+		</component>
+	</component>
+</componentUI>

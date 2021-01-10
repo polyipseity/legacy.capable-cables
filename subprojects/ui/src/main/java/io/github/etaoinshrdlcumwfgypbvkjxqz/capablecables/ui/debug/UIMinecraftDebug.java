@@ -159,9 +159,7 @@ public enum UIMinecraftDebug {
 
 		static {
 			// COMMENT early check
-			IUIComponentView<?, ?> view = getViewSupplier().get();
-			IUITheme theme = getThemeSupplier().get();
-			IUIView.getThemeStack(view).push(theme);
+			IUIView.withThemes(getViewSupplier().get(), Iterators.singletonIterator(getThemeSupplier().get()));
 		}
 
 		private boolean useCode = false;

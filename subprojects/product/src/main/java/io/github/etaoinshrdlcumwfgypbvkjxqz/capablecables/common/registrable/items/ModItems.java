@@ -6,6 +6,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.blo
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.common.registrable.items.groups.ModItemGroups;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.UIConstants;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.debug.UIMinecraftDebug;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.designer.impl.minecraft.UIMinecraftDesignerBootstrap;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.compile.EnumBuildType;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -22,14 +23,19 @@ public enum ModItems {
 
 	private static final RegistryObject<Item> CABLE = getRegister().register(ModBlocks.getCable().getId().getPath(), () -> new BlockItem(ModBlocks.getCable().orElseThrow(InternalError::new), new Item.Properties().group(ModItemGroups.getDefault())));
 
-	@SuppressWarnings("unused")
-	@Nullable
-	private static final RegistryObject<Item> DEBUG_UI;
+	private static final @Nullable RegistryObject<Item> UI_DESIGNER;
+	private static final @Nullable RegistryObject<Item> DEBUG_UI;
 
 	static {
-		DEBUG_UI = UIConstants.getBuildType() == EnumBuildType.DEBUG
-				? getRegister().register(UIMinecraftDebug.getPath(), () -> new BlockItem(UIMinecraftDebug.getBlockEntry(), new Item.Properties().group(ModItemGroups.getDefault())))
-				: null;
+		if (UIConstants.getBuildType() == EnumBuildType.DEBUG) {
+			UI_DESIGNER = getRegister().register(UIMinecraftDesignerBootstrap.getPath(),
+					() -> new BlockItem(UIMinecraftDesignerBootstrap.getBlockEntry(), new Item.Properties().group(ModItemGroups.getDefault())));
+			DEBUG_UI = getRegister().register(UIMinecraftDebug.getPath(),
+					() -> new BlockItem(UIMinecraftDebug.getBlockEntry(), new Item.Properties().group(ModItemGroups.getDefault())));
+		} else {
+			UI_DESIGNER = null;
+			DEBUG_UI = null;
+		}
 	}
 
 	public static DeferredRegister<Item> getRegister() {
@@ -48,5 +54,11 @@ public enum ModItems {
 	@Nullable
 	private static RegistryObject<Item> getDebugUI() {
 		return DEBUG_UI;
+	}
+
+	@SuppressWarnings("unused")
+	@Nullable
+	private static RegistryObject<Item> getUIDesigner() {
+		return UI_DESIGNER;
 	}
 }

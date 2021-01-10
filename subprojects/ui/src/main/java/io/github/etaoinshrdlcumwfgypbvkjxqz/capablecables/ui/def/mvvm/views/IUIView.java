@@ -7,6 +7,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.IUISubInfr
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.events.IUIEventTarget;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.mvvm.views.rendering.IUIRendererContainer;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.naming.INamedTrackers;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.theming.IUITheme;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.def.theming.IUIThemeStack;
 
 import java.awt.*;
@@ -40,6 +41,11 @@ public interface IUIView<S extends Shape>
 
 	static void unregisterRendererContainers(IUIView<?> instance, Iterator<? extends IUIRendererContainer<?>> rendererContainers) {
 		IUIView.getNamedTrackers(instance).remove(IUIRendererContainer.class, rendererContainers);
+	}
+
+	static <T extends IUIView<?>> T withThemes(T instance, Iterator<? extends IUITheme> themes) {
+		themes.forEachRemaining(getThemeStack(instance)::push);
+		return instance;
 	}
 
 	IUIEventTarget getTargetAtPoint(Point2D point);
