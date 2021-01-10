@@ -108,7 +108,7 @@ public class UITeleportingComponentUserResizableExtension<C extends IUIComponent
 		super((Class<C>) arguments.getContainerClass());
 
 		this.rendererContainerContainer =
-				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this), UIComponentUserResizeableExtensionEmptyResizingRenderer.class);
+				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this), UIDefaultComponentUserResizableExtensionPreviewingResizingRenderer.class);
 
 		Map<IIdentifier, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.targetComponent = IUIPropertyMappingValue.createBindingField(String.class, ConstantValue.of(""), mappings.get(getPropertyTargetComponentIdentifier()));

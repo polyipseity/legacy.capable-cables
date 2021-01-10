@@ -103,7 +103,7 @@ public class UITeleportingComponentUserRelocatableExtension<C extends IUICompone
 		super((Class<C>) arguments.getContainerClass());
 
 		this.rendererContainerContainer =
-				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this), UIComponentUserRelocatableExtensionEmptyRelocatingRenderer.class);
+				UIDefaultRendererContainerContainer.ofDefault(arguments.getRendererName().orElse(null), suppressThisEscapedWarning(() -> this), UIDefaultComponentUserRelocatableExtensionPreviewingRelocatingRenderer.class);
 
 		Map<IIdentifier, IUIPropertyMappingValue> mappings = arguments.getMappingsView();
 		this.targetComponent = IUIPropertyMappingValue.createBindingField(String.class, ConstantValue.of(""), mappings.get(getPropertyTargetComponentIdentifier()));
