@@ -18,4 +18,8 @@ public interface IRegistry<K, V>
 	boolean containsKey(Object key);
 
 	boolean containsValue(Object value);
+
+	Publisher<Map.@Immutable Entry<K, V>> getPublisher();
+
+	@Immutable Map<K, IRegistryObject<? extends V>> asMapView();
 }
