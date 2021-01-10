@@ -25,10 +25,12 @@
 			<xs:selector xpath=".//ui:component"/>
 			<xs:field xpath="@name"/>
 		</xs:key>
+		<!-- CODE
 		<xs:keyref name="componentUIComponentIDRef" refer="ui:componentUIComponentName">
-			<xs:selector xpath=".//ui:anchor"/>
-			<xs:field xpath="@target"/>
+		<xs:selector xpath=".//ui:anchor"/>
+		<xs:field xpath="@target"/>
 		</xs:keyref>
+		-->
 		<!-- COMMENT renderer container name -->
 		<xs:key name="componentUIRendererName">
 			<xs:selector xpath=".//ui:component|ui:extension"/>
