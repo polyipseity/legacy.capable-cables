@@ -5,11 +5,14 @@
              xml:lang="EN">
 	<!-- SECTION using -->
 
+	<!-- COMMENT shape -->
 	<using alias="shape.rectangle" target="java.awt.geom.Rectangle2D"/>
 
+	<!-- COMMENT view -->
 	<using alias="view.default"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.UIDefaultComponentView"/>
 
+	<!-- COMMENT component -->
 	<using alias="component.manager"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIDefaultComponentManager"/>
 	<using alias="component.window"
@@ -17,12 +20,18 @@
 	<using alias="component.list"
 	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.impl.UIListComponent"/>
 
+	<!-- COMMENT extension -->
+	<using alias="extension.user_relocatable"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.relocatable.UITeleportingComponentUserRelocatableExtension"/>
+	<using alias="extension.user_resizable"
+	       target="io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.ui.impl.mvvm.views.components.extensions.resizable.UITeleportingComponentUserResizableExtension"/>
+
 
 	<!-- SECTION view -->
 	<view class="view.default"/>
 
 
-	<!-- SECTION components -->
+	<!-- SECTION component -->
 	<component class="component.manager" name="Manager" rendererName="ManagerRenderer">
 		<shape class="shape.rectangle"/>
 
@@ -30,6 +39,17 @@
 			<shape class="shape.rectangle" width="100" height="500"/>
 
 			<!-- TODO window title -->
+
+			<extension class="extension.user_resizable" rendererName="PaletteWindowResizableExtensionRenderer"/>
+
+			<componentEmbed name="controls">
+				<extension class="extension.user_relocatable" rendererName="PaletteWindowRelocatableExtensionRenderer">
+					<!-- COMMENT on controls because the trigger area is only valid for the component itself -->
+					<property key="default:property.teleporting.target">
+						<string>PaletteWindow</string>
+					</property>
+				</extension>
+			</componentEmbed>
 
 			<component class="component.list" name="PaletteList" rendererName="PaletteListRenderer">
 				<shape class="shape.rectangle"/>
