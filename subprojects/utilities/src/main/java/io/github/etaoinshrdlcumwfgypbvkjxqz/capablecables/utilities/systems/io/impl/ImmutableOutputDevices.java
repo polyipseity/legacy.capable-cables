@@ -1,87 +1,58 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.impl;
 
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Nullable;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.def.IGraphicsDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.def.IOutputDevices;
-import sun.misc.Cleaner;
 
-import javax.annotation.WillClose;
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.WillNotClose;
-import java.awt.*;
 import java.util.Optional;
-
-import static io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.SuppressWarningsUtilities.suppressThisEscapedWarning;
 
 public final class ImmutableOutputDevices
 		implements IOutputDevices {
-	private final @Nullable Graphics2D graphics;
+	private final @Nullable IGraphicsDevice graphicsDevice;
 
-	protected ImmutableOutputDevices(@Nullable @WillCloseWhenClosed Graphics2D graphics) {
-		this.graphics = graphics;
-
-		registerGraphicsDisposer(suppressThisEscapedWarning(() -> this), this.graphics);
+	protected ImmutableOutputDevices(@Nullable IGraphicsDevice graphicsDevice) {
+		this.graphicsDevice = graphicsDevice;
 	}
 
-	protected static void registerGraphicsDisposer(Object referent, @Nullable @WillClose Graphics2D graphics) {
-		if (graphics != null)
-			Cleaner.create(referent, graphics::dispose);
-	}
-
-	private static ImmutableOutputDevices of(@Nullable @WillNotClose Graphics2D graphics) {
-		return new ImmutableOutputDevices(
-				(Graphics2D) Optional.ofNullable(graphics)
-						.map(Graphics::create)
-						.orElse(null)
-		);
+	private static ImmutableOutputDevices of(@Nullable IGraphicsDevice graphicsDevice) {
+		return new ImmutableOutputDevices(graphicsDevice);
 	}
 
 	@Override
-	public Optional<? extends Graphics2D> createGraphics() {
-		return getGraphics()
-				.map(Graphics::create)
-				.map(Graphics2D.class::cast);
-	}
-
-	protected Optional<? extends Graphics2D> getGraphics() {
-		return Optional.ofNullable(graphics);
+	public Optional<? extends IGraphicsDevice> getGraphicsDevice() {
+		return Optional.ofNullable(graphicsDevice);
 	}
 
 	public static class Builder {
-		private @Nullable Graphics2D graphics;
+		private @Nullable IGraphicsDevice graphicsDevice;
 
 		public Builder(IOutputDevices source) {
 			this();
-
-			this.graphics = source.createGraphics().orElse(null);
-
-			registerGraphicsDisposer(suppressThisEscapedWarning(() -> this), this.graphics);
+			this.graphicsDevice = source.getGraphicsDevice().orElse(null);
 		}
 
 		public Builder() {}
 
 		public Builder snapshot() {
-			// COMMENT graphics cloned
+			getGraphicsDevice()
+					.map(ImmutableGraphicsDevice::of)
+					.ifPresent(this::setGraphicsDevice);
+			return this;
+		}
+
+		protected Optional<? extends IGraphicsDevice> getGraphicsDevice() {
+			return Optional.ofNullable(graphicsDevice);
+		}
+
+		public Builder setGraphicsDevice(@Nullable IGraphicsDevice graphicsDevice) {
+			this.graphicsDevice = graphicsDevice;
 			return this;
 		}
 
 		public ImmutableOutputDevices build() {
 			return of(
-					getGraphics().orElse(null) // COMMENT graphics automatically cloned
+					getGraphicsDevice().orElse(null)
 			);
-		}
-
-		public Builder setGraphics(@Nullable @WillNotClose Graphics2D graphics) {
-			getGraphics().ifPresent(Graphics::dispose);
-			this.graphics = (Graphics2D) Optional.ofNullable(graphics)
-					.map(Graphics::create)
-					.orElse(null);
-			registerGraphicsDisposer(this, this.graphics);
-			return this;
-		}
-
-
-		protected Optional<? extends Graphics2D> getGraphics() {
-			return Optional.ofNullable(graphics);
 		}
 	}
 }

@@ -14,6 +14,7 @@ import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.CapacityUtil
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.dynamic.DynamicUtilities;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.def.paths.IPath;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.structures.impl.paths.FunctionalPath;
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.def.IGraphicsDevice;
 import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.throwable.impl.ThrowableUtilities;
 import sun.misc.Cleaner;
 
@@ -60,7 +61,9 @@ public class UIDefaultComponentContext
 		this.viewContext = viewContext;
 		this.view = view;
 		this.mutator = mutator;
-		this.graphics = viewContext.getOutputDevices().createGraphics().orElse(null);
+		this.graphics = viewContext.getOutputDevices().getGraphicsDevice()
+				.map(IGraphicsDevice::createGraphics)
+				.orElse(null);
 
 		this.path = new FunctionalPath<>(ImmutableList.of(), Lists::newArrayList);
 		this.transformStack = new ArrayDeque<>(CapacityUtilities.getInitialCapacityMedium());

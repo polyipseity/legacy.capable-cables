@@ -1,8 +1,8 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.io.def;
 
-import java.util.Optional;
+import java.awt.*;
 
 @SuppressWarnings("InterfaceMayBeAnnotatedFunctional")
-public interface IOutputDevices {
-	Optional<? extends IGraphicsDevice> getGraphicsDevice();
+public interface IGraphicsDevice {
+	Graphics2D createGraphics();
 }
