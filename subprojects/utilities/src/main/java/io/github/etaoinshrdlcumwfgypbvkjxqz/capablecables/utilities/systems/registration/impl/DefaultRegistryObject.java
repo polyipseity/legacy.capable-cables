@@ -8,11 +8,17 @@ public class DefaultRegistryObject<V>
 	@SuppressWarnings("NonSerializableFieldInSerializableClass")
 	private V value;
 
-	public DefaultRegistryObject(V value) { this.value = value; }
+	public DefaultRegistryObject(V value) {
+		this.value = value;
+	}
 
 	@Override
-	public V getValue() { return value; }
+	public V getValue() {
+		return value;
+	}
 
 	@Override
-	public void setValue(V value) { this.value = value; }
+	public void setValue(V value) {
+		this.value = value;
+	}
 }

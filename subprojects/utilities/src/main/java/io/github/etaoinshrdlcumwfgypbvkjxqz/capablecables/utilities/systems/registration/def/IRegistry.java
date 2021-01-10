@@ -1,6 +1,10 @@
 package io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.utilities.systems.registration.def;
 
+import io.github.etaoinshrdlcumwfgypbvkjxqz.capablecables.annotations.Immutable;
+import org.reactivestreams.Publisher;
+
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Optional;
 
 public interface IRegistry<K, V>
