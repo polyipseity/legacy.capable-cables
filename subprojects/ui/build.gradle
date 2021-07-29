@@ -17,8 +17,7 @@ def compileJava = tasks.named 'compileJava'
 
 // COMMENT JAXB
 dependencies {
-	// TODO jaxb 'codes.rafael.xjc:nullsafe:1.1'
-	jaxb files('libs/nullsafe-1.2-SNAPSHOT.jar')
+	jaxb 'codes.rafael.xjc:nullsafe:1.2'
 }
 File xjcMainUIGeneratedDir = file "${getGeneratedDirectory.call 'main'}${separator}xjc_ui"
 CharSequence xjcMainUIContextPath = "${jaxbPackagePrefix}.ui"
